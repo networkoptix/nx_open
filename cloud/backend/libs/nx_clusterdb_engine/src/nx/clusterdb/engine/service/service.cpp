@@ -20,8 +20,20 @@ Service::Service(
     char **argv)
     :
     base_type(argc, argv, "nx::clusterdb::engine service"),
-    m_applicationId(applicationId)
+    m_applicationId(applicationId),
+    m_protocolVersionRange(ProtocolVersionRange::any)
 {
+}
+
+void Service::setSupportedProtocolRange(
+    const ProtocolVersionRange& protocolVersionRange)
+{
+    m_protocolVersionRange = protocolVersionRange;
+}
+
+ProtocolVersionRange Service::protocolVersionRange() const
+{
+    return m_protocolVersionRange;
 }
 
 std::vector<network::SocketAddress> Service::httpEndpoints() const
@@ -85,7 +97,11 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     Model model(settings);
     m_model = &model;
 
-    Controller controller(m_applicationId, settings, &model);
+    Controller controller(
+        m_applicationId,
+        settings,
+        m_protocolVersionRange,
+        &model);
     m_controller = &controller;
 
     View view(settings, settings.api().baseHttpPath, &controller);

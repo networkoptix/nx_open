@@ -1,22 +1,28 @@
 #include <gtest/gtest.h>
 
+#include <nx/clusterdb/engine/connection_manager.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/literal.h>
 #include <nx/utils/random.h>
-
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/sync_call.h>
-#include <utils/common/util.h>
 
+#include <nx/clusterdb/engine/service/service.h>
+#include <nx/clusterdb/engine/transport/connector_factory.h>
+#include <nx/clusterdb/engine/transport/p2p_websocket/connector.h>
+
+#include <nx_ec/ec_proto_version.h>
 #include <media_server/media_server_module.h>
 #include <media_server/serverutil.h>
+#include <utils/common/util.h>
+#include <test_support/mediaserver_launcher.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
-#include <test_support/mediaserver_launcher.h>
 
 using namespace nx::cloud::db;
 
@@ -206,8 +212,6 @@ INSTANTIATE_TEST_CASE_P(P2pMode, CloudAuthentication,
 class CloudAuthenticationInviteUser:
     public CloudAuthentication
 {
-public:
-
 protected:
     void inviteCloudUser()
     {
@@ -253,3 +257,98 @@ TEST_P(CloudAuthenticationInviteUser, invited_user_is_authorized_by_mediaserver)
 INSTANTIATE_TEST_CASE_P(P2pMode, CloudAuthenticationInviteUser,
     ::testing::Values(TestParams(false), TestParams(true)
 ));
+
+//-------------------------------------------------------------------------------------------------
+
+namespace {
+
+class CloudNode:
+    public nx::clusterdb::engine::Service
+{
+    using base_type = nx::clusterdb::engine::Service;
+
+public:
+    CloudNode(
+        int argc,
+        char** argv)
+        :
+        base_type("", argc, argv)
+    {
+        nx::clusterdb::engine::ProtocolVersionRange protocolVersionRange(
+            nx_ec::EC2_PROTO_VERSION,
+            nx_ec::EC2_PROTO_VERSION);
+        setSupportedProtocolRange(protocolVersionRange);
+    }
+};
+
+} // namespace
+
+class CloudAuthenticationForSynchronization:
+    public CloudAuthentication
+{
+    using base_type = CloudAuthentication;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        const auto dbPath = lm("%1/cloud_node_db.sqlite").args(testDataDir()).toStdString();
+        m_cloudNode.addArg("-db/name", dbPath.c_str());
+        m_cloudNode.addArg("-p2pDb/clusterId", cloudSystem().id.c_str());
+        m_cloudNode.addArg("-api/baseHttpPath", "");
+
+        ASSERT_TRUE(m_cloudNode.startAndWaitUntilStarted());
+    }
+
+    void whenEstablishSynchronizationConnectionUsingCloudSystemCredentials()
+    {
+        auto url = nx::network::url::Builder(mediaServer().apiUrl()).appendPath("ec2/").toUrl();
+        url.setUserName(cloudSystem().id.c_str());
+        url.setPassword(cloudSystem().authKey.c_str());
+
+        m_connector = std::make_unique<nx::clusterdb::engine::transport::p2p::websocket::Connector>(
+            m_cloudNode.moduleInstance()->protocolVersionRange(),
+            &m_cloudNode.moduleInstance()->synchronizationEngine().transactionLog(),
+            m_cloudNode.moduleInstance()->synchronizationEngine().outgoingCommandFilter(),
+            url,
+            cloudSystem().id,
+            "nodeId");
+
+        m_connector->connect(
+            [this](auto&&... args)
+            {
+                saveConnectCompletion(std::forward<decltype(args)>(args)...);
+            });
+    }
+
+    void thenConnectionIsEstablished()
+    {
+        const auto result = m_connectResults.pop();
+        ASSERT_TRUE(result.ok());
+    }
+
+private:
+    nx::utils::test::ModuleLauncher<CloudNode> m_cloudNode;
+    nx::utils::SyncQueue<nx::clusterdb::engine::transport::ConnectResultDescriptor> m_connectResults;
+    std::unique_ptr<nx::clusterdb::engine::transport::p2p::websocket::Connector> m_connector;
+
+    void saveConnectCompletion(
+        nx::clusterdb::engine::transport::ConnectResultDescriptor connectResultDescriptor,
+        std::unique_ptr<nx::clusterdb::engine::transport::AbstractConnection> /*connection*/)
+    {
+        m_connectResults.push(std::move(connectResultDescriptor));
+    }
+};
+
+TEST_P(CloudAuthenticationForSynchronization, DISABLED_cloud_system_credentials_are_allowed)
+{
+    whenEstablishSynchronizationConnectionUsingCloudSystemCredentials();
+
+    thenConnectionIsEstablished();
+}
+
+INSTANTIATE_TEST_CASE_P(
+    P2pMode,
+    CloudAuthenticationForSynchronization,
+    ::testing::Values(TestParams(true)));
