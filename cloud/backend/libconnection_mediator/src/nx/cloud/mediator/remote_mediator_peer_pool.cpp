@@ -190,7 +190,7 @@ void RemoteMediatorPeerPool::findMediatorByPeerDomain(
             {
                 NX_WARNING(
                     this,
-                    "getRangeWithPrefix with peerDomainName: %1 failed error: %1 for",
+                    "getRangeWithPrefix returned ResultCode: %1 for peerDomainName: %2",
                     nx::clusterdb::map::toString(result), peerDomainName);
                 return handler(MediatorEndpoint());
             }
