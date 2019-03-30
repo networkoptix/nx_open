@@ -1,6 +1,9 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
+
 class MediaServerLauncher;
+class QnArchiveStreamReader;
 
 namespace nx::test_support {
 
@@ -10,6 +13,7 @@ struct ChunkData
 {
     qint64 startTimeMs;
     qint64 durationsMs;
+    QString path;
 };
 
 using ChunkDataList = std::vector<ChunkData>;
@@ -31,5 +35,7 @@ Catalog generateCameraArchive(
     const QString& baseDir, const QString& cameraName, qint64 startTimeMs, int count);
 
 QByteArray createTestMkvFile(int lengthSec, int width, int height);
+std::unique_ptr<QnArchiveStreamReader> createArchiveStreamReader(
+    const QnVirtualCameraResourcePtr& camera);
 
 } // namespace nx::test_support
