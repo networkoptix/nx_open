@@ -49,12 +49,11 @@ protected:
 
     void thenArchiveShouldBePlayedWithoutGaps()
     {
-        // #TODO #akulikov Uncomment and fix
-        //NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
-        //while (!m_archivePlayedTillTheEnd)
-        //    m_archivePlaybackWaitCondition.wait(&m_archivePlaybackMutex);
+        NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
+        while (!m_archivePlayedTillTheEnd)
+            m_archivePlaybackWaitCondition.wait(&m_archivePlaybackMutex);
 
-        //m_archivePlayedTillTheEnd = false;
+        m_archivePlayedTillTheEnd = false;
     }
 
     void whenPlayArchiveRequestIsIssued()
@@ -76,9 +75,9 @@ protected:
         m_archiveReader->start();
 
         m_archiveStartTime =
-            m_generatedArchive[test_support::kCamera1Name].highQualityChunks.front().startTimeMs;
+            m_generatedArchive[test_support::kCamera1Name].lowQualityChunks.front().startTimeMs;
         m_archiveEndTime =
-            m_generatedArchive[test_support::kCamera1Name].highQualityChunks.back().startTimeMs;
+            m_generatedArchive[test_support::kCamera1Name].lowQualityChunks.back().startTimeMs;
     }
 
     void whenArchiveIntegritySignalsConnected()
@@ -101,6 +100,7 @@ private:
     std::unique_ptr<QnArchiveStreamReader> m_archiveReader;
     int64_t m_archiveStartTime;
     int64_t m_archiveEndTime;
+    int64_t m_timeGap = 0;
 
     void onArchiveIntegrityBreached(const QnStorageResourcePtr& storage)
     {
@@ -116,13 +116,23 @@ private:
 
     virtual void putData(const QnAbstractDataPacketPtr& data) override
     {
-        qDebug() << data->timestamp;
-        ASSERT_LE(data->timestamp - m_archiveStartTime, 1000000);
-        m_archiveStartTime = data->timestamp;
-
-        if (m_archiveStartTime - m_archiveEndTime < 1000000)
         {
             NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
+            if (m_archivePlayedTillTheEnd)
+                return;
+        }
+
+        const int64_t currentDataTimestampMs = data->timestamp / 1000;
+        if (m_timeGap < currentDataTimestampMs - m_archiveStartTime)
+            m_timeGap = currentDataTimestampMs - m_archiveStartTime;
+
+        ASSERT_LE(m_timeGap, 1000);
+        m_archiveStartTime = currentDataTimestampMs;
+
+        if (m_archiveStartTime >= m_archiveEndTime && m_archiveStartTime != AV_NOPTS_VALUE)
+        {
+            NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
+            m_archivePlayedTillTheEnd = true;
             m_archivePlaybackWaitCondition.wakeOne();
         }
     }

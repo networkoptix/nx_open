@@ -107,32 +107,14 @@ void addTestStorage(MediaServerLauncher* server, const QString& storagePath)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Test data generation
 
-static void writeHeaderTimestamp(const QString &fileName, int64_t timestamp)
-{
-    QFile file(fileName);
-    const auto filePermissions =
-        QFile::ReadOther | QFile::WriteOther | QFile::ReadOwner | QFile::WriteOwner
-        | QFile::ReadGroup | QFile::WriteGroup;
+static const int64_t kMediaFileDurationMs = 60000;
 
-    NX_ASSERT(file.setPermissions(filePermissions));
-    file.open(QIODevice::ReadWrite);
-    NX_ASSERT(file.isOpen());
-
-    file.seek(0x219);
-    auto buf = file.read(11);
-    NX_ASSERT(memcmp(buf.constData(), "START_TIMED", 11) == 0);
-
-    file.seek(0x219 + 0xd);
-    file.write(QString::number(timestamp).toLatin1().constData());
-    file.close();
-};
-
-void replaceValue(QByteArray& payload, const QByteArray& key, const QByteArray& newValue)
+static void replaceValue(QByteArray& payload, const QByteArray& key, const QByteArray& newValue)
 {
     const int keyPos = payload.indexOf(key);
     NX_ASSERT(keyPos != -1);
 
-    const int replacePos = keyPos + key.size() + 4;
+    const int replacePos = keyPos + key.size() + 3;
     memcpy(payload.data() + replacePos, newValue.constData(), newValue.size());
 }
 
@@ -141,7 +123,7 @@ static void updateMetaData(QByteArray& payload, int64_t startTimeMs)
     replaceValue(payload, "startTimeMs", QByteArray::number(startTimeMs));
     replaceValue(
         payload, "integrityHash",
-        vms::server::IntegrityHashHelper::generateIntegrityHash(QByteArray::number(startTimeMs)));
+        vms::server::IntegrityHashHelper::generateIntegrityHash(QByteArray::number(startTimeMs)).toBase64());
 }
 
 static ChunkDataList generateChunksForQuality(
@@ -149,13 +131,10 @@ static ChunkDataList generateChunksForQuality(
     int count, QByteArray& payload)
 {
     using namespace std::chrono;
-
-    const int durationMs = 70000;
     ChunkDataList result;
-
     for (int i = 0; i < count; ++i)
     {
-        QString fileName = lit("%1_%2.mkv").arg(startTimeMs).arg(durationMs);
+        QString fileName = lit("%1_%2.mkv").arg(startTimeMs).arg(kMediaFileDurationMs);
         QString pathString = QnStorageManager::dateTimeStr(
             startTimeMs, currentTimeZone() / 60, "/");
 
@@ -171,8 +150,8 @@ static ChunkDataList generateChunksForQuality(
         NX_ASSERT(dataFile.open(QIODevice::WriteOnly));
         NX_ASSERT(dataFile.write(payload));
 
-        result.push_back(ChunkData{ startTimeMs, durationMs, fullFileName });
-        startTimeMs += durationMs + 5;
+        result.push_back(ChunkData{ startTimeMs, kMediaFileDurationMs, fullFileName });
+        startTimeMs += kMediaFileDurationMs + 5;
     }
 
     return result;
@@ -181,10 +160,12 @@ static ChunkDataList generateChunksForQuality(
 Catalog generateCameraArchive(
     const QString& baseDir, const QString& cameraName, qint64 startTimeMs, int count)
 {
-    QByteArray hiQualityPayLoad = createTestMkvFile(60, kHiQualityFileWidth, kHiQualityFileHeight);
-    QByteArray lowQualityPayLoad = createTestMkvFile(60, kLowQualityFileWidth, kLowQualityFileHeight);
-    Catalog result;
+    QByteArray hiQualityPayLoad = createTestMkvFile(
+        kMediaFileDurationMs / 1000, kHiQualityFileWidth, kHiQualityFileHeight);
+    QByteArray lowQualityPayLoad = createTestMkvFile(
+        kMediaFileDurationMs / 1000, kLowQualityFileWidth, kLowQualityFileHeight);
 
+    Catalog result;
     result.lowQualityChunks = generateChunksForQuality(
         baseDir, cameraName, "low_quality", startTimeMs, count, lowQualityPayLoad);
 
@@ -279,6 +260,7 @@ private:
     void setupMetadata()
     {
         QnAviArchiveMetadata metadata;
+        metadata.startTimeMs = 1553604378060;
         metadata.version = QnAviArchiveMetadata::kIntegrityCheckVersion;
         metadata.integrityHash =
             vms::server::IntegrityHashHelper::generateIntegrityHash("1553604378060");

@@ -151,7 +151,6 @@ Authenticator::Result Authenticator::tryAllMethods(
         }
     }
 
-    qDebug() << lm("Result %1 for %2").args(result, request.requestLine);
     NX_VERBOSE(this, lm("Result %1 for %2").args(result, request.requestLine));
     return result;
 }
