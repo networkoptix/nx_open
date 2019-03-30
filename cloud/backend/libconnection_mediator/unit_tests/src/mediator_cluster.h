@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/cloud/mediator/mediator_service.h>
 #include <nx/cloud/mediator/test_support/mediator_functional_test.h>
 
 #include <nx/cloud/mediator/remote_mediator_peer_pool.h>
