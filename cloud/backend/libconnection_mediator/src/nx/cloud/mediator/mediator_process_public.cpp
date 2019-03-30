@@ -37,5 +37,10 @@ const MediatorProcess* MediatorProcessPublic::impl() const
     return m_impl;
 }
 
+MediatorProcess* MediatorProcessPublic::impl()
+{
+    return m_impl;
+}
+
 } // namespace hpm
 } // namespace nx

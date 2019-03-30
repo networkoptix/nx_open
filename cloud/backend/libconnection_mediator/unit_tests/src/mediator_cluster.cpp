@@ -2,6 +2,8 @@
 
 #include <nx/utils/thread/sync_queue.h>
 
+#include <nx/cloud/mediator/mediator_service.h>
+
 namespace nx::hpm::test {
 
 Mediator& MediatorCluster::addMediator(
@@ -33,7 +35,7 @@ const Mediator& MediatorCluster::mediator(int index) const
 bool MediatorCluster::peerInformationSynchronizedInCluster(const std::string& peerDomainName)
 {
     const auto doesMediatorHavePeer =
-        [](const Mediator* mediator, const std::string& peerDomainName)->bool
+        [](Mediator* mediator, const std::string& peerDomainName)->bool
         {
             nx::utils::SyncQueue<bool> hasEndpoint;
             mediator->moduleInstance()->impl()->remoteMediatorPeerPool().findMediatorByPeerDomain(
