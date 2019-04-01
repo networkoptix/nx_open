@@ -8,6 +8,7 @@ import { DOCUMENT, Location, TitleCasePipe } from '@angular/common';
 import { NgbTabChangeEvent, NgbTabset }      from '@ng-bootstrap/ng-bootstrap';
 import { DeviceDetectorService }             from 'ngx-device-detector';
 import { NxConfigService }                   from '../../services/nx-config';
+import { TranslateService }                  from '@ngx-translate/core';
 
 @Component({
     selector   : 'download-component',
@@ -27,6 +28,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
     config: any;
     downloads: any;
     downloadsData: any;
+    lang: any;
     platformMatch: {};
     canSeeHistory: boolean;
     tabsVisible: boolean;
@@ -76,6 +78,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
                 private route: ActivatedRoute,
                 private router: Router,
                 private titleService: Title,
+                private translate: TranslateService,
                 location: Location) {
 
         this.location = location;
@@ -106,8 +109,8 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
             for (const mobile in this.downloads.mobile) {
                 if (this.downloads.mobile[ mobile ].os === this.activeOs) {
-                    if (this.language.lang.downloads.mobile[ this.downloads.mobile[ mobile ].name ].link !== 'disabled') {
-                        this.document.location.href = this.language.lang.downloads.mobile[ this.downloads.mobile[ mobile ].name ].link;
+                    if (this.lang.downloads.mobile[ this.downloads.mobile[ mobile ].name ].link !== 'disabled') {
+                        this.document.location.href = this.lang.downloads.mobile[ this.downloads.mobile[ mobile ].name ].link;
                         return;
                     }
                     break;
@@ -134,8 +137,8 @@ export class DownloadComponent implements OnInit, OnDestroy {
                                     return this.downloads.groups[platform.name].appTypes.includes(installer.appType);
                             }
                         }).map((installer) => {
-                            const translatedPlatform = this.language.lang.downloads.platforms[installer.platform] || installer.platform;
-                            const translatedAppType = this.language.lang.downloads.appTypes[installer.appType] || this.language.lang.appTypes.package;
+                            const translatedPlatform = this.lang.downloads.platforms[installer.platform] || installer.platform;
+                            const translatedAppType = this.lang.downloads.appTypes[installer.appType] || this.lang.appTypes.package;
                             installer.formatName = `${translatedPlatform} - ${translatedAppType}`;
                             installer.url = `${this.downloadsData.releaseUrl}${installer.path}`;
                             return installer;
@@ -163,6 +166,9 @@ export class DownloadComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.translate.getTranslation(this.translate.currentLang).subscribe((lang) => {
+            this.lang = lang;
+        });
         this.account
             .get()
             .then(result => {
