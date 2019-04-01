@@ -14,8 +14,6 @@
 
 namespace nx::vms::server::analytics::debug_helpers {
 
-QString debugFilesDirectoryPath(const QString& path);
-
 /** @return Null if the file does not exist, or on error. */
 nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
     const QString& fileDescription,

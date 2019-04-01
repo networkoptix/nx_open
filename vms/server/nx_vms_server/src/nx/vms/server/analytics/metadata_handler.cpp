@@ -17,6 +17,8 @@
 
 #include <core/resource/camera_resource.h>
 
+#include <nx/analytics/analytics_logging_ini.h>
+
 namespace nx {
 namespace vms::server {
 namespace analytics {
@@ -25,8 +27,15 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 using namespace nx::vms::api::analytics;
 
-MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
-    ServerModuleAware(serverModule)
+MetadataHandler::MetadataHandler(
+    QnMediaServerModule* serverModule,
+    QnVirtualCameraResourcePtr device,
+    QnUuid engineId)
+    :
+    ServerModuleAware(serverModule),
+    m_resource(device),
+    m_engineId(engineId),
+    m_metadataLogger("outgoing_metadata_", m_resource->getId(), m_engineId)
 {
     connect(this, &MetadataHandler::sdkEventTriggered,
         serverModule->eventConnector(), &event::EventConnector::at_analyticsSdkEvent,
@@ -138,6 +147,9 @@ void MetadataHandler::handleObjectMetadataPacket(
 
     if (m_visualDebugger)
         m_visualDebugger->push(nx::common::metadata::toMetadataPacket(data));
+
+    if (nx::analytics::loggingIni().isLoggingEnabled())
+        m_metadataLogger.pushObjectMetadata(data);
 }
 
 void MetadataHandler::handleEventMetadata(
@@ -191,16 +203,6 @@ void MetadataHandler::handleEventMetadata(
     }
 
     emit sdkEventTriggered(sdkEvent);
-}
-
-void MetadataHandler::setResource(QnVirtualCameraResourcePtr resource)
-{
-    m_resource = std::move(resource);
-}
-
-void MetadataHandler::setEngineId(QnUuid engineId)
-{
-    m_engineId = std::move(engineId);
 }
 
 void MetadataHandler::setEventTypeDescriptors(DescriptorMap descriptors)
