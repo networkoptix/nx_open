@@ -1,4 +1,4 @@
-FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.1
+FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.2
 
 COPY stage/traffic_relay /opt/networkoptix/traffic_relay
 COPY etc/traffic_relay.conf /opt/networkoptix/traffic_relay/etc/traffic_relay.conf
