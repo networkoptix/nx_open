@@ -42,7 +42,7 @@ using namespace nx::vms::client::desktop::ui;
 using UpdateContents = nx::update::UpdateContents;
 
 namespace {
-    constexpr int kUpdatePeriodMSec = 60 * 60 * 1000; //< 1 hour.
+    constexpr int kUpdatePeriodMSec = 10000; //< 10 seconds.
     constexpr int kHoursPerDay = 24;
     constexpr int kMinutesPerHour = 60;
     constexpr int kSecsPerMinute = 60;
@@ -62,17 +62,13 @@ struct WorkbenchUpdateWatcher::Private
 WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_checkUpdateTimer(this),
     m_updateStateTimer(this),
     m_notifiedVersion(),
     m_private(new Private())
 {
     m_private->m_serverUpdateTool.reset(new ServerUpdateTool(this));
-
-    m_checkUpdateTimer.setInterval(kUpdatePeriodMSec);
-
     m_autoChecksEnabled = qnGlobalSettings->isUpdateNotificationsEnabled();
-    connect(&m_checkUpdateTimer, &QTimer::timeout, this, &WorkbenchUpdateWatcher::atStartCheckUpdate);
+
     connect(qnGlobalSettings, &QnGlobalSettings::updateNotificationsChanged, this,
         [this]()
         {
@@ -80,7 +76,6 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
             syncState();
         });
 
-    m_updateStateTimer.start(10000);
     connect(&m_updateStateTimer, &QTimer::timeout,
         this, &WorkbenchUpdateWatcher::atUpdateCurrentState);
 
@@ -96,17 +91,17 @@ WorkbenchUpdateWatcher::~WorkbenchUpdateWatcher() {}
 
 void WorkbenchUpdateWatcher::syncState()
 {
-    if (m_userLoggedIn && m_autoChecksEnabled && !m_checkUpdateTimer.isActive())
+    if (m_userLoggedIn && m_autoChecksEnabled && !m_updateStateTimer.isActive())
     {
         NX_VERBOSE(this, "syncState() - starting automatic checks for updates");
-        m_checkUpdateTimer.start();
         atStartCheckUpdate();
+        m_updateStateTimer.start(kUpdatePeriodMSec);
     }
 
-    if ((!m_userLoggedIn || !m_autoChecksEnabled) && m_checkUpdateTimer.isActive())
+    if ((!m_userLoggedIn || !m_autoChecksEnabled) && m_updateStateTimer.isActive())
     {
         NX_VERBOSE(this, "syncState() - stopping automatic checks for updates");
-        m_checkUpdateTimer.stop();
+        m_updateStateTimer.stop();
     }
 }
 
@@ -166,8 +161,8 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
         return;
 
     // We are not interested in updates right now.
-    if (!m_checkUpdateTimer.isActive())
-        return;
+    //if (!m_checkUpdateTimer.isActive())
+    //    return;
 
     // We have no access rights.
     if (!menu()->canTrigger(action::SystemUpdateAction))
