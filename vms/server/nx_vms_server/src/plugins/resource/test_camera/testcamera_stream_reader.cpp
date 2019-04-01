@@ -170,7 +170,7 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
     }
 
     const QByteArray data = url.toString(QUrl::RemoveAuthority | QUrl::RemoveScheme).toUtf8();
-    if (!m_tcpSock->send(data.data(), data.size() + 1))
+    if (m_tcpSock->send(data.data(), data.size() + 1) <= 0)
     {
        closeStream();
        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url.toString(), url.port());
