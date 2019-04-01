@@ -70,7 +70,7 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue<QnResourceList>(d->accessibleCameras(event));
 
         case Qn::DisplayedResourceListRole:
-            return {};
+            return event.source ? QVariant::fromValue<QnResourceList>({event.source}) : QVariant();
 
         case Qn::RemovableRole:
             return event.removable;

@@ -63,6 +63,7 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, compatibilityIsMediaPaused, "Check if all sync play items are paused at every request.");
     NX_INI_STRING("", autoUpdatesCheckChangesetOverride, "Background updates check will use this changeset instead of \"latest\"");
     NX_INI_INT(0, massSystemUpdateWaitForServerOnlineOverride, "Period to wait until server goes online, in seconds. Set to zero to use built-in value.");
+    NX_INI_FLAG(0, enableSyncedChunksForExtraContent, "Show motion and analytics chunks at synced area of the timeline.");
 };
 
 inline Ini& ini()

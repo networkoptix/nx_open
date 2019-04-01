@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>697</width>
-    <height>213</height>
+    <height>300</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string/>
@@ -80,26 +86,6 @@
     <widget class="QCheckBox" name="forceVideoTrafficEncryptionCheckBox">
      <property name="text">
       <string>Encrypt video traffic</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="displayWatermarkCheckBox">
-     <property name="text">
-      <string>Display watermark with username over video</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="watermarkSettingsButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Watermark Preview</string>
      </property>
     </widget>
    </item>
@@ -199,6 +185,36 @@
        </layout>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="displayWatermarkCheckBox">
+     <property name="text">
+      <string>Display watermark with username over video</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="watermarkExplanationLabel">
+     <property name="text">
+      <string>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="watermarkSettingsButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Watermark Preview</string>
+     </property>
     </widget>
    </item>
    <item>

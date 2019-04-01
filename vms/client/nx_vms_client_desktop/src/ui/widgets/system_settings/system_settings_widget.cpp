@@ -18,9 +18,13 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    setHelpTopic(ui->autoDiscoveryCheckBox,     Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
-    setHelpTopic(ui->statisticsReportCheckBox,  Qn::SystemSettings_General_AnonymousUsage_Help);
+    setHelpTopic(ui->autoDiscoveryCheckBox, Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
+    ui->autodiscoveryHint->addHintLine(tr("When enabled, the system continuously discovers new cameras and servers, "
+        "and sends discovery requests to cameras for status update. "));
+    ui->autodiscoveryHint->addHintLine(tr("Failover server measures may still request camera status updates regardless of this setting."));
+    setHelpTopic(ui->autodiscoveryHint, Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
 
+    setHelpTopic(ui->statisticsReportCheckBox, Qn::SystemSettings_General_AnonymousUsage_Help);
     ui->statisticsReportHint->addHintLine(tr("Includes information about system, such as cameras models and firmware versions, number of servers, etc."));
     ui->statisticsReportHint->addHintLine(tr("Does not include any personal information and is completely anonymous."));
     setHelpTopic(ui->statisticsReportHint, Qn::SystemSettings_General_AnonymousUsage_Help);
@@ -50,8 +54,8 @@ void QnSystemSettingsWidget::retranslateUi()
 {
     ui->autoDiscoveryCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         resourcePool(),
-        tr("Enable devices and servers auto discovery"),
-        tr("Enable cameras and servers auto discovery")));
+        tr("Enable devices and servers autodiscovery and automated device status check"),
+        tr("Enable cameras and servers autodiscovery and automated camera status check")));
 
     ui->autoSettingsCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         resourcePool(),
