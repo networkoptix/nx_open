@@ -1726,7 +1726,7 @@ void MultiServerUpdatesWidget::setTargetState(
                 connect(m_installCheckTimer.get(), &QTimer::timeout,
                     this, &MultiServerUpdatesWidget::atCheckInstallState);
                 m_installCheckTimer->setSingleShot(true);
-                m_installCheckTimer->start();
+                m_installCheckTimer->start(kDelayForCheckingInstallStatus);
 
                 if (m_clientUpdateTool->hasUpdate())
                     m_clientUpdateTool->installUpdateAsync();
