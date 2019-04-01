@@ -15,7 +15,7 @@
 #include <common/common_globals.h>
 #include <nx/utils/scope_guard.h>
 
-#include <nx/cloud/mediator/remote_mediator_peer_pool.h>
+#include <nx/cloud/mediator/listening_peer_db.h>
 #include <nx/cloud/mediator/listening_peer_pool.h>
 #include <nx/cloud/mediator/peer_registrator.h>
 #include <nx/cloud/mediator/mediaserver_endpoint_tester.h>
@@ -37,8 +37,8 @@ protected:
     StunCustomTest():
         mediaserverApi(&cloudData),
         m_relayClusterClient(settings),
-        m_remoteMediatorPeerPool(settings.clusterDbMap()),
-        m_listeningPeerPool(settings.listeningPeer(), &m_remoteMediatorPeerPool),
+        m_listeningPeerDb(settings.clusterDbMap()),
+        m_listeningPeerPool(settings.listeningPeer(), &m_listeningPeerDb),
         m_listeningPeerRegistrator(settings, &cloudData, &m_listeningPeerPool, &m_relayClusterClient),
         m_server(
             &m_stunMessageDispatcher,
@@ -66,7 +66,7 @@ protected:
 
 private:
     RelayClusterClient m_relayClusterClient;
-    RemoteMediatorPeerPool m_remoteMediatorPeerPool;
+    ListeningPeerDb m_listeningPeerDb;
     ListeningPeerPool m_listeningPeerPool;
     PeerRegistrator m_listeningPeerRegistrator;
     MessageDispatcher m_stunMessageDispatcher;

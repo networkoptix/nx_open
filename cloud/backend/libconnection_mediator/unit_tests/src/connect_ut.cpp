@@ -24,7 +24,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <nx/cloud/mediator/remote_mediator_peer_pool.h>
+#include <nx/cloud/mediator/listening_peer_db.h>
 #include <nx/cloud/mediator/listening_peer_pool.h>
 #include <nx/cloud/mediator/peer_registrator.h>
 #include <nx/cloud/mediator/relay/relay_cluster_client.h>
@@ -43,8 +43,8 @@ class ConnectTest:
 {
 protected:
     ConnectTest():
-        m_remoteMediatorPeerPool(m_settings.clusterDbMap()),
-        m_listeningPeerPool(m_settings.listeningPeer(), &m_remoteMediatorPeerPool)
+        m_listeningPeerDb(m_settings.clusterDbMap()),
+        m_listeningPeerPool(m_settings.listeningPeer(), &m_listeningPeerDb)
     {
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
@@ -81,7 +81,7 @@ protected:
 
 private:
     conf::Settings m_settings;
-    RemoteMediatorPeerPool m_remoteMediatorPeerPool;
+    ListeningPeerDb m_listeningPeerDb;
     ListeningPeerPool m_listeningPeerPool;
     std::unique_ptr<RelayClusterClient> m_relayClusterClient;
     std::unique_ptr<PeerRegistrator> m_listeningPeerRegistrator;

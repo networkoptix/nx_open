@@ -8,7 +8,7 @@
 #include "relay/abstract_relay_cluster_client.h"
 #include "server/hole_punching_processor.h"
 #include "statistics/stats_manager.h"
-#include "remote_mediator_peer_pool.h"
+#include "listening_peer_db.h"
 
 namespace nx {
 namespace hpm {
@@ -32,8 +32,8 @@ public:
     nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool();
     const nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool() const;
 
-    RemoteMediatorPeerPool& remoteMediatorPeerPool();
-    const RemoteMediatorPeerPool& remoteMediatorPeerPool() const;
+    ListeningPeerDb& listeningPeerDb();
+    const ListeningPeerDb& listeningPeerDb() const;
 
     const stats::StatsManager& statisticsManager() const;
 
@@ -46,7 +46,7 @@ private:
     std::unique_ptr<AbstractCloudDataProvider> m_cloudDataProvider;
     MediaserverEndpointTester m_mediaserverEndpointTester;
     std::unique_ptr<AbstractRelayClusterClient> m_relayClusterClient;
-    RemoteMediatorPeerPool m_remoteMediatorPeerPool;
+    ListeningPeerDb m_listeningPeerDb;
     ListeningPeerPool m_listeningPeerPool;
     PeerRegistrator m_listeningPeerRegistrator;
     stats::StatsManager m_statsManager;

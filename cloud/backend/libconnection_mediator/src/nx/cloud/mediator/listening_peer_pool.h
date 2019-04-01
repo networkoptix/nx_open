@@ -19,7 +19,7 @@
 namespace nx {
 namespace hpm {
 
-class RemoteMediatorPeerPool;
+class ListeningPeerDb;
 
 struct ListeningPeerData
 {
@@ -100,7 +100,7 @@ public:
 
     ListeningPeerPool(
         const conf::ListeningPeer& settings,
-        RemoteMediatorPeerPool* remoteMediatorPeerPool);
+        ListeningPeerDb* listeningPeerDb);
     virtual ~ListeningPeerPool();
 
     /**
@@ -128,7 +128,7 @@ private:
     mutable QnMutex m_mutex;
     PeerContainer m_peers;
     const conf::ListeningPeer m_settings;
-    RemoteMediatorPeerPool* m_remoteMediatorPeerPool = nullptr;
+    ListeningPeerDb* m_listeningPeerDb = nullptr;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     nx::utils::Counter m_counter;
 

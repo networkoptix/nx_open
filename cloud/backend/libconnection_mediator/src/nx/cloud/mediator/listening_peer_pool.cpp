@@ -2,7 +2,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include <nx/cloud/mediator/remote_mediator_peer_pool.h>
+#include <nx/cloud/mediator/listening_peer_db.h>
 
 namespace nx {
 namespace hpm {
@@ -107,10 +107,10 @@ ListeningPeerData& ListeningPeerPool::DataLocker::value()
 
 ListeningPeerPool::ListeningPeerPool(
     const conf::ListeningPeer& settings,
-    RemoteMediatorPeerPool* remoteMediatorPeerPool)
+    ListeningPeerDb* listeningPeerDb)
     :
     m_settings(settings),
-    m_remoteMediatorPeerPool(remoteMediatorPeerPool)
+    m_listeningPeerDb(listeningPeerDb)
 {
 }
 
@@ -150,7 +150,7 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
         peerIter->second.isLocal = true;
         peerIter->second.isListening = false;
         peerIter->second.hostName = peerIter->first.hostName();
-        m_remoteMediatorPeerPool->addPeer(
+        m_listeningPeerDb->addPeer(
             peerData.hostName().toStdString(),
             [this, hostName = peerData.hostName()](bool added)
             {
@@ -295,10 +295,10 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
 
     m_peers.erase(peerIter);
 
-    m_remoteMediatorPeerPool->removePeer(peerData.hostName().toStdString(),
+    m_listeningPeerDb->removePeer(peerData.hostName().toStdString(),
         [this, hostName = peerData.hostName()](bool removed)
         {
-            NX_DEBUG(this, "Peer %1 removed from RemoteMediatorPeerPool: %2", hostName, removed);
+            NX_DEBUG(this, "Peer %1 removed from ListeningPeerDb: %2", hostName, removed);
         });
 }
 

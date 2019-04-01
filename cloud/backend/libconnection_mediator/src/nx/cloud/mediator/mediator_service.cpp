@@ -64,9 +64,9 @@ const Controller& MediatorProcess::controller() const
     return *m_controller;
 }
 
-RemoteMediatorPeerPool& MediatorProcess::remoteMediatorPeerPool()
+ListeningPeerDb& MediatorProcess::listeningPeerDb()
 {
-    return m_controller->remoteMediatorPeerPool();
+    return m_controller->listeningPeerDb();
 }
 
 std::unique_ptr<nx::utils::AbstractServiceSettings> MediatorProcess::createSettings()
@@ -158,11 +158,11 @@ bool MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& se
     assignPort(httpsEndpoints(), &endpoint.httpsPort);
     assignPort(stunUdpEndpoints(), &endpoint.stunUdpPort);
 
-    m_controller->remoteMediatorPeerPool().setEndpoint(endpoint);
+    m_controller->listeningPeerDb().setThisMediatorEndpoint(endpoint);
 
     if (settings.clusterDbMap().map.synchronizationSettings.discovery.enabled)
     {
-        m_controller->remoteMediatorPeerPool().startDiscovery(
+        m_controller->listeningPeerDb().startDiscovery(
             &m_view->httpServer().messageDispatcher());
     }
 

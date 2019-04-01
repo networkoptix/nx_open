@@ -23,17 +23,17 @@ struct MediatorEndpoint
 };
 
 //-------------------------------------------------------------------------------------------------
-// RemoteMediatorPeerPool
+// ListeningPeerDb
 
 /**
- * Associates peer domains with a mediator instance domain
+ * Associates peer domains (e.g. mediaserverid.systemid) with a mediator instance domain
  * discovering other mediator instances and synchronizing with their
- * RemoteMediatorPeerPools.
+ * ListeningPeerDbs.
  */
-class RemoteMediatorPeerPool
+class ListeningPeerDb
 {
 public:
-    RemoteMediatorPeerPool(const conf::ClusterDbMap& settings);
+    ListeningPeerDb(const conf::ClusterDbMap& settings);
 
     /**
      * Initializes the underlying database.
@@ -44,12 +44,17 @@ public:
      * Sets the domain name that all added peers will be associated with.
      * NOTE: MUST be called before addPeer or startDiscovery can be called.
      */
-    void setEndpoint(const MediatorEndpoint& endpoint);
+    void setThisMediatorEndpoint(const MediatorEndpoint& endpoint);
+
+    /**
+    * Get this mediator instance's endpoint.
+    */
+    const MediatorEndpoint& thisMediatorEndpoint() const;
 
     /**
      * Adds or updates the domain name of a peer with the public url of the mediator instance given
      * in the constructor to the peer pool.
-     * NOTE: setEndpoint MUST also be called before addPeer can be called.
+     * NOTE: setThisMediatorEndpoint MUST also be called before addPeer can be called.
      */
     void addPeer(
         const std::string& peerDomainName,
@@ -72,18 +77,13 @@ public:
 
     /*
      * Starts discovery of other mediator instances and synchronizes
-     * their RemoteMediatorPeerPool entries.
-     * NOTE: setEndpoint MUST be called before startDiscovery will work.
+     * their ListeningPeerDb entries.
+     * NOTE: setThisMediatorEndpoint MUST be called before startDiscovery will work.
      *
      * @return true if discovery service started successfully, false otherwise
      */
     void startDiscovery(
         nx::network::http::server::rest::MessageDispatcher* messageDispatcher);
-
-    /**
-     * Get this mediator instance's endpoint.
-     */
-    const MediatorEndpoint& thisEndpoint() const;
 
     /**
      * Get the node id of the underlying synchronizationEngine or an empty string if initialize()

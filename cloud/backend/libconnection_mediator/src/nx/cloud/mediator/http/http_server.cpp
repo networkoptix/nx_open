@@ -22,12 +22,12 @@ Server::Server(
     const conf::Settings& settings,
     const PeerRegistrator& peerRegistrator,
     nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool,
-    RemoteMediatorPeerPool* remoteMediatorPeerPool,
+    ListeningPeerDb* listeningPeerDb,
     HolePunchingProcessor* holePunchingProcessor)
     :
     m_settings(settings),
     m_multiAddressHttpServer(&m_authenticationDispatcher, &m_httpMessageDispatcher),
-    m_remoteMediatorPeerPool(remoteMediatorPeerPool),
+    m_listeningPeerDb(listeningPeerDb),
     m_holePunchingProcessor(holePunchingProcessor)
 {
     NX_ASSERT(!m_settings.http().addrToListenList.empty());
@@ -180,7 +180,7 @@ void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
         {
             return std::make_unique<InitiateConnectionRequestHandler>(
                 m_holePunchingProcessor,
-                m_remoteMediatorPeerPool);
+                m_listeningPeerDb);
         },
         network::http::Method::post);
 }
@@ -204,10 +204,10 @@ void Server::registerApiHandler(
 
 InitiateConnectionRequestHandler::InitiateConnectionRequestHandler(
     HolePunchingProcessor* holePunchingProcessor,
-    RemoteMediatorPeerPool* remoteMediatorPeerPool)
+    ListeningPeerDb* listeningPeerDb)
     :
     m_holePunchingProcessor(holePunchingProcessor),
-    m_remoteMediatorPeerPool(remoteMediatorPeerPool)
+    m_listeningPeerDb(listeningPeerDb)
 {
 }
 
@@ -279,7 +279,7 @@ void InitiateConnectionRequestHandler::redirectToRemoteMediator(
     api::ResultCode resultCode,
     api::ConnectResponse response)
 {
-    m_remoteMediatorPeerPool->findMediatorByPeerDomain(
+    m_listeningPeerDb->findMediatorByPeerDomain(
         targetServer.toStdString(),
         [this, requestContext = std::move(requestContext),
             resultCode, response = std::move(response)](
@@ -291,7 +291,7 @@ void InitiateConnectionRequestHandler::redirectToRemoteMediator(
                 return reportResult(api::ResultCode::notFound, std::move(response));
             }
 
-            if (endpoint == m_remoteMediatorPeerPool->thisEndpoint())
+            if (endpoint == m_listeningPeerDb->thisMediatorEndpoint())
             {
                 NX_VERBOSE(this, "Redirecting to this mediator but connection already failed");
                 return reportResult(api::ResultCode::notFound, std::move(response));

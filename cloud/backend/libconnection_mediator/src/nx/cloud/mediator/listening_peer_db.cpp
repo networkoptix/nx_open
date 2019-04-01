@@ -1,4 +1,4 @@
-#include "remote_mediator_peer_pool.h"
+#include "listening_peer_db.h"
 
 #include <nx/utils/std/algorithm.h>
 #include <nx/clusterdb/engine/http/http_paths.h>
@@ -25,10 +25,10 @@ int toInt(const std::string& integer)
     catch (const std::exception& /*e*/)
     {
         NX_WARNING(
-            typeid(RemoteMediatorPeerPool),
+            typeid(ListeningPeerDb),
             "error converting string to int: %1",
             integer);
-        return -1;
+        return MediatorEndpoint::kPortUnused;
     }
 }
 
@@ -76,14 +76,14 @@ bool MediatorEndpoint::operator==(const MediatorEndpoint &other) const
 }
 
 //-------------------------------------------------------------------------------------------------
-// RemoteMediatorPeerPool
+// ListeningPeerDb
 
-RemoteMediatorPeerPool::RemoteMediatorPeerPool(const conf::ClusterDbMap& settings):
+ListeningPeerDb::ListeningPeerDb(const conf::ClusterDbMap& settings):
     m_settings(settings)
 {
 }
 
-bool RemoteMediatorPeerPool::initialize()
+bool ListeningPeerDb::initialize()
 {
     if (m_map)
         return true;
@@ -116,7 +116,7 @@ bool RemoteMediatorPeerPool::initialize()
     return m_map != nullptr;
 }
 
-void RemoteMediatorPeerPool::setEndpoint(const MediatorEndpoint& endpoint)
+void ListeningPeerDb::setThisMediatorEndpoint(const MediatorEndpoint& endpoint)
 {
     m_mediatorEndpoint = endpoint;
     m_mediatorEndpointString = toString(endpoint);
@@ -130,7 +130,12 @@ void RemoteMediatorPeerPool::setEndpoint(const MediatorEndpoint& endpoint)
         .setPort(endpoint.httpPort).toUrl();
 }
 
-void RemoteMediatorPeerPool::addPeer(
+const MediatorEndpoint& ListeningPeerDb::thisMediatorEndpoint() const
+{
+    return m_mediatorEndpoint;
+}
+
+void ListeningPeerDb::addPeer(
     const std::string& peerDomainName,
     nx::utils::MoveOnlyFunc<void(bool)> handler)
 {
@@ -157,7 +162,7 @@ void RemoteMediatorPeerPool::addPeer(
         });
 }
 
-void RemoteMediatorPeerPool::removePeer(
+void ListeningPeerDb::removePeer(
     const std::string& peerDomainName,
     nx::utils::MoveOnlyFunc<void(bool)> handler)
 {
@@ -182,7 +187,7 @@ void RemoteMediatorPeerPool::removePeer(
         });
 }
 
-void RemoteMediatorPeerPool::findMediatorByPeerDomain(
+void ListeningPeerDb::findMediatorByPeerDomain(
     const std::string& peerDomainName,
     nx::utils::MoveOnlyFunc<void(MediatorEndpoint)> handler)
 {
@@ -224,7 +229,7 @@ void RemoteMediatorPeerPool::findMediatorByPeerDomain(
         });
 }
 
-void RemoteMediatorPeerPool::startDiscovery(
+void ListeningPeerDb::startDiscovery(
     nx::network::http::server::rest::MessageDispatcher* messageDispatcher)
 {
     if (!m_map)
@@ -239,12 +244,7 @@ void RemoteMediatorPeerPool::startDiscovery(
         m_syncEngineUrl);
 }
 
-const MediatorEndpoint& RemoteMediatorPeerPool::thisEndpoint() const
-{
-    return m_mediatorEndpoint;
-}
-
-std::string RemoteMediatorPeerPool::nodeId() const
+std::string ListeningPeerDb::nodeId() const
 {
     return m_map ? m_map->synchronizationEngine().nodeId() : std::string();
 }

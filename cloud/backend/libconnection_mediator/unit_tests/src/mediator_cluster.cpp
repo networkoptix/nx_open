@@ -11,7 +11,7 @@ namespace {
 static bool mediatorHasPeer (Mediator* mediator, const std::string& peerDomainName)
 {
     nx::utils::SyncQueue<bool> hasEndpoint;
-    mediator->moduleInstance()->impl()->remoteMediatorPeerPool().findMediatorByPeerDomain(
+    mediator->moduleInstance()->impl()->listeningPeerDb().findMediatorByPeerDomain(
         peerDomainName,
         [&hasEndpoint](MediatorEndpoint endpoint)
         {
