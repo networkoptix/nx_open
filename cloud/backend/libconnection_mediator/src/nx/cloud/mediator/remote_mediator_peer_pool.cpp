@@ -78,8 +78,7 @@ bool MediatorEndpoint::operator==(const MediatorEndpoint &other) const
 //-------------------------------------------------------------------------------------------------
 // RemoteMediatorPeerPool
 
-RemoteMediatorPeerPool::RemoteMediatorPeerPool(const conf::ClusterDbMap& settings)
-    :
+RemoteMediatorPeerPool::RemoteMediatorPeerPool(const conf::ClusterDbMap& settings):
     m_settings(settings)
 {
 }
@@ -88,6 +87,15 @@ bool RemoteMediatorPeerPool::initialize()
 {
     if (m_map)
         return true;
+
+    if (!m_settings.enabled)
+    {
+        NX_INFO(this, "Starting in stand-alone mode. "
+            "Not synchronizing listening peer list with other nodes");
+        return true;
+    }
+
+    NX_INFO(this, "Starting in cluster mode. Initializing listening peer DB...");
 
     try
     {

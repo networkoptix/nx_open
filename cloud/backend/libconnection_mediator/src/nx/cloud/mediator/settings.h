@@ -82,6 +82,7 @@ struct Server
 
 struct ClusterDbMap
 {
+    bool enabled = false;
     std::chrono::milliseconds connectionRetryDelay;
     nx::sql::ConnectionOptions sql;
     nx::clusterdb::map::Settings map;

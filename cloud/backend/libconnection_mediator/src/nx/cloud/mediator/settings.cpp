@@ -520,6 +520,10 @@ void Settings::loadServer()
 
 void Settings::loadClusterDbMap()
 {
+    if (!settings().containsGroup(cluster_db_map::kGroupName))
+        return;
+
+    m_clusterDbMap.enabled = true;
     const auto str =
         lm("%1/%2").arg(cluster_db_map::kGroupName).arg(cluster_db_map::kConnectionRetryDelay);
     m_clusterDbMap.connectionRetryDelay = nx::utils::parseTimerDuration(
