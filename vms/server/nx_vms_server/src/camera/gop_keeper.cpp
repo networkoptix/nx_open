@@ -24,7 +24,7 @@ namespace vms {
 namespace server {
 
 GopKeeper::GopKeeper(
-    QnVideoCamera* camera,
+    VideoCamera* camera,
     const QnResourcePtr& resource,
     QnServer::ChunksCatalog catalog)
     :

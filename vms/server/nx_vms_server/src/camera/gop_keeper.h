@@ -13,17 +13,16 @@
 #include <nx/api/mediaserver/image_request.h>
 #include <server/server_globals.h>
 
-class QnVideoCamera; // TODO: rename
-
 namespace nx {
 namespace vms {
 namespace server {
 
+class VideoCamera;
+
 class GopKeeper: public QnResourceConsumer, public QnAbstractDataConsumer
 {
 public:
-    GopKeeper(
-        QnVideoCamera* camera, const QnResourcePtr &resource, QnServer::ChunksCatalog catalog);
+    GopKeeper(VideoCamera* camera, const QnResourcePtr &resource, QnServer::ChunksCatalog catalog);
 
     virtual ~GopKeeper();
 
@@ -63,7 +62,7 @@ private:
     int m_gotIFramesMask;
     int m_allChannelsMask;
     bool m_isSecondaryStream;
-    QnVideoCamera* m_camera;
+    VideoCamera* m_camera;
     bool m_activityStarted;
     qint64 m_activityStartTime;
     QnServer::ChunksCatalog m_catalog;

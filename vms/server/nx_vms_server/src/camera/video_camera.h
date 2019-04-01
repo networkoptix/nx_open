@@ -9,21 +9,21 @@ class QnDataProviderFactory;
 class MediaStreamCache;
 
 namespace nx::vms::server {
+
 class Settings;
 class GopKeeper;
-} // namespace nx::vms::server
 
 // TODO: #dliman try to avoid using QObject here.
-class QnVideoCamera: public QObject, public nx::vms::server::AbstractVideoCamera
+class VideoCamera: public QObject, public nx::vms::server::AbstractVideoCamera
 {
     Q_OBJECT
 
 public:
-    QnVideoCamera(
+    VideoCamera(
         const nx::vms::server::Settings& settings,
         QnDataProviderFactory* dataProviderFactory,
         const nx::vms::server::resource::CameraPtr& camera);
-    virtual ~QnVideoCamera() override;
+    virtual ~VideoCamera() override;
 
     virtual QnLiveStreamProviderPtr getLiveReader(
         QnServer::ChunksCatalog catalog,
@@ -105,3 +105,5 @@ private:
 private slots:
     void at_camera_resourceChanged();
 };
+
+} // namespace nx::vms::server

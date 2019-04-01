@@ -37,7 +37,9 @@ static const qint64 USEC_PER_MSEC = 1000;
 static unsigned int MEDIA_CACHE_SIZE_MILLIS = 10 * MSEC_PER_SEC;
 static const int CAMERA_PULLING_STOP_TIMEOUT = 1000 * 3;
 
-QnVideoCamera::QnVideoCamera(
+namespace nx::vms::server {
+
+VideoCamera::VideoCamera(
     const nx::vms::server::Settings& settings,
     QnDataProviderFactory* dataProviderFactory,
     const nx::vms::server::resource::CameraPtr& camera)
@@ -53,14 +55,14 @@ QnVideoCamera::QnVideoCamera(
     // Ensuring that vectors will not take much memory.
     static_assert(
         ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
-        "MediaQuality enum suddenly contains too large values: consider changing QnVideoCamera::m_liveCache, QnVideoCamera::m_hlsLivePlaylistManager type" );
+        "MediaQuality enum suddenly contains too large values: consider changing VideoCamera::m_liveCache, VideoCamera::m_hlsLivePlaylistManager type" );
 
     m_liveCache.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_hlsLivePlaylistManager.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_lastActivityTimer.invalidate();
 }
 
-nx::vms::server::GopKeeper* QnVideoCamera::getGopKeeper(StreamIndex streamIndex) const
+nx::vms::server::GopKeeper* VideoCamera::getGopKeeper(StreamIndex streamIndex) const
 {
     switch (streamIndex)
     {
@@ -75,7 +77,7 @@ nx::vms::server::GopKeeper* QnVideoCamera::getGopKeeper(StreamIndex streamIndex)
     return nullptr; //< Fallback for the failed assertion.
 }
 
-void QnVideoCamera::beforeStop()
+void VideoCamera::beforeStop()
 {
     QnMutexLocker lock(&m_getReaderMutex);
 
@@ -102,7 +104,7 @@ void QnVideoCamera::beforeStop()
     }
 }
 
-void QnVideoCamera::stop()
+void VideoCamera::stop()
 {
     if (m_primaryReader)
         m_primaryReader->stop();
@@ -110,7 +112,7 @@ void QnVideoCamera::stop()
         m_secondaryReader->stop();
 }
 
-QnVideoCamera::~QnVideoCamera()
+VideoCamera::~VideoCamera()
 {
     beforeStop();
     stop();
@@ -118,7 +120,7 @@ QnVideoCamera::~QnVideoCamera()
     delete m_secondaryGopKeeper;
 }
 
-void QnVideoCamera::at_camera_resourceChanged()
+void VideoCamera::at_camera_resourceChanged()
 {
     QnMutexLocker lock(&m_getReaderMutex);
 
@@ -138,7 +140,7 @@ void QnVideoCamera::at_camera_resourceChanged()
     }
 }
 
-void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
+void VideoCamera::createReader(QnServer::ChunksCatalog catalog)
 {
     const StreamIndex streamIndex = (catalog == QnServer::HiQualityCatalog)
         ? StreamIndex::primary
@@ -191,7 +193,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     }
 }
 
-void QnVideoCamera::startLiveCacheIfNeeded()
+void VideoCamera::startLiveCacheIfNeeded()
 {
     using namespace std::chrono;
 
@@ -231,7 +233,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
     }
 }
 
-QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(
+QnLiveStreamProviderPtr VideoCamera::getLiveReader(
     QnServer::ChunksCatalog catalog, bool ensureInitialized, bool createIfNotExist)
 {
     QnMutexLocker lock( &m_getReaderMutex );
@@ -241,7 +243,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(
     return getLiveReaderNonSafe( catalog, ensureInitialized);
 }
 
-int QnVideoCamera::copyLastGop(
+int VideoCamera::copyLastGop(
     StreamIndex streamIndex,
     qint64 skipTime,
     QnDataPacketQueue& dstQueue,
@@ -254,7 +256,7 @@ int QnVideoCamera::copyLastGop(
     return 0;
 }
 
-std::unique_ptr<QnConstDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
+std::unique_ptr<QnConstDataPacketQueue> VideoCamera::getFrameSequenceByTime(
     StreamIndex streamIndex,
     qint64 time,
     int channel,
@@ -268,7 +270,7 @@ std::unique_ptr<QnConstDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
     return nullptr;
 }
 
-QnConstCompressedVideoDataPtr QnVideoCamera::getLastVideoFrame(
+QnConstCompressedVideoDataPtr VideoCamera::getLastVideoFrame(
     StreamIndex streamIndex, int channel) const
 {
     if (auto gopKeeper = getGopKeeper(streamIndex))
@@ -276,14 +278,14 @@ QnConstCompressedVideoDataPtr QnVideoCamera::getLastVideoFrame(
     return nullptr;
 }
 
-QnConstCompressedAudioDataPtr QnVideoCamera::getLastAudioFrame(StreamIndex streamIndex) const
+QnConstCompressedAudioDataPtr VideoCamera::getLastAudioFrame(StreamIndex streamIndex) const
 {
     if (auto gopKeeper = getGopKeeper(streamIndex))
         return gopKeeper->getLastAudioFrame();
     return nullptr;
 }
 
-void QnVideoCamera::inUse(void* user)
+void VideoCamera::inUse(void* user)
 {
     {
         QnMutexLocker lock(&m_getReaderMutex);
@@ -295,19 +297,19 @@ void QnVideoCamera::inUse(void* user)
     updateActivity();
 }
 
-void QnVideoCamera::notInUse(void* user)
+void VideoCamera::notInUse(void* user)
 {
     QnMutexLocker lock( &m_getReaderMutex );
     m_cameraUsers.remove(user);
     m_lastActivityTimer.restart();
 }
 
-bool QnVideoCamera::isSomeActivity() const
+bool VideoCamera::isSomeActivity() const
 {
     return !m_cameraUsers.isEmpty() && !m_camera->hasFlags(Qn::foreigner);
 }
 
-void QnVideoCamera::updateActivity()
+void VideoCamera::updateActivity()
 {
     //this method is called periodically
 
@@ -319,7 +321,7 @@ void QnVideoCamera::updateActivity()
     startLiveCacheIfNeeded();
 }
 
-void QnVideoCamera::stopIfNoActivity()
+void VideoCamera::stopIfNoActivity()
 {
     QnMutexLocker lock( &m_getReaderMutex );
 
@@ -379,28 +381,28 @@ void QnVideoCamera::stopIfNoActivity()
         m_secondaryReader->pleaseStop();
 }
 
-const MediaStreamCache* QnVideoCamera::liveCache( MediaQuality streamQuality ) const
+const MediaStreamCache* VideoCamera::liveCache( MediaQuality streamQuality ) const
 {
     return streamQuality < m_liveCache.size()
         ? m_liveCache[streamQuality].get()
         : nullptr;
 }
 
-MediaStreamCache* QnVideoCamera::liveCache( MediaQuality streamQuality )
+MediaStreamCache* VideoCamera::liveCache( MediaQuality streamQuality )
 {
     return streamQuality < m_liveCache.size()
         ? m_liveCache[streamQuality].get()
         : nullptr;
 }
 
-nx::vms::server::hls::LivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
+nx::vms::server::hls::LivePlaylistManagerPtr VideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
 {
     return streamQuality < m_hlsLivePlaylistManager.size()
         ? m_hlsLivePlaylistManager[streamQuality]
         : nx::vms::server::hls::LivePlaylistManagerPtr();
 }
 
-QnResourcePtr QnVideoCamera::resource() const
+QnResourcePtr VideoCamera::resource() const
 {
     return m_camera;
 }
@@ -409,7 +411,7 @@ QnResourcePtr QnVideoCamera::resource() const
  * Starts caching live stream, if not started.
  * @return True if started, false if failed to start.
  */
-bool QnVideoCamera::ensureLiveCacheStarted(MediaQuality streamQuality, qint64 targetDurationUSec)
+bool VideoCamera::ensureLiveCacheStarted(MediaQuality streamQuality, qint64 targetDurationUSec)
 {
     QnMutexLocker lock(&m_getReaderMutex);
 
@@ -436,7 +438,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(MediaQuality streamQuality, qint64 ta
     return false;
 }
 
-QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(
+QnLiveStreamProviderPtr VideoCamera::getLiveReaderNonSafe(
     QnServer::ChunksCatalog catalog, bool ensureInitialized)
 {
     if (m_camera->hasFlags(Qn::foreigner))
@@ -469,7 +471,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(
  * Starts caching live stream, if not started.
  * @return True if started, false if failed to start.
  */
-bool QnVideoCamera::ensureLiveCacheStarted(
+bool VideoCamera::ensureLiveCacheStarted(
     MediaQuality streamQuality,
     const QnLiveStreamProviderPtr& primaryReader,
     qint64 targetDurationUSec )
@@ -497,3 +499,5 @@ bool QnVideoCamera::ensureLiveCacheStarted(
     primaryReader->addDataProcessor(m_liveCache[streamQuality].get());
     return true;
 }
+
+} // namespace nx::vms::server

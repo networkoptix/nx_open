@@ -77,8 +77,8 @@ QnVideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res) con
 QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const nx::vms::server::resource::CameraPtr& res)
 {
     QnMutexLocker lock(&m_mutex);
-    return m_cameras.insert(
-        res, QnVideoCameraPtr(new QnVideoCamera(m_settings, m_dataProviderFactory, res))).value();
+    return m_cameras.insert(res, QnVideoCameraPtr(
+        new nx::vms::server::VideoCamera(m_settings, m_dataProviderFactory, res))).value();
 }
 
 bool QnVideoCameraPool::addVideoCamera(
