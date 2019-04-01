@@ -266,7 +266,7 @@ bool CommonUpdateManager::installerState(update::Status* outUpdateStatus, const 
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "No enough free space on device");
+            "Not enough free space on device");
         return true;
     case CommonUpdateInstaller::State::unknownError:
         *outUpdateStatus = update::Status(
