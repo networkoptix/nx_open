@@ -216,9 +216,6 @@ private:
     /** Instrument manager for the scene. */
     QPointer<InstrumentManager> m_instrumentManager;
 
-    /** Fps counting instrument. */
-    QPointer<DebugInfoInstrument> m_debugInfoInstrument;
-
     /** Activity listener instrument. */
     QPointer<ActivityListenerInstrument> m_controlsActivityInstrument;
 
