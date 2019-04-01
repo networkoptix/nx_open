@@ -14,7 +14,7 @@ namespace test {
 class MediatorFunctionalTest:
     public nx::hpm::MediatorFunctionalTest,
     public testing::Test,
-    OverridePublicIp
+    public OverridePublicIp
 {
 public:
 };
