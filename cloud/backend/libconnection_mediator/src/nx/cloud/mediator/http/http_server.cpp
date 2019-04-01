@@ -287,13 +287,13 @@ void InitiateConnectionRequestHandler::redirectToRemoteMediator(
         {
             if (endpoint.domainName.empty())
             {
-                NX_WARNING(this, "Redirect to remote mediator failed.");
+                NX_VERBOSE(this, "Redirect to remote mediator failed");
                 return reportResult(api::ResultCode::notFound, std::move(response));
             }
 
             if (endpoint == m_remoteMediatorPeerPool->thisEndpoint())
             {
-                NX_WARNING(this, "Redirecting to this mediator but connection already failed");
+                NX_VERBOSE(this, "Redirecting to this mediator but connection already failed");
                 return reportResult(api::ResultCode::notFound, std::move(response));
             }
 
