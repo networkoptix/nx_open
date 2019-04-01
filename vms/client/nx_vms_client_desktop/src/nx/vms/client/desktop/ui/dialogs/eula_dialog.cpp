@@ -22,7 +22,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static constexpr QSize kDesiredSize{800, 900};
+static constexpr QSize kDesiredSize{800, 600};
 
 } // namespace
 
