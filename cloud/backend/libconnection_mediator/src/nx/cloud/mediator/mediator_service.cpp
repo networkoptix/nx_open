@@ -135,7 +135,7 @@ bool MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& se
     const auto assignPort =
         [](const std::vector<network::SocketAddress>& endpoints, int* outPort)
         {
-            *outPort = endpoints.empty() ? -1 : endpoints.front().port;
+            *outPort = endpoints.empty() ? MediatorEndpoint::kPortUnused : endpoints.front().port;
         };
 
     MediatorEndpoint endpoint;

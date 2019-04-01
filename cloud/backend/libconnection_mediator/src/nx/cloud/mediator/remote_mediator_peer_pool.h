@@ -12,10 +12,12 @@ namespace nx::hpm {
  */
 struct MediatorEndpoint
 {
-    std::string domainName; //< Ip address without port or domain name to be resolved by dns
-    int httpPort;
-    int httpsPort;
-    int stunUdpPort;
+    static constexpr int kPortUnused = -1;
+
+    std::string domainName; //< Ip address without port, or domain name to be resolved by dns
+    int httpPort = kPortUnused;
+    int httpsPort = kPortUnused;
+    int stunUdpPort = kPortUnused;
 
     bool operator ==(const MediatorEndpoint& other) const;
 };
