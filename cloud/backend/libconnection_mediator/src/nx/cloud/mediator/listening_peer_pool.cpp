@@ -2,6 +2,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include <nx/cloud/mediator/remote_mediator_peer_pool.h>
+
 namespace nx {
 namespace hpm {
 
@@ -103,8 +105,12 @@ ListeningPeerData& ListeningPeerPool::DataLocker::value()
 //-------------------------------------------------------------------------------------------------
 // class ListeningPeerPool
 
-ListeningPeerPool::ListeningPeerPool(const conf::ListeningPeer& settings):
-    m_settings(settings)
+ListeningPeerPool::ListeningPeerPool(
+    const conf::ListeningPeer& settings,
+    RemoteMediatorPeerPool* remoteMediatorPeerPool)
+    :
+    m_settings(settings),
+    m_remoteMediatorPeerPool(remoteMediatorPeerPool)
 {
 }
 
@@ -144,6 +150,13 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
         peerIter->second.isLocal = true;
         peerIter->second.isListening = false;
         peerIter->second.hostName = peerIter->first.hostName();
+        m_remoteMediatorPeerPool->addPeer(
+            peerData.hostName().toStdString(),
+            [this, hostName = peerData.hostName()](bool added)
+            {
+                NX_VERBOSE(this, "Peer %1 added to RemoteRelayPeerPool: %2",
+                    hostName, added);
+            });
     }
 
     if (peerIter->second.peerConnection != connection)
@@ -281,6 +294,12 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
         peerIter->first.hostName(), (void*) connection);
 
     m_peers.erase(peerIter);
+
+    m_remoteMediatorPeerPool->removePeer(peerData.hostName().toStdString(),
+        [this, hostName = peerData.hostName()](bool removed)
+        {
+            NX_DEBUG(this, "Peer %1 removed from RemoteMediatorPeerPool: %2", hostName, removed);
+        });
 }
 
 void ListeningPeerPool::closeConnectionAsync(

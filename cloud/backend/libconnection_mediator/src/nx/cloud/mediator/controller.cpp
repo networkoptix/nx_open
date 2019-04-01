@@ -18,7 +18,8 @@ Controller::Controller(const conf::Settings& settings):
         : nullptr),
     m_mediaserverEndpointTester(m_cloudDataProvider.get()),
     m_relayClusterClient(RelayClusterClientFactory::instance().create(settings)),
-    m_listeningPeerPool(settings.listeningPeer()),
+    m_remoteMediatorPeerPool(settings.clusterDbMap()),
+    m_listeningPeerPool(settings.listeningPeer(), &m_remoteMediatorPeerPool),
     m_listeningPeerRegistrator(
         settings,
         m_cloudDataProvider.get(),
@@ -34,8 +35,7 @@ Controller::Controller(const conf::Settings& settings):
         &m_listeningPeerPool,
         m_relayClusterClient.get(),
         &m_statsManager.collector()),
-    m_discoveredPeerPool(settings.discovery()),
-    m_remoteMediatorPeerPool(settings.clusterDbMap())
+    m_discoveredPeerPool(settings.discovery())
 {
     if (!m_cloudDataProvider)
     {

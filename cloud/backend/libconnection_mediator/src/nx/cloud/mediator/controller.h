@@ -46,12 +46,12 @@ private:
     std::unique_ptr<AbstractCloudDataProvider> m_cloudDataProvider;
     MediaserverEndpointTester m_mediaserverEndpointTester;
     std::unique_ptr<AbstractRelayClusterClient> m_relayClusterClient;
+    RemoteMediatorPeerPool m_remoteMediatorPeerPool;
     ListeningPeerPool m_listeningPeerPool;
     PeerRegistrator m_listeningPeerRegistrator;
     stats::StatsManager m_statsManager;
     HolePunchingProcessor m_cloudConnectProcessor;
     nx::cloud::discovery::RegisteredPeerPool m_discoveredPeerPool;
-    RemoteMediatorPeerPool m_remoteMediatorPeerPool;
 };
 
 } // namespace hpm
