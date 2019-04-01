@@ -73,6 +73,8 @@ constexpr auto kLatestVersionBannerLabelFontSizePixels = 22;
 constexpr auto kLatestVersionBannerLabelFontWeight = QFont::Light;
 
 const auto kWaitForUpdateCheck = std::chrono::milliseconds(1);
+const auto kDelayForCheckingInstallStatus = std::chrono::minutes(1);
+const auto kPeriodForCheckingInstallStatus = std::chrono::seconds(10);
 
 const int kLinkCopiedMessageTimeoutMs = 2000;
 
@@ -736,6 +738,26 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
         loadDataToUi();
 
     syncDebugInfoToUi();
+}
+
+void MultiServerUpdatesWidget::atCheckInstallState()
+{
+    NX_ASSERT(m_serverUpdateTool);
+    if (!m_serverUpdateTool)
+        return;
+
+    if (m_widgetState == WidgetUpdateState::installing
+        || m_widgetState == WidgetUpdateState::installingStalled)
+    {
+        NX_ASSERT(m_installCheckTimer);
+        m_serverUpdateTool->requestModuleInformation();
+        m_installCheckTimer->start(kPeriodForCheckingInstallStatus);
+    }
+    else
+    {
+        NX_VERBOSE(this, "atCheckInstallState() - stopping timer for checking install status");
+        m_installCheckTimer.reset();
+    }
 }
 
 bool MultiServerUpdatesWidget::tryClose(bool /*force*/)
@@ -1486,9 +1508,6 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
     auto readyToInstall = m_stateTracker->getPeersInState(StatusCode::readyToInstall);
     auto peersFailed = m_stateTracker->getPeersFailed();
 
-    // We need the most recent version information only in state 'installing'.
-    m_serverUpdateTool->requestModuleInformation();
-
     // No peers are doing anything right now. We should check if installation is complete.
     if (peersInstalling.empty())
     {
@@ -1702,6 +1721,12 @@ void MultiServerUpdatesWidget::setTargetState(
                         m_serverUpdateTool->requestInstallAction(servers);
                     }
                 }
+
+                m_installCheckTimer = std::make_unique<QTimer>(this);
+                connect(m_installCheckTimer.get(), &QTimer::timeout,
+                    this, &MultiServerUpdatesWidget::atCheckInstallState);
+                m_installCheckTimer->setSingleShot(true);
+                m_installCheckTimer->start();
 
                 if (m_clientUpdateTool->hasUpdate())
                     m_clientUpdateTool->installUpdateAsync();

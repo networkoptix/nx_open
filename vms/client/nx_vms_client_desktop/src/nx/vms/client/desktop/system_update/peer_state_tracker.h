@@ -48,7 +48,8 @@ struct UpdateItem
     bool offline = false;
     bool skipped = false;
     bool installed = false;
-    bool changedProtocol = false;
+    /** Protocol version for this peer. */
+    int protocol = 0;
     bool installing = false;
     bool storeUpdates = true;
     /**

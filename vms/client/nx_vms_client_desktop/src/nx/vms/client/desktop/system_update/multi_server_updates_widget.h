@@ -61,6 +61,8 @@ public:
 protected:
     /** This one is called by timer periodically. */
     void atUpdateCurrentState();
+    /** Handler for a separate timer for checking installation status. We check it less often. */
+    void atCheckInstallState();
     void atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     void atStartUpdateAction();
     /** Called by clicking 'cancel' button. */
@@ -264,10 +266,16 @@ private:
     QString m_targetChangeset;
 
     /** Watchdog timer for the case when update has taken too long. */
-    std::unique_ptr<QTimer> m_longUpdateWarningTimer = nullptr;
+    std::unique_ptr<QTimer> m_longUpdateWarningTimer;
 
     /** Timer for updating interal state and synching it with UI. */
-    std::unique_ptr<QTimer> m_stateCheckTimer = nullptr;
+    std::unique_ptr<QTimer> m_stateCheckTimer;
+
+    /**
+     * Timer for checking installation status. It works at different rate than
+     * m_stateCheckTimer.
+     */
+    std::unique_ptr<QTimer> m_installCheckTimer;
 
     qint64 m_lastAutoUpdateCheck = 0;
 

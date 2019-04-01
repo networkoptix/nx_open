@@ -801,7 +801,7 @@ void ServerUpdateTool::requestInstallAction(
     m_remoteUpdateStatus = {};
 
     m_timeStartedInstall = qnSyncTime->currentMSecsSinceEpoch();
-    m_serversAreInstalling.clear();
+    m_serversAreInstalling = targets;
 
     auto callback = [tool = QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
         {
@@ -823,19 +823,16 @@ void ServerUpdateTool::requestInstallAction(
 
 void ServerUpdateTool::requestModuleInformation()
 {
-    if (auto connection = getServerConnection(commonModule()->currentServer()))
-    {
-        auto callback =
-            [tool = QPointer(this)](
-                bool success, rest::Handle /*handle*/,
-                const QList<nx::vms::api::ModuleInformation>& response)
-            {
-                if (success && tool)
-                    emit tool->moduleInformationReceived(response);
-            };
-        if (auto handle = connection->getModuleInformation(callback, thread()))
-            m_requestingInstall.insert(handle);
-    }
+    //NX_VERBOSE(this, "requestModuleInformation()");
+    auto callback =
+        [tool = QPointer(this), connection = m_serverConnection](
+            bool success, rest::Handle /*handle*/,
+            const rest::RestResultWithData<QList<nx::vms::api::ModuleInformation>>& response)
+        {
+            if (success && tool)
+                emit tool->moduleInformationReceived(response.data);
+        };
+    m_serverConnection->getModuleInformationAll(callback);
 }
 
 void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
@@ -909,6 +906,8 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                 tool->m_activeRequests.remove(handle);
                 if (success && response.error == QnRestResult::NoError)
                 {
+                    if (tool->m_skippedRequests.contains((handle)))
+                        return;
                     tool->m_updateManifest = response.data;
                     tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
                 }
