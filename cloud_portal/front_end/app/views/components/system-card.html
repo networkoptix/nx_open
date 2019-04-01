@@ -1,4 +1,3 @@
-
 <div class="card card-condensed" ng-if="system.isMine">
     <div class="card-body">
         <h2 class="mb-3">Your System</h2>
@@ -38,10 +37,13 @@
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div><strong>{{mergeTargetSystem.name}}</strong>
-            is being merged to this system</div>
-        <hr />
-        <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
+        <div ng-if="mergeTargetSystem.name" >
+            <div><strong>{{mergeTargetSystem.name}}</strong>
+                is being merged to this system</div>
+            <hr />
+            <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
+        </div>
+        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
@@ -55,7 +57,7 @@
             <p>Depending of the size of the database it may take up to several hours.</p>
             <p>Until merge is finished you can log in to this system and watch video, but cannot change any settings.</p>
             <p>When merge is finished, all users and cameras from this system will become available
-                in System "<span class="merge-system-name">{{mergeTargetSystem.name}}</span>", and this system will be deleted.</p>
+                in <span class="merge-system-name">{{mergeTargetSystem.name}}</span> System, and this system will be deleted.</p>
         </div>
     </div>
 </div>
