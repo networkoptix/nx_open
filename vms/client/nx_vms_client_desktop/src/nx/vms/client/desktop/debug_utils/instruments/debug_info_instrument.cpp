@@ -39,7 +39,8 @@ struct DebugInfoInstrument::Private
 
     QString fps = "----";
     qint64 frameTimeMs = 0;
-    nx::utils::circular_buffer<qint64> frameTimePoints{ini().storeFrameTimePoints};
+    nx::utils::circular_buffer<qint64> frameTimePoints{
+        static_cast<std::size_t>(ini().storeFrameTimePoints)};
     QString handles;
 
     void updateHandles()
