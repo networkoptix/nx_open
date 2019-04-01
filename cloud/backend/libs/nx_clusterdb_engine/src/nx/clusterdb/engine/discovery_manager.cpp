@@ -52,17 +52,10 @@ void DiscoveryManager::start(
         {
             NX_VERBOSE(
                 this,
-                "Discovered a new node: %1. Non http scheme urls will be ignored.",
+                "Discovered a new node: %1.",
                 toString(node));
 
-            nx::utils::Url url(node.urls.front());
-            if (!isHttpScheme(url))
-            {
-                NX_WARNING(this, "%1 is not an http scheme url, ignoring.", url);
-                return;
-            }
-
-            m_syncEngine->connector().addNodeUrl(clusterId, url);
+            m_syncEngine->connector().addNodeUrl(clusterId, node.urls.front());
         });
 
     m_discoveryClient->start();
