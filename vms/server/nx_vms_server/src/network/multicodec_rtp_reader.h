@@ -66,8 +66,8 @@ public:
     void setRole(Qn::ConnectionRole role);
     void setPrefferedAuthScheme(const nx::network::http::header::AuthScheme::Value scheme);
 
-    static void setDefaultTransport(const QString& defaultTransportToUse);
-    void setRtpTransport(RtspTransport value);
+    static void setDefaultTransport(nx::vms::api::RtpTransportType defaultTransportToUse);
+    void setRtpTransport(nx::vms::api::RtpTransportType value);
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
     void setUserAgent(const QString& value);
@@ -92,7 +92,7 @@ public:
         std::chrono::milliseconds timeout,
         OnSocketReadTimeoutCallback callback);
 
-    RtspTransport getRtpTransport() const;
+    nx::vms::api::RtpTransportType getRtpTransport() const;
 
 signals:
     void networkIssue(
@@ -160,7 +160,7 @@ private:
     bool m_rtpStarted;
     nx::network::http::header::AuthScheme::Value m_prefferedAuthScheme;
     nx::utils::Url m_currentStreamUrl;
-    RtspTransport m_rtpTransport;
+    nx::vms::api::RtpTransportType m_rtpTransport;
 
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
@@ -168,9 +168,10 @@ private:
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
     CameraDiagnostics::Result m_openStreamResult;
+    std::optional<std::chrono::steady_clock::time_point> m_packetLossReportTime;
 
     static nx::utils::Mutex s_defaultTransportMutex;
-    static RtspTransport s_defaultTransportToUse;
+    static nx::vms::api::RtpTransportType s_defaultTransportToUse;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

@@ -231,6 +231,11 @@ public:
         m_cloudSystemId = cloudSystemId;
     }
 
+    virtual void init() override
+    {
+
+    }
+
 private:
     CloudData* m_cloudData;
     std::string m_cloudSystemId;

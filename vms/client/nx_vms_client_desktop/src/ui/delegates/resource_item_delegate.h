@@ -12,6 +12,13 @@
 
 class QnWorkbench;
 
+/**
+ * Delegate for displaying resources in resource tree.
+ * It uses the following roles from the model:
+ *  - Qt::DisplayRole base name for resource
+ *  - Qn::ResourceRole resource pointer, QnResourcePtr
+ *  - Qn::NodeTypeRole type of the node in resource tree, ResourceTreeNodeType
+ */
 class QnResourceItemDelegate : public Customized<QStyledItemDelegate>
 {
     Q_OBJECT
@@ -54,7 +61,7 @@ public:
     void setOptions(Options value);
 
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption,
-        const QModelIndex& index) const;
+        const QModelIndex& index) const override;
 
     virtual QSize sizeHint(const QStyleOptionViewItem& styleOption,
         const QModelIndex& index) const override;
@@ -67,7 +74,7 @@ protected:
         = QStyle::State_AutoRaise; //< Use unused in item views value.
 
     virtual void initStyleOption(QStyleOptionViewItem* option,
-        const QModelIndex& index) const;
+        const QModelIndex& index) const override;
 
     virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
         const QModelIndex& index) const override;

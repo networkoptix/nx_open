@@ -70,6 +70,7 @@ public:
 
     static QnResourceTypePool *instance();
 
+    QnResourceTypePool();
     QnResourceTypePtr getResourceTypeByName(const QString& name) const;
     QnResourceTypePtr getResourceType(QnUuid id) const;
     void addResourceType(QnResourceTypePtr resourceType);

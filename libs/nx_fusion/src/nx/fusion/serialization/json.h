@@ -344,4 +344,6 @@ T deserialized(const QByteArray& value, const T& defaultValue, bool* success)
     return defaultValue;
 }
 
+QString toString(QJsonValue::Type jsonType);
+
 } // namespace QJson

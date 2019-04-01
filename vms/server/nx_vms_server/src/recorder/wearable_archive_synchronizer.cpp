@@ -4,6 +4,7 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
+#include <media_server/media_server_module.h>
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -24,13 +25,13 @@ WearableArchiveSynchronizer::WearableArchiveSynchronizer(QnMediaServerModule* se
     m_workerPool->start();
 
     connect(
-        resourcePool(),
+        this->serverModule()->resourcePool(),
         &QnResourcePool::resourceAdded,
         this,
         &WearableArchiveSynchronizer::at_resourceAdded);
 
     connect(
-        resourcePool(),
+        this->serverModule()->resourcePool(),
         &QnResourcePool::resourceRemoved,
         this,
         &WearableArchiveSynchronizer::at_resourceRemoved);

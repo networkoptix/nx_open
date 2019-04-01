@@ -89,29 +89,28 @@ QnJsonRestResult SystemMergeProcessor::merge(
         return result;
     }
 
-    result.setReply(m_remoteModuleInformation);
+    auto makeError =
+        [&](const QString& logMessage)
+        {
+            NX_DEBUG(this, logMessage);
+            result.setReply(m_remoteModuleInformation);
+            return result;
+        };
 
     result = checkWhetherMergeIsPossible(data);
     if (result.error)
-    {
-        NX_DEBUG(this, lm("Systems cannot be merged"));
-        return result;
-    }
+        return makeError("Systems cannot be merged");
+
 
     result = mergeSystems(accessRights, data);
     if (result.error)
-    {
-        NX_DEBUG(this, lm("Failed to merge systems. %1")
-            .args(toString(result.error)));
-        return result;
-    }
+        return makeError(lm("Failed to merge systems. %1").args(toString(result.error)));
 
     nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
     if (!addMergeHistoryRecord(data, &mergeHistoryRecord))
     {
-        NX_DEBUG(this, "Failed to add merge history data");
         setMergeError(&result, MergeStatus::unknownError);
-        return result;
+        return makeError("Failed to add merge history data");
     }
     QJson::serialize(mergeHistoryRecord, &result.reply);
 
@@ -482,6 +481,55 @@ QnJsonRestResult SystemMergeProcessor::applyCurrentSettings(
     return executeRemoteConfigure(data, remoteUrl, postKey);
 }
 
+bool SystemMergeProcessor::shiftSynchronizationTimestamp(
+    const ConfigureSystemData& remoteSystemData)
+{
+    auto newTranLogTime = std::max(
+        remoteSystemData.tranLogTime,
+        m_commonModule->ec2Connection()->getTransactionLogTime());
+    ++newTranLogTime.sequence;
+
+    NX_DEBUG(this, "Shifting local synchronization timestamp to %1 so that critical data is not "
+        "overwritten by some en-route transactions", newTranLogTime);
+
+    m_commonModule->ec2Connection()->setTransactionLogTime(newTranLogTime);
+
+    auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);
+    const auto errorCode = miscManager->changeSystemIdSync(
+        m_commonModule->moduleInformation().localSystemId,
+        m_commonModule->systemIdentityTime(),
+        newTranLogTime);
+    if (errorCode != ec2::ErrorCode::ok)
+    {
+        NX_DEBUG(this, "Failed to save new transaction log timestamp (%1): %2",
+            newTranLogTime, ec2::toString(errorCode));
+        return false;
+    }
+
+    return true;
+}
+
+bool SystemMergeProcessor::changeSystemId(
+    const QnUuid& systemId,
+    const ConfigureSystemData& remoteSystemData)
+{
+    auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);
+    const auto errorCode = miscManager->changeSystemIdSync(
+        systemId,
+        remoteSystemData.sysIdTime,
+        m_commonModule->ec2Connection()->getTransactionLogTime());
+
+    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
+    if (errorCode != ec2::ErrorCode::ok)
+    {
+        NX_DEBUG(this, lit("applyRemoteSettings. Failed to save new system name: %1")
+            .arg(ec2::toString(errorCode)));
+        return false;
+    }
+
+    return true;
+}
+
 QnJsonRestResult SystemMergeProcessor::executeRemoteConfigure(
     const ConfigureSystemData& data,
     const nx::utils::Url& remoteUrl,
@@ -581,6 +629,13 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
 
     // 2. Updating local data.
 
+    if (!shiftSynchronizationTimestamp(remoteSystemData))
+    {
+        NX_DEBUG(this, lit("applyRemoteSettings. Failed to shift local system timestamp"));
+        setMergeError(&result, MergeStatus::configurationFailed);
+        return result;
+    }
+
     if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(m_commonModule, remoteSystemData))
     {
         NX_DEBUG(this, lit("applyRemoteSettings. Failed to change system name"));
@@ -621,14 +676,8 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
         }
     }
 
-    auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);
-    const auto errorCode = miscManager->changeSystemIdSync(
-        systemId, remoteSystemData.sysIdTime, remoteSystemData.tranLogTime);
-    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-    if (errorCode != ec2::ErrorCode::ok)
+    if (!changeSystemId(systemId, remoteSystemData))
     {
-        NX_DEBUG(this, lit("applyRemoteSettings. Failed to save new system name: %1")
-            .arg(ec2::toString(errorCode)));
         setMergeError(&result, MergeStatus::configurationFailed);
         return result;
     }

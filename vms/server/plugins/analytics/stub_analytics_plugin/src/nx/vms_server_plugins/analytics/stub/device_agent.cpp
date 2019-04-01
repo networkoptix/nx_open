@@ -108,6 +108,25 @@ void DeviceAgent::settingsReceived()
     }
 }
 
+/** @param func Name of the caller for logging; supply __func__. */
+void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* func)
+{
+    NX_OUTPUT << func << "(): timestamp " << videoFrame->timestampUs() << " us;"
+        << " frame #" << m_frameCounter;
+
+    if (m_frameCounter == ini().crashDeviceAgentOnFrameN)
+    {
+        const std::string message = nx::kit::utils::format(
+            "ATTENTION: Intentionally crashing the process at frame #%d as per %s",
+            m_frameCounter, ini().iniFile());
+        NX_PRINT << message;
+        nx::kit::debug::intentionallyCrash(message.c_str());
+    }
+
+    ++m_frameCounter;
+    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
+}
+
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
     if (engine()->needUncompressedVideoFrames())
@@ -116,9 +135,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
         return false;
     }
 
-    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUs() << " us";
-    ++m_frameCounter;
-    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
+    processVideoFrame(videoFrame, __func__);
     return true;
 }
 
@@ -130,12 +147,8 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
         return false;
     }
 
-    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUs() << " us";
-
-    ++m_frameCounter;
-    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
-
-    return checkFrame(videoFrame);
+    processVideoFrame(videoFrame, __func__);
+    return checkVideoFrame(videoFrame);
 }
 
 bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)
@@ -274,9 +287,9 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 // private
 
 static IObjectMetadata* makeObjectMetadata(
-    std::string objectTypeId,
-    Uuid objectId,
-    double dt,
+    const std::string& objectTypeId,
+    const Uuid& objectId,
+    double offset,
     int64_t lastVideoFrameTimestampUs,
     bool generatePreviewAttributes,
     int objectIndex)
@@ -285,8 +298,8 @@ static IObjectMetadata* makeObjectMetadata(
     objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
     objectMetadata->setTypeId(objectTypeId);
     objectMetadata->setId(objectId);
-    objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) dt,
-        (float) dt + 0.05 * objectIndex, 0.25F, 0.25F));
+    objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) offset,
+        (float) offset + 0.05 * objectIndex, 0.25F, 0.25F));
 
     if (generatePreviewAttributes)
     {
@@ -294,9 +307,9 @@ static IObjectMetadata* makeObjectMetadata(
         objectMetadata->addAttributes({
             {IAttribute::Type::number, "nx.sys.preview.timestampUs",
                 std::to_string(lastVideoFrameTimestampUs)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(dt)},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(offset)},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.y",
-                std::to_string(dt)},
+                std::to_string(offset)},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.width", "0.1"},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"},
         });
@@ -334,13 +347,13 @@ static IObjectMetadata* makeObjectMetadata(
 
 void DeviceAgent::generateObjectIds()
 {
-    int objectsCount = ini().objectsCount;
-    if (objectsCount < 1)
+    int objectCount = ini().objectCount;
+    if (objectCount < 1)
     {
         NX_OUTPUT << "Invalid value for objectCount in .ini; assuming 1.";
-        objectsCount = 1;
+        objectCount = 1;
     }
-    m_objectIds.resize(objectsCount);
+    m_objectIds.resize(objectCount);
     for (auto& objectId: m_objectIds)
         objectId = UuidHelper::randomUuid();
 }
@@ -454,7 +467,7 @@ int64_t DeviceAgent::usSinceEpoch() const
         system_clock::now().time_since_epoch()).count();
 }
 
-bool DeviceAgent::checkFrame(const IUncompressedVideoFrame* frame) const
+bool DeviceAgent::checkVideoFrame(const IUncompressedVideoFrame* frame) const
 {
     if (frame->pixelFormat() != engine()->pixelFormat())
     {

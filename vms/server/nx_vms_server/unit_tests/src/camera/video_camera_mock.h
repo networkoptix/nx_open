@@ -5,11 +5,11 @@
 #include <camera/video_camera.h>
 
 /**
- * Validates QnAbstractMediaServerVideoCamera interface is used in a proper way.
+ * Validates nx::vms::server::AbstractVideoCamera interface is used in a proper way.
  * Almost every method has an empty implementation.
  */
 class MediaServerVideoCameraMock:
-    public QnAbstractMediaServerVideoCamera
+    public nx::vms::server::AbstractVideoCamera
 {
 public:
     MediaServerVideoCameraMock();

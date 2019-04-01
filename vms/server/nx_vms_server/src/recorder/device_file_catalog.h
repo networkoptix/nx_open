@@ -310,8 +310,6 @@ public:
     static QnMutex m_rebuildMutex;
     static QSet<void*> m_pauseList;
 
-    bool doRebuildArchive(const QnStorageResourcePtr &storage, const QnTimePeriod& period);
-
     struct ScanFilter
     {
         ScanFilter() {}
@@ -323,7 +321,11 @@ public:
         bool intersects(const QnTimePeriod& period) const;
     };
 
-    void scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList,
+    void scanMediaFiles(
+        const QString& folder,
+        const QnStorageResourcePtr &storage,
+        QMap<qint64, Chunk>& allChunks,
+        QVector<EmptyFileInfo>& emptyFileList,
         const ScanFilter& filter);
 
     static std::deque<Chunk> mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2);
@@ -348,7 +350,6 @@ private:
     bool addChunk(const Chunk& chunk);
     QSet<QDate> recordedMonthList();
 
-    void readStorageData(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& scanFilter);
     Chunk chunkFromFile(const QnStorageResourcePtr &storage, const QString& fileName);
     QnTimePeriod timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName);
     void replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog);

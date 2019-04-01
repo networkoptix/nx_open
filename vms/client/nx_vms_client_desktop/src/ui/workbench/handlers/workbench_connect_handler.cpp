@@ -51,6 +51,7 @@
 #include <platform/hardware_information.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/integrations/integrations.h>
 
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/reconnect_info_dialog.h>
@@ -511,6 +512,8 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
         connectionInfo.effectiveUserName.isEmpty()
         ? url.userName()
         : connectionInfo.effectiveUserName);
+
+    integrations::connectionEstablished(connection);
 }
 
 void QnWorkbenchConnectHandler::storeConnectionRecord(
@@ -1162,13 +1165,15 @@ void QnWorkbenchConnectHandler::testConnectionToServer(
 
 bool QnWorkbenchConnectHandler::tryToRestoreConnection()
 {
+    using nx::vms::client::core::ReconnectHelper;
+
     nx::utils::Url currentUrl = commonModule()->currentUrl();
     NX_ASSERT(!currentUrl.isEmpty());
     if (currentUrl.isEmpty())
         return false;
 
     if (!m_reconnectHelper)
-        m_reconnectHelper.reset(new nx::vms::client::core::ReconnectHelper());
+        m_reconnectHelper.reset(new ReconnectHelper(qnSettings->stickReconnectToServer()));
 
     if (m_reconnectHelper->servers().isEmpty())
     {

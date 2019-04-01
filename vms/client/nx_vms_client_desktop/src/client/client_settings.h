@@ -130,6 +130,9 @@ public:
         LAST_LOCAL_CONNECTION_URL,
         KNOWN_SERVER_URLS,
 
+        // Force client to reconnect only to the same server it was connected to.
+        STICKY_RECONNECT,
+
         EXPORT_MEDIA_SETTINGS,
         EXPORT_LAYOUT_SETTINGS,
         EXPORT_BOOKMARK_SETTINGS,
@@ -139,6 +142,7 @@ public:
 
         /** Version of the latest read and accepted EULA. */
         ACCEPTED_EULA_VERSION,
+        DISABLE_MT_DECODING,
 
         ALL_LAYOUTS_SELECTION_DIALOG_MODE, //< Tree mode in MultipleLayoutSelectionDialog.
 
@@ -225,6 +229,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportMode,         setLastExportMode,          LAST_EXPORT_MODE,           lit("media"))
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
+        QN_DECLARE_R_PROPERTY(bool,                         stickReconnectToServer,                             STICKY_RECONNECT,           false)
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMs,    setInitialLiveBufferMs,     INITIAL_LIVE_BUFFER_MSECS,  50)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMs,    setMaximumLiveBufferMs,     MAXIMUM_LIVE_BUFFER_MSECS,  500)
@@ -236,6 +241,7 @@ private:
 
         QN_DECLARE_RW_PROPERTY(bool, allLayoutsSelectionDialogMode, setAllLayoutsSelectionDialogMode, ALL_LAYOUTS_SELECTION_DIALOG_MODE, 0)
         QN_DECLARE_RW_PROPERTY(QString, systemUpdaterState, setSystemUpdaterState, SYSTEM_UPDATER_STATE, 0)
+        QN_DECLARE_R_PROPERTY(bool,                         disableMtDecoding,                                  DISABLE_MT_DECODING,        false)
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();

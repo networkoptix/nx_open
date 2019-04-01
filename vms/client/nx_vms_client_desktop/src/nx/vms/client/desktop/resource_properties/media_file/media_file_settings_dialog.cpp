@@ -4,31 +4,31 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <core/resource/media_resource.h>
-#include <core/ptz/media_dewarping_params.h>
-
-#include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include <nx/vms/client/desktop/resource_properties/fisheye/fisheye_calibration_widget.h>
 
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_item.h>
-
 #include <nx/vms/client/desktop/image_providers/ffmpeg_image_provider.h>
+#include "../fisheye/fisheye_preview_controller.h"
 
 namespace nx::vms::client::desktop {
 
 MediaFileSettingsDialog::MediaFileSettingsDialog(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::MediaFileSettingsDialog),
-    m_updating(false)
+    ui(new Ui::MediaFileSettingsDialog)
 {
     ui->setupUi(this);
-    connect(ui->fisheyeWidget, &FisheyeSettingsWidget::dataChanged,
-        this, &MediaFileSettingsDialog::paramsChanged);
+
+    const auto fisheyePreviewController(new FisheyePreviewController(this));
+
+    connect(ui->fisheyeWidget,
+        &FisheyeSettingsWidget::dataChanged,
+        this,
+        [this, fisheyePreviewController]
+        {
+            if (!m_updating)
+                fisheyePreviewController->preview(m_resource, ui->fisheyeWidget->parameters());
+        });
 }
 
 MediaFileSettingsDialog::~MediaFileSettingsDialog()
@@ -43,7 +43,7 @@ void MediaFileSettingsDialog::updateFromResource(const QnMediaResourcePtr& resou
     QScopedValueRollback<bool> updateRollback(m_updating, true);
 
     m_resource = resource;
-    auto resourcePtr = resource->toResourcePtr();
+    const auto resourcePtr = resource->toResourcePtr();
 
     if (resourcePtr->hasFlags(Qn::still_image))
         m_imageProvider.reset(new BasicImageProvider(QImage(resourcePtr->getUrl()), this));
@@ -58,30 +58,7 @@ void MediaFileSettingsDialog::updateFromResource(const QnMediaResourcePtr& resou
 
 void MediaFileSettingsDialog::submitToResource(const QnMediaResourcePtr& resource)
 {
-    QnMediaDewarpingParams params = resource->getDewarpingParams();
-    ui->fisheyeWidget->submitToParams(params);
-    resource->setDewarpingParams(params);
-}
-
-void MediaFileSettingsDialog::paramsChanged()
-{
-    if (m_updating)
-        return;
-
-    /* Dialog is modal, so changes rollback is not required. */
-    QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
-    QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget);
-    if (!m_resource || !mediaWidget || mediaWidget->resource() != m_resource)
-        return;
-
-    QnMediaDewarpingParams dewarpingParams = mediaWidget->dewarpingParams();
-    ui->fisheyeWidget->submitToParams(dewarpingParams);
-    mediaWidget->setDewarpingParams(dewarpingParams);
-
-    QnWorkbenchItem* item = mediaWidget->item();
-    auto itemParams = item->dewarpingParams();
-    itemParams.enabled = dewarpingParams.enabled;
-    item->setDewarpingParams(itemParams);
+    resource->setDewarpingParams(ui->fisheyeWidget->parameters());
 }
 
 } // namespace nx::vms::client::desktop

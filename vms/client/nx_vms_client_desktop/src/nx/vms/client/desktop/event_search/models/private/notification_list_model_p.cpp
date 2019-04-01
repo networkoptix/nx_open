@@ -105,8 +105,17 @@ NotificationListModel::Private::Private(NotificationListModel* q):
                 const auto extraData = Private::extraData(event);
                 m_uuidHashes[extraData.first][extraData.second].remove(event.id);
                 m_players.remove(event.id);
+
+                for (auto it = m_itemsByLoadingSound.begin(); it != m_itemsByLoadingSound.end(); ++it)
+                {
+                    if (it.value() == event.id)
+                    {
+                        m_itemsByLoadingSound.erase(it);
+                        break;
+                    }
+                }
             }
-    });
+        });
 
     connect(context()->instance<ServerNotificationCache>(),
         &ServerNotificationCache::fileDownloaded, this,
@@ -140,7 +149,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
     auto title = m_helper->eventAtResource(params, qnSettings->extraInfoInTree());
     const microseconds timestamp(params.eventTimestampUsec);
-    const qint64 timestampMs = duration_cast<milliseconds>(timestamp).count();
 
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
     auto camera = resource.dynamicCast<QnVirtualCameraResource>();

@@ -8,8 +8,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/server/settings.h>
 
+#include <nx/vms/server/resource/resource_fwd.h>
 #include <core/resource/resource_fwd.h>
-
 
 #include "camera_fwd.h"
 
@@ -31,7 +31,7 @@ private:
     QnVideoCameraPtr m_camera;
 };
 
-class QnVideoCameraPool: public  QObject
+class QnVideoCameraPool: public QObject
 {
     Q_OBJECT
 public:
@@ -47,8 +47,8 @@ public:
         \return Object belongs to this pool
     */
     QnVideoCameraPtr getVideoCamera(const QnResourcePtr& res) const;
-    QnVideoCameraPtr addVideoCamera(const QnResourcePtr& res);
-    bool addVideoCamera(const QnResourcePtr& res, QnVideoCameraPtr camera);
+    QnVideoCameraPtr addVideoCamera(const nx::vms::server::resource::CameraPtr& res);
+    bool addVideoCamera(const nx::vms::server::resource::CameraPtr& res, QnVideoCameraPtr camera);
     void removeVideoCamera(const QnResourcePtr& res);
     void updateActivity();
 

@@ -4,8 +4,6 @@
 
 #include <QtCore/QList>
 
-#include <api/app_server_connection.h>
-
 #include <nx/vms/event/actions/actions.h>
 #include <nx/vms/event/events/ip_conflict_event.h>
 #include <nx/vms/event/events/server_conflict_event.h>
@@ -25,7 +23,7 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_history.h>
-
+#include <core/resource/resource_command_processor.h>
 #include <core/resource/avi/avi_resource.h>
 
 #include <database/server_db.h>
@@ -54,9 +52,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <utils/common/delayed.h>
 
-#if !defined(EDGE_SERVER)
 #include <providers/speech_synthesis_data_provider.h>
-#endif
 
 #include <providers/stored_file_data_provider.h>
 #include <streaming/audio_streamer_pool.h>
@@ -71,7 +67,6 @@
 #include <rest/handlers/multiserver_chunks_rest_handler.h>
 #include <common/common_module.h>
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
-#include <api/helpers/thumbnail_request_data.h>
 #include <utils/common/util.h>
 #include <nx/utils/concurrent.h>
 #include <utils/camera/bookmark_helpers.h>
@@ -79,6 +74,8 @@
 #include <media_server/media_server_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 #include <api/helpers/camera_id_helper.h>
+#include <nx/vms/rules/action_parameters_processing.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -222,7 +219,7 @@ ExtendedRuleProcessor::ExtendedRuleProcessor(QnMediaServerModule* serverModule):
     base_type(serverModule),
     m_emailManager(new EmailManagerImpl(serverModule->commonModule()))
 {
-    connect(resourcePool(), &QnResourcePool::resourceRemoved,
+    connect(this->serverModule()->resourcePool(), &QnResourcePool::resourceRemoved,
         this, &ExtendedRuleProcessor::onRemoveResource, Qt::QueuedConnection);
 }
 
@@ -325,8 +322,8 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
     const vms::event::AbstractActionPtr& action)
 {
     const auto params = action->getParams();
-    const auto resource = resourcePool()->getResourceById<nx::vms::server::resource::Camera>(
-        params.actionResourceId);
+    const auto resource = serverModule()->resourcePool()
+        ->getResourceById<nx::vms::server::resource::Camera>(params.actionResourceId);
 
     if (!resource)
         return false;
@@ -378,11 +375,16 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
 
 bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActionPtr& action)
 {
-#if !defined(EDGE_SERVER) && !defined(__aarch64__)
+    if (!QnSpeechSynthesisDataProvider::isEnabled())
+    {
+        NX_WARNING(this, "Speech synthesizer is absent on this Server.");
+        return true;
+    }
+
     const auto params = action->getParams();
     const auto text = params.sayText;
-    const auto resource = resourcePool()->getResourceById<nx::vms::server::resource::Camera>(
-        params.actionResourceId);
+    const auto resource = serverModule()->resourcePool()
+        ->getResourceById<nx::vms::server::resource::Camera>(params.actionResourceId);
     if (!resource)
         return false;
 
@@ -394,18 +396,16 @@ bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActio
         return false;
 
     QnAbstractStreamDataProviderPtr speechProvider(new QnSpeechSynthesisDataProvider(text));
-    transmitter->subscribe(speechProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
+    transmitter->subscribe(
+        speechProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
     speechProvider->startIfNotRunning();
     return true;
-#else
-    return true;
-#endif
 }
 
 bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr& action)
 {
     const QnUuid serverGuid(serverModule()->settings().serverGuid());
-    const QnResourcePtr& mediaServerRes = resourcePool()->getResourceById(serverGuid);
+    const QnResourcePtr& mediaServerRes = serverModule()->resourcePool()->getResourceById(serverGuid);
     QnMediaServerResource* mediaServer = dynamic_cast<QnMediaServerResource*> (mediaServerRes.data());
     if (!mediaServer)
         return false;
@@ -422,7 +422,10 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
 
 bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractActionPtr& action)
 {
-    const nx::vms::event::ActionParameters& actionParameters=action->getParams();
+    const auto actionParameters = nx::vms::rules::actualActionParameters(
+        action->actionType(),
+        action->getParams(),
+        action->getRuntimeParams());
     nx::network::http::StringType requestType = actionParameters.requestType;
 
     nx::utils::Url url(action->getParams().url);
@@ -495,7 +498,8 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
 
 bool ExtendedRuleProcessor::executePtzAction(const vms::event::AbstractActionPtr& action)
 {
-    auto camera = resourcePool()->getResourceById<nx::vms::server::resource::Camera>(action->getParams().actionResourceId);
+    auto camera = serverModule()->resourcePool()
+        ->getResourceById<nx::vms::server::resource::Camera>(action->getParams().actionResourceId);
     if (!camera)
         return false;
     if (camera->getDewarpingParams().enabled)
@@ -510,7 +514,8 @@ bool ExtendedRuleProcessor::executePtzAction(const vms::event::AbstractActionPtr
 bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingActionPtr& action)
 {
     NX_ASSERT(action);
-    auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
+    auto camera = serverModule()->resourcePool()
+        ->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     //NX_ASSERT(camera);
     bool rez = false;
     if (camera)
@@ -542,7 +547,8 @@ bool ExtendedRuleProcessor::executeBookmarkAction(const vms::event::AbstractActi
         ? action->getParams().actionResourceId
         : QnUuid();
 
-    const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(cameraId);
+    const auto camera =
+        serverModule()->resourcePool()->getResourceById<QnSecurityCamResource>(cameraId);
     if (!camera || !fixActionTimeFields(action))
         return false;
 
@@ -557,7 +563,8 @@ QnUuid ExtendedRuleProcessor::getGuid() const
 
 bool ExtendedRuleProcessor::triggerCameraOutput(const vms::event::CameraOutputActionPtr& action)
 {
-    auto resource = resourcePool()->getResourceById(action->getParams().actionResourceId);
+    auto resource =
+        serverModule()->resourcePool()->getResourceById(action->getParams().actionResourceId);
     if (!resource)
     {
         NX_WARNING(this, lit("Received BA_CameraOutput with no resource reference. Ignoring..."));
@@ -585,8 +592,10 @@ ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreensho
     qint64 timestampUsec,
     QSize dstSize) const
 {
-    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
-    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
+    const auto camera =
+        serverModule()->resourcePool()->getResourceById<QnVirtualCameraResource>(id);
+    const auto server =
+        serverModule()->resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
 
     if (!camera || !server)
         return TimespampedFrame();
@@ -685,7 +694,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
 
         contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
 
-        const auto allUsers = resourcePool()->getResources<QnUserResource>();
+        const auto allUsers = serverModule()->resourcePool()->getResources<QnUserResource>();
         for (const auto& user: allUsers)
         {
             if (user->isCloud() && user->getEmail() == cloudOwnerAccount)
@@ -856,13 +865,12 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
         case EventType::cameraMotionEvent:
         case EventType::cameraInputEvent:
         {
-            auto camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(
+            auto camRes = serverModule()->resourcePool()->getResourceById<QnVirtualCameraResource>(
                 action->getRuntimeParams().eventResourceId);
             cameraHistoryPool()->updateCameraHistorySync(camRes);
             if (camRes->hasVideo(nullptr))
             {
                 const qint64 eventTimeUs = action->getRuntimeParams().eventTimestampUsec;
-                const qint64 currentTimeBeforeGetUs = qnSyncTime->currentUSecsSinceEpoch();
 
                 TimespampedFrame timestempedFrame = getEventScreenshotEncoded(
                     action->getRuntimeParams().eventResourceId, eventTimeUs, SCREENSHOT_SIZE);
@@ -913,7 +921,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                 break;
 
             const auto& userId = params.metadata.instigators[0];
-            const auto user = resourcePool()->getResourceById(userId);
+            const auto user = serverModule()->resourcePool()->getResourceById(userId);
             NX_ASSERT(user, "Unknown user id as soft trigger instigator");
 
             contextMap[tpUser] = user ? user->getName() : userId.toString();
@@ -927,7 +935,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
             contextMap[tpTimestampDate] = helper.eventTimestampDate(params);
             contextMap[tpTimestampTime] = helper.eventTimestampTime(params);
 
-            auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(
+            auto camera = serverModule()->resourcePool()->getResourceById<QnVirtualCameraResource>(
                 params.eventResourceId);
 
             cameraHistoryPool()->updateCameraHistorySync(camera);
@@ -967,7 +975,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                 for (const auto& cameraId: metadata.cameraRefs)
                 {
                     auto camRes = camera_id_helper::findCameraByFlexibleId(
-                        resourcePool(), cameraId);
+                        serverModule()->resourcePool(), cameraId);
                     if (camRes)
                     {
                         QVariantMap camera;
@@ -1096,8 +1104,8 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
         case EventType::cameraInputEvent:
         {
             // Try to use port name if possible, otherwise use port ID as is.
-            auto resource = resourcePool()->getResourceById<QnVirtualCameraResource>(
-                params.eventResourceId);
+            auto resource = serverModule()->resourcePool()
+                ->getResourceById<QnVirtualCameraResource>(params.eventResourceId);
             NX_ASSERT(resource);
             auto ports = resource->ioPortDescriptions();
             auto portIt = std::find_if(ports.begin(), ports.end(),
@@ -1135,8 +1143,11 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
 
                 for (const auto& id: params.description.split(L';'))
                 {
-                    if (const auto& camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
+                    if (const auto& camera = serverModule()->resourcePool()
+                        ->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
+                    {
                         disabledCameras << QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
+                    }
                 }
 
                 reasonContext[lit("disabledCameras")] = disabledCameras;

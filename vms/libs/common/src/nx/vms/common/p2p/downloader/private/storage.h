@@ -23,6 +23,10 @@ struct FileMetadata: FileInformation
     {
     }
 
+    static FileMetadata fromFileInformation(
+        const FileInformation& fileInformation,
+        const QDir& defaultDownloadsDirectory);
+
     QVector<QByteArray> chunkChecksums;
     QString fullFilePath;
 };

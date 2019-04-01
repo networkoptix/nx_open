@@ -16,6 +16,7 @@
 
 #include <client/client_settings.h>
 
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <ui/dialogs/common/message_box.h>
@@ -23,6 +24,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/webview_style.h>
+#include <ui/workbench/workbench_context.h>
 
 #include <utils/common/html.h>
 
@@ -81,6 +83,13 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
     m_updateStateTimer.start(10000);
     connect(&m_updateStateTimer, &QTimer::timeout,
         this, &WorkbenchUpdateWatcher::atUpdateCurrentState);
+
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        [this](const QnUserResourcePtr &user)
+        {
+            m_userLoggedIn = user != nullptr;
+            syncState();
+        });
 }
 
 WorkbenchUpdateWatcher::~WorkbenchUpdateWatcher() {}
@@ -123,18 +132,6 @@ std::future<UpdateContents> WorkbenchUpdateWatcher::takeUpdateCheck()
     return std::move(m_private->m_updateCheck);
 }
 
-void WorkbenchUpdateWatcher::start()
-{
-    m_userLoggedIn = true;
-    syncState();
-}
-
-void WorkbenchUpdateWatcher::stop()
-{
-    m_userLoggedIn = false;
-    syncState();
-}
-
 void WorkbenchUpdateWatcher::atStartCheckUpdate()
 {
     // This signal will be removed when update check is complete.
@@ -142,7 +139,17 @@ void WorkbenchUpdateWatcher::atStartCheckUpdate()
         return;
     QString updateUrl = qnSettings->updateFeedUrl();
     NX_ASSERT(!updateUrl.isEmpty());
-    m_private->m_updateCheck = m_private->m_serverUpdateTool->checkLatestUpdate(updateUrl);
+
+    QString changesetOverride = ini().autoUpdatesCheckChangesetOverride;
+    if (changesetOverride.isEmpty())
+    {
+        m_private->m_updateCheck = m_private->m_serverUpdateTool->checkLatestUpdate(updateUrl);
+    }
+    else
+    {
+        m_private->m_updateCheck = m_private->m_serverUpdateTool->checkSpecificChangeset(
+            updateUrl, changesetOverride);
+    }
 }
 
 void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)

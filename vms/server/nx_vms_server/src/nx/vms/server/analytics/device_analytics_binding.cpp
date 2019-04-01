@@ -1,6 +1,6 @@
 #include "device_analytics_binding.h"
 
-#include <plugins/plugins_ini.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 #include <core/resource/camera_resource.h>
 #include <media_server/media_server_module.h>
@@ -195,16 +195,17 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
             m_device->getId(),
             m_engine->getName(),
             m_engine->getId());
+    }
+    else
+    {
+        QVariantMap result;
+        const auto count = pluginSideSettings->count();
+        for (auto i = 0; i < count; ++i)
+            result.insert(pluginSideSettings->key(i), pluginSideSettings->value(i));
 
-        return QVariantMap();
+        jsonEngine.applyValues(result);
     }
 
-    QVariantMap result;
-    const auto count = pluginSideSettings->count();
-    for (auto i = 0; i < count; ++i)
-        result.insert(pluginSideSettings->key(i), pluginSideSettings->value(i));
-
-    jsonEngine.applyValues(result);
     return jsonEngine.values();
 }
 

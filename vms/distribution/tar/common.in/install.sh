@@ -23,7 +23,8 @@ configure()
 
 checkRunningUnderRoot()
 {
-    if [ "$(id -u)" != "0" ]; then
+    if [ "$(id -u)" != "0" ]
+    then
         echo "ERROR: $0 should be run under root" >&2
         exit 1
     fi
@@ -97,7 +98,8 @@ copyToDataPartition()
 
     local CONF_FILE="$MNT/$MEDIASERVER_PATH/etc/mediaserver.conf"
     local CONF_CONTENT="statisticsReportAllowed=true"
-    if grep -q "^$CONF_CONTENT$" "$CONF_FILE"; then
+    if grep -q "^$CONF_CONTENT$" "$CONF_FILE"
+    then
         echo "$CONF_CONTENT" >>"$CONF_FILE" || return $?
     fi
 }
@@ -108,17 +110,20 @@ installDebs() # package [version]
 {
     local -r PACKAGE="$1"; shift
     local VERSION=""
-    if [ $# -ge 2 ]; then
+    if [ $# -ge 2 ]
+    then
         VERSION="$2"
     fi
 
     local -r DEB_DIR="/opt/deb/$PACKAGE"
-    if [ ! -d "$DEB_DIR" ]; then # The deb is missing from /opt/deb.
+    if [ ! -d "$DEB_DIR" ]
+    then # The deb is missing from /opt/deb.
         return
     fi
 
     local -r INSTALLED_VERSION=$(dpkg -l |grep "$PACKAGE" |grep "$VERSION" |awk '{print $3}')
-    if [ -z "$INSTALLED_VERSION" ]; then
+    if [ -z "$INSTALLED_VERSION" ]
+    then
         dpkg -i "$DEB_DIR"/*.deb
     fi
 }
@@ -137,7 +142,8 @@ upgradeVms()
 
     installDebs cifs-utils
 
-    if [ "$BOX" = "bpi" ]; then
+    if [ "$BOX" = "bpi" ]
+    then
         # Avoid grabbing libstdc++ from mediaserver lib folder.
         export LD_LIBRARY_PATH=""
 
@@ -152,7 +158,8 @@ upgradeVms()
         installDebs fonts-arphic-ukai
         installDebs fonts-thai-tlwg
 
-        if [ -d "/opt/deb/libvdpau" ]; then
+        if [ -d "/opt/deb/libvdpau" ]
+        then
             installDebs libvdpau 0.4.1
 
             touch "/dev/cedar_dev"
@@ -184,7 +191,8 @@ checkMediaserverPid() # pid
 {
     local PID="$1"
 
-    if [ ! -z "$PID" ] && [ ! -z "$(ps "$PID" |grep "/$MEDIASERVER_PATH")" ]; then
+    if [ ! -z "$PID" ] && [ ! -z "$(ps "$PID" |grep "/$MEDIASERVER_PATH")" ]
+    then
         echo "$PID"
     fi
 }
@@ -192,7 +200,8 @@ checkMediaserverPid() # pid
 restartMediaserver()
 {
     # If the mediaserver cannot start because another process uses its port, kill it and restart.
-    while true; do
+    while true
+    do
         "$STARTUP_SCRIPT" start || true #< If not started, the loop will try again.
         sleep 3
 
@@ -203,12 +212,14 @@ restartMediaserver()
         local PID_WHICH_USES_PORT=$(getPidWhichUsesPort "$MEDIASERVER_PORT")
         local MEDIASERVER_PID=$(checkMediaserverPid "$PID_WHICH_USES_PORT")
 
-        if [ ! -z "$MEDIASERVER_PID" ]; then
+        if [ ! -z "$MEDIASERVER_PID" ]
+        then
             echo "Upgraded mediaserver is up and running with pid $MEDIASERVER_PID at port $MEDIASERVER_PORT"
             break
         fi
 
-        if [ ! -z "$PID_WHICH_USES_PORT" ]; then
+        if [ ! -z "$PID_WHICH_USES_PORT" ]
+        then
             echo "Another process (pid $PID_WHICH_USES_PORT) uses port $MEDIASERVER_PORT:" \
                 "killing it and restarting $CUSTOMIZATION-mediaserver"
 
@@ -225,7 +236,8 @@ main()
     configure
     checkRunningUnderRoot
 
-    if [ $# = 0 ] || ( [ "$1" != "-v" ] && [ "$1" != "--verbose" ] ); then
+    if [ $# = 0 ] || ( [ "$1" != "-v" ] && [ "$1" != "--verbose" ] )
+    then
         redirectOutput "$LOG_FILE"
     fi
 
@@ -243,30 +255,25 @@ main()
 
     sync
 
-    if [ "$BOX" = "bpi" ]; then
-        reboot
-        exit 0
+    if [[ $BOX == "rpi" ]]
+    then
+        "$INSTALLER_DIR/nx_rpi_cam_setup.sh" || true
     fi
 
-    if [ "$BOX" = "rpi" ]; then
-        source $INSTALLER_DIR/nx_rpi_cam_setup.sh
-        if [ "$NX_RPI_REBOOT" = "1" ]; then
-            reboot
-            exit 0
-        fi
-    fi
-
-    restartMediaserver
+    reboot
+    exit 0
 }
 
 onExit() # Called on exit via trap.
 {
     local -r -i RESULT=$?
-    if [ $RESULT != 0 ]; then
+    if [ $RESULT != 0 ]
+    then
         local -r MESSAGE="ERROR: VMS upgrade script failed with exit status $RESULT"
         mkdir -p "$(dirname "$FAILURE_FLAG")" \
             || echo "ERROR: Unable to create dir for flag file $FAILURE_FLAG" >&2
-        if touch "$FAILURE_FLAG"; then
+        if touch "$FAILURE_FLAG"
+        then
             echo "$MESSAGE; created $FAILURE_FLAG" >&2
         else
             echo "ERROR: Unable to create flag file $FAILURE_FLAG" >&2

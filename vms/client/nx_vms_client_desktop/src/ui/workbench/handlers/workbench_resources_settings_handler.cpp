@@ -291,7 +291,7 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
                             sourceCamera,
                             task.streamQuality,
                             task.fps,
-                            QString()); //< Bitrate for default codec.
+                            /*codec*/ QString()); //< Bitrate for default codec.
 
                     const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
                     const auto targetNormalBitrate =
@@ -299,7 +299,7 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
                             camera,
                             task.streamQuality,
                             task.fps,
-                            QString()); //< Bitrate for default codec.
+                            /*codec*/ QString()); //< Bitrate for default codec.
 
                     const auto targetBitrate = targetNormalBitrate * bitrateAspect;
                     task.bitrateKbps = targetBitrate;
@@ -325,13 +325,12 @@ void QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered()
 
     // We should update local media directories
     // Is there a better place for it?
-    if (auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>())
+    if (auto localFilesSearcher = commonModule()->instance<ResourceDirectoryBrowser>())
     {
-        QStringList dirs;
-        dirs << qnSettings->mediaFolder();
-        dirs << qnSettings->extraMediaFolders();
-        localFilesSearcher->setPathCheckList(dirs);
-        emit localFilesSearcher->startLocalDiscovery();
+        QStringList paths;
+        paths.append(qnSettings->mediaFolder());
+        paths.append(qnSettings->extraMediaFolders());
+        localFilesSearcher->setLocalResourcesDirectories(paths);
     }
 }
 

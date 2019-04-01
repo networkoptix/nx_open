@@ -13,15 +13,23 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
         static constexpr int kDefaultAssertCrash = 1;
         static constexpr int kDefaultAssertHeavyCondition = 1;
         static constexpr int kShowPasswordsInLogs = 1;
+        static constexpr int kLogLevelReducerPassLimit = 5;
+        static constexpr int kLogLevelReducerWindowSizeS = 1;
     #else
         static constexpr const char* kDefaultMutexImplementation = "qt";
         static constexpr int kDefaultAssertCrash = 0;
         static constexpr int kDefaultAssertHeavyCondition = 0;
         static constexpr int kShowPasswordsInLogs = 0;
+        static constexpr int kLogLevelReducerPassLimit = 10;
+        static constexpr int kLogLevelReducerWindowSizeS = 60;
     #endif
 
     NX_INI_STRING(kDefaultMutexImplementation, mutexImplementation,
-        "Mutex implementation: qt, std, debug or analyze.");
+        "Mutex implementation:\n"
+        "qt - fastest, default for release;\n"
+        "std - average speed, usefull for valgrind;\n"
+        "debug - average speed, provides more info for debugger, default for debug;\n"
+        "analyze - very slow, analyses metexes for deadlocks.");
 
     NX_INI_FLAG(kDefaultAssertCrash, assertCrash,
         "Crash application on assertion failure.");
@@ -31,6 +39,12 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(kShowPasswordsInLogs, showPasswordsInLogs,
         "Show passwords in the log messages.");
+
+    NX_INI_INT(kLogLevelReducerPassLimit, logLevelReducerPassLimit,
+        "Replace error and warning logs with debugs after X same messages.");
+
+    NX_INI_INT(kLogLevelReducerWindowSizeS, logLevelReducerWindowSizeS,
+        "Replace error and warning logs with debugs within this time.");
 };
 
 NX_UTILS_API Ini& ini();

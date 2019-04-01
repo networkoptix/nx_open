@@ -160,7 +160,7 @@ bool SdkObjectFactory::initPluginResources()
         data.url = QString();
     }
 
-    const auto resPool = resourcePool();
+    const auto resPool = serverModule()->resourcePool();
     if (!resPool)
     {
         NX_ERROR(this, "Can't access the resource pool");
@@ -231,7 +231,8 @@ bool SdkObjectFactory::initEngineResources()
             .push_back(std::move(databaseAnalyticsEngine));
     }
 
-    auto pluginResources = resourcePool()->getResources<resource::AnalyticsPluginResource>();
+    auto pluginResources =
+        serverModule()->resourcePool()->getResources<resource::AnalyticsPluginResource>();
     for (const auto& plugin: pluginResources)
     {
         const auto& pluginId = plugin->getId();
@@ -250,7 +251,7 @@ bool SdkObjectFactory::initEngineResources()
         for (const auto& engine: engineList)
         {
             analyticsManager->saveSync(engine);
-            auto engineResource = resourcePool()
+            auto engineResource = serverModule()->resourcePool()
                 ->getResourceById<resource::AnalyticsEngineResource>(engine.id);
 
             if (!engineResource)

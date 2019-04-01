@@ -218,11 +218,10 @@ boost::optional<int> HikvisionHevcStreamReader::rescaleQuality(
     if (!parametersAreOk)
         return boost::none;
 
-    auto outputScaleSize = outputQuality.size();
     auto inputScale = (double)inputScaleSize / (inputQualityIndex + 1);
     auto outputIndex = qRound(outputQuality.size() / inputScale) - 1;
 
-    bool indexIsCorrect = outputIndex < outputQuality.size() && outputIndex >= 0;
+    bool indexIsCorrect = outputIndex < int(outputQuality.size()) && outputIndex >= 0;
     NX_ASSERT(indexIsCorrect, lit("Wrong Hikvision quality index."));
     if (!indexIsCorrect)
         return boost::none;
@@ -360,8 +359,9 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
             return CameraDiagnostics::NotAuthorisedResult(channelProperties.httpUrl.toString());
 
         return CameraDiagnostics::RequestFailedResult(
-            lit("Fetch video channel configuration."),
-            lit("Request failed."));
+            "Fetch video channel configuration.",
+            lm("Request failed with status %1").args(
+                nx::network::http::StatusCode::toString(statusCode)));
     }
 
     QDomDocument videoChannelConfiguration;
@@ -406,8 +406,9 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
             return CameraDiagnostics::NotAuthorisedResult(channelProperties.httpUrl.toString());
 
         return CameraDiagnostics::RequestFailedResult(
-            lit("Update video channel configuration."),
-            lit("Request failed."));
+            "Update video channel configuration.",
+            lm("Request failed with status %1").args(
+                nx::network::http::StatusCode::toString(statusCode)));
     }
 
     return CameraDiagnostics::NoErrorResult();

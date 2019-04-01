@@ -14,7 +14,7 @@ namespace {
 
 QRegularExpression makeExactMatchPattern(const Tag& tag)
 {
-    return QRegularExpression("^" + tag.toString() + "$");
+    return QRegularExpression("^" + tag.toString());
 }
 
 } // namespace

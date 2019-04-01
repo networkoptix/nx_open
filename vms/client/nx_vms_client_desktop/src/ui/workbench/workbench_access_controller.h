@@ -3,12 +3,12 @@
 #include <QtCore/QObject>
 #include <QtCore/QList>
 
-#include <client/client_globals.h>
-
 #include <common/common_globals.h>
 #include <common/common_module_aware.h>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/client_resource_fwd.h>
+
 #include <nx/utils/uuid.h>
 #include <utils/common/connective.h>
 
@@ -131,7 +131,8 @@ private:
 
     Qn::Permissions calculatePermissions(const QnResourcePtr& resource) const;
     // Deal with layouts; called from calculatePermissions().
-    Qn::Permissions calculateLayoutPermissions(const QnLayoutResourcePtr& layout) const;
+    Qn::Permissions calculateRemoteLayoutPermissions(const QnLayoutResourcePtr& layout) const;
+    Qn::Permissions calculateFileLayoutPermissions(const QnFileLayoutResourcePtr& layout) const;
 
     GlobalPermissions calculateGlobalPermissions() const;
 

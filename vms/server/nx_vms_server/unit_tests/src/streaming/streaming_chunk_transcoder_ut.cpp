@@ -11,6 +11,7 @@
 #include <streaming/streaming_params.h>
 #include <test_support/resource/camera_resource_stub.h>
 
+#include <nx/mediaserver/camera_mock.h>
 #include "../camera/video_camera_mock.h"
 #include <core/dataprovider/data_provider_factory.h>
 #include <media_server/media_server_module.h>
@@ -35,7 +36,8 @@ protected:
     {
         m_cameraResourceId = QnUuid::createUuid();
 
-        auto cameraResource = QnResourcePtr(new CameraResourceStub());
+        auto cameraResource = nx::vms::server::resource::CameraPtr(
+            new nx::vms::server::resource::test::CameraMock(&m_serverModule));
         cameraResource->setId(m_cameraResourceId);
         m_serverModule.resourcePool()->addResource(cameraResource);
         ASSERT_TRUE(m_serverModule.videoCameraPool()->addVideoCamera(

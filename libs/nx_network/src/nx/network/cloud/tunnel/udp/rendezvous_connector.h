@@ -5,9 +5,9 @@
 #include <nx/utils/system_error.h>
 
 #include "nx/network/aio/abstract_pollable.h"
+#include "nx/network/abstract_socket.h"
 #include "nx/network/aio/timer.h"
 #include "nx/network/udt/udt_socket.h"
-#include "nx/network/system_socket.h"
 
 namespace nx {
 namespace network {
@@ -31,7 +31,7 @@ public:
     RendezvousConnector(
         std::string connectSessionId,
         SocketAddress remotePeerAddress,
-        std::unique_ptr<nx::network::UDPSocket> udpSocket);
+        std::unique_ptr<AbstractDatagramSocket> udpSocket);
 
     RendezvousConnector(
         std::string connectSessionId,
@@ -64,7 +64,7 @@ protected:
 private:
     const std::string m_connectSessionId;
     const SocketAddress m_remotePeerAddress;
-    std::unique_ptr<nx::network::UDPSocket> m_udpSocket;
+    std::unique_ptr<AbstractDatagramSocket> m_udpSocket;
     std::unique_ptr<nx::network::UdtStreamSocket> m_udtConnection;
     ConnectCompletionHandler m_completionHandler;
     boost::optional<SocketAddress> m_localAddressToBindTo;

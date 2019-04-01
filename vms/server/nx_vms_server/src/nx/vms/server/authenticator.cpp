@@ -105,8 +105,16 @@ Authenticator::Result Authenticator::tryAllMethods(
     nx::network::http::Response* response,
     bool isProxy)
 {
-    const auto sessionKey = nx::network::http::getHeaderValue(
-        request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    const auto sessionKey =
+        [&request]()
+        {
+            const auto value = nx::network::http::getHeaderValue(
+                request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+
+            // Some browsers like chrome refuse to delete expited cookies. Since this value is
+            // copied from it we have to check it was not deleted.
+            return value == "deleted" ? nx::network::http::StringType() : value;
+        }();
 
     if (!sessionKey.isEmpty())
     {
@@ -538,7 +546,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
             *usedAuthMethod = nx::network::http::AuthMethod::httpBasic;
         authResult = tryHttpBasic(request.requestLine.method, authorizationHeader, response, accessRights);
 
-        if (authResult == Qn::Auth_OK && userResource &&
+        if (authResult == Qn::Auth_OK && userResource && userResource->isLocal() &&
             (userResource->getDigest().isEmpty() || userResource->getRealm() != nx::network::AppInfo::realm()))
         {
             updateUserHashes(userResource, QString::fromUtf8(authorizationHeader.basic->password));
@@ -823,6 +831,18 @@ Qn::AuthResult Authenticator::tryAuthRecord(
         method,
         authorization,
         &response.headers);
+
+    if (errorCode == Qn::AuthResult::Auth_OK)
+    {
+        NX_VERBOSE(this, "Auth record authenticated. User %1, nonce %2",
+            authorization.digest->userid, authorization.digest->params["nonce"]);
+    }
+    else
+    {
+        NX_DEBUG(this, "Failed to authenticate auth record. User %1, nonce %2, realm %3. %4",
+            authorization.digest->userid, authorization.digest->params["nonce"],
+            authorization.digest->params["realm"], toString(errorCode));
+    }
 
     if (const auto user = resource.dynamicCast<QnUserResource>())
     {

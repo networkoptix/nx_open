@@ -177,6 +177,11 @@ namespace ResourceDataKey
     static const QString kParseOnvifNotificationsWithHttpReader("parseOnvifNotificationsWithHttpReader");
     static const QString kDisableHevc("disableHevc");
 
+    static const QString DO_UPDATE_PORT_IN_SUBSCRIPTION_ADDRESS = lit("doUpdatePortInSubscriptionAddress");
+
+
+    static const QString kDoUpdatePortInSubscriptionAddress("doUpdatePortInSubscriptionAddress");
+
     // Rename?
     static const QString kNeedToReloadAllAdvancedParametersAfterApply("needToReloadAllAdvancedParametersAfterApply");
 
@@ -194,6 +199,7 @@ namespace ResourceDataKey
     static const QString kVideoLayout("videoLayout");
 
     static const QString kRepeatIntervalForSendVideoEncoderMS("repeatIntervalForSendVideoEncoderMS");
+    static const QString kMulticastIsSupported("multicastIsSupported");
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------

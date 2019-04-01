@@ -79,7 +79,7 @@ int QnStorageStatusRestHandler::executeGet(
     const QString &,
     const QnRequestParams &params,
     QnJsonRestResult &result,
-    const QnRestConnectionProcessor* owner)
+    const QnRestConnectionProcessor* /*owner*/)
 {
     QString storageUrl;
 

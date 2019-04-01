@@ -158,7 +158,7 @@ private slots:
 
     void at_workbenchLayoutItem_dataChanged(Qn::ItemDataRole role);
 
-    void at_navigator_positionChanged();
+    void at_navigator_timeSyncRequested();
     void at_navigator_playingChanged();
     void at_navigator_speedChanged();
 
@@ -174,7 +174,6 @@ private slots:
 
 private:
     void showControlledByAnotherUserMessage() const;
-
     void showFailedToApplyChanges() const;
 
 private:
@@ -197,6 +196,7 @@ private:
         qint64 sequence;
         QList<QnVideoWallControlMessage> cachedMessages;
         QTimer* cacheTimer;
+        QTimer* syncPlayTimer; //< Timer for periodical play position sync.
     } m_controlMode;
 
     QnVideoWallLicenseUsageHelper* m_licensesHelper;

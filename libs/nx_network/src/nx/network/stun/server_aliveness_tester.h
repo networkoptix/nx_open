@@ -24,6 +24,7 @@ public:
     ServerAlivenessTester(
         KeepAliveOptions keepAliveOptions,
         AbstractAsyncClient* client);
+    ~ServerAlivenessTester();
 
 protected:
     /**

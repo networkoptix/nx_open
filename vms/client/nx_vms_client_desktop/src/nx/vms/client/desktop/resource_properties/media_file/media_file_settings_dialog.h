@@ -7,13 +7,12 @@
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-namespace Ui {
-class MediaFileSettingsDialog;
-}
+namespace Ui { class MediaFileSettingsDialog; }
 
 namespace nx::vms::client::desktop {
 
 class ImageProvider;
+class FisheyePreviewController;
 
 class MediaFileSettingsDialog:
     public QnButtonBoxDialog,
@@ -29,13 +28,10 @@ public:
     void updateFromResource(const QnMediaResourcePtr& resource);
     void submitToResource(const QnMediaResourcePtr& resource);
 
-private slots:
-    void paramsChanged();
-
 private:
     QScopedPointer<Ui::MediaFileSettingsDialog> ui;
 
-    bool m_updating;
+    bool m_updating = false;
     QnMediaResourcePtr m_resource;
     QScopedPointer<ImageProvider> m_imageProvider;
 };

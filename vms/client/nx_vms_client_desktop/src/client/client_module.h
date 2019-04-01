@@ -55,6 +55,7 @@ private:
     void initSingletons();
     void initRuntimeParams(const QnStartupParameters& startupParams);
     void initLog();
+    bool initLogFromFile(const QString& filename, const QString& suffix = QString());
     void initNetwork();
     void initSkin();
     void initLocalResources();

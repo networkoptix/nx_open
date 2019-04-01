@@ -38,7 +38,7 @@ public:
      * NOTE: It is safe to invoke this method only within ConnectionMediationInitiator::start
      * completion handler.
      */
-    std::unique_ptr<UDPSocket> takeUdpSocket();
+    std::unique_ptr<AbstractDatagramSocket> takeUdpSocket();
 
     /**
      * Mediator address can be changed during performing request: the request can be redirected to
@@ -55,7 +55,7 @@ private:
     hpm::api::ConnectRequest m_request;
     Handler m_handler;
     std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
-    std::unique_ptr<UDPSocket> m_udpHolePunchingSocket;
+    std::unique_ptr<AbstractDatagramSocket> m_udpHolePunchingSocket;
     aio::Timer m_tcpConnectDelayTimer;
     std::unique_ptr<nx::hpm::api::Client> m_mediatorApiClient;
     bool m_tcpRequestCompleted = false;

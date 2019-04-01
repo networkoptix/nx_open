@@ -44,10 +44,10 @@ void Downloader::Private::startDownload(const QString& fileName)
 {
     NX_MUTEX_LOCKER lock(&mutex);
 
-    const auto keyFileName = FileInformation::keyFromFileName(fileName);
-    if (workers.contains(keyFileName))
+    if (workers.contains(fileName))
         return;
 
+    NX_ASSERT(storage->fileInformation(fileName).isValid());
     const auto status = storage->fileInformation(fileName).status;
     if (status == FileInformation::Status::downloaded)
     {
@@ -61,13 +61,13 @@ void Downloader::Private::startDownload(const QString& fileName)
     if (!downloadsStarted)
         return;
 
-    const auto fi = storage->fileInformation(keyFileName);
+    const auto fi = storage->fileInformation(fileName);
     auto peerManager = peerManagerFactory->createPeerManager(fi.peerPolicy, fi.additionalPeers);
     auto worker = std::make_shared<Worker>(
-        keyFileName,
+        fileName,
         storage.data(),
         peerManager);
-    workers[keyFileName] = worker;
+    workers[fileName] = worker;
 
     connect(worker.get(), &Worker::finished, this,
         [this](const QString& fileName)
@@ -84,7 +84,7 @@ void Downloader::Private::stopDownload(const QString& fileName, bool emitSignals
     Worker::State state;
     {
         NX_MUTEX_LOCKER lock(&mutex);
-        const auto worker = workers.take(FileInformation::keyFromFileName(fileName));
+        const auto worker = workers.take(fileName);
         if (!worker)
             return;
 
@@ -115,8 +115,20 @@ Downloader::Downloader(
 {
     d->storage.reset(new Storage(downloadsDirectory));
 
-    connect(d->storage.data(), &Storage::fileAdded, this, &Downloader::fileAdded);
-    connect(d->storage.data(), &Storage::fileDeleted, this, &Downloader::fileDeleted);
+    connect(d->storage.data(), &Storage::fileAdded, this,
+        [this](const FileInformation& fileInformation)
+        {
+            emit fileAdded(fileInformation);
+            d->startDownload(fileInformation.name);
+        });
+
+    connect(d->storage.data(), &Storage::fileDeleted, this,
+        [this](const QString& fileName)
+        {
+            d->stopDownload(fileName, false);
+            emit fileDeleted(fileName);
+        });
+
     connect(d->storage.data(), &Storage::fileInformationChanged, this,
         &Downloader::fileInformationChanged);
     connect(d->storage.data(), &Storage::fileStatusChanged, this, &Downloader::fileStatusChanged);
@@ -130,11 +142,6 @@ Downloader::Downloader(
         d->peerManagerFactory = factory.get();
         d->peerManagerFactoryOwner = std::move(factory);
     }
-
-    QMetaObject::invokeMethod(
-        d->storage.data(),
-        [this]() { d->storage->findDownloads(); },
-        Qt::QueuedConnection);
 }
 
 Downloader::~Downloader()
@@ -153,6 +160,11 @@ QString Downloader::filePath(const QString& fileName) const
     return d->storage->filePath(fileName);
 }
 
+QDir Downloader::downloadsDirectory() const
+{
+    return d->storage->downloadsDirectory();
+}
+
 FileInformation Downloader::fileInformation(const QString& fileName) const
 {
     return d->storage->fileInformation(fileName);
@@ -160,17 +172,7 @@ FileInformation Downloader::fileInformation(const QString& fileName) const
 
 ResultCode Downloader::addFile(const FileInformation& fileInformation)
 {
-    auto errorCode = d->storage->addFile(fileInformation);
-    if (errorCode != ResultCode::ok)
-        return errorCode;
-
-    executeInThread(thread(),
-        [this, fileName = fileInformation.name]
-        {
-            d->startDownload(fileName);
-        });
-
-    return errorCode;
+    return d->storage->addFile(fileInformation);
 }
 
 ResultCode Downloader::updateFileInformation(
@@ -235,9 +237,9 @@ void Downloader::stopDownloads()
         worker->stop();
 }
 
-void Downloader::findExistingDownloads(bool waitForFinished)
+void Downloader::findExistingDownloads()
 {
-    d->storage->findDownloads(waitForFinished);
+    d->storage->findDownloads(true);
 }
 
 void Downloader::validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,

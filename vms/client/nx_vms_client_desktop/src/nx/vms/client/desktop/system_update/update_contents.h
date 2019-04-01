@@ -56,14 +56,13 @@ bool checkCloudHost(
  * @param contents - update contents. Result is stored inside its fields.
  * @param servers - servers to be used for update verification.
  * @param clientVersions - a set of installed client versions.
- * @param checkClient - should we check client package.
+ * @param clientId - peer id for a client. Verification will ignore client if clientId is null.
  * @returns true if everything is ok.
  */
 bool verifyUpdateContents(
     QnCommonModule* commonModule,
     nx::update::UpdateContents& contents,
     std::map<QnUuid, QnMediaServerResourcePtr> servers,
-    const std::set<nx::utils::SoftwareVersion>& clientVersions = {},
-    bool checkClient = true);
+    const std::set<nx::utils::SoftwareVersion>& clientVersions = {}, QnUuid clientId = QnUuid());
 
 } // namespace nx::vms::client::desktop

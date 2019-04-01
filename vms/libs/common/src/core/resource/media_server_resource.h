@@ -13,15 +13,7 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/system_information.h>
 
-namespace nx {
-namespace network {
-namespace http {
-
-class AsyncHttpClientPtr;
-
-} // namespace nx
-} // namespace network
-} // namespace http
+namespace nx::network::http { class AsyncHttpClientPtr; }
 
 class QnMediaServerResource:
     public QnResource,
@@ -134,6 +126,11 @@ public:
      * reference to a original ID. So, its overrid this call for fakeMediaServer
      */
     virtual QnUuid getOriginalGuid() const { return getId();  }
+
+    /**
+     * @return Ids of Analytics Engines which are actually running on the server.
+     */
+    QSet<QnUuid> activeAnalyticsEngineIds() const;
 
     static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
 

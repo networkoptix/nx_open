@@ -5,6 +5,7 @@
 #include <utils/common/synctime.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 /**
@@ -107,7 +108,7 @@ void QnWearableLockManager::cleanupExpiredLockUnsafe(const QnUuid& cameraId)
     }
 
     // Check if user was deleted.
-    if (!resourcePool()->getResourceById(pos->userId))
+    if (!serverModule()->resourcePool()->getResourceById(pos->userId))
         m_lockByCameraId.erase(pos);
 }
 

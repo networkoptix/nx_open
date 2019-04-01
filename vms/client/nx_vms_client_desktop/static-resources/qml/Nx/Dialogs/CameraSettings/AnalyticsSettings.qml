@@ -56,7 +56,7 @@ Item
         id: menu
 
         width: 240
-        height: parent.height
+        height: parent.height - alertBar.height
 
         Repeater
         {
@@ -73,9 +73,10 @@ Item
 
     ColumnLayout
     {
-        anchors.fill: parent
-        anchors.margins: 16
-        anchors.leftMargin: menu.width + 16
+        x: menu.width + 16
+        y: 16
+        width: parent.width - x - 16
+        height: parent.height - 16 - alertBar.height
         spacing: 16
 
         enabled: !loading
@@ -116,8 +117,8 @@ Item
         {
             id: settingsView
 
-            width: parent.width
             Layout.fillHeight: true
+            Layout.fillWidth: true
 
             onValuesEdited: store.setDeviceAgentSettingsValues(currentEngineId, getValues())
 
@@ -129,9 +130,10 @@ Item
     {
         id: alertBar
 
+        height: visible ? implicitHeight : 0
         visible: false
         anchors.bottom: parent.bottom
-        label.text: qsTr("Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.")
+        label.text: qsTr("Camera analytics will work only when camera is being viewed."
+            + " Enable recording to make it work all the time.")
     }
-
 }
