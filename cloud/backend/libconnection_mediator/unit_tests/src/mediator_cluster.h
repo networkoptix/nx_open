@@ -21,7 +21,15 @@ public:
     Mediator& mediator(int index);
     const Mediator& mediator(int index) const;
 
-    bool peerInformationSynchronizedInCluster(const std::string& peerDomainName);
+    /**
+     * returns true if ALL Mediator's have peerDomainName.
+     */
+    bool peerInformationSynchronizedInCluster(const std::string& peerDomainName) const;
+
+    /**
+     * returns true if ALL Mediator's do NOT have peerDomainName.
+     */
+    bool peerInformationIsAbsentFromCluster(const std::string& peerDomainName) const;
 
 private:
     std::vector<std::unique_ptr<Mediator>> m_mediators;

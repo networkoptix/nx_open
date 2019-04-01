@@ -6,6 +6,22 @@
 
 namespace nx::hpm::test {
 
+namespace {
+
+static bool mediatorHasPeer (Mediator* mediator, const std::string& peerDomainName)
+{
+    nx::utils::SyncQueue<bool> hasEndpoint;
+    mediator->moduleInstance()->impl()->remoteMediatorPeerPool().findMediatorByPeerDomain(
+        peerDomainName,
+        [&hasEndpoint](MediatorEndpoint endpoint)
+        {
+            hasEndpoint.push(!endpoint.domainName.empty());
+        });
+    return hasEndpoint.pop();
+}
+
+} //namespace
+
 Mediator& MediatorCluster::addMediator(
     std::vector<const char*> args,
     Mediator::MediatorTestFlags flags)
@@ -32,26 +48,24 @@ const Mediator& MediatorCluster::mediator(int index) const
     return *m_mediators[index];
 }
 
-bool MediatorCluster::peerInformationSynchronizedInCluster(const std::string& peerDomainName)
+bool MediatorCluster::peerInformationSynchronizedInCluster(const std::string& peerDomainName) const
 {
-    const auto doesMediatorHavePeer =
-        [](Mediator* mediator, const std::string& peerDomainName)->bool
-        {
-            nx::utils::SyncQueue<bool> hasEndpoint;
-            mediator->moduleInstance()->impl()->remoteMediatorPeerPool().findMediatorByPeerDomain(
-                peerDomainName,
-                [&hasEndpoint](MediatorEndpoint endpoint)
-                {
-                    hasEndpoint.push(!endpoint.domainName.empty());
-                });
-            return hasEndpoint.pop();
-        };
-
-    bool allMediatorsHavePeerDomainName = true;
+    bool allMediatorsHavePeer = true;
     for (const auto& mediator : m_mediators)
-        allMediatorsHavePeerDomainName &= doesMediatorHavePeer(mediator.get(), peerDomainName);
+        allMediatorsHavePeer &= mediatorHasPeer(mediator.get(), peerDomainName);
 
-    return allMediatorsHavePeerDomainName;
+    return allMediatorsHavePeer;
+}
+
+bool MediatorCluster::peerInformationIsAbsentFromCluster(const std::string& peerDomainName) const
+{
+    for (const auto& mediator : m_mediators)
+    {
+        if (mediatorHasPeer(mediator.get(), peerDomainName))
+            return false;
+    }
+
+    return true;
 }
 
 } // namespace nx::hpm::test
