@@ -6,7 +6,7 @@
 /** Used in lib common for plugin framework. */
 struct PluginsIniConfig: public nx::kit::IniConfig
 {
-    PluginsIniConfig(): nx::kit::IniConfig("plugins.ini") { reload(); }
+    PluginsIniConfig(): nx::kit::IniConfig("vms_server_plugins.ini") { reload(); }
 
     NX_INI_STRING("", disabledNxPlugins,
         "Comma-separated list of Nx plugins to skip in \"plugins\" dir,\n"

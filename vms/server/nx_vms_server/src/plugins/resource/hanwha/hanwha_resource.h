@@ -156,6 +156,7 @@ public:
     boost::optional<int> bypassChannel() const;
 
     CameraDiagnostics::Result enableAudioInput();
+    CameraDiagnostics::Result ensureMulticastEnabled(Qn::ConnectionRole role);
 
 protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
@@ -201,6 +202,7 @@ private:
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
 
     CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
+    CameraDiagnostics::Result enableMulticast(const HanwhaVideoProfile& profile);
 
     void cleanUpOnProxiedDeviceChange();
 

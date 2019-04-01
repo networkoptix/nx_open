@@ -705,7 +705,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     auto result = detectMaxFpsForSecondaryCodec();
     if (!result)
         return result;
-
+    setCameraCapability(Qn::CameraTimeCapability, true);
     saveProperties();
 
     return CameraDiagnostics::NoErrorResult();

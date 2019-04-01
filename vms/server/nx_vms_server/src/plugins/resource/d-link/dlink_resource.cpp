@@ -348,7 +348,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
         else
             ++it;
     }
-
+    setCameraCapability(Qn::CameraTimeCapability, true);
     saveProperties();
 
     return CameraDiagnostics::NoErrorResult();

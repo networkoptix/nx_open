@@ -95,7 +95,7 @@ struct QnOnvifServiceUrls
 
 struct OnvifIniConfig: public nx::kit::IniConfig
 {
-    OnvifIniConfig(): IniConfig("server_onvif.ini") {}
+    OnvifIniConfig(): IniConfig("vms_server_onvif.ini") {}
 
     static OnvifIniConfig& instance()
     {

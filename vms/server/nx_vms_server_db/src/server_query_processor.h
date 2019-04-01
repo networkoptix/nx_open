@@ -23,6 +23,7 @@
 #include <transaction/message_bus_adapter.h>
 #include <transaction/amend_transaction_data.h>
 #include <nx/utils/thread/long_runnable.h>
+#include <nx/network/app_info.h>
 
 namespace ec2 {
 
@@ -192,6 +193,8 @@ inline void fixRequestDataIfNeeded(nx::vms::api::UserDataEx* const userDataEx)
         userDataEx->digest = hashes.passwordDigest;
         userDataEx->cryptSha512Hash = hashes.cryptSha512Hash;
     }
+    if(userDataEx->realm.isEmpty())
+        userDataEx->realm = nx::network::AppInfo::realm();
 
     fixRequestDataIfNeeded(static_cast<nx::vms::api::UserData* const>(userDataEx));
 }

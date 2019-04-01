@@ -748,7 +748,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
         if (!checkResultAndSetStatus(result))
             return result;
     }
-
+    setCameraCapability(Qn::CameraTimeCapability, true);
     saveProperties();
 
     return CameraDiagnostics::NoErrorResult();

@@ -27,6 +27,7 @@ static const QString kAssociatedParametersAux = lit("associatedWith");
 static const QString kAssociationCondition = lit("associationCondition");
 static const QString kPtzTraitsAux = lit("ptzTraits");
 static const QString kPtzCapabilitiesAux = lit("ptzCapabilities");
+static const QString kMulticastAux = lit("multicast");
 
 static const QString kPrimaryProfile = lit("primary");
 static const QString kSecondaryProfile = lit("secondary");
@@ -242,6 +243,11 @@ Ptz::Capabilities HanwhaAdavancedParameterInfo::ptzCapabilities() const
     return m_ptzCapabilities;
 }
 
+bool HanwhaAdavancedParameterInfo::isMulticastParameter() const
+{
+    return m_isMulticast;
+}
+
 bool HanwhaAdavancedParameterInfo::isValid() const
 {
     return (!m_cgi.isEmpty()
@@ -325,6 +331,8 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
                 auxValue,
                 Ptz::NoPtzCapabilities);
         }
+        if (auxName == kMulticastAux)
+            m_isMulticast = fromString<bool>(auxValue);
     }
 }
 

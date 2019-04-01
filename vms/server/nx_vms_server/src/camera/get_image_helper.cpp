@@ -7,7 +7,7 @@
 #include <nx/streaming/config.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/app_info.h>
-#include <mediaserver_ini.h>
+#include <nx_vms_server_ini.h>
 
 #include "utils/media/frame_info.h"
 #include "transcoding/transcoder.h"

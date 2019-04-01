@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <api/server_rest_connection.h>
-#include <mediaserver_ini.h>
+#include <nx_vms_server_ini.h>
 #include <nx/utils/test_support/run_test.h>
 #include <test_support/mediaserver_launcher.h>
 

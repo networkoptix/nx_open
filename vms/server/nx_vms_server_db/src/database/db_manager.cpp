@@ -401,7 +401,7 @@ int QnDbManager::currentBuildNumber(const QString& basePath)
         {
             sdb.close();
             sdb = QSqlDatabase();
-            QSqlDatabase::removeDatabase(buildNumberConnectionName);
+            nx::sql::Database::removeDatabase(buildNumberConnectionName);
         });
 
     QSqlQuery getVersionQuery(sdb);
@@ -2117,7 +2117,7 @@ QnDbManager::~QnDbManager()
     if (m_sdbStatic.isOpen())
     {
         m_sdbStatic = QSqlDatabase();
-        QSqlDatabase::removeDatabase(getDatabaseName("QnDbManagerStatic"));
+        nx::sql::Database::removeDatabase(getDatabaseName("QnDbManagerStatic"));
     }
 }
 
@@ -2538,7 +2538,7 @@ ErrorCode QnDbManager::executeTransactionInternal(
     {
         testDB.close();
         testDB = QSqlDatabase();
-        QSqlDatabase::removeDatabase(databaseName);
+        nx::sql::Database::removeDatabase(databaseName);
     });
 
     testDB.setDatabaseName( f.fileName());

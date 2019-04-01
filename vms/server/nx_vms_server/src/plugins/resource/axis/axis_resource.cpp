@@ -672,7 +672,7 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     // because mobile client doesn't load resource type information.
     if (isIOModule())
         setProperty(ResourcePropertyKey::kIoConfigCapability, QString("1"));
-
+    setCameraCapability(Qn::CameraTimeCapability, true);
     saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
