@@ -17,7 +17,7 @@ public:
     virtual RestResponse executePost(const RestRequest& request);
 
 private:
-    std::optional<RestResponse> checkCommonInputParameters(const QnRequestParams& parameters) const;
+    std::optional<RestResponse> checkCommonInputParameters(const RestRequest& request) const;
     std::optional<QJsonObject> deviceAgentSettingsModel(const QString& engineId) const;
 
     RestResponse makeSettingsResponse(

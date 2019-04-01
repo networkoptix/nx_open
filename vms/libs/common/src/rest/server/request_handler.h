@@ -1,14 +1,17 @@
 #pragma once
 
+#include <type_traits>
+
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 #include <QtCore/QSharedPointer>
 
 #include <common/common_globals.h>
-#include <utils/common/request_param.h>
-
+#include <nx/fusion/model_functions.h>
+#include <nx/utils/exception.h>
 #include <rest/server/json_rest_result.h>
+#include <utils/common/request_param.h>
 
 class TCPSocket;
 class QnRestConnectionProcessor;
@@ -29,19 +32,15 @@ struct RestContent
     std::optional<QJsonValue> parse() const;
 };
 
-class RestException:
-    public std::exception
+class RestException: public nx::utils::Exception
 {
 public:
     const QnRestResult::ErrorDescriptor descriptor;
 
     template<typename... Args>
-    RestException(Args... args): descriptor(std::forward<Args>(args)...) {}
+    RestException(QnRestResult::Error errorCode, Args... args);
 
-    virtual const char* what() const noexcept override;
-
-private:
-    mutable std::optional<std::string> m_what;
+    QString message() const override;
 };
 
 struct RestRequest
@@ -70,9 +69,18 @@ struct RestRequest
      * it if ini config permits so).
      */
     const RequestParams& params() const;
-    std::optional<QString> param(const QString& key) const;
-    QString paramOr(const QString& key, const QString& defaultValue = {}) const;
-    QString paramOrThrow(const QString& key) const;
+
+    /** Returns parsed param value, returns std::nullpot on failure. */
+    template<typename T = QString>
+    std::optional<T> param(const QString& key) const;
+
+    /** The save as param, but returns defaultValue on failure. */
+    template<typename T = QString>
+    T paramOr(const QString& key, const T& defaultValue = {}) const;
+
+    /** The save as param, but throws RestException on failure. */
+    template<typename T = QString>
+    T paramOrThrow(const QString& key) const;
 
     /**
      * If method may not provide message body, parses URL params.
@@ -80,6 +88,8 @@ struct RestRequest
      */
     template <typename T>
     std::optional<T> parseContent() const;
+
+    /** The save as parseContent, but throws RestException on failure. */
     template <typename T>
     T parseContentOrThrow() const;
 
@@ -205,6 +215,82 @@ typedef QSharedPointer<QnRestRequestHandler> QnRestRequestHandlerPtr;
 
 //--------------------------------------------------------------------------------------------------
 
+inline void qStringListAdd(QStringList* /*list*/) {}
+
+template<typename... Args>
+void qStringListAdd(QStringList* list, QString arg, Args... args)
+{
+    list->append(std::move(arg));
+    qStringListAdd(list, std::forward<Args>(args)...);
+}
+
+template<typename... Args>
+QStringList qStringListInit(Args... args)
+{
+    QStringList argList;
+    qStringListAdd(&argList, std::forward<Args>(args)...);
+    return argList;
+}
+
+template<typename... Args>
+RestException::RestException(QnRestResult::Error code, Args... args):
+    descriptor({code, qStringListInit(std::forward<Args>(args)...)})
+{
+}
+
+template<typename T>
+std::optional<T> RestRequest::param(const QString& key) const
+{
+    const auto stringValue = param<QString>(key);
+    if (!stringValue)
+        return std::nullopt;
+
+    T value;
+    if (!QnLexical::deserialize(*stringValue, &value))
+        return std::nullopt;
+
+    return value;
+}
+
+template<>
+inline std::optional<QString> RestRequest::param<QString>(const QString& key) const
+{
+    const auto& params_ = params();
+    const auto it = params_.find(key);
+    if (it == params_.end())
+        return std::nullopt;
+
+    return it.value();
+}
+
+template<typename T>
+T RestRequest::paramOr(const QString& key, const T& defaultValue) const
+{
+    auto value = param<T>(key);
+    return value ? *value : defaultValue;
+}
+
+template<typename T>
+T RestRequest::paramOrThrow(const QString& key) const
+{
+    const auto stringValue = paramOrThrow<QString>(key);
+    T value;
+    if (!QnLexical::deserialize(stringValue, &value))
+        throw RestException(QnRestResult::InvalidParameter, key, stringValue);
+
+    return value;
+}
+
+template<>
+inline QString RestRequest::paramOrThrow<QString>(const QString& key) const
+{
+    const auto stringValue = param<QString>(key);
+    if (!stringValue)
+        throw RestException(QnRestResult::MissingParameter, key);
+
+    return *stringValue;
+}
+
 template<typename T>
 std::optional<T> RestRequest::parseContent() const
 {
@@ -240,19 +326,8 @@ RestResponse RestResponse::reply(const T& data)
     return result(json);
 }
 
-inline void qStringListAdd(QStringList* /*list*/) {}
-
 template<typename... Args>
-void qStringListAdd(QStringList* list, QString arg, Args... args)
+RestResponse RestResponse::error(QnRestResult::Error code, Args... args)
 {
-    list->append(std::move(arg));
-    qStringListAdd(list, std::forward<Args>(args)...);
-}
-
-template<typename... Args>
-RestResponse RestResponse::error(QnRestResult::Error errorCode, Args... args)
-{
-    QStringList argList;
-    qStringListAdd(&argList, args...);
-    return error(QnRestResult::ErrorDescriptor{errorCode, std::move(argList)});
+    return error({code, qStringListInit(std::forward<Args>(args)...)});
 }

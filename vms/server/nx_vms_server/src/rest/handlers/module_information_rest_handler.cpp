@@ -12,38 +12,28 @@
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
-namespace {
-
 static const std::chrono::hours kConnectionTimeout(10);
 static const nx::network::KeepAliveOptions kKeepAliveOptions(
     std::chrono::seconds(10), std::chrono::seconds(10), 3);
 
-template<typename P>
-bool allModulesMode(const P& p) { return p.value(lit("allModules")) == lit("true"); }
+static const QString kAllModules("allModules");
+static const QString kShowAddresses("showAddresses");
+static const QString kCheckOwnerPermissions("checkOwnerPermissions");
+static const QString kKeepConnectionOpen("keepConnectionOpen");
+static const QString kUpdateStreamTime("updateStream");
 
-template<typename P>
-bool showAddressesMode(const P& p) { return p.value(lit("showAddresses"), lit("true")) != lit("false"); }
-
-template<typename P>
-bool checkOwnerPermissionsMode(const P& p) { return p.value(lit("checkOwnerPermissions"), lit("false")) != lit("false"); }
-
-template<typename P>
-bool keepConnectionOpenMode(const P& p) { return p.contains(lit("keepConnectionOpen")); }
-
-template<typename P>
-std::optional<std::chrono::milliseconds> updateStreamTime(const P& p)
+static std::optional<std::chrono::milliseconds> parseUpdateStreamTime(const RestRequest& request)
 {
-    if (!p.contains("updateStream"))
+    const auto value = request.param(kUpdateStreamTime);
+    if (!value)
         return std::nullopt;
 
-    std::chrono::milliseconds requestedTime = std::chrono::seconds(p.value("updateStream").toInt());
+    std::chrono::milliseconds requestedTime = std::chrono::seconds(value->toInt());
     if (requestedTime.count() == 0)
         requestedTime = kKeepAliveOptions.inactivityPeriodBeforeFirstProbe / 2;
 
     return requestedTime;
 }
-
-} // namespace
 
 QnModuleInformationRestHandler::QnModuleInformationRestHandler(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
@@ -89,8 +79,7 @@ void QnModuleInformationRestHandler::clear(Connections* connections)
 
 RestResponse QnModuleInformationRestHandler::executeGet(const RestRequest& request)
 {
-    if (checkOwnerPermissionsMode(request.params())
-        && !QnPermissionsHelper::hasOwnerPermissions(
+    if (request.param(kCheckOwnerPermissions) && !QnPermissionsHelper::hasOwnerPermissions(
             request.owner->resourcePool(), request.owner->accessRights()))
     {
         QnJsonRestResult result;
@@ -99,10 +88,10 @@ RestResponse QnModuleInformationRestHandler::executeGet(const RestRequest& reque
     }
 
     RestResponse response;
-    if (allModulesMode(request.params()))
+    if (request.param(kAllModules))
     {
         const auto allServers = request.owner->resourcePool()->getAllServers(Qn::AnyStatus);
-        if (showAddressesMode(request.params()))
+        if (request.param(kShowAddresses))
         {
             QList<nx::vms::api::ModuleInformationWithAddresses> modules;
             for (const QnMediaServerResourcePtr &server : allServers)
@@ -119,7 +108,7 @@ RestResponse QnModuleInformationRestHandler::executeGet(const RestRequest& reque
             response = RestResponse::reply(modules);
         }
     }
-    else if (showAddressesMode(request.params()))
+    else if (request.param(kShowAddresses))
     {
         const auto id = request.owner->commonModule()->moduleGUID();
         if (const auto s = request.owner->resourcePool()->getResourceById<QnMediaServerResource>(id))
@@ -132,7 +121,7 @@ RestResponse QnModuleInformationRestHandler::executeGet(const RestRequest& reque
         response = RestResponse::reply(request.owner->commonModule()->moduleInformation());
     }
 
-    if (updateStreamTime(request.params()))
+    if (parseUpdateStreamTime(request))
         response.isUndefinedContentLength = true;
 
     return response;
@@ -141,7 +130,8 @@ RestResponse QnModuleInformationRestHandler::executeGet(const RestRequest& reque
 void QnModuleInformationRestHandler::afterExecute(
     const RestRequest& request, const RestResponse& /*response*/)
 {
-    if (!keepConnectionOpenMode(request.params()) && !updateStreamTime(request.params()))
+    const auto updateStreamTime = parseUpdateStreamTime(request);
+    if (!request.param(kKeepConnectionOpen) && !updateStreamTime)
         return;
 
     // TODO: Probably owner is supposed to be passed as mutable.
@@ -160,8 +150,7 @@ void QnModuleInformationRestHandler::afterExecute(
     }
 
     m_pollable.post(
-        [this, socket = std::move(socket), updateStreamTime = updateStreamTime(request.params())
-            ]() mutable
+        [this, socket = std::move(socket), updateStreamTime]() mutable
         {
             if (updateStreamTime)
             {

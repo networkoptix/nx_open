@@ -24,7 +24,7 @@ DeviceAnalyticsSettingsHandler::DeviceAnalyticsSettingsHandler(QnMediaServerModu
 
 RestResponse DeviceAnalyticsSettingsHandler::executeGet(const RestRequest& request)
 {
-    if (const auto& error = checkCommonInputParameters(request.params()))
+    if (const auto& error = checkCommonInputParameters(request))
         return *error;
 
     const auto analyticsManager = serverModule()->analyticsManager();
@@ -43,17 +43,10 @@ RestResponse DeviceAnalyticsSettingsHandler::executeGet(const RestRequest& reque
 
 RestResponse DeviceAnalyticsSettingsHandler::executePost(const RestRequest& request)
 {
-    if (const auto& error = checkCommonInputParameters(request.params()))
+    if (const auto& error = checkCommonInputParameters(request))
         return *error;
 
-    const auto& settings = request.parseContent<QJsonObject>();
-    if (!settings)
-    {
-        const QString message("Unable to deserialize request");
-        NX_WARNING(this, message);
-        return RestResponse::error(QnRestResult::Error::BadRequest, message);
-    }
-
+    const auto& settings = request.parseContentOrThrow<QJsonObject>();
     auto analyticsManager = serverModule()->analyticsManager();
     if (!analyticsManager)
     {
@@ -65,29 +58,15 @@ RestResponse DeviceAnalyticsSettingsHandler::executePost(const RestRequest& requ
     const QString& deviceId = request.paramOr(kDeviceIdParameter);
     const QString& engineId = request.paramOr(kAnalyticsEngineIdParameter);
 
-    analyticsManager->setSettings(deviceId, engineId, settings->toVariantMap());
+    analyticsManager->setSettings(deviceId, engineId, settings.toVariantMap());
     return makeSettingsResponse(analyticsManager, engineId, deviceId);
 }
 
 std::optional<RestResponse> DeviceAnalyticsSettingsHandler::checkCommonInputParameters(
-    const QnRequestParams& parameters) const
+    const RestRequest& request) const
 {
-    if (!parameters.contains(kDeviceIdParameter))
-    {
-        NX_WARNING(this, "Missing parameter %1", kDeviceIdParameter);
-        return RestResponse::error(
-            QnRestResult::Error::MissingParameter, kDeviceIdParameter);
-    }
-
-    if (!parameters.contains(kAnalyticsEngineIdParameter))
-    {
-        NX_WARNING(this, "Missing parameter %1", kAnalyticsEngineIdParameter);
-        return RestResponse::error(
-            QnRestResult::Error::MissingParameter, kAnalyticsEngineIdParameter);
-    }
-
-    const QString& deviceId = parameters[kDeviceIdParameter];
-    const QString& engineId = parameters[kAnalyticsEngineIdParameter];
+    const QString& deviceId = request.paramOrThrow(kDeviceIdParameter);
+    const QString& engineId = request.paramOrThrow(kAnalyticsEngineIdParameter);
 
     const auto device = nx::camera_id_helper::findCameraByFlexibleId(
         serverModule()->resourcePool(),
@@ -96,7 +75,7 @@ std::optional<RestResponse> DeviceAnalyticsSettingsHandler::checkCommonInputPara
     if (!device)
     {
         const auto message = lm("Unable to find device by id %1").args(deviceId);
-        NX_WARNING(this, message);
+        NX_DEBUG(this, message);
         return RestResponse::error(QnRestResult::Error::CantProcessRequest, message);
     }
 
@@ -106,7 +85,7 @@ std::optional<RestResponse> DeviceAnalyticsSettingsHandler::checkCommonInputPara
             lm("Wrong server. Device belongs to the server %1, current server: %2").args(
                 device->getParentId(), moduleGUID());
 
-        NX_WARNING(this, message);
+        NX_DEBUG(this, message);
         return RestResponse::error(QnRestResult::Error::CantProcessRequest, message);
     }
 
@@ -116,7 +95,7 @@ std::optional<RestResponse> DeviceAnalyticsSettingsHandler::checkCommonInputPara
     if (!engine)
     {
         const auto message = lm("Unable to find analytics engine by id %1").args(engineId);
-        NX_WARNING(this, message);
+        NX_DEBUG(this, message);
         return RestResponse::error(QnRestResult::Error::CantProcessRequest, message);
     }
 
@@ -131,7 +110,7 @@ std::optional<QJsonObject> DeviceAnalyticsSettingsHandler::deviceAgentSettingsMo
 
     if (!engine)
     {
-        NX_WARNING(this, "Unable to find analytics engine by id %1", engineId);
+        NX_DEBUG(this, "Unable to find analytics engine by id %1", engineId);
         return std::nullopt;
     }
 

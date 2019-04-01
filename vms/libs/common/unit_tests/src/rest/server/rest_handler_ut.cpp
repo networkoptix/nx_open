@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
-
 #include <rest/server/request_handler.h>
+
+#include <nx/network/rest/nx_network_rest_ini.h>
+#include <nx/utils/test_support/run_test.h>
 
 class RequestParamsTest:
     public ::testing::Test
@@ -84,6 +86,8 @@ public:
         return request;
     }
 
+    nx::utils::test::IniConfigTweaks iniTweaks;
+
 private:
     std::vector<std::unique_ptr<nx::network::http::Request>> m_requests;
 };
@@ -117,6 +121,7 @@ TEST_F(RestRequestTest, Get)
     EXPECT_EQ(RequestParams{}, request->params());
     EXPECT_FALSE(request->content);
     EXPECT_FALSE(request->isExtraFormattingRequired());
+    EXPECT_FALSE(request->parseContent<SomeData>());
 }
 
 TEST_F(RestRequestTest, GetWithUrlParams)
@@ -134,6 +139,16 @@ TEST_F(RestRequestTest, GetWithUrlParams)
     EXPECT_EQ(
         RequestParams({{"b", "true"}, {"extraFormatting", ""}, {"i", "42"}, {"s", "hi"}}),
         request->params());
+
+    EXPECT_TRUE(request->param("extraFormatting"));
+    EXPECT_FALSE(request->param("notExist"));
+
+    EXPECT_EQ(std::optional<int>(42), request->param<int>("i"));
+    EXPECT_FALSE(request->param<int>("b"));
+
+    EXPECT_EQ("", request->paramOr("notExist"));
+    EXPECT_EQ("default", request->paramOr("notExist", QString("default")));
+    EXPECT_EQ(123, request->paramOr<int>("b", 123));
 
     const auto data = request->parseContent<SomeData>();
     ASSERT_TRUE(data);
@@ -161,7 +176,7 @@ TEST_F(RestRequestTest, GetToPostByHeader)
 
 TEST_F(RestRequestTest, GetToPutByParam)
 {
-    // TODO: setIniValue(&nx::network::rest::ini().allowGetMethodReplacement, true);
+    iniTweaks.set(&nx::network::rest::ini().allowGetMethodReplacement, true);
 
     const auto request = restRequest({
         "GET /some/path?s=someData&method_=put HTTP/1.1",
@@ -179,10 +194,9 @@ TEST_F(RestRequestTest, GetToPutByParam)
     EXPECT_EQ((SomeData{false, 0, "someData"}), *data);
 }
 
-// TODO: Enable when ini config works properly.
-TEST_F(RestRequestTest, DISABLED_GetToPutByParamFailure)
+TEST_F(RestRequestTest, GetToPutByParamFailure)
 {
-    // TODO: setIniValue(&nx::network::rest::ini().allowGetMethodReplacement, false);
+    iniTweaks.set(&nx::network::rest::ini().allowGetMethodReplacement, false);
 
     const auto request = restRequest({
         "GET /some/path?s=someData&method_=put HTTP/1.1",
@@ -286,7 +300,7 @@ TEST_F(RestRequestTest, PostBadJson)
 
 TEST_F(RestRequestTest, PostWithUrlParams)
 {
-    // TODO: setIniValue(&nx::network::rest::ini().allowUrlParamitersForAnyMethod, true);
+    iniTweaks.set(&nx::network::rest::ini().allowUrlParamitersForAnyMethod, true);
 
     const auto request = restRequest({
         "POST /some/path?b=true&i=42&s=hi HTTP/1.1",
@@ -305,10 +319,9 @@ TEST_F(RestRequestTest, PostWithUrlParams)
     EXPECT_EQ((SomeData{true, 42, "hi"}), *data);
 }
 
-// TODO: Enable when ini config works properly.
-TEST_F(RestRequestTest, DISABLED_PostWithUrlParamsFailure)
+TEST_F(RestRequestTest, PostWithUrlParamsFailure)
 {
-    // TODO: setIniValue(&nx::network::rest::ini().allowUrlParamitersForAnyMethod, false);
+    iniTweaks.set(&nx::network::rest::ini().allowUrlParamitersForAnyMethod, false);
 
     const auto request = restRequest({
         "POST /some/path?b=true&i=42&s=hi HTTP/1.1",
@@ -395,6 +408,32 @@ TEST_F(RestRequestTest, RestException)
             "Failed to process request 'Unable to parse request of SomeData'",
             error.descriptor.text());
     }
+}
+
+TEST_F(RestRequestTest, RestTypeException)
+{
+    const auto request = restRequest({
+        "PUT /some/path?id=777 HTTP/1.1",
+        "Content-Type: application/json",
+        "Content-Length: 10",
+        "",
+        "trash data"
+    });
+    ASSERT_TRUE(request);
+
+    try
+    {
+        request->paramOrThrow<bool>("id");
+        FAIL() << "did not throw";
+    }
+    catch (const RestException& error)
+    {
+        EXPECT_EQ(
+            "Invalid parameter 'id' value: '777'",
+            error.descriptor.text());
+    }
+
+    ASSERT_EQ(777, request->paramOrThrow<int>("id"));
 }
 
 class RestResponseTest:

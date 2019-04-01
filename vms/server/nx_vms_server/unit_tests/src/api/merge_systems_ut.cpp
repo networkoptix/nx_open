@@ -7,7 +7,7 @@
 #include <api/model/getnonce_reply.h>
 #include <nx/vms/api/data/module_information.h>
 #include <rest/server/json_rest_result.h>
-#include <network/authutil.cpp>
+#include <network/authutil.h>
 
 #include "test_api_requests.h"
 #include <utils/merge_systems_common.h>

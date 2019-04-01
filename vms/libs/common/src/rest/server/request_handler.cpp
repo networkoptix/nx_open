@@ -2,6 +2,7 @@
 
 #include <QtCore/QDebug>
 
+#include <nx/fusion/serialization/json.h>
 #include <nx/network/rest/nx_network_rest_ini.h>
 #include <nx/utils/log/log.h>
 
@@ -27,11 +28,9 @@ std::optional<QJsonValue> RestContent::parse() const
     return std::nullopt;
 }
 
-const char* RestException::what() const noexcept
+QString RestException::message() const
 {
-    if (!m_what)
-        m_what = descriptor.text().toStdString();
-    return m_what->c_str();
+    return descriptor.text();
 }
 
 RestRequest::RestRequest(
@@ -61,30 +60,6 @@ const RequestParams& RestRequest::params() const
         m_paramsCache = calculateParams();
 
     return *m_paramsCache;
-}
-
-std::optional<QString> RestRequest::param(const QString& key) const
-{
-    const auto& params_ = params();
-    const auto it = params_.find(key);
-    if (it == params_.end())
-        return std::nullopt;
-
-    return it.value();
-}
-
-QString RestRequest::paramOr(const QString& key, const QString& defaultValue) const
-{
-    auto p = param(key);
-    return p ? *p : defaultValue;
-}
-
-QString RestRequest::paramOrThrow(const QString& key) const
-{
-    auto p = param(key);
-    if (!p)
-        throw RestException(QnRestResult::MissingParameter, key);
-    return *p;
 }
 
 bool RestRequest::isExtraFormattingRequired() const
@@ -130,26 +105,41 @@ RequestParams RestRequest::calculateParams() const
 
 std::optional<QJsonValue> RestRequest::calculateContent() const
 {
+    std::optional<QJsonObject> urlParamsContent;
+    if (!m_urlParams.isEmpty())
+        urlParamsContent = m_urlParams.toJson();
+
     if (!nx::network::http::Method::isMessageBodyAllowed(httpRequest->requestLine.method))
-        return m_urlParams.toJson();
+        return urlParamsContent;
 
     std::optional<QJsonValue> parsedContent;
     if (content)
-    {
         parsedContent = content->parse();
-        if (!nx::network::rest::ini().allowUrlParamitersForAnyMethod)
-            return parsedContent;
+
+    if (!nx::network::rest::ini().allowUrlParamitersForAnyMethod)
+    {
+        NX_DEBUG(this, "Ignoring URL parameters for %1", httpRequest->requestLine);
+        return parsedContent;
     }
 
-    if (m_urlParams.isEmpty() || (parsedContent && parsedContent->type() != QJsonValue::Object))
-        return parsedContent; //< Impossible to merge with URL params.
+    if (!urlParamsContent)
+        return parsedContent;
+
+    if (!parsedContent)
+        return urlParamsContent;
+
+    if (parsedContent && parsedContent->type() != QJsonValue::Object)
+    {
+        NX_DEBUG(this, "Unable to merge %1 for %2",
+            parsedContent->type(), httpRequest->requestLine);
+        return parsedContent;
+    }
 
     QJsonObject object;
     if (parsedContent)
         object = parsedContent->toObject();
 
-    const auto urlObject = m_urlParams.toJson();
-    for (auto it = urlObject.begin(); it != urlObject.end(); ++it)
+    for (auto it = urlParamsContent->begin(); it != urlParamsContent->end(); ++it)
         object.insert(it.key(), it.value());
 
     return object;

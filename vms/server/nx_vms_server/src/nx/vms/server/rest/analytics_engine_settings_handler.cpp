@@ -47,18 +47,11 @@ AnalyticsEngineSettingsHandler::AnalyticsEngineSettingsHandler(QnMediaServerModu
 
 RestResponse AnalyticsEngineSettingsHandler::executeGet(const RestRequest& request)
 {
-    if (!request.param(kAnalyticsEngineIdParameter))
-    {
-        NX_WARNING(this, "Missing required parameter 'analyticsEngineId'");
-        return RestResponse::error(
-            QnRestResult::Error::MissingParameter, kAnalyticsEngineIdParameter);
-    }
-
-    const auto engineId = request.paramOr(kAnalyticsEngineIdParameter);
+    const auto engineId = request.paramOrThrow(kAnalyticsEngineIdParameter);
     auto engine = sdk_support::find<resource::AnalyticsEngineResource>(serverModule(), engineId);
     if (!engine)
     {
-        NX_WARNING(this, "Can't find engine with id %1", engineId);
+        NX_DEBUG(this, "Can't find engine with id %1", engineId);
         return RestResponse::error(
             QnRestResult::Error::CantProcessRequest,
             lm("Unable to find analytics engine with id %1").args(engineId));
@@ -69,31 +62,18 @@ RestResponse AnalyticsEngineSettingsHandler::executeGet(const RestRequest& reque
 
 RestResponse AnalyticsEngineSettingsHandler::executePost(const RestRequest& request)
 {
-    if (!request.param(kAnalyticsEngineIdParameter))
-    {
-        NX_WARNING(this, "Missing required parameter 'analyticsEngineId'");
-        return RestResponse::error(
-            QnRestResult::Error::MissingParameter, kAnalyticsEngineIdParameter);
-    }
-
-    const auto settings = request.parseContent<QJsonObject>();
-    if (!settings)
-    {
-        const QString message("Unable to deserialize request");
-        NX_WARNING(this, message);
-        return RestResponse::error(QnRestResult::Error::BadRequest, message);
-    }
-
-    const auto engineId = request.paramOr(kAnalyticsEngineIdParameter);
+    const auto settings = request.parseContentOrThrow<QJsonObject>();
+    const auto engineId = request.paramOrThrow(kAnalyticsEngineIdParameter);
     auto engine = sdk_support::find<resource::AnalyticsEngineResource>(serverModule(), engineId);
     if (!engine)
     {
-        NX_WARNING(this, "Can't find engine with id %1", engineId);
-        return RestResponse::error(QnRestResult::Error::CantProcessRequest,
+        NX_DEBUG(this, "Can't find engine with id %1", engineId);
+        return RestResponse::error(
+            QnRestResult::Error::CantProcessRequest,
             lm("Unable to find analytics engine with id %1").args(engineId));
     }
 
-    engine->setSettingsValues(settings->toVariantMap());
+    engine->setSettingsValues(settings.toVariantMap());
     engine->saveProperties();
 
     return makeSettingsResponse(engine);
