@@ -5,8 +5,10 @@
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Rename System</button>
         </p>
-        <p ng-if="canMerge || debugMode || betaMode">
-            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="mergeSystems()">Merge with Another System</button>
+        <p ng-if="system.canMerge || debugMode || betaMode">
+            <button class="btn btn-default"
+                    ng-disabled="(currentlyMerging || !system.isOnline || !system.isAvailable) && !(debugMode || betaMode)"
+                    ng-click="mergeSystems()">Merge with Another System</button>
         </p>
         <hr />
         <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
