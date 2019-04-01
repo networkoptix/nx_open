@@ -36,7 +36,7 @@ s = requests.post("{}/api/setupCloudSystem".format(SERVER_URL),
 	auth=requests.auth.HTTPDigestAuth(DEFAULT_LOGIN, DEFAULT_PASSWORD))
 print s.status_code
 
-
+#This creates the "Client Custom" user role and returns the userRoleId
 t = requests.post("{}/ec2/saveUserRole".format(SERVER_URL),
 	json={
 	    "name": "Client Custom",
@@ -46,7 +46,7 @@ t = requests.post("{}/ec2/saveUserRole".format(SERVER_URL),
 print t.status_code
 jsonDataT = t.json()
 
-
+#List of users and their permission types. Client Custom gets Custom for now
 userList = {"viewer":"viewer",
 			"advviewer":"advancedViewer",
 			"liveviewer":"liveViewer",
@@ -54,8 +54,10 @@ userList = {"viewer":"viewer",
 			"admin":"cloudAdmin",
 			"custom":"Custom",
 			"clientcustom":"Custom"}
+
+#Go through each of the users and share them with the system
 for user, permission in userList.iteritems():
-	u = requests.post("{}/cdb/system/share".format(CLOUD_URL, jsonData["id"]),
+	u = requests.post("{}/cdb/system/share".format(CLOUD_URL),
 		json={
 			"systemId" : jsonData["id"],
 			"accessRole": permission,
@@ -64,6 +66,7 @@ for user, permission in userList.iteritems():
 		auth=requests.auth.HTTPDigestAuth(CLOUD_USER, CLOUD_PASS))
 	print u.status_code
 
+#This loop gets the users list once it is at least 8 long
 vLen = 0
 while vLen < 9:
 	v = requests.get("{}/ec2/getUsers".format(SERVER_URL),
@@ -73,6 +76,7 @@ while vLen < 9:
 	print "Waiting for user list to update..."
 	time.sleep(1)
 
+#This takes the Client Custom user and changes their permissions from Custom to Client Custom
 w = requests.post("{}/ec2/saveUser".format(SERVER_URL),
 	json={
 		"isCloud": True,
