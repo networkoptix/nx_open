@@ -57,7 +57,7 @@ QnAbstractMediaDataPtr QnRtpStreamReader::getNextData()
 
     if (!result)
     {
-        NX_VERBOSE(this, lm("Next data: end of stream %1")
+        NX_VERBOSE(this, lm("Next data: end of stream %1. Closing stream")
             .args(m_rtpReader.getCurrentStreamUrl()));
         closeStream();
     }
