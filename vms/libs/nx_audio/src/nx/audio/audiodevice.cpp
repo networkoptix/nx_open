@@ -58,8 +58,8 @@ void fixVolumeLevel()
     const auto& deviceInfo = nx::utils::IosDeviceInformation::currentInformation();
     const bool isIPhone6 = deviceInfo.majorVersion == nx::utils::IosDeviceInformation::iPhone6;
     static const int kTimesGain = isIPhone6
-        ? 3 //< Prevents volume overload in iPhone 6.
-        : 48;
+        ? 4 //< Prevents volume overload in iPhone 6.
+        : 64;
     alListenerf(AL_GAIN, kTimesGain);
 }
 
