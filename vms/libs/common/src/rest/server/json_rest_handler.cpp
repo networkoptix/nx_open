@@ -36,7 +36,9 @@ RestResponse JsonRestResponse::toRest(bool extraFormatting) const
     if (extraFormatting)
         content.body = nx::utils::formatJsonString(content.body);
 
-    return {statusCode, std::move(content), isUndefinedContentLength};
+    RestResponse response{statusCode, std::move(content), isUndefinedContentLength};
+    response.httpHeaders = httpHeaders;
+    return response;
 }
 
 JsonRestRequest::JsonRestRequest(const RestRequest& rest):
