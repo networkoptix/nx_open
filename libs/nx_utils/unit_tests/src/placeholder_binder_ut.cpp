@@ -20,9 +20,9 @@ const std::vector<TestCase> kTestCases = {
     {"{:hello}, {:world}!", {{"hello", "Hello"}, {"world", "James"}}, "Hello, James!"},
     {"{:hello}, {:world}!", {{"hello", "Good bye"}, {"world", "James"}}, "Good bye, James!"},
     {"{:hello}, {:world}", {{"hello", "Good bye"}, {"world", "James"}}, "Good bye, James"},
-    {"{:hello}, {:world}", {{"hello1", "Good bye"}, {"world", "James"}}, ", James"},
-    {"{:hello}, {:world}", {{"hello1", "Good bye"}, {"world1", "James"}}, ", "},
-    {"{:hello}, {:world}", {{"hello", "Good bye"}, {"world1", "James"}}, "Good bye, "},
+    {"{:hello}, {:world}", {{"hello1", "Good bye"}, {"world", "James"}}, "{:hello}, James"},
+    {"{:hello}, {:world}", {{"hello1", "Good bye"}, {"world1", "James"}}, "{:hello}, {:world}"},
+    {"{:hello}, {:world}", {{"hello", "Good bye"}, {"world1", "James"}}, "Good bye, {:world}"},
 };
 
 TEST(PlaceholderBinder, bindPlaceholders)
