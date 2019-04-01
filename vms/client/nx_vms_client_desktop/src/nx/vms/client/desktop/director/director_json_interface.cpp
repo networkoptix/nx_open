@@ -119,6 +119,8 @@ DirectorJsonInterface::DirectorJsonInterface(QObject* parent)
 
 QJsonDocument DirectorJsonInterface::process(const QJsonDocument& jsonRequest)
 {
+    NX_ASSERT(Director::instance(), "Director's life cycle must be greater than the current class");
+
     const auto& jsonObject = jsonRequest.object();
     const auto command = jsonObject.value("command").toString();
     if (command.isEmpty())

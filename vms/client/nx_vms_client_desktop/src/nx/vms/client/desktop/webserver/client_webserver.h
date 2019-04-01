@@ -7,28 +7,29 @@ class QJsonDocument;
 class QtHttpServer;
 class QtHttpReply;
 class QtHttpRequest;
-class QnWorkbenchContext;
 
 namespace nx::vmx::client::desktop {
 
 class DirectorJsonInterface;
 
 /**
-* ClientWebserver provides HTTP API for operational control and telemetry for NX client.
+* DirectorWebserver provides HTTP API for operational control and telemetry for NX client.
 * Uses DirectorJsonInterface to take actions.
 * It is used (or to be used) for functional testing.
 */
 
-class ClientWebserver: public QObject
+class DirectorWebserver: public QObject
 {
     Q_OBJECT
 
     static constexpr int kDefaultPort = 7012;
 public:
-    explicit ClientWebserver(QObject* parent);
-    virtual ~ClientWebserver();
+    explicit DirectorWebserver(QObject* parent);
+    virtual ~DirectorWebserver();
 
-    bool start(int port = 0);
+    void setPort(int port);
+
+    bool start();
     void stop();
 
 private:

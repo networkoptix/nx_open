@@ -443,8 +443,11 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
             &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
     #endif
 
-    if (const int port = ini().clientWebServerPort)
-        context()->instance<nx::vmx::client::desktop::ClientWebserver>()->start(port);
+    if (const int port = ini().clientWebServerPort; port > 0 && port < 65536)
+    {
+        context()->instance<nx::vmx::client::desktop::DirectorWebserver>()->setPort(port);
+        context()->instance<nx::vmx::client::desktop::DirectorWebserver>()->start();
+    }
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()

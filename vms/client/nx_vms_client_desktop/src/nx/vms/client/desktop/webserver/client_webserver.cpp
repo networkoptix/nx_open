@@ -7,12 +7,11 @@
 #include <QtHttpRequest.h>
 #include <QtHttpReply.h>
 
-
 #include <nx/vms/client/desktop/director/director_json_interface.h>
-#include <qdnslookup.h>
+#include <nx/utils/app_info.h>
 
 namespace {
-const QString kServerName = "NX Client HTTP Server";
+const QString kServerName = nx::utils::AppInfo::productNameLong() + " Desktop Client HTTP Server";
 const auto kServerBinding = QHostAddress::LocalHost;
 
 QJsonDocument convertHttpToJsonRequest(const QtHttpRequest& request)
@@ -35,7 +34,7 @@ QJsonDocument convertHttpToJsonRequest(const QtHttpRequest& request)
 
 namespace nx::vmx::client::desktop {
 
-ClientWebserver::ClientWebserver(QObject* parent):
+DirectorWebserver::DirectorWebserver(QObject* parent):
     QObject(parent),
     m_server(new QtHttpServer(this)),
     m_directorInterface(new DirectorJsonInterface(this))
@@ -46,29 +45,40 @@ ClientWebserver::ClientWebserver(QObject* parent):
     connect(m_server.data(), &QtHttpServer::stopped,
         this, [this] { m_active = false; });
     connect(m_server.data(), &QtHttpServer::requestNeedsReply,
-        this, &ClientWebserver::makeReply);
+        this, &DirectorWebserver::makeReply);
 }
 
-ClientWebserver::~ClientWebserver()
+DirectorWebserver::~DirectorWebserver()
 {
     stop();
 }
 
-bool ClientWebserver::start(int port)
+void DirectorWebserver::setPort(int port)
 {
-    if (port != 0)
-        m_port = port;
+    if (!NX_ASSERT(port > 0 && port < 65536, "Client webserver port number should be 1..65535"))
+        return;
 
+    m_port = port;
+
+    if (m_active)
+    {
+        stop();
+        start();
+    }
+}
+
+bool DirectorWebserver::start()
+{
     m_server->start(m_port, kServerBinding);
     return m_active;
 }
 
-void ClientWebserver::stop()
+void DirectorWebserver::stop()
 {
     m_server->stop();
 }
 
-void ClientWebserver::makeReply(QtHttpRequest* request, QtHttpReply* reply)
+void DirectorWebserver::makeReply(QtHttpRequest* request, QtHttpReply* reply)
 {
     reply->setStatusCode(QtHttpReply::Ok); //< This line is actually extraneous.
     reply->addHeader("Content-Type", QByteArrayLiteral ("application/json"));
