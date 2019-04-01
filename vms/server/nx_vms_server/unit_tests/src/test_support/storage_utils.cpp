@@ -120,10 +120,10 @@ static void replaceValue(QByteArray& payload, const QByteArray& key, const QByte
 
 static void updateMetaData(QByteArray& payload, int64_t startTimeMs)
 {
-    replaceValue(payload, "startTimeMs", QByteArray::number(startTimeMs));
+    replaceValue(payload, "startTimeMs", QByteArray::number((qint64) startTimeMs));
     replaceValue(
         payload, "integrityHash",
-        vms::server::IntegrityHashHelper::generateIntegrityHash(QByteArray::number(startTimeMs)).toBase64());
+        vms::server::IntegrityHashHelper::generateIntegrityHash(QByteArray::number((qint64) startTimeMs)).toBase64());
 }
 
 static ChunkDataList generateChunksForQuality(
