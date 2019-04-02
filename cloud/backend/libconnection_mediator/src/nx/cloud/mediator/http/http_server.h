@@ -102,6 +102,7 @@ protected:
     /** Used to cache needed info from nx::network::http::RequestContext*/
     struct CachedRequestContext
     {
+        nx::utils::Url requestUrl;
         bool isSsl = false;
         nx::network::http::Response* response;
     };
@@ -123,7 +124,7 @@ protected:
 
     nx::utils::Url buildMediatorUrl(
         const MediatorEndpoint& endpoint,
-        bool useHttps);
+        const CachedRequestContext& requestContext);
 
 private:
     HolePunchingProcessor* m_holePunchingProcessor = nullptr;
