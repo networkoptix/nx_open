@@ -1,6 +1,6 @@
 nx_add_test(nx_vms_server_ut
     PUBLIC_LIBS
-        nx_vms_server libcloud_db)
+        nx_vms_server)
 
 set(mocableFiles ${CMAKE_CURRENT_SOURCE_DIR}/src/test_support/mediaserver_launcher.h)
 
