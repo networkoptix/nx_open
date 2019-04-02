@@ -10,7 +10,7 @@ namespace stats {
 
 PersistentCollector::PersistentCollector(
     const conf::Statistics& settings,
-    nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor)
+    nx::sql::AbstractAsyncSqlQueryExecutor* sqlQueryExecutor)
     :
     m_settings(settings),
     m_sqlQueryExecutor(sqlQueryExecutor),
@@ -101,7 +101,7 @@ CollectorFactory& CollectorFactory::instance()
 
 std::unique_ptr<AbstractCollector> CollectorFactory::defaultFactoryFunction(
     const conf::Statistics& settings,
-    nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor)
+    nx::sql::AbstractAsyncSqlQueryExecutor* sqlQueryExecutor)
 {
     return std::make_unique<PersistentCollector>(settings, sqlQueryExecutor);
 }

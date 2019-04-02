@@ -36,14 +36,14 @@ class PersistentCollector:
 public:
     PersistentCollector(
         const conf::Statistics& settings,
-        nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor);
+        nx::sql::AbstractAsyncSqlQueryExecutor* sqlQueryExecutor);
     virtual ~PersistentCollector() override;
 
     virtual void saveConnectSessionStatistics(const ConnectSession& data) override;
 
 private:
     const conf::Statistics m_settings;
-    nx::sql::AsyncSqlQueryExecutor* m_sqlQueryExecutor;
+    nx::sql::AbstractAsyncSqlQueryExecutor* m_sqlQueryExecutor;
     std::unique_ptr<dao::AbstractDataObject> m_dataObject;
     nx::utils::Counter m_startedAsyncCallsCounter;
 };
@@ -106,7 +106,7 @@ private:
 using CollectorFactoryFunction =
     std::unique_ptr<AbstractCollector>(
         const conf::Statistics& settings,
-        nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor);
+        nx::sql::AbstractAsyncSqlQueryExecutor* sqlQueryExecutor);
 
 class CollectorFactory:
     public nx::utils::BasicFactory<CollectorFactoryFunction>
@@ -121,7 +121,7 @@ public:
 private:
     std::unique_ptr<AbstractCollector> defaultFactoryFunction(
         const conf::Statistics& settings,
-        nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor);
+        nx::sql::AbstractAsyncSqlQueryExecutor* sqlQueryExecutor);
 };
 
 } // namespace stats

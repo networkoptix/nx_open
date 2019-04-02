@@ -25,7 +25,8 @@ public:
         nx::sql::DBResult(nx::sql::QueryContext*, const QnUuid&));
 };
 
-class SqlExecutorStub: public nx::sql::AbstractAsyncSqlQueryExecutor
+class SqlExecutorStub:
+    public nx::sql::AbstractAsyncSqlQueryExecutor
 {
 public:
     virtual ~SqlExecutorStub()
@@ -37,6 +38,15 @@ public:
     virtual const nx::sql::ConnectionOptions& connectionOptions() const override
     {
         return m_connectionOptions;
+    }
+
+    virtual void setQueryPriority(nx::sql::QueryType /*queryType*/, int /*newPriority*/) override
+    {
+    }
+
+    virtual int pendingQueryCount() const override
+    {
+        return 0;
     }
 
     virtual void executeUpdate(

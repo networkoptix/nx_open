@@ -71,7 +71,7 @@ public:
     CommandLog(
         const QnUuid& peerId,
         const ProtocolVersionRange& supportedProtocolRange,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager,
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
         AbstractOutgoingCommandDispatcher* const outgoingTransactionDispatcher);
 
     /**
@@ -280,7 +280,7 @@ private:
 
     const QnUuid m_peerId;
     const ProtocolVersionRange m_supportedProtocolRange;
-    nx::sql::AsyncSqlQueryExecutor* m_dbManager = nullptr;
+    nx::sql::AbstractAsyncSqlQueryExecutor* m_dbManager = nullptr;
     AbstractOutgoingCommandDispatcher* m_outgoingTransactionDispatcher = nullptr;
     mutable QnMutex m_mutex;
     DbTransactionContextMap m_dbTransactionContexts;

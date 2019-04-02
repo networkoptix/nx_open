@@ -9,7 +9,7 @@ SynchronizationEngine::SynchronizationEngine(
     const std::string& /*applicationId*/, // TODO: #ak CLOUD-2249.
     const SynchronizationSettings& settings,
     const ProtocolVersionRange& supportedProtocolRange,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager)
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager)
     :
     m_peerId(
         !QnUuid::fromStringSafe(settings.nodeId).isNull()

@@ -38,7 +38,7 @@ public:
 
     void setDbVersionToUpdateTo(unsigned int dbVersion);
 
-    nx::sql::AsyncSqlQueryExecutor& queryExecutor();
+    nx::sql::AbstractAsyncSqlQueryExecutor& queryExecutor();
 
 protected:
     const std::unique_ptr<dao::rdb::DbInstanceController>& persistentDbManager() const;

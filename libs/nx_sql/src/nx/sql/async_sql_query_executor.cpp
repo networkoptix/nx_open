@@ -171,9 +171,9 @@ void AsyncSqlQueryExecutor::reserveConnections(int count)
         openNewConnection(lock);
 }
 
-std::size_t AsyncSqlQueryExecutor::pendingQueryCount() const
+int AsyncSqlQueryExecutor::pendingQueryCount() const
 {
-    return m_queryQueue.size();
+    return (int) m_queryQueue.size();
 }
 
 void AsyncSqlQueryExecutor::createCursorImpl(

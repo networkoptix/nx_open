@@ -37,7 +37,7 @@ public:
         const std::string& applicationId,
         const SynchronizationSettings& settings,
         const ProtocolVersionRange& supportedProtocolRange,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager);
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager);
     ~SynchronizationEngine();
 
     void pleaseStopSync();

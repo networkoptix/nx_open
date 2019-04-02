@@ -32,6 +32,16 @@ public:
         return m_connectionOptions;
     }
 
+    virtual void setQueryPriority(QueryType queryType, int newPriority) override
+    {
+        m_delegate->setQueryPriority(queryType, newPriority);
+    }
+
+    virtual int pendingQueryCount() const override
+    {
+        return m_delegate->pendingQueryCount();
+    }
+
     //---------------------------------------------------------------------------------------------
     // Asynchronous operations.
 

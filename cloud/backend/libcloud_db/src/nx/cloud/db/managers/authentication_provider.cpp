@@ -25,7 +25,7 @@ namespace nx::cloud::db {
 
 AuthenticationProvider::AuthenticationProvider(
     const conf::Settings& settings,
-    nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor,
+    nx::sql::AbstractAsyncSqlQueryExecutor* sqlQueryExecutor,
     AbstractAccountManager* accountManager,
     AbstractSystemSharingManager* systemSharingManager,
     const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,

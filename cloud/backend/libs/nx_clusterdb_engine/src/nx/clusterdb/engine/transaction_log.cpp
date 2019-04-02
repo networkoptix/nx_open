@@ -17,7 +17,7 @@ const ReadCommandsFilter ReadCommandsFilter::kEmptyFilter = {
 CommandLog::CommandLog(
     const QnUuid& peerId,
     const ProtocolVersionRange& supportedProtocolRange,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager,
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
     AbstractOutgoingCommandDispatcher* const outgoingTransactionDispatcher)
     :
     m_peerId(peerId),

@@ -29,6 +29,8 @@ public:
 
     virtual const ConnectionOptions& connectionOptions() const = 0;
 
+    virtual void setQueryPriority(QueryType queryType, int newPriority) = 0;
+
     //---------------------------------------------------------------------------------------------
     // Asynchronous operations.
 
@@ -48,6 +50,8 @@ public:
     virtual void executeSelect(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
+
+    virtual int pendingQueryCount() const = 0;
 
     //---------------------------------------------------------------------------------------------
     // Synchronous operations.
@@ -220,9 +224,9 @@ public:
     /**
      * By default, each query type has same priority of kDefaultQueryPriority.
      */
-    void setQueryPriority(QueryType queryType, int newPriority);
+    virtual void setQueryPriority(QueryType queryType, int newPriority) override;
 
-    std::size_t pendingQueryCount() const;
+    virtual int pendingQueryCount() const override;
 
     /**
      * Executes data modification request that spawns some output data.
