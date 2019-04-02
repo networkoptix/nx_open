@@ -259,12 +259,18 @@ void Settings::loadConnectingPeer()
 }
 
 ClusterDbMap::ClusterDbMap():
+    enabled(false),
     connectionRetryDelay(cluster_db_map::kDefaultConnectionRetryDelay)
 {
 }
 
 void ClusterDbMap::load(const QnSettings& settings)
 {
+    if (!settings.containsGroup(cluster_db_map::kGroupName))
+        return;
+
+    enabled = true;
+
     auto str =
         lm("%1/%2").arg(cluster_db_map::kGroupName).arg(cluster_db_map::kConnectionRetryDelay);
     connectionRetryDelay = nx::utils::parseTimerDuration(
