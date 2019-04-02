@@ -64,7 +64,7 @@ void ErrorProcessor::processStreamError(
         return;
 
     auto owner = streamReader->getOwner();
-    auto videoCamera = owner.dynamicCast<QnAbstractMediaServerVideoCamera>();
+    auto videoCamera = owner.dynamicCast<nx::vms::server::AbstractVideoCamera>();
     if (!videoCamera)
         return;
 

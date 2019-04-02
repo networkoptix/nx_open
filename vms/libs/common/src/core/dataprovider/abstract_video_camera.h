@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utils/common/from_this_to_shared.h>
+
 class QnAbstractVideoCamera:
     public QnFromThisToShared<QnAbstractVideoCamera>
 {

@@ -217,7 +217,7 @@ void QnLiveStreamProvider::setPrimaryStreamParams(const QnLiveStreamParams& para
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        if (auto owner = getOwner().dynamicCast<QnAbstractMediaServerVideoCamera>())
+        if (auto owner = getOwner().dynamicCast<nx::vms::server::AbstractVideoCamera>())
         {
             QnLiveStreamProviderPtr lp = owner->getSecondaryReader();
             if (lp)

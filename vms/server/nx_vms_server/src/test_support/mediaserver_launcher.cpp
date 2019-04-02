@@ -8,11 +8,6 @@
 #include <transaction/message_bus_adapter.h>
 #include <nx/p2p/p2p_message_bus.h>
 
-namespace {
-
-
-} // namespace
-
 MediaServerLauncher::MediaServerLauncher(
     const QString& tmpDir,
     int port,

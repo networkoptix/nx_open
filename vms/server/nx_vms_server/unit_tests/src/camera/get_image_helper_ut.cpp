@@ -125,7 +125,8 @@ TEST(GetImageHelper, determineStreamIndex)
     using StreamIndex = nx::vms::api::StreamIndex;
     using StreamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode;
 
-    QnGetImageHelper helper(/*serverModule*/ nullptr);
+    QnMediaServerModule serverModule;
+    QnGetImageHelper helper(&serverModule);
     nx::api::CameraImageRequest request;
     const auto camera = QnSharedResourcePointer(new MockCameraResource());
     request.camera = camera;
