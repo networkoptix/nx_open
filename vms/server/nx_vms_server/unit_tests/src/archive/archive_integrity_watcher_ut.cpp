@@ -127,6 +127,21 @@ protected:
         ASSERT_TRUE(QDir().rename(folder1Path + "_tmp", folder2Path));
     }
 
+    void thenLogShouldContain(const QString& message)
+    {
+        bool logContainsMessage = false;
+        for (const auto& m: m_logBuffer->takeMessages())
+        {
+            if (m.contains(message))
+            {
+                logContainsMessage = true;
+                break;
+            }
+        }
+
+        ASSERT_TRUE(logContainsMessage);
+    }
+
 private:
     QnMutex m_archiveIntegrityMutex;
     QnWaitCondition m_archiveIntegrityWaitCondition;
@@ -208,6 +223,7 @@ TEST_F(FtArchiveIntegrityWatcher, SwappingHoursFolders)
     whenPlayArchiveRequestIsIssued();
     thenArchiveShouldBePlayedWithoutGaps();
     thenIntegritySignalShouldBeReceived();
+    thenLogShouldContain("File is present in the DB but missing in the archive");
 }
 
 } // namespace nx::vms::server::test
