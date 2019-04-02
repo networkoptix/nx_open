@@ -11,7 +11,6 @@ SynchronizationEngine::SynchronizationEngine(
     const ProtocolVersionRange& supportedProtocolRange,
     nx::sql::AsyncSqlQueryExecutor* const dbManager)
     :
-    m_nodeId(settings.nodeId),
     m_peerId(
         !QnUuid::fromStringSafe(settings.nodeId).isNull()
             ? QnUuid::fromStringSafe(settings.nodeId)
@@ -171,11 +170,6 @@ void SynchronizationEngine::unsubscribeFromSystemDeletedNotification(
 QnUuid SynchronizationEngine::peerId() const
 {
     return m_peerId;
-}
-
-std::string SynchronizationEngine::nodeId() const
-{
-    return m_nodeId;
 }
 
 void SynchronizationEngine::registerHttpApi(

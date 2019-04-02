@@ -246,7 +246,13 @@ void ListeningPeerDb::startDiscovery(
 
 std::string ListeningPeerDb::nodeId() const
 {
-    return m_map ? m_map->synchronizationEngine().nodeId() : std::string();
+    const auto& nodeId = m_settings.map.synchronizationSettings.nodeId;
+    if (!nodeId.empty())
+        return nodeId;
+
+    return m_map
+        ? m_map->synchronizationEngine().peerId().toSimpleString().toStdString()
+        : std::string();
 }
 
 } // namespace nx::hpm

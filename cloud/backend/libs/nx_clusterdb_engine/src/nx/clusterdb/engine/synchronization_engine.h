@@ -73,7 +73,6 @@ public:
         nx::utils::Subscription<std::string>& subscription);
 
     QnUuid peerId() const;
-    std::string nodeId() const;
 
     void registerHttpApi(
         const std::string& pathPrefix,
@@ -82,9 +81,6 @@ public:
     DiscoveryManager& discoveryManager();
 
 private:
-    // m_nodeId exists because converting a non-guid nodeId to QnUuid won't convert back properly
-    const std::string m_nodeId;
-    // TODO remove m_peerId and make std::string m_nodeId default
     const QnUuid m_peerId;
     OutgoingCommandFilter m_outgoingCommandFilter;
     const ProtocolVersionRange m_supportedProtocolRange;
