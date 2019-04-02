@@ -30,6 +30,7 @@
 
 class QnDataProviderFactory;
 
+using namespace std::chrono;
 using nx::api::ImageRequest;
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
@@ -40,6 +41,28 @@ static const qint64 MSEC_PER_SEC = 1000;
 static const qint64 USEC_PER_MSEC = 1000;
 static const int CAMERA_PULLING_STOP_TIMEOUT = 1000 * 3;
 static const int kMaxGopSize = 260;
+
+static QString mediaQualityToStreamName(MediaQuality mediaQuality)
+{
+    switch(mediaQuality)
+    {
+        case MEDIA_Quality_High: return "primary";
+        case MEDIA_Quality_Low: return "secondary";
+        default: return lm("MediaQuality=%1").arg((int) mediaQuality);
+    }
+}
+
+static milliseconds minimalLiveCacheSizeByQuality(MediaQuality mediaQuality)
+{
+    switch(mediaQuality)
+    {
+        case MEDIA_Quality_High:
+            return milliseconds(ini().liveStreamCacheForPrimaryStreamMinSizeMs);
+        case MEDIA_Quality_Low:
+            return milliseconds(ini().liveStreamCacheForSecondaryStreamMinSizeMs);
+        default: return milliseconds::zero();
+    }
+}
 
 //-------------------------------------------------------------------------------------------------
 // QnVideoCameraGopKeeper
@@ -532,12 +555,14 @@ void QnVideoCamera::beforeStop()
 
     if (m_primaryReader) {
         m_primaryReader->removeDataProcessor(m_primaryGopKeeper);
+        m_liveCacheValidityTimers[MEDIA_Quality_High].restart();
         m_primaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_High].get());
         m_primaryReader->pleaseStop();
     }
 
     if (m_secondaryReader) {
         m_secondaryReader->removeDataProcessor(m_secondaryGopKeeper);
+        m_liveCacheValidityTimers[MEDIA_Quality_Low].restart();
         m_secondaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_Low].get());
         m_secondaryReader->pleaseStop();
     }
@@ -650,6 +675,17 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     }
 }
 
+QnLiveStreamProviderPtr QnVideoCamera::readerByQuality(MediaQuality streamQuality) const
+{
+    if (streamQuality == MediaQuality::MEDIA_Quality_Low)
+        return m_secondaryReader;
+
+    if (streamQuality == MediaQuality::MEDIA_Quality_High)
+        return m_primaryReader;
+
+    return QnLiveStreamProviderPtr();
+}
+
 QnVideoCamera::ForceLiveCacheForPrimaryStream
     QnVideoCamera::getSettingForceLiveCacheForPrimaryStream(
         const QnSecurityCamResource* cameraResource) const
@@ -729,8 +765,6 @@ bool QnVideoCamera::isLiveCacheNeededForPrimaryStream(
 
 void QnVideoCamera::startLiveCacheIfNeeded()
 {
-    using namespace std::chrono;
-
     QnMutexLocker lock(&m_getReaderMutex);
 
     if (!isSomeActivity())
@@ -868,36 +902,42 @@ void QnVideoCamera::stopIfNoActivity()
     {
         m_cameraUsers.remove(this);
 
-        if( m_liveCache[MEDIA_Quality_High] )
-        {
-            //if single stream is available and that stream is suitable for motion
-            //  then stopping caching only if no one else fetches stream
-            const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
-            const bool isSingleStreamCameraAndHiSuitableForCaching =
-                cameraResource &&
-                !cameraResource->hasDualStreaming() &&
-                cameraResource->hasCameraCapabilities( Qn::PrimaryStreamSoftMotionCapability );
-            if( !isSingleStreamCameraAndHiSuitableForCaching || !isSomeActivity() )
+        auto resetCachesIfNeeded =
+            [this](MediaQuality streamQuality)
             {
-                if( m_primaryReader )
-                    m_primaryReader->removeDataProcessor( m_liveCache[MEDIA_Quality_High].get() );
-                m_hlsLivePlaylistManager[MEDIA_Quality_High].reset();
-                m_liveCache[MEDIA_Quality_High].reset();
-            }
-        }
+                if (!m_liveCache[streamQuality] || isSomeActivity())
+                    return;
 
-        if( m_liveCache[MEDIA_Quality_Low] &&
-            !isSomeActivity() )             //stopping low quality stream caching only if no one else fetches stream (i.e., no recording enabled)
-        {
-            if( m_secondaryReader )
-                m_secondaryReader->removeDataProcessor( m_liveCache[MEDIA_Quality_Low].get() );
-            m_hlsLivePlaylistManager[MEDIA_Quality_Low].reset();
-            m_liveCache[MEDIA_Quality_Low].reset();
-        }
+                QnLiveStreamProviderPtr reader = readerByQuality(streamQuality);
+                if (!reader)
+                    return;
+
+                reader->removeDataProcessor(m_liveCache[streamQuality].get());
+                auto& timer = m_liveCacheValidityTimers[streamQuality];
+                if (!timer.isValid())
+                    timer.restart();
+
+                if (timer.hasExpired(minimalLiveCacheSizeByQuality(streamQuality)))
+                {
+                    NX_DEBUG(this, "Resetting live cache for %1 stream",
+                         mediaQualityToStreamName(streamQuality));
+                    m_hlsLivePlaylistManager[streamQuality].reset();
+                    m_liveCache[streamQuality].reset();
+                }
+            };
+
+        resetCachesIfNeeded(MediaQuality::MEDIA_Quality_Low);
+        resetCachesIfNeeded(MediaQuality::MEDIA_Quality_High);
     }
 
     if (isSomeActivity())
+    {
+        for (auto& [streamQuality, timer]: m_liveCacheValidityTimers)
+            timer.invalidate();
+
         return;
+    }
+
     else if (m_lastActivityTimer.isValid() && m_lastActivityTimer.elapsed() < CAMERA_PULLING_STOP_TIMEOUT)
         return;
 
@@ -1001,16 +1041,6 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(
     return catalog == QnServer::HiQualityCatalog ? m_primaryReader : m_secondaryReader;
 }
 
-static QString mediaQualityToStreamName(MediaQuality mediaQuality)
-{
-    switch(mediaQuality)
-    {
-        case MEDIA_Quality_High: return "primary";
-        case MEDIA_Quality_Low: return "secondary";
-        default: return lm("MediaQuality=%1").arg((int) mediaQuality);
-    }
-}
-
 std::pair<int, int> QnVideoCamera::getMinMaxLiveCacheSizeMs(MediaQuality streamQuality) const
 {
     // Here we treat streams other than MEDIA_Quality_High as secondary, because currently
@@ -1043,14 +1073,18 @@ std::pair<int, int> QnVideoCamera::getMinMaxLiveCacheSizeMs(MediaQuality streamQ
  */
 bool QnVideoCamera::ensureLiveCacheStarted(
     MediaQuality streamQuality,
-    const QnLiveStreamProviderPtr& primaryReader,
+    const QnLiveStreamProviderPtr& reader,
     qint64 targetDurationUSec,
     const QString& reasonForLog)
 {
     if (!NX_ASSERT(streamQuality >= 0) || !NX_ASSERT(streamQuality < m_liveCache.size()))
         return false;
 
-    primaryReader->startIfNotRunning();
+    NX_VERBOSE(this, "Ensuring live cache started for %1 stream: %2",
+        mediaQualityToStreamName(streamQuality),
+        reasonForLog);
+
+    reader->startIfNotRunning();
 
     m_cameraUsers.insert(this);
 
@@ -1079,6 +1113,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
     }
 
     // Connecting live cache to the reader.
-    primaryReader->addDataProcessor(m_liveCache[streamQuality].get());
+    m_liveCacheValidityTimers[streamQuality].invalidate();
+    reader->addDataProcessor(m_liveCache[streamQuality].get());
     return true;
 }
