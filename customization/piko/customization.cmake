@@ -16,8 +16,8 @@ set(backgroundImage
 set(defaultWebPages "{\"Home Page\": \"https://www.cooksecuritygroup.com\"}")
 
 # Support section
-set(companyUrl "https://www.cooksecuritygroup.com")
-set(productUrl "www.pikovms.com")
+set(companyUrl "http://www.pikovms.com")
+set(productUrl "http://www.pikovms.com")
 set(supportEmail "support@pikovms.com")
 set(licenseEmail "support@pikovms.com")
 
