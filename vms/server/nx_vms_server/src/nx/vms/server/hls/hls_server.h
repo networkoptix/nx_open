@@ -106,7 +106,7 @@ private:
         const QString& requestFileExtension,
         const QnSecurityCamResourcePtr& camResource,
         const Qn::UserAccessData& accessRights,
-        const QnVideoCameraPtr& videoCamera,
+        const nx::vms::server::VideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& requestParams,
         nx::network::http::Response* const response,
         QnJsonRestResult* error);
@@ -119,7 +119,7 @@ private:
         Session* session,
         const nx::network::http::Request& request,
         const QnSecurityCamResourcePtr& camResource,
-        const QnVideoCameraPtr& videoCamera,
+        const nx::vms::server::VideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& requestParams,
         QByteArray* serializedPlaylist);
 
@@ -144,7 +144,7 @@ private:
         const QString& sessionID,
         const std::multimap<QString, QString>& requestParams,
         const QnSecurityCamResourcePtr& camResource,
-        const QnVideoCameraPtr& videoCamera,
+        const nx::vms::server::VideoCameraPtr& videoCamera,
         MediaQuality streamQuality,
         Session** session,
         QnJsonRestResult* error);
@@ -152,7 +152,7 @@ private:
     int estimateStreamBitrate(
         Session* const session,
         QnSecurityCamResourcePtr camResource,
-        const QnVideoCameraPtr& videoCamera,
+        const nx::vms::server::VideoCameraPtr& videoCamera,
         MediaQuality streamQuality);
 
     void ensureChunkCacheFilledEnoughForPlayback(

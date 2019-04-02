@@ -111,7 +111,7 @@ void QnRecordingManager::stopRecorder(const Recorders& recorders)
 
 void QnRecordingManager::deleteRecorder(const Recorders& recorders, const QnResourcePtr& /*resource*/)
 {
-    QnVideoCameraPtr camera;
+    nx::vms::server::VideoCameraPtr camera;
     if (recorders.recorderHiRes)
     {
         recorders.recorderHiRes->stop();
@@ -265,7 +265,7 @@ bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& cam
 }
 
 bool QnRecordingManager::startOrStopRecording(
-    const QnResourcePtr& res, const QnVideoCameraPtr& camera,
+    const QnResourcePtr& res, const nx::vms::server::VideoCameraPtr& camera,
     QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
     auto cameraRes = res.dynamicCast<nx::vms::server::resource::Camera>();

@@ -32,7 +32,7 @@ QnAudioStreamerPool::QnAudioStreamerPool(QnMediaServerModule* serverModule):
 {
 }
 
-QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& sourceId) const
+nx::vms::server::VideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& sourceId) const
 {
     if (auto camera = serverModule()->resourcePool()->getResourceByUniqueId(sourceId))
     {
@@ -40,7 +40,7 @@ QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& sourceId)
         if (camera->hasFlags(Qn::desktop_camera))
             return videoCameraPool()->getVideoCamera(camera);
     }
-    return QnVideoCameraPtr();
+    return nx::vms::server::VideoCameraPtr();
 }
 
 nx::vms::server::resource::CameraPtr QnAudioStreamerPool::getTransmitDestination(const QnUuid& resourceId) const

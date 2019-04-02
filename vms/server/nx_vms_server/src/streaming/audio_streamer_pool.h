@@ -40,7 +40,7 @@ public:
 private:
     QString calcActionUniqueKey(const nx::vms::event::AbstractActionPtr& action) const;
 
-    QnVideoCameraPtr getTransmitSource(const QString& sourceId) const;
+    nx::vms::server::VideoCameraPtr getTransmitSource(const QString& sourceId) const;
     nx::vms::server::resource::CameraPtr getTransmitDestination(const QnUuid& resourceId) const;
 private:
     QnMutex m_prolongedProvidersMutex;

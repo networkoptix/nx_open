@@ -39,7 +39,7 @@ protected:
         cameraResource->setId(m_cameraResourceId);
         m_serverModule.resourcePool()->addResource(cameraResource);
         ASSERT_TRUE(m_serverModule.videoCameraPool()->addVideoCamera(
-            cameraResource, QnVideoCameraPtr(new VideoCameraMock())));
+            cameraResource, nx::vms::server::VideoCameraPtr(new VideoCameraMock())));
 
         m_streamingChunkKey = StreamingChunkCacheKey(
             m_cameraResourceId.toSimpleString(),

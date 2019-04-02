@@ -16,7 +16,7 @@ Session::Session(
     std::chrono::milliseconds targetDurationMS,
     bool _isLive,
     MediaQuality streamQuality,
-    const QnVideoCameraPtr& videoCamera,
+    const VideoCameraPtr& videoCamera,
     const QnAuthSession& authSession)
     :
     ServerModuleAware(serverModule),
@@ -69,7 +69,7 @@ Session::~Session()
         if (resource)
         {
             //checking resource stream type. Only h.264 is OK for HLS
-            QnVideoCameraPtr camera = videoCameraPool()->getVideoCamera(resource);
+            VideoCameraPtr camera = videoCameraPool()->getVideoCamera(resource);
             if (camera)
                 camera->notInUse(this);
         }

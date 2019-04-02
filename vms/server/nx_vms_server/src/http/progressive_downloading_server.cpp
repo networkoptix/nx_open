@@ -96,7 +96,7 @@ public:
 
     void setAuditHandle(const AuditHandle& handle) { m_auditHandle = handle; }
 
-    void copyLastGopFromCamera(const QnVideoCameraPtr& camera)
+    void copyLastGopFromCamera(const nx::vms::server::VideoCameraPtr& camera)
     {
         camera->copyLastGop(
             nx::vms::api::StreamIndex::primary,

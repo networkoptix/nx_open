@@ -179,7 +179,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
 DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
     QnSecurityCamResourcePtr cameraResource,
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     const StreamingChunkCacheKey& transcodeParams)
 {
     DataSourceContextPtr dataSourceCtx = m_dataSourceCache.take(transcodeParams);
@@ -245,7 +245,7 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
 
 AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createLiveMediaDataProvider(
     const VideoCameraLocker& /*locker*/,
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     const StreamingChunkCacheKey& transcodeParams)
 {
     using namespace std::chrono;
