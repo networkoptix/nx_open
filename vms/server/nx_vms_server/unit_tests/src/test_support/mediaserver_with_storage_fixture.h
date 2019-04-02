@@ -8,10 +8,21 @@
 
 #include <gtest/gtest.h>
 
-namespace nx::test_support {
+namespace nx::vms::server::test::test_support {
 
 static const QString kCamera1Name = "camera1";
 static const QString kCamera2Name = "camera2";
+
+struct CameraChunksInfo
+{
+    QString cameraName;
+    int chunksCount;
+
+    CameraChunksInfo(const QString& cameraName, int chunksCount):
+        cameraName(cameraName),
+        chunksCount(chunksCount)
+    {}
+};
 
 class MediaserverWithStorageFixture: public QObject, public ::testing::Test
 {
@@ -46,7 +57,8 @@ protected:
         ASSERT_TRUE(m_server->stop());
     }
 
-    void givenSomeArchiveOnHdd()
+    void givenSomeArchiveOnHdd(
+        const QList<CameraChunksInfo>& cameraChunks = { CameraChunksInfo(kCamera1Name, 10), CameraChunksInfo(kCamera2Name, 5) })
     {
         qint64 startTimeMs = 0;
         for (const auto& catalog : m_generatedArchive)
@@ -69,8 +81,8 @@ protected:
             startTimeMs += duration_cast<milliseconds>(hours(24)).count();
         }
 
-        addArchiveDataForCamera(kCamera1Name, 10, startTimeMs);
-        addArchiveDataForCamera(kCamera2Name, 5, startTimeMs);
+        for (const auto& cameraChunksInfo: cameraChunks)
+            addArchiveDataForCamera(cameraChunksInfo.cameraName, cameraChunksInfo.chunksCount, startTimeMs);
     }
 
     void addArchiveDataForCamera(const QString& cameraName, int count, qint64 startTimeMs)
@@ -156,4 +168,4 @@ protected:
             ASSERT_EQ(generatedChunks[i].startTimeMs, serverChunks[i].startTimeMs);
     }
 };
-} // namespace nx::test_support
+} // namespace nx::vms::server::test::test_support

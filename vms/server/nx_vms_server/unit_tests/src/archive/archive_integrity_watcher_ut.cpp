@@ -3,12 +3,15 @@
 #include <memory>
 
 #include <test_support/mediaserver_with_storage_fixture.h>
+#include <test_support/utils.h>
+#include <test_support/log_utils.h>
 #include <media_server/media_server_module.h>
 #include <recorder/archive_integrity_watcher.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/utils/log/log_writers.h>
 
 namespace nx::vms::server::test {
 
@@ -21,12 +24,15 @@ protected:
     {
         test_support::MediaserverWithStorageFixture::SetUp();
         m_server->addSetting("appserverPassword", "admin");
+        test_support::createTestLogger({"ServerArchiveIntegrityWatcher"}, &m_logBuffer);
     }
 
     virtual void TearDown() override
     {
         m_archiveReader->stop();
         m_archiveReader->removeDataProcessor(this);
+        utils::log::removeLoggers({ utils::log::Filter(QString("ServerArchiveIntegrityWatcher")) });
+        nx::utils::log::lockConfiguration();
     }
 
     void whenSomeFilesAreDeleted()
@@ -90,6 +96,37 @@ protected:
             this, &FtArchiveIntegrityWatcher::onArchiveIntegrityBreached, Qt::DirectConnection);
     }
 
+    void whenHoursFoldersSwapped(const QString& cameraName, QnServer::ChunksCatalog quality)
+    {
+        const auto serverCatalogIt = m_serverCatalog[quality].find(cameraName);
+        ASSERT_NE(m_serverCatalog[quality].cend(), serverCatalogIt);
+
+        QString folder1Path;
+        QString folder2Path;
+
+        for (const auto& chunk: (*serverCatalogIt)->getChunksUnsafe())
+        {
+            const auto fullFileName = (*serverCatalogIt)->fullFileName(chunk);
+            const auto folderPath = QFileInfo(fullFileName).absolutePath();
+            if (folder1Path.isEmpty())
+            {
+                folder1Path = folderPath;
+            }
+            else if (folder1Path != folderPath)
+            {
+                folder2Path = folderPath;
+                break;
+            }
+        }
+
+        ASSERT_FALSE(folder1Path.isEmpty());
+        ASSERT_FALSE(folder2Path.isEmpty());
+
+        ASSERT_TRUE(QDir().rename(folder1Path, folder1Path + "_tmp"));
+        ASSERT_TRUE(QDir().rename(folder2Path, folder1Path));
+        ASSERT_TRUE(QDir().rename(folder1Path + "_tmp", folder2Path));
+    }
+
 private:
     QnMutex m_archiveIntegrityMutex;
     QnWaitCondition m_archiveIntegrityWaitCondition;
@@ -101,6 +138,7 @@ private:
     int64_t m_archiveStartTime;
     int64_t m_archiveEndTime;
     int64_t m_timeGap = 0;
+    utils::log::Buffer* m_logBuffer = nullptr;
 
     void onArchiveIntegrityBreached(const QnStorageResourcePtr& storage)
     {
@@ -150,6 +188,23 @@ TEST_F(FtArchiveIntegrityWatcher, RemovingFiles)
     whenArchiveIntegritySignalsConnected();
 
     whenSomeFilesAreDeleted();
+    whenPlayArchiveRequestIsIssued();
+    thenArchiveShouldBePlayedWithoutGaps();
+    thenIntegritySignalShouldBeReceived();
+}
+
+TEST_F(FtArchiveIntegrityWatcher, SwappingHoursFolders)
+{
+    givenSomeArchiveOnHdd({ test_support::CameraChunksInfo(test_support::kCamera1Name, 120) });
+    whenServerStarted();
+    thenArchiveShouldBeScannedCorreclty();
+
+    whenReindexRequestIssued();
+    thenArchiveShouldBeScannedCorreclty();
+
+    whenArchiveIntegritySignalsConnected();
+
+    whenHoursFoldersSwapped(test_support::kCamera1Name, QnServer::HiQualityCatalog);
     whenPlayArchiveRequestIsIssued();
     thenArchiveShouldBePlayedWithoutGaps();
     thenIntegritySignalShouldBeReceived();
