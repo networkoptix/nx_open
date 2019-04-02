@@ -83,18 +83,9 @@ export class NxLanguageDropdown implements OnInit {
 
                 this.splitLanguages();
 
-                const browserLang = this.translate.getBrowserCultureLang().replace('-', '_');
-
                 this.activeLanguage = this.languages.find(lang => {
-                    return (lang.language === (this.language.lang.language || browserLang));
+                    return (lang.language === this.language.lang.language);
                 });
-
-                if (!this.activeLanguage) {
-                    this.activeLanguage = {
-                        language: 'en_US',
-                        name    : 'English (US)'
-                    };
-                }
             });
     }
 }
