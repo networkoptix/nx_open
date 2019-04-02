@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
+#include <nx/vms/client/desktop/image_providers/delaying_proxy_image_provider.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
@@ -307,19 +308,22 @@ void EventRibbon::Private::updateTilePreview(int index)
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
 
     auto& previewProvider = m_tiles[index]->preview;
-    if (previewProvider && (request.resource != previewProvider->requestData().resource
-        || request.usecSinceEpoch != previewProvider->requestData().usecSinceEpoch))
-    {
-        previewProvider.reset();
-    }
-
-    if (!previewProvider)
+    if (!previewProvider || request.resource != previewProvider->requestData().resource)
         previewProvider.reset(new ResourceThumbnailProvider(request));
 
     previewProvider->setStreamSelectionMode(modelIndex.data(Qn::PreviewStreamSelectionRole)
         .value<nx::api::CameraImageRequest::StreamSelectionMode>());
 
-    widget->setPreview(previewProvider.get());
+    static const auto kDelayingProxyPropertyName = "__qn_delayingProxyProvider";
+    auto proxy = previewProvider->property(kDelayingProxyPropertyName)
+        .value<DelayingProxyImageProvider*>();
+    if (!proxy)
+    {
+        proxy = new DelayingProxyImageProvider(previewProvider.get());
+        previewProvider->setProperty(kDelayingProxyPropertyName, QVariant::fromValue(proxy));
+    }
+
+    widget->setPreview(proxy);
     widget->setPreviewCropRect(previewCropRect);
 }
 

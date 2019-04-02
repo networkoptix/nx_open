@@ -88,13 +88,15 @@ struct Ini: nx::kit::IniConfig
         "Period to wait until the Server goes online, in seconds. Set to zero to use the\n"
         "built-in value.");
     NX_INI_INT(0, tilePreviewLoadDelayOverrideMs,
-        "Tiles in the right panel will request previews only after this time, in milliseconds.\n"
-        "0 means 100 ms.");
+        "Tiles in the right panel will request previews only after this time, in milliseconds,\n"
+        "after appearing. 0 means default value (100 ms).");
+    NX_INI_INT(750, tilePreviewLoadIntervalMs,
+        "Right Panel tiles will not request previews more often than this time, in milliseconds.");
     NX_INI_FLAG(0, enableSyncedChunksForExtraContent,
         "Show motion and analytics chunks at synced area of the timeline.");
     NX_INI_INT(0, clientWebServerPort,
-        "Enables web server to remote control NX client operation. Set port value 1..65535\n"
-        "(typically 7012) to enable.");
+        "Enables web server to remotely control Nx Client operation; port should be 1..65535\n"
+        "(typically 7012) to enable; 0 means disabled.");
     NX_INI_INT(1000, storeFrameTimePoints,
         "Makes client to remember this number of last frame paint time points for using in FT.");
 };

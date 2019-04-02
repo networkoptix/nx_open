@@ -482,6 +482,7 @@ std::vector<char> CLVideoDecoderOutput::toRgb(int* outLineSize, AVPixelFormat pi
         }
     #endif
 
+    // TODO: Check return value.
     convertImageFormat(width, height,
         data, linesize, (AVPixelFormat) format,
         targetData, targetLineSize, pixelFormat);
