@@ -50,10 +50,16 @@ void DiscoveryManager::start(
     m_discoveryClient->setOnNodeDiscovered(
         [this, clusterId](nx::cloud::discovery::Node node)
         {
-            NX_VERBOSE(
-                this,
-                "Discovered a new node: %1.",
-                toString(node));
+            if (node.urls.empty())
+            {
+                NX_WARNING(
+                    this,
+                    "Discovered node %1 provided 0 urls, discovery will not start",
+                    toString(node));
+                return;
+            }
+
+            NX_VERBOSE(this, "Discovered a new node: %1.", toString(node));
 
             m_syncEngine->connector().addNodeUrl(clusterId, node.urls.front());
         });
