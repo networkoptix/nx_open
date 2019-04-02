@@ -19,7 +19,7 @@ ${valid email}                 noptixqa+valid@gmail.com
 
 *** Test Cases ***                        FIRST       LAST        EMAIL                     PASS                        CHECKED
 Invalid Email 1 noptixqagmail.com         mark        hamill      noptixqagmail.com         ${BASE PASSWORD}            True
-    [tags]    C41557    C41860
+    [tags]    C41557
 Invalid Email 2 @gmail.com                mark        hamill      @gmail.com                ${BASE PASSWORD}            True
     [tags]    C41557
 Invalid Email 3 noptixqa@gmail..com       mark        hamill      noptixqa@gmail..com       ${BASE PASSWORD}            True
