@@ -56,6 +56,7 @@ struct Request
     T parseContentOrThrow() const;
 
     bool isExtraFormattingRequired() const;
+    Qn::SerializationFormat expectedResponseFormat() const;
 
 private:
     http::Method::ValueType calculateMethod() const;

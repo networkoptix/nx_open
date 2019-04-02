@@ -6,14 +6,16 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QUrlQuery>
 
+#include <nx/fusion/serialization_format.h>
 #include <nx/utils/exception.h>
 #include <rest/server/json_rest_result.h>
 
 namespace nx::network::rest {
 
 // TODO: Should probably be moved somewhere into nx::network::http.
-static const nx::network::http::StringType kFormContentType("application/x-www-form-urlencoded");
-static const nx::network::http::StringType kJsonContentType("application/json");
+static const http::StringType kFormContentType("application/x-www-form-urlencoded");
+static const http::StringType kJsonContentType("application/json");
+static const http::StringType kUbjsonContentType("application/ubjson");
 
 class Params: public QMultiMap<QString, QString>
 {
@@ -40,8 +42,8 @@ public:
 
 struct Content
 {
-    nx::network::http::StringType type;
-    nx::network::http::StringType body;
+    http::StringType type;
+    http::StringType body;
 
     std::optional<QJsonValue> parse() const;
 };

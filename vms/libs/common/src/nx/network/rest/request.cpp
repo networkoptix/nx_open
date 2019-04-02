@@ -39,6 +39,16 @@ bool Request::isExtraFormattingRequired() const
     return (bool) param(kExtraFormatting);
 }
 
+Qn::SerializationFormat Request::expectedResponseFormat() const
+{
+    static const QString kFormat("format");
+    if (const auto format = param(kFormat))
+        return QnLexical::deserialized<Qn::SerializationFormat>(*format, Qn::JsonFormat);
+
+    // TODO: Look into "Accept" header as well.
+    return Qn::JsonFormat;
+}
+
 http::Method::ValueType Request::calculateMethod() const
 {
     if (ini().allowGetMethodReplacement)

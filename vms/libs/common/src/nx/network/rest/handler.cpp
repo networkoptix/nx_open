@@ -68,22 +68,22 @@ QString Handler::extractAction(const QString& path) const
     return localPath.mid(localPath.lastIndexOf(L'/') + 1);
 }
 
-Response Handler::executeGet(const Request& request)
+Response Handler::executeGet(const Request& /*request*/)
 {
     return {nx::network::http::StatusCode::notImplemented};
 }
 
-Response Handler::executeDelete(const Request& request)
+Response Handler::executeDelete(const Request& /*request*/)
 {
     return {nx::network::http::StatusCode::notImplemented};
 }
 
-Response Handler::executePost(const Request& request)
+Response Handler::executePost(const Request& /*request*/)
 {
     return {nx::network::http::StatusCode::notImplemented};
 }
 
-Response Handler::executePut(const Request& request)
+Response Handler::executePut(const Request& /*request*/)
 {
     return {nx::network::http::StatusCode::notImplemented};
 }

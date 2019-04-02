@@ -8,7 +8,7 @@ namespace nx::network::rest {
 // instantiate single ini configs because of static linkage.
 // Threre are already some plans to move nx::network::rest here anyway.
 
-struct NX_UTILS_API Ini: nx::kit::IniConfig
+struct NX_NETWORK_API Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_network_rest.ini") { reload(); }
 
@@ -28,6 +28,6 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
         "Enables POST and PUT methods to accept URL paramiters as well as message body.");
 };
 
-NX_UTILS_API Ini& ini();
+NX_NETWORK_API Ini& ini();
 
 } // namespace nx::network::rest
