@@ -141,6 +141,7 @@ public:
     {
         nx::utils::to_lower(&m_peerName);
 
+        addArg("-clusterDbMap/connectionRetryDelay", "1ms");
         addArg("-listeningPeer/maxPreemptiveConnectionCount", "7");
         addArg("-listeningPeer/recommendedPreemptiveConnectionCount", "4");
         addArg("-listeningPeer/internalTimerPeriod", "1ms");
