@@ -142,6 +142,36 @@ protected:
         ASSERT_TRUE(logContainsMessage);
     }
 
+    void whenTwoFilesSwapped(const QString& cameraName, QnServer::ChunksCatalog quality)
+    {
+        const auto serverCatalogIt = m_serverCatalog[quality].find(cameraName);
+        ASSERT_NE(m_serverCatalog[quality].cend(), serverCatalogIt);
+
+        QString file1Path;
+        QString file2Path;
+
+        for (const auto& chunk: (*serverCatalogIt)->getChunksUnsafe())
+        {
+            const auto fullFileName = (*serverCatalogIt)->fullFileName(chunk);
+            if (file1Path.isEmpty())
+            {
+                file1Path = fullFileName;
+            }
+            else if (file1Path != fullFileName)
+            {
+                file2Path = fullFileName;
+                break;
+            }
+        }
+
+        ASSERT_FALSE(file1Path.isEmpty());
+        ASSERT_FALSE(file2Path.isEmpty());
+
+        ASSERT_TRUE(QFile().rename(file1Path, file1Path + "_tmp"));
+        ASSERT_TRUE(QFile().rename(file2Path, file1Path));
+        ASSERT_TRUE(QDir().rename(file1Path + "_tmp", file2Path));
+    }
+
 private:
     QnMutex m_archiveIntegrityMutex;
     QnWaitCondition m_archiveIntegrityWaitCondition;
@@ -224,6 +254,24 @@ TEST_F(FtArchiveIntegrityWatcher, SwappingHoursFolders)
     thenArchiveShouldBePlayedWithoutGaps();
     thenIntegritySignalShouldBeReceived();
     thenLogShouldContain("File is present in the DB but missing in the archive");
+}
+
+TEST_F(FtArchiveIntegrityWatcher, SwappingTwoFiles)
+{
+    givenSomeArchiveOnHdd({ test_support::CameraChunksInfo(test_support::kCamera1Name, 10) });
+    whenServerStarted();
+    thenArchiveShouldBeScannedCorreclty();
+
+    whenReindexRequestIssued();
+    thenArchiveShouldBeScannedCorreclty();
+
+    whenArchiveIntegritySignalsConnected();
+
+    whenTwoFilesSwapped(test_support::kCamera1Name, QnServer::HiQualityCatalog);
+    whenPlayArchiveRequestIsIssued();
+    thenArchiveShouldBePlayedWithoutGaps();
+    thenIntegritySignalShouldBeReceived();
+    thenLogShouldContain("integrity problem");
 }
 
 } // namespace nx::vms::server::test
