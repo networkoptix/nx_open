@@ -58,11 +58,15 @@ void BasicComponentTest::addRelayInstance(
         m_relays.back()->addArg(arg);
 
     ASSERT_TRUE(m_serverListening);
-    m_relays.back()->addArg("--clusterDbMap/connectionRetryDelay=1ms");
-    m_relays.back()->addArg("-p2pDb/clusterId", kClusterId);
+    m_relays.back()->addArg("-clusterDbMap/connectionRetryDelay", "1ms");
+    m_relays.back()->addArg("-discovery/registrationErrorDelay", "1ms");
+    m_relays.back()->addArg("-discovery/onlineNodesRequestDelay", "100ms");
+    m_relays.back()->addArg("-discovery/enabled", "true");
+    m_relays.back()->addArg("-discovery/roundTripPadding", "1ms");
     m_relays.back()->addArg(
         "-discovery/discoveryServiceUrl",
         m_discoveryServer.url().toStdString().c_str());
+    m_relays.back()->addArg("-p2pDb/clusterId", kClusterId);
     m_relays.back()->addArg(
         "-p2pDb/maxConcurrentConnectionsFromSystem",
         std::to_string(7).c_str());
