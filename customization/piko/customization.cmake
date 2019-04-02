@@ -37,7 +37,7 @@ set(customization.fullBundleUpgradeCode "{486DA831-335F-4D02-B1A1-82D3C9868404}"
 set(deb.customization.company.name "piko")
 
 set(ios.new_bundle_identifier "com.pikovms.pikomobile")
-set(ios.group_identifier "com.pikovms.piko")
+set(ios.group_identifier "group.com.pikovms.piko")
 set(ios.sign.identity "iPhone Distribution: Cook Security Group, Inc (N52Z7JQP9L)")
 
 set(mac.skip.sign false)
