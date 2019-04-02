@@ -14,10 +14,10 @@ namespace vms::server {
 namespace resource {
 namespace test {
 
-class VideoCameraMock: public MediaServerVideoCameraMock
+class CustomVideoCameraMock: public nx::vms::server::test::VideoCameraMock
 {
 public:
-    VideoCameraMock(
+    CustomVideoCameraMock(
         QnSharedResourcePointer<CameraMock> camera,
         QnDataProviderFactory* factory)
     {
@@ -44,6 +44,7 @@ public:
         {
             case QnServer::HiQualityCatalog: return m_primaryProvider;
             case QnServer::LowQualityCatalog: return m_secondaryProvider;
+            case QnServer::ChunksCatalogCount: break;
         }
 
         NX_ASSERT(false);
@@ -68,7 +69,7 @@ public:
         NX_ASSERT(m_camera);
         m_camera->setId(QnUuid::createUuid());
 
-        m_videoCamera.reset(new VideoCameraMock(m_camera, serverModule()->dataProviderFactory()));
+        m_videoCamera.reset(new CustomVideoCameraMock(m_camera, serverModule()->dataProviderFactory()));
         m_videoCamera->init();
     }
 
@@ -80,7 +81,7 @@ public:
     }
 
     QnSharedResourcePointer<CameraMock> m_camera;
-    QnSharedResourcePointer<VideoCameraMock> m_videoCamera;
+    QnSharedResourcePointer<CustomVideoCameraMock> m_videoCamera;
 };
 
 class LiveStreamParameters: public CameraTest
@@ -110,7 +111,7 @@ public:
         NX_ASSERT(m_camera);
         m_camera->setId(QnUuid::createUuid());
 
-        m_videoCamera.reset(new VideoCameraMock(m_camera, serverModule()->dataProviderFactory()));
+        m_videoCamera.reset(new CustomVideoCameraMock(m_camera, serverModule()->dataProviderFactory()));
         m_videoCamera->init();
     }
 
@@ -122,7 +123,7 @@ public:
     }
 
     QnSharedResourcePointer<CameraMock> m_camera;
-    QnSharedResourcePointer<VideoCameraMock> m_videoCamera;
+    QnSharedResourcePointer<CustomVideoCameraMock> m_videoCamera;
 };
 
 class EmptyLiveStreamParameters: public CameraTest
@@ -135,7 +136,7 @@ public:
         NX_ASSERT(m_camera);
         m_camera->setId(QnUuid::createUuid());
 
-        m_videoCamera.reset(new VideoCameraMock(m_camera, serverModule()->dataProviderFactory()));
+        m_videoCamera.reset(new CustomVideoCameraMock(m_camera, serverModule()->dataProviderFactory()));
         m_videoCamera->init();
     }
 
@@ -147,7 +148,7 @@ public:
     }
 
     QnSharedResourcePointer<CameraMock> m_camera;
-    QnSharedResourcePointer<VideoCameraMock> m_videoCamera;
+    QnSharedResourcePointer<CustomVideoCameraMock> m_videoCamera;
 };
 
 TEST_F(EmptyLiveStreamParameters, checkDefaultQuality)

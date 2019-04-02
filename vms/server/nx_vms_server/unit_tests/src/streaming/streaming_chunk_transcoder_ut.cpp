@@ -17,7 +17,6 @@
 #include <media_server/media_server_module.h>
 
 namespace nx {
-namespace vms {
 namespace vms::server {
 namespace test {
 
@@ -36,12 +35,11 @@ protected:
     {
         m_cameraResourceId = QnUuid::createUuid();
 
-        auto cameraResource = nx::vms::server::resource::CameraPtr(
-            new nx::vms::server::resource::test::CameraMock(&m_serverModule));
+        auto cameraResource = resource::CameraPtr(new resource::test::CameraMock(&m_serverModule));
         cameraResource->setId(m_cameraResourceId);
         m_serverModule.resourcePool()->addResource(cameraResource);
         ASSERT_TRUE(m_serverModule.videoCameraPool()->addVideoCamera(
-            cameraResource, QnVideoCameraPtr(new MediaServerVideoCameraMock())));
+            cameraResource, QnVideoCameraPtr(new VideoCameraMock())));
 
         m_streamingChunkKey = StreamingChunkCacheKey(
             m_cameraResourceId.toSimpleString(),
@@ -88,5 +86,4 @@ TEST_F(StreamingChunkTranscoder, transcode_fails_if_desired_quality_is_not_avail
 
 } // namespace test
 } // namespace vms::server
-} // namespace vms
 } // namespace nx

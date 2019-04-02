@@ -4,15 +4,17 @@
 
 #include <camera/video_camera.h>
 
+namespace nx::vms::server::test {
+
 /**
  * Validates nx::vms::server::AbstractVideoCamera interface is used in a proper way.
  * Almost every method has an empty implementation.
  */
-class MediaServerVideoCameraMock:
-    public nx::vms::server::AbstractVideoCamera
+class VideoCameraMock:
+    public AbstractVideoCamera
 {
 public:
-    MediaServerVideoCameraMock();
+    VideoCameraMock();
 
     virtual QnLiveStreamProviderPtr getLiveReader(
         QnServer::ChunksCatalog catalog,
@@ -47,7 +49,7 @@ public:
     virtual const MediaStreamCache* liveCache(MediaQuality streamQuality) const override;
     virtual MediaStreamCache* liveCache(MediaQuality streamQuality) override;
 
-    virtual nx::vms::server::hls::LivePlaylistManagerPtr hlsLivePlaylistManager(
+    virtual hls::LivePlaylistManagerPtr hlsLivePlaylistManager(
         MediaQuality streamQuality) const override;
 
     virtual bool ensureLiveCacheStarted(
@@ -58,3 +60,5 @@ public:
 private:
     std::atomic<int> m_usageCounter;
 };
+
+} // namespace nx::vms::server::test
