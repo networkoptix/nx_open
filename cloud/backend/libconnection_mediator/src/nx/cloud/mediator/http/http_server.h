@@ -104,7 +104,7 @@ protected:
     {
         nx::utils::Url requestUrl;
         bool isSsl = false;
-        nx::network::http::Response* response;
+        nx::network::http::Response* response = nullptr;
     };
 
     virtual void processRequest(
