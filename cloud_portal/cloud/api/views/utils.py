@@ -31,7 +31,7 @@ def get_settings_from_cache():
         'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
         'publicDownloads': customization_cache['public_downloads'],
         'publicReleases': customization_cache['public_releases'],
-        'sortSupportedDevices': customization_cache['sort_supported_devices'],
+        'sortSupportedDevicesByPopularity': customization_cache['sort_supported_devices_by_popularity'],
         'supportLink': customization_cache['support_link'],
         'supportedResolutions': customization_cache['supported_resolutions'],
         'supportedHardwareTypes': customization_cache['supported_hardware_types'],

@@ -197,13 +197,13 @@ export class CamTableComponent implements OnChanges, OnInit {
 
     private sortElements(keepURI) {
         // If sort by popularity is set in CMS or default sorting 'Vendor-Model'
-        const sortBy = (this.CONFIG.ipvd.sortSupportedDevices) ? 'count' : 'sortKey';
+        const sortBy = (this.CONFIG.ipvd.sortSupportedDevicesByPopularity) ? 'count' : 'sortKey';
         this.toggleSort(sortBy, keepURI);
     }
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes.elements) {
-            this.sortOrderASC = !this.CONFIG.ipvd.sortSupportedDevices;
+            this.sortOrderASC = !this.CONFIG.ipvd.sortSupportedDevicesByPopularity;
             this._elements = changes.elements.currentValue;
             this.results = this._elements.length;
 

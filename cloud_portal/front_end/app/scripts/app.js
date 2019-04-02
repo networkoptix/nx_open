@@ -107,7 +107,7 @@ window.L = {};
                     
                     angular.extend(CONFIG, appState);
                     
-                    CONFIG.ipvd.sortSupportedDevices = response.sortSupportedDevices;
+                    CONFIG.ipvd.sortSupportedDevicesByPopularity = response.sortSupportedDevicesByPopularity;
                     CONFIG.ipvd.supportedResolutions = response.supportedResolutions;
                     CONFIG.ipvd.supportedHardwareTypes = response.supportedHardwareTypes;
                     CONFIG.ipvd.searchTags = response.searchTags;

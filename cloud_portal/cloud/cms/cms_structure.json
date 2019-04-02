@@ -496,7 +496,7 @@
         "values": [
           {
             "label": "Sort supported devices by popularity",
-            "name": "%SORT_SUPPORTED_DEVICES%",
+            "name": "%SORT_SUPPORTED_DEVICES_BY_POPULARITY%",
             "value": "false",
             "description": "Sets supported devices (camera page) sorting order by popularity",
             "advanced": true,
