@@ -8,7 +8,7 @@ namespace nx::hpm::test {
 
 namespace {
 
-static bool mediatorHasPeer (Mediator* mediator, const std::string& peerDomainName)
+static bool mediatorHasPeer(Mediator* mediator, const std::string& peerDomainName)
 {
     nx::utils::SyncQueue<bool> hasEndpoint;
     mediator->moduleInstance()->impl()->listeningPeerDb().findMediatorByPeerDomain(
@@ -50,11 +50,13 @@ const Mediator& MediatorCluster::mediator(int index) const
 
 bool MediatorCluster::peerInformationSynchronizedInCluster(const std::string& peerDomainName) const
 {
-    bool allMediatorsHavePeer = true;
     for (const auto& mediator : m_mediators)
-        allMediatorsHavePeer &= mediatorHasPeer(mediator.get(), peerDomainName);
+    {
+        if (!mediatorHasPeer(mediator.get(), peerDomainName))
+            return false;
+    }
 
-    return allMediatorsHavePeer;
+    return true;
 }
 
 bool MediatorCluster::peerInformationIsAbsentFromCluster(const std::string& peerDomainName) const
