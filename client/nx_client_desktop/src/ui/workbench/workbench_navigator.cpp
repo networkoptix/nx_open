@@ -1415,36 +1415,19 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         }
         else if (noRecordedPeriodsFound)
         {
-            if (qnRuntime->isAcsMode())
+            if (!qnRuntime->isAcsMode())
             {
-                /* Set to default value. */
-                endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
-                startTimeMSec = endTimeMSec - kTimelineWindowNearLive;
-
-                // TODO: #gdm refactor this safety check sometime
-                if (QnWorkbenchItem* item = m_currentMediaWidget->item())
+                if (isRecording()) //< recording has been just started, no archive received yet
                 {
-                    /* And then try to read saved value - it was valid someday. */
-                    QnTimePeriod window = item->data(Qn::ItemSliderWindowRole).value<QnTimePeriod>();
-                    if (window.isValid())
-                    {
-                        startTimeMSec = window.startTimeMs;
-                        endTimeMSec = window.isInfinite()
-                            ? qnSyncTime->currentMSecsSinceEpoch()
-                            : window.endTimeMs();
-                    }
+                    /* Set to last minute. */
+                    endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
+                    startTimeMSec = endTimeMSec - kTimelineWindowNearLive;
                 }
-            }
-            else if (isRecording()) //< recording has been just started, no archive received yet
-            {
-                /* Set to last minute. */
-                endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
-                startTimeMSec = endTimeMSec - kTimelineWindowNearLive;
-            }
-            else
-            {
-                // #vkutin It seems we shouldn't do anything here until we receive actual data.
-                return;
+                else
+                {
+                    // #vkutin It seems we shouldn't do anything here until we receive actual data.
+                    return;
+                }
             }
         }
         else
