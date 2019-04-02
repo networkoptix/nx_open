@@ -146,6 +146,11 @@ void SynchronizationEngine::setOutgoingCommandFilter(
     m_outgoingCommandFilter.configure(configuration);
 }
 
+OutgoingCommandFilter& SynchronizationEngine::outgoingCommandFilter()
+{
+    return m_outgoingCommandFilter;
+}
+
 void SynchronizationEngine::subscribeToSystemDeletedNotification(
     nx::utils::Subscription<std::string>& subscription)
 {

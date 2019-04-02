@@ -18,7 +18,8 @@ Controller::Controller(const conf::Settings& settings):
         : nullptr),
     m_mediaserverEndpointTester(m_cloudDataProvider.get()),
     m_relayClusterClient(RelayClusterClientFactory::instance().create(settings)),
-    m_listeningPeerPool(settings.listeningPeer()),
+    m_listeningPeerDb(settings.clusterDbMap()),
+    m_listeningPeerPool(settings.listeningPeer(), &m_listeningPeerDb),
     m_listeningPeerRegistrator(
         settings,
         m_cloudDataProvider.get(),
@@ -34,8 +35,7 @@ Controller::Controller(const conf::Settings& settings):
         &m_listeningPeerPool,
         m_relayClusterClient.get(),
         &m_statsManager.collector()),
-    m_discoveredPeerPool(settings.discovery()),
-    m_remoteMediatorPeerPool(settings.clusterDbMap())
+    m_discoveredPeerPool(settings.discovery())
 {
     if (!m_cloudDataProvider)
     {
@@ -78,14 +78,14 @@ const nx::cloud::discovery::RegisteredPeerPool& Controller::discoveredPeerPool()
     return m_discoveredPeerPool;
 }
 
-RemoteMediatorPeerPool& Controller::remoteMediatorPeerPool()
+ListeningPeerDb& Controller::listeningPeerDb()
 {
-    return m_remoteMediatorPeerPool;
+    return m_listeningPeerDb;
 }
 
-const RemoteMediatorPeerPool& Controller::remoteMediatorPeerPool() const
+const ListeningPeerDb& Controller::listeningPeerDb() const
 {
-    return m_remoteMediatorPeerPool;
+    return m_listeningPeerDb;
 }
 
 const stats::StatsManager& Controller::statisticsManager() const
@@ -95,7 +95,7 @@ const stats::StatsManager& Controller::statisticsManager() const
 
 bool Controller::doMandatoryInitialization()
 {
-    return m_remoteMediatorPeerPool.initialize();
+    return m_listeningPeerDb.initialize();
 }
 
 std::optional<network::HostAddress> Controller::discoverPublicAddress()

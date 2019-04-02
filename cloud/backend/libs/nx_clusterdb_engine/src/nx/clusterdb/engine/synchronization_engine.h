@@ -65,6 +65,7 @@ public:
      */
     void setOutgoingCommandFilter(
         const OutgoingCommandFilterConfiguration& configuration);
+    OutgoingCommandFilter& outgoingCommandFilter();
 
     void subscribeToSystemDeletedNotification(
         nx::utils::Subscription<std::string>& subscription);

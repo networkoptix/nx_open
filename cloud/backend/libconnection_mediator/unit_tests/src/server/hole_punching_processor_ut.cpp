@@ -9,6 +9,7 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/uuid.h>
 
+#include <nx/cloud/mediator/listening_peer_db.h>
 #include <nx/cloud/mediator/relay/relay_cluster_client.h>
 #include <nx/cloud/mediator/server/hole_punching_processor.h>
 #include <nx/cloud/mediator/settings.h>
@@ -390,7 +391,8 @@ class HolePunchingProcessor:
 
 public:
     HolePunchingProcessor():
-        m_listeningPeerPool(m_settings.listeningPeer()),
+        m_listeningPeerDb(m_settings.clusterDbMap()),
+        m_listeningPeerPool(m_settings.listeningPeer(), &m_listeningPeerDb),
         m_relayClusterClient(m_settings),
         m_holePunchingProcessor(
             m_settings,
@@ -504,6 +506,7 @@ private:
 
     conf::Settings m_settings;
     TestCloudDataProvider m_cloudData;
+    ListeningPeerDb m_listeningPeerDb;
     ListeningPeerPool m_listeningPeerPool;
     DummyStatisticsCollector m_statisticsCollector;
     RelayClusterClient m_relayClusterClient;

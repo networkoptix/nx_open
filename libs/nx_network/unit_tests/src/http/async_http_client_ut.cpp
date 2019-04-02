@@ -461,6 +461,12 @@ public:
         init();
     }
 
+    ~HttpClientAsyncMultiRequest()
+    {
+        if (m_client)
+            m_client->pleaseStopSync();
+    }
+
 protected:
     void doRequest(const nx::utils::Url& url, const QByteArray& message)
     {

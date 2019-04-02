@@ -8,6 +8,7 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/network/url/url_builder.h>
 
 #include "get_listening_peer_list_handler.h"
 #include "../controller.h"
@@ -21,12 +22,12 @@ Server::Server(
     const conf::Settings& settings,
     const PeerRegistrator& peerRegistrator,
     nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool,
-    RemoteMediatorPeerPool* remoteMediatorPeerPool,
+    ListeningPeerDb* listeningPeerDb,
     HolePunchingProcessor* holePunchingProcessor)
     :
     m_settings(settings),
     m_multiAddressHttpServer(&m_authenticationDispatcher, &m_httpMessageDispatcher),
-    m_remoteMediatorPeerPool(remoteMediatorPeerPool),
+    m_listeningPeerDb(listeningPeerDb),
     m_holePunchingProcessor(holePunchingProcessor)
 {
     NX_ASSERT(!m_settings.http().addrToListenList.empty());
@@ -178,7 +179,8 @@ void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
         [this]()
         {
             return std::make_unique<InitiateConnectionRequestHandler>(
-                m_holePunchingProcessor);
+                m_holePunchingProcessor,
+                m_listeningPeerDb);
         },
         network::http::Method::post);
 }
@@ -201,9 +203,11 @@ void Server::registerApiHandler(
 //-------------------------------------------------------------------------------------------------
 
 InitiateConnectionRequestHandler::InitiateConnectionRequestHandler(
-    HolePunchingProcessor* holePunchingProcessor)
+    HolePunchingProcessor* holePunchingProcessor,
+    ListeningPeerDb* listeningPeerDb)
     :
-    m_holePunchingProcessor(holePunchingProcessor)
+    m_holePunchingProcessor(holePunchingProcessor),
+    m_listeningPeerDb(listeningPeerDb)
 {
 }
 
@@ -211,17 +215,38 @@ void InitiateConnectionRequestHandler::processRequest(
     nx::network::http::RequestContext requestContext,
     api::ConnectRequest inputData)
 {
+    CachedRequestContext cachedRequestContext{
+        requestContext.connection->isSsl(),
+        requestContext.response
+    };
+
     m_holePunchingProcessor->connect(
         RequestSourceDescriptor{
             network::TransportProtocol::tcp,
             requestContext.connection->socket()->getForeignAddress()},
         inputData,
-        [this](auto&&... args) { reportResult(std::move(args)...); });
+        [this, cachedRequestContext = std::move(cachedRequestContext),
+            targetServer = inputData.destinationHostName](
+            api::ResultCode resultCode,
+            api::ConnectResponse response)
+        {
+            if (resultCode == api::ResultCode::notFound)
+            {
+                return redirectToRemoteMediator(
+                    std::move(cachedRequestContext),
+                    targetServer,
+                    std::move(resultCode),
+                    std::move(response));
+            }
+
+            reportResult(std::move(resultCode), std::move(response));
+        });
 }
 
 void InitiateConnectionRequestHandler::reportResult(
     api::ResultCode resultCode,
-    api::ConnectResponse response)
+    api::ConnectResponse response,
+    const std::optional<nx::network::http::StatusCode::Value>& httpStatusCode)
 {
     network::http::FusionRequestResult result;
     if (resultCode != api::ResultCode::ok)
@@ -229,13 +254,73 @@ void InitiateConnectionRequestHandler::reportResult(
         result.errorClass = network::http::FusionRequestErrorClass::logicError;
         result.errorDetail = static_cast<int>(resultCode);
         result.errorText = api::toString(resultCode);
-        result.setHttpStatusCode(
-            resultCode == api::ResultCode::notFound
-            ? network::http::StatusCode::notFound
-            : network::http::StatusCode::badRequest);
+        if (httpStatusCode.has_value())
+        {
+            result.setHttpStatusCode(*httpStatusCode);
+        }
+        else
+        {
+            result.setHttpStatusCode(
+                resultCode == api::ResultCode::notFound
+                    ? network::http::StatusCode::notFound
+                    : network::http::StatusCode::badRequest);
+        }
+
+
     }
 
     this->requestCompleted(std::move(result), std::move(response));
+}
+
+
+void InitiateConnectionRequestHandler::redirectToRemoteMediator(
+    CachedRequestContext requestContext,
+    const nx::String& targetServer,
+    api::ResultCode resultCode,
+    api::ConnectResponse response)
+{
+    m_listeningPeerDb->findMediatorByPeerDomain(
+        targetServer.toStdString(),
+        [this, requestContext = std::move(requestContext),
+            resultCode, response = std::move(response)](
+                MediatorEndpoint endpoint)
+        {
+            if (endpoint.domainName.empty())
+            {
+                NX_VERBOSE(this, "Redirect to remote mediator failed");
+                return reportResult(api::ResultCode::notFound, std::move(response));
+            }
+
+            if (endpoint == m_listeningPeerDb->thisMediatorEndpoint())
+            {
+                NX_VERBOSE(this, "Redirecting to this mediator but connection already failed");
+                return reportResult(api::ResultCode::notFound, std::move(response));
+            }
+
+            auto location = buildMediatorUrl(endpoint, requestContext.isSsl);
+
+            network::http::insertOrReplaceHeader(
+                &requestContext.response->headers,
+                nx::network::http::HttpHeader("Location", location.toStdString().c_str()));
+
+            reportResult(
+                api::ResultCode::notFound,
+                std::move(response),
+                nx::network::http::StatusCode::temporaryRedirect);
+        });
+}
+
+nx::utils::Url InitiateConnectionRequestHandler::buildMediatorUrl(
+    const MediatorEndpoint& endpoint,
+    bool useHttps)
+{
+    return nx::network::url::Builder()
+        .setHost(endpoint.domainName.c_str())
+        .setScheme(
+            useHttps
+                ? nx::network::http::kSecureUrlSchemeName
+                : nx::network::http::kUrlSchemeName)
+        .setPort(useHttps ? endpoint.httpsPort : endpoint.httpPort).toUrl();
 }
 
 } // namespace http

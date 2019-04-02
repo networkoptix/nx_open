@@ -64,6 +64,11 @@ const Controller& MediatorProcess::controller() const
     return *m_controller;
 }
 
+ListeningPeerDb& MediatorProcess::listeningPeerDb()
+{
+    return m_controller->listeningPeerDb();
+}
+
 std::unique_ptr<nx::utils::AbstractServiceSettings> MediatorProcess::createSettings()
 {
     return std::make_unique<conf::Settings>();
@@ -127,6 +132,12 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
 bool MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& settings)
 {
+    const auto assignPort =
+        [](const std::vector<network::SocketAddress>& endpoints, int* outPort)
+        {
+            *outPort = endpoints.empty() ? MediatorEndpoint::kPortUnused : endpoints.front().port;
+        };
+
     MediatorEndpoint endpoint;
     if (settings.server().name.empty())
     {
@@ -137,22 +148,21 @@ bool MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& se
             return false;
         }
         endpoint.domainName = publicIp->toString().toStdString();
-
-        if (!httpEndpoints().empty())
-            endpoint.httpPort = httpEndpoints().front().port;
-        else
-            endpoint.httpsPort = httpsEndpoints().front().port;
     }
     else
     {
         endpoint.domainName = settings.server().name;
     }
 
-    m_controller->remoteMediatorPeerPool().setEndpoint(endpoint);
+    assignPort(httpEndpoints(), &endpoint.httpPort);
+    assignPort(httpsEndpoints(), &endpoint.httpsPort);
+    assignPort(stunUdpEndpoints(), &endpoint.stunUdpPort);
+
+    m_controller->listeningPeerDb().setThisMediatorEndpoint(endpoint);
 
     if (settings.clusterDbMap().map.synchronizationSettings.discovery.enabled)
     {
-        m_controller->remoteMediatorPeerPool().startDiscovery(
+        m_controller->listeningPeerDb().startDiscovery(
             &m_view->httpServer().messageDispatcher());
     }
 
