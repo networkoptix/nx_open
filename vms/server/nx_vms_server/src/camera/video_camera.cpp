@@ -2,6 +2,7 @@
 
 #include <deque>
 
+#include <nx/kit/utils.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h> /* For getUsecTimer. */
 #include <utils/media/frame_info.h>
@@ -20,11 +21,13 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <media_server/settings.h>
 
 #include <nx_vms_server_ini.h>
+#include <nx/utils/switch.h>
 #include <media_server/media_server_module.h>
 #include <core/dataprovider/data_provider_factory.h>
+#include <nx/vms/server/settings.h>
+#include <nx_vms_server_ini.h>
 
 class QnDataProviderFactory;
 
@@ -36,7 +39,6 @@ static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
 static const qint64 GET_FRAME_MAX_TIME = 1000000ll * 15;
 static const qint64 MSEC_PER_SEC = 1000;
 static const qint64 USEC_PER_MSEC = 1000;
-static unsigned int MEDIA_CACHE_SIZE_MILLIS = 10 * MSEC_PER_SEC;
 static const int CAMERA_PULLING_STOP_TIMEOUT = 1000 * 3;
 static const int kMaxGopSize = 260;
 
@@ -350,6 +352,13 @@ std::unique_ptr<QnConstDataPacketQueue> QnVideoCameraGopKeeper::getFrameSequence
     NX_VERBOSE(this, "%1(%2 us, channel: %3, %4) BEGIN", __func__, timeUs, channel, roundMethod);
     if (roundMethod == ImageRequest::RoundMethod::precise)
     {
+        QnLiveStreamProviderPtr provider = m_camera->getLiveReader(m_catalog);
+        if (!provider || !provider->isRunning())
+        {
+            NX_VERBOSE(this, "%1() END -> null: Provider for quality %2 is not running.", __func__, m_catalog);
+            return nullptr;
+        }
+
         auto frames = getGopTillTime(timeUs, channel);
         if (frames->isEmpty())
         {
@@ -468,7 +477,7 @@ void QnVideoCameraGopKeeper::clearVideoData()
 }
 
 //-------------------------------------------------------------------------------------------------
-//  QnVideoCamera 
+//  QnVideoCamera
 
 QnVideoCamera::QnVideoCamera(
     const nx::vms::server::Settings& settings,
@@ -630,9 +639,93 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
                 else
                     m_secondaryGopKeeper = gopKeeper;
                 reader->addDataProcessor(gopKeeper);
+
+                connect(reader.get(), &QThread::started, this,
+                    [gopKeeper]()
+                    {
+                        gopKeeper->clearVideoData();
+                    },
+                    Qt::DirectConnection);
             }
         }
     }
+}
+
+QnVideoCamera::ForceLiveCacheForPrimaryStream
+    QnVideoCamera::getSettingForceLiveCacheForPrimaryStream(
+        const QnSecurityCamResource* cameraResource) const
+{
+    const QString& value =
+        cameraResource->commonModule()->globalSettings()->forceLiveCacheForPrimaryStream();
+    return nx::utils::switch_(value,
+        "no", []() { return ForceLiveCacheForPrimaryStream::no; },
+        "yes", []() { return ForceLiveCacheForPrimaryStream::yes; },
+        "auto", []() { return ForceLiveCacheForPrimaryStream::auto_; },
+        nx::utils::default_,
+            [this, &value]()
+            {
+                NX_ERROR(this,
+                    "Invalid value in System setting \"forceLiveCacheForPrimaryStream\": %1, "
+                    "assuming \"auto\".",
+                    nx::kit::utils::toString(value));
+                return ForceLiveCacheForPrimaryStream::auto_;
+            }
+      );
+}
+
+/** @param outReasonForLog Filled by this method only when returning `true`. */
+bool QnVideoCamera::isLiveCacheForcingUseful(QString* outReasonForLog) const
+{
+    const auto virtualCameraResource = dynamic_cast<QnVirtualCameraResource*>(m_resource.data());
+    if (!NX_ASSERT(virtualCameraResource))
+        return false;
+
+    // Force the cache if any Analytics Engine can produce Object Metadata.
+    for (const auto& [engineId, objectTypeIds]: virtualCameraResource->supportedObjectTypes())
+    {
+        if (!objectTypeIds.empty())
+        {
+            *outReasonForLog = "useful because analytics produces objects";
+            return true;
+        }
+    }
+    return false;
+}
+
+/** @param outReasonForLog Filled by this method only when returning `true`. */
+bool QnVideoCamera::needToForceLiveCacheForPrimaryStream(
+    const QnSecurityCamResource* cameraResource, QString* outReasonForLog) const
+{
+    return nx::utils::switch_(getSettingForceLiveCacheForPrimaryStream(cameraResource),
+        ForceLiveCacheForPrimaryStream::no,
+            []() { return false; },
+        ForceLiveCacheForPrimaryStream::yes,
+            [&]()
+            {
+                *outReasonForLog = "forced by System settings";
+                return true;
+            },
+        ForceLiveCacheForPrimaryStream::auto_,
+            [&]() { return isLiveCacheForcingUseful(outReasonForLog); }
+    );
+}
+
+/** @param outReasonForLog Filled by this method only when returning `true`. */
+bool QnVideoCamera::isLiveCacheNeededForPrimaryStream(
+    const QnSecurityCamResource* cameraResource, QString* outReasonForLog) const
+{
+    if (needToForceLiveCacheForPrimaryStream(cameraResource, outReasonForLog))
+        return true;
+
+    if (!m_secondaryReader && !cameraResource->hasDualStreaming()
+        && cameraResource->hasCameraCapabilities(Qn::PrimaryStreamSoftMotionCapability))
+    {
+        // The camera has one stream only and it is suitable for motion, then cache the primary stream.
+        *outReasonForLog = "there is only one stream, and it is motion-capable";
+        return true;
+    }
+
+    return false;
 }
 
 void QnVideoCamera::startLiveCacheIfNeeded()
@@ -644,37 +737,28 @@ void QnVideoCamera::startLiveCacheIfNeeded()
     if (!isSomeActivity())
         return;
 
-    const QnSecurityCamResource* cameraResource =
-        dynamic_cast<QnSecurityCamResource*>(m_resource.data());
+    const auto cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
+    if (!NX_ASSERT(cameraResource))
+        return;
 
-    if (m_secondaryReader)
+    if (m_secondaryReader && !m_liveCache[MEDIA_Quality_Low])
     {
-        if (!m_liveCache[MEDIA_Quality_Low])
-        {
-            ensureLiveCacheStarted(
-                MEDIA_Quality_Low,
-                m_secondaryReader,
-                duration_cast<microseconds>(m_settings.hlsTargetDurationMS()).count());
-        }
+        ensureLiveCacheStarted(
+            MEDIA_Quality_Low,
+            m_secondaryReader,
+            duration_cast<microseconds>(m_settings.hlsTargetDurationMS()).count(),
+            "always needed on secondary stream");
     }
 
+    QString primaryStreamLiveCacheReasonForLog;
     if (!m_liveCache[MEDIA_Quality_High] && m_primaryReader
-        && (ini().forceLiveCacheForPrimaryStream || !m_secondaryReader))
+        && isLiveCacheNeededForPrimaryStream(cameraResource, &primaryStreamLiveCacheReasonForLog))
     {
-        // If the camera has one stream only and it is suitable for motion, then cache the primary
-        // stream.
-        bool needToCachePrimaryStream =
-            !cameraResource->hasDualStreaming()
-            && cameraResource->hasCameraCapabilities(Qn::PrimaryStreamSoftMotionCapability);
-
-        if (ini().forceLiveCacheForPrimaryStream || needToCachePrimaryStream)
-        {
-            NX_VERBOSE(this, "ATTENTION: Enabling liveCache for the primary stream");
-            ensureLiveCacheStarted(
-                MEDIA_Quality_High,
-                m_primaryReader,
-                duration_cast<microseconds>(m_settings.hlsTargetDurationMS()).count());
-        }
+        ensureLiveCacheStarted(
+            MEDIA_Quality_High,
+            m_primaryReader,
+            duration_cast<microseconds>(m_settings.hlsTargetDurationMS()).count(),
+            primaryStreamLiveCacheReasonForLog);
     }
 }
 
@@ -870,7 +954,8 @@ bool QnVideoCamera::ensureLiveCacheStarted(MediaQuality streamQuality, qint64 ta
             getLiveReaderNonSafe(QnServer::HiQualityCatalog, true);
         if (!m_primaryReader)
             return false;
-        return ensureLiveCacheStarted(streamQuality, m_primaryReader, targetDurationUSec);
+        return ensureLiveCacheStarted(
+            streamQuality, m_primaryReader, targetDurationUSec, "needed for HLS");
     }
 
     if (streamQuality == MEDIA_Quality_Low)
@@ -879,7 +964,8 @@ bool QnVideoCamera::ensureLiveCacheStarted(MediaQuality streamQuality, qint64 ta
             getLiveReaderNonSafe(QnServer::LowQualityCatalog, true);
         if (!m_secondaryReader)
             return false;
-        return ensureLiveCacheStarted(streamQuality, m_secondaryReader, targetDurationUSec);
+        return ensureLiveCacheStarted(
+            streamQuality, m_secondaryReader, targetDurationUSec, "needed for HLS");
     }
 
     return false;
@@ -916,6 +1002,42 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(
     return catalog == QnServer::HiQualityCatalog ? m_primaryReader : m_secondaryReader;
 }
 
+static QString mediaQualityToStreamName(MediaQuality mediaQuality)
+{
+    switch(mediaQuality)
+    {
+        case MEDIA_Quality_High: return "primary";
+        case MEDIA_Quality_Low: return "secondary";
+        default: return lm("MediaQuality=%1").arg((int) mediaQuality);
+    }
+}
+
+std::pair<int, int> QnVideoCamera::getMinMaxLiveCacheSizeMs(MediaQuality streamQuality) const
+{
+    // Here we treat streams other than MEDIA_Quality_High as secondary, because currently
+    // there is only one such stream: MEDIA_Quality_Low.
+
+    // NOTE: Hls spec requires 7 last chunks to be in memory, adding extra 3 just in case,
+    //     thus, the lowest recommended min cache size is 10.
+
+    const int minSizeMs = (streamQuality == MEDIA_Quality_High)
+        ? ini().liveStreamCacheForPrimaryStreamMinSizeMs
+        : ini().liveStreamCacheForSecondaryStreamMinSizeMs;
+
+    const int maxSizeMs = (streamQuality == MEDIA_Quality_High)
+        ? ini().liveStreamCacheForPrimaryStreamMaxSizeMs
+        : ini().liveStreamCacheForSecondaryStreamMaxSizeMs;
+
+    if (minSizeMs < 0 || minSizeMs > maxSizeMs)
+    {
+        NX_WARNING(this, "Invalid min/max size for Live Cache for %1 stream in %2; assuming 0..0",
+            mediaQualityToStreamName(streamQuality), ini().iniFile());
+        return std::pair(0, 0);
+    }
+
+    return std::pair(minSizeMs, maxSizeMs);
+}
+
 /**
  * Starts caching live stream, if not started.
  * @return True if started, false if failed to start.
@@ -923,20 +1045,33 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(
 bool QnVideoCamera::ensureLiveCacheStarted(
     MediaQuality streamQuality,
     const QnLiveStreamProviderPtr& primaryReader,
-    qint64 targetDurationUSec )
+    qint64 targetDurationUSec,
+    const QString& reasonForLog)
 {
+    if (!NX_ASSERT(streamQuality >= 0) || !NX_ASSERT(streamQuality < m_liveCache.size()))
+        return false;
+
     primaryReader->startIfNotRunning();
 
     m_cameraUsers.insert(this);
 
     if (!m_liveCache[streamQuality].get())
     {
-        m_liveCache[streamQuality].reset(new MediaStreamCache(
-            MEDIA_CACHE_SIZE_MILLIS,
-            // Hls spec requires 7 last chunks to be in memory, adding extra 3 just in case.
-            MEDIA_CACHE_SIZE_MILLIS * 10));
+        const auto minMaxSizeMs = getMinMaxLiveCacheSizeMs(streamQuality);
 
-        int removedChunksToKeepCount = m_settings.hlsRemovedChunksToKeep();
+        NX_INFO(this, "Enabling Live Cache for %1 stream (%2..%3 seconds): %4",
+            mediaQualityToStreamName(streamQuality),
+            minMaxSizeMs.first,
+            minMaxSizeMs.second,
+            reasonForLog);
+
+        m_liveCache[streamQuality].reset(
+            new MediaStreamCache(
+                minMaxSizeMs.first,
+                minMaxSizeMs.second));
+
+        const int removedChunksToKeepCount = m_settings.hlsRemovedChunksToKeep();
+
         m_hlsLivePlaylistManager[streamQuality] =
             std::make_shared<nx::vms::server::hls::LivePlaylistManager>(
                 m_liveCache[streamQuality].get(),

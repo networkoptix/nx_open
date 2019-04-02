@@ -109,7 +109,7 @@
         <item>
          <widget class="QCheckBox" name="limitSessionLengthCheckBox">
           <property name="text">
-           <string>Limit Session Length</string>
+           <string>Limit session duration</string>
           </property>
          </widget>
         </item>

@@ -26,7 +26,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
     ui->auditTrailHint->setHint(tr("Tracks and logs all user actions."));
 
     ui->limitSessionLengthHint->setHint(
-        tr("User will be automatically logged out after this period of time."));
+        tr("Users will be automatically logged out if their session exceeds the specified duration."));
 
     connect(ui->watermarkSettingsButton, &QPushButton::pressed, this,
         [this]

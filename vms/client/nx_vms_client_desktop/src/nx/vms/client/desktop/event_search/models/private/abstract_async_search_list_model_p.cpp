@@ -44,7 +44,10 @@ bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler c
     if (fetchInProgress() || !completionHandler)
         return false;
 
-    m_request.direction = q->fetchDirection();
+    m_request.direction = q->rowCount() == 0
+        ? FetchDirection::earlier //< First fetch is always backwards from the live.
+        : q->fetchDirection();
+
     m_request.batchSize = q->fetchBatchSize();
 
     if (q->fetchedTimeWindow().isEmpty())
