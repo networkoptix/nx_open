@@ -1641,7 +1641,16 @@ bool MultiServerUpdatesWidget::processRemoteChanges()
     {
         auto idle = m_stateTracker->getPeersInState(StatusCode::idle);
         auto all = m_stateTracker->getAllPeers();
-        if (idle.size() == all.size() && m_serverUpdateTool->haveActiveUpdate())
+        auto downloading = m_stateTracker->getPeersInState(StatusCode::downloading);
+
+        if (!downloading.empty())
+        {
+            // According to VMS-13655, we should go to downloading stage if we have merged
+            // another system. This system will start update automatically, so we just need
+            // to change UI state.
+            setTargetState(WidgetUpdateState::downloading, downloading, false);
+        }
+        else if (idle.size() == all.size() && m_serverUpdateTool->haveActiveUpdate())
         {
             setTargetState(WidgetUpdateState::ready, {});
         }
