@@ -73,6 +73,30 @@ public:
         return m_delegate->execSqlScriptSync(script, queryContext);
     }
 
+    //---------------------------------------------------------------------------------------------
+
+    virtual void createCursorImpl(
+        std::unique_ptr<detail::AbstractCursorHandler> cursorHandler) override
+    {
+        m_delegate->createCursorImpl(std::move(cursorHandler));
+    }
+
+    virtual void fetchNextRecordFromCursorImpl(
+        std::unique_ptr<detail::AbstractFetchNextRecordFromCursorTask> task) override
+    {
+        m_delegate->fetchNextRecordFromCursorImpl(std::move(task));
+    }
+
+    virtual void removeCursor(QnUuid id) override
+    {
+        m_delegate->removeCursor(id);
+    }
+
+    virtual int openCursorCount() const override
+    {
+        return m_delegate->openCursorCount();
+    }
+
     ConnectionOptions& connectionOptions()
     {
         return m_connectionOptions;

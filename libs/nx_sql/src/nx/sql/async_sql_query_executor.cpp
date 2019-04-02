@@ -176,6 +176,31 @@ std::size_t AsyncSqlQueryExecutor::pendingQueryCount() const
     return m_queryQueue.size();
 }
 
+void AsyncSqlQueryExecutor::createCursorImpl(
+    std::unique_ptr<detail::AbstractCursorHandler> cursorHandler)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_cursorProcessorContexts.empty())
+            addCursorProcessingThread(lock);
+    }
+
+    auto cursorCreator = std::make_unique<detail::CursorCreator>(
+        &m_cursorProcessorContexts.front()->cursorContextPool,
+        std::move(cursorHandler));
+    m_cursorTaskQueue.push(std::move(cursorCreator));
+}
+
+void AsyncSqlQueryExecutor::fetchNextRecordFromCursorImpl(
+    std::unique_ptr<detail::AbstractFetchNextRecordFromCursorTask> task)
+{
+    auto executor = std::make_unique<detail::FetchCursorDataExecutor>(
+        &m_cursorProcessorContexts.front()->cursorContextPool,
+        std::move(task));
+
+    m_cursorTaskQueue.push(std::move(executor));
+}
+
 void AsyncSqlQueryExecutor::removeCursor(QnUuid id)
 {
     m_cursorProcessorContexts.front()->cursorContextPool.markCursorForDeletion(id);

@@ -81,6 +81,24 @@ public:
         return nx::sql::DBResult::ok;
     }
 
+    virtual void createCursorImpl(std::unique_ptr<nx::sql::detail::AbstractCursorHandler> /*cursorHandler*/) override
+    {
+    }
+
+    virtual void fetchNextRecordFromCursorImpl(
+        std::unique_ptr<nx::sql::detail::AbstractFetchNextRecordFromCursorTask> /*task*/) override
+    {
+    }
+
+    virtual void removeCursor(QnUuid /*id*/) override
+    {
+    }
+
+    virtual int openCursorCount() const override
+    {
+        return 0;
+    }
+
 private:
     nx::sql::ConnectionOptions m_connectionOptions;
     QnMutex m_mutex;
