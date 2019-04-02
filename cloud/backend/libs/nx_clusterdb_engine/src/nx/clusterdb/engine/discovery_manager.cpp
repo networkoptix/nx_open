@@ -13,11 +13,6 @@ static QString toString(const nx::cloud::discovery::Node& node)
     return nx::cloud::discovery::NodeSerialization::serialized(node);
 }
 
-bool isHttpScheme(const nx::utils::Url& url)
-{
-    return url.scheme() == nx::network::http::kUrlSchemeName;
-}
-
 } // namespace
 
 DiscoveryManager::DiscoveryManager(
