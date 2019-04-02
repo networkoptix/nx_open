@@ -12,7 +12,7 @@ namespace udp {
 RendezvousConnector::RendezvousConnector(
     std::string connectSessionId,
     SocketAddress remotePeerAddress,
-    std::unique_ptr<nx::network::UDPSocket> udpSocket)
+    std::unique_ptr<AbstractDatagramSocket> udpSocket)
 :
     m_connectSessionId(std::move(connectSessionId)),
     m_remotePeerAddress(std::move(remotePeerAddress)),
@@ -115,11 +115,11 @@ bool RendezvousConnector::initializeUdtConnection(
     UdtStreamSocket* udtConnection,
     std::chrono::milliseconds timeout)
 {
-    auto udpSocket = std::move(m_udpSocket);
+    auto udpSocket = std::exchange(m_udpSocket, nullptr);
     if (udpSocket)
     {
         // Moving system socket handler from m_mediatorUdpClient to m_udtConnection.
-        const bool result = udtConnection->bindToUdpSocket(std::move(*udpSocket));
+        const bool result = udtConnection->bindToUdpSocket(udpSocket.get());
         // udpSocket destructor may reset system error code.
         const auto sysErrorCodeBak = SystemError::getLastOSErrorCode();
         udpSocket.reset();

@@ -2555,17 +2555,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>서버 설정</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>서버 업데이트</translation>
-    </message>
-  </context>
-  <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
@@ -5091,219 +5080,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>서버</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>상태</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>업데이트 파일 선택...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>업데이트 내용</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>설치 파일을 사용하여 클라이언트의 수동 업데이트가 필요합니다.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>업데이트 할 수 없는 파일입니다.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>최신 사용할 수 있는 업데이트</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>최신 버전 업데이트 파일 다운로드</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>선택한 버전</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>업데이트 다운로드</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>업데이트 파일에 대 한 탐색...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>업데이트 파일 선택...</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>외부 브라우저에서 다운로드</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>클립보드에 링크 복사</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>인터넷에서 업데이트를 확인할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>알 수 없는 빌드 번호입니다.</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>이전 버전으로 다운 그레이드를 권하지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>하나 이상의 서버에 대 한 업데이트 된 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>클라이언트 업데이트를 찾지 못했습니다.</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>업데이트 파일을 추출할 수 없습니다. 여유 공간이 남아 있지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>업데이트 완료...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>업데이트 확인 중...</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>업데이트 다운로드 중...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>클라이언트 업데이트를 설치...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>호환 되지 않는 서버에 업데이트를 설치...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>서버로 강제 업데이트 진행</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>업데이트 설치 중...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>특정 빌드...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>특정 빌드를 업데이트</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>업데이트 시스템</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>시스템 업데이트 진행 중입니다.</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>업데이트 취소</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>백그라운드에서 계속</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>%n 서버에 여유 공간 부족</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>업데이트 실패시 서버 오동작의 원인이 될 수있습니다.</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>강제 업데이트</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>서버 업데이트 완료</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>업데이트 완료</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>업데이트 취소</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>모든서버가 업데이트된 상태입니다.</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>업데이트 실패!</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>%1 설치 패키지를 사용 하 여 수동으로 업데이트 하십시오.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 업데이트 버전을 다시 시작 됩니다.</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>이 단계에서 업데이트를 취소할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>완료 전까지 대기 해주세요</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>시스템의 모든 구성 요소는 최신 버전입니다.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>시스템의 모든 구성 요소는 최신 버전입니다.</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Incompatible %1 instance. To update disconnect System from %1 first.</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>업데이트 파일</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>업데이트 확인 중...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>여유 공간 확인 중...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
       <source>Unsaved changes:</source>
@@ -5983,10 +5759,6 @@ to %1</source>
       <translation>원격 보관 파일 동기화가 진행 중입니다.</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>원격 보관 파일 동기화 중 오류가 발생 했습니다.</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>다음 장치에 대 한 원격 보관 파일 동기화 시작 되었습니다.</translation>
     </message>
@@ -6035,6 +5807,10 @@ to %1</source>
     <message>
       <source>The System is running in safe mode.</source>
       <translation type="unfinished">The System is running in safe mode.</translation>
+    </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
     </message>
   </context>
   <context>
@@ -6145,79 +5921,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>말하기 위해 잡고 계세요.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>업데이트가 성공적으로 완료 되었습니다.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>업데이트가 취소 되었습니다.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>업데이트가 이미 시작되었습니다.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>모든서버가 업데이트된 상태입니다.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>업데이트를 다운 받을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>여유 공간이 디스크에 남아있지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>서버에 업데이트를 할 수 없습니다.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>%n 서버에 문제 발생:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>%n 서버에 여유 공간이 없음:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>%n 서버가 응답이 없음:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>%n 서버가 오프라인 상태:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>%n 서버들의 인증 실패</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>클라이언트에 업데이트를 설치 할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>하나 이상의 서버에 업데이트를 설치 할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -6668,25 +6371,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6695,10 +6379,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>다른 시스템의 서바가 서버 리소스 트리에 곧 표시 됩니다.</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>서버를 업데이트 하지 못했습니다.</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -6866,29 +6546,6 @@ to %1</source>
     <message>
       <source>JPEG Image</source>
       <translation type="unfinished">JPEG Image</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>업데이트 내용</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>%1 버전 사용 가능</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>주요 문제 해결 되었습니다. 업데이트 하는 것이 좋습니다.</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>업데이트...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>이 업데이트에 대 한 다시 통지 하지 마십시오</translation>
     </message>
   </context>
   <context>
@@ -7961,16 +7618,16 @@ to %1</source>
       <translation type="unfinished">Broken update package.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
-    </message>
-    <message>
       <source>Internal error.</source>
       <translation>내부 오류</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
   </context>
   <context>
@@ -8002,6 +7659,17 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>붙여넣기</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>서버 설정</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>서버 업데이트</translation>
     </message>
   </context>
   <context>
@@ -8117,6 +7785,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>I Agree</source>
+      <translation type="unfinished">I Agree</translation>
+    </message>
+    <message>
+      <source>I Do Not Agree</source>
+      <translation type="unfinished">I Do Not Agree</translation>
+    </message>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8186,10 +7873,6 @@ to %1</source>
       <source>No events</source>
       <translation>이벤트 없음</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation type="unfinished">No events occured</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
       <translation type="unfinished">
@@ -8199,6 +7882,10 @@ to %1</source>
     <message>
       <source>unnamed analytics engine</source>
       <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation type="unfinished">No events occurred</translation>
     </message>
   </context>
   <context>
@@ -8696,26 +8383,6 @@ to %1</source>
       <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation type="unfinished">Install now</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation type="unfinished">Later</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation type="unfinished">Updates downloaded</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation type="unfinished">Failed to download update packages</translation>
-    </message>
-    <message>
       <source>Please make sure there is enough free storage space and network connection is stable.</source>
       <translation type="unfinished">Please make sure there is enough free storage space and network connection is stable.</translation>
     </message>
@@ -8880,6 +8547,14 @@ to %1</source>
     <message>
       <source>There are no online servers to update.</source>
       <translation type="unfinished">There are no online servers to update.</translation>
+    </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
   </context>
   <context>
@@ -9437,10 +9112,40 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>%1 버전 사용 가능</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>업데이트 내용</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>주요 문제 해결 되었습니다. 업데이트 하는 것이 좋습니다.</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>업데이트...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>이 업데이트에 대 한 다시 통지 하지 마십시오</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>여러 값</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation type="unfinished">Reconstruct Resolution</translation>
     </message>
   </context>
   <context>

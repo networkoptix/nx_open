@@ -53,19 +53,22 @@ void assertStrEq(
     const char* actualValue, const char* actualExpr,
     const char* file, int line)
 {
+    using nx::kit::utils::toString;
+
     if (expectedValue == nullptr)
     {
         throw TestFailure(file, line,
-            std::string("    INTERNAL ERROR: Expected string is null: [") + expectedExpr + "]\n");
+            std::string("    INTERNAL ERROR: Expected string is null: [")
+                + toString(expectedExpr) + "]\n");
     }
 
     if (actualValue == nullptr || strcmp(expectedValue, actualValue) != 0)
     {
-        const std::string actualValueStr =
-            actualValue ? (std::string("[") + actualValue + "]") : "null";
-        throw TestFailure(file, line,
-            std::string("    Expected: [") + expectedValue + "] (" + expectedExpr + ")\n" +
-            std::string("    Actual:   ") + actualValueStr + " (" + actualExpr + ")");
+        throw TestFailure(file, line, nx::kit::utils::format(
+            "    Expected: [%s] (%s)\n"
+            "    Actual:   [%s] (%s)",
+            toString(expectedValue).c_str(), expectedExpr,
+            toString(actualValue).c_str(), actualExpr));
     }
 }
 
@@ -147,7 +150,7 @@ static std::string testLogPrefix(const char* caption)
     vfprintf(stderr, (testLogPrefix("FATAL ERROR") + formatStr + "\n").c_str(), args);
     va_end(args);
 
-    exit(255);
+    exit(64);
 }
 
 static void printNote(const char* formatStr, ...)
@@ -169,6 +172,54 @@ int regTest(const Test& test)
     }
 
     return 0; //< Return value is not used.
+}
+
+struct ParsedCmdLineArgs
+{
+    bool showHelp = false;
+    std::string explicitBaseTempDir;
+};
+
+static const ParsedCmdLineArgs& parsedCmdLineArgs()
+{
+    static std::unique_ptr<ParsedCmdLineArgs> parsedArgs;
+
+    if (parsedArgs)
+        return *parsedArgs;
+
+    parsedArgs.reset(new ParsedCmdLineArgs);
+
+    const auto& args = nx::kit::utils::getProcessCmdLineArgs();
+
+    if (args.size() == 1)
+        return *parsedArgs; //< Do nothing if no args were specified.
+
+    const auto arg = [&args](int i) { return ((int) args.size() <= i) ? "" : args[i]; };
+
+    if (args.size() == 2 && (arg(1) == "-h" || arg(1) == "--help"))
+    {
+        parsedArgs->showHelp = true;
+        return *parsedArgs;
+    }
+
+    const std::string tmpOption = "--tmp";
+    const std::string tmpOptionEq = "--tmp=";
+    if (arg(1) == tmpOption)
+    {
+        if (args.size() < 3)
+            fatalError("Invalid command line args: no param for --tmp; run with \"--help\".");
+        parsedArgs->explicitBaseTempDir = arg(2);
+    }
+    else if (arg(1).compare(0, tmpOptionEq.size(), tmpOptionEq) == 0) //< Starts with tmpOptionEq.
+    {
+        parsedArgs->explicitBaseTempDir = arg(1).substr(tmpOptionEq.size());
+    }
+    else
+    {
+        fatalError("Unknown command line arg [%s]; run with \"--help\".", arg(1).c_str());
+    }
+
+    return *parsedArgs;
 }
 
 } using namespace detail;
@@ -227,25 +278,19 @@ static std::string randAsString()
     return s.str();
 }
 
-static std::string& explicitBaseTempDir()
-{
-    static std::string value;
-    return value;
-}
-
 static std::string baseTempDir()
 {
     static std::string value;
     if (value.empty())
     {
-        if (explicitBaseTempDir().empty())
+        if (parsedCmdLineArgs().explicitBaseTempDir.empty())
         {
             value = systemTempDir() + "nx_kit_test_" + randAsString() + kPathSeparator;
             createDir(value);
         }
         else
         {
-            value = explicitBaseTempDir();
+            value = parsedCmdLineArgs().explicitBaseTempDir;
 
             // Append a path separator if needed.
             const char lastChar = value[value.size() - 1];
@@ -272,38 +317,6 @@ static void printHelp(const std::string& argv0)
         "  --tmp=<temp-dir>\n" <<
         "    Use <temp-dir> for temp files instead of a random dir in the system temp dir.\n" <<
         "";
-}
-
-static void processArgs(int argc, const char* const argv[])
-{
-    if (argc == 1)
-        return; //< Do nothing if no args were specified.
-
-    const std::vector<std::string> args{argv, argv + argc};
-    const auto arg = [&args](int i) { return ((int) args.size() <= i) ? "" : args[i]; };
-
-    if (args.size() == 2 && (arg(1) == "-h" || arg(1) == "--help"))
-    {
-        printHelp(arg(0));
-        exit(0);
-    }
-
-    const std::string tmpOption = "--tmp";
-    const std::string tmpOptionEq = "--tmp=";
-    if (arg(1) == tmpOption)
-    {
-        if (args.size() < 3)
-            fatalError("Invalid command line args: no param for --tmp; run with \"--help\".");
-        explicitBaseTempDir() = arg(2);
-    }
-    else if (arg(1).compare(0, tmpOptionEq.size(), tmpOptionEq) == 0) //< Starts with tmpOptionEq.
-    {
-        explicitBaseTempDir() = arg(1).substr(tmpOptionEq.size());
-    }
-    else
-    {
-        fatalError("Unknown command line arg [%s]; run with \"--help\".", arg(1).c_str());
-    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -379,9 +392,13 @@ static bool runTest(Test& test, int testNumber)
     return success;
 }
 
-int runAllTests(const char* testSuiteName, int argc, const char* const argv[])
+int runAllTests(const char *testSuiteName)
 {
-    processArgs(argc, argv);
+    if (parsedCmdLineArgs().showHelp)
+    {
+        printHelp(nx::kit::utils::getProcessCmdLineArgs()[0]);
+        exit(0);
+    }
 
     const std::string fullSuiteName =
         std::string("suite ") + testSuiteName + " [" + suiteId() + "]";

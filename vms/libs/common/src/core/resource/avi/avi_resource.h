@@ -5,16 +5,13 @@
 #include <nx/streaming/config.h>
 #include <nx/streaming/media_data_packet.h>
 #include <utils/common/aspect_ratio.h>
-#include <utils/crypt/encryptable.h>
 
 #include "avi_archive_metadata.h"
 
 class QnArchiveStreamReader;
 class QnAviArchiveDelegate;
 
-class QnAviResource:
-    public QnAbstractArchiveResource,
-    public nx::utils::Encryptable
+class QnAviResource: public QnAbstractArchiveResource
 {
     Q_OBJECT
     using base_type = QnAbstractArchiveResource;
@@ -32,7 +29,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
 
-    void setStorage(const QnStorageResourcePtr&);
+    void setStorage(const QnStorageResourcePtr& storage);
     QnStorageResourcePtr getStorage() const;
 
     void setMotionBuffer(const QnMetaDataLightVector& data, int channel);
@@ -63,24 +60,6 @@ public:
 
     /** Returns true if the entity is contained inside a layout file. */
     bool isEmbedded() const;
-
-    // All these functions actually propagate to m_storage if possible.
-    /** Returns true if the entity is actually encrypted. */
-    virtual bool isEncrypted() const override;
-    /** Returns true if the entity is encrypted and no valid password is provided. */
-    virtual bool requiresPassword() const override;
-    /** Attempts to set a password for opening existing entity. */
-    virtual bool usePasswordToRead(const QString& password) override;
-    /** Sets a password for writing new entity. */
-    virtual void setPasswordToWrite(const QString& password) override;
-    /** Drops password. */
-    virtual void forgetPassword() override;
-    /** Returns password. */
-    virtual QString password() override;
-
-signals:
-    /** Fired when password is set or dropped. */
-    void storageAccessChanged();
 
 private:
     QnStorageResourcePtr m_storage;

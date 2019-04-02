@@ -348,6 +348,23 @@ bool validateAuthorization(
     return !response.isEmpty() && response == calculatedResponse;
 }
 
+bool validateAuthorization(
+    const StringType& method,
+    const Credentials& credentials,
+    const header::DigestAuthorization& digestAuthorizationHeader)
+{
+    return validateAuthorization(
+        method,
+        credentials.username.toUtf8(),
+        credentials.authToken.type == AuthTokenType::password
+            ? boost::make_optional(credentials.authToken.value)
+            : boost::none,
+        credentials.authToken.type == AuthTokenType::ha1
+            ? boost::make_optional(credentials.authToken.value)
+            : boost::none,
+        digestAuthorizationHeader);
+}
+
 static const size_t MD5_CHUNK_LEN = 64;
 
 BufferType calcIntermediateResponse(

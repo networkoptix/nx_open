@@ -11,12 +11,12 @@
 #include <streaming/streaming_params.h>
 #include <test_support/resource/camera_resource_stub.h>
 
+#include <nx/mediaserver/camera_mock.h>
 #include "../camera/video_camera_mock.h"
 #include <core/dataprovider/data_provider_factory.h>
 #include <media_server/media_server_module.h>
 
 namespace nx {
-namespace vms {
 namespace vms::server {
 namespace test {
 
@@ -35,11 +35,11 @@ protected:
     {
         m_cameraResourceId = QnUuid::createUuid();
 
-        auto cameraResource = QnResourcePtr(new CameraResourceStub());
+        auto cameraResource = resource::CameraPtr(new resource::test::CameraMock(&m_serverModule));
         cameraResource->setId(m_cameraResourceId);
         m_serverModule.resourcePool()->addResource(cameraResource);
         ASSERT_TRUE(m_serverModule.videoCameraPool()->addVideoCamera(
-            cameraResource, QnVideoCameraPtr(new MediaServerVideoCameraMock())));
+            cameraResource, nx::vms::server::VideoCameraPtr(new VideoCameraMock())));
 
         m_streamingChunkKey = StreamingChunkCacheKey(
             m_cameraResourceId.toSimpleString(),
@@ -86,5 +86,4 @@ TEST_F(StreamingChunkTranscoder, transcode_fails_if_desired_quality_is_not_avail
 
 } // namespace test
 } // namespace vms::server
-} // namespace vms
 } // namespace nx

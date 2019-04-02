@@ -8,8 +8,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/server/settings.h>
 
+#include <nx/vms/server/resource/resource_fwd.h>
 #include <core/resource/resource_fwd.h>
-
 
 #include "camera_fwd.h"
 
@@ -21,17 +21,17 @@ class QnResourcePool;
 class VideoCameraLocker
 {
 public:
-    VideoCameraLocker(QnVideoCameraPtr);
+    VideoCameraLocker(nx::vms::server::VideoCameraPtr);
     virtual ~VideoCameraLocker();
 
     VideoCameraLocker(const VideoCameraLocker&) = delete;
     VideoCameraLocker& operator=(const VideoCameraLocker&) = delete;
 
 private:
-    QnVideoCameraPtr m_camera;
+    nx::vms::server::VideoCameraPtr m_camera;
 };
 
-class QnVideoCameraPool: public  QObject
+class QnVideoCameraPool: public QObject
 {
     Q_OBJECT
 public:
@@ -46,16 +46,16 @@ public:
     /*!
         \return Object belongs to this pool
     */
-    QnVideoCameraPtr getVideoCamera(const QnResourcePtr& res) const;
-    QnVideoCameraPtr addVideoCamera(const QnResourcePtr& res);
-    bool addVideoCamera(const QnResourcePtr& res, QnVideoCameraPtr camera);
+    nx::vms::server::VideoCameraPtr getVideoCamera(const QnResourcePtr& res) const;
+    nx::vms::server::VideoCameraPtr addVideoCamera(const nx::vms::server::resource::CameraPtr& res);
+    bool addVideoCamera(const nx::vms::server::resource::CameraPtr& res, nx::vms::server::VideoCameraPtr camera);
     void removeVideoCamera(const QnResourcePtr& res);
     void updateActivity();
 
     std::unique_ptr<VideoCameraLocker> getVideoCameraLockerByResourceId(const QnUuid& id) const;
 
 private:
-    typedef QMap<QnResourcePtr, QnVideoCameraPtr> CameraMap;
+    typedef QMap<QnResourcePtr, nx::vms::server::VideoCameraPtr> CameraMap;
 
     const nx::vms::server::Settings& m_settings;
     QnDataProviderFactory* m_dataProviderFactory = nullptr;

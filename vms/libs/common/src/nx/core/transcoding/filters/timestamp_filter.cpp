@@ -107,7 +107,6 @@ CLVideoDecoderOutputPtr TimestampFilter::updateImage(const CLVideoDecoderOutputP
 
 QSize TimestampFilter::updatedResolution(const QSize& sourceSize)
 {
-    d->painter().updateSourceSize(sourceSize);
     return sourceSize;
 }
 

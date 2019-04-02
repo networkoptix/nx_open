@@ -215,7 +215,8 @@ void OnvifResourceInformationFetcher::findResources(
         SoapTimeouts(serverModule()->settings().onvifTimeouts()),
         endpoint.toStdString(), QString(), QString(), 0);
 
-    QnVirtualCameraResourcePtr existResource = resourcePool()->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
+    QnVirtualCameraResourcePtr existResource = serverModule()->resourcePool()
+        ->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
     if (existResource)
     {

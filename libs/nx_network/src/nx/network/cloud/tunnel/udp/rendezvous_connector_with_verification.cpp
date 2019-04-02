@@ -15,7 +15,7 @@ namespace udp {
 RendezvousConnectorWithVerification::RendezvousConnectorWithVerification(
     std::string connectSessionId,
     SocketAddress remotePeerAddress,
-    std::unique_ptr<nx::network::UDPSocket> udpSocket)
+    std::unique_ptr<AbstractDatagramSocket> udpSocket)
 :
     RendezvousConnector(
         std::move(connectSessionId),

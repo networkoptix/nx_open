@@ -102,6 +102,6 @@ TEST(outputRedirector, check)
     stdoutLogStream.close();
     stderrLogStream.close();
 
-    ASSERT_EQ("stdout is redirected to this file\nstdout test\ncout test\n", stdoutLogContent);
-    ASSERT_EQ("stderr is redirected to this file\nstderr test\ncerr test\n", stderrLogContent);
+    ASSERT_STREQ("stdout is redirected to this file\nstdout test\ncout test\n", stdoutLogContent);
+    ASSERT_STREQ("stderr is redirected to this file\nstderr test\ncerr test\n", stderrLogContent);
 }

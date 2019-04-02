@@ -15,7 +15,6 @@
 #include "utils/common/warnings.h"
 #include "utils/common/delete_later.h"
 #include "common/common_module.h"
-#include "app_server_connection.h"
 #include <api/network_proxy_factory.h>
 #include <nx/network/http/custom_headers.h>
 #include "http_client_pool.h"
@@ -38,15 +37,18 @@ QnSessionManager::QnSessionManager(QObject* parent):
 
 QnSessionManager::~QnSessionManager()
 {
-    disconnect(this, NULL, this, NULL);
     directDisconnectAll();
+
+    const auto pool = httpClientPool();
+    if (!NX_ASSERT(pool, "Destruction order is invalid"))
+        return;
 
     QnMutexLocker lk(&m_mutex);
     auto requestInProgress = std::move(m_requestInProgress);
     lk.unlock();
 
-    for (auto& httpClientAndRequestInfo : requestInProgress)
-        httpClientPool()->terminate(httpClientAndRequestInfo.first);
+    for (auto& httpClientAndRequestInfo: requestInProgress)
+        pool->terminate(httpClientAndRequestInfo.first);
 }
 
 void QnSessionManager::start()

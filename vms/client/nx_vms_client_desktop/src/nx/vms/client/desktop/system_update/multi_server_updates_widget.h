@@ -10,6 +10,7 @@
 
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
+#include <ui/delegates/resource_item_delegate.h>
 
 #include <utils/common/id.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
@@ -62,10 +63,19 @@ protected:
     void atUpdateCurrentState();
     void atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     void atStartUpdateAction();
+    /** Called by clicking 'cancel' button. */
     bool atCancelCurrentAction();
+    /** Called when server responds to /ec2/cancelUpdate. Connected to ServerUpdateToool.*/
+    void atCancelUpdateComplete(bool success);
+    /** Called when server responds to /ec2/finishUpdate. Connected to ServerUpdateToool.*/
+    void atFinishUpdateComplete(bool success);
+
+    /**
+     * Called when ServerUpdateTool finishes downloading package for mediaserver without
+     * internet.
+     */
     void atServerPackageDownloaded(const nx::update::Package& package);
     void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
-    void atCloudSettingsChanged();
 
     void clearUpdateInfo();
     void pickLocalFile();
@@ -95,12 +105,20 @@ private:
         downloading,
         /** Pushing local update package to the servers. */
         pushing,
+        /**
+         * Waiting server to respond to /ec2/cancelUpdate from 'downloading' or 'pushing'
+         * state.
+         */
+        cancelingDownload,
         /** Some servers have downloaded update data and ready to install it. */
         readyInstall,
+        cancelingReadyInstall,
         /** Some servers are installing an update. */
         installing,
         /** Some servers are installing an update, but it took too long. */
         installingStalled,
+        /** Waiting server to respond to /ec2/finishUpdate */
+        finishingInstall,
         /** Installation process is complete. */
         complete,
     };
@@ -118,6 +136,10 @@ private:
     void setAutoUpdateCheckMode(bool mode);
     void autoCheckForUpdates();
     void checkForInternetUpdates(bool initial = false);
+    /**
+     * Repeat validation process for current update information. Will work only in 'Ready' state.
+     */
+    void repeatUpdateValidation();
 
     /**
      * Describes all possible display modes for update version.
@@ -187,7 +209,8 @@ private:
     void closePanelNotifications();
 
     /** Advances UI FSM towards selected state. */
-    void setTargetState(WidgetUpdateState state, QSet<QnUuid> targets = {});
+    void setTargetState(WidgetUpdateState state, const QSet<QnUuid>& targets = {},
+        bool runCommands = true);
     void completeInstallation(bool clientUpdated);
     static bool stateHasProgress(WidgetUpdateState state);
     void syncDebugInfoToUi();
@@ -221,6 +244,7 @@ private:
     std::shared_ptr<PeerStateTracker> m_stateTracker;
     std::unique_ptr<SortedPeerUpdatesModel> m_sortedModel;
     std::unique_ptr<ServerStatusItemDelegate> m_statusItemDelegate;
+    std::unique_ptr<QnResourceItemDelegate> m_resourceNameDelegate;
 
     /** ServerUpdateTool promises this. */
     std::future<nx::update::UpdateContents> m_updateCheck;
@@ -233,7 +257,6 @@ private:
     nx::update::UpdateContents m_updateInfo;
     VersionReport m_updateReport;
     nx::utils::SoftwareVersion m_targetVersion;
-    bool m_holdConnection = false;
 
     WidgetUpdateState m_widgetState = WidgetUpdateState::initial;
 
@@ -250,18 +273,6 @@ private:
 
     /** Id of the progress notification at the right panel. */
     QnUuid m_rightPanelDownloadProgress;
-
-    /**
-     * This sets are changed every time we are initiating some update action.
-     * Set of servers that are currently active.
-     */
-    QSet<QnUuid> m_peersActive;
-    /** Set of servers that are used for the current task. */
-    QSet<QnUuid> m_peersIssued;
-    /** A set of servers that have completed current task. */
-    QSet<QnUuid> m_peersComplete;
-    /** A set of servers that have failed current task. */
-    QSet<QnUuid> m_peersFailed;
 };
 
 } // namespace nx::vms::client::desktop

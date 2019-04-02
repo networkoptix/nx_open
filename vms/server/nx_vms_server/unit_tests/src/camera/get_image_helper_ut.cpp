@@ -2,7 +2,8 @@
 #include <gmock/gmock.h>
 #include <ostream>
 
-#include <mediaserver_ini.h>
+#include <media_server/media_server_module.h>
+#include <nx_vms_server_ini.h>
 #include <common/common_globals.h>
 #include <camera/get_image_helper.h>
 #include <core/resource/camera_resource.h>
@@ -119,15 +120,15 @@ TEST(GetImageHelper, updateDstSize_maxSize)
         updateDstSize(&camera, {0, 0}, outFrame, AspectRatio::source));
 }
 
-#ifndef EDGE_SERVER
-
 TEST(GetImageHelper, determineStreamIndex)
 {
     using StreamIndex = nx::vms::api::StreamIndex;
+    using StreamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode;
 
-    QnGetImageHelper helper(nullptr);
+    QnMediaServerModule serverModule;
+    QnGetImageHelper helper(&serverModule);
     nx::api::CameraImageRequest request;
-    auto camera = QnSharedResourcePointer(new MockCameraResource());
+    const auto camera = QnSharedResourcePointer(new MockCameraResource());
     request.camera = camera;
 
     // Specify secondary stream resolution for requests with auto_.
@@ -137,38 +138,36 @@ TEST(GetImageHelper, determineStreamIndex)
         CameraMediaStreamInfo(StreamIndex::secondary, kSecondaryStreamSize));
 
     request.size = {0,0};
-    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::auto_;
+    request.streamSelectionMode = StreamSelectionMode::auto_;
     EXPECT_EQ(StreamIndex::primary, helper.determineStreamIndex(request));
-    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimary;
+    request.streamSelectionMode = StreamSelectionMode::forcedPrimary;
     EXPECT_EQ(StreamIndex::primary, helper.determineStreamIndex(request));
-    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::forcedSecondary;
+    request.streamSelectionMode = StreamSelectionMode::forcedSecondary;
     EXPECT_EQ(StreamIndex::secondary, helper.determineStreamIndex(request));
-    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics;
+    request.streamSelectionMode = StreamSelectionMode::sameAsAnalytics;
     EXPECT_EQ(ini().analyzeSecondaryStream ? StreamIndex::secondary : StreamIndex::primary,
         helper.determineStreamIndex(request));
-    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::sameAsMotion;
+    request.streamSelectionMode = StreamSelectionMode::sameAsMotion;
     EXPECT_EQ(request.camera->motionStreamIndex().index, helper.determineStreamIndex(request));
 
     request.size = {kSecondaryStreamSize.width() / 2, kSecondaryStreamSize.height() / 2};
-    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::auto_;
+    request.streamSelectionMode = StreamSelectionMode::auto_;
     EXPECT_EQ(StreamIndex::secondary, helper.determineStreamIndex(request));
-    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimary;
+    request.streamSelectionMode = StreamSelectionMode::forcedPrimary;
     EXPECT_EQ(StreamIndex::primary, helper.determineStreamIndex(request));
-    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::forcedSecondary;
+    request.streamSelectionMode = StreamSelectionMode::forcedSecondary;
     EXPECT_EQ(StreamIndex::secondary, helper.determineStreamIndex(request));
-    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics;
+    request.streamSelectionMode = StreamSelectionMode::sameAsAnalytics;
     EXPECT_EQ(ini().analyzeSecondaryStream ? StreamIndex::secondary : StreamIndex::primary,
         helper.determineStreamIndex(request));
-    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::sameAsMotion;
+    request.streamSelectionMode = StreamSelectionMode::sameAsMotion;
     EXPECT_EQ(request.camera->motionStreamIndex().index, helper.determineStreamIndex(request));
 
-    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::auto_;
+    request.streamSelectionMode = StreamSelectionMode::auto_;
     request.size = {kSecondaryStreamSize.width() * 2, kSecondaryStreamSize.height() / 2};
     EXPECT_EQ(StreamIndex::primary, helper.determineStreamIndex(request));
     request.size = {kSecondaryStreamSize.width() / 2, kSecondaryStreamSize.height() * 2};
     EXPECT_EQ(StreamIndex::primary, helper.determineStreamIndex(request));
 }
-
-#endif // #ifndef EDGE_SERVER
 
 } // namespace nx::test

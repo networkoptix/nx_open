@@ -30,6 +30,8 @@ public:
 
     QString filePath(const QString& fileName) const;
 
+    QDir downloadsDirectory() const;
+
     FileInformation fileInformation(const QString& fileName) const;
 
     ResultCode addFile(const FileInformation& fileInformation);
@@ -55,7 +57,7 @@ public:
 
     void startDownloads();
     void stopDownloads();
-    void findExistingDownloads(bool waitForFinished = false);
+    void findExistingDownloads();
 
     static void validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,
         std::function<void(bool)> callback);

@@ -141,6 +141,8 @@ void BaseInputFieldPrivate::updateVisualStateDelayed()
 
             if (useWarningStyleForControl)
                 input->setPalette(palette);
+            else
+                input->setPalette(defaultPalette);
 
             if (hintColor.isValid())
                 setCustomStyle(&palette, hintColor);
@@ -516,6 +518,19 @@ ValidationResult BaseInputField::calculateValidationResult() const
     return d->validator && !d->optionalTextIsNull
         ? d->validator(d->getText())
         : ValidationResult(QValidator::Acceptable);
+}
+
+bool BaseInputField::getUseWarningStyleForControl() const
+{
+    Q_D(const BaseInputField);
+    return d->useWarningStyleForControl;
+}
+
+void BaseInputField::setUseWarningStyleForControl(bool useWarningStyle)
+{
+    Q_D(BaseInputField);
+    d->useWarningStyleForControl = useWarningStyle;
+    d->updateVisualStateDelayed();
 }
 
 } // namespace detail

@@ -1,111 +1,26 @@
 #pragma once
 
 #include <memory>
-
 #include <QScopedPointer>
 
-#include <nx/streaming/abstract_data_consumer.h>
-#include <nx/streaming/video_data_packet.h>
-#include <nx/streaming/audio_data_packet.h>
-#include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <camera/abstract_video_camera.h>
 
-
-#include <nx/api/mediaserver/image_request.h>
-
-#include "camera_fwd.h"
-#include <core/resource/resource_consumer.h>
-#include <providers/live_stream_provider.h>
-#include <server/server_globals.h>
-#include <nx/vms/server/settings.h>
-#include <nx/vms/server/hls/hls_live_playlist_manager.h>
-#include <api/helpers/thumbnail_request_data.h>
-
-class QnVideoCameraGopKeeper;
 class QnDataProviderFactory;
 class MediaStreamCache;
 
-namespace nx { namespace vms::server { class Settings; } }
+namespace nx::vms::server {
 
-/**
- * TODO: #ak Have to introduce this class since QnAbstractVideoCamera
- * is in common and thus cannot dependend on mediaserver's types.
- * TODO: #ak QnAbstractMediaServerVideoCamera is better be nx::vms::vms::server::AbstractVideoCamera.
- */
-class QnAbstractMediaServerVideoCamera: public QnAbstractVideoCamera
+class Settings;
+class GopKeeper;
+
+class VideoCamera: public QObject, public nx::vms::server::AbstractVideoCamera
 {
 public:
-    using StreamIndex = nx::vms::api::StreamIndex;
-
-    virtual ~QnAbstractMediaServerVideoCamera() override = default;
-
-    virtual QnLiveStreamProviderPtr getLiveReader(
-        QnServer::ChunksCatalog catalog,
-        bool ensureInitialized = true, bool createIfNotExist = true) = 0;
-
-    QnLiveStreamProviderPtr getPrimaryReader() { return getLiveReader(QnServer::HiQualityCatalog); }
-    QnLiveStreamProviderPtr getSecondaryReader() { return getLiveReader(QnServer::LowQualityCatalog); }
-
-    virtual int copyLastGop(
-        StreamIndex streamIndex,
-        qint64 skipTime,
-        QnDataPacketQueue& dstQueue,
-        bool iFramesOnly) = 0;
-
-    virtual QnConstCompressedVideoDataPtr getLastVideoFrame(
-        StreamIndex streamIndex,
-        int channel) const = 0;
-    virtual QnConstCompressedAudioDataPtr getLastAudioFrame(StreamIndex streamIndex) const = 0;
-
-    /**
-     * @return I-frame and the following P-frames up to the desired frame. Can be null but not
-     * empty.
-     */
-    virtual std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
-        StreamIndex streamIndex,
-        qint64 time,
-        int channel,
-        nx::api::ImageRequest::RoundMethod roundMethod) const = 0;
-
-    virtual void beforeStop() = 0;
-    virtual bool isSomeActivity() const = 0;
-    /**
-     * Stop reading from camera if no active DataConsumers left.
-     */
-    virtual void stopIfNoActivity() = 0;
-    virtual void updateActivity() = 0;
-
-    /**
-     * @return cache holding several last seconds of media stream. Can be null.
-     */
-    virtual const MediaStreamCache* liveCache(MediaQuality streamQuality) const = 0;
-    virtual MediaStreamCache* liveCache(MediaQuality streamQuality) = 0;
-
-    /**
-     * TODO: #ak Should remove it from here.
-     */
-    virtual nx::vms::server::hls::LivePlaylistManagerPtr hlsLivePlaylistManager(
-        MediaQuality streamQuality) const = 0;
-
-    /**
-     * Starts caching live stream, if not started.
-     * @return true, if started, false if failed to start.
-     */
-    virtual bool ensureLiveCacheStarted(
-        MediaQuality streamQuality,
-        qint64 targetDurationUSec) = 0;
-    virtual QnResourcePtr resource() const = 0;
-};
-
-class QnVideoCamera: public QObject, public QnAbstractMediaServerVideoCamera
-{
-    Q_OBJECT
-
-public:
-    QnVideoCamera(
+    VideoCamera(
         const nx::vms::server::Settings& settings,
         QnDataProviderFactory* dataProviderFactory,
-        const QnResourcePtr& resource);
-    virtual ~QnVideoCamera() override;
+        const nx::vms::server::resource::CameraPtr& camera);
+    virtual ~VideoCamera() override;
 
     virtual QnLiveStreamProviderPtr getLiveReader(
         QnServer::ChunksCatalog catalog,
@@ -153,12 +68,12 @@ private:
     QnMutex m_getReaderMutex;
     const nx::vms::server::Settings& m_settings;
     QnDataProviderFactory* m_dataProviderFactory = nullptr;
-    QnResourcePtr m_resource;
+    nx::vms::server::resource::CameraPtr m_camera;
     QnLiveStreamProviderPtr m_primaryReader;
     QnLiveStreamProviderPtr m_secondaryReader;
 
-    QnVideoCameraGopKeeper* m_primaryGopKeeper;
-    QnVideoCameraGopKeeper* m_secondaryGopKeeper;
+    nx::vms::server::GopKeeper* m_primaryGopKeeper;
+    nx::vms::server::GopKeeper* m_secondaryGopKeeper;
     QSet<void*> m_cameraUsers;
     QnCompressedAudioDataPtr m_lastAudioFrame;
     //!index - is a \a MediaQuality element
@@ -172,7 +87,7 @@ private:
     QElapsedTimer m_lastActivityTimer;
 
 private:
-    QnVideoCameraGopKeeper* getGopKeeper(StreamIndex streamIndex) const;
+    nx::vms::server::GopKeeper* getGopKeeper(StreamIndex streamIndex) const;
 
     QnLiveStreamProviderPtr getLiveReaderNonSafe(
         QnServer::ChunksCatalog catalog, bool ensureInitialized);
@@ -184,6 +99,7 @@ private:
         const QnLiveStreamProviderPtr& primaryReader,
         qint64 targetDurationUSec );
 
-private slots:
     void at_camera_resourceChanged();
 };
+
+} // namespace nx::vms::server

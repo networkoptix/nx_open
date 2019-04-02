@@ -85,8 +85,9 @@ void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& r
         //it is possible, that multiple servers will decide to generate event, if servers statuses are being changed at the moment, but this is OK for now
 
     const auto serverGuid = moduleGUID();
-    const QnMediaServerResourceList& mserversList = resourcePool()->getResources<QnMediaServerResource>();
-    if(!mserversList.isEmpty())   //in a strange case when there are no servers generating event
+    const QnMediaServerResourceList& mserversList =
+        serverModule()->resourcePool()->getResources<QnMediaServerResource>();
+    if (!mserversList.isEmpty())   //in a strange case when there are no servers generating event
     {
         std::map<QnUuid, QnMediaServerResource*> mserversById;
         for( const QnMediaServerResourcePtr& mserver: mserversList )

@@ -102,7 +102,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP2 )
     QnRtspClient rtspClient(config);
     rtspClient.setAuth( auth, nx::network::http::header::AuthScheme::basic );
 
-    rtspClient.setTransport(RtspTransport::tcp);
+    rtspClient.setTransport(nx::vms::api::RtpTransportType::tcp);
     ASSERT_TRUE( rtspClient.open( rtspUrl ).errorCode == 0 );
     rtspClient.play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
 
@@ -132,7 +132,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP3 )
     QnRtspClient rtspClient(config);
     rtspClient.setAuth( auth, nx::network::http::header::AuthScheme::basic );
 
-    rtspClient.setTransport(RtspTransport::tcp);
+    rtspClient.setTransport(nx::vms::api::RtpTransportType::tcp);
     ASSERT_TRUE( rtspClient.open( rtspUrl ).errorCode == 0 );
     rtspClient.play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
 
@@ -242,7 +242,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
     QnRtspClient rtspClient(config);
     rtspClient.setAuth( auth, nx::network::http::header::AuthScheme::basic );
 
-    rtspClient.setTransport(RtspTransport::tcp);
+    rtspClient.setTransport(nx::vms::api::RtpTransportType::tcp);
     ASSERT_TRUE( rtspClient.open( rtspUrl ).errorCode == 0 );
     rtspClient.play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
 
@@ -422,7 +422,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP7 )
     {
         rtspClient.reset(new QnRtspClient(config));
         rtspClient->setAuth( auth, nx::network::http::header::AuthScheme::basic );
-        rtspClient->setTransport(RtspTransport::tcp);
+        rtspClient->setTransport(nx::vms::api::RtpTransportType::tcp);
         ASSERT_TRUE( rtspClient->open( rtspUrl ).errorCode == 0 );
         rtspClient->play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
     }
@@ -471,7 +471,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP8 )
     {
         rtspClient.reset(new QnRtspClient(config));
         rtspClient->setAuth( auth, nx::network::http::header::AuthScheme::basic );
-        rtspClient->setTransport(RtspTransport::tcp);
+        rtspClient->setTransport(nx::vms::api::RtpTransportType::tcp);
         ASSERT_TRUE( rtspClient->open( rtspUrl ).errorCode == 0 );
         rtspClient->play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
     }

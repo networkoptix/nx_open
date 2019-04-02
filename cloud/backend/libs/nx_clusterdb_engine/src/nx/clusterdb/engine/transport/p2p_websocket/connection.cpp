@@ -267,11 +267,12 @@ int Connection::highestProtocolVersionCompatibleWithRemotePeer() const
         : remotePeer().protoVersion;
 }
 
-void Connection::fillAuthInfo(
+bool Connection::fillAuthInfo(
     nx::network::http::AsyncClient* /*httpClient*/,
     bool /*authByKey*/)
 {
     NX_ASSERT(false, "This method is used for outgoing connections only. Not implemented");
+    return false;
 }
 
 } // namespace nx::clusterdb::engine::transport::p2p::websocket

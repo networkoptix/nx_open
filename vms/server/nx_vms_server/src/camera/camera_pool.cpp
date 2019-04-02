@@ -2,9 +2,11 @@
 
 #include <nx/utils/std/cpp14.h>
 
+#include <nx/vms/server/resource/camera.h>
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <camera/video_camera.h>
 
 #if defined(Q_OS_WIN)
     #include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
@@ -14,7 +16,7 @@
 
 //-------------------------------------------------------------------------------------------------
 // VideoCameraLocker
-VideoCameraLocker::VideoCameraLocker(QnVideoCameraPtr camera):
+VideoCameraLocker::VideoCameraLocker(nx::vms::server::VideoCameraPtr camera):
     m_camera(camera)
 {
     m_camera->inUse(this);
@@ -30,7 +32,7 @@ VideoCameraLocker::~VideoCameraLocker()
 
 void QnVideoCameraPool::stop()
 {
-    for( const QnVideoCameraPtr& camera: m_cameras.values())
+    for( const nx::vms::server::VideoCameraPtr& camera: m_cameras.values())
         camera->beforeStop();
 
     #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
@@ -63,28 +65,25 @@ void QnVideoCameraPool::updateActivity()
         camera->updateActivity();
 }
 
-QnVideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res) const
+nx::vms::server::VideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res) const
 {
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
-        return QnVideoCameraPtr();
+        return nx::vms::server::VideoCameraPtr();
     QnMutexLocker lock(&m_mutex);
     CameraMap::const_iterator itr = m_cameras.find(res);
-    return itr == m_cameras.cend() ? QnVideoCameraPtr() : itr.value();
+    return itr == m_cameras.cend() ? nx::vms::server::VideoCameraPtr() : itr.value();
 }
 
-QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res)
+nx::vms::server::VideoCameraPtr QnVideoCameraPool::addVideoCamera(const nx::vms::server::resource::CameraPtr& res)
 {
-    if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
-        return QnVideoCameraPtr();
     QnMutexLocker lock(&m_mutex);
-    return m_cameras.insert(
-        res, QnVideoCameraPtr(new QnVideoCamera(m_settings, m_dataProviderFactory, res))).value();
+    return m_cameras.insert(res, nx::vms::server::VideoCameraPtr(
+        new nx::vms::server::VideoCamera(m_settings, m_dataProviderFactory, res))).value();
 }
 
-bool QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res, QnVideoCameraPtr camera)
+bool QnVideoCameraPool::addVideoCamera(
+    const nx::vms::server::resource::CameraPtr& res, nx::vms::server::VideoCameraPtr camera)
 {
-    if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
-        return false;
     QnMutexLocker lock(&m_mutex);
     m_cameras.insert(res, camera);
     return true;

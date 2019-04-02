@@ -9,11 +9,11 @@ function crash_gdb_bt() {
         return 2
     fi
 
-    if [ ! $(which gdb) ]; then
+    if ! which gdb; then
         echo GDB is not available on the host. >2
         return 0
     fi
-    if [ $(pidof gdb) ]; then
+    if pidof gdb; then
         echo GDB is already engaged. >2
         return 0
     fi
@@ -21,8 +21,7 @@ function crash_gdb_bt() {
     CORE_ORIG=$(dirname $BIN_PATH)/core
     TIME=$(date +"%s")
     CORE=$CORE_ORIG.$TIME
-    mv $CORE_ORIG $CORE 2>/dev/null
-    if [ $? -eq 0 ]; then
+    if mv $CORE_ORIG $CORE 2>/dev/null; then
         REPORT=$(basename $BIN_PATH)_${FULL_VERSION}_$TIME.gdb-bt
 
         echo Generate crash report $CRASH_DIR/$REPORT...   BACKGROUND

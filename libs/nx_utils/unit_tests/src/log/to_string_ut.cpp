@@ -50,8 +50,8 @@ TEST(ToString, Std)
     assertToString(std::chrono::hours(2), "2h");
     assertToString(std::chrono::hours(200), "200h");
 
-    assertToString(std::bitset<8>(), "bitset(00000000)");
-    assertToString(std::bitset<8>(0xFF), "bitset(11111111)");
+    assertToString(std::bitset<8>(), "0b00000000");
+    assertToString(std::bitset<8>(0xFF), "0b11111111");
 }
 
 TEST(ToString, Qt)

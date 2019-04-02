@@ -1,4 +1,4 @@
-if (withMediaServer
+if(withMediaServer
     OR withTestCamera
     OR withTrayTool
     OR withDesktopClient
@@ -12,28 +12,22 @@ if (withMediaServer
     add_subdirectory(nx_update)
 endif()
 
-if (withMediaServer OR withRootTool OR withClouds)
+if(withMediaServer OR withRootTool OR withClouds)
     add_subdirectory(nx_system_commands)
 endif()
 
-if (withDesktopClient OR withMobileClient)
+if(withDesktopClient OR withMobileClient)
     add_subdirectory(nx_vms_applauncher_api)
     add_subdirectory(nx_vms_utils)
-endif()
-
-if(withDesktopClient OR withMobileClient)
     add_subdirectory(nx_audio)
     add_subdirectory(nx_media)
 endif()
 
-if((withMediaServer OR withDesktopClient) AND NOT targetDevice STREQUAL edge1)
+if(withMediaServer OR withDesktopClient)
     add_subdirectory(nx_speech_synthesizer)
 endif()
 
 if(withMediaServer)
     add_subdirectory(nx_email)
-endif()
-
-if(withMediaServer)
     add_subdirectory(nx_plugin_utils)
 endif()

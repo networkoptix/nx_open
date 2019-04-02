@@ -244,8 +244,8 @@ void HttpLiveStreamingProcessor::run()
 
             case State::done:
                 NX_DEBUG(QnLog::HTTP_LOG_INDEX,
-                    lm("Done message to %1 (sent %2 bytes). Closing connection...\n\n\n")
-                        .args(remoteHostAddress().toString(), m_bytesSent));
+                    "Done message to %1 (sent %2 bytes). Closing connection...\n\n\n",
+                    remoteHostAddress(), m_bytesSent);
                 return;
         }
     }
@@ -316,7 +316,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
     }
 
     //checking resource stream type. Only h.264 is OK for HLS
-    QnVideoCameraPtr camera = serverModule()->videoCameraPool()->getVideoCamera(camResource);
+    nx::vms::server::VideoCameraPtr camera = serverModule()->videoCameraPool()->getVideoCamera(camResource);
     if (!camera)
     {
         NX_VERBOSE(this, lm("Error. HLS request to resource %1 which is not a camera")
@@ -401,8 +401,8 @@ void HttpLiveStreamingProcessor::sendResponse(const nx::network::http::Response&
     response.serialize(&m_writeBuffer);
     m_bytesSent = (size_t)0 - m_writeBuffer.size();
 
-    NX_DEBUG(QnLog::HTTP_LOG_INDEX, lm("Sending response to %1:\n%2\n-------------------\n\n\n")
-        .args(remoteHostAddress().toString(), QString::fromLatin1(m_writeBuffer)));
+    NX_DEBUG(QnLog::HTTP_LOG_INDEX, "Sending response to %1:\n%2\n-------------------\n",
+        remoteHostAddress(), m_writeBuffer);
 
     m_state = State::sending;
 }
@@ -453,7 +453,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
     const QString& requestFileExtension,
     const QnSecurityCamResourcePtr& camResource,
     const Qn::UserAccessData& accessRights,
-    const QnVideoCameraPtr& videoCamera,
+    const nx::vms::server::VideoCameraPtr& videoCamera,
     const std::multimap<QString, QString>& requestParams,
     nx::network::http::Response* const response,
     QnJsonRestResult* error)
@@ -570,7 +570,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getVariantPlayl
     Session* session,
     const nx::network::http::Request& request,
     const QnSecurityCamResourcePtr& camResource,
-    const QnVideoCameraPtr& videoCamera,
+    const nx::vms::server::VideoCameraPtr& videoCamera,
     const std::multimap<QString, QString>& /*requestParams*/,
     QByteArray* serializedPlaylist)
 {
@@ -938,7 +938,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
     const QString& sessionID,
     const std::multimap<QString, QString>& requestParams,
     const QnSecurityCamResourcePtr& camResource,
-    const QnVideoCameraPtr& videoCamera,
+    const nx::vms::server::VideoCameraPtr& videoCamera,
     MediaQuality streamQuality,
     Session** session,
     QnJsonRestResult* error)
@@ -1047,7 +1047,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
 int HttpLiveStreamingProcessor::estimateStreamBitrate(
     Session* const session,
     QnSecurityCamResourcePtr camResource,
-    const QnVideoCameraPtr& videoCamera,
+    const nx::vms::server::VideoCameraPtr& videoCamera,
     MediaQuality streamQuality)
 {
     int bandwidth = session->playlistManager(streamQuality)->getMaxBitrate();

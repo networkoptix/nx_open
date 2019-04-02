@@ -6,7 +6,8 @@
 
 #include <nx/streaming/config.h>
 #include <nx/utils/log/log_main.h>
-#include <mediaserver_ini.h>
+#include <nx/utils/app_info.h>
+#include <nx_vms_server_ini.h>
 
 #include "utils/media/frame_info.h"
 #include "transcoding/transcoder.h"
@@ -300,7 +301,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     StreamIndex streamIndex,
     qint64 timestampUs,
     int preferredChannel,
@@ -332,7 +333,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
     StreamIndex streamIndex,
     qint64 timestampUs,
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     int channelNumber) const
 {
     NX_VERBOSE(this, "%1()", __func__);
@@ -383,7 +384,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
 std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTime(
     StreamIndex streamIndex,
     qint64 timestampUs,
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     int channelNumber) const
 {
     const MediaQuality stream = (streamIndex == StreamIndex::primary)
@@ -527,10 +528,11 @@ StreamIndex QnGetImageHelper::determineStreamIndex(
     {
         case StreamSelectionMode::auto_:
         {
-            #if defined(EDGE_SERVER)
+            if (nx::utils::AppInfo::isEdgeServer())
+            {
                 // On edge, we always try to use the secondary stream first.
                 return StreamIndex::secondary;
-            #endif
+            }
 
             const auto secondaryResolution =
                 request.camera->streamInfo(StreamIndex::secondary).getResolution();
@@ -543,8 +545,10 @@ StreamIndex QnGetImageHelper::determineStreamIndex(
 
             return StreamIndex::secondary;
         }
-        case StreamSelectionMode::forcedPrimary: return StreamIndex::primary;
-        case StreamSelectionMode::forcedSecondary: return StreamIndex::secondary;
+        case StreamSelectionMode::forcedPrimary:
+            return StreamIndex::primary;
+        case StreamSelectionMode::forcedSecondary:
+            return StreamIndex::secondary;
         case StreamSelectionMode::sameAsAnalytics:
             return ini().analyzeSecondaryStream ? StreamIndex::secondary : StreamIndex::primary;
         case StreamSelectionMode::sameAsMotion:

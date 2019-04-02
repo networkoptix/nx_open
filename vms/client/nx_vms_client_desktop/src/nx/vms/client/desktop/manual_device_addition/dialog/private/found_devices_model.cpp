@@ -64,6 +64,8 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
                 m_devices.append(device);
                 m_deviceRowState.insert(id, {presentedState, isChecked});
                 incrementDeviceCount({presentedState, isChecked});
+                emit headerDataChanged(Qt::Horizontal, FoundDevicesModel::presentedStateColumn,
+                    FoundDevicesModel::presentedStateColumn);
             }
         }
     }
@@ -341,19 +343,17 @@ Qt::ItemFlags FoundDevicesModel::flags(const QModelIndex& index) const
     if (!isCorrectRow(index))
         return result;
 
-    if (index.column() == checkboxColumn)
+    const auto presentedStateIndex = index.siblingAtColumn(presentedStateColumn);
+    const auto presentedStateData = presentedStateIndex.data(presentedStateRole);
+    if (!presentedStateData.isNull())
     {
-        const auto presentedStateIndex = index.siblingAtColumn(presentedStateColumn);
-        const auto presentedStateData = presentedStateIndex.data(presentedStateRole);
-        if (!presentedStateData.isNull())
-        {
-            const auto presentedState = presentedStateData.value<PresentedState>();
-            if (presentedState == notPresentedState)
-                result.setFlag(Qt::ItemIsUserCheckable, true);
-            else
-                result.setFlag(Qt::ItemIsEnabled, false);
-        }
+        const auto presentedState = presentedStateData.value<PresentedState>();
+        if (presentedState != notPresentedState)
+            result.setFlag(Qt::ItemIsEnabled, false);
+        else if (index.column() == checkboxColumn)
+            result.setFlag(Qt::ItemIsUserCheckable, true);
     }
+
     return result;
 }
 

@@ -389,7 +389,6 @@ signals:
     void capabilitiesChanged(const QnResourcePtr& resource);
     void disableDualStreamingChanged(const QnResourcePtr& resource);
     void audioEnabledChanged(const QnResourcePtr &resource);
-    void ptzConfigurationChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonParamsEncoded);
 
@@ -404,6 +403,8 @@ signals:
         const QString& caption,
         const QString& description,
         qint64 timestamp );
+
+    void recordingActionChanged(const QnResourcePtr& resource);
 protected slots:
     virtual void at_initializedChanged();
     virtual void at_motionRegionChanged();

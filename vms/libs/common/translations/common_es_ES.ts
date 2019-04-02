@@ -5,11 +5,11 @@
     <name>DateTimeFormats</name>
     <message>
       <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
+      <translation>MM / dd</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>MMMM aaaa</translation>
     </message>
   </context>
   <context>
@@ -104,7 +104,12 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>No se pueden combinar los sistemas porque tienen al menos un servidor con el mismo ID. Por favor, elimine este servidor y vuelva a intentarlo.</translation>
+    </message>
+    <message>
+      <source>Cloud systems have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
     </message>
   </context>
   <context>
@@ -331,15 +336,15 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>Error de complemento. %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>El complemento no está disponible</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>Error de servidor interno. %1</translation>
     </message>
   </context>
   <context>
@@ -378,7 +383,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>No se pudieron asignar buffers de muestra</translation>
     </message>
   </context>
   <context>
@@ -592,12 +597,12 @@
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Licencias Libres</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Licencias Libres</numerusform>
         <numerusform>%n Free Licenses</numerusform>
       </translation>
     </message>
@@ -676,9 +681,9 @@
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licencias Libres</numerusform>
+        <numerusform>%n/%1 Licencias Libres</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -761,11 +766,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>Sólo se permite una licencia Starter por Sistema.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>Ya tienes una licencia Starter activa.</translation>
     </message>
   </context>
   <context>
@@ -827,44 +832,44 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n Camaras</numerusform>
+        <numerusform>%n Camaras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n camaras</numerusform>
+        <numerusform>%n camaras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n Módulos E/S</numerusform>
+        <numerusform>%n Módulos de E/S</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n módulos E/S</numerusform>
+        <numerusform>%n módulos E/S</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n Dispositivos</numerusform>
+        <numerusform>%n Dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n dispositivos</numerusform>
+        <numerusform>%n dispositivos</numerusform>
       </translation>
     </message>
   </context>
@@ -1023,19 +1028,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>El archivo Zip está corrupto.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>No se pudo encontrar el directorio de destino.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>No se pudo abrir el archivo para escribir.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>No hay espacio libre en el disco.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1043,22 +1048,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>La extracción fue cancelada.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>El extractor está ocupado.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>Tamaño de flujo encriptado incorrecto.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>Cabezal de la secuencia cifrada dañada.</translation>
     </message>
   </context>
   <context>
@@ -1283,10 +1288,6 @@
       <translation>Ha ocurrido un evento desconocido</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occured</source>
-      <translation>Se han producido múltiples eventos %1</translation>
-    </message>
-    <message>
       <source>Event: %1</source>
       <translation>Evento: %1</translation>
     </message>
@@ -1372,10 +1373,6 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>Conexión para cámara (corriente secundaria) fue cerrado inesperadamente.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>Pérdida de paquete RTP detectado, prev seq.=%1 siguiente seq.=%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1554,19 +1551,23 @@
     </message>
     <message>
       <source>Plugin Event</source>
-      <translation type="unfinished">Plugin Event</translation>
+      <translation>Evento de plugin</translation>
     </message>
     <message>
       <source>Unknown plugin event</source>
-      <translation type="unfinished">Unknown plugin event</translation>
+      <translation>Evento de plugin desconocido</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>No se pudo forzar el uso del tiempo de la cámara, se demora demasiado, se usará el tiempo del sistema</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>El tiempo de la cámara ha vuelto a la normalidad</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occurred</source>
+      <translation type="unfinished">Multiple %1 events have occurred</translation>
     </message>
   </context>
   <context>

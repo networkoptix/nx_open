@@ -4,7 +4,7 @@
 #include <QtCore/QFileInfo>
 
 #include <core/resource/camera_resource.h>
-#include <plugins/plugins_ini.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_level.h>

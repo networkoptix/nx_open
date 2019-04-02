@@ -22,7 +22,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, generateObjects, "");
     NX_INI_FLAG(1, generateEvents, "");
     NX_INI_INT(1, generateObjectsEveryNFrames, "");
-    NX_INI_INT(1, objectsCount, "Number of simultaneosly shown objects.");
+    NX_INI_INT(1, objectCount, "Number of simultaneosly shown objects.");
     NX_INI_FLAG(1, generatePreviewAttributes, "");
     NX_INI_FLAG(0, deviceDependent, "Respective capability in the manifest.");
 
@@ -31,6 +31,9 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(1, throwPluginEventsFromDeviceAgent,
         "Periodically throw plugin events from DeviceAgent to Server.");
+
+    NX_INI_INT(-1, crashDeviceAgentOnFrameN,
+        "If >= 0, intentionally crash DeviceAgent on processing a frame with this index.");
 };
 
 inline Ini& ini()

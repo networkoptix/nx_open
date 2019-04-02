@@ -86,12 +86,13 @@ if(withNxTool)
             nxtool
             wix_custom_actions
         COMMENT "Collecting NxTool QML libraries..."
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
-        COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
-            "--config" ${config_file}
-            "--source" ${nxtool_executable}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build_utils/python
+        COMMAND ${PYTHON_EXECUTABLE} qmldeploy.py
             "--qml-root" ${nxtool_qml_root}
+            "--qt-root" ${qt.dir}
             "--output" ${nxtool_qml_dir}
+            "--prefer-compiled"
+            "--skip-styles"
         )
 
     add_custom_target(create_nxtool_installer ALL
@@ -115,12 +116,13 @@ if(withDesktopClient)
         DEPENDS
             desktop_client
         COMMENT "Collecting QML libraries..."
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
-        COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
-            "--config" ${config_file}
-            "--source" ${desktop_client_executable}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build_utils/python
+        COMMAND ${PYTHON_EXECUTABLE} qmldeploy.py
             "--qml-root" ${desktop_client_qml_root}
+            "--qt-root" ${qt.dir}
             "--output" ${client_qml_dir}
+            "--prefer-compiled"
+            "--skip-styles"
         )
     add_dependencies(distribution_wix collect_qml_dependencies applauncher minilauncher)
 

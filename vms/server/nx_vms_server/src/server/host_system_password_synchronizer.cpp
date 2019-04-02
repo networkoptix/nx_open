@@ -25,10 +25,10 @@ HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer(QnMediaServerModu
     nx::vms::server::ServerModuleAware(serverModule)
 {
     Qn::directConnect(
-        resourcePool(), &QnResourcePool::resourceAdded,
+        this->serverModule()->resourcePool(), &QnResourcePool::resourceAdded,
         this, &HostSystemPasswordSynchronizer::at_resourceFound);
 
-    if (QnUserResourcePtr admin = resourcePool()->getAdministrator())
+    if (QnUserResourcePtr admin = this->serverModule()->resourcePool()->getAdministrator())
         setAdmin(admin);
 }
 

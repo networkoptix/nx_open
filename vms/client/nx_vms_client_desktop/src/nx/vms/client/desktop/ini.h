@@ -48,7 +48,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, enableTimelineScreenshotCursor, "Show screenshot cursor when hovering above timeline.");
     NX_INI_FLAG(1, enableWatermark, "Enable watermarks preview and setup.");
     NX_INI_FLAG(1, enableCaseExport, "Enable case export.");
-    NX_INI_FLAG(0, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
+    NX_INI_FLAG(1, enableSessionTimeout,
+        "Enable admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode, "Password preview activation mode: \"press\", \"hover\" or \"toggle\".");
     NX_INI_FLAG(1, redesignedTimeSynchronization, "Redesigned time synchronization widget in the System Adminstration dialog.");
     NX_INI_FLAG(1, automaticFilterByTimelineSelection, "Automatically switch Right Panel time"
@@ -61,9 +62,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, overrideDialogFramesWIN, "Replace system dialog frames with application defined ones (Windows-only).");
     NX_INI_FLAG(0, systemUpdateProgressInformers, "Show Right Panel progress informers during System Update (unfinished functionality).");
     NX_INI_FLAG(0, compatibilityIsMediaPaused, "Check if all sync play items are paused at every request.");
-    NX_INI_STRING("", enableEntropixZoomWindowReconstructionOn,
-		"Enable Entropix 'Reconstruct Resolution' integration on the cameras, which model matches "
-		"the provided string, counted as a regular expression.");
+    NX_INI_STRING("", autoUpdatesCheckChangesetOverride, "Background updates check will use this changeset instead of \"latest\"");
+    NX_INI_INT(0, massSystemUpdateWaitForServerOnlineOverride, "Period to wait until server goes online, in seconds. Set to zero to use built-in value.");
 };
 
 inline Ini& ini()

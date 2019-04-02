@@ -121,6 +121,7 @@ NX_DEFINE_RESPONSE_TRAITS(DeviceIO, GetDigitalInputs)
 NX_DEFINE_RESPONSE_TRAITS_IRREGULAR(DeviceIO, GetRelayOutputs, _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
 NX_DEFINE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
 
+NX_DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfiguration)
 NX_DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
 NX_DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
 NX_DEFINE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)

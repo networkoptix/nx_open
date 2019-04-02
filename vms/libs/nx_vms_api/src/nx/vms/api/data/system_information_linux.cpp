@@ -7,7 +7,7 @@
 #include <QtCore/QString>
 #include <QtCore/QTextStream>
 
-#include <nx/vms/api/helpers/system_information_helper_linux.h>
+#include <nx/utils/platform/ubuntu_version_linux.h>
 
 namespace nx::vms::api {
 
@@ -26,19 +26,19 @@ static QByteArray osReleaseContents()
 
 QString SystemInformation::currentSystemRuntime()
 {
-    const auto prettyName = osReleaseContentsValueByKey(osReleaseContents(), "pretty_name");
+    const auto prettyName = utils::osReleaseContentsValueByKey(osReleaseContents(), "pretty_name");
     return prettyName.isEmpty() ? "GNU/Linux without /etc/os-release" : prettyName;
 }
 
 QString SystemInformation::runtimeOsVersion()
 {
-    const auto codenameVersion = ubuntuVersionFromCodeName(
-        osReleaseContentsValueByKey(osReleaseContents(), "ubuntu_codename"));
+    const auto codenameVersion = utils::ubuntuVersionFromCodeName(
+        utils::osReleaseContentsValueByKey(osReleaseContents(), "ubuntu_codename"));
 
     if (!codenameVersion.isEmpty())
         return codenameVersion;
 
-    return osReleaseContentsValueByKey(osReleaseContents(), "version_id");
+    return utils::osReleaseContentsValueByKey(osReleaseContents(), "version_id");
 }
 
 } // namespace nx::vms::api

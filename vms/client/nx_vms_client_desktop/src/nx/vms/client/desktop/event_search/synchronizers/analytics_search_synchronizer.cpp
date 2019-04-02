@@ -108,8 +108,13 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         {
             if (const auto mediaWidget = asMediaWidget(widget))
             {
+                const auto updateWidgetMode =
+                    [this, mediaWidget] { updateMediaResourceWidgetAnalyticsMode(mediaWidget); };
+
                 connect(mediaWidget, &QnMediaResourceWidget::displayChanged, this,
-                    [this, mediaWidget] { updateMediaResourceWidgetAnalyticsMode(mediaWidget); });
+                    updateWidgetMode);
+                connect(mediaWidget, &QnMediaResourceWidget::analyticsSupportChanged, this,
+                    updateWidgetMode);
                 updateMediaResourceWidgetAnalyticsMode(mediaWidget);
             }
         });
@@ -136,9 +141,12 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         });
 }
 
-bool AnalyticsSearchSynchronizer::calculateMediaResourceWidgetAnalyticsMode(
+bool AnalyticsSearchSynchronizer::calculateMediaResourceWidgetAnalyticsEnabled(
     QnMediaResourceWidget* widget) const
 {
+    if (!widget->isAnalyticsSupported())
+        return false;
+
     if (this->active())
         return true;
 
@@ -203,7 +211,7 @@ void AnalyticsSearchSynchronizer::updateTimelineDisplay()
 void AnalyticsSearchSynchronizer::updateMediaResourceWidgetAnalyticsMode(
     QnMediaResourceWidget* widget)
 {
-    widget->setAnalyticsEnabled(calculateMediaResourceWidgetAnalyticsMode(widget));
+    widget->setAnalyticsEnabled(calculateMediaResourceWidgetAnalyticsEnabled(widget));
 }
 
 void AnalyticsSearchSynchronizer::updateAllMediaResourceWidgetsAnalyticsMode()

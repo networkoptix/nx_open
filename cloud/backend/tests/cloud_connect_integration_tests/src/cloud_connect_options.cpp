@@ -23,7 +23,7 @@ protected:
 
     void thenConnectionCanBeEstablished()
     {
-        assertConnectionCanBeEstablished();
+        assertCloudConnectionCanBeEstablished();
     }
 
 private:

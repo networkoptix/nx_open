@@ -3,13 +3,14 @@
 #include <QtSql/QSqlError>
 
 #include <nx/utils/uuid.h>
+#include "database.h"
 
 namespace nx::sql {
 
 QtDbConnection::QtDbConnection(const ConnectionOptions& connectionOptions)
 {
     m_connectionName = QUuid::createUuid().toString();
-    m_connection = QSqlDatabase::addDatabase(
+    m_connection = Database::addDatabase(
         toString(connectionOptions.driverType),
         m_connectionName);
 
@@ -27,7 +28,7 @@ QtDbConnection::~QtDbConnection()
         close();
 
     m_connection = QSqlDatabase();
-    QSqlDatabase::removeDatabase(m_connectionName);
+    nx::sql::Database::removeDatabase(m_connectionName);
 }
 
 bool QtDbConnection::open()

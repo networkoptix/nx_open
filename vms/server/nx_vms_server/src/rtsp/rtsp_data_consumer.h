@@ -3,10 +3,12 @@
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QElapsedTimer>
 
+#include <nx/network/abstract_socket.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <utils/media/externaltimesource.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
+#include <nx/utils/elapsed_timer.h>
 #include <utils/common/adaptive_sleep.h>
 #include <camera/video_camera.h>
 
@@ -38,7 +40,7 @@ public:
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
     int copyLastGopFromCamera(
-        QnVideoCameraPtr camera,
+        nx::vms::server::VideoCameraPtr camera,
         nx::vms::api::StreamIndex streamIndex,
         qint64 skipTime,
         bool iFramesOnly);

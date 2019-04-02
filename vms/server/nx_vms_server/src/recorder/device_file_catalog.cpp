@@ -474,8 +474,12 @@ bool DeviceFileCatalog::needRebuildPause()
     return !m_pauseList.isEmpty();
 }
 
-void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage,
-    QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
+void DeviceFileCatalog::scanMediaFiles(
+    const QString& folder,
+    const QnStorageResourcePtr &storage,
+    QMap<qint64, Chunk>& allChunks,
+    QVector<EmptyFileInfo>& emptyFileList,
+    const ScanFilter& filter)
 {
     NX_VERBOSE(this, "%1 Processing directory %2", __func__, nx::utils::url::hidePassword(folder));
     QnAbstractStorageResource::FileInfoList files;
@@ -567,17 +571,6 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
         nx::utils::url::hidePassword(folder), allChunks.size());
 }
 
-void DeviceFileCatalog::readStorageData(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& scanFilter)
-{
-    scanMediaFiles(
-        rootFolder(storage, catalog),
-        storage,
-        allChunks,
-        emptyFileList,
-        scanFilter
-    );
-}
-
 QString DeviceFileCatalog::rootFolder(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog) const
 {
     QString path = closeDirPath(storage->getUrl());
@@ -588,41 +581,6 @@ QString DeviceFileCatalog::rootFolder(const QnStorageResourcePtr &storage, QnSer
 
 QString DeviceFileCatalog::cameraUniqueId() const {
     return m_cameraUniqueId;
-}
-
-bool DeviceFileCatalog::doRebuildArchive(const QnStorageResourcePtr &storage, const QnTimePeriod& period)
-{
-//     QElapsedTimer t;
-//     t.restart();
-//     qWarning() << "start rebuilding archive for camera " << m_cameraUniqueId << prefixByCatalog(m_catalog);
-    //m_rebuildStartTime = qnSyncTime->currentMSecsSinceEpoch();
-
-    QMap<qint64, Chunk> allChunks;
-    if (getMyStorageMan()->needToStopMediaScan())
-        return false;
-
-    QVector<EmptyFileInfo> emptyFileList;
-    readStorageData(
-        storage,
-        m_catalog,
-        allChunks,
-        emptyFileList,
-        period
-    );
-
-    for(const EmptyFileInfo& emptyFile: emptyFileList) {
-        if (emptyFile.startTimeMs < period.endTimeMs())
-            storage->removeFile(emptyFile.fileName);
-    }
-
-    QnMutexLocker lk( &m_mutex );
-
-    for(const Chunk& chunk: allChunks)
-        m_chunks.push_back(chunk);
-
-    //qWarning() << "rebuild archive for camera " << m_cameraUniqueId << prefixByCatalog(m_catalog) << "finished. time=" << t.elapsed() << "ms. processd files=" << m_chunks.size();
-
-    return true;
 }
 
 QnServer::ChunksCatalog DeviceFileCatalog::getRole() const

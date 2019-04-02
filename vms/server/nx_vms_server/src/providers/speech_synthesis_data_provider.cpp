@@ -1,7 +1,6 @@
-#if !defined(EDGE_SERVER) && !defined(__arch64__)
 #include "speech_synthesis_data_provider.h"
 
-#include <nx_speech_synthesizer/text_to_wav.h>
+#include <nx/speech_synthesizer/text_to_wave_server.h>
 #include <core/dataconsumer/audio_data_transmitter.h>
 #include <core/resource/resource.h>
 #include <QtCore/QBuffer>
@@ -10,15 +9,34 @@
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
 
-namespace {
-    const size_t kDefaultDataChunkSize = 2048;
+static const size_t kDefaultDataChunkSize = 2048;
+
+/*static*/ bool QnSpeechSynthesisDataProvider::isEnabled()
+{
+    return nx::speech_synthesizer::TextToWaveServer::isEnabled();
 }
 
-QnSpeechSynthesisDataProvider::QnSpeechSynthesisDataProvider(const QString& text) :
+/*static*/ std::shared_ptr<QnSpeechSynthesisDataProvider::OpaqueBackend>
+    QnSpeechSynthesisDataProvider::backendInstance(const QString& applicationDirPath)
+{
+    if (!isEnabled())
+        return nullptr;
+
+    // Create the only instance of TextToWaveServer singleton.
+    auto textToWaveServer =
+        std::make_shared<nx::speech_synthesizer::TextToWaveServer>(applicationDirPath);
+    textToWaveServer->start();
+    textToWaveServer->waitForStarted();
+
+    return textToWaveServer;
+}
+
+QnSpeechSynthesisDataProvider::QnSpeechSynthesisDataProvider(const QString& text):
     QnAbstractStreamDataProvider(QnResourcePtr(new QnResource())),
     m_text(text),
     m_curPos(0)
 {
+    NX_ASSERT(isEnabled());
 }
 
 QnSpeechSynthesisDataProvider::~QnSpeechSynthesisDataProvider()
@@ -26,7 +44,8 @@ QnSpeechSynthesisDataProvider::~QnSpeechSynthesisDataProvider()
     stop();
 }
 
-QnConstMediaContextPtr QnSpeechSynthesisDataProvider::initializeAudioContext(const QnAudioFormat& format)
+QnConstMediaContextPtr QnSpeechSynthesisDataProvider::initializeAudioContext(
+    const QnAudioFormat& format)
 {
     auto codecId = QnFfmpegHelper::fromQtAudioFormatToFfmpegPcmCodec(format);
     if (codecId == AV_CODEC_ID_NONE)
@@ -50,7 +69,7 @@ QnConstMediaContextPtr QnSpeechSynthesisDataProvider::initializeAudioContext(con
 
 QnAbstractMediaDataPtr QnSpeechSynthesisDataProvider::getNextData()
 {
-    if (m_curPos >= m_rawBuffer.size())
+    if ((int) m_curPos >= m_rawBuffer.size())
         return QnAbstractMediaDataPtr();
 
     QnWritableCompressedAudioDataPtr packet(
@@ -59,10 +78,10 @@ QnAbstractMediaDataPtr QnSpeechSynthesisDataProvider::getNextData()
             kDefaultDataChunkSize,
             m_ctx));
 
-    auto bytesRest = m_rawBuffer.size() - m_curPos;
+    const size_t bytesRest = m_rawBuffer.size() - m_curPos;
     packet->m_data.write(
         m_rawBuffer.constData() + m_curPos,
-        bytesRest < kDefaultDataChunkSize ? bytesRest : kDefaultDataChunkSize);
+        (bytesRest < kDefaultDataChunkSize) ? bytesRest : kDefaultDataChunkSize);
     packet->compressionType = AVCodecID::AV_CODEC_ID_PCM_S16LE;
     packet->dataType = QnAbstractMediaData::DataType::AUDIO;
     packet->dataProvider = this;
@@ -79,9 +98,9 @@ void QnSpeechSynthesisDataProvider::run()
     if (!status)
         return;
 
-    while(auto data = getNextData())
+    while (const auto data = getNextData())
     {
-        if(dataCanBeAccepted())
+        if (dataCanBeAccepted())
             putData(data);
     }
 
@@ -90,7 +109,7 @@ void QnSpeechSynthesisDataProvider::run()
 
 void QnSpeechSynthesisDataProvider::afterRun()
 {
-    QnAbstractMediaDataPtr endOfStream(new QnEmptyMediaData());
+    const QnAbstractMediaDataPtr endOfStream(new QnEmptyMediaData());
     endOfStream->dataProvider = this;
     putData(endOfStream);
 }
@@ -108,7 +127,7 @@ QByteArray QnSpeechSynthesisDataProvider::doSynthesis(const QString &text, bool*
 
     *outStatus = true;
 
-    auto ttvInstance = TextToWaveServer::instance();
+    auto ttvInstance = nx::speech_synthesizer::TextToWaveServer::instance();
     ttvInstance->generateSoundSync(text, &soundBuf, &waveFormat);
 
     m_ctx = initializeAudioContext(waveFormat);
@@ -118,7 +137,3 @@ QByteArray QnSpeechSynthesisDataProvider::doSynthesis(const QString &text, bool*
     const std::size_t kSynthesizerOutputHeaderSize = 52;
     return soundBuf.data().mid(kSynthesizerOutputHeaderSize);
 }
-
-#endif
-
-

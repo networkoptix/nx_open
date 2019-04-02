@@ -97,9 +97,8 @@ int AudioStream::initializeInput()
     static constexpr char kAudioBufferSizeKey[] = "audio_buffer_size";
     static constexpr int64_t kAudioBufferSizeValue = 80; // < milliseconds
     inputFormat->setEntry(kAudioBufferSizeKey, kAudioBufferSizeValue);
-
-
 #endif // _WIN32
+
     result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
     if (result < 0)
         return result;
@@ -107,6 +106,12 @@ int AudioStream::initializeInput()
     m_inputFormat = std::move(inputFormat);
 
     return 0;
+}
+
+AVCodecContext* AudioStream::getCodecContext()
+{
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    return m_transcoder.getCodecContext();
 }
 
 int AudioStream::nextPacket(std::shared_ptr<ffmpeg::Packet>& resultPacket)

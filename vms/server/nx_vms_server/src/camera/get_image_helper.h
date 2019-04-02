@@ -53,7 +53,7 @@ private:
         const nx::api::CameraImageRequest& request) const;
 
     CLVideoDecoderOutputPtr decodeFrameFromCaches(
-        QnVideoCameraPtr camera,
+        nx::vms::server::VideoCameraPtr camera,
         nx::vms::api::StreamIndex streamIndex,
         qint64 timestampUs,
         int preferredChannel,
@@ -66,12 +66,12 @@ private:
     CLVideoDecoderOutputPtr decodeFrameFromLiveCache(
         nx::vms::api::StreamIndex streamIndex,
         qint64 timestampUs,
-        QnVideoCameraPtr camera,
+        nx::vms::server::VideoCameraPtr camera,
         int channelNumber) const;
 
     std::unique_ptr<QnConstDataPacketQueue> getLiveCacheGopTillTime(
         nx::vms::api::StreamIndex streamIndex,
         qint64 timestampUs,
-        QnVideoCameraPtr camera,
+        nx::vms::server::VideoCameraPtr camera,
         int channelNumber) const;
 };

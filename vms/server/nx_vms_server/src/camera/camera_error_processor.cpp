@@ -11,6 +11,7 @@
 #include <camera/camera_pool.h>
 #include <utils/common/synctime.h>
 #include <nx/network/http/http_types.h>
+#include <providers/spush_media_stream_provider.h>
 
 namespace nx::vms::server::camera {
 
@@ -63,7 +64,7 @@ void ErrorProcessor::processStreamError(
         return;
 
     auto owner = streamReader->getOwner();
-    auto videoCamera = owner.dynamicCast<QnAbstractMediaServerVideoCamera>();
+    auto videoCamera = owner.dynamicCast<nx::vms::server::AbstractVideoCamera>();
     if (!videoCamera)
         return;
 
@@ -96,7 +97,9 @@ void ErrorProcessor::processStreamError(
     bool gotVideoFrameRecently = hasGopData(nx::vms::api::StreamIndex::primary)
         || hasGopData(nx::vms::api::StreamIndex::secondary);
 
-    if (!gotVideoFrameRecently)
+
+    if (!gotVideoFrameRecently
+        && error.errorCode != CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
     {
         if (streamReader->getStatistics(0)->getTotalData() > 0)
             ownerResource->setLastMediaIssue(CameraDiagnostics::BadMediaStreamResult());
