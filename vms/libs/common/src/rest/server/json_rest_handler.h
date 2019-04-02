@@ -10,10 +10,17 @@
 class QnJsonRestHandler: public QnRestRequestHandler
 {
 protected:
-    virtual RestResponse executeGet(const RestRequest& request) override;
-    virtual RestResponse executeDelete(const RestRequest& request) override;
-    virtual RestResponse executePost(const RestRequest& request) override;
-    virtual RestResponse executePut(const RestRequest& request) override;
+    virtual nx::network::rest::Response executeGet(
+        const nx::network::rest::Request& request) override;
+
+    virtual nx::network::rest::Response executeDelete(
+        const nx::network::rest::Request& request) override;
+
+    virtual nx::network::rest::Response executePost(
+        const nx::network::rest::Request& request) override;
+
+    virtual nx::network::rest::Response executePut(
+        const nx::network::rest::Request& request) override;
 
     virtual int executeGet(
         const QString& path, const QnRequestParams& params, QnJsonRestResult& result,

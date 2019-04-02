@@ -1,11 +1,12 @@
 #include "options_request_handler.h"
 
-RestResponse OptionsRequestHandler::executeRequest(const RestRequest& request)
-{
-    const auto origin = nx::network::http::getHeaderValue(
-        request.httpRequest->headers, "Origin");
+using namespace nx::network;
 
-    RestResponse restResponse(nx::network::http::StatusCode::ok);
+rest::Response OptionsRequestHandler::executeRequest(const rest::Request& request)
+{
+    const auto origin = http::getHeaderValue(request.httpRequest->headers, "Origin");
+
+    rest::Response restResponse(http::StatusCode::ok);
     restResponse.httpHeaders.emplace("Access-Control-Allow-Origin", origin);
     restResponse.httpHeaders.emplace("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
     restResponse.httpHeaders.emplace("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type");

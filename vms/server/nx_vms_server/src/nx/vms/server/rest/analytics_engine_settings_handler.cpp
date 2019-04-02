@@ -20,7 +20,7 @@ using namespace nx::network;
 
 namespace {
 
-RestResponse makeSettingsResponse(
+nx::network::rest::Response makeSettingsResponse(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
 {
     nx::vms::api::analytics::SettingsResponse response;
@@ -29,13 +29,13 @@ RestResponse makeSettingsResponse(
     const auto parentPlugin = engine->plugin();
     if (!NX_ASSERT(parentPlugin))
     {
-        return RestResponse::error(
+        return nx::network::rest::Response::error(
             QnRestResult::Error::InternalServerError,
             lm("Unable to access the parent Plugin of the Engine, %1").args(engine));
     }
 
     response.model = parentPlugin->manifest().engineSettingsModel;
-    return RestResponse::reply(response);
+    return nx::network::rest::Response::reply(response);
 }
 
 } // namespace
@@ -45,14 +45,15 @@ AnalyticsEngineSettingsHandler::AnalyticsEngineSettingsHandler(QnMediaServerModu
 {
 }
 
-RestResponse AnalyticsEngineSettingsHandler::executeGet(const RestRequest& request)
+nx::network::rest::Response AnalyticsEngineSettingsHandler::executeGet(
+    const nx::network::rest::Request& request)
 {
     const auto engineId = request.paramOrThrow(kAnalyticsEngineIdParameter);
     auto engine = sdk_support::find<resource::AnalyticsEngineResource>(serverModule(), engineId);
     if (!engine)
     {
         NX_DEBUG(this, "Can't find engine with id %1", engineId);
-        return RestResponse::error(
+        return nx::network::rest::Response::error(
             QnRestResult::Error::CantProcessRequest,
             lm("Unable to find analytics engine with id %1").args(engineId));
     }
@@ -60,7 +61,8 @@ RestResponse AnalyticsEngineSettingsHandler::executeGet(const RestRequest& reque
     return makeSettingsResponse(engine);
 }
 
-RestResponse AnalyticsEngineSettingsHandler::executePost(const RestRequest& request)
+nx::network::rest::Response AnalyticsEngineSettingsHandler::executePost(
+    const nx::network::rest::Request& request)
 {
     const auto settings = request.parseContentOrThrow<QJsonObject>();
     const auto engineId = request.paramOrThrow(kAnalyticsEngineIdParameter);
@@ -68,7 +70,7 @@ RestResponse AnalyticsEngineSettingsHandler::executePost(const RestRequest& requ
     if (!engine)
     {
         NX_DEBUG(this, "Can't find engine with id %1", engineId);
-        return RestResponse::error(
+        return nx::network::rest::Response::error(
             QnRestResult::Error::CantProcessRequest,
             lm("Unable to find analytics engine with id %1").args(engineId));
     }

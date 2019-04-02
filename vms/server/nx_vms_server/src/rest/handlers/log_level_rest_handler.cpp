@@ -9,6 +9,7 @@
 #include <common/common_module.h>
 
 using namespace nx::utils::log;
+using namespace nx::network;
 
 static const QString kNameParam = lit("name");
 static const QString kIdParam = lit("id");
@@ -26,7 +27,7 @@ static QString levelString(const std::shared_ptr<AbstractLogger>& logger)
     return settings.toString();
 }
 
-RestResponse QnLogLevelRestHandler::executeGet(const RestRequest& request)
+rest::Response QnLogLevelRestHandler::executeGet(const rest::Request& request)
 {
     // TODO: Remove as soon as WEB client supports new API.
     if (request.param(kIdParam))
@@ -37,33 +38,33 @@ RestResponse QnLogLevelRestHandler::executeGet(const RestRequest& request)
         std::map<QString, QString> levelsByName;
         for (const auto& name: QnLogs::getLoggerNames())
             levelsByName[name] = levelString(QnLogs::getLogger(name));
-        return RestResponse::reply(levelsByName);
+        return rest::Response::reply(levelsByName);
     }
 
     const auto name = request.paramOr(kNameParam);
     const auto logger = QnLogs::getLogger(name);
     if (!logger)
-        return RestResponse::error(QnRestResult::InvalidParameter, kNameParam, name);
+        return rest::Response::error(QnRestResult::InvalidParameter, kNameParam, name);
 
     const auto value = request.paramOr(kValueParam);
     if (!value.isEmpty())
     {
         if (!hasPermission(request.owner))
-            return RestResponse::error(QnRestResult::Forbidden);
+            return rest::Response::error(QnRestResult::Forbidden);
 
         LevelSettings settings;
         if (!settings.parse(value))
-            return RestResponse::error(QnRestResult::InvalidParameter, kValueParam, value);
+            return rest::Response::error(QnRestResult::InvalidParameter, kValueParam, value);
 
         // TODO: Also update in config.
         logger->setDefaultLevel(settings.primary);
         logger->setLevelFilters(settings.filters);
     }
 
-    return RestResponse::reply(levelString(logger));
+    return rest::Response::reply(levelString(logger));
 }
 
-RestResponse QnLogLevelRestHandler::manageLogLevelById(const RestRequest& request)
+rest::Response QnLogLevelRestHandler::manageLogLevelById(const rest::Request& request)
 {
     std::shared_ptr<nx::utils::log::AbstractLogger> logger;
     const auto logId = request.paramOr(kIdParam);
@@ -75,22 +76,22 @@ RestResponse QnLogLevelRestHandler::manageLogLevelById(const RestRequest& reques
     }
 
     if (!logger)
-        return RestResponse::error(QnRestResult::InvalidParameter, kIdParam, logId);
+        return rest::Response::error(QnRestResult::InvalidParameter, kIdParam, logId);
 
     auto value = request.params().find(kValueParam);
     if (value != request.params().cend())
     {
         if (!hasPermission(request.owner))
-            return RestResponse::error(QnRestResult::Forbidden);
+            return rest::Response::error(QnRestResult::Forbidden);
 
         const auto logLevel = nx::utils::log::levelFromString(*value);
         if (logLevel == Level::undefined)
-            return RestResponse::error(QnRestResult::InvalidParameter, kValueParam, *value);
+            return rest::Response::error(QnRestResult::InvalidParameter, kValueParam, *value);
 
         logger->setDefaultLevel(logLevel);
     }
 
     const auto level = logger->defaultLevel();
-    return RestResponse::reply(
+    return rest::Response::reply(
         (level == Level::verbose) ? lit("DEBUG2") : toString(level).toUpper());
 }

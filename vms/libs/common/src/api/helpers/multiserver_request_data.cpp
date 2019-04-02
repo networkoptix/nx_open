@@ -12,12 +12,12 @@ static const QString kExtraFormattingParam(lit("extraFormatting"));
 
 const Qn::SerializationFormat QnBaseMultiserverRequestData::kDefaultFormat = Qn::JsonFormat;
 
-QnBaseMultiserverRequestData::QnBaseMultiserverRequestData(const RequestParams& params)
+QnBaseMultiserverRequestData::QnBaseMultiserverRequestData(const nx::network::rest::Params& params)
 {
     loadFromParams(params);
 }
 
-void QnBaseMultiserverRequestData::loadFromParams(const RequestParams& params)
+void QnBaseMultiserverRequestData::loadFromParams(const nx::network::rest::Params& params)
 {
     isLocal = params.contains(kLocalParam);
     extraFormatting = params.contains(kExtraFormattingParam);
@@ -29,14 +29,14 @@ QnMultiserverRequestData::~QnMultiserverRequestData()
 }
 
 void QnMultiserverRequestData::loadFromParams(QnResourcePool* resourcePool,
-    const RequestParams& params)
+    const nx::network::rest::Params& params)
 {
     QnBaseMultiserverRequestData::loadFromParams(params);
 }
 
-RequestParams QnMultiserverRequestData::toParams() const
+nx::network::rest::Params QnMultiserverRequestData::toParams() const
 {
-    RequestParams result;
+    nx::network::rest::Params result;
     if (isLocal)
         result.insert(kLocalParam, QString());
     if (extraFormatting)

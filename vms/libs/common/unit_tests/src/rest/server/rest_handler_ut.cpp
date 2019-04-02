@@ -4,12 +4,14 @@
 #include <nx/network/rest/nx_network_rest_ini.h>
 #include <nx/utils/test_support/run_test.h>
 
+namespace nx::network::rest::test {
+
 class RequestParamsTest:
     public ::testing::Test
 {
 public:
     static void testTo(
-        const RequestParams& params,
+        const Params& params,
         const QByteArray& url, const QByteArray& json)
     {
         EXPECT_EQ(url, params.toUrlQuery().toString());
@@ -17,7 +19,7 @@ public:
     }
 
     static void testFrom(
-        const RequestParams& params,
+        const Params& params,
         const QByteArray& url, const QByteArray& json = {})
     {
         const auto fromUrl = params.fromUrlQuery(QUrlQuery(url));
@@ -31,7 +33,7 @@ public:
     }
 
     static void testConversions(
-        const RequestParams& params,
+        const Params& params,
         const QByteArray& url, const QByteArray& json)
     {
         testTo(params, url, json);
@@ -71,14 +73,14 @@ class RestRequestTest:
     public ::testing::Test
 {
 public:
-    std::optional<RestRequest> restRequest(const QStringList& text)
+    std::optional<rest::Request> restRequest(const QStringList& text)
     {
-        auto httpRequest = std::make_unique<nx::network::http::Request>();
+        auto httpRequest = std::make_unique<http::Request>();
         if (!httpRequest->parse(text.join("\r\n").toUtf8()))
             return std::nullopt;
 
-        RestRequest request(httpRequest.get(), nullptr);
-        auto contentType = nx::network::http::getHeaderValue(httpRequest->headers, "Content-Type");
+        rest::Request request(httpRequest.get(), nullptr);
+        auto contentType = http::getHeaderValue(httpRequest->headers, "Content-Type");
         if (!contentType.isEmpty())
             request.content = {std::move(contentType), std::move(httpRequest->messageBody)};
 
@@ -89,7 +91,7 @@ public:
     nx::utils::test::IniConfigTweaks iniTweaks;
 
 private:
-    std::vector<std::unique_ptr<nx::network::http::Request>> m_requests;
+    std::vector<std::unique_ptr<http::Request>> m_requests;
 };
 
 struct SomeData
@@ -118,7 +120,7 @@ TEST_F(RestRequestTest, Get)
 
     EXPECT_EQ("GET", request->method());
     EXPECT_EQ("/some/path", request->path());
-    EXPECT_EQ(RequestParams{}, request->params());
+    EXPECT_EQ(Params{}, request->params());
     EXPECT_FALSE(request->content);
     EXPECT_FALSE(request->isExtraFormattingRequired());
     EXPECT_FALSE(request->parseContent<SomeData>());
@@ -137,7 +139,7 @@ TEST_F(RestRequestTest, GetWithUrlParams)
     EXPECT_EQ("/some/path", request->path());
     EXPECT_TRUE(request->isExtraFormattingRequired());
     EXPECT_EQ(
-        RequestParams({{"b", "true"}, {"extraFormatting", ""}, {"i", "42"}, {"s", "hi"}}),
+        Params({{"b", "true"}, {"extraFormatting", ""}, {"i", "42"}, {"s", "hi"}}),
         request->params());
 
     EXPECT_TRUE(request->param("extraFormatting"));
@@ -167,7 +169,7 @@ TEST_F(RestRequestTest, GetToPostByHeader)
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->path());
-    EXPECT_EQ(RequestParams({{"b", "true"}, {"i", "777"}, {"s", "data"}}), request->params());
+    EXPECT_EQ(Params({{"b", "true"}, {"i", "777"}, {"s", "data"}}), request->params());
 
     const auto data = request->parseContent<SomeData>();
     ASSERT_TRUE(data);
@@ -176,7 +178,7 @@ TEST_F(RestRequestTest, GetToPostByHeader)
 
 TEST_F(RestRequestTest, GetToPutByParam)
 {
-    iniTweaks.set(&nx::network::rest::ini().allowGetMethodReplacement, true);
+    iniTweaks.set(&rest::ini().allowGetMethodReplacement, true);
 
     const auto request = restRequest({
         "GET /some/path?s=someData&method_=put HTTP/1.1",
@@ -187,7 +189,7 @@ TEST_F(RestRequestTest, GetToPutByParam)
 
     EXPECT_EQ("PUT", request->method());
     EXPECT_EQ("/some/path", request->path());
-    EXPECT_EQ(RequestParams({{"method_", "put"}, {"s", "someData"}}), request->params());
+    EXPECT_EQ(Params({{"method_", "put"}, {"s", "someData"}}), request->params());
 
     const auto data = request->parseContent<SomeData>();
     ASSERT_TRUE(data);
@@ -196,7 +198,7 @@ TEST_F(RestRequestTest, GetToPutByParam)
 
 TEST_F(RestRequestTest, GetToPutByParamFailure)
 {
-    iniTweaks.set(&nx::network::rest::ini().allowGetMethodReplacement, false);
+    iniTweaks.set(&rest::ini().allowGetMethodReplacement, false);
 
     const auto request = restRequest({
         "GET /some/path?s=someData&method_=put HTTP/1.1",
@@ -207,7 +209,7 @@ TEST_F(RestRequestTest, GetToPutByParamFailure)
 
     EXPECT_EQ("GET", request->method());
     EXPECT_EQ("/some/path", request->path());
-    EXPECT_EQ(RequestParams({{"method_", "put"}, {"s", "someData"}}), request->params());
+    EXPECT_EQ(Params({{"method_", "put"}, {"s", "someData"}}), request->params());
 
     const auto data = request->parseContent<SomeData>();
     ASSERT_TRUE(data);
@@ -226,7 +228,7 @@ TEST_F(RestRequestTest, Post)
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->path());
-    EXPECT_EQ(RequestParams(), request->params());
+    EXPECT_EQ(Params(), request->params());
 
     EXPECT_FALSE(request->parseContent<SomeData>());
 }
@@ -247,7 +249,7 @@ TEST_F(RestRequestTest, PostJson)
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->path());
-    EXPECT_EQ(RequestParams({{"b", "true"}, {"i", "222"}, {"s", "data"}}), request->params());
+    EXPECT_EQ(Params({{"b", "true"}, {"i", "222"}, {"s", "data"}}), request->params());
 
     const auto data = request->parseContent<SomeData>();
     ASSERT_TRUE(data);
@@ -270,7 +272,7 @@ TEST_F(RestRequestTest, PostForm)
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->path());
-    EXPECT_EQ(RequestParams({{"b", "false"}, {"i", "123"}, {"s", "some text"}}), request->params());
+    EXPECT_EQ(Params({{"b", "false"}, {"i", "123"}, {"s", "some text"}}), request->params());
 
     const auto data = request->parseContent<SomeData>();
     ASSERT_TRUE(data);
@@ -293,14 +295,14 @@ TEST_F(RestRequestTest, PostBadJson)
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->path());
-    EXPECT_EQ(RequestParams(), request->params());
+    EXPECT_EQ(Params(), request->params());
 
     ASSERT_FALSE(request->parseContent<SomeData>());
 }
 
 TEST_F(RestRequestTest, PostWithUrlParams)
 {
-    iniTweaks.set(&nx::network::rest::ini().allowUrlParamitersForAnyMethod, true);
+    iniTweaks.set(&rest::ini().allowUrlParamitersForAnyMethod, true);
 
     const auto request = restRequest({
         "POST /some/path?b=true&i=42&s=hi HTTP/1.1",
@@ -312,7 +314,7 @@ TEST_F(RestRequestTest, PostWithUrlParams)
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->path());
-    EXPECT_EQ(RequestParams({{"b", "true"}, {"i", "42"}, {"s", "hi"}}), request->params());
+    EXPECT_EQ(Params({{"b", "true"}, {"i", "42"}, {"s", "hi"}}), request->params());
 
     const auto data = request->parseContent<SomeData>();
     ASSERT_TRUE(data);
@@ -321,7 +323,7 @@ TEST_F(RestRequestTest, PostWithUrlParams)
 
 TEST_F(RestRequestTest, PostWithUrlParamsFailure)
 {
-    iniTweaks.set(&nx::network::rest::ini().allowUrlParamitersForAnyMethod, false);
+    iniTweaks.set(&rest::ini().allowUrlParamitersForAnyMethod, false);
 
     const auto request = restRequest({
         "POST /some/path?b=true&i=42&s=hi HTTP/1.1",
@@ -333,7 +335,7 @@ TEST_F(RestRequestTest, PostWithUrlParamsFailure)
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->path());
-    EXPECT_EQ(RequestParams(), request->params());
+    EXPECT_EQ(Params(), request->params());
     ASSERT_FALSE(request->parseContent<SomeData>());
 }
 
@@ -353,7 +355,7 @@ TEST_F(RestRequestTest, PutJson)
 
     EXPECT_EQ("PUT", request->method());
     EXPECT_EQ("/some/path", request->path());
-    EXPECT_EQ(RequestParams({{"s", "some text"}}), request->params());
+    EXPECT_EQ(Params({{"s", "some text"}}), request->params());
 
     const auto data = request->parseContent<SomeData>();
     ASSERT_TRUE(data);
@@ -371,7 +373,7 @@ TEST_F(RestRequestTest, Delete)
 
     EXPECT_EQ("DELETE", request->method());
     EXPECT_EQ("/some/path", request->path());
-    EXPECT_EQ(RequestParams({{"id", "ID"}}), request->params());
+    EXPECT_EQ(Params({{"id", "ID"}}), request->params());
 }
 
 TEST_F(RestRequestTest, RestException)
@@ -390,11 +392,9 @@ TEST_F(RestRequestTest, RestException)
         request->paramOrThrow("id");
         FAIL() << "did not throw";
     }
-    catch (const RestException& error)
+    catch (const rest::Exception& error)
     {
-        EXPECT_EQ(
-            "Missing required parameter 'id'",
-            error.descriptor.text());
+        EXPECT_EQ("Missing required parameter 'id'", error.message());
     }
 
     try
@@ -402,11 +402,11 @@ TEST_F(RestRequestTest, RestException)
         request->parseContentOrThrow<SomeData>();
         FAIL() << "did not throw";
     }
-    catch (const RestException& error)
+    catch (const rest::Exception& error)
     {
         EXPECT_EQ(
-            "Failed to process request 'Unable to parse request of SomeData'",
-            error.descriptor.text());
+            "Failed to process request 'Unable to parse request of nx::network::rest::test::SomeData'",
+            error.message());
     }
 }
 
@@ -426,11 +426,9 @@ TEST_F(RestRequestTest, RestTypeException)
         request->paramOrThrow<bool>("id");
         FAIL() << "did not throw";
     }
-    catch (const RestException& error)
+    catch (const rest::Exception& error)
     {
-        EXPECT_EQ(
-            "Invalid parameter 'id' value: '777'",
-            error.descriptor.text());
+        EXPECT_EQ("Invalid parameter 'id' value: '777'", error.message());
     }
 
     ASSERT_EQ(777, request->paramOrThrow<int>("id"));
@@ -441,9 +439,7 @@ class RestResponseTest:
 {
 public:
     static void expectJsonResponse(
-        const RestResponse& response,
-        nx::network::http::StatusCode::Value statusCode,
-        const QByteArray& json)
+        const rest::Response& response, http::StatusCode::Value statusCode, const QByteArray& json)
     {
         EXPECT_EQ(statusCode, response.statusCode);
         ASSERT_TRUE(response.content);
@@ -457,8 +453,8 @@ TEST_F(RestResponseTest, JsonResult)
     QnJsonRestResult result;
     result.setReply(SomeData{false, 111, "hello"});
     expectJsonResponse(
-        RestResponse::result(result),
-        nx::network::http::StatusCode::ok,
+        rest::Response::result(result),
+        http::StatusCode::ok,
         R"json({"error":"0","errorString":"","reply":{"b":false,"i":111,"s":"hello"}})json");
 }
 
@@ -467,8 +463,8 @@ TEST_F(RestResponseTest, JsonError)
     QnJsonRestResult result;
     result.setError({QnRestResult::MissingParameter, "name"});
     expectJsonResponse(
-        RestResponse::result(result),
-        nx::network::http::StatusCode::unprocessableEntity,
+        rest::Response::result(result),
+        http::StatusCode::unprocessableEntity,
         R"json({"error":"1","errorString":"Missing required parameter 'name'","reply":null})json");
 }
 
@@ -477,23 +473,25 @@ TEST_F(RestResponseTest, RestError)
     QnRestResult result;
     result.setError(QnRestResult::InternalServerError, "Something went wrong");
     expectJsonResponse(
-        RestResponse::result(result),
-        nx::network::http::StatusCode::badRequest,
+        rest::Response::result(result),
+        http::StatusCode::badRequest,
         R"json({"error":"6","errorString":"Something went wrong","reply":null})json");
 }
 
 TEST_F(RestResponseTest, DataReply)
 {
     expectJsonResponse(
-        RestResponse::reply(SomeData{true, 55, "ok"}),
-        nx::network::http::StatusCode::ok,
+        rest::Response::reply(SomeData{true, 55, "ok"}),
+        http::StatusCode::ok,
         R"json({"error":"0","errorString":"","reply":{"b":true,"i":55,"s":"ok"}})json");
 }
 
 TEST_F(RestResponseTest, ErrorResult)
 {
     expectJsonResponse(
-        RestResponse::error(QnRestResult::InvalidParameter, "a", "X"),
-        nx::network::http::StatusCode::unprocessableEntity,
+        rest::Response::error(QnRestResult::InvalidParameter, "a", "X"),
+        http::StatusCode::unprocessableEntity,
         R"json({"error":"2","errorString":"Invalid parameter 'a' value: 'X'","reply":null})json");
 }
+
+} // namespace nx::network::rest::test

@@ -42,7 +42,7 @@ bool isRadassSupported(const QnLayoutResourcePtr& layout, MatchMode match)
     if (!layout)
         return false;
 
-    return GenericCondition::check<QnLayoutItemData>(layout->getItems(), match,
+    return GenericCondition::check<QnLayoutItemData>(layout->getItems().values(), match,
         [resourcePool = layout->resourcePool()](const QnLayoutItemData& item)
         {
             return isRadassSupportedInternal(resourcePool, item);
@@ -54,7 +54,7 @@ ConditionResult isRadassSupported(const QnLayoutResourcePtr& layout)
     if (!layout)
         return ConditionResult::None;
 
-    return GenericCondition::check<QnLayoutItemData>(layout->getItems(),
+    return GenericCondition::check<QnLayoutItemData>(layout->getItems().values(),
         [resourcePool = layout->resourcePool()](const QnLayoutItemData& item)
         {
             return isRadassSupportedInternal(resourcePool, item);

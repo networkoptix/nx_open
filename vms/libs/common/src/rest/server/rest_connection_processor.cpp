@@ -34,7 +34,7 @@ const QString QnRestProcessorPool::kAnyPath = QString();
 
 void QnRestProcessorPool::registerHandler(
     const QString& path,
-    QnRestRequestHandler* handler,
+    nx::network::rest::Handler* handler,
     GlobalPermission permissions)
 {
     registerHandler(kAnyHttpMethod, path, handler, permissions);
@@ -43,15 +43,15 @@ void QnRestProcessorPool::registerHandler(
 void QnRestProcessorPool::registerHandler(
     nx::network::http::Method::ValueType httpMethod,
     const QString& path,
-    QnRestRequestHandler* handler,
+    nx::network::rest::Handler* handler,
     GlobalPermission permissions)
 {
-    m_handlers[httpMethod].insert(path, QnRestRequestHandlerPtr(handler));
+    m_handlers[httpMethod].insert(path, std::shared_ptr<nx::network::rest::Handler>(handler));
     handler->setPath(path);
     handler->setPermissions(permissions);
 }
 
-QnRestRequestHandlerPtr QnRestProcessorPool::findHandler(
+std::shared_ptr<nx::network::rest::Handler> QnRestProcessorPool::findHandler(
     const nx::network::http::Method::ValueType& httpMethod,
     const QString& path) const
 {
@@ -74,7 +74,7 @@ boost::optional<QString> QnRestProcessorPool::getRedirectRule(const QString& pat
         return boost::none;
 }
 
-QnRestRequestHandlerPtr QnRestProcessorPool::findHandlerForSpecificMethod(
+std::shared_ptr<nx::network::rest::Handler> QnRestProcessorPool::findHandlerForSpecificMethod(
     const nx::network::http::Method::ValueType& httpMethod,
     const QString& path) const
 {
@@ -85,7 +85,7 @@ QnRestRequestHandlerPtr QnRestProcessorPool::findHandlerForSpecificMethod(
     return findHandlerByPath(it->second, path);
 }
 
-QnRestRequestHandlerPtr QnRestProcessorPool::findHandlerByPath(
+std::shared_ptr<nx::network::rest::Handler> QnRestProcessorPool::findHandlerByPath(
     const HandlersByPath& handlersByPath,
     const QString& path) const
 {
@@ -137,9 +137,9 @@ void QnRestConnectionProcessor::run()
 
     d->response.messageBody.clear();
 
-    RestRequest request(&d->request, this);
-    RestResponse response;
-    QnRestRequestHandlerPtr handler = static_cast<QnHttpConnectionListener*>(d->owner)
+    nx::network::rest::Request request(&d->request, this);
+    nx::network::rest::Response response;
+    const auto handler = static_cast<QnHttpConnectionListener*>(d->owner)
         ->processorPool()->findHandler(request.method(), request.path());
     if (handler)
     {
@@ -162,7 +162,7 @@ void QnRestConnectionProcessor::run()
             nx::network::http::getHeaderValue(d->request.headers, "Content-Type");
 
         if (!requestContentType.isEmpty() || d->requestBody.isEmpty())
-            request.content = RestContent{requestContentType, d->requestBody};
+            request.content = nx::network::rest::Content{requestContentType, d->requestBody};
 
         response = handler->executeRequest(request);
     }
@@ -170,7 +170,7 @@ void QnRestConnectionProcessor::run()
     {
         QByteArray type;
         response.statusCode = (nx::network::http::StatusCode::Value) notFound(type);
-        response.content = RestContent{type, d->response.messageBody};
+        response.content = nx::network::rest::Content{type, d->response.messageBody};
     }
 
     QByteArray contentEncoding;

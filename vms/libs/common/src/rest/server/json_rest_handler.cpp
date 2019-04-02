@@ -7,25 +7,27 @@
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/util.h>
 
-RestResponse QnJsonRestHandler::executeGet(const RestRequest& request)
+using namespace nx::network;
+
+rest::Response QnJsonRestHandler::executeGet(const rest::Request& request)
 {
     QnJsonRestResult result;
     const auto statusCode = executeGet(request.path(), request.params(), result, request.owner);
-    auto response = RestResponse::result(result);
-    response.statusCode = static_cast<nx::network::http::StatusCode::Value>(statusCode);
+    auto response = rest::Response::result(result);
+    response.statusCode = static_cast<http::StatusCode::Value>(statusCode);
     return response;
 }
 
-RestResponse QnJsonRestHandler::executeDelete(const RestRequest& request)
+rest::Response QnJsonRestHandler::executeDelete(const rest::Request& request)
 {
     QnJsonRestResult result;
     const auto statusCode = executeDelete(request.path(), request.params(), result, request.owner);
-    auto response = RestResponse::result(result);
-    response.statusCode = static_cast<nx::network::http::StatusCode::Value>(statusCode);
+    auto response = rest::Response::result(result);
+    response.statusCode = static_cast<http::StatusCode::Value>(statusCode);
     return response;
 }
 
-RestResponse QnJsonRestHandler::executePost(const RestRequest& request)
+rest::Response QnJsonRestHandler::executePost(const rest::Request& request)
 {
     QnJsonRestResult result;
     const auto statusCode = executePost(
@@ -33,12 +35,12 @@ RestResponse QnJsonRestHandler::executePost(const RestRequest& request)
         request.content ? request.content->body : QByteArray(),
         result, request.owner);
 
-    auto response = RestResponse::result(result);
-    response.statusCode = static_cast<nx::network::http::StatusCode::Value>(statusCode);
+    auto response = rest::Response::result(result);
+    response.statusCode = static_cast<http::StatusCode::Value>(statusCode);
     return response;
 }
 
-RestResponse QnJsonRestHandler::executePut(const RestRequest& request)
+rest::Response QnJsonRestHandler::executePut(const rest::Request& request)
 {
     QnJsonRestResult result;
     const auto statusCode = executePut(
@@ -46,8 +48,8 @@ RestResponse QnJsonRestHandler::executePut(const RestRequest& request)
         request.content ? request.content->body : QByteArray(),
         result, request.owner);
 
-    auto response = RestResponse::result(result);
-    response.statusCode = static_cast<nx::network::http::StatusCode::Value>(statusCode);
+    auto response = rest::Response::result(result);
+    response.statusCode = static_cast<http::StatusCode::Value>(statusCode);
     return response;
 }
 
@@ -58,7 +60,7 @@ static int setWrongMethodError(
         QnRestResult::CantProcessRequest,
         lm("Method %1 is not allowed for %2").args(owner->request().requestLine.method, path));
 
-    return static_cast<int>(nx::network::http::StatusCode::badRequest);
+    return static_cast<int>(http::StatusCode::badRequest);
 }
 
 int QnJsonRestHandler::executeGet(
@@ -97,7 +99,7 @@ int QnJsonRestHandler::executeGet(
     const QnRestConnectionProcessor* /*owner*/)
 {
     NX_ASSERT(false, "Is not supposed to be called");
-    return (int) nx::network::http::StatusCode::notImplemented;
+    return (int) http::StatusCode::notImplemented;
 }
 
 int QnJsonRestHandler::executeDelete(
@@ -108,7 +110,7 @@ int QnJsonRestHandler::executeDelete(
     const QnRestConnectionProcessor* /*owner*/)
 {
     NX_ASSERT(false, "Is not supposed to be called");
-    return (int) nx::network::http::StatusCode::notImplemented;
+    return (int) http::StatusCode::notImplemented;
 }
 
 int QnJsonRestHandler::executePost(
@@ -121,7 +123,7 @@ int QnJsonRestHandler::executePost(
     const QnRestConnectionProcessor* /*owner*/)
 {
     NX_ASSERT(false, "Is not supposed to be called");
-    return (int) nx::network::http::StatusCode::notImplemented;
+    return (int) http::StatusCode::notImplemented;
 }
 
 int QnJsonRestHandler::executePut(
@@ -134,5 +136,5 @@ int QnJsonRestHandler::executePut(
     const QnRestConnectionProcessor* /*owner*/)
 {
     NX_ASSERT(false, "Is not supposed to be called");
-    return (int) nx::network::http::StatusCode::notImplemented;
+    return (int) http::StatusCode::notImplemented;
 }

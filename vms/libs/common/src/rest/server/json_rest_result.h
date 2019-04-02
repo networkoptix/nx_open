@@ -16,6 +16,7 @@
 // description of the error.
 //
 
+// TODO: Should also be moved to nx::network::rest.
 struct QnRestResult {
 public:
     enum Error {

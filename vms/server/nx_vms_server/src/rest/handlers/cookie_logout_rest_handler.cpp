@@ -3,16 +3,18 @@
 #include <network/universal_tcp_listener.h>
 #include <rest/server/rest_connection_processor.h>
 
-RestResponse QnCookieLogoutRestHandler::executeGet(const RestRequest& request)
+using namespace nx::network;
+
+rest::Response QnCookieLogoutRestHandler::executeGet(const rest::Request& request)
 {
     logout(request.owner);
-    return {nx::network::http::StatusCode::ok};
+    return {http::StatusCode::ok};
 }
 
-RestResponse QnCookieLogoutRestHandler::executePost(const RestRequest& request)
+rest::Response QnCookieLogoutRestHandler::executePost(const rest::Request& request)
 {
     logout(request.owner);
-    return {nx::network::http::StatusCode::ok};
+    return {http::StatusCode::ok};
 }
 
 void QnCookieLogoutRestHandler::logout(const QnRestConnectionProcessor* connection)

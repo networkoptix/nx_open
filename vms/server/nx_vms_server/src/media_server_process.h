@@ -165,13 +165,13 @@ private:
      */
     void reg(
         const QString& path,
-        QnRestRequestHandler* handler,
+        nx::network::rest::Handler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
     void reg(
         const nx::network::http::Method::ValueType& method,
         const QString& path,
-        QnRestRequestHandler* handler,
+        nx::network::rest::Handler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
     template<class TcpConnectionProcessor, typename... ExtraParam>

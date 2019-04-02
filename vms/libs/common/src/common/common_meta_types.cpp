@@ -189,7 +189,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnScheduleTask>();
     qRegisterMetaType<QnScheduleTaskList>();
 
-    qRegisterMetaType<RequestParams>();
+    qRegisterMetaType<nx::network::rest::Params>();
     qRegisterMetaType<QnHTTPRawResponse>();
 
     qRegisterMetaType<Qn::TimePeriodContent>();

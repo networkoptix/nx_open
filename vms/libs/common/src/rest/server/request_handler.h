@@ -1,176 +1,33 @@
 #pragma once
 
-#include <type_traits>
-
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QByteArray>
-#include <QtCore/QSharedPointer>
-
-#include <common/common_globals.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/utils/exception.h>
-#include <rest/server/json_rest_result.h>
+#include <nx/network/rest/handler.h>
 #include <utils/common/request_param.h>
 
-class TCPSocket;
-class QnRestConnectionProcessor;
+using RestPermissions = nx::network::rest::Permissions;
 
-// TODO: This should go into nx::network::rest and placed in common/src/nx/network/rest.
-
-enum class RestPermissions
+// TODO: This class should be removed as soon as old style handlers are refactored.
+class QnRestRequestHandler: public nx::network::rest::Handler
 {
-    anyUser,
-    adminOnly,
-};
-
-struct RestContent
-{
-    QByteArray type;
-    QByteArray body;
-
-    std::optional<QJsonValue> parse() const;
-};
-
-class RestException: public nx::utils::Exception
-{
-public:
-    const QnRestResult::ErrorDescriptor descriptor;
-
-    template<typename... Args>
-    RestException(QnRestResult::Error errorCode, Args... args);
-
-    QString message() const override;
-};
-
-struct RestRequest
-{
-    // TODO: These should be private, all data should be avalible by getters.
-    const nx::network::http::Request* httpRequest = nullptr;
-    const QnRestConnectionProcessor* owner = nullptr;
-
-    std::optional<RestContent> content;
-
-    RestRequest(
-        const nx::network::http::Request* httpRequest,
-        const QnRestConnectionProcessor* owner);
-
-    /**
-     * Method from request, may be overwritten by:
-     * - X-Method-Override header.
-     * - method_ URL param if ini config allows it.
-     */
-    const nx::network::http::Method::ValueType& method() const;
-    QString path() const;
-
-    /**
-     * If method may not provide message body, uses URL params.
-     * If method provides message body, parses message body instead (url params may be merged into
-     * it if ini config permits so).
-     */
-    const RequestParams& params() const;
-
-    /** Returns parsed param value, returns std::nullpot on failure. */
-    template<typename T = QString>
-    std::optional<T> param(const QString& key) const;
-
-    /** The save as param, but returns defaultValue on failure. */
-    template<typename T = QString>
-    T paramOr(const QString& key, const T& defaultValue = {}) const;
-
-    /** The save as param, but throws RestException on failure. */
-    template<typename T = QString>
-    T paramOrThrow(const QString& key) const;
-
-    /**
-     * If method may not provide message body, parses URL params.
-     * If method provides message body, parses message body instead.
-     */
-    template <typename T>
-    std::optional<T> parseContent() const;
-
-    /** The save as parseContent, but throws RestException on failure. */
-    template <typename T>
-    T parseContentOrThrow() const;
-
-    bool isExtraFormattingRequired() const;
-
-private:
-    nx::network::http::Method::ValueType calculateMethod() const;
-    std::optional<QJsonValue> parseMessageBody() const;
-    RequestParams calculateParams() const;
-    std::optional<QJsonValue> calculateContent() const;
-
-private:
-    const RequestParams m_urlParams;
-    const nx::network::http::Method::ValueType m_method;
-    mutable std::optional<RequestParams> m_paramsCache;
-};
-
-struct RestResponse
-{
-    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
-    std::optional<RestContent> content;
-    bool isUndefinedContentLength = false;
-    nx::network::http::HttpHeaders httpHeaders;
-
-    RestResponse(
-        nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined);
-
-    static RestResponse result(const QnJsonRestResult& result);
-
-    template<typename T>
-    static RestResponse reply(const T& data);
-
-    static RestResponse error(const QnRestResult::ErrorDescriptor& descriptor);
-
-    template<typename... Args>
-    static RestResponse error(QnRestResult::Error errorCode, Args... args);
-};
-
-/**
- * QnRestRequestHandler must be thread-safe.
- *
- * Single handler instance receives all requests, each request in different thread.
- */
-class QnRestRequestHandler: public QObject
-{
-public:
-    virtual RestResponse executeRequest(const RestRequest& request);
-    virtual void afterExecute(const RestRequest& request, const RestResponse& response);
-
-    friend class QnRestProcessorPool;
-
-    GlobalPermission permissions() const { return m_permissions; }
-
-    /** In derived classes, report all url params carrying camera id. */
-    virtual QStringList cameraIdUrlParams() const { return {}; }
-
 protected:
-    virtual RestResponse executeGet(const RestRequest& request);
-    virtual RestResponse executeDelete(const RestRequest& request);
-    virtual RestResponse executePost(const RestRequest& request);
-    virtual RestResponse executePut(const RestRequest& request);
+    virtual nx::network::rest::Response executeGet(const nx::network::rest::Request& request);
+    virtual nx::network::rest::Response executeDelete(const nx::network::rest::Request& request);
+    virtual nx::network::rest::Response executePost(const nx::network::rest::Request& request);
+    virtual nx::network::rest::Response executePut(const nx::network::rest::Request& request);
 
-    // TODO: Remove and reimplement by generic executeRequest.
     virtual int executeGet(
         const QString& /*path*/,
         const QnRequestParamList& /*params*/,
         QByteArray& /*result*/,
         QByteArray& /*contentType*/,
-        const QnRestConnectionProcessor* /*owner*/)
-    {
-        return nx::network::http::StatusCode::notImplemented;
-    }
+        const QnRestConnectionProcessor* /*owner*/);
+
     virtual int executeDelete(
         const QString& /*path*/,
         const QnRequestParamList& /*params*/,
         QByteArray& /*result*/,
         QByteArray& /*contentType*/,
-        const QnRestConnectionProcessor* /*owner*/)
-    {
-        return nx::network::http::StatusCode::notImplemented;
-    }
+        const QnRestConnectionProcessor* /*owner*/);
+
     virtual int executePost(
         const QString& /*path*/,
         const QnRequestParamList& /*params*/,
@@ -178,10 +35,8 @@ protected:
         const QByteArray& /*srcBodyContentType*/,
         QByteArray& /*result*/,
         QByteArray& /*resultContentType*/,
-        const QnRestConnectionProcessor* /*owner*/)
-    {
-        return nx::network::http::StatusCode::notImplemented;
-    }
+        const QnRestConnectionProcessor* /*owner*/);
+
     virtual int executePut(
         const QString& /*path*/,
         const QnRequestParamList& /*params*/,
@@ -189,145 +44,11 @@ protected:
         const QByteArray& /*srcBodyContentType*/,
         QByteArray& /*result*/,
         QByteArray& /*resultContentType*/,
-        const QnRestConnectionProcessor* /*owner*/)
-    {
-        return nx::network::http::StatusCode::notImplemented;
-    }
+        const QnRestConnectionProcessor* /*owner*/);
+
     virtual void afterExecute(
         const QString& /*path*/,
         const QnRequestParamList& /*params*/,
         const QByteArray& /*body*/,
-        const QnRestConnectionProcessor* /*owner*/)
-    {
-    }
-
-protected:
-    void setPath(const QString& path) { m_path = path; }
-    void setPermissions(GlobalPermission permissions ) { m_permissions = permissions; }
-    QString extractAction(const QString& path) const;
-
-protected:
-    QString m_path;
-    GlobalPermission m_permissions;
+        const QnRestConnectionProcessor* /*owner*/);
 };
-
-typedef QSharedPointer<QnRestRequestHandler> QnRestRequestHandlerPtr;
-
-//--------------------------------------------------------------------------------------------------
-
-inline void qStringListAdd(QStringList* /*list*/) {}
-
-template<typename... Args>
-void qStringListAdd(QStringList* list, QString arg, Args... args)
-{
-    list->append(std::move(arg));
-    qStringListAdd(list, std::forward<Args>(args)...);
-}
-
-template<typename... Args>
-QStringList qStringListInit(Args... args)
-{
-    QStringList argList;
-    qStringListAdd(&argList, std::forward<Args>(args)...);
-    return argList;
-}
-
-template<typename... Args>
-RestException::RestException(QnRestResult::Error code, Args... args):
-    descriptor({code, qStringListInit(std::forward<Args>(args)...)})
-{
-}
-
-template<typename T>
-std::optional<T> RestRequest::param(const QString& key) const
-{
-    const auto stringValue = param<QString>(key);
-    if (!stringValue)
-        return std::nullopt;
-
-    T value;
-    if (!QnLexical::deserialize(*stringValue, &value))
-        return std::nullopt;
-
-    return value;
-}
-
-template<>
-inline std::optional<QString> RestRequest::param<QString>(const QString& key) const
-{
-    const auto& params_ = params();
-    const auto it = params_.find(key);
-    if (it == params_.end())
-        return std::nullopt;
-
-    return it.value();
-}
-
-template<typename T>
-T RestRequest::paramOr(const QString& key, const T& defaultValue) const
-{
-    auto value = param<T>(key);
-    return value ? *value : defaultValue;
-}
-
-template<typename T>
-T RestRequest::paramOrThrow(const QString& key) const
-{
-    const auto stringValue = paramOrThrow<QString>(key);
-    T value;
-    if (!QnLexical::deserialize(stringValue, &value))
-        throw RestException(QnRestResult::InvalidParameter, key, stringValue);
-
-    return value;
-}
-
-template<>
-inline QString RestRequest::paramOrThrow<QString>(const QString& key) const
-{
-    const auto stringValue = param<QString>(key);
-    if (!stringValue)
-        throw RestException(QnRestResult::MissingParameter, key);
-
-    return *stringValue;
-}
-
-template<typename T>
-std::optional<T> RestRequest::parseContent() const
-{
-    const auto value = calculateContent();
-    if (!value)
-        return std::nullopt;
-
-    T result;
-    if (!QJson::deserialize(*value, &result))
-        return std::nullopt;
-
-    return result;
-}
-
-template <typename T>
-T RestRequest::parseContentOrThrow() const
-{
-    auto value = parseContent<T>();
-    if (value)
-        return *value;
-
-    throw RestException(
-        QnRestResult::CantProcessRequest,
-        lm("Unable to parse request of %1").args(typeid(T)));
-}
-
-template<typename T>
-RestResponse RestResponse::reply(const T& data)
-{
-    // TODO: Add support for other then JSON results?
-    QnJsonRestResult json;
-    json.setReply(data);
-    return result(json);
-}
-
-template<typename... Args>
-RestResponse RestResponse::error(QnRestResult::Error code, Args... args)
-{
-    return error({code, qStringListInit(std::forward<Args>(args)...)});
-}

@@ -12,8 +12,10 @@
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
+using namespace nx::network;
+
 static const std::chrono::hours kConnectionTimeout(10);
-static const nx::network::KeepAliveOptions kKeepAliveOptions(
+static const KeepAliveOptions kKeepAliveOptions(
     std::chrono::seconds(10), std::chrono::seconds(10), 3);
 
 static const QString kAllModules("allModules");
@@ -22,7 +24,8 @@ static const QString kCheckOwnerPermissions("checkOwnerPermissions");
 static const QString kKeepConnectionOpen("keepConnectionOpen");
 static const QString kUpdateStreamTime("updateStream");
 
-static std::optional<std::chrono::milliseconds> parseUpdateStreamTime(const RestRequest& request)
+static std::optional<std::chrono::milliseconds> parseUpdateStreamTime(
+    const nx::network::rest::Request& request)
 {
     const auto value = request.param(kUpdateStreamTime);
     if (!value)
@@ -51,7 +54,7 @@ QnModuleInformationRestHandler::~QnModuleInformationRestHandler()
         m_aboutToStop = true;
     }
 
-    nx::network::aio::BasicPollable stopPollable(m_pollable.getAioThread());
+    aio::BasicPollable stopPollable(m_pollable.getAioThread());
 
     nx::utils::promise<void> stopPromise;
     stopPollable.post(
@@ -72,22 +75,23 @@ QnModuleInformationRestHandler::~QnModuleInformationRestHandler()
 void QnModuleInformationRestHandler::clear(Connections* connections)
 {
     for (const auto& c: *connections)
-        c.socket->cancelIOSync(nx::network::aio::etNone);
+        c.socket->cancelIOSync(aio::etNone);
 
     connections->clear();
 }
 
-RestResponse QnModuleInformationRestHandler::executeGet(const RestRequest& request)
+nx::network::rest::Response QnModuleInformationRestHandler::executeGet(
+    const nx::network::rest::Request& request)
 {
     if (request.param(kCheckOwnerPermissions) && !QnPermissionsHelper::hasOwnerPermissions(
             request.owner->resourcePool(), request.owner->accessRights()))
     {
         QnJsonRestResult result;
         QnPermissionsHelper::notOwnerError(result);
-        return RestResponse::result(result);
+        return nx::network::rest::Response::result(result);
     }
 
-    RestResponse response;
+    nx::network::rest::Response response;
     if (request.param(kAllModules))
     {
         const auto allServers = request.owner->resourcePool()->getAllServers(Qn::AnyStatus);
@@ -97,7 +101,7 @@ RestResponse QnModuleInformationRestHandler::executeGet(const RestRequest& reque
             for (const QnMediaServerResourcePtr &server : allServers)
                 modules.append(std::move(server->getModuleInformationWithAddresses()));
 
-            response = RestResponse::reply(modules);
+            response = nx::network::rest::Response::reply(modules);
         }
         else
         {
@@ -105,20 +109,28 @@ RestResponse QnModuleInformationRestHandler::executeGet(const RestRequest& reque
             for (const QnMediaServerResourcePtr &server : allServers)
                 modules.append(server->getModuleInformation());
 
-            response = RestResponse::reply(modules);
+            response = nx::network::rest::Response::reply(modules);
         }
     }
     else if (request.param(kShowAddresses))
     {
         const auto id = request.owner->commonModule()->moduleGUID();
-        if (const auto s = request.owner->resourcePool()->getResourceById<QnMediaServerResource>(id))
-            response = RestResponse::reply(s->getModuleInformationWithAddresses());
+        if (const auto server = request.owner->resourcePool()
+                ->getResourceById<QnMediaServerResource>(id))
+        {
+            response = nx::network::rest::Response::reply(
+                server->getModuleInformationWithAddresses());
+        }
         else
-            response = RestResponse::reply(request.owner->commonModule()->moduleInformation());
+        {
+            response = nx::network::rest::Response::reply(
+                request.owner->commonModule()->moduleInformation());
+        }
     }
     else
     {
-        response = RestResponse::reply(request.owner->commonModule()->moduleInformation());
+        response = nx::network::rest::Response::reply(
+            request.owner->commonModule()->moduleInformation());
     }
 
     if (parseUpdateStreamTime(request))
@@ -128,14 +140,14 @@ RestResponse QnModuleInformationRestHandler::executeGet(const RestRequest& reque
 }
 
 void QnModuleInformationRestHandler::afterExecute(
-    const RestRequest& request, const RestResponse& /*response*/)
+    const nx::network::rest::Request& request, const nx::network::rest::Response& /*response*/)
 {
     const auto updateStreamTime = parseUpdateStreamTime(request);
     if (!request.param(kKeepConnectionOpen) && !updateStreamTime)
         return;
 
     // TODO: Probably owner is supposed to be passed as mutable.
-    std::unique_ptr<nx::network::AbstractStreamSocket> socket =
+    std::unique_ptr<AbstractStreamSocket> socket =
         const_cast<QnRestConnectionProcessor*>(request.owner)->takeSocket();
 
     socket->bindToAioThread(m_pollable.getAioThread());
@@ -182,7 +194,7 @@ void QnModuleInformationRestHandler::afterExecute(
                             connection->socket->getForeignAddress(), size,
                             SystemError::toString(code));
 
-                        connection->socket->cancelIOSync(nx::network::aio::etNone);
+                        connection->socket->cancelIOSync(aio::etNone);
                         m_connectionsToKeepOpened.erase(connection);
                     });
             }
@@ -226,7 +238,7 @@ void QnModuleInformationRestHandler::send(Connections::iterator connection, nx::
         return;
 
     connection->isSendInProgress = true;
-    connection->socket->cancelIOSync(nx::network::aio::etNone); //< Stop timer.
+    connection->socket->cancelIOSync(aio::etNone); //< Stop timer.
     connection->socket->sendAsync(
         connection->dataToSend,
         [this, connection](SystemError::ErrorCode code, size_t size)
@@ -235,7 +247,7 @@ void QnModuleInformationRestHandler::send(Connections::iterator connection, nx::
             {
                 NX_VERBOSE(this, "Connection from %1 is lost",
                     connection->socket->getForeignAddress());
-                connection->socket->cancelIOSync(nx::network::aio::etNone);
+                connection->socket->cancelIOSync(aio::etNone);
                 m_connectionsToUpdate.erase(connection);
                 return;
             }

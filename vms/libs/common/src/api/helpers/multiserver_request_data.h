@@ -17,10 +17,10 @@ struct QnBaseMultiserverRequestData
     bool extraFormatting = false;
 
     QnBaseMultiserverRequestData() = default;
-    QnBaseMultiserverRequestData(const RequestParams& params);
+    QnBaseMultiserverRequestData(const nx::network::rest::Params& params);
 
 protected:
-    void loadFromParams(const RequestParams& params);
+    void loadFromParams(const nx::network::rest::Params& params);
 };
 
 struct QnMultiserverRequestData: QnBaseMultiserverRequestData
@@ -35,8 +35,8 @@ struct QnMultiserverRequestData: QnBaseMultiserverRequestData
         return request;
     }
 
-    virtual void loadFromParams(QnResourcePool* resourcePool, const RequestParams& params);
-    virtual RequestParams toParams() const;
+    virtual void loadFromParams(QnResourcePool* resourcePool, const nx::network::rest::Params& params);
+    virtual nx::network::rest::Params toParams() const;
     virtual QUrlQuery toUrlQuery() const;
     virtual bool isValid() const;
 
