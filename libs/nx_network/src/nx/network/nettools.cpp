@@ -92,7 +92,7 @@ bool QnInterfaceAndAddr::isHostBelongToIpv4Network(const QHostAddress& address) 
         broadcastAddress().toIPv4Address());
 }
 
-QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy)
+QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy, bool ignoreLoopback)
 {
     struct LocalCache
     {
@@ -116,7 +116,9 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy)
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface : interfaces)
     {
-        if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
+        if (!iface.flags().testFlag(QNetworkInterface::IsUp))
+            continue;
+        if (ignoreLoopback && iface.flags().testFlag(QNetworkInterface::IsLoopBack))
             continue;
 
 #if defined(Q_OS_LINUX) && defined(__arm__)
@@ -129,18 +131,17 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy)
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         for (const QNetworkAddressEntry& address : addresses)
         {
-            const bool isLocalHost = (address.ip() == QHostAddress::LocalHost);
-            const bool isIpV4 = (address.ip().protocol() == QAbstractSocket::IPv4Protocol);
+            if (ignoreLoopback && address.ip() == QHostAddress::LocalHost)
+                continue;
+            if (address.ip().protocol() != QAbstractSocket::IPv4Protocol)
+                continue;
 
-            if (isIpV4 && !isLocalHost)
+            if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
             {
-                if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
-                {
-                    result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
-                    addInterfaceAnyway = false;
-                    if (policy != InterfaceListPolicy::keepAllAddressesPerInterface)
-                        break;
-                }
+                result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
+                addInterfaceAnyway = false;
+                if (policy != InterfaceListPolicy::keepAllAddressesPerInterface)
+                    break;
             }
         }
 

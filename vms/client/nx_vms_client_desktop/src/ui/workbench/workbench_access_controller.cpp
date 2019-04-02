@@ -208,8 +208,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
 
     if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        // TODO: Code duplication with QnMediaResourceWidget.
-        if (camera->isDtsBased() && !camera->isLicenseUsed())
+        if (camera->licenseType() == Qn::LC_VMAX && !camera->isLicenseUsed())
         {
             const Qn::Permissions forbidden = Qn::ViewLivePermission | Qn::ViewFootagePermission;
             const auto basePermissions = resourceAccessManager()->permissions(m_user, resource);

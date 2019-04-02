@@ -69,7 +69,8 @@ using QnInterfaceAndAddrList = QList<QnInterfaceAndAddr>;
  * @return List of network interfaces.
  */
 NX_NETWORK_API QList<QnInterfaceAndAddr> getAllIPv4Interfaces(
-    InterfaceListPolicy policy = InterfaceListPolicy::oneAddressPerInterface);
+    InterfaceListPolicy policy = InterfaceListPolicy::oneAddressPerInterface,
+    bool ignoreLoopback = true);
 
 /**
  * @return List of IPv4 addresses of current machine. Skips 127.0.0.1 and addresses we can't bind to.
