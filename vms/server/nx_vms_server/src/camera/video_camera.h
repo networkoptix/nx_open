@@ -13,11 +13,8 @@ namespace nx::vms::server {
 class Settings;
 class GopKeeper;
 
-// TODO: #dliman try to avoid using QObject here.
 class VideoCamera: public QObject, public nx::vms::server::AbstractVideoCamera
 {
-    Q_OBJECT
-
 public:
     VideoCamera(
         const nx::vms::server::Settings& settings,
@@ -102,7 +99,6 @@ private:
         const QnLiveStreamProviderPtr& primaryReader,
         qint64 targetDurationUSec );
 
-private slots:
     void at_camera_resourceChanged();
 };
 
