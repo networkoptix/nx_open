@@ -22,12 +22,17 @@ DiscoveryManager::DiscoveryManager(
     m_discoverySettings(discoverySettings),
     m_syncEngine(syncEngine)
 {
+    if (!m_discoverySettings.enabled)
+        NX_VERBOSE(this, "Discovery is disabled in settings. calling start() will do nothing");
 }
 
 void DiscoveryManager::start(
     const std::string& clusterId,
     const nx::utils::Url& synchronizationEngineUrl)
 {
+    if (!m_discoverySettings.enabled)
+        return;
+
     if (m_discoveryClient)
         return;
 
