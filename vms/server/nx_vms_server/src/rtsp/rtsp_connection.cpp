@@ -694,7 +694,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
     bool canCheckLive = (dataType == QnAbstractMediaData::VIDEO) || (d->startTime == DATETIME_NOW);
     if (canCheckLive)
     {
-        QnVideoCameraPtr camera;
+        nx::vms::server::VideoCameraPtr camera;
         const nx::vms::api::StreamIndex streamIndex =
             (quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh)
             ? nx::vms::api::StreamIndex::primary
@@ -1054,7 +1054,7 @@ void QnRtspConnectionProcessor::createDataProvider()
     else
         d->dataProcessor->clearUnprocessedData();
 
-    QnVideoCameraPtr camera;
+    nx::vms::server::VideoCameraPtr camera;
     if (d->mediaRes) {
         camera = d->serverModule->videoCameraPool()->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
@@ -1293,7 +1293,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
 
     d->lastPlayCSeq = nx::network::http::getHeaderValue(d->request.headers, "CSeq").toInt();
 
-    QnVideoCameraPtr camera;
+    nx::vms::server::VideoCameraPtr camera;
     if (d->mediaRes)
         camera = d->serverModule->videoCameraPool()->getVideoCamera(d->mediaRes->toResourcePtr());
     if (d->playbackMode == PlaybackMode::Live)

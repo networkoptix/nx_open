@@ -5,7 +5,7 @@
 class MediaServerLauncher;
 class QnArchiveStreamReader;
 
-namespace nx::test_support {
+namespace nx::vms::server::test::test_support {
 
 void addTestStorage(MediaServerLauncher* server, const QString& path);
 
@@ -38,4 +38,4 @@ QByteArray createTestMkvFile(int lengthSec, int width, int height);
 std::unique_ptr<QnArchiveStreamReader> createArchiveStreamReader(
     const QnVirtualCameraResourcePtr& camera);
 
-} // namespace nx::test_support
+} // namespace nx::vms::server::test::test_support

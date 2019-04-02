@@ -30,7 +30,7 @@ private:
         const nx::vms::server::resource::CameraPtr& cameraRes);
 
     static CameraDiagnostics::Result tryAcquireCameraMediaStream(
-        const QnVideoCameraPtr& videoCamera);
+        const nx::vms::server::VideoCameraPtr& videoCamera);
 
     static CameraDiagnostics::Result checkCameraMediaStreamForErrors(
         const nx::vms::server::resource::CameraPtr& camera);

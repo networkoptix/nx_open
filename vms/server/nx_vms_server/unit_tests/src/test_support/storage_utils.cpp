@@ -1,5 +1,5 @@
 #include "storage_utils.h"
-#include "mediaserver_launcher.h"
+#include <test_support/mediaserver_launcher.h>
 
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <recorder/storage_manager.h>
@@ -18,7 +18,7 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
-namespace nx::test_support {
+namespace nx::vms::server::test::test_support {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Test storage
@@ -452,4 +452,4 @@ std::unique_ptr<QnArchiveStreamReader> createArchiveStreamReader(
     return archiveReader;
 }
 
-} // namespace nx::test_support
+} // namespace nx::vms::server::test::test_support

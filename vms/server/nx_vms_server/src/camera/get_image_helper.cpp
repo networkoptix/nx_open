@@ -301,7 +301,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     StreamIndex streamIndex,
     qint64 timestampUs,
     int preferredChannel,
@@ -333,7 +333,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
     StreamIndex streamIndex,
     qint64 timestampUs,
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     int channelNumber) const
 {
     NX_VERBOSE(this, "%1()", __func__);
@@ -384,7 +384,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
 std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTime(
     StreamIndex streamIndex,
     qint64 timestampUs,
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     int channelNumber) const
 {
     const MediaQuality stream = (streamIndex == StreamIndex::primary)

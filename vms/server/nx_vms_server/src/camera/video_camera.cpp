@@ -173,12 +173,8 @@ void VideoCamera::createReader(QnServer::ChunksCatalog catalog)
                 // TODO: Make at_camera_resourceChanged async (queued connection, etc.).
                 if (role == Qn::CR_LiveVideo)
                 {
-                    connect(
-                        reader->getResource().data(),
-                        SIGNAL(resourceChanged(const QnResourcePtr&)),
-                        this,
-                        SLOT(at_camera_resourceChanged()),
-                        Qt::DirectConnection);
+                    QObject::connect(reader->getResource().data(), &QnResource::resourceChanged,
+                        this, &VideoCamera::at_camera_resourceChanged, Qt::DirectConnection);
                 }
 
                 nx::vms::server::GopKeeper* gopKeeper =

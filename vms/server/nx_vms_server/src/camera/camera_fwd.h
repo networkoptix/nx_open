@@ -1,6 +1,8 @@
 #pragma once
 
 namespace nx::vms::server {
+
 class AbstractVideoCamera;
-}
-using QnVideoCameraPtr = QnSharedResourcePointer<nx::vms::server::AbstractVideoCamera>;
+using VideoCameraPtr = QnSharedResourcePointer<AbstractVideoCamera>;
+
+} // namespace nx::vms::server

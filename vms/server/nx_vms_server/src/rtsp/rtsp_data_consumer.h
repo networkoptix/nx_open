@@ -40,7 +40,7 @@ public:
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
     int copyLastGopFromCamera(
-        QnVideoCameraPtr camera,
+        nx::vms::server::VideoCameraPtr camera,
         nx::vms::api::StreamIndex streamIndex,
         qint64 skipTime,
         bool iFramesOnly);

@@ -223,6 +223,10 @@ endif()
 
 add_subdirectory(vms)
 
+if(withTests)
+    add_subdirectory(tests)
+endif()
+
 include(fix_qt_vars)
 
 if(beta)

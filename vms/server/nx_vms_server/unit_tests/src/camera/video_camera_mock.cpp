@@ -4,19 +4,21 @@
 
 #include <nx/utils/test_support/utils.h>
 
-MediaServerVideoCameraMock::MediaServerVideoCameraMock():
+namespace nx::vms::server::test {
+
+VideoCameraMock::VideoCameraMock():
     m_usageCounter(0)
 {
 }
 
-QnLiveStreamProviderPtr MediaServerVideoCameraMock::getLiveReader(
+QnLiveStreamProviderPtr VideoCameraMock::getLiveReader(
     QnServer::ChunksCatalog /*catalog*/,
     bool /*ensureInitialized*/, bool /*createIfNotExist*/)
 {
     return QnLiveStreamProviderPtr();
 }
 
-int MediaServerVideoCameraMock::copyLastGop(
+int VideoCameraMock::copyLastGop(
     StreamIndex /*streamIndex*/,
     qint64 /*skipTime*/,
     QnDataPacketQueue& /*dstQueue*/,
@@ -25,20 +27,20 @@ int MediaServerVideoCameraMock::copyLastGop(
     return 0;
 }
 
-QnConstCompressedVideoDataPtr MediaServerVideoCameraMock::getLastVideoFrame(
+QnConstCompressedVideoDataPtr VideoCameraMock::getLastVideoFrame(
     StreamIndex /*streamIndex*/,
     int /*channel*/) const
 {
     return QnConstCompressedVideoDataPtr();
 }
 
-QnConstCompressedAudioDataPtr MediaServerVideoCameraMock::getLastAudioFrame(
+QnConstCompressedAudioDataPtr VideoCameraMock::getLastAudioFrame(
     StreamIndex /*streamIndex*/) const
 {
     return QnConstCompressedAudioDataPtr();
 }
 
-std::unique_ptr<QnConstDataPacketQueue> MediaServerVideoCameraMock::getFrameSequenceByTime(
+std::unique_ptr<QnConstDataPacketQueue> VideoCameraMock::getFrameSequenceByTime(
     StreamIndex /*streamIndex*/,
     qint64 /*time*/,
     int /*channel*/,
@@ -47,61 +49,63 @@ std::unique_ptr<QnConstDataPacketQueue> MediaServerVideoCameraMock::getFrameSequ
     return nullptr;
 }
 
-void MediaServerVideoCameraMock::beforeStop()
+void VideoCameraMock::beforeStop()
 {
 }
 
-bool MediaServerVideoCameraMock::isSomeActivity() const
+bool VideoCameraMock::isSomeActivity() const
 {
     return false;
 }
 
-void MediaServerVideoCameraMock::stopIfNoActivity()
+void VideoCameraMock::stopIfNoActivity()
 {
 }
 
-void MediaServerVideoCameraMock::updateActivity()
+void VideoCameraMock::updateActivity()
 {
 }
 
-void MediaServerVideoCameraMock::inUse(void* /*user*/)
+void VideoCameraMock::inUse(void* /*user*/)
 {
     ++m_usageCounter;
 }
 
-void MediaServerVideoCameraMock::notInUse(void* /*user*/)
+void VideoCameraMock::notInUse(void* /*user*/)
 {
     ASSERT_GT(m_usageCounter, 0);
     --m_usageCounter;
 }
 
-const MediaStreamCache* MediaServerVideoCameraMock::liveCache(MediaQuality /*streamQuality*/) const
+const MediaStreamCache* VideoCameraMock::liveCache(MediaQuality /*streamQuality*/) const
 {
     NX_GTEST_ASSERT_GT(m_usageCounter, 0);
     return nullptr;
 }
 
-MediaStreamCache* MediaServerVideoCameraMock::liveCache(MediaQuality /*streamQuality*/)
+MediaStreamCache* VideoCameraMock::liveCache(MediaQuality /*streamQuality*/)
 {
     NX_GTEST_ASSERT_GT(m_usageCounter, 0);
     return nullptr;
 }
 
-nx::vms::server::hls::LivePlaylistManagerPtr MediaServerVideoCameraMock::hlsLivePlaylistManager(
+hls::LivePlaylistManagerPtr VideoCameraMock::hlsLivePlaylistManager(
     MediaQuality /*streamQuality*/) const
 {
     NX_GTEST_ASSERT_GT(m_usageCounter, 0);
     return nullptr;
 }
 
-bool MediaServerVideoCameraMock::ensureLiveCacheStarted(
+bool VideoCameraMock::ensureLiveCacheStarted(
     MediaQuality /*streamQuality*/,
     qint64 /*targetDurationUSec*/)
 {
     return false;
 }
 
-QnResourcePtr MediaServerVideoCameraMock::resource() const
+QnResourcePtr VideoCameraMock::resource() const
 {
     return QnResourcePtr();
 }
+
+} // namespace nx::vms::server::test
