@@ -152,7 +152,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>I do not agree</string>
+        <string>I Do Not Agree</string>
        </property>
       </widget>
      </item>

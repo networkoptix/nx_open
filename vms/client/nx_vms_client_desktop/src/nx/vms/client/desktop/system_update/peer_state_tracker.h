@@ -48,7 +48,8 @@ struct UpdateItem
     bool offline = false;
     bool skipped = false;
     bool installed = false;
-    bool changedProtocol = false;
+    /** Protocol version for this peer. */
+    int protocol = 0;
     bool installing = false;
     bool storeUpdates = true;
     /**
@@ -64,6 +65,12 @@ struct UpdateItem
 
 using UpdateItemPtr = std::shared_ptr<UpdateItem>;
 
+/**
+ * PeerStateTracker integrates keeps state for all the peers participating in system update.
+ *
+ * ServerUpdatesModel uses it as a data source, by subscribing to itemChanged/itemAdded/... events.
+ * ServerUpdateTool passes mediaserver responses here.
+ */
 class PeerStateTracker:
     public Connective<QObject>,
     public QnWorkbenchContextAware

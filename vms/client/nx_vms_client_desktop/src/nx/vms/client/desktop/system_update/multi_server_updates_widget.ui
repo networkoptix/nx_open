@@ -442,7 +442,7 @@ border-style: solid;
       <item>
        <widget class="QStackedWidget" name="updateStackedWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="updateControlsPage">
          <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -577,7 +577,13 @@ border-style: solid;
            <number>0</number>
           </property>
           <item>
-           <widget class="QProgressBar" name="actionProgess"/>
+           <widget class="QProgressBar" name="actionProgess">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="cancelProgressAction">

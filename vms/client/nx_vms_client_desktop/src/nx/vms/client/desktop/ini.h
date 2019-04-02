@@ -92,6 +92,11 @@ struct Ini: nx::kit::IniConfig
         "0 means 100 ms.");
     NX_INI_FLAG(0, enableSyncedChunksForExtraContent,
         "Show motion and analytics chunks at synced area of the timeline.");
+    NX_INI_INT(0, clientWebServerPort,
+        "Enables web server to remote control NX client operation. Set port value 1..65535\n"
+        "(typically 7012) to enable.");
+    NX_INI_INT(1000, storeFrameTimePoints,
+        "Makes client to remember this number of last frame paint time points for using in FT.");
 };
 
 inline Ini& ini()
