@@ -1446,9 +1446,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     if (emptyData && !flushCurrentBuffer)
     {
         bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
-        if (!emptyData->flags.testFlag(QnAbstractMediaData::MediaFlags_GotFromRemotePeer) &&
-            !emptyData->flags.testFlag(QnAbstractMediaData::MediaFlags_AfterEOF) &&
-            isVideoCamera)
+        if (!emptyData->flags.testFlag(QnAbstractMediaData::MediaFlags_AfterEOF) && isVideoCamera)
         {
             // Local EOF packet could be created on TCP stream reconnect.
             // Ignore such packets for video cameras.
