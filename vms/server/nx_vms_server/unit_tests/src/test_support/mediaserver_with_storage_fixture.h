@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mediaserver_launcher.h"
+#include <test_support/mediaserver_launcher.h>
 #include "storage_utils.h"
 #include <recorder/storage_manager.h>
 #include <api/test_api_requests.h>

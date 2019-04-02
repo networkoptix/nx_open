@@ -1,5 +1,5 @@
 #include "storage_utils.h"
-#include "mediaserver_launcher.h"
+#include <test_support/mediaserver_launcher.h>
 
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <recorder/storage_manager.h>
