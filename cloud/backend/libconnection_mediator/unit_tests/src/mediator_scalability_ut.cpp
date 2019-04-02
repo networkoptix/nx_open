@@ -3,10 +3,8 @@
 #include <nx/network/cloud/mediator/api/mediator_api_client.h>
 #include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 #include <nx/cloud/discovery/test_support/discovery_server.h>
-#include <nx/cloud/mediator/public_ip_discovery.h>
 
 #include "mediator_cluster.h"
-#include "override_public_ip.h"
 
 namespace nx::hpm::test {
 
@@ -19,7 +17,6 @@ static constexpr int kMaxMediators = 2;
 
 class MediatorScalability:
     public testing::Test,
-    public OverridePublicIp,
     public nx::hpm::api::AbstractCloudSystemCredentialsProvider
 {
 public:
@@ -53,6 +50,8 @@ protected:
         std::string maxMediatorCount = std::to_string(kMaxMediators);
 
         auto& mediator = m_mediatorCluster.addMediator({
+            "-server/name", "127.0.0.1",
+            "-clusterDbMap/enabled", "true",
             "-discovery/enabled", "true",
             "-discovery/discoveryServiceUrl", discoveryServiceUrl.c_str(),
             "-discovery/roundTripPadding", "1ms",
@@ -60,8 +59,7 @@ protected:
             "-discovery/onlineNodesRequestDelay", "10ms",
             "-p2pDb/clusterId", kClusterId,
             "-p2pDb/nodeId", nodeId.c_str(),
-            "-p2pDb/maxConcurrentConnectionsFromSystem", maxMediatorCount.c_str(),
-            "-clusterDbMap/enabled", "true"});
+            "-p2pDb/maxConcurrentConnectionsFromSystem", maxMediatorCount.c_str()});
 
         ASSERT_TRUE(mediator.startAndWaitUntilStarted());
     }

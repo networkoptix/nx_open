@@ -38,7 +38,6 @@ public:
     const stats::StatsManager& statisticsManager() const;
 
     bool doMandatoryInitialization();
-    std::optional<network::HostAddress> discoverPublicAddress();
 
     void stop();
 

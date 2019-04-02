@@ -15,7 +15,6 @@
 
 #include "controller.h"
 #include "libconnection_mediator_app_info.h"
-#include "public_ip_discovery.h"
 #include "settings.h"
 #include "statistics/statistics_provider.h"
 #include "statistics/stats_manager.h"
@@ -116,8 +115,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     NX_INFO(this, lm("Initialization completed. Running..."));
 
-    if (!registerThisInstanceNameInCluster(settings))
-        return -1;
+    registerThisInstanceNameInCluster(settings);
 
     const int result = runMainLoop();
 
@@ -130,7 +128,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
     return result;
 }
 
-bool MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& settings)
+void MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& settings)
 {
     const auto assignPort =
         [](const std::vector<network::SocketAddress>& endpoints, int* outPort)
@@ -138,22 +136,14 @@ bool MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& se
             *outPort = endpoints.empty() ? MediatorEndpoint::kPortUnused : endpoints.front().port;
         };
 
-    MediatorEndpoint endpoint;
     if (settings.server().name.empty())
     {
-        const auto publicIp = m_controller->discoverPublicAddress();
-        if (!publicIp)
-        {
-            NX_ERROR(this, "Failed to discover public address. Terminating.");
-            return false;
-        }
-        endpoint.domainName = publicIp->toString().toStdString();
-    }
-    else
-    {
-        endpoint.domainName = settings.server().name;
+        NX_INFO(this, "Server name is empty, discovery is not enabled.");
+        return;
     }
 
+    MediatorEndpoint endpoint;
+    endpoint.domainName = settings.server().name;;
     assignPort(httpEndpoints(), &endpoint.httpPort);
     assignPort(httpsEndpoints(), &endpoint.httpsPort);
     assignPort(stunUdpEndpoints(), &endpoint.stunUdpPort);
@@ -165,8 +155,6 @@ bool MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& se
         m_controller->listeningPeerDb().startDiscovery(
             &m_view->httpServer().messageDispatcher());
     }
-
-    return true;
 }
 
 } // namespace hpm
