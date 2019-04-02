@@ -306,13 +306,7 @@ void EventRibbon::Private::updateTilePreview(int index)
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
 
     auto& previewProvider = m_tiles[index]->preview;
-    if (previewProvider && (request.resource != previewProvider->requestData().resource
-        || request.usecSinceEpoch != previewProvider->requestData().usecSinceEpoch))
-    {
-        previewProvider.reset();
-    }
-
-    if (!previewProvider)
+    if (!previewProvider || request.resource != previewProvider->requestData().resource)
         previewProvider.reset(new ResourceThumbnailProvider(request));
 
     previewProvider->setStreamSelectionMode(modelIndex.data(Qn::PreviewStreamSelectionRole)
