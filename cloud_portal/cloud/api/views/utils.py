@@ -322,7 +322,7 @@ def get_ipvd(request):
         cache.set("ipvd", ipvd, 60 * 60 * 24) # 24 hours
         # ---------------------
 
-        return Response({"ipvd": ipvd})
+        return Response(ipvd)
 
     elif request.method == 'POST':
         # clear cache
