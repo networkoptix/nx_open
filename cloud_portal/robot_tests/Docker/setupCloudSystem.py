@@ -2,10 +2,11 @@
 
 import requests
 import time
+import sys
 
 SERVER_URL = "http://localhost:7001"
 CLOUD_URL = "https://cloud-test.hdw.mx"
-SYSTEM_NAME = "kyle-VirtualBox"
+SYSTEM_NAME = sys.argv[1] if len(sys.argv)>1 else "kyle-VirtualBox"
 CUSTOMIZATION = "default"
 CLOUD_USER = "noptixautoqa+owner@gmail.com"
 CLOUD_PASS = "qweasd 123"
