@@ -488,14 +488,14 @@ TEST_F(ReaderTest, HandlerError_typeIdNotFound)
     then(ResultIs::Empty);
 }
 
-TEST_F(ReaderTest, HandlerError_getFileDataError)
+TEST_F(ReaderTest, HandlerError_getFileDataError_shouldNotPreventFromCreatingArchiveCameras)
 {
     when(CameraPresence::NotInTheResourcePool,
          ModuleGuid::Found,
          ArchiveCamTypeId::Found,
          GetFileData::Failed);
     nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
-    then(ResultIs::Empty);
+    then(ResultIs::NotEmpty);
 }
 
 TEST_F(ReaderTest, ErrorsInData)
