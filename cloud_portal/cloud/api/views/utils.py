@@ -262,9 +262,9 @@ def get_ipvd(request):
 
     if request.method == 'GET':
         # check cache and return cached item if any
-        ipvd = cache.get("ipvd")
+        ipvd = cache.get("ipvd", {})
 
-        if ipvd["cameras"] is None or ipvd["vendors"] is None or ipvd["num_cameras"] is None:
+        if all(k in ipvd for k in ("cameras", "vendors", "num_cameras")):
             return Response({
                 "cameras": ipvd["cameras"],
                 "vendors": ipvd["vendors"],
