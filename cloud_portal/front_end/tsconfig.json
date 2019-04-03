@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2015",
+    "lib": ["es2015", "es2016", "dom", "es2018.promise"],
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": true,

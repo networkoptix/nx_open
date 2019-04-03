@@ -180,8 +180,9 @@ angular.module('cloudApp')
             };
 
             $scope.mergeSystems = function () {
+                var systems = $scope.systemsProvider.getMySystems($scope.account.email, $scope.system.id);
                 return dialogs
-                    .merge($scope.system)
+                    .merge($scope.system, systems)
                     .then(function (mergeInfo) {
                         if (mergeInfo) {
                            $scope.system.mergeInfo = mergeInfo;

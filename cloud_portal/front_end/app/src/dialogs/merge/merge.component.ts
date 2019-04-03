@@ -8,22 +8,25 @@ import { NgbModal, NgbActiveModal, NgbModalRef }       from '@ng-bootstrap/ng-bo
 })
 export class MergeModalContent {
     @Input() system;
+    @Input() systems;
     @Input() systemName;
     @Input() language;
     @Input() closable;
 
+    checking: boolean;
+    checkMergeabilityProcess: any;
     config: any;
     masterId: string;
-    merging: any;
+    mergingProcess: any;
     multipleSystems: boolean;
     outOfDate: boolean;
     password: string;
-    showMergeForm: boolean;
+    processedSystems: any;
     state: string;
-    systems: any;
+    systemError: boolean;
     systemMergeable: string;
-    systemsSelect: any;
     targetSystem: any;
+    targetSystemDropdown: any;
     tooManySystems: boolean;
     user: any;
     wrongPassword: boolean;
@@ -39,86 +42,26 @@ export class MergeModalContent {
                 @Inject('systemsProvider') private systemsProvider: any,
                 @Inject('cloudApiService') private cloudApi: any) {
         this.config = this.configService.config;
-
-    }
-
-    // Add system can merge where added to systems form api call
-    checkMergeAbility(system) {
-        if (!system.id) {
-            return undefined;
-        }
-        if (system.stateOfHealth === 'offline' || !system.isOnline) {
-            return 'offline';
-        }
-        if (!system.canMerge) {
-            return 'cannotMerge';
-        }
-        return '';
-    }
-
-    setTargetSystem(system) {
-        this.systemMergeable = undefined;
-        this.targetSystem = {... system};
-        if (!system.id) {
-            return;
-        }
-
-        return this.systemService(system.id, this.user.email).update().then((system) => {
-            this.targetSystem = {...this.targetSystem, ...system};
-            this.systemMergeable = this.checkMergeAbility(system);
-
-            return Promise.all([
-                this.system.mediaserver.getMediaServers(),
-                this.targetSystem.mediaserver.getMediaServers()
-            ]).then(res => {
-                this.tooManySystems = res.map(req => req.data.length)
-                    .reduce((acc, cur) => acc + cur) > this.config.maxServers;
-            });
-        });
-    }
-
-    addStatus(system) {
-        let status = '';
-
-        if (system.stateOfHealth === 'offline') {
-            status = ' (offline)';
-        } else if (system.stateOfHealth === 'online' && !system.canMerge) {
-            status = ' (incompatable)';
-        }
-
-        return system.name + status;
-    }
-
-    makeSelectorList(systems) {
-        this.systemsSelect = [{name: '- - - -', id: ''}];
-        systems.forEach(element => {
-            this.systemsSelect.push({
-                name: this.addStatus(element),
-                id: element.id
-            });
-        });
+        this.checking = false;
+        this.state = 'select';
+        this.wrongPassword = false;
     }
 
     ngOnInit() {
-        this.systemMergeable = undefined;
-        this.systemsSelect = [{name: '- - - -', id: ''}];
-        this.wrongPassword = false;
         this.masterId = this.system.id;
-        this.account
-            .get()
-            .then((user) => {
-                this.state = 'select';
-                this.user = user;
-                this.systems = this.systemsProvider.getMySystems(user.email, this.system.id);
-                this.multipleSystems = this.systems.length > 0;
-                this.outOfDate = this.multipleSystems && !this.system.canMerge;
-                this.makeSelectorList(this.systems);
-                this.targetSystem = {... this.systemsSelect[0]};
-                this.systemMergeable = this.checkMergeAbility(this.targetSystem);
-                this.showMergeForm = this.multipleSystems && !this.outOfDate;
-            });
+        this.multipleSystems = this.systems.length > 0;
+        this.outOfDate = this.multipleSystems && !this.system.canMerge;
+        this.processedSystems = this.makeSelectorList(this.systems);
+        this.targetSystem = this.selectDefaultSystem();
+        this.targetSystemDropdown = this.processedSystems([this.targetSystem]);
+        this.systemMergeable = this.checkMergeability(this.targetSystem);
+        this.systemError = !this.multipleSystems || this.outOfDate;
 
-        this.merging = this.process.init(() => {
+        this.account.get().then((user) => {
+            this.user = user;
+        });
+
+        this.mergingProcess = this.process.init(() => {
             let masterSystemId;
             let slaveSystemId;
             if (this.masterId === this.system.id) {
@@ -161,6 +104,94 @@ export class MergeModalContent {
                     this.configService.config.systemStatuses.slave
             });
         });
+
+        this.checkMergeabilityProcess = this.process.init(() => {
+            this.checking = true;
+            this.systemMergeable = '';
+            return this.precheckSystemMerge();
+        }, {
+            errorCodes: {}
+        }).then((res) => {
+            this.checking = false;
+            this.systemMergeable = this.checkMergeability(this.targetSystem);
+            if (!res.system && this.systemMergeable === '') {
+                return this.updateState();
+            }
+        });
+    }
+
+    addStatus(system) {
+        let status = '';
+
+        if (system.stateOfHealth === 'offline' || system.hasOwnProperty('isOnline') && !system.isOnline) {
+            status = ` - ${this.language.systemStatuses.offline}`;
+        } else if (system.stateOfHealth === 'online' && !system.canMerge) {
+            status = ` - ${this.language.systemStatuses.incompatible}`;
+        } else if (system.stateOfHealth === 'unavailable' || system.hasOwnProperty('isAvailable') && !system.isAvailable) {
+            status = ` - ${this.language.systemStatuses.unavailable}`;
+        }
+
+        return `<span>${system.name}</span><span class="text-muted">${status}</span>`;
+    }
+
+    // Add system can merge where added to systems form api call
+    checkMergeability(system) {
+        const stateOfHealth = system.info && system.info.stateOfHealth || system.stateOfHealth || system.stateMessage || '';
+
+        if (system.hasOwnProperty('isOnline') && !system.isOnline || stateOfHealth.indexOf('offline') > -1) {
+            return 'offline';
+        }
+        if (system.hasOwnProperty('isAvailable') && !system.isAvailable || stateOfHealth.indexOf('unavailable') > -1) {
+            return 'unavailable';
+        }
+        if (!system.canMerge) {
+            return 'secondaryCannotMerge';
+        }
+        if (!this.system.canMerge) {
+            return 'primaryCannotMerge';
+        }
+        return '';
+    }
+
+    precheckSystemMerge() {
+        return this.systemService(this.targetSystem.id, this.user.email).update().then((system) => {
+            this.targetSystem = {...this.targetSystem, ...system};
+            return Promise.all([
+                this.system.mediaserver.getMediaServers().catch(error => {
+                    return Promise.reject({system: 'primary', errorResponse: error});
+                }),
+                this.targetSystem.mediaserver.getMediaServers().catch(error => {
+                    return Promise.reject({system: 'secondary', errorResponse: error});
+                })
+            ]).then(res => {
+                this.tooManySystems = res.map(req => req.data.length)
+                    .reduce((acc, cur) => acc + cur) > this.config.maxServers;
+                return {};
+            }).catch(error => error);
+        });
+    }
+
+    makeSelectorList(systems) {
+        return systems.map(system => {
+            return { id: system.id, name: this.addStatus(system) };
+        });
+    }
+
+    selectDefaultSystem() {
+        if (this.systems.length < 1) {
+            throw 'Error User needs to be the owner of more that 1 system';
+        }
+        for (const i in this.systems) {
+            if (this.checkMergeability(this.systems[i]) === '') {
+                return {...this.systems[i]};
+            }
+        }
+        return {...this.systems[0]};
+    }
+
+    setTargetSystem(targetSystem) {
+        this.systemMergeable = '';
+        this.targetSystem = {... this.systems.find(system => system.id === targetSystem.id)};
     }
 
     updateState() {
@@ -191,17 +222,18 @@ export class NxModalMergeComponent {
                 private modalService: NgbModal) {
     }
 
-    private dialog(system) {
+    private dialog(system, systems) {
         this.modalRef = this.modalService.open(MergeModalContent, {backdrop: 'static', centered: true});
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.system = system;
+        this.modalRef.componentInstance.systems = systems;
         this.modalRef.componentInstance.closable = true;
 
         return this.modalRef;
     }
 
-    open(system) {
-        return this.dialog(system).result;
+    open(system, systems) {
+        return this.dialog(system, systems).result;
     }
 
     close() {

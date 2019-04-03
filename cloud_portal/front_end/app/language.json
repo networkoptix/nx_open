@@ -38,6 +38,7 @@
   },
   "systemStatuses": {
     "activated": "activated",
+    "incompatible": "incompatible",
     "merging": "merging",
     "notActivated": "not activated",
     "online": "online",
