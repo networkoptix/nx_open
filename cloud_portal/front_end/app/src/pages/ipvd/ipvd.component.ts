@@ -181,7 +181,7 @@ private setupDefaults() {
                 this.lang = this.translate.translations[this.translate.currentLang];
                 this.placeholder = this.lang.search.search_ipvd;
 
-                this.data = data;
+                // this.data = data;
 
                 this.cameras = data.cameras;
                 this.vendors = data.vendors;

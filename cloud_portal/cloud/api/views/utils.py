@@ -262,12 +262,15 @@ def get_ipvd(request):
 
     if request.method == 'GET':
         # check cache and return cached item if any
-        cameras = cache.get("cameras")
-        vendors = cache.get("vendors")
-        num_cameras = cache.get("num_cameras")
+        ipvd = cache.get("ipvd")
 
-        if cameras and vendors and num_cameras:
-            return Response({"cameras": cameras, "vendors": vendors, "num_cameras": num_cameras, "cached": True})
+        if ipvd.cameras and ipvd.vendors and ipvd.num_cameras:
+            return Response({
+                "cameras": ipvd.cameras,
+                "vendors": ipvd.vendors,
+                "num_cameras": ipvd.num_cameras,
+                "cached": True
+            })
         # ---------------------
 
         # else request and process
@@ -309,19 +312,21 @@ def get_ipvd(request):
 
         vendors = vendors_dict.values()
 
-        # cache cameras and vendors
-        cache.set("cameras", cameras, 60 * 60 * 24) # 24 hours
-        cache.set("vendors", vendors, 60 * 60 * 24)  # 24 hours
-        cache.set("num_cameras", num_cameras, 60 * 60 * 24)  # 24 hours
+        ipvd = {
+            "cameras": cameras,
+            "vendors": vendors,
+            "num_cameras": num_cameras
+        }
+
+        # cache ipvd
+        cache.set("ipvd", ipvd, 60 * 60 * 24) # 24 hours
         # ---------------------
 
-        return Response({"cameras": cameras, "vendors": vendors, "num_cameras": num_cameras})
+        return Response({"ipvd": ipvd})
 
     elif request.method == 'POST':
         # clear cache
-        cache.set("cameras", None)
-        cache.set("vendors", None)
-        cache.set("num_cameras", None)
+        cache.set("ipvd", None)
         # --------------------
 
         return Response({'IPVD cache cleared'})
