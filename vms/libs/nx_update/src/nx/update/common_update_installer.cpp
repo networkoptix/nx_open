@@ -186,7 +186,13 @@ void CommonUpdateInstaller::stopSync()
 bool CommonUpdateInstaller::cleanInstallerDirectory()
 {
     QString path = installerWorkDir();
-    if (!QDir(path).removeRecursively())
+    const auto removeResult = QDir(path).removeRecursively();
+    const auto fileInfo = QFileInfo(path);
+    NX_DEBUG(
+        this,
+        "Cleaning up the installer's temporary directory (%1). Exists: %2, owner: %3, group: %4, remove succeded: %5",
+        path, fileInfo.exists(), fileInfo.owner(), fileInfo.group(), removeResult);
+    if (!removeResult)
         return false;
     return QDir().mkpath(path);
 }
