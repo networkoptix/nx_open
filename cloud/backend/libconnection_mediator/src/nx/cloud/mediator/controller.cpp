@@ -17,7 +17,7 @@ Controller::Controller(const conf::Settings& settings):
         : nullptr),
     m_mediaserverEndpointTester(m_cloudDataProvider.get()),
     m_relayClusterClient(RelayClusterClientFactory::instance().create(settings)),
-    m_listeningPeerDb(settings.clusterDbMap()),
+    m_listeningPeerDb(settings.listeningPeerDb()),
     m_listeningPeerPool(settings.listeningPeer(), &m_listeningPeerDb),
     m_listeningPeerRegistrator(
         settings,

@@ -24,7 +24,7 @@ public:
         m_settings.connectionInactivityTimeout =
             std::chrono::milliseconds(nx::utils::random::number<int>());
         m_listeningPeerDb =
-            std::make_unique<hpm::ListeningPeerDb>(conf::ClusterDbMap());
+            std::make_unique<hpm::ListeningPeerDb>(conf::ListeningPeerDb());
         m_listeningPeerPool =
             std::make_unique<hpm::ListeningPeerPool>(m_settings, m_listeningPeerDb.get());
 

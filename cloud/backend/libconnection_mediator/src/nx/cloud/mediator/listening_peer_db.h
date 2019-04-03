@@ -33,7 +33,7 @@ struct MediatorEndpoint
 class ListeningPeerDb
 {
 public:
-    ListeningPeerDb(const conf::ClusterDbMap& settings);
+    ListeningPeerDb(const conf::ListeningPeerDb& settings);
 
     /**
      * Initializes the underlying database.
@@ -92,7 +92,7 @@ public:
     std::string nodeId() const;
 
 private:
-    const conf::ClusterDbMap& m_settings;
+    const conf::ListeningPeerDb& m_settings;
     std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_sqlExecutor;
     std::unique_ptr<nx::clusterdb::map::EmbeddedDatabase> m_map;
 

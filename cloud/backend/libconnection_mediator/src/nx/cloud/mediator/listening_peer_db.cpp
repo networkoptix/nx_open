@@ -77,7 +77,7 @@ bool MediatorEndpoint::operator==(const MediatorEndpoint &other) const
 //-------------------------------------------------------------------------------------------------
 // ListeningPeerDb
 
-ListeningPeerDb::ListeningPeerDb(const conf::ClusterDbMap& settings):
+ListeningPeerDb::ListeningPeerDb(const conf::ListeningPeerDb& settings):
     m_settings(settings)
 {
 }

@@ -80,14 +80,14 @@ struct Server
     std::string name;
 };
 
-struct ClusterDbMap
+struct ListeningPeerDb
 {
     bool enabled = false;
     std::chrono::milliseconds connectionRetryDelay;
     nx::sql::ConnectionOptions sql;
     nx::clusterdb::map::Settings map;
 
-    ClusterDbMap();
+    ListeningPeerDb();
 };
 
 /**
@@ -129,7 +129,7 @@ public:
     const nx::cloud::discovery::conf::Discovery& discovery() const;
     const ListeningPeer& listeningPeer() const;
     const Server& server() const;
-    const ClusterDbMap& clusterDbMap() const;
+    const ListeningPeerDb& listeningPeerDb() const;
 
 private:
     General m_general;
@@ -145,7 +145,7 @@ private:
     nx::cloud::discovery::conf::Discovery m_discovery;
     ListeningPeer m_listeningPeer;
     Server m_server;
-    ClusterDbMap m_clusterDbMap;
+    ListeningPeerDb m_listeningPeerDb;
 
     virtual void loadSettings() override;
 
@@ -161,7 +161,7 @@ private:
     void loadHttp();
     void loadHttps();
     void loadServer();
-    void loadClusterDbMap();
+    void loadListeningPeerDb();
 };
 
 } // namespace conf

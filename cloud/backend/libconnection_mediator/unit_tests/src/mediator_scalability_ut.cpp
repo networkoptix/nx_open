@@ -51,7 +51,7 @@ protected:
 
         auto& mediator = m_mediatorCluster.addMediator({
             "-server/name", "127.0.0.1",
-            "-clusterDbMap/enabled", "true",
+            "-listeningPeerDb/enabled", "true",
             "-discovery/enabled", "true",
             "-discovery/discoveryServiceUrl", discoveryServiceUrl.c_str(),
             "-discovery/roundTripPadding", "1ms",

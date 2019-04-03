@@ -85,7 +85,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
     while (!controller.doMandatoryInitialization())
     {
         NX_INFO(this, lm("Retrying controller initialization after delay"));
-        std::this_thread::sleep_for(settings.clusterDbMap().connectionRetryDelay);
+        std::this_thread::sleep_for(settings.listeningPeerDb().connectionRetryDelay);
     }
     m_controller = &controller;
 
@@ -150,7 +150,7 @@ void MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& se
 
     m_controller->listeningPeerDb().setThisMediatorEndpoint(endpoint);
 
-    if (settings.clusterDbMap().map.synchronizationSettings.discovery.enabled)
+    if (settings.listeningPeerDb().map.synchronizationSettings.discovery.enabled)
     {
         m_controller->listeningPeerDb().startDiscovery(
             &m_view->httpServer().messageDispatcher());

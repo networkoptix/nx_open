@@ -37,7 +37,7 @@ protected:
     StunCustomTest():
         mediaserverApi(&cloudData),
         m_relayClusterClient(settings),
-        m_listeningPeerDb(settings.clusterDbMap()),
+        m_listeningPeerDb(settings.listeningPeerDb()),
         m_listeningPeerPool(settings.listeningPeer(), &m_listeningPeerDb),
         m_listeningPeerRegistrator(settings, &cloudData, &m_listeningPeerPool, &m_relayClusterClient),
         m_server(
