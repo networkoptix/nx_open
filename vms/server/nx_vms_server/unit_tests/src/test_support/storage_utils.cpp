@@ -452,4 +452,64 @@ std::unique_ptr<QnArchiveStreamReader> createArchiveStreamReader(
     return archiveReader;
 }
 
+QnVirtualCameraResourcePtr cameraByUniqueId(QnResourcePool* resourcePool, const QString& uniqueId)
+{
+    const auto allCameras = resourcePool->getAllCameras();
+    QnVirtualCameraResourcePtr result;
+    for (const auto camera : allCameras)
+    {
+        if (camera->getUniqueId() == uniqueId)
+        {
+            result = camera;
+            break;
+        }
+    }
+
+    return result;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Playback checker
+
+bool PlaybackChecker::canAcceptData() const
+{
+    return true;
+}
+
+void PlaybackChecker::putData(const QnAbstractDataPacketPtr& data)
+{
+    {
+        NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
+        if (m_archivePlayedTillTheEnd)
+            return;
+    }
+
+    const int64_t currentDataTimestampMs = data->timestamp / 1000;
+    if (m_timeGap < currentDataTimestampMs - m_archiveStartTime)
+        m_timeGap = currentDataTimestampMs - m_archiveStartTime;
+
+    NX_ASSERT(m_timeGap, 1000);
+    m_archiveStartTime = currentDataTimestampMs;
+
+    if (m_archiveStartTime >= m_archiveEndTime && m_archiveStartTime != AV_NOPTS_VALUE)
+    {
+        NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
+        m_archivePlayedTillTheEnd = true;
+        m_archivePlaybackWaitCondition.wakeOne();
+    }
+}
+
+void PlaybackChecker::wait()
+{
+}
+
+void PlaybackChecker::reset()
+{
+}
+
+PlaybackChecker::PlaybackChecker(const QnTimePeriodList& timePeriods): m_timePeriods(timePeriods)
+{
+    std::sort(m_timePeriods.begin(), m_timePeriods.end());
+}
+
 } // namespace nx::vms::server::test::test_support

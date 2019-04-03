@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <core/dataconsumer/abstract_data_receptor.h>
 
 class MediaServerLauncher;
 class QnArchiveStreamReader;
@@ -37,5 +38,29 @@ Catalog generateCameraArchive(
 QByteArray createTestMkvFile(int lengthSec, int width, int height);
 std::unique_ptr<QnArchiveStreamReader> createArchiveStreamReader(
     const QnVirtualCameraResourcePtr& camera);
+
+QnVirtualCameraResourcePtr cameraByUniqueId(QnResourcePool* resourcePool, const QString& uniqueId);
+
+/**
+ * Checks that media data played covers the given time periods. The wait() function hangs until
+ * above happens.
+ */
+class PlaybackChecker: public QnAbstractMediaDataReceptor
+{
+public:
+    PlaybackChecker(const QnTimePeriodList& timePeriods);
+
+    virtual bool canAcceptData() const override;
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
+    void wait();
+    void reset();
+
+private:
+    QnMutex m_archivePlaybackMutex;
+    QnWaitCondition m_archivePlaybackWaitCondition;
+    bool m_archivePlayedTillTheEnd = false;
+    QnTimePeriodList m_timePeriods;
+    int64_t m_timeGap = 0;
+};
 
 } // namespace nx::vms::server::test::test_support

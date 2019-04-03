@@ -29,6 +29,7 @@ protected:
 
     virtual void TearDown() override
     {
+        ASSERT_TRUE(m_archiveReader);
         m_archiveReader->stop();
         m_archiveReader->removeDataProcessor(this);
         utils::log::removeLoggers({ utils::log::Filter(QString("ServerArchiveIntegrityWatcher")) });
@@ -64,19 +65,11 @@ protected:
 
     void whenPlayArchiveRequestIsIssued()
     {
-        const auto allCameras = m_server->serverModule()->resourcePool()->getAllCameras();
-        QnVirtualCameraResourcePtr camera1;
-        for (const auto camera : allCameras)
-        {
-            if (camera->getUniqueId() == test_support::kCamera1Name)
-            {
-                camera1 = camera;
-                break;
-            }
-        }
+        const auto camera = test_support::cameraByUniqueId(
+            m_server->serverModule()->resourcePool(), test_support::kCamera1Name);
 
-        ASSERT_TRUE((bool)camera1);
-        m_archiveReader = test_support::createArchiveStreamReader(camera1);
+        ASSERT_TRUE((bool)camera);
+        m_archiveReader = test_support::createArchiveStreamReader(camera);
         m_archiveReader->addDataProcessor(this);
         m_archiveReader->start();
 
