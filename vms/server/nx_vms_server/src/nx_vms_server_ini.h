@@ -27,20 +27,20 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, forceLiteClient, "Force Lite Client for this server.");
 
     NX_INI_INT(67000, liveStreamCacheForPrimaryStreamMinSizeMs,
-        "Lower bound of Live Stream Cache size for primary stream, milliseconds.\n"
-        "\n" + kLiveStreamCacheHelp);
+        (std::string("Lower bound of Live Stream Cache size for primary stream, milliseconds.\n\n")
+        + kLiveStreamCacheHelp).c_str());
     NX_INI_INT(100000, liveStreamCacheForPrimaryStreamMaxSizeMs,
-        "Upper bound of Live Stream Cache size for primary stream, milliseconds.\n"
-        "\n" + kLiveStreamCacheHelp);
+        (std::string("Upper bound of Live Stream Cache size for primary stream, milliseconds.\n\n")
+        + kLiveStreamCacheHelp).c_str());
     NX_INI_INT(67000, liveStreamCacheForSecondaryStreamMinSizeMs,
-        "Lower bound of Live Stream Cache size for secondary stream, milliseconds.\n"
-        "\n" + kLiveStreamCacheHelp);
+        (std::string("Lower bound of Live Stream Cache size for secondary stream, milliseconds.\n\n")
+        + kLiveStreamCacheHelp).c_str());
     NX_INI_INT(100000, liveStreamCacheForSecondaryStreamMaxSizeMs,
-        "Upper bound of Live Stream Cache size for secondary stream, milliseconds.\n"
-        "\n" + kLiveStreamCacheHelp);
+        (std::string("Upper bound of Live Stream Cache size for secondary stream, milliseconds.\n\n")
+        + kLiveStreamCacheHelp).c_str());
 
 private:        
-    static constexpr char[] kLiveStreamCacheHelp =
+    static constexpr char kLiveStreamCacheHelp[] =
         "Live Stream Cache allows Desktop Client's Right Panel receive adequate thumbnails of\n"
         "the detected Objects and Events. It is needed because frames in the video archive are\n"
         "inaccessible for ~1 minute since the moment of recording. Beware that increasing the\n"

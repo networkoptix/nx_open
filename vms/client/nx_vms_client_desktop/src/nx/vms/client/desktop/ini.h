@@ -67,7 +67,7 @@ struct Ini: nx::kit::IniConfig
         "If enabled, current time in a camera window is shown in microseconds since epoch\n"
         "together with the default human-readable date-time representation.");
     NX_INI_FLAG(0, massSystemUpdateDebugInfo,
-        "Wheter to show additional debug information for experimental update system.");
+        "Whether to show additional debug information for experimental update system.");
     NX_INI_FLAG(0, massSystemUpdateClearDownloads,
         "Forces the Client to remove downloaded data for system updates.");
     NX_INI_FLAG(0, forceCompatibilityMode,
@@ -122,7 +122,7 @@ struct Ini: nx::kit::IniConfig
         "Enables a check if all sync play items are paused upon every request.");
     NX_INI_STRING("", autoUpdatesCheckChangesetOverride,
         "Background updates check will use this changeset instead of \"latest\".");
-    NX_INI_INT(0, massSystemUpdateWaitForServerOnline,
+    NX_INI_INT(0, massSystemUpdateWaitForServerOnlineOverride,
         "Time to wait until Server goes online in seconds. Default value is used when set to 0.");
     NX_INI_INT(0, tilePreviewLoadDelayOverrideMs,
         "Tiles in the Right Panel will request previews only after this period (in milliseconds)\n"
@@ -130,10 +130,10 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(750, tilePreviewLoadIntervalMs,
         "Right Panel tiles will not request previews more often than this period, milliseconds.");
     NX_INI_FLAG(0, enableSyncedChunksForExtraContent,
-        "Wheter to show motion and analytics chunks in the synced area of the timeline.");
+        "Whether to show motion and analytics chunks in the synced area of the timeline.");
     NX_INI_INT(0, clientWebServerPort,
-        "Enables web server to remotely control the Nx Client operation; port should be in range\n
-        1..65535 (typically 7012) to enable; 0 means disabled.");
+        "Enables web server to remotely control the Nx Client operation; port should be in range\n"
+        "1..65535 (typically 7012) to enable; 0 means disabled.");
     NX_INI_INT(1000, storeFrameTimePoints,
         "Number of frame timestamps stored by the Client. Used in Functional Tests for fps\n"
         "measurement.");
