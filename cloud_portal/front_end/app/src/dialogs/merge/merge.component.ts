@@ -53,7 +53,7 @@ export class MergeModalContent {
         this.outOfDate = this.multipleSystems && !this.system.canMerge;
         this.processedSystems = this.makeSelectorList(this.systems);
         this.targetSystem = this.selectDefaultSystem();
-        this.targetSystemDropdown = this.processedSystems([this.targetSystem]);
+        this.targetSystemDropdown = this.makeSelectorList([this.targetSystem])[0];
         this.systemMergeable = this.checkMergeability(this.targetSystem);
         this.systemError = !this.multipleSystems || this.outOfDate;
 
