@@ -428,24 +428,20 @@ bool operator<(const UpdateInfo& lhs, const UpdateInfo& rhs)
 
 struct GroupParameterInfo
 {
-    GroupParameterInfo() = default;
-
-    GroupParameterInfo(
-        const QString& parameterValue,
-        const QString& name,
-        const QString& lead,
-        const QString& condition)
-        :
-        value(parameterValue),
-        groupName(name),
-        groupLead(lead),
-        groupIncludeCondition(condition)
-    {};
-
     QString value;
     QString groupName;
     QString groupLead;
     QString groupIncludeCondition;
+    QString groupIncludeContainsCondition;
+
+    bool isGroupInclude(const QString& value) const
+    {
+        if (!groupIncludeCondition.isEmpty())
+            return value == groupIncludeCondition;
+        if (!groupIncludeContainsCondition.isEmpty())
+            return value.contains(groupIncludeCondition);
+        return false;
+    }
 };
 
 static QString physicalIdForChannel(const QString& groupId, int value)
@@ -3316,12 +3312,12 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
             continue;
         }
 
-        groupParameters[value.id] =
-            GroupParameterInfo(
-                value.value,
-                group,
-                groupLead(group),
-                info->groupIncludeCondition());
+        groupParameters[value.id] = {
+            value.value,
+            group,
+            groupLead(group),
+            info->groupIncludeCondition(),
+            info->groupIncludeContainsCondition()};
     }
 
     // resolve group parameters
@@ -3349,7 +3345,7 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
             continue;
         }
 
-        if (info.groupIncludeCondition == groupParameters[groupLead].value)
+        if (info.isGroupInclude(groupParameters[groupLead].value))
             result.push_back(QnCameraAdvancedParamValue(parameterName, info.value));
     }
 
@@ -3364,11 +3360,12 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
         if (!info)
             continue;
 
-        groupParameters[lead.id] = GroupParameterInfo(
+        groupParameters[lead.id] = {
             lead.value,
             info->group(),
             lead.id,
-            info->groupIncludeCondition());
+            info->groupIncludeCondition(),
+            info->groupIncludeContainsCondition()};
     }
 
     for (const auto& parameterName: parametersToResolve)
@@ -3388,7 +3385,7 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
         if (!groupParameters.contains(groupLead))
             continue;
 
-        if (info.groupIncludeCondition == groupParameters[groupLead].value)
+        if (info.isGroupInclude(groupParameters[groupLead].value))
             result.push_back(QnCameraAdvancedParamValue(parameterName, info.value));
     }
 

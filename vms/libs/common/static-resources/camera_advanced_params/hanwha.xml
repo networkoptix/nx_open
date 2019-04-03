@@ -1018,7 +1018,7 @@
                         dataType="Enumeration"
                         range="Open:Color/Close:BW,Open:BW/Close:Color"
                         internalRange="SwitchToBWIfCloses,SwitchToBWIfOpens"
-                        aux="group=dn;groupInclude=External">
+                        aux="group=dn;groupIncludeContains=External">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -1055,20 +1055,34 @@
                 <param id="image/imageenhancements/Saturation"
                         name="ColorLevel"
                         dataType="Number"/>
-                <param id="image/imageenhancements/LDCEnable"
-                        name="LDC"
-                        dataType="Bool"
-                        aux="groupLead=ldc"/>
-                <param id="image/imageenhancements/LDCLevel"
-                        name="LDC Level"
-                        dataType="Number"
-                        aux="group=ldc;groupInclude=true">
+                <!-- 
+                    LDCMode - LDCLevel dependency is based on XND-6085V, LDCEnable is not used
+                    because it's handled by LDCMode. 
+                -->
+                <param id="image/imageenhancements/LDCMode"
+                        name="LDC Mode"
+                        dataType="Enumeration"
+                        aux="groupLead=ldc">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
                                 <condition
                                     watch="image/imageenhancements/LDCEnable"
                                     condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                <param id="image/imageenhancements/LDCLevel"
+                        name="LDC Level"
+                        dataType="Number"
+                        aux="group=ldc;groupInclude=Manual">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/imageenhancements/LDCMode"
+                                    condition="value=Manual"/>
                             </conditional-show>
                         </dependencies-show>
                     </dependencies>
