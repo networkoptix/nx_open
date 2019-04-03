@@ -310,23 +310,23 @@ angular.module('nxCommon')
             var data = {
                     cameraId:cleanId(cameraId)
                 },
-                uri = '/ec2/cameraThumbnail';
+                endpoint = '/ec2/cameraThumbnail';
             
-            if(time){
+            if (time) {
                 data.time = time;
             } else {
-                uri += '?ignoreExternalArchive';
+                endpoint += '?ignoreExternalArchive&time=LATEST';
             }
             
-            if(width){
+            if (width) {
                 data.width = width;
             }
             
-            if(height){
+            if (height) {
                 data.height = height;
             }
             
-            return this._setGetParams(uri, data, this.systemId && this.authGet());
+            return this._setGetParams(endpoint, data, this.systemId && this.authGet());
         };
         ServerConnection.prototype.hlsUrl = function(cameraId, position, resolution){
             var data = {};
