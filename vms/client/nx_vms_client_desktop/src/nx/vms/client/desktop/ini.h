@@ -93,10 +93,7 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(0, massSystemUpdateWaitForServerOnline,
         "Period to wait until server goes online, in seconds. Set to zero to use built-in value.");
     NX_INI_INT(0, tilePreviewLoadDelayOverrideMs,
-        "Tiles in the right panel will request previews only after this time, in milliseconds,\n"
-        "after appearing. 0 means default value (100 ms).");
-    NX_INI_INT(750, tilePreviewLoadIntervalMs,
-        "Right Panel tiles will not request previews more often than this time, in milliseconds.");
+        "Tiles in the right panel will request preview only after this time. 0 means default (100ms)");
 };
 
 inline Ini& ini()
