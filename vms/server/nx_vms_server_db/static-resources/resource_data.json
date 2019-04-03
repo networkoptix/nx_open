@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.26",
+    "version": "1.0.1.32",
     "data": [
         {
             "keys": [
@@ -2571,7 +2571,17 @@
         },
         {
             "keys": [
-                "DigitalWatchdog|DWC-MTT4Wi36"
+                "DigitalWatchdog|DWC-MTT4Wi36",
+                "DigitalWatchdog|DWC-MVT4Wi28",
+                "DigitalWatchdog|DWC-MVT4Wi36",
+                "DigitalWatchdog|DWC-MVT4Wi6",
+                "DigitalWatchdog|DWC-MBT4Wi28",
+                "DigitalWatchdog|DWC-MBT4Wi36",
+                "DigitalWatchdog|DWC-MVT4WiA",
+                "DigitalWatchdog|DWC-MTT4Wi28",
+                "DigitalWatchdog|DWC-MTT4Wi36",
+                "DigitalWatchdog|DWC-MTT4Wi6",
+                "DigitalWatchdog|DWC-MTT4WiA"
             ],
             "forceOnvifAdvancedParameters": true
         },
