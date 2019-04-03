@@ -113,6 +113,7 @@ export class MergeModalContent {
             errorCodes: {}
         }).then((res) => {
             this.checking = false;
+            this.targetSystemDropdown.name = this.addStatus(this.targetSystem);
             this.systemMergeable = this.checkMergeability(this.targetSystem);
             if (!res.system && this.systemMergeable === '') {
                 return this.updateState();
