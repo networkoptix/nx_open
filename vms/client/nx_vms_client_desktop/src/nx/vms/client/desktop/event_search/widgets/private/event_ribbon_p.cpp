@@ -45,7 +45,6 @@ static constexpr int kDefaultTileSpacing = 1;
 static constexpr int kScrollBarStep = 16;
 
 static constexpr int kDefaultThumbnailWidth = 224;
-static constexpr int kMaximumThumbnailWidth = 1024;
 
 static constexpr auto kFadeCurtainColorName = "dark3";
 
@@ -75,6 +74,11 @@ bool shouldAnimateTile(const QModelIndex& index)
 bool isPreviewLoadControlledByRibbon()
 {
     return ini().tilePreviewLoadIntervalMs > 0;
+}
+
+int maximumThumbnailWidth()
+{
+    return ini().rightPanelMaxThumbnailWidth;
 }
 
 } // namespace
@@ -299,7 +303,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     const auto previewCropRect = modelIndex.data(Qn::ItemZoomRectRole).value<QRectF>();
     const auto thumbnailWidth = previewCropRect.isEmpty()
         ? kDefaultThumbnailWidth
-        : qMin<int>(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
+        : qMin<int>(kDefaultThumbnailWidth / previewCropRect.width(), maximumThumbnailWidth());
 
     const bool precisePreview = !previewCropRect.isEmpty()
         || modelIndex.data(Qn::ForcePrecisePreviewRole).toBool();

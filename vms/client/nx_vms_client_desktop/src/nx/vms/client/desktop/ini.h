@@ -96,6 +96,8 @@ struct Ini: nx::kit::IniConfig
         "Tiles in the right panel will request preview only after this time. 0 means default (100ms)");
     NX_INI_INT(750, tilePreviewLoadIntervalMs,
         "Right Panel tiles will not request previews more often than this time, in milliseconds.");
+    NX_INI_INT(1024, rightPanelMaxThumbnailWidth,
+        "Maximum image width, in pixels, that Right Panel can request from a server.");
 };
 
 inline Ini& ini()
