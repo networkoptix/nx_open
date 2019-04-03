@@ -11,9 +11,9 @@
 using namespace nx::utils::log;
 using namespace nx::network;
 
-static const QString kNameParam = lit("name");
-static const QString kIdParam = lit("id");
-static const QString kValueParam = lit("value");
+static const QString kNameParam("name");
+static const QString kIdParam("id");
+static const QString kValueParam("value");
 
 static bool hasPermission(const QnRestConnectionProcessor* processor)
 {
@@ -93,5 +93,5 @@ rest::Response QnLogLevelRestHandler::manageLogLevelById(const rest::Request& re
 
     const auto level = logger->defaultLevel();
     return rest::Response::reply(
-        (level == Level::verbose) ? lit("DEBUG2") : toString(level).toUpper());
+        (level == Level::verbose) ? QString("DEBUG2") : toString(level).toUpper());
 }

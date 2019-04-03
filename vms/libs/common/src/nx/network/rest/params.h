@@ -61,7 +61,9 @@ public:
 
 //--------------------------------------------------------------------------------------------------
 
-inline void qStringListAdd(QStringList* /*list*/) {}
+inline void qStringListAdd(QStringList* /*list*/)
+{
+}
 
 template<typename... Args>
 void qStringListAdd(QStringList* list, QString arg, Args... args)

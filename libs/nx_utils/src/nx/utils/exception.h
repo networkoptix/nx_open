@@ -5,8 +5,7 @@
 
 #include <QString>
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 class NX_UTILS_API Exception: public std::exception
 {
@@ -18,6 +17,5 @@ private:
     mutable std::optional<std::string> m_whatCache;
 };
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils
 

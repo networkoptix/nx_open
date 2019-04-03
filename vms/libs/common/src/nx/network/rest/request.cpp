@@ -7,7 +7,7 @@ namespace nx::network::rest {
 Request::Request(
     const http::Request* httpRequest,
     const QnRestConnectionProcessor* owner)
-:
+    :
     httpRequest(httpRequest),
     owner(owner),
     m_urlParams(Params::fromUrlQuery(QUrlQuery(httpRequest->requestLine.url.toQUrl()))),
@@ -72,7 +72,7 @@ Params Request::calculateParams() const
         return m_urlParams;
 
     Params params;
-    if (ini().allowUrlParamitersForAnyMethod)
+    if (ini().allowUrlParametersForAnyMethod)
         params.unite(m_urlParams);
 
     if (content)
@@ -98,7 +98,7 @@ std::optional<QJsonValue> Request::calculateContent() const
     if (content)
         parsedContent = content->parse();
 
-    if (!rest::ini().allowUrlParamitersForAnyMethod)
+    if (!ini().allowUrlParametersForAnyMethod)
     {
         NX_DEBUG(this, "Ignoring URL parameters for %1", httpRequest->requestLine);
         return parsedContent;

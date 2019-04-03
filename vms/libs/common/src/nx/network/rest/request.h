@@ -23,30 +23,31 @@ struct Request
      * - method_ URL param if ini config allows it.
      */
     const http::Method::ValueType& method() const;
+
     QString path() const;
 
     /**
-     * If method may not provide message body, uses URL params.
-     * If method provides message body, parses message body instead (url params may be merged into
-     * it if ini config permits so).
+     * If HTTP method of request may not provide message body, uses URL params.
+     * If HTTP method provides message body, parses message body instead (url params may be merged
+     * into it if ini_config permits so).
      */
     const Params& params() const;
 
-    /** Returns parsed param value, returns std::nullpot on failure. */
+    /** @return parsed param value or std::nullopt on failure. */
     template<typename T = QString>
     std::optional<T> param(const QString& key) const;
 
-    /** The save as param, but returns defaultValue on failure. */
+    /** @return parsed param value or defaultValue on failure. */
     template<typename T = QString>
     T paramOr(const QString& key, const T& defaultValue = {}) const;
 
-    /** The save as param, but throws RestException on failure. */
+    /** @return parsed param value or throws rest::Exception on failure. */
     template<typename T = QString>
     T paramOrThrow(const QString& key) const;
 
     /**
-     * If method may not provide message body, parses URL params.
-     * If method provides message body, parses message body instead.
+     * If HTTP method of request may not provide message body, parses URL params.
+     * If HTTP method provides message body, parses message body instead.
      */
     template <typename T>
     std::optional<T> parseContent() const;

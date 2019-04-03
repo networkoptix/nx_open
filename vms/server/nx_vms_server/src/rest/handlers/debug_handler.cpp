@@ -15,9 +15,9 @@ static std::pair<Action, QString> actionFromParams(const QnRequestParamList& par
 {
     Action action = Action::invalid;
     QString value;
-    for (const auto& [stringAction, paramValue]: params.toList())
+    for (auto it = params.begin(); it != params.end(); ++it)
     {
-        const Action paramAction = nx::utils::switch_(stringAction,
+        const Action paramAction = nx::utils::switch_(it.key(),
             "crash", [](){ return Action::crash; },
             "exit", [](){ return Action::exit; },
             "delayS", [](){ return Action::delayS; },
@@ -29,7 +29,7 @@ static std::pair<Action, QString> actionFromParams(const QnRequestParamList& par
                 return {Action::invalid, ""};
 
             action = paramAction;
-            value = paramValue;
+            value = it.value();
         }
     }
     return {action, value};

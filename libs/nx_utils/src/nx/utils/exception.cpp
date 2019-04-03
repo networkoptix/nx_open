@@ -1,7 +1,6 @@
 #include "exception.h"
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 const char* Exception::what() const noexcept
 {
@@ -11,6 +10,5 @@ const char* Exception::what() const noexcept
     return m_whatCache->c_str();
 }
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils
 

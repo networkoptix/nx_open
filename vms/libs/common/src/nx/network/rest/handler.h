@@ -20,29 +20,40 @@ enum class Permissions
 };
 
 /**
- * Single handler instance receives all requests, each request in different thread.
+ * Base class for REST requests processing.
+ * Single handler instance receives all requests, each request in a different thread.
  */
 class Handler: public QObject
 {
+protected:
+    /**
+     * Override to implement request processing for all requests. Default implementation calls
+     * exeute<METHOD>, override only them to process specific requests.
+     * Implementation is expected to throw rest::Exception in case of error which is returned in
+     * response.
+     */
+    virtual Response executeAny(const Request& request);
+
+    virtual Response executeGet(const Request& request);
+    virtual Response executeDelete(const Request& request);
+    virtual Response executePost(const Request& request);
+    virtual Response executePut(const Request& request);
+
 public:
-    virtual Response executeRequest(const Request& request);
+    Response executeRequest(const Request& request);
+
+    /** Override to execute some logic after request processing. */
     virtual void afterExecute(const Request& request, const Response& response);
 
     friend class QnRestProcessorPool;
 
     GlobalPermission permissions() const;
     void setPath(const QString& path);
-    void setPermissions(GlobalPermission permissions) ;
+    void setPermissions(GlobalPermission permissions);
     QString extractAction(const QString& path) const;
 
     /** In derived classes, report all url params carrying camera id. */
     virtual QStringList cameraIdUrlParams() const;
-
-protected:
-    virtual Response executeGet(const Request& request);
-    virtual Response executeDelete(const Request& request);
-    virtual Response executePost(const Request& request);
-    virtual Response executePut(const Request& request);
 
 protected:
     QString m_path;

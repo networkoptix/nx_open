@@ -8,7 +8,7 @@ namespace nx::network::rest {
 // instantiate single ini configs because of static linkage.
 // Threre are already some plans to move nx::network::rest here anyway.
 
-struct NX_NETWORK_API Ini: nx::kit::IniConfig
+struct Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_network_rest.ini") { reload(); }
 
@@ -19,15 +19,18 @@ struct NX_NETWORK_API Ini: nx::kit::IniConfig
     #endif
 
     NX_INI_FLAG(kAllowGetMethodReplacement, allowGetMethodReplacement,
-        "Allows to change GET request method ot any other method by 'method_' URL paramiter.\n"
-        "So request 'GET /path?param=value&method_=post HTTP/1.1'\n"
-        "works like 'POST /path HTTP/1.1' with body 'param=value'.");
+        "Allows to change GET request method ot any other method by 'method_' URL parameter.\n"
+        "So request 'GET /path?param=value&method_=post HTTP/1.1' is processed as POST.");
 
     // This must be disabled as soon as we can discontinue deprecated POST methods.
-    NX_INI_FLAG(1, allowUrlParamitersForAnyMethod,
-        "Enables POST and PUT methods to accept URL paramiters as well as message body.");
+    NX_INI_FLAG(1, allowUrlParametersForAnyMethod,
+        "Enables POST and PUT methods to accept URL parameters as well as the message body.");
 };
 
-NX_NETWORK_API Ini& ini();
+inline Ini& ini()
+{
+    static Ini ini;
+    return ini;
+}
 
 } // namespace nx::network::rest

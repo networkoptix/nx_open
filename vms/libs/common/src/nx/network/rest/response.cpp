@@ -16,7 +16,7 @@ Response Response::result(const QnRestResult& restResult, Qn::SerializationForma
         default: break;
     }
 
-    NX_ASSERT(false, lm("Unsupported serrialization format %1").arg(QnLexical::serialized(format)));
+    NX_ASSERT(false, lm("Unsupported serialization format %1").arg(QnLexical::serialized(format)));
     return {http::StatusCode::internalServerError};
 }
 

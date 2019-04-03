@@ -302,7 +302,7 @@ TEST_F(RestRequestTest, PostBadJson)
 
 TEST_F(RestRequestTest, PostWithUrlParams)
 {
-    iniTweaks.set(&rest::ini().allowUrlParamitersForAnyMethod, true);
+    iniTweaks.set(&rest::ini().allowUrlParametersForAnyMethod, true);
 
     const auto request = restRequest({
         "POST /some/path?b=true&i=42&s=hi HTTP/1.1",
@@ -323,7 +323,7 @@ TEST_F(RestRequestTest, PostWithUrlParams)
 
 TEST_F(RestRequestTest, PostWithUrlParamsFailure)
 {
-    iniTweaks.set(&rest::ini().allowUrlParamitersForAnyMethod, false);
+    iniTweaks.set(&rest::ini().allowUrlParametersForAnyMethod, false);
 
     const auto request = restRequest({
         "POST /some/path?b=true&i=42&s=hi HTTP/1.1",
@@ -491,6 +491,14 @@ TEST_F(RestResponseTest, ErrorResult)
     expectJsonResponse(
         rest::Response::error(QnRestResult::InvalidParameter, "a", "X"),
         http::StatusCode::unprocessableEntity,
+        R"json({"error":"2","errorString":"Invalid parameter 'a' value: 'X'","reply":null})json");
+}
+
+TEST_F(RestResponseTest, ErrorResultWithCode)
+{
+    expectJsonResponse(
+        rest::Response::error(http::StatusCode::ok, QnRestResult::InvalidParameter, "a", "X"),
+        http::StatusCode::ok,
         R"json({"error":"2","errorString":"Invalid parameter 'a' value: 'X'","reply":null})json");
 }
 

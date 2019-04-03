@@ -5,22 +5,47 @@
 
 namespace nx::network::rest {
 
+Response Handler::executeAny(const Request& request)
+{
+    if (request.method() == nx::network::http::Method::get)
+        return executeGet(request);
+    else if (request.method() == nx::network::http::Method::post)
+        return executePost(request);
+    else if (request.method() == nx::network::http::Method::put)
+        return executePut(request);
+    else if (request.method() == nx::network::http::Method::delete_)
+        return executeDelete(request);
+    else
+        throw Exception(QnRestResult::CantProcessRequest, "Invalid HTTP method");
+}
+
+Response Handler::executeGet(const Request& /*request*/)
+{
+    return {nx::network::http::StatusCode::notImplemented};
+}
+
+Response Handler::executeDelete(const Request& /*request*/)
+{
+    return {nx::network::http::StatusCode::notImplemented};
+}
+
+Response Handler::executePost(const Request& /*request*/)
+{
+    return {nx::network::http::StatusCode::notImplemented};
+}
+
+Response Handler::executePut(const Request& /*request*/)
+{
+    return {nx::network::http::StatusCode::notImplemented};
+}
+
 Response Handler::executeRequest(
     const Request& request)
 {
     Response response;
     try
     {
-        if (request.method() == nx::network::http::Method::get)
-            response = executeGet(request);
-        else if (request.method() == nx::network::http::Method::post)
-            response = executePost(request);
-        else if (request.method() == nx::network::http::Method::put)
-            response = executePut(request);
-        else if (request.method() == nx::network::http::Method::delete_)
-            response = executeDelete(request);
-        else
-            throw Exception(QnRestResult::CantProcessRequest, "Invalid HTTP method");
+        response = executeAny(request);
     }
     catch (const Exception& error)
     {
@@ -66,26 +91,6 @@ QString Handler::extractAction(const QString& path) const
     while(localPath.endsWith(L'/'))
         localPath.chop(1);
     return localPath.mid(localPath.lastIndexOf(L'/') + 1);
-}
-
-Response Handler::executeGet(const Request& /*request*/)
-{
-    return {nx::network::http::StatusCode::notImplemented};
-}
-
-Response Handler::executeDelete(const Request& /*request*/)
-{
-    return {nx::network::http::StatusCode::notImplemented};
-}
-
-Response Handler::executePost(const Request& /*request*/)
-{
-    return {nx::network::http::StatusCode::notImplemented};
-}
-
-Response Handler::executePut(const Request& /*request*/)
-{
-    return {nx::network::http::StatusCode::notImplemented};
 }
 
 } // namespace nx::network::rest
