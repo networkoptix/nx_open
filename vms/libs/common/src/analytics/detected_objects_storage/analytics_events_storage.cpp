@@ -21,7 +21,8 @@ EventsStorage::EventsStorage(const Settings& settings):
 bool EventsStorage::initialize()
 {
     return m_dbController.initialize()
-        && readMaximumEventTimestamp();
+        && readMaximumEventTimestamp()
+        && loadDictionaries();
 }
 
 void EventsStorage::save(
@@ -164,68 +165,223 @@ bool EventsStorage::readMaximumEventTimestamp()
     return true;
 }
 
+bool EventsStorage::loadDictionaries()
+{
+    try
+    {
+        m_dbController.queryExecutor().executeSelectQuerySync(
+            [this](nx::sql::QueryContext* queryContext)
+            {
+                loadObjectTypeDictionary(queryContext);
+                loadDeviceDictionary(queryContext);
+                // TODO: #ak Remove when executeSelectQuerySync supports void functors.
+                return true;
+            });
+    }
+    catch (const std::exception& e)
+    {
+        NX_WARNING(this, "Failed to read maximum event timestamp from the DB. %1", e.what());
+        return false;
+    }
+
+    return true;
+}
+
+void EventsStorage::loadObjectTypeDictionary(nx::sql::QueryContext* queryContext)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare("SELECT id, name FROM object_type");
+    query->exec();
+    while (query->next())
+        addObjectTypeToDictionary(query->value(0).toLongLong(), query->value(1).toString());
+}
+
+void EventsStorage::loadDeviceDictionary(nx::sql::QueryContext* queryContext)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare("SELECT id, guid FROM device");
+    query->exec();
+    while (query->next())
+    {
+        addDeviceToDictionary(
+            query->value(0).toLongLong(),
+            QnSql::deserialized_field<QnUuid>(query->value(1)));
+    }
+}
+
+void EventsStorage::addDeviceToDictionary(
+    std::int64_t id, const QnUuid& deviceGuid)
+{
+    QnMutexLocker locker(&m_mutex);
+    m_deviceGuidToId.emplace(deviceGuid, id);
+    m_idToDeviceGuid.emplace(id, deviceGuid);
+}
+
+std::int64_t EventsStorage::deviceIdFromGuid(const QnUuid& deviceGuid) const
+{
+    QnMutexLocker locker(&m_mutex);
+    auto it = m_deviceGuidToId.find(deviceGuid);
+    return it != m_deviceGuidToId.end() ? it->second : -1;
+}
+
+QnUuid EventsStorage::deviceGuidFromId(std::int64_t id) const
+{
+    QnMutexLocker locker(&m_mutex);
+    auto it = m_idToDeviceGuid.find(id);
+    return it != m_idToDeviceGuid.end() ? it->second : QnUuid();
+}
+
+void EventsStorage::addObjectTypeToDictionary(
+    std::int64_t id, const QString& name)
+{
+    QnMutexLocker locker(&m_mutex);
+    m_objectTypeToId.emplace(name, id);
+    m_idToObjectType.emplace(id, name);
+}
+
+std::int64_t EventsStorage::objectTypeIdFromName(const QString& name) const
+{
+    QnMutexLocker locker(&m_mutex);
+    auto it = m_objectTypeToId.find(name);
+    return it != m_objectTypeToId.end() ? it->second : -1;
+}
+
+QString EventsStorage::objectTypeFromId(std::int64_t id) const
+{
+    QnMutexLocker locker(&m_mutex);
+    auto it = m_idToObjectType.find(id);
+    return it != m_idToObjectType.end() ? it->second : QString();
+}
+
 sql::DBResult EventsStorage::savePacket(
     sql::QueryContext* queryContext,
     common::metadata::ConstDetectionMetadataPacketPtr packet)
 {
     for (const auto& detectedObject: packet->objects)
     {
-        const auto eventId = insertEvent(queryContext, *packet, detectedObject);
-        insertEventAttributes(queryContext, eventId, detectedObject.labels);
+        updateDictionariesIfNeeded(queryContext, *packet, detectedObject);
+
+        const auto attributesId = insertAttributes(queryContext, detectedObject.labels);
+        insertEvent(queryContext, *packet, detectedObject, attributesId);
     }
 
     return sql::DBResult::ok;
 }
 
-std::int64_t EventsStorage::insertEvent(
-    sql::QueryContext* queryContext,
+void EventsStorage::updateDictionariesIfNeeded(
+    nx::sql::QueryContext* queryContext,
     const common::metadata::DetectionMetadataPacket& packet,
     const common::metadata::DetectedObject& detectedObject)
+{
+    updateDeviceDictionaryIfNeeded(queryContext, packet);
+    updateObjectTypeDictionaryIfNeeded(queryContext, packet, detectedObject);
+}
+
+void EventsStorage::updateDeviceDictionaryIfNeeded(
+    nx::sql::QueryContext* queryContext,
+    const common::metadata::DetectionMetadataPacket& packet)
+{
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_deviceGuidToId.find(packet.deviceId) != m_deviceGuidToId.end())
+            return;
+    }
+
+    auto query = queryContext->connection()->createQuery();
+    query->prepare("INSERT INTO device(guid) VALUES (:guid)");
+    query->bindValue(":guid", QnSql::serialized_field(packet.deviceId));
+    query->exec();
+
+    addDeviceToDictionary(
+        query->impl().lastInsertId().toLongLong(),
+        packet.deviceId);
+}
+
+void EventsStorage::updateObjectTypeDictionaryIfNeeded(
+    nx::sql::QueryContext* queryContext,
+    const common::metadata::DetectionMetadataPacket& packet,
+    const common::metadata::DetectedObject& detectedObject)
+{
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_objectTypeToId.find(detectedObject.objectTypeId) != m_objectTypeToId.end())
+            return;
+    }
+
+    auto query = queryContext->connection()->createQuery();
+    query->prepare("INSERT INTO object_type(name) VALUES (:name)");
+    query->bindValue(":name", detectedObject.objectTypeId);
+    query->exec();
+
+    addObjectTypeToDictionary(
+        query->impl().lastInsertId().toLongLong(),
+        detectedObject.objectTypeId);
+}
+
+void EventsStorage::insertEvent(
+    sql::QueryContext* queryContext,
+    const common::metadata::DetectionMetadataPacket& packet,
+    const common::metadata::DetectedObject& detectedObject,
+    std::int64_t attributesId)
 {
     sql::SqlQuery insertEventQuery(queryContext->connection());
     insertEventQuery.prepare(QString::fromLatin1(R"sql(
         INSERT INTO event(timestamp_usec_utc, duration_usec,
-            device_guid, object_type_id, object_id, attributes,
+            device_id, object_type_id, object_id, attributes_id,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
-        VALUES(:timestampUsec, :durationUsec, :deviceId, :objectTypeId, :objectAppearanceId, :attributes,
+        VALUES(:timestampUsec, :durationUsec, :deviceId, :objectTypeId, :objectAppearanceId, :attributesId,
             :boxTopLeftX, :boxTopLeftY, :boxBottomRightX, :boxBottomRightY)
     )sql"));
     insertEventQuery.bindValue(":timestampUsec", packet.timestampUsec);
     insertEventQuery.bindValue(":durationUsec", packet.durationUsec);
-    insertEventQuery.bindValue(":deviceId", QnSql::serialized_field(packet.deviceId));
+    insertEventQuery.bindValue(":deviceId", deviceIdFromGuid(packet.deviceId));
     insertEventQuery.bindValue(
         ":objectTypeId",
-        QnSql::serialized_field(detectedObject.objectTypeId));
+        objectTypeIdFromName(detectedObject.objectTypeId));
     insertEventQuery.bindValue(
         ":objectAppearanceId",
         QnSql::serialized_field(detectedObject.objectId));
-    insertEventQuery.bindValue(":attributes", QJson::serialized(detectedObject.labels));
 
+    insertEventQuery.bindValue(":attributesId", attributesId);
     insertEventQuery.bindValue(":boxTopLeftX", detectedObject.boundingBox.topLeft().x());
     insertEventQuery.bindValue(":boxTopLeftY", detectedObject.boundingBox.topLeft().y());
     insertEventQuery.bindValue(":boxBottomRightX", detectedObject.boundingBox.bottomRight().x());
     insertEventQuery.bindValue(":boxBottomRightY", detectedObject.boundingBox.bottomRight().y());
 
     insertEventQuery.exec();
-    return insertEventQuery.impl().lastInsertId().toLongLong();
 }
 
-void EventsStorage::insertEventAttributes(
+std::int64_t EventsStorage::insertAttributes(
     sql::QueryContext* queryContext,
-    std::int64_t eventId,
     const std::vector<common::metadata::Attribute>& eventAttributes)
 {
-    sql::SqlQuery insertEventAttributesQuery(queryContext->connection());
-    insertEventAttributesQuery.prepare(QString::fromLatin1(R"sql(
-        INSERT INTO event_properties(docid, content)
-        VALUES(:eventId, :content)
-    )sql"));
-    insertEventAttributesQuery.bindValue(":eventId", static_cast<qint64>(eventId));
-    insertEventAttributesQuery.bindValue(
-        ":content",
-        containerString(eventAttributes, "; " /*delimiter*/,
-            QString() /*prefix*/, QString() /*suffix*/, QString() /*empty*/));
-    insertEventAttributesQuery.exec();
+    const auto content = QJson::serialized(eventAttributes);
+
+    // TODO: META-220 Search using some hash of content.
+    // TODO: META-220 Cache a number of recent values since same object likely has same attributes.
+
+    auto findIdQuery = queryContext->connection()->createQuery();
+    findIdQuery->prepare("SELECT id FROM unique_attributes WHERE content=:content");
+    findIdQuery->bindValue(":content", content);
+    findIdQuery->exec();
+    if (findIdQuery->next())
+        return findIdQuery->value(0).toLongLong();
+
+    // No such value. Inserting.
+    auto insertContentQuery = queryContext->connection()->createQuery();
+    insertContentQuery->prepare("INSERT INTO unique_attributes(content) VALUES (:content)");
+    insertContentQuery->bindValue(":content", content);
+    insertContentQuery->exec();
+
+    const auto id = insertContentQuery->impl().lastInsertId().toLongLong();
+    insertContentQuery = queryContext->connection()->createQuery();
+    insertContentQuery->prepare(
+        "INSERT INTO attributes_text_index(docid, content) VALUES (:id, :content)");
+    insertContentQuery->bindValue(":id", id);
+    insertContentQuery->bindValue(":content", content);
+    insertContentQuery->exec();
+
+    return id;
 }
 
 void EventsStorage::prepareCursorQuery(
@@ -235,22 +391,25 @@ void EventsStorage::prepareCursorQuery(
     QString eventsFilteredByFreeTextSubQuery;
     const auto sqlQueryFilter =
         prepareSqlFilterExpression(filter, &eventsFilteredByFreeTextSubQuery);
+
+    std::string whereClause = "WHERE e.attributes_id = attrs.docid";
+
     auto sqlQueryFilterStr = sqlQueryFilter.toString();
     if (!sqlQueryFilterStr.empty())
-        sqlQueryFilterStr = "WHERE " + sqlQueryFilterStr;
+        whereClause += " AND " + sqlQueryFilterStr;
 
     // TODO: #ak Think over limit in the following query.
     query->prepare(lm(R"sql(
-        SELECT timestamp_usec_utc, duration_usec, device_guid,
-            object_type_id, object_id, attributes,
+        SELECT timestamp_usec_utc, duration_usec, device_id,
+            object_type_id, object_id, attrs.content as attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
-        FROM %1
+        FROM %1 as e, attributes_text_index attrs
         %2
         ORDER BY timestamp_usec_utc %3, object_id %3
         LIMIT 30000;
     )sql").args(
         eventsFilteredByFreeTextSubQuery,
-        sqlQueryFilterStr,
+        whereClause,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
     sqlQueryFilter.bindFields(query);
 }
@@ -296,14 +455,14 @@ void EventsStorage::prepareLookupQuery(
 
     query->prepare(lm(R"sql(
         WITH filtered_events AS
-        (SELECT timestamp_usec_utc, duration_usec, device_guid,
-            object_type_id, object_id, attributes,
+        (SELECT timestamp_usec_utc, duration_usec, device_id,
+            object_type_id, object_id, attributes_id,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
          FROM %1
          %2
          ORDER BY timestamp_usec_utc DESC
          LIMIT %3)
-        SELECT *
+        SELECT *, attrs.content as attributes
         FROM filtered_events e
             INNER JOIN
             (SELECT object_id AS id, MIN(timestamp_usec_utc) AS track_start_time
@@ -311,7 +470,9 @@ void EventsStorage::prepareLookupQuery(
              GROUP BY object_id
              ORDER BY MIN(timestamp_usec_utc) DESC
              %4) object
-            ON e.object_id = object.id
+            ON e.object_id = object.id,
+            attributes_text_index attrs
+        WHERE e.attributes_id = attrs.docid
         ORDER BY object.track_start_time %5, e.timestamp_usec_utc ASC
     )sql").args(
         eventsFilteredByFreeTextSubQuery,
@@ -332,9 +493,9 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
     if (!filter.deviceIds.empty())
     {
         auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
-            "device_guid", ":deviceId");
-        for (const auto& deviceId: filter.deviceIds)
-            condition->addValue(QnSql::serialized_field(deviceId));
+            "device_id", ":deviceId");
+        for (const auto& deviceGuid: filter.deviceIds)
+            condition->addValue(deviceIdFromGuid(deviceGuid));
         sqlFilter.addCondition(std::move(condition));
     }
 
@@ -356,9 +517,8 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
     if (!filter.freeText.isEmpty())
     {
         *eventsFilteredByFreeTextSubQuery = lm(R"sql(
-            (SELECT rowid, *
-             FROM event
-             WHERE rowid IN (SELECT docid FROM event_properties WHERE content MATCH '%1*'))
+            (SELECT rowid, * FROM event WHERE attributes_id IN
+             (SELECT docid FROM attributes_text_index WHERE content MATCH '%1*'))
         )sql").args(filter.freeText);
     }
     else
@@ -370,13 +530,13 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
 }
 
 void EventsStorage::addObjectTypeIdToFilter(
-    const std::vector<QString>& objectTypeIds,
+    const std::vector<QString>& objectTypes,
     nx::sql::Filter* sqlFilter)
 {
     auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
         "object_type_id", ":objectTypeId");
-    for (const auto& objectTypeId: objectTypeIds)
-        condition->addValue(QnSql::serialized_field(objectTypeId));
+    for (const auto& objectType: objectTypes)
+        condition->addValue(objectTypeIdFromName(objectType));
     sqlFilter->addCondition(std::move(condition));
 }
 
@@ -499,8 +659,8 @@ void EventsStorage::loadObject(
 {
     object->objectAppearanceId = QnSql::deserialized_field<QnUuid>(
         selectEventsQuery->value("object_id"));
-    object->objectTypeId = QnSql::deserialized_field<QString>(
-        selectEventsQuery->value("object_type_id"));
+    object->objectTypeId =
+        objectTypeFromId(selectEventsQuery->value("object_type_id").toLongLong());
     QJson::deserialize(
         selectEventsQuery->value("attributes").toString(),
         &object->attributes);
@@ -508,8 +668,7 @@ void EventsStorage::loadObject(
     object->track.push_back(ObjectPosition());
     ObjectPosition& objectPosition = object->track.back();
 
-    objectPosition.deviceId = QnSql::deserialized_field<QnUuid>(
-        selectEventsQuery->value("device_guid"));
+    objectPosition.deviceId = deviceGuidFromId(selectEventsQuery->value("device_id").toLongLong());
     objectPosition.timestampUsec = selectEventsQuery->value("timestamp_usec_utc").toLongLong();
     objectPosition.durationUsec = selectEventsQuery->value("duration_usec").toLongLong();
 
@@ -664,11 +823,9 @@ void EventsStorage::cleanupEvents(
     sql::SqlQuery deleteEventsQuery(queryContext->connection());
     deleteEventsQuery.prepare(R"sql(
         DELETE FROM event
-        WHERE device_guid=:deviceId AND timestamp_usec_utc < :timestampUsec
+        WHERE device_id=:deviceId AND timestamp_usec_utc < :timestampUsec
     )sql");
-    deleteEventsQuery.bindValue(
-        ":deviceId",
-        QnSql::serialized_field(deviceId));
+    deleteEventsQuery.bindValue(":deviceId", deviceIdFromGuid(deviceId));
     deleteEventsQuery.bindValue(
         ":timestampUsec",
         (qint64)microseconds(oldestDataToKeepTimestamp).count());
