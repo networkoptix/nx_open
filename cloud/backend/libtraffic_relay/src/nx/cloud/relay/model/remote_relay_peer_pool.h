@@ -63,7 +63,7 @@ private:
     void startDiscovery();
 
 private:
-    const conf::ClusterDbMap& m_settings;
+    const conf::ListeningPeerDb& m_settings;
     std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_queryExecutor;
     std::unique_ptr<nx::clusterdb::map::EmbeddedDatabase> m_map;
 

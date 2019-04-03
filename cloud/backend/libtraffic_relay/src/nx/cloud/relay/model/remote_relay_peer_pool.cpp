@@ -22,7 +22,7 @@ static std::string toLowerReversed(std::string domainName)
 } //namespace
 
 RemoteRelayPeerPool::RemoteRelayPeerPool(const conf::Settings& settings):
-    m_settings(settings.clusterDbMap()),
+    m_settings(settings.listeningPeerDb()),
     m_baseApiPath(nx::clusterdb::engine::kBaseSynchronizationPath)
 {
     // Try to connect immediately
