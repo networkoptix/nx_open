@@ -266,9 +266,9 @@ def get_ipvd(request):
 
         if ipvd["cameras"] is None or ipvd["vendors"] is None or ipvd["num_cameras"] is None:
             return Response({
-                "cameras": ipvd.cameras,
-                "vendors": ipvd.vendors,
-                "num_cameras": ipvd.num_cameras,
+                "cameras": ipvd["cameras"],
+                "vendors": ipvd["vendors"],
+                "num_cameras": ipvd["num_cameras"],
                 "cached": True
             })
         # ---------------------
