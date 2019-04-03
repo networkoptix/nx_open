@@ -468,7 +468,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         const QnResourceWidgetRenderer* widgetRenderer = dynamic_cast<const QnResourceWidgetRenderer*>(renderer);
 
         DecoderConfig config = DecoderConfig::fromMediaResource(m_resource);
-        config.disableMtDecoding = qnSettings->disableMtDecoding();
+        config.allowMtDecoding = qnSettings->allowMtDecoding();
         dec = QnVideoDecoderFactory::createDecoder(
                 config,
                 data,
