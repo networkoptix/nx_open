@@ -100,7 +100,9 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     m_spsFound(false)
 {
     if (!config.allowMtDecoding)
+    {
         m_forcedMtDecoding = ForceMtDecodingType::forcedOff;
+    }
     else
     {
         for (auto& codecName: config.disabledCodecsForMtDecoding)
