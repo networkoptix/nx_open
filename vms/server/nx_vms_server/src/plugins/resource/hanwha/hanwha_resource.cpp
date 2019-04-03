@@ -481,10 +481,10 @@ CameraDiagnostics::Result HanwhaResource::enableMulticast(const HanwhaVideoProfi
     const auto response = helper.update(
         lit("media/videoprofile"),
         {
-            {lit("Profile"), QString::number(profile.number)},
-            {lit("RTPMulticastEnable"), kHanwhaTrue},
-            {lit("RTPMulticastAddress"), address},
-            {lit("RTPMulticastPort"), QString::number(port)},
+            {kHanwhaProfileNumberProperty, QString::number(profile.number)},
+            {kHanwhaRtpMulticastEnable, kHanwhaTrue},
+            {kHanwhaRtpMulticastAddress, address},
+            {kHanwhaRtpMulticastPort, QString::number(port)},
         });
 
     NX_VERBOSE(this, "enable multicast: [%1]", response.requestUrl());
