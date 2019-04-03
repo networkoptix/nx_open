@@ -86,6 +86,10 @@ public:
     bool previewEnabled() const;
     void setPreviewEnabled(bool value);
 
+    bool automaticPreviewLoad() const;
+    void setAutomaticPreviewLoad(bool value);
+    bool isPreviewLoadNeeded() const;
+
     bool footerEnabled() const;
     void setFooterEnabled(bool value);
 
@@ -127,6 +131,8 @@ signals:
 
     // Links can be passed and displayed in description field.
     void linkActivated(const QString& link);
+
+    void needsPreviewLoad();
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;

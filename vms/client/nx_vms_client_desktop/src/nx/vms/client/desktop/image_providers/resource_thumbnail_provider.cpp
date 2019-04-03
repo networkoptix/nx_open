@@ -288,4 +288,12 @@ void ResourceThumbnailProvider::doLoadAsync()
         d->baseProvider->loadAsync();
 }
 
+std::chrono::microseconds ResourceThumbnailProvider::timestamp() const
+{
+    if (const auto cameraProvider = qobject_cast<CameraThumbnailProvider*>(d->baseProvider.get()))
+        return std::chrono::microseconds(cameraProvider->timestampUs());
+
+    return std::chrono::microseconds(d->request.usecSinceEpoch);
+}
+
 } // namespace nx::vms::client::desktop
