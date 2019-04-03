@@ -360,15 +360,16 @@ angular.module('nxCommon')
                         //Typo with server api so we check for both spellings
                         //Internal fix Link to task: https://networkoptix.atlassian.net/browse/VMS-7984
                         var timeSinceEpochMs = parseInt(time || server.timeSinceEpochMs || server.timeSinseEpochMs);
-                        self.serverOffsets[server.serverId] = window.timeManager.getOffset(timeSinceEpochMs, parseInt(server.timeZoneOffsetMs));
+                        // API changed so we have to check both server.timeZoneOffsetMs and server.timeZoneOffset
+                        self.serverOffsets[server.serverId] = window.timeManager.getOffset(timeSinceEpochMs, parseInt(server.timeZoneOffsetMs || server.timeZoneOffset));
                     });
                 }
         
                 if (Config.webclient.useSystemTime) {
                     return self.systemAPI.getSystemTime()
-                        .then(function (systemTime) {
-                            if (systemTime.data.reply) {
-                                return setServerOffsetTime(systemTime.data.reply.utcTimeMs);
+                        .then(function(response) {
+                            if (response.data.reply) {
+                                return setServerOffsetTime(response.data.reply.utcTimeMs);
                             }
     
                             // Server does not support this API call
