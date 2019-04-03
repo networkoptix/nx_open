@@ -1,4 +1,6 @@
 {
+	"&nbsp;to merge it with the current one.": "&nbsp;to merge it with the current one.",
+	"&nbsp;to merge it with the&nbsp;": "&nbsp;to merge it with the&nbsp;",
 	"Account Settings": "Account Settings",
 	"Account not activated": "Account not activated",
 	"Account not found": "Account not found",
@@ -10,6 +12,7 @@
 	"Cameras menu": "Cameras menu",
 	"Cancel": "Cancel",
 	"Change Password": "Change Password",
+	"Checking...": "Checking...",
 	"Choose which properties should be visible to customers:": "Choose which properties should be visible to customers:",
 	"Close": "Close",
 	"Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.": "Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.",
@@ -65,16 +68,18 @@
 	"Update them to the": "Update them to the",
 	"User": "User",
 	"View": "View",
-	"We'd recommend consulting with": "We'd recommend consulting with",
+	"We'd recommend consulting with&nbsp;": "We'd recommend consulting with&nbsp;",
 	"We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.": "We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.",
 	"What's new?": "What's new?",
 	"Wrong password": "Wrong password",
 	"You can merge only those cloud Systems, where you have the \"Owner\" permissions.": "You can merge only those cloud Systems, where you have the \"Owner\" permissions.",
 	"You can only merge Systems in which you have owner permissions.": "You can only merge Systems in which you have owner permissions.",
 	"Your browser is not supported": "Your browser is not supported",
-	"before proceeding.": "before proceeding.",
-	"is incompatible and cannot be merged with the current one.": "is incompatible and cannot be merged with the current one.",
+	"has a newer software version that is incompatible with the current system. Update the current system to the&nbsp;": "has a newer software version that is incompatible with the current system. Update the current system to the&nbsp;",
+	"has an older software version that is incompatable with the current system. Update": "has an older software version that is incompatable with the current system. Update",
+	"is currently unreachable. Try again in a few minutes or contact&nbsp;": "is currently unreachable. Try again in a few minutes or contact&nbsp;",
 	"is offline and cannot be merged with the current one.": "is offline and cannot be merged with the current one.",
 	"latest build": "latest build",
-	"servers in the merged System.": "servers in the merged System."
+	"servers in the merged System.": "servers in the merged System.",
+	"support": "support"
 }
