@@ -25,7 +25,6 @@
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
-#include <nx/vms/client/desktop/image_providers/delaying_proxy_image_provider.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
@@ -320,16 +319,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     previewProvider->setStreamSelectionMode(modelIndex.data(Qn::PreviewStreamSelectionRole)
         .value<nx::api::CameraImageRequest::StreamSelectionMode>());
 
-    static const auto kDelayingProxyPropertyName = "__qn_delayingProxyProvider";
-    auto proxy = previewProvider->property(kDelayingProxyPropertyName)
-        .value<DelayingProxyImageProvider*>();
-    if (!proxy)
-    {
-        proxy = new DelayingProxyImageProvider(previewProvider.get());
-        previewProvider->setProperty(kDelayingProxyPropertyName, QVariant::fromValue(proxy));
-    }
-
-    widget->setPreview(proxy);
+    widget->setPreview(previewProvider.get());
     widget->setPreviewCropRect(previewCropRect);
 }
 
