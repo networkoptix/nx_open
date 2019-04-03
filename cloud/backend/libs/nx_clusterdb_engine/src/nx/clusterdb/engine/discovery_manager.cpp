@@ -52,23 +52,20 @@ void DiscoveryManager::start(
         {
             if (node.urls.empty())
             {
-                NX_WARNING(
-                    this,
-                    "Discovered node %1 provided 0 urls, discovery will not start",
+                NX_WARNING(this,
+                    "Discovered node %1 provided 0 urls, can't connect to remote synchronization engine",
                     toString(node));
                 return;
             }
 
-            NX_VERBOSE(this, "Discovered a new node: %1.", toString(node));
+            NX_VERBOSE(this, "Discovered a new node: %1", toString(node));
 
             m_syncEngine->connector().addNodeUrl(clusterId, node.urls.front());
         });
 
     m_discoveryClient->start();
 
-    NX_VERBOSE(
-        this,
-        "discovery started with cluster id: %1 on url: %2",
+    NX_VERBOSE(this, "discovery started with cluster id: %1 on url: %2",
         clusterId, synchronizationEngineUrl.toStdString());
 }
 
