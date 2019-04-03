@@ -49,6 +49,7 @@ export class NxIpvdComponent implements OnInit {
     mobileDetailMode: boolean;
     noResult: boolean;
     hasNoSearch: boolean;
+    debug: any;
     uriPath: string;
 
 private setupDefaults() {
@@ -108,7 +109,7 @@ private setupDefaults() {
             .getURI()
             .subscribe(params => {
                 this.params = params;
-
+                this.debug = params.debug === '' || false;
                 if (Object.keys(this.params).length !== 0) {
                     this.hasNoSearch = false;
                 }
@@ -168,6 +169,12 @@ private setupDefaults() {
 
     modelChanged(model) {
        this.searchVendor();
+    }
+
+    reset() {
+        this.cameraService
+            .reloadIPVD()
+            .subscribe();
     }
 
     activate() {

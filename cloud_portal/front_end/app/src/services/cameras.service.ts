@@ -14,6 +14,10 @@ export class CamerasService {
         return this.api.getIPVD();
     }
 
+    reloadIPVD(): Observable<any> {
+        return this.api.reloadIPVD();
+    }
+
     private handleError<T>(operation = 'operation', result?: T) {
         return (error: any): Observable<T> => {
 

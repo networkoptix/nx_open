@@ -262,7 +262,7 @@ def get_ipvd(request):
 
     if request.method == 'GET':
         # check cache and return cached item if any
-        ipvd = cache.get("ipvd", {})
+        ipvd = cache.get("ipvd", dict())
 
         if all(k in ipvd for k in ("cameras", "vendors", "num_cameras")):
             return Response({
@@ -326,7 +326,7 @@ def get_ipvd(request):
 
     elif request.method == 'POST':
         # clear cache
-        cache.set("ipvd", None)
+        cache.set("ipvd", dict())
         # --------------------
 
         return Response({'IPVD cache cleared'})
