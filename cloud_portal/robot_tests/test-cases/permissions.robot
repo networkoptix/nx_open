@@ -305,7 +305,7 @@ Share with unregistered user - brings them to registration page with code with c
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
     Share To    ${random email}    ${ADMIN TEXT}
-    Check User Permissions    ${random email}    ${CUSTOM TEXT}
+    Check User Permissions    ${random email}    ${ADMIN TEXT}
     Log Out
     Validate Log Out
     ${link}    Get Email Link    ${random email}    register
