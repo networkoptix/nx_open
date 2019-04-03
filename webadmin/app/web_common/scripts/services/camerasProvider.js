@@ -357,9 +357,15 @@ angular.module('nxCommon')
                 }
     
                 if (Config.webclient.useSystemTime) {
-                    return self.systemAPI.getSystemTime().then(function(response) {
-                        var systemTime = response.data.reply.utcTimeMs;
-                        return setServerOffsetTime(systemTime);
+                    return self.systemAPI
+                        .getSystemTime()
+                        .then(function(response) {
+                            if (response.data.reply) {
+                                return setServerOffsetTime(response.data.reply.utcTimeMs);
+                            }
+    
+                            // Server does not support this API call
+                            return setServerOffsetTime();
                     });
                 }
                 return setServerOffsetTime();
