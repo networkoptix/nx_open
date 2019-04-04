@@ -234,8 +234,8 @@ void InitiateConnectionRequestHandler::processRequest(
         [this, cachedRequestContext = std::move(cachedRequestContext),
             targetServer = inputData.destinationHostName,
             lock = m_listeningPeerDbGuard.getScopedIncrement()](
-            api::ResultCode resultCode,
-            api::ConnectResponse response)
+                api::ResultCode resultCode,
+                api::ConnectResponse response)
         {
             if (resultCode == api::ResultCode::notFound)
             {
@@ -272,8 +272,6 @@ void InitiateConnectionRequestHandler::reportResult(
                     ? network::http::StatusCode::notFound
                     : network::http::StatusCode::badRequest);
         }
-
-
     }
 
     this->requestCompleted(std::move(result), std::move(response));
@@ -292,17 +290,8 @@ void InitiateConnectionRequestHandler::redirectToRemoteMediator(
             resultCode, response = std::move(response)](
                 MediatorEndpoint endpoint)
         {
-            if (endpoint.domainName.empty())
-            {
-                NX_VERBOSE(this, "Redirect to remote mediator failed");
+            if (!validateMediatorEndpoint(endpoint, requestContext.isSsl))
                 return reportResult(api::ResultCode::notFound, std::move(response));
-            }
-
-            if (endpoint == m_listeningPeerDb->thisMediatorEndpoint())
-            {
-                NX_VERBOSE(this, "Redirecting to this mediator but connection already failed");
-                return reportResult(api::ResultCode::notFound, std::move(response));
-            }
 
             auto location = buildMediatorUrl(endpoint, requestContext);
 
@@ -315,6 +304,44 @@ void InitiateConnectionRequestHandler::redirectToRemoteMediator(
                 std::move(response),
                 nx::network::http::StatusCode::temporaryRedirect);
         });
+}
+
+bool InitiateConnectionRequestHandler::validateMediatorEndpoint(
+    const MediatorEndpoint& endpoint,
+    bool useHttpsPort) const
+{
+    if (endpoint.domainName.empty())
+    {
+        NX_VERBOSE(this, "Redirect to remote mediator failed");
+        return false;
+    }
+
+    if (endpoint == m_listeningPeerDb->thisMediatorEndpoint())
+    {
+        NX_VERBOSE(this, "Redirecting to this mediator but connection already failed");
+        return false;
+    }
+
+    if (useHttpsPort)
+    {
+        if (endpoint.httpsPort == MediatorEndpoint::kPortUnused)
+        {
+            NX_VERBOSE(this, "found mediator: %1, but no https port is accessible.",
+                endpoint.domainName);
+            return false;
+        }
+    }
+    else
+    {
+        if (endpoint.httpPort == MediatorEndpoint::kPortUnused)
+        {
+            NX_VERBOSE(this, "found mediator: %1, but no http port is accessible.",
+                endpoint.domainName);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 nx::utils::Url InitiateConnectionRequestHandler::buildMediatorUrl(

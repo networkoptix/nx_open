@@ -124,6 +124,8 @@ protected:
         api::ResultCode resultCode,
         api::ConnectResponse response);
 
+    bool validateMediatorEndpoint(const MediatorEndpoint& endpoint, bool useHttpsPort) const;
+
     nx::utils::Url buildMediatorUrl(
         const MediatorEndpoint& endpoint,
         const CachedRequestContext& requestContext);
