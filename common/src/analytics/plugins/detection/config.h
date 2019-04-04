@@ -33,6 +33,8 @@ struct IniConfig: public nx::kit::IniConfig
 
     NX_INI_FLAG(0, enableDetectionPlugin, "");
     NX_INI_FLAG(1, enableMotionDetection, "");
+    NX_INI_FLAG(1, allowMtDecoding,
+        "Allow multithreading decoding video when software motion detection enabled");
 
     // Rectangles filtering parameters
     NX_INI_INT(

@@ -12,6 +12,7 @@
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
+#include <analytics/plugins/detection/config.h>
 
 // TODO: #Elric move to config?
 // see https://code.google.com/p/arxlib/source/browse/include/arx/Utility.h
@@ -1026,6 +1027,7 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     {
         delete m_decoder;
         DecoderConfig config;
+        config.allowMtDecoding = nx::analytics::ini().allowMtDecoding;
         if (videoData && videoData->dataProvider)
             config = DecoderConfig::fromResource(videoData->dataProvider->getResource());
         m_decoder = new QnFfmpegVideoDecoder(
