@@ -136,10 +136,10 @@ static constexpr char kPackCoordinates[] =
 R"sql(
 
 UPDATE event SET
-    box_top_left_x = box_top_left_x * %1,
-    box_top_left_y = box_top_left_y * %1,
-    box_bottom_right_x = box_bottom_right_x * %1,
-    box_bottom_right_y = box_bottom_right_y * %1
+    box_top_left_x = round(box_top_left_x * %1),
+    box_top_left_y = round(box_top_left_y * %1),
+    box_bottom_right_x = round(box_bottom_right_x * %1),
+    box_bottom_right_y = round(box_bottom_right_y * %1)
 
 )sql";
 
