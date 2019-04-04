@@ -357,7 +357,6 @@ std::int64_t EventsStorage::insertAttributes(
 {
     const auto content = QJson::serialized(eventAttributes);
 
-    // TODO: META-220 Search using some hash of content.
     // TODO: META-220 Cache a number of recent values since same object likely has same attributes.
 
     auto findIdQuery = queryContext->connection()->createQuery();
@@ -373,12 +372,18 @@ std::int64_t EventsStorage::insertAttributes(
     insertContentQuery->bindValue(":content", content);
     insertContentQuery->exec();
 
+    // NOTE: Following string is in non-reversable format. So, cannot use it to store attributes.
+    // But, cannot use JSON for full text search since it contains additional information.
+    const auto contentForTextSearch =
+        containerString(eventAttributes, lit("; ") /*delimiter*/,
+            QString() /*prefix*/, QString() /*suffix*/, QString() /*empty*/);
+
     const auto id = insertContentQuery->impl().lastInsertId().toLongLong();
     insertContentQuery = queryContext->connection()->createQuery();
     insertContentQuery->prepare(
         "INSERT INTO attributes_text_index(docid, content) VALUES (:id, :content)");
     insertContentQuery->bindValue(":id", id);
-    insertContentQuery->bindValue(":content", content);
+    insertContentQuery->bindValue(":content", contentForTextSearch);
     insertContentQuery->exec();
 
     return id;
@@ -392,7 +397,7 @@ void EventsStorage::prepareCursorQuery(
     const auto sqlQueryFilter =
         prepareSqlFilterExpression(filter, &eventsFilteredByFreeTextSubQuery);
 
-    std::string whereClause = "WHERE e.attributes_id = attrs.docid";
+    std::string whereClause = "WHERE e.attributes_id = attrs.id";
 
     auto sqlQueryFilterStr = sqlQueryFilter.toString();
     if (!sqlQueryFilterStr.empty())
@@ -403,7 +408,7 @@ void EventsStorage::prepareCursorQuery(
         SELECT timestamp_usec_utc, duration_usec, device_id,
             object_type_id, object_id, attrs.content as attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
-        FROM %1 as e, attributes_text_index attrs
+        FROM %1 as e, unique_attributes attrs
         %2
         ORDER BY timestamp_usec_utc %3, object_id %3
         LIMIT 30000;
@@ -471,8 +476,8 @@ void EventsStorage::prepareLookupQuery(
              ORDER BY MIN(timestamp_usec_utc) DESC
              %4) object
             ON e.object_id = object.id,
-            attributes_text_index attrs
-        WHERE e.attributes_id = attrs.docid
+            unique_attributes attrs
+        WHERE e.attributes_id = attrs.id
         ORDER BY object.track_start_time %5, e.timestamp_usec_utc ASC
     )sql").args(
         eventsFilteredByFreeTextSubQuery,
