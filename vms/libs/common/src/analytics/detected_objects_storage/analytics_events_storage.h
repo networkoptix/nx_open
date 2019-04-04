@@ -255,6 +255,9 @@ private:
 
     void addToAttributesCache(long long id, const QByteArray& content);
     long long findAttributesIdInCache(const QByteArray& content);
+
+    static int packCoordinate(double);
+    static double unpackCoordinate(int);
 };
 
 //-------------------------------------------------------------------------------------------------

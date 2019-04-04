@@ -121,12 +121,25 @@ CREATE INDEX idx_event_for_streaming_cursor ON event(device_id, timestamp_usec_u
 )sql";
 
 //-------------------------------------------------------------------------------------------------
-// META-220
+// META-223
 // TODO: #ak Rename timestamp_usec_utc along with the next event table structure change.
 static constexpr char kConvertTimestampToMillis[] =
 R"sql(
 
 UPDATE event SET timestamp_usec_utc = timestamp_usec_utc / 1000
+
+)sql";
+
+//-------------------------------------------------------------------------------------------------
+// META-223
+static constexpr char kPackCoordinates[] =
+R"sql(
+
+UPDATE event SET
+    box_top_left_x = box_top_left_x * %1,
+    box_top_left_y = box_top_left_y * %1,
+    box_bottom_right_x = box_bottom_right_x * %1,
+    box_bottom_right_y = box_bottom_right_y * %1
 
 )sql";
 

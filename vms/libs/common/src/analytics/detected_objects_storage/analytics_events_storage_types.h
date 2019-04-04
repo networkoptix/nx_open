@@ -15,6 +15,13 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
+// Using 14 bits for coordinates. That allows using only 2 bytes when compressing the value.
+static constexpr int kCoordinatesBits = 14;
+static constexpr int kCoordinatesPrecision = (2 << kCoordinatesBits) - 1;
+static constexpr int kCoordinateDecimalDigits = nx::common::metadata::kCoordinateDecimalDigits;
+// NOTE: If the assertion fails, all constants here must be modified and analytics DB data migrated.
+static_assert(kCoordinateDecimalDigits == 4);
+
 struct ObjectPosition
 {
     /** Device object has been detected on. */

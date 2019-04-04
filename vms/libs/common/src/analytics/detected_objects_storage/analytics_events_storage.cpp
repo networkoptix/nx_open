@@ -1,5 +1,7 @@
 #include "analytics_events_storage.h"
 
+#include <cmath>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/sql/filter.h>
@@ -17,6 +19,7 @@ EventsStorage::EventsStorage(const Settings& settings):
     m_settings(settings),
     m_dbController(settings.dbConnectionOptions)
 {
+    NX_CRITICAL(std::pow(10, kCoordinateDecimalDigits) < kCoordinatesPrecision);
 }
 
 bool EventsStorage::initialize()
@@ -343,10 +346,22 @@ void EventsStorage::insertEvent(
         QnSql::serialized_field(detectedObject.objectId));
 
     insertEventQuery.bindValue(":attributesId", attributesId);
-    insertEventQuery.bindValue(":boxTopLeftX", detectedObject.boundingBox.topLeft().x());
-    insertEventQuery.bindValue(":boxTopLeftY", detectedObject.boundingBox.topLeft().y());
-    insertEventQuery.bindValue(":boxBottomRightX", detectedObject.boundingBox.bottomRight().x());
-    insertEventQuery.bindValue(":boxBottomRightY", detectedObject.boundingBox.bottomRight().y());
+
+    insertEventQuery.bindValue(
+        ":boxTopLeftX",
+        packCoordinate(detectedObject.boundingBox.topLeft().x()));
+
+    insertEventQuery.bindValue(
+        ":boxTopLeftY",
+        packCoordinate(detectedObject.boundingBox.topLeft().y()));
+
+    insertEventQuery.bindValue(
+        ":boxBottomRightX",
+        packCoordinate(detectedObject.boundingBox.bottomRight().x()));
+
+    insertEventQuery.bindValue(
+        ":boxBottomRightY",
+        packCoordinate(detectedObject.boundingBox.bottomRight().y()));
 
     insertEventQuery.exec();
 }
@@ -585,25 +600,25 @@ void EventsStorage::addBoundingBoxToFilter(
     auto topLeftXFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
         "box_top_left_x",
         ":boxTopLeftX",
-        QnSql::serialized_field(boundingBox.bottomRight().x()));
+        QnSql::serialized_field(packCoordinate(boundingBox.bottomRight().x())));
     sqlFilter->addCondition(std::move(topLeftXFilter));
 
     auto bottomRightXFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
         "box_bottom_right_x",
         ":boxBottomRightX",
-        QnSql::serialized_field(boundingBox.topLeft().x()));
+        QnSql::serialized_field(packCoordinate(boundingBox.topLeft().x())));
     sqlFilter->addCondition(std::move(bottomRightXFilter));
 
     auto topLeftYFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
         "box_top_left_y",
         ":boxTopLeftY",
-        QnSql::serialized_field(boundingBox.bottomRight().y()));
+        QnSql::serialized_field(packCoordinate(boundingBox.bottomRight().y())));
     sqlFilter->addCondition(std::move(topLeftYFilter));
 
     auto bottomRightYFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
         "box_bottom_right_y",
         ":boxBottomRightY",
-        QnSql::serialized_field(boundingBox.topLeft().y()));
+        QnSql::serialized_field(packCoordinate(boundingBox.topLeft().y())));
     sqlFilter->addCondition(std::move(bottomRightYFilter));
 }
 
@@ -686,11 +701,11 @@ void EventsStorage::loadObject(
     objectPosition.durationUsec = selectEventsQuery->value("duration_usec").toLongLong();
 
     objectPosition.boundingBox.setTopLeft(QPointF(
-        selectEventsQuery->value("box_top_left_x").toDouble(),
-        selectEventsQuery->value("box_top_left_y").toDouble()));
+        unpackCoordinate(selectEventsQuery->value("box_top_left_x").toInt()),
+        unpackCoordinate(selectEventsQuery->value("box_top_left_y").toInt())));
     objectPosition.boundingBox.setBottomRight(QPointF(
-        selectEventsQuery->value("box_bottom_right_x").toDouble(),
-        selectEventsQuery->value("box_bottom_right_y").toDouble()));
+        unpackCoordinate(selectEventsQuery->value("box_bottom_right_x").toInt()),
+        unpackCoordinate(selectEventsQuery->value("box_bottom_right_y").toInt())));
 }
 
 void EventsStorage::mergeObjects(
@@ -887,6 +902,16 @@ long long EventsStorage::findAttributesIdInCache(
         [&md5](const auto& entry) { return entry.md5 == md5; });
 
     return it != m_attributesCache.rend() ? it->id : -1;
+}
+
+int EventsStorage::packCoordinate(double value)
+{
+    return (int) (value * kCoordinatesPrecision);
+}
+
+double EventsStorage::unpackCoordinate(int packedValue)
+{
+    return packedValue / (double) kCoordinatesPrecision;
 }
 
 //-------------------------------------------------------------------------------------------------
