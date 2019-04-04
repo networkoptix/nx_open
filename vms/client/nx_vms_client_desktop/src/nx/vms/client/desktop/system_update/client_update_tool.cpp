@@ -297,6 +297,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         setState(State::downloading);
 
         const auto code = m_downloader->addFile(info);
+        NX_VERBOSE(this, "setUpdateTarget(%1) m_downloader->addFile code=%2", contents.info.version, code);
         m_updateFile = m_downloader->filePath(m_clientPackage.file);
 
         if (code == common::p2p::downloader::ResultCode::fileAlreadyExists

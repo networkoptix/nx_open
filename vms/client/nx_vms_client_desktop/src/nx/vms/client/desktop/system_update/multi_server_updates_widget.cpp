@@ -72,7 +72,7 @@ static constexpr int kSectionMinHeight = 30;
 constexpr auto kLatestVersionBannerLabelFontSizePixels = 22;
 constexpr auto kLatestVersionBannerLabelFontWeight = QFont::Light;
 
-const auto kWaitForUpdateCheck = std::chrono::milliseconds(1);
+const auto kWaitForUpdateCheckFuture = std::chrono::milliseconds(1);
 const auto kDelayForCheckingInstallStatus = std::chrono::minutes(1);
 const auto kPeriodForCheckingInstallStatus = std::chrono::seconds(10);
 
@@ -683,7 +683,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
 
     // We poll all our tools for new information. Then we update UI if there are any changes
     if (m_updateCheck.valid()
-        && m_updateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
+        && m_updateCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready)
     {
         auto checkResponse = m_updateCheck.get();
         NX_VERBOSE(this) << "atUpdateCurrentState got update info:"
@@ -1320,9 +1320,9 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         return;
     }
 
-    if (m_serverUpdateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready
+    if (m_serverUpdateCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready
         && m_serverStatusCheck.valid()
-        && m_serverStatusCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
+        && m_serverStatusCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready)
     {
         auto updateInfo = m_serverUpdateCheck.get();
         auto serverStatus = m_serverStatusCheck.get();

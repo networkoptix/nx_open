@@ -98,9 +98,11 @@ struct Ini: nx::kit::IniConfig
         "Enables web server to remote control NX client operation. Set port value 1..65535\n"
         "(typically 7012) to enable.");
     NX_INI_INT(1000, storeFrameTimePoints,
-        "Makes client to remember this number of last frame paint time points for using in FT.");		
+        "Makes client to remember this number of last frame paint time points for using in FT.");
     NX_INI_INT(1024, rightPanelMaxThumbnailWidth,
         "Maximum image width, in pixels, that Right Panel can request from a server.");
+    NX_INI_INT(0, backgroupdUpdateCheckPeriodOverrideSec,
+        "Period to check for new updates, in seconds. Set to zero to use the built-in value.");
 };
 
 inline Ini& ini()
