@@ -32,6 +32,10 @@ body {
     padding   : 0 !important;
 }
 
+strong {
+  color: $dark1;
+}
+
 [data-whatintent='mouse'] *:focus {
     outline : none !important;
 }

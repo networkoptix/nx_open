@@ -15,9 +15,9 @@
             </p>
             <p class="help-block-no-height">
                 <span translate>Connect System you want to merge with this one to&nbsp;</span>
-                <span class="bold-text">%PRODUCT_NAME%</span>
+                <strong>%PRODUCT_NAME%</strong>
                 <span>&nbsp;or merge locally using&nbsp;</span>
-                <span class="bold-text">%VMS_NAME%</span>
+                <strong>%VMS_NAME%</strong>
                 <span translate>&nbsp;Client.</span>
             </p>
         </div>
@@ -117,7 +117,7 @@
             <div class="modal-body">
                 <p>
                     <span translate>There will be more than</span>
-                    <span class="bold-text">&nbsp;{{ config.maxServers }}&nbsp;</span>
+                    <strong>&nbsp;{{ config.maxServers }}&nbsp;</strong>
                     <span translate>servers in the merged System.</span>
                 </p>
                 <p translate>Systems of such size may work but will be unstable and have troubles with updates and synchronisation.</p>
@@ -135,7 +135,7 @@
         <div *ngIf="state == 'confirm'">
             <div class="modal-body">
                 <p translate class="mb-3">
-                    You are about to merge systems <span class="bold-text">{{system.info.name}}</span> and <span class="bold-text">{{targetSystem.name}}</span>. Settings and the name will be taken from the <span class="bold-text">{{system.info.name}}</span>.
+                    You are about to merge systems <strong>{{system.info.name}}</strong> and <strong>{{targetSystem.name}}</strong>. Settings and the name will be taken from the <strong>{{system.info.name}}</strong>.
                 </p>
                 <div class="form-group">
                     <label for="mergePassword" translate>Enter password for your account to continue</label>
