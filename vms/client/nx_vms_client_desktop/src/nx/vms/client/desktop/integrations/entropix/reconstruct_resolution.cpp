@@ -67,24 +67,6 @@ struct Description
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ZoomWindow)(Description), (json), _Fields)
 
-class CameraIsSelected: public ui::action::Condition
-{
-public:
-    ui::action::ActionVisibility check(
-        const QnResourceWidgetList& widgets,
-        QnWorkbenchContext* context)
-    {
-        const bool selected = std::any_of(
-            widgets.cbegin(),
-            widgets.cend(),
-            [](const auto& widget) { return widget->isSelected(); });
-
-        return selected
-            ? ui::action::EnabledAction
-            : ui::action::InvisibleAction;
-    }
-};
-
 bool cameraModelMatchesPattern(const QRegularExpression& pattern, const QnResourcePtr& resource)
 {
     if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
@@ -160,7 +142,6 @@ void ReconstructResolutionIntegration::registerActions(ui::action::MenuFactory* 
         .condition(
             !condition::isSafeMode()
             && ConditionWrapper(new AddBookmarkCondition())
-            && ConditionWrapper(new CameraIsSelected())
             && ConditionWrapper(
                 new ResourceCondition(
                     [this](const QnResourcePtr& resource)
@@ -193,9 +174,8 @@ void ReconstructResolutionIntegration::addReconstructResolutionBookmark(
         std::back_inserter(selectedWindows),
         [](QnResourceWidget* widget) { return widget->isSelected(); });
 
-    NX_ASSERT(!selectedWindows.empty(), "Condition must not allow this");
     if (selectedWindows.empty())
-        return;
+        selectedWindows.push_back(context->display()->widget(Qn::CentralRole));
 
     QnCameraBookmark bookmark;
     bookmark.guid = QnUuid::createUuid();
