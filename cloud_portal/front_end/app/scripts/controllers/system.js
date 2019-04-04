@@ -192,7 +192,7 @@ angular.module('cloudApp')
                             .replace('{{primarySystem}}', $scope.system.info.name)
                             .replace('{{secondarySystem}}', error.targetSystem.name);
                         var dialogBody = '<p>' + commonErrorMsg + '</p>';
-                        var responseError = L.errorCodes[error.errorText];
+                        var responseError = L.errorCodes[error.errorText] || L.errorCodes[error.responseCode];
                         if (!responseError) {
                             delete error.targetSystem;
                             delete error.targetSystem;
