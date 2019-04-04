@@ -3,6 +3,16 @@
     "rulesDirectory": [
         "node_modules/tslint-eslint-rules/dist/rules"
     ],
+    "jsRules": {
+        "quotemark": [
+            true,
+            "single",
+            "avoid-escape",
+            "avoid-template"
+        ],
+        "trailing-comma": false,
+        "object-literal-sort-keys": false
+    },
     "rules"         : {
         "no-unnecessary-type-assertion"   : true,
         "array-type"                      : [
