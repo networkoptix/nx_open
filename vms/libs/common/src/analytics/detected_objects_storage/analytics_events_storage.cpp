@@ -848,6 +848,9 @@ void EventsStorage::cleanupEvents(
 void EventsStorage::cleanupEventProperties(
     nx::sql::QueryContext* queryContext)
 {
+    // TODO: #ak META-222
+
+#if 0
     sql::SqlQuery query(queryContext->connection());
 
     query.prepare(R"sql(
@@ -856,6 +859,7 @@ void EventsStorage::cleanupEventProperties(
     )sql");
 
     query.exec();
+#endif
 }
 
 void EventsStorage::addToAttributesCache(
