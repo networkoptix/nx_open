@@ -51,7 +51,6 @@ jsonDataT = t.json()
 userList = {"viewer":"viewer",
 			"advviewer":"advancedViewer",
 			"liveviewer":"liveViewer",
-			"notowner":"viewer",
 			"admin":"cloudAdmin",
 			"custom":"Custom",
 			"clientcustom":"Custom"}
