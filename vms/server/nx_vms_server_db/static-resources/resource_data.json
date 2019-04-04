@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.32",
+    "version": "1.0.1.36",
     "data": [
         {
             "keys": [
@@ -2828,7 +2828,11 @@
             }
         },
         {
-            "keys": ["DW|DWC-MPZ20XFM"],
+            "keys": 
+            [
+                "DW|DWC-MPZ20XFM",
+                "DW|DWC-MD421D"
+            ],
             "mediaTraits": {
                 "aspectRatioDependent": {
                     "allowedAspectRatioDiff": "0.1"
