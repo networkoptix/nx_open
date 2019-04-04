@@ -19,8 +19,6 @@ struct QnEventLogMultiserverRequestData: public QnMultiserverRequestData
 
     virtual void loadFromParams(QnResourcePool* resourcePool,
         const QnRequestParamList& params) override;
-    virtual void loadFromParams(QnResourcePool* resourcePool,
-        const QnRequestParams& params) override;
 
     virtual QnRequestParamList toParams() const override;
     virtual bool isValid() const override;

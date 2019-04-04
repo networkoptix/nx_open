@@ -28,18 +28,12 @@ int QnLogRestHandler::executeGet(
     }
 
     qint64 linesToRead = 100;
-    for (int i = 0; i < params.size(); ++i)
-    {
-        if (params[i].first == "lines")
-        {
-            linesToRead = params[i].second.toLongLong();
-            break;
-        }
-    }
+    if (const auto lines = params.value("lines"); !lines.isEmpty())
+        linesToRead = lines.toLongLong();
 
     std::optional<QString> logFilePath;
     {
-        const auto name = params.value(lit("name"));
+        const auto name = params.value("name");
         if (!name.isEmpty())
         {
             if (auto logger = QnLogs::getLogger(name))
@@ -47,7 +41,7 @@ int QnLogRestHandler::executeGet(
         }
         else
         {
-            const auto id = params.value(lit("id")).toInt();
+            const auto id = params.value("id").toInt();
             if (auto logger = QnLogs::getLogger(id))
                 logFilePath = logger->filePath();
         }

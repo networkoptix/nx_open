@@ -2745,7 +2745,7 @@ void MediaServerProcess::registerRestHandlers(
 
 void MediaServerProcess::reg(
     const QString& path,
-    QnRestRequestHandler* handler,
+    nx::network::rest::Handler* handler,
     GlobalPermission permission)
 {
     reg(QnRestProcessorPool::kAnyHttpMethod, path, handler, permission);
@@ -2754,7 +2754,7 @@ void MediaServerProcess::reg(
 void MediaServerProcess::reg(
     const nx::network::http::Method::ValueType& method,
     const QString& path,
-    QnRestRequestHandler* handler,
+    nx::network::rest::Handler* handler,
     GlobalPermission permission)
 {
     m_universalTcpListener->processorPool()->registerHandler(

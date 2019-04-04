@@ -1,13 +1,10 @@
 #pragma once
 
-#include "request_handler.h"
+#include <nx/network/rest/handler.h>
 
-class OptionsRequestHandler:
-    public QnRestRequestHandler
+class OptionsRequestHandler: public nx::network::rest::Handler
 {
-public:
-    virtual RestResponse executeRequest(
-        nx::network::http::Method::ValueType method,
-        const RestRequest& request,
-        const RestContent& content) override;
+private:
+    virtual nx::network::rest::Response executeAny(
+        const nx::network::rest::Request& request) override;
 };
