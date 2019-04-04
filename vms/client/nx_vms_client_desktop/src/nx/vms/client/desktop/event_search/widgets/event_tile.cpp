@@ -193,13 +193,13 @@ struct EventTile::Private
         return q->preview() && q->previewEnabled();
     }
 
-    void requestPreview()
+    bool isPreviewUpdateRequired() const
     {
         if (!isPreviewNeeded() || !NX_ASSERT(q->preview()))
             return false;
 
-        if (!isPreviewNeeded())
-            return;
+        if (forceNextPreviewUpdate)
+            return true;
 
         switch (q->preview()->status())
         {
@@ -214,6 +214,7 @@ struct EventTile::Private
 
     void requestPreview()
     {
+        if (!isPreviewUpdateRequired())
             return;
 
         NX_VERBOSE(this, "Requesting tile preview");
@@ -232,7 +233,7 @@ struct EventTile::Private
 
     void updatePreview(milliseconds delay)
     {
-        if (isPreviewNeeded())
+        if (isPreviewUpdateRequired())
             loadPreviewTimer->start(delay);
         else
             loadPreviewTimer->stop();
@@ -524,6 +525,7 @@ ImageProvider* EventTile::preview() const
 
 void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
 {
+    if (preview() == value && !forceUpdate)
         return;
 
     if (preview())
