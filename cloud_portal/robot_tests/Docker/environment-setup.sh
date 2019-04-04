@@ -2,26 +2,27 @@
 TESTENV=https://cloud-test.hdw.mx
 SERVERVERSION=4.0.0.28541
 
-#robot -v ENV:$TESTENV special-cases/qa-user-creation
-docker build -t mediaserverma --build-arg mediaserver_deb=nxwitness-server-$SERVERVERSION*.deb .
+#build the docker media server
+docker build -t mediaserver --build-arg mediaserver_deb=nxwitness-server-$SERVERVERSION*.deb .
 a=0
+#create 7 eroneous offline systems for testing
 while [ $a -lt 7 ]
 do
     docker-compose up -d
     sleep  3
     python setupCloudSystem.py
-    sleep  90
+    sleep  3
     docker-compose down
     sudo rm -rf video/
     sudo rm -rf data/
     echo $a
     a=`expr $a + 1`
-
 done
-docker-compose up
+#create the Auto Tests 2 system
+docker-compose up -d
 sleep  3
 python setupCloudSystem.py "Auto Tests 2"
-sleep  90
+sleep  3
 docker-compose down
-rm -r video/
-rm -r data/
+sudo rm -r video/
+sudo rm -r data/

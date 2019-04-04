@@ -67,6 +67,17 @@ for user, permission in userList.iteritems():
 		auth=requests.auth.HTTPDigestAuth(CLOUD_USER, CLOUD_PASS))
 	print u.status_code
 
+#If it is creating the Auto Tests 2 system, also add the anchor user
+if SYSTEM_NAME == "Auto Tests 2":
+	u = requests.post("{}/cdb/system/share".format(CLOUD_URL),
+		json={
+			"systemId" : jsonData["id"],
+			"accessRole": "viewer",
+			"accountEmail"  : "noptixautoqa+autotests2anchor@gmail.com",
+			},
+		auth=requests.auth.HTTPDigestAuth(CLOUD_USER, CLOUD_PASS))
+	print u.status_code
+
 #This loop gets the users list once it is at least 8 long
 vLen = 0
 while vLen < 9:
@@ -75,7 +86,7 @@ while vLen < 9:
 	jsonDataV = v.json()
 	vLen = len(jsonDataV)
 	print "Waiting for user list to update..."
-	time.sleep(1)
+	time.sleep(2)
 
 #This takes the Client Custom user and changes their permissions from Custom to Client Custom
 w = requests.post("{}/ec2/saveUser".format(SERVER_URL),
