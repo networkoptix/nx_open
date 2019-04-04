@@ -17,6 +17,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/color_transformations.h>
@@ -112,9 +113,12 @@ EventRibbon::Private::Private(EventRibbon* q):
     m_autoCloseTimer->setInterval(1s);
     connect(m_autoCloseTimer.get(), &QTimer::timeout, this, &Private::closeExpiredTiles);
 
+    const auto loadNextPreviewDelayed =
+        [this]() { executeLater([this]() { loadNextPreview(); }, this); };
+
     m_previewLoad->setIntervalMs(ini().tilePreviewLoadIntervalMs);
     m_previewLoad->setFlags(nx::utils::PendingOperation::FireImmediately);
-    m_previewLoad->setCallback([this]() { loadNextPreview(); });
+    m_previewLoad->setCallback(loadNextPreviewDelayed);
 }
 
 EventRibbon::Private::~Private()
@@ -323,11 +327,13 @@ void EventRibbon::Private::updateTilePreview(int index)
     auto& previewProvider = m_tiles[index]->preview;
     if (!previewProvider || request.resource != previewProvider->requestData().resource)
         previewProvider.reset(new ResourceThumbnailProvider(request));
+    else
+        previewProvider->setRequestData(request);
 
     previewProvider->setStreamSelectionMode(modelIndex.data(Qn::PreviewStreamSelectionRole)
         .value<nx::api::CameraImageRequest::StreamSelectionMode>());
 
-    widget->setPreview(previewProvider.get());
+    widget->setPreview(previewProvider.get(), true /*force update*/);
     widget->setPreviewCropRect(previewCropRect);
 }
 
