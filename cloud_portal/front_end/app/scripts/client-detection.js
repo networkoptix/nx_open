@@ -5,13 +5,13 @@
  * (C) viazenetti GmbH (Christian Ludwig)
  * http://jsfiddle.net/ChristianL/AVyND/
  */
-(function () {
+(function() {
     {
         var unknown = '-';
 
         // screen
         var screenSize = '';
-        var width,height;
+        var width, height;
 
         if (screen.width) {
             width = (screen.width) ? screen.width : '';
@@ -138,24 +138,30 @@
         }
 
         var osVersion = unknown;
+        var supportedOS = {
+            'macos': 'Mac OS X',
+            'win': 'Windows',
+            'android': 'Android',
+            'ios': 'iOS'
+        };
 
         if (/Windows/.test(os)) {
             osVersion = /Windows (.*)/.exec(os)[1];
-            os = 'Windows';
+            os = supportedOS.win;
         }
         var touch = false;
         switch (os) {
-            case 'Mac OS X':
+            case supportedOS.macos:
                 osVersion = /Mac OS X (10[\.\_\d]+)/.exec(nAgt)[1];
                 touch = true;
                 break;
 
-            case 'Android':
+            case supportedOS.android:
                 osVersion = /Android ([\.\_\d]+)/.exec(nAgt)[1];
                 touch = true;
                 break;
 
-            case 'iOS':
+            case supportedOS.ios:
                 osVersion = /OS (\d+)_(\d+)_?(\d+)?/.exec(nVer);
                 touch = true;
                 osVersion = osVersion[1] + '.' + osVersion[2] + '.' + (osVersion[3] | 0);
@@ -169,19 +175,19 @@
             var fv = swfobject.getFlashPlayerVersion();
             if (fv.major > 0) {
                 flashVersion = fv.major + '.' + fv.minor + ' r' + fv.release;
-            }
-            else  {
+            } else  {
                 flashVersion = null;
             }
         }
     }
 
     window.jscd = {
+        supportedOS: supportedOS,
         screen: screenSize,
         browser: browser,
         browserVersion: version,
-        browserMajorVersion:majorVersion,
-        isWebkit:'',
+        browserMajorVersion: majorVersion,
+        isWebkit: '',
         touch: touch,
         mobile: mobile,
         os: os,

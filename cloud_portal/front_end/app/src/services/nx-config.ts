@@ -27,6 +27,7 @@ export class NxConfigService {
             openClientTimeout: 20 * 1000, // 20 seconds we wait for client to open
 
             openMobileClientTimeout: 300, // 300ms for mobile browsers
+            timelineMouseEventTimeout: 300, // milliseconds
 
             alertTimeout       : 3 * 1000,  // Alerts are shown for 3 seconds
             alertsMaxCount     : 5,
