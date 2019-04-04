@@ -76,6 +76,9 @@ public:
     /** Process startup parameters and call related actions. Returns false if something goes critically wrong. */
     StartupParametersCode handleStartupParameters(const QnStartupParameters& startupParams);
 
+    /** Whether the scene is visible in the main window. */
+    bool isWorkbenchVisible() const;
+
 signals:
     /**
      * This signal is emitted whenever the user that is currently logged in changes.

@@ -405,3 +405,7 @@ void QnWorkbenchContext::initWorkarounds()
     menu()->registerAlias(action::EffectiveMaximizeAction, effectiveMaximizeActionId);
 }
 
+bool QnWorkbenchContext::isWorkbenchVisible() const
+{
+    return m_mainWindow && m_mainWindow->isWorkbenchVisible();
+}
