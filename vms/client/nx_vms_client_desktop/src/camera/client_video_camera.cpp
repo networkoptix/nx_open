@@ -64,7 +64,6 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
                 &m_camdispay, &QnCamDisplay::onSkippingFrames, Qt::DirectConnection);
         }
     }
-
 }
 
 QnClientVideoCamera::~QnClientVideoCamera()
@@ -154,7 +153,6 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     QnMutexLocker lock( &m_exportMutex );
     if (!m_exportRecorder)
     {
-
         auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
             m_resource->toResourcePtr());
         QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (tmpReader);
@@ -260,7 +258,7 @@ void QnClientVideoCamera::stopExport()
             m_exportRecorder->pleaseStop();
             m_exportReader->wait(); //< We should wait for recorder to stop.
             // executeLater is used to make it work similar to previous code.
-            executeLater([this]() { emit exportStopped(); }, this); 
+            emit exportStopped();
         }
         m_exportRecorder->deleteLater();
     }
