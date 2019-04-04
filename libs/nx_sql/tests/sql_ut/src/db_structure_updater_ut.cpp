@@ -97,7 +97,8 @@ class BasicDbStructureUpdaterTestSetup:
     using base_type = FixtureWithQueryExecutorOnly;
 
 public:
-    BasicDbStructureUpdaterTestSetup()
+    BasicDbStructureUpdaterTestSetup():
+        base_type("sql_ut")
     {
         using namespace std::placeholders;
 
