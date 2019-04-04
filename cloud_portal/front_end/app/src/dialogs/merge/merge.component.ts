@@ -74,16 +74,11 @@ export class MergeModalContent {
             return this.cloudApi.merge(masterSystemId, slaveSystemId, this.password);
         }, {
             errorCodes: {
-                mergedSystemIsOffline: (error) => {
-                    return this.language.errorCodes[error.errorText] || error.errorText;
+                mergedSystemIsOffline: () => {
+                    return this.language.system.failedMerge;
                 },
-                vmsRequestFailure: (error) => {
-                    const errorText = this.language.errorCodes[error.errorText] || error.errorText;
-                    let errorData = '';
-                    if (!(errorText in this.language.errorCodes) && error.errorData) {
-                        errorData = JSON.stringify(error.errorData);
-                    }
-                    return errorData ? `${errorText}\nError Data: ${errorData}` : errorText;
+                vmsRequestFailure: () => {
+                    return this.language.system.failedMerge;
                 },
                 wrongPassword: () => {
                     this.mergeForm.controls['mergePassword'].setErrors({'wrongPassword': true});
@@ -91,10 +86,9 @@ export class MergeModalContent {
 
                     this.renderer.selectRootElement('#mergePassword').focus();
                     this.wrongPassword = true;
-
                 },
             },
-            successMessage: this.language.system.mergeSystemSuccess
+            successMessage: this.language.system.successMerge
         }).then(() => {
             this.systemsProvider.forceUpdateSystems();
             this.activeModal.close({
@@ -103,6 +97,11 @@ export class MergeModalContent {
                     this.configService.config.systemStatuses.master :
                     this.configService.config.systemStatuses.slave
             });
+        }, (error) => {
+            if (error.data.resultCode !== 'wrongPassword') {
+                error.data.targetSystem = this.targetSystem;
+                this.activeModal.dismiss(error.data);
+            }
         });
 
         this.checkMergeabilityProcess = this.process.init(() => {
@@ -115,7 +114,7 @@ export class MergeModalContent {
             this.checking = false;
             this.targetSystemDropdown.name = this.addStatus(this.targetSystem);
             this.systemMergeable = this.checkMergeability(this.targetSystem);
-            if (!res.system && this.systemMergeable === '') {
+            if (!res.system && this.systemMergeable === '' || this.config.allowDebugMode) {
                 return this.updateState();
             }
         });
