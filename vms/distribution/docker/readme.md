@@ -8,7 +8,7 @@ TODO: Pass the name for mediaserver.deb through arguments
 
 Building an image from current directory
 ```bash
-docker build -t mediaserver .
+docker build -t mediaserver --build-arg mediaserver_deb=path_to_mediaserver.deb .
 ```
 
 It will fetch all necessary layers and build docker image with name `mediaserver`.
