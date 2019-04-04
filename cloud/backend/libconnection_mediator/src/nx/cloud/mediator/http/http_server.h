@@ -98,6 +98,8 @@ public:
         HolePunchingProcessor* holePunchingProcessor,
         ListeningPeerDb* listeningPeerDb);
 
+    virtual ~InitiateConnectionRequestHandler();
+
 protected:
     /** Used to cache needed info from nx::network::http::RequestContext*/
     struct CachedRequestContext
@@ -129,6 +131,7 @@ protected:
 private:
     HolePunchingProcessor* m_holePunchingProcessor = nullptr;
     ListeningPeerDb* m_listeningPeerDb = nullptr;
+    nx::utils::Counter m_listeningPeerDbGuard;
 };
 
 } // namespace http

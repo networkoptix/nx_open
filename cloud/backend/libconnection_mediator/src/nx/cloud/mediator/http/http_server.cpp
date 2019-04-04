@@ -211,6 +211,11 @@ InitiateConnectionRequestHandler::InitiateConnectionRequestHandler(
 {
 }
 
+InitiateConnectionRequestHandler::~InitiateConnectionRequestHandler()
+{
+    m_listeningPeerDbGuard.wait();
+}
+
 void InitiateConnectionRequestHandler::processRequest(
     nx::network::http::RequestContext requestContext,
     api::ConnectRequest inputData)
@@ -227,7 +232,8 @@ void InitiateConnectionRequestHandler::processRequest(
             requestContext.connection->socket()->getForeignAddress()},
         inputData,
         [this, cachedRequestContext = std::move(cachedRequestContext),
-            targetServer = inputData.destinationHostName](
+            targetServer = inputData.destinationHostName,
+            lock = m_listeningPeerDbGuard.getScopedIncrement()](
             api::ResultCode resultCode,
             api::ConnectResponse response)
         {
