@@ -21,6 +21,8 @@
 #include <nx/vms/server/hls/hls_live_playlist_manager.h>
 #include <api/helpers/thumbnail_request_data.h>
 
+#include <nx/utils/elapsed_timer.h>
+
 class QnVideoCameraGopKeeper;
 class QnDataProviderFactory;
 class MediaStreamCache;
@@ -147,6 +149,7 @@ public:
 
 private:
     void createReader(QnServer::ChunksCatalog catalog);
+    QnLiveStreamProviderPtr readerByQuality(MediaQuality streamQuality) const;
     void stop();
 
 private:
@@ -163,7 +166,8 @@ private:
     QSet<void*> m_cameraUsers;
     QnCompressedAudioDataPtr m_lastAudioFrame;
     //!index - is a \a MediaQuality element
-    std::vector<std::unique_ptr<MediaStreamCache> > m_liveCache;
+    std::vector<std::unique_ptr<MediaStreamCache>> m_liveCache;
+    std::map<MediaQuality, nx::utils::ElapsedTimer> m_liveCacheValidityTimers;
     //!index - is a \a MediaQuality element
     std::vector<nx::vms::server::hls::LivePlaylistManagerPtr> m_hlsLivePlaylistManager;
 
@@ -197,7 +201,7 @@ private:
 
     bool ensureLiveCacheStarted(
         MediaQuality streamQuality,
-        const QnLiveStreamProviderPtr& primaryReader,
+        const QnLiveStreamProviderPtr& reader,
         qint64 targetDurationUSec,
         const QString& reasonForLog);
 

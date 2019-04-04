@@ -108,6 +108,7 @@ struct EventTile::Private
     const QScopedPointer<QTimer> loadPreviewTimer;
     bool automaticPreviewLoad = true;
     bool isPreviewLoadNeeded = false;
+    bool forceNextPreviewUpdate = false;
     qreal progressValue = 0.0;
     bool isRead = false;
     bool footerEnabled = true;
@@ -192,10 +193,13 @@ struct EventTile::Private
         return q->preview() && q->previewEnabled();
     }
 
-    bool isPreviewUpdareRequired() const
+    void requestPreview()
     {
         if (!isPreviewNeeded() || !NX_ASSERT(q->preview()))
             return false;
+
+        if (!isPreviewNeeded())
+            return;
 
         switch (q->preview()->status())
         {
@@ -210,10 +214,11 @@ struct EventTile::Private
 
     void requestPreview()
     {
-        if (!isPreviewUpdareRequired())
             return;
 
         NX_VERBOSE(this, "Requesting tile preview");
+        forceNextPreviewUpdate = false;
+
         if (automaticPreviewLoad)
         {
             q->preview()->loadAsync();
@@ -227,7 +232,7 @@ struct EventTile::Private
 
     void updatePreview(milliseconds delay)
     {
-        if (isPreviewUpdareRequired())
+        if (isPreviewNeeded())
             loadPreviewTimer->start(delay);
         else
             loadPreviewTimer->stop();
@@ -517,9 +522,8 @@ ImageProvider* EventTile::preview() const
     return ui->previewWidget->imageProvider();
 }
 
-void EventTile::setPreview(ImageProvider* value)
+void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
 {
-    if (preview() == value)
         return;
 
     if (preview())
@@ -529,6 +533,7 @@ void EventTile::setPreview(ImageProvider* value)
     ui->previewWidget->parentWidget()->setHidden(!value);
 
     d->isPreviewLoadNeeded = false;
+    d->forceNextPreviewUpdate = true;
     d->updatePreview(previewLoadDelay());
 
     if (ini().showDebugTimeInformationInRibbon)
@@ -572,9 +577,8 @@ void EventTile::setAutomaticPreviewLoad(bool value)
         return;
 
     d->automaticPreviewLoad = value;
-
-    if (d->automaticPreviewLoad)
-        d->updatePreview(previewLoadDelay());
+    d->isPreviewLoadNeeded = d->isPreviewLoadNeeded && !d->automaticPreviewLoad;
+    d->updatePreview(previewLoadDelay());
 }
 
 bool EventTile::isPreviewLoadNeeded() const
@@ -880,7 +884,7 @@ void EventTile::clear()
     setFooterText({});
     setTimestamp({});
     setIcon({});
-    setPreview({});
+    setPreview({}, false);
     setPreviewCropRect({});
     setAction({});
     setBusyIndicatorVisible(false);

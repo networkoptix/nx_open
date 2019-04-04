@@ -63,7 +63,7 @@ public:
 
     // Does not take ownership.
     ImageProvider* preview() const;
-    void setPreview(ImageProvider* value);
+    void setPreview(ImageProvider* value, bool forceUpdate);
 
     QRectF previewCropRect() const;
     void setPreviewCropRect(const QRectF& relativeRect);
