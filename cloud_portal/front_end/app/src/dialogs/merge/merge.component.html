@@ -13,8 +13,12 @@
             <p class="help-block-no-height" translate>
                 You can merge only those cloud Systems, where you have the "Owner" permissions.
             </p>
-            <p class="help-block-no-height" translate>
-                Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.
+            <p class="help-block-no-height">
+                <span translate>Connect System you want to merge with this one to&nbsp;</span>
+                <span class="bold-text">%PRODUCT_NAME%</span>
+                <span>&nbsp;or merge locally using&nbsp;</span>
+                <span class="bold-text">%VMS_NAME%</span>
+                <span translate>&nbsp;Client.</span>
             </p>
         </div>
         <div *ngIf="outOfDate">
@@ -85,20 +89,20 @@
                        class="help-block-no-height mb-2" translate>You can only merge Systems in which you have owner permissions.</p>
                 </ng-template>
                 <div>
-                        <div [ngClass]="{'text-muted': systemMergeable != ''}" translate>Take System name and settings from</div>
-                        <div>
-                            <div class="radio-group">
-                                <nx-radio name="firstSystem" [value]="system.id"
-                                          [label]="system.name || system.info && system.info.name"
-                                          compId="firstSystem" [(ngModel)]="masterId"></nx-radio>
-                            </div>
-                            <div class="radio-group">
-                                <nx-radio name="secondSystem" [value]="targetSystem.id"
-                                          [label]="targetSystem.name || targetSystem.info && targetSystem.info.name"
-                                          compId="secondSystem" [(ngModel)]="masterId"></nx-radio>
-                            </div>
+                    <div class="bold-text" translate>Take System name and settings from</div>
+                    <div>
+                        <div class="radio-group">
+                            <nx-radio name="firstSystem" [value]="system.id"
+                                      [label]="system.name || system.info && system.info.name"
+                                      compId="firstSystem" [(ngModel)]="masterId"></nx-radio>
+                        </div>
+                        <div class="radio-group">
+                            <nx-radio name="secondSystem" [value]="targetSystem.id"
+                                      [label]="targetSystem.name || targetSystem.info && targetSystem.info.name"
+                                      compId="secondSystem" [(ngModel)]="masterId"></nx-radio>
                         </div>
                     </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <nx-process-button [process]="checkMergeabilityProcess"
@@ -113,7 +117,7 @@
             <div class="modal-body">
                 <p>
                     <span translate>There will be more than</span>
-                    &nbsp;{{ config.maxServers }}&nbsp;
+                    <span class="bold-text">&nbsp;{{ config.maxServers }}&nbsp;</span>
                     <span translate>servers in the merged System.</span>
                 </p>
                 <p translate>Systems of such size may work but will be unstable and have troubles with updates and synchronisation.</p>
@@ -130,9 +134,11 @@
         </div>
         <div *ngIf="state == 'confirm'">
             <div class="modal-body">
-                <p translate class="mb-3">Enter password to your account.</p>
+                <p translate class="mb-3">
+                    You are about to merge systems <span class="bold-text">{{system.info.name}}</span> and <span class="bold-text">{{targetSystem.name}}</span>. Settings and the name will be taken from the <span class="bold-text">{{system.info.name}}</span>.
+                </p>
                 <div class="form-group">
-                    <label for="mergePassword" translate>Password</label>
+                    <label for="mergePassword" translate>Enter password for your account to continue</label>
                     <input class="form-control"
                            [(ngModel)]="password" #mergePassword="ngModel"
                            id="mergePassword" autocomplete="new-password"
@@ -151,7 +157,7 @@
                                    [process]="mergingProcess"
                                    [form]="mergeForm"
                                    actionType="primary"
-                                   buttonText="{{ 'Merge' | translate}}"></nx-process-button>
+                                   buttonText="{{ 'Merge Systems' | translate}}"></nx-process-button>
                 <button class="btn btn-default" (click)="activeModal.close()" translate>Cancel</button>
             </div>
         </div>

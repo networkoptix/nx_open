@@ -147,3 +147,9 @@
         padding         : 1rem;
     }
 }
+
+.bold-text {
+    font-size   : $font-size-base;
+    font-weight : bolder;
+    color: $dark9;
+}
