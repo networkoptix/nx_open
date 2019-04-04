@@ -50,17 +50,29 @@ void CommonUpdateInstaller::prepareAsync(const QString& path)
                     m_condition.wakeOne();
                 });
 
+            NX_DEBUG(
+                this,
+                lm("ZipExtractor for a path (%1) finished with the code %2")
+                    .args(QnZipExtractor::errorToString(errorCode)));
+
             switch (errorCode)
             {
                 case QnZipExtractor::Error::Ok:
                     return setStateLocked(checkContents(outputPath));
                 case QnZipExtractor::Error::NoFreeSpace:
                     return setStateLocked(CommonUpdateInstaller::State::noFreeSpace);
-                default:
-                    NX_WARNING(
-                        this,
-                        lm("ZipExtractor error: %1").args(QnZipExtractor::errorToString(errorCode)));
-                    return setStateLocked(CommonUpdateInstaller::State::unknownError);
+                case QnZipExtractor::Error::BrokenZip:
+                    return setStateLocked(CommonUpdateInstaller::State::brokenZip);
+                case QnZipExtractor::Error::WrongDir:
+                    return setStateLocked(CommonUpdateInstaller::State::wrongDir);
+                case QnZipExtractor::Error::CantOpenFile:
+                    return setStateLocked(CommonUpdateInstaller::State::cantOpenFile);
+                case QnZipExtractor::Error::OtherError:
+                    return setStateLocked(CommonUpdateInstaller::State::otherError);
+                case QnZipExtractor::Error::Stopped:
+                    return setStateLocked(CommonUpdateInstaller::State::stopped);
+                case QnZipExtractor::Error::Busy:
+                    return setStateLocked(CommonUpdateInstaller::State::busy);
             }
         });
 }
