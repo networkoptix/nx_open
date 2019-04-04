@@ -128,17 +128,17 @@ private:
     struct AttributesCacheEntry
     {
         QByteArray md5;
-        std::int64_t id = -1;
+        long long id = -1;
     };
 
     const Settings& m_settings;
     DbController m_dbController;
     std::chrono::microseconds m_maxRecordedTimestamp = std::chrono::microseconds::zero();
     mutable QnMutex m_mutex;
-    std::map<QnUuid, std::int64_t> m_deviceGuidToId;
-    std::map<std::int64_t, QnUuid> m_idToDeviceGuid;
-    std::map<QString, std::int64_t> m_objectTypeToId;
-    std::map<std::int64_t, QString> m_idToObjectType;
+    std::map<QnUuid, long long> m_deviceGuidToId;
+    std::map<long long, QnUuid> m_idToDeviceGuid;
+    std::map<QString, long long> m_objectTypeToId;
+    std::map<long long, QString> m_idToObjectType;
     std::deque<AttributesCacheEntry> m_attributesCache;
 
     bool readMaximumEventTimestamp();
@@ -147,13 +147,13 @@ private:
     void loadDeviceDictionary(nx::sql::QueryContext* queryContext);
     void loadObjectTypeDictionary(nx::sql::QueryContext* queryContext);
 
-    void addDeviceToDictionary(std::int64_t id, const QnUuid& deviceGuid);
-    std::int64_t deviceIdFromGuid(const QnUuid& deviceGuid) const;
-    QnUuid deviceGuidFromId(std::int64_t id) const;
+    void addDeviceToDictionary(long long id, const QnUuid& deviceGuid);
+    long long deviceIdFromGuid(const QnUuid& deviceGuid) const;
+    QnUuid deviceGuidFromId(long long id) const;
 
-    void addObjectTypeToDictionary(std::int64_t id, const QString& name);
-    std::int64_t objectTypeIdFromName(const QString& name) const;
-    QString objectTypeFromId(std::int64_t id) const;
+    void addObjectTypeToDictionary(long long id, const QString& name);
+    long long objectTypeIdFromName(const QString& name) const;
+    QString objectTypeFromId(long long id) const;
 
     nx::sql::DBResult savePacket(
         nx::sql::QueryContext*,
@@ -167,7 +167,7 @@ private:
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject,
-        std::int64_t attributesId);
+        long long attributesId);
 
     void updateDictionariesIfNeeded(
         nx::sql::QueryContext* queryContext,
@@ -187,7 +187,7 @@ private:
      * Inserts attributes or returns id or existing attributes.
      * @return attributesId
      */
-    std::int64_t insertAttributes(
+    long long insertAttributes(
         nx::sql::QueryContext* queryContext,
         const std::vector<common::metadata::Attribute>& eventAttributes);
 
@@ -254,8 +254,8 @@ private:
 
     void cleanupEventProperties(nx::sql::QueryContext* queryContext);
 
-    void addToAttributesCache(std::int64_t id, const QByteArray& content);
-    std::int64_t findAttributesIdInCache(const QByteArray& content);
+    void addToAttributesCache(long long id, const QByteArray& content);
+    long long findAttributesIdInCache(const QByteArray& content);
 };
 
 //-------------------------------------------------------------------------------------------------

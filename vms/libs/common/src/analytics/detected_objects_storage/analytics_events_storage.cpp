@@ -210,21 +210,21 @@ void EventsStorage::loadDeviceDictionary(nx::sql::QueryContext* queryContext)
 }
 
 void EventsStorage::addDeviceToDictionary(
-    std::int64_t id, const QnUuid& deviceGuid)
+    long long id, const QnUuid& deviceGuid)
 {
     QnMutexLocker locker(&m_mutex);
     m_deviceGuidToId.emplace(deviceGuid, id);
     m_idToDeviceGuid.emplace(id, deviceGuid);
 }
 
-std::int64_t EventsStorage::deviceIdFromGuid(const QnUuid& deviceGuid) const
+long long EventsStorage::deviceIdFromGuid(const QnUuid& deviceGuid) const
 {
     QnMutexLocker locker(&m_mutex);
     auto it = m_deviceGuidToId.find(deviceGuid);
     return it != m_deviceGuidToId.end() ? it->second : -1;
 }
 
-QnUuid EventsStorage::deviceGuidFromId(std::int64_t id) const
+QnUuid EventsStorage::deviceGuidFromId(long long id) const
 {
     QnMutexLocker locker(&m_mutex);
     auto it = m_idToDeviceGuid.find(id);
@@ -232,21 +232,21 @@ QnUuid EventsStorage::deviceGuidFromId(std::int64_t id) const
 }
 
 void EventsStorage::addObjectTypeToDictionary(
-    std::int64_t id, const QString& name)
+    long long id, const QString& name)
 {
     QnMutexLocker locker(&m_mutex);
     m_objectTypeToId.emplace(name, id);
     m_idToObjectType.emplace(id, name);
 }
 
-std::int64_t EventsStorage::objectTypeIdFromName(const QString& name) const
+long long EventsStorage::objectTypeIdFromName(const QString& name) const
 {
     QnMutexLocker locker(&m_mutex);
     auto it = m_objectTypeToId.find(name);
     return it != m_objectTypeToId.end() ? it->second : -1;
 }
 
-QString EventsStorage::objectTypeFromId(std::int64_t id) const
+QString EventsStorage::objectTypeFromId(long long id) const
 {
     QnMutexLocker locker(&m_mutex);
     auto it = m_idToObjectType.find(id);
@@ -322,7 +322,7 @@ void EventsStorage::insertEvent(
     sql::QueryContext* queryContext,
     const common::metadata::DetectionMetadataPacket& packet,
     const common::metadata::DetectedObject& detectedObject,
-    std::int64_t attributesId)
+    long long attributesId)
 {
     sql::SqlQuery insertEventQuery(queryContext->connection());
     insertEventQuery.prepare(QString::fromLatin1(R"sql(
@@ -351,7 +351,7 @@ void EventsStorage::insertEvent(
     insertEventQuery.exec();
 }
 
-std::int64_t EventsStorage::insertAttributes(
+long long EventsStorage::insertAttributes(
     sql::QueryContext* queryContext,
     const std::vector<common::metadata::Attribute>& eventAttributes)
 {
@@ -863,7 +863,7 @@ void EventsStorage::cleanupEventProperties(
 }
 
 void EventsStorage::addToAttributesCache(
-    std::int64_t id,
+    long long id,
     const QByteArray& content)
 {
     static constexpr int kCacheSize = 101;
@@ -876,7 +876,7 @@ void EventsStorage::addToAttributesCache(
         m_attributesCache.pop_front();
 }
 
-std::int64_t EventsStorage::findAttributesIdInCache(
+long long EventsStorage::findAttributesIdInCache(
     const QByteArray& content)
 {
     const auto md5 = QCryptographicHash::hash(content, QCryptographicHash::Md5);
