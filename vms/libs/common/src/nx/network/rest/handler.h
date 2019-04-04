@@ -32,7 +32,7 @@ protected:
      * Implementation is expected to throw rest::Exception in case of error which is returned in
      * response.
      */
-    virtual Response executeAny(const Request& request);
+    virtual Response executeAnyMethod(const Request& request);
 
     virtual Response executeGet(const Request& request);
     virtual Response executeDelete(const Request& request);

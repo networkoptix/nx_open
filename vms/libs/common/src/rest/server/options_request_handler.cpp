@@ -2,7 +2,7 @@
 
 using namespace nx::network;
 
-rest::Response OptionsRequestHandler::executeAny(const rest::Request& request)
+rest::Response OptionsRequestHandler::executeAnyMethod(const rest::Request& request)
 {
     const auto origin = http::getHeaderValue(request.httpRequest->headers, "Origin");
 

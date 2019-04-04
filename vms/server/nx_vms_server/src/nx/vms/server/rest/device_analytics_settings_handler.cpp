@@ -36,8 +36,8 @@ nx::network::rest::Response DeviceAnalyticsSettingsHandler::executeGet(
         return nx::network::rest::Response::error(QnRestResult::InternalServerError, message);
     }
 
-    const QString& deviceId = request.paramOr(kDeviceIdParameter);
-    const QString& engineId = request.paramOr(kAnalyticsEngineIdParameter);
+    const QString& deviceId = request.paramOrDefault(kDeviceIdParameter);
+    const QString& engineId = request.paramOrDefault(kAnalyticsEngineIdParameter);
 
     return makeSettingsResponse(analyticsManager, engineId, deviceId);
 }
@@ -57,8 +57,8 @@ nx::network::rest::Response DeviceAnalyticsSettingsHandler::executePost(
         return nx::network::rest::Response::error(QnRestResult::InternalServerError, message);
     }
 
-    const QString& deviceId = request.paramOr(kDeviceIdParameter);
-    const QString& engineId = request.paramOr(kAnalyticsEngineIdParameter);
+    const QString& deviceId = request.paramOrDefault(kDeviceIdParameter);
+    const QString& engineId = request.paramOrDefault(kAnalyticsEngineIdParameter);
 
     analyticsManager->setSettings(deviceId, engineId, settings.toVariantMap());
     return makeSettingsResponse(analyticsManager, engineId, deviceId);

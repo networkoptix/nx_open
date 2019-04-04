@@ -4,10 +4,6 @@
 
 namespace nx::network::rest {
 
-// This ini config resides here because nx::network::rest is still in common and we can not
-// instantiate single ini configs because of static linkage.
-// Threre are already some plans to move nx::network::rest here anyway.
-
 struct Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_network_rest.ini") { reload(); }
@@ -25,6 +21,11 @@ struct Ini: nx::kit::IniConfig
     // This must be disabled as soon as we can discontinue deprecated POST methods.
     NX_INI_FLAG(1, allowUrlParametersForAnyMethod,
         "Enables POST and PUT methods to accept URL parameters as well as the message body.");
+
+    // This must be disabled as soon as we can discontinue deprecated modifying GET methods.
+    NX_INI_FLAG(1, allowGetModifications,
+        "Allows GET requests to modify server's state, e.g. 'GET /api/mergeSystems?... HTTP/1.1'\n"
+        "will result in 'HTTP/1.1 403 Forbidden', so user is forced to use POST.");
 };
 
 inline Ini& ini()

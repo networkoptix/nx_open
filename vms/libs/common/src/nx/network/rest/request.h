@@ -39,7 +39,7 @@ struct Request
 
     /** @return parsed param value or defaultValue on failure. */
     template<typename T = QString>
-    T paramOr(const QString& key, const T& defaultValue = {}) const;
+    T paramOrDefault(const QString& key, const T& defaultValue = {}) const;
 
     /** @return parsed param value or throws rest::Exception on failure. */
     template<typename T = QString>
@@ -99,7 +99,7 @@ inline std::optional<QString> Request::param<QString>(const QString& key) const
 }
 
 template<typename T>
-T Request::paramOr(const QString& key, const T& defaultValue) const
+T Request::paramOrDefault(const QString& key, const T& defaultValue) const
 {
     auto value = param<T>(key);
     return value ? *value : defaultValue;

@@ -5,6 +5,6 @@
 class OptionsRequestHandler: public nx::network::rest::Handler
 {
 private:
-    virtual nx::network::rest::Response executeAny(
+    virtual nx::network::rest::Response executeAnyMethod(
         const nx::network::rest::Request& request) override;
 };

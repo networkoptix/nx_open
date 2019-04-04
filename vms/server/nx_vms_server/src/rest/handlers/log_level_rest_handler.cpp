@@ -41,12 +41,12 @@ rest::Response QnLogLevelRestHandler::executeGet(const rest::Request& request)
         return rest::Response::reply(levelsByName);
     }
 
-    const auto name = request.paramOr(kNameParam);
+    const auto name = request.paramOrDefault(kNameParam);
     const auto logger = QnLogs::getLogger(name);
     if (!logger)
         return rest::Response::error(QnRestResult::InvalidParameter, kNameParam, name);
 
-    const auto value = request.paramOr(kValueParam);
+    const auto value = request.paramOrDefault(kValueParam);
     if (!value.isEmpty())
     {
         if (!hasPermission(request.owner))
@@ -67,7 +67,7 @@ rest::Response QnLogLevelRestHandler::executeGet(const rest::Request& request)
 rest::Response QnLogLevelRestHandler::manageLogLevelById(const rest::Request& request)
 {
     std::shared_ptr<nx::utils::log::AbstractLogger> logger;
-    const auto logId = request.paramOr(kIdParam);
+    const auto logId = request.paramOrDefault(kIdParam);
     {
         bool isLogIdInt = false;
         const auto logIdInt = logId.toInt(&isLogIdInt);

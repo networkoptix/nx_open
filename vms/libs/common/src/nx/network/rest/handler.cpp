@@ -5,7 +5,7 @@
 
 namespace nx::network::rest {
 
-Response Handler::executeAny(const Request& request)
+Response Handler::executeAnyMethod(const Request& request)
 {
     if (request.method() == nx::network::http::Method::get)
         return executeGet(request);
@@ -45,7 +45,7 @@ Response Handler::executeRequest(
     Response response;
     try
     {
-        response = executeAny(request);
+        response = executeAnyMethod(request);
     }
     catch (const Exception& error)
     {

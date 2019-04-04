@@ -148,9 +148,9 @@ TEST_F(RestRequestTest, GetWithUrlParams)
     EXPECT_EQ(std::optional<int>(42), request->param<int>("i"));
     EXPECT_FALSE(request->param<int>("b"));
 
-    EXPECT_EQ("", request->paramOr("notExist"));
-    EXPECT_EQ("default", request->paramOr("notExist", QString("default")));
-    EXPECT_EQ(123, request->paramOr<int>("b", 123));
+    EXPECT_EQ("", request->paramOrDefault("notExist"));
+    EXPECT_EQ("default", request->paramOrDefault("notExist", QString("default")));
+    EXPECT_EQ(123, request->paramOrDefault<int>("b", 123));
 
     const auto data = request->parseContent<SomeData>();
     ASSERT_TRUE(data);
