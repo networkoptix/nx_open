@@ -2,6 +2,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <recording/time_period_list.h>
+#include <nx/utils/thread/wait_condition.h>
 
 class MediaServerLauncher;
 class QnArchiveStreamReader;
@@ -35,32 +37,18 @@ static const int kLowQualityFileHeight = 240;
 Catalog generateCameraArchive(
     const QString& baseDir, const QString& cameraName, qint64 startTimeMs, int count);
 
-QByteArray createTestMkvFile(int lengthSec, int width, int height);
+QByteArray createTestMkvFileData(int lengthSec, int width, int height);
+void updateMkvMetaData(QByteArray& payload, int64_t startTimeMs);
 std::unique_ptr<QnArchiveStreamReader> createArchiveStreamReader(
     const QnVirtualCameraResourcePtr& camera);
 
 QnVirtualCameraResourcePtr cameraByUniqueId(QnResourcePool* resourcePool, const QString& uniqueId);
 
 /**
- * Checks that media data played covers the given time periods. The wait() function hangs until
- * above happens.
+ * Checks that media data played covers the given time periods. This function waits until
+ * above happens or forever.
  */
-class PlaybackChecker: public QnAbstractMediaDataReceptor
-{
-public:
-    PlaybackChecker(const QnTimePeriodList& timePeriods);
-
-    virtual bool canAcceptData() const override;
-    virtual void putData(const QnAbstractDataPacketPtr& data) override;
-    void wait();
-    void reset();
-
-private:
-    QnMutex m_archivePlaybackMutex;
-    QnWaitCondition m_archivePlaybackWaitCondition;
-    bool m_archivePlayedTillTheEnd = false;
-    QnTimePeriodList m_timePeriods;
-    int64_t m_timeGap = 0;
-};
+void checkPlaybackCorrecteness(
+    QnArchiveStreamReader* archiveReader, const QnTimePeriodList& expectedTimePeriods);
 
 } // namespace nx::vms::server::test::test_support

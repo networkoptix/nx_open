@@ -15,9 +15,7 @@
 
 namespace nx::vms::server::test {
 
-class FtArchiveIntegrityWatcher:
-    public test_support::MediaserverWithStorageFixture,
-    public QnAbstractMediaDataReceptor
+class FtArchiveIntegrityWatcher: public test_support::MediaserverWithStorageFixture
 {
 protected:
     virtual void SetUp() override
@@ -31,7 +29,6 @@ protected:
     {
         ASSERT_TRUE(m_archiveReader);
         m_archiveReader->stop();
-        m_archiveReader->removeDataProcessor(this);
         utils::log::removeLoggers({ utils::log::Filter(QString("ServerArchiveIntegrityWatcher")) });
         nx::utils::log::lockConfiguration();
     }
@@ -56,11 +53,7 @@ protected:
 
     void thenArchiveShouldBePlayedWithoutGaps()
     {
-        NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
-        while (!m_archivePlayedTillTheEnd)
-            m_archivePlaybackWaitCondition.wait(&m_archivePlaybackMutex);
-
-        m_archivePlayedTillTheEnd = false;
+        // Intentionally empty.
     }
 
     void whenPlayArchiveRequestIsIssued()
@@ -70,13 +63,12 @@ protected:
 
         ASSERT_TRUE((bool)camera);
         m_archiveReader = test_support::createArchiveStreamReader(camera);
-        m_archiveReader->addDataProcessor(this);
-        m_archiveReader->start();
 
-        m_archiveStartTime =
-            m_generatedArchive[test_support::kCamera1Name].lowQualityChunks.front().startTimeMs;
-        m_archiveEndTime =
-            m_generatedArchive[test_support::kCamera1Name].lowQualityChunks.back().startTimeMs;
+        const auto& chunks = m_generatedArchive[test_support::kCamera1Name].lowQualityChunks;
+        QnTimePeriod periodToCheck(
+            chunks.front().startTimeMs,
+            chunks.back().startTimeMs + chunks.back().durationsMs - chunks.front().startTimeMs);
+        test_support::checkPlaybackCorrecteness(m_archiveReader.get(), { periodToCheck });
     }
 
     void whenArchiveIntegritySignalsConnected()
@@ -169,13 +161,7 @@ private:
     QnMutex m_archiveIntegrityMutex;
     QnWaitCondition m_archiveIntegrityWaitCondition;
     bool m_archiveIntegritySignalReceived = false;
-    QnMutex m_archivePlaybackMutex;
-    QnWaitCondition m_archivePlaybackWaitCondition;
-    bool m_archivePlayedTillTheEnd = false;
     std::unique_ptr<QnArchiveStreamReader> m_archiveReader;
-    int64_t m_archiveStartTime;
-    int64_t m_archiveEndTime;
-    int64_t m_timeGap = 0;
     utils::log::Buffer* m_logBuffer = nullptr;
 
     void onArchiveIntegrityBreached(const QnStorageResourcePtr& storage)
@@ -183,34 +169,6 @@ private:
         NX_MUTEX_LOCKER lock(&m_archiveIntegrityMutex);
         m_archiveIntegritySignalReceived = true;
         m_archiveIntegrityWaitCondition.wakeOne();
-    }
-
-    virtual bool canAcceptData() const override
-    {
-        return true;
-    }
-
-    virtual void putData(const QnAbstractDataPacketPtr& data) override
-    {
-        {
-            NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
-            if (m_archivePlayedTillTheEnd)
-                return;
-        }
-
-        const int64_t currentDataTimestampMs = data->timestamp / 1000;
-        if (m_timeGap < currentDataTimestampMs - m_archiveStartTime)
-            m_timeGap = currentDataTimestampMs - m_archiveStartTime;
-
-        ASSERT_LE(m_timeGap, 1000);
-        m_archiveStartTime = currentDataTimestampMs;
-
-        if (m_archiveStartTime >= m_archiveEndTime && m_archiveStartTime != AV_NOPTS_VALUE)
-        {
-            NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
-            m_archivePlayedTillTheEnd = true;
-            m_archivePlaybackWaitCondition.wakeOne();
-        }
     }
 };
 

@@ -1,3 +1,5 @@
+#include <gtest/gtest.h>
+
 #include "storage_utils.h"
 #include <test_support/mediaserver_launcher.h>
 
@@ -118,7 +120,7 @@ static void replaceValue(QByteArray& payload, const QByteArray& key, const QByte
     memcpy(payload.data() + replacePos, newValue.constData(), newValue.size());
 }
 
-static void updateMetaData(QByteArray& payload, int64_t startTimeMs)
+void updateMkvMetaData(QByteArray& payload, int64_t startTimeMs)
 {
     replaceValue(payload, "startTimeMs", QByteArray::number((qint64) startTimeMs));
     replaceValue(
@@ -143,7 +145,7 @@ static ChunkDataList generateChunksForQuality(
         QString fullFileName =
             closeDirPath(baseDir) + closeDirPath(pathString) + fileName;
 
-        updateMetaData(payload, startTimeMs);
+        updateMkvMetaData(payload, startTimeMs);
 
         NX_ASSERT(QDir().mkpath(fullDirPath));
         QFile dataFile(fullFileName);
@@ -160,9 +162,9 @@ static ChunkDataList generateChunksForQuality(
 Catalog generateCameraArchive(
     const QString& baseDir, const QString& cameraName, qint64 startTimeMs, int count)
 {
-    QByteArray hiQualityPayLoad = createTestMkvFile(
+    QByteArray hiQualityPayLoad = createTestMkvFileData(
         kMediaFileDurationMs / 1000, kHiQualityFileWidth, kHiQualityFileHeight);
-    QByteArray lowQualityPayLoad = createTestMkvFile(
+    QByteArray lowQualityPayLoad = createTestMkvFileData(
         kMediaFileDurationMs / 1000, kLowQualityFileWidth, kLowQualityFileHeight);
 
     Catalog result;
@@ -419,7 +421,7 @@ static int64_t ffmpegSeek(void* userCtx, int64_t pos, int whence)
     return (mkvContext->m_pos = absolutePos);
 }
 
-QByteArray createTestMkvFile(int lengthSec, int width, int height)
+QByteArray createTestMkvFileData(int lengthSec, int width, int height)
 {
     try
     {
@@ -458,7 +460,7 @@ QnVirtualCameraResourcePtr cameraByUniqueId(QnResourcePool* resourcePool, const 
     QnVirtualCameraResourcePtr result;
     for (const auto camera : allCameras)
     {
-        if (camera->getUniqueId() == uniqueId)
+        if (camera->getUniqueId() == uniqueId || camera->getName() == uniqueId)
         {
             result = camera;
             break;
@@ -469,47 +471,107 @@ QnVirtualCameraResourcePtr cameraByUniqueId(QnResourcePool* resourcePool, const 
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Playback checker
+// Playback check
 
-bool PlaybackChecker::canAcceptData() const
+class PlaybackChecker : public QnAbstractMediaDataReceptor
 {
-    return true;
-}
-
-void PlaybackChecker::putData(const QnAbstractDataPacketPtr& data)
-{
+public:
+    PlaybackChecker(const QnTimePeriodList& timePeriods): m_timePeriods(timePeriods)
     {
-        NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
-        if (m_archivePlayedTillTheEnd)
+        std::sort(m_timePeriods.begin(), m_timePeriods.end());
+        selectNextTimePeriod(false);
+    }
+
+    virtual bool canAcceptData() const override
+    {
+        return true;
+    }
+
+    virtual void putData(const QnAbstractDataPacketPtr& data) override
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        if (m_state != inProgress)
             return;
+
+        const int64_t dataTimestampMs = data->timestamp / 1000;
+        if (dataTimestampMs == AV_NOPTS_VALUE)
+        {
+            m_state = failed;
+            return;
+        }
+
+        if (dataTimestampMs < m_startTime)
+        {
+            if (!m_waitingForPeriodBeginning)
+                m_state = failed;
+            return;
+        }
+
+        m_waitingForPeriodBeginning = false;
+        ASSERT_LT(dataTimestampMs - m_startTime, kTimeGapMs);
+        m_startTime = dataTimestampMs;
+
+        if (m_endTime - m_startTime < kAcceptableTimeSpanToTheEndMs)
+            selectNextTimePeriod(true);
     }
 
-    const int64_t currentDataTimestampMs = data->timestamp / 1000;
-    if (m_timeGap < currentDataTimestampMs - m_archiveStartTime)
-        m_timeGap = currentDataTimestampMs - m_archiveStartTime;
-
-    NX_ASSERT(m_timeGap, 1000);
-    m_archiveStartTime = currentDataTimestampMs;
-
-    if (m_archiveStartTime >= m_archiveEndTime && m_archiveStartTime != AV_NOPTS_VALUE)
+    void wait()
     {
-        NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
-        m_archivePlayedTillTheEnd = true;
-        m_archivePlaybackWaitCondition.wakeOne();
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        while (m_state != success)
+            m_waitCondition.wait(&m_mutex);
     }
-}
 
-void PlaybackChecker::wait()
-{
-}
+private:
+    enum State
+    {
+        failed,
+        success,
+        inProgress
+    };
 
-void PlaybackChecker::reset()
-{
-}
+    static const int64_t kTimeGapMs = 1000;
+    static const int64_t kAcceptableTimeSpanToTheEndMs = 30000;
 
-PlaybackChecker::PlaybackChecker(const QnTimePeriodList& timePeriods): m_timePeriods(timePeriods)
+    QnMutex m_mutex;
+    QnWaitCondition m_waitCondition;
+    bool m_waitingForPeriodBeginning = true;
+    QnTimePeriodList m_timePeriods;
+    State m_state = inProgress;
+    int64_t m_startTime = 0;
+    int64_t m_endTime = 0;
+
+    void selectNextTimePeriod(bool removeFirst)
+    {
+        if (m_timePeriods.isEmpty())
+            return setSuccess();
+
+        if (removeFirst)
+        {
+            m_timePeriods.takeFirst();
+            if (m_timePeriods.isEmpty())
+                return setSuccess();
+        }
+
+        m_startTime = m_timePeriods[0].startTimeMs;
+        m_endTime = m_timePeriods[0].endTimeMs();
+    }
+
+    void setSuccess()
+    {
+        m_state = success;
+        m_waitCondition.wakeOne();
+    }
+};
+
+void checkPlaybackCorrecteness(
+    QnArchiveStreamReader* archiveReader, const QnTimePeriodList& expectedTimePeriods)
 {
-    std::sort(m_timePeriods.begin(), m_timePeriods.end());
+    PlaybackChecker playbackChecker(expectedTimePeriods);
+    archiveReader->addDataProcessor(&playbackChecker);
+    archiveReader->start();
+    playbackChecker.wait();
+    archiveReader->removeDataProcessor(&playbackChecker);
 }
 
 } // namespace nx::vms::server::test::test_support
