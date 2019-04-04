@@ -5,8 +5,8 @@
 * [type script](https://www.typescriptlang.org/) - Compiles into javascript.
 
 #Npm Packages
-| name                   | version        | usage    | author        | website                                               | license    |
-|------------------------|:---------------|:---------|:--------------|:------------------------------------------------------|:-----------|
+| name                   | version        | usage    | author           | website                                            | license    |
+|------------------------|:---------------|:---------|:-----------------|:---------------------------------------------------|:-----------|
 | @types/bluebird        | 3.5.5 (fixed)  | uses     |                  | https://github.com/DefinitelyTyped/DefinitelyTyped | MIT        |
 | @types/express         | 4.11.1 (fixed) | uses     |                  | https://github.com/DefinitelyTyped/DefinitelyTyped | MIT        |
 | @types/request-promise | 4.1.41 (fixed) | uses     |                  | https://github.com/DefinitelyTyped/DefinitelyTyped | MIT        |
