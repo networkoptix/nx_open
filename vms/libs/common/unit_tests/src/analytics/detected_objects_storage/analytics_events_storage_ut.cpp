@@ -424,11 +424,11 @@ protected:
             analyticsDataPackets.begin(), analyticsDataPackets.end(),
             std::back_inserter(m_analyticsDataPackets));
 
-        for (const auto& packet : analyticsDataPackets)
-            whenIssueSavePacket(packet);
+        std::for_each(analyticsDataPackets.begin(), analyticsDataPackets.end(),
+            [this](const auto& packet) { whenIssueSavePacket(packet); });
 
-        for (const auto& packet : analyticsDataPackets)
-            thenSaveSucceeded();
+        std::for_each(analyticsDataPackets.begin(), analyticsDataPackets.end(),
+            [this](const auto&) { thenSaveSucceeded(); });
     }
 
     EventsStorage& eventsStorage()

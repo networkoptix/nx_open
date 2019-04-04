@@ -180,7 +180,6 @@ private:
 
     void updateObjectTypeDictionaryIfNeeded(
         nx::sql::QueryContext* queryContext,
-        const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject);
 
     /**

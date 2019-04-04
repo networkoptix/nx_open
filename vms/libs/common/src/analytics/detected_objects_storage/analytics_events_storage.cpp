@@ -275,7 +275,7 @@ void EventsStorage::updateDictionariesIfNeeded(
     const common::metadata::DetectedObject& detectedObject)
 {
     updateDeviceDictionaryIfNeeded(queryContext, packet);
-    updateObjectTypeDictionaryIfNeeded(queryContext, packet, detectedObject);
+    updateObjectTypeDictionaryIfNeeded(queryContext, detectedObject);
 }
 
 void EventsStorage::updateDeviceDictionaryIfNeeded(
@@ -300,7 +300,6 @@ void EventsStorage::updateDeviceDictionaryIfNeeded(
 
 void EventsStorage::updateObjectTypeDictionaryIfNeeded(
     nx::sql::QueryContext* queryContext,
-    const common::metadata::DetectionMetadataPacket& packet,
     const common::metadata::DetectedObject& detectedObject)
 {
     {
@@ -848,7 +847,7 @@ void EventsStorage::cleanupEvents(
 }
 
 void EventsStorage::cleanupEventProperties(
-    nx::sql::QueryContext* queryContext)
+    nx::sql::QueryContext* /*queryContext*/)
 {
     // TODO: #ak META-222
 
