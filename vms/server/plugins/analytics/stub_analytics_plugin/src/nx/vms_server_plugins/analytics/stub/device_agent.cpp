@@ -299,7 +299,7 @@ static IObjectMetadata* makeObjectMetadata(
     objectMetadata->setTypeId(objectTypeId);
     objectMetadata->setId(objectId);
     objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) offset,
-        (float) offset + 0.05 * objectIndex, 0.25F, 0.25F));
+        (float) offset + 0.05F * (float) objectIndex, 0.25F, 0.25F));
 
     if (generatePreviewAttributes)
     {

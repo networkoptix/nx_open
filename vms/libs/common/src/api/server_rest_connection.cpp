@@ -226,7 +226,15 @@ Handle ServerConnection::sendStatisticsAsync(
 }
 
 Handle ServerConnection::getModuleInformation(
-    Result<QList<nx::vms::api::ModuleInformation>>::type callback,
+    Result<RestResultWithData<nx::vms::api::ModuleInformation>>::type callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    return executeGet("/api/moduleInformation", params, callback, targetThread);
+}
+
+Handle ServerConnection::getModuleInformationAll(
+    Result<RestResultWithData<QList<nx::vms::api::ModuleInformation>>>::type callback,
     QThread* targetThread)
 {
     QnRequestParamList params;

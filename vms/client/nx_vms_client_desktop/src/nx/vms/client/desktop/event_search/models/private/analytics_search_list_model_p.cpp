@@ -605,6 +605,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
     auto periodToCommit = QnTimePeriod::fromInterval(
         startTime(newObjects.front()), startTime(newObjects.back()));
 
+    q->setFetchDirection(FetchDirection::later);
     q->addToFetchedTimeWindow(periodToCommit);
 
     NX_VERBOSE(q, "Live update commit");

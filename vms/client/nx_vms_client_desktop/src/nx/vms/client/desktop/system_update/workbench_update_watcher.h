@@ -49,7 +49,6 @@ private:
     bool m_autoChecksEnabled = false;
     /** We should not run update checks if we are logged out. */
     bool m_userLoggedIn = false;
-    QTimer m_checkUpdateTimer;
     QTimer m_updateStateTimer;
     nx::utils::SoftwareVersion m_notifiedVersion;
 

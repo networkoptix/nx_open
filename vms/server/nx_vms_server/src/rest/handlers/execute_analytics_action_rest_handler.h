@@ -7,6 +7,23 @@
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/sdk_support/loggers.h>
 
+#include <api/model/analytics_actions.h>
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <transcoding/filters/abstract_image_filter.h>
+
+#include <nx/vms/api/analytics/descriptors.h>
+
+struct ExtendedAnalyticsActionData
+{
+    AnalyticsAction action;
+    nx::vms::server::resource::AnalyticsEngineResourcePtr engine;
+    nx::vms::api::analytics::ActionTypeDescriptor actionTypeDescriptor;
+
+    std::optional<nx::analytics::storage::DetectedObject> detectedObject;
+    std::optional<nx::analytics::storage::ObjectPosition> bestShotObjectPosition;
+    CLVideoDecoderOutputPtr bestShotVideoFrame;
+};
+
 class QnExecuteAnalyticsActionRestHandler:
     public QnJsonRestHandler,
     public /*mixin*/ nx::vms::server::ServerModuleAware
@@ -24,10 +41,39 @@ public:
         const QnRestConnectionProcessor* owner) override;
 
 private:
+    std::optional<AnalyticsAction> deserializeActionData(const QByteArray& requestBody) const;
+
+    QString checkInputParameters(const AnalyticsAction& body) const;
+
+    nx::vms::server::resource::AnalyticsEngineResourcePtr engineForAction(
+        const AnalyticsAction& actionData) const;
+
+    std::optional<nx::vms::api::analytics::ActionTypeDescriptor> actionDescriptor(
+        const AnalyticsAction& actionData) const;
+
+    std::optional<ExtendedAnalyticsActionData> makeExtendedAnalyticsActionData(
+        const AnalyticsAction& action,
+        const nx::vms::server::resource::AnalyticsEngineResourcePtr engineResource,
+        const nx::vms::api::analytics::ActionTypeDescriptor& actionTypeDescriptor);
+
     QString executeAction(
-        AnalyticsActionResult* outActionResult,
-        nx::sdk::analytics::IEngine* plugin,
-        const AnalyticsAction& actionData);
+        const ExtendedAnalyticsActionData& actionData,
+        AnalyticsActionResult* outActionResult);
+
+    std::optional<nx::analytics::storage::DetectedObject> fetchDetectedObject(
+        const QnUuid& objectTrackId,
+        bool needFullTrack);
+
+    std::optional<nx::analytics::storage::ObjectPosition> fetchObjectPositionByTimestamp(
+        const QnUuid& objectTrackId,
+        int64_t timestampUs);
+
+    int64_t tryToFindBestShotTimestampUsByAttrubute(const QnUuid& objectTrackId);
+
+    CLVideoDecoderOutputPtr imageByTimestamp(const QnUuid& deviceId, const int64_t timestampUs);
+
+    std::optional<nx::analytics::storage::LookupResult> makeDatabaseRequest(
+        const nx::analytics::storage::Filter& filter);
 
     std::unique_ptr<nx::vms::server::sdk_support::AbstractManifestLogger> makeLogger(
         nx::vms::server::resource::AnalyticsEngineResourcePtr engineResource) const;

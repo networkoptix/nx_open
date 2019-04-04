@@ -311,6 +311,7 @@ void EventSearchListModel::Private::fetchLive()
                 q->clear(); //< Otherwise there will be a gap between live and archive events.
             }
 
+            q->setFetchDirection(FetchDirection::later);
             q->addToFetchedTimeWindow(periodToCommit);
 
             NX_VERBOSE(q, "Live update commit");

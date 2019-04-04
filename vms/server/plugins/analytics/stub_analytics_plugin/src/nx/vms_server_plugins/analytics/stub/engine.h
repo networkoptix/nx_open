@@ -40,6 +40,7 @@ protected:
         nx::sdk::Uuid objectId,
         nx::sdk::Uuid deviceId,
         int64_t timestampUs,
+        nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> objectTrackInfo,
         const std::map<std::string, std::string>& params,
         std::string* outActionUrl,
         std::string* outMessageToUser,
