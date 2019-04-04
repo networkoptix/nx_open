@@ -357,20 +357,28 @@ std::int64_t EventsStorage::insertAttributes(
 {
     const auto content = QJson::serialized(eventAttributes);
 
-    // TODO: META-220 Cache a number of recent values since same object likely has same attributes.
+    auto attributesId = findAttributesIdInCache(content);
+    if (attributesId >= 0)
+        return attributesId;
 
     auto findIdQuery = queryContext->connection()->createQuery();
     findIdQuery->prepare("SELECT id FROM unique_attributes WHERE content=:content");
     findIdQuery->bindValue(":content", content);
     findIdQuery->exec();
     if (findIdQuery->next())
-        return findIdQuery->value(0).toLongLong();
+    {
+        const auto id = findIdQuery->value(0).toLongLong();
+        addToAttributesCache(id, content);
+        return id;
+    }
 
     // No such value. Inserting.
     auto insertContentQuery = queryContext->connection()->createQuery();
     insertContentQuery->prepare("INSERT INTO unique_attributes(content) VALUES (:content)");
     insertContentQuery->bindValue(":content", content);
     insertContentQuery->exec();
+    const auto id = insertContentQuery->impl().lastInsertId().toLongLong();
+    addToAttributesCache(id, content);
 
     // NOTE: Following string is in non-reversable format. So, cannot use it to store attributes.
     // But, cannot use JSON for full text search since it contains additional information.
@@ -378,7 +386,6 @@ std::int64_t EventsStorage::insertAttributes(
         containerString(eventAttributes, lit("; ") /*delimiter*/,
             QString() /*prefix*/, QString() /*suffix*/, QString() /*empty*/);
 
-    const auto id = insertContentQuery->impl().lastInsertId().toLongLong();
     insertContentQuery = queryContext->connection()->createQuery();
     insertContentQuery->prepare(
         "INSERT INTO attributes_text_index(docid, content) VALUES (:id, :content)");
@@ -849,6 +856,32 @@ void EventsStorage::cleanupEventProperties(
     )sql");
 
     query.exec();
+}
+
+void EventsStorage::addToAttributesCache(
+    std::int64_t id,
+    const QByteArray& content)
+{
+    static constexpr int kCacheSize = 101;
+
+    m_attributesCache.push_back({
+        QCryptographicHash::hash(content, QCryptographicHash::Md5),
+        id});
+
+    if (m_attributesCache.size() > kCacheSize)
+        m_attributesCache.pop_front();
+}
+
+std::int64_t EventsStorage::findAttributesIdInCache(
+    const QByteArray& content)
+{
+    const auto md5 = QCryptographicHash::hash(content, QCryptographicHash::Md5);
+
+    const auto it = std::find_if(
+        m_attributesCache.rbegin(), m_attributesCache.rend(),
+        [&md5](const auto& entry) { return entry.md5 == md5; });
+
+    return it != m_attributesCache.rend() ? it->id : -1;
 }
 
 //-------------------------------------------------------------------------------------------------

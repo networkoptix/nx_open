@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <deque>
 #include <map>
 #include <vector>
 
@@ -124,6 +125,12 @@ public:
         std::chrono::milliseconds oldestDataToKeepTimestamp) override;
 
 private:
+    struct AttributesCacheEntry
+    {
+        QByteArray md5;
+        std::int64_t id = -1;
+    };
+
     const Settings& m_settings;
     DbController m_dbController;
     std::chrono::microseconds m_maxRecordedTimestamp = std::chrono::microseconds::zero();
@@ -132,6 +139,7 @@ private:
     std::map<std::int64_t, QnUuid> m_idToDeviceGuid;
     std::map<QString, std::int64_t> m_objectTypeToId;
     std::map<std::int64_t, QString> m_idToObjectType;
+    std::deque<AttributesCacheEntry> m_attributesCache;
 
     bool readMaximumEventTimestamp();
 
@@ -245,6 +253,9 @@ private:
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void cleanupEventProperties(nx::sql::QueryContext* queryContext);
+
+    void addToAttributesCache(std::int64_t id, const QByteArray& content);
+    std::int64_t findAttributesIdInCache(const QByteArray& content);
 };
 
 //-------------------------------------------------------------------------------------------------
