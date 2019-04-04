@@ -297,6 +297,13 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     if (video)
         outFrame->channel = video->channelNumber;
 
+    if (!gotFrame && video)
+    {
+        NX_VERBOSE(this,
+            "%1: Failed to decode frame (ts: %2, size: %3x%4, channel %5, flags: %6, dataType: %7)",
+            __func__, video->timestamp, video->width, video->height, video->channelNumber,
+            video->flags, video->dataType);
+    }
     return gotFrame ? outFrame : nullptr;
 }
 
