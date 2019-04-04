@@ -3,6 +3,7 @@ from threading import Thread
 from os import system, path
 from get_names import get_threaded_names
 import datetime
+import time
 
 startTime = datetime.datetime.now()
 cmdList = []
@@ -49,11 +50,14 @@ def threadedTestRun(loc, lang):
     # fill the queue with all the commands
     for x in cmdList:
         q.put(x)
+
     # run and manage the threads
     for i in range(num_threads):
         worker=Thread(target=do_stuff, args=(q,))
         worker.setDaemon(True)
         worker.start()
+        #due to a post request sent by a variable file, we wait a second so we don't get bad responses from the server
+        time.sleep(1)
 
     q.join()
 

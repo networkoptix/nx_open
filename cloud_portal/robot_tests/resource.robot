@@ -5,10 +5,10 @@ Library           String
 Library           NoptixLibrary/
 Resource          variables.robot
 Resource          ${variables_file}
+Variables         getIds.py    ${ENV}
 
 
 *** variables ***
-${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
 ${variables_file}    variables-env.robot
 ${options}    true
