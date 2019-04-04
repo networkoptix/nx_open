@@ -263,7 +263,6 @@ void QnClientVideoCamera::stopExport()
         m_exportRecorder->deleteLater();
     }
 
-    QnMutexLocker lock(&m_exportMutex);
     m_exportReader.clear();
     m_exportRecorder.clear();
 }
