@@ -894,8 +894,8 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     m_sharedContext->setResourceAccess(getUrl(), getAuth());
     m_sharedContext->setChunkLoaderSettings(
         {
-            std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderResponseTimeoutSeconds()),
-            std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderMessageBodyTimeoutSeconds())
+            std::chrono::seconds(ini().chunkReaderResponseTimeoutS),
+            std::chrono::seconds(ini().chunkReaderMessageBodyTimeoutS)
         });
 
     const auto info = m_sharedContext->information();
@@ -1504,7 +1504,7 @@ CameraDiagnostics::Result HanwhaResource::initConfigurationalPtz()
         if (parameter == boost::none || !parameter->isValid())
             continue;
 
-        if (qnGlobalSettings->showHanwhaAlternativePtzControlsOnTile())
+        if (ini().showAlternativePtzControlsOnTile)
             m_ptzCapabilities[core::ptz::Type::operational] |= descriptor.capabilities;
 
         configurationalCapabilities |= descriptor.capabilities;
@@ -1837,7 +1837,7 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
     if (!result)
         return result;
 
-    if (!qnGlobalSettings->hanwhaDeleteProfilesOnInitIfNeeded())
+    if (!ini().deleteProfilesOnInitIfNeeded)
     {
         int amountOfProfilesNeeded = 0;
 

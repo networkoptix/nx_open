@@ -129,12 +129,6 @@
             syncTimeExchangePeriod: {type: 'number'},
 
             maxWearableArchiveSynchronizationThreads: {type: 'number'},
-
-            hanwhaDeleteProfilesOnInitIfNeeded: {type: 'checkbox'},
-            hanwhaChunkReaderMessageBodyTimeoutSeconds: {type: 'number'},
-            hanwhaChunkReaderResponseTimeoutSeconds: {type: 'number'},
-            showHanwhaAlternativePtzControlsOnTile: {type: 'checkbox'},
-
             maxEventLogRecords: {type: 'number'}
         },
         webclient: {
