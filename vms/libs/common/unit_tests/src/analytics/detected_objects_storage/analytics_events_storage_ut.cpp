@@ -398,10 +398,9 @@ protected:
                 if (m_allowedTimeRange.second > m_allowedTimeRange.first)
                 {
                     packet->timestampUsec = nx::utils::random::number<qint64>(
-                        duration_cast<microseconds>(
-                            m_allowedTimeRange.first.time_since_epoch()).count(),
-                        duration_cast<microseconds>(
-                            m_allowedTimeRange.second.time_since_epoch()).count());
+                        duration_cast<milliseconds>(m_allowedTimeRange.first.time_since_epoch()).count(),
+                        duration_cast<milliseconds>(m_allowedTimeRange.second.time_since_epoch()).count())
+                        * 1000;
                 }
 
                 analyticsDataPackets.push_back(packet);

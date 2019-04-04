@@ -21,6 +21,7 @@ DbController::DbController(
     dbStructureUpdater().addUpdateScript(kAnalyticsDbEvenMoreIndexes);
     dbStructureUpdater().addUpdateScript(kMoveAttributesTextToASeparateTable);
     dbStructureUpdater().addUpdateScript(kMoveObjectTypeAndDeviceToSeparateTables);
+    dbStructureUpdater().addUpdateScript(kConvertTimestampToMillis);
 
     // TODO: #ak Rename object_id column after switching to SQLITE 3.25.0.
     // Before that renaming requires re-creating table and copying data

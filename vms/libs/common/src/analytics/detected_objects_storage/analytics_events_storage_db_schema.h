@@ -120,6 +120,16 @@ CREATE INDEX idx_event_for_streaming_cursor ON event(device_id, timestamp_usec_u
 
 )sql";
 
+//-------------------------------------------------------------------------------------------------
+// META-220
+// TODO: #ak Rename timestamp_usec_utc along with the next event table structure change.
+static constexpr char kConvertTimestampToMillis[] =
+R"sql(
+
+UPDATE event SET timestamp_usec_utc = timestamp_usec_utc / 1000
+
+)sql";
+
 } // namespace storage
 } // namespace analytics
 } // namespace nx

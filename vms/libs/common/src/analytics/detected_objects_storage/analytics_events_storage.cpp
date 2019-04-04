@@ -10,7 +10,8 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
-constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833-456437eaa7c7";
+static constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833-456437eaa7c7";
+static constexpr int kUsecPerMsec = 1000;
 
 EventsStorage::EventsStorage(const Settings& settings):
     m_settings(settings),
@@ -146,14 +147,14 @@ bool EventsStorage::readMaximumEventTimestamp()
     try
     {
         m_maxRecordedTimestamp = m_dbController.queryExecutor().executeSelectQuerySync(
-            [](nx::sql::QueryContext* queryContext) -> std::chrono::microseconds
+            [](nx::sql::QueryContext* queryContext)
             {
                 auto query = queryContext->connection()->createQuery();
                 query->prepare("SELECT max(timestamp_usec_utc) FROM event");
                 query->exec();
                 if (query->next())
-                    return std::chrono::microseconds(query->value(0).toLongLong());
-                return std::chrono::microseconds::zero();
+                    return std::chrono::milliseconds(query->value(0).toLongLong());
+                return std::chrono::milliseconds::zero();
             });
     }
     catch (const std::exception& e)
@@ -329,10 +330,10 @@ void EventsStorage::insertEvent(
         INSERT INTO event(timestamp_usec_utc, duration_usec,
             device_id, object_type_id, object_id, attributes_id,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
-        VALUES(:timestampUsec, :durationUsec, :deviceId, :objectTypeId, :objectAppearanceId, :attributesId,
+        VALUES(:timestampMs, :durationUsec, :deviceId, :objectTypeId, :objectAppearanceId, :attributesId,
             :boxTopLeftX, :boxTopLeftY, :boxBottomRightX, :boxBottomRightY)
     )sql"));
-    insertEventQuery.bindValue(":timestampUsec", packet.timestampUsec);
+    insertEventQuery.bindValue(":timestampMs", packet.timestampUsec / kUsecPerMsec);
     insertEventQuery.bindValue(":durationUsec", packet.durationUsec);
     insertEventQuery.bindValue(":deviceId", deviceIdFromGuid(packet.deviceId));
     insertEventQuery.bindValue(
@@ -560,8 +561,8 @@ void EventsStorage::addTimePeriodToFilter(
 
     auto startTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
         "timestamp_usec_utc",
-        ":startTimeUsec",
-        QnSql::serialized_field(duration_cast<microseconds>(
+        ":startTimeMs",
+        QnSql::serialized_field(duration_cast<milliseconds>(
             timePeriod.startTime()).count()));
     sqlFilter->addCondition(std::move(startTimeFilterField));
 
@@ -571,8 +572,8 @@ void EventsStorage::addTimePeriodToFilter(
     {
         auto endTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldLess>(
             "timestamp_usec_utc",
-            ":endTimeUsec",
-            QnSql::serialized_field(duration_cast<microseconds>(
+            ":endTimeMs",
+            QnSql::serialized_field(duration_cast<milliseconds>(
                 timePeriod.endTime()).count()));
         sqlFilter->addCondition(std::move(endTimeFilterField));
     }
@@ -681,7 +682,8 @@ void EventsStorage::loadObject(
     ObjectPosition& objectPosition = object->track.back();
 
     objectPosition.deviceId = deviceGuidFromId(selectEventsQuery->value("device_id").toLongLong());
-    objectPosition.timestampUsec = selectEventsQuery->value("timestamp_usec_utc").toLongLong();
+    objectPosition.timestampUsec =
+        selectEventsQuery->value("timestamp_usec_utc").toLongLong() * kUsecPerMsec;
     objectPosition.durationUsec = selectEventsQuery->value("duration_usec").toLongLong();
 
     objectPosition.boundingBox.setTopLeft(QPointF(
@@ -751,8 +753,8 @@ void EventsStorage::queryTrackInfo(
         trackInfoQuery.exec();
         if (!trackInfoQuery.next())
             continue;
-        object.firstAppearanceTimeUsec = trackInfoQuery.value(0).toLongLong();
-        object.lastAppearanceTimeUsec = trackInfoQuery.value(1).toLongLong();
+        object.firstAppearanceTimeUsec = trackInfoQuery.value(0).toLongLong() * kUsecPerMsec;
+        object.lastAppearanceTimeUsec = trackInfoQuery.value(1).toLongLong() * kUsecPerMsec;
     }
 }
 
@@ -798,7 +800,7 @@ void EventsStorage::loadTimePeriods(
     while (query.next())
     {
         QnTimePeriod timePeriod(
-            milliseconds(query.value("timestamp_usec_utc").toLongLong() / kUsecPerMs),
+            milliseconds(query.value("timestamp_usec_utc").toLongLong()),
             milliseconds(query.value("duration_usec").toLongLong() / kUsecPerMs));
         result->push_back(timePeriod);
     }
@@ -835,12 +837,12 @@ void EventsStorage::cleanupEvents(
     sql::SqlQuery deleteEventsQuery(queryContext->connection());
     deleteEventsQuery.prepare(R"sql(
         DELETE FROM event
-        WHERE device_id=:deviceId AND timestamp_usec_utc < :timestampUsec
+        WHERE device_id=:deviceId AND timestamp_usec_utc < :timestampMs
     )sql");
     deleteEventsQuery.bindValue(":deviceId", deviceIdFromGuid(deviceId));
     deleteEventsQuery.bindValue(
-        ":timestampUsec",
-        (qint64)microseconds(oldestDataToKeepTimestamp).count());
+        ":timestampMs",
+        (qint64) milliseconds(oldestDataToKeepTimestamp).count());
 
     deleteEventsQuery.exec();
 }
