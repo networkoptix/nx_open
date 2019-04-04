@@ -43,7 +43,7 @@ class ConnectTest:
 {
 protected:
     ConnectTest():
-        m_listeningPeerDb(m_settings.clusterDbMap()),
+        m_listeningPeerDb(m_settings.listeningPeerDb()),
         m_listeningPeerPool(m_settings.listeningPeer(), &m_listeningPeerDb)
     {
         nx::network::SocketGlobalsHolder::instance()->reinitialize();

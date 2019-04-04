@@ -1,6 +1,5 @@
 #include "controller.h"
 
-#include "public_ip_discovery.h"
 #include "relay/relay_cluster_client_factory.h"
 
 namespace nx {
@@ -18,7 +17,7 @@ Controller::Controller(const conf::Settings& settings):
         : nullptr),
     m_mediaserverEndpointTester(m_cloudDataProvider.get()),
     m_relayClusterClient(RelayClusterClientFactory::instance().create(settings)),
-    m_listeningPeerDb(settings.clusterDbMap()),
+    m_listeningPeerDb(settings.listeningPeerDb()),
     m_listeningPeerPool(settings.listeningPeer(), &m_listeningPeerDb),
     m_listeningPeerRegistrator(
         settings,
@@ -96,15 +95,6 @@ const stats::StatsManager& Controller::statisticsManager() const
 bool Controller::doMandatoryInitialization()
 {
     return m_listeningPeerDb.initialize();
-}
-
-std::optional<network::HostAddress> Controller::discoverPublicAddress()
-{
-    auto publicHostAddress = PublicIpDiscovery::get();
-    if (!(bool)publicHostAddress)
-        return std::nullopt;
-
-    return *publicHostAddress;
 }
 
 void Controller::stop()

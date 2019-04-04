@@ -26,7 +26,7 @@ public:
 protected:
     virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) = 0;
     virtual void closeDatabase() = 0;
-    virtual AsyncSqlQueryExecutor& asyncSqlQueryExecutor() = 0;
+    virtual AbstractAsyncSqlQueryExecutor& asyncSqlQueryExecutor() = 0;
 
     ConnectionOptions& connectionOptions();
     const ConnectionOptions& connectionOptions() const;
@@ -103,7 +103,7 @@ class BaseDbTest:
 protected:
     virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
     virtual void closeDatabase() override;
-    virtual AsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
+    virtual AbstractAsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
 
 private:
     std::unique_ptr<InstanceController> m_dbInstanceController;
@@ -117,7 +117,7 @@ class FixtureWithQueryExecutorOnly:
 protected:
     virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
     virtual void closeDatabase() override;
-    virtual AsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
+    virtual AbstractAsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
 
 private:
     std::unique_ptr<AsyncSqlQueryExecutor> m_queryExecutor;

@@ -57,13 +57,14 @@ struct ConnectingPeer
     ConnectingPeer();
 };
 
-struct ClusterDbMap
+struct ListeningPeerDb
 {
+    bool enabled;
     std::chrono::milliseconds connectionRetryDelay;
     nx::sql::ConnectionOptions sql;
     nx::clusterdb::map::Settings map;
 
-    ClusterDbMap();
+    ListeningPeerDb();
 
     void load(const QnSettings& settings);
 };
@@ -88,7 +89,7 @@ public:
     const Http& http() const;
     const Https& https() const;
     const Proxy& proxy() const;
-    const ClusterDbMap& clusterDbMap() const;
+    const ListeningPeerDb& listeningPeerDb() const;
 
 private:
     utils::log::Settings m_logging;
@@ -98,7 +99,7 @@ private:
     Proxy m_proxy;
     relaying::Settings m_listeningPeer;
     ConnectingPeer m_connectingPeer;
-    ClusterDbMap m_clusterDbMap;
+    ListeningPeerDb m_listeningPeerDb;
 
     virtual void loadSettings() override;
 

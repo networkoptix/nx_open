@@ -8,7 +8,7 @@ namespace dao {
 namespace rdb {
 
 SystemMergeDao::SystemMergeDao(
-    sql::AsyncSqlQueryExecutor* queryExecutor)
+    sql::AbstractAsyncSqlQueryExecutor* queryExecutor)
     :
     m_queryExecutor(queryExecutor)
 {

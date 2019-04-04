@@ -155,14 +155,14 @@ const std::chrono::hours kDefaultListeningPeerConnectionInactivityTimeout(10);
 
 const QLatin1String kServerName("server/name");
 
-// ClusterDbMap  settings
-namespace cluster_db_map {
+// ListeningPeerDb  settings
+namespace listening_peer_db {
 
-static constexpr char kGroupName[] = "clusterDbMap";
+static constexpr char kGroupName[] = "listeningPeerDb";
 static constexpr char kConnectionRetryDelay[] = "connectionRetryDelay";
 static const std::chrono::milliseconds kDefaultConnectionRetryDelay = std::chrono::seconds(10);
 
-} //namespace cluster_db_map
+} //namespace listening_peer_db
 
 } // namespace
 
@@ -170,8 +170,8 @@ namespace nx {
 namespace hpm {
 namespace conf {
 
-ClusterDbMap::ClusterDbMap():
-    connectionRetryDelay(cluster_db_map::kDefaultConnectionRetryDelay)
+ListeningPeerDb::ListeningPeerDb():
+    connectionRetryDelay(listening_peer_db::kDefaultConnectionRetryDelay)
 {
 }
 
@@ -261,9 +261,9 @@ const Server& Settings::server() const
     return m_server;
 }
 
-const ClusterDbMap& Settings::clusterDbMap() const
+const ListeningPeerDb& Settings::listeningPeerDb() const
 {
-    return m_clusterDbMap;
+    return m_listeningPeerDb;
 }
 
 void Settings::initializeWithDefaultValues()
@@ -364,7 +364,7 @@ void Settings::loadSettings()
 
     loadServer();
 
-    loadClusterDbMap();
+    loadListeningPeerDb();
 
     //analyzing values
     if (m_general.dataDir.isEmpty())
@@ -518,20 +518,20 @@ void Settings::loadServer()
     m_server.name = settings().value(kServerName).toString().toStdString();
 }
 
-void Settings::loadClusterDbMap()
+void Settings::loadListeningPeerDb()
 {
-    if (!settings().containsGroup(cluster_db_map::kGroupName))
+    if (!settings().containsGroup(listening_peer_db::kGroupName))
         return;
 
-    m_clusterDbMap.enabled = true;
+    m_listeningPeerDb.enabled = true;
     const auto str =
-        lm("%1/%2").arg(cluster_db_map::kGroupName).arg(cluster_db_map::kConnectionRetryDelay);
-    m_clusterDbMap.connectionRetryDelay = nx::utils::parseTimerDuration(
+        lm("%1/%2").arg(listening_peer_db::kGroupName).arg(listening_peer_db::kConnectionRetryDelay);
+    m_listeningPeerDb.connectionRetryDelay = nx::utils::parseTimerDuration(
         settings().value(str).toString(),
-        cluster_db_map::kDefaultConnectionRetryDelay);
+        listening_peer_db::kDefaultConnectionRetryDelay);
 
-    m_clusterDbMap.sql.loadFromSettings(settings(), cluster_db_map::kGroupName);
-    m_clusterDbMap.map.load(settings());
+    m_listeningPeerDb.sql.loadFromSettings(settings(), listening_peer_db::kGroupName);
+    m_listeningPeerDb.map.load(settings());
 }
 
 

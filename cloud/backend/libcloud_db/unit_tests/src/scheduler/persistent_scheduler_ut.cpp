@@ -25,7 +25,8 @@ public:
         nx::sql::DBResult(nx::sql::QueryContext*, const QnUuid&));
 };
 
-class SqlExecutorStub: public nx::sql::AbstractAsyncSqlQueryExecutor
+class SqlExecutorStub:
+    public nx::sql::AbstractAsyncSqlQueryExecutor
 {
 public:
     virtual ~SqlExecutorStub()
@@ -37,6 +38,15 @@ public:
     virtual const nx::sql::ConnectionOptions& connectionOptions() const override
     {
         return m_connectionOptions;
+    }
+
+    virtual void setQueryPriority(nx::sql::QueryType /*queryType*/, int /*newPriority*/) override
+    {
+    }
+
+    virtual int pendingQueryCount() const override
+    {
+        return 0;
     }
 
     virtual void executeUpdate(
@@ -79,6 +89,24 @@ public:
         nx::sql::QueryContext* const /*queryContext*/) override
     {
         return nx::sql::DBResult::ok;
+    }
+
+    virtual void createCursorImpl(std::unique_ptr<nx::sql::detail::AbstractCursorHandler> /*cursorHandler*/) override
+    {
+    }
+
+    virtual void fetchNextRecordFromCursorImpl(
+        std::unique_ptr<nx::sql::detail::AbstractFetchNextRecordFromCursorTask> /*task*/) override
+    {
+    }
+
+    virtual void removeCursor(QnUuid /*id*/) override
+    {
+    }
+
+    virtual int openCursorCount() const override
+    {
+        return 0;
     }
 
 private:

@@ -52,12 +52,11 @@ std::optional<MediatorEndpoint> toMediatorEndpoint(const std::string& endpointSt
     if (values.size() != 4)
         return std::nullopt;
 
-    return MediatorEndpoint
-    {
-        values[0],
+    return MediatorEndpoint{
+        std::move(values[0]),
         toInt(values[1]),
         toInt(values[2]),
-        toInt(values[3]),
+        toInt(values[3])
     };
 }
 
@@ -78,7 +77,7 @@ bool MediatorEndpoint::operator==(const MediatorEndpoint &other) const
 //-------------------------------------------------------------------------------------------------
 // ListeningPeerDb
 
-ListeningPeerDb::ListeningPeerDb(const conf::ClusterDbMap& settings):
+ListeningPeerDb::ListeningPeerDb(const conf::ListeningPeerDb& settings):
     m_settings(settings)
 {
 }
@@ -120,6 +119,8 @@ void ListeningPeerDb::setThisMediatorEndpoint(const MediatorEndpoint& endpoint)
 {
     m_mediatorEndpoint = endpoint;
     m_mediatorEndpointString = toString(endpoint);
+
+    NX_ASSERT(toMediatorEndpoint(m_mediatorEndpointString) == m_mediatorEndpoint);
 
     m_syncEngineUrl = nx::network::url::Builder()
         .setScheme(nx::network::http::kUrlSchemeName)

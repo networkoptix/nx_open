@@ -216,8 +216,9 @@ void InitiateConnectionRequestHandler::processRequest(
     api::ConnectRequest inputData)
 {
     CachedRequestContext cachedRequestContext{
+        requestContext.request.requestLine.url,
         requestContext.connection->isSsl(),
-        requestContext.response
+        requestContext.response,
     };
 
     m_holePunchingProcessor->connect(
@@ -297,7 +298,7 @@ void InitiateConnectionRequestHandler::redirectToRemoteMediator(
                 return reportResult(api::ResultCode::notFound, std::move(response));
             }
 
-            auto location = buildMediatorUrl(endpoint, requestContext.isSsl);
+            auto location = buildMediatorUrl(endpoint, requestContext);
 
             network::http::insertOrReplaceHeader(
                 &requestContext.response->headers,
@@ -312,15 +313,16 @@ void InitiateConnectionRequestHandler::redirectToRemoteMediator(
 
 nx::utils::Url InitiateConnectionRequestHandler::buildMediatorUrl(
     const MediatorEndpoint& endpoint,
-    bool useHttps)
+    const CachedRequestContext& requestContext)
 {
     return nx::network::url::Builder()
         .setHost(endpoint.domainName.c_str())
         .setScheme(
-            useHttps
+            requestContext.isSsl
                 ? nx::network::http::kSecureUrlSchemeName
                 : nx::network::http::kUrlSchemeName)
-        .setPort(useHttps ? endpoint.httpsPort : endpoint.httpPort).toUrl();
+        .setPort(requestContext.isSsl ? endpoint.httpsPort : endpoint.httpPort).
+        setPath(requestContext.requestUrl.path()).toUrl();
 }
 
 } // namespace http

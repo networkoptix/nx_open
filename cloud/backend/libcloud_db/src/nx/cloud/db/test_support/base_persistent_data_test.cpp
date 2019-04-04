@@ -131,7 +131,7 @@ void DaoHelper::setDbVersionToUpdateTo(unsigned int dbVersion)
     m_dbVersionToUpdateTo = dbVersion;
 }
 
-nx::sql::AsyncSqlQueryExecutor& DaoHelper::queryExecutor()
+nx::sql::AbstractAsyncSqlQueryExecutor& DaoHelper::queryExecutor()
 {
     return m_persistentDbManager->queryExecutor();
 }

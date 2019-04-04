@@ -152,9 +152,11 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
         peerIter->second.hostName = peerIter->first.hostName();
         m_listeningPeerDb->addPeer(
             peerData.hostName().toStdString(),
-            [this, hostName = peerData.hostName()](bool added)
+            [hostName = peerData.hostName()](bool added)
             {
-                NX_VERBOSE(this, "Peer %1 added to RemoteRelayPeerPool: %2",
+                // Can't use "this" because the life time of m_listeningPeerDb is longer than "this".
+                // this handler with "this" may happen after "this" has been destroyed.
+                NX_VERBOSE(typeid(ListeningPeerPool), "Peer %1 added to RemoteRelayPeerPool: %2",
                     hostName, added);
             });
     }
@@ -296,9 +298,12 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
     m_peers.erase(peerIter);
 
     m_listeningPeerDb->removePeer(peerData.hostName().toStdString(),
-        [this, hostName = peerData.hostName()](bool removed)
+        [hostName = peerData.hostName()](bool removed)
         {
-            NX_DEBUG(this, "Peer %1 removed from ListeningPeerDb: %2", hostName, removed);
+            // Can't use "this" because the life time of m_listeningPeerDb is longer than "this".
+            // this handler with "this" may happen after "this" has been destroyed.
+            NX_DEBUG(typeid(ListeningPeerPool), "Peer %1 removed from ListeningPeerDb: %2",
+                hostName, removed);
         });
 }
 

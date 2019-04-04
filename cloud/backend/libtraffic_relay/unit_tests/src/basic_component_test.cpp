@@ -7,7 +7,6 @@
 #include <nx/cloud/relay/controller/relay_public_ip_discovery.h>
 #include <nx/cloud/relay/model/remote_relay_peer_pool.h>
 
-
 namespace nx {
 namespace cloud {
 namespace relay {
@@ -58,14 +57,15 @@ void BasicComponentTest::addRelayInstance(
         m_relays.back()->addArg(arg);
 
     ASSERT_TRUE(m_serverListening);
-    m_relays.back()->addArg("--clusterDbMap/connectionRetryDelay=1ms");
-    m_relays.back()->addArg("-p2pDb/clusterId", kClusterId);
+    m_relays.back()->addArg("-listeningPeerDb/connectionRetryDelay", "1ms");
+    m_relays.back()->addArg("-discovery/registrationErrorDelay", "1ms");
+    m_relays.back()->addArg("-discovery/onlineNodesRequestDelay", "100ms");
+    m_relays.back()->addArg("-discovery/enabled", "true");
+    m_relays.back()->addArg("-discovery/roundTripPadding", "1ms");
     m_relays.back()->addArg(
         "-discovery/discoveryServiceUrl",
         m_discoveryServer.url().toStdString().c_str());
-    m_relays.back()->addArg(
-        "-p2pDb/maxConcurrentConnectionsFromSystem",
-        std::to_string(7).c_str());
+    m_relays.back()->addArg("-p2pDb/clusterId", kClusterId);
 
     if (waitUntilStarted)
     {
@@ -106,11 +106,13 @@ bool BasicComponentTest::peerInformationSynchronizedInCluster(
             return hasHostname.pop();
     };
 
-    bool allRelaysHaveHostname = true;
     for (const auto& relay : m_relays)
-        allRelaysHaveHostname &= doesRelayhaveHostname(relay.get(), hostname);
+    {
+        if (!doesRelayhaveHostname(relay.get(), hostname))
+            return false;
+    }
 
-    return allRelaysHaveHostname;
+    return true;
 }
 
 } // namespace test
