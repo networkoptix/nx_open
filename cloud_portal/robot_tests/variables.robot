@@ -20,9 +20,10 @@ ${BACKDROP}                           //ngb-modal-window
 
 ${CYRILLIC TEXT}                      Кенгшщзх
 ${SMILEY TEXT}                        ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
-${GLYPH TEXT}                         您都可以享受源源不絕的好禮及優惠
+${GLYPH TEXT}                         您都可以享受源源不あなたのアカウント
 ${SYMBOL TEXT}                        `~!@#$%^&*()_:";'{}[]+<>?,./\
 ${TM TEXT}                            qweasdzxc123®™
+${KOREAN TEXT}                        계정이 이미 활성
 
 #Log In Elements
 ${LOG IN MODAL}                       //form[@name='loginForm']
@@ -208,9 +209,9 @@ ${DOWNLOAD MAC OS VMS LINK}           //div[text()="Mac OS X - Client only"]/../
 ${ITUNES STORE DOWNLOAD BUTTON}       //a[@class="mobile-link iOS"]
 ${PLAY STORE DOWNLOAD BUTTON}         //a[@class="mobile-link Android"]
 
-${WINDOWS TAB}                        //a[@id="Windows"]
-${UBUNTU TAB}                         //a[@id="Linux"]
-${MAC OS TAB}                         //a[@id="MacOS"]
+${WINDOWS TAB}                        //a[@id="windows"]
+${UBUNTU TAB}                         //a[@id="linux"]
+${MAC OS TAB}                         //a[@id="macos"]
 
 #History
 ${RELEASES TAB}                       //span[@class='tab-heading' and text()='Releases']/..
