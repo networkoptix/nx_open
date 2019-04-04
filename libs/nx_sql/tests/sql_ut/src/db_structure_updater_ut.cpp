@@ -98,7 +98,7 @@ class BasicDbStructureUpdaterTestSetup:
 
 public:
     BasicDbStructureUpdaterTestSetup():
-        base_type("sql_ut")
+        base_type(kModuleName)
     {
         using namespace std::placeholders;
 
