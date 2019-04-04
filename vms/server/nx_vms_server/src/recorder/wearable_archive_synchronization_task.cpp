@@ -25,6 +25,10 @@ class WearableCameraRecorder: public QnServerEdgeStreamRecorder
 {
 public:
     using QnServerEdgeStreamRecorder::QnServerEdgeStreamRecorder;
+    ~WearableCameraRecorder()
+    {
+        stop();
+    }
 protected:
     virtual void beforeProcessData(const QnConstAbstractMediaDataPtr& media) override
     {
