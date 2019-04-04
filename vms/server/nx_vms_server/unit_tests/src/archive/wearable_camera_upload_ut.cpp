@@ -65,7 +65,7 @@ protected:
 
     void whenPlayArchiveRequestIsIssued()
     {
-        const auto camera = test_support::cameraByUniqueId(
+        const auto camera = test_support::getCamera(
             m_server->serverModule()->resourcePool(), m_wearableCameraName);
 
         ASSERT_TRUE((bool)camera);

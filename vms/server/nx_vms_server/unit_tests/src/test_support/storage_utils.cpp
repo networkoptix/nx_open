@@ -454,13 +454,13 @@ std::unique_ptr<QnArchiveStreamReader> createArchiveStreamReader(
     return archiveReader;
 }
 
-QnVirtualCameraResourcePtr cameraByUniqueId(QnResourcePool* resourcePool, const QString& uniqueId)
+QnVirtualCameraResourcePtr getCamera(QnResourcePool* resourcePool, const QString& uniqueIdOrName)
 {
     const auto allCameras = resourcePool->getAllCameras();
     QnVirtualCameraResourcePtr result;
     for (const auto camera : allCameras)
     {
-        if (camera->getUniqueId() == uniqueId || camera->getName() == uniqueId)
+        if (camera->getUniqueId() == uniqueIdOrName || camera->getName() == uniqueIdOrName)
         {
             result = camera;
             break;

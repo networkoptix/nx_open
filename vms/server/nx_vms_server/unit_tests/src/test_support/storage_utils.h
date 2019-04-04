@@ -42,7 +42,7 @@ void updateMkvMetaData(QByteArray& payload, int64_t startTimeMs);
 std::unique_ptr<QnArchiveStreamReader> createArchiveStreamReader(
     const QnVirtualCameraResourcePtr& camera);
 
-QnVirtualCameraResourcePtr cameraByUniqueId(QnResourcePool* resourcePool, const QString& uniqueId);
+QnVirtualCameraResourcePtr getCamera(QnResourcePool* resourcePool, const QString& uniqueIdOrName);
 
 /**
  * Checks that media data played covers the given time periods. This function waits until
