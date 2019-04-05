@@ -115,6 +115,14 @@ bool ListeningPeerDb::initialize()
     return m_map != nullptr;
 }
 
+void ListeningPeerDb::stop()
+{
+    if (m_map)
+        m_map->synchronizationEngine().pleaseStopSync();
+    if (m_sqlExecutor)
+        m_sqlExecutor->pleaseStopSync();
+}
+
 void ListeningPeerDb::setThisMediatorEndpoint(const MediatorEndpoint& endpoint)
 {
     m_mediatorEndpoint = endpoint;

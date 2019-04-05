@@ -31,6 +31,7 @@ Controller::Controller(const conf::Settings& settings):
     m_cloudConnectProcessor(
         settings,
         m_cloudDataProvider.get(),
+        &m_listeningPeerDb,
         &m_listeningPeerPool,
         m_relayClusterClient.get(),
         &m_statsManager.collector()),
@@ -100,6 +101,7 @@ bool Controller::doMandatoryInitialization()
 void Controller::stop()
 {
     m_cloudConnectProcessor.stop();
+    m_listeningPeerDb.stop();
 }
 
 } // namespace hpm
