@@ -122,6 +122,7 @@ bool WearableArchiveSynchronizationTask::execute()
     m_recorder->pleaseStop();
     m_recorder->wait();
 
+    m_archiveReader->removeDataProcessor(m_recorder.get());
     m_archiveReader.reset();
     m_recorder.reset();
 
