@@ -134,7 +134,7 @@ nx::vms::client::core::OperationManager* QnContext::operationManager() const
     return commonModule()->instance<nx::vms::client::core::OperationManager>();
 }
 
-nx::vms::client::core::UserWatcher* QnContext::userWatcher() const
+nx::vms::client::core::UserWatcher* QnContext::currentUserWatcher() const
 {
     return commonModule()->instance<nx::vms::client::core::UserWatcher>();
 }
