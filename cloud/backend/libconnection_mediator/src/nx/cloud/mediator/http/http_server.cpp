@@ -232,8 +232,7 @@ void InitiateConnectionRequestHandler::processRequest(
             requestContext.connection->socket()->getForeignAddress()},
         inputData,
         [this, cachedRequestContext = std::move(cachedRequestContext),
-            targetServer = inputData.destinationHostName,
-            lock = m_listeningPeerDbGuard.getScopedIncrement()](
+            targetServer = inputData.destinationHostName](
                 api::ResultCode resultCode,
                 api::ConnectResponse response)
         {
@@ -312,7 +311,9 @@ bool InitiateConnectionRequestHandler::validateMediatorEndpoint(
 {
     if (endpoint.domainName.empty())
     {
-        NX_VERBOSE(this, "Redirect to remote mediator failed");
+        NX_VERBOSE(this,
+            "Redirect to remote mediator failed. attemted to redirect to remote mediator: %1",
+            endpoint);
         return false;
     }
 
@@ -326,8 +327,8 @@ bool InitiateConnectionRequestHandler::validateMediatorEndpoint(
     {
         if (endpoint.httpsPort == MediatorEndpoint::kPortUnused)
         {
-            NX_VERBOSE(this, "found mediator: %1, but no https port is accessible.",
-                endpoint.domainName);
+            NX_VERBOSE(this, "Found remote mediator: %1, but no https port is accessible.",
+                endpoint);
             return false;
         }
     }
@@ -335,8 +336,8 @@ bool InitiateConnectionRequestHandler::validateMediatorEndpoint(
     {
         if (endpoint.httpPort == MediatorEndpoint::kPortUnused)
         {
-            NX_VERBOSE(this, "found mediator: %1, but no http port is accessible.",
-                endpoint.domainName);
+            NX_VERBOSE(this, "Found remote mediator: %1, but no http port is accessible.",
+                endpoint);
             return false;
         }
     }
