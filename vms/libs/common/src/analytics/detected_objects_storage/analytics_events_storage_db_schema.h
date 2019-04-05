@@ -143,6 +143,27 @@ UPDATE event SET
 
 )sql";
 
+//-------------------------------------------------------------------------------------------------
+// META-226
+static constexpr char kAddFullTimePeriods[] =
+R"sql(
+
+CREATE TABLE time_period_full(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id          INTEGER,
+    period_start_ms    INTEGER,
+    period_end_ms      INTEGER
+);
+
+CREATE INDEX idx_time_period_full_device_id ON time_period_full(device_id);
+
+INSERT INTO time_period_full (device_id, period_start_ms, period_end_ms)
+SELECT device_id, MIN(timestamp_usec_utc), MAX(timestamp_usec_utc)
+FROM event
+GROUP BY device_id, timestamp_usec_utc/60000;
+
+)sql";
+
 } // namespace storage
 } // namespace analytics
 } // namespace nx

@@ -15,6 +15,37 @@ namespace storage {
 static constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833-456437eaa7c7";
 static constexpr int kUsecPerMsec = 1000;
 
+static constexpr auto kMaxTimePeriodLength = std::chrono::minutes(10);
+static constexpr auto kTimePeriodPreemptiveLength = std::chrono::minutes(1);
+
+namespace detail {
+
+std::chrono::milliseconds TimePeriod::length() const
+{
+    return endTime - startTime;
+}
+
+bool TimePeriod::addPacketToPeriod(
+    std::chrono::milliseconds timestamp,
+    std::chrono::milliseconds duration)
+{
+    if (length() > kMaxTimePeriodLength ||
+        startTime > timestamp || //< Packet from the past?
+        (timestamp > endTime && timestamp - endTime > kMinTimePeriodAggregationPeriod))
+    {
+        return false;
+    }
+
+    if (endTime < timestamp + duration)
+        endTime = timestamp + duration;
+
+    return true;
+}
+
+} // namespace detail
+
+//-------------------------------------------------------------------------------------------------
+
 EventsStorage::EventsStorage(const Settings& settings):
     m_settings(settings),
     m_dbController(settings.dbConnectionOptions)
@@ -178,6 +209,7 @@ bool EventsStorage::loadDictionaries()
             {
                 loadObjectTypeDictionary(queryContext);
                 loadDeviceDictionary(queryContext);
+                fillCurrentTimePeriodsCache(queryContext);
                 // TODO: #ak Remove when executeSelectQuerySync supports void functors.
                 return true;
             });
@@ -266,7 +298,15 @@ sql::DBResult EventsStorage::savePacket(
         updateDictionariesIfNeeded(queryContext, *packet, detectedObject);
 
         const auto attributesId = insertAttributes(queryContext, detectedObject.labels);
-        insertEvent(queryContext, *packet, detectedObject, attributesId);
+
+        const auto timePeriodId = insertOrUpdateTimePeriod(queryContext, *packet);
+
+        insertEvent(
+            queryContext,
+            *packet,
+            detectedObject,
+            attributesId,
+            timePeriodId);
     }
 
     return sql::DBResult::ok;
@@ -325,14 +365,16 @@ void EventsStorage::insertEvent(
     sql::QueryContext* queryContext,
     const common::metadata::DetectionMetadataPacket& packet,
     const common::metadata::DetectedObject& detectedObject,
-    long long attributesId)
+    long long attributesId,
+    long long timePeriodId)
 {
     sql::SqlQuery insertEventQuery(queryContext->connection());
     insertEventQuery.prepare(QString::fromLatin1(R"sql(
         INSERT INTO event(timestamp_usec_utc, duration_usec,
             device_id, object_type_id, object_id, attributes_id,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
-        VALUES(:timestampMs, :durationUsec, :deviceId, :objectTypeId, :objectAppearanceId, :attributesId,
+        VALUES(:timestampMs, :durationUsec, :deviceId,
+            :objectTypeId, :objectAppearanceId, :attributesId,
             :boxTopLeftX, :boxTopLeftY, :boxBottomRightX, :boxBottomRightY)
     )sql"));
     insertEventQuery.bindValue(":timestampMs", packet.timestampUsec / kUsecPerMsec);
@@ -409,6 +451,142 @@ long long EventsStorage::insertAttributes(
     insertContentQuery->exec();
 
     return id;
+}
+
+long long EventsStorage::insertOrUpdateTimePeriod(
+    nx::sql::QueryContext* queryContext,
+    const common::metadata::DetectionMetadataPacket& packet)
+{
+    using namespace std::chrono;
+
+    const auto packetTimestamp = duration_cast<milliseconds>(microseconds(packet.timestampUsec));
+    const auto packetDuration = duration_cast<milliseconds>(microseconds(packet.durationUsec));
+    const auto deviceId = deviceIdFromGuid(packet.deviceId);
+
+    auto currentPeriod = insertOrFetchCurrentTimePeriod(
+        queryContext, deviceId, packetTimestamp, packetDuration);
+
+    if (!currentPeriod->addPacketToPeriod(packetTimestamp, packetDuration))
+    {
+        closeCurrentTimePeriod(queryContext, deviceId);
+
+        // Adding new period.
+        currentPeriod = insertOrFetchCurrentTimePeriod(
+            queryContext, deviceId, packetTimestamp, packetDuration);
+    }
+    else if (currentPeriod->lastSavedEndTime < currentPeriod->endTime)
+    {
+        currentPeriod->lastSavedEndTime = currentPeriod->endTime + kTimePeriodPreemptiveLength;
+
+        saveTimePeriodEnd(
+            queryContext,
+            currentPeriod->id,
+            currentPeriod->lastSavedEndTime);
+    }
+
+    return currentPeriod->id;
+}
+
+detail::TimePeriod* EventsStorage::insertOrFetchCurrentTimePeriod(
+    nx::sql::QueryContext* queryContext,
+    long long deviceId,
+    std::chrono::milliseconds packetTimestamp,
+    std::chrono::milliseconds packetDuration)
+{
+    auto periodIter = m_deviceIdToCurrentTimePeriod.find(deviceId);
+    if (periodIter != m_deviceIdToCurrentTimePeriod.end())
+        return &periodIter->second;
+
+    detail::TimePeriod timePeriod;
+
+    timePeriod.deviceId = deviceId;
+    timePeriod.startTime = packetTimestamp;
+    timePeriod.endTime = packetTimestamp + packetDuration;
+
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(R"sql(
+        INSERT INTO time_period_full(device_id, period_start_ms, period_end_ms)
+        VALUES (:deviceId, :periodStartMs, :periodEndMs)
+    )sql");
+    query->bindValue(":deviceId", deviceId);
+    query->bindValue(":periodStartMs", packetTimestamp.count());
+    // Filling period end so that this period is used in queries.
+    query->bindValue(":periodEndMs", (timePeriod.endTime + kTimePeriodPreemptiveLength).count());
+
+    query->exec();
+
+    timePeriod.id = query->lastInsertId().toLongLong();
+    timePeriod.lastSavedEndTime = timePeriod.endTime + kTimePeriodPreemptiveLength;
+
+    periodIter = m_deviceIdToCurrentTimePeriod.emplace(deviceId, timePeriod).first;
+    m_idToTimePeriod[periodIter->second.id] = periodIter;
+
+    NX_VERBOSE(this, "Added new time period %1 (device %2, start time %3)",
+        timePeriod.id, deviceGuidFromId(timePeriod.deviceId), timePeriod.startTime);
+
+    return &periodIter->second;
+}
+
+void EventsStorage::closeCurrentTimePeriod(
+    nx::sql::QueryContext* queryContext,
+    long long deviceId)
+{
+    auto periodIter = m_deviceIdToCurrentTimePeriod.find(deviceId);
+    NX_ASSERT(periodIter != m_deviceIdToCurrentTimePeriod.end());
+    if (periodIter == m_deviceIdToCurrentTimePeriod.end())
+        return;
+
+    saveTimePeriodEnd(
+        queryContext,
+        periodIter->second.id,
+        periodIter->second.endTime);
+
+    NX_VERBOSE(this, "Closed time period %1 (device %2)",
+        periodIter->second.id, deviceGuidFromId(deviceId));
+
+    m_idToTimePeriod.erase(periodIter->second.id);
+    m_deviceIdToCurrentTimePeriod.erase(periodIter);
+}
+
+void EventsStorage::saveTimePeriodEnd(
+    nx::sql::QueryContext* queryContext,
+    long long id,
+    std::chrono::milliseconds endTime)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(
+        "UPDATE time_period_full SET period_end_ms=:periodEndMs WHERE id=:id");
+
+    query->bindValue(":id", id);
+    query->bindValue(":periodEndMs", endTime.count());
+    query->exec();
+
+    NX_VERBOSE(this, "Updated end of time period %1 to %2", id, endTime);
+}
+
+void EventsStorage::fillCurrentTimePeriodsCache(
+    nx::sql::QueryContext* queryContext)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(R"sql(
+        SELECT id, device_id, period_start_ms, period_end_ms
+        FROM time_period_full
+        GROUP BY device_id
+        HAVING max(rowid)
+    )sql");
+
+    while (query->next())
+    {
+        detail::TimePeriod timePeriod;
+
+        timePeriod.id = query->value("id").toLongLong();
+        timePeriod.deviceId = query->value("device_id").toLongLong();
+        timePeriod.startTime = std::chrono::milliseconds(query->value("period_start_ms").toLongLong());
+        timePeriod.endTime = std::chrono::milliseconds(query->value("period_end_ms").toLongLong());
+
+        auto it = m_deviceIdToCurrentTimePeriod.emplace(timePeriod.deviceId, timePeriod).first;
+        m_idToTimePeriod[timePeriod.id] = it;
+    }
 }
 
 void EventsStorage::prepareCursorQuery(
@@ -778,6 +956,67 @@ nx::sql::DBResult EventsStorage::selectTimePeriods(
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
+    auto query = queryContext->connection()->createQuery();
+    query->setForwardOnly(true);
+
+    Filter localFilter = filter;
+    localFilter.deviceIds.clear();
+    localFilter.timePeriod.clear();
+
+    if (localFilter.empty())
+    {
+        prepareSelectTimePeriodsUnfilteredQuery(
+            query.get(), filter.deviceIds, filter.timePeriod, options);
+    }
+    else
+    {
+        prepareSelectTimePeriodsFilteredQuery(query.get(), filter, options);
+    }
+
+    query->exec();
+    loadTimePeriods(query.get(), options, result);
+
+    return nx::sql::DBResult::ok;
+}
+
+void EventsStorage::prepareSelectTimePeriodsUnfilteredQuery(
+    nx::sql::AbstractSqlQuery* query,
+    const std::vector<QnUuid>& deviceGuids,
+    const QnTimePeriod& /*timePeriod*/,
+    const TimePeriodsLookupOptions& /*options*/)
+{
+    nx::sql::Filter sqlFilter;
+
+    if (!deviceGuids.empty())
+    {
+        auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
+            "device_id", ":deviceId");
+        for (const auto& deviceGuid: deviceGuids)
+            condition->addValue(deviceIdFromGuid(deviceGuid));
+        sqlFilter.addCondition(std::move(condition));
+    }
+
+    // TODO: META-226 timePeriod
+
+    std::string whereClause;
+    const auto sqlFilterStr = sqlFilter.toString();
+    if (!sqlFilterStr.empty())
+        whereClause = "WHERE " + sqlFilterStr;
+
+    query->prepare(lm(R"sql(
+        SELECT id, device_id, period_start_ms, period_end_ms - period_start_ms AS duration_ms
+        FROM time_period_full
+        %1
+        ORDER BY period_start_ms ASC
+    )sql").args(whereClause));
+    sqlFilter.bindFields(query);
+}
+
+void EventsStorage::prepareSelectTimePeriodsFilteredQuery(
+    nx::sql::AbstractSqlQuery* query,
+    const Filter& filter,
+    const TimePeriodsLookupOptions& options)
+{
     QString eventsFilteredByFreeTextSubQuery;
     const auto sqlQueryFilter =
         prepareSqlFilterExpression(filter, &eventsFilteredByFreeTextSubQuery);
@@ -785,37 +1024,34 @@ nx::sql::DBResult EventsStorage::selectTimePeriods(
     if (!sqlQueryFilterStr.empty())
         sqlQueryFilterStr = "WHERE " + sqlQueryFilterStr;
 
-    // TODO: #ak Aggregate in query.
-
-    sql::SqlQuery query(queryContext->connection());
-    query.setForwardOnly(true);
-    query.prepare(lm(R"sql(
-        SELECT timestamp_usec_utc, duration_usec
+    query->prepare(lm(R"sql(
+        SELECT -1 AS id, timestamp_usec_utc AS period_start_ms, duration_usec / 1000 AS duration_ms
         FROM %1
         %2
         ORDER BY timestamp_usec_utc ASC
     )sql").args(eventsFilteredByFreeTextSubQuery, sqlQueryFilterStr));
-    sqlQueryFilter.bindFields(&query);
-
-    query.exec();
-    loadTimePeriods(query, options, result);
-    return nx::sql::DBResult::ok;
+    sqlQueryFilter.bindFields(query);
 }
 
 void EventsStorage::loadTimePeriods(
-    nx::sql::SqlQuery& query,
+    nx::sql::AbstractSqlQuery* query,
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
     using namespace std::chrono;
 
-    constexpr int kUsecPerMs = 1000;
-
-    while (query.next())
+    while (query->next())
     {
         QnTimePeriod timePeriod(
-            milliseconds(query.value("timestamp_usec_utc").toLongLong()),
-            milliseconds(query.value("duration_usec").toLongLong() / kUsecPerMs));
+            milliseconds(query->value("period_start_ms").toLongLong()),
+            milliseconds(query->value("duration_ms").toLongLong()));
+
+        // Fixing time period end if needed.
+        const auto id = query->value("id").toLongLong();
+
+        if (auto it = m_idToTimePeriod.find(id); it != m_idToTimePeriod.end())
+            timePeriod.setEndTime(it->second->second.endTime);
+
         result->push_back(timePeriod);
     }
 

@@ -5,6 +5,10 @@
 #include <map>
 #include <vector>
 
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/member.hpp>
+
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
 #include <nx/utils/basic_factory.h>
@@ -95,6 +99,26 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
+namespace detail {
+
+class TimePeriod
+{
+public:
+    long long id = -1;
+    long long deviceId = -1;
+    std::chrono::milliseconds startTime = std::chrono::milliseconds::zero();
+    std::chrono::milliseconds endTime = std::chrono::milliseconds::zero();
+    std::chrono::milliseconds lastSavedEndTime = std::chrono::milliseconds::zero();
+
+    std::chrono::milliseconds length() const;
+
+    bool addPacketToPeriod(
+        std::chrono::milliseconds timestamp,
+        std::chrono::milliseconds duration);
+};
+
+} // namespace detai;
+
 class EventsStorage:
     public AbstractEventsStorage
 {
@@ -131,6 +155,22 @@ private:
         long long id = -1;
     };
 
+    using TimePeriods = boost::multi_index::multi_index_container<
+        detail::TimePeriod,
+        boost::multi_index::indexed_by<
+            boost::multi_index::ordered_unique<boost::multi_index::member<
+                detail::TimePeriod, decltype(detail::TimePeriod::id), &detail::TimePeriod::id>>,
+            boost::multi_index::ordered_unique<boost::multi_index::member<
+                detail::TimePeriod, decltype(detail::TimePeriod::deviceId), &detail::TimePeriod::deviceId>>>>;
+
+    static constexpr int kTimePeriodsById = 0;
+    static constexpr int kTimePeriodsByDeviceId = 1;
+
+    TimePeriods m_timePeriods;
+
+    using DeviceIdToCurrentTimePeriod = std::map<long long, detail::TimePeriod>;
+    using IdToTimePeriod = std::map<long long, DeviceIdToCurrentTimePeriod::iterator>;
+
     const Settings& m_settings;
     DbController m_dbController;
     std::chrono::microseconds m_maxRecordedTimestamp = std::chrono::microseconds::zero();
@@ -140,6 +180,8 @@ private:
     std::map<QString, long long> m_objectTypeToId;
     std::map<long long, QString> m_idToObjectType;
     std::deque<AttributesCacheEntry> m_attributesCache;
+    DeviceIdToCurrentTimePeriod m_deviceIdToCurrentTimePeriod;
+    IdToTimePeriod m_idToTimePeriod;
 
     bool readMaximumEventTimestamp();
 
@@ -167,7 +209,8 @@ private:
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject,
-        long long attributesId);
+        long long attributesId,
+        long long timePeriodId);
 
     void updateDictionariesIfNeeded(
         nx::sql::QueryContext* queryContext,
@@ -189,6 +232,30 @@ private:
     long long insertAttributes(
         nx::sql::QueryContext* queryContext,
         const std::vector<common::metadata::Attribute>& eventAttributes);
+
+    /**
+     * @return Id of the current time period.
+     */
+    long long insertOrUpdateTimePeriod(
+        nx::sql::QueryContext* queryContext,
+        const common::metadata::DetectionMetadataPacket& packet);
+
+    detail::TimePeriod* insertOrFetchCurrentTimePeriod(
+        nx::sql::QueryContext* queryContext,
+        long long deviceId,
+        std::chrono::milliseconds packetTimestamp,
+        std::chrono::milliseconds packetDuration);
+
+    void closeCurrentTimePeriod(
+        nx::sql::QueryContext* queryContext,
+        long long deviceId);
+
+    void saveTimePeriodEnd(
+        nx::sql::QueryContext* queryContext,
+        long long id,
+        std::chrono::milliseconds endTime);
+
+    void fillCurrentTimePeriodsCache(nx::sql::QueryContext* queryContext);
 
     void prepareCursorQuery(const Filter& filter, nx::sql::SqlQuery* query);
 
@@ -236,8 +303,19 @@ private:
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 
+    void prepareSelectTimePeriodsUnfilteredQuery(
+        nx::sql::AbstractSqlQuery* query,
+        const std::vector<QnUuid>& deviceIds,
+        const QnTimePeriod& timePeriod,
+        const TimePeriodsLookupOptions& options);
+
+    void prepareSelectTimePeriodsFilteredQuery(
+        nx::sql::AbstractSqlQuery* query,
+        const Filter& filter,
+        const TimePeriodsLookupOptions& options);
+
     void loadTimePeriods(
-        nx::sql::SqlQuery& query,
+        nx::sql::AbstractSqlQuery* query,
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 

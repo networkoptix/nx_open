@@ -38,6 +38,11 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 //-------------------------------------------------------------------------------------------------
 
+bool Filter::empty() const
+{
+    return *this == Filter();
+}
+
 bool Filter::operator==(const Filter& right) const
 {
     return objectTypeId == right.objectTypeId

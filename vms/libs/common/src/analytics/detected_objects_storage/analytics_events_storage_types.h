@@ -22,6 +22,11 @@ static constexpr int kCoordinateDecimalDigits = nx::common::metadata::kCoordinat
 // NOTE: If the assertion fails, all constants here must be modified and analytics DB data migrated.
 static_assert(kCoordinateDecimalDigits == 4);
 
+/**
+ * Time periods shorter than this value are always aggregated.
+ */
+static constexpr auto kMinTimePeriodAggregationPeriod = std::chrono::seconds(3);
+
 struct ObjectPosition
 {
     /** Device object has been detected on. */
@@ -89,6 +94,8 @@ struct Filter
      * Found objects are sorted by minimal track time using this order.
      */
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
+
+    bool empty() const;
 
     bool operator==(const Filter& right) const;
     bool operator!=(const Filter& right) const;

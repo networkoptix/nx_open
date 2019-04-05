@@ -33,6 +33,7 @@ public:
     virtual QVariant value(int index) const = 0;
     virtual QVariant value(const QString& name) const = 0;
     virtual QSqlRecord record() = 0;
+    virtual QVariant lastInsertId() const = 0;
 
     // TODO: #ak Remove these methods.
     // For now they are required for compatibility with QnSql::*.
@@ -65,6 +66,7 @@ public:
     virtual QVariant value(int index) const override;
     virtual QVariant value(const QString& name) const override;
     virtual QSqlRecord record() override;
+    virtual QVariant lastInsertId() const override;
 
     virtual QSqlQuery& impl() override;
     virtual const QSqlQuery& impl() const override;
