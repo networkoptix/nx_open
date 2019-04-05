@@ -1,4 +1,5 @@
 import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { Location } from '@angular/common';
 import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EmailValidator } from '@angular/forms';
@@ -48,6 +49,7 @@ export class NxModalGenericComponent implements OnInit {
     modalRef: NgbModalRef;
 
     constructor(@Inject('languageService') private language: any,
+                private domSanitizer: DomSanitizer,
                 private location: Location,
                 private modalService: NgbModal) {
     }
@@ -57,7 +59,7 @@ export class NxModalGenericComponent implements OnInit {
         this.modalRef = this.modalService.open(GenericModalContent, {backdrop: 'static', centered: true});
         this.modalRef.componentInstance.language = this.language.lang;
 
-        this.modalRef.componentInstance.message = message;
+        this.modalRef.componentInstance.message = this.domSanitizer.bypassSecurityTrustHtml(message);
         this.modalRef.componentInstance.title = title;
         this.modalRef.componentInstance.actionLabel = actionLabel;
         this.modalRef.componentInstance.buttonType = actionType || 'default';

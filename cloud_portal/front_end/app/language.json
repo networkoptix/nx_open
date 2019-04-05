@@ -143,7 +143,7 @@
     "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
     "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
     "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
-    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a [href]=\"config.supportLink\">support</a>."
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"{{supportLink}}\" target=\"_blank\">support</a>."
   },
   "merging": {
     "mergeFailedTitle": "Systems merge failed",
