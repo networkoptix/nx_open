@@ -520,7 +520,7 @@ void PeerStateTracker::processDownloadTaskSet()
         {
             if (m_peersActive.contains(id))
             {
-                NX_VERBOSE(this, "processDownloadTaskSet() ",
+                NX_VERBOSE(this, "processDownloadTaskSet() "
                     "peer %1 has already installed this package.", id);
                 m_peersActive.remove(id);
             }

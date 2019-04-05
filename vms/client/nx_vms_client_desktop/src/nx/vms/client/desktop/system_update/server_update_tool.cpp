@@ -880,7 +880,7 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
             {
                 if (response.error != QnRestResult::NoError)
                 {
-                    NX_DEBUG(this,
+                    NX_VERBOSE(this,
                         "requestRemoteUpdateStateAsync: An error in response to the /ec2/updateStatus request: code=%1, err=%2",
                         response.error, response.errorString);
                 }

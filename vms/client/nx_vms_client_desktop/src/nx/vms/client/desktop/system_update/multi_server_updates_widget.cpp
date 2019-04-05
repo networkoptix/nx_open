@@ -1115,8 +1115,27 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool /*success*/)
 {
     if (m_widgetState == WidgetUpdateState::finishingInstall)
     {
-        m_clientUpdateTool->resetState();
+        bool shouldRestartClient = m_clientUpdateTool->hasUpdate()
+            && m_clientUpdateTool->shouldRestartTo(m_updateInfo.getVersion());
+
         setTargetState(WidgetUpdateState::initial, {});
+        if (shouldRestartClient)
+        {
+            // 1. Check if there is any server who completed installation
+            // 2. Check if there is online servers. - What for?
+            auto complete = m_stateTracker->getPeersCompleteInstall();
+            QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
+            // 1. Everything is complete
+            messageBox->setIcon(QnMessageBoxIcon::Success);
+            messageBox->setText(tr("Nx Witness Client will be restarted to the updated version."));
+            messageBox->setStandardButtons(QDialogButtonBox::Ok);
+            messageBox->exec();
+            completeInstallation(true);
+        }
+        else
+        {
+            m_clientUpdateTool->resetState();
+        }
     }
 }
 
