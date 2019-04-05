@@ -7,7 +7,8 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-using namespace network::stun::extension;
+namespace stun = network::stun;
+using namespace stun::extension;
 
 ConnectRequest::ConnectRequest():
     StunRequestData(kMethod),
@@ -60,6 +61,8 @@ void ConnectResponse::serializeAttributes(nx::network::stun::Message* const mess
     message->newAttribute<attrs::HostName>(destinationHostFullName);
     params.serializeAttributes(message);
     message->addAttribute(attrs::cloudConnectVersion, (int)cloudConnectVersion);
+    if (alternateMediatorEndpointStunUdp)
+        message->newAttribute<stun::attrs::AlternateServer>(std::move(*alternateMediatorEndpointStunUdp));
 }
 
 bool ConnectResponse::parseAttributes(const nx::network::stun::Message& message)
@@ -72,6 +75,10 @@ bool ConnectResponse::parseAttributes(const nx::network::stun::Message& message)
         trafficRelayUrl = std::move(trafficRelayEndpointLocal);
 
     readStringAttributeValue<attrs::HostName>(message, &destinationHostFullName);
+
+    network::SocketAddress mediatorEndpoint;
+    if (readAttributeValue<stun::attrs::AlternateServer>(message, &mediatorEndpoint))
+        alternateMediatorEndpointStunUdp = std::move(mediatorEndpoint);
 
     return
         readAttributeValue<attrs::PublicEndpointList>(message, &forwardedTcpEndpointList) &&
