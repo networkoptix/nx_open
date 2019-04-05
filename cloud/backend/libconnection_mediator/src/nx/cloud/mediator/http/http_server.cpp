@@ -211,11 +211,6 @@ InitiateConnectionRequestHandler::InitiateConnectionRequestHandler(
 {
 }
 
-InitiateConnectionRequestHandler::~InitiateConnectionRequestHandler()
-{
-    m_listeningPeerDbGuard.wait();
-}
-
 void InitiateConnectionRequestHandler::processRequest(
     nx::network::http::RequestContext requestContext,
     api::ConnectRequest inputData)
