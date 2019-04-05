@@ -35,6 +35,10 @@ public:
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
+    virtual void pleaseStopSync()
+    {
+    }
+
     virtual const nx::sql::ConnectionOptions& connectionOptions() const override
     {
         return m_connectionOptions;
