@@ -17,6 +17,7 @@ static constexpr int kUsecPerMsec = 1000;
 
 static constexpr auto kMaxTimePeriodLength = std::chrono::minutes(10);
 static constexpr auto kTimePeriodPreemptiveLength = std::chrono::minutes(1);
+static constexpr int kMaxObjectLookupResultSet = 1000;
 
 namespace detail {
 
@@ -648,9 +649,8 @@ void EventsStorage::prepareLookupQuery(
     if (!sqlQueryFilterStr.empty())
         sqlQueryFilterStr = "WHERE " + sqlQueryFilterStr;
 
-    QString sqlLimitStr;
-    if (filter.maxObjectsToSelect > 0)
-        sqlLimitStr = lm("LIMIT %1").args(filter.maxObjectsToSelect).toQString();
+    auto sqlLimitStr = lm("LIMIT %1").args(
+        std::max<int>(filter.maxObjectsToSelect, kMaxObjectLookupResultSet)).toQString();
 
     // NOTE: Limiting filtered_events subquery to make query
     // CPU/memory requirements much less dependent of DB size.
