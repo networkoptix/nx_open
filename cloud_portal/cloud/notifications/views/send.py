@@ -9,14 +9,17 @@ from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import redirect
 
-from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes
+from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, get_client_ip
 from api.models import Account
-from cms.models import Customization, Product, UserGroupsToProductPermissions, get_cloud_portal_product
+from cms.models import Customization, Product, UserGroupsToProductPermissions
 from notifications import notifications_api
 from notifications.models import *
 from notifications.tasks import send_to_all_users
 
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Replaces </p> and <br> with \n and then remove all html tags
@@ -97,6 +100,9 @@ def send_event(request):
         request.data['sender_email'] = request.data['userEmail']
         request.data['sender_name'] = request.data['userName']
         request.data['sender_to_be_contacted'] = request.data['contact']
+
+        ip = get_client_ip(request)
+        logging.info("ip: {}\t user: {}\nrequest data: {}".format(ip, request.user, request.data))
 
         notifications_api.notify(request.data['type'], product_id, request.data)
 
