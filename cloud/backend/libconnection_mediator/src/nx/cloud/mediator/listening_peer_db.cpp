@@ -224,15 +224,13 @@ void ListeningPeerDb::findMediatorByPeerDomain(
         {
             if (result != nx::clusterdb::map::ResultCode::ok)
             {
-                NX_WARNING(
-                    this,
+                NX_VERBOSE(this,
                     "getRangeWithPrefix returned ResultCode: %1 for peerDomainName: %2",
                     nx::clusterdb::map::toString(result), peerDomainName);
                 return handler(MediatorEndpoint());
             }
 
-            NX_VERBOSE(
-                this,
+            NX_VERBOSE(this,
                 "getRangeWithPrefix returned ResultCode: %1 and result set: %2 for peerDomainName: %3",
                 nx::clusterdb::map::toString(result), containerString(map), peerDomainName);
 
@@ -242,7 +240,7 @@ void ListeningPeerDb::findMediatorByPeerDomain(
             auto endpoint = toMediatorEndpoint(map.begin()->second);
             if (!endpoint.has_value())
             {
-                NX_WARNING(this,
+                NX_VERBOSE(this,
                     "Failed to deserialize MediatorEndpoint. string was: %1",
                     map.begin()->second);
                 return handler(MediatorEndpoint());

@@ -147,8 +147,7 @@ bool Server::launchHttpServerIfNeeded(
 
     if (!m_settings.http().maintenanceHtdigestPath.empty())
     {
-        NX_INFO(
-            this,
+        NX_INFO(this,
             lm("htdigest authentication for connection mediator maintenance server enabled. File path: %1")
                 .arg(m_settings.http().maintenanceHtdigestPath));
 
@@ -283,7 +282,7 @@ void InitiateConnectionRequestHandler::redirectToRemoteMediator(
         [this, requestContext = std::move(requestContext),
             resultCode, response = std::move(response)](
                 MediatorEndpoint endpoint)
-        {
+    {
             if (!validateMediatorEndpoint(endpoint, requestContext.isSsl))
                 return reportResult(api::ResultCode::notFound, std::move(response));
 
