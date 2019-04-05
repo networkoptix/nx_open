@@ -155,19 +155,6 @@ private:
         long long id = -1;
     };
 
-    using TimePeriods = boost::multi_index::multi_index_container<
-        detail::TimePeriod,
-        boost::multi_index::indexed_by<
-            boost::multi_index::ordered_unique<boost::multi_index::member<
-                detail::TimePeriod, decltype(detail::TimePeriod::id), &detail::TimePeriod::id>>,
-            boost::multi_index::ordered_unique<boost::multi_index::member<
-                detail::TimePeriod, decltype(detail::TimePeriod::deviceId), &detail::TimePeriod::deviceId>>>>;
-
-    static constexpr int kTimePeriodsById = 0;
-    static constexpr int kTimePeriodsByDeviceId = 1;
-
-    TimePeriods m_timePeriods;
-
     using DeviceIdToCurrentTimePeriod = std::map<long long, detail::TimePeriod>;
     using IdToTimePeriod = std::map<long long, DeviceIdToCurrentTimePeriod::iterator>;
 
