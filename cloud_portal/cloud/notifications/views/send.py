@@ -9,9 +9,9 @@ from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import redirect
 
-from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, get_client_ip
+from api.helpers.exceptions import handle_exceptions, APIRequestException, APIServiceException, api_success, ErrorCodes, get_client_ip
 from api.models import Account
-from cms.models import Customization, Product, UserGroupsToProductPermissions
+from cms.models import Customization, Product, UserGroupsToProductPermissions, cloud_portal_customization_cache
 from notifications import notifications_api
 from notifications.models import *
 from notifications.tasks import send_to_all_users
@@ -60,6 +60,10 @@ def update_or_create_notification(data, customizations=[]):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def send_event(request):
+    feedback_enabled = cloud_portal_customization_cache(settings.CUSTOMIZATION, 'config')['feedback_enabled']
+    if not feedback_enabled:
+        raise APIServiceException('Feedback is currently unavailable', ErrorCodes.service_unavailable)
+
     try:
         validation_error = False
         error_data = {}

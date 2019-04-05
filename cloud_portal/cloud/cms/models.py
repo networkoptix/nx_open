@@ -73,6 +73,7 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'copyright_year': product.read_global_value("%COPYRIGHT_YEAR%"),
                 'company_name': product.read_global_value("%COMPANY_NAME%"),
                 'company_link': product.read_global_value("%COMPANY_LINK%"),
+                'feedback_enabled': product.read_global_value("%FEEDBACK_ENABLED%"),
                 'footer_items': footer_items,
                 'public_downloads': product.read_global_value("%PUBLIC_DOWNLOADS%"),
                 'public_releases': product.read_global_value("%PUBLIC_RELEASE_HISTORY%"),

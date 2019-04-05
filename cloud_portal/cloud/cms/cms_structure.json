@@ -484,6 +484,15 @@
             "type": "check_box",
             "value": "false",
             "optional": true
+          },
+          {
+            "label": "Enable feedback endpoint",
+            "name": "%FEEDBACK_ENABLED%",
+            "description": "If feedback is being abused disable this setting to block all feedback",
+            "type": "check_box",
+            "value": "true",
+            "optional": true,
+            "advanced": true
           }
         ]
       },
