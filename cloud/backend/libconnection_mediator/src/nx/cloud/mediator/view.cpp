@@ -8,6 +8,7 @@
 namespace nx {
 namespace hpm {
 
+
 View::View(
     const conf::Settings& settings,
     Controller* controller)
@@ -125,8 +126,8 @@ void View::registerStunApiHandlers(
     dispatcher->registerRequestProcessor(
         network::stun::extension::methods::connect,
         detail::createRequestProcessor(
-            &HolePunchingProcessor::connect,
-            holePunchingProcessor));
+            &HolePunchingProcessor::ConnectHandler::connect,
+            &holePunchingProcessor->connectHandler()));
 
     dispatcher->registerRequestProcessor(
         network::stun::extension::methods::connectionAck,

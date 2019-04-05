@@ -19,6 +19,10 @@ namespace conf { class Settings; }
 namespace stats { class AbstractCollector; }
 
 class ListeningPeerPool;
+class ListeningPeerDb;
+
+//-------------------------------------------------------------------------------------------------
+// HolePunchingProcessor
 
 /**
  * Handles requests used to establish hole punching connection.
@@ -28,9 +32,37 @@ class HolePunchingProcessor:
     protected RequestProcessor
 {
 public:
+    class ConnectHandler:
+        protected RequestProcessor
+    {
+    public:
+        ConnectHandler(
+            AbstractCloudDataProvider* cloudData,
+            HolePunchingProcessor* holePunchingProcessor,
+            ListeningPeerDb* listeningPeerDb);
+
+        void connect(
+            const RequestSourceDescriptor& requestSourceDescriptor,
+            api::ConnectRequest request,
+            std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
+
+    private:
+        void redirectToRemoteMediator(
+            const RequestSourceDescriptor& requestSourceDescriptor,
+            api::ConnectRequest request,
+            api::ConnectResponse reponse,
+            std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
+
+    private:
+        HolePunchingProcessor* m_holePunchingProcessor;
+        ListeningPeerDb* m_listeningPeerDb;
+    };
+
+public:
     HolePunchingProcessor(
         const conf::Settings& settings,
         AbstractCloudDataProvider* cloudData,
+        ListeningPeerDb* listeningPeerDb,
         ListeningPeerPool* listeningPeerPool,
         AbstractRelayClusterClient* relayClusterClient,
         stats::AbstractCollector* statisticsCollector);
@@ -53,6 +85,8 @@ public:
         api::ConnectionResultRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 
+    ConnectHandler& connectHandler();
+
 private:
     typedef std::map<
         nx::String,
@@ -66,6 +100,7 @@ private:
     QnMutex m_mutex;
     //map<id, connection initiation>
     ConnectSessionsDictionary m_activeConnectSessions;
+    ConnectHandler m_connectHandler;
 
     std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
         validateConnectRequest(

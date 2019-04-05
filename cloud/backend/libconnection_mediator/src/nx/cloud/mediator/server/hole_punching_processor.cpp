@@ -6,12 +6,15 @@
 #include <nx/utils/time.h>
 #include <nx/utils/thread/barrier_handler.h>
 
+#include "../listening_peer_db.h"
 #include "../listening_peer_pool.h"
 #include "../settings.h"
 #include "../statistics/collector.h"
 
 namespace nx {
 namespace hpm {
+
+namespace {
 
 static QString logRequest(
     const RequestSourceDescriptor& requestSourceDescriptor,
@@ -22,9 +25,95 @@ static QString logRequest(
             request.destinationHostName, request.connectSessionId);
 }
 
+static bool validateMediatorEndpoint(const MediatorEndpoint& endpoint)
+{
+    if (endpoint.domainName.empty())
+        return false;
+
+    if (endpoint.stunUdpPort == MediatorEndpoint::kPortUnused)
+        return false;
+
+    return true;
+}
+
+} // namespace
+
+//-------------------------------------------------------------------------------------------------
+// HolePunchingProcessor::ConnectHandler
+
+HolePunchingProcessor::ConnectHandler::ConnectHandler(
+    AbstractCloudDataProvider* cloudData,
+    HolePunchingProcessor* holePunchingProcessor,
+    ListeningPeerDb* listeningPeerDb)
+    :
+    RequestProcessor(cloudData),
+    m_holePunchingProcessor(holePunchingProcessor),
+    m_listeningPeerDb(listeningPeerDb)
+{
+}
+
+void HolePunchingProcessor::ConnectHandler::connect(
+    const RequestSourceDescriptor& requestSourceDescriptor,
+    api::ConnectRequest request,
+    std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
+{
+    m_holePunchingProcessor->connect(
+        requestSourceDescriptor,
+        std::move(request),
+        [this, completionHandler = std::move(completionHandler),
+            requestSourceDescriptor, request](
+                api::ResultCode resultCode, api::ConnectResponse response)
+        {
+            if (resultCode == api::ResultCode::notFound)
+            {
+                return redirectToRemoteMediator(
+                    requestSourceDescriptor,
+                    request,
+                    std::move(response),
+                    std::move(completionHandler));
+            }
+
+            return completionHandler(std::move(resultCode), std::move(response));
+        });
+}
+
+void HolePunchingProcessor::ConnectHandler::redirectToRemoteMediator(
+    const RequestSourceDescriptor& requestSourceDescriptor,
+    api::ConnectRequest request,
+    api::ConnectResponse response,
+    std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
+{
+    QString connectRequestString = logRequest(requestSourceDescriptor, request);
+    NX_VERBOSE(this, "Attempting to redirect connect request %1:", connectRequestString);
+
+    m_listeningPeerDb->findMediatorByPeerDomain(
+        request.destinationHostName.toStdString(),
+        [this, response = std::move(response),
+            completionHandler = std::move(completionHandler), connectRequestString](
+                MediatorEndpoint endpoint) mutable
+        {
+            if (!validateMediatorEndpoint(endpoint))
+            {
+                NX_VERBOSE(this,
+                    "Failed to redirect Stun connect request: %1 to remote mediator endpoint: %2",
+                    connectRequestString, endpoint);
+                return completionHandler(api::ResultCode::notFound, std::move(response));
+            }
+
+            response.alternateMediatorEndpointStunUdp =
+                network::SocketAddress(endpoint.domainName, endpoint.stunUdpPort);
+
+            return completionHandler(api::ResultCode::notFound, std::move(response));
+        });
+}
+
+//-------------------------------------------------------------------------------------------------
+// HolePunchingProcessor
+
 HolePunchingProcessor::HolePunchingProcessor(
     const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
+    ListeningPeerDb* listeningPeerDb,
     ListeningPeerPool* listeningPeerPool,
     AbstractRelayClusterClient* relayClusterClient,
     stats::AbstractCollector* statisticsCollector)
@@ -33,7 +122,8 @@ HolePunchingProcessor::HolePunchingProcessor(
     m_settings(settings),
     m_listeningPeerPool(listeningPeerPool),
     m_relayClusterClient(relayClusterClient),
-    m_statisticsCollector(statisticsCollector)
+    m_statisticsCollector(statisticsCollector),
+    m_connectHandler(cloudData, this, listeningPeerDb)
 {
 }
 
@@ -165,6 +255,11 @@ void HolePunchingProcessor::connectionResult(
     connectionIter->second->onConnectionResultRequest(
         std::move(request),
         std::move(completionHandler));
+}
+
+HolePunchingProcessor::ConnectHandler& HolePunchingProcessor::connectHandler()
+{
+    return m_connectHandler;
 }
 
 std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
