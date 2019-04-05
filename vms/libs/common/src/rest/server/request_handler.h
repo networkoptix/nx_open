@@ -2,6 +2,7 @@
 
 #include <nx/network/rest/handler.h>
 #include <utils/common/request_param.h>
+#include <rest/server/json_rest_result.h>
 
 using RestPermissions = nx::network::rest::Permissions;
 

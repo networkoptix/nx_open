@@ -3,15 +3,16 @@
 #include <QtCore/QString>
 #include <QtCore/QHash>
 
-#include <nx/utils/uuid.h>
-#include <api/server_rest_connection_fwd.h>
 #include <api/model/statistics_reply.h>
-#include <core/resource/resource_fwd.h>
+#include <api/server_rest_connection_fwd.h>
 #include <common/common_module_aware.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
 
 class QTimer;
 
-struct QnJsonRestResult;
+namespace nx::network::rest { class JsonResult; }
+using QnJsonRestResult = nx::network::rest::JsonResult;
 
 /**
  * Class that receives, parses and stores statistics data from one server.

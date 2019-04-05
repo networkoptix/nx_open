@@ -14,25 +14,25 @@ struct Response
     Response(http::StatusCode::Value statusCode = http::StatusCode::undefined);
 
     static Response result(
-        const QnRestResult& result,
+        const Result& result,
         Qn::SerializationFormat format = Qn::JsonFormat);
 
-    static Response result(const QnJsonRestResult& jsonResult);
-    static Response result(const QnUbjsonRestResult& ubjsonResult);
+    static Response result(const JsonResult& jsonResult);
+    static Response result(const UbjsonResult& ubjsonResult);
 
-    template<typename ResultType = QnJsonRestResult, typename DataType>
+    template<typename ResultType = JsonResult, typename DataType>
     static Response reply(const DataType& data);
 
     template<typename DataType>
     static Response reply(const DataType& data, Qn::SerializationFormat format);
 
-    static Response error(const QnRestResult::ErrorDescriptor& descriptor);
+    static Response error(const Result::ErrorDescriptor& descriptor);
 
     template<typename... Args>
-    static Response error(QnRestResult::Error code, Args... args);
+    static Response error(Result::Error code, Args... args);
 
     template<typename... Args>
-    static Response error(http::StatusCode::Value status, QnRestResult::Error code, Args... args);
+    static Response error(http::StatusCode::Value status, Result::Error code, Args... args);
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -50,8 +50,8 @@ Response Response::reply(const DataType& data, Qn::SerializationFormat format)
 {
     switch (format)
     {
-        case Qn::JsonFormat: return reply<QnJsonRestResult>(data);
-        case Qn::UbjsonFormat: return reply<QnJsonRestResult>(data);
+        case Qn::JsonFormat: return reply<JsonResult>(data);
+        case Qn::UbjsonFormat: return reply<UbjsonResult>(data);
         default: break;
     }
 
@@ -60,15 +60,15 @@ Response Response::reply(const DataType& data, Qn::SerializationFormat format)
 }
 
 template<typename... Args>
-Response Response::error(QnRestResult::Error code, Args... args)
+Response Response::error(Result::Error code, Args... args)
 {
-    return error({code, qStringListInit(std::forward<Args>(args)...)});
+    return error({code, std::forward<Args>(args)...});
 }
 
 template<typename... Args>
-Response Response::error(http::StatusCode::Value status, QnRestResult::Error code, Args... args)
+Response Response::error(http::StatusCode::Value status, Result::Error code, Args... args)
 {
-    auto response = error({code, qStringListInit(std::forward<Args>(args)...)});
+    auto response = error({code, std::forward<Args>(args)...});
     response.statusCode = status;
     return response;
 }

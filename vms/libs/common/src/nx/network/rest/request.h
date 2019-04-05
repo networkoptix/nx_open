@@ -111,7 +111,7 @@ T Request::paramOrThrow(const QString& key) const
     const auto stringValue = paramOrThrow<QString>(key);
     T value;
     if (!QnLexical::deserialize(stringValue, &value))
-        throw Exception(QnRestResult::InvalidParameter, key, stringValue);
+        throw Exception(Result::InvalidParameter, key, stringValue);
 
     return value;
 }
@@ -121,7 +121,7 @@ inline QString Request::paramOrThrow<QString>(const QString& key) const
 {
     const auto stringValue = param<QString>(key);
     if (!stringValue)
-        throw Exception(QnRestResult::MissingParameter, key);
+        throw Exception(Result::MissingParameter, key);
 
     return *stringValue;
 }
@@ -148,7 +148,7 @@ T Request::parseContentOrThrow() const
         return *value;
 
     throw Exception(
-        QnRestResult::CantProcessRequest,
+        Result::CantProcessRequest,
         lm("Unable to parse request of %1").args(typeid(T)));
 }
 

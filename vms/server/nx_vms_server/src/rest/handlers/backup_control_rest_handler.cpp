@@ -22,7 +22,7 @@ nx::network::rest::Response BackupControlRestHandler::executeGet(
     if (const auto action = request.param(kAction))
     {
         if (!nx::network::rest::ini().allowGetModifications)
-            throw nx::network::rest::Exception(QnRestResult::Forbidden);
+            throw nx::network::rest::Exception(nx::network::rest::Result::Forbidden);
 
         execute(*action);
     }
@@ -49,7 +49,7 @@ int BackupControlRestHandler::execute(const QString& action)
     if (action == "stop")
         return serverModule()->backupStorageManager()->scheduleSync()->interrupt();
 
-    throw nx::network::rest::Exception(QnRestResult::InvalidParameter, kAction, action);
+    throw nx::network::rest::Exception(nx::network::rest::Result::InvalidParameter, kAction, action);
 }
 
 } // namespace nx::vms::server::rest

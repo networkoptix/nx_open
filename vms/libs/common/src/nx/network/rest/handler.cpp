@@ -16,7 +16,7 @@ Response Handler::executeAnyMethod(const Request& request)
     else if (request.method() == nx::network::http::Method::delete_)
         return executeDelete(request);
     else
-        throw Exception(QnRestResult::CantProcessRequest, "Invalid HTTP method");
+        throw Exception(Result::CantProcessRequest, "Invalid HTTP method");
 }
 
 Response Handler::executeGet(const Request& /*request*/)

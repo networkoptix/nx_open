@@ -7,12 +7,12 @@ Response::Response(http::StatusCode::Value statusCode):
 {
 }
 
-Response Response::result(const QnRestResult& restResult, Qn::SerializationFormat format)
+Response Response::result(const Result& restResult, Qn::SerializationFormat format)
 {
     switch (format)
     {
-        case Qn::JsonFormat: return result(QnJsonRestResult(restResult));
-        case Qn::UbjsonFormat: return result(QnUbjsonRestResult(restResult));
+        case Qn::JsonFormat: return result(JsonResult(restResult));
+        case Qn::UbjsonFormat: return result(UbjsonResult(restResult));
         default: break;
     }
 
@@ -20,25 +20,25 @@ Response Response::result(const QnRestResult& restResult, Qn::SerializationForma
     return {http::StatusCode::internalServerError};
 }
 
-Response Response::result(const QnJsonRestResult& jsonResult)
+Response Response::result(const JsonResult& jsonResult)
 {
     Response response;
-    response.statusCode = QnRestResult::toHttpStatus(jsonResult.error);
+    response.statusCode = Result::toHttpStatus(jsonResult.error);
     response.content = Content{kJsonContentType, QJson::serialized(jsonResult)};
     return response;
 }
 
-Response Response::result(const QnUbjsonRestResult& ubjsonResult)
+Response Response::result(const UbjsonResult& ubjsonResult)
 {
     Response response;
-    response.statusCode = QnRestResult::toHttpStatus(ubjsonResult.error);
+    response.statusCode = Result::toHttpStatus(ubjsonResult.error);
     response.content = Content{kUbjsonContentType, QnUbjson::serialized(ubjsonResult)};
     return response;
 }
 
-Response Response::error(const QnRestResult::ErrorDescriptor& descriptor)
+Response Response::error(const Result::ErrorDescriptor& descriptor)
 {
-    QnRestResult rest;
+    Result rest;
     rest.setError(descriptor);
     return result(rest);
 }

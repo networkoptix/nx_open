@@ -8,7 +8,8 @@
 
 #include <nx/fusion/serialization_format.h>
 #include <nx/utils/exception.h>
-#include <rest/server/json_rest_result.h>
+
+#include "result.h"
 
 namespace nx::network::rest {
 
@@ -51,38 +52,19 @@ struct Content
 class Exception: public nx::utils::Exception
 {
 public:
-    const QnRestResult::ErrorDescriptor descriptor;
+    const Result::ErrorDescriptor descriptor;
 
     template<typename... Args>
-    Exception(QnRestResult::Error errorCode, Args... args);
+    Exception(Result::Error errorCode, Args... args);
 
     QString message() const override;
 };
 
 //--------------------------------------------------------------------------------------------------
 
-inline void qStringListAdd(QStringList* /*list*/)
-{
-}
-
 template<typename... Args>
-void qStringListAdd(QStringList* list, QString arg, Args... args)
-{
-    list->append(std::move(arg));
-    qStringListAdd(list, std::forward<Args>(args)...);
-}
-
-template<typename... Args>
-QStringList qStringListInit(Args... args)
-{
-    QStringList argList;
-    qStringListAdd(&argList, std::forward<Args>(args)...);
-    return argList;
-}
-
-template<typename... Args>
-Exception::Exception(QnRestResult::Error code, Args... args):
-    descriptor({code, qStringListInit(std::forward<Args>(args)...)})
+Exception::Exception(Result::Error code, Args... args):
+    descriptor(code, std::forward<Args>(args)...)
 {
 }
 

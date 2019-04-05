@@ -4,7 +4,8 @@
 
 #include <nx/vms/utils/vms_utils.h>
 
-struct QnJsonRestResult;
+namespace nx::network::rest { class JsonResult; }
+using QnJsonRestResult = nx::network::rest::JsonResult;
 class QnCommonModule;
 
 namespace nx::vms::cloud_integration { class CloudConnectionManager; }

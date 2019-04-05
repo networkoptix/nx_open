@@ -8,7 +8,8 @@ class QnCommonModule;
 struct CloudCredentialsData;
 struct DetachFromCloudData;
 struct DetachFromCloudReply;
-struct QnJsonRestResult;
+namespace nx::network::rest { class JsonResult; }
+using QnJsonRestResult = nx::network::rest::JsonResult;
 struct QnAuthSession;
 struct SetupCloudSystemData;
 

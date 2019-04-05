@@ -6,7 +6,7 @@
 
 namespace nx::network::rest::test {
 
-class RequestParamsTest:
+class RestParamsTest:
     public ::testing::Test
 {
 public:
@@ -41,7 +41,7 @@ public:
     }
 };
 
-TEST_F(RequestParamsTest, SimpleConversions)
+TEST_F(RestParamsTest, SimpleConversions)
 {
     testConversions(
         {{"a", "1"}, {"b", "hello"}, {"c", "true"}},
@@ -49,7 +49,7 @@ TEST_F(RequestParamsTest, SimpleConversions)
         R"json({"a":1,"b":"hello","c":true})json");
 }
 
-TEST_F(RequestParamsTest, DuplicateConversions)
+TEST_F(RestParamsTest, DuplicateConversions)
 {
     testTo(
         {{"a", "1"}, {"b", "hello"}, {"b", "world"}, {"c", "true"}},
@@ -61,7 +61,7 @@ TEST_F(RequestParamsTest, DuplicateConversions)
         "a=1&b=hello&b=world&c=true");
 }
 
-TEST_F(RequestParamsTest, SpecialCharactersConversions)
+TEST_F(RestParamsTest, SpecialCharactersConversions)
 {
     testConversions(
         {{"a", "?"}, {"b", "&"}, {"c", "\""}},

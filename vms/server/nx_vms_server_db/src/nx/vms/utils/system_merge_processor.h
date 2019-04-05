@@ -11,7 +11,8 @@
 #include <nx/vms/api/data/module_information.h>
 
 class QnCommonModule;
-struct QnJsonRestResult;
+namespace nx::network::rest { class JsonResult; }
+using QnJsonRestResult = nx::network::rest::JsonResult;
 class MediaServerClient;
 
 namespace nx {

@@ -5,7 +5,6 @@
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/exception.h>
-#include <rest/server/json_rest_result.h>
 
 #include "params.h"
 #include "request.h"

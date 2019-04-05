@@ -30,7 +30,7 @@ nx::network::rest::Response makeSettingsResponse(
     if (!NX_ASSERT(parentPlugin))
     {
         return nx::network::rest::Response::error(
-            QnRestResult::Error::InternalServerError,
+            nx::network::rest::Result::InternalServerError,
             lm("Unable to access the parent Plugin of the Engine, %1").args(engine));
     }
 
@@ -54,7 +54,7 @@ nx::network::rest::Response AnalyticsEngineSettingsHandler::executeGet(
     {
         NX_DEBUG(this, "Can't find engine with id %1", engineId);
         return nx::network::rest::Response::error(
-            QnRestResult::Error::CantProcessRequest,
+            nx::network::rest::Result::CantProcessRequest,
             lm("Unable to find analytics engine with id %1").args(engineId));
     }
 
@@ -71,7 +71,7 @@ nx::network::rest::Response AnalyticsEngineSettingsHandler::executePost(
     {
         NX_DEBUG(this, "Can't find engine with id %1", engineId);
         return nx::network::rest::Response::error(
-            QnRestResult::Error::CantProcessRequest,
+            nx::network::rest::Result::CantProcessRequest,
             lm("Unable to find analytics engine with id %1").args(engineId));
     }
 

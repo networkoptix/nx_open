@@ -33,7 +33,8 @@ nx::network::rest::Response DeviceAnalyticsSettingsHandler::executeGet(
     {
         const QString message("Unable to access analytics manager");
         NX_ERROR(this, message);
-        return nx::network::rest::Response::error(QnRestResult::InternalServerError, message);
+        return nx::network::rest::Response::error(
+            nx::network::rest::Result::InternalServerError, message);
     }
 
     const QString& deviceId = request.paramOrDefault(kDeviceIdParameter);
@@ -54,7 +55,8 @@ nx::network::rest::Response DeviceAnalyticsSettingsHandler::executePost(
     {
         const QString message("Unable to access analytics manager");
         NX_ERROR(this, message);
-        return nx::network::rest::Response::error(QnRestResult::InternalServerError, message);
+        return nx::network::rest::Response::error(
+            nx::network::rest::Result::InternalServerError, message);
     }
 
     const QString& deviceId = request.paramOrDefault(kDeviceIdParameter);
@@ -78,7 +80,8 @@ std::optional<nx::network::rest::Response> DeviceAnalyticsSettingsHandler::check
     {
         const auto message = lm("Unable to find device by id %1").args(deviceId);
         NX_DEBUG(this, message);
-        return nx::network::rest::Response::error(QnRestResult::Error::CantProcessRequest, message);
+        return nx::network::rest::Response::error(
+            nx::network::rest::Result::Error::CantProcessRequest, message);
     }
 
     if (device->flags().testFlag(Qn::foreigner))
@@ -88,7 +91,8 @@ std::optional<nx::network::rest::Response> DeviceAnalyticsSettingsHandler::check
                 device->getParentId(), moduleGUID());
 
         NX_DEBUG(this, message);
-        return nx::network::rest::Response::error(QnRestResult::Error::CantProcessRequest, message);
+        return nx::network::rest::Response::error(
+            nx::network::rest::Result::Error::CantProcessRequest, message);
     }
 
     const auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
@@ -98,7 +102,8 @@ std::optional<nx::network::rest::Response> DeviceAnalyticsSettingsHandler::check
     {
         const auto message = lm("Unable to find analytics engine by id %1").args(engineId);
         NX_DEBUG(this, message);
-        return nx::network::rest::Response::error(QnRestResult::Error::CantProcessRequest, message);
+        return nx::network::rest::Response::error(
+            nx::network::rest::Result::Error::CantProcessRequest, message);
     }
 
     return std::nullopt;
@@ -128,7 +133,7 @@ nx::network::rest::Response DeviceAnalyticsSettingsHandler::makeSettingsResponse
     if (!analyticsManager)
     {
         return nx::network::rest::Response::error(
-            QnRestResult::InternalServerError,
+            nx::network::rest::Result::InternalServerError,
             "Unable to access an analytics manager");
     }
 
@@ -144,7 +149,8 @@ nx::network::rest::Response DeviceAnalyticsSettingsHandler::makeSettingsResponse
             lm("Unable to find DeviceAgent settings model for the Engine with id %1")
             .args(engineId);
 
-        return nx::network::rest::Response::error(QnRestResult::Error::CantProcessRequest, message);
+        return nx::network::rest::Response::error(
+            nx::network::rest::Result::Error::CantProcessRequest, message);
     }
 
     response.model = *settingsModel;
