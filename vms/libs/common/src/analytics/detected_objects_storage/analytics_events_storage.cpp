@@ -366,7 +366,7 @@ void EventsStorage::insertEvent(
     const common::metadata::DetectionMetadataPacket& packet,
     const common::metadata::DetectedObject& detectedObject,
     long long attributesId,
-    long long timePeriodId)
+    long long /*timePeriodId*/)
 {
     sql::SqlQuery insertEventQuery(queryContext->connection());
     insertEventQuery.prepare(QString::fromLatin1(R"sql(
@@ -509,9 +509,9 @@ detail::TimePeriod* EventsStorage::insertOrFetchCurrentTimePeriod(
         VALUES (:deviceId, :periodStartMs, :periodEndMs)
     )sql");
     query->bindValue(":deviceId", deviceId);
-    query->bindValue(":periodStartMs", packetTimestamp.count());
+    query->bindValue(":periodStartMs", (long long) packetTimestamp.count());
     // Filling period end so that this period is used in queries.
-    query->bindValue(":periodEndMs", (timePeriod.endTime + kTimePeriodPreemptiveLength).count());
+    query->bindValue(":periodEndMs", (long long) (timePeriod.endTime + kTimePeriodPreemptiveLength).count());
 
     query->exec();
 
@@ -558,7 +558,7 @@ void EventsStorage::saveTimePeriodEnd(
         "UPDATE time_period_full SET period_end_ms=:periodEndMs WHERE id=:id");
 
     query->bindValue(":id", id);
-    query->bindValue(":periodEndMs", endTime.count());
+    query->bindValue(":periodEndMs", (long long) endTime.count());
     query->exec();
 
     NX_VERBOSE(this, "Updated end of time period %1 to %2", id, endTime);
@@ -1015,7 +1015,7 @@ void EventsStorage::prepareSelectTimePeriodsUnfilteredQuery(
 void EventsStorage::prepareSelectTimePeriodsFilteredQuery(
     nx::sql::AbstractSqlQuery* query,
     const Filter& filter,
-    const TimePeriodsLookupOptions& options)
+    const TimePeriodsLookupOptions& /*options*/)
 {
     QString eventsFilteredByFreeTextSubQuery;
     const auto sqlQueryFilter =
