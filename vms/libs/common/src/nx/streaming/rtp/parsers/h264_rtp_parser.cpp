@@ -275,7 +275,7 @@ bool H264Parser::isPacketStartsNewFrame(
 
     auto nalUnitType = *curPtr & 0x1f;
     if (!NALUnit::isSliceNal(nalUnitType))
-        return false;
+        return true;
     if (!isFirstSliceNal(nalUnitType, curPtr, nalLen))
         return false;
     if (m_spsInitialized && !m_sps.frame_mbs_only_flag)

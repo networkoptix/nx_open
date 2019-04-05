@@ -1175,7 +1175,7 @@ int SliceUnit::deserializeSliceHeader(const SPSUnit* sps, const PPSUnit* pps)
         if( nal_unit_type == 5)
             idr_pic_id = extractUEGolombCode();
 
-        if (pps == nullptr)
+        if (pps == nullptr || pps->pic_parameter_set_id != pic_parameter_set_id)
             return SPS_OR_PPS_NOT_READY;
 
         m_picOrderBitPos = -1;
