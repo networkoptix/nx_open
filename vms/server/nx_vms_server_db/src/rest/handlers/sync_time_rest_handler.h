@@ -1,22 +1,18 @@
 #pragma once
 
-#include "rest/server/json_rest_handler.h"
 #include <api/model/time_reply.h>
+#include <nx/network/rest/handler.h>
 #include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
 namespace rest {
 namespace handlers {
 
-class SyncTimeRestHandler: public QnJsonRestHandler
+class SyncTimeRestHandler: public nx::network::rest::Handler
 {
-public:
-    SyncTimeRestHandler() {}
-    virtual int executeGet(
-        const QString &path,
-        const QnRequestParams &params,
-        QnJsonRestResult &result,
-        const QnRestConnectionProcessor*) override;
+protected:
+    nx::network::rest::Response executeGet(const nx::network::rest::Request& request) override;
 
+public:
     static SyncTimeData execute(nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager);
 };
 

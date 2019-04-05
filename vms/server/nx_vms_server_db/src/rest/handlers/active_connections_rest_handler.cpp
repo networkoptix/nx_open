@@ -3,19 +3,21 @@
 #include <transaction/message_bus_adapter.h>
 #include <nx/fusion/model_functions.h>
 
-QnActiveConnectionsRestHandler::QnActiveConnectionsRestHandler(
-    const ec2::AbstractTransactionMessageBus* messageBus):
-    QnJsonRestHandler(),
+namespace rest {
+namespace handlers {
+
+ActiveConnectionsRestHandler::ActiveConnectionsRestHandler(
+    const ec2::AbstractTransactionMessageBus* messageBus)
+:
     m_messageBus(messageBus)
 {
 }
 
-int QnActiveConnectionsRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& /*params*/,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* /*owner*/)
+nx::network::rest::Response ActiveConnectionsRestHandler::executeGet(
+    const nx::network::rest::Request& /*request*/)
 {
-    result.setReply(m_messageBus->connectionsInfo());
-    return nx::network::http::StatusCode::ok;
+    return nx::network::rest::Response::reply(m_messageBus->connectionsInfo());
 }
+
+} // namespace handlers
+} // namespace rest

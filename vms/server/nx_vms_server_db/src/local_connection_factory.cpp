@@ -1731,7 +1731,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
             return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(in, out);
         });
 
-    p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_bus.get()));
+    p->registerHandler(
+        "ec2/activeConnections", new rest::handlers::ActiveConnectionsRestHandler(m_bus.get()));
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.
     p->registerHandler(

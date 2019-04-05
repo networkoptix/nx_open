@@ -68,28 +68,24 @@ static void loadRemoteDataAsync(
 
 namespace nx::vms::server::rest {
 
- ServerTimeHandler::ServerTimeHandler(const QString &getTimeHandlerPath):
-     m_getTimeHandlerPath(getTimeHandlerPath)
- {
- }
+ServerTimeHandler::ServerTimeHandler(const QString &getTimeHandlerPath):
+    m_getTimeHandlerPath(getTimeHandlerPath)
+{
+}
 
-int ServerTimeHandler::executeGet(
-    const QString& path,
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+nx::network::rest::Response ServerTimeHandler::executeGet(const nx::network::rest::Request& request)
 {
     ServerTimeReplyList outputData;
-    const auto ownerPort = owner->owner()->getPort();
+    const auto ownerPort = request.owner->owner()->getPort();
     nx::utils::ElapsedTimer timer;
     timer.restart();
     ServerTimeRequestContext context(timer, ownerPort);
 
-    auto onlineServers = owner->commonModule()->resourcePool()->getAllServers(Qn::Online);
+    auto onlineServers = request.owner->commonModule()->resourcePool()->getAllServers(Qn::Online);
     for (const auto& server: onlineServers)
     {
         loadRemoteDataAsync(
-            owner->commonModule(), outputData, server, &context, m_getTimeHandlerPath);
+            request.owner->commonModule(), outputData, server, &context, m_getTimeHandlerPath);
     }
 
     context.waitForDone();
@@ -100,8 +96,7 @@ int ServerTimeHandler::executeGet(
         record.vmsTime += timer.elapsed() / 2;
     }
 
-    result.setReply(outputData);
-    return nx::network::http::StatusCode::ok;
+    return nx::network::rest::Response::reply(outputData);
 }
 
 } // namespace nx::vms::server::rest

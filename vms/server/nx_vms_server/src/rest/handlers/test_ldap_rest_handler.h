@@ -1,9 +1,13 @@
 #pragma once
 
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 
-class QnTestLdapSettingsHandler: public QnJsonRestHandler {
-    Q_OBJECT
-public:
-    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
+namespace nx::vms::server::rest {
+
+class TestLdapSettingsHandler: public nx::network::rest::Handler
+{
+protected:
+    nx::network::rest::Response executePost(const nx::network::rest::Request& request) override;
 };
+
+} // namespace nx::vms::server::rest

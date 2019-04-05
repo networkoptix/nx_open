@@ -7,18 +7,15 @@
 namespace rest {
 namespace handlers {
 
-int SyncTimeRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& /*params*/,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+nx::network::rest::Response SyncTimeRestHandler::executeGet(
+    const nx::network::rest::Request& request)
 {
-    auto timeSyncManager = owner->commonModule()->ec2Connection()->timeSyncManager();
-    result.setReply(execute(timeSyncManager));
-    return nx::network::http::StatusCode::ok;
+    auto timeSyncManager = request.owner->commonModule()->ec2Connection()->timeSyncManager();
+    return nx::network::rest::Response::reply(execute(timeSyncManager));
 }
 
-SyncTimeData SyncTimeRestHandler::execute(nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager)
+SyncTimeData SyncTimeRestHandler::execute(
+    nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager)
 {
     SyncTimeData reply;
     reply.utcTimeMs = timeSyncManager->getSyncTime(&reply.isTakenFromInternet).count();
