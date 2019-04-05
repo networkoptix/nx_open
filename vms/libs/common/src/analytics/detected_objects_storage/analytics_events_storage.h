@@ -160,7 +160,7 @@ private:
 
     const Settings& m_settings;
     DbController m_dbController;
-    std::chrono::microseconds m_maxRecordedTimestamp = std::chrono::microseconds::zero();
+    std::chrono::milliseconds m_maxRecordedTimestamp = std::chrono::milliseconds::zero();
     mutable QnMutex m_mutex;
     std::map<QnUuid, long long> m_deviceGuidToId;
     std::map<long long, QnUuid> m_idToDeviceGuid;
@@ -263,7 +263,9 @@ private:
 
     void addTimePeriodToFilter(
         const QnTimePeriod& timePeriod,
-        nx::sql::Filter* sqlFilter);
+        nx::sql::Filter* sqlFilter,
+        const char* leftBoundaryFieldName,
+        const char* rightBoundaryFieldName);
 
     void addBoundingBoxToFilter(
         const QRectF& boundingBox,
@@ -303,6 +305,7 @@ private:
 
     void loadTimePeriods(
         nx::sql::AbstractSqlQuery* query,
+        const QnTimePeriod& timePeriod,
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 

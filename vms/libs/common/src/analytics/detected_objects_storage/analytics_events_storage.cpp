@@ -65,14 +65,15 @@ void EventsStorage::save(
     StoreCompletionHandler completionHandler)
 {
     using namespace std::placeholders;
+    using namespace std::chrono;
 
     NX_VERBOSE(this, "Saving packet %1", *packet);
 
     {
         QnMutexLocker lock(&m_mutex);
-        m_maxRecordedTimestamp = std::max(
+        m_maxRecordedTimestamp = std::max<milliseconds>(
             m_maxRecordedTimestamp,
-            std::chrono::microseconds(packet->timestampUsec));
+            duration_cast<milliseconds>(microseconds(packet->timestampUsec)));
     }
 
     m_dbController.queryExecutor().executeUpdate(
@@ -714,7 +715,7 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
         addObjectTypeIdToFilter(filter.objectTypeId, &sqlFilter);
 
     if (!filter.timePeriod.isNull())
-        addTimePeriodToFilter(filter.timePeriod, &sqlFilter);
+        addTimePeriodToFilter(filter.timePeriod, &sqlFilter, "timestamp_usec_utc", "timestamp_usec_utc");
 
     if (!filter.boundingBox.isNull())
         addBoundingBoxToFilter(filter.boundingBox, &sqlFilter);
@@ -747,23 +748,24 @@ void EventsStorage::addObjectTypeIdToFilter(
 
 void EventsStorage::addTimePeriodToFilter(
     const QnTimePeriod& timePeriod,
-    nx::sql::Filter* sqlFilter)
+    nx::sql::Filter* sqlFilter,
+    const char* leftBoundaryFieldName,
+    const char* rightBoundaryFieldName)
 {
     using namespace std::chrono;
 
     auto startTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
-        "timestamp_usec_utc",
+        rightBoundaryFieldName,
         ":startTimeMs",
         QnSql::serialized_field(duration_cast<milliseconds>(
             timePeriod.startTime()).count()));
     sqlFilter->addCondition(std::move(startTimeFilterField));
 
     if (timePeriod.durationMs != QnTimePeriod::kInfiniteDuration &&
-        timePeriod.startTimeMs + timePeriod.durationMs <
-            duration_cast<milliseconds>(m_maxRecordedTimestamp).count())
+        timePeriod.startTime() + timePeriod.duration() <= m_maxRecordedTimestamp)
     {
         auto endTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldLess>(
-            "timestamp_usec_utc",
+            leftBoundaryFieldName,
             ":endTimeMs",
             QnSql::serialized_field(duration_cast<milliseconds>(
                 timePeriod.endTime()).count()));
@@ -974,7 +976,7 @@ nx::sql::DBResult EventsStorage::selectTimePeriods(
     }
 
     query->exec();
-    loadTimePeriods(query.get(), options, result);
+    loadTimePeriods(query.get(), filter.timePeriod, options, result);
 
     return nx::sql::DBResult::ok;
 }
@@ -982,7 +984,7 @@ nx::sql::DBResult EventsStorage::selectTimePeriods(
 void EventsStorage::prepareSelectTimePeriodsUnfilteredQuery(
     nx::sql::AbstractSqlQuery* query,
     const std::vector<QnUuid>& deviceGuids,
-    const QnTimePeriod& /*timePeriod*/,
+    const QnTimePeriod& timePeriod,
     const TimePeriodsLookupOptions& /*options*/)
 {
     nx::sql::Filter sqlFilter;
@@ -996,7 +998,15 @@ void EventsStorage::prepareSelectTimePeriodsUnfilteredQuery(
         sqlFilter.addCondition(std::move(condition));
     }
 
-    // TODO: META-226 timePeriod
+    if (!timePeriod.isEmpty())
+    {
+        auto localTimePeriod = timePeriod;
+        if (localTimePeriod.durationMs == QnTimePeriod::kInfiniteDuration)
+            localTimePeriod.setEndTime(m_maxRecordedTimestamp);
+
+        addTimePeriodToFilter(
+            localTimePeriod, &sqlFilter, "period_end_ms", "period_start_ms");
+    }
 
     std::string whereClause;
     const auto sqlFilterStr = sqlFilter.toString();
@@ -1035,6 +1045,7 @@ void EventsStorage::prepareSelectTimePeriodsFilteredQuery(
 
 void EventsStorage::loadTimePeriods(
     nx::sql::AbstractSqlQuery* query,
+    const QnTimePeriod& timePeriodFilter,
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
@@ -1048,9 +1059,21 @@ void EventsStorage::loadTimePeriods(
 
         // Fixing time period end if needed.
         const auto id = query->value("id").toLongLong();
-
         if (auto it = m_idToTimePeriod.find(id); it != m_idToTimePeriod.end())
             timePeriod.setEndTime(it->second->second.endTime);
+
+        // Truncating time period by the filter
+        if (!timePeriodFilter.isEmpty())
+        {
+            if (timePeriod.startTime() < timePeriodFilter.startTime())
+                timePeriod.setStartTime(timePeriodFilter.startTime());
+
+            if (timePeriodFilter.durationMs != QnTimePeriod::kInfiniteDuration &&
+                timePeriod.endTime() > timePeriodFilter.endTime())
+            {
+                timePeriod.setEndTime(timePeriodFilter.endTime());
+            }
+        }
 
         result->push_back(timePeriod);
     }

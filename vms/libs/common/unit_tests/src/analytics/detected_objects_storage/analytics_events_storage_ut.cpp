@@ -888,6 +888,11 @@ protected:
         return m_filter;
     }
 
+    Filter& filter()
+    {
+        return m_filter;
+    }
+
 private:
     Filter m_filter;
     QnUuid m_specificObjectAppearanceId;
@@ -1137,6 +1142,16 @@ protected:
         m_lookupOptions.detailLevel = archiveLength;
     }
 
+    void givenFilterWithTimePeriod()
+    {
+        const auto allTimePeriods = expectedLookupResult();
+        const auto archiveLength =
+            allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
+
+        filter().timePeriod.setStartTime(allTimePeriods.front().startTime() + archiveLength / 3);
+        filter().timePeriod.setDuration(archiveLength * 2 / 3);
+    }
+
     void givenRandomLookupOptions()
     {
         m_lookupOptions.detailLevel = std::chrono::milliseconds(
@@ -1150,7 +1165,7 @@ protected:
         eventsStorage().lookupTimePeriods(
             filter(),
             m_lookupOptions,
-            std::bind(&AnalyticsEventsStorageTimePeriodsLookup::saveLookupResult, this, _1, _2));
+            [this](auto&&... args) { saveLookupResult(std::forward<decltype(args)>(args)...); });
     }
 
     void thenResultMatchesExpectations()
@@ -1224,8 +1239,14 @@ TEST_F(AnalyticsEventsStorageTimePeriodsLookup, selecting_all_periods_aggregated
     thenResultMatchesExpectations();
 }
 
-// TODO: META-226
-// TEST_F(AnalyticsEventsStorageTimePeriodsLookup, selecting_periods_with_timestamp_filter_only)
+TEST_F(
+    AnalyticsEventsStorageTimePeriodsLookup,
+    selecting_periods_with_timestamp_filter_only)
+{
+    givenFilterWithTimePeriod();
+    whenLookupTimePeriods();
+    thenResultMatchesExpectations();
+}
 
 TEST_F(AnalyticsEventsStorageTimePeriodsLookup, with_aggregation_period)
 {
