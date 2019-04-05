@@ -25,15 +25,14 @@
                 
                     server.apiUrl = window.location.protocol + '//' + ips[i] + port;
                     server.apiUrlFormatted = server.apiUrl.replace('http://', '').replace('https://', '');
-                
                     mediaserver.pingServer(server.apiUrl).catch(function (error) {
                         if (i < ips.length - 1) {
                             checkServersIp(server, i + 1);
                         } else {
                             server.status = L.settings.unavailable;
                         
-                            $scope.mediaServers = _.sortBy($scope.mediaServers, function(server) {
-                                return (server.status === 'Online' ? '0' : '1') + server.Name + server.id;
+                            $scope.mediaServers = _.sortBy($scope.mediaServers, function(mediaServer) {
+                                return (mediaServer.status === 'Online' ? '0' : '1') + mediaServer.name + mediaServer.id;
                                 // Сортировка: online->name->id
                             });
                         
