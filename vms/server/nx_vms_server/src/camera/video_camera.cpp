@@ -912,7 +912,6 @@ void QnVideoCamera::stopIfNoActivity()
                 if (!reader)
                     return;
 
-                reader->removeDataProcessor(m_liveCache[streamQuality].get());
                 auto& timer = m_liveCacheValidityTimers[streamQuality];
                 if (!timer.isValid())
                     timer.restart();
@@ -921,6 +920,8 @@ void QnVideoCamera::stopIfNoActivity()
                 {
                     NX_DEBUG(this, "Resetting live cache for %1 stream",
                          mediaQualityToStreamName(streamQuality));
+
+                    reader->removeDataProcessor(m_liveCache[streamQuality].get());
                     m_hlsLivePlaylistManager[streamQuality].reset();
                     m_liveCache[streamQuality].reset();
                 }
