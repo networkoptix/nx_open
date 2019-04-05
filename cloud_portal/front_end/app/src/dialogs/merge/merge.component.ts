@@ -124,11 +124,11 @@ export class MergeModalContent {
         let status = '';
 
         if (system.stateOfHealth === 'offline' || system.hasOwnProperty('isOnline') && !system.isOnline) {
-            status = ` - ${this.language.systemStatuses.offline}`;
+            status = ` – ${this.language.systemStatuses.offline}`;
         } else if (system.stateOfHealth === 'online' && !system.canMerge) {
-            status = ` - ${this.language.systemStatuses.incompatible}`;
+            status = ` – ${this.language.systemStatuses.incompatible}`;
         } else if (system.stateOfHealth === 'unavailable' || system.hasOwnProperty('isAvailable') && !system.isAvailable) {
-            status = ` - ${this.language.systemStatuses.unavailable}`;
+            status = ` – ${this.language.systemStatuses.unavailable}`;
         }
 
         return `<span>${system.name}</span><span class="text-muted">${status}</span>`;

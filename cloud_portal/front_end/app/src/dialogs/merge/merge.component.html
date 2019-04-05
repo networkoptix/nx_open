@@ -33,7 +33,7 @@
     <div class="modal-footer">
         <button type="button"
                 class="btn btn-primary wide-button" (click)="activeModal.close()">
-            {{ 'Ok' | translate}}
+            {{ 'OK' | translate}}
         </button>
         <button *ngIf="config.allowDebugMode" type="button" class="btn btn-danger"
                 (click)="systemError = false; outOfDate = false;">Go to Merge (Debug)</button>
@@ -49,7 +49,7 @@
                     <nx-select id="system" [items]="processedSystems" [selected]="targetSystemDropdown" (onSelected)="setTargetSystem($event)"></nx-select>
                 </div>
                 <div *ngIf="checking; else notChecking">
-                    <p class="help-block-no-height mb-2" translate>Checking...</p>
+                    <p class="help-block-no-height mb-2 light-text" translate>Checking...</p>
                 </div>
                 <ng-template #notChecking>
                     <p *ngIf="systemMergeable == 'unavailable'" class="help-block-no-height warning-label mb-2">
@@ -64,7 +64,6 @@
                         <span>&nbsp;{{targetSystem.name}}&nbsp;</span>
                         <span translate>is offline and cannot be merged with the current one.</span>
                     </p>
-                    <p></p>
                     <p *ngIf="systemMergeable == 'secondaryCannotMerge'"
                        class="help-block-no-height warning-label mb-2">
                         <span translate>System</span>
@@ -85,8 +84,9 @@
                         <span>&nbsp;{{targetSystem.name}}&nbsp;</span>
                         <span translate>System</span>
                     </p>
-                    <p *ngIf="systemMergeable == ''"
-                       class="help-block-no-height mb-2" translate>You can only merge Systems in which you have owner permissions.</p>
+                    <p *ngIf="systemMergeable == ''" class="help-block-no-height mb-2 light-text" translate>
+                        You can only merge Systems in which you have owner permissions.
+                    </p>
                 </ng-template>
                 <div>
                     <div class="bold-text" translate>Take System name and settings from</div>
@@ -109,7 +109,7 @@
                                    [form]="mergeForm"
                                    [buttonDisabled]="!user"
                                    actionType="primary"
-                                   buttonText="{{ 'Ok' | translate}}"></nx-process-button>
+                                   buttonText="{{ 'OK' | translate}}"></nx-process-button>
                 <button class="btn btn-default" (click)="activeModal.close()" translate>Cancel</button>
             </div>
         </div>
@@ -153,8 +153,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <nx-process-button [buttonDisabled]="mergePassword.invalid"
-                                   [process]="mergingProcess"
+                <nx-process-button [process]="mergingProcess"
                                    [form]="mergeForm"
                                    actionType="primary"
                                    buttonText="{{ 'Merge Systems' | translate}}"></nx-process-button>

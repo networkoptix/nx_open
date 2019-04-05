@@ -32,10 +32,6 @@ body {
     padding   : 0 !important;
 }
 
-strong {
-  color: $dark1;
-}
-
 [data-whatintent='mouse'] *:focus {
     outline : none !important;
 }
@@ -955,21 +951,25 @@ h1 .badge {
     background-position: -64px 0;
 }
 
-.close-icon{
+.close-icon {
   @include icon;
   background-position: -32px 0;
 }
 
-.wide-button{
+.wide-button {
   width: 102px;
 }
 
-.help-block-no-height{
+.help-block-no-height {
   min-height: 0px !important;
 }
 
-.light-label{
+.light-label {
   font-weight: initial;
   padding-left: 4px;
 }
 
+.light-text {
+  color: $light16;
+  font-size: 13px;
+}

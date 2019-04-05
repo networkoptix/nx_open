@@ -2,6 +2,11 @@
 @import '../../../app/styles/custom/custom_palette';
 @import '../../../app/styles/theme_variables';
 
+
+button {
+    min-width: 80px;
+}
+
 .modal {
     &-backdrop {
         background-color : $modal-backdrop-bg;
