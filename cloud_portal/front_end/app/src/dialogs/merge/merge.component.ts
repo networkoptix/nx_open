@@ -48,8 +48,6 @@ export class MergeModalContent {
     }
 
     ngOnInit() {
-        console.log(this.system);
-        console.log(this.user);
         this.masterId = this.system.id;
         this.multipleSystems = this.systems.length > 0;
         this.outOfDate = this.multipleSystems && !this.system.canMerge;
