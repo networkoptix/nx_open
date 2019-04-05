@@ -14,11 +14,11 @@
                 You can merge only those cloud Systems, where you have the "Owner" permissions.
             </p>
             <p class="help-block-no-height">
-                <span translate>Connect System you want to merge with this one to&nbsp;</span>
-                <strong>%PRODUCT_NAME%</strong>
-                <span>&nbsp;or merge locally using&nbsp;</span>
-                <strong>%VMS_NAME%</strong>
-                <span translate>&nbsp;Client.</span>
+                <span translate>Connect System you want to merge with this one to</span>
+                <strong>&nbsp;{{language.productName}}&nbsp;</strong>
+                <span>or merge locally using</span>
+                <strong>&nbsp;{{language.vmsName}}&nbsp;</strong>
+                <span translate>Client.</span>
             </p>
         </div>
         <div *ngIf="outOfDate">
@@ -55,8 +55,8 @@
                     <p *ngIf="systemMergeable == 'unavailable'" class="help-block-no-height warning-label mb-2">
                         <span translate>System</span>
                         <span>&nbsp;{{targetSystem.name}}&nbsp;</span>
-                        <span translate> is currently unreachable. Try again in a few minutes or contact&nbsp;</span>
-                        <span><a [href]="config.supportLink" target="_blank" translate>support</a></span><span>.</span>
+                        <span translate> is currently unreachable. Try again in a few minutes or contact</span>
+                        <span>&nbsp;<a [href]="config.supportLink" target="_blank" translate>support</a>.</span>
                     </p>
                     <p *ngIf="systemMergeable == 'offline'"
                        class="help-block-no-height warning-label mb-2">
@@ -70,17 +70,17 @@
                         <span>&nbsp;{{targetSystem.name}}&nbsp;</span>
                         <span translate>has an older software version that is incompatable with the current system. Update</span>
                         <span>&nbsp;{{targetSystem.info.name}}&nbsp;</span>
-                        <span>to the&nbsp;</span>
-                        <span><a href="/download" target="_blank" translate>latest build</a></span>
-                        <span translate>&nbsp;to merge it with the current one.</span>
+                        <span>to the</span>
+                        <span>&nbsp;<a href="/download" target="_blank" translate>latest build</a>&nbsp;</span>
+                        <span translate>to merge it with the current one.</span>
                     </p>
                     <p *ngIf="systemMergeable == 'primaryCannotMerge'"
                        class="help-block-no-height warning-label mb-2">
                         <span translate>System</span>
                         <span>&nbsp;{{targetSystem.name}}&nbsp;</span>
-                        <span translate>has a newer software version that is incompatible with the current system. Update the current system to the&nbsp;</span>
-                        <span><a href="/download" target="_blank" translate>latest build</a></span>
-                        <span translate>&nbsp;to merge it with the&nbsp;</span>
+                        <span translate>has a newer software version that is incompatible with the current system. Update the current system to the</span>
+                        <span>&nbsp;<a href="/download" target="_blank" translate>latest build</a>&nbsp;</span>
+                        <span translate>to merge it with the</span>
                         <span>&nbsp;{{targetSystem.name}}&nbsp;</span>
                         <span translate>System</span>
                     </p>
@@ -121,9 +121,9 @@
                 </p>
                 <p translate>Systems of such size may work but will be unstable and have troubles with updates and synchronisation.</p>
                 <p>
-                    <span translate>We'd recommend consulting with&nbsp;</span>
-                    <span><a [href]="config.supportLink" target="_blank" translate>support</a></span>
-                    <span>&nbsp;before proceeding.</span>
+                    <span translate>We'd recommend consulting with</span>
+                    <span>&nbsp;<a [href]="config.supportLink" target="_blank" translate>support</a>&nbsp;</span>
+                    <span>before proceeding.</span>
                 </p>
             </div>
             <div class="modal-footer">
@@ -133,8 +133,13 @@
         </div>
         <div *ngIf="state == 'confirm'">
             <div class="modal-body">
-                <p translate class="mb-3">
-                    You are about to merge systems <strong>{{system.info.name}}</strong> and <strong>{{targetSystem.name}}</strong>. Settings and the name will be taken from the <strong>{{system.info.name}}</strong>.
+                <p class="mb-3">
+                    <span translate>You are about to merge systems</span>
+                    <strong>&nbsp;{{system.info.name}}&nbsp;</strong>
+                    <span translate>and</span>
+                    <strong>&nbsp;{{targetSystem.name}}&nbsp;</strong>.
+                    <span translate>Settings and the name will be taken from the </span>
+                    <strong>&nbsp;{{system.info.name}}&nbsp;</strong>.
                 </p>
                 <div class="form-group">
                     <label for="mergePassword" translate>Enter password for your account to continue</label>

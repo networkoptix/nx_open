@@ -2,6 +2,7 @@
   "language": "en_US",
   "language_name": "LANGUAGE_NAME",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "OK",
