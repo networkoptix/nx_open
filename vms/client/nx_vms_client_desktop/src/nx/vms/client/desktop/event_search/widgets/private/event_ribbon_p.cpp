@@ -1225,12 +1225,8 @@ void EventRibbon::Private::doUpdateView()
 
     if (!m_animations.empty())
     {
-        const auto callback =
-            [this]() { qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest)); };
-
-        // This workaround prevents QAnimation and client hangs.
-        static const int kWorkaroundDelayMs = 15;
-        executeDelayedParented(callback, kWorkaroundDelayMs, this);
+        qApp->processEvents();
+        qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest));
     }
 }
 
