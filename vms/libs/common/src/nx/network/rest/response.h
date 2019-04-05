@@ -62,13 +62,13 @@ Response Response::reply(const DataType& data, Qn::SerializationFormat format)
 template<typename... Args>
 Response Response::error(Result::Error code, Args... args)
 {
-    return error({code, std::forward<Args>(args)...});
+    return error(Result::ErrorDescriptor{code, std::forward<Args>(args)...});
 }
 
 template<typename... Args>
 Response Response::error(http::StatusCode::Value status, Result::Error code, Args... args)
 {
-    auto response = error({code, std::forward<Args>(args)...});
+    auto response = error(Result::ErrorDescriptor{code, std::forward<Args>(args)...});
     response.statusCode = status;
     return response;
 }
