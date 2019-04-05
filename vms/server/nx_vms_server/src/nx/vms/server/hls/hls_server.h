@@ -14,7 +14,7 @@
 
 #include "hls_playlist_manager.h"
 
-namespace nx::network::rest { class JsonResult; }
+namespace nx::network::rest { struct JsonResult; }
 using QnJsonRestResult = nx::network::rest::JsonResult;
 
 namespace nx::vms::server::hls {

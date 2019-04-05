@@ -11,7 +11,7 @@
 
 class QTimer;
 
-namespace nx::network::rest { class JsonResult; }
+namespace nx::network::rest { struct JsonResult; }
 using QnJsonRestResult = nx::network::rest::JsonResult;
 
 /**

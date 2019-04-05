@@ -32,7 +32,6 @@ QString Result::ErrorDescriptor::text() const
     const auto message =
         [this](nx::utils::log::Message format, int argsToUse)
         {
-            NX_ASSERT(m_arguments.size() >= argsToUse, containerString(m_arguments));
             const auto message = nx::utils::switch_(argsToUse,
                 0, [&](){ return format; },
                 1, [&](){ return format.arg(m_arguments.value(0)); },
@@ -40,7 +39,7 @@ QString Result::ErrorDescriptor::text() const
                 nx::utils::default_,
                 [&]()
                 {
-                    NX_ASSERT(false, containerString(m_arguments));
+                    NX_ASSERT(false, m_arguments.join(", "));
                     argsToUse = 0;
                     return format;
                 });
@@ -48,7 +47,7 @@ QString Result::ErrorDescriptor::text() const
             if (m_arguments.size() <= argsToUse)
                 return message;
 
-            return lm("%1 - %2").args(message, containerString(m_arguments.mid(argsToUse)));
+            return lm("%1 - %2").args(message, m_arguments.mid(argsToUse).join(", "));
         };
 
     switch (m_code)
@@ -63,7 +62,7 @@ QString Result::ErrorDescriptor::text() const
     }
 
     const auto error = lm("Unknown error code '%1'. Arguments: %2")
-        .args(static_cast<int>(m_code), containerString(m_arguments));
+        .args(static_cast<int>(m_code), m_arguments.join(", "));
 
     NX_ASSERT(false, error);
     return error;
