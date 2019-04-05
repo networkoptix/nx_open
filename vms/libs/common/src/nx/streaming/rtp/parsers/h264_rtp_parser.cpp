@@ -274,7 +274,20 @@ bool H264Parser::isPacketStartsNewFrame(
     }
 
     auto nalUnitType = *curPtr & 0x1f;
-    return !NALUnit::isSliceNal(nalUnitType) || isFirstSliceNal(nalUnitType, curPtr, nalLen);
+    if (!NALUnit::isSliceNal(nalUnitType))
+        return false;
+    if (!isFirstSliceNal(nalUnitType, curPtr, nalLen))
+        return false;
+    if (m_spsInitialized && !m_sps.frame_mbs_only_flag)
+    {
+        // Interlaced video.
+        SliceUnit slice;
+        slice.decodeBuffer(curPtr, bufferEnd);
+        slice.deserialize(&m_sps, nullptr /*pps*/);
+        if (slice.bottom_field_flag)
+            return false; //< Bottom field of the video frame.
+    }
+    return true;
 }
 
 bool H264Parser::processData(
