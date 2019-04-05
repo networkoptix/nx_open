@@ -11,7 +11,7 @@ set(cloudName "Nx Meta Cloud")
 set(uri.protocol "nx-metavms")
 set(mediaserver_application_name "Network Optix MetaVMS Media Server")
 set(mediaserver_service_name "Network Optix MetaVMS Media Server")
-set(metaVersion "R7.3")
+set(metaVersion "R7.3_mac")
 
 # Default settings
 set(backgroundImage
