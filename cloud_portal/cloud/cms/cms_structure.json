@@ -483,7 +483,8 @@
             "description": "Shows the cloud merge button for all systems.",
             "type": "check_box",
             "value": "false",
-            "optional": true
+            "optional": true,
+            "advanced": true
           },
           {
             "label": "Enable feedback endpoint",
