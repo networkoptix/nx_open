@@ -63,8 +63,8 @@ export class NxDialogsService {
         return this.renameModal.open(systemId, systemName);
     }
 
-    merge(system, systems) {
-        return this.mergeModal.open(system, systems);
+    merge(system, systems, user) {
+        return this.mergeModal.open(system, systems, user);
     }
 
     embed(system) {

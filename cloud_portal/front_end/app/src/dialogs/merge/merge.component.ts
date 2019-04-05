@@ -12,6 +12,7 @@ export class MergeModalContent {
     @Input() systemName;
     @Input() language;
     @Input() closable;
+    @Input() user;
 
     checking: boolean;
     checkMergeabilityProcess: any;
@@ -28,7 +29,6 @@ export class MergeModalContent {
     targetSystem: any;
     targetSystemDropdown: any;
     tooManySystems: boolean;
-    user: any;
     wrongPassword: boolean;
 
     @ViewChild('mergeForm') mergeForm: HTMLFormElement;
@@ -48,6 +48,8 @@ export class MergeModalContent {
     }
 
     ngOnInit() {
+        console.log(this.system);
+        console.log(this.user);
         this.masterId = this.system.id;
         this.multipleSystems = this.systems.length > 0;
         this.outOfDate = this.multipleSystems && !this.system.canMerge;
@@ -56,10 +58,6 @@ export class MergeModalContent {
         this.targetSystemDropdown = this.makeSelectorList([this.targetSystem])[0];
         this.systemMergeable = this.checkMergeability(this.targetSystem);
         this.systemError = !this.multipleSystems || this.outOfDate;
-
-        this.account.get().then((user) => {
-            this.user = user;
-        });
 
         this.mergingProcess = this.process.init(() => {
             let masterSystemId;
@@ -222,9 +220,10 @@ export class NxModalMergeComponent {
                 private modalService: NgbModal) {
     }
 
-    private dialog(system, systems) {
+    private dialog(system, systems, user) {
         this.modalRef = this.modalService.open(MergeModalContent, {backdrop: 'static', centered: true});
         this.modalRef.componentInstance.language = this.language.lang;
+        this.modalRef.componentInstance.user = user;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.systems = systems;
         this.modalRef.componentInstance.closable = true;
@@ -232,8 +231,8 @@ export class NxModalMergeComponent {
         return this.modalRef;
     }
 
-    open(system, systems) {
-        return this.dialog(system, systems).result;
+    open(system, systems, user) {
+        return this.dialog(system, systems, user).result;
     }
 
     close() {

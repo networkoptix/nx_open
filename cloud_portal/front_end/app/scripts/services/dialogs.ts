@@ -192,8 +192,8 @@
                         //     }
                         // }).result;
                     },
-                    merge: function (system, systems) {
-                        return NxDialogsService.merge(system, systems);
+                    merge: function (system, systems, user) {
+                        return NxDialogsService.merge(system, systems, user);
 
                         // var title = lang.system.mergeSystemTitle;
                         //
