@@ -103,6 +103,8 @@ struct Ini: nx::kit::IniConfig
         "Maximum image width, in pixels, that Right Panel can request from a server.");
     NX_INI_INT(0, backgroupdUpdateCheckPeriodOverrideSec,
         "Period to check for new updates, in seconds. Set to zero to use the built-in value.");
+    NX_INI_FLAG(1, rightPanelHoverPreviewCrop,
+        "Whether mouse hover toggles crop mode on Right Panel tiles and tooltips.");	
 };
 
 inline Ini& ini()
