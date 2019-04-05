@@ -143,7 +143,12 @@ struct CameraSettingsDialog::Private: public QObject
 
     void resetChanges()
     {
+        const auto singleCamera = cameras.size() == 1
+            ? cameras.first()
+            : QnVirtualCameraResourcePtr();
+
         store->loadCameras(cameras);
+        deviceAgentSettingsAdaptor->setCamera(singleCamera);
 
         handleCamerasChanged();
     }
@@ -421,7 +426,6 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->readOnlyWatcher->setCameras(cameras);
     d->wearableStateWatcher->setCameras(cameras);
     d->previewManager->selectCamera(singleCamera);
-    d->deviceAgentSettingsAdaptor->setCamera(singleCamera);
     d->analyticsEnginesWatcher->setCamera(singleCamera);
 
     d->handleCamerasWithDefaultPasswordChanged();

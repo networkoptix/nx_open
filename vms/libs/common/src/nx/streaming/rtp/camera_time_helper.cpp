@@ -2,6 +2,7 @@
 
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
+#include <nx/streaming/nx_streaming_ini.h>
 
 namespace nx::streaming::rtp {
 
@@ -19,6 +20,9 @@ int64_t CameraTimeHelper::RptTimeLinearizer::linearize(uint32_t rtpTime)
 
 CameraTimeHelper::CameraTimeHelper(const std::string& resourceId, const TimeOffsetPtr& offset):
     m_primaryOffset(offset),
+    m_resyncThreshold(milliseconds(nxStreamingIni().resyncTresholdMs)),
+    m_streamsSyncThreshold(milliseconds(nxStreamingIni().streamsSyncThresholdMs)),
+    m_forceCameraTimeThreshold(milliseconds(nxStreamingIni().forceCameraTimeThresholdMs)),
     m_resourceId(resourceId)
 {}
 

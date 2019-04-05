@@ -119,6 +119,10 @@ TEST(GetImageHelper, updateDstSize_maxSize)
         updateDstSize(&camera, {0, 0}, outFrame, AspectRatio::source));
 }
 
+/**
+ * NOTE: This test should be modified as it will fail on edge1 because of a different behavior of
+ *     GetImageHelper::determineStreamIndex() on edge1.
+ */
 TEST(GetImageHelper, determineStreamIndex)
 {
     using StreamIndex = nx::vms::api::StreamIndex;

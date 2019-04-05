@@ -51,7 +51,7 @@ namespace {
 static constexpr int kNarrowWidth = 280;
 static constexpr int kWideWidth = 430;
 
-static const QSize kToolTipMaxThumbnailSize(480, 480);
+static const QSize kToolTipMaxThumbnailSize(240, 180);
 static constexpr int kToolTipShowDelayMs = 250;
 static constexpr int kToolTipHideDelayMs = 250;
 static constexpr qreal kToolTipFadeSpeedFactor = 2.0;

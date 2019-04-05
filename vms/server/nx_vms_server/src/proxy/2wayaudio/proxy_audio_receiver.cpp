@@ -68,7 +68,7 @@ private:
 public:
     QnProxyDesktopDataProvider(const QnUuid& cameraId):
         QnAbstractStreamDataProvider(QnResourcePtr()),
-        m_parser(cameraId.toString()),
+        m_parser(cameraId),
         m_cameraId(cameraId)
     {
         m_recvBuffer = new quint8[65536];

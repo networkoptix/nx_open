@@ -19,6 +19,10 @@
 #include <nx/streaming/rtp/rtp.h>
 #include <media_server/media_server_module.h>
 
+#include <nx/analytics/frame_info.h>
+#include <nx/analytics/analytics_logging_ini.h>
+#include <mediaserver_ini.h>
+
 using namespace nx::vms::api;
 
 namespace {
@@ -91,6 +95,22 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
+
+    if (nx::analytics::loggingIni().isLoggingEnabled())
+    {
+        m_primaryLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_",
+            camera->getId(),
+            /*engineId*/ QnUuid(),
+            nx::vms::api::StreamIndex::primary);
+
+        m_secondaryLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_",
+            camera->getId(),
+            /*engineId*/ QnUuid(),
+            nx::vms::api::StreamIndex::secondary);
+    }
+
     auto videoLayout = camera->getVideoLayout();
     if (!videoLayout)
         return;
@@ -468,11 +488,24 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
     bool isAudio = media->dataType == QnAbstractMediaData::AUDIO;
+    bool isMetadata = media->dataType == QnAbstractMediaData::GENERIC_METADATA;
 
     if (isVideo || isAudio)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
         bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+
+        if (isSecondaryProvider && m_secondaryLogger)
+        {
+            m_secondaryLogger->pushFrameInfo(
+                std::make_unique<nx::analytics::FrameInfo>(media->timestamp));
+        }
+        else if (m_primaryLogger)
+        {
+            m_primaryLogger->pushFrameInfo(
+                std::make_unique<nx::analytics::FrameInfo>(media->timestamp));
+        }
+
         {
             QnMutexLocker lock( &m_qualityChangeMutex );
             if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
@@ -541,6 +574,18 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         {
             m_isLive = false;
         }
+    }
+
+    const auto logger =
+        ini().analyzeSecondaryStream ? m_secondaryLogger.get() : m_primaryLogger.get();
+
+    if (isMetadata && logger)
+    {
+        nx::common::metadata::DetectionMetadataPacketPtr detectionMetadata =
+            nx::common::metadata::fromMetadataPacket(
+                std::dynamic_pointer_cast<const QnCompressedMetadata>(media));
+
+        logger->pushObjectMetadata(*detectionMetadata);
     }
 
     int trackNum = media->channelNumber;

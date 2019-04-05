@@ -16,8 +16,16 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, enablePersistentAnalyticsDeviceAgent,
         "Don't recreate analytics DeviceAgents on resource changes (workaround of libtegra_video.so bug).");
 
-    NX_INI_FLAG(0, forceLiveCacheForPrimaryStream, "Always cache primary stream frames in liveCache.");
-    NX_INI_FLAG(0, forceLiteClient, "Force Lite Client for this server");
+    NX_INI_FLAG(0, forceLiteClient, "Force Lite Client for this server.");
+
+    NX_INI_INT(67000, liveStreamCacheForPrimaryStreamMinSizeMs,
+        "Lower bound of Live Stream Cache size for primary stream, milliseconds.");
+    NX_INI_INT(100000, liveStreamCacheForPrimaryStreamMaxSizeMs,
+        "Upper bound of Live Stream Cache size for primary stream, milliseconds.");
+    NX_INI_INT(67000, liveStreamCacheForSecondaryStreamMinSizeMs,
+        "Lower bound of Live Stream Cache size for secondary stream, milliseconds.");
+    NX_INI_INT(100000, liveStreamCacheForSecondaryStreamMaxSizeMs,
+        "Upper bound of Live Stream Cache size for secondary stream, milliseconds.");
 };
 
 inline Ini& ini()

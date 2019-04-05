@@ -5,6 +5,10 @@
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
+is_systemd_used() {
+    [[ $(readlink -m /sbin/init) =~ .*systemd$ ]]
+}
+
 COMPANY_NAME="@deb.customization.company.name@"
 CLOUD_GROUP_SUFFIX="@cloud_group_suffix@"
 CLOUD_NAME="@cloudName@"
@@ -16,7 +20,16 @@ BIN_DIR="$BASE_DIR/bin"
 CONFIG_FILE="$ETC_DIR/mediaserver.conf"
 CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 
-if [ "$1" = "remove" ]
+WITH_ROOT_TOOL='@withRootTool@'
+
+systemctl stop $COMPANY_NAME-mediaserver.service || true
+
+if [[ $WITH_ROOT_TOOL == 'true' ]]
+then
+    systemctl stop $COMPANY_NAME-root-tool.service || true
+fi
+
+if [[ $1 == 'remove' ]]
 then
     REMOVE="Remove the Database"
     KEEP="Keep current version"
@@ -53,16 +66,22 @@ then
         fi
     fi
 
-    which systemctl && (systemctl disable $COMPANY_NAME-mediaserver || exit $?)
-    which systemctl && (systemctl disable $COMPANY_NAME-root-tool || exit $?)
+    if is_systemd_used
+    then
+        systemctl disable $COMPANY_NAME-mediaserver.service
 
-    service $COMPANY_NAME-mediaserver stop || true
-    service $COMPANY_NAME-root-tool stop || true
+        if [[ $WITH_ROOT_TOOL == 'true' ]]
+        then
+            systemctl disable $COMPANY_NAME-root-tool.service
+        fi
+    fi
 
     $CFG_HELPER sysIdTime -d
 
     if [ "$RET" = "$REMOVE" ]
     then
-        rm -f /opt/$COMPANY_NAME/mediaserver/var/*.sqlite*
+        find "/opt/$COMPANY_NAME/mediaserver/var" -name "*.sqlite*" \
+            -a ! -name "ecs_static.sqlite*" \
+            |xargs rm -f
     fi
 fi
