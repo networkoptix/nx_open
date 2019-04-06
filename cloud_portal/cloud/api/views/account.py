@@ -1,9 +1,10 @@
+import base64
+import django
+import time
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.serializers import ValidationError
-import django
-import base64
 from django.utils import timezone
 
 from api.controllers.cloud_api import Account
@@ -78,6 +79,7 @@ def login(request):
 
     request.session['login'] = email
     request.session['password'] = password
+    request.session['time'] = time.time()
     if 'timezone' in request.data:
         request.session['timezone'] = request.data['timezone']
     serializer = AccountSerializer(user, many=False)
