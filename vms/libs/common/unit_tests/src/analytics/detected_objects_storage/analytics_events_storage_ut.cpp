@@ -1198,9 +1198,37 @@ private:
 
     QnTimePeriodList expectedLookupResult()
     {
-        return toTimePeriods(
-            filterPackets(filter(), analyticsDataPackets()),
-            m_lookupOptions);
+        return filterTimePeriods(
+            filter(),
+            toTimePeriods(
+                filterPackets(filter(), analyticsDataPackets()),
+                m_lookupOptions));
+    }
+
+    QnTimePeriodList filterTimePeriods(
+        const Filter& filter,
+        const QnTimePeriodList& timePeriods)
+    {
+        if (filter.timePeriod.isEmpty())
+            return timePeriods;
+
+        QnTimePeriodList result;
+        for (const auto& timePeriod: timePeriods)
+        {
+            auto resultingTimePeriod = timePeriod;
+            if (resultingTimePeriod.startTime() < filter.timePeriod.startTime())
+                resultingTimePeriod.setStartTime(filter.timePeriod.startTime());
+
+            if (filter.timePeriod.durationMs != QnTimePeriod::kInfiniteDuration &&
+                resultingTimePeriod.endTime() > filter.timePeriod.endTime())
+            {
+                resultingTimePeriod.setEndTime(filter.timePeriod.endTime());
+            }
+
+            result.push_back(resultingTimePeriod);
+        }
+
+        return result;
     }
 
     QnTimePeriodList toTimePeriods(
