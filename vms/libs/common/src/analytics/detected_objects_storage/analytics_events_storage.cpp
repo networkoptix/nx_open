@@ -649,8 +649,11 @@ void EventsStorage::prepareLookupQuery(
     if (!sqlQueryFilterStr.empty())
         sqlQueryFilterStr = "WHERE " + sqlQueryFilterStr;
 
-    auto sqlLimitStr = lm("LIMIT %1").args(
-        std::max<int>(filter.maxObjectsToSelect, kMaxObjectLookupResultSet)).toQString();
+    int maxObjectsToSelect = kMaxObjectLookupResultSet;
+    if (filter.maxObjectsToSelect > 0)
+        maxObjectsToSelect = std::min<int>(filter.maxObjectsToSelect, maxObjectsToSelect);
+
+    auto sqlLimitStr = lm("LIMIT %1").args(maxObjectsToSelect).toQString();
 
     // NOTE: Limiting filtered_events subquery to make query
     // CPU/memory requirements much less dependent of DB size.
