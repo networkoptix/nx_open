@@ -1075,11 +1075,14 @@ void EventsStorage::loadTimePeriods(
             }
         }
 
+        if (!result->empty() && result->back() == timePeriod)
+            continue;
+
         result->push_back(timePeriod);
     }
 
     *result = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
-        *result, options.detailLevel);
+        *result, std::max<milliseconds>(options.detailLevel, kMinTimePeriodAggregationPeriod));
 }
 
 nx::sql::DBResult EventsStorage::cleanupData(
