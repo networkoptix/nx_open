@@ -14,12 +14,14 @@ button {
     border-radius: 2px;
     display: flex;
     justify-content : center;
+    align-items     : center;
     height          : 32px;
     width           : 32px;
-}
-
-.tag-close-icon {
-    margin: auto !important;
+    cursor          : pointer;
+    
+    .tag-close-icon {
+        margin : 0 !important;
+    }
 }
 
 .badge,
@@ -38,11 +40,13 @@ button {
 }
 
 .badge-selected {
-    @include badge-selected($light16, $light17, $light18)
+    @include badge-selected($light16, $light17, $light18);
+    cursor : default !important;
 }
 
 .badge-brand-selected {
-    @include badge-selected($brand_core, $brand_d1, $brand_d2)
+    @include badge-selected($brand_core, $brand_d1, $brand_d2);
+    cursor : default !important;
 }
 
 $theme-colors : (

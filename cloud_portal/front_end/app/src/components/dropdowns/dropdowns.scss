@@ -54,6 +54,7 @@ header {
     
     .dropdown-toggle {
         display          : flex;
+        justify-content  : flex-start;
         padding          : 5px 32px 5px 10px;
         background-color : $light4;
         width            : 100%;
@@ -168,6 +169,7 @@ header {
                     cursor       : pointer;
                     width        : calc(100% - 10px);
                     line-height  : 20px;
+                    bottom       : 3px;
                 }
             }
             

@@ -20,29 +20,29 @@
                         <span class="glyphicon-close"></span>
                     </button>
                 </div>
-                <button class="float-left btn btn-big btn-tag-selected ml-lg-3 mt-3 mt-lg-0 mr-1 mr-lg-0"
+                <div class="float-left btn btn-big btn-tag-selected ml-lg-3 mt-3 mt-lg-0 mr-1 mr-lg-0"
                         *ngIf="numberFilters != 0 && !searchOnly">
 
-                    <div class="ml-2 mr-3">
+                    <span class="ml-2 mr-3">
                         {{filterSelected}}
-                    </div>
+                    </span>
 
                     <span class="close-button" (click)="resetFilters()">
                         <span class="glyphicon tag-close-icon"></span>
                     </span>
-                </button>
+                </div>
 
-                <button class="btn btn-arrow btn-big btn-tag ml-lg-3 mt-3 mt-lg-0"
+                <div class="btn btn-arrow btn-big btn-tag ml-lg-3 mt-3 mt-lg-0"
                         [ngClass]="{'selected' : showAdvancedOptions}"
                         (click)="toggleOptions()"
-                        *ngIf="!searchOnly" [disabled]="!dataLoaded">
+                        *ngIf="!searchOnly">
 
                     <div class="nav-arrow">
                         <span></span>
                         <span></span>
                     </div>
                     <span translate>Advanced search</span>
-                </button>
+                </div>
             </div>
         </div>
 

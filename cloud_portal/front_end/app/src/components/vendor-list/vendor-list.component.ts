@@ -1,9 +1,9 @@
 import {
-    Component, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, SimpleChanges
-}                                 from '@angular/core';
+    Component, forwardRef, Input, OnChanges, OnInit, SimpleChanges, ViewEncapsulation
+} from '@angular/core';
 import { NxConfigService }        from '../../services/nx-config';
 import { NG_VALUE_ACCESSOR }      from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute }         from '@angular/router';
 import { NxUriService }           from '../../services/uri.service';
 import { TranslateService }       from '@ngx-translate/core';
 import { NxUtilsService }         from '../../services/utils.service';
@@ -20,6 +20,7 @@ import { NxUtilsService }         from '../../services/utils.service';
     selector   : 'nx-vendor-list',
     templateUrl: 'vendor-list.component.html',
     styleUrls  : ['vendor-list.component.scss'],
+    encapsulation: ViewEncapsulation.None,
     providers  : [{
         provide    : NG_VALUE_ACCESSOR,
         useExisting: forwardRef(() => NxVendorListComponent),
