@@ -10,20 +10,18 @@ import os.path
 import time
 import types
 from requests import head
-from robot.utils import NormalizedDict
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 from selenium.common.exceptions import NoSuchElementException
-from SeleniumLibrary.base import keyword, LibraryComponent
-from SeleniumLibrary.locators import WindowManager
 from SeleniumLibrary.utils import (is_falsy, is_truthy, secs_to_timestr,
                                    timestr_to_secs, SELENIUM_VERSION)
 from random import *
 from robot.libraries.BuiltIn import BuiltIn
+from .APIKeywords import APIKeywords
 
 
-class NoptixLibrary(object):
+class NoptixLibrary(APIKeywords):
 
     def copy_text(self, locator):
         locator.send_keys(Keys.CONTROL + 'a')

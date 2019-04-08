@@ -5,6 +5,8 @@ from get_names import get_threaded_names
 import datetime
 import time
 
+ENVIRONMENT = "https://cloud-test.hdw.mx"
+
 startTime = datetime.datetime.now()
 cmdList = []
 # list of files that are going to be run as a whole file, but threaded
@@ -15,7 +17,7 @@ testList = get_threaded_names("Threaded")
 
 # Collect the list of tests that need to be run serially.
 # Note we do not use individual cases here and only want the files themselves.
-# They will be filtered by excluding the threaded" and "threaded file"
+# They will be filtered by excluding the "threaded" and "threaded file"
 # tags and remove repeats
 serialList = list(set((test[0] for test in get_threaded_names("Unthreaded"))))
 
@@ -36,16 +38,16 @@ def threadedTestRun(loc, lang):
 
     # loop through the files and add a command to run each
     for idx, file in enumerate(ThreadableFileList):
-        cmdList.append('robot --loglevel trace -v BROWSER:headlesschrome -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} --output outputs\\{}multi{}.xml test-cases\\{}.robot'.format(path.join(loc, 'combined-results'), lang, file, idx, file))
+        cmdList.append('robot --loglevel trace -v ENV:{} -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} --output outputs\\{}multi{}.xml test-cases\\{}.robot'.format(ENVIRONMENT, path.join(loc, 'combined-results'), lang, file, idx, file))
 
     # loop through the files and add a command to run each test case
     for idx, file in enumerate(testList):
-        cmdList.append('robot --loglevel trace -v BROWSER:headlesschrome -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} -t "{}" --output outputs\\{}multi{}.xml  test-cases\\{}.robot"'.format(path.join(loc, 'combined-results'), lang, str(file[1]), str(file[0]), idx, str(file[0])))
+        cmdList.append('robot --loglevel trace -v ENV:{} -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} -t "{}" --output outputs\\{}multi{}.xml  test-cases\\{}.robot"'.format(ENVIRONMENT, path.join(loc, 'combined-results'), lang, str(file[1]), str(file[0]), idx, str(file[0])))
 
     # loop through the serial tests and run them
     for idx, file in enumerate(serialList):
-        system('robot --loglevel trace -v BROWSER:headlesschrome -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} -e Threaded -e "Threaded File" --output outputs\\{}multi{}.xml  test-cases\\{}.robot'.format(
-            path.join(loc, 'combined-results'), lang, str(file), idx + 200, str(file)))
+        system('robot --loglevel trace -v ENV:{} -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} -e Threaded -e "Threaded File" --output outputs\\{}multi{}.xml  test-cases\\{}.robot'.format(
+            ENVIRONMENT, path.join(loc, 'combined-results'), lang, str(file), idx + 200, str(file)))
 
     # fill the queue with all the commands
     for x in cmdList:
