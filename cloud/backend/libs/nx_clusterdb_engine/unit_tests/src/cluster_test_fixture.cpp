@@ -13,6 +13,7 @@ Peer::Peer():
     m_nodeId(QnUuid::createUuid().toSimpleString().toStdString())
 {
     m_process.addArg("-p2pDb/nodeId", m_nodeId.c_str());
+    m_process.addArg("-p2pDb/nodeConnectRetryTimeout", "100ms");
 }
 
 nx::utils::test::ModuleLauncher<CustomerDbNode>& Peer::process()
