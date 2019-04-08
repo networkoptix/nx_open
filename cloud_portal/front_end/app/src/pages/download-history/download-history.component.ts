@@ -11,6 +11,7 @@ import { NgbTabChangeEvent, NgbTabset }      from '@ng-bootstrap/ng-bootstrap';
 import isArray = require('core-js/fn/array/is-array');
 import angular = require('angular');
 import { NxConfigService }                   from '../../services/nx-config';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector   : 'download-history',
@@ -27,6 +28,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     private canViewRelease: boolean;
 
     config: any;
+    lang: any;
     user: any;
     downloads: any;
     activeBuilds: any;
@@ -49,6 +51,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                 private route: ActivatedRoute,
                 private router: Router,
                 private titleService: Title,
+                private translate: TranslateService,
                 location: Location) {
 
         this.location = location;
@@ -111,6 +114,9 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.translate.getTranslation(this.translate.currentLang).subscribe((lang) => {
+            this.lang = lang;
+        });
         this.sub = this.route.params.subscribe(params => {
             // this.build = params['build'];
 

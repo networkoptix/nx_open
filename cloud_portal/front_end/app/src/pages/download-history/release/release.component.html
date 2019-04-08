@@ -33,7 +33,7 @@
 <h4 class="mt-3" translate>Download Links:</h4>
 <div *ngFor="let platform of release.platforms" #card>
     <a href class="ml-3" (click)="card.expanded = !card.expanded; false">
-        {{language.lang.downloads.groups[platform.name].label || platform.name}}
+        {{lang.downloads.groups[platform.name].label || platform.name}}
     </a>
 
     <ul [ngbCollapse]="!card.expanded">
