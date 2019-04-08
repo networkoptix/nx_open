@@ -11,6 +11,7 @@
 #include "udp_hole_punching_connection_initiation_fsm.h"
 #include "../relay/abstract_relay_cluster_client.h"
 #include "../request_processor.h"
+#include "../listening_peer_db.h"
 
 namespace nx {
 namespace hpm {
@@ -19,7 +20,6 @@ namespace conf { class Settings; }
 namespace stats { class AbstractCollector; }
 
 class ListeningPeerPool;
-class ListeningPeerDb;
 
 //-------------------------------------------------------------------------------------------------
 // HolePunchingProcessor
@@ -40,6 +40,7 @@ public:
             AbstractCloudDataProvider* cloudData,
             HolePunchingProcessor* holePunchingProcessor,
             ListeningPeerDb* listeningPeerDb);
+        ~ConnectHandler();
 
         void connect(
             const RequestSourceDescriptor& requestSourceDescriptor,
@@ -51,6 +52,13 @@ public:
             const RequestSourceDescriptor& requestSourceDescriptor,
             api::ConnectRequest request,
             api::ConnectResponse reponse,
+            std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
+
+        bool validateMediatorEndpoint(const MediatorEndpoint& endpoint) const;
+
+        void resolveDomainName(
+            api::ConnectResponse response,
+            MediatorEndpoint endpoint,
             std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
 
     private:

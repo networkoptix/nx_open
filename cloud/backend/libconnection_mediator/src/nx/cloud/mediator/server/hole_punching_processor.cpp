@@ -1,5 +1,6 @@
 #include "hole_punching_processor.h"
 
+#include <nx/network/address_resolver.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
@@ -25,17 +26,6 @@ static QString logRequest(
             request.destinationHostName, request.connectSessionId);
 }
 
-static bool validateMediatorEndpoint(const MediatorEndpoint& endpoint)
-{
-    if (endpoint.domainName.empty())
-        return false;
-
-    if (endpoint.stunUdpPort == MediatorEndpoint::kPortUnused)
-        return false;
-
-    return true;
-}
-
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -50,6 +40,11 @@ HolePunchingProcessor::ConnectHandler::ConnectHandler(
     m_holePunchingProcessor(holePunchingProcessor),
     m_listeningPeerDb(listeningPeerDb)
 {
+}
+
+HolePunchingProcessor::ConnectHandler::~ConnectHandler()
+{
+    network::SocketGlobals::instance().addressResolver().cancel(this);
 }
 
 void HolePunchingProcessor::ConnectHandler::connect(
@@ -100,11 +95,69 @@ void HolePunchingProcessor::ConnectHandler::redirectToRemoteMediator(
                 return completionHandler(api::ResultCode::notFound, std::move(response));
             }
 
-            response.alternateMediatorEndpointStunUdp =
-                network::SocketAddress(endpoint.domainName, endpoint.stunUdpPort);
-
-            return completionHandler(api::ResultCode::notFound, std::move(response));
+            return resolveDomainName(
+                std::move(response),
+                std::move(endpoint),
+                std::move(completionHandler));
         });
+}
+
+bool HolePunchingProcessor::ConnectHandler::validateMediatorEndpoint(
+    const MediatorEndpoint& endpoint) const
+{
+    if (endpoint.domainName.empty())
+    {
+        NX_VERBOSE(this, "Remote Mediator endpoint lookup returned empty domain name");
+        return false;
+    }
+
+    if (endpoint.stunUdpPort == MediatorEndpoint::kPortUnused)
+    {
+        NX_VERBOSE(this, "Remote Mediator lookup returned invalid stun udp port");
+        return false;
+    }
+
+    if (endpoint == m_listeningPeerDb->thisMediatorEndpoint())
+    {
+        NX_VERBOSE(this,
+            "Remote Mediator being redirected to self and connection request already failed.");
+        return false;
+    }
+
+    return true;
+}
+
+void HolePunchingProcessor::ConnectHandler::resolveDomainName(
+    api::ConnectResponse response,
+    MediatorEndpoint endpoint,
+    std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
+{
+    nx::network::SocketGlobals::instance().addressResolver().resolveAsync(
+        endpoint.domainName,
+        [this, response = std::move(response), endpoint,
+            completionHandler = std::move(completionHandler)](
+                SystemError::ErrorCode errorCode, std::deque<network::AddressEntry> entries) mutable
+        {
+            if (errorCode != SystemError::noError)
+            {
+                NX_VERBOSE(this, "Error resolving ip address of %1: %2",
+                    endpoint.domainName, SystemError::toString(errorCode));
+                return completionHandler(api::ResultCode::notFound, std::move(response));
+            }
+
+            if (entries.empty())
+            {
+                NX_VERBOSE(this, "No Ip address resolved for %1:", endpoint.domainName);
+                return completionHandler(api::ResultCode::notFound, std::move(response));
+            }
+
+            response.alternateMediatorEndpointStunUdp = entries.front().toEndpoint();
+            response.alternateMediatorEndpointStunUdp->port = endpoint.stunUdpPort;
+            return completionHandler(api::ResultCode::tryAlternate, std::move(response));
+        },
+        network::NatTraversalSupport::disabled,
+        AF_INET,
+        this);
 }
 
 //-------------------------------------------------------------------------------------------------
