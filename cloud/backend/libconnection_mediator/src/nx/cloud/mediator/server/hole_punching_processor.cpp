@@ -78,24 +78,21 @@ void HolePunchingProcessor::ConnectHandler::redirectToRemoteMediator(
     api::ConnectResponse response,
     std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
 {
-    QString connectRequestString = logRequest(requestSourceDescriptor, request);
-    NX_VERBOSE(this, "Attempting to redirect connect request %1:", connectRequestString);
-
     m_listeningPeerDb->findMediatorByPeerDomain(
         request.destinationHostName.toStdString(),
-        [this, response = std::move(response),
-            completionHandler = std::move(completionHandler), connectRequestString](
+        [this, response = std::move(response), completionHandler = std::move(completionHandler),
+            connectRequestString = logRequest(requestSourceDescriptor, request)](
                 MediatorEndpoint endpoint) mutable
         {
             if (!validateMediatorEndpoint(endpoint))
             {
                 NX_VERBOSE(this,
-                    "Failed to redirect Stun connect request: %1 to remote mediator endpoint: %2",
+                    "Failed to redirect stun connect request: %1 to remote mediator endpoint: %2",
                     connectRequestString, endpoint);
                 return completionHandler(api::ResultCode::notFound, std::move(response));
             }
 
-            return resolveDomainName(
+            resolveDomainName(
                 std::move(response),
                 std::move(endpoint),
                 std::move(completionHandler));
@@ -107,20 +104,21 @@ bool HolePunchingProcessor::ConnectHandler::validateMediatorEndpoint(
 {
     if (endpoint.domainName.empty())
     {
-        NX_VERBOSE(this, "Remote Mediator endpoint lookup returned empty domain name");
+        NX_VERBOSE(this, "Remote mediator lookup returned empty domain name");
         return false;
     }
 
     if (endpoint.stunUdpPort == MediatorEndpoint::kPortUnused)
     {
-        NX_VERBOSE(this, "Remote Mediator lookup returned invalid stun udp port");
+        NX_VERBOSE(this, "Remote mediator lookup returned invalid stun udp port");
         return false;
     }
 
     if (endpoint == m_listeningPeerDb->thisMediatorEndpoint())
     {
         NX_VERBOSE(this,
-            "Remote Mediator being redirected to self and connection request already failed.");
+            "Remote mediator lookup returned \"this\" instance: %1, but connection request already"
+            " failed.", endpoint.toString());
         return false;
     }
 
