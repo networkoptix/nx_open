@@ -110,7 +110,7 @@ First name is required
     Validate Log In
     Verify In Account Page
     Input Text    ${ACCOUNT FIRST NAME}    ${EMPTY}
-    Click Button    ${ACCOUNT SAVE}
+    Click Element    ${ACCOUNT LAST NAME}
     Wait Until Element Is Visible    ${ACCOUNT FIRST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
@@ -121,7 +121,7 @@ Last name is required
     Validate Log In
     Verify In Account Page
     Input Text    ${ACCOUNT LAST NAME}    ${EMPTY}
-    Click Button    ${ACCOUNT SAVE}
+    Click Element    ${ACCOUNT FIRST NAME}
     Wait Until Element Is Visible    ${ACCOUNT LAST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
@@ -132,7 +132,7 @@ SPACE for first name is not valid
     Validate Log In
     Verify In Account Page
     Input Text    ${ACCOUNT FIRST NAME}    ${SPACE}
-    Click Button    ${ACCOUNT SAVE}
+    Click Element    ${ACCOUNT LAST NAME}
     Wait Until Element Is Visible    ${ACCOUNT FIRST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
@@ -144,7 +144,7 @@ SPACE for last name is not valid
     Verify In Account Page
     Input Text    ${ACCOUNT FIRST NAME}    Mark
     Input Text    ${ACCOUNT LAST NAME}    ${SPACE}
-    Click Button    ${ACCOUNT SAVE}
+    Click Element    ${ACCOUNT FIRST NAME}
     Wait Until Element Is Visible    ${ACCOUNT LAST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
