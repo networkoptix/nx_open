@@ -45,12 +45,12 @@ public:
     };
 
     //!Calls \a start
-    MediatorFunctionalTest(int flags = allFlags);
+    MediatorFunctionalTest(int flags = allFlags, const QString& testDir = QString());
     ~MediatorFunctionalTest();
 
     /**
      * Use it to make restart reliable.
-     * Without using proxy mediator is not able to automatically attach to the same port after 
+     * Without using proxy mediator is not able to automatically attach to the same port after
      * restart.
      * false by default.
      */
