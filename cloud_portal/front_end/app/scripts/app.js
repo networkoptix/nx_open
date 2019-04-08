@@ -93,6 +93,7 @@ window.L = {};
                     appState.companyLink = response.companyLink;
                     appState.companyName = response.companyName;
                     appState.copyrightYear = response.copyrightYear;
+                    appState.feedbackEnabled = response.feedbackEnabled;
                     appState.footerItems = response.footerItems ? JSON.parse(response.footerItems) : {};
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
