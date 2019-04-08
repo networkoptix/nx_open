@@ -117,7 +117,7 @@ bool HolePunchingProcessor::ConnectHandler::validateMediatorEndpoint(
     if (endpoint == m_listeningPeerDb->thisMediatorEndpoint())
     {
         NX_VERBOSE(this,
-            "Remote mediator lookup returned \"this\" instance: %1, but connection request already"
+            "Remote mediator lookup returned \"this\" mediator: %1, but connection request already"
             " failed.", endpoint.toString());
         return false;
     }
