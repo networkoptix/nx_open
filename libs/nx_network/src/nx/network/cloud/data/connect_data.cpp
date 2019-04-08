@@ -54,15 +54,16 @@ ConnectResponse::ConnectResponse():
 
 void ConnectResponse::serializeAttributes(nx::network::stun::Message* const message)
 {
-    message->newAttribute< attrs::PublicEndpointList >(std::move(forwardedTcpEndpointList));
-    message->newAttribute< attrs::UdtHpEndpointList >(std::move(udpEndpointList));
+    message->newAttribute<attrs::PublicEndpointList>(std::move(forwardedTcpEndpointList));
+    message->newAttribute<attrs::UdtHpEndpointList>(std::move(udpEndpointList));
     if (trafficRelayUrl)
         message->newAttribute<attrs::TrafficRelayUrl>(std::move(*trafficRelayUrl));
     message->newAttribute<attrs::HostName>(destinationHostFullName);
     params.serializeAttributes(message);
     message->addAttribute(attrs::cloudConnectVersion, (int)cloudConnectVersion);
+
     if (alternateMediatorEndpointStunUdp)
-        message->newAttribute<stun::attrs::AlternateServer>(std::move(*alternateMediatorEndpointStunUdp));
+        message->newAttribute<stun::attrs::AlternateServer>(*alternateMediatorEndpointStunUdp);
 }
 
 bool ConnectResponse::parseAttributes(const nx::network::stun::Message& message)
