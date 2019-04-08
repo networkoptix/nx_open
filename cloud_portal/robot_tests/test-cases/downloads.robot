@@ -79,8 +79,10 @@ Going to the downloads page should show you the tab according to your OS
     Log In    ${email}    ${password}    button=None
     Validate Log In
     Wait Until Elements Are Visible    ${DOWNLOADS HEADER}    ${WINDOWS TAB}
+    #we convert to lowercase because the ids are lowercase but the os call gives uppercase
     ${os}    Get OS
-    Wait Until Element Is Visible    //a[contains(@class,"active") and @id="${os}"]
+    ${os}    Convert To Lowercase    ${os}
+    Wait Until Element Is Visible    //a[@aria-expanded="true" and @id="${os}"]
 
 Make sure each tab changes the text to show the corresponding OS and url
     Go to download page
@@ -88,10 +90,10 @@ Make sure each tab changes the text to show the corresponding OS and url
     Click Link    ${WINDOWS TAB}
     Wait Until Element Is Visible    ${UBUNTU TAB}
     Click Link    ${UBUNTU TAB}
-    Location Should Be    ${url}/download/Linux
+    Location Should Be    ${url}/download/linux
     Wait Until Elements Are Visible    ${DOWNLOAD UBUNTU VMS LINK}    ${MAC OS TAB}
     Click Link    ${MAC OS TAB}
-    Location Should Be    ${url}/download/MacOS
+    Location Should Be    ${url}/download/macos
     Wait Until Elements Are Visible    ${DOWNLOAD MAC OS VMS LINK}    ${MAC OS TAB}
 
 Validate the windows download links

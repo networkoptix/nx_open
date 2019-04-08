@@ -203,7 +203,7 @@ ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-cl
 
 #Downloads
 ${DOWNLOADS HEADER}                   //h1["Downloads"]
-${DOWNLOAD WINDOWS VMS LINK}          //div[text()="Windows x64 - Client only"]/../..
+${DOWNLOAD WINDOWS VMS LINK}          //div[text()="Windows x64 - Client and Server"]/../..
 ${DOWNLOAD UBUNTU VMS LINK}           //div[text()="Ubuntu x64 - Client only"]/../..
 ${DOWNLOAD MAC OS VMS LINK}           //div[text()="Mac OS X - Client only"]/../..
 ${ITUNES STORE DOWNLOAD BUTTON}       //a[@class="mobile-link iOS"]

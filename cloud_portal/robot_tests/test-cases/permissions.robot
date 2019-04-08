@@ -201,6 +201,7 @@ Owner cannot edit self via share
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']
     Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']/..
     Click Button    ${SHARE BUTTON MODAL}
+    Click Button    ${SHARE CLOSE}
     Check For Alert    ${CHANGING OWN PERMISSIONS IS NOT ALLOWED}
 
 admin cannot delete or edit other admins
