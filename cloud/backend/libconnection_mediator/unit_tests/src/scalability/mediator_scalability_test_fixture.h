@@ -42,6 +42,8 @@ protected:
 
     void thenServerInfoIsDroppedFromCluster();
 
+    void thenRequestIsRedirected();
+
     void establishListeningConnectionToMediatorAsync(int mediatorIndex);
 
     void assertConnectionToMediatorHasBeenEstablished();

@@ -32,13 +32,6 @@ protected:
         whenTryToConnectToServerOnDifferentMediator(mediatorIndex, true);
     }
 
-    void thenRequestIsRedirected()
-    {
-        auto resultCodeAndResponse = m_connectResponseQueue.pop();
-        while (std::get<api::ResultCode>(resultCodeAndResponse) != api::ResultCode::ok)
-            resultCodeAndResponse = m_connectResponseQueue.pop();
-    }
-
     void andConnectionToDifferentMediatorIsEstablished()
     {
         //TODO
