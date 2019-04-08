@@ -51,7 +51,7 @@ void MediatorScalabilityTestFixture::givenMultipleMediators()
         addMediator();
 }
 
-void MediatorScalabilityTestFixture::givenSynchronizedClusterWithServer()
+void MediatorScalabilityTestFixture::givenSynchronizedClusterWithListeningServer()
 {
     givenMultipleMediators();
 
@@ -60,17 +60,14 @@ void MediatorScalabilityTestFixture::givenSynchronizedClusterWithServer()
     thenServerInfoIsSynchronized();
 }
 
-void MediatorScalabilityTestFixture::givenServerIsListeningOnMediator(int mediatorIndex)
+void MediatorScalabilityTestFixture::whenAddServer()
 {
-    establishListeningConnectionToMediatorAsync(mediatorIndex);
-    assertConnectionToMediatorHasBeenEstablished();
-}
-
-void MediatorScalabilityTestFixture::whenAddServer(int mediatorIndex)
-{
-    m_system = m_mediatorCluster.mediator(mediatorIndex).addRandomSystem();
-    m_mediaServer = m_mediatorCluster.mediator(mediatorIndex).addRandomServer(m_system);
+    m_system = m_mediatorCluster.mediator(0).addRandomSystem();
+    m_mediaServer = m_mediatorCluster.mediator(0).addRandomServer(m_system);
     m_mediaServerFullName = m_mediaServer->fullName().toStdString();
+
+    auto resultCodeAndResponse = m_mediaServer->listen();
+    ASSERT_EQ(api::ResultCode::ok, resultCodeAndResponse.first);
 }
 
 void MediatorScalabilityTestFixture::whenMediaServerGoesOffline()
@@ -93,50 +90,7 @@ void MediatorScalabilityTestFixture::thenServerInfoIsDroppedFromCluster()
 void MediatorScalabilityTestFixture::thenRequestIsRedirected()
 {
     auto resultCodeAndResponse = m_connectResponseQueue.pop();
-    while (std::get<api::ResultCode>(resultCodeAndResponse) != api::ResultCode::ok)
-        resultCodeAndResponse = m_connectResponseQueue.pop();
-}
-
-void MediatorScalabilityTestFixture::establishListeningConnectionToMediatorAsync(int mediatorIndex)
-{
-    auto& mediator = m_mediatorCluster.mediator(mediatorIndex);
-
-    auto stunClient = std::make_shared<nx::network::stun::AsyncClient>();
-
-    stunClient->connect(nx::network::url::Builder()
-        .setScheme(nx::network::stun::kUrlSchemeName)
-        .setEndpoint(mediator.stunTcpEndpoint()));
-
-    stunClient->setOnConnectionClosedHandler(
-        [this, stunClient = stunClient.get()](SystemError::ErrorCode /*systemErrorCode*/)
-    {
-        m_closeConnectionEvents.push(stunClient);
-    });
-
-    auto connection =
-        std::make_unique<nx::hpm::api::MediatorServerTcpConnection>(stunClient, this);
-    m_serverConnections.push_back(std::move(stunClient));
-
-    nx::hpm::api::ListenRequest request;
-    request.systemId = m_system.id;
-    request.serverId = m_mediaServer->serverId();
-
-    auto connectionPtr = connection.get();
-    connectionPtr->listen(
-        std::move(request),
-        [this, connection = std::move(connection)](
-            nx::hpm::api::ResultCode resultCode,
-            nx::hpm::api::ListenResponse response) mutable
-        {
-            m_listenResponseQueue.push(std::make_tuple(resultCode, std::move(response)));
-            connection.reset();
-        });
-}
-
-void MediatorScalabilityTestFixture::assertConnectionToMediatorHasBeenEstablished()
-{
-    const auto result = m_listenResponseQueue.pop();
-    ASSERT_EQ(nx::hpm::api::ResultCode::ok, std::get<0>(result));
+    ASSERT_EQ(api::ResultCode::ok, std::get<api::ResultCode>(resultCodeAndResponse));
 }
 
 } // namespace nx::hpm::test

@@ -30,11 +30,9 @@ protected:
 
     void givenMultipleMediators();
 
-    void givenSynchronizedClusterWithServer();
+    void givenSynchronizedClusterWithListeningServer();
 
-    void givenServerIsListeningOnMediator(int mediatorIndex = 0);
-
-    void whenAddServer(int mediatorIndex = 0);
+    void whenAddServer();
 
     void whenMediaServerGoesOffline();
 
@@ -43,10 +41,6 @@ protected:
     void thenServerInfoIsDroppedFromCluster();
 
     void thenRequestIsRedirected();
-
-    void establishListeningConnectionToMediatorAsync(int mediatorIndex);
-
-    void assertConnectionToMediatorHasBeenEstablished();
 
 protected:
     nx::cloud::discovery::test::DiscoveryServer m_discoveryServer;

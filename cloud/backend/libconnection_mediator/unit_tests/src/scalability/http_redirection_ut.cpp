@@ -5,10 +5,10 @@ namespace nx::hpm::test {
 class HttpRedirection: public MediatorScalabilityTestFixture
 {
 protected:
-    void whenTryToConnectToServerOnDifferentMediator(int mediatorIndex = 0, bool useHttps = false)
+    void whenTryToConnectToServerOnDifferentMediator(bool useHttps = false)
     {
         // m_mediaServer is connected to m_mediatorCluster.mediator(0);
-        auto& differentMediator = m_mediatorCluster.mediator(mediatorIndex);
+        auto& differentMediator = m_mediatorCluster.mediator(1);
 
         m_httpClient = std::make_unique<api::Client>(buildUrl(differentMediator, useHttps));
 
@@ -21,15 +21,15 @@ protected:
         m_httpClient->initiateConnection(
             connectRequest,
             [this](api::ResultCode resultCode, api::ConnectResponse response)
-        {
-            m_connectResponseQueue.push(
-                std::make_tuple(resultCode, std::move(response)));
-        });
+            {
+                m_connectResponseQueue.push(
+                    std::make_tuple(resultCode, std::move(response)));
+            });
     }
 
-    void whenTryToConnectToServerOnDifferentMediatorWithHttps(int mediatorIndex = 0)
+    void whenTryToConnectToServerOnDifferentMediatorWithHttps()
     {
-        whenTryToConnectToServerOnDifferentMediator(mediatorIndex, true);
+        whenTryToConnectToServerOnDifferentMediator(true);
     }
 
     void andConnectionToDifferentMediatorIsEstablished()
@@ -56,10 +56,9 @@ private:
 
 TEST_F(HttpRedirection, http_connect_request_redirected_to_correct_mediator)
 {
-    givenSynchronizedClusterWithServer();
-    givenServerIsListeningOnMediator(0);
+    givenSynchronizedClusterWithListeningServer();
 
-    whenTryToConnectToServerOnDifferentMediator(1);
+    whenTryToConnectToServerOnDifferentMediator();
 
     thenRequestIsRedirected();
 
@@ -68,10 +67,9 @@ TEST_F(HttpRedirection, http_connect_request_redirected_to_correct_mediator)
 
 TEST_F(HttpRedirection, https_connect_request_redirected_to_correct_mediator)
 {
-    givenSynchronizedClusterWithServer();
-    givenServerIsListeningOnMediator(0);
+    givenSynchronizedClusterWithListeningServer();
 
-    whenTryToConnectToServerOnDifferentMediatorWithHttps(1);
+    whenTryToConnectToServerOnDifferentMediatorWithHttps();
 
     thenRequestIsRedirected();
 
