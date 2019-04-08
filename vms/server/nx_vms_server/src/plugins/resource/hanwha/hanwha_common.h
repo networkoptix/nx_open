@@ -108,6 +108,10 @@ static const QString kHanwhaFullMode = lit("Full");
 
 static const QString kHanwhaRtpUnicast = lit("RTPUnicast");
 static const QString kHanwhaRtpMulticast = lit("RTPMulticast");
+static const QString kHanwhaRtpMulticastEnable = lit("RTPMulticastEnable");
+static const QString kHanwhaRtpMulticastAddress = lit("RTPMulticastAddress");
+static const QString kHanwhaRtpMulticastPort = lit("RTPMulticastPort");
+static const QString kHanwhaRtpMulticastTtl = lit("RTPMulticastTTL");
 
 static const QString kHanwhaPcClient = lit("PC");
 static const QString kHanwhaMobileClient = lit("Mobile");

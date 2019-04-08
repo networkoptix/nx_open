@@ -1,7 +1,13 @@
 #pragma once
 
 #include <chrono>
+#include <deque>
+#include <map>
 #include <vector>
+
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/member.hpp>
 
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
@@ -93,6 +99,26 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
+namespace detail {
+
+class TimePeriod
+{
+public:
+    long long id = -1;
+    long long deviceId = -1;
+    std::chrono::milliseconds startTime = std::chrono::milliseconds::zero();
+    std::chrono::milliseconds endTime = std::chrono::milliseconds::zero();
+    std::chrono::milliseconds lastSavedEndTime = std::chrono::milliseconds::zero();
+
+    std::chrono::milliseconds length() const;
+
+    bool addPacketToPeriod(
+        std::chrono::milliseconds timestamp,
+        std::chrono::milliseconds duration);
+};
+
+} // namespace detai;
+
 class EventsStorage:
     public AbstractEventsStorage
 {
@@ -123,12 +149,40 @@ public:
         std::chrono::milliseconds oldestDataToKeepTimestamp) override;
 
 private:
+    struct AttributesCacheEntry
+    {
+        QByteArray md5;
+        long long id = -1;
+    };
+
+    using DeviceIdToCurrentTimePeriod = std::map<long long, detail::TimePeriod>;
+    using IdToTimePeriod = std::map<long long, DeviceIdToCurrentTimePeriod::iterator>;
+
     const Settings& m_settings;
     DbController m_dbController;
-    std::chrono::microseconds m_maxRecordedTimestamp = std::chrono::microseconds::zero();
+    std::chrono::milliseconds m_maxRecordedTimestamp = std::chrono::milliseconds::zero();
     mutable QnMutex m_mutex;
+    std::map<QnUuid, long long> m_deviceGuidToId;
+    std::map<long long, QnUuid> m_idToDeviceGuid;
+    std::map<QString, long long> m_objectTypeToId;
+    std::map<long long, QString> m_idToObjectType;
+    std::deque<AttributesCacheEntry> m_attributesCache;
+    DeviceIdToCurrentTimePeriod m_deviceIdToCurrentTimePeriod;
+    IdToTimePeriod m_idToTimePeriod;
 
     bool readMaximumEventTimestamp();
+
+    bool loadDictionaries();
+    void loadDeviceDictionary(nx::sql::QueryContext* queryContext);
+    void loadObjectTypeDictionary(nx::sql::QueryContext* queryContext);
+
+    void addDeviceToDictionary(long long id, const QnUuid& deviceGuid);
+    long long deviceIdFromGuid(const QnUuid& deviceGuid) const;
+    QnUuid deviceGuidFromId(long long id) const;
+
+    void addObjectTypeToDictionary(long long id, const QString& name);
+    long long objectTypeIdFromName(const QString& name) const;
+    QString objectTypeFromId(long long id) const;
 
     nx::sql::DBResult savePacket(
         nx::sql::QueryContext*,
@@ -138,18 +192,57 @@ private:
      * @return Inserted event id.
      * Throws on error.
      */
-    std::int64_t insertEvent(
+    void insertEvent(
+        nx::sql::QueryContext* queryContext,
+        const common::metadata::DetectionMetadataPacket& packet,
+        const common::metadata::DetectedObject& detectedObject,
+        long long attributesId,
+        long long timePeriodId);
+
+    void updateDictionariesIfNeeded(
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject);
 
-    /**
-     * Throws on error.
-     */
-    void insertEventAttributes(
+    void updateDeviceDictionaryIfNeeded(
         nx::sql::QueryContext* queryContext,
-        std::int64_t eventId,
+        const common::metadata::DetectionMetadataPacket& packet);
+
+    void updateObjectTypeDictionaryIfNeeded(
+        nx::sql::QueryContext* queryContext,
+        const common::metadata::DetectedObject& detectedObject);
+
+    /**
+     * Inserts attributes or returns id or existing attributes.
+     * @return attributesId
+     */
+    long long insertAttributes(
+        nx::sql::QueryContext* queryContext,
         const std::vector<common::metadata::Attribute>& eventAttributes);
+
+    /**
+     * @return Id of the current time period.
+     */
+    long long insertOrUpdateTimePeriod(
+        nx::sql::QueryContext* queryContext,
+        const common::metadata::DetectionMetadataPacket& packet);
+
+    detail::TimePeriod* insertOrFetchCurrentTimePeriod(
+        nx::sql::QueryContext* queryContext,
+        long long deviceId,
+        std::chrono::milliseconds packetTimestamp,
+        std::chrono::milliseconds packetDuration);
+
+    void closeCurrentTimePeriod(
+        nx::sql::QueryContext* queryContext,
+        long long deviceId);
+
+    void saveTimePeriodEnd(
+        nx::sql::QueryContext* queryContext,
+        long long id,
+        std::chrono::milliseconds endTime);
+
+    void fillCurrentTimePeriodsCache(nx::sql::QueryContext* queryContext);
 
     void prepareCursorQuery(const Filter& filter, nx::sql::SqlQuery* query);
 
@@ -170,7 +263,9 @@ private:
 
     void addTimePeriodToFilter(
         const QnTimePeriod& timePeriod,
-        nx::sql::Filter* sqlFilter);
+        nx::sql::Filter* sqlFilter,
+        const char* leftBoundaryFieldName,
+        const char* rightBoundaryFieldName);
 
     void addBoundingBoxToFilter(
         const QRectF& boundingBox,
@@ -197,8 +292,20 @@ private:
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 
+    void prepareSelectTimePeriodsUnfilteredQuery(
+        nx::sql::AbstractSqlQuery* query,
+        const std::vector<QnUuid>& deviceIds,
+        const QnTimePeriod& timePeriod,
+        const TimePeriodsLookupOptions& options);
+
+    void prepareSelectTimePeriodsFilteredQuery(
+        nx::sql::AbstractSqlQuery* query,
+        const Filter& filter,
+        const TimePeriodsLookupOptions& options);
+
     void loadTimePeriods(
-        nx::sql::SqlQuery& query,
+        nx::sql::AbstractSqlQuery* query,
+        const QnTimePeriod& timePeriod,
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 
@@ -213,6 +320,12 @@ private:
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void cleanupEventProperties(nx::sql::QueryContext* queryContext);
+
+    void addToAttributesCache(long long id, const QByteArray& content);
+    long long findAttributesIdInCache(const QByteArray& content);
+
+    static int packCoordinate(double);
+    static double unpackCoordinate(int);
 };
 
 //-------------------------------------------------------------------------------------------------

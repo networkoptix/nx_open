@@ -11,8 +11,11 @@ namespace nx::sql::detail::test {
 class DbRequestExecutor:
     public nx::sql::test::BaseDbTest
 {
+    using base_type = nx::sql::test::BaseDbTest;
+
 public:
-    DbRequestExecutor()
+    DbRequestExecutor():
+        base_type(kModuleName)
     {
         initializeDatabase();
 
