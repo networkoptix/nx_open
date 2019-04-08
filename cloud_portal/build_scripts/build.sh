@@ -87,9 +87,9 @@ done
 
 cp ../cloud/cloud/cloud_portal.yaml $TARGET_DIR/_source
 
-
-echo "Checking files for mentions of nx"
-branding=$(grep -iE "(nx|nx witness client|nx cloud)" --exclude=*.png -rl ${TARGET_DIR}) || true
+BAN_LIST="nx witness|nx witness client|nx platform|nx1|nxvms|nx cloud|nx"
+echo "Checking files for mentions of nx with the following patterns: ${BAN_LIST}"
+branding=$(grep -iE "$BAN_LIST" --exclude=fonts --include=*.html -rl ${TARGET_DIR}/_source) || true
 if [[ -z ${branding} ]]
 then
     echo "No mentions were found"
