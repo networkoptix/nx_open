@@ -55,7 +55,7 @@ void QnExecScript::afterExecute(const QString& path, const QnRequestParamList& p
     QString fileName = m_dataDirectory + "/scripts/" + scriptName;
 
     QStringList args;
-    for (const auto& param: params)
+    for (const auto& param: params.toList())
         args << lit("%1=%2").arg(param.first).arg(param.second);
 
     if (!QProcess::startDetached(fileName, args))

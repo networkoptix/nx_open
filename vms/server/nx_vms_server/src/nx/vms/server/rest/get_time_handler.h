@@ -1,19 +1,13 @@
 #pragma once
 
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 
 namespace nx::vms::server::rest {
 
-class GetTimeHandler: public QnJsonRestHandler
+class GetTimeHandler: public nx::network::rest::Handler
 {
-    Q_OBJECT
-
-public:
-    virtual int executeGet(
-        const QString& path,
-        const QnRequestParams& params,
-        QnJsonRestResult& result,
-        const QnRestConnectionProcessor* owner) override;
+protected:
+    nx::network::rest::Response executeGet(const nx::network::rest::Request& request) override;
 };
 
 } // namespace nx::vms::server::rest

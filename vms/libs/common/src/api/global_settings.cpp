@@ -731,6 +731,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         100 * 1000, //< Default value.
         this);
 
+    m_forceLiveCacheForPrimaryStreamAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        kForceLiveCacheForPrimaryStream,
+        "auto",
+        this);
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -949,7 +954,10 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_downloaderPeersAdaptor
         << m_lowQualityScreenVideoCodecAdaptor
         << m_maxWebMTranscoders
-        << m_maxEventLogRecordsAdaptor;
+        << m_maxEventLogRecordsAdaptor
+        << m_forceLiveCacheForPrimaryStreamAdaptor
+    ;
+
 
     if (isHanwhaEnabledCustomization())
     {
@@ -1828,6 +1836,16 @@ QString QnGlobalSettings::lowQualityScreenVideoCodec() const
 void QnGlobalSettings::setLowQualityScreenVideoCodec(const QString& value)
 {
     m_lowQualityScreenVideoCodecAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::forceLiveCacheForPrimaryStream() const
+{
+    return m_forceLiveCacheForPrimaryStreamAdaptor->value();
+}
+
+void QnGlobalSettings::setForceLiveCacheForPrimaryStream(const QString& value)
+{
+    m_forceLiveCacheForPrimaryStreamAdaptor->setValue(value);
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

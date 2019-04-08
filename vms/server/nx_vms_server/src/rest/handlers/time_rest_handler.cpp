@@ -12,18 +12,17 @@
 #include <nx/network/app_info.h>
 #include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
-int QnTimeRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+namespace nx::vms::server::rest {
+
+nx::network::rest::Response DeprecatedTimeRestHandler::executeGet(
+    const nx::network::rest::Request& request)
 {
     QnTimeReply reply;
     reply.timeZoneOffset = currentTimeZone() * 1000LL;
 
     // TODO: Remove parameter "local", making its behavior the default. Check nxtool.
-    auto commonModule = owner->commonModule();
-    if (params.contains("local"))
+    auto commonModule = request.owner->commonModule();
+    if (request.param("local"))
         reply.utcTime =  QDateTime::currentDateTime().toMSecsSinceEpoch();
     else
         reply.utcTime = commonModule->ec2Connection()->timeSyncManager()->getSyncTime().count();
@@ -32,6 +31,7 @@ int QnTimeRestHandler::executeGet(
 
     reply.realm = nx::network::AppInfo::realm();
 
-    result.setReply(reply);
-    return nx::network::http::StatusCode::ok;
+    return nx::network::rest::Response::reply(reply);
 }
+
+} // namespace nx::vms::server::rest

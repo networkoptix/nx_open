@@ -1,19 +1,23 @@
 #pragma once
 
-#include "rest/server/json_rest_handler.h"
+#include <nx/network/rest/handler.h>
 
-namespace ec2
-{
-    class AbstractTransactionMessageBus;
-}
+namespace ec2 { class AbstractTransactionMessageBus; }
 
-class QnActiveConnectionsRestHandler: public QnJsonRestHandler
+namespace rest {
+namespace handlers {
+
+class ActiveConnectionsRestHandler: public nx::network::rest::Handler
 {
-    Q_OBJECT
 public:
-    QnActiveConnectionsRestHandler(const ec2::AbstractTransactionMessageBus* messageBus);
+    ActiveConnectionsRestHandler(const ec2::AbstractTransactionMessageBus* messageBus);
 
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
+protected:
+    nx::network::rest::Response executeGet(const nx::network::rest::Request& request) override;
+
 private:
     const ec2::AbstractTransactionMessageBus* m_messageBus;
 };
+
+} // namespace handlers
+} // namespace rest

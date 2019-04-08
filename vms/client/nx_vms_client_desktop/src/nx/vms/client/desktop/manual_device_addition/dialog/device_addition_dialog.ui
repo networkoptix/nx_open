@@ -338,7 +338,7 @@
                        <number>65535</number>
                       </property>
                       <property name="value">
-                       <number>0</number>
+                       <number>80</number>
                       </property>
                      </widget>
                     </item>
@@ -475,6 +475,9 @@
                       </property>
                       <property name="maximum">
                        <number>65535</number>
+                      </property>
+                      <property name="value">
+                       <number>80</number>
                       </property>
                      </widget>
                     </item>

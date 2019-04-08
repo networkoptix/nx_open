@@ -6,6 +6,7 @@
 
 #include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
+#include <nx/analytics/metadata_logger.h>
 
 namespace nx::streaming::rtp {
 
@@ -13,9 +14,7 @@ class QnNxRtpParser: public VideoStreamParser
 {
 public:
     /** @param debugSourceId Human-readable stream source id for logging. */
-    QnNxRtpParser(const QString& debugSourceId = QString());
-
-    virtual ~QnNxRtpParser() override;
+    QnNxRtpParser(QnUuid devivceId);
 
     virtual void setSdpInfo(const Sdp::Media& /*sdp*/) override {};
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
@@ -29,19 +28,19 @@ public:
     void setAudioEnabled(bool value);
 
 private:
-    void writeAnalyticsMetadataToLogFile(const QnAbstractMediaDataPtr& metadata);
+    void logMediaData(const QnAbstractMediaDataPtr& metadata);
 
 private:
-    const QString m_debugSourceId;
+    const QnUuid m_deviceId;
     QnConstMediaContextPtr m_context;
     QnAbstractMediaDataPtr m_nextDataPacket;
     QnByteArray* m_nextDataPacketBuffer;
     qint64 m_position;
     bool m_isAudioEnabled;
-    QFile m_analyticsMetadataLogFile;
-    bool m_isAnalyticsMetadataLogFileOpened = false;
     qint64 m_lastFramePtsUs; //< Intended for debug.
     nx::debugging::VisualMetadataDebuggerPtr m_visualDebugger;
+    nx::analytics::MetadataLogger m_primaryLogger;
+    nx::analytics::MetadataLogger m_secondaryLogger;
 };
 
 using QnNxRtpParserPtr = QSharedPointer<QnNxRtpParser>;

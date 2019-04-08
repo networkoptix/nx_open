@@ -364,11 +364,8 @@ void MediaServerClient::ec2AnalyticsLookupDetectedObjects(
     nx::analytics::storage::serializeToParams(request, &queryParams);
     if (!queryParams.isEmpty())
     {
-        QUrlQuery query;
-        for (const auto& param: queryParams)
-            query.addQueryItem(param.first, param.second);
         // We create request path here. Not an URL. So, no need to encode it.
-        requestPath += lit("?") + query.toString(QUrl::FullyDecoded);
+        requestPath += lit("?") + queryParams.toUrlQuery().toString(QUrl::FullyDecoded);
     }
 
     performAsyncEc2Call(

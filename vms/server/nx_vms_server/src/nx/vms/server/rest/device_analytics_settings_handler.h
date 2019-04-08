@@ -2,27 +2,27 @@
 
 #include <optional>
 
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 #include <nx/vms/server/server_module_aware.h>
 
 namespace nx::vms::server::analytics { class Manager; }
 
 namespace nx::vms::server::rest {
 
-class DeviceAnalyticsSettingsHandler: public QnJsonRestHandler, public ServerModuleAware
+class DeviceAnalyticsSettingsHandler: public nx::network::rest::Handler, public ServerModuleAware
 {
 public:
     DeviceAnalyticsSettingsHandler(QnMediaServerModule* serverModule);
-    virtual JsonRestResponse executeGet(const JsonRestRequest& request);
-    virtual JsonRestResponse executePost(const JsonRestRequest& request, const QByteArray& body);
+    virtual nx::network::rest::Response executeGet(const nx::network::rest::Request& request);
+    virtual nx::network::rest::Response executePost(const nx::network::rest::Request& request);
 
 private:
-    std::optional<JsonRestResponse> checkCommonInputParameters(
-        const QnRequestParams& parameters) const;
+    std::optional<nx::network::rest::Response> checkCommonInputParameters(
+        const nx::network::rest::Request& request) const;
 
     std::optional<QJsonObject> deviceAgentSettingsModel(const QString& engineId) const;
 
-    JsonRestResponse makeSettingsResponse(
+    nx::network::rest::Response makeSettingsResponse(
         const nx::vms::server::analytics::Manager* analyticsManager,
         const QString& engineId,
         const QString& deviceId) const;

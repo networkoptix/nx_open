@@ -1,19 +1,23 @@
 #pragma once
 
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 #include <nx/vms/server/server_module_aware.h>
 
-class QnBackupControlRestHandler:
-    public QnJsonRestHandler,
+namespace nx::vms::server::rest {
+
+class BackupControlRestHandler:
+    public nx::network::rest::Handler,
     public /*mixin*/ nx::vms::server::ServerModuleAware
 {
-    Q_OBJECT
 public:
-    QnBackupControlRestHandler(QnMediaServerModule* serverModule);
+    BackupControlRestHandler(QnMediaServerModule* serverModule);
 
-    virtual int executeGet(
-        const QString &path,
-        const QnRequestParams &params,
-        QnJsonRestResult &result,
-        const QnRestConnectionProcessor*) override;
+protected:
+    nx::network::rest::Response executeGet(const nx::network::rest::Request& request) override;
+    nx::network::rest::Response executePost(const nx::network::rest::Request& request) override;
+
+private:
+    int execute(const QString& command);
 };
+
+} // namespace nx::vms::server::rest

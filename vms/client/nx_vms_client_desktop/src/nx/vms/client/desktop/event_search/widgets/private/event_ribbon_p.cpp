@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
+#include <nx/vms/client/desktop/image_providers/delaying_proxy_image_provider.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
@@ -33,6 +34,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/utils/app_info.h>
 
 namespace nx::vms::client::desktop {
 
@@ -306,19 +308,22 @@ void EventRibbon::Private::updateTilePreview(int index)
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
 
     auto& previewProvider = m_tiles[index]->preview;
-    if (previewProvider && (request.resource != previewProvider->requestData().resource
-        || request.usecSinceEpoch != previewProvider->requestData().usecSinceEpoch))
-    {
-        previewProvider.reset();
-    }
-
-    if (!previewProvider)
+    if (!previewProvider || request.resource != previewProvider->requestData().resource)
         previewProvider.reset(new ResourceThumbnailProvider(request));
 
     previewProvider->setStreamSelectionMode(modelIndex.data(Qn::PreviewStreamSelectionRole)
         .value<nx::api::CameraImageRequest::StreamSelectionMode>());
 
-    widget->setPreview(previewProvider.get());
+    static const auto kDelayingProxyPropertyName = "__qn_delayingProxyProvider";
+    auto proxy = previewProvider->property(kDelayingProxyPropertyName)
+        .value<DelayingProxyImageProvider*>();
+    if (!proxy)
+    {
+        proxy = new DelayingProxyImageProvider(previewProvider.get());
+        previewProvider->setProperty(kDelayingProxyPropertyName, QVariant::fromValue(proxy));
+    }
+
+    widget->setPreview(proxy);
     widget->setPreviewCropRect(previewCropRect);
 }
 
@@ -1190,7 +1195,14 @@ void EventRibbon::Private::doUpdateView()
     updateHighlightedTiles();
 
     if (!m_animations.empty())
+    {
+        // Sometimes in Mac OS animation has running state but never starts actually.
+        // Looks like processEvents() calls gives a chance to start animations actually.
+        if (nx::utils::AppInfo::isMacOsX())
+            qApp->processEvents();
+
         qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest));
+    }
 }
 
 void EventRibbon::Private::fadeIn(EventTile* widget)

@@ -1706,7 +1706,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %param:string reply.timezoneId Identification of the time zone in the text form.
      *         %param:string reply.utcTime Server time, in milliseconds since epoch.
      */
-    reg("api/gettime", new QnTimeRestHandler());
+    reg("api/gettime", new nx::vms::server::rest::DeprecatedTimeRestHandler());
 
     /**%apidoc GET /api/getTimeZones
      * Return the complete list of time zones supported by the server machine.
@@ -1760,9 +1760,9 @@ void MediaServerProcess::registerRestHandlers(
      * Get hardware information
      * %return:object JSON with hardware information.
      */
-    reg("api/getHardwareInfo", new QnGetHardwareInfoHandler());
+    reg("api/getHardwareInfo", new nx::vms::server::rest::HardwareInfoHandler());
 
-    reg("api/testLdapSettings", new QnTestLdapSettingsHandler());
+    reg("api/testLdapSettings", new nx::vms::server::rest::TestLdapSettingsHandler());
 
     /**%apidoc GET /api/ping
      * Ping the server.
@@ -1849,7 +1849,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value <any_other_value_or_no_parameter> Report the backup process status.
      * %return:object Bakcup process progress status or an error code.
      */
-    reg("api/backupControl", new QnBackupControlRestHandler(serverModule()));
+    reg("api/backupControl", new nx::vms::server::rest::BackupControlRestHandler(serverModule()));
 
     /**%apidoc[proprietary] GET /api/events
      * Return event log in the proprietary binary format.
@@ -2745,7 +2745,7 @@ void MediaServerProcess::registerRestHandlers(
 
 void MediaServerProcess::reg(
     const QString& path,
-    QnRestRequestHandler* handler,
+    nx::network::rest::Handler* handler,
     GlobalPermission permission)
 {
     reg(QnRestProcessorPool::kAnyHttpMethod, path, handler, permission);
@@ -2754,7 +2754,7 @@ void MediaServerProcess::reg(
 void MediaServerProcess::reg(
     const nx::network::http::Method::ValueType& method,
     const QString& path,
-    QnRestRequestHandler* handler,
+    nx::network::rest::Handler* handler,
     GlobalPermission permission)
 {
     m_universalTcpListener->processorPool()->registerHandler(

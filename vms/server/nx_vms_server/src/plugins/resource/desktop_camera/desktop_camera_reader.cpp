@@ -13,10 +13,15 @@
 
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
+using namespace nx::streaming::rtp;
+
 QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(
     const QnDesktopCameraResourcePtr& res)
-:
-    CLServerPushStreamReader(res)
+    :
+    CLServerPushStreamReader(res),
+    m_parsers({
+        QSharedPointer<QnNxRtpParser>::create(res->getId()),
+        QSharedPointer<QnNxRtpParser>::create(res->getId())})
 {
 }
 
@@ -167,8 +172,8 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         if (bufferSize == packetSize)
         {
             bool gotData;
-            m_parsers[streamIndex].processData(m_recvBuffer, 0, packetSize, gotData);
-            result = m_parsers[streamIndex].nextData();
+            m_parsers[streamIndex]->processData(m_recvBuffer, 0, packetSize, gotData);
+            result = m_parsers[streamIndex]->nextData();
             if (result)
                 result->channelNumber = streamIndex;
         }

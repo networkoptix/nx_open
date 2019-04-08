@@ -18,53 +18,59 @@
 #include "current_user_rest_handler.h"
 #include <common/common_module.h>
 
-int QnCookieLoginRestHandler::executePost(
-    const QString &/*path*/,
-    const QnRequestParams &/*params*/,
-    const QByteArray &body,
-    QnJsonRestResult &result,
-    const QnRestConnectionProcessor* owner)
-{
-    bool success = false;
-    QnCookieData cookieData = QJson::deserialized<QnCookieData>(body, QnCookieData(), &success);
-    if (!success)
-    {
-        result.setError(QnRestResult::InvalidParameter, "Invalid json object. All fields are mandatory");
-        return nx::network::http::StatusCode::ok;
-    }
+using namespace nx::network;
 
-    const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
+static void addResultHeader(rest::Response* response, Qn::AuthResult code)
+{
+    http::insertOrReplaceHeader(
+        &response->httpHeaders,
+        {Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(code).toUtf8()});
+}
+
+static rest::Response errorResponse(Qn::AuthResult code)
+{
+    auto response = rest::Response::error(
+        http::StatusCode::ok, QnRestResult::CantProcessRequest, Qn::toErrorMessage(code));
+
+    addResultHeader(&response, code);
+    return response;
+}
+
+rest::Response QnCookieLoginRestHandler::executePost(const rest::Request& request)
+{
+    QnCookieData cookieData = request.parseContentOrThrow<QnCookieData>();
+
+    const auto authenticator = QnUniversalTcpListener::authenticator(request.owner->owner());
     Qn::UserAccessData accessRights;
     Qn::AuthResult authResult = authenticator->tryAuthRecord(
-        owner->getForeignAddress().address,
+        request.owner->getForeignAddress().address,
         cookieData.auth,
         QByteArray("GET"),
-        *owner->response(),
+        *request.owner->response(),
         &accessRights);
 
-    const_cast<QnRestConnectionProcessor*>(owner)->setAccessRights(accessRights);
+    const_cast<QnRestConnectionProcessor*>(request.owner)->setAccessRights(accessRights);
     if (authResult == Qn::Auth_CloudConnectError
         || authResult == Qn::Auth_LDAPConnectError
         || authResult == Qn::Auth_LockedOut)
     {
-        result.setError(QnRestResult::CantProcessRequest, Qn::toErrorMessage(authResult));
-        return nx::network::http::StatusCode::ok;
+        return errorResponse(authResult);
     }
 
     if (authResult != Qn::Auth_OK)
     {
-        auto session = owner->authSession();
+        auto session = request.owner->authSession();
         session.id = QnUuid::createUuid();
-        auto auditManager = owner->commonModule()->auditManager();
+        auto auditManager = request.owner->commonModule()->auditManager();
         auditManager->addAuditRecord(auditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
-
-        result.setError(QnRestResult::CantProcessRequest, Qn::toErrorMessage(authResult));
-        return nx::network::http::StatusCode::ok;
+        return errorResponse(authResult);
     }
 
     authenticator->setAccessCookie(
-        owner->request(), owner->response(), accessRights, owner->isConnectionSecure());
+        request.owner->request(), request.owner->response(),
+        accessRights, request.owner->isConnectionSecure());
 
-    QnCurrentUserRestHandler currentUser;
-    return currentUser.executeGet(QString(), QnRequestParams(), result, owner);
+    auto response = QnCurrentUserRestHandler().executeGet(request);
+    addResultHeader(&response, authResult);
+    return response;
 }

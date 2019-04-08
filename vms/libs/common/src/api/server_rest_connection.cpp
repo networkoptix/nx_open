@@ -226,11 +226,19 @@ Handle ServerConnection::sendStatisticsAsync(
 }
 
 Handle ServerConnection::getModuleInformation(
-    Result<QList<nx::vms::api::ModuleInformation>>::type callback,
+    Result<RestResultWithData<nx::vms::api::ModuleInformation>>::type callback,
     QThread* targetThread)
 {
     QnRequestParamList params;
-    params << QnRequestParam("allModules", lit("true"));
+    return executeGet("/api/moduleInformation", params, callback, targetThread);
+}
+
+Handle ServerConnection::getModuleInformationAll(
+    Result<RestResultWithData<QList<nx::vms::api::ModuleInformation>>>::type callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    params.insert("allModules", lit("true"));
     return executeGet("/api/moduleInformation", params, callback, targetThread);
 }
 
@@ -285,9 +293,9 @@ Handle ServerConnection::saveCloudSystemCredentials(
 
 Handle ServerConnection::startLiteClient(GetCallback callback, QThread* targetThread)
 {
-    QnRequestParamList params;
-    params.append({lit("startCamerasMode"), lit("true")});
-    return executeGet(lit("/api/startLiteClient"), params, callback, targetThread);
+    return executeGet(
+        "/api/startLiteClient", {{"startCamerasMode", "true"}},
+        callback, targetThread);
 }
 
 Handle ServerConnection::getFreeSpaceForUpdateFiles(
@@ -346,12 +354,12 @@ Handle ServerConnection::addCamera(
     {
         const auto camera = cameras.at(i);
         const auto number = QString::number(i);
-        parameters << QnRequestParam(lit("url") + number, camera.url);
-        parameters << QnRequestParam(lit("manufacturer") + number, camera.manufacturer);
-        parameters << QnRequestParam(lit("uniqueId") + number, camera.uniqueId);
+        parameters.insert(lit("url") + number, camera.url);
+        parameters.insert(lit("manufacturer") + number, camera.manufacturer);
+        parameters.insert(lit("uniqueId") + number, camera.uniqueId);
     }
-    parameters << QnRequestParam("user", userName);
-    parameters << QnRequestParam("password", password);
+    parameters.insert("user", userName);
+    parameters.insert("password", password);
 
     return executeGet(lit("/api/manualCamera/add"), parameters, callback, thread);
 }
@@ -369,7 +377,7 @@ Handle ServerConnection::searchCameraStart(
         {"user", userName},
         {"password", password}};
     if (port.has_value())
-        parameters << QnRequestParam("port", *port);
+        parameters.insert("port", *port);
 
     return executeGet("/api/manualCamera/search", parameters, callback, targetThread);
 }
@@ -390,7 +398,7 @@ Handle ServerConnection::searchCameraRangeStart(
         {"password", password},
         {"end_ip", endAddress}};
     if (port.has_value())
-        parameters << QnRequestParam("port", *port);
+        parameters.insert("port", *port);
 
     return executeGet("/api/manualCamera/search", parameters, callback, targetThread);
 }
@@ -1019,10 +1027,7 @@ QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList&
 {
     QUrl result;
     result.setPath(path);
-    QUrlQuery q;
-    for (const auto& param: params)
-        q.addQueryItem(param.first, QString::fromUtf8(QUrl::toPercentEncoding(param.second)));
-    result.setQuery(q);
+    result.setQuery(params.toUrlQuery());
     return result;
 }
 

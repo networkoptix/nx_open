@@ -10,11 +10,19 @@ struct PluginsIniConfig: public nx::kit::IniConfig
 
     NX_INI_STRING("", disabledNxPlugins,
         "Comma-separated list of Nx plugins to skip in \"plugins\" dir,\n"
-        "without extension and \"lib\" prefix. Can be \"*\", meaning \"all\".");
+        "without extension and \"lib\" prefix. Can be \"*\", meaning \"all\".\n"
+        "Example: you don't want the server to load the USB Camera Plugin and Generic\n"
+        "Multicast Plugin (the library names on Linux are libusb_camera_plugin.so and\n"
+        "libgeneric_multicast_plugin.so, on Windows the libraries are\n"
+        "usb_camera_plugin.dll and generic_multicast_plugin.dll.\n"
+        "Set the value of this setting to \"usb_camera_plugin,generic_multicast_plugin\"");
 
     NX_INI_STRING("", enabledNxPluginsOptional,
         "Comma-separated list of Nx plugins to load from \"plugins_optional\" dir,\n"
-        "without extension and \"lib\" prefix. Can be \"*\", meaning \"all\".");
+        "without extension and \"lib\" prefix. Can be \"*\", meaning \"all\".\n"
+        "The syntax is identical to disabledNxPlugins setting. The difference is that\n"
+        "this setting enables the plugins that are disabled by default, and the\n"
+        "disabledNxPlugins setting disables the plugins that are enabled by default.");
 
     NX_INI_STRING("", analyticsEngineSettingsPath,
         "Path (absolute or relative to .ini dir) to {plugin_name}_engine_settings.json: array\n"

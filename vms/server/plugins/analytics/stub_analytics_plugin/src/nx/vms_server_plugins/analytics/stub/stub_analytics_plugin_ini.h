@@ -26,10 +26,10 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, generatePreviewAttributes, "");
     NX_INI_FLAG(0, deviceDependent, "Respective capability in the manifest.");
 
-    NX_INI_FLAG(1, throwPluginEventsFromEngine,
+    NX_INI_FLAG(0, throwPluginEventsFromEngine,
         "Periodically throw plugin events from Engine to Server.");
 
-    NX_INI_FLAG(1, throwPluginEventsFromDeviceAgent,
+    NX_INI_FLAG(0, throwPluginEventsFromDeviceAgent,
         "Periodically throw plugin events from DeviceAgent to Server.");
 
     NX_INI_INT(-1, crashDeviceAgentOnFrameN,
