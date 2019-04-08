@@ -2,7 +2,7 @@ import {
     Component,
     OnInit,
     ViewEncapsulation
-} from '@angular/core';
+}                                              from '@angular/core';
 import { CamerasService }                      from '../../services/cameras.service';
 import { IpvdSearchService }                   from './ipvd-search.service';
 import { NxModalMessageComponent }             from '../../dialogs/message/message.component';
@@ -52,42 +52,42 @@ export class NxIpvdComponent implements OnInit {
     debug: any;
     uriPath: string;
 
-private setupDefaults() {
-      this.allowedParameters = [
-          'vendor', 'model', 'hardwareType',
-          'maxResolution', 'maxFps', 'primaryCodec', 'isAudioSupported',
-          'isTwAudioSupported', 'isPtzSupported', 'isAptzSupported',
-          'isFisheye', 'isMdSupported', 'isIoSupported', 'count'
-      ];
+    private setupDefaults() {
+        this.allowedParameters = [
+            'vendor', 'model', 'hardwareType',
+            'maxResolution', 'maxFps', 'primaryCodec', 'isAudioSupported',
+            'isTwAudioSupported', 'isPtzSupported', 'isAptzSupported',
+            'isFisheye', 'isMdSupported', 'isIoSupported', 'count'
+        ];
 
-      this.placeholder = '';
-      this.data = undefined;
-      this.resolution = '0';
-      this.itemsPerPage = 15;
-      this.query = '';
-      this.noResult = false;
-      this.hasNoSearch = true;
-      this.cameras = [];
-      this.camerasTable = [];
-      this.vendors = undefined;
+        this.placeholder = '';
+        this.data = undefined;
+        this.resolution = '0';
+        this.itemsPerPage = 15;
+        this.query = '';
+        this.noResult = false;
+        this.hasNoSearch = true;
+        this.cameras = [];
+        this.camerasTable = [];
+        this.vendors = undefined;
 
-      this.activeCamera = undefined;
-      this.showAll = false;
-      this.toggleCamview = false;
+        this.activeCamera = undefined;
+        this.showAll = false;
+        this.toggleCamview = false;
 
-      this.filter = {};
-      this.filterModel = {
-          query: ''
-      };
-      this.filterModel.tags = [];
-      this.filterModel.selects = [];
-      this.filterModel.multiselects = [];
+        this.filter = {};
+        this.filterModel = {
+            query: ''
+        };
+        this.filterModel.tags = [];
+        this.filterModel.selects = [];
+        this.filterModel.multiselects = [];
 
-      this.resolutions = [];
-      this.hardwareTypes = [];
+        this.resolutions = [];
+        this.hardwareTypes = [];
 
-      this.uriPath = '/' + this.route.snapshot.url[0].path;
-  }
+        this.uriPath = '/' + this.route.snapshot.url[0].path;
+    }
 
     constructor(private configService: NxConfigService,
                 private translate: TranslateService,
@@ -168,7 +168,7 @@ private setupDefaults() {
     }
 
     modelChanged(model) {
-       this.searchVendor();
+        this.searchVendor();
     }
 
     reset() {
@@ -215,29 +215,29 @@ private setupDefaults() {
                         });
 
                 // Trigger model change for search component
-                this.filterModel = {...this.filterModel};
+                this.filterModel = { ...this.filterModel };
             });
     }
 
-  resetFilters() {
-      this.filter = {...this.emptyFilter};
-  }
+    resetFilters() {
+        this.filter = { ...this.emptyFilter };
+    }
 
-  // restrict the parameters to be passed and viewed for to cam-table (based on allowedParameters)
-  preFilterCameraTable (cameras) {
-    const values = Object.keys(cameras).map(key => cameras[key]);
-    const filteredCameras = [];
-    values.forEach(camera => {
-        const filteredCamera = Object.keys(camera)
-          .filter(key => this.allowedParameters.indexOf(key) > -1 || key === 'sortKey')
-          .reduce((obj, key) => {
-            obj[key] = camera[key];
-            return obj;
-          }, {});
-        filteredCameras.push(filteredCamera);
-    });
-    return filteredCameras;
-  }
+    // restrict the parameters to be passed and viewed for to cam-table (based on allowedParameters)
+    preFilterCameraTable(cameras) {
+        const values = Object.keys(cameras).map(key => cameras[key]);
+        const filteredCameras = [];
+        values.forEach(camera => {
+            const filteredCamera = Object.keys(camera)
+                                         .filter(key => this.allowedParameters.indexOf(key) > -1 || key === 'sortKey')
+                                         .reduce((obj, key) => {
+                                             obj[key] = camera[key];
+                                             return obj;
+                                         }, {});
+            filteredCameras.push(filteredCamera);
+        });
+        return filteredCameras;
+    }
 
     filterEmpty() {
         // query
@@ -286,89 +286,90 @@ private setupDefaults() {
         }
     }
 
-  setVendor(vendor) {
-      this.filterModel.query = vendor;
-      this.searchVendor();
-      return false;
-  }
+    setVendor(vendor) {
+        this.filterModel.query = vendor;
+        this.searchVendor();
+        return false;
+    }
 
-  activateCamera(elementSelected: any): void {
-      if (!elementSelected) {
-          return;
-      }
-      if (Object.keys(elementSelected).length === 0 || elementSelected.key === -1) {
-          // call was not initiated by linking the element in HTML
-          // this.resetActiveCamera();
-          return;
-      }
+    activateCamera(elementSelected: any): void {
+        if (!elementSelected) {
+            return;
+        }
+        if (Object.keys(elementSelected).length === 0 || elementSelected.key === -1) {
+            // call was not initiated by linking the element in HTML
+            // this.resetActiveCamera();
+            return;
+        }
 
-      const queryParams: Params = {};
-      queryParams.camera = elementSelected.model || elementSelected.value.model;
-      this.uri.updateURI(this.uriPath, queryParams, true);
+        const queryParams: Params = {};
+        queryParams.camera = elementSelected.model || elementSelected.value.model;
+        this.uri.updateURI(this.uriPath, queryParams, true);
 
-      const selectedCamera = this.cameras.find((camera) => {
-          return camera.sortKey === (elementSelected.sortKey || elementSelected.value.sortKey);
-      });
+        const selectedCamera = this.cameras.find((camera) => {
+            return camera.sortKey === (elementSelected.sortKey || elementSelected.value.sortKey);
+        });
 
-      if (this.activeCamera && this.activeCamera.sortKey === selectedCamera.sortKey) {
-          return;
-      }
+        if (this.activeCamera && this.activeCamera.sortKey === selectedCamera.sortKey) {
+            return;
+        }
 
-      this.activeCamera = {...selectedCamera};
-      this.showAll = false;
+        this.activeCamera = { ...selectedCamera };
+        this.showAll = false;
 
-      if (this.breakpointObserver.isMatched('(max-width: 991px)')) {
-          this.mobileDetailMode = true;
-      }
+        if (this.breakpointObserver.isMatched('(max-width: 991px)')) {
+            this.mobileDetailMode = true;
+        }
 
-      if (typeof this.activeCamera.firmwares === 'string') {
-          const firmwares = JSON.parse(this.activeCamera.firmwares);
-          let firmwaresArray = [];
+        if (typeof this.activeCamera.firmwares === 'string') {
+            const firmwares = JSON.parse(this.activeCamera.firmwares);
+            let firmwaresArray = [];
 
-          let maxFirmwareCount = 0,
-              totalCameraCount = 0;
+            let maxFirmwareCount = 0,
+                totalCameraCount = 0;
 
-          Object.keys(firmwares).forEach(key => {
-              const count = firmwares[key];
-              firmwaresArray.push({name: key, count});
+            Object.keys(firmwares).forEach(key => {
+                const count = firmwares[key];
+                firmwaresArray.push({ name: key, count });
 
-              totalCameraCount += count;
-              if (count > maxFirmwareCount) {
-                  maxFirmwareCount = count;
-              }
-          });
+                totalCameraCount += count;
+                if (count > maxFirmwareCount) {
+                    maxFirmwareCount = count;
+                }
+            });
 
-          firmwaresArray = firmwaresArray.sort((a, b) => {
+            firmwaresArray = firmwaresArray.sort((a, b) => {
                 return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
             });
 
-          firmwaresArray.reverse();
+            firmwaresArray.reverse();
 
-          this.activeCamera.maxFirmwareCount = maxFirmwareCount;
-          this.activeCamera.totalCameraCount = totalCameraCount;
-          this.activeCamera.firmwares = firmwaresArray;
-      }
+            this.activeCamera.maxFirmwareCount = maxFirmwareCount;
+            this.activeCamera.totalCameraCount = totalCameraCount;
+            this.activeCamera.firmwares = firmwaresArray;
+        }
 
-      this.toggleCamview = true;
-  }
+        this.toggleCamview = true;
+    }
 
     openFeedback(param) {
-        const type = (param === 'device') ? this.CONFIG.messageType.ipvd_device : this.CONFIG.messageType.ipvd_page ;
+        const type = (param === 'device') ? this.CONFIG.messageType.ipvd_device : this.CONFIG.messageType.ipvd_page;
         const device = (this.activeCamera) ? this.activeCamera.model : '';
         this.messageDialog
             .open(type, device, device)
-            .then(() => {});
+            .then(() => {
+            });
 
         return false;
     }
 
-  resetActiveCamera() {
-      const queryParams: Params = {};
-      queryParams.camera = undefined;
-      this.uri.updateURI(this.uriPath, queryParams, true);
+    resetActiveCamera() {
+        const queryParams: Params = {};
+        queryParams.camera = undefined;
+        this.uri.updateURI(this.uriPath, queryParams, true);
 
-      this.activeCamera = undefined;
-      this.toggleCamview = false;
-      this.mobileDetailMode = false;
-  }
+        this.activeCamera = undefined;
+        this.toggleCamview = false;
+        this.mobileDetailMode = false;
+    }
 }
