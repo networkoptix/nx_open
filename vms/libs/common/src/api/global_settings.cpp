@@ -43,12 +43,6 @@ QSet<QString> parseDisabledVendors(const QString& disabledVendors)
     return updatedVendorList.toSet();
 }
 
-bool isHanwhaEnabledCustomization()
-{
-    const auto customization = nx::utils::AppInfo::customizationName();
-    return customization == "hanwha" || customization == "default";
-}
-
 const int kEc2ConnectionKeepAliveTimeoutDefault = 5;
 const int kEc2KeepAliveProbeCountDefault = 3;
 const QString kEc2AliveUpdateInterval("ec2AliveUpdateIntervalSec");
@@ -96,21 +90,6 @@ const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(2
 const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(5);
 const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(1);
 const std::chrono::minutes kSyncTimeExchangePeriodDefault(10);
-
-const QString kHanwhaDeleteProfilesOnInitIfNeeded("hanwhaDeleteProfilesOnInitIfNeeded");
-const bool kHanwhaDeleteProfilesOnInitIfNeededDefault = false;
-
-const QString kShowHanwhaAlternativePtzControlsOnTile(
-    "showHanwhaAlternativePtzControlsOnTile");
-const bool kShowHanwhaAlternativePtzControlsOnTileDefault = false;
-
-const QString kHanwhaChunkReaderResponseTimeoutSeconds(
-    "hanwhaChunkReaderResponseTimeoutSeconds");
-const std::chrono::minutes kHanwhaChunkReaderResponseTimeoutDefault(5);
-
-const QString kHanwhaChunkReaderMessageBodyTimeoutSeconds(
-    "hanwhaChunkReaderMessageBodyTimeoutSeconds");
-const std::chrono::minutes kHanwhaChunkReaderMessageBodyTimeoutDefault(30);
 
 const QString kEnableEdgeRecording(lit("enableEdgeRecording"));
 const bool kEnableEdgeRecordingDefault(true);
@@ -648,29 +627,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kCloudConnectRelayingEnabledDefault,
         this);
 
-    if (isHanwhaEnabledCustomization())
-    {
-        m_hanwhaDeleteProfilesOnInitIfNeeded = new QnLexicalResourcePropertyAdaptor<bool>(
-            kHanwhaDeleteProfilesOnInitIfNeeded,
-            kHanwhaDeleteProfilesOnInitIfNeededDefault,
-            this);
-
-        m_showHanwhaAlternativePtzControlsOnTile = new QnLexicalResourcePropertyAdaptor<bool>(
-            kShowHanwhaAlternativePtzControlsOnTile,
-            kShowHanwhaAlternativePtzControlsOnTileDefault,
-            this);
-
-        m_hanwhaChunkReaderResponseTimeoutSeconds = new QnLexicalResourcePropertyAdaptor<int>(
-            kHanwhaChunkReaderResponseTimeoutSeconds,
-            duration_cast<seconds>(kHanwhaChunkReaderResponseTimeoutDefault).count(),
-            this);
-
-        m_hanwhaChunkReaderMessageBodyTimeoutSeconds = new QnLexicalResourcePropertyAdaptor<int>(
-            kHanwhaChunkReaderMessageBodyTimeoutSeconds,
-            duration_cast<seconds>(kHanwhaChunkReaderMessageBodyTimeoutDefault).count(),
-            this);
-    }
-
     m_edgeRecordingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kEnableEdgeRecording,
         kEnableEdgeRecordingDefault,
@@ -958,14 +914,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_forceLiveCacheForPrimaryStreamAdaptor
     ;
 
-
-    if (isHanwhaEnabledCustomization())
-    {
-        result << m_hanwhaDeleteProfilesOnInitIfNeeded;
-        result << m_showHanwhaAlternativePtzControlsOnTile;
-        result << m_hanwhaChunkReaderResponseTimeoutSeconds;
-        result << m_hanwhaChunkReaderMessageBodyTimeoutSeconds;
-    }
 
     return result;
 }
@@ -1640,72 +1588,6 @@ int QnGlobalSettings::maxWebMTranscoders() const
 int QnGlobalSettings::maxRecorderQueueSizePackets() const
 {
     return m_maxRecorderQueueSizePackets->value();
-}
-
-bool QnGlobalSettings::hanwhaDeleteProfilesOnInitIfNeeded() const
-{
-    if (!m_hanwhaDeleteProfilesOnInitIfNeeded)
-        return kHanwhaDeleteProfilesOnInitIfNeededDefault;
-
-    return m_hanwhaDeleteProfilesOnInitIfNeeded->value();
-}
-
-void QnGlobalSettings::setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles)
-{
-    if (!m_hanwhaDeleteProfilesOnInitIfNeeded)
-        return;
-
-    m_hanwhaDeleteProfilesOnInitIfNeeded->setValue(deleteProfiles);
-}
-
-bool QnGlobalSettings::showHanwhaAlternativePtzControlsOnTile() const
-{
-    if (!m_showHanwhaAlternativePtzControlsOnTile)
-        return kShowHanwhaAlternativePtzControlsOnTileDefault;
-
-    return m_showHanwhaAlternativePtzControlsOnTile->value();
-}
-
-void QnGlobalSettings::setShowHanwhaAlternativePtzControlsOnTile(bool showPtzControls)
-{
-    if (!m_showHanwhaAlternativePtzControlsOnTile)
-        return;
-
-    m_showHanwhaAlternativePtzControlsOnTile->setValue(showPtzControls);
-}
-
-int QnGlobalSettings::hanwhaChunkReaderResponseTimeoutSeconds() const
-{
-    using namespace std::chrono;
-    if (!m_hanwhaChunkReaderResponseTimeoutSeconds)
-        return duration_cast<seconds>(kHanwhaChunkReaderResponseTimeoutDefault).count();
-
-    return m_hanwhaChunkReaderResponseTimeoutSeconds->value();
-}
-
-void QnGlobalSettings::setHanwhaChunkReaderResponseTimeoutSeconds(int value)
-{
-    if (!m_hanwhaChunkReaderResponseTimeoutSeconds)
-        return;
-
-    m_hanwhaChunkReaderResponseTimeoutSeconds->setValue(value);
-}
-
-int QnGlobalSettings::hanwhaChunkReaderMessageBodyTimeoutSeconds() const
-{
-    using namespace std::chrono;
-    if (!m_hanwhaChunkReaderMessageBodyTimeoutSeconds)
-        return duration_cast<seconds>(kHanwhaChunkReaderMessageBodyTimeoutDefault).count();
-
-    return m_hanwhaChunkReaderMessageBodyTimeoutSeconds->value();
-}
-
-void QnGlobalSettings::setHanwhaChunkReaderMessageBodyTimeoutSeconds(int value)
-{
-    if (!m_hanwhaChunkReaderMessageBodyTimeoutSeconds)
-        return;
-
-    m_hanwhaChunkReaderMessageBodyTimeoutSeconds->setValue(value);
 }
 
 bool QnGlobalSettings::isEdgeRecordingEnabled() const

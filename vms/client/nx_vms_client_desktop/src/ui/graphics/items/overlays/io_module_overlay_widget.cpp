@@ -23,6 +23,9 @@
 #include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/vms/event/actions/camera_output_action.h>
 #include <nx/fusion/model_functions.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <api/server_rest_connection.h>
 
 using namespace nx;
 
@@ -309,19 +312,24 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     action->setResources({ module->getId() });
     action->setToggleState(it->state.isActive ? vms::api::EventState::inactive : vms::api::EventState::active);
 
-    ec2::AbstractECConnectionPtr connection = commonModule()->ec2Connection();
-    // we are not interested in client->server transport error code because of real port checking by timer
-    if (connection)
+    auto dstPeer = module->getParentId();
+    auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(dstPeer);
+    if (!server)
     {
-        nx::vms::api::EventActionData actionData;
-        ec2::fromResourceToApi(action, actionData);
-
-        connection->getEventRulesManager(Qn::kSystemAccess)->sendEventAction(
-            actionData,
-            module->getParentId(),
-            this,
-            []{});
+        NX_WARNING(this, "Can't delivery event to the  target server %1. Not found", dstPeer);
+        return;
     }
+    auto connection = server->restConnection();
+    nx::vms::api::EventActionData actionData;
+    ec2::fromResourceToApi(action, actionData);
+    // we are not interested in client->server transport error code because of real port checking by timer
+    connection->executeEventAction(actionData,
+        [this, action, dstPeer](bool success, rest::Handle requestId, QnJsonRestResult result)
+    {
+        if (!success)
+            NX_WARNING(this, "Delivery business action to the target server %1 is failed. Error: %2", dstPeer, result.errorString);
+    });
+
 
     it->stateChangeTimer.restart();
 }

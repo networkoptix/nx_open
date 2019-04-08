@@ -351,13 +351,21 @@ angular.module('nxCommon')
                         //Typo with server api so we check for both spellings
                         //Internal fix Link to task: https://networkoptix.atlassian.net/browse/VMS-7984
                         var timeSinceEpochMs = time || server.timeSinceEpochMs || server.timeSinseEpochMs;
-                        self.serverOffsets[server.serverId] = timeManager.getOffset(timeSinceEpochMs, server.timeZoneOffsetMs);
+                        // API changed so we have to check both server.timeZoneOffsetMs and server.timeZoneOffset
+                        self.serverOffsets[server.serverId] = window.timeManager.getOffset(timeSinceEpochMs, server.timeZoneOffsetMs || server.timeZoneOffset);
                     });
                 }
     
                 if (Config.webclient.useSystemTime) {
-                    return self.systemAPI.getSystemTime().then(function (systemTime) {
-                        return setServerOffsetTime(systemTime);
+                    return self.systemAPI
+                        .getSystemTime()
+                        .then(function(response) {
+                            if (response.data.reply) {
+                                return setServerOffsetTime(response.data.reply.utcTimeMs);
+                            }
+    
+                            // Server does not support this API call
+                            return setServerOffsetTime();
                     });
                 }
                 return setServerOffsetTime();

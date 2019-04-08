@@ -244,20 +244,14 @@ void PasswordHelper::printPasswords() const
 #endif
 }
 
-//
-// SoapErrorHelper
-//
-
 const QString SoapErrorHelper::fetchDescription(const SOAP_ENV__Fault* faultInfo)
 {
     if (!faultInfo) {
-#ifdef ONVIF_DEBUG
-        qDebug() << "SoapErrorHelper::fetchDescription: fault info is null";
-#endif
-        return lit("unknown_error");
+        NX_DEBUG(typeid(SoapErrorHelper), "Failed to get error description");
+        return "unknown_error";
     }
 
-    QByteArray result("Fault Info. ");
+    QByteArray result("Fault info. ");
 
     if (faultInfo->faultcode) {
         result += "Code: ";

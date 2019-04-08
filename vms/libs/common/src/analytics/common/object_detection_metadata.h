@@ -32,6 +32,8 @@ QString toString(const Attribute&);
 
 // TODO: Rename all classes without words "Detection" and "Detected".
 
+static constexpr int kCoordinateDecimalDigits = 4;
+
 struct DetectedObject
 {
     QString objectTypeId;

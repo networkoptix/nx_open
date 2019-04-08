@@ -28,6 +28,7 @@
 #include <nx/vms/api/analytics/settings_response.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/api/data/time_reply.h>
+#include <nx/vms/api/data/event_rule_data.h>
 
 namespace rest {
 
@@ -421,6 +422,11 @@ public:
 
     Handle executeAnalyticsAction(
         const AnalyticsAction& action,
+        Result<QnJsonRestResult>::type callback,
+        QThread* targetThread = nullptr);
+
+    Handle executeEventAction(
+        const nx::vms::api::EventActionData& action,
         Result<QnJsonRestResult>::type callback,
         QThread* targetThread = nullptr);
 

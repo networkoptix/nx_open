@@ -6,6 +6,8 @@
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log_message.h>
 
+#include <utils/math/math.h>
+
 namespace nx {
 namespace common {
 namespace metadata {
@@ -38,7 +40,7 @@ bool operator==(const DetectedObject& left, const DetectedObject& right)
 {
     return left.objectTypeId == right.objectTypeId
         && left.objectId == right.objectId
-        && left.boundingBox == right.boundingBox
+        && equalWithPrecision(left.boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && left.labels == right.labels;
 }
 

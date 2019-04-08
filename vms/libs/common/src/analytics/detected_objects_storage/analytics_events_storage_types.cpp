@@ -17,7 +17,7 @@ bool ObjectPosition::operator==(const ObjectPosition& right) const
     return deviceId == right.deviceId
         && timestampUsec == right.timestampUsec
         && durationUsec == right.durationUsec
-        && equalWithPrecision(boundingBox, right.boundingBox, 6)
+        && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && attributes == right.attributes;
 }
 
@@ -56,13 +56,18 @@ bool isSameItems(const std::vector<T>& left, const std::vector<T>& right)
     return true;
 }
 
+bool Filter::empty() const
+{
+    return *this == Filter();
+}
+
 bool Filter::operator==(const Filter& right) const
 {
     return isSameItems(deviceIds, right.deviceIds)
         && isSameItems(objectTypeId, right.objectTypeId)
         && objectAppearanceId == right.objectAppearanceId
         && timePeriod == right.timePeriod
-        && equalWithPrecision(boundingBox, right.boundingBox, 6)
+        && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && isSameItems(requiredAttributes, right.requiredAttributes)
         && freeText == right.freeText
         && sortOrder == right.sortOrder;
@@ -193,7 +198,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 
     os << "maxObjectsToSelect " << filter.maxObjectsToSelect << "; ";
     os << "maxTrackSize " << filter.maxTrackSize << "; ";
-    os << "sortOrder " << 
+    os << "sortOrder " <<
         (filter.sortOrder == Qt::SortOrder::DescendingOrder ? "DESC" : "ASC");
 
     return os;

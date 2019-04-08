@@ -437,6 +437,20 @@ Handle ServerConnection::executeAnalyticsAction(
         targetThread);
 }
 
+Handle ServerConnection::executeEventAction(
+    const nx::vms::api::EventActionData& action,
+    Result<QnJsonRestResult>::type callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/executeEventAction"),
+        QnRequestParamList(),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(action),
+        callback,
+        targetThread);
+}
+
 Handle ServerConnection::addFileUpload(
     const QString& fileName,
     qint64 size,

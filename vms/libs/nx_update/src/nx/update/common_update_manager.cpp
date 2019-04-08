@@ -268,6 +268,42 @@ bool CommonUpdateManager::installerState(update::Status* outUpdateStatus, const 
             update::Status::Code::error,
             "Not enough free space on device");
         return true;
+    case CommonUpdateInstaller::State::brokenZip:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            "Zip archive is broken");
+        return true;
+    case CommonUpdateInstaller::State::wrongDir:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            "Wrong directory");
+        return true;
+    case CommonUpdateInstaller::State::cantOpenFile:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            "Can't open file");
+        return true;
+    case CommonUpdateInstaller::State::otherError:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            "Other error");
+        return true;
+    case CommonUpdateInstaller::State::stopped:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            "Installer was unexpectedly stopped");
+        return true;
+    case CommonUpdateInstaller::State::busy:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            "Installer is busy");
+        return true;
     case CommonUpdateInstaller::State::unknownError:
         *outUpdateStatus = update::Status(
             peerId,

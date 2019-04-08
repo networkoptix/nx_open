@@ -2,6 +2,7 @@ const fs = require('fs');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const server_address = process.env.server_address || 'https://10.1.5.115:7001';
 
 const common = require('./webpack.common.js');
 
@@ -16,7 +17,7 @@ module.exports = merge(common, {
             {
                 context: ['/web/', '/api/', '/ec2/', '/hls/', '/media/', '/proxy/'],
                 // target: 'https://fb7a19a3-2b0c-4feb-be48-539231e50113.relay.vmsproxy.hdw.mx/',
-                target: 'https://10.1.5.115:7001',
+                target: server_address,
                 changeOrigin: true,
                 secure      : false
             },

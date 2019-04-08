@@ -104,6 +104,7 @@
 #include <recorder/storage_manager.h>
 #include <recorder/schedule_sync.h>
 
+#include <nx/vms/server/rest/exec_event_action_rest_handler.h>
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/event_log_rest_handler.h>
 #include <rest/handlers/event_log2_rest_handler.h>
@@ -2625,6 +2626,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
 
+
     /**%apidoc POST /api/executeAnalyticsAction
      * Execute analytics action from the particular analytics plugin on this server. The action is
      * applied to the specified metadata object.
@@ -2646,6 +2648,39 @@ void MediaServerProcess::registerRestHandlers(
      *             to be shown to the user who triggered the action.
      */
     reg("api/executeAnalyticsAction", new QnExecuteAnalyticsActionRestHandler(serverModule()));
+
+    /**%apidoc POST /api/executeEventAction
+     * Execute event action.
+     * %param:enum actionType Type of the action.
+     *     %value UndefinedAction
+     *     %value CameraOutputAction Change camera output state.
+     *     %value BookmarkAction
+     *     %value CameraRecordingAction Start camera recording.
+     *     %value PanicRecordingAction Activate panic recording mode.
+     *     %value SendMailAction Send an email.
+     *     %value DiagnosticsAction Write a record to the server's log.
+     *     %value ShowPopupAction
+     *     %value PlaySoundAction
+     *     %value PlaySoundOnceAction
+     *     %value SayTextAction
+     *     %value ExecutePtzPresetAction Execute given PTZ preset.
+     *     %value ShowTextOverlayAction Show text overlay over the given camera(s).
+     *     %value ShowOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
+     *     %value ExecHttpRequestAction Send HTTP request as an action.
+     * %param[opt]:enum EventState
+     *     %value inactive Event has been finished (for prolonged events).
+     *     %value active Event has been started (for prolonged events).
+     *     %value undefined Event state is undefined (for instant events).
+     * %param[proprietary]:boolean receivedFromRemoteHost
+     * %param:stringArray resourceIds List of ids for resources associated with the event.
+     *     Each id can be either camera id, camera MAC address or camera External id.
+     * %param[opt]:objectJson params Json object with action parameters.
+     * %param[opt]:objectJson runtimeParams Json object with event parameters.
+     * %param[opt]:integer ruleId Event rule id.
+     * %param[opt]:integer aggregationCount How many events were aggregated together for this action.
+     */
+    reg("api/executeEventAction",
+        new nx::vms::server::rest::QnExecuteEventActionRestHandler(serverModule()));
 
     /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system
