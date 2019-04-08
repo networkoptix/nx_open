@@ -229,12 +229,12 @@ should open System page by link not authorized user, and show alert if logs in a
     Log In    ${EMAIL NOPERM}    ${password}    None
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
 
-should display same user data as user provided during registration (stress to cyrillic)
+should display same user data as user provided during registration
     [tags]    email    Threaded
 #create user
     ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
-    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${random email}    ${password}
+    Register    ${COMBO TEXT}    ${COMBO TEXT}    ${random email}    ${password}
     Activate    ${random email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
@@ -243,7 +243,7 @@ should display same user data as user provided during registration (stress to cy
 
 #verify user was added with appropriate name
     Log In    ${random email}    ${password}
-    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
+    Wait Until Element Is Visible    //td[contains(text(),'${COMBO TEXT} ${COMBO TEXT}')]
 
 #remove new user from system
     Log Out
@@ -253,7 +253,7 @@ should display same user data as user provided during registration (stress to cy
     Delete All Emails
     Close Mailbox
 
-should display same user data as showed in user account (stress to cyrillic)
+should display same user data as showed in user account
     [tags]    email    C41573    C41842    Threaded
 #create user
     ${random email}    Get Random Email    ${BASE EMAIL}
@@ -273,9 +273,9 @@ should display same user data as showed in user account (stress to cyrillic)
     # sometimes the text field refills itself if I don't wait a second
     sleep    1
     Clear Element Text    ${ACCOUNT FIRST NAME}
-    Input Text    ${ACCOUNT FIRST NAME}    ${CYRILLIC TEXT}
+    Input Text    ${ACCOUNT FIRST NAME}    ${COMBO TEXT}
     Clear Element Text    ${ACCOUNT LAST NAME}
-    Input Text    ${ACCOUNT LAST NAME}    ${CYRILLIC TEXT}
+    Input Text    ${ACCOUNT LAST NAME}    ${COMBO TEXT}
     sleep    .15
     Wait Until Element Is Visible    ${ACCOUNT SAVE}
     Click Button    ${ACCOUNT SAVE}
@@ -283,7 +283,7 @@ should display same user data as showed in user account (stress to cyrillic)
     Log Out
 
     Log in to Auto Tests System    ${email}
-    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
+    Wait Until Element Is Visible    //td[contains(text(),'${COMBO TEXT} ${COMBO TEXT}')]
 
     #remove new user from system
     Log Out

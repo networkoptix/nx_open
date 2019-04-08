@@ -18,6 +18,7 @@ ${DOWNLOAD LINK}                      //footer//a[@href="/download"]
 
 ${BACKDROP}                           //ngb-modal-window
 
+${COMBO TEXT}                         Кенг☿☂⊗⅓您都可以`~!@#$%계정이 이
 ${CYRILLIC TEXT}                      Кенгшщзх
 ${SMILEY TEXT}                        ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
 ${GLYPH TEXT}                         您都可以享受源源不あなたのアカウント
