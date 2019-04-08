@@ -10,7 +10,7 @@ public:
     QnRtpStreamReader(const QnResourcePtr& res, const QString& request = QString());
     virtual ~QnRtpStreamReader();
 
-    void setRtpTransport(const RtpTransport::Value& transport);
+    void setRtpTransport(nx::vms::api::RtpTransportType transport);
     void setRequest(const QString& request);
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
     virtual void pleaseStop() override;
@@ -26,7 +26,7 @@ protected:
 
 private:
     QString m_request;
-    RtpTransport::Value m_rtpTransport;
+    nx::vms::api::RtpTransportType m_rtpTransport{nx::vms::api::RtpTransportType::automatic};
     size_t m_dataPassed = 0;
 };
 

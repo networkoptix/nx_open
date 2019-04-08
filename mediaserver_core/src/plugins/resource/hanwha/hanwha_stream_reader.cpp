@@ -15,6 +15,8 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -265,12 +267,11 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
 
 QString HanwhaStreamReader::rtpTransport() const
 {
-    QString transportStr = m_hanwhaResource
-        ->getProperty(QnMediaResource::rtpTransportKey())
-            .toUpper()
-            .trimmed();
+    auto transport = QnLexical::deserialized(
+        m_hanwhaResource->getProperty(QnMediaResource::rtpTransportKey()),
+        nx::vms::api::RtpTransportType::automatic);
 
-    if (transportStr == RtpTransport::udp)
+    if (transport == nx::vms::api::RtpTransportType::udp)
         return kHanwhaUdp;
 
     return kHanwhaTcp;

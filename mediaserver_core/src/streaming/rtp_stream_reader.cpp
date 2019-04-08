@@ -9,8 +9,7 @@ static const size_t kPacketCountToOmitLog = 50;
 QnRtpStreamReader::QnRtpStreamReader(const QnResourcePtr& res, const QString& request):
     CLServerPushStreamReader(res),
     m_rtpReader(res),
-    m_request(request),
-    m_rtpTransport(RtpTransport::_auto)
+    m_request(request)
 {
 }
 
@@ -19,7 +18,7 @@ QnRtpStreamReader::~QnRtpStreamReader()
     stop();
 }
 
-void QnRtpStreamReader::setRtpTransport(const RtpTransport::Value& transport)
+void QnRtpStreamReader::setRtpTransport(nx::vms::api::RtpTransportType transport)
 {
     m_rtpTransport = transport;
 }

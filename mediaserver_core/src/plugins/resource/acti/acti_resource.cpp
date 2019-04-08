@@ -21,6 +21,8 @@
 #include "acti_resource_searcher.h"
 #include <common/static_common_module.h>
 
+#include <nx/fusion/model_functions.h>
+
 const QString QnActiResource::MANUFACTURE(lit("ACTI"));
 const QString QnActiResource::CAMERA_PARAMETER_GROUP_ENCODER(lit("encoder"));
 const QString QnActiResource::CAMERA_PARAMETER_GROUP_SYSTEM(lit("system"));
@@ -54,7 +56,7 @@ const QString kTwoWayAudioDeviceType = lit("Two Ways Audio (0x71)");
 } // namespace
 
 QnActiResource::QnActiResource() :
-    m_desiredTransport(RtpTransport::_auto),
+    m_desiredTransport(nx::vms::api::RtpTransportType::automatic),
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
     m_outputCount(0),
@@ -470,11 +472,9 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         m_availableEncoders.insert(lit("H264"));
     }
 
-    auto desiredTransport = resData.value<QString>(
-        Qn::DESIRED_TRANSPORT_PARAM_NAME,
-        RtpTransport::_auto);
-
-    m_desiredTransport = RtpTransport::fromString(desiredTransport);
+    m_desiredTransport = QnLexical::deserialized(
+        resData.value<QString>(Qn::DESIRED_TRANSPORT_PARAM_NAME),
+        nx::vms::api::RtpTransportType::automatic);
 
     bool dualStreamingCapability = false;
     bool fisheyeStreamingCapability = false;
@@ -922,7 +922,7 @@ QString QnActiResource::formatBitrateString(int bitrateKbps) const
     return bitrateToDefaultString(bitrateKbps);
 }
 
-RtpTransport::Value QnActiResource::getDesiredTransport() const
+nx::vms::api::RtpTransportType QnActiResource::getDesiredTransport() const
 {
     return m_desiredTransport;
 }

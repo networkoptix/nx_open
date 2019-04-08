@@ -19,19 +19,6 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/streaming/rtp_stream_parser.h>
 
-namespace RtpTransport {
-
-typedef QString Value;
-
-// Server selects best suitable transport.
-static const QLatin1String _auto( "AUTO" );
-static const QLatin1String udp( "UDP" );
-static const QLatin1String tcp( "TCP" );
-
-Value fromString(const QString& str);
-
-} // namespace RtpTransport
-
 class QnRtpStreamParser;
 class QnRtpAudioStreamParser;
 class QnRtpVideoStreamParser;
@@ -79,8 +66,8 @@ public:
     void setRole(Qn::ConnectionRole role);
     void setPrefferedAuthScheme(const nx_http::header::AuthScheme::Value scheme);
 
-    static void setDefaultTransport(const RtpTransport::Value& defaultTransportToUse);
-    void setRtpTransport(const RtpTransport::Value& value);
+    static void setDefaultTransport(nx::vms::api::RtpTransportType defaultTransportToUse);
+    void setRtpTransport(nx::vms::api::RtpTransportType value);
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
     void setUserAgent(const QString& value);
@@ -140,7 +127,7 @@ private:
         quint8* buffer, int bufferSize, int bufferCapacity);
     void buildClientRTCPReport(quint8 chNumber);
     QnAbstractMediaDataPtr getNextDataInternal();
-    QnRtspClient::TransportType getRtpTransport() const;
+    nx::vms::api::RtpTransportType getRtpTransport() const;
 
     void calcStreamUrl();
 
@@ -183,7 +170,7 @@ private:
     bool m_rtpStarted;
     nx_http::header::AuthScheme::Value m_prefferedAuthScheme;
     QString m_currentStreamUrl;
-    QString m_rtpTransport;
+    nx::vms::api::RtpTransportType m_rtpTransport;
 
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
@@ -191,6 +178,9 @@ private:
     boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime{0};
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
+
+    static QnMutex s_defaultTransportMutex;
+    static nx::vms::api::RtpTransportType s_defaultTransportToUse;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)
