@@ -24,7 +24,7 @@ public:
 
     SynchronizationSettings();
 
-    void load(const QnSettings& settings);
+    void load(const QnSettings& settings, std::string groupId = "p2pDb");
 };
 
 } // namespace nx::clusterdb::engine

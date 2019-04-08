@@ -178,7 +178,7 @@ void Settings::loadSettings()
     loadHttps();
     m_listeningPeer.load(settings());
     loadConnectingPeer();
-    m_listeningPeerDb.load(settings());
+    loadListeningPeerDb();
 }
 
 void Settings::loadServer()
@@ -264,22 +264,23 @@ ListeningPeerDb::ListeningPeerDb():
 {
 }
 
-void ListeningPeerDb::load(const QnSettings& settings)
+void Settings::loadListeningPeerDb()
 {
-    if (!settings.containsGroup(listening_peer_db::kGroupName))
+    if (!settings().containsGroup(listening_peer_db::kGroupName))
         return;
 
-    enabled = true;
+    std::string groupName = listening_peer_db::kGroupName;
 
-    auto str = lm("%1/%2")
-        .arg(listening_peer_db::kGroupName)
-        .arg(listening_peer_db::kConnectionRetryDelay);
-    connectionRetryDelay = nx::utils::parseTimerDuration(
-        settings.value(str).toString(),
+    m_listeningPeerDb.enabled = true;
+
+    m_listeningPeerDb.connectionRetryDelay = nx::utils::parseTimerDuration(
+        settings().value(lm("%1/%2")
+            .arg(listening_peer_db::kGroupName)
+            .arg(listening_peer_db::kConnectionRetryDelay)).toString(),
         listening_peer_db::kDefaultConnectionRetryDelay);
 
-    sql.loadFromSettings(settings, listening_peer_db::kGroupName);
-    map.load(settings);
+    m_listeningPeerDb.sql.loadFromSettings(settings(), lm("%1/sql").arg(groupName));
+    m_listeningPeerDb.map.load(settings(), lm("%1/cluster").arg(groupName).toStdString());
 }
 
 } // namespace conf

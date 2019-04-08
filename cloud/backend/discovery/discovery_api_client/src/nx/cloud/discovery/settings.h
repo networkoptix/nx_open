@@ -43,7 +43,7 @@ struct NX_DISCOVERY_CLIENT_API Settings
 
     Settings();
 
-    void load(const QnSettings& settings);
+    void load(const QnSettings& settings, std::string groupName = "discovery");
 };
 
 } // namespace nx::cloud::discovery

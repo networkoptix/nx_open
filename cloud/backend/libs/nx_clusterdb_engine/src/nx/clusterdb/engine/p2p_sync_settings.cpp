@@ -8,15 +8,15 @@ namespace nx::clusterdb::engine {
 
 namespace {
 
-static constexpr char kNodeId[] = "p2pDb/nodeId";
+static constexpr char kNodeId[] = "nodeId";
 
-static constexpr char kClusterId[] = "p2pDb/clusterId";
+static constexpr char kClusterId[] = "clusterId";
 
 static constexpr char kMaxConcurrentConnectionsFromSystem[] =
-    "p2pDb/maxConcurrentConnectionsFromSystem";
+    "maxConcurrentConnectionsFromSystem";
 static constexpr int kMaxConcurrentConnectionsFromSystemDefault = 2;
 
-static constexpr char kNodeConnectRetryTimeout[] = "p2pDb/nodeConnectRetryTimeout";
+static constexpr char kNodeConnectRetryTimeout[] = "nodeConnectRetryTimeout";
 static constexpr std::chrono::seconds kDefaultNodeConnectRetryTimeout = std::chrono::seconds(7);
 
 } // namespace
@@ -29,16 +29,22 @@ SynchronizationSettings::SynchronizationSettings():
 {
 }
 
-void SynchronizationSettings::load(const QnSettings& settings)
+void SynchronizationSettings::load(const QnSettings& settings, std::string groupName)
 {
-    clusterId = settings.value(kClusterId, clusterId.c_str()).toString().toStdString();
+    QString settingsTemplate = groupName.empty() ? "%1%2" : "%1/%2";
 
-    nodeId = settings.value(kNodeId, nodeId.c_str()).toString().toStdString();
+    clusterId = settings.value(
+        lm(settingsTemplate).arg(groupName).arg(kClusterId),
+        clusterId.c_str()).toString().toStdString();
+
+    nodeId = settings.value(
+        lm(settingsTemplate).arg(groupName).arg(kNodeId),
+        nodeId.c_str()).toString().toStdString();
 
     if (clusterId.empty())
     {
         maxConcurrentConnectionsFromSystem = settings.value(
-            kMaxConcurrentConnectionsFromSystem,
+            lm(settingsTemplate).arg(groupName).arg(kMaxConcurrentConnectionsFromSystem),
             kMaxConcurrentConnectionsFromSystemDefault).toInt();
     }
     else
@@ -46,11 +52,11 @@ void SynchronizationSettings::load(const QnSettings& settings)
         maxConcurrentConnectionsFromSystem = std::numeric_limits<int>::max();
     }
 
-    nodeConnectRetryTimeout = nx::utils::parseTimerDuration(
-        settings.value(kNodeConnectRetryTimeout).toString(),
+    nodeConnectRetryTimeout = nx::utils::parseTimerDuration(settings.value(
+        lm(settingsTemplate).arg(groupName).arg(kNodeConnectRetryTimeout)).toString(),
         kDefaultNodeConnectRetryTimeout);
 
-    discovery.load(settings);
+    discovery.load(settings, groupName + "/" + "discovery");
 }
 
 } // namespace nx::clusterdb::engine

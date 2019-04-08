@@ -58,14 +58,15 @@ void BasicComponentTest::addRelayInstance(
 
     ASSERT_TRUE(m_serverListening);
     m_relays.back()->addArg("-listeningPeerDb/connectionRetryDelay", "1ms");
-    m_relays.back()->addArg("-discovery/registrationErrorDelay", "1ms");
-    m_relays.back()->addArg("-discovery/onlineNodesRequestDelay", "100ms");
-    m_relays.back()->addArg("-discovery/enabled", "true");
-    m_relays.back()->addArg("-discovery/roundTripPadding", "1ms");
+    m_relays.back()->addArg("-listeningPeerDb/cluster/discovery/registrationErrorDelay", "1ms");
+    m_relays.back()->addArg("-listeningPeerDb/cluster/discovery/onlineNodesRequestDelay", "100ms");
+    m_relays.back()->addArg("-listeningPeerDb/cluster/discovery/enabled", "true");
+    m_relays.back()->addArg("-listeningPeerDb/cluster/discovery/roundTripPadding", "1ms");
     m_relays.back()->addArg(
-        "-discovery/discoveryServiceUrl",
+        "-listeningPeerDb/cluster/discovery/discoveryServiceUrl",
         m_discoveryServer.url().toStdString().c_str());
-    m_relays.back()->addArg("-p2pDb/clusterId", kClusterId);
+    m_relays.back()->addArg("-listeningPeerDb/cluster/clusterId", kClusterId);
+    m_relays.back()->addArg("-listeningPeerDb/cluster/nodeConnectRetryTimeout", "100ms");
 
     if (waitUntilStarted)
     {

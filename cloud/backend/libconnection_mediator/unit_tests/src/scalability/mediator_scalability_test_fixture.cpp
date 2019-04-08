@@ -33,14 +33,16 @@ void MediatorScalabilityTestFixture::addMediator()
         "-http/connectionInactivityTimeout", "10m",
         "-server/name", "127.0.0.1",
         "-listeningPeerDb/enabled", "true",
-        "-discovery/enabled", "true",
-        "-discovery/discoveryServiceUrl", discoveryServiceUrl.c_str(),
-        "-discovery/roundTripPadding", "1ms",
-        "-discovery/registrationErrorDelay", "10ms",
-        "-discovery/onlineNodesRequestDelay", "10ms",
-        "-p2pDb/clusterId", kClusterId,
-        "-p2pDb/nodeId", nodeId.c_str(),
-        "-p2pDb/maxConcurrentConnectionsFromSystem", maxMediatorCount.c_str()});
+        "-listeningPeerDb/connectionRetryDelay", "100ms",
+        "-listeningPeerDb/cluster/discovery/enabled", "true",
+        "-listeningPeerDb/cluster/discovery/discoveryServiceUrl", discoveryServiceUrl.c_str(),
+        "-listeningPeerDb/cluster/discovery/roundTripPadding", "1ms",
+        "-listeningPeerDb/cluster/discovery/registrationErrorDelay", "10ms",
+        "-listeningPeerDb/cluster/discovery/onlineNodesRequestDelay", "10ms",
+        "-listeningPeerDb/cluster/nodeConnectRetryTimeout", "100ms",
+        "-listeningPeerDb/cluster/clusterId", kClusterId,
+        "-listeningPeerDb/cluster/nodeId", nodeId.c_str(),
+        "-listeningPeerDb/cluster/maxConcurrentConnectionsFromSystem", maxMediatorCount.c_str()});
 
     ASSERT_TRUE(mediator.startAndWaitUntilStarted());
 }
