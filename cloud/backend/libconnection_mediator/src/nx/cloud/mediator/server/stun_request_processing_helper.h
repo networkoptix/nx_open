@@ -14,14 +14,11 @@ using ConnectionPtr = network::stun::AbstractServerConnection*;
 using ConnectionStrongRef = std::shared_ptr<network::stun::AbstractServerConnection>;
 using ConnectionWeakRef = std::weak_ptr<network::stun::AbstractServerConnection>;
 
-/** Send success response with optional attributes if OutputData is given. */
-template<
-    typename ConnectionPtr,
-    typename... OutputData>
+/** Send success response without attributes. */
+template<typename ConnectionPtr>
     void sendSuccessResponse(
         const ConnectionPtr& connection,
-        network::stun::Header requestHeader,
-        OutputData*... outputData)
+        network::stun::Header requestHeader)
 {
     network::stun::Message response(
         network::stun::Header(
@@ -30,15 +27,10 @@ template<
             std::move(requestHeader.transactionId)));
     response.newAttribute<network::stun::extension::attrs::ResultCode>(api::ResultCode::ok);
 
-    if constexpr (sizeof...(OutputData) > 0)
-    {
-        serialize(outputData..., &response);
-    }
-
     connection->sendMessage(std::move(response), nullptr);
 }
 
-/** Send error response with error code, description as attribute, and optional outputData attributes, if given. */
+/** Send error response with error code and description as attribute. */
 template<
     typename ConnectionPtr,
     typename... OutputData>
@@ -47,8 +39,7 @@ template<
         network::stun::Header requestHeader,
         api::ResultCode resultCode,
         int stunErrorCode,
-        String reason,
-        OutputData*... outputData)
+        String reason)
 {
     network::stun::Message response(
         network::stun::Header(
@@ -60,14 +51,6 @@ template<
     response.newAttribute< network::stun::attrs::ErrorCode >(
         stunErrorCode,
         std::move(reason));
-
-    if constexpr (sizeof...(OutputData) > 0)
-    {
-        serialize(outputData..., &response);
-        // NOTE: Need to reset messageClass because calling serialize could reset it to
-        // successResponse. see documentation for StunResponseData::serialize().
-        response.header.messageClass = network::stun::MessageClass::errorResponse;
-    }
 
     connection->sendMessage(std::move(response), nullptr);
 }
@@ -108,18 +91,33 @@ template<
         api::ResultCode resultCode,
         OutputData*... outputData)
 {
+    network::stun::Message response(
+        network::stun::Header(
+            resultCode == api::ResultCode::ok
+                ? network::stun::MessageClass::successResponse
+                : network::stun::MessageClass::errorResponse,
+            requestHeader.method,
+            std::move(requestHeader.transactionId)));
+
+    response.newAttribute<network::stun::extension::attrs::ResultCode>(resultCode);
     if (resultCode != api::ResultCode::ok)
     {
-        return sendErrorResponse(
-            connection,
-            std::move(requestHeader),
-            resultCode,
+        response.newAttribute< network::stun::attrs::ErrorCode >(
             api::resultCodeToStunErrorCode(resultCode),
-            QnLexical::serialized(resultCode).toLatin1(),
-            outputData...);
+            QnLexical::serialized(resultCode).toLatin1());
     }
 
-    sendSuccessResponse(connection, std::move(requestHeader), outputData...);
+    if constexpr (sizeof...(OutputData) > 0)
+    {
+        serialize(outputData..., &response);
+        // NOTE: Need to reset messageClass because calling serialize could reset it to
+        // successResponse. see documentation for StunResponseData::serialize().
+        response.header.messageClass = resultCode == api::ResultCode::ok
+            ? network::stun::MessageClass::successResponse
+            : network::stun::MessageClass::errorResponse;
+    }
+
+    connection->sendMessage(std::move(response), nullptr);
 }
 
 /**
