@@ -28,6 +28,14 @@ export class CamViewComponent implements OnInit {
       this.showAll = false;
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+      if (changes.activeCamera) {
+          this.firmwareCleanUp();
+          this.firmwaresToShow = this.CONFIG.ipvd.firmwaresToShow;
+          this.showAll = false;
+      }
+  }
+
     sendFeedback() {
         this.onFeedbackClick.emit(this.activeCamera);
         return false;
