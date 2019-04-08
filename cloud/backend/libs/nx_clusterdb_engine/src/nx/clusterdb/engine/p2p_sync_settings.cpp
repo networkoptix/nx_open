@@ -56,7 +56,7 @@ void SynchronizationSettings::load(const QnSettings& settings, std::string group
         lm(settingsTemplate).arg(groupName).arg(kNodeConnectRetryTimeout)).toString(),
         kDefaultNodeConnectRetryTimeout);
 
-    discovery.load(settings, groupName + "/" + "discovery");
+    discovery.load(settings, groupName.empty() ? "discovery" : groupName + "/" + "discovery");
 }
 
 } // namespace nx::clusterdb::engine
