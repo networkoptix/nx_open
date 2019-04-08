@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChange, SimpleChanges } from '@angular/core';
+import { NxConfigService }                                                             from '../../../../services/nx-config';
 
 @Component({
   selector: 'nx-cam-view',
@@ -12,16 +13,20 @@ export class CamViewComponent implements OnInit {
   @Output() public onCloseView: EventEmitter<any> = new EventEmitter<any>();
   @Output() public onFeedbackClick: EventEmitter<any> = new EventEmitter<any>();
 
-  constructor() { }
+  CONFIG: any = {};
+  firmwares: any = [];
+  firmwaresToShow: number;
+  showAll: boolean;
 
-  ngOnInit() {
+  constructor(private configService: NxConfigService) {
+      this.CONFIG = this.configService.getConfig();
   }
 
-  // ngOnChanges(changes: SimpleChanges) {
-  //     if (changes.activeCamera) {
-  //         this._activeCamera = changes.activeCamera.currentValue;
-  //     }
-  // }
+  ngOnInit() {
+      this.firmwareCleanUp();
+      this.firmwaresToShow = this.CONFIG.ipvd.firmwaresToShow;
+      this.showAll = false;
+  }
 
     sendFeedback() {
         this.onFeedbackClick.emit(this.activeCamera);
@@ -32,6 +37,10 @@ export class CamViewComponent implements OnInit {
       this.activeCamera = undefined;
       this.onCloseView.emit(this.activeCamera);
   }
+
+    firmwareCleanUp() {
+        this.firmwares = this.activeCamera.firmwares.filter((fw) => !fw.name.match(/[<>]+/g));
+    }
 
   firmwarePercentage (count, total) {
       const percentage = Math.round((count / total) * 100);

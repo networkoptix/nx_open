@@ -120,7 +120,7 @@
                     <div class="col-5"><h4 class="m-0" translate>Popularity</h4></div>
                 </div>
 
-                <ng-container *ngFor="let firmware of activeCamera.firmwares | slice:0:5">
+                <ng-container *ngFor="let firmware of firmwares | slice:0:firmwaresToShow">
                     <div class="row" *ngIf="firmware.name">
                         <div class="col-7 no-linewrap" title="{{ firmware.name }}">{{ firmware.name }}</div>
                         <div class="col-5" title="{{ firmwarePercentage(firmware.count, activeCamera.totalCameraCount) }}">
@@ -137,28 +137,11 @@
                     </div>
                 </ng-container>
 
-                <div class="row" *ngIf="!showAll && activeCamera.firmwares.length > 5">
+                <div class="row" *ngIf="!showAll && firmwares.length > 5">
                     <div class="col-12">
-                        <a href (click)="showAll = true; false" translate>Show All</a>
+                        <a href (click)="showAll = true; firmwaresToShow = firmwares.length; false" translate>Show All</a>
                     </div>
                 </div>
-
-                <ng-container *ngFor="let firmware of activeCamera.firmwares | slice:5:100">
-                    <div class="row" *ngIf="firmware.name && showAll">
-                        <div class="col-7">{{ firmware.name }}</div>
-                        <div class="col-5" title="{{ firmwarePercentage(firmware.count, activeCamera.totalCameraCount) }}">
-                            <div class="icon blue" role="img" style="width: 100%">
-                                <canvas class="icon-canvas" height="4"></canvas>
-                                <svg class="img-responsive icon-svg" height="4">
-                                    <line x1="0" y1="8"
-                                          [attr.x2]="firmwareLength(firmware.count, activeCamera.maxFirmwareCount)"
-                                          y2="8" class="firmware-line"
-                                          stroke-dasharray="8, 2"></line>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </ng-container>
             </div>
         </nx-section>
 
