@@ -107,14 +107,26 @@ export class CamTableComponent implements OnChanges, OnInit {
                 return elm[param].split('x');
             }, !this.sortOrderASC);
 
-        } else if (param === 'maxFps' ||
-                param === 'isFisheye' ||
+        } else if (param === 'maxFps') {
+            byParam = NxUtilsService.byParam((elm) => {
+                return elm[param];
+            }, !this.sortOrderASC);
+
+        } else if (param === 'isFisheye' ||
                 param === 'isMdSupported' ||
                 param === 'isIoSupported') {
 
             byParam = NxUtilsService.byParam((elm) => {
-                return elm[param];
-            }, !this.sortOrderASC);
+                if (elm[param]) {
+                    return 0;
+                }
+                if (elm[param] === false) {
+                    return 2;
+                }
+                if (elm[param] === null) {
+                    return 3;
+                }
+            }, this.sortOrderASC);
 
         } else if (param === 'isPtzSupported') {
             byParam = NxUtilsService.byParam((elm) => {
