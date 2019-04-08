@@ -281,8 +281,8 @@ nx::network::stun::Message
         stun::Header(
             stun::MessageClass::indication,
             stun::extension::indications::connectionRequested));
-    connectionRequestedEvent.serialize(&indication);
     connectionRequestedEvent.cloudConnectVersion = connectRequest.cloudConnectVersion;
+    connectionRequestedEvent.serialize(&indication);
 
     return indication;
 }
@@ -383,7 +383,7 @@ void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
 {
     m_state = State::resolvingServersRelayInstance;
 
-    auto completionHander = 
+    auto completionHander =
         [this](
             nx::cloud::relay::api::ResultCode resultCode,
             QUrl relayInstanceUrl)
@@ -400,7 +400,7 @@ void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
 void UDPHolePunchingConnectionInitiationFsm::findRelayInstance(
     RelayInstanceSearchCompletionHandler handler)
 {
-    auto sharedHandler = 
+    auto sharedHandler =
         std::make_shared<RelayInstanceSearchCompletionHandler>(std::move(handler));
 
     m_findRelayInstanceFunc.invokeWithTimeout(
