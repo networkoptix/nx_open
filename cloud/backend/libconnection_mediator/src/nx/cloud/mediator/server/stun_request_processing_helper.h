@@ -14,11 +14,14 @@ using ConnectionPtr = network::stun::AbstractServerConnection*;
 using ConnectionStrongRef = std::shared_ptr<network::stun::AbstractServerConnection>;
 using ConnectionWeakRef = std::weak_ptr<network::stun::AbstractServerConnection>;
 
-/** Send success responce without attributes. */
-template<typename ConnectionPtr>
-void sendSuccessResponse(
-    const ConnectionPtr& connection,
-    network::stun::Header requestHeader)
+/** Send success response with optional attributes if OutputData is given. */
+template<
+    typename ConnectionPtr,
+    typename... OutputData>
+    void sendSuccessResponse(
+        const ConnectionPtr& connection,
+        network::stun::Header requestHeader,
+        OutputData*... outputData)
 {
     network::stun::Message response(
         network::stun::Header(
@@ -27,17 +30,25 @@ void sendSuccessResponse(
             std::move(requestHeader.transactionId)));
     response.newAttribute<network::stun::extension::attrs::ResultCode>(api::ResultCode::ok);
 
+    if constexpr (sizeof...(OutputData) > 0)
+    {
+        serialize(outputData..., &response);
+    }
+
     connection->sendMessage(std::move(response), nullptr);
 }
 
-/** Send error responce with error code and description as attribute. */
-template<typename ConnectionPtr>
-void sendErrorResponse(
-    const ConnectionPtr& connection,
-    network::stun::Header requestHeader,
-    api::ResultCode resultCode,
-    int stunErrorCode,
-    String reason)
+/** Send error response with error code, description as attribute, and optional outputData attributes, if given. */
+template<
+    typename ConnectionPtr,
+    typename... OutputData>
+    void sendErrorResponse(
+        const ConnectionPtr& connection,
+        network::stun::Header requestHeader,
+        api::ResultCode resultCode,
+        int stunErrorCode,
+        String reason,
+        OutputData*... outputData)
 {
     network::stun::Message response(
         network::stun::Header(
@@ -49,6 +60,15 @@ void sendErrorResponse(
     response.newAttribute< network::stun::attrs::ErrorCode >(
         stunErrorCode,
         std::move(reason));
+
+    if constexpr (sizeof...(OutputData) > 0)
+    {
+        serialize(outputData..., &response);
+        // NOTE: Need to reset messageClass because calling serialize could reset it to
+        // successResponse. see documentation for StunResponseData::serialize().
+        response.header.messageClass = network::stun::MessageClass::errorResponse;
+    }
+
     connection->sendMessage(std::move(response), nullptr);
 }
 
@@ -82,11 +102,11 @@ namespace detail {
 template<
     typename ConnectionStrongRef,
     typename... OutputData>
-void fillAndSendResponse(
-    network::stun::Header requestHeader,
-    const ConnectionStrongRef& connection,
-    api::ResultCode resultCode,
-    OutputData*... outputData)
+    void fillAndSendResponse(
+        network::stun::Header requestHeader,
+        const ConnectionStrongRef& connection,
+        api::ResultCode resultCode,
+        OutputData*... outputData)
 {
     if (resultCode != api::ResultCode::ok)
     {
@@ -95,23 +115,11 @@ void fillAndSendResponse(
             std::move(requestHeader),
             resultCode,
             api::resultCodeToStunErrorCode(resultCode),
-            QnLexical::serialized(resultCode).toLatin1());
+            QnLexical::serialized(resultCode).toLatin1(),
+            outputData...);
     }
 
-    network::stun::Message response(
-        network::stun::Header(
-            network::stun::MessageClass::successResponse,
-            requestHeader.method,
-            std::move(requestHeader.transactionId)));
-
-    if constexpr (sizeof...(OutputData) > 0)
-    {
-        serialize(outputData..., &response);
-    }
-
-    response.newAttribute<network::stun::extension::attrs::ResultCode>(resultCode);
-
-    connection->sendMessage(std::move(response));
+    sendSuccessResponse(connection, std::move(requestHeader), outputData...);
 }
 
 /**
@@ -150,13 +158,13 @@ void processRequest(
             [requestHeader = std::move(requestHeader), connection](
                 api::ResultCode resultCode,
                 OutputData... outputData) mutable
-            {
-                fillAndSendResponse(
-                    requestHeader,
-                    connection,
-                    resultCode,
-                    &outputData...);
-            });
+        {
+            fillAndSendResponse(
+                requestHeader,
+                connection,
+                resultCode,
+                &outputData...);
+        });
     }
     else
     {
@@ -168,17 +176,17 @@ void processRequest(
             [requestHeader = std::move(requestHeader), weakConnectionRef](
                 api::ResultCode resultCode,
                 OutputData... outputData) mutable
-            {
-                // Connection can be removed at any moment.
-                auto connectionStrongRef = weakConnectionRef.lock();
-                if (!connectionStrongRef)
-                    return;
-                fillAndSendResponse(
-                    requestHeader,
-                    connectionStrongRef,
-                    resultCode,
-                    &outputData...);
-            });
+        {
+            // Connection can be removed at any moment.
+            auto connectionStrongRef = weakConnectionRef.lock();
+            if (!connectionStrongRef)
+                return;
+            fillAndSendResponse(
+                requestHeader,
+                connectionStrongRef,
+                resultCode,
+                &outputData...);
+        });
     }
 }
 
@@ -195,15 +203,15 @@ auto createRequestProcessor(
         [processor, func](
             const ConnectionStrongRef& connection,
             network::stun::Message message)
+    {
+        processRequest<InputData, OutputData...>(
+            [processor, func](auto... args)
         {
-            processRequest<InputData, OutputData...>(
-                [processor, func](auto... args)
-                {
-                    (processor->*func)(std::move(args)...);
-                },
-                connection,
-                std::move(message));
-        };
+            (processor->*func)(std::move(args)...);
+        },
+            connection,
+            std::move(message));
+    };
 }
 
 template<typename Processor, typename InputData, typename... OutputData>
@@ -218,18 +226,18 @@ auto createRequestProcessor(
         [processor, func](
             const ConnectionStrongRef& connection,
             network::stun::Message message)
+    {
+        processRequest<InputData, OutputData...>(
+            [processor, func](
+                const ConnectionStrongRef& connection,
+                network::stun::Message,
+                auto... args)
         {
-            processRequest<InputData, OutputData...>(
-                [processor, func](
-                    const ConnectionStrongRef& connection,
-                    network::stun::Message,
-                    auto... args)
-                {
-                    (processor->*func)(connection, std::move(args)...);
-                },
-                connection,
-                std::move(message));
-        };
+            (processor->*func)(connection, std::move(args)...);
+        },
+            connection,
+            std::move(message));
+    };
 }
 
 
@@ -245,22 +253,22 @@ auto createRequestProcessor(
         [processor, func](
             const ConnectionStrongRef& connection,
             network::stun::Message message)
+    {
+        processRequest<InputData, OutputData...>(
+            [processor, func](
+                const ConnectionStrongRef& connection,
+                network::stun::Message,
+                auto... args)
         {
-            processRequest<InputData, OutputData...>(
-                [processor, func](
-                    const ConnectionStrongRef& connection,
-                    network::stun::Message,
-                    auto... args)
-                {
-                    (processor->*func)(
-                        RequestSourceDescriptor{
-                            connection->transportProtocol(),
-                            connection->getSourceAddress()},
-                        std::move(args)...);
-                },
-                connection,
-                std::move(message));
-        };
+            (processor->*func)(
+                RequestSourceDescriptor{
+                    connection->transportProtocol(),
+                    connection->getSourceAddress()},
+                    std::move(args)...);
+        },
+            connection,
+            std::move(message));
+    };
 }
 
 } // namespace detail
