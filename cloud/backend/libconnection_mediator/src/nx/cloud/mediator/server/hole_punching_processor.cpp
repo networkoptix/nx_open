@@ -1,6 +1,5 @@
 #include "hole_punching_processor.h"
 
-#include <nx/network/address_resolver.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
@@ -28,143 +27,9 @@ static QString logRequest(
 
 } // namespace
 
-//-------------------------------------------------------------------------------------------------
-// HolePunchingProcessor::ConnectHandler
-
-HolePunchingProcessor::ConnectHandler::ConnectHandler(
-    AbstractCloudDataProvider* cloudData,
-    HolePunchingProcessor* holePunchingProcessor,
-    ListeningPeerDb* listeningPeerDb)
-    :
-    RequestProcessor(cloudData),
-    m_holePunchingProcessor(holePunchingProcessor),
-    m_listeningPeerDb(listeningPeerDb)
-{
-}
-
-HolePunchingProcessor::ConnectHandler::~ConnectHandler()
-{
-    network::SocketGlobals::instance().addressResolver().cancel(this);
-}
-
-void HolePunchingProcessor::ConnectHandler::connect(
-    const RequestSourceDescriptor& requestSourceDescriptor,
-    api::ConnectRequest request,
-    std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
-{
-    m_holePunchingProcessor->connect(
-        requestSourceDescriptor,
-        std::move(request),
-        [this, completionHandler = std::move(completionHandler),
-            requestSourceDescriptor, request](
-                api::ResultCode resultCode, api::ConnectResponse response)
-        {
-            if (resultCode == api::ResultCode::notFound)
-            {
-                return redirectToRemoteMediator(
-                    requestSourceDescriptor,
-                    request,
-                    std::move(response),
-                    std::move(completionHandler));
-            }
-
-            return completionHandler(std::move(resultCode), std::move(response));
-        });
-}
-
-void HolePunchingProcessor::ConnectHandler::redirectToRemoteMediator(
-    const RequestSourceDescriptor& requestSourceDescriptor,
-    api::ConnectRequest request,
-    api::ConnectResponse response,
-    std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
-{
-    m_listeningPeerDb->findMediatorByPeerDomain(
-        request.destinationHostName.toStdString(),
-        [this, response = std::move(response), completionHandler = std::move(completionHandler),
-            connectRequestString = logRequest(requestSourceDescriptor, request)](
-                MediatorEndpoint endpoint) mutable
-        {
-            if (!validateMediatorEndpoint(endpoint))
-            {
-                NX_VERBOSE(this,
-                    "Failed to redirect stun connect request: %1 to remote mediator endpoint: %2",
-                    connectRequestString, endpoint);
-                return completionHandler(api::ResultCode::notFound, std::move(response));
-            }
-
-            resolveDomainName(
-                std::move(response),
-                std::move(endpoint),
-                std::move(completionHandler));
-        });
-}
-
-bool HolePunchingProcessor::ConnectHandler::validateMediatorEndpoint(
-    const MediatorEndpoint& endpoint) const
-{
-    if (endpoint.domainName.empty())
-    {
-        NX_VERBOSE(this, "Remote mediator lookup returned empty domain name");
-        return false;
-    }
-
-    if (endpoint.stunUdpPort == MediatorEndpoint::kPortUnused)
-    {
-        NX_VERBOSE(this, "Remote mediator lookup returned invalid stun udp port");
-        return false;
-    }
-
-    if (endpoint == m_listeningPeerDb->thisMediatorEndpoint())
-    {
-        NX_VERBOSE(this,
-            "Remote mediator lookup returned \"this\" mediator: %1, but connection request already"
-            " failed.", endpoint.toString());
-        return false;
-    }
-
-    return true;
-}
-
-void HolePunchingProcessor::ConnectHandler::resolveDomainName(
-    api::ConnectResponse response,
-    MediatorEndpoint endpoint,
-    std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
-{
-    nx::network::SocketGlobals::instance().addressResolver().resolveAsync(
-        endpoint.domainName,
-        [this, response = std::move(response), endpoint,
-            completionHandler = std::move(completionHandler)](
-                SystemError::ErrorCode errorCode, std::deque<network::AddressEntry> entries) mutable
-        {
-            if (errorCode != SystemError::noError)
-            {
-                NX_VERBOSE(this, "Error resolving ip address of %1: %2",
-                    endpoint.domainName, SystemError::toString(errorCode));
-                return completionHandler(api::ResultCode::notFound, std::move(response));
-            }
-
-            if (entries.empty())
-            {
-                NX_VERBOSE(this, "No Ip address resolved for %1:", endpoint.domainName);
-                return completionHandler(api::ResultCode::notFound, std::move(response));
-            }
-
-            response.alternateMediatorEndpointStunUdp = entries.front().toEndpoint();
-            response.alternateMediatorEndpointStunUdp->port = endpoint.stunUdpPort;
-            return completionHandler(api::ResultCode::tryAlternate, std::move(response));
-        },
-        network::NatTraversalSupport::disabled,
-        AF_INET,
-        this);
-}
-
-//-------------------------------------------------------------------------------------------------
-// HolePunchingProcessor
-
 HolePunchingProcessor::HolePunchingProcessor(
     const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
-    ListeningPeerDb* listeningPeerDb,
     ListeningPeerPool* listeningPeerPool,
     AbstractRelayClusterClient* relayClusterClient,
     stats::AbstractCollector* statisticsCollector)
@@ -173,8 +38,7 @@ HolePunchingProcessor::HolePunchingProcessor(
     m_settings(settings),
     m_listeningPeerPool(listeningPeerPool),
     m_relayClusterClient(relayClusterClient),
-    m_statisticsCollector(statisticsCollector),
-    m_connectHandler(cloudData, this, listeningPeerDb)
+    m_statisticsCollector(statisticsCollector)
 {
 }
 
@@ -306,11 +170,6 @@ void HolePunchingProcessor::connectionResult(
     connectionIter->second->onConnectionResultRequest(
         std::move(request),
         std::move(completionHandler));
-}
-
-HolePunchingProcessor::ConnectHandler& HolePunchingProcessor::connectHandler()
-{
-    return m_connectHandler;
 }
 
 std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>

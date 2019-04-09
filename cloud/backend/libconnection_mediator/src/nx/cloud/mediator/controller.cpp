@@ -31,7 +31,6 @@ Controller::Controller(const conf::Settings& settings):
     m_cloudConnectProcessor(
         settings,
         m_cloudDataProvider.get(),
-        &m_listeningPeerDb,
         &m_listeningPeerPool,
         m_relayClusterClient.get(),
         &m_statsManager.collector()),
@@ -61,6 +60,11 @@ PeerRegistrator& Controller::listeningPeerRegistrator()
 const PeerRegistrator& Controller::listeningPeerRegistrator() const
 {
     return m_listeningPeerRegistrator;
+}
+
+AbstractCloudDataProvider& Controller::cloudDataProvider()
+{
+    return *m_cloudDataProvider;
 }
 
 HolePunchingProcessor& Controller::cloudConnectProcessor()

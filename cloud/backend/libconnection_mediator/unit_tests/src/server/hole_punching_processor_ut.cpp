@@ -397,7 +397,6 @@ public:
         m_holePunchingProcessor(
             m_settings,
             &m_cloudData,
-            &m_listeningPeerDb,
             &m_listeningPeerPool,
             &m_relayClusterClient,
             &m_statisticsCollector)

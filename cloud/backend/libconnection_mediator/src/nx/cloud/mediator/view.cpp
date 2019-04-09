@@ -19,7 +19,11 @@ View::View(
         &controller->discoveredPeerPool(),
         &controller->listeningPeerDb(),
         &controller->cloudConnectProcessor()),
-    m_stunServer(settings, &m_httpServer)
+    m_stunServer(settings, &m_httpServer),
+    m_redirectingHolePunchingProcessor(
+        &controller->cloudDataProvider(),
+        &controller->cloudConnectProcessor(),
+        &controller->listeningPeerDb())
 {
     registerStunApiHandlers(controller);
 }
@@ -61,9 +65,26 @@ void View::registerStunApiHandlers(Controller* controller)
         &controller->listeningPeerRegistrator(),
         &m_stunServer.dispatcher());
 
+    // Overrides controller->cloudConnectProcessor() connect handler with
+    // connect handler that performs redirection.
+    registerRedirectingHolePunchingProcessor(
+        &m_redirectingHolePunchingProcessor,
+        &m_stunServer.dispatcher());
+
     registerStunApiHandlers(
         &controller->cloudConnectProcessor(),
         &m_stunServer.dispatcher());
+}
+
+void View::registerRedirectingHolePunchingProcessor(
+    RedirectingHolePunchingProcessor* redirectingHolePunchingProcessor,
+    network::stun::MessageDispatcher* dispatcher)
+{
+    dispatcher->registerRequestProcessor(
+        network::stun::extension::methods::connect,
+        detail::createRequestProcessor(
+            &RedirectingHolePunchingProcessor::connect,
+            redirectingHolePunchingProcessor));
 }
 
 void View::registerStunApiHandlers(
@@ -126,8 +147,8 @@ void View::registerStunApiHandlers(
     dispatcher->registerRequestProcessor(
         network::stun::extension::methods::connect,
         detail::createRequestProcessor(
-            &HolePunchingProcessor::ConnectHandler::connect,
-            &holePunchingProcessor->connectHandler()));
+            &HolePunchingProcessor::connect,
+            holePunchingProcessor));
 
     dispatcher->registerRequestProcessor(
         network::stun::extension::methods::connectionAck,
