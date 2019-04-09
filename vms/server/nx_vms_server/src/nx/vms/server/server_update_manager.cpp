@@ -1,5 +1,6 @@
 #include "server_update_manager.h"
 #include <media_server/media_server_module.h>
+#include <nx/vms/server/root_fs.h>
 
 namespace nx {
 namespace vms::server {
@@ -24,6 +25,11 @@ vms::common::p2p::downloader::Downloader* ServerUpdateManager::downloader()
 CommonUpdateInstaller* ServerUpdateManager::installer()
 {
     return &m_installer;
+}
+
+int64_t ServerUpdateManager::freeSpace(const QString& path) const
+{
+    return serverModule()->rootFileSystem()->freeSpace(path);
 }
 
 } // namespace vms::server
