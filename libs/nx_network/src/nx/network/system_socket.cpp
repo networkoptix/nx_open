@@ -1660,6 +1660,15 @@ bool UDPSocket::setMulticastIF(const QString& multicastIF)
 
 bool UDPSocket::joinGroup(const QString &multicastGroup)
 {
+#ifdef __linux
+    int mcAll = 0;
+    if (setsockopt(handle(), IPPROTO_IP, IP_MULTICAST_ALL, (raw_type *)&mcAll, sizeof(mcAll)) < 0)
+    {
+        NX_WARNING(this, "Failed to disable IP_MULTICAST_ALL socket option for group %1. %2",
+            multicastGroup, SystemError::getLastOSErrorText());
+        return false;
+    }
+#endif
     struct ip_mreq multicastRequest;
     memset(&multicastRequest, 0, sizeof(multicastRequest));
 
@@ -1677,9 +1686,17 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)
 
 bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicastIF)
 {
+#ifdef __linux
+    int mcAll = 0;
+    if (setsockopt(handle(), IPPROTO_IP, IP_MULTICAST_ALL, (raw_type *)&mcAll, sizeof(mcAll)) < 0)
+    {
+        NX_WARNING(this, "Failed to disable IP_MULTICAST_ALL socket option for group %1. %2",
+            multicastGroup, SystemError::getLastOSErrorText());
+        return false;
+    }
+#endif
     struct ip_mreq multicastRequest;
     memset(&multicastRequest, 0, sizeof(multicastRequest));
-
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toLatin1());
     if (setsockopt(
