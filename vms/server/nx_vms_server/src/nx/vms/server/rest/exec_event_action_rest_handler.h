@@ -10,8 +10,8 @@ class QnExecuteEventActionRestHandler: public QnJsonRestHandler, public ServerMo
 public:
     QnExecuteEventActionRestHandler(QnMediaServerModule* serverModule);
 
-    virtual JsonRestResponse executePost(
-        const JsonRestRequest& request, const QByteArray& body) override;
+    virtual nx::network::rest::Response executePost(
+        const nx::network::rest::Request& request) override;
 };
 
 } //namespace nx::vms::server::rest

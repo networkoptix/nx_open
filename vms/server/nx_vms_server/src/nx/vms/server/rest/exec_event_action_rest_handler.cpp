@@ -12,25 +12,31 @@ QnExecuteEventActionRestHandler::QnExecuteEventActionRestHandler(QnMediaServerMo
 {
 }
 
-JsonRestResponse QnExecuteEventActionRestHandler::executePost(
-    const JsonRestRequest& request, const QByteArray& body)
+nx::network::rest::Response QnExecuteEventActionRestHandler::executePost(
+    const nx::network::rest::Request& request)
 {
-    JsonRestResponse response(nx::network::http::StatusCode::ok);
+    if (!request.content)
+    {
+        return nx::network::rest::Response::error(
+            nx::network::rest::Result::BadRequest,
+            "Missing request body.");
+    }
 
     bool success = false;
-    const auto action = QJson::deserialized<api::EventActionData>(body, api::EventActionData(), &success);
+    const auto action = QJson::deserialized<api::EventActionData>(
+        request.content->body, api::EventActionData(), &success);
     if (!success)
     {
-        response.json.setError(
-            QnRestResult::InvalidParameter, "Invalid json object.");
-        return response;
+        return nx::network::rest::Response::error(
+            nx::network::rest::Result::InvalidParameter,
+            "Invalid json object.");
     }
 
     nx::vms::event::AbstractActionPtr businessAction;
     ec2::fromApiToResource(action, businessAction);
     businessAction->setReceivedFromRemoteHost(true);
     serverModule()->eventMessageBus()->at_actionReceived(businessAction);
-    return response;
+    return nx::network::rest::Response(nx::network::http::StatusCode::ok);
 }
 
 } //namespace nx::vms::server::rest
