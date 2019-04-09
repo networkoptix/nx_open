@@ -42,7 +42,7 @@ void RedirectingHolePunchingProcessor::connect(
 {
     m_holePunchingProcessor->connect(
         requestSourceDescriptor,
-        std::move(request),
+        request,
         [this, completionHandler = std::move(completionHandler),
         requestSourceDescriptor, request](
             api::ResultCode resultCode, api::ConnectResponse response)
@@ -51,7 +51,7 @@ void RedirectingHolePunchingProcessor::connect(
         {
             return redirectToRemoteMediator(
                 requestSourceDescriptor,
-                request,
+                std::move(request),
                 std::move(response),
                 std::move(completionHandler));
         }
@@ -66,11 +66,14 @@ void RedirectingHolePunchingProcessor::redirectToRemoteMediator(
     api::ConnectResponse response,
     std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
 {
+    QString connectRequestString = logRequest(requestSourceDescriptor, request);
+    NX_VERBOSE(this, "Attempting redirection for connect request: %1", connectRequestString);
+
     m_listeningPeerDb->findMediatorByPeerDomain(
         request.destinationHostName.toStdString(),
-        [this, response = std::move(response), completionHandler = std::move(completionHandler),
-        connectRequestString = logRequest(requestSourceDescriptor, request)](
-            MediatorEndpoint endpoint) mutable
+        [this, destinationHostName = request.destinationHostName, response = std::move(response),
+            completionHandler = std::move(completionHandler), connectRequestString](
+                MediatorEndpoint endpoint) mutable
     {
         if (!validateMediatorEndpoint(endpoint))
         {
@@ -79,6 +82,9 @@ void RedirectingHolePunchingProcessor::redirectToRemoteMediator(
                 connectRequestString, endpoint);
             return completionHandler(api::ResultCode::notFound, std::move(response));
         }
+
+        NX_VERBOSE(this, "Remote mediator lookup for %1 succeeded with endpoint: %2",
+            destinationHostName, endpoint);
 
         resolveDomainName(
             std::move(response),
@@ -118,29 +124,36 @@ void RedirectingHolePunchingProcessor::resolveDomainName(
     MediatorEndpoint endpoint,
     std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
 {
+    NX_VERBOSE(this, "Attempting dns resolution of %1 to ip", endpoint.domainName);
+
     nx::network::SocketGlobals::instance().addressResolver().resolveAsync(
         endpoint.domainName,
         [this, response = std::move(response), endpoint,
-        completionHandler = std::move(completionHandler)](
-            SystemError::ErrorCode errorCode, std::deque<network::AddressEntry> entries) mutable
-    {
-        if (errorCode != SystemError::noError)
+            completionHandler = std::move(completionHandler)](
+                SystemError::ErrorCode errorCode, std::deque<network::AddressEntry> entries) mutable
         {
-            NX_VERBOSE(this, "Error resolving ip address of %1: %2",
-                endpoint.domainName, SystemError::toString(errorCode));
-            return completionHandler(api::ResultCode::notFound, std::move(response));
-        }
+            if (errorCode != SystemError::noError)
+            {
+                NX_VERBOSE(this, "Error resolving ip address of %1: %2",
+                    endpoint.domainName, SystemError::toString(errorCode));
+                return completionHandler(api::ResultCode::notFound, std::move(response));
+            }
 
-        if (entries.empty())
-        {
-            NX_VERBOSE(this, "No Ip address resolved for %1:", endpoint.domainName);
-            return completionHandler(api::ResultCode::notFound, std::move(response));
-        }
+            if (entries.empty())
+            {
+                NX_VERBOSE(this, "No Ip address resolved for %1:", endpoint.domainName);
+                return completionHandler(api::ResultCode::notFound, std::move(response));
+            }
 
-        response.alternateMediatorEndpointStunUdp = entries.front().toEndpoint();
-        response.alternateMediatorEndpointStunUdp->port = endpoint.stunUdpPort;
-        return completionHandler(api::ResultCode::tryAlternate, std::move(response));
-    },
+            response.alternateMediatorEndpointStunUdp = entries.front().toEndpoint();
+            response.alternateMediatorEndpointStunUdp->port = endpoint.stunUdpPort;
+
+            NX_VERBOSE(this, "Dns lookup for %1 resolved to: %2. Using redirection endpoint: %3",
+                endpoint.domainName, containerString(entries),
+                *response.alternateMediatorEndpointStunUdp);
+
+            return completionHandler(api::ResultCode::tryAlternate, std::move(response));
+        },
         network::NatTraversalSupport::disabled,
         AF_INET,
         this);
