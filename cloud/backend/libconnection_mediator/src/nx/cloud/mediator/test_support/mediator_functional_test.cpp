@@ -114,12 +114,7 @@ bool MediatorFunctionalTest::waitUntilStarted()
 
 network::SocketAddress MediatorFunctionalTest::stunUdpEndpoint() const
 {
-    if (moduleInstance()->impl()->stunUdpEndpoints().empty())
-        return network::SocketAddress();
-
-    return network::SocketAddress(
-        network::HostAddress::localhost,
-        moduleInstance()->impl()->stunUdpEndpoints().front().port);
+    return m_stunUdpEndpoint ? *m_stunUdpEndpoint : network::SocketAddress();
 }
 
 network::SocketAddress MediatorFunctionalTest::stunTcpEndpoint() const
