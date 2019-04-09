@@ -39,7 +39,8 @@ public:
     ~CommonUpdateInstaller();
     void stopSync();
     State state() const;
-    QString workDir() const;
+
+    virtual QString dataDirectoryPath() const = 0;
 
 private:
     update::detail::ZipExtractor m_extractor;
@@ -49,7 +50,6 @@ private:
     mutable QString m_executable;
     mutable CommonUpdateInstaller::State m_state = CommonUpdateInstaller::State::idle;
 
-    virtual QString dataDirectoryPath() const = 0;
     virtual bool initializeUpdateLog(const QString& targetVersion, QString* logFileName) const = 0;
 
     void setState(CommonUpdateInstaller::State result);
@@ -59,6 +59,7 @@ private:
     vms::api::SystemInformation systemInformation() const;
     bool checkExecutable(const QString& executableName) const;
     CommonUpdateInstaller::State checkContents(const QString& outputPath) const;
+    QString workDir() const;
 };
 
 } // namespace nx
