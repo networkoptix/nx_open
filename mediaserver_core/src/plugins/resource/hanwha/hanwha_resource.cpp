@@ -327,6 +327,9 @@ static const QString kFramePriorityProperty = lit("PriorityType");
 static const QString kHanwhaVideoSourceStateOn = lit("On");
 static const int kHanwhaInvalidInputValue = 604;
 
+static constexpr int kHanwhaDefaultMulticastPort = 5000;
+static const QString kHanwhaDefaultMulticastAddress = "239.0.0.1";
+
 //Taken from Hanwha metadata plugin manifest.json
 static const QnUuid kHanwhaInputPortEventId =
     QnUuid(lit("{1BAB8A57-5F19-4E3A-B73B-3641058D46B8}"));
@@ -442,6 +445,55 @@ struct GroupParameterInfo
 HanwhaResource::~HanwhaResource()
 {
     m_timerHolder.terminate();
+}
+
+CameraDiagnostics::Result HanwhaResource::enableMulticast(const HanwhaVideoProfile& profile)
+{
+    int port = profile.rtpMulticastPort;
+    QString address = profile.rtpMulticastAddress;
+    if (address.isEmpty())
+        address = kHanwhaDefaultMulticastAddress;
+    if (port <= 0)
+        port = kHanwhaDefaultMulticastPort;
+
+    HanwhaRequestHelper helper(sharedContext());
+    const auto response = helper.update(
+        lit("media/videoprofile"),
+        {
+            {kHanwhaProfileNumberProperty, QString::number(profile.number)},
+            {kHanwhaRtpMulticastEnable, kHanwhaTrue},
+            {kHanwhaRtpMulticastAddress, address},
+            {kHanwhaRtpMulticastPort, QString::number(port)},
+        });
+
+    NX_VERBOSE(this, lm("enable multicast: [%1]").args(response.requestUrl()));
+    if (!response.isSuccessful())
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            response.requestUrl(),
+            lit("Can't update video profile to enable multicast"));
+    }
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::ensureMulticastEnabled(Qn::ConnectionRole role)
+{
+    boost::optional<HanwhaVideoProfile> profile;
+    auto result = findProfiles(
+        role == Qn::ConnectionRole::CR_LiveVideo ? &profile : nullptr,
+        role == Qn::ConnectionRole::CR_SecondaryLiveVideo ? &profile : nullptr,
+        /*totalProfileNumber*/ nullptr,
+        /*profilesToRemove*/ nullptr);
+    if (!result)
+        return result;
+
+    if (profile && !profile->rtpMulticastEnable)
+    {
+        result = enableMulticast(profile.value());
+        if (!result)
+            return result;
+    }
+    return CameraDiagnostics::NoErrorResult();
 }
 
 QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
@@ -2732,6 +2784,10 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         const auto parameter = allParameters.getParameterById(id);
         const auto info = advancedParameterInfo(parameter.id);
         if (!info)
+            continue;
+
+        // Drop multicast params if NVR.
+        if (info->isMulticastParameter() && isNvr())
             continue;
 
         if (info->isService()) //< E.g, "Reset profiles to default" button.

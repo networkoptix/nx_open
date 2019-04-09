@@ -153,6 +153,8 @@ public:
     bool isBypassSupported() const;
     boost::optional<int> bypassChannel() const;
 
+    CameraDiagnostics::Result ensureMulticastEnabled(Qn::ConnectionRole role);
+
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
@@ -200,6 +202,7 @@ private:
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
 
     CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
+    CameraDiagnostics::Result enableMulticast(const HanwhaVideoProfile& profile);
 
     void cleanUpOnProxiedDeviceChange();
 

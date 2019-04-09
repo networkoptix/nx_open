@@ -69,6 +69,21 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
         // if it added to the end of URL only.
         streamUrlString.append(lit("&session=%1").arg(m_sessionContext->sessionId));
     }
+    else
+    {
+        // If multicast transport used, ensure that camera configured accordingly.
+        const auto rtpTransportString =
+            m_hanwhaResource->getProperty(QnMediaResource::rtpTransportKey());
+        const auto transport = QnLexical::deserialized<nx::vms::api::RtpTransportType>(
+            rtpTransportString,
+            nx::vms::api::RtpTransportType::automatic);
+        if (transport == nx::vms::api::RtpTransportType::multicast)
+        {
+            auto result = m_hanwhaResource->ensureMulticastEnabled(getRole());
+            if (!result)
+                return result;
+        }
+    }
 
     const auto role = getRole();
     m_rtpReader.setRole(role);
