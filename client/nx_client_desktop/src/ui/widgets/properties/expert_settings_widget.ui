@@ -60,7 +60,7 @@
         <x>0</x>
         <y>0</y>
         <width>956</width>
-        <height>509</height>
+        <height>529</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
@@ -357,6 +357,11 @@
                  <item>
                   <property name="text">
                    <string>UDP</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Multicast</string>
                   </property>
                  </item>
                 </widget>
