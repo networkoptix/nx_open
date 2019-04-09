@@ -1479,7 +1479,7 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
         // 3. All other cases. Some servers have failed
         messageBox->setIcon(QnMessageBoxIcon::Critical);
-        messageBox->setText(tr("Failed to download update packages to some servers"));
+        messageBox->setText(tr("Failed to download update packages to some components"));
 
         // TODO: Client can be here as well, but it would not be displayed.
         // Should we display it somehow?
