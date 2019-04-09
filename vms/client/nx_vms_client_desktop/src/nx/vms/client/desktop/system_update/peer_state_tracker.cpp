@@ -161,6 +161,7 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
     NX_ASSERT(!version.isNull());
+    NX_VERBOSE(this, "setUpdateTarget(%1)", version);
     m_targetVersion = version;
 
     // VMS-13789: Should set client version to target version, if client has installed it.
@@ -178,7 +179,7 @@ void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version
 
             if (installed != item->installed)
             {
-                item->installed = true;
+                item->installed = installed;
                 NX_INFO(this, "setUpdateTarget() - peer %1 changed installed=%2", item->id, item->installed);
             }
             emit itemChanged(item);
