@@ -153,11 +153,12 @@ header {
                 &:focus {
                     background-color : $light4;
                 }
-                
-                & > span {
-                    padding : 0.25rem rem(10px);
+    
+                & > span:first-child {
+                    padding-left : rem(10px);
+                    display      : flex;
+                    align-items  : center;
                 }
-                
             }
             
             nx-checkbox {
