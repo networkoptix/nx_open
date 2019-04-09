@@ -79,6 +79,12 @@ update::Status CommonUpdateManager::start()
         return updateStatus;
     }
 
+    if (freeSpace(installer()->workDir()) < package.size * 2 * 1.2f)
+    {
+        return nx::update::Status(
+            peerId, update::Status::Code::error, "Not enough free space for keeping update files");
+    }
+
     FileInformation fileInformation;
     fileInformation.name = package.file;
     fileInformation.md5 = QByteArray::fromHex(package.md5.toLatin1());

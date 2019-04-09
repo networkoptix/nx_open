@@ -26,5 +26,10 @@ CommonUpdateInstaller* ServerUpdateManager::installer()
     return &m_installer;
 }
 
+int64_t ServerUpdateManager::freeSpace(const QString& path) const
+{
+    return serverModule()->rootFileSystem()->freeSpace(path);
+}
+
 } // namespace vms::server
 } // namespace nx

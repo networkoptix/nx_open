@@ -39,6 +39,7 @@ public:
     ~CommonUpdateInstaller();
     void stopSync();
     State state() const;
+    QString workDir() const;
 
 private:
     update::detail::ZipExtractor m_extractor;
@@ -57,7 +58,6 @@ private:
     QVariantMap updateInformation(const QString& outputPath) const;
     vms::api::SystemInformation systemInformation() const;
     bool checkExecutable(const QString& executableName) const;
-    QString installerWorkDir() const;
     CommonUpdateInstaller::State checkContents(const QString& outputPath) const;
 };
 

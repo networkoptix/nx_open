@@ -37,7 +37,7 @@ void CommonUpdateInstaller::prepareAsync(const QString& path)
 
     m_extractor.extractAsync(
         path,
-        installerWorkDir(),
+        workDir(),
         [this](QnZipExtractor::Error errorCode, const QString& outputPath)
         {
             auto cleanupGuard = nx::utils::makeScopeGuard(
@@ -150,7 +150,7 @@ CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString&
 
 bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
 {
-    QString installerDir = installerWorkDir();
+    QString installerDir = workDir();
 
     QStringList arguments;
     QString logFileName;
@@ -164,7 +164,7 @@ bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
     authRecord.addParam("version", m_version.toLatin1());
     commonModule()->auditManager()->addAuditRecord(authRecord);
 
-    QString installerPath = QDir(installerWorkDir()).absoluteFilePath(m_executable);
+    QString installerPath = QDir(workDir()).absoluteFilePath(m_executable);
     SystemError::ErrorCode error = nx::startProcessDetached(installerPath, arguments, installerDir);
     if (error == SystemError::noError)
     {
@@ -179,7 +179,7 @@ bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
     return true;
 }
 
-QString CommonUpdateInstaller::installerWorkDir() const
+QString CommonUpdateInstaller::workDir() const
 {
     QString selfPath = commonModule()->moduleGUID().toString();
     // This path will look like /tmp/nx_isntaller-server_guid/
@@ -197,7 +197,7 @@ void CommonUpdateInstaller::stopSync()
 
 bool CommonUpdateInstaller::cleanInstallerDirectory()
 {
-    QString path = installerWorkDir();
+    QString path = workDir();
     const auto removeResult = QDir(path).removeRecursively();
     const auto fileInfo = QFileInfo(path);
     NX_DEBUG(
@@ -231,7 +231,7 @@ nx::vms::api::SystemInformation CommonUpdateInstaller::systemInformation() const
 
 bool CommonUpdateInstaller::checkExecutable(const QString& executableName) const
 {
-    QFile executableFile(QDir(installerWorkDir()).absoluteFilePath(executableName));
+    QFile executableFile(QDir(workDir()).absoluteFilePath(executableName));
     if (!executableFile.exists())
     {
         NX_ERROR(
