@@ -28,6 +28,8 @@
 #include <nx/streaming/media_data_packet.h>
 #include <onvif/soapStub.h>
 
+#include <plugins/resource/onvif/onvif_multicast_parameters_provider.h>
+
 #include "soap_wrapper.h"
 
 class onvifXsd__AudioEncoderConfigurationOption;
@@ -230,6 +232,11 @@ public:
 
     QString getVideoSourceToken() const;
     void setVideoSourceToken(const QString &src);
+
+    std::string videoEncoderConfigurationToken(Qn::StreamIndex streamIndex) const;
+    void setVideoEncoderConfigurationToken(
+        Qn::StreamIndex streamIndex,
+        std::string token);
 
     QString getPtzUrl() const;
     void setPtzUrl(const QString& src);
@@ -539,6 +546,7 @@ private:
     QString m_ptzUrl;
     QString m_ptzProfileToken;
     QString m_ptzConfigurationToken;
+    std::map<Qn::StreamIndex, std::string> m_videoEncoderConfigurationTokens;
     mutable int m_timeDrift;
     mutable QElapsedTimer m_timeDriftTimer;
     mutable QTimeZone m_cameraTimeZone;
@@ -603,6 +611,7 @@ private:
         DeviceSoapWrapper* const soapWrapper,
         CapabilitiesResp* const response );
     void fillFullUrlInfo( const CapabilitiesResp& response );
+    void detectCapabilities(const _onvifDevice__GetCapabilitiesResponse& response);
     CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
     QString getInputPortNumberFromString(const QString& portName);
     virtual QnAudioTransmitterPtr initializeTwoWayAudio();
@@ -618,6 +627,8 @@ private:
 
 protected:
     nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
+    nx::vms::server::resource::OnvifMulticastParametersProvider m_primaryMulticastParametersProvider;
+    nx::vms::server::resource::OnvifMulticastParametersProvider m_secondaryMulticastParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
     QString m_audioOutputConfigurationToken;
