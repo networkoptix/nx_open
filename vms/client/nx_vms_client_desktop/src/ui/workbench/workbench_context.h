@@ -54,6 +54,7 @@ public:
     QnControlsStatisticsModule* statisticsModule() const;
 
     nx::vms::client::desktop::MainWindow* mainWindow() const;
+    QWidget* mainWindowWidget() const;
     void setMainWindow(nx::vms::client::desktop::MainWindow* mainWindow);
 
     nx::core::Watermark watermark() const;

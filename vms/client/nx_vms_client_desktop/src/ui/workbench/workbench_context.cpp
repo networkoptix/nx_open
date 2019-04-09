@@ -194,6 +194,11 @@ MainWindow* QnWorkbenchContext::mainWindow() const
     return m_mainWindow.data();
 }
 
+QWidget* QnWorkbenchContext::mainWindowWidget() const
+{
+    return mainWindow();
+}
+
 void QnWorkbenchContext::setMainWindow(MainWindow* mainWindow)
 {
     if (m_mainWindow == mainWindow)
