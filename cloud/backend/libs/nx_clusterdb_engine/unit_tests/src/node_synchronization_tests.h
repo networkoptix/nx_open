@@ -184,7 +184,7 @@ TYPED_TEST_P(Synchronization, with_outgoing_command_filter)
     this->thenPeersAreAbleToSynchronizeNewData({0, 1});
 }
 
-TYPED_TEST_P(Synchronization, DISABLED_peer_can_receive_same_data_from_multiple_peers_simultaneously)
+TYPED_TEST_P(Synchronization, peer_can_receive_same_data_from_multiple_peers_simultaneously)
 {
     constexpr int count = 4;
 
@@ -239,7 +239,7 @@ REGISTER_TYPED_TEST_CASE_P(Synchronization,
     connected_peers_exchange_data,
     peers_connected_as_a_chain_are_synchronized,
     with_outgoing_command_filter,
-    DISABLED_peer_can_receive_same_data_from_multiple_peers_simultaneously,
+    peer_can_receive_same_data_from_multiple_peers_simultaneously,
     command_sequence_is_not_reused
 );
 

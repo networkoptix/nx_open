@@ -7,21 +7,21 @@ namespace nx::cloud::discovery {
 
 namespace {
 
-static constexpr char kDiscoveryEnabled[] = "discovery/enabled";
+static constexpr char kDiscoveryEnabled[] = "enabled";
 static constexpr char kDefaultDiscoveryEnabled[] = "false";
 
-static constexpr char kDiscoveryServiceUrl[] = "discovery/discoveryServiceUrl";
+static constexpr char kDiscoveryServiceUrl[] = "discoveryServiceUrl";
 static constexpr char kDefaultDiscoveryServiceUrl[] = "https://discovery.vmsproxy.com";
 
-static constexpr char kRoundTripPadding[] = "discovery/roundTripPadding";
+static constexpr char kRoundTripPadding[] = "roundTripPadding";
 static const std::chrono::milliseconds kDefaultRoundTripPadding =
     std::chrono::seconds(3);
 
-static constexpr char kRegistrationErrorDelay[] = "discovery/registrationErrorDelay";
+static constexpr char kRegistrationErrorDelay[] = "registrationErrorDelay";
 static const std::chrono::milliseconds kDefaultRegistrationErrorDelay =
     std::chrono::minutes(1);
 
-static constexpr char kOnlineNodesRequestDelay[] = "discovery/onlineNodesRequestDelay";
+static constexpr char kOnlineNodesRequestDelay[] = "onlineNodesRequestDelay";
 static const std::chrono::milliseconds kDefaultOnlineNodesRequestDelay =
     std::chrono::seconds(30);
 
@@ -35,23 +35,31 @@ Settings::Settings():
 {
 }
 
-void Settings::load(const QnSettings& settings)
+void Settings::load(const QnSettings& settings, std::string groupName)
 {
-    enabled = settings.value(kDiscoveryEnabled, kDefaultDiscoveryEnabled).toString() == "true";
+    if (!groupName.empty() && groupName.back() == '/')
+        groupName.erase(groupName.size() - 1);
 
-    discoveryServiceUrl =
-        settings.value(kDiscoveryServiceUrl, kDefaultDiscoveryServiceUrl).toString();
+    QString settingsTemplate = groupName.empty() ? "%1%2" : "%1/%2";
+
+    enabled = settings.value(
+        lm(settingsTemplate).arg(groupName).arg(kDiscoveryEnabled),
+        kDefaultDiscoveryEnabled).toString() == "true";
+
+    discoveryServiceUrl = settings.value(
+        lm(settingsTemplate).arg(groupName).arg(kDiscoveryServiceUrl),
+        kDefaultDiscoveryServiceUrl).toString();
 
     roundTripPadding = nx::utils::parseTimerDuration(
-        settings.value(kRoundTripPadding).toString(),
+        settings.value(lm(settingsTemplate).arg(groupName).arg(kRoundTripPadding)).toString(),
         kDefaultRoundTripPadding);
 
     registrationErrorDelay = nx::utils::parseTimerDuration(
-        settings.value(kRegistrationErrorDelay).toString(),
+        settings.value(lm(settingsTemplate).arg(groupName).arg(kRegistrationErrorDelay)).toString(),
         kDefaultRegistrationErrorDelay);
 
     onlineNodesRequestDelay = nx::utils::parseTimerDuration(
-        settings.value(kOnlineNodesRequestDelay).toString(),
+        settings.value(lm(settingsTemplate).arg(groupName).arg(kOnlineNodesRequestDelay)).toString(),
         kDefaultOnlineNodesRequestDelay);
 }
 

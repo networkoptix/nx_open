@@ -78,7 +78,7 @@ void HttpCommandPipelineConnector::onStateChanged(
 {
     using State = ::ec2::QnTransactionTransportBase::State;
 
-    // TODO: Have to do post here since onStateChanged is called by
+    // NOTE: Have to do post here since onStateChanged is called by
     // QnTransactionTransportBase with mutex locked.
     post(
         [this, newState]()
@@ -114,7 +114,6 @@ void HttpCommandPipelineConnector::processSuccessfulConnect()
     auto commandPipeline = std::make_unique<CommonHttpConnection>(
         m_protocolVersionRange,
         std::exchange(m_connection, nullptr),
-        //getAioThread(),
         m_connectionGuardSharedState,
         m_systemId,
         nx::network::url::getEndpoint(m_getCommandsNodeUrl));

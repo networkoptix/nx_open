@@ -62,6 +62,11 @@ const PeerRegistrator& Controller::listeningPeerRegistrator() const
     return m_listeningPeerRegistrator;
 }
 
+AbstractCloudDataProvider& Controller::cloudDataProvider()
+{
+    return *m_cloudDataProvider;
+}
+
 HolePunchingProcessor& Controller::cloudConnectProcessor()
 {
     return m_cloudConnectProcessor;
@@ -100,6 +105,7 @@ bool Controller::doMandatoryInitialization()
 void Controller::stop()
 {
     m_cloudConnectProcessor.stop();
+    m_listeningPeerDb.stop();
 }
 
 } // namespace hpm

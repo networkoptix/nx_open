@@ -38,6 +38,7 @@ SynchronizationEngine::SynchronizationEngine(
         m_peerId.toSimpleByteArray().toStdString()),
     m_connector(
         m_peerId.toSimpleByteArray().toStdString(),
+        settings,
         &m_transportManager,
         &m_connectionManager),
     m_httpTransportAcceptor(

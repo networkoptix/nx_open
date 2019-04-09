@@ -65,6 +65,20 @@ std::optional<MediatorEndpoint> toMediatorEndpoint(const std::string& endpointSt
 //-------------------------------------------------------------------------------------------------
 // MediatorEndpoint
 
+std::string MediatorEndpoint::toString() const
+{
+    std::string s ("{ domainName: ");
+    s += domainName;
+    s += ", httpPort: ";
+    s += std::to_string(httpPort);
+    s += ", httpsPort: ";
+    s += std::to_string(httpsPort);
+    s += ", stunUdpPort: ";
+    s += std::to_string(stunUdpPort);
+    s += " }";
+    return s;
+}
+
 bool MediatorEndpoint::operator==(const MediatorEndpoint &other) const
 {
     return
@@ -113,6 +127,14 @@ bool ListeningPeerDb::initialize()
     }
 
     return m_map != nullptr;
+}
+
+void ListeningPeerDb::stop()
+{
+    if (m_map)
+        m_map->synchronizationEngine().pleaseStopSync();
+    if (m_sqlExecutor)
+        m_sqlExecutor->pleaseStopSync();
 }
 
 void ListeningPeerDb::setThisMediatorEndpoint(const MediatorEndpoint& endpoint)
@@ -202,15 +224,13 @@ void ListeningPeerDb::findMediatorByPeerDomain(
         {
             if (result != nx::clusterdb::map::ResultCode::ok)
             {
-                NX_WARNING(
-                    this,
+                NX_VERBOSE(this,
                     "getRangeWithPrefix returned ResultCode: %1 for peerDomainName: %2",
                     nx::clusterdb::map::toString(result), peerDomainName);
                 return handler(MediatorEndpoint());
             }
 
-            NX_VERBOSE(
-                this,
+            NX_VERBOSE(this,
                 "getRangeWithPrefix returned ResultCode: %1 and result set: %2 for peerDomainName: %3",
                 nx::clusterdb::map::toString(result), containerString(map), peerDomainName);
 
@@ -220,7 +240,7 @@ void ListeningPeerDb::findMediatorByPeerDomain(
             auto endpoint = toMediatorEndpoint(map.begin()->second);
             if (!endpoint.has_value())
             {
-                NX_WARNING(this,
+                NX_VERBOSE(this,
                     "Failed to deserialize MediatorEndpoint. string was: %1",
                     map.begin()->second);
                 return handler(MediatorEndpoint());

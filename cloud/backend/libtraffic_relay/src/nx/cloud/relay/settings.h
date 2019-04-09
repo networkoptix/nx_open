@@ -65,8 +65,6 @@ struct ListeningPeerDb
     nx::clusterdb::map::Settings map;
 
     ListeningPeerDb();
-
-    void load(const QnSettings& settings);
 };
 
 class Settings:
@@ -113,6 +111,7 @@ private:
     void loadHttps();
     void loadProxy();
     void loadConnectingPeer();
+    void loadListeningPeerDb();
 };
 
 } // namespace conf

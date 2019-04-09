@@ -19,6 +19,7 @@ struct MediatorEndpoint
     int httpsPort = kPortUnused;
     int stunUdpPort = kPortUnused;
 
+    std::string toString() const;
     bool operator ==(const MediatorEndpoint& other) const;
 };
 
@@ -39,6 +40,11 @@ public:
      * Initializes the underlying database.
      */
     bool initialize();
+
+    /**
+     * stops the underlying database.
+     */
+    void stop();
 
     /**
      * Sets the domain name that all added peers will be associated with.

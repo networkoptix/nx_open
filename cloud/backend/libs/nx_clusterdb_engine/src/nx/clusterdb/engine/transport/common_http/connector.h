@@ -43,8 +43,8 @@ private:
     nx::vms::api::PeerData m_peerData;
 
     Handler m_completionHandler;
-    std::unique_ptr<::ec2::QnTransactionTransportBase> m_connection;
     std::shared_ptr<::ec2::ConnectionGuardSharedState> m_connectionGuardSharedState;
+    std::unique_ptr<::ec2::QnTransactionTransportBase> m_connection;
     QMetaObject::Connection m_stateChangedConnection;
 
     void onStateChanged(::ec2::QnTransactionTransportBase::State newState);

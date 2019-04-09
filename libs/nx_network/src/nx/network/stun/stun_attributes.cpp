@@ -133,6 +133,11 @@ const SocketAddress& MappedAddress::endpoint() const
     return m_endpoint;
 }
 
+const SocketAddress& MappedAddress::get() const
+{
+    return m_endpoint;
+}
+
 bool MappedAddress::operator==(const MappedAddress& rhs) const
 {
     return m_endpoint == rhs.m_endpoint;

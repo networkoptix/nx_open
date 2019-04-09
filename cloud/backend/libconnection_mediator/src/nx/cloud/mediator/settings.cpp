@@ -523,15 +523,15 @@ void Settings::loadListeningPeerDb()
     if (!settings().containsGroup(listening_peer_db::kGroupName))
         return;
 
+    std::string groupName = listening_peer_db::kGroupName;
+
     m_listeningPeerDb.enabled = true;
-    const auto str =
-        lm("%1/%2").arg(listening_peer_db::kGroupName).arg(listening_peer_db::kConnectionRetryDelay);
-    m_listeningPeerDb.connectionRetryDelay = nx::utils::parseTimerDuration(
-        settings().value(str).toString(),
+    m_listeningPeerDb.connectionRetryDelay = nx::utils::parseTimerDuration(settings().value(
+        lm("%1/%2").arg(groupName).arg(listening_peer_db::kConnectionRetryDelay)).toString(),
         listening_peer_db::kDefaultConnectionRetryDelay);
 
-    m_listeningPeerDb.sql.loadFromSettings(settings(), listening_peer_db::kGroupName);
-    m_listeningPeerDb.map.load(settings());
+    m_listeningPeerDb.sql.loadFromSettings(settings(), lm("%1/sql").arg(groupName));
+    m_listeningPeerDb.map.load(settings(), lm("%1/cluster").arg(groupName).toStdString());
 }
 
 

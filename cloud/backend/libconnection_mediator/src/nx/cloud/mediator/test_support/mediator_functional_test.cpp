@@ -94,6 +94,9 @@ bool MediatorFunctionalTest::waitUntilStarted()
         m_httpEndpoint = moduleInstance()->impl()->httpEndpoints().front();
     }
 
+    if (!moduleInstance()->impl()->httpsEndpoints().empty())
+        m_httpsEndpoint = moduleInstance()->impl()->httpsEndpoints().front();
+
     if (!moduleInstance()->impl()->stunUdpEndpoints().empty())
         m_stunUdpEndpoint = moduleInstance()->impl()->stunUdpEndpoints().front();
 
@@ -111,12 +114,7 @@ bool MediatorFunctionalTest::waitUntilStarted()
 
 network::SocketAddress MediatorFunctionalTest::stunUdpEndpoint() const
 {
-    if (moduleInstance()->impl()->stunUdpEndpoints().empty())
-        return network::SocketAddress();
-
-    return network::SocketAddress(
-        network::HostAddress::localhost,
-        moduleInstance()->impl()->stunUdpEndpoints().front().port);
+    return m_stunUdpEndpoint ? *m_stunUdpEndpoint : network::SocketAddress();
 }
 
 network::SocketAddress MediatorFunctionalTest::stunTcpEndpoint() const
@@ -127,6 +125,11 @@ network::SocketAddress MediatorFunctionalTest::stunTcpEndpoint() const
 network::SocketAddress MediatorFunctionalTest::httpEndpoint() const
 {
     return m_httpEndpoint;
+}
+
+network::SocketAddress MediatorFunctionalTest::httpsEndpoint() const
+{
+    return m_httpsEndpoint;
 }
 
 nx::utils::Url MediatorFunctionalTest::httpUrl() const

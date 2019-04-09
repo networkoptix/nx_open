@@ -12,7 +12,7 @@ class NX_KEY_VALUE_DB_API Settings
 public:
     nx::clusterdb::engine::SynchronizationSettings synchronizationSettings;
 
-    void load(const QnSettings& settings);
+    void load(const QnSettings& settings, std::string groupName = "cluster");
 };
 
 } // namespace nx::clusterdb::map

@@ -4,19 +4,20 @@
 #include <nx/utils/uuid.h>
 
 #include "connection_manager.h"
+#include "p2p_sync_settings.h"
 #include "transport/command_transport_delegate.h"
 #include "transport/transport_manager.h"
 
 namespace nx::clusterdb::engine {
 
-static constexpr std::chrono::seconds kRetryConnectTimeout(7);
-
 Connector::Connector(
     const std::string& nodeId,
+    const SynchronizationSettings& settings,
     transport::TransportManager* transportManager,
     ConnectionManager* connectionManager)
     :
     m_nodeId(nodeId),
+    m_settings(settings),
     m_transportManager(transportManager),
     m_connectionManager(connectionManager)
 {
@@ -112,7 +113,7 @@ void Connector::onConnectCompletion(
         NX_DEBUG(this, lm("Error connecting to %1. %2").args(url, result));
 
         nodeContext.retryTimer->start(
-            kRetryConnectTimeout,
+            m_settings.nodeConnectRetryTimeout,
             [url, this]() { connectToNodeAsync(url); });
         return;
     }
@@ -180,7 +181,7 @@ void Connector::onConnectionClosed(
     nodeIter->second.connectionClosedSubscriptionId = nx::utils::kInvalidSubscriptionId;
 
     nodeIter->second.retryTimer->start(
-        kRetryConnectTimeout,
+        m_settings.nodeConnectRetryTimeout,
         [url, this]() { connectToNodeAsync(url); });
 }
 
