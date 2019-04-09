@@ -450,7 +450,8 @@ void MultiServerUpdatesWidget::initDropdownActions()
     m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::internetSpecific) + "...",
         [this]()
         {
-            setUpdateSourceMode(UpdateSourceType::internetSpecific);
+            // We are forcing this change to make appear dialog for picking a build.
+            setUpdateSourceMode(UpdateSourceType::internetSpecific, true);
         });
 
     m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::file) + "...",
@@ -871,9 +872,9 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
     }
 }
 
-void MultiServerUpdatesWidget::setUpdateSourceMode(UpdateSourceType mode)
+void MultiServerUpdatesWidget::setUpdateSourceMode(UpdateSourceType mode, bool force)
 {
-    if (m_updateSourceMode == mode)
+    if (m_updateSourceMode == mode && !force)
         return;
 
     switch(mode)

@@ -130,7 +130,13 @@ private:
     static QString toString(LocalStatusCode stage);
     static QString toString(ServerUpdateTool::OfflineUpdateState state);
 
-    void setUpdateSourceMode(nx::update::UpdateSourceType mode);
+    /**
+     * Changes source for getting update.
+     * It will try to skip any changes if we picking the same mode.
+     * @param mode - desired mode.
+     * @param force - should we force mode changes, even if mode is the same.
+     */
+    void setUpdateSourceMode(nx::update::UpdateSourceType mode, bool force = false);
 
     void initDropdownActions();
     void initDownloadActions();
