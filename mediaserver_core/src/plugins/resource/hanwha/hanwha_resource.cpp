@@ -3683,6 +3683,12 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
     return nullptr;
 }
 
+std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+    HanwhaResource::advancedParametersProviders()
+{
+    return { &m_advancedParametersProvider };
+}
+
 void HanwhaResource::setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList)
 {
     nx::api::AnalyticsSupportedEvents externalEvents;
