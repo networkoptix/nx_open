@@ -118,7 +118,7 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     setup(abstractSettings);
     auto customLogicGuard = nx::utils::makeScopeGuard([this]() { teardown(); });
 
-    if (settings.discovery().enabled)
+    if (settings.synchronization().discovery.enabled)
     {
         controller.synchronizationEngine().discoveryManager().start(
             settings.synchronization().clusterId,

@@ -33,7 +33,6 @@ public:
     const SynchronizationSettings& synchronization() const;
     const nx::sql::ConnectionOptions& db() const;
     const nx::network::http::server::Settings& http() const;
-    const nx::cloud::discovery::Settings& discovery() const;
     const Api& api() const;
 
 protected:
@@ -44,7 +43,6 @@ private:
     SynchronizationSettings m_syncSettings;
     nx::sql::ConnectionOptions m_db;
     nx::network::http::server::Settings m_http;
-    nx::cloud::discovery::Settings m_discovery;
     Api m_api;
 
     void loadApi();
