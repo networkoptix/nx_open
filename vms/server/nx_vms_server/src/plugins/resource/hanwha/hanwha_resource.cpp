@@ -337,6 +337,7 @@ static const QString kHanwhaVideoSourceStateOn = lit("On");
 static const int kHanwhaInvalidInputValue = 604;
 static constexpr int kHanwhaDefaultMulticastPort = 5000;
 static const QString kHanwhaDefaultMulticastAddress = "239.0.0.1";
+static const QString kHanwhaDefaultSecondaryMulticastAddress = "239.0.0.2";
 
 
 // Taken from Hanwha metadata plugin manifest.json.
@@ -464,12 +465,16 @@ HanwhaResource::~HanwhaResource()
     m_timerHolder.terminate();
 }
 
-CameraDiagnostics::Result HanwhaResource::enableMulticast(const HanwhaVideoProfile& profile)
+CameraDiagnostics::Result HanwhaResource::enableMulticast(
+    const HanwhaVideoProfile& profile, Qn::ConnectionRole role)
 {
     int port = profile.rtpMulticastPort;
     QString address = profile.rtpMulticastAddress;
     if (address.isEmpty())
-        address = kHanwhaDefaultMulticastAddress;
+    {
+        address = role == Qn::ConnectionRole::CR_LiveVideo ? kHanwhaDefaultMulticastAddress :
+            kHanwhaDefaultSecondaryMulticastAddress;
+    }
     if (port <= 0)
         port = kHanwhaDefaultMulticastPort;
 
@@ -483,7 +488,7 @@ CameraDiagnostics::Result HanwhaResource::enableMulticast(const HanwhaVideoProfi
             {kHanwhaRtpMulticastPort, QString::number(port)},
         });
 
-    NX_VERBOSE(this, "enable multicast: [%1]", response.requestUrl());
+    NX_DEBUG(this, "Enable multicast: [%1]", response.requestUrl());
     if (!response.isSuccessful())
     {
         return CameraDiagnostics::RequestFailedResult(
@@ -506,7 +511,7 @@ CameraDiagnostics::Result HanwhaResource::ensureMulticastEnabled(Qn::ConnectionR
 
     if (profile && !profile->rtpMulticastEnable)
     {
-        result = enableMulticast(profile.value());
+        result = enableMulticast(profile.value(), role);
         if (!result)
             return result;
     }
