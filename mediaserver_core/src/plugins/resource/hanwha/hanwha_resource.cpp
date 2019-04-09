@@ -1110,6 +1110,13 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     if (!ini().initMedia)
         return CameraDiagnostics::NoErrorResult();
 
+    const auto multicastSupportAttribute = attributes().attribute<bool>(
+        lm("Media/Stream.Multicast/%1").arg(getChannel()));
+
+    setCameraCapability(
+        Qn::CameraCapability::MulticastStreamCapability,
+        multicastSupportAttribute && *multicastSupportAttribute);
+
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
