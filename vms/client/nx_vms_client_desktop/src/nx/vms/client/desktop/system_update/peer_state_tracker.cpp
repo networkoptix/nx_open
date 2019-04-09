@@ -163,6 +163,12 @@ void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version
     NX_ASSERT(!version.isNull());
     m_targetVersion = version;
 
+    // VMS-13789: Should set client version to target version, if client has installed it.
+    if (m_clientItem && m_clientItem->state == StatusCode::latestUpdateInstalled)
+    {
+        m_clientItem->version = version;
+    }
+
     for (auto& item: m_items)
     {
         if (version != item->version)
@@ -822,6 +828,8 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
         case State::readyRestart:
             m_clientItem->statusMessage = tr("Ready to restart to the new version");
             m_clientItem->state = StatusCode::readyToInstall;
+            NX_ASSERT(!m_targetVersion.isNull());
+            m_clientItem->version = m_targetVersion;
             m_clientItem->installed = true;
             m_clientItem->progress = 100;
             break;
@@ -832,6 +840,8 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
             break;
         case State::complete:
             m_clientItem->state = StatusCode::latestUpdateInstalled;
+            NX_ASSERT(!m_targetVersion.isNull());
+            m_clientItem->version = m_targetVersion;
             m_clientItem->installing = false;
             m_clientItem->installed = true;
             m_clientItem->progress = 100;

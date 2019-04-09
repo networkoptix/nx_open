@@ -1386,6 +1386,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
             NX_INFO(NX_SCOPE_TAG, "taking update info from mediaserver");
             m_updateInfo = updateInfo;
             m_updateReport = calculateUpdateVersionReport(m_updateInfo);
+            m_stateTracker->setUpdateTarget(m_updateInfo.getVersion());
             m_clientUpdateTool->setUpdateTarget(m_updateInfo);
             m_haveValidUpdate = true;
         }
