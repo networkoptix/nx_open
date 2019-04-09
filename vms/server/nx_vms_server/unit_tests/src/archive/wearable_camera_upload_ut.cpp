@@ -4,6 +4,7 @@
 #include <test_support/storage_utils.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/vms/common/p2p/downloader/file_information.h>
 
 namespace nx::vms::server::test {
 
@@ -29,9 +30,11 @@ protected:
     void whenWearableCameraIsCreated()
     {
         using namespace nx::test;
+        QnJsonRestResult addCameraResult;
+        QByteArray response;
         NX_TEST_API_POST(
-            m_server.get(), QString("/api/%1/add?name=wearableCamera").arg(m_wearableCameraName),
-            QByteArray());
+            m_server.get(), QString("/api/%1/add").arg(m_wearableCameraName),
+            QByteArray(),nullptr, network::http::StatusCode::ok, "admin", "admin", &response);
     }
 
     void whenFileIsUploaded()
@@ -61,6 +64,14 @@ protected:
             m_server.get(), QString("/api/downloads/%1/chunks/0").arg(m_testFileName),
             fileData, nullptr, nx::network::http::StatusCode::ok, "admin", "admin", nullptr,
             "application/octet-stream");
+
+        using namespace vms::common::p2p::downloader;
+        QnJsonRestResult uploadResult;
+        NX_TEST_API_GET(m_server.get(), QString("/api/downloads/%1/status"), &uploadResult);
+        ASSERT_EQ(QnRestResult::Error::NoError, uploadResult.error);
+        const auto fileInformation =
+            uploadResult.deserialized<FileInformation>();
+        ASSERT_TRUE(fileInformation.status == FileInformation::Status::downloaded);
     }
 
     void whenPlayArchiveRequestIsIssued()

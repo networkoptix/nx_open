@@ -186,6 +186,16 @@ static int ffmpegRead(void* userCtx, uint8_t* data, int size);
 static int ffmpegWrite(void* userCtx, uint8_t* data, int size);
 static int64_t ffmpegSeek(void* userCtx, int64_t pos, int whence);
 
+static void drawTimestampOnFrame(AVFrame* frame, int64_t timestamp)
+{
+
+}
+
+static int64_t getTimestampFromFrame(AVFrame* frame)
+{
+    return 0;
+}
+
 class MkvBufferContext
 {
 public:
@@ -389,7 +399,7 @@ static int ffmpegWrite(void* userCtx, uint8_t* data, int size)
     MkvBufferContext* mkvContext = (MkvBufferContext*)userCtx;
     auto& buffer = mkvContext->m_buffer;
     const auto resizeValue = mkvContext->m_pos + size;
-    if (resizeValue > buffer.size())
+    if (resizeValue > (int) buffer.size())
         buffer.resize(resizeValue);
 
     memcpy(buffer.data() + mkvContext->m_pos, data, size);
@@ -530,8 +540,8 @@ private:
         inProgress
     };
 
-    static const int64_t kTimeGapMs = 1000;
-    static const int64_t kAcceptableTimeSpanToTheEndMs = 30000;
+    const int64_t kTimeGapMs = 1000;
+    const int64_t kAcceptableTimeSpanToTheEndMs = 30000;
 
     QnMutex m_mutex;
     QnWaitCondition m_waitCondition;
