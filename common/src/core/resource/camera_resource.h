@@ -15,6 +15,8 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/security_cam_resource.h>
 
+#include <nx/streaming/rtsp_client.h>
+
 class CameraMediaStreams;
 class CameraBitrates;
 class CameraBitrateInfo;
@@ -68,6 +70,8 @@ public:
      * For primary stream this parameters are merged with parameters on record schedule.
      */
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
+
+    nx::vms::api::RtpTransportType preferredRtpTransport() const;
 
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );

@@ -21,6 +21,8 @@
 #include <utils/crypt/symmetrical.h>
 #include <utils/math/math.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace {
 
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
@@ -464,4 +466,11 @@ QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
 {
     NX_ASSERT(false, lm("This method should not be called on client side."));
     return QnAdvancedStreamParams();
+}
+
+nx::vms::api::RtpTransportType QnVirtualCameraResource::preferredRtpTransport() const
+{
+    return QnLexical::deserialized(
+        getProperty(QnMediaResource::rtpTransportKey()),
+        nx::vms::api::RtpTransportType::automatic);
 }
