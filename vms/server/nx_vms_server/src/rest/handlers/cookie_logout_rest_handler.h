@@ -4,10 +4,10 @@
 
 class QnCookieLogoutRestHandler : public nx::network::rest::Handler
 {
-    Q_OBJECT
-public:
+protected:
     virtual nx::network::rest::Response executeGet(const nx::network::rest::Request& request);
     virtual nx::network::rest::Response executePost(const nx::network::rest::Request& request);
 
+public:
     static void logout(const QnRestConnectionProcessor* connection);
 };
