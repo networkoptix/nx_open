@@ -27,6 +27,8 @@ public:
     explicit ClipboardButton(const QString& text, const QString& confirmationText,
         QWidget* parent = nullptr);
 
+    void setType(StandardType type);
+
     static ClipboardButton* createInline(QLineEdit* parent, StandardType type);
 
     static QString clipboardText();

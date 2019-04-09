@@ -38,6 +38,7 @@ EulaDialog::EulaDialog(QWidget* parent):
     font.setPixelSize(font.pixelSize() + 2);
     ui->titleLabel->setFont(font);
     ui->titleLabel->setForegroundRole(QPalette::Light);
+    ui->copyToClipboard->setType(ClipboardButton::StandardType::copyLong);
 
     //ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     // We have replaced standard buttons to keep our own button order and style.
