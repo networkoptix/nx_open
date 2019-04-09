@@ -577,13 +577,7 @@ border-style: solid;
            <number>0</number>
           </property>
           <item>
-           <widget class="QProgressBar" name="actionProgess">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-           </widget>
+           <widget class="QProgressBar" name="actionProgess"/>
           </item>
           <item>
            <widget class="QPushButton" name="cancelProgressAction">
