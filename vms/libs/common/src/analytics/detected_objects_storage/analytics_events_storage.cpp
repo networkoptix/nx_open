@@ -19,6 +19,17 @@ static constexpr auto kMaxTimePeriodLength = std::chrono::minutes(10);
 static constexpr auto kTimePeriodPreemptiveLength = std::chrono::minutes(1);
 static constexpr int kMaxObjectLookupResultSet = 1000;
 
+// NOTE: Limiting filtered_events subquery to make query
+// CPU/memory requirements much less dependent of DB size.
+// Assuming that objects tracks are whether interleaved or quite short.
+// So, in situation, when there is a single 100,000 - records long object track
+// selected by filter less objects than requested filter.maxObjectsToSelect would be returned.
+static constexpr int kMaxExpectedTrackLength = 100;
+static constexpr int kMaxFilterEventsResultSize =
+    kMaxExpectedTrackLength * kMaxObjectLookupResultSet;
+
+static constexpr bool kUseTrackAggregation = false;
+
 namespace detail {
 
 std::chrono::milliseconds TimePeriod::length() const
@@ -654,13 +665,6 @@ void EventsStorage::prepareLookupQuery(
         maxObjectsToSelect = std::min<int>(filter.maxObjectsToSelect, maxObjectsToSelect);
 
     auto sqlLimitStr = lm("LIMIT %1").args(maxObjectsToSelect).toQString();
-
-    // NOTE: Limiting filtered_events subquery to make query
-    // CPU/memory requirements much less dependent of DB size.
-    // Assuming that objects tracks are whether interleaved or quite short.
-    // So, in situation, when there is a single 100,000 - records long object track
-    // selected by filter less objects than requested filter.maxObjectsToSelect would be returned.
-    constexpr int kMaxFilterEventsResultSize = 100000;
 
     query->prepare(lm(R"sql(
         WITH filtered_events AS
