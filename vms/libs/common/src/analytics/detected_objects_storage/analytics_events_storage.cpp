@@ -8,6 +8,8 @@
 #include <nx/sql/sql_cursor.h>
 #include <nx/utils/log/log.h>
 
+#include "detection_data_saver.h"
+
 namespace nx {
 namespace analytics {
 namespace storage {
@@ -96,14 +98,57 @@ void EventsStorage::save(
             duration_cast<milliseconds>(microseconds(packet->timestampUsec)));
     }
 
-    m_dbController.queryExecutor().executeUpdate(
-        std::bind(&EventsStorage::savePacket, this, _1, std::move(packet)),
-        [this, completionHandler = std::move(completionHandler)](
-            sql::DBResult resultCode)
+    if (!kUseTrackAggregation)
+    {
+        m_dbController.queryExecutor().executeUpdate(
+            std::bind(&EventsStorage::savePacket, this, _1, std::move(packet)),
+            [this, completionHandler = std::move(completionHandler)](
+                sql::DBResult resultCode)
+            {
+                completionHandler(dbResultToResultCode(resultCode));
+            },
+            kSaveEventQueryAggregationKey);
+    }
+    else
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        m_objectCache.add(packet);
+
+        for (const auto& detectedObject: packet->objects)
         {
-            completionHandler(dbResultToResultCode(resultCode));
-        },
-        kSaveEventQueryAggregationKey);
+            m_trackAggregator.add(
+                detectedObject.objectId,
+                duration_cast<milliseconds>(microseconds(packet->timestampUsec)),
+                detectedObject.boundingBox);
+        }
+
+        DetectionDataSaver detectionDataSaver(
+            &m_attributesDao,
+            &m_deviceDao,
+            &m_objectTypeDao);
+
+        detectionDataSaver.load(&m_objectCache, &m_trackAggregator);
+
+        m_objectCache.removeExpiredData();
+
+        if (!detectionDataSaver.empty())
+        {
+            m_dbController.queryExecutor().executeUpdate(
+                [this, detectionDataSaver = std::move(detectionDataSaver)](
+                    nx::sql::QueryContext* queryContext) mutable
+                {
+                    detectionDataSaver.save(queryContext);
+                    return nx::sql::DBResult::ok;
+                },
+                [this, completionHandler = std::move(completionHandler)](
+                    sql::DBResult resultCode)
+                {
+                    completionHandler(dbResultToResultCode(resultCode));
+                },
+                kSaveEventQueryAggregationKey);
+        }
+    }
 }
 
 void EventsStorage::createLookupCursor(
