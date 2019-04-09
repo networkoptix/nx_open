@@ -39,6 +39,7 @@ protected:
     virtual Response executePut(const Request& request);
 
 public:
+    virtual ~Handler() = default;
     Response executeRequest(const Request& request);
 
     /** Override to execute some logic after request processing. */
