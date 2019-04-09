@@ -37,7 +37,7 @@ public:
         const std::string& applicationId,
         const SynchronizationSettings& settings,
         const ProtocolVersionRange& supportedProtocolRange,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager);
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager);
     ~SynchronizationEngine();
 
     void pleaseStopSync();
@@ -65,6 +65,7 @@ public:
      */
     void setOutgoingCommandFilter(
         const OutgoingCommandFilterConfiguration& configuration);
+    OutgoingCommandFilter& outgoingCommandFilter();
 
     void subscribeToSystemDeletedNotification(
         nx::utils::Subscription<std::string>& subscription);

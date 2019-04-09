@@ -13,11 +13,6 @@ static QString toString(const nx::cloud::discovery::Node& node)
     return nx::cloud::discovery::NodeSerialization::serialized(node);
 }
 
-bool isHttpScheme(const nx::utils::Url& url)
-{
-    return url.scheme() == nx::network::http::kUrlSchemeName;
-}
-
 } // namespace
 
 DiscoveryManager::DiscoveryManager(
@@ -27,12 +22,17 @@ DiscoveryManager::DiscoveryManager(
     m_discoverySettings(discoverySettings),
     m_syncEngine(syncEngine)
 {
+    if (!m_discoverySettings.enabled)
+        NX_VERBOSE(this, "Discovery is disabled in settings. calling start() will do nothing");
 }
 
 void DiscoveryManager::start(
     const std::string& clusterId,
     const nx::utils::Url& synchronizationEngineUrl)
 {
+    if (!m_discoverySettings.enabled)
+        return;
+
     if (m_discoveryClient)
         return;
 
@@ -50,26 +50,22 @@ void DiscoveryManager::start(
     m_discoveryClient->setOnNodeDiscovered(
         [this, clusterId](nx::cloud::discovery::Node node)
         {
-            NX_VERBOSE(
-                this,
-                "Discovered a new node: %1. Non http scheme urls will be ignored.",
-                toString(node));
-
-            nx::utils::Url url(node.urls.front());
-            if (!isHttpScheme(url))
+            if (node.urls.empty())
             {
-                NX_WARNING(this, "%1 is not an http scheme url, ignoring.", url);
+                NX_WARNING(this,
+                    "Discovered node %1 provided 0 urls, can't connect to remote synchronization engine",
+                    toString(node));
                 return;
             }
 
-            m_syncEngine->connector().addNodeUrl(clusterId, url);
+            NX_VERBOSE(this, "Discovered a new node: %1", toString(node));
+
+            m_syncEngine->connector().addNodeUrl(clusterId, node.urls.front());
         });
 
     m_discoveryClient->start();
 
-    NX_VERBOSE(
-        this,
-        "discovery started with cluster id: %1 on url: %2",
+    NX_VERBOSE(this, "discovery started with cluster id: %1 on url: %2",
         clusterId, synchronizationEngineUrl.toStdString());
 }
 

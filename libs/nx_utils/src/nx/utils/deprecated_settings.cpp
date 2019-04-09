@@ -43,6 +43,16 @@ bool QnSettings::contains(const QString& key) const
     return false;
 }
 
+bool QnSettings::containsGroup(QString groupName) const
+{
+    if (!groupName.endsWith('/'))
+        groupName += '/';
+
+    const auto allSettings = allArgs();
+    auto it = allSettings.lower_bound(groupName);
+    return it != allSettings.end() && it->first.startsWith(groupName);
+}
+
 QVariant QnSettings::value(
     const QString& key,
     const QVariant& defaultValue) const

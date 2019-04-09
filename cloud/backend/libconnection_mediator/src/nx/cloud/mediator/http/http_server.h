@@ -11,7 +11,7 @@
 #include <nx/network/http/server/authentication_dispatcher.h>
 #include <nx/network/maintenance/server.h>
 
-#include "../remote_mediator_peer_pool.h"
+#include "../listening_peer_db.h"
 #include "../discovery/discovery_http_server.h"
 #include "../server/hole_punching_processor.h"
 
@@ -32,7 +32,7 @@ public:
         const conf::Settings& settings,
         const PeerRegistrator& peerRegistrator,
         nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool,
-        RemoteMediatorPeerPool* remoteMediatorPeerPool,
+        ListeningPeerDb* listeningPeerDb,
         HolePunchingProcessor* holePunchingProcessor);
 
     void listen();
@@ -66,7 +66,7 @@ private:
     nx::network::http::server::MultiEndpointAcceptor m_multiAddressHttpServer;
     std::unique_ptr<nx::cloud::discovery::HttpServer> m_discoveryHttpServer;
     nx::cloud::discovery::RegisteredPeerPool* m_registeredPeerPool = nullptr;
-    RemoteMediatorPeerPool* m_remoteMediatorPeerPool = nullptr;
+    ListeningPeerDb* m_listeningPeerDb = nullptr;
     HolePunchingProcessor* m_holePunchingProcessor = nullptr;
     std::unique_ptr<MaintenanceAuthenticator> m_maintenanceAuthenticator;
     network::maintenance::Server m_maintenanceServer;
@@ -95,19 +95,40 @@ class InitiateConnectionRequestHandler:
 {
 public:
     InitiateConnectionRequestHandler(
-        HolePunchingProcessor* holePunchingProcessor);
+        HolePunchingProcessor* holePunchingProcessor,
+        ListeningPeerDb* listeningPeerDb);
 
 protected:
+    /** Used to cache needed info from nx::network::http::RequestContext*/
+    struct CachedRequestContext
+    {
+        nx::utils::Url requestUrl;
+        bool isSsl = false;
+        nx::network::http::Response* response = nullptr;
+    };
+
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
         api::ConnectRequest inputData) override;
 
-private:
-    HolePunchingProcessor* m_holePunchingProcessor = nullptr;
-
     void reportResult(
         api::ResultCode resultCode,
+        api::ConnectResponse response,
+        const std::optional<nx::network::http::StatusCode::Value>& httpStatusCode = std::nullopt);
+
+    void redirectToRemoteMediator(
+        CachedRequestContext requestContext,
+        const nx::String& targetServer,
+        api::ResultCode resultCode,
         api::ConnectResponse response);
+
+    nx::utils::Url buildMediatorUrl(
+        const MediatorEndpoint& endpoint,
+        const CachedRequestContext& requestContext);
+
+private:
+    HolePunchingProcessor* m_holePunchingProcessor = nullptr;
+    ListeningPeerDb* m_listeningPeerDb = nullptr;
 };
 
 } // namespace http

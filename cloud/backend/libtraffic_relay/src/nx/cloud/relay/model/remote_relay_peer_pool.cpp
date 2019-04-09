@@ -22,7 +22,7 @@ static std::string toLowerReversed(std::string domainName)
 } //namespace
 
 RemoteRelayPeerPool::RemoteRelayPeerPool(const conf::Settings& settings):
-    m_settings(settings.clusterDbMap()),
+    m_settings(settings.listeningPeerDb()),
     m_baseApiPath(nx::clusterdb::engine::kBaseSynchronizationPath)
 {
     // Try to connect immediately
@@ -37,8 +37,15 @@ RemoteRelayPeerPool::~RemoteRelayPeerPool()
 
 bool RemoteRelayPeerPool::connectToDb()
 {
-    if (isConnected())
+    if (m_map)
         return true;
+
+    if (!m_settings.enabled)
+    {
+        NX_INFO(this,
+            "RemoteRelayPeerPool was not enabled. Other DB's will not be discovered...");
+        return true;
+    }
 
     try
     {
@@ -61,8 +68,7 @@ bool RemoteRelayPeerPool::connectToDb()
     }
     catch (const std::exception& e)
     {
-        NX_ERROR(
-            this,
+        NX_ERROR(this,
             "Failed to initialize database, traffic relay will not function properly: %1",
             e.what());
     }
@@ -72,6 +78,8 @@ bool RemoteRelayPeerPool::connectToDb()
 
 bool RemoteRelayPeerPool::isConnected() const
 {
+    if (!m_settings.enabled)
+        return true;
     return m_map != nullptr;
 }
 
@@ -81,7 +89,7 @@ void RemoteRelayPeerPool::findRelayByDomain(
 {
     using namespace nx::clusterdb::map;
 
-    if (!isConnected())
+    if (!m_map)
         return handler(std::string());
 
     m_map->database().dataManager().getRangeWithPrefix(
@@ -91,17 +99,13 @@ void RemoteRelayPeerPool::findRelayByDomain(
         {
             if (result != ResultCode::ok)
             {
-                NX_WARNING(
-                    this,
-                    "getRangeWithPrefix returned error: %1 for key: %2",
+                NX_WARNING(this, "getRangeWithPrefix returned error: %1 for key: %2",
                     toString(result), domainName);
                 return handler(std::string());
             }
 
-            NX_VERBOSE(
-                this,
-                "getRangeWithPrefix returned ResultCode: %1 and result set: %2 for domainName: %3",
-                toString(result), containerString(map), domainName);
+            NX_VERBOSE(this, "getRangeWithPrefix returned result set: %2 for domainName: %3",
+                containerString(map), domainName);
 
             if (map.empty())
                 handler(std::string());
@@ -116,7 +120,7 @@ void RemoteRelayPeerPool::addPeer(
 {
     using namespace nx::clusterdb::map;
 
-    if (!isConnected())
+    if (!m_map)
         return handler(false);
 
     m_map->database().dataManager().insertOrUpdate(
@@ -126,9 +130,7 @@ void RemoteRelayPeerPool::addPeer(
         {
             if (result != ResultCode::ok)
             {
-                NX_WARNING(
-                    this,
-                    "insertOrUpdate returned error: %1 for args: key: %2, value: %3",
+                NX_WARNING(this, "insertOrUpdate returned error: %1 for args: key: %2, value: %3",
                     toString(result), domainName, m_domainName);
             }
             handler(result == ResultCode::ok);
@@ -141,7 +143,7 @@ void RemoteRelayPeerPool::removePeer(
 {
     using namespace nx::clusterdb::map;
 
-    if (!isConnected())
+    if (!m_map)
         return handler(false);
 
     m_map->database().dataManager().remove(
@@ -150,8 +152,7 @@ void RemoteRelayPeerPool::removePeer(
         {
             if (result != ResultCode::ok)
             {
-                NX_VERBOSE(
-                    this,
+                NX_VERBOSE(this,
                     "remove returned error: %1, for args: key: %2, value: %3",
                     toString(result), domainName, m_domainName);
             }

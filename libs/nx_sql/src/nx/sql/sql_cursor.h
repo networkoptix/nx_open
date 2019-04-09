@@ -20,7 +20,7 @@ class Cursor:
     public BaseCursor
 {
 public:
-    Cursor(AsyncSqlQueryExecutor* asyncSqlQueryExecutor, QnUuid id):
+    Cursor(AbstractAsyncSqlQueryExecutor* asyncSqlQueryExecutor, QnUuid id):
         m_asyncSqlQueryExecutor(asyncSqlQueryExecutor),
         m_id(id)
     {
@@ -49,7 +49,7 @@ public:
     }
 
 private:
-    AsyncSqlQueryExecutor* m_asyncSqlQueryExecutor;
+    AbstractAsyncSqlQueryExecutor* m_asyncSqlQueryExecutor;
     const QnUuid m_id;
 };
 

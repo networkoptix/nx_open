@@ -2,6 +2,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include <nx/cloud/mediator/listening_peer_db.h>
+
 namespace nx {
 namespace hpm {
 
@@ -103,8 +105,12 @@ ListeningPeerData& ListeningPeerPool::DataLocker::value()
 //-------------------------------------------------------------------------------------------------
 // class ListeningPeerPool
 
-ListeningPeerPool::ListeningPeerPool(const conf::ListeningPeer& settings):
-    m_settings(settings)
+ListeningPeerPool::ListeningPeerPool(
+    const conf::ListeningPeer& settings,
+    ListeningPeerDb* listeningPeerDb)
+    :
+    m_settings(settings),
+    m_listeningPeerDb(listeningPeerDb)
 {
 }
 
@@ -144,6 +150,15 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
         peerIter->second.isLocal = true;
         peerIter->second.isListening = false;
         peerIter->second.hostName = peerIter->first.hostName();
+        m_listeningPeerDb->addPeer(
+            peerData.hostName().toStdString(),
+            [hostName = peerData.hostName()](bool added)
+            {
+                // Can't use "this" because the life time of m_listeningPeerDb is longer than "this".
+                // this handler with "this" may happen after "this" has been destroyed.
+                NX_VERBOSE(typeid(ListeningPeerPool), "Peer %1 added to RemoteRelayPeerPool: %2",
+                    hostName, added);
+            });
     }
 
     if (peerIter->second.peerConnection != connection)
@@ -281,6 +296,15 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
         peerIter->first.hostName(), (void*) connection);
 
     m_peers.erase(peerIter);
+
+    m_listeningPeerDb->removePeer(peerData.hostName().toStdString(),
+        [hostName = peerData.hostName()](bool removed)
+        {
+            // Can't use "this" because the life time of m_listeningPeerDb is longer than "this".
+            // this handler with "this" may happen after "this" has been destroyed.
+            NX_DEBUG(typeid(ListeningPeerPool), "Peer %1 removed from ListeningPeerDb: %2",
+                hostName, removed);
+        });
 }
 
 void ListeningPeerPool::closeConnectionAsync(

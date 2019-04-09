@@ -46,6 +46,7 @@ private:
     const OutgoingCommandFilter& m_commandFilter;
     nx::utils::Url m_remoteNodeUrl;
     const std::string m_systemId;
+    int m_stage2TryCount = 0;
 
     std::unique_ptr<network::http::AsyncClient> m_connectionUpgradeClient;
     std::unique_ptr<nx::p2p::P2PWebsocketTransport> m_commandPipeline;
@@ -55,6 +56,8 @@ private:
     nx::vms::api::PeerDataEx m_remotePeerData;
 
     void handleUpgradeCompletion();
+    void upgradeHttpConnectionToCommandTransportConnection();
+    void sendConnectStage2Request();
     void handlePipelineStart(SystemError::ErrorCode resultCode);
 };
 

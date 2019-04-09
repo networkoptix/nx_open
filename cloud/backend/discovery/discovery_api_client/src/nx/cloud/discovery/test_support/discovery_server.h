@@ -15,9 +15,7 @@ NX_DISCOVERY_CLIENT_API std::string generateInfoJson(const std::string& nodeId);
 class NX_DISCOVERY_CLIENT_API DiscoveryServer
 {
 public:
-    DiscoveryServer(
-        const std::string& clusterId,
-        const std::chrono::milliseconds& nodeLifetime = std::chrono::seconds(1));
+    DiscoveryServer(const std::chrono::milliseconds& nodeLifetime = std::chrono::seconds(1));
 
     bool bindAndListen();
 
@@ -37,19 +35,17 @@ private:
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler);
 
-    bool requestContainsThisClusterId(
-        const nx::network::http::RequestContext& requestContext) const;
+    bool haveClusterId(const std::string& clusterId) const;
 
-    Node updateNode(const NodeInfo& nodeInfo);
+    Node updateNode(const std::string& clusterId, const NodeInfo& nodeInfo);
 
-    std::vector<Node> updateOnlineNodes();
+    std::vector<Node> updateOnlineNodes(const std::string& clusterId);
 
 private:
-    const std::string m_clusterId;
     const std::chrono::milliseconds m_nodeLifetime;
 
     mutable QnMutex m_mutex;
-    std::map<std::string/*nodeId*/, Node> m_onlineNodes;
+    std::map<std::string /*clusterId*/, std::map<std::string /*nodeId*/, Node>> m_onlineNodes;
 
     nx::network::http::TestHttpServer m_httpServer;
 };

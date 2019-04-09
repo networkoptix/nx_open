@@ -19,6 +19,8 @@ using nx::vms::api::UserData;
 using nx::vms::api::UserDataList;
 
 MediaServerCloudIntegrationTest::MediaServerCloudIntegrationTest():
+    nx::utils::test::TestWithTemporaryDirectory("vms_cloud_integration"),
+    m_cdb(testDataDir()),
     m_defaultOwnerCredentials({ "admin", "admin" })
 {
     m_mediaServerLauncher.addSetting("delayBeforeSettingMasterFlag", "100ms");

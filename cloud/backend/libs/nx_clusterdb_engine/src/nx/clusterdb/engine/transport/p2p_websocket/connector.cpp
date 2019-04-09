@@ -18,6 +18,8 @@
 
 namespace nx::clusterdb::engine::transport::p2p::websocket {
 
+static constexpr int kMaxStage2Tries = 2;
+
 Connector::Connector(
     const ProtocolVersionRange& protocolVersionRange,
     CommandLog* commandLog,
@@ -90,17 +92,41 @@ void Connector::stopWhileInAioThread()
 
 void Connector::handleUpgradeCompletion()
 {
-    if (m_connectionUpgradeClient->failed() ||
-        m_connectionUpgradeClient->response()->statusLine.statusCode !=
-            nx::network::http::StatusCode::switchingProtocols)
+    if (m_connectionUpgradeClient->failed())
     {
         m_connectionUpgradeClient.reset();
 
-        NX_DEBUG(this, "Connection to %1 has failed", m_remoteNodeUrl);
+        NX_DEBUG(this, "Connection to %1 has failed. %2",
+            m_remoteNodeUrl, SystemError::toString(m_connectionUpgradeClient->lastSysErrorCode()));
         nx::utils::swapAndCall(m_completionHandler, SystemError::connectionRefused, nullptr);
         return;
     }
 
+    if (m_connectionUpgradeClient->response()->statusLine.statusCode ==
+        nx::network::http::StatusCode::switchingProtocols)
+    {
+        upgradeHttpConnectionToCommandTransportConnection();
+    }
+    else if (m_connectionUpgradeClient->response()->statusLine.statusCode ==
+        nx::network::http::StatusCode::noContent &&
+        m_connectionUpgradeClient->response()->headers.count(Qn::EC2_CONNECT_STAGE_1) > 0 &&
+        m_stage2TryCount < kMaxStage2Tries)
+    {
+        sendConnectStage2Request();
+        ++m_stage2TryCount;
+    }
+    else
+    {
+        m_connectionUpgradeClient.reset();
+        NX_DEBUG(this, "Connection to %1 has failed. %2 (%3) received",
+            m_remoteNodeUrl, m_connectionUpgradeClient->response()->statusLine.statusCode,
+            m_connectionUpgradeClient->response()->statusLine.reasonPhrase);
+        nx::utils::swapAndCall(m_completionHandler, SystemError::connectionRefused, nullptr);
+    }
+}
+
+void Connector::upgradeHttpConnectionToCommandTransportConnection()
+{
     const auto resultCode = nx::network::websocket::validateResponse(
         m_connectionUpgradeClient->request(),
         *m_connectionUpgradeClient->response());
@@ -126,6 +152,17 @@ void Connector::handleUpgradeCompletion()
 
     m_commandPipeline->start(
         [this](auto resultCode) { handlePipelineStart(resultCode); });
+}
+
+void Connector::sendConnectStage2Request()
+{
+    NX_VERBOSE(this, "Sending connect stage 2 request to %1", m_remoteNodeUrl);
+
+    m_connectionUpgradeClient->doUpgrade(
+        m_connectionUpgradeClient->url(),
+        nx::network::http::Method::get,
+        nx::network::websocket::kWebsocketProtocolName,
+        [this]() { handleUpgradeCompletion(); });
 }
 
 void Connector::handlePipelineStart(SystemError::ErrorCode resultCode)

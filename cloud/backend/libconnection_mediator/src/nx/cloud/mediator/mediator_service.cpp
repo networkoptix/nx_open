@@ -15,7 +15,6 @@
 
 #include "controller.h"
 #include "libconnection_mediator_app_info.h"
-#include "public_ip_discovery.h"
 #include "settings.h"
 #include "statistics/statistics_provider.h"
 #include "statistics/stats_manager.h"
@@ -64,6 +63,11 @@ const Controller& MediatorProcess::controller() const
     return *m_controller;
 }
 
+ListeningPeerDb& MediatorProcess::listeningPeerDb()
+{
+    return m_controller->listeningPeerDb();
+}
+
 std::unique_ptr<nx::utils::AbstractServiceSettings> MediatorProcess::createSettings()
 {
     return std::make_unique<conf::Settings>();
@@ -81,7 +85,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
     while (!controller.doMandatoryInitialization())
     {
         NX_INFO(this, lm("Retrying controller initialization after delay"));
-        std::this_thread::sleep_for(settings.clusterDbMap().connectionRetryDelay);
+        std::this_thread::sleep_for(settings.listeningPeerDb().connectionRetryDelay);
     }
     m_controller = &controller;
 
@@ -111,8 +115,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     NX_INFO(this, lm("Initialization completed. Running..."));
 
-    if (!registerThisInstanceNameInCluster(settings))
-        return -1;
+    registerThisInstanceNameInCluster(settings);
 
     const int result = runMainLoop();
 
@@ -125,38 +128,33 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
     return result;
 }
 
-bool MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& settings)
+void MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& settings)
 {
-    MediatorEndpoint endpoint;
+    const auto assignPort =
+        [](const std::vector<network::SocketAddress>& endpoints, int* outPort)
+        {
+            *outPort = endpoints.empty() ? MediatorEndpoint::kPortUnused : endpoints.front().port;
+        };
+
     if (settings.server().name.empty())
     {
-        const auto publicIp = m_controller->discoverPublicAddress();
-        if (!publicIp)
-        {
-            NX_ERROR(this, "Failed to discover public address. Terminating.");
-            return false;
-        }
-        endpoint.domainName = publicIp->toString().toStdString();
-
-        if (!httpEndpoints().empty())
-            endpoint.httpPort = httpEndpoints().front().port;
-        else
-            endpoint.httpsPort = httpsEndpoints().front().port;
-    }
-    else
-    {
-        endpoint.domainName = settings.server().name;
+        NX_INFO(this, "Server name is empty, discovery is not enabled.");
+        return;
     }
 
-    m_controller->remoteMediatorPeerPool().setEndpoint(endpoint);
+    MediatorEndpoint endpoint;
+    endpoint.domainName = settings.server().name;;
+    assignPort(httpEndpoints(), &endpoint.httpPort);
+    assignPort(httpsEndpoints(), &endpoint.httpsPort);
+    assignPort(stunUdpEndpoints(), &endpoint.stunUdpPort);
 
-    if (settings.clusterDbMap().map.synchronizationSettings.discovery.enabled)
+    m_controller->listeningPeerDb().setThisMediatorEndpoint(endpoint);
+
+    if (settings.listeningPeerDb().map.synchronizationSettings.discovery.enabled)
     {
-        m_controller->remoteMediatorPeerPool().startDiscovery(
+        m_controller->listeningPeerDb().startDiscovery(
             &m_view->httpServer().messageDispatcher());
     }
-
-    return true;
 }
 
 } // namespace hpm

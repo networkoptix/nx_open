@@ -109,8 +109,7 @@ class DiscoveryManager: public testing::Test
 protected:
     void SetUp() override
     {
-        m_server = std::make_unique<nx::cloud::discovery::test::DiscoveryServer>(
-            m_fixture.clusterId());
+        m_server = std::make_unique<nx::cloud::discovery::test::DiscoveryServer>();
 
         ASSERT_TRUE(m_server->bindAndListen());
     }

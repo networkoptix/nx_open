@@ -325,7 +325,22 @@ bool validateAuthorization(
     const boost::optional<BufferType>& predefinedHa1,
     const header::DigestAuthorization& digestAuthorizationHeader)
 {
-    const auto& digestParams = digestAuthorizationHeader.digest->params;
+    return validateAuthorization(
+        method,
+        userName,
+        userPassword,
+        predefinedHa1,
+        *digestAuthorizationHeader.digest);
+}
+
+bool validateAuthorization(
+    const StringType& method,
+    const StringType& userName,
+    const boost::optional<StringType>& userPassword,
+    const boost::optional<BufferType>& predefinedHa1,
+    const header::DigestCredentials& digestAuthorizationHeader)
+{
+    const auto& digestParams = digestAuthorizationHeader.params;
 
     const auto uri = fieldOrEmpty(digestParams, "uri");
     if (uri.isEmpty())
@@ -352,6 +367,17 @@ bool validateAuthorization(
     const StringType& method,
     const Credentials& credentials,
     const header::DigestAuthorization& digestAuthorizationHeader)
+{
+    return validateAuthorization(
+        method,
+        credentials,
+        *digestAuthorizationHeader.digest);
+}
+
+bool validateAuthorization(
+    const StringType& method,
+    const Credentials& credentials,
+    const header::DigestCredentials& digestAuthorizationHeader)
 {
     return validateAuthorization(
         method,

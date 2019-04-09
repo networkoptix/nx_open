@@ -53,7 +53,7 @@ public:
         AbstractSystemManager* systemManager,
         const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
         AbstractVmsGateway* vmsGateway,
-        nx::sql::AsyncSqlQueryExecutor* queryExecutor);
+        nx::sql::AbstractAsyncSqlQueryExecutor* queryExecutor);
     virtual ~SystemMergeManager() override;
 
     virtual void startMergingSystems(
@@ -84,7 +84,7 @@ private:
     AbstractSystemManager* m_systemManager = nullptr;
     const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
     AbstractVmsGateway* m_vmsGateway;
-    nx::sql::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;
+    nx::sql::AbstractAsyncSqlQueryExecutor* m_queryExecutor = nullptr;
     QnMutex m_mutex;
     // TODO: #ak Replace with std::set when c++17 is supported.
     std::map<MergeRequestContext*, std::unique_ptr<MergeRequestContext>> m_currentRequests;

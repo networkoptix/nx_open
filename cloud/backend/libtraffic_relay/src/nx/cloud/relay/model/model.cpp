@@ -44,9 +44,6 @@ bool Model::doMandatoryInitialization()
     // we can create some dummy RemoteRelayPeerPool so that we keep real RemoteRelayPeerPool
     // implementation clear (free of DB needed/not needed checks).
 
-    //if (m_settings.cassandraConnection().host.empty())
-    //    return true;
-
     return m_remoteRelayPeerPool->connectToDb();
 }
 

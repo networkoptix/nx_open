@@ -6,6 +6,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 
+#include <nx/cloud/mediator/listening_peer_db.h>
 #include <nx/cloud/mediator/listening_peer_pool.h>
 
 #include "server/test_connection.h"
@@ -22,7 +23,10 @@ public:
     {
         m_settings.connectionInactivityTimeout =
             std::chrono::milliseconds(nx::utils::random::number<int>());
-        m_listeningPeerPool = std::make_unique<hpm::ListeningPeerPool>(m_settings);
+        m_listeningPeerDb =
+            std::make_unique<hpm::ListeningPeerDb>(conf::ListeningPeerDb());
+        m_listeningPeerPool =
+            std::make_unique<hpm::ListeningPeerPool>(m_settings, m_listeningPeerDb.get());
 
         m_connection = std::make_shared<TestTcpConnection>();
     }
@@ -67,6 +71,7 @@ protected:
 
 private:
     conf::ListeningPeer m_settings;
+    std::unique_ptr<hpm::ListeningPeerDb> m_listeningPeerDb;
     std::unique_ptr<hpm::ListeningPeerPool> m_listeningPeerPool;
     std::shared_ptr<TestTcpConnection> m_connection;
 };
