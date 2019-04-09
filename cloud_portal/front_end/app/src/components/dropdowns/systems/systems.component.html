@@ -27,10 +27,11 @@
                    [ngClass]="{ 'selected': system == activeSystem }"
                    [href]="getUrlFor(system.id)"
                    (click)="show = false; return;">
-
-                    <span class="glyphicon glyphicon-home"></span>
-                    <span class="system-name">{{system.name}}</span>
-                    <span class="system-owner">&nbsp;&mdash;&nbsp;{{system.ownerFullName}}</span>
+                    <span>
+                        <span class="glyphicon glyphicon-home"></span>
+                        <span class="system-name">{{system.name}}</span>
+                        <span class="system-owner">&nbsp;&mdash;&nbsp;{{system.ownerFullName}}</span>
+                    </span>
                 </a>
             </li>
         </ul>
