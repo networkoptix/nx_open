@@ -729,7 +729,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
     int sended = doInterruptableSystemCallWithTimeout<>(
         this,
         std::bind(&::send, this->m_fd, (const void*)buffer, (size_t)bufferLen,
-#ifdef __linux
+#ifdef __linux__
             MSG_NOSIGNAL
 #else
             0
@@ -1660,7 +1660,7 @@ bool UDPSocket::setMulticastIF(const QString& multicastIF)
 
 bool UDPSocket::joinGroup(const QString &multicastGroup)
 {
-#ifdef __linux
+#ifdef __linux__
     int mcAll = 0;
     if (setsockopt(handle(), IPPROTO_IP, IP_MULTICAST_ALL, (raw_type *)&mcAll, sizeof(mcAll)) < 0)
     {
@@ -1686,7 +1686,7 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)
 
 bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicastIF)
 {
-#ifdef __linux
+#ifdef __linux__
     int mcAll = 0;
     if (setsockopt(handle(), IPPROTO_IP, IP_MULTICAST_ALL, (raw_type *)&mcAll, sizeof(mcAll)) < 0)
     {
