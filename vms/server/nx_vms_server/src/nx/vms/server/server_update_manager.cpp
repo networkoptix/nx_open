@@ -1,5 +1,6 @@
 #include "server_update_manager.h"
 #include <media_server/media_server_module.h>
+#include <nx/vms/server/root_fs.h>
 
 namespace nx {
 namespace vms::server {
