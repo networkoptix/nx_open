@@ -31,6 +31,9 @@ SynchronizationSettings::SynchronizationSettings():
 
 void SynchronizationSettings::load(const QnSettings& settings, std::string groupName)
 {
+    if (!groupName.empty() && groupName.back() == '/')
+        groupName.erase(groupName.size() - 1);
+
     QString settingsTemplate = groupName.empty() ? "%1%2" : "%1/%2";
 
     clusterId = settings.value(
@@ -56,7 +59,7 @@ void SynchronizationSettings::load(const QnSettings& settings, std::string group
         lm(settingsTemplate).arg(groupName).arg(kNodeConnectRetryTimeout)).toString(),
         kDefaultNodeConnectRetryTimeout);
 
-    discovery.load(settings, groupName.empty() ? "discovery" : groupName + "/" + "discovery");
+    discovery.load(settings, groupName.empty() ? "discovery" : groupName + "/discovery");
 }
 
 } // namespace nx::clusterdb::engine
