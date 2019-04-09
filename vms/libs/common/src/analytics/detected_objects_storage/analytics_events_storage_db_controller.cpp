@@ -5,9 +5,7 @@
 #include "analytics_events_storage_db_schema.h"
 #include "analytics_events_storage_types.h"
 
-namespace nx {
-namespace analytics {
-namespace storage {
+namespace nx::analytics::storage {
 
 DbController::DbController(
     const nx::sql::ConnectionOptions& connectionOptions)
@@ -27,14 +25,8 @@ DbController::DbController(
     dbStructureUpdater().addUpdateScript(kConvertTimestampToMillis);
     dbStructureUpdater().addUpdateScript(lm(kPackCoordinates).args(kCoordinatesPrecision).toUtf8());
     dbStructureUpdater().addUpdateScript(kAddFullTimePeriods);
-
-    // TODO: #ak Rename object_id column after switching to SQLITE 3.25.0.
-    // Before that renaming requires re-creating table and copying data
-    // which can be quite expensive here.
-    //dbStructureUpdater().addUpdateScript(
-    //    "ALTER TABLE event RENAME COLUMN object_id TO object_appearance_id");
+    if (kUseTrackAggregation)
+        dbStructureUpdater().addUpdateScript(kSplitDataToObjectAndSearch);
 }
 
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::storage

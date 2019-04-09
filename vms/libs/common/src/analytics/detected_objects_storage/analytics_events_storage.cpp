@@ -28,7 +28,10 @@ static constexpr int kMaxExpectedTrackLength = 100;
 static constexpr int kMaxFilterEventsResultSize =
     kMaxExpectedTrackLength * kMaxObjectLookupResultSet;
 
-static constexpr bool kUseTrackAggregation = false;
+static constexpr auto kTrackAggregationPeriod = std::chrono::seconds(5);
+static constexpr auto kMaxCachedObjectLifeTime = std::chrono::minutes(1);
+static constexpr auto kTrackSearchResolutionX = 44;
+static constexpr auto kTrackSearchResolutionY = 32;
 
 namespace detail {
 
@@ -60,7 +63,12 @@ bool TimePeriod::addPacketToPeriod(
 
 EventsStorage::EventsStorage(const Settings& settings):
     m_settings(settings),
-    m_dbController(settings.dbConnectionOptions)
+    m_dbController(settings.dbConnectionOptions),
+    m_objectCache(kTrackAggregationPeriod, kMaxCachedObjectLifeTime),
+    m_trackAggregator(
+        kTrackSearchResolutionX,
+        kTrackSearchResolutionY,
+        kTrackAggregationPeriod)
 {
     NX_CRITICAL(std::pow(10, kCoordinateDecimalDigits) < kCoordinatesPrecision);
 }
@@ -220,8 +228,8 @@ bool EventsStorage::loadDictionaries()
         m_dbController.queryExecutor().executeSelectQuerySync(
             [this](nx::sql::QueryContext* queryContext)
             {
-                loadObjectTypeDictionary(queryContext);
-                loadDeviceDictionary(queryContext);
+                m_objectTypeDao.loadObjectTypeDictionary(queryContext);
+                m_deviceDao.loadDeviceDictionary(queryContext);
                 fillCurrentTimePeriodsCache(queryContext);
                 // TODO: #ak Remove when executeSelectQuerySync supports void functors.
                 return true;
@@ -236,72 +244,6 @@ bool EventsStorage::loadDictionaries()
     return true;
 }
 
-void EventsStorage::loadObjectTypeDictionary(nx::sql::QueryContext* queryContext)
-{
-    auto query = queryContext->connection()->createQuery();
-    query->prepare("SELECT id, name FROM object_type");
-    query->exec();
-    while (query->next())
-        addObjectTypeToDictionary(query->value(0).toLongLong(), query->value(1).toString());
-}
-
-void EventsStorage::loadDeviceDictionary(nx::sql::QueryContext* queryContext)
-{
-    auto query = queryContext->connection()->createQuery();
-    query->prepare("SELECT id, guid FROM device");
-    query->exec();
-    while (query->next())
-    {
-        addDeviceToDictionary(
-            query->value(0).toLongLong(),
-            QnSql::deserialized_field<QnUuid>(query->value(1)));
-    }
-}
-
-void EventsStorage::addDeviceToDictionary(
-    long long id, const QnUuid& deviceGuid)
-{
-    QnMutexLocker locker(&m_mutex);
-    m_deviceGuidToId.emplace(deviceGuid, id);
-    m_idToDeviceGuid.emplace(id, deviceGuid);
-}
-
-long long EventsStorage::deviceIdFromGuid(const QnUuid& deviceGuid) const
-{
-    QnMutexLocker locker(&m_mutex);
-    auto it = m_deviceGuidToId.find(deviceGuid);
-    return it != m_deviceGuidToId.end() ? it->second : -1;
-}
-
-QnUuid EventsStorage::deviceGuidFromId(long long id) const
-{
-    QnMutexLocker locker(&m_mutex);
-    auto it = m_idToDeviceGuid.find(id);
-    return it != m_idToDeviceGuid.end() ? it->second : QnUuid();
-}
-
-void EventsStorage::addObjectTypeToDictionary(
-    long long id, const QString& name)
-{
-    QnMutexLocker locker(&m_mutex);
-    m_objectTypeToId.emplace(name, id);
-    m_idToObjectType.emplace(id, name);
-}
-
-long long EventsStorage::objectTypeIdFromName(const QString& name) const
-{
-    QnMutexLocker locker(&m_mutex);
-    auto it = m_objectTypeToId.find(name);
-    return it != m_objectTypeToId.end() ? it->second : -1;
-}
-
-QString EventsStorage::objectTypeFromId(long long id) const
-{
-    QnMutexLocker locker(&m_mutex);
-    auto it = m_idToObjectType.find(id);
-    return it != m_idToObjectType.end() ? it->second : QString();
-}
-
 sql::DBResult EventsStorage::savePacket(
     sql::QueryContext* queryContext,
     common::metadata::ConstDetectionMetadataPacketPtr packet)
@@ -310,7 +252,9 @@ sql::DBResult EventsStorage::savePacket(
     {
         updateDictionariesIfNeeded(queryContext, *packet, detectedObject);
 
-        const auto attributesId = insertAttributes(queryContext, detectedObject.labels);
+        const auto attributesId = m_attributesDao.insertOrFetchAttributes(
+            queryContext,
+            detectedObject.labels);
 
         const auto timePeriodId = insertOrUpdateTimePeriod(queryContext, *packet);
 
@@ -330,48 +274,8 @@ void EventsStorage::updateDictionariesIfNeeded(
     const common::metadata::DetectionMetadataPacket& packet,
     const common::metadata::DetectedObject& detectedObject)
 {
-    updateDeviceDictionaryIfNeeded(queryContext, packet);
-    updateObjectTypeDictionaryIfNeeded(queryContext, detectedObject);
-}
-
-void EventsStorage::updateDeviceDictionaryIfNeeded(
-    nx::sql::QueryContext* queryContext,
-    const common::metadata::DetectionMetadataPacket& packet)
-{
-    {
-        QnMutexLocker locker(&m_mutex);
-        if (m_deviceGuidToId.find(packet.deviceId) != m_deviceGuidToId.end())
-            return;
-    }
-
-    auto query = queryContext->connection()->createQuery();
-    query->prepare("INSERT INTO device(guid) VALUES (:guid)");
-    query->bindValue(":guid", QnSql::serialized_field(packet.deviceId));
-    query->exec();
-
-    addDeviceToDictionary(
-        query->impl().lastInsertId().toLongLong(),
-        packet.deviceId);
-}
-
-void EventsStorage::updateObjectTypeDictionaryIfNeeded(
-    nx::sql::QueryContext* queryContext,
-    const common::metadata::DetectedObject& detectedObject)
-{
-    {
-        QnMutexLocker locker(&m_mutex);
-        if (m_objectTypeToId.find(detectedObject.objectTypeId) != m_objectTypeToId.end())
-            return;
-    }
-
-    auto query = queryContext->connection()->createQuery();
-    query->prepare("INSERT INTO object_type(name) VALUES (:name)");
-    query->bindValue(":name", detectedObject.objectTypeId);
-    query->exec();
-
-    addObjectTypeToDictionary(
-        query->impl().lastInsertId().toLongLong(),
-        detectedObject.objectTypeId);
+    m_deviceDao.insertOrFetch(queryContext, packet.deviceId);
+    m_objectTypeDao.insertOrFetch(queryContext, detectedObject.objectTypeId);
 }
 
 void EventsStorage::insertEvent(
@@ -392,10 +296,10 @@ void EventsStorage::insertEvent(
     )sql"));
     insertEventQuery.bindValue(":timestampMs", packet.timestampUsec / kUsecPerMsec);
     insertEventQuery.bindValue(":durationUsec", packet.durationUsec);
-    insertEventQuery.bindValue(":deviceId", deviceIdFromGuid(packet.deviceId));
+    insertEventQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(packet.deviceId));
     insertEventQuery.bindValue(
         ":objectTypeId",
-        objectTypeIdFromName(detectedObject.objectTypeId));
+        m_objectTypeDao.objectTypeIdFromName(detectedObject.objectTypeId));
     insertEventQuery.bindValue(
         ":objectAppearanceId",
         QnSql::serialized_field(detectedObject.objectId));
@@ -421,51 +325,6 @@ void EventsStorage::insertEvent(
     insertEventQuery.exec();
 }
 
-long long EventsStorage::insertAttributes(
-    sql::QueryContext* queryContext,
-    const std::vector<common::metadata::Attribute>& eventAttributes)
-{
-    const auto content = QJson::serialized(eventAttributes);
-
-    auto attributesId = findAttributesIdInCache(content);
-    if (attributesId >= 0)
-        return attributesId;
-
-    auto findIdQuery = queryContext->connection()->createQuery();
-    findIdQuery->prepare("SELECT id FROM unique_attributes WHERE content=:content");
-    findIdQuery->bindValue(":content", content);
-    findIdQuery->exec();
-    if (findIdQuery->next())
-    {
-        const auto id = findIdQuery->value(0).toLongLong();
-        addToAttributesCache(id, content);
-        return id;
-    }
-
-    // No such value. Inserting.
-    auto insertContentQuery = queryContext->connection()->createQuery();
-    insertContentQuery->prepare("INSERT INTO unique_attributes(content) VALUES (:content)");
-    insertContentQuery->bindValue(":content", content);
-    insertContentQuery->exec();
-    const auto id = insertContentQuery->impl().lastInsertId().toLongLong();
-    addToAttributesCache(id, content);
-
-    // NOTE: Following string is in non-reversable format. So, cannot use it to store attributes.
-    // But, cannot use JSON for full text search since it contains additional information.
-    const auto contentForTextSearch =
-        containerString(eventAttributes, lit("; ") /*delimiter*/,
-            QString() /*prefix*/, QString() /*suffix*/, QString() /*empty*/);
-
-    insertContentQuery = queryContext->connection()->createQuery();
-    insertContentQuery->prepare(
-        "INSERT INTO attributes_text_index(docid, content) VALUES (:id, :content)");
-    insertContentQuery->bindValue(":id", id);
-    insertContentQuery->bindValue(":content", contentForTextSearch);
-    insertContentQuery->exec();
-
-    return id;
-}
-
 long long EventsStorage::insertOrUpdateTimePeriod(
     nx::sql::QueryContext* queryContext,
     const common::metadata::DetectionMetadataPacket& packet)
@@ -474,7 +333,7 @@ long long EventsStorage::insertOrUpdateTimePeriod(
 
     const auto packetTimestamp = duration_cast<milliseconds>(microseconds(packet.timestampUsec));
     const auto packetDuration = duration_cast<milliseconds>(microseconds(packet.durationUsec));
-    const auto deviceId = deviceIdFromGuid(packet.deviceId);
+    const auto deviceId = m_deviceDao.deviceIdFromGuid(packet.deviceId);
 
     auto currentPeriod = insertOrFetchCurrentTimePeriod(
         queryContext, deviceId, packetTimestamp, packetDuration);
@@ -535,7 +394,7 @@ detail::TimePeriod* EventsStorage::insertOrFetchCurrentTimePeriod(
     m_idToTimePeriod[periodIter->second.id] = periodIter;
 
     NX_VERBOSE(this, "Added new time period %1 (device %2, start time %3)",
-        timePeriod.id, deviceGuidFromId(timePeriod.deviceId), timePeriod.startTime);
+        timePeriod.id, m_deviceDao.deviceGuidFromId(timePeriod.deviceId), timePeriod.startTime);
 
     return &periodIter->second;
 }
@@ -555,7 +414,7 @@ void EventsStorage::closeCurrentTimePeriod(
         periodIter->second.endTime);
 
     NX_VERBOSE(this, "Closed time period %1 (device %2)",
-        periodIter->second.id, deviceGuidFromId(deviceId));
+        periodIter->second.id, m_deviceDao.deviceGuidFromId(deviceId));
 
     m_idToTimePeriod.erase(periodIter->second.id);
     m_deviceIdToCurrentTimePeriod.erase(periodIter);
@@ -708,7 +567,7 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
         auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
             "device_id", ":deviceId");
         for (const auto& deviceGuid: filter.deviceIds)
-            condition->addValue(deviceIdFromGuid(deviceGuid));
+            condition->addValue(m_deviceDao.deviceIdFromGuid(deviceGuid));
         sqlFilter.addCondition(std::move(condition));
     }
 
@@ -749,7 +608,7 @@ void EventsStorage::addObjectTypeIdToFilter(
     auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
         "object_type_id", ":objectTypeId");
     for (const auto& objectType: objectTypes)
-        condition->addValue(objectTypeIdFromName(objectType));
+        condition->addValue(m_objectTypeDao.objectTypeIdFromName(objectType));
     sqlFilter->addCondition(std::move(condition));
 }
 
@@ -874,7 +733,7 @@ void EventsStorage::loadObject(
     object->objectAppearanceId = QnSql::deserialized_field<QnUuid>(
         selectEventsQuery->value("object_id"));
     object->objectTypeId =
-        objectTypeFromId(selectEventsQuery->value("object_type_id").toLongLong());
+        m_objectTypeDao.objectTypeFromId(selectEventsQuery->value("object_type_id").toLongLong());
     QJson::deserialize(
         selectEventsQuery->value("attributes").toString(),
         &object->attributes);
@@ -882,7 +741,8 @@ void EventsStorage::loadObject(
     object->track.push_back(ObjectPosition());
     ObjectPosition& objectPosition = object->track.back();
 
-    objectPosition.deviceId = deviceGuidFromId(selectEventsQuery->value("device_id").toLongLong());
+    objectPosition.deviceId = m_deviceDao.deviceGuidFromId(
+        selectEventsQuery->value("device_id").toLongLong());
     objectPosition.timestampUsec =
         selectEventsQuery->value("timestamp_usec_utc").toLongLong() * kUsecPerMsec;
     objectPosition.durationUsec = selectEventsQuery->value("duration_usec").toLongLong();
@@ -1001,7 +861,7 @@ void EventsStorage::prepareSelectTimePeriodsUnfilteredQuery(
         auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
             "device_id", ":deviceId");
         for (const auto& deviceGuid: deviceGuids)
-            condition->addValue(deviceIdFromGuid(deviceGuid));
+            condition->addValue(m_deviceDao.deviceIdFromGuid(deviceGuid));
         sqlFilter.addCondition(std::move(condition));
     }
 
@@ -1122,7 +982,7 @@ void EventsStorage::cleanupEvents(
         DELETE FROM event
         WHERE device_id=:deviceId AND timestamp_usec_utc < :timestampMs
     )sql");
-    deleteEventsQuery.bindValue(":deviceId", deviceIdFromGuid(deviceId));
+    deleteEventsQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(deviceId));
     deleteEventsQuery.bindValue(
         ":timestampMs",
         (qint64) milliseconds(oldestDataToKeepTimestamp).count());
@@ -1145,32 +1005,6 @@ void EventsStorage::cleanupEventProperties(
 
     query.exec();
 #endif
-}
-
-void EventsStorage::addToAttributesCache(
-    long long id,
-    const QByteArray& content)
-{
-    static constexpr int kCacheSize = 101;
-
-    m_attributesCache.push_back({
-        QCryptographicHash::hash(content, QCryptographicHash::Md5),
-        id});
-
-    if (m_attributesCache.size() > kCacheSize)
-        m_attributesCache.pop_front();
-}
-
-long long EventsStorage::findAttributesIdInCache(
-    const QByteArray& content)
-{
-    const auto md5 = QCryptographicHash::hash(content, QCryptographicHash::Md5);
-
-    const auto it = std::find_if(
-        m_attributesCache.rbegin(), m_attributesCache.rend(),
-        [&md5](const auto& entry) { return entry.md5 == md5; });
-
-    return it != m_attributesCache.rend() ? it->id : -1;
 }
 
 int EventsStorage::packCoordinate(double value)

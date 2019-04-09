@@ -11,7 +11,7 @@ ObjectCache::ObjectCache(
 {
 }
 
-void ObjectCache::add(common::metadata::ConstDetectionMetadataPacketPtr /*packet*/)
+void ObjectCache::add(const common::metadata::ConstDetectionMetadataPacketPtr& /*packet*/)
 {
     // TODO
 }
