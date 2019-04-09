@@ -18,6 +18,7 @@ extern "C" {
 #include <libavutil/opt.h>
 #include <libavutil/imgutils.h>
 #include <libavformat/avformat.h>
+#include <decoders/video/ffmpeg_video_decoder.h>
 }
 
 namespace nx::vms::server::test::test_support {
@@ -185,15 +186,55 @@ static const int kBlockSize = 1024 * 1024;
 static int ffmpegRead(void* userCtx, uint8_t* data, int size);
 static int ffmpegWrite(void* userCtx, uint8_t* data, int size);
 static int64_t ffmpegSeek(void* userCtx, int64_t pos, int whence);
+static const int pixelSize = 8;
 
-static void drawTimestampOnFrame(AVFrame* frame, int64_t timestamp)
+static void drawTimestampOnFrame(AVFrame* frame, uint64_t timestamp)
 {
+    NX_ASSERT(frame->linesize[0] >= pixelSize * 8);
+    NX_ASSERT(frame->height >= pixelSize * 8);
 
+    uint64_t bitMask = 1;
+    for (int bitNum = 0; bitNum < 64; ++bitNum)
+    {
+        uint8_t color = (timestamp & bitMask) ? 0xff : 0x00;
+        int posX = (bitNum % 8) * pixelSize;
+        int posY = (bitNum / 8) * pixelSize;
+        uint8_t* data = frame->data[0] + posY * frame->linesize[0] + posX;
+        for (int y = 0; y < pixelSize; ++y)
+        {
+            for (int x = 0; x < pixelSize; ++x)
+                data[y * frame->linesize[0] + x] = color;
+        }
+        bitMask <<= 1;
+    }
 }
 
-static int64_t getTimestampFromFrame(AVFrame* frame)
+static uint64_t getTimestampFromFrame(const AVFrame* frame)
 {
-    return 0;
+    NX_ASSERT(frame->linesize[0] >= pixelSize * 8);
+    NX_ASSERT(frame->height >= pixelSize * 8);
+
+    uint64_t result = 0;
+    uint64_t bitMask = 1;
+    for (int bitNum = 0; bitNum < 64; ++bitNum)
+    {
+        int posX = (bitNum % 8) * pixelSize;
+        int posY = (bitNum / 8) * pixelSize;
+        uint8_t* data = frame->data[0] + posY * frame->linesize[0] + posX;
+        int color = 0;
+        for (int y = 0; y < pixelSize; ++y)
+        {
+            for (int x = 0; x < pixelSize; ++x)
+                color += data[y * frame->linesize[0] + x];
+        }
+        float avarageColor = color / (float)(pixelSize * pixelSize);
+        if (avarageColor >= 128.0)
+            result |= bitMask;
+
+        bitMask <<= 1;
+    }
+
+    return result;
 }
 
 class MkvBufferContext
@@ -357,6 +398,15 @@ private:
             }
 
             m_frame->pts = m_pts++;
+
+            const auto codecContextTimeBase = m_codecContext->time_base;
+            const auto streamTimeBase = m_formatContext->streams[0]->time_base;
+
+            auto timestampMs = av_rescale_q(m_frame->pts, codecContextTimeBase, {1, 1000});
+            drawTimestampOnFrame(m_frame, timestampMs);
+            auto writtenTimestamp = getTimestampFromFrame(m_frame);
+            ASSERT_EQ(timestampMs, writtenTimestamp);
+
             if (avcodec_send_frame(m_codecContext, m_frame) < 0)
                 throw std::runtime_error("Write frame failed: avcodec_send_frame");
 
@@ -367,9 +417,6 @@ private:
                     continue;
                 else if (result < 0)
                     throw std::runtime_error("Write frame failed: avcodec_receive_packet");
-
-                const auto codecContextTimeBase = m_codecContext->time_base;
-                const auto streamTimeBase = m_formatContext->streams[0]->time_base;
 
                 m_packet->pts = av_rescale_q(m_packet->pts, codecContextTimeBase, streamTimeBase);
                 m_packet->dts = av_rescale_q(m_packet->dts, codecContextTimeBase, streamTimeBase);
@@ -521,6 +568,21 @@ public:
         ASSERT_LT(dataTimestampMs - m_startTime, kTimeGapMs);
         m_startTime = dataTimestampMs;
 
+        auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(data);
+        if (video)
+        {
+            auto& decoder = m_decoders[video->compressionType];
+            if (!decoder)
+            {
+                decoder = std::make_unique<QnFfmpegVideoDecoder>(
+                    DecoderConfig(), video->compressionType, video, false);
+            }
+            QSharedPointer<CLVideoDecoderOutput>  outFrame(new CLVideoDecoderOutput());
+            decoder->decode(video, &outFrame);
+            auto frameTimestampMs = getTimestampFromFrame(outFrame.get());
+            ASSERT_EQ(dataTimestampMs - m_firstFrameTime, frameTimestampMs);
+        }
+
         if (m_endTime - m_startTime < kAcceptableTimeSpanToTheEndMs)
             selectNextTimePeriod(true);
     }
@@ -533,6 +595,8 @@ public:
     }
 
 private:
+    std::map<AVCodecID, std::unique_ptr<QnFfmpegVideoDecoder>> m_decoders;
+
     enum State
     {
         failed,
@@ -548,6 +612,7 @@ private:
     bool m_waitingForPeriodBeginning = true;
     QnTimePeriodList m_timePeriods;
     State m_state = inProgress;
+    int64_t m_firstFrameTime = 0;
     int64_t m_startTime = 0;
     int64_t m_endTime = 0;
 
@@ -563,7 +628,7 @@ private:
                 return setSuccess();
         }
 
-        m_startTime = m_timePeriods[0].startTimeMs;
+        m_firstFrameTime = m_startTime = m_timePeriods[0].startTimeMs;
         m_endTime = m_timePeriods[0].endTimeMs();
     }
 
