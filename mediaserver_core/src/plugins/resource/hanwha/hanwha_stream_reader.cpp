@@ -28,9 +28,6 @@ static const int kHanwhaDefaultPrimaryStreamProfile = 2;
 static const std::chrono::milliseconds kNvrSocketReadTimeout(500);
 static const std::chrono::milliseconds kTimeoutToExtrapolateTime(1000 * 5);
 
-static const QString kHanwhaTcp("TCP");
-static const QString kHanwhaUdp("UDP");
-
 QString toHanwhaStreamingType(nx::vms::api::RtpTransportType rtpTransport)
 {
     using namespace nx::vms::api;
