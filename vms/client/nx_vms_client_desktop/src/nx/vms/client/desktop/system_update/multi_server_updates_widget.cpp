@@ -242,6 +242,8 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         });
 
     ui->advancedUpdateSettings->setIcon(qnSkin->icon("text_buttons/collapse.png"));
+
+    setAccentStyle(ui->downloadButton);
     // This button is hidden for now. We will implement it in future.
     ui->downloadAndInstall->hide();
 
