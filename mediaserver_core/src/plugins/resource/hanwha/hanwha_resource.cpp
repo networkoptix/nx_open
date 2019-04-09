@@ -3307,7 +3307,17 @@ QnCameraAdvancedParamValueList HanwhaResource::addAssociatedParameters(
 {
     std::map<QString, QString> parameterValues;
     for (const auto& value: values)
+    {
+        const auto info = advancedParameterInfo(value.id);
+        if (!info)
+            continue;
+
+        const auto associationCondition = info->associationCondition();
+        if (!associationCondition.isEmpty() && associationCondition != value.value)
+            continue;
+
         parameterValues[value.id] = value.value;
+    }
 
     QSet<QString> parametersToFetch;
     for (const auto& entry: parameterValues)
