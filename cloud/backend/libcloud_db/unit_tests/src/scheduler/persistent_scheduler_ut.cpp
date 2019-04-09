@@ -35,7 +35,7 @@ public:
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    virtual void pleaseStopSync()
+    virtual void pleaseStopSync() override
     {
     }
 
