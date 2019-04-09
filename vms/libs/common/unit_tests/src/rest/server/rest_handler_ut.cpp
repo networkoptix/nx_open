@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <rest/server/request_handler.h>
 
+#include <nx/network/rest/handler.h>
 #include <nx/network/rest/nx_network_rest_ini.h>
 #include <nx/utils/test_support/run_test.h>
 
@@ -450,7 +450,7 @@ public:
 
 TEST_F(RestResponseTest, JsonResult)
 {
-    QnJsonRestResult result;
+    JsonResult result;
     result.setReply(SomeData{false, 111, "hello"});
     expectJsonResponse(
         rest::Response::result(result),
@@ -460,8 +460,8 @@ TEST_F(RestResponseTest, JsonResult)
 
 TEST_F(RestResponseTest, JsonError)
 {
-    QnJsonRestResult result;
-    result.setError({QnRestResult::MissingParameter, "name"});
+    JsonResult result;
+    result.setError({Result::MissingParameter, "name"});
     expectJsonResponse(
         rest::Response::result(result),
         http::StatusCode::unprocessableEntity,
@@ -470,8 +470,8 @@ TEST_F(RestResponseTest, JsonError)
 
 TEST_F(RestResponseTest, RestError)
 {
-    QnRestResult result;
-    result.setError(QnRestResult::InternalServerError, "Something went wrong");
+    Result result;
+    result.setError(Result::InternalServerError, "Something went wrong");
     expectJsonResponse(
         rest::Response::result(result),
         http::StatusCode::badRequest,
@@ -489,7 +489,7 @@ TEST_F(RestResponseTest, DataReply)
 TEST_F(RestResponseTest, ErrorResult)
 {
     expectJsonResponse(
-        rest::Response::error(QnRestResult::InvalidParameter, "a", "X"),
+        rest::Response::error(Result::InvalidParameter, "a", "X"),
         http::StatusCode::unprocessableEntity,
         R"json({"error":"2","errorString":"Invalid parameter 'a' value: 'X'","reply":null})json");
 }
@@ -497,7 +497,7 @@ TEST_F(RestResponseTest, ErrorResult)
 TEST_F(RestResponseTest, ErrorResultWithCode)
 {
     expectJsonResponse(
-        rest::Response::error(http::StatusCode::ok, QnRestResult::InvalidParameter, "a", "X"),
+        rest::Response::error(http::StatusCode::ok, Result::InvalidParameter, "a", "X"),
         http::StatusCode::ok,
         R"json({"error":"2","errorString":"Invalid parameter 'a' value: 'X'","reply":null})json");
 }

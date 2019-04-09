@@ -22,7 +22,7 @@ enum class Permissions
  * Base class for REST requests processing.
  * Single handler instance receives all requests, each request in a different thread.
  */
-class Handler: public QObject
+class Handler
 {
 protected:
     /**

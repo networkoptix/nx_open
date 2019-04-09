@@ -149,5 +149,3 @@ T UbjsonResult::deserialized(bool* isOk) const
 }
 
 } // namespace nx::network::rest
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::network::rest::Result::Error, (lexical)(numeric))
