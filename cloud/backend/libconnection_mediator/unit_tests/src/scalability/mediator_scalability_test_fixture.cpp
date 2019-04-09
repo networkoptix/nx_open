@@ -32,7 +32,6 @@ void MediatorScalabilityTestFixture::addMediator()
         "-https/listenOn", "127.0.0.1",
         "-http/connectionInactivityTimeout", "10m",
         "-server/name", "127.0.0.1",
-        "-listeningPeerDb/enabled", "true",
         "-listeningPeerDb/connectionRetryDelay", "100ms",
         "-listeningPeerDb/cluster/discovery/enabled", "true",
         "-listeningPeerDb/cluster/discovery/discoveryServiceUrl", discoveryServiceUrl.c_str(),
