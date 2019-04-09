@@ -701,6 +701,7 @@ public:
     int getCompatibleAudioDecoderConfigurations(GetCompatibleAudioDecoderConfigurationsReq& request, GetCompatibleAudioDecoderConfigurationsResp& response);
     int addAudioDecoderConfiguration(AddAudioDecoderConfigurationReq& request, AddAudioDecoderConfigurationResp& response);
 
+    int getAudioEncoderConfiguration(AudioConfigReq& request, AudioConfigResp& response);
     int getAudioEncoderConfigurationOptions(AudioOptionsReq& request, AudioOptionsResp& response);
     int getAudioEncoderConfigurations(AudioConfigsReq& request, AudioConfigsResp& response);
     int getAudioSourceConfigurations(AudioSrcConfigsReq& request, AudioSrcConfigsResp& response);
