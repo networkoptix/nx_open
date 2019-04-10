@@ -71,12 +71,11 @@
          *ngIf="vendors">
 
         <p>
-            <span translate="">This list is limited to actual devices auto-reporting data to {{company}}, as
-            approved by anonymous system users.
-                The complete list of supported manufacturers and models is greater in scope.</span>
+            <span [translate]="'disclaimer'"
+                  [translateParams]="{value: company}">
+            </span>
             <span *ngIf="CONFIG.feedbackEnabled">
-                <span translate>Please</span>&nbsp;<a href (click)="openFeedback('page')" translate>submit a request</a>&nbsp;
-                <span translate>for additionalquestions/concerns regarding supported devices.</span>
+                {{lang.ipvd.feedback.a_Please}} <a href (click)="openFeedback('page')">{{lang.ipvd.feedback.b_Link}}</a> {{lang.ipvd.feedback.c_Info}}
             </span>
         </p>
         <button *ngIf="debug" (click)="reset()">reset</button>

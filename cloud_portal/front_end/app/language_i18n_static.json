@@ -129,7 +129,12 @@
 		"I / O modules": "I / O modules",
 		"Multisensor Cameras": "Multisensor Cameras",
 		"Cameras with 2-way audio": "Cameras with 2-way audio",
-		"Extra high resolution cameras": "Extra high resolution cameras"
+		"Extra high resolution cameras": "Extra high resolution cameras",
+		"feedback" : {
+			"a_Please": "Please",
+			"b_Link": "submit a request",
+			"c_Info": "for additional questions/concerns regarding supported devices."
+		}
 	},
 	"integration": {
 		"previewRibbonText": "This page is a preview of the latest changes, and it doesn't match publicly available version.",

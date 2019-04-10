@@ -72,7 +72,6 @@
     "Password is required": "Password is required", 
     "Password:": "Password:", 
     "Permissions": "Permissions", 
-    "Please": "Please", 
     "Popularity": "Popularity", 
     "Privacy": "Privacy", 
     "Release Notes": "Release Notes", 
@@ -101,7 +100,6 @@
     "Terms": "Terms", 
     "The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.": "The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.", 
     "There will be more than": "There will be more than", 
-    "This list is limited to actual devices auto-reporting data to {{company}}, as\n            approved by anonymous system users.\n                The complete list of supported manufacturers and models is greater in scope.": "This list is limited to actual devices auto-reporting data to {{company}}, as\n            approved by anonymous system users.\n                The complete list of supported manufacturers and models is greater in scope.", 
     "Too many attempts. Try again in a minute.": "Too many attempts. Try again in a minute.", 
     "Update them to the": "Update them to the", 
     "Updated": "Updated", 
@@ -130,6 +128,7 @@
         "fisheye": "Fisheye cameras"
     }, 
     "devices": "devices", 
+    "disclaimer": "This list is limited to actual devices auto-reporting data to {{value}}, as approved by anonymous system users. The complete list of supported manufacturers and models is greater in scope.", 
     "downloads": {
         "platforms": {
             "win86": "x86", 
@@ -205,7 +204,6 @@
         }, 
         "action": "Download %VMS_NAME%"
     }, 
-    "for additionalquestions/concerns regarding supported devices.": "for additionalquestions/concerns regarding supported devices.", 
     "integration": {
         "backToEditText": "Back to the editing interfaces", 
         "Access Control": "Access Control", 
@@ -218,6 +216,11 @@
     }, 
     "ipvd": {
         "Cameras supporting H.265": "Cameras supporting H.265", 
+        "feedback": {
+            "info": "for additional questions/concerns regarding supported devices.", 
+            "link": "submit a request", 
+            "please": "Please"
+        }, 
         "isAptzSupported": "Advanced PTZ", 
         "hardwareType": "Type", 
         "isAptzSupportedShort": "Adv. PTZ", 
@@ -265,6 +268,5 @@
         "hardwareTypes": "types", 
         "minResolution": "Minimum Resolution"
     }, 
-    "servers in the merged System.": "servers in the merged System.", 
-    "submit a request": "submit a request"
+    "servers in the merged System.": "servers in the merged System."
 }
