@@ -186,23 +186,23 @@ static const int kBlockSize = 1024 * 1024;
 static int ffmpegRead(void* userCtx, uint8_t* data, int size);
 static int ffmpegWrite(void* userCtx, uint8_t* data, int size);
 static int64_t ffmpegSeek(void* userCtx, int64_t pos, int whence);
-static const int pixelSize = 8;
+static const int kdrawPixelSize = 16;
 
 static void drawTimestampOnFrame(AVFrame* frame, uint64_t timestamp)
 {
-    NX_ASSERT(frame->linesize[0] >= pixelSize * 8);
-    NX_ASSERT(frame->height >= pixelSize * 8);
+    NX_ASSERT(frame->linesize[0] >= kdrawPixelSize * 8);
+    NX_ASSERT(frame->height >= kdrawPixelSize * 8);
 
     uint64_t bitMask = 1;
     for (int bitNum = 0; bitNum < 64; ++bitNum)
     {
         uint8_t color = (timestamp & bitMask) ? 0xff : 0x00;
-        int posX = (bitNum % 8) * pixelSize;
-        int posY = (bitNum / 8) * pixelSize;
+        int posX = (bitNum % 8) * kdrawPixelSize;
+        int posY = (bitNum / 8) * kdrawPixelSize;
         uint8_t* data = frame->data[0] + posY * frame->linesize[0] + posX;
-        for (int y = 0; y < pixelSize; ++y)
+        for (int y = 0; y < kdrawPixelSize; ++y)
         {
-            for (int x = 0; x < pixelSize; ++x)
+            for (int x = 0; x < kdrawPixelSize; ++x)
                 data[y * frame->linesize[0] + x] = color;
         }
         bitMask <<= 1;
@@ -211,23 +211,23 @@ static void drawTimestampOnFrame(AVFrame* frame, uint64_t timestamp)
 
 static uint64_t getTimestampFromFrame(const AVFrame* frame)
 {
-    NX_ASSERT(frame->linesize[0] >= pixelSize * 8);
-    NX_ASSERT(frame->height >= pixelSize * 8);
+    NX_ASSERT(frame->linesize[0] >= kdrawPixelSize * 8);
+    NX_ASSERT(frame->height >= kdrawPixelSize * 8);
 
     uint64_t result = 0;
     uint64_t bitMask = 1;
     for (int bitNum = 0; bitNum < 64; ++bitNum)
     {
-        int posX = (bitNum % 8) * pixelSize;
-        int posY = (bitNum / 8) * pixelSize;
+        int posX = (bitNum % 8) * kdrawPixelSize;
+        int posY = (bitNum / 8) * kdrawPixelSize;
         uint8_t* data = frame->data[0] + posY * frame->linesize[0] + posX;
         int color = 0;
-        for (int y = 0; y < pixelSize; ++y)
+        for (int y = 0; y < kdrawPixelSize; ++y)
         {
-            for (int x = 0; x < pixelSize; ++x)
+            for (int x = 0; x < kdrawPixelSize; ++x)
                 color += data[y * frame->linesize[0] + x];
         }
-        float avarageColor = color / (float)(pixelSize * pixelSize);
+        float avarageColor = color / (float)(kdrawPixelSize * kdrawPixelSize);
         if (avarageColor >= 128.0)
             result |= bitMask;
 
