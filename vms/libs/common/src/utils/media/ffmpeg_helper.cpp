@@ -558,3 +558,11 @@ QnFfmpegAvPacket::~QnFfmpegAvPacket()
 {
     av_packet_unref(this);
 }
+
+QString toString(AVPixelFormat pixelFormat)
+{
+    const AVPixFmtDescriptor* const descriptor = av_pix_fmt_desc_get(pixelFormat);
+    if (!descriptor || !descriptor->name)
+        return "AVPixelFormat(" + QString::number((int) pixelFormat) + ")";
+    return descriptor->name;
+}

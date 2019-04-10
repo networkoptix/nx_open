@@ -136,3 +136,5 @@ struct QnFfmpegAvPacket: AVPacket
     QnFfmpegAvPacket(const QnFfmpegAvPacket&) = delete;
     QnFfmpegAvPacket& operator=(const QnFfmpegAvPacket&) = delete;
 };
+
+QString toString(AVPixelFormat pixelFormat);

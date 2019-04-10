@@ -6,11 +6,18 @@
 
 #include <cstring>
 #include <cstdio>
+#include <array>
+#include <memory>
 
 #include <utils/math/math.h>
 
+#include <nx/utils/switch.h>
 #include <nx/utils/app_info.h>
 #include <utils/color_space/yuvconvert.h>
+
+#include <utils/media/ffmpeg_helper.h>
+
+#include <nx/streaming/config.h>
 
 extern "C" {
 #ifdef WIN32
@@ -23,36 +30,6 @@ extern "C" {
 #   undef AVPixFmtDescriptor
 #endif
 };
-
-namespace {
-
-bool convertImageFormat(
-    int width,
-    int height,
-    uint8_t* const sourceSlice[],
-    const int sourceStride[],
-    AVPixelFormat sourceFormat,
-    uint8_t* const targetSlice[],
-    const int targetStride[],
-    AVPixelFormat targetFormat)
-{
-    if (const auto context = sws_getContext(
-            width, height, sourceFormat,
-            width, height, targetFormat,
-            SWS_BILINEAR, nullptr, nullptr, nullptr))
-    {
-        sws_scale(context, sourceSlice, sourceStride, 0, height, targetSlice, targetStride);
-        sws_freeContext(context);
-        return true;
-    }
-    return false;
-}
-
-} // namespace
-
-/////////////////////////////////////////////////////
-//  class QnSysMemPictureData
-/////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////
 //  class QnOpenGLPictureData
@@ -96,6 +73,31 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(int targetWidth, int targetHeight, in
 CLVideoDecoderOutput::~CLVideoDecoderOutput()
 {
     clean();
+}
+
+bool CLVideoDecoderOutput::convertImageFormat(
+    int width,
+    int height,
+    const uint8_t* const sourceSlice[],
+    const int sourceStride[],
+    AVPixelFormat sourceFormat,
+    uint8_t* const targetSlice[],
+    const int targetStride[],
+    AVPixelFormat targetFormat) const
+{
+    if (const auto context = sws_getContext(
+        width, height, sourceFormat,
+        width, height, targetFormat,
+        SWS_BILINEAR, /*srcFilter*/ nullptr, /*dstFilter*/ nullptr, /*param*/nullptr))
+    {
+        sws_scale(context, sourceSlice, sourceStride, 0, height, targetSlice, targetStride);
+        sws_freeContext(context);
+        return true;
+    }
+
+    NX_ERROR(this, "Unable to convert video frame from %1 to %2: sws_getContext() failed.",
+        sourceFormat, targetFormat);
+    return false;
 }
 
 void CLVideoDecoderOutput::setUseExternalData(bool value)
@@ -396,6 +398,7 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
     for (int y = 0; y < height; ++y)
         memcpy(src.data[0] + src.linesize[0]*y, image.scanLine(y), width * 4);
 
+    // Ignore the potential error (already logged) - no clear way to handle it here.
     convertImageFormat(width, height,
         src.data, src.linesize, AV_PIX_FMT_BGRA,
         data, linesize, AV_PIX_FMT_YUV420P);
@@ -403,9 +406,12 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 
 QImage CLVideoDecoderOutput::toImage() const
 {
+    // TODO: Investigate if the below mentioned bug is still present.
+    // TODO: Consider using SSE via yuvconverter.h.
+
     // In some cases direct conversion to AV_PIX_FMT_BGRA causes crash in sws_scale
     // function. As workaround we can temporary convert to AV_PIX_FMT_ARGB format and then convert
-    // to target AV_PIX_FMT_BGRA
+    // to target AV_PIX_FMT_BGRA.
     const AVPixelFormat intermediateFormat = AV_PIX_FMT_ARGB;
     const AVPixelFormat targetFormat = AV_PIX_FMT_BGRA;
 
@@ -417,13 +423,17 @@ QImage CLVideoDecoderOutput::toImage() const
     if (!convertImageFormat(width, height,
         data, linesize, (AVPixelFormat)format,
         target->data, target->linesize, intermediateFormat))
-        return QImage();
+    {
+        return {};
+    }
 
     const CLVideoDecoderOutputPtr converted(new CLVideoDecoderOutput(width, height, targetFormat));
     if (!convertImageFormat(width, height,
         target->data, target->linesize, intermediateFormat,
         converted->data, converted->linesize, targetFormat))
-        return QImage();
+    {
+        return {};
+    }
 
     target = converted;
 
@@ -434,59 +444,87 @@ QImage CLVideoDecoderOutput::toImage() const
     return img;
 }
 
-std::vector<char> CLVideoDecoderOutput::toRgb(int* outLineSize, AVPixelFormat pixelFormat) const
+
+/**
+ * Convert the frame using the optimized conversion, if it is available for the source and
+ * destination pixel formats.
+ *
+ * @param dstAvFrame Should be properly allocated according to dstAvPixelFormat.
+ * @return Whether the optimized conversion was available.
+ */
+bool CLVideoDecoderOutput::convertUsingSimdIntrTo(
+    AVPixelFormat dstAvPixelFormat, const AVFrame* dstAvFrame) const
 {
-    NX_ASSERT(outLineSize);
-
-    int bytesPerPixel = 0;
-    switch (pixelFormat)
-    {
-        case AV_PIX_FMT_ARGB:
-        case AV_PIX_FMT_ABGR:
-        case AV_PIX_FMT_RGBA:
-        case AV_PIX_FMT_BGRA:
-            bytesPerPixel = 4;
-            break;
-
-        case AV_PIX_FMT_RGB24:
-        case AV_PIX_FMT_BGR24:
-            bytesPerPixel = 3;
-            break;
-
-        default:
-            NX_ERROR(this) << __func__ << "(): Unsupported AVPixelFormat " << pixelFormat;
-            return std::vector<char>{};
-    }
-
-    int targetLineSize[4];
-    memset(targetLineSize, 0, sizeof(targetLineSize));
-    targetLineSize[0] = qPower2Ceil((unsigned int) (width * bytesPerPixel), 16U);
-    *outLineSize = targetLineSize[0];
-
-    std::vector<char> result(*outLineSize * height);
-
-    uint8_t* targetData[4];
-    memset(targetData, 0, sizeof(targetData));
-    targetData[0] = (uint8_t*) &result.at(0);
-
-    #if defined(__i386) || defined(__amd64) || defined(_WIN32)
-        if (pixelFormat == AV_PIX_FMT_BGRA)
-        {
-            // ATTENTION: Despite its name, this function actually converts to BGRA.
-            yuv420_argb32_simd_intr(
-                (uint8_t*) &result[0],
-                data[0], data[1], data[2],
-                width, height, *outLineSize,
-                linesize[0], linesize[1], /*alpha*/ 255);
-            return result;
-        }
+    // Currently, the optimized conversion is not supported on arms (neon).
+    #if !defined(__i386) && !defined(__amd64) && !defined(_WIN32)
+        return false;
     #endif
 
-    // TODO: Check return value.
-    convertImageFormat(width, height,
-        data, linesize, (AVPixelFormat) format,
-        targetData, targetLineSize, pixelFormat);
-    return result;
+    // NOTE: Despite the names of ..._argb32_simd_intr() converters, they actually convert
+    // to BGRA (instead of ARGB as their names may suggest).
+    if (dstAvPixelFormat != AV_PIX_FMT_BGRA)
+        return false;
+
+    const auto convertFrame = //< Pointer to the appropriate conversion function.
+        nx::utils::switch_(format,
+            AV_PIX_FMT_YUV420P, []{ return yuv420_argb32_simd_intr; },
+            AV_PIX_FMT_YUV422P, []{ return yuv422_argb32_simd_intr; },
+            AV_PIX_FMT_YUV444P, []{ return yuv444_argb32_simd_intr; },
+            nx::utils::default_, []{ return nullptr; }
+        );
+    if (!convertFrame)
+        return false;
+
+    if (!NX_ASSERT(linesize[1] == linesize[2], "Src frame U and V planes have different strides.")
+        || !NX_ASSERT(dstAvFrame->linesize[0] >= width * 4)
+        || !NX_ASSERT(dstAvFrame->linesize[0] % CL_MEDIA_ALIGNMENT == 0)
+        || !NX_ASSERT((intptr_t) dstAvFrame->data[0] % CL_MEDIA_ALIGNMENT == 0))
+    {
+        return false;
+    }
+
+    convertFrame(
+        dstAvFrame->data[0],
+        data[0], data[1], data[2],
+        width, height,
+        /*dst_stride*/ dstAvFrame->linesize[0],
+        /*y_stride*/ linesize[0],
+        /*uv_stride*/ linesize[1],
+        /*alpha*/ 255);
+
+    return true;
+}
+
+std::shared_ptr<const AVFrame> CLVideoDecoderOutput::convertTo(AVPixelFormat dstPixelFormat) const
+{
+    if (!NX_ASSERT(format >= 0))
+        return nullptr;
+
+    if (format == dstPixelFormat)
+        return std::shared_ptr<const AVFrame>((AVFrame*) this, /*empty deleter*/ [](AVFrame*) {});
+
+    AVFrame* const avFramePtr = new AVFrame;
+    avFramePtr->data[0] = nullptr; //< Required by the deleter.
+    std::shared_ptr<AVFrame> frame(avFramePtr,
+        /*deleter*/ [](AVFrame* avFrame) { av_freep(&avFrame->data[0]); });
+
+    const int r = av_image_alloc(
+        frame->data, frame->linesize, width, height, dstPixelFormat, CL_MEDIA_ALIGNMENT);
+    if (!NX_ASSERT(r > 0, lm("av_image_alloc() failed for pixel format %1").args(dstPixelFormat)))
+        return nullptr;
+
+    if (!convertUsingSimdIntrTo(dstPixelFormat, frame.get()))
+    {
+        if (!convertImageFormat(
+            width, height,
+            data, linesize, (AVPixelFormat) format,
+            frame->data, frame->linesize, dstPixelFormat))
+        {
+            return nullptr;
+        }
+    }
+
+    return frame;
 }
 
 void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)

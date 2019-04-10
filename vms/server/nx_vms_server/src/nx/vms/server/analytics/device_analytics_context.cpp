@@ -201,12 +201,12 @@ void DeviceAnalyticsContext::putFrame(
         if (!gotPixelFormat)
             continue;
 
-        if (const auto& dataPacket = frameConverter.getDataPacket(pixelFormat))
+        if (const auto dataPacket = frameConverter.getDataPacket(pixelFormat))
         {
             if (binding->canAcceptData()
                 && NX_ASSERT(dataPacket->timestampUs() >= 0))
             {
-                binding->putData(std::make_shared<DataPacketAdapter>(dataPacket));
+                binding->putData(std::make_shared<DataPacketAdapter>(dataPacket.get()));
             }
             else
             {

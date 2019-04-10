@@ -4,6 +4,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <atomic>
+#include <memory>
 
 #include <QtCore/QAtomicInt>
 #include <QtGui/QImage>
@@ -151,8 +152,12 @@ private:
 };
 
 
-//!Decoded frame, ready to be rendered
-
+/**
+ * Decoded frame, ready to be rendered.
+ *
+ * ATTENTION: AVFrame's field pkt_dts is filled with the time since epoch in microseconds, instead
+ * of time_base units as ffmpeg states in the documentation.
+ */
 class CLVideoDecoderOutput: public AVFrame
 {
 public:
@@ -165,8 +170,12 @@ public:
 
     QImage toImage() const;
 
-    /** On error, return an empty array after logging the error. */
-    std::vector<char> toRgb(int* outLineSize, AVPixelFormat pixelFormat) const;
+    /**
+     * @param dstPixelFormat If identical to the current pixel format, a shared pointer to `this` with
+     *     an empty deleter will be returned, otherwise, a shared pointer to the newly allocated
+     *     frame with a de-allocating deleter will be returned.
+     */
+    std::shared_ptr<const AVFrame> convertTo(AVPixelFormat dstPixelFormat) const;
 
     static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
@@ -206,8 +215,10 @@ public:
     int channel = 0;
 
     FrameMetadata metadata; // addition data associated with video frame
+
 private:
     bool m_useExternalData = false; // pointers only copied to this frame
+
 private:
     bool invalidScaleParameters(const QSize& size) const;
     static void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height);
@@ -215,6 +226,18 @@ private:
 
     CLVideoDecoderOutput( const CLVideoDecoderOutput& );
     const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );
+
+    bool convertUsingSimdIntrTo(AVPixelFormat dstAvPixelFormat, const AVFrame* frameData) const;
+
+    bool convertImageFormat(
+        int width,
+        int height,
+        const uint8_t* const sourceSlice[],
+        const int sourceStride[],
+        AVPixelFormat sourceFormat,
+        uint8_t* const targetSlice[],
+        const int targetStride[],
+        AVPixelFormat targetFormat) const;
 };
 typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;
 typedef QSharedPointer<const CLVideoDecoderOutput> CLConstVideoDecoderOutputPtr;
