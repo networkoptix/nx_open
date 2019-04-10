@@ -99,23 +99,6 @@
                 <div [innerHtml]="plugin.instructions.installationInstructions"></div>
             </nx-section>
         </nx-block>
-
-        <nx-block *ngIf="plugin && plugin.additionalInformation">
-            <header translate>
-                Additional information
-            </header>
-            <nx-section *ngIf="plugin.additionalInformation.additionalVideo">
-                <nx-external-video [src]="plugin.additionalInformation.additionalVideo"></nx-external-video>
-            </nx-section>
-
-            <nx-section *ngIf="plugin.additionalInformation.additionalInformation">
-                <div [innerHtml]="plugin.additionalInformation.additionalInformation"></div>
-            </nx-section>
-            <nx-section *ngIf="plugin.additionalInformation.usefulLinks">
-                <div class="mt-3"
-                     [innerHtml]="plugin.additionalInformation.usefulLinks"></div>
-            </nx-section>
-        </nx-block>
     </nx-layout-right>
 </div>
 
