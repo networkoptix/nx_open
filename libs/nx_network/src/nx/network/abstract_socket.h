@@ -487,6 +487,11 @@ public:
      */
     virtual void handshakeAsync(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
+
+    /**
+     * @return "servername" TLS extension from ClientHello. Valid only for accepted socket.
+     */
+    virtual std::string serverName() const = 0;
 };
 
 using AcceptCompletionHandler =

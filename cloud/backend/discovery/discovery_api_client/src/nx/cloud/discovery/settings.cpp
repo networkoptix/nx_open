@@ -37,8 +37,8 @@ Settings::Settings():
 
 void Settings::load(const QnSettings& settings, std::string groupName)
 {
-    if (!groupName.empty() && groupName.back() == '/')
-        groupName.erase(groupName.size() - 1);
+    while (!groupName.empty() && groupName.back() == '/')
+        groupName.pop_back();
 
     QString settingsTemplate = groupName.empty() ? "%1%2" : "%1/%2";
 

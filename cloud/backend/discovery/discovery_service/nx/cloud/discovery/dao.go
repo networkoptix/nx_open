@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
-type Item map[string]*dynamodb.AttributeValue
+//type Item map[string]*dynamodb.AttributeValue
 
 func tableName() *string {
 	return aws.String(os.Getenv("DISCOVERY_TABLE_NAME"))
@@ -38,12 +38,42 @@ func toUnixStr(t time.Time) *string {
 	return &str
 }
 
+func toNode(item map[string]*dynamodb.AttributeValue) Node {
+	nsec, _ := strconv.ParseInt(*item["expirationTime"].N, 10, 64)
+	node := Node{
+		NodeId:         *item["nodeId"].S,
+		ExpirationTime: Date{Time: time.Unix(0, nsec)},
+	}
+	if urls, ok := item["urls"]; ok {
+		node.Urls = toStrSlice(urls.SS)
+	}
+	if infoJson, ok := item["infoJson"]; ok {
+		node.InfoJson = *infoJson.S
+	}
+	return node
+}
+
+func toItem(node *Node, clusterId string) map[string]*dynamodb.AttributeValue {
+	item := map[string]*dynamodb.AttributeValue{
+		"clusterId":      &dynamodb.AttributeValue{S: &clusterId},
+		"nodeId":         &dynamodb.AttributeValue{S: &node.NodeId},
+		"expirationTime": &dynamodb.AttributeValue{N: toUnixStr(node.ExpirationTime.Time)},
+	}
+	if len(node.Urls) > 0 {
+		item["urls"] = &dynamodb.AttributeValue{SS: toStrPtrSlice(node.Urls)}
+	}
+	if len(node.InfoJson) > 0 {
+		item["infoJson"] = &dynamodb.AttributeValue{S: &node.InfoJson}
+	}
+	return item
+}
+
 func (dao *DAO) getExpiredNodes(clusterId string) ([]map[string]*dynamodb.AttributeValue, error) {
 	input := &dynamodb.QueryInput{
 		TableName:              tableName(),
 		IndexName:              aws.String("clusterId-expirationTime-index"),
 		KeyConditionExpression: aws.String("clusterId = :clusterId AND expirationTime <= :now"),
-		ExpressionAttributeValues: Item{
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":clusterId": &dynamodb.AttributeValue{S: &clusterId},
 			":now":       &dynamodb.AttributeValue{N: toUnixStr(time.Now())},
 		},
@@ -94,13 +124,7 @@ func NewDAO() (*DAO, error) {
 func (dao *DAO) InsertOrUpdate(node *Node, clusterId string) error {
 	_, err := dao.db.PutItem(&dynamodb.PutItemInput{
 		TableName: tableName(),
-		Item: Item{
-			"clusterId":      &dynamodb.AttributeValue{S: &clusterId},
-			"nodeId":         &dynamodb.AttributeValue{S: &node.NodeId},
-			"urls":           &dynamodb.AttributeValue{SS: toStrPtrSlice(node.Urls)},
-			"expirationTime": &dynamodb.AttributeValue{N: toUnixStr(node.ExpirationTime.Time)},
-			"infoJson":       &dynamodb.AttributeValue{S: &node.InfoJson},
-		},
+		Item:      toItem(node, clusterId),
 	})
 
 	return err
@@ -114,7 +138,7 @@ func (dao *DAO) GetOnlineNodes(clusterId string) ([]Node, error) {
 		TableName:              tableName(),
 		IndexName:              aws.String("clusterId-expirationTime-index"),
 		KeyConditionExpression: aws.String("clusterId = :clusterId AND expirationTime > :now"),
-		ExpressionAttributeValues: Item{
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":clusterId": &dynamodb.AttributeValue{S: &clusterId},
 			":now":       &dynamodb.AttributeValue{N: toUnixStr(time.Now())},
 		},
@@ -130,13 +154,7 @@ func (dao *DAO) GetOnlineNodes(clusterId string) ([]Node, error) {
 		}
 
 		for _, item := range output.Items {
-			nsec, _ := strconv.ParseInt(*item["expirationTime"].N, 10, 64)
-			onlineNodes = append(onlineNodes, Node{
-				NodeId:         *item["nodeId"].S,
-				Urls:           toStrSlice(item["urls"].SS),
-				ExpirationTime: Date{Time: time.Unix(0, nsec)},
-				InfoJson:       *item["infoJson"].S,
-			})
+			onlineNodes = append(onlineNodes, toNode(item))
 		}
 
 		queryInput.ExclusiveStartKey = output.LastEvaluatedKey
