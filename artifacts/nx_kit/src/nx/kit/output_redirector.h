@@ -12,14 +12,18 @@ namespace kit {
 /**
  * The mechanism allows to perform output (stdout, stderr) redirection to files.
  *
- * To activate redirection, the user must create files in the directory nx::kit::IniConfig::iniFilesDir(), named as
- * follows: `<executable-name-without-.exe>-stdout.log` and/or `<executable-name-without-.exe>-stderr.log`. If such
- * file(s) exists, the respective stream will be appended to the file contents.
+ * To activate redirection, the user must create special files in the directory
+ * nx::kit::IniConfig::iniFilesDir(), named as follows:
+ * `<executable-name-without-extension>_stdout.log`
+ * and/or
+ * `<executable-name-without-extension>_stderr.log`
  *
- * Redirection is performed during static initialization, thus, to ensure that it occurs before any other output, this
- * library should be the first in the list of linked libraries of the executable. Note that in Windows due to
- * some MSVC C++ Runtime issues, if any output occurs before the redirection, the redirection may not work (the output
- * disappears at all).
+ * If such a file exists, the respective stream will be appended to the file contents.
+ *
+ * Redirection is performed during static initialization, thus, to ensure that it occurs before any
+ * other output, this library should be the first in the list of linked libraries of the
+ * executable. Note that in Windows due to some MSVC C++ Runtime issues, if any output occurs
+ * before the redirection, the redirection may not work (the output disappears at all).
  *
  * If needed, this mechanism can be disabled defining a macro at compiling output_redirector.cpp:
  * -DNX_OUTPUT_REDIRECTOR_DISABLED.
