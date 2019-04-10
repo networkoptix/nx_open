@@ -20,6 +20,9 @@
    <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="spacing">
+    <number>2</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -83,6 +86,22 @@
     </widget>
    </item>
    <item>
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>2</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
     <widget class="QCheckBox" name="forceVideoTrafficEncryptionCheckBox">
      <property name="text">
       <string>Encrypt video traffic</string>
@@ -99,7 +118,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
-       <number>4</number>
+       <number>0</number>
       </property>
       <property name="leftMargin">
        <number>0</number>
@@ -115,6 +134,9 @@
       </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>4</number>
+        </property>
         <item>
          <widget class="QCheckBox" name="limitSessionLengthCheckBox">
           <property name="text">
@@ -154,14 +176,14 @@
        </layout>
       </item>
       <item>
-       <spacer name="verticalSpacer_2">
+       <spacer name="preventFlickeringSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>1</height>
+          <height>0</height>
          </size>
         </property>
        </spacer>
@@ -179,13 +201,13 @@
           <number>0</number>
          </property>
          <property name="topMargin">
-          <number>0</number>
+          <number>6</number>
          </property>
          <property name="rightMargin">
           <number>0</number>
          </property>
          <property name="bottomMargin">
-          <number>0</number>
+          <number>6</number>
          </property>
          <property name="verticalSpacing">
           <number>0</number>
@@ -240,6 +262,22 @@
     </widget>
    </item>
    <item>
+    <spacer name="verticalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>4</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
     <widget class="QLabel" name="watermarkExplanationLabel">
      <property name="text">
       <string>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</string>
@@ -248,6 +286,22 @@
       <bool>true</bool>
      </property>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>4</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <widget class="QPushButton" name="watermarkSettingsButton">
