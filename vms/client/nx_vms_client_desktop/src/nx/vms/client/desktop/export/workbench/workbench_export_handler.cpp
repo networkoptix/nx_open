@@ -535,8 +535,9 @@ void WorkbenchExportHandler::runExport(ExportToolInstance&& context)
         return;
 
     d->startingExportMessageBox.reset(new QnMessageBox(QnMessageBoxIcon::Information,
-        tr("Starting export..."), QString(), QDialogButtonBox::NoButton,
-        QDialogButtonBox::NoButton, mainWindowWidget()));
+        tr("Starting export..."),
+        tr("We are preparing files for the export process. Please wait for a few seconds."),
+        QDialogButtonBox::NoButton, QDialogButtonBox::NoButton, mainWindowWidget()));
 
     // Only show this message if startExport() takes some time.
     // startExport() will call processEvents().
