@@ -111,6 +111,7 @@ void addTestStorage(MediaServerLauncher* server, const QString& storagePath)
 // Test data generation
 
 static const int64_t kMediaFileDurationMs = 60000;
+static const int64_t kMediaFilesGapMs = 40;
 
 static void replaceValue(QByteArray& payload, const QByteArray& key, const QByteArray& newValue)
 {
@@ -154,7 +155,7 @@ static ChunkDataList generateChunksForQuality(
         NX_ASSERT(dataFile.write(payload));
 
         result.push_back(ChunkData{ startTimeMs, kMediaFileDurationMs, fullFileName });
-        startTimeMs += kMediaFileDurationMs + 5;
+        startTimeMs += kMediaFileDurationMs + kMediaFilesGapMs;
     }
 
     return result;
@@ -356,7 +357,7 @@ private:
     void setupIoContext()
     {
         uint8_t* ioBuffer;
-        ioBuffer = (uint8_t*)av_malloc(kBlockSize);
+        ioBuffer = static_cast<uint8_t*>(av_malloc(kBlockSize));
         m_formatContext->pb = avio_alloc_context(
             ioBuffer, kBlockSize, 1, this, &ffmpegRead, &ffmpegWrite, &ffmpegSeek);
         if (!m_formatContext->pb)
@@ -368,7 +369,7 @@ private:
         if (m_formatContext->pb)
         {
             avio_flush(m_formatContext->pb);
-            m_formatContext->pb->opaque = 0;
+            m_formatContext->pb->opaque = nullptr;
             av_freep(&m_formatContext->pb->buffer);
             av_opt_free(m_formatContext->pb);
             av_free(m_formatContext->pb);
@@ -515,7 +516,7 @@ QnVirtualCameraResourcePtr getCamera(QnResourcePool* resourcePool, const QString
 {
     const auto allCameras = resourcePool->getAllCameras();
     QnVirtualCameraResourcePtr result;
-    for (const auto camera : allCameras)
+    for (const auto& camera: allCameras)
     {
         if (camera->getUniqueId() == uniqueIdOrName || camera->getName() == uniqueIdOrName)
         {
@@ -580,7 +581,13 @@ public:
             QSharedPointer<CLVideoDecoderOutput>  outFrame(new CLVideoDecoderOutput());
             decoder->decode(video, &outFrame);
             auto frameTimestampMs = getTimestampFromFrame(outFrame.get());
-            ASSERT_EQ(dataTimestampMs - m_firstFrameTime, frameTimestampMs);
+            if (frameTimestampMs == 0
+                && dataTimestampMs - m_firstFileFrameTime == kMediaFileDurationMs + kMediaFilesGapMs)
+            {
+                // New file
+                m_firstFileFrameTime += kMediaFileDurationMs + kMediaFilesGapMs;
+            }
+            ASSERT_EQ(dataTimestampMs - m_firstFileFrameTime, frameTimestampMs);
         }
 
         if (m_endTime - m_startTime < kAcceptableTimeSpanToTheEndMs)
@@ -595,8 +602,6 @@ public:
     }
 
 private:
-    std::map<AVCodecID, std::unique_ptr<QnFfmpegVideoDecoder>> m_decoders;
-
     enum State
     {
         failed,
@@ -612,9 +617,10 @@ private:
     bool m_waitingForPeriodBeginning = true;
     QnTimePeriodList m_timePeriods;
     State m_state = inProgress;
-    int64_t m_firstFrameTime = 0;
+    int64_t m_firstFileFrameTime = 0;
     int64_t m_startTime = 0;
     int64_t m_endTime = 0;
+    std::map<AVCodecID, std::unique_ptr<QnFfmpegVideoDecoder>> m_decoders;
 
     void selectNextTimePeriod(bool removeFirst)
     {
@@ -628,7 +634,7 @@ private:
                 return setSuccess();
         }
 
-        m_firstFrameTime = m_startTime = m_timePeriods[0].startTimeMs;
+        m_firstFileFrameTime = m_startTime = m_timePeriods[0].startTimeMs;
         m_endTime = m_timePeriods[0].endTimeMs();
     }
 
