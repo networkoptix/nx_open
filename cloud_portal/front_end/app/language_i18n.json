@@ -76,13 +76,16 @@
 	"You can only merge Systems in which you have owner permissions.": "You can only merge Systems in which you have owner permissions.",
 	"Your browser is not supported": "Your browser is not supported",
 	"and": "and",
+	"before proceeding.": "before proceeding.",
 	"has a newer software version that is incompatible with the current system. Update the current system to the": "has a newer software version that is incompatible with the current system. Update the current system to the",
 	"has an older software version that is incompatable with the current system. Update": "has an older software version that is incompatable with the current system. Update",
 	"is currently unreachable. Try again in a few minutes or contact": "is currently unreachable. Try again in a few minutes or contact",
 	"is offline and cannot be merged with the current one.": "is offline and cannot be merged with the current one.",
 	"latest build": "latest build",
+	"or merge locally using": "or merge locally using",
 	"servers in the merged System.": "servers in the merged System.",
 	"support": "support",
 	"to merge it with the": "to merge it with the",
-	"to merge it with the current one.": "to merge it with the current one."
+	"to merge it with the current one.": "to merge it with the current one.",
+	"to the": "to the"
 }
