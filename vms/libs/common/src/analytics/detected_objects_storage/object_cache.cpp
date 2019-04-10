@@ -39,6 +39,19 @@ long long ObjectCache::dbIdFromObjectId(const QnUuid& /*objectId*/) const
     return -1;
 }
 
+void ObjectCache::saveObjectGuidToAttributesId(
+    const QnUuid& /*guid*/,
+    long long /*attributesId*/)
+{
+    // TODO
+}
+
+long long ObjectCache::getAttributesIdByObjectGuid(const QnUuid& /*guid*/) const
+{
+    // TODO
+    return -1;
+}
+
 void ObjectCache::removeExpiredData()
 {
     // TODO

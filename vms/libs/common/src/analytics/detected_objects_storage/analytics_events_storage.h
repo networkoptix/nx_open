@@ -127,6 +127,7 @@ class EventsStorage:
 {
 public:
     EventsStorage(const Settings& settings);
+    virtual ~EventsStorage();
 
     virtual bool initialize() override;
 

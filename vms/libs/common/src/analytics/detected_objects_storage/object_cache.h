@@ -16,7 +16,11 @@ static constexpr long long kInvalidDbId = -1;
 struct ObjectUpdate
 {
     long long dbId = kInvalidDbId;
-    std::vector<ObjectPosition> trackToAppend;
+    QnUuid objectId;
+    std::vector<ObjectPosition> appendedTrack;
+    /** Attributes that were added since the last insert/update. */
+    std::vector<common::metadata::Attribute> appendedAttributes;
+    /** All object's attributes. */
     std::vector<common::metadata::Attribute> allAttributes;
 };
 
@@ -59,6 +63,10 @@ public:
      * @return kInvalidDbId if object id is unknown.
      */
     long long dbIdFromObjectId(const QnUuid& objectId) const;
+
+    void saveObjectGuidToAttributesId(const QnUuid& guid, long long attributesId);
+
+    long long getAttributesIdByObjectGuid(const QnUuid& guid) const;
 
     /**
      * NOTE: Data removal happens inly in this method.

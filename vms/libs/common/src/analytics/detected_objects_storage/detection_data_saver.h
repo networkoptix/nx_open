@@ -18,11 +18,10 @@ public:
     DetectionDataSaver(
         AttributesDao* attributesDao,
         DeviceDao* deviceDao,
-        ObjectTypeDao* objectTypeDao);
+        ObjectTypeDao* objectTypeDao,
+        ObjectCache* objectCache);
 
-    void load(
-        ObjectCache* objectCache,
-        ObjectTrackAggregator* trackAggregator);
+    void load(ObjectTrackAggregator* trackAggregator);
 
     bool empty() const;
 
@@ -35,6 +34,7 @@ private:
     AttributesDao* m_attributesDao = nullptr;
     DeviceDao* m_deviceDao = nullptr;
     ObjectTypeDao* m_objectTypeDao = nullptr;
+    ObjectCache* m_objectCache = nullptr;
 
     std::vector<DetectedObject> m_objectsToInsert;
     std::vector<ObjectUpdate> m_objectsToUpdate;
@@ -46,6 +46,7 @@ private:
     void insertObjects(nx::sql::QueryContext* queryContext);
     void updateObjects(nx::sql::QueryContext* queryContext);
     void saveObjectSearchData(nx::sql::QueryContext* queryContext);
+    std::vector<long long> toDbIds(const std::vector<QnUuid>& objectIds);
 };
 
 } // namespace nx::analytics::storage

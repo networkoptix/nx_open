@@ -75,6 +75,11 @@ EventsStorage::EventsStorage(const Settings& settings):
     NX_CRITICAL(std::pow(10, kCoordinateDecimalDigits) < kCoordinatesPrecision);
 }
 
+EventsStorage::~EventsStorage()
+{
+    // TODO: Waiting for completion or cancelling posted queries.
+}
+
 bool EventsStorage::initialize()
 {
     return m_dbController.initialize()
@@ -126,9 +131,10 @@ void EventsStorage::save(
         DetectionDataSaver detectionDataSaver(
             &m_attributesDao,
             &m_deviceDao,
-            &m_objectTypeDao);
+            &m_objectTypeDao,
+            &m_objectCache);
 
-        detectionDataSaver.load(&m_objectCache, &m_trackAggregator);
+        detectionDataSaver.load(&m_trackAggregator);
 
         m_objectCache.removeExpiredData();
 

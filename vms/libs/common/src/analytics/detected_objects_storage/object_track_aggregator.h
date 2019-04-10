@@ -1,7 +1,6 @@
 #pragma once
 
 #include <chrono>
-#include <list>
 #include <vector>
 
 #include <QtCore/QRect>
@@ -18,7 +17,7 @@ struct AggregatedTrackData
      * Resolution is defined by ObjectTrackAggregator settings.
      */
     QRect boundingBox;
-    std::list<QnUuid> objectIds;
+    std::vector<QnUuid> objectIds;
 };
 
 /**
