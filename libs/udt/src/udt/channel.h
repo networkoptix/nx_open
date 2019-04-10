@@ -41,9 +41,11 @@ Yunhong Gu, last updated 01/27/2011
 #ifndef __UDT_CHANNEL_H__
 #define __UDT_CHANNEL_H__
 
+#include <optional>
 
 #include "udt.h"
 #include "packet.h"
+#include "socket_addresss.h"
 
 
 class UdpChannel
@@ -56,11 +58,11 @@ public:
     // Functionality:
     //    Open a UDP channel.
     // Parameters:
-    //    0) [in] addr: The local address that UDP will use.
+    //    0) [in] addr: The local address that UDP will use. Pass NULL to auto-assign address.
     // Returned value:
     //    None.
 
-    void open(const sockaddr* addr = NULL);
+    void open(const std::optional<detail::SocketAddress>& addr);
 
     // Functionality:
     //    Open a UDP channel based on an existing UDP socket.
@@ -114,7 +116,7 @@ public:
     // Returned value:
     //    None.
 
-    void getSockAddr(sockaddr* addr) const;
+    detail::SocketAddress getSockAddr() const;
 
     // Functionality:
     //    Query the peer side socket address that the channel is connect to.
@@ -123,7 +125,7 @@ public:
     // Returned value:
     //    None.
 
-    void getPeerAddr(sockaddr* addr) const;
+    detail::SocketAddress getPeerAddr() const;
 
     // Functionality:
     //    Send a packet to the given address.
@@ -133,7 +135,7 @@ public:
     // Returned value:
     //    Actual size of data sent.
 
-    int sendto(const sockaddr* addr, CPacket& packet) const;
+    int sendto(const detail::SocketAddress& addr, CPacket& packet) const;
 
     // Functionality:
     //    Receive a packet from the channel and record the source address.
@@ -143,7 +145,7 @@ public:
     // Returned value:
     //    Actual size of data received.
 
-    int recvfrom(sockaddr* addr, CPacket& packet) const;
+    int recvfrom(detail::SocketAddress& addr, CPacket& packet) const;
 
     int shutdown();
 
@@ -152,7 +154,6 @@ private:
 
 private:
     int m_iIPversion;                    // IP version
-    int m_iSockAddrSize;                 // socket address structure size (pre-defined to avoid run-time test)
 
     UDPSOCKET m_iSocket;                 // socket descriptor
 

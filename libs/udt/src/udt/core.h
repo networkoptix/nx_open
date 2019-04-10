@@ -75,7 +75,7 @@ public:
     /**
      * If packet does not contain connection request, non-zero is returned.
      */
-    int processConnectionRequest(sockaddr* addr, CPacket& packet);
+    int processConnectionRequest(const detail::SocketAddress& addr, CPacket& packet);
 
     void addEPoll(const int eid);
     void removeEPoll(const int eid);
@@ -194,7 +194,7 @@ public: // internal API
 
     bool synRecving() const { return m_bSynRecving; }
     bool synSending() const { return m_bSynSending; }
-    sockaddr* peerAddr() { return m_pPeerAddr; };
+    detail::SocketAddress& peerAddr() { return m_pPeerAddr; };
     const uint32_t* selfIp() const { return m_piSelfIP; }
 
     int32_t isn() const { return m_iISN; }
@@ -239,7 +239,7 @@ public: // internal API
     // Returned value:
     //    None.
 
-    void connect(const sockaddr* peer);
+    void connect(const detail::SocketAddress& peer);
 
     // Functionality:
     //    Process the response handshake packet.
@@ -258,7 +258,7 @@ public: // internal API
     // Returned value:
     //    None.
 
-    void connect(const sockaddr* peer, CHandShake* hs);
+    void connect(const detail::SocketAddress& peer, CHandShake* hs);
 
     int shutdown(int how);
 
@@ -556,7 +556,7 @@ private: // Timers
 
 private: // for UDP multiplexer
     std::shared_ptr<Multiplexer> m_multiplexer;
-    sockaddr* m_pPeerAddr = nullptr;    // peer address
+    detail::SocketAddress m_pPeerAddr;    // peer address
     uint32_t m_piSelfIP[4];             // local UDP IP address
     CSNode* m_pSNode = nullptr;         // node information for UDT list used in snd queue
     std::shared_ptr<ServerSideConnectionAcceptor> m_synPacketHandler;
