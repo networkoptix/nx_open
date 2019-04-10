@@ -102,8 +102,8 @@ protected:
         using namespace nx::test;
         NX_TEST_API_POST(
             m_server.get(),
-            QString("/api/wearableCamera/lock/?cameraId=%1&ttl=60000&userId=%2")
-                .arg(m_wearableCameraId.toString()).arg(m_lockId),
+            QString("/api/wearableCamera/lock?cameraId=%1&ttl=60000&userId=%2")
+                .arg(m_wearableCameraId.toString()).arg(m_lockId.toString()),
             QByteArray());
     }
 
@@ -111,7 +111,7 @@ private:
     QString m_testFilePath;
     QString m_testFileName;
     const QString m_wearableCameraName = "testCamera";
-    const QString m_lockId = "testUser";
+    const QnUuid m_lockId = QnUuid::createUuid();
     QnUuid m_wearableCameraId;
     int64_t m_testFileStartTimeMs;
 };

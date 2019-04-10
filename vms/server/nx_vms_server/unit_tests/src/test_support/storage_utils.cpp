@@ -584,7 +584,7 @@ public:
             if (frameTimestampMs == 0
                 && dataTimestampMs - m_firstFileFrameTime == kMediaFileDurationMs + kMediaFilesGapMs)
             {
-                // New file
+                // A new file.
                 m_firstFileFrameTime += kMediaFileDurationMs + kMediaFilesGapMs;
             }
             ASSERT_EQ(dataTimestampMs - m_firstFileFrameTime, frameTimestampMs);
