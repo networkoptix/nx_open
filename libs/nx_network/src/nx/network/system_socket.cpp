@@ -47,6 +47,13 @@ typedef void raw_type;       // Type used for raw data on this platform
 #define SOCKET_ERROR (-1)
 #endif
 
+// Needed only for bpi build, that use old C Library headers.
+#ifdef __linux__
+    #ifndef IP_MULTICAST_ALL
+        #define IP_MULTICAST_ALL 49
+    #endif
+#endif
+
 namespace nx {
 namespace network {
 
