@@ -8,7 +8,6 @@ import email.header
 from email.parser import HeaderParser
 import os.path
 import time
-import types
 from requests import head
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -18,10 +17,9 @@ from SeleniumLibrary.utils import (is_falsy, is_truthy, secs_to_timestr,
                                    timestr_to_secs, SELENIUM_VERSION)
 from random import *
 from robot.libraries.BuiltIn import BuiltIn
-from .APIKeywords import APIKeywords
 
 
-class NoptixLibrary(APIKeywords):
+class NoptixLibrary(object):
 
     def copy_text(self, locator):
         locator.send_keys(Keys.CONTROL + 'a')
