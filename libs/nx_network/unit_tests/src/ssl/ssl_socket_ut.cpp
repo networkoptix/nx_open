@@ -551,6 +551,15 @@ protected:
                 ->isEncryptionEnabled());
     }
 
+    void assertServerNameHasBeenPassedByTheClientConnection()
+    {
+        thenConnectionHasBeenAccepted();
+
+        ASSERT_EQ(
+            "127.0.0.1",
+            static_cast<AbstractEncryptedStreamSocket*>(lastAcceptedSocket())->serverName());
+    }
+
 private:
     std::unique_ptr<TCPSocket> m_notEncryptedConnection;
     QByteArray m_dataSent;
@@ -600,6 +609,14 @@ TEST_F(SslSocketSpecific, disabled_encryption_is_reported)
     givenNotEncryptedConnection();
 
     assertServerConnectionReportsEncryptionDisabled();
+}
+
+TEST_F(SslSocketSpecific, servername_tls_extension_is_passed)
+{
+    givenAcceptingServerSocket();
+    givenConnectedSocket();
+
+    assertServerNameHasBeenPassedByTheClientConnection();
 }
 
 //-------------------------------------------------------------------------------------------------
