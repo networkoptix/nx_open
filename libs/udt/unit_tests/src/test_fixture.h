@@ -18,6 +18,7 @@ class BasicFixture:
 public:
     void initializeUdt();
     void deinitializeUdt();
+    void setIpVersion(int ipVersion);
 
     void givenListeningServerSocket();
     void startAcceptingAsync();
@@ -39,6 +40,7 @@ public:
     void givenTwoConnectedSockets();
 
 private:
+    int m_ipVersion = AF_INET;
     UDTSOCKET m_serverSocket = -1;
     UDTSOCKET m_acceptedConnection = -1;
     struct sockaddr_in m_serverAddress;

@@ -1,5 +1,9 @@
 #include "test_fixture.h"
 
+#ifdef _WIN32
+#include <Ws2ipdef.h>
+#endif
+
 #include <gtest/gtest.h>
 
 namespace udt::test {
@@ -14,18 +18,43 @@ void BasicFixture::deinitializeUdt()
     UDT::cleanup();
 }
 
+void BasicFixture::setIpVersion(int ipVersion)
+{
+    m_ipVersion = ipVersion;
+}
+
 void BasicFixture::givenListeningServerSocket()
 {
-    m_serverSocket = UDT::socket(AF_INET, SOCK_STREAM, 0);
+    m_serverSocket = UDT::socket(m_ipVersion, SOCK_STREAM, 0);
     ASSERT_GT(m_serverSocket, 0);
 
-    struct sockaddr_in localAddress;
-    memset(&localAddress, 0, sizeof(localAddress));
-    localAddress.sin_family = AF_INET;
-    localAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
-    ASSERT_EQ(
-        0,
-        UDT::bind(m_serverSocket, (struct sockaddr*)&localAddress, sizeof(localAddress)));
+    struct sockaddr_in localAddress4;
+    memset(&localAddress4, 0, sizeof(localAddress4));
+
+    struct sockaddr_in6 localAddress6;
+    memset(&localAddress6, 0, sizeof(localAddress6));
+
+    struct sockaddr* localAddress = nullptr;
+    int localAddressLen = 0;
+
+    if (m_ipVersion == AF_INET)
+    {
+        localAddress4.sin_family = m_ipVersion;
+        localAddress4.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+        localAddress = (sockaddr*) &localAddress4;
+        localAddressLen = sizeof(localAddress4);
+    }
+    else
+    {
+        localAddress6.sin6_family = m_ipVersion;
+        localAddress6.sin6_addr = in6addr_loopback;
+
+        localAddress = (sockaddr*) &localAddress6;
+        localAddressLen = sizeof(localAddress6);
+    }
+
+    ASSERT_EQ(0, UDT::bind(m_serverSocket, localAddress, localAddressLen));
 
     ASSERT_EQ(0, UDT::listen(m_serverSocket, 127));
 
@@ -81,7 +110,7 @@ void BasicFixture::closeServerSocket()
 
 void BasicFixture::givenConnectingClientSocket()
 {
-    m_clientSocket = UDT::socket(AF_INET, SOCK_STREAM, 0);
+    m_clientSocket = UDT::socket(m_ipVersion, SOCK_STREAM, 0);
 
     enableNonBlockingMode(m_clientSocket);
 
@@ -90,7 +119,7 @@ void BasicFixture::givenConnectingClientSocket()
 
 void BasicFixture::givenConnectedClientSocket()
 {
-    m_clientSocket = UDT::socket(AF_INET, SOCK_STREAM, 0);
+    m_clientSocket = UDT::socket(m_ipVersion, SOCK_STREAM, 0);
 
     connectToServer();
 }
