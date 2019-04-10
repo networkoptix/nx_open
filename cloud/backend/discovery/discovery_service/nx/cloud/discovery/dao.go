@@ -11,8 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
-//type Item map[string]*dynamodb.AttributeValue
-
 func tableName() *string {
 	return aws.String(os.Getenv("DISCOVERY_TABLE_NAME"))
 }
