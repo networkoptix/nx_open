@@ -12,38 +12,31 @@
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
-namespace {
+using namespace nx::network;
 
 static const std::chrono::hours kConnectionTimeout(10);
-static const nx::network::KeepAliveOptions kKeepAliveOptions(
+static const KeepAliveOptions kKeepAliveOptions(
     std::chrono::seconds(10), std::chrono::seconds(10), 3);
 
-template<typename P>
-bool allModulesMode(const P& p) { return p.value(lit("allModules")) == lit("true"); }
+static const QString kAllModules("allModules");
+static const QString kShowAddresses("showAddresses");
+static const QString kCheckOwnerPermissions("checkOwnerPermissions");
+static const QString kKeepConnectionOpen("keepConnectionOpen");
+static const QString kUpdateStreamTime("updateStream");
 
-template<typename P>
-bool showAddressesMode(const P& p) { return p.value(lit("showAddresses"), lit("true")) != lit("false"); }
-
-template<typename P>
-bool checkOwnerPermissionsMode(const P& p) { return p.value(lit("checkOwnerPermissions"), lit("false")) != lit("false"); }
-
-template<typename P>
-bool keepConnectionOpenMode(const P& p) { return p.contains(lit("keepConnectionOpen")); }
-
-template<typename P>
-std::optional<std::chrono::milliseconds> updateStreamTime(const P& p)
+static std::optional<std::chrono::milliseconds> parseUpdateStreamTime(
+    const nx::network::rest::Request& request)
 {
-    if (!p.contains("updateStream"))
+    const auto value = request.param(kUpdateStreamTime);
+    if (!value)
         return std::nullopt;
 
-    std::chrono::milliseconds requestedTime = std::chrono::seconds(p.value("updateStream").toInt());
+    std::chrono::milliseconds requestedTime = std::chrono::seconds(value->toInt());
     if (requestedTime.count() == 0)
         requestedTime = kKeepAliveOptions.inactivityPeriodBeforeFirstProbe / 2;
 
     return requestedTime;
 }
-
-} // namespace
 
 QnModuleInformationRestHandler::QnModuleInformationRestHandler(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
@@ -61,7 +54,7 @@ QnModuleInformationRestHandler::~QnModuleInformationRestHandler()
         m_aboutToStop = true;
     }
 
-    nx::network::aio::BasicPollable stopPollable(m_pollable.getAioThread());
+    aio::BasicPollable stopPollable(m_pollable.getAioThread());
 
     nx::utils::promise<void> stopPromise;
     stopPollable.post(
@@ -82,72 +75,79 @@ QnModuleInformationRestHandler::~QnModuleInformationRestHandler()
 void QnModuleInformationRestHandler::clear(Connections* connections)
 {
     for (const auto& c: *connections)
-        c.socket->cancelIOSync(nx::network::aio::etNone);
+        c.socket->cancelIOSync(aio::etNone);
 
     connections->clear();
 }
 
-JsonRestResponse QnModuleInformationRestHandler::executeGet(const JsonRestRequest& request)
+nx::network::rest::Response QnModuleInformationRestHandler::executeGet(
+    const nx::network::rest::Request& request)
 {
-    if (checkOwnerPermissionsMode(request.params)
-        && !QnPermissionsHelper::hasOwnerPermissions(
+    if (request.param(kCheckOwnerPermissions) && !QnPermissionsHelper::hasOwnerPermissions(
             request.owner->resourcePool(), request.owner->accessRights()))
     {
-        JsonRestResponse response;
-        response.statusCode = (nx::network::http::StatusCode::Value)
-            QnPermissionsHelper::notOwnerError(response.json);
-        return response;
+        QnJsonRestResult result;
+        QnPermissionsHelper::notOwnerError(result);
+        return nx::network::rest::Response::result(result);
     }
 
-    JsonRestResponse response(nx::network::http::StatusCode::ok, {},
-        (bool) updateStreamTime(request.params));
-    if (allModulesMode(request.params))
+    nx::network::rest::Response response;
+    if (request.param(kAllModules))
     {
         const auto allServers = request.owner->resourcePool()->getAllServers(Qn::AnyStatus);
-        if (showAddressesMode(request.params))
+        if (request.param(kShowAddresses))
         {
             QList<nx::vms::api::ModuleInformationWithAddresses> modules;
             for (const QnMediaServerResourcePtr &server : allServers)
                 modules.append(std::move(server->getModuleInformationWithAddresses()));
 
-            response.json.setReply(modules);
+            response = nx::network::rest::Response::reply(modules);
         }
         else
         {
             QList<nx::vms::api::ModuleInformation> modules;
             for (const QnMediaServerResourcePtr &server : allServers)
                 modules.append(server->getModuleInformation());
-            response.json.setReply(modules);
+
+            response = nx::network::rest::Response::reply(modules);
         }
     }
-    else if (showAddressesMode(request.params))
+    else if (request.param(kShowAddresses))
     {
         const auto id = request.owner->commonModule()->moduleGUID();
-        if (const auto s = request.owner->resourcePool()->getResourceById<QnMediaServerResource>(id))
-            response.json.setReply(s->getModuleInformationWithAddresses());
+        if (const auto server = request.owner->resourcePool()
+                ->getResourceById<QnMediaServerResource>(id))
+        {
+            response = nx::network::rest::Response::reply(
+                server->getModuleInformationWithAddresses());
+        }
         else
-            response.json.setReply(request.owner->commonModule()->moduleInformation());
+        {
+            response = nx::network::rest::Response::reply(
+                request.owner->commonModule()->moduleInformation());
+        }
     }
     else
     {
-        response.json.setReply(request.owner->commonModule()->moduleInformation());
+        response = nx::network::rest::Response::reply(
+            request.owner->commonModule()->moduleInformation());
     }
 
-    response.statusCode = nx::network::http::StatusCode::ok;
-    if (updateStreamTime(request.params))
+    if (parseUpdateStreamTime(request))
         response.isUndefinedContentLength = true;
 
     return response;
 }
 
 void QnModuleInformationRestHandler::afterExecute(
-    const RestRequest& request, const QByteArray& /*response*/)
+    const nx::network::rest::Request& request, const nx::network::rest::Response& /*response*/)
 {
-    if (!keepConnectionOpenMode(request.params) && !updateStreamTime(request.params))
+    const auto updateStreamTime = parseUpdateStreamTime(request);
+    if (!request.param(kKeepConnectionOpen) && !updateStreamTime)
         return;
 
     // TODO: Probably owner is supposed to be passed as mutable.
-    std::unique_ptr<nx::network::AbstractStreamSocket> socket =
+    std::unique_ptr<AbstractStreamSocket> socket =
         const_cast<QnRestConnectionProcessor*>(request.owner)->takeSocket();
 
     socket->bindToAioThread(m_pollable.getAioThread());
@@ -162,8 +162,7 @@ void QnModuleInformationRestHandler::afterExecute(
     }
 
     m_pollable.post(
-        [this, socket = std::move(socket), updateStreamTime = updateStreamTime(request.params)
-            ]() mutable
+        [this, socket = std::move(socket), updateStreamTime]() mutable
         {
             if (updateStreamTime)
             {
@@ -195,7 +194,7 @@ void QnModuleInformationRestHandler::afterExecute(
                             connection->socket->getForeignAddress(), size,
                             SystemError::toString(code));
 
-                        connection->socket->cancelIOSync(nx::network::aio::etNone);
+                        connection->socket->cancelIOSync(aio::etNone);
                         m_connectionsToKeepOpened.erase(connection);
                     });
             }
@@ -224,16 +223,6 @@ void QnModuleInformationRestHandler::changeModuleInformation()
         });
 }
 
-int QnModuleInformationRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& /*params*/,
-    QnJsonRestResult& /*result*/,
-    const QnRestConnectionProcessor* /*owner*/)
-{
-    NX_ASSERT(false, "Is not supposed to be called");
-    return (int) nx::network::http::StatusCode::notImplemented;
-}
-
 void QnModuleInformationRestHandler::updateModuleImformation()
 {
     QnJsonRestResult result;
@@ -249,7 +238,7 @@ void QnModuleInformationRestHandler::send(Connections::iterator connection, nx::
         return;
 
     connection->isSendInProgress = true;
-    connection->socket->cancelIOSync(nx::network::aio::etNone); //< Stop timer.
+    connection->socket->cancelIOSync(aio::etNone); //< Stop timer.
     connection->socket->sendAsync(
         connection->dataToSend,
         [this, connection](SystemError::ErrorCode code, size_t size)
@@ -258,7 +247,7 @@ void QnModuleInformationRestHandler::send(Connections::iterator connection, nx::
             {
                 NX_VERBOSE(this, "Connection from %1 is lost",
                     connection->socket->getForeignAddress());
-                connection->socket->cancelIOSync(nx::network::aio::etNone);
+                connection->socket->cancelIOSync(aio::etNone);
                 m_connectionsToUpdate.erase(connection);
                 return;
             }

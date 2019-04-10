@@ -34,7 +34,7 @@ public:
         CLConstVideoDecoderOutputPtr uncompressedFrame,
         bool* missingUncompressedFrameWarningIssued)
         :
-        m_compressedFrame(new CompressedVideoPacket(compressedFrame)),
+        m_compressedFrame(compressedFrame ? new CompressedVideoPacket(compressedFrame) : nullptr),
         m_uncompressedFrame(std::move(uncompressedFrame)),
         m_missingUncompressedFrameWarningIssued(missingUncompressedFrameWarningIssued)
     {

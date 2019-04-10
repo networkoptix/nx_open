@@ -202,7 +202,7 @@ protected:
     template<class T>
     int sendSyncGetRequest(int object, const QnRequestParamList &params, T *reply, std::optional<std::chrono::milliseconds> timeout = std::nullopt)
     {
-        return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply, timeout);
+        return sendSyncGetRequest(object, {}, params, reply, timeout);
     }
 
     QnResourcePtr targetResource() const;

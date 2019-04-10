@@ -1,16 +1,16 @@
 #pragma once
 
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 #include <nx/vms/server/server_module_aware.h>
 
 namespace nx::vms::server::rest {
 
-class AnalyticsEngineSettingsHandler: public QnJsonRestHandler, public ServerModuleAware
+class AnalyticsEngineSettingsHandler: public nx::network::rest::Handler, public ServerModuleAware
 {
 public:
     AnalyticsEngineSettingsHandler(QnMediaServerModule* serverModule);
-    virtual JsonRestResponse executeGet(const JsonRestRequest& request);
-    virtual JsonRestResponse executePost(const JsonRestRequest& request, const QByteArray& body);
+    virtual nx::network::rest::Response executeGet(const nx::network::rest::Request& request);
+    virtual nx::network::rest::Response executePost(const nx::network::rest::Request& request);
 };
 
 } // namespace nx::vms::server::rest

@@ -73,13 +73,13 @@ void HanwhaVideoProfile::setParameter(
         fixed = parameterValue == lit("True");
     else if (parameterName == lit("ProfileToken"))
         token = parameterValue;
-    else if (parameterName == lit("RTPMulticastEnable"))
+    else if (parameterName == kHanwhaRtpMulticastEnable)
         rtpMulticastEnable = parameterValue == lit("True");
-    else if (parameterName == lit("RTPMulticastAddress"))
+    else if (parameterName == kHanwhaRtpMulticastAddress)
         rtpMulticastAddress = parameterValue;
-    else if (parameterName == lit("RTPMulticastPort"))
+    else if (parameterName == kHanwhaRtpMulticastPort)
         setInteger(&rtpMulticastPort, parameterValue);
-    else if (parameterName == lit("RTPMulticastTTL"))
+    else if (parameterName == kHanwhaRtpMulticastTtl)
         setInteger(&rtpMulticastTtl, parameterValue);
 }
 

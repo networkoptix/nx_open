@@ -10,6 +10,7 @@ target_compile_definitions(nx_onvif
     PUBLIC 
         WITH_OPENSSL=
         WITH_PURE_VIRTUAL=
+        WITH_C_LOCALE=
 )
 
 target_include_directories(nx_onvif 

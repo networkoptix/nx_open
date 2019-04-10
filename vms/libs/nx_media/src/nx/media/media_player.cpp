@@ -450,8 +450,11 @@ void PlayerPrivate::at_gotVideoFrame()
     if (!videoFrameToRender)
         return;
 
+    gotDataTimer.restart();
+
     FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
-    if (metadata.dataType == QnAbstractMediaData::EMPTY_DATA)
+
+    if (metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_AfterEOF))
     {
         videoFrameToRender.reset();
         log("at_gotVideoFrame(): EOF reached, jumping to LIVE.");

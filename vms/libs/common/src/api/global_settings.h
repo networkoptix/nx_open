@@ -109,6 +109,7 @@ static const QString kSessionLimit("sessionLimitMinutes");
 const QString kDefaultVideoCodec(lit("defaultVideoCodec"));
 const QString kDefaultExportVideoCodec(lit("defaultExportVideoCodec"));
 const QString kLowQualityScreenVideoCodec(lit("lowQualityScreenVideoCodec"));
+const QString kForceLiveCacheForPrimaryStream(lit("forceLiveCacheForPrimaryStream"));
 
 } // namespace nx::settings_names
 
@@ -329,18 +330,6 @@ public:
 
     int maxWebMTranscoders() const;
 
-    bool hanwhaDeleteProfilesOnInitIfNeeded() const;
-    void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
-
-    bool showHanwhaAlternativePtzControlsOnTile() const;
-    void setShowHanwhaAlternativePtzControlsOnTile(bool showPtzControls);
-
-    int hanwhaChunkReaderResponseTimeoutSeconds() const;
-    void setHanwhaChunkReaderResponseTimeoutSeconds(int value);
-
-    int hanwhaChunkReaderMessageBodyTimeoutSeconds() const;
-    void setHanwhaChunkReaderMessageBodyTimeoutSeconds(int value);
-
     bool isEdgeRecordingEnabled() const;
     void setEdgeRecordingEnabled(bool enabled);
 
@@ -373,6 +362,9 @@ public:
 
     QString lowQualityScreenVideoCodec() const;
     void setLowQualityScreenVideoCodec(const QString& value);
+
+    QString forceLiveCacheForPrimaryStream() const;
+    void setForceLiveCacheForPrimaryStream(const QString& value);
 
 signals:
     void initialized();
@@ -516,11 +508,6 @@ private:
     QnResourcePropertyAdaptor<bool>* m_cloudConnectUdpHolePunchingEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_showHanwhaAlternativePtzControlsOnTile = nullptr;
-    QnResourcePropertyAdaptor<int>* m_hanwhaChunkReaderResponseTimeoutSeconds = nullptr;
-    QnResourcePropertyAdaptor<int>* m_hanwhaChunkReaderMessageBodyTimeoutSeconds = nullptr;
-
     QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads = nullptr;
@@ -535,6 +522,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_defaultVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_defaultExportVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_lowQualityScreenVideoCodecAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_forceLiveCacheForPrimaryStreamAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

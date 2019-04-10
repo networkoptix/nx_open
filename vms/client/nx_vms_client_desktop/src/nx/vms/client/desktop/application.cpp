@@ -68,6 +68,7 @@
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
+#include <nx/vms/client/desktop/director/director.h>
 #include <ui/help/help_handler.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>

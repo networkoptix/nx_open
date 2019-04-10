@@ -109,12 +109,13 @@ class Action: public RefCountable<IAction>
 public:
     Action(): m_params(new StringMap()) {}
 
-    virtual const char* actionId() override { return m_actionId.c_str(); }
-    virtual Uuid objectId() override { return m_objectId; }
-    virtual Uuid deviceId() override { return m_deviceId; }
-    virtual int64_t timestampUs() override { return m_timestampUs; }
+    virtual const char* actionId() const override { return m_actionId.c_str(); }
+    virtual Uuid objectId() const override { return m_objectId; }
+    virtual Uuid deviceId() const override { return m_deviceId; }
+    virtual IObjectTrackInfo* objectTrackInfo() const override { return nullptr; }
+    virtual int64_t timestampUs() const override { return m_timestampUs; }
 
-    virtual const IStringMap* params() override
+    virtual const IStringMap* params() const override
     {
         if (!m_params)
             return nullptr;

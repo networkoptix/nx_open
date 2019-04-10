@@ -5,6 +5,7 @@
 #include <QtCore/QJsonObject>
 
 #include <nx/vms/api/analytics/manifest_items.h>
+#include <nx/vms/api/analytics/pixel_format.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 
@@ -23,13 +24,33 @@ struct NX_VMS_API EngineManifest
      */
     struct ObjectAction
     {
+        enum Capability
+        {
+            noCapabilities = 0,
+            needBestShotVideoFrame = 1 << 0,
+            needBestShotObjectMetadata = 1 << 1,
+            needTrack = 1 << 2,
+        };
+        Q_DECLARE_FLAGS(Capabilities, Capability);
+
+        struct Requirements
+        {
+            Capabilities capabilities;
+            PixelFormat bestShotVideoFramePixelFormat;
+        };
+        #define nx_vms_api_analytics_Engine_ObjectAction_Requirements_Fields \
+            (capabilities)(bestShotVideoFramePixelFormat)
+
         QString id; /**< Id of the action type, like "vendor.pluginName.actionName". */
         QString name; /**< Action name to be shown to the user. */
         QList<QString> supportedObjectTypeIds;
         QJsonObject parametersModel;
+        Requirements requirements;
     };
-    #define ObjectAction_Fields (id)(name)(supportedObjectTypeIds)(parametersModel)
+    #define ObjectAction_Fields (id)(name)(supportedObjectTypeIds)(parametersModel)\
+        (requirements)
 
+    // TODO: #dmishin replace it with the PixelFormat enum.
     enum Capability
     {
         noCapabilities = 0,
@@ -63,8 +84,11 @@ struct NX_VMS_API EngineManifest
     (capabilities)(eventTypes)(objectTypes)(objectActions)(groups)(deviceAgentSettingsModel)
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json), NX_VMS_API)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EngineManifest::Capabilities)
+Q_DECLARE_OPERATORS_FOR_FLAGS(EngineManifest::ObjectAction::Capabilities)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EngineManifest::Capability)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EngineManifest::ObjectAction::Capability)
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest::ObjectAction, (json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(EngineManifest::ObjectAction::Requirements, (json)(eq), NX_VMS_API)
 
 } // namespace nx::vms::api::analytics
 
@@ -72,4 +96,10 @@ QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::EngineManifest::Capability,
     (metatype)(numeric)(lexical), NX_VMS_API)
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::EngineManifest::Capabilities,
+    (metatype)(numeric)(lexical), NX_VMS_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::EngineManifest::ObjectAction::Capability,
+    (metatype)(numeric)(lexical), NX_VMS_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::EngineManifest::ObjectAction::Capabilities,
     (metatype)(numeric)(lexical), NX_VMS_API)

@@ -53,6 +53,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         vms_gateway_core
         nx_vms_applauncher_api
         qtsingleapplication
+        qthttpserver
         nx_kit
     MACOS_ARG_MAX_WORKAROUND
 )

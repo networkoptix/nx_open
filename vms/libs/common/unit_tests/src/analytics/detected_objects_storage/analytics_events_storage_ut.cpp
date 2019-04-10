@@ -398,10 +398,9 @@ protected:
                 if (m_allowedTimeRange.second > m_allowedTimeRange.first)
                 {
                     packet->timestampUsec = nx::utils::random::number<qint64>(
-                        duration_cast<microseconds>(
-                            m_allowedTimeRange.first.time_since_epoch()).count(),
-                        duration_cast<microseconds>(
-                            m_allowedTimeRange.second.time_since_epoch()).count());
+                        duration_cast<milliseconds>(m_allowedTimeRange.first.time_since_epoch()).count(),
+                        duration_cast<milliseconds>(m_allowedTimeRange.second.time_since_epoch()).count())
+                        * 1000;
                 }
 
                 analyticsDataPackets.push_back(packet);
@@ -425,11 +424,11 @@ protected:
             analyticsDataPackets.begin(), analyticsDataPackets.end(),
             std::back_inserter(m_analyticsDataPackets));
 
-        for (const auto& packet : analyticsDataPackets)
-            whenIssueSavePacket(packet);
+        std::for_each(analyticsDataPackets.begin(), analyticsDataPackets.end(),
+            [this](const auto& packet) { whenIssueSavePacket(packet); });
 
-        for (const auto& packet : analyticsDataPackets)
-            thenSaveSucceeded();
+        std::for_each(analyticsDataPackets.begin(), analyticsDataPackets.end(),
+            [this](const auto&) { thenSaveSucceeded(); });
     }
 
     EventsStorage& eventsStorage()
@@ -889,6 +888,11 @@ protected:
         return m_filter;
     }
 
+    Filter& filter()
+    {
+        return m_filter;
+    }
+
 private:
     Filter m_filter;
     QnUuid m_specificObjectAppearanceId;
@@ -1129,6 +1133,25 @@ class AnalyticsEventsStorageTimePeriodsLookup:
     using base_type = AnalyticsEventsStorageLookup;
 
 protected:
+    void givenAggregationPeriodEqualToTheWholeArchivePeriod()
+    {
+        const auto allTimePeriods = expectedLookupResult();
+        const auto archiveLength =
+            allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
+
+        m_lookupOptions.detailLevel = archiveLength;
+    }
+
+    void givenFilterWithTimePeriod()
+    {
+        const auto allTimePeriods = expectedLookupResult();
+        const auto archiveLength =
+            allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
+
+        filter().timePeriod.setStartTime(allTimePeriods.front().startTime() + archiveLength / 3);
+        filter().timePeriod.setDuration(archiveLength * 2 / 3);
+    }
+
     void givenRandomLookupOptions()
     {
         m_lookupOptions.detailLevel = std::chrono::milliseconds(
@@ -1142,7 +1165,7 @@ protected:
         eventsStorage().lookupTimePeriods(
             filter(),
             m_lookupOptions,
-            std::bind(&AnalyticsEventsStorageTimePeriodsLookup::saveLookupResult, this, _1, _2));
+            [this](auto&&... args) { saveLookupResult(std::forward<decltype(args)>(args)...); });
     }
 
     void thenResultMatchesExpectations()
@@ -1175,9 +1198,37 @@ private:
 
     QnTimePeriodList expectedLookupResult()
     {
-        return toTimePeriods(
-            filterPackets(filter(), analyticsDataPackets()),
-            m_lookupOptions);
+        return filterTimePeriods(
+            filter(),
+            toTimePeriods(
+                filterPackets(filter(), analyticsDataPackets()),
+                m_lookupOptions));
+    }
+
+    QnTimePeriodList filterTimePeriods(
+        const Filter& filter,
+        const QnTimePeriodList& timePeriods)
+    {
+        if (filter.timePeriod.isEmpty())
+            return timePeriods;
+
+        QnTimePeriodList result;
+        for (const auto& timePeriod: timePeriods)
+        {
+            auto resultingTimePeriod = timePeriod;
+            if (resultingTimePeriod.startTime() < filter.timePeriod.startTime())
+                resultingTimePeriod.setStartTime(filter.timePeriod.startTime());
+
+            if (filter.timePeriod.durationMs != QnTimePeriod::kInfiniteDuration &&
+                resultingTimePeriod.endTime() > filter.timePeriod.endTime())
+            {
+                resultingTimePeriod.setEndTime(filter.timePeriod.endTime());
+            }
+
+            result.push_back(resultingTimePeriod);
+        }
+
+        return result;
     }
 
     QnTimePeriodList toTimePeriods(
@@ -1199,12 +1250,35 @@ private:
 
         return QnTimePeriodList::aggregateTimePeriodsUnconstrained(
             result,
-            lookupOptions.detailLevel);
+            std::max<milliseconds>(lookupOptions.detailLevel, kMinTimePeriodAggregationPeriod));
     }
 };
 
 TEST_F(AnalyticsEventsStorageTimePeriodsLookup, selecting_all_periods)
 {
+    whenLookupTimePeriods();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageTimePeriodsLookup, selecting_all_periods_aggregated_to_one)
+{
+    givenAggregationPeriodEqualToTheWholeArchivePeriod();
+    whenLookupTimePeriods();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(
+    AnalyticsEventsStorageTimePeriodsLookup,
+    selecting_periods_with_timestamp_filter_only)
+{
+    givenFilterWithTimePeriod();
+    whenLookupTimePeriods();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageTimePeriodsLookup, with_aggregation_period)
+{
+    givenRandomLookupOptions();
     whenLookupTimePeriods();
     thenResultMatchesExpectations();
 }
@@ -1216,12 +1290,7 @@ TEST_F(AnalyticsEventsStorageTimePeriodsLookup, with_random_filter)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageTimePeriodsLookup, with_aggregation_period)
-{
-    givenRandomLookupOptions();
-    whenLookupTimePeriods();
-    thenResultMatchesExpectations();
-}
+// TODO: with_random_filter_and_aggregation
 
 //-------------------------------------------------------------------------------------------------
 // Deprecating data.

@@ -2138,7 +2138,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
-        // TODO: Code duplication with QnWorkbenchAccessController.
         if (d->camera->isDtsBased() && !d->camera->isLicenseUsed())
         {
             const auto requiredPermission = d->isPlayingLive()

@@ -1,31 +1,32 @@
 #pragma once
 
+#include <common/common_module_aware.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/basic_pollable.h>
-#include <rest/server/json_rest_handler.h>
-#include "nx/utils/safe_direct_connection.h"
-#include <common/common_module_aware.h>
+#include <nx/network/rest/handler.h>
+#include <nx/utils/safe_direct_connection.h>
 
 class QnCommonModule;
 
 class QnModuleInformationRestHandler:
-    public QnJsonRestHandler,
+    public nx::network::rest::Handler,
     public /*mixin*/ QnCommonModuleAware,
     public /*mixin*/ Qn::EnableSafeDirectConnection
 {
-    Q_OBJECT
-
 public:
     QnModuleInformationRestHandler(QnCommonModule* commonModule);
     virtual ~QnModuleInformationRestHandler() override;
 
-    virtual JsonRestResponse executeGet(const JsonRestRequest& request) override;
-    virtual void afterExecute(const RestRequest& request, const QByteArray& response) override;
+    virtual nx::network::rest::Response executeGet(
+        const nx::network::rest::Request& request) override;
 
-private slots:
-    void changeModuleInformation();
+    virtual void afterExecute(
+        const nx::network::rest::Request& request,
+        const nx::network::rest::Response& response) override;
 
 private:
+    void changeModuleInformation();
+
     struct Connection
     {
         std::unique_ptr<nx::network::AbstractStreamSocket> socket;
@@ -36,12 +37,6 @@ private:
     using Connections = std::list<Connection>;
 
     static void clear(Connections* connections);
-
-    virtual int executeGet(
-        const QString& /*path*/,
-        const QnRequestParams& /*params*/,
-        QnJsonRestResult& /*result*/,
-        const QnRestConnectionProcessor* /*owner*/);
 
     void updateModuleImformation();
     void send(Connections::iterator socket, nx::Buffer buffer = {});
@@ -56,6 +51,4 @@ private:
 
     QnMutex m_mutex;
     bool m_aboutToStop = false;
-
-private:
 };

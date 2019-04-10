@@ -45,7 +45,7 @@ public:
     };
 
     //!Calls \a start
-    MediatorFunctionalTest(int flags = allFlags);
+    MediatorFunctionalTest(int flags = allFlags, const QString& testDir = QString());
     ~MediatorFunctionalTest();
 
     /**

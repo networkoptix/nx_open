@@ -10,6 +10,9 @@
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/fusion/serialization/binary.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <api/server_rest_connection.h>
 
 namespace nx {
 namespace vms::server {
@@ -37,31 +40,28 @@ int EventMessageBus::deliverAction(const vms::event::AbstractActionPtr& action, 
     nx::vms::api::EventActionData actionData;
     ec2::fromResourceToApi(action, actionData);
 
-    ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
-    int handle = ec2Connection->getEventRulesManager(Qn::kSystemAccess)->sendEventAction(
-        actionData, dstPeer, this, &EventMessageBus::at_DeliverActionFinished);
+    auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(dstPeer);
+    if (!server)
+    {
+        NX_WARNING(this, "Can't delivery event to the  target server %1. Not found", dstPeer);
+        return 0;
+    }
+    auto connection = server->restConnection();
+    connection->executeEventAction(actionData,
+        [this, action, dstPeer](bool success, rest::Handle requestId, QnJsonRestResult result)
+        {
+            if (success)
+            {
+                emit actionDelivered(action);
+            }
+            else
+            {
+                NX_WARNING(this, "Delivery business action to the target server %1 is failed. Error: %2", dstPeer, result.errorString);
+                emit actionDeliveryFail(action);
+            }
+        });
 
-    QnMutexLocker lock(&m_mutex);
-    m_sendingActions.insert(handle, action);
     return 0;
-}
-
-void EventMessageBus::at_DeliverActionFinished(int handle, ec2::ErrorCode errorCode)
-{
-    QnMutexLocker lock(&m_mutex);
-    auto action = m_sendingActions.value(handle);
-    m_sendingActions.remove(handle);
-    lock.unlock();
-
-    if (errorCode == ec2::ErrorCode::ok)
-    {
-        emit actionDelivered(action);
-    }
-    else
-    {
-        qWarning() << "error delivering exec action message #" << handle << "error:" << ec2::toString(errorCode);
-        emit actionDeliveryFail(action);
-    }
 }
 
 void EventMessageBus::at_actionReceived(const vms::event::AbstractActionPtr& action)

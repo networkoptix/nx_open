@@ -18,8 +18,6 @@ void QnBusinessEventNotificationManager::triggerNotification(
     businessAction->setReceivedFromRemoteHost(true);
     if (tran.command == ApiCommand::broadcastAction)
         emit gotBroadcastAction(businessAction);
-    else
-        emit execBusinessAction(businessAction);
 }
 
 void QnBusinessEventNotificationManager::triggerNotification(

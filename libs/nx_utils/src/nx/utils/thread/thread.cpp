@@ -103,8 +103,11 @@ void Thread::stop()
 #if defined(_DEBUG)
     if (m_type)
     {
-        NX_ASSERT(typeid(*this) == *m_type,
-            "stop() must be called from derived class destructor.");
+        NX_ASSERT(
+            typeid(*this) == *m_type,
+            lm("stop() must be called from derived class destructor. This: %1, m_type: %2").args(
+                typeid(*this), *m_type)
+        );
         m_type = nullptr; //< So that we don't check it again.
     }
 #endif

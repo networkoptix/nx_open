@@ -944,16 +944,10 @@ SliceUnit::SliceUnit():NALUnit() {
 
 int SliceUnit::deserialize(const SPSUnit* sps,const PPSUnit* pps)
 {
-    QMap<quint32, const SPSUnit*> spsMap;
-    QMap<quint32, const PPSUnit*> ppsMap;
-    spsMap.insert(0, sps);
-    ppsMap.insert(0, pps);
-    return deserialize(m_nalBuffer, m_nalBuffer + m_nalBufferLen, spsMap, ppsMap);
+    return deserialize(m_nalBuffer, m_nalBuffer + m_nalBufferLen, sps, pps);
 }
 
-int SliceUnit::deserialize(quint8* buffer, quint8* end,
-                            const QMap<quint32, const SPSUnit*>& spsMap,
-                            const QMap<quint32, const PPSUnit*>& ppsMap)
+int SliceUnit::deserialize(quint8* buffer, quint8* end, const SPSUnit* sps, const PPSUnit* pps)
 {
     m_ref_pic_vect.clear();
     m_ref_pic_vect2.clear();
@@ -977,7 +971,7 @@ int SliceUnit::deserialize(quint8* buffer, quint8* end,
 
     bitReader.setBuffer(buffer + 1, end);
     //m_getbitContextBuffer = buffer+1;
-    rez = deserializeSliceHeader(spsMap, ppsMap);
+    rez = deserializeSliceHeader(sps, pps);
     if (rez != 0 || m_shortDeserializeMode)
         return rez;
 
@@ -1155,8 +1149,7 @@ void NALUnit::updateBits(int bitOffset, int bitLen, int value)
     bitWriter.flushBits();
 }
 
-int SliceUnit::deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMap,
-                                      const QMap<quint32, const PPSUnit*>& ppsMap)
+int SliceUnit::deserializeSliceHeader(const SPSUnit* sps, const PPSUnit* pps)
 {
     try {
         first_mb_in_slice = extractUEGolombCode();
@@ -1164,17 +1157,12 @@ int SliceUnit::deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMa
         if (slice_type >= 5)
             slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
         pic_parameter_set_id = extractUEGolombCode();
-        QMap<quint32, const PPSUnit*>::const_iterator itr = ppsMap.find(pic_parameter_set_id);
-        if (itr == ppsMap.end())
-            return SPS_OR_PPS_NOT_READY;
-        pps = itr.value();
-
-        QMap<quint32, const SPSUnit*>::const_iterator itr2 = spsMap.find(pps->seq_parameter_set_id);
-        if (itr2 == spsMap.end())
-            return SPS_OR_PPS_NOT_READY;
-        sps = itr2.value();
 
         m_frameNumBitPos = bitReader.getBitsCount(); //getBitContext.buffer
+
+        if (sps == nullptr)
+            return SPS_OR_PPS_NOT_READY;
+
         m_frameNumBits = sps->log2_max_frame_num;
         frame_num = bitReader.getBits( m_frameNumBits);
         bottom_field_flag = 0;
@@ -1186,6 +1174,10 @@ int SliceUnit::deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMa
         }
         if( nal_unit_type == 5)
             idr_pic_id = extractUEGolombCode();
+
+        if (pps == nullptr || pps->pic_parameter_set_id != pic_parameter_set_id)
+            return SPS_OR_PPS_NOT_READY;
+
         m_picOrderBitPos = -1;
         if( sps->pic_order_cnt_type ==  0)
         {

@@ -62,4 +62,5 @@ private:
     QnResourcePool* m_resourcePool = nullptr;
     CameraMap m_cameras;
     mutable QnMutex m_mutex;
+    bool m_isStopped = false;
 };

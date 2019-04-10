@@ -6,7 +6,7 @@
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/sdk_support/utils.h>
-#include <nx/vms/server/sdk_support/placeholder_binder.h>
+#include <nx/utils/placeholder_binder.h>
 #include <nx/sdk/helpers/to_string.h>
 
 namespace nx::vms::server::sdk_support {
@@ -112,7 +112,7 @@ void ManifestLogger::log(
 
 QString ManifestLogger::buildLogString(const QString& error) const
 {
-    sdk_support::PlaceholderBinder binder(m_messageTemplate);
+    nx::utils::PlaceholderBinder binder(m_messageTemplate);
     binder.bind({
         {"device", buildDeviceStr(m_device)},
         {"engine", buildEngineStr(m_engineResource)},

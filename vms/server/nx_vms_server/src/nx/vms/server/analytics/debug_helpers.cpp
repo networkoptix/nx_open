@@ -9,6 +9,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_level.h>
 #include <nx/utils/file_system.h>
+#include <nx/utils/debug_helpers/debug_helpers.h>
 
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
@@ -119,31 +120,15 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFileInternal(
     if (!NX_ASSERT(pluginsIni().analyticsEngineSettingsPath[0]))
         return nullptr;
 
-    const QDir dir(debugFilesDirectoryPath(pluginsIni().analyticsEngineSettingsPath));
+    const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(
+        pluginsIni().analyticsEngineSettingsPath));
+
     return loadSettingsFromFile(
         "Engine settings",
         dir.absoluteFilePath(settingsFilename));
 }
 
 } // namespace
-
-QString debugFilesDirectoryPath(const QString& path)
-{
-    if (QDir::isAbsolutePath(path))
-        return QDir::cleanPath(path);
-
-    const QString basePath(nx::kit::IniConfig::iniFilesDir());
-    const QString fullPath = basePath + path;
-
-    const QDir directory(fullPath);
-    if (!directory.exists())
-    {
-        NX_WARNING(kLogTag, "Directory doesn't exist: %1", directory.absolutePath());
-        return QString();
-    }
-
-    return directory.absolutePath();
-}
 
 nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
     const QString& fileDescription,
@@ -180,7 +165,9 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
     if (!NX_ASSERT(pluginsIni().analyticsDeviceAgentSettingsPath[0]))
         return nullptr;
 
-    const QDir dir(debugFilesDirectoryPath(pluginsIni().analyticsDeviceAgentSettingsPath));
+    const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(
+        pluginsIni().analyticsDeviceAgentSettingsPath));
+
     return loadSettingsFromFile(
         "DeviceAgent settings",
         dir.absoluteFilePath(settingsFilename));
@@ -255,7 +242,7 @@ void dumpStringToFile(
 
     log(Level::info, "Saving to file");
 
-    QDir dir(analytics::debug_helpers::debugFilesDirectoryPath(directoryPath));
+    QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(directoryPath));
     if (!nx::utils::file_system::ensureDir(dir))
         return log(Level::error, "Unable to create directory for file");
 

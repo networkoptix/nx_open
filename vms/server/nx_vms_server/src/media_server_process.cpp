@@ -104,6 +104,7 @@
 #include <recorder/storage_manager.h>
 #include <recorder/schedule_sync.h>
 
+#include <nx/vms/server/rest/exec_event_action_rest_handler.h>
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/event_log_rest_handler.h>
 #include <rest/handlers/event_log2_rest_handler.h>
@@ -1706,7 +1707,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %param:string reply.timezoneId Identification of the time zone in the text form.
      *         %param:string reply.utcTime Server time, in milliseconds since epoch.
      */
-    reg("api/gettime", new QnTimeRestHandler());
+    reg("api/gettime", new nx::vms::server::rest::DeprecatedTimeRestHandler());
 
     /**%apidoc GET /api/getTimeZones
      * Return the complete list of time zones supported by the server machine.
@@ -1760,9 +1761,9 @@ void MediaServerProcess::registerRestHandlers(
      * Get hardware information
      * %return:object JSON with hardware information.
      */
-    reg("api/getHardwareInfo", new QnGetHardwareInfoHandler());
+    reg("api/getHardwareInfo", new nx::vms::server::rest::HardwareInfoHandler());
 
-    reg("api/testLdapSettings", new QnTestLdapSettingsHandler());
+    reg("api/testLdapSettings", new nx::vms::server::rest::TestLdapSettingsHandler());
 
     /**%apidoc GET /api/ping
      * Ping the server.
@@ -1849,7 +1850,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value <any_other_value_or_no_parameter> Report the backup process status.
      * %return:object Bakcup process progress status or an error code.
      */
-    reg("api/backupControl", new QnBackupControlRestHandler(serverModule()));
+    reg("api/backupControl", new nx::vms::server::rest::BackupControlRestHandler(serverModule()));
 
     /**%apidoc[proprietary] GET /api/events
      * Return event log in the proprietary binary format.
@@ -2625,6 +2626,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
 
+
     /**%apidoc POST /api/executeAnalyticsAction
      * Execute analytics action from the particular analytics plugin on this server. The action is
      * applied to the specified metadata object.
@@ -2646,6 +2648,39 @@ void MediaServerProcess::registerRestHandlers(
      *             to be shown to the user who triggered the action.
      */
     reg("api/executeAnalyticsAction", new QnExecuteAnalyticsActionRestHandler(serverModule()));
+
+    /**%apidoc POST /api/executeEventAction
+     * Execute event action.
+     * %param:enum actionType Type of the action.
+     *     %value UndefinedAction
+     *     %value CameraOutputAction Change camera output state.
+     *     %value BookmarkAction
+     *     %value CameraRecordingAction Start camera recording.
+     *     %value PanicRecordingAction Activate panic recording mode.
+     *     %value SendMailAction Send an email.
+     *     %value DiagnosticsAction Write a record to the server's log.
+     *     %value ShowPopupAction
+     *     %value PlaySoundAction
+     *     %value PlaySoundOnceAction
+     *     %value SayTextAction
+     *     %value ExecutePtzPresetAction Execute given PTZ preset.
+     *     %value ShowTextOverlayAction Show text overlay over the given camera(s).
+     *     %value ShowOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
+     *     %value ExecHttpRequestAction Send HTTP request as an action.
+     * %param[opt]:enum EventState
+     *     %value inactive Event has been finished (for prolonged events).
+     *     %value active Event has been started (for prolonged events).
+     *     %value undefined Event state is undefined (for instant events).
+     * %param[proprietary]:boolean receivedFromRemoteHost
+     * %param:stringArray resourceIds List of ids for resources associated with the event.
+     *     Each id can be either camera id, camera MAC address or camera External id.
+     * %param[opt]:objectJson params Json object with action parameters.
+     * %param[opt]:objectJson runtimeParams Json object with event parameters.
+     * %param[opt]:integer ruleId Event rule id.
+     * %param[opt]:integer aggregationCount How many events were aggregated together for this action.
+     */
+    reg("api/executeEventAction",
+        new nx::vms::server::rest::QnExecuteEventActionRestHandler(serverModule()));
 
     /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system
@@ -2745,7 +2780,7 @@ void MediaServerProcess::registerRestHandlers(
 
 void MediaServerProcess::reg(
     const QString& path,
-    QnRestRequestHandler* handler,
+    nx::network::rest::Handler* handler,
     GlobalPermission permission)
 {
     reg(QnRestProcessorPool::kAnyHttpMethod, path, handler, permission);
@@ -2754,7 +2789,7 @@ void MediaServerProcess::reg(
 void MediaServerProcess::reg(
     const nx::network::http::Method::ValueType& method,
     const QString& path,
-    QnRestRequestHandler* handler,
+    nx::network::rest::Handler* handler,
     GlobalPermission permission)
 {
     m_universalTcpListener->processorPool()->registerHandler(

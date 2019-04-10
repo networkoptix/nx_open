@@ -6,25 +6,23 @@
 #include <nx/vms/server/ldap_manager.h>
 #include <utils/common/ldap.h>
 
-int QnTestLdapSettingsHandler::executePost(
-    const QString& /*path*/,
-    const QnRequestParams& /*params*/,
-    const QByteArray& body,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+namespace nx::vms::server::rest {
+
+nx::network::rest::Response TestLdapSettingsHandler::executePost(
+    const nx::network::rest::Request& request)
 {
-
-    QnLdapSettings settings = QJson::deserialized(body, QnLdapSettings());
-
     QnLdapUsers ldapUsers;
-    const auto ldapResult = QnUniversalTcpListener::authenticator(owner->owner())->ldapManager()
-        ->fetchUsers(ldapUsers, settings);
+    const auto ldapResult = QnUniversalTcpListener::authenticator(request.owner->owner())
+        ->ldapManager()->fetchUsers(ldapUsers, request.parseContentOrThrow<QnLdapSettings>());
+
     if (ldapResult != nx::vms::server::LdapResult::NoError)
     {
-        result.setError(QnRestResult::CantProcessRequest, toString(ldapResult));
-        return nx::network::http::StatusCode::ok;
+        return nx::network::rest::Response::error(
+            nx::network::http::StatusCode::ok,
+            QnRestResult::CantProcessRequest, toString(ldapResult));
     }
 
-    result.setReply(ldapUsers);
-    return nx::network::http::StatusCode::ok;
+    return nx::network::rest::Response::reply(ldapUsers);
 }
+
+} // namespace nx::vms::server::rest

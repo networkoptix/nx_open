@@ -34,8 +34,8 @@ namespace hpm {
 
 static constexpr size_t kMaxBindRetryCount = 10;
 
-MediatorFunctionalTest::MediatorFunctionalTest(int flags):
-    utils::test::TestWithTemporaryDirectory("hpm", QString()),
+MediatorFunctionalTest::MediatorFunctionalTest(int flags, const QString& testDir):
+    utils::test::TestWithTemporaryDirectory("hpm", testDir),
     m_testFlags(flags)
 {
     if (m_testFlags & initializeSocketGlobals)

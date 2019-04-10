@@ -85,6 +85,11 @@ QSqlRecord SqlQuery::record()
     return m_sqlQuery.record();
 }
 
+QVariant SqlQuery::lastInsertId() const
+{
+    return m_sqlQuery.lastInsertId();
+}
+
 QSqlQuery& SqlQuery::impl()
 {
     return m_sqlQuery;
