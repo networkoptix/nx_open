@@ -11,9 +11,11 @@
 
 namespace nx::analytics::storage {
 
+static constexpr long long kInvalidDbId = -1;
+
 struct ObjectUpdate
 {
-    long long dbId = -1;
+    long long dbId = kInvalidDbId;
     std::vector<ObjectPosition> trackToAppend;
     std::vector<common::metadata::Attribute> allAttributes;
 };
@@ -35,7 +37,7 @@ public:
         std::chrono::milliseconds aggregationPeriod,
         std::chrono::milliseconds maxObjectLifetime);
 
-    void add(common::metadata::ConstDetectionMetadataPacketPtr packet);
+    void add(const common::metadata::ConstDetectionMetadataPacketPtr& packet);
 
     /**
      * @return Objects that are to be inserted
@@ -54,7 +56,7 @@ public:
     void setObjectIdInDb(const QnUuid& objectId, long long dbId);
 
     /**
-     * @return -1 if object id is unknown.
+     * @return kInvalidDbId if object id is unknown.
      */
     long long dbIdFromObjectId(const QnUuid& objectId) const;
 

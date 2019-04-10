@@ -3586,6 +3586,7 @@ ErrorCode QnDbManager::doQueryNoLock(
         SELECT id, timestamp, merged_system_local_id AS mergedSystemLocalId,
             merged_system_cloud_id AS mergedSystemCloudId, username, signature
         FROM system_merge_history
+        ORDER BY id
         )sql");
     if (!fetchMergeHistoryQuery.exec())
     {

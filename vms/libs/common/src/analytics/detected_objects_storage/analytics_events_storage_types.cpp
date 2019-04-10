@@ -36,6 +36,19 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json)(ubjson),
     _analytics_storage_Fields)
 
+QByteArray serializeTrack(const std::vector<ObjectPosition>& /*track*/)
+{
+    NX_ASSERT(false);
+    // TODO
+    return QByteArray();
+}
+
+std::vector<ObjectPosition> deserializeTrack(const QByteArray& /*serializedData*/)
+{
+    // TODO
+    return {};
+}
+
 //-------------------------------------------------------------------------------------------------
 
 bool Filter::empty() const
