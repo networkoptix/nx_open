@@ -213,6 +213,8 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     int addedPanTiltCount = 0;
     int addedZoomCount = 0;
 
+    bool isMulticastTransportAvailable = true;
+
     int camCnt = 0;
     for (const auto& camera: cameras)
     {
@@ -268,6 +270,9 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         if (camRtpTransport != rtpTransport && camCnt > 0)
             sameRtpTransport = false;
         rtpTransport = camRtpTransport;
+
+        if (!camera->hasCameraCapabilities(Qn::MulticastStreamCapability))
+            isMulticastTransportAvailable = false;
 
         auto forcedMotionStreamProperty = camera->getProperty(QnMediaResource::motionStreamKey());
         if (forcedMotionStreamProperty != mdPolicy && camCnt > 0)
@@ -350,6 +355,13 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     {
         ui->checkBoxSecondaryRecorder->setChecked(false);
     }
+
+    static const QString kMulticastTransport("Multicast");
+    const auto index = ui->comboBoxTransport->findText(kMulticastTransport);
+    if (isMulticastTransportAvailable && index < 0)
+        ui->comboBoxTransport->addItem(kMulticastTransport);
+    else if (!isMulticastTransportAvailable && index >= 0)
+        ui->comboBoxTransport->removeItem(index);
 
     if (rtpTransport.isEmpty())
         ui->comboBoxTransport->setCurrentIndex(0);

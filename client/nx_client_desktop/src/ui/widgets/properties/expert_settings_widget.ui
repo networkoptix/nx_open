@@ -344,6 +344,12 @@
                </item>
                <item>
                 <widget class="QComboBox" name="comboBoxTransport">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <item>
                   <property name="text">
                    <string>Auto</string>
@@ -357,11 +363,6 @@
                  <item>
                   <property name="text">
                    <string>UDP</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Multicast</string>
                   </property>
                  </item>
                 </widget>
