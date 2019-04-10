@@ -138,7 +138,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
                             }
                         }).map((installer) => {
                             const translatedPlatform = this.lang.downloads.platforms[installer.platform] || installer.platform;
-                            const translatedAppType = this.lang.downloads.appTypes[installer.appType] || this.lang.appTypes.package;
+                            const translatedAppType = this.lang.downloads.appTypes[installer.appType] || this.lang.downloads.appTypes.package;
                             installer.formatName = `${translatedPlatform} - ${translatedAppType}`;
                             installer.url = `${this.downloadsData.releaseUrl}${installer.path}`;
                             return installer;
