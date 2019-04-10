@@ -83,7 +83,14 @@ void setWidgetHolder(QWidget* widget, QWidget* newHolder)
     widget->setParent(newHolder);
     newHolder->layout()->addWidget(widget);
     widget->setHidden(wasHidden);
-};
+}
+
+milliseconds previewLoadDelay()
+{
+    return ini().tilePreviewLoadDelayOverrideMs > 0
+        ? milliseconds(ini().tilePreviewLoadDelayOverrideMs)
+        : kPreviewLoadDelay;
+}
 
 } // namespace
 
@@ -192,6 +199,7 @@ struct EventTile::Private
         {
             case Qn::ThumbnailStatus::Invalid:
             case Qn::ThumbnailStatus::NoData:
+                NX_VERBOSE(this, "Requesting tile preview");
                 q->preview()->loadAsync();
                 break;
 
@@ -483,7 +491,7 @@ void EventTile::setPreview(ImageProvider* value)
     ui->previewWidget->setImageProvider(value);
     ui->previewWidget->parentWidget()->setHidden(!value);
 
-    d->updatePreview(kPreviewLoadDelay);
+    d->updatePreview(previewLoadDelay());
 
     if (preview() && kPreviewReloadDelay > 0s)
     {
@@ -706,7 +714,7 @@ void EventTile::setPreviewEnabled(bool value)
     ui->previewWidget->setHidden(!value);
     ui->previewWidget->parentWidget()->setHidden(!value || !ui->previewWidget->imageProvider());
 
-    d->updatePreview(kPreviewLoadDelay);
+    d->updatePreview(previewLoadDelay());
 }
 
 bool EventTile::footerEnabled() const

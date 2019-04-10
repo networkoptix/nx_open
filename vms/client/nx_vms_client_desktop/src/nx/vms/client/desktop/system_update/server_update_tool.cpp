@@ -801,7 +801,7 @@ void ServerUpdateTool::requestInstallAction(
     m_remoteUpdateStatus = {};
 
     m_timeStartedInstall = qnSyncTime->currentMSecsSinceEpoch();
-    m_serversAreInstalling.clear();
+    m_serversAreInstalling = targets;
 
     auto callback = [tool = QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
         {
@@ -823,19 +823,16 @@ void ServerUpdateTool::requestInstallAction(
 
 void ServerUpdateTool::requestModuleInformation()
 {
-    if (auto connection = getServerConnection(commonModule()->currentServer()))
-    {
-        auto callback =
-            [tool = QPointer(this)](
-                bool success, rest::Handle /*handle*/,
-                const QList<nx::vms::api::ModuleInformation>& response)
-            {
-                if (success && tool)
-                    emit tool->moduleInformationReceived(response);
-            };
-        if (auto handle = connection->getModuleInformation(callback, thread()))
-            m_requestingInstall.insert(handle);
-    }
+    //NX_VERBOSE(this, "requestModuleInformation()");
+    auto callback =
+        [tool = QPointer(this), connection = m_serverConnection](
+            bool success, rest::Handle /*handle*/,
+            const rest::RestResultWithData<QList<nx::vms::api::ModuleInformation>>& response)
+        {
+            if (success && tool)
+                emit tool->moduleInformationReceived(response.data);
+        };
+    m_serverConnection->getModuleInformationAll(callback);
 }
 
 void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
@@ -909,6 +906,8 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                 tool->m_activeRequests.remove(handle);
                 if (success && response.error == QnRestResult::NoError)
                 {
+                    if (tool->m_skippedRequests.contains((handle)))
+                        return;
                     tool->m_updateManifest = response.data;
                     tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
                 }
@@ -1064,7 +1063,7 @@ void ServerUpdateTool::atDownloadFailed(const QString& fileName)
     }
 }
 
-QString getServerUrl(QnCommonModule* commonModule, QString path)
+nx::utils::Url getServerUrl(QnCommonModule* commonModule, QString path)
 {
     if (const auto connection = commonModule->ec2Connection())
     {
@@ -1073,24 +1072,30 @@ QString getServerUrl(QnCommonModule* commonModule, QString path)
         url.setPath(path);
         bool hasSsl = commonModule->moduleInformation().sslAllowed;
         url.setScheme(nx::network::http::urlSheme(hasSsl));
-        return url.toString(QUrl::RemoveUserInfo);
+        return url;
     }
     return "";
 }
 
 QString ServerUpdateTool::getUpdateStateUrl() const
 {
-    return getServerUrl(commonModule(), "/ec2/updateStatus");
+    const auto url = getServerUrl(commonModule(), "/ec2/updateStatus");
+    return url.toString(QUrl::RemoveUserInfo);
 }
 
 QString ServerUpdateTool::getUpdateInformationUrl() const
 {
-    return getServerUrl(commonModule(), "/ec2/updateInformation");
+    const auto url = getServerUrl(commonModule(), "/ec2/updateInformation");
+    return url.toString(QUrl::RemoveUserInfo);
 }
 
 QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 {
-    return getServerUrl(commonModule(), "/ec2/updateInfomation?version=installed");
+    auto url = getServerUrl(commonModule(), "/ec2/updateInfomation");
+    QUrlQuery query;
+    query.addQueryItem("version", "latest");
+    url.setQuery(query);
+    return url.toString(QUrl::RemoveUserInfo);
 }
 
 std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkLatestUpdate(

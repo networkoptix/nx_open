@@ -69,6 +69,8 @@ extern "C"
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 
+#include <nx/vms/client/desktop/ini.h>
+
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
 #include <utils/common/long_runable_cleanup.h>
@@ -177,6 +179,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     for (int i = 0; i < Qn::TimePeriodContentCount; ++i)
     {
         Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
+        if (!ini().enableSyncedChunksForExtraContent && timePeriodType != Qn::RecordingContent)
+            continue;
 
         auto chunksMergeTool = new QnThreadedChunksMergeTool();
         m_threadedChunksMergeTool[timePeriodType].reset(chunksMergeTool);
@@ -1230,6 +1234,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     updateSpeedRange();
     updateSpeed();
     updateThumbnailsLoader();
+    updatePlaybackMask();
 
     emit currentWidgetChanged();
 
@@ -1535,7 +1540,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     if (m_dayTimeWidget)
         m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
 
-    if (!m_currentWidgetLoaded && widgetLoaded
+    if (!m_currentWidgetLoaded && widgetLoaded && !isSearch
         && display()->widgets().size() == 1
         && m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
     {
@@ -1699,7 +1704,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             if (camera->isDtsBased())
                 updateHasArchive();
         }
-        updateTimelineRelevancy();
+        updateTimelineRelevancy(); //< TODO: #vbreus check if this update really needed
     }
 }
 
@@ -1758,6 +1763,9 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodT
 
     /* Check if no chunks were updated. */
     if (startTimeMs == DATETIME_NOW)
+        return;
+
+    if (!ini().enableSyncedChunksForExtraContent && timePeriodType != Qn::RecordingContent)
         return;
 
     /* We don't want duplicate providers. */
@@ -1996,11 +2004,9 @@ bool QnWorkbenchNavigator::calculateTimelineRelevancy() const
     if (resource->flags().testFlag(Qn::local))
         return true;
 
-    const bool rtspStreamIsOpen = m_currentWidgetLoaded;
-
     return isRecording()
         || hasArchive()
-        || rtspStreamIsOpen;
+        || workbench()->currentLayout()->isSearchLayout();
 }
 
 void QnWorkbenchNavigator::updateTimelineRelevancy()
@@ -2308,6 +2314,8 @@ void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr& resourc
         updateSyncedPeriods(type, startTimeMs);
         updateHasArchive();
     }
+
+    updatePlaybackMask();
 }
 
 void QnWorkbenchNavigator::clearTimeSelection()
@@ -2625,18 +2633,38 @@ void QnWorkbenchNavigator::updateSliderBookmarks()
 void QnWorkbenchNavigator::updatePlaybackMask()
 {
     const auto content = selectedExtraContent();
+    QnTimePeriodList playbackMask;
 
     // TODO: #dmishin setting of playback mask for analytics content makes it impossible.
     // to play archive in some cases (if analytics periods are very small)
     // Figure out how to properly fix it.
-    const auto mask = content != Qn::RecordingContent && content != Qn::AnalyticsContent
-        ? m_mergedTimePeriods[content]
-        : QnTimePeriodList();
+    if (content != Qn::RecordingContent && content != Qn::AnalyticsContent)
+    {
+        if (ini().enableSyncedChunksForExtraContent)
+        {
+            playbackMask = m_mergedTimePeriods[content];
+        }
+        else if (m_currentMediaWidget)
+        {
+            if (const auto loader = loaderByWidget(m_currentMediaWidget))
+                playbackMask = loader->periods(content);
+        }
+    }
 
     for (auto widget: m_syncedWidgets)
     {
         if (auto archiveReader = widget->display()->archiveReader())
-            archiveReader->setPlaybackMask(mask);
+            archiveReader->setPlaybackMask(playbackMask);
+    }
+
+    for (auto widget: display()->widgets())
+    {
+        const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
+        if (!mediaWidget || m_syncedWidgets.contains(mediaWidget))
+            continue;
+
+        if (const auto archiveReader = mediaWidget->display()->archiveReader())
+            archiveReader->setPlaybackMask({});
     }
 }
 

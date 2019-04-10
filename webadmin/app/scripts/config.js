@@ -129,7 +129,9 @@
             syncTimeExchangePeriod: {type: 'number'},
 
             maxWearableArchiveSynchronizationThreads: {type: 'number'},
-            maxEventLogRecords: {type: 'number'}
+            maxEventLogRecords: {type: 'number'},
+            
+            forceLiveCacheForPrimaryStream: {type: 'text'}
         },
         webclient: {
             useServerTime: true,

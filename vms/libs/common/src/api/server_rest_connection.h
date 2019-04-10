@@ -470,7 +470,11 @@ public:
         QThread* targetThread = nullptr);
 
     Handle getModuleInformation(
-        Result<QList<nx::vms::api::ModuleInformation>>::type callback,
+        Result<RestResultWithData<nx::vms::api::ModuleInformation>>::type callback,
+        QThread* targetThread = nullptr);
+
+    Handle getModuleInformationAll(
+        Result<RestResultWithData<QList<nx::vms::api::ModuleInformation>>>::type callback,
         QThread* targetThread = nullptr);
 
     Handle getEngineAnalyticsSettings(

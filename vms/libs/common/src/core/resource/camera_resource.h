@@ -123,14 +123,14 @@ public:
     void setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines);
 
     /**
-     * @return Map of supported event types by the Engine id. Only actually compatible with the
-     * Device, enabled by the user and active (running on the current server) Engines are used.
+     * @return Map of supported Event types by the Engine id. Only actually compatible with the
+     * Device, enabled by the user and active (running on the current Server) Engines are used.
      */
     std::map<QnUuid, std::set<QString>> supportedEventTypes() const;
 
     /**
-     * @return Map of supported object types by the Engine id. Only actually compatible with the
-     * Device, enabled by the user and active (running on the current server) Engines are used.
+     * @return Map of supported Object types by the Engine id. Only actually compatible with the
+     * Device, enabled by the user and active (running on the current Server) Engines are used.
      */
     std::map<QnUuid, std::set<QString>> supportedObjectTypes() const;
 

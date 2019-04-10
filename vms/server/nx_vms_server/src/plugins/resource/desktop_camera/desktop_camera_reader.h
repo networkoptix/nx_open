@@ -2,6 +2,8 @@
 
 #ifdef ENABLE_DESKTOP_CAMERA
 
+#include <array>
+
 #include <QtCore/QElapsedTimer>
 
 #include <providers/spush_media_stream_provider.h>
@@ -49,7 +51,7 @@ private:
 
     QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
     quint8 m_recvBuffer[65536];
-    nx::streaming::rtp::QnNxRtpParser m_parsers[MEDIA_STREAM_COUNT];
+    std::array<nx::streaming::rtp::QnNxRtpParserPtr, MEDIA_STREAM_COUNT> m_parsers;
     QElapsedTimer m_keepaliveTimer;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     mutable QnMutex m_audioLayoutMutex;

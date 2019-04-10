@@ -6,6 +6,7 @@
 
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/i_string_map.h>
+#include <nx/sdk/analytics/i_object_track_info.h>
 
 namespace nx {
 namespace sdk {
@@ -20,22 +21,25 @@ public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IAction"); }
 
     /** Id of the action being triggered. */
-    virtual const char* actionId() = 0;
+    virtual const char* actionId() const = 0;
 
     /** Id of a metadata object for which the action has been triggered. */
-    virtual Uuid objectId() = 0;
+    virtual Uuid objectId() const = 0;
 
     /** Id of a device from which the action has been triggered. */
-    virtual Uuid deviceId() = 0;
+    virtual Uuid deviceId() const = 0;
+
+    /** Info about an object track this action has been triggered from. */
+    virtual IObjectTrackInfo* objectTrackInfo() const = 0;
 
     /** Timestamp of a video frame from which the action has been triggered. */
-    virtual int64_t timestampUs() = 0;
+    virtual int64_t timestampUs() const = 0;
 
     /**
      * If the Engine manifest defines params for this action type, contains the array of their
      * values after they are filled by the user via Client form. Otherwise, null.
      */
-    virtual const nx::sdk::IStringMap* params() = 0;
+    virtual const nx::sdk::IStringMap* params() const = 0;
 
     /**
      * Report action result back to Server. If the action is decided not to have any result, this

@@ -30,6 +30,7 @@
 #include <client_core/client_core_module.h>
 
 #include <nx/vms/client/desktop/settings/migration.h>
+#include <nx/vms/client/desktop/director/director.h>
 #include <client/client_app_info.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>

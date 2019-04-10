@@ -109,6 +109,7 @@ static const QString kSessionLimit("sessionLimitMinutes");
 const QString kDefaultVideoCodec(lit("defaultVideoCodec"));
 const QString kDefaultExportVideoCodec(lit("defaultExportVideoCodec"));
 const QString kLowQualityScreenVideoCodec(lit("lowQualityScreenVideoCodec"));
+const QString kForceLiveCacheForPrimaryStream(lit("forceLiveCacheForPrimaryStream"));
 
 } // namespace nx::settings_names
 
@@ -362,6 +363,9 @@ public:
     QString lowQualityScreenVideoCodec() const;
     void setLowQualityScreenVideoCodec(const QString& value);
 
+    QString forceLiveCacheForPrimaryStream() const;
+    void setForceLiveCacheForPrimaryStream(const QString& value);
+
 signals:
     void initialized();
 
@@ -518,6 +522,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_defaultVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_defaultExportVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_lowQualityScreenVideoCodecAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_forceLiveCacheForPrimaryStreamAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 
