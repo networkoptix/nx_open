@@ -8,19 +8,20 @@
 #include "core/resource/storage_resource.h"
 #include <utils/media/av_codec_helper.h>
 #include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/basic_media_context.h>
 #include <nx/utils/type_utils.h>
 
-extern "C"
-{
+extern "C" {
+
 #include <libavutil/error.h>
 #include <libswresample/swresample.h>
 #include <libavutil/opt.h>
-}
+#include <libavutil/pixdesc.h>
+
+} // extern "C"
 
 QnFfmpegHelper::StaticHolder QnFfmpegHelper::StaticHolder::instance;
 
-void QnFfmpegHelper::copyAvCodecContextField(void **fieldPtr, const void* data, size_t size)
+void QnFfmpegHelper::copyAvCodecContextField(void** fieldPtr, const void* data, size_t size)
 {
     NX_ASSERT(fieldPtr);
 
@@ -322,7 +323,11 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
     return reader->seek(absolutePos);
 }
 
-AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int ioBlockSize)
+AVIOContext* QnFfmpegHelper::createFfmpegIOContext(
+    QnStorageResourcePtr resource,
+    const QString& url,
+    QIODevice::OpenMode openMode,
+    int ioBlockSize)
 {
     QString path = url;
 
@@ -511,22 +516,23 @@ int QnFfmpegHelper::getDefaultFrameSize(AVCodecContext* context)
         encoderContext->sample_fmt = avCodec->sample_fmts[0];
     encoderContext->channels = context->channels;
     encoderContext->sample_rate = context->sample_rate;
-    auto result = avcodec_open2(encoderContext.get(), avCodec, nullptr) >= 0 ? encoderContext->frame_size : 0;
-
-    return result;
+    return (avcodec_open2(encoderContext.get(), avCodec, nullptr) >= 0)
+        ? encoderContext->frame_size
+        : 0;
 }
 
-QnFfmpegAudioHelper::QnFfmpegAudioHelper(AVCodecContext* decoderContex):
+QnFfmpegAudioHelper::QnFfmpegAudioHelper(AVCodecContext* decoderContext):
     m_swr(swr_alloc())
 {
-    av_opt_set_int(m_swr, "in_channel_layout", decoderContex->channel_layout, 0);
-    av_opt_set_int(m_swr, "out_channel_layout", decoderContex->channel_layout, 0);
-    av_opt_set_int(m_swr, "in_channel_count", decoderContex->channels, 0);
-    av_opt_set_int(m_swr, "out_channel_count", decoderContex->channels, 0);
-    av_opt_set_int(m_swr, "in_sample_rate", decoderContex->sample_rate, 0);
-    av_opt_set_int(m_swr, "out_sample_rate", decoderContex->sample_rate, 0);
-    av_opt_set_sample_fmt(m_swr, "in_sample_fmt", decoderContex->sample_fmt, 0);
-    av_opt_set_sample_fmt(m_swr, "out_sample_fmt", av_get_packed_sample_fmt(decoderContex->sample_fmt), 0);
+    av_opt_set_int(m_swr, "in_channel_layout", decoderContext->channel_layout, 0);
+    av_opt_set_int(m_swr, "out_channel_layout", decoderContext->channel_layout, 0);
+    av_opt_set_int(m_swr, "in_channel_count", decoderContext->channels, 0);
+    av_opt_set_int(m_swr, "out_channel_count", decoderContext->channels, 0);
+    av_opt_set_int(m_swr, "in_sample_rate", decoderContext->sample_rate, 0);
+    av_opt_set_int(m_swr, "out_sample_rate", decoderContext->sample_rate, 0);
+    av_opt_set_sample_fmt(m_swr, "in_sample_fmt", decoderContext->sample_fmt, 0);
+    av_opt_set_sample_fmt(m_swr, "out_sample_fmt",
+        av_get_packed_sample_fmt(decoderContext->sample_fmt), 0);
     swr_init(m_swr);
 }
 
@@ -535,7 +541,7 @@ QnFfmpegAudioHelper::~QnFfmpegAudioHelper()
     swr_free(&m_swr);
 }
 
-void QnFfmpegAudioHelper::copyAudioSamples(quint8* dst, const AVFrame* src)
+void QnFfmpegAudioHelper::copyAudioSamples(quint8* dst, const AVFrame* src) const
 {
     quint8* tmpData[4] = {dst};
     swr_convert(m_swr,tmpData, src->nb_samples, (const quint8**) src->data, src->nb_samples);

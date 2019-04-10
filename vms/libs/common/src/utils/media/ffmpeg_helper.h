@@ -83,13 +83,13 @@ public:
     static AVSampleFormat fromQtAudioFormatToFfmpegSampleType(const QnAudioFormat& format);
     static AVCodecID fromQtAudioFormatToFfmpegPcmCodec(const QnAudioFormat& format);
 
-
     static int getDefaultFrameSize(AVCodecContext* context);
+
 private:
     static void copyMediaContextFieldsToAvCodecContext(
         AVCodecContext* av, const QnConstMediaContextPtr& media);
 
-    /** 
+    /**
      * Holds a globally shared static instance of a stub AVCodec used for
      * AVCodecContext when the proper codec is not available in ffmpeg.
      */
@@ -119,10 +119,11 @@ struct SwrContext;
 class QnFfmpegAudioHelper
 {
 public:
-    QnFfmpegAudioHelper(AVCodecContext* decoderContex);
+    QnFfmpegAudioHelper(AVCodecContext* decoderContext);
     ~QnFfmpegAudioHelper();
 
-    void copyAudioSamples(quint8* dst, const AVFrame* src);
+    void copyAudioSamples(quint8* dst, const AVFrame* src) const;
+
 private:
     SwrContext* m_swr;
 };
