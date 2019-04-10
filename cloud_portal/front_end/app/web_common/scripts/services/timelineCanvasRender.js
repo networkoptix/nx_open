@@ -457,7 +457,8 @@ window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, 
                 }
             }
         }
-        return mouseX && 0 < mouseY && mouseY < self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height;
+        return mouseX > 0 && mouseX < self.canvas.width &&
+               mouseY > 0 && mouseY < self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height;
     }
 
     var chunkLoadingTexture = false;
