@@ -197,7 +197,7 @@ AVPixelFormat CLVideoDecoderOutput::fixDeprecatedPixelFormat(AVPixelFormat origi
     }
 }
 
-void CLVideoDecoderOutput::memZerro()
+void CLVideoDecoderOutput::memZero()
 {
     const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
     for (int i = 0; i < descr->nb_components && data[i]; ++i)

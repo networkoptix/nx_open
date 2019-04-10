@@ -179,7 +179,7 @@ public:
     void reallocate(int newWidth, int newHeight, int format);
     void reallocate(const QSize& size, int format);
     void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
-    void memZerro();
+    void memZero();
 
     void copyDataFrom(const AVFrame* frame);
     CLVideoDecoderOutput* rotated(int angle);
