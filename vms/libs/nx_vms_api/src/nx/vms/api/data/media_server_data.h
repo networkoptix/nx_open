@@ -75,6 +75,8 @@ struct NX_VMS_API MediaServerUserAttributesData: Data
 
     // Bitrate cap in bytes per second. Negative value if not capped. Not capped by default.
     int backupBitrate = kDefaultBackupBitrate;
+    QnUuid metadataStorageId;
+
     static const int kDefaultBackupBitrate;
 
     QnUuid getIdForMerging() const { return serverId; } //< See IdData::getIdForMerging().
@@ -88,7 +90,8 @@ struct NX_VMS_API MediaServerUserAttributesData: Data
     (backupDaysOfTheWeek) \
     (backupStart) \
     (backupDuration) \
-    (backupBitrate)
+    (backupBitrate) \
+    (metadataStorageId)
 #define MediaServerUserAttributesData_Fields \
     (serverId) \
     (serverName) \
