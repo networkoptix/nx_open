@@ -114,9 +114,10 @@ void EventsStorage::save(
         if (!detectionDataSaver.empty())
         {
             m_dbController.queryExecutor().executeUpdate(
-                [this, detectionDataSaver = std::move(detectionDataSaver)](
+                [this, packet = packet, detectionDataSaver = std::move(detectionDataSaver)](
                     nx::sql::QueryContext* queryContext) mutable
                 {
+                    m_timePeriodDao.insertOrUpdateTimePeriod(queryContext, *packet);
                     detectionDataSaver.save(queryContext);
                     return nx::sql::DBResult::ok;
                 },
