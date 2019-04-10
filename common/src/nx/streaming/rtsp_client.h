@@ -302,6 +302,7 @@ public:
         bool isBackChannel = false;
         int timeBase = 0;
         int serverPort = 0;
+        bool setupSuccess = false;
     };
 
     static QString mediaTypeToStr(TrackType tt);
@@ -324,7 +325,7 @@ public:
     * @param positionEnd end position at mksec
     * @param scale playback speed
     */
-    QnRtspClient::TrackMap play(qint64 positionStart, qint64 positionEnd, double scale);
+    bool play(qint64 positionStart, qint64 positionEnd, double scale);
 
     // returns true if there is no error delivering STOP
     bool stop();
@@ -343,7 +344,16 @@ public:
     bool sendKeepAliveIfNeeded();
 
     void setTransport(nx::vms::api::RtpTransportType transport);
+
+    // RTP transport configured by user.
     nx::vms::api::RtpTransportType getTransport() const { return m_transport; }
+
+    /**
+     * Actual session RTP transport If user set 'automatic', it can be 'tcp' or 'udp',
+     * otherwise it should be equal to result of getTransport().
+     */
+    nx::vms::api::RtpTransportType getActualTransport() const { return m_prefferedTransport; }
+
     QString getTrackFormatByRtpChannelNum(int channelNum);
     TrackType getTrackTypeByRtpChannelNum(int channelNum);
     int getChannelNum(int rtpChannelNum);
@@ -412,8 +422,6 @@ public:
     void setUsePredefinedTracks(int numOfVideoChannel);
 
     static quint8* prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve);
-
-    bool setTCPReadBufferSize(int value);
 
     QString getVideoLayout() const;
     TrackMap getTrackInfo() const;

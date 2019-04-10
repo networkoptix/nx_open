@@ -81,7 +81,13 @@ void OnvifAudioTransmitter::prepare()
     tracks[0]->interleaved = QPair<int, int>(0, 1);
 
     m_rtspConnection->setTrackInfo(tracks);
-    auto tracksToPlay = m_rtspConnection->play(DATETIME_NOW, AV_NOPTS_VALUE, 1.0);
+    if (!m_rtspConnection->play(DATETIME_NOW, AV_NOPTS_VALUE, 1.0))
+    {
+        close();
+        return;
+    }
+
+    auto tracksToPlay = m_rtspConnection->getTrackInfo();
     if (tracksToPlay.isEmpty())
     {
         close();

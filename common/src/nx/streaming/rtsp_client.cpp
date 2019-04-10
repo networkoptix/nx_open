@@ -179,13 +179,10 @@ qint64 QnRtspIoDevice::read(char *data, qint64 maxSize)
 {
     int bytesRead;
     if (m_transport == nx::vms::api::RtpTransportType::tcp)
-    {
         bytesRead = m_owner->readBinaryResponce((quint8*) data, maxSize); // demux binary data from TCP socket
-    }
     else
-    {
         bytesRead = m_mediaSocket->recv(data, maxSize);
-    }
+
     m_owner->sendKeepAliveIfNeeded();
     if (m_transport != nx::vms::api::RtpTransportType::tcp)
         processRtcpData();
@@ -1006,7 +1003,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     return result;
 }
 
-QnRtspClient::TrackMap QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
+bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
 {
     m_prefferedTransport = m_transport;
     if (m_prefferedTransport == nx::vms::api::RtpTransportType::automatic)
@@ -1014,13 +1011,16 @@ QnRtspClient::TrackMap QnRtspClient::play(qint64 positionStart, qint64 positionE
     m_TimeOut = 0; // default timeout 0 ( do not send keep alive )
     if (!m_numOfPredefinedChannels) {
         if (!sendSetup() || m_sdpTracks.isEmpty())
-            return TrackMap();
+            return false;
     }
 
     if (!sendPlay(positionStart, positionEnd, scale))
+    {
         m_sdpTracks.clear();
+        return false;
+    }
 
-    return m_sdpTracks;
+    return true;
 }
 
 bool QnRtspClient::stop()
@@ -1324,6 +1324,7 @@ bool QnRtspClient::sendSetup()
 
         {   //generating transport header
             nx_http::StringType transportStr = "RTP/AVP/";
+
             transportStr += m_prefferedTransport == nx::vms::api::RtpTransportType::tcp
                 ? "TCP"
                 : "UDP";
@@ -1371,6 +1372,7 @@ bool QnRtspClient::sendSetup()
             else
                 return false;
         }
+        trackInfo->setupSuccess = true;
 
         QString sessionParam = extractRTSPParam(QLatin1String(responce), QLatin1String("Session:"));
         if (sessionParam.size() > 0)
@@ -2166,11 +2168,6 @@ void QnRtspClient::setUsePredefinedTracks(int numOfVideoChannel)
 void QnRtspClient::setUserAgent(const QString& value)
 {
     m_userAgent = value.toUtf8();
-}
-
-bool QnRtspClient::setTCPReadBufferSize(int value)
-{
-    return m_tcpSock->setRecvBufferSize(value);
 }
 
 QString QnRtspClient::getVideoLayout() const
