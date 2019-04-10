@@ -180,7 +180,7 @@ public:
     // Returned value:
     //    1 if successfully retrieved, -1 if no packet found.
 
-    int pop(sockaddr*& addr, CPacket& pkt);
+    int pop(detail::SocketAddress& addr, CPacket& pkt);
 
     // Functionality:
     //    Remove UDT instance from the list.
@@ -306,14 +306,13 @@ public:
     void insert(
         const UDTSOCKET& id,
         std::weak_ptr<CUDT> u,
-        int ipVersion,
-        const sockaddr* addr,
+        const detail::SocketAddress& addr,
         uint64_t ttl);
 
     void remove(const UDTSOCKET& id);
 
     std::shared_ptr<CUDT> getByAddr(
-        const sockaddr* addr,
+        const detail::SocketAddress& addr,
         UDTSOCKET& id) const;
 
     void updateConnStatus();
@@ -324,7 +323,7 @@ private:
         UDTSOCKET id = -1;
         std::weak_ptr<CUDT> socket;
         // UDT sonnection peer address
-        struct sockaddr peerAddr;
+        detail::SocketAddress peerAddr;
         // the time that this request expires
         uint64_t ttl = 0;
 
@@ -353,7 +352,7 @@ public:
     // Returned value:
     //    Size of data sent out.
 
-    int sendto(const sockaddr* addr, CPacket& packet);
+    int sendto(const detail::SocketAddress& addr, CPacket& packet);
 
     // List of UDT instances for data sending.
     CSndUList& sndUList() { return *m_pSndUList; }
@@ -419,8 +418,7 @@ public:
     void registerConnector(
         const UDTSOCKET& id,
         std::shared_ptr<CUDT> u,
-        int ipVersion,
-        const sockaddr* addr,
+        const detail::SocketAddress& addr,
         uint64_t ttl);
 
     void removeConnector(const UDTSOCKET& id);

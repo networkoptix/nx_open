@@ -28,39 +28,21 @@ void BasicFixture::givenListeningServerSocket()
     m_serverSocket = UDT::socket(m_ipVersion, SOCK_STREAM, 0);
     ASSERT_GT(m_serverSocket, 0);
 
-    struct sockaddr_in localAddress4;
-    memset(&localAddress4, 0, sizeof(localAddress4));
-
-    struct sockaddr_in6 localAddress6;
-    memset(&localAddress6, 0, sizeof(localAddress6));
-
-    struct sockaddr* localAddress = nullptr;
-    int localAddressLen = 0;
-
+    detail::SocketAddress localAddress;
     if (m_ipVersion == AF_INET)
     {
-        localAddress4.sin_family = m_ipVersion;
-        localAddress4.sin_addr.s_addr = inet_addr("127.0.0.1");
-
-        localAddress = (sockaddr*) &localAddress4;
-        localAddressLen = sizeof(localAddress4);
+        localAddress.setFamily(m_ipVersion);
+        localAddress.v4().sin_addr.s_addr = inet_addr("127.0.0.1");
     }
     else
     {
-        localAddress6.sin6_family = m_ipVersion;
-        localAddress6.sin6_addr = in6addr_loopback;
-
-        localAddress = (sockaddr*) &localAddress6;
-        localAddressLen = sizeof(localAddress6);
+        localAddress.setFamily(m_ipVersion);
+        localAddress.v6().sin6_addr = in6addr_loopback;
     }
 
-    ASSERT_EQ(0, UDT::bind(m_serverSocket, localAddress, localAddressLen));
-
+    ASSERT_EQ(0, UDT::bind(m_serverSocket, localAddress.get(), localAddress.size()));
     ASSERT_EQ(0, UDT::listen(m_serverSocket, 127));
-
-    memset(&m_serverAddress, 0, sizeof(m_serverAddress));
-    int len = sizeof(m_serverAddress);
-    ASSERT_EQ(0, UDT::getsockname(m_serverSocket, (struct sockaddr*) &m_serverAddress, &len));
+    ASSERT_EQ(0, UDT::getsockname(m_serverSocket, m_serverAddress.get(), (int*) &m_serverAddress.length()));
 }
 
 void BasicFixture::startAcceptingAsync()
@@ -97,7 +79,7 @@ void BasicFixture::thenServerReceives(const std::string& expected)
     ASSERT_EQ(expected, received);
 }
 
-const struct sockaddr_in& BasicFixture::serverAddress() const
+detail::SocketAddress BasicFixture::serverAddress() const
 {
     return m_serverAddress;
 }
@@ -175,7 +157,7 @@ void BasicFixture::connectToServer()
     const auto& serverAddr = serverAddress();
     ASSERT_EQ(
         0,
-        UDT::connect(m_clientSocket, (const sockaddr*)&serverAddr, sizeof(serverAddr)));
+        UDT::connect(m_clientSocket, serverAddr.get(), serverAddr.size()));
 }
 
 void BasicFixture::enableNonBlockingMode(UDTSOCKET handle)
