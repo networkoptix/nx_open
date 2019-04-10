@@ -17,7 +17,10 @@ struct Ini: public nx::kit::IniConfig
         "Don't recreate analytics DeviceAgents on resource changes (workaround of libtegra_video.so bug).");
 
     NX_INI_FLAG(0, forceLiveCacheForPrimaryStream, "Always cache primary stream frames in liveCache.");
-    NX_INI_FLAG(0, forceLiteClient, "Force Lite Client for this server");
+    NX_INI_FLAG(0, forceLiteClient, "Force Lite Client for this server.");
+
+    NX_INI_FLAG(0, allowMtDecoding,
+        "Allow multithreading decoding of video when software motion detection is enabled.");
 };
 
 inline Ini& ini()
