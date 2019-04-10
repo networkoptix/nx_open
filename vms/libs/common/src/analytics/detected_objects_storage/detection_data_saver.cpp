@@ -157,7 +157,7 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
 
     for (const auto& objectSearchGridCell: m_objectSearchData)
     {
-        insertObjectSearchCell->bindValue(0, duration_cast<seconds>(objectSearchGridCell.timestamp).count());
+        insertObjectSearchCell->bindValue(0, (long long) duration_cast<seconds>(objectSearchGridCell.timestamp).count());
         insertObjectSearchCell->bindValue(1, objectSearchGridCell.boundingBox.topLeft().x());
         insertObjectSearchCell->bindValue(2, objectSearchGridCell.boundingBox.topLeft().y());
         insertObjectSearchCell->bindValue(3, objectSearchGridCell.boundingBox.bottomRight().x());
