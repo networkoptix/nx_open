@@ -293,7 +293,8 @@ void QnRtspClient::parseSDP(const QByteArray& data)
 {
     m_sdp.parse(QString(data));
 
-    if (m_sdp.serverAddress.isMulticast())
+    // At this moment we do not support different transport for streams, so use first.
+    if (m_sdp.media.size() > 0 && m_sdp.media[0].connectionAddress.isMulticast())
         m_transport = nx::vms::api::RtpTransportType::multicast;
 
     for (const auto& media: m_sdp.media)
@@ -675,7 +676,7 @@ bool QnRtspClient::sendSetup()
             track.ioDevice->setTransport(m_prefferedTransport);
             if (m_prefferedTransport == nx::vms::api::RtpTransportType::multicast)
             {
-                track.ioDevice->bindToMulticastAddress(m_sdp.serverAddress,
+                track.ioDevice->bindToMulticastAddress(track.sdpMedia.connectionAddress,
                     m_tcpSock->getLocalAddress().address.toString());
             }
 
@@ -783,7 +784,7 @@ bool QnRtspClient::sendSetup()
                         track.ioDevice->updateRemoteMulticastPorts(
                             ports.mediaPort, ports.rtcpPort);
 
-                        track.ioDevice->bindToMulticastAddress(m_sdp.serverAddress,
+                        track.ioDevice->bindToMulticastAddress(track.sdpMedia.connectionAddress,
                             m_tcpSock->getLocalAddress().address.toString());
                     }
                 }

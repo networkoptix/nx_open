@@ -7,6 +7,6 @@
 # release branch. Ask #akolesnikov for the details.
 # YOU MUST FIX THE COMMENT to make sure it will generate a merge conflict if somebody also updates
 # the protocol version. Prefer to use issue number and title as a comment.
-set(_vmsInVersionProtocolNumber 00) # Make protocol version depend on VMS project version
+set(_vmsInVersionProtocolNumber 01) # VMS-13741: Add database field to keep selected storage uuid
 set(vmsProtocolVersion "${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}${_vmsInVersionProtocolNumber}")
 unset(_vmsInVersionProtocolNumber)

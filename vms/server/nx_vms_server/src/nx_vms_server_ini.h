@@ -25,6 +25,10 @@ struct Ini: public nx::kit::IniConfig
         "libtegra_video.so bug).");
 
     NX_INI_FLAG(0, forceLiteClient, "Force Lite Client for this server.");
+	
+    NX_INI_FLAG(0, allowMtDecoding,
+        "Allow multithreading decoding of video when software motion detection is enabled.");
+
 
     NX_INI_INT(67000, liveStreamCacheForPrimaryStreamMinSizeMs,
         (std::string("Lower bound of Live Stream Cache size for primary stream, milliseconds.\n\n")
