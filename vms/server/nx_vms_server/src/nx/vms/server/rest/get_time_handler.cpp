@@ -16,15 +16,11 @@ namespace nx::vms::server::rest {
 
 using namespace std::chrono;
 
-int GetTimeHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+nx::network::rest::Response GetTimeHandler::executeGet(const nx::network::rest::Request& request)
 {
     nx::vms::api::TimeReply reply;
 
-    auto commonModule = owner->commonModule();
+    auto commonModule = request.owner->commonModule();
     reply.osTime = milliseconds(QDateTime::currentDateTime().toMSecsSinceEpoch());
     reply.vmsTime = commonModule->ec2Connection()->timeSyncManager()->getSyncTime();
     reply.timeZoneOffset = milliseconds(currentTimeZone() * 1000LL);
@@ -32,8 +28,7 @@ int GetTimeHandler::executeGet(
     reply.timeZoneId = nx::utils::getCurrentTimeZoneId();
     reply.realm = nx::network::AppInfo::realm();
 
-    result.setReply(reply);
-    return nx::network::http::StatusCode::ok;
+    return nx::network::rest::Response::reply(reply);
 }
 
 } // namespace nx::vms::server::rest

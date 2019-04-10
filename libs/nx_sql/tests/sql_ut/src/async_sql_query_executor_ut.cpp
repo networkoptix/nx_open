@@ -93,11 +93,11 @@ constexpr int kDefaultMaxConnectionCount = 29;
 class DbAsyncSqlQueryExecutor:
     public test::BaseDbTest
 {
+    using base_type = test::BaseDbTest;
+
 public:
     DbAsyncSqlQueryExecutor():
-        m_eventsReceiver(nullptr),
-        m_maxNumberOfConcurrentDataModificationRequests(0),
-        m_concurrentDataModificationRequests(0)
+        base_type(kModuleName)
     {
         using namespace std::placeholders;
 
@@ -286,12 +286,12 @@ protected:
     }
 
 private:
-    DbConnectionEventsReceiver* m_eventsReceiver;
+    DbConnectionEventsReceiver* m_eventsReceiver = nullptr;
     nx::utils::SyncQueue<DBResult> m_queryResults;
     int m_issuedRequestCount = 0;
     nx::utils::promise<void> m_finishHangingQuery;
-    std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests;
-    std::atomic<int> m_concurrentDataModificationRequests;
+    std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests = 0;
+    std::atomic<int> m_concurrentDataModificationRequests = 0;
     detail::RequestExecutorFactory::Function m_requestExecutorFactoryBak;
 
     void emulateQueryError(DBResult dbResultToEmulate)

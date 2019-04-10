@@ -27,11 +27,41 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QCheckBox" name="autoDiscoveryCheckBox">
-     <property name="text">
-      <string notr="true">&lt;Enable cameras and servers auto discovery&gt;</string>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <property name="spacing">
+      <number>4</number>
      </property>
-    </widget>
+    <item>
+     <widget class="QCheckBox" name="autoDiscoveryCheckBox">
+      <property name="text">
+       <string notr="true">&lt;Enable cameras and servers auto discovery&gt;</string>
+      </property>
+     </widget>
+    </item>
+     <item>
+      <widget class="nx::vms::client::desktop::HintButton" name="autodiscoveryHint" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">

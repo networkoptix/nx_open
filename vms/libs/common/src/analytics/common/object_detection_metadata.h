@@ -23,7 +23,7 @@ struct Attribute
 #define Attribute_Fields (name)(value)
 QN_FUSION_DECLARE_FUNCTIONS(Attribute, (json)(ubjson));
 
-bool operator< (const Attribute& f, const Attribute& s);
+bool operator<(const Attribute& f, const Attribute& s);
 bool operator==(const Attribute& left, const Attribute& right);
 
 QString toString(const Attribute&);
@@ -31,6 +31,8 @@ QString toString(const Attribute&);
 //-------------------------------------------------------------------------------------------------
 
 // TODO: Rename all classes without words "Detection" and "Detected".
+
+static constexpr int kCoordinateDecimalDigits = 4;
 
 struct DetectedObject
 {
@@ -46,6 +48,7 @@ struct DetectedObject
 QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
 
 bool operator==(const DetectedObject& left, const DetectedObject& right);
+QString toString(const DetectedObject& object);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -76,7 +79,7 @@ bool operator<(const DetectionMetadataPacket& first,
 bool operator<(std::chrono::microseconds first, const DetectionMetadataPacket& second);
 bool operator<(const DetectionMetadataPacket& first, std::chrono::microseconds second);
 
-QString toString(const DetectionMetadataPacket&);
+QString toString(const DetectionMetadataPacket& packet);
 QnCompressedMetadataPtr toMetadataPacket(const DetectionMetadataPacket&);
 DetectionMetadataPacketPtr fromMetadataPacket(const QnConstCompressedMetadataPtr&);
 ::std::ostream& operator<<(::std::ostream& os, const DetectionMetadataPacket& packet);

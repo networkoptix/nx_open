@@ -22,6 +22,9 @@ Running it
 ```bash
 sudo docker run -d --name mediaserver1 --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro -t mediaserver
 ```
+OR
+You can use the docker-compose file which has the run parameters set, and will provide volumes for persistent database and video storage.
+Note that the video storage location, if modified, needs to be short. Changing the name is fine but changing the path may result in no valid storage location.
 
 ## Useful commands ##
 

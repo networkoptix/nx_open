@@ -25,6 +25,9 @@ class NX_NETWORK_API TunnelAcceptorFactory:
 public:
     TunnelAcceptorFactory();
 
+    hpm::api::ConnectionMethods enabledConnectionMethods() const;
+    void setEnabledConnectionMethods(hpm::api::ConnectionMethods);
+
     void setUdpHolePunchingEnabled(bool val);
     void setRelayingEnabled(bool val);
 

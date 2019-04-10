@@ -149,7 +149,7 @@ public:
     std::string toString() const;
 
     void bindFields(QSqlQuery* query) const;
-    void bindFields(SqlQuery* query) const;
+    void bindFields(AbstractSqlQuery* query) const;
 
 private:
     std::vector<std::unique_ptr<AbstractFilterCondition>> m_conditions;

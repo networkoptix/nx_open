@@ -1,9 +1,13 @@
 #pragma once
 
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 
-class QnGetHardwareInfoHandler: public QnJsonRestHandler {
-    Q_OBJECT
-public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
+namespace nx::vms::server::rest {
+
+class HardwareInfoHandler: public nx::network::rest::Handler
+{
+protected:
+    nx::network::rest::Response executeGet(const nx::network::rest::Request& request) override;
 };
+
+} // namespace nx::vms::server::rest

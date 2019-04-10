@@ -146,10 +146,7 @@ QnRequestParamList QnChunksRequestData::toParams() const
 
 QUrlQuery QnChunksRequestData::toUrlQuery() const
 {
-    QUrlQuery urlQuery;
-    for (const auto& param: toParams())
-        urlQuery.addQueryItem(param.first, param.second);
-    return urlQuery;
+    return toParams().toUrlQuery();
 }
 
 bool QnChunksRequestData::isValid() const

@@ -14,10 +14,8 @@ class AbstractBusinessEventNotificationManager: public QObject
 signals:
     void addedOrUpdated(const nx::vms::api::EventRuleData& rule, ec2::NotificationSource source);
     void removed(const QnUuid& id);
-    void businessActionBroadcasted(const nx::vms::event::AbstractActionPtr& businessAction);
     void businessRuleReset(const nx::vms::api::EventRuleDataList& rules);
     void gotBroadcastAction(const nx::vms::event::AbstractActionPtr& action);
-    void execBusinessAction(const nx::vms::event::AbstractActionPtr& action);
 };
 
 using AbstractBusinessEventNotificationManagerPtr =
@@ -99,22 +97,6 @@ public:
                     handler)));
     }
 
-    template<class TargetType, class HandlerType>
-    int sendEventAction(
-        const nx::vms::api::EventActionData& actionData,
-        const QnUuid& dstPeer,
-        TargetType* target,
-        HandlerType handler)
-    {
-        return sendEventAction(
-            actionData,
-            dstPeer,
-            std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
-                    target,
-                    handler)));
-    }
-
     /*!
         \param handler Functor with params: (ErrorCode)
     */
@@ -136,10 +118,6 @@ private:
     virtual int deleteRule(QnUuid ruleId, impl::SimpleHandlerPtr handler) = 0;
     virtual int broadcastEventAction(
         const nx::vms::api::EventActionData& actionData,
-        impl::SimpleHandlerPtr handler) = 0;
-    virtual int sendEventAction(
-        const nx::vms::api::EventActionData& actionData,
-        const QnUuid& id,
         impl::SimpleHandlerPtr handler) = 0;
     virtual int resetBusinessRules(impl::SimpleHandlerPtr handler) = 0;
 };

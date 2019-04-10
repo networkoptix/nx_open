@@ -409,9 +409,7 @@ public:
     virtual ~SliceUnit() {
         ;
     }
-    int deserialize(quint8* buffer, quint8* end,
-                            const QMap<quint32, const SPSUnit*>& spsMap,
-                            const QMap<quint32, const PPSUnit*>& ppsMap);
+    int deserialize(quint8* buffer, quint8* end, const SPSUnit* sps, const PPSUnit* pps);
 
     const SPSUnit* getSPS() const {return sps;}
     const PPSUnit* getPPS() const {return pps;}
@@ -545,7 +543,7 @@ private:
     const SPSUnit* sps;
     int m_frameNumBits;
     int m_fullHeaderLen;
-    int deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMap,const QMap<quint32, const PPSUnit*>& ppsMap);
+    int deserializeSliceHeader(const SPSUnit* sps, const PPSUnit* pps);
 };
 
 namespace h264

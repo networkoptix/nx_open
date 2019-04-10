@@ -1,9 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 #include <QScopedPointer>
 
 #include <camera/abstract_video_camera.h>
+#include <nx/utils/elapsed_timer.h>
 
 class QnDataProviderFactory;
 class MediaStreamCache;
@@ -61,6 +63,7 @@ public:
 
 private:
     void createReader(QnServer::ChunksCatalog catalog);
+    QnLiveStreamProviderPtr readerByQuality(MediaQuality streamQuality) const;
     void stop();
 
 private:
@@ -77,7 +80,8 @@ private:
     QSet<void*> m_cameraUsers;
     QnCompressedAudioDataPtr m_lastAudioFrame;
     //!index - is a \a MediaQuality element
-    std::vector<std::unique_ptr<MediaStreamCache> > m_liveCache;
+    std::vector<std::unique_ptr<MediaStreamCache>> m_liveCache;
+    std::map<MediaQuality, nx::utils::ElapsedTimer> m_liveCacheValidityTimers;
     //!index - is a \a MediaQuality element
     std::vector<nx::vms::server::hls::LivePlaylistManagerPtr> m_hlsLivePlaylistManager;
 
@@ -87,17 +91,28 @@ private:
     QElapsedTimer m_lastActivityTimer;
 
 private:
+    enum class ForceLiveCacheForPrimaryStream { no, yes, auto_ };
+
+    ForceLiveCacheForPrimaryStream getSettingForceLiveCacheForPrimaryStream() const;
+
+    bool isLiveCacheForcingUseful(QString* outReasonForLog) const;
+    bool needToForceLiveCacheForPrimaryStream(QString* outReasonForLog) const;
+    bool isLiveCacheNeededForPrimaryStream(QString* outReasonForLog) const;
+
     nx::vms::server::GopKeeper* getGopKeeper(StreamIndex streamIndex) const;
 
     QnLiveStreamProviderPtr getLiveReaderNonSafe(
         QnServer::ChunksCatalog catalog, bool ensureInitialized);
 
+    std::pair<int, int> getMinMaxLiveCacheSizeMs(MediaQuality streamQuality) const;
+
     void startLiveCacheIfNeeded();
 
     bool ensureLiveCacheStarted(
         MediaQuality streamQuality,
-        const QnLiveStreamProviderPtr& primaryReader,
-        qint64 targetDurationUSec );
+        const QnLiveStreamProviderPtr& reader,
+        qint64 targetDurationUSec,
+        const QString& reasonForLog);
 
     void at_camera_resourceChanged();
 };

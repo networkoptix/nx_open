@@ -17,6 +17,7 @@
 
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/director/director.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -50,6 +51,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
+#include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 
 using namespace nx::vms::client::desktop::ui;
@@ -118,6 +120,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
         statisticsManager, &QnStatisticsManager::sendStatistics);
 
     instance<nx::vms::client::desktop::SystemHealthState>();
+
+    instance<nx::vmx::client::desktop::Director>();
+    instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
 
     initWorkarounds();
 }
@@ -228,7 +233,6 @@ void QnWorkbenchContext::setUserName(const QString &userName) {
     if(m_userWatcher)
         m_userWatcher->setUserName(userName);
 }
-
 
 bool QnWorkbenchContext::closingDown() const
 {

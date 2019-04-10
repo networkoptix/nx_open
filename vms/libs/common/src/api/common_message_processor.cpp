@@ -56,6 +56,7 @@
 #include <nx/vms/event/rule_manager.h>
 #include <nx/utils/log/log.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 using namespace nx;
 using namespace nx::vms::api;
@@ -347,12 +348,6 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         connectionType);
     connect(
         eventManager,
-        &ec2::AbstractBusinessEventNotificationManager::businessActionBroadcasted,
-        this,
-        &QnCommonMessageProcessor::on_businessActionBroadcasted,
-        connectionType);
-    connect(
-        eventManager,
         &ec2::AbstractBusinessEventNotificationManager::businessRuleReset,
         this,
         &QnCommonMessageProcessor::resetEventRules,
@@ -362,12 +357,6 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &ec2::AbstractBusinessEventNotificationManager::gotBroadcastAction,
         this,
         &QnCommonMessageProcessor::on_broadcastBusinessAction,
-        connectionType);
-    connect(
-        eventManager,
-        &ec2::AbstractBusinessEventNotificationManager::execBusinessAction,
-        this,
-        &QnCommonMessageProcessor::on_execBusinessAction,
         connectionType);
 
     const auto storedFileManager = connection->storedFileNotificationManager();
@@ -769,22 +758,10 @@ void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid& id)
     eventRuleManager()->removeRule(id);
 }
 
-void QnCommonMessageProcessor::on_businessActionBroadcasted(
-    const vms::event::AbstractActionPtr& /*businessAction*/)
-{
-    // Nothing to do for a while.
-}
-
 void QnCommonMessageProcessor::on_broadcastBusinessAction( const vms::event::AbstractActionPtr& action )
 {
     emit businessActionReceived(action);
 }
-
-void QnCommonMessageProcessor::on_execBusinessAction( const vms::event::AbstractActionPtr& action )
-{
-    execBusinessActionInternal(action);
-}
-
 void QnCommonMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)
 {
     layoutTourManager()->addOrUpdateTour(tour);

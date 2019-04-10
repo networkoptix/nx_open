@@ -1264,7 +1264,7 @@ void QnPlOnvifResource::handleOneNotification(
     /*
         TODO: #szaitsev: This function should be completely rewritten in 4.1.
         In does not correspond onvif specification.
-        ONVIF Core Specification – Ver. 18.12 (or later), paragraph 9.
+        ONVIF Core Specification Ver. 18.12 (or later), paragraph 9.
     */
     const auto now = qnSyncTime->currentUSecsSinceEpoch();
     if (m_clearInputsTimeoutUSec > 0)

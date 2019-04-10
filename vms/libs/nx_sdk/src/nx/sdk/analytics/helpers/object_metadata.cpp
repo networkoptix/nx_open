@@ -68,26 +68,29 @@ void ObjectMetadata::setSubtype(const std::string& value)
     m_subtype = value;
 }
 
+void ObjectMetadata::addAttribute(Attribute attribute)
+{
+    auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
+        [attributeName = attribute.name()](const Attribute& attribute)
+        {
+            return strcmp(attribute.name(), attributeName) == 0;
+        });
+
+    if (existingAttribute != m_attributes.end())
+    {
+        NX_KIT_ASSERT(existingAttribute->type() == attribute.type());
+        existingAttribute->setValue(attribute.value());
+    }
+    else
+    {
+        m_attributes.push_back(std::move(attribute));
+    }
+}
+
 void ObjectMetadata::addAttributes(const std::vector<Attribute>& value)
 {
     for (const auto& newAttribute: value)
-    {
-        auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
-            [newAttributeName = newAttribute.name()](const Attribute& attribute)
-            {
-                return strcmp(attribute.name(), newAttributeName) == 0;
-            });
-
-        if (existingAttribute != m_attributes.end())
-        {
-            NX_KIT_ASSERT(existingAttribute->type() == newAttribute.type());
-            existingAttribute->setValue(newAttribute.value());
-        }
-        else
-        {
-            m_attributes.push_back(newAttribute);
-        }
-    }
+        addAttribute(newAttribute);
 }
 
 void ObjectMetadata::setAuxiliaryData(std::string auxiliaryData)

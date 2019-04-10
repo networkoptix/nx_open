@@ -1,13 +1,13 @@
 #pragma once
 
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 
-class QnCookieLogoutRestHandler : public QnJsonRestHandler
+class QnCookieLogoutRestHandler : public nx::network::rest::Handler
 {
-    Q_OBJECT
-public:
-    virtual JsonRestResponse executeGet(const JsonRestRequest& request);
-    virtual JsonRestResponse executePost(const JsonRestRequest& request, const QByteArray& body);
+protected:
+    virtual nx::network::rest::Response executeGet(const nx::network::rest::Request& request);
+    virtual nx::network::rest::Response executePost(const nx::network::rest::Request& request);
 
+public:
     static void logout(const QnRestConnectionProcessor* connection);
 };

@@ -72,15 +72,3 @@ QNetworkReply::NetworkError QnHTTPRawResponse::httpStatusCodeToNetworkError(
             return QNetworkReply::UnknownServerError;
     }
 }
-
-QnRequestParams requestParamsFromUrl(const nx::utils::Url& url)
-{
-    QnRequestParams params;
-    const QUrlQuery query(url.toQUrl());
-    for (const auto& item: query.queryItems())
-    {
-        if (!params.contains(item.first))
-            params.insert(item.first, item.second);
-    }
-    return params;
-}

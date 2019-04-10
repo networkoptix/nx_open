@@ -17,7 +17,7 @@ bool ObjectPosition::operator==(const ObjectPosition& right) const
     return deviceId == right.deviceId
         && timestampUsec == right.timestampUsec
         && durationUsec == right.durationUsec
-        && equalWithPrecision(boundingBox, right.boundingBox, 6)
+        && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && attributes == right.attributes;
 }
 
@@ -38,13 +38,37 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 //-------------------------------------------------------------------------------------------------
 
+template<typename T>
+bool isSameItems(const std::vector<T>& left, const std::vector<T>& right)
+{
+    for (const auto& item: left)
+    {
+        if (std::find(right.begin(), right.end(), item) == right.end())
+            return false;
+    }
+
+    for (const auto& item: right)
+    {
+        if (std::find(left.begin(), left.end(), item) == left.end())
+            return false;
+    }
+
+    return true;
+}
+
+bool Filter::empty() const
+{
+    return *this == Filter();
+}
+
 bool Filter::operator==(const Filter& right) const
 {
-    return objectTypeId == right.objectTypeId
+    return isSameItems(deviceIds, right.deviceIds)
+        && isSameItems(objectTypeId, right.objectTypeId)
         && objectAppearanceId == right.objectAppearanceId
         && timePeriod == right.timePeriod
-        && equalWithPrecision(boundingBox, right.boundingBox, 6)
-        && requiredAttributes == right.requiredAttributes
+        && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
+        && isSameItems(requiredAttributes, right.requiredAttributes)
         && freeText == right.freeText
         && sortOrder == right.sortOrder;
 }
@@ -96,10 +120,10 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
 
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 {
-    for (const auto& deviceIdStr: params.allValues(lit("deviceId")))
+    for (const auto& deviceIdStr: params.values(lit("deviceId")))
         filter->deviceIds.push_back(QnUuid::fromStringSafe(deviceIdStr));
 
-    for (const auto& objectTypeId: params.allValues(lit("objectTypeId")))
+    for (const auto& objectTypeId: params.values(lit("objectTypeId")))
         filter->objectTypeId.push_back(objectTypeId);
 
     if (params.contains(lit("objectAppearanceId")))
@@ -174,7 +198,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 
     os << "maxObjectsToSelect " << filter.maxObjectsToSelect << "; ";
     os << "maxTrackSize " << filter.maxTrackSize << "; ";
-    os << "sortOrder " << 
+    os << "sortOrder " <<
         (filter.sortOrder == Qt::SortOrder::DescendingOrder ? "DESC" : "ASC");
 
     return os;

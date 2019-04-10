@@ -11,39 +11,23 @@
 namespace rest {
 namespace handlers {
 
-int SetPrimaryTimeServerRestHandler::executePost(
-    const QString& /*path*/,
-    const QnRequestParams& /*params*/,
-    const QByteArray& body,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+nx::network::rest::Response SetPrimaryTimeServerRestHandler::executePost(
+    const nx::network::rest::Request& request)
 {
-    auto timeSyncManager = owner->commonModule()->ec2Connection()->timeSyncManager();
-    result = execute(
-        timeSyncManager,
-        owner->commonModule(),
-        QJson::deserialized<nx::vms::api::IdData>(body).id);
-    return nx::network::http::StatusCode::ok;
-}
-
-QnJsonRestResult SetPrimaryTimeServerRestHandler::execute(
-    nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager,
-    QnCommonModule* commonModule,
-    const QnUuid& id)
-{
-    auto server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(id);
-    QnJsonRestResult result;
+    const auto id = request.parseContentOrThrow<nx::vms::api::IdData>().id;
+    const auto common = request.owner->commonModule();
+    auto server = common->resourcePool()->getResourceById<QnMediaServerResource>(id);
     if (!server && !id.isNull())
     {
-        result.setError(QnRestResult::InvalidParameter,
-            lit("Mediaserver with Id '%1' is not found.").arg(id.toString()));
-        return result;
+        return nx::network::rest::Response::error(
+            nx::network::http::StatusCode::ok, QnRestResult::CantProcessRequest,
+            lm("Server with Id '%1' is not found.").arg(id));
     }
 
-    auto settings = commonModule->globalSettings();
+    auto settings = common->globalSettings();
     settings->setPrimaryTimeServer(id);
     settings->synchronizeNow();
-    return result;
+    return nx::network::rest::Response::result(QnJsonRestResult());
 }
 
 } // namespace handlers
