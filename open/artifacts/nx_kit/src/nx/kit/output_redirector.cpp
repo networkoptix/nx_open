@@ -68,9 +68,14 @@ OutputRedirector::OutputRedirector()
 
 static void redirectOutput(FILE* stream, const char* streamName, const std::string& filename)
 {
-    if (freopen(filename.c_str(), "w", stream))
-        fprintf(stream, "%s is redirected to this file\n", streamName);
-    // Ignore possible errors because it is not clear where to print the error message.
+    if (!freopen(filename.c_str(), "w", stream))
+    {
+        fprintf(stderr, "ERROR: Unable to perform redirection of %s to %s\n",
+            streamName, filename.c_str());
+        return;
+    }
+
+    fprintf(stream, "%s is redirected to this file\n", streamName);
 }
 
 static bool fileExists(const std::string& filePath)
