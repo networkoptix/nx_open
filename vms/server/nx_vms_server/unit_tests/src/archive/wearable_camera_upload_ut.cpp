@@ -6,12 +6,21 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 #include <api/model/wearable_camera_reply.h>
+#include <api/model/wearable_status_reply.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
 
 namespace nx::vms::server::test {
 
 class FtWearableCameraUpload: public test_support::MediaserverWithStorageFixture
 {
 protected:
+    virtual void SetUp() override
+    {
+        test_support::MediaserverWithStorageFixture::SetUp();
+        m_server->addSetting("appserverPassword", "admin");
+    }
+
     void givenSingleFileOnDisk()
     {
         using namespace std::chrono;
@@ -74,7 +83,8 @@ protected:
 
         using namespace vms::common::p2p::downloader;
         QnJsonRestResult uploadResult;
-        NX_TEST_API_GET(m_server.get(), QString("/api/downloads/%1/status").arg(m_testFileName), &uploadResult);
+        NX_TEST_API_GET(
+            m_server.get(), QString("/api/downloads/%1/status").arg(m_testFileName), &uploadResult);
         ASSERT_EQ(QnRestResult::Error::NoError, uploadResult.error);
         const auto fileInformation = uploadResult.deserialized<FileInformation>();
         ASSERT_TRUE(fileInformation.status == FileInformation::Status::downloaded);
@@ -100,10 +110,48 @@ protected:
     void whenUploadedFileAddedToTheCamera()
     {
         using namespace nx::test;
+        QByteArray rawResponse;
+        const auto adminId = m_server->serverModule()->resourcePool()->getAdministrator()->getId();
+
         NX_TEST_API_POST(
             m_server.get(),
             QString("/api/wearableCamera/lock?cameraId=%1&ttl=60000&userId=%2")
-                .arg(m_wearableCameraId.toString()).arg(m_lockId.toString()),
+                .arg(m_wearableCameraId.toString()).arg(adminId.toString()),
+            QByteArray(), nullptr, network::http::StatusCode::ok, "admin", "admin", &rawResponse);
+
+        QnJsonRestResult restResult = QJson::deserialized<QnJsonRestResult>(rawResponse);
+        auto wearableStatusReply = restResult.deserialized<QnWearableStatusReply>();
+
+        NX_TEST_API_POST(
+            m_server.get(),
+            QString("/api/wearableCamera/consume?cameraId=%1&token=%2&uploadId=%3&startTime=%4")
+                .arg(m_wearableCameraId.toString()).arg(wearableStatusReply.token.toString())
+                .arg(m_testFileName).arg(m_testFileStartTimeMs),
+            QByteArray());
+
+        while (true)
+        {
+            NX_TEST_API_POST(
+                m_server.get(),
+                QString("/api/wearableCamera/extend?cameraId=%1&token=%2&userId=%3&ttl=60000")
+                    .arg(m_wearableCameraId.toString()).arg(wearableStatusReply.token.toString())
+                    .arg(adminId.toString()),
+                QByteArray(), nullptr, network::http::StatusCode::ok, "admin", "admin", &rawResponse);
+
+            QnJsonRestResult restResult = QJson::deserialized<QnJsonRestResult>(rawResponse);
+            const auto wearableStatusReply = restResult.deserialized<QnWearableStatusReply>();
+
+            ASSERT_TRUE(wearableStatusReply.success);
+            if (wearableStatusReply.progress == 100)
+                break;
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        }
+
+        NX_TEST_API_POST(
+            m_server.get(),
+            QString("/api/wearableCamera/release?cameraId=%1&token=%2")
+                .arg(m_wearableCameraId.toString()).arg(wearableStatusReply.token.toString()),
             QByteArray());
     }
 
@@ -111,7 +159,6 @@ private:
     QString m_testFilePath;
     QString m_testFileName;
     const QString m_wearableCameraName = "testCamera";
-    const QnUuid m_lockId = QnUuid::createUuid();
     QnUuid m_wearableCameraId;
     int64_t m_testFileStartTimeMs;
 };

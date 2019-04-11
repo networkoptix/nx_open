@@ -25,6 +25,12 @@ class WearableCameraRecorder: public QnServerEdgeStreamRecorder
 {
 public:
     using QnServerEdgeStreamRecorder::QnServerEdgeStreamRecorder;
+
+    virtual ~WearableCameraRecorder() override
+    {
+        stop();
+    }
+
 protected:
     virtual void beforeProcessData(const QnConstAbstractMediaDataPtr& media) override
     {
@@ -50,6 +56,7 @@ protected:
 
         m_mediaInfoSaved = true;
     }
+
 private:
     bool m_mediaInfoSaved = false;
 };
@@ -118,6 +125,8 @@ bool WearableArchiveSynchronizationTask::execute()
     m_recorder->pleaseStop();
     m_recorder->wait();
 
+    m_archiveReader->stop();
+    m_archiveReader->removeDataProcessor(m_recorder.get());
     m_archiveReader.reset();
     m_recorder.reset();
 

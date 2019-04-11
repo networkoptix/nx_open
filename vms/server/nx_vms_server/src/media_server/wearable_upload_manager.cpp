@@ -63,7 +63,8 @@ QnWearableStorageStats QnWearableUploadManager::storageStats() const
     return result;
 }
 
-bool QnWearableUploadManager::consume(const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs)
+bool QnWearableUploadManager::consume(
+    const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs)
 {
     WearableArchiveSynchronizer* synchronizer =
         serverModule()->findInstance<WearableArchiveSynchronizer>();
@@ -100,20 +101,21 @@ bool QnWearableUploadManager::consume(const QnUuid& cameraId, const QnUuid& toke
         {
             if (auto downloader = serverModule()->findInstance<Downloader>())
                 downloader->deleteFile(uploadId);
+        }
 
-            QnMutexLocker locker(&d->mutex);
-            d->stateByCameraId.remove(cameraId);
-        }
-        else
-        {
-            QnMutexLocker locker(&d->mutex);
-            d->stateByCameraId[cameraId] = state;
-        }
+        QnMutexLocker locker(&d->mutex);
+        d->stateByCameraId[cameraId] = state;
     };
     connect(task, &WearableArchiveSynchronizationTask::stateChanged, this, stateChangedHandler);
 
     synchronizer->addTask(camera, task);
     return true;
+}
+
+void QnWearableUploadManager::release(const QnUuid& cameraId)
+{
+    QnMutexLocker locker(&d->mutex);
+    d->stateByCameraId.remove(cameraId);
 }
 
 bool QnWearableUploadManager::isConsuming(const QnUuid& cameraId) const

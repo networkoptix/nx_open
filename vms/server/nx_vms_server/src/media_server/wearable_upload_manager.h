@@ -28,9 +28,11 @@ public:
 
     QnWearableStorageStats storageStats() const;
 
-    bool consume(const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs);
+    bool consume(
+        const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs);
 
     bool isConsuming(const QnUuid& cameraId) const;
+    void release(const QnUuid& cameraId);
     nx::vms::server::recorder::WearableArchiveSynchronizationState state(const QnUuid& cameraId) const;
 
 private:

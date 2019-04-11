@@ -369,6 +369,7 @@ int QnWearableCameraRestHandler::executeRelease(const QnRequestParams& params,
     reply.consuming = state.isConsuming();
     reply.progress = state.progress();
     result.setReply(reply);
+    uploader->release(cameraId);
 
     return nx::network::http::StatusCode::ok;
 }
