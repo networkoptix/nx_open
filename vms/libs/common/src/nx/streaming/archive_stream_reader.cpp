@@ -890,7 +890,6 @@ begin_label:
                 setNeedKeyData();
             internalJumpTo(newTime);
             setSkipFramesToTime(newTime, true);
-            m_eof = true;
             m_BOF = true;
             goto begin_label;
         }
