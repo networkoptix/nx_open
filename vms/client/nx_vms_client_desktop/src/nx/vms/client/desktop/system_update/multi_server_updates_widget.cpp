@@ -1953,7 +1953,8 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         && (m_updateInfo.error == nx::update::InformationError::networkError
             || m_updateInfo.error == nx::update::InformationError::httpError
             // If one wants to download a file in another place.
-            || m_updateInfo.error == nx::update::InformationError::noError);
+            || m_updateInfo.error == nx::update::InformationError::noError)
+        && m_widgetState != WidgetUpdateState::readyInstall;
 
     ui->manualDownloadButton->setVisible(showButton);
 
