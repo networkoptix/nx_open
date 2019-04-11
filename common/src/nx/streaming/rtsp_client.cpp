@@ -329,6 +329,28 @@ void QnRtspIoDevice::updateSockets()
         : 0);
 }
 
+QnRtspIoDevice::AddressInfo QnRtspIoDevice::mediaAddressInfo() const
+{
+    return addressInfo(m_remoteMediaPort);
+}
+
+QnRtspIoDevice::AddressInfo QnRtspIoDevice::rtcpAddressInfo() const
+{
+    return addressInfo(m_remoteRtcpPort);
+}
+
+QnRtspIoDevice::AddressInfo QnRtspIoDevice::addressInfo(int port) const
+{
+    AddressInfo info;
+    info.transport = m_transport;
+    info.address.address = m_transport == nx::vms::api::RtpTransportType::multicast
+        ? HostAddress(m_multicastAddress.toString())
+        : HostAddress(m_hostAddress.toString());
+
+    info.address.port = port;
+    return info;
+}
+
 void QnRtspClient::SDPTrackInfo::setSSRC(quint32 value)
 {
     ioDevice->setSSRC(value);
@@ -1015,7 +1037,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     return result;
 }
 
-bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
+bool QnRtspClient::playPhase1()
 {
     m_prefferedTransport = m_transport;
     if (m_prefferedTransport == nx::vms::api::RtpTransportType::automatic)
@@ -1026,6 +1048,11 @@ bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
             return false;
     }
 
+    return true;
+}
+
+bool QnRtspClient::playPhase2(qint64 positionStart, qint64 positionEnd, double scale)
+{
     if (!sendPlay(positionStart, positionEnd, scale))
     {
         m_sdpTracks.clear();
@@ -1033,6 +1060,14 @@ bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
     }
 
     return true;
+}
+
+bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
+{
+    if (!playPhase1())
+        return false;
+
+    return playPhase2(positionStart, positionEnd, scale);
 }
 
 bool QnRtspClient::stop()

@@ -171,6 +171,8 @@ private:
     nx::media::CameraTraits m_mediaTraits;
 };
 
+using CameraPtr = QnSharedResourcePointer<Camera>;
+
 } // namespace resource
 } // namespace mediaserver
 } // namespace nx

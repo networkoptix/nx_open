@@ -35,6 +35,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <nx/streaming/multicast_address_registry.h>
+
 using namespace nx;
 
 namespace {
@@ -125,6 +127,8 @@ QnMulticodecRtpReader::~QnMulticodecRtpReader()
 
     for (unsigned int i = 0; i < m_demuxedData.size(); ++i)
         delete m_demuxedData[i];
+
+    unregisterMulticastAddresses();
 }
 
 void QnMulticodecRtpReader::setRequest(const QString& request)
@@ -565,6 +569,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     const QnNetworkResource* nres = dynamic_cast<QnNetworkResource*>(getResource().data());
 
+    unregisterMulticastAddresses();
     calcStreamUrl();
 
     m_RtpSession.setAuth(nres->getAuth(), m_prefferedAuthScheme);
@@ -582,11 +587,52 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if (camera)
         m_RtpSession.setAudioEnabled(camera->isAudioEnabled());
 
-    if (!m_RtpSession.play(position, AV_NOPTS_VALUE, m_RtpSession.getScale()))
+    if (!m_RtpSession.playPhase1())
     {
-        NX_WARNING(this, lm("Can't open RTSP stream [%1]").args(m_currentStreamUrl));
+        NX_WARNING(this, lm("Can't open RTSP stream [%1], SETUP request has been failed").args(
+            m_currentStreamUrl));
+
+        return CameraDiagnostics::RequestFailedResult(m_currentStreamUrl,
+            "Can't open RTSP stream: SETUP request has been failed");
+    }
+
+    auto tracks = m_RtpSession.getTrackInfo();
+    if (tracks.empty())
+    {
+        NX_WARNING(this, lm("Tracks are empty for [%1]").args(m_currentStreamUrl));
+        return CameraDiagnostics::CameraInvalidParams("The list of tracks are empty");
+    }
+
+    std::set<QnRtspIoDevice::AddressInfo> addressInfoToRegister;
+    for (const auto& track: tracks)
+    {
+        if (!track->ioDevice)
+            continue;
+
+        if (track->trackType == QnRtspClient::TrackType::TT_AUDIO ||
+            track->trackType == QnRtspClient::TrackType::TT_VIDEO)
+        {
+            addressInfoToRegister.insert(track->ioDevice->mediaAddressInfo());
+            addressInfoToRegister.insert(track->ioDevice->rtcpAddressInfo());
+        }
+    }
+
+    for (const auto& addressInfo: addressInfoToRegister)
+    {
+        if (!registerMulticastAddress(addressInfo))
+        {
+            return CameraDiagnostics::CameraInvalidParams(
+                "Multicast media address conflict detected");
+        }
+    }
+
+    if (!m_RtpSession.playPhase2(position, AV_NOPTS_VALUE, m_RtpSession.getScale()))
+    {
+        NX_WARNING(this,
+            lm("Can't open RTSP stream [%1], PLAY request failed").args(m_currentStreamUrl));
+
         return CameraDiagnostics::RequestFailedResult(
-            m_currentStreamUrl, "Can't open RTSP stream");
+            m_currentStreamUrl, "Can't open RTSP stream: PLAY request has failed");
     }
 
     m_numberOfVideoChannels = camera && camera->allowRtspVideoLayout() ?  m_RtpSession.getTrackCount(QnRtspClient::TT_VIDEO) : 1;
@@ -706,6 +752,8 @@ void QnMulticodecRtpReader::closeStream()
         if (m_demuxedData[i])
             m_demuxedData[i]->clear();
     }
+
+    unregisterMulticastAddresses();
 }
 
 bool QnMulticodecRtpReader::isStreamOpened() const
@@ -798,6 +846,110 @@ void QnMulticodecRtpReader::calcStreamUrl()
         QTextStream(&m_currentStreamUrl) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
     }
 }
+
+CameraDiagnostics::Result QnMulticodecRtpReader::registerMulticastAddress(
+    const QnRtspIoDevice::AddressInfo& addressInfo)
+{
+    if (addressInfo.transport != nx::vms::api::RtpTransportType::multicast)
+        return CameraDiagnostics::NoErrorResult();
+
+    auto resource = getResource();
+    if (!resource)
+    {
+        NX_ASSERT(false, "Resource have to be set");
+        return CameraDiagnostics::CameraInvalidParams(
+            "Multicodec reader has no corresponding resource");
+    }
+
+    const auto& multicastAddress = addressInfo.address;
+    if (!QHostAddress(multicastAddress.address.toString()).isMulticast()
+        || multicastAddress.port <= 0)
+    {
+        emit networkIssue(
+            resource,
+            qnSyncTime->currentUSecsSinceEpoch(),
+            nx::vms::event::EventReason::networkMulticastAddressIsInvalid,
+            QJson::serialized(multicastAddress));
+
+        return CameraDiagnostics::CameraInvalidParams(
+            "Address %1 is not a multicast address, though multicast transport has been chosen");
+    }
+
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+    {
+        NX_ASSERT(false,
+            lm("Unable to convert resource %1 to QnVirtualCameraResource")
+                .args(camera));
+
+        return CameraDiagnostics::CameraInvalidParams(
+            "Unable to convert resource to the needed type");
+    }
+
+    auto multicastAddressRegistry = camera->commonModule()->multicastAddressRegistry();
+    if (!multicastAddressRegistry)
+    {
+        NX_ASSERT(false,
+            lm("Unable to access multicast address registry for resource %1").args(camera));
+
+        return CameraDiagnostics::CameraInvalidParams(
+            "Unable to access multicast address registry");
+    }
+
+    if (!multicastAddressRegistry->registerAddress(camera, multicastAddress))
+    {
+        const auto currentAddressUser = multicastAddressRegistry->addressUser(multicastAddress);
+        const auto currentAddressUserName = currentAddressUser
+            ? currentAddressUser->getUserDefinedName()
+            : QString();
+
+        nx::vms::event::NetworkIssueEvent::MulticastAddressConflictParameters
+            eventParameters { multicastAddress, currentAddressUserName };
+
+        emit networkIssue(
+            camera,
+            qnSyncTime->currentUSecsSinceEpoch(),
+            nx::vms::event::EventReason::networkMulticastAddressConflict,
+            QJson::serialized(eventParameters));
+
+        return CameraDiagnostics::CameraInvalidParams(
+            lm("Multicast address %1 is already in use by %2")
+                .args(multicastAddress, currentAddressUserName));
+    }
+    else
+    {
+        m_registeredMulticastAddresses.insert(multicastAddress);
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+void QnMulticodecRtpReader::unregisterMulticastAddresses()
+{
+    auto camera = getResource().dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+    {
+        NX_WARNING(this,
+            lm("%1() -> Unable to convert resource %2 to QnVirtualCameraResource").args(
+                __func__, m_resource));
+        return;
+    }
+
+    auto multicastAddressRegistry = camera->commonModule()->multicastAddressRegistry();
+    if (!multicastAddressRegistry)
+    {
+        NX_WARNING(this,
+            lm("%1() -> Unable to access multicast address registry for resource %2").args(
+                __func__, m_resource));
+        return;
+    }
+
+    for (const auto& multicastAddress: m_registeredMulticastAddresses)
+        multicastAddressRegistry->unregisterAddress(multicastAddress);
+
+    m_registeredMulticastAddresses.clear();
+}
+
 
 void QnMulticodecRtpReader::setPositionUsec(qint64 value)
 {

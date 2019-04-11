@@ -70,7 +70,11 @@ enum class EventReason
     backupEndOfPeriod,
     backupDone,
     backupCancelled,
-    networkNoResponseFromDevice
+    networkNoResponseFromDevice,
+    networkBadCameraTime,
+    networkCameraTimeBackToNormal,
+    networkMulticastAddressConflict,
+    networkMulticastAddressIsInvalid,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 

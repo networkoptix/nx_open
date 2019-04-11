@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <atomic>
+#include <set>
 
 #include <core/dataprovider/abstract_media_stream_provider.h>
 #include <core/resource/resource_consumer.h>
@@ -131,6 +132,10 @@ private:
 
     void calcStreamUrl();
 
+    CameraDiagnostics::Result registerMulticastAddress(
+        const QnRtspIoDevice::AddressInfo& addressInfo);
+    void unregisterMulticastAddresses();
+
     boost::optional<std::chrono::microseconds> parseOnvifNtpExtensionTime(
         quint8* bufferStart,
         int length) const;
@@ -181,6 +186,7 @@ private:
 
     static QnMutex s_defaultTransportMutex;
     static nx::vms::api::RtpTransportType s_defaultTransportToUse;
+    std::set<SocketAddress> m_registeredMulticastAddresses;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

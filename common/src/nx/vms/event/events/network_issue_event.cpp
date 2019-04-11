@@ -2,9 +2,14 @@
 
 #include <core/resource/resource.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx {
 namespace vms {
 namespace event {
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkIssueEvent::MulticastAddressConflictParameters, (json),
+    MulticastAddressConflictParameters_Fields, (brief, true))
 
 NetworkIssueEvent::NetworkIssueEvent(
     const QnResourcePtr& resource,

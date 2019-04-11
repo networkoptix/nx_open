@@ -149,6 +149,13 @@ private:
 class QnRtspIoDevice
 {
 public:
+    struct AddressInfo
+    {
+        nx::vms::api::RtpTransportType transport{ nx::vms::api::RtpTransportType::automatic };
+        SocketAddress address;
+    };
+
+public:
     explicit QnRtspIoDevice(
         QnRtspClient* owner,
         nx::vms::api::RtpTransportType rtpTransport,
@@ -173,7 +180,12 @@ public:
     void bindToMulticastAddress(const QHostAddress& address, const QString& interfaceAddress);
 
     void updateRemoteMulticastPorts(quint16 mediaPort, quint16 rtcpPort);
+
+    AddressInfo mediaAddressInfo() const;
+    AddressInfo rtcpAddressInfo() const;
+
 private:
+    AddressInfo addressInfo(int port) const;
     void processRtcpData();
     void updateSockets();
 private:
@@ -191,6 +203,16 @@ private:
     bool m_forceRtcpReports = false;
     QHostAddress m_multicastAddress;
 };
+
+inline bool operator<(
+    const QnRtspIoDevice::AddressInfo& lhs,
+    const QnRtspIoDevice::AddressInfo& rhs)
+{
+    if (lhs.transport != rhs.transport)
+        return lhs.transport < rhs.transport;
+
+    return lhs.address < rhs.address;
+}
 
 class QnRtspClient: public QObject
 {
@@ -319,6 +341,14 @@ public:
 
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
     CameraDiagnostics::Result open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
+
+    /**
+    * TODO: #dmishin the two methods below are hacks to make multicodec RTP reader work properly
+    * with multicast streams. We need to refactor it.
+    */
+    bool playPhase1(); //< Sends SETUP if needed.
+
+    bool playPhase2(qint64 positionStart, qint64 positionEnd, double scale); //< Sends actual PLAY.
 
     /*
     * Start playing RTSP sessopn.

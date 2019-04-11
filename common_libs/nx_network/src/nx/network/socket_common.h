@@ -25,6 +25,7 @@
 #endif
 
 #include <nx/utils/system_error.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
 namespace network {
@@ -68,7 +69,7 @@ NX_NETWORK_API bool socketCannotRecoverFromError(SystemError::ErrorCode sysError
 
 /**
  * Represents ipv4 address. Supports conversion to QString and to uint32.
- * @note Not using QHostAddress because QHostAddress can trigger dns name 
+ * @note Not using QHostAddress because QHostAddress can trigger dns name
  * lookup which depends on Qt sockets which we do not want to use.
  */
 class NX_NETWORK_API HostAddress
@@ -128,6 +129,8 @@ NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
 
 Q_DECLARE_METATYPE(HostAddress)
 
+QN_FUSION_DECLARE_FUNCTIONS(HostAddress, (json), NX_NETWORK_API)
+
 /**
  * Represents host and port (e.g. 127.0.0.1:1234).
  */
@@ -160,6 +163,8 @@ inline uint qHash(const SocketAddress &address)
 {
     return qHash(address.address.toString(), address.port);
 }
+
+QN_FUSION_DECLARE_FUNCTIONS(SocketAddress, (json), NX_NETWORK_API)
 
 namespace std {
 
