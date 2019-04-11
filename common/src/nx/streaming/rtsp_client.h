@@ -303,6 +303,7 @@ public:
         int timeBase = 0;
         int serverPort = 0;
         bool setupSuccess = false;
+        QHostAddress connectionAddress;
     };
 
     static QString mediaTypeToStr(TrackType tt);

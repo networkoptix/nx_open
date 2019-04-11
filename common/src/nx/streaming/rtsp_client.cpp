@@ -767,7 +767,7 @@ void QnRtspClient::updateTrackNum()
 void QnRtspClient::parseSDP()
 {
     QList<QByteArray> lines = m_sdp.split('\n');
-
+    m_serverAddress = QHostAddress();
     QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(this, m_transport));
     for (QByteArray line : lines)
     {
@@ -815,7 +815,10 @@ void QnRtspClient::parseSDP()
         }
         else if (QString::fromUtf8(lineLower).startsWith("c=", Qt::CaseInsensitive))
         {
-            m_serverAddress = parseServerAddress(lineLower);
+            if (sdpTrack->isValid())
+                sdpTrack->connectionAddress = parseServerAddress(lineLower);
+            else
+                m_serverAddress = parseServerAddress(lineLower);
         }
     }
     if (sdpTrack->isValid())
@@ -830,6 +833,15 @@ void QnRtspClient::parseSDP()
             return m_config.backChannelAudioOnly != track->isBackChannel;
         }),
         m_sdpTracks.end());
+
+    if (!m_serverAddress.isNull())
+    {
+        for (auto& track: m_sdpTracks)
+        {
+            if (track->connectionAddress.isNull())
+                track->connectionAddress = m_serverAddress;
+        }
+    }
 
     if (m_serverAddress.isMulticast())
         m_transport = nx::vms::api::RtpTransportType::multicast;
@@ -1439,7 +1451,7 @@ bool QnRtspClient::sendSetup()
                             ports.mediaPort, ports.rtcpPort);
 
                         trackInfo->ioDevice->bindToMulticastAddress(
-                            m_serverAddress,
+                            trackInfo->connectionAddress,
                             m_tcpSock->getLocalAddress().address.toString());
                     }
                 }
