@@ -12,11 +12,13 @@ angular.module('cloudApp')
                 scope.L = L;
                 scope.Config = Config;
                 scope.openClient = process.init(function () {
-                    return urlProtocol.open(scope.system && scope.system.id).catch(function(error){
-                        dialogs.noClientDetected();
-                        return true;
-                    })
-                });
+                    return urlProtocol.open(scope.system && scope.system.id)
+                        .then(function(error) {},
+                            function(error){
+                                dialogs.noClientDetected();
+                                return true;
+                            });
+                },{});
             }
         };
     }]);

@@ -12,7 +12,9 @@
     "logoutAuthorisedContinueButton": "Continue",
     "logoutAuthorisedLogoutButton": "Log Out",
     "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageSent": "Message has been sent.",
+    "noClientDetectedTitle": "Install %VMS_NAME% to view your System",
+    "download": "Download %VMS_NAME%"
   },
   "messageType": {
     "ipvd_feedback_page": "Cameras page feedback",

@@ -212,8 +212,8 @@
                     noClientDetected: function () {
                         // message, title, actionLabel, actionType
                         return this
-                            .confirm(lang.downloads.noClientDetectedMessage, lang.downloads.noClientDetectedTitle,
-                                lang.downloads.action, 'btn-primary',
+                            .confirm(lang.errorCodes.cantOpenClient, lang.dialogs.noClientDetectedTitle,
+                                lang.dialogs.download, 'btn-primary',
                                 lang.dialogs.cancelButton)
                             .then((result) => {
                                 if (result) {
