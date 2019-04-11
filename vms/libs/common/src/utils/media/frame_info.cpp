@@ -75,7 +75,7 @@ CLVideoDecoderOutput::~CLVideoDecoderOutput()
     clean();
 }
 
-bool CLVideoDecoderOutput::convertImageFormat(
+static bool convertImageFormat(
     int width,
     int height,
     const uint8_t* const sourceSlice[],
@@ -83,7 +83,8 @@ bool CLVideoDecoderOutput::convertImageFormat(
     AVPixelFormat sourceFormat,
     uint8_t* const targetSlice[],
     const int targetStride[],
-    AVPixelFormat targetFormat) const
+    AVPixelFormat targetFormat,
+    const nx::utils::log::Tag& logTag)
 {
     if (const auto context = sws_getContext(
         width, height, sourceFormat,
@@ -95,7 +96,7 @@ bool CLVideoDecoderOutput::convertImageFormat(
         return true;
     }
 
-    NX_ERROR(this, "Unable to convert video frame from %1 to %2: sws_getContext() failed.",
+    NX_ERROR(logTag, "Unable to convert video frame from %1 to %2: sws_getContext() failed.",
         sourceFormat, targetFormat);
     return false;
 }
@@ -401,7 +402,7 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
     // Ignore the potential error (already logged) - no clear way to handle it here.
     convertImageFormat(width, height,
         src.data, src.linesize, AV_PIX_FMT_BGRA,
-        data, linesize, AV_PIX_FMT_YUV420P);
+        data, linesize, AV_PIX_FMT_YUV420P, /*logTag*/ this);
 }
 
 QImage CLVideoDecoderOutput::toImage() const
@@ -422,7 +423,7 @@ QImage CLVideoDecoderOutput::toImage() const
 
     if (!convertImageFormat(width, height,
         data, linesize, (AVPixelFormat)format,
-        target->data, target->linesize, intermediateFormat))
+        target->data, target->linesize, intermediateFormat, /*logTag*/ this))
     {
         return {};
     }
@@ -430,7 +431,7 @@ QImage CLVideoDecoderOutput::toImage() const
     const CLVideoDecoderOutputPtr converted(new CLVideoDecoderOutput(width, height, targetFormat));
     if (!convertImageFormat(width, height,
         target->data, target->linesize, intermediateFormat,
-        converted->data, converted->linesize, targetFormat))
+        converted->data, converted->linesize, targetFormat, /*logTag*/ this))
     {
         return {};
     }
@@ -477,8 +478,7 @@ bool CLVideoDecoderOutput::convertUsingSimdIntrTo(
 
     if (!NX_ASSERT(linesize[1] == linesize[2], "Src frame U and V planes have different strides.")
         || !NX_ASSERT(dstAvFrame->linesize[0] >= width * 4)
-        || !NX_ASSERT(dstAvFrame->linesize[0] % CL_MEDIA_ALIGNMENT == 0)
-        || !NX_ASSERT((intptr_t) dstAvFrame->data[0] % CL_MEDIA_ALIGNMENT == 0))
+        || !NX_ASSERT(dstAvFrame->linesize[0] % CL_MEDIA_ALIGNMENT == 0))
     {
         return false;
     }
@@ -513,18 +513,18 @@ std::shared_ptr<const AVFrame> CLVideoDecoderOutput::convertTo(AVPixelFormat dst
     if (!NX_ASSERT(r > 0, lm("av_image_alloc() failed for pixel format %1").args(dstPixelFormat)))
         return nullptr;
 
-    if (!convertUsingSimdIntrTo(dstPixelFormat, frame.get()))
+    if (convertUsingSimdIntrTo(dstPixelFormat, frame.get()))
+        return frame;
+
+    if (convertImageFormat(
+        width, height,
+        data, linesize, (AVPixelFormat) format,
+        frame->data, frame->linesize, dstPixelFormat, /*logTag*/ this))
     {
-        if (!convertImageFormat(
-            width, height,
-            data, linesize, (AVPixelFormat) format,
-            frame->data, frame->linesize, dstPixelFormat))
-        {
-            return nullptr;
-        }
+        return frame;
     }
 
-    return frame;
+    return nullptr; //< AVFrame will be de-allocated by its deleter at this point.
 }
 
 void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)

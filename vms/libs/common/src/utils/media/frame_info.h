@@ -228,16 +228,6 @@ private:
     const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );
 
     bool convertUsingSimdIntrTo(AVPixelFormat dstAvPixelFormat, const AVFrame* frameData) const;
-
-    bool convertImageFormat(
-        int width,
-        int height,
-        const uint8_t* const sourceSlice[],
-        const int sourceStride[],
-        AVPixelFormat sourceFormat,
-        uint8_t* const targetSlice[],
-        const int targetStride[],
-        AVPixelFormat targetFormat) const;
 };
 typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;
 typedef QSharedPointer<const CLVideoDecoderOutput> CLConstVideoDecoderOutputPtr;

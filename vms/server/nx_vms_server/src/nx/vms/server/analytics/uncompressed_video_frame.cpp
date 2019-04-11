@@ -114,7 +114,7 @@ bool UncompressedVideoFrame::assertPlaneValid(int plane, const char* func) const
 
     return NX_ASSERT(plane >= 0 && plane < m_avPixFmtDescriptor->nb_components,
         lm("%1(): Requested plane %2 of %3").args(
-                func, plane, m_avPixFmtDescriptor->nb_components));
+            func, plane, m_avPixFmtDescriptor->nb_components));
 }
 
 int UncompressedVideoFrame::planeLineCount(int plane) const
