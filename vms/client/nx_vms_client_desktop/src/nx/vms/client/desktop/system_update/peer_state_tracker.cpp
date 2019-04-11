@@ -868,7 +868,7 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
     NX_ASSERT(server);
     if (!server)
         return nullptr;
-    NX_VERBOSE(this, "addItemForServer(%1)", server->getName());
+    NX_VERBOSE(this, "addItemForServer(name=%1, id=%2)", server->getName(), server->getId());
     UpdateItemPtr item = std::make_shared<UpdateItem>();
     item->id = server->getId();
     item->component = UpdateItem::Component::server;
