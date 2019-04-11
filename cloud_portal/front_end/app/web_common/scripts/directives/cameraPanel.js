@@ -107,6 +107,20 @@
                     server.expanded = !server.expanded;
                     scope.storage.serverStates[ server.id ] = server.expanded;
                 };
+                
+                scope.formatURL = function(addresses) {
+                    var addr = addresses.split(';');
+                    var mainAddr = addr[0];
+                    // IPv6 literal support
+                    var offset = mainAddr[0] === '['
+                        ? mainAddr.indexOf(']') + 1
+                        : 0;
+                    var index = mainAddr.indexOf(':', offset);
+    
+                    return index !== -1
+                        ? mainAddr.substring(0, index)
+                        : mainAddr;
+                };
 
                 function updateMediaServers () {
                     scope.mediaServers = scope.camerasProvider.getMediaServers();
