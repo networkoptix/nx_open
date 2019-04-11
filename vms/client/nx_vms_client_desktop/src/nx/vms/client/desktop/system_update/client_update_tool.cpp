@@ -484,12 +484,13 @@ bool ClientUpdateTool::installUpdateAsync()
                     case Result::invalidVersionFormat:
                     case Result::notEnoughSpace:
                     case Result::notFound:
+                    case Result::ok:
                         return result;
                     case Result::connectError:
                     case Result::ioError:
                     default:
                         NX_VERBOSE(NX_SCOPE_TAG, "failed to run zip installation: %1", message);
-                        // Other variats can be fixed by retrying installation, do they?
+                        // Other variants can be fixed by retrying installation, do they?
                         break;
                 }
 
