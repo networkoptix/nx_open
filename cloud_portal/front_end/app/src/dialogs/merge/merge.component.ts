@@ -1,5 +1,6 @@
 import { Component, Inject, Input, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NgbModal, NgbActiveModal, NgbModalRef }       from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'nx-modal-merge-content',
@@ -17,6 +18,7 @@ export class MergeModalContent {
     checking: boolean;
     checkMergeabilityProcess: any;
     config: any;
+    lang: any;
     masterId: string;
     mergingProcess: any;
     multipleSystems: boolean;
@@ -40,11 +42,16 @@ export class MergeModalContent {
                 @Inject('system') private systemService: any,
                 @Inject('configService') private configService: any,
                 @Inject('systemsProvider') private systemsProvider: any,
-                @Inject('cloudApiService') private cloudApi: any) {
+                @Inject('cloudApiService') private cloudApi: any,
+                public translateService: TranslateService) {
         this.config = this.configService.config;
         this.checking = false;
         this.state = 'select';
         this.wrongPassword = false;
+        this.translateService.getTranslation(this.translateService.currentLang)
+            .subscribe((translations) => {
+                this.lang = translations;
+        });
     }
 
     ngOnInit() {
@@ -193,7 +200,7 @@ export class MergeModalContent {
     updateState() {
         switch (this.state) {
             case 'select':
-                this.state = this.tooManySystems ? 'warning' : 'confirm';
+                this.state = this.tooManySystems || 1 ? 'warning' : 'confirm';
                 break;
             case 'warning':
                 this.state = 'confirm';

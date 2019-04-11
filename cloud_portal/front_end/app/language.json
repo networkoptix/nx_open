@@ -334,5 +334,10 @@
       "stop listening"      : "stop listening",
       "help"                : "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "We'd recommend consulting with",
+    "b_support": "support",
+    "c_proceeding": "before proceeding."
   }
 }

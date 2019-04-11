@@ -13,12 +13,11 @@
             <p class="help-block-no-height" translate>
                 You can merge only those cloud Systems, where you have the "Owner" permissions.
             </p>
-            <p class="help-block-no-height">
-                <span translate>Connect System you want to merge with this one to</span>
-                <strong>&nbsp;{{language.productName}}&nbsp;</strong>
-                <span translate>or merge locally using</span>
-                <strong>&nbsp;{{language.vmsName}}&nbsp;</strong>
-                <span translate>Client.</span>
+            <p class="help-block-no-height"
+               [innerHTML]="'connectToCloud' | translate: {
+                    productName: language.productName,
+                    vmsName: language.vmsName
+               }">
             </p>
         </div>
         <div *ngIf="outOfDate">
@@ -53,36 +52,22 @@
                 </div>
                 <ng-template #notChecking>
                     <p *ngIf="systemMergeable == 'unavailable'" class="help-block-no-height warning-label mb-2">
-                        <span translate>System</span>
-                        <span>&nbsp;{{targetSystem.name}}&nbsp;</span>
-                        <span translate> is currently unreachable. Try again in a few minutes or contact</span>
+                        <span [translate]="'systemUnavailable'" [translateParams]="{ targetSystem: targetSystem.name }"></span>
                         <span>&nbsp;<a [href]="config.supportLink" target="_blank" translate>support</a>.</span>
                     </p>
-                    <p *ngIf="systemMergeable == 'offline'"
+                    <p *ngIf="systemMergeable == 'offline'" translate
                        class="help-block-no-height warning-label mb-2">
-                        <span translate>System</span>
-                        <span>&nbsp;{{targetSystem.name}}&nbsp;</span>
-                        <span translate>is offline and cannot be merged with the current one.</span>
+                        System {{targetSystem.name}} is offline and cannot be merged with the current one.
                     </p>
-                    <p *ngIf="systemMergeable == 'secondaryCannotMerge'"
-                       class="help-block-no-height warning-label mb-2">
-                        <span translate>System</span>
-                        <span>&nbsp;{{targetSystem.name}}&nbsp;</span>
-                        <span translate>has an older software version that is incompatable with the current system. Update</span>
-                        <span>&nbsp;{{targetSystem.info.name}}&nbsp;</span>
-                        <span translate>to the</span>
-                        <span>&nbsp;<a href="/download" target="_blank" translate>latest build</a>&nbsp;</span>
-                        <span translate>to merge it with the current one.</span>
+                    <p *ngIf="systemMergeable == 'secondaryCannotMerge'" class="help-block-no-height warning-label mb-2"
+                       [innerHTML]="'secondaryCannotMerge' | translate: {
+                            targetSystem: targetSystem.name || targetSystem.info.name
+                       }">
                     </p>
-                    <p *ngIf="systemMergeable == 'primaryCannotMerge'"
-                       class="help-block-no-height warning-label mb-2">
-                        <span translate>System</span>
-                        <span>&nbsp;{{targetSystem.name}}&nbsp;</span>
-                        <span translate>has a newer software version that is incompatible with the current system. Update the current system to the</span>
-                        <span>&nbsp;<a href="/download" target="_blank" translate>latest build</a>&nbsp;</span>
-                        <span translate>to merge it with the</span>
-                        <span>&nbsp;{{targetSystem.name}}&nbsp;</span>
-                        <span translate>System</span>
+                    <p *ngIf="systemMergeable == 'primaryCannotMerge'" class="help-block-no-height warning-label mb-2"
+                       [innerHTML]="'primaryCannotMerge' | translate: {
+                            targetSystem: targetSystem.name || targetSystem.info.name
+                            }">
                     </p>
                     <p *ngIf="systemMergeable == ''" class="help-block-no-height mb-2 light-text" translate>
                         You can only merge Systems in which you have owner permissions.
@@ -114,17 +99,11 @@
         </div>
         <div *ngIf="state == 'warning'">
             <div class="modal-body">
-                <p>
-                    <span translate>There will be more than</span>
-                    <strong>&nbsp;{{ config.maxServers }}&nbsp;</strong>
-                    <span translate>servers in the merged System.</span>
+                <p translate>
+                    There will be more than <strong>{{ config.maxServers }}</strong> servers in the merged System.
                 </p>
                 <p translate>Systems of such size may work but will be unstable and have troubles with updates and synchronisation.</p>
-                <p>
-                    <span translate>We'd recommend consulting with</span>
-                    <span>&nbsp;<a [href]="config.supportLink" target="_blank" translate>support</a>&nbsp;</span>
-                    <span translate>before proceeding.</span>
-                </p>
+                <p>{{language.recommendSupport.a_recommend}} <a [href]="config.supportLink" target="_blank">{{language.recommendSupport.b_support}}</a> {{language.recommendSupport.c_proceeding}}</p>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-default" (click)="updateState()" translate>Merge Anyway</button>
@@ -133,13 +112,10 @@
         </div>
         <div *ngIf="state == 'confirm'">
             <div class="modal-body">
-                <p class="mb-3">
-                    <span translate>You are about to merge systems</span>
-                    <strong>&nbsp;{{system.info.name}}&nbsp;</strong>
-                    <span translate>and</span>
-                    <strong>&nbsp;{{targetSystem.name}}&nbsp;</strong>.
-                    <span translate>Settings and the name will be taken from the </span>
-                    <strong>&nbsp;{{system.info.name}}&nbsp;</strong>.
+                <p class="mb-3" [innerHTML]="'mergeConfirmation' | translate: {
+                    system: system.info.name || system.name,
+                    targetSystem: targetSystem.info.name || targetSystem.name
+                }">
                 </p>
                 <div class="form-group">
                     <label for="mergePassword" translate>Enter password for your account to continue</label>
