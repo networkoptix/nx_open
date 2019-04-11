@@ -22,6 +22,7 @@ class QnMergeSystemsRestHandler:
 public:
     QnMergeSystemsRestHandler(QnMediaServerModule* serverModule);
 
+    // TODO: rest::ini().allowGetModifications.
     virtual int executeGet(
         const QString &path,
         const QnRequestParams &params,

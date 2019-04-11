@@ -2,83 +2,76 @@
 #include "audio_transmission_rest_handler.h"
 
 #include <nx/network/http/http_types.h>
-#include <streaming/audio_streamer_pool.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
+#include <nx/utils/switch.h>
 
-namespace
-{
-    const QString kClientIdParamName("clientId");
-    const QString kResourceIdParamName("resourceId");
-    const QString kActionParamName("action");
-    const QString kStartStreamAction("start");
-    const QString kStopStreamAction("stop");
-}
+static const QString kClientIdParamName("clientId");
+static const QString kResourceIdParamName("resourceId");
+static const QString kActionParamName("action");
+static const QString kStartStreamAction("start");
+static const QString kStopStreamAction("stop");
 
-QnAudioTransmissionRestHandler::QnAudioTransmissionRestHandler(QnMediaServerModule* serverModule):
+using namespace nx::network;
+
+namespace nx::vms::server {
+
+AudioTransmissionRestHandler::AudioTransmissionRestHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
-int QnAudioTransmissionRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams &params,
-    QnJsonRestResult &result,
-    const QnRestConnectionProcessor* )
+rest::Response AudioTransmissionRestHandler::executeGet(const rest::Request& request)
 {
-    QString errorStr;
-    if (!validateParams(params, errorStr))
-    {
-        result.setError(QnJsonRestResult::InvalidParameter, errorStr);
-        return nx::network::http::StatusCode::ok;
-    }
+    if (!rest::ini().allowGetModifications)
+        throw nx::network::rest::Exception(nx::network::rest::Result::Forbidden);
 
-    auto sourceId = params[kClientIdParamName];
-    auto resourceId = params[kResourceIdParamName];
-    QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction)
-        ? QnAudioStreamerPool::Action::Start
-        : QnAudioStreamerPool::Action::Stop;
-
-    if (!audioStreamPool()->startStopStreamToResource(
-            sourceId,
-            QnUuid::fromStringSafe(resourceId),
-            action,
-            errorStr,
-            params))
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest, errorStr);
-    }
-    return nx::network::http::StatusCode::ok;
+    return executePost(request);
 }
 
-bool QnAudioTransmissionRestHandler::validateParams(const QnRequestParams &params, QString& error)
+static AudioTransmissionRestHandler::Params parseRestParams(const rest::Request& request)
 {
-    bool ok = true;
-    if (!params.contains(kClientIdParamName))
-    {
-        ok = false;
-        error += lit("Client ID is not specified. ");
-    }
-    if (!params.contains(kResourceIdParamName))
-    {
-        ok = false;
-        error += lit("Resource ID is not specified. ");
-    }
-    if (!params.contains(kActionParamName))
-    {
-        ok = false;
-        error += lit("Action is not specified. ");
-        return false;
-    }
+    AudioTransmissionRestHandler::Params params;
+    params.sourceId = request.paramOrThrow(kClientIdParamName);
+    params.resourceId = QnUuid::fromStringSafe(request.paramOrThrow(kResourceIdParamName));
 
-    auto action = params[kActionParamName];
+    const auto actionString = request.paramOrThrow(kActionParamName);
+    params.action = nx::utils::switch_(actionString,
+        kStartStreamAction, []() { return QnAudioStreamerPool::Action::Start; },
+        kStopStreamAction, []() { return QnAudioStreamerPool::Action::Stop; },
+        nx::utils::default_,
+        [&actionString] () -> QnAudioStreamerPool::Action
+        {
+            throw rest::Exception(rest::Result::InvalidParameter, kActionParamName, actionString);
+        });
 
-    if (action != kStartStreamAction && action != kStopStreamAction)
-    {
-        ok = false;
-        error += lit("Action parameter should has value of either '%1' or '%2'")
-                .arg(kStartStreamAction)
-                .arg(kStopStreamAction);
-    }
-
-    return ok;
-
+    return params;
 }
+
+rest::Response AudioTransmissionRestHandler::executePost(const rest::Request& request)
+{
+    const auto params = parseRestParams(request);
+    QString error;
+    if (audioStreamPool()->startStopStreamToResource(
+            params.sourceId, params.resourceId, params.action, error, request.params()))
+    {
+        return rest::Response::result(rest::JsonResult());
+    }
+
+    return rest::Response::error(http::StatusCode::ok, rest::Result::CantProcessRequest, error);
+}
+
+std::optional<AudioTransmissionRestHandler::Params>
+    AudioTransmissionRestHandler::parseParams(const http::Request& request)
+{
+    rest::Request restRequest(&request, nullptr);
+    try
+    {
+        return parseRestParams(restRequest);
+    }
+    catch (rest::Exception& /*error*/)
+    {
+        return std::nullopt;
+    }
+}
+
+} // namespace nx::vms::server

@@ -15,17 +15,20 @@ class QnSetupLocalSystemRestHandler:
 public:
     QnSetupLocalSystemRestHandler(QnMediaServerModule* serverModule);
 
+    // TODO: rest::ini().allowGetModifications.
     virtual int executeGet(
         const QString &path,
         const QnRequestParams &params,
         QnJsonRestResult &result,
         const QnRestConnectionProcessor*owner) override;
+
     virtual int executePost(
         const QString &path,
         const QnRequestParams &params,
         const QByteArray &body,
         QnJsonRestResult &result,
         const QnRestConnectionProcessor*owner) override;
+
 private:
     int execute(SetupLocalSystemData data, const QnRestConnectionProcessor* owner, QnJsonRestResult &result);
 };

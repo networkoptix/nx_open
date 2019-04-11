@@ -34,6 +34,7 @@ class QnSystemSettingsHandler:
     Q_OBJECT
 
 public:
+    // TODO: rest::ini().allowGetModifications.
     virtual int executeGet(
         const QString& path,
         const QnRequestParams& params,

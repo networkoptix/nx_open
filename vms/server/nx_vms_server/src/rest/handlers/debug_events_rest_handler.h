@@ -9,6 +9,7 @@ class QnDebugEventsRestHandler: public QnJsonRestHandler, public /*mixin*/ nx::v
 public:
     QnDebugEventsRestHandler(QnMediaServerModule* serverModule);
 
+    // TODO: rest::ini().allowGetModifications.
     virtual int executeGet(
         const QString &path,
         const QnRequestParams &params,

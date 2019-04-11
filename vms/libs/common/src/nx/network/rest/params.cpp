@@ -73,16 +73,6 @@ QJsonObject Params::toJson() const
         if (value.isEmpty())
             return QJsonValue(QJsonValue::Null);
 
-        if (value == QStringLiteral("true"))
-            return QJsonValue(true);
-
-        if (value == QStringLiteral("false"))
-            return QJsonValue(false);
-
-        bool isOk = false;
-        if (const auto number = value.toDouble(&isOk); isOk)
-            return QJsonValue(number);
-
         // TODO: Add some format for Array and Object.
         return QJsonValue(value);
     };

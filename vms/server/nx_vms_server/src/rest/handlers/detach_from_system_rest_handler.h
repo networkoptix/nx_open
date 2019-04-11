@@ -22,6 +22,7 @@ public:
         nx::vms::cloud_integration::CloudConnectionManager* const cloudConnectionManager,
         ec2::AbstractTransactionMessageBus* messageBus);
 
+    // TODO: rest::ini().allowGetModifications.
     virtual int executeGet(
         const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner) override;

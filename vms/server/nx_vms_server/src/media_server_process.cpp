@@ -1850,7 +1850,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value <any_other_value_or_no_parameter> Report the backup process status.
      * %return:object Bakcup process progress status or an error code.
      */
-    reg("api/backupControl", new nx::vms::server::rest::BackupControlRestHandler(serverModule()));
+    reg("api/backupControl", new nx::vms::server::BackupControlRestHandler(serverModule()));
 
     /**%apidoc[proprietary] GET /api/events
      * Return event log in the proprietary binary format.
@@ -2174,7 +2174,7 @@ void MediaServerProcess::registerRestHandlers(
      *     server must be restarted to apply settings. Error string contains a hint to identify the
      *     problem: "SYSTEM_NAME" or "PORT".
      */
-    reg("api/configure", new QnConfigureRestHandler(serverModule()), kAdmin);
+    reg("api/configure", new nx::vms::server::ConfigureRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /api/detachFromCloud
      * Detaches the Server from the Cloud. Local admin user is enabled, admin password is changed to
@@ -2278,7 +2278,7 @@ void MediaServerProcess::registerRestHandlers(
      * Back up server database.
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("api/backupDatabase", new QnBackupDbRestHandler(serverModule()));
+    reg("api/backupDatabase", new nx::vms::server::BackupDbRestHandler(serverModule()));
 
     /**%apidoc GET /api/discoveredPeers
      * Return a list of the discovered peers.
@@ -2330,7 +2330,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/systemSettings", new QnSystemSettingsHandler());
 
-    reg("api/transmitAudio", new QnAudioTransmissionRestHandler(serverModule()));
+    reg("api/transmitAudio", new nx::vms::server::AudioTransmissionRestHandler(serverModule()));
 
     // TODO: Introduce constants for API methods registered here, also use them in
     // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors,

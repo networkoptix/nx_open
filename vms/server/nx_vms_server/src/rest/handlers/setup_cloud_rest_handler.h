@@ -18,6 +18,7 @@ public:
         QnMediaServerModule* serverModule,
         nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup);
 
+    // TODO: rest::ini().allowGetModifications.
     virtual int executeGet(
         const QString& path,
         const QnRequestParams& params,

@@ -134,7 +134,9 @@ std::optional<T> Request::parseContent() const
         return std::nullopt;
 
     T result;
-    if (!QJson::deserialize(*value, &result))
+    QnJsonContext context;
+    context.setAllowStringConvesions(true);
+    if (!QJson::deserialize(&context, *value, &result))
         return std::nullopt;
 
     return result;

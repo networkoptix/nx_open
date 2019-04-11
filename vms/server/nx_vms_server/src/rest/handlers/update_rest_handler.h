@@ -13,6 +13,7 @@ public:
         QnServerUpdateTool* updateTool, 
         const nx::vms::api::SoftwareVersion& engineVersion);
 
+    // TODO: rest::ini().allowGetModifications.
     virtual int executeGet(
         const QString &path, 
         const QnRequestParams &params, 

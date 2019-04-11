@@ -11,6 +11,7 @@ class QnRebuildArchiveRestHandler:
 public:
     QnRebuildArchiveRestHandler(QnMediaServerModule* serverModule);
 
+    // TODO: rest::ini().allowGetModifications.
     virtual int executeGet(
         const QString &path,
         const QnRequestParams &params,

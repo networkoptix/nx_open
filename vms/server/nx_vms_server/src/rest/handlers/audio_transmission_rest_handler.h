@@ -1,22 +1,32 @@
 #pragma once
 
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <streaming/audio_streamer_pool.h>
 
-class QnProxyDesktopDataProvider;
+namespace nx::vms::server {
 
-class QnAudioTransmissionRestHandler:
-    public QnJsonRestHandler,
-    public /*mixin*/ nx::vms::server::ServerModuleAware
+class AudioTransmissionRestHandler:
+    public nx::network::rest::Handler,
+    public /*mixin*/ ServerModuleAware
 {
 public:
-    QnAudioTransmissionRestHandler(QnMediaServerModule* serverModule);
+    AudioTransmissionRestHandler(QnMediaServerModule* serverModule);
 
-    virtual int executeGet(
-        const QString& path,
-        const QnRequestParams& params,
-        QnJsonRestResult& result,
-        const QnRestConnectionProcessor* owner) override;
+    virtual nx::network::rest::Response executeGet(
+        const nx::network::rest::Request& request) override;
 
-    static bool validateParams(const QnRequestParams& params, QString& error);
+    virtual nx::network::rest::Response executePost(
+        const nx::network::rest::Request& request) override;
+
+    struct Params
+    {
+        QString sourceId;
+        QnUuid resourceId;
+        QnAudioStreamerPool::Action action = QnAudioStreamerPool::Action::Start;
+    };
+
+    static std::optional<Params> parseParams(const nx::network::http::Request& request);
 };
+
+} // namespace nx::vms::server

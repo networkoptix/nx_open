@@ -20,6 +20,7 @@ public:
     QnManualCameraAdditionRestHandler(QnMediaServerModule* serverModule);
     ~QnManualCameraAdditionRestHandler();
 
+    // TODO: rest::ini().allowGetModifications.
     virtual int executeGet(
         const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
         const QnRestConnectionProcessor*) override;

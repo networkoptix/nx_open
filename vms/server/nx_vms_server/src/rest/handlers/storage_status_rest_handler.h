@@ -12,11 +12,13 @@ class QnStorageStatusRestHandler:
 public:
     QnStorageStatusRestHandler(QnMediaServerModule* serverModule);
 
+    // TODO: rest::ini().allowGetModifications.
     virtual int executeGet(
         const QString &path,
         const QnRequestParams &params,
         QnJsonRestResult &result,
         const QnRestConnectionProcessor*) override;
+
 private:
     QnStorageResourcePtr getOrCreateStorage(const QString& storageUrl) const;
 };
