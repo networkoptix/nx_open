@@ -39,8 +39,8 @@ protected:
     void andConnectionToDifferentMediatorIsEstablished()
     {
         ASSERT_EQ(
-            m_mediatorCluster.mediator(0).stunUdpEndpoint(),
-            m_connectionHeader.locationEndpoint);
+            m_mediatorCluster.mediator(0).stunUdpEndpoint().toString(),
+            m_connectionHeader.locationEndpoint.toString());
     }
 
 private:
