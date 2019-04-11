@@ -217,9 +217,9 @@
     "ipvd": {
         "Cameras supporting H.265": "Cameras supporting H.265", 
         "feedback": {
-            "info": "for additional questions/concerns regarding supported devices.", 
-            "link": "submit a request", 
-            "please": "Please"
+            "c_Info": "for additional questions/concerns regarding supported devices.", 
+            "b_Link": "submit a request", 
+            "a_Please": "Please"
         }, 
         "isAptzSupported": "Advanced PTZ", 
         "hardwareType": "Type", 
