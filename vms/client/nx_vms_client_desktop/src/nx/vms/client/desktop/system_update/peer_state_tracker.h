@@ -58,7 +58,9 @@ struct UpdateItem
      */
     bool statusUnknown = false;
     /** The last time we've seen this peer online. */
-    TimePoint lastTimeOnline;
+    TimePoint lastOnlineTime;
+    /** The last time we've got status update for this item. */
+    TimePoint lastStatusTime;
     /** Row in the table. */
     int row = -1;
 };

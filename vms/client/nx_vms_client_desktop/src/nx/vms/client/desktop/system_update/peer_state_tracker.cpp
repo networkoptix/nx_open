@@ -264,6 +264,8 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
                 // Ignoring 'offline' status from /ec2/updateStatus.
                 //item->offline = (status.second.code == StatusCode::offline);
 
+                item->lastStatusTime = UpdateItem::Clock::now();
+
                 if (changed)
                     itemsChanged.append(item);
             }
@@ -507,14 +509,26 @@ void PeerStateTracker::processDownloadTaskSet()
             continue;
 
         if (item->statusUnknown)
+        {
+            auto delta = now - item->lastStatusTime;
+            if (delta > m_waitForServerReturn)
+            {
+                NX_VERBOSE(this, "processDownloadTaskSet() "
+                    "peer %1 had no status updates for too long. Skipping it.", id);
+                m_peersActive.remove(id);
+                m_peersFailed.insert(id);
+                item->state = StatusCode::error;
+                item->statusMessage = tr("The server is taking too long to respond");
+            }
             continue;
+        }
 
         if (item->incompatible)
             continue;
 
         if (item->offline || state == StatusCode::offline)
         {
-            auto delta = now - item->lastTimeOnline;
+            auto delta = now - item->lastOnlineTime;
             if (delta > m_waitForServerReturn)
             {
                 NX_VERBOSE(this, "processDownloadTaskSet() "
@@ -945,7 +959,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
         if (viewAsOffline)
         {
             // TODO: Should track online->offline changes for task sets
-            item->lastTimeOnline = UpdateItem::Clock::now();
+            item->lastOnlineTime = UpdateItem::Clock::now();
             item->statusUnknown = false;
         }
         else
