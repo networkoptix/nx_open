@@ -185,29 +185,28 @@ bool Engine::useOrCreateCertificate(
 {
     if (loadCertificateFromFile(filePath))
     {
-        NX_INFO(typeid(Engine), lm("Loaded certificate from '%1'").arg(filePath));
+        NX_INFO(typeid(Engine), "Loaded certificate from '%1'", filePath);
         return true;
     }
 
-    NX_ALWAYS(typeid(Engine), lm("Unable to find valid SSL certificate '%1', generate new one")
-        .arg(filePath));
+    NX_ALWAYS(typeid(Engine), "Unable to find valid SSL certificate '%1', generate new one",
+        filePath);
 
     const auto certData = makeCertificateAndKey(name, country, company);
 
     NX_ASSERT(!certData.isEmpty());
     if (!filePath.isEmpty())
     {
-        QDir(filePath).mkpath("..");
+        QFileInfo(filePath).absoluteDir().mkpath(".");
         QFile file(filePath);
-        if (!file.open(QIODevice::WriteOnly) ||
-            file.write(certData) != certData.size())
+        if (!file.open(QIODevice::WriteOnly) || file.write(certData) != certData.size())
         {
-            NX_ERROR(typeid(Engine), lm("Unable to write SSL certificate to file %1")
-                .args(filePath));
+            NX_ERROR(typeid(Engine), "Unable to write SSL certificate to file %1: %2",
+                filePath, file.errorString());
         }
     }
 
-    NX_INFO(typeid(Engine), lm("Using auto-generated certificate"));
+    NX_INFO(typeid(Engine), "Using auto-generated certificate");
     return useCertificateAndPkey(certData);
 }
 
@@ -215,7 +214,7 @@ bool Engine::loadCertificateFromFile(const QString& filePath)
 {
     if (filePath.isEmpty())
     {
-        NX_INFO(typeid(Engine), lm("Certificate path is empty"));
+        NX_INFO(typeid(Engine), "Certificate path is empty");
         return false;
     }
 
@@ -223,19 +222,20 @@ bool Engine::loadCertificateFromFile(const QString& filePath)
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly))
     {
-        NX_INFO(typeid(Engine), lm("Failed to open certificate file '%1'").arg(filePath));
+        NX_INFO(typeid(Engine), "Failed to open certificate file '%1': %2",
+            filePath, file.errorString());
         return false;
     }
     certData = file.readAll();
 
-    NX_INFO(typeid(Engine), lm("Loaded certificate from '%1'").arg(filePath));
+    NX_INFO(typeid(Engine), "Loaded certificate from '%1'", filePath);
     if (!useCertificateAndPkey(certData))
     {
-        NX_INFO(typeid(Engine), lm("Failed to load certificate from '%1'").arg(filePath));
+        NX_INFO(typeid(Engine), "Failed to load certificate from '%1'", filePath);
         return false;
     }
 
-    NX_INFO(typeid(Engine), lm("Loaded certificate from '%1'").arg(filePath));
+    NX_INFO(typeid(Engine), "Used certificate from '%1'", filePath);
     return true;
 }
 
