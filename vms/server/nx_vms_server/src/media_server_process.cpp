@@ -1519,7 +1519,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/setCameraParam", new QnCameraSettingsRestHandler(serverModule()->resourceCommandProcessor()));
 
-    /**%apidoc GET /api/manualCamera/search
+    /**%apidoc POST /api/manualCamera/search
      * Start searching for the cameras in manual mode. There are two ways to call this method:
      * IP range search and single host search. To scan an IP range, "start_ip" and "end_ip" must be
      * specified. To run a single host search, "url" must be specified.
@@ -1546,19 +1546,6 @@ void MediaServerProcess::registerRestHandlers(
      * Stop manual adding progress.
      * %param:uuid uuid Process unique id, can be obtained from "processUuid" field in the result
      *     of /api/manualCamera/search.
-     * %return:object JSON object with error message and error code (0 means OK).
-     *
-     **%apidoc[proprietary] GET /api/manualCamera/add
-     * Manually add camera(s). If several cameras are added, parameters "url" and "manufacturer"
-     * must be defined several times with incrementing suffix "0", "1", etc.
-     * %param:string url0 Camera url, can be obtained from "reply.cameras[].url" field in the
-     *     result of /api/manualCamera/status.
-     * %param:string uniqueId0 Camera physical id, can be obtained from "reply.cameras[].uniqueId"
-     *     field in the result of /api/manualCamera/status.
-     * %param:string manufacturer0 Camera manufacturer, can be obtained from
-     *     "reply.cameras[].manufacturer" field in the result of /api/manualCamera/status.
-     * %param[opt]:string user Username for the cameras.
-     * %param[opt]:string password Password for the cameras.
      * %return:object JSON object with error message and error code (0 means OK).
      *
      **%apidoc POST /api/manualCamera/add
@@ -1595,7 +1582,7 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/wearableCamera", new QnWearableCameraRestHandler(serverModule()));
 
-    /**%apidoc GET /api/ptz
+    /**%apidoc POST /api/ptz
      * Perform reading or writing PTZ operation
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
@@ -1626,6 +1613,13 @@ void MediaServerProcess::registerRestHandlers(
      *         preset name. Parameter speed defines move speed in range [0..1.0.]
      *     %value GetPresetsPtzCommand Read PTZ presets list.
      *     %value GetPresetsPtzCommand Read PTZ presets list.
+     * %return:object JSON object with error message and error code (0 means OK).
+     *
+     **%apidoc GET /api/ptz
+     * Perform reading PTZ operation
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
+     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param:enum command PTZ operation, only Get* values are supported.
      * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("api/ptz", new QnPtzRestHandler(serverModule()));
@@ -1830,7 +1824,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/changeCameraPassword", new QnChangeCameraPasswordRestHandler(), kAdmin);
 
-    /**%apidoc GET /api/rebuildArchive
+    /**%apidoc POST /api/rebuildArchive
      * Start or stop the server archive rebuilding, also can report this process status.
      * %param[opt]:enum action What to do and what to report about the server archive rebuild.
      *     %value start Start server archive rebuild.
@@ -1841,13 +1835,17 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/rebuildArchive", new nx::vms::server::RebuildArchiveRestHandler(serverModule()));
 
-    /**%apidoc GET /api/backupControl
+    /**%apidoc POST /api/backupControl
      * Start or stop the recorded data backup process, also can report this process status.
      * %param[opt]:enum action What to do and what to report about the backup process.
      *     %value start Start backup just now.
      *     %value stop Stop backup.
      *     %value <any_other_value_or_no_parameter> Report the backup process status.
-     * %return:object Bakcup process progress status or an error code.
+     * %return:object Backup process progress status or an error code.
+     *
+     **%apidoc GET /api/backupControl
+     * Return recorded data backup processs status.
+     * %return:object Backup process progress status or an error code.
      */
     reg("api/backupControl", new nx::vms::server::BackupControlRestHandler(serverModule()));
 
@@ -2275,7 +2273,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/mergeSystems", new nx::vms::server::MergeSystemsRestHandler(serverModule()), kAdmin);
 
-    /**%apidoc GET /api/backupDatabase
+    /**%apidoc POST /api/backupDatabase
      * Back up server database.
      * %return:object JSON object with error message and error code (0 means OK).
      */
@@ -2305,7 +2303,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/logLevel", new QnLogLevelRestHandler());
 
-    /**%apidoc[proprietary] GET /api/execute
+    /**%apidoc[proprietary] POST /api/execute
      * Execute any script from subfolder "scripts" of media server. Script name provides directly
      * in a URL path like "/api/execute/script1.sh". All URL parameters are passed directly to
      * a script as an parameters.

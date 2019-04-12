@@ -29,6 +29,8 @@ ExternalEventRestHandler::ExternalEventRestHandler(QnMediaServerModule* serverMo
 
 rest::Response ExternalEventRestHandler::executeGet(const rest::Request& request)
 {
+    // TODO: Probably we have to introduce some request forgery protection,
+    // instead of making it inaccesible.
     if (!rest::ini().allowGetModifications)
         return rest::Response::error(nx::network::rest::Result::Forbidden);
 
