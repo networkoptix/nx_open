@@ -6,10 +6,8 @@
 
 struct PasswordData
 {
-    PasswordData() = default;
-    PasswordData(const QnRequestParams& params);
-
-    static PasswordData calculateHashes(const QString& username, const QString& password, bool isLdap);
+    static PasswordData calculateHashes(
+        const QString& username, const QString& password, bool isLdap);
 
     bool hasPassword() const;
 
@@ -23,9 +21,6 @@ struct PasswordData
 
 struct CurrentPasswordData
 {
-    CurrentPasswordData() = default;
-    CurrentPasswordData(const QnRequestParams& params);
-
     QString currentPassword;
 };
 #define CurrentPasswordData_Fields (currentPassword)

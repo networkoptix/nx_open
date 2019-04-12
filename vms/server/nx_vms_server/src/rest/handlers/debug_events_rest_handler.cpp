@@ -1,47 +1,58 @@
 #include "debug_events_rest_handler.h"
 
-#include <nx/vms/event/events/events_fwd.h>
-#include <nx/vms/event/events/reasoned_event.h>
-#include <nx/vms/event/events/network_issue_event.h>
-#include <nx/vms/event/events/camera_disconnected_event.h>
-#include <nx/vms/server/event/rule_processor.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx/network/http/http_types.h>
-#include <utils/common/synctime.h>
-#include <rest/server/rest_connection_processor.h>
 #include <media_server/media_server_module.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
+#include <nx/utils/switch.h>
+#include <nx/vms/event/events/camera_disconnected_event.h>
+#include <nx/vms/event/events/events_fwd.h>
+#include <nx/vms/event/events/network_issue_event.h>
+#include <nx/vms/event/events/reasoned_event.h>
 #include <nx/vms/server/event/extended_rule_processor.h>
+#include <nx/vms/server/event/rule_processor.h>
+#include <rest/server/rest_connection_processor.h>
+#include <utils/common/synctime.h>
 
-using namespace nx;
+namespace nx::vms::server {
 
-QnDebugEventsRestHandler::QnDebugEventsRestHandler(QnMediaServerModule* serverModule):
-    nx::vms::server::ServerModuleAware(serverModule)
+DebugEventsRestHandler::DebugEventsRestHandler(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
 {
 }
 
-int QnDebugEventsRestHandler::executeGet(
-    const QString &path,
-    const QnRequestParams &params,
-    QnJsonRestResult &result,
-    const QnRestConnectionProcessor* owner)
+nx::network::rest::Response DebugEventsRestHandler::executeGet(
+    const nx::network::rest::Request& request)
 {
-    QString action = extractAction(path);
+    if (!nx::network::rest::ini().allowGetModifications)
+        return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
 
-    if (action == "networkIssue")
-        return testNetworkIssue(params, result, owner);
-
-    if (action == "disconnected")
-        return testCameraDisconnected(params, result, owner);
-
-    return nx::network::http::StatusCode::notFound;
+    return executePost(request);
 }
 
-int QnDebugEventsRestHandler::testNetworkIssue(
-    const QnRequestParams & params,
-    QnJsonRestResult &result,
+nx::network::rest::Response DebugEventsRestHandler::executePost(
+    const nx::network::rest::Request& request)
+{
+    nx::network::rest::JsonResult result;
+    const auto status = nx::utils::switch_(
+        extractAction(request.path()),
+        "networkIssue",
+        [&] { return testNetworkIssue(request.params(), result, request.owner); },
+        "disconnected",
+        [&] { return testCameraDisconnected(request.params(), result, request.owner); },
+        nx::utils::default_,
+        [&] { return nx::network::http::StatusCode::notFound; });
+
+
+    auto response = nx::network::rest::Response::result(result);
+    response.statusCode = status;
+    return response;
+}
+
+nx::network::http::StatusCode::Value DebugEventsRestHandler::testNetworkIssue(
+    const nx::network::rest::Params& params,
+    nx::network::rest::Result& result,
     const QnRestConnectionProcessor* owner)
 {
     QnVirtualCameraResourcePtr camera = owner->resourcePool()->getAllCameras(QnResourcePtr()).first();
@@ -97,9 +108,9 @@ int QnDebugEventsRestHandler::testNetworkIssue(
     return nx::network::http::StatusCode::notImplemented;
 }
 
-int QnDebugEventsRestHandler::testCameraDisconnected(
-    const QnRequestParams& params,
-    QnJsonRestResult& /*result*/,
+nx::network::http::StatusCode::Value DebugEventsRestHandler::testCameraDisconnected(
+    const nx::network::rest::Params& params,
+    nx::network::rest::Result& /*result*/,
     const QnRestConnectionProcessor* owner)
 {
     QnVirtualCameraResourcePtr camera = owner->resourcePool()->getAllCameras(QnResourcePtr()).first();
@@ -114,3 +125,5 @@ int QnDebugEventsRestHandler::testCameraDisconnected(
     serverModule()->eventRuleProcessor()->processEvent(event);
     return nx::network::http::StatusCode::ok;
 }
+
+} // namespace nx::vms::server

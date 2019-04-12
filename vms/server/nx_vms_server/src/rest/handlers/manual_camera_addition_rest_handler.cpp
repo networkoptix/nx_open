@@ -1,25 +1,23 @@
 #include "manual_camera_addition_rest_handler.h"
 
 #include <functional>
-
 #include <QtCore/QThreadPool>
 #include <QtNetwork/QAuthenticator>
 
 #include <api/model/manual_camera_seach_reply.h>
-#include "audit/audit_manager.h"
-
-#include <core/resource_management/resource_discovery_manager.h>
-#include "core/resource/network_resource.h"
-#include <network/tcp_connection_priv.h>
-#include <rest/server/rest_connection_processor.h>
-
-#include <nx/fusion/serialization/json_functions.h>
+#include <audit/audit_manager.h>
 #include <common/common_module.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/thread/barrier_handler.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/security_cam_resource.h>
+#include <network/tcp_connection_priv.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
 #include <nx/network/url/url_builder.h>
-
+#include <nx/utils/switch.h>
+#include <nx/utils/thread/barrier_handler.h>
+#include <rest/server/rest_connection_processor.h>
 
 static constexpr const char kUserParam[] = "user";
 static constexpr const char kPasswordParam[] = "password";
@@ -28,12 +26,14 @@ static constexpr const char kEndIpParam[] = "end_ip";
 static constexpr const char kPortParam[] = "port";
 static constexpr const char kUrlParam[] = "url";
 
-QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler(QnMediaServerModule* serverModule):
-    nx::vms::server::ServerModuleAware(serverModule)
+namespace nx::vms::server {
+
+ManualCameraAdditionRestHandler::ManualCameraAdditionRestHandler(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
 {
 }
 
-QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler()
+ManualCameraAdditionRestHandler::~ManualCameraAdditionRestHandler()
 {
     NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
     {
@@ -45,8 +45,9 @@ QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler()
     }
 }
 
-int QnManualCameraAdditionRestHandler::extractSearchStartParams(QnJsonRestResult* const result,
-    const QnRequestParams& params,
+nx::network::http::StatusCode::Value ManualCameraAdditionRestHandler::extractSearchStartParams(
+    nx::network::rest::JsonResult* const result,
+    const nx::network::rest::Params& params,
     nx::utils::Url* const outUrl,
     std::optional<std::pair<nx::network::HostAddress, nx::network::HostAddress>>* const outIpRange)
 {
@@ -150,9 +151,9 @@ int QnManualCameraAdditionRestHandler::extractSearchStartParams(QnJsonRestResult
     return nx::network::http::StatusCode::ok;
 }
 
-int QnManualCameraAdditionRestHandler::searchStartAction(
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
+nx::network::http::StatusCode::Value ManualCameraAdditionRestHandler::searchStartAction(
+    const nx::network::rest::Params& params,
+    nx::network::rest::JsonResult& result,
     const QnRestConnectionProcessor* owner)
 {
     NX_DEBUG(this, lm("Start searching for new cameras"));
@@ -192,8 +193,8 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
     return nx::network::http::StatusCode::ok;
 }
 
-int QnManualCameraAdditionRestHandler::searchStatusAction(
-    const QnRequestParams& params, QnJsonRestResult& result)
+nx::network::http::StatusCode::Value ManualCameraAdditionRestHandler::searchStatusAction(
+    const nx::network::rest::Params& params, nx::network::rest::JsonResult& result)
 {
     QnUuid processUuid = QnUuid(params.value("uuid"));
     NX_VERBOSE(this, "Status of the search %1 was requested", processUuid);
@@ -210,8 +211,8 @@ int QnManualCameraAdditionRestHandler::searchStatusAction(
     return nx::network::http::StatusCode::ok;
 }
 
-int QnManualCameraAdditionRestHandler::searchStopAction(
-    const QnRequestParams& params, QnJsonRestResult& result)
+nx::network::http::StatusCode::Value ManualCameraAdditionRestHandler::searchStopAction(
+    const nx::network::rest::Params& params, nx::network::rest::JsonResult& result)
 {
     QnUuid processUuid = QnUuid(params.value("uuid"));
     if (processUuid.isNull())
@@ -242,37 +243,9 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
     return nx::network::http::StatusCode::ok;
 }
 
-int QnManualCameraAdditionRestHandler::addCamerasAction(
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
-{
-    AddManualCameraData data;
-
-    data.user = params.value("user");
-    data.password = params.value("password");
-
-    for (int i = 0, skipped = 0; skipped < 5; ++i)
-    {
-        ManualCameraData camera;
-        camera.url = params.value("url" + QString::number(i));
-        camera.manufacturer = params.value("manufacturer" + QString::number(i));
-
-        if(camera.url.isEmpty() || camera.manufacturer.isEmpty()) {
-            skipped++;
-            continue;
-        }
-        camera.uniqueId = params.value("uniqueId" + QString::number(i));
-
-        data.cameras.append(camera);
-    }
-
-    return addCameras(data, result, owner);
-}
-
-int QnManualCameraAdditionRestHandler::addCameras(
+nx::network::http::StatusCode::Value ManualCameraAdditionRestHandler::addCameras(
     const AddManualCameraData& data,
-    QnJsonRestResult& result,
+    nx::network::rest::JsonResult& result,
     const QnRestConnectionProcessor* owner)
 {
     QAuthenticator auth;
@@ -286,7 +259,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
         QnManualCameraInfo info(url, auth, camera.manufacturer, camera.uniqueId);
         if (info.resType.isNull())
         {
-            result.setError(QnJsonRestResult::InvalidParameter,
+            result.setError(nx::network::rest::JsonResult::InvalidParameter,
                 lit("Invalid camera manufacturer '%1'.").arg(camera.manufacturer));
             return nx::network::http::StatusCode::unprocessableEntity;
         }
@@ -323,40 +296,56 @@ int QnManualCameraAdditionRestHandler::addCameras(
         return nx::network::http::StatusCode::internalServerError;
 }
 
-int QnManualCameraAdditionRestHandler::executeGet(
-    const QString &path, const QnRequestParams &params, QnJsonRestResult &result,
-    const QnRestConnectionProcessor* owner)
+nx::network::rest::Response ManualCameraAdditionRestHandler::executeGet(
+    const nx::network::rest::Request& request)
 {
-    QString action = extractAction(path);
-    if (action == "search")
-        return searchStartAction(params, result, owner);
-    else if (action == "status")
-        return searchStatusAction(params, result);
-    else if (action == "stop")
-        return searchStopAction(params, result);
-    else if (action == "add")
-        return addCamerasAction(params, result, owner);
-    else
-        return nx::network::http::StatusCode::notFound;
+    if (!nx::network::rest::ini().allowGetModifications && extractAction(request.path()) != "status")
+        return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
+
+    return executePost(request);
 }
 
-int QnManualCameraAdditionRestHandler::executePost(
-    const QString& path, const QnRequestParams& /*params*/, const QByteArray& body,
-    QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
+nx::network::rest::Response ManualCameraAdditionRestHandler::executePost(
+    const nx::network::rest::Request& request)
 {
-    QString action = extractAction(path);
-    if (action == "add")
-    {
-        const AddManualCameraData data = QJson::deserialized<AddManualCameraData>(body);
-        return addCameras(data, result, owner);
-    }
-    else
-    {
-        return nx::network::http::StatusCode::notFound;
-    }
+    const auto parseCameras =
+        [&]()
+        {
+            auto data = request.parseContentOrThrow<AddManualCameraData>();
+
+            // Add more cameras from URL params (backwards compatibility).
+            for (int i = 0, skipped = 0; skipped < 5; ++i)
+            {
+                ManualCameraData camera;
+                camera.url = request.paramOrDefault("url" + QString::number(i));
+                camera.manufacturer = request.paramOrDefault("manufacturer" + QString::number(i));
+                if (camera.url.isEmpty() || camera.manufacturer.isEmpty()) {
+                    skipped++;
+                    continue;
+                }
+
+                camera.uniqueId = request.paramOrDefault("uniqueId" + QString::number(i));
+                data.cameras.append(camera);
+            }
+
+            return data;
+        };
+
+    nx::network::rest::JsonResult result;
+    const auto status = nx::utils::switch_(
+        extractAction(request.path()),
+        "search", [&] { return searchStartAction(request.params(), result, request.owner); },
+        "status", [&] { return searchStatusAction(request.params(), result); },
+        "stop", [&] { return searchStopAction(request.params(), result); },
+        "add", [&] { return addCameras(parseCameras(), result, request.owner); },
+        nx::utils::default_, [&] { return nx::network::http::StatusCode::notFound; });
+
+    auto response = nx::network::rest::Response::result(result);
+    response.statusCode = status;
+    return response;
 }
 
-QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchStatus(
+QnManualCameraSearchProcessStatus ManualCameraAdditionRestHandler::getSearchStatus(
     const QnUuid& searchProcessUuid)
 {
     NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
@@ -367,9 +356,11 @@ QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchSt
     return m_searchProcesses[searchProcessUuid]->status();
 }
 
-bool QnManualCameraAdditionRestHandler::isSearchActive(
+bool ManualCameraAdditionRestHandler::isSearchActive(
     const QnUuid &searchProcessUuid)
 {
     NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
     return m_searchProcesses.count(searchProcessUuid);
 }
+
+} // namespace nx::vms::server

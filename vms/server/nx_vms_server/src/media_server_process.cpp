@@ -137,7 +137,6 @@
 #include <rest/handlers/activate_license_rest_handler.h>
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
-#include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/start_update_rest_handler.h>
 #include <rest/handlers/finish_update_rest_handler.h>
@@ -1592,7 +1591,7 @@ void MediaServerProcess::registerRestHandlers(
      *         "reply.cameras[].manufacturer" field in the result of /api/manualCamera/status.
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("api/manualCamera", new QnManualCameraAdditionRestHandler(serverModule()));
+    reg("api/manualCamera", new nx::vms::server::ManualCameraAdditionRestHandler(serverModule()));
 
     reg("api/wearableCamera", new QnWearableCameraRestHandler(serverModule()));
 
@@ -1676,7 +1675,7 @@ void MediaServerProcess::registerRestHandlers(
      *         stop.
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("api/createEvent", new QnExternalEventRestHandler(serverModule()));
+    reg("api/createEvent", new nx::vms::server::ExternalEventRestHandler(serverModule()));
 
     static const QString kGetTimePath("api/getTime");
     /**%apidoc GET /api/getTime
@@ -1840,7 +1839,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:integer mainPool 1 (for the main storage) or 0 (for the backup storage)
      * %return:object Rebuild progress status or an error code.
      */
-    reg("api/rebuildArchive", new QnRebuildArchiveRestHandler(serverModule()));
+    reg("api/rebuildArchive", new nx::vms::server::RebuildArchiveRestHandler(serverModule()));
 
     /**%apidoc GET /api/backupControl
      * Start or stop the recorded data backup process, also can report this process status.
@@ -2131,7 +2130,7 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
      */
-    reg("api/settime", new QnSetTimeRestHandler(), kAdmin); //< deprecated
+    reg("api/settime", new nx::vms::server::SetTimeRestHandler(), kAdmin); //< deprecated
 
     /**%apidoc POST /api/setTime
      * Set current time on the server machine.
@@ -2155,7 +2154,7 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
      */
-    reg("api/setTime", new QnSetTimeRestHandler(), kAdmin); //< new version
+    reg("api/setTime", new nx::vms::server::SetTimeRestHandler(), kAdmin); //< new version
 
     /**%apidoc GET /api/moduleInformationAuthenticated
      * The same as moduleInformation but requires authentication. Useful to test connection.
@@ -2193,7 +2192,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string currentPassword Current user password.
      * %return JSON result with error code.
      */
-    reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
+    reg("api/detachFromSystem", new nx::vms::server::DetachFromSystemRestHandler(
         serverModule(), &cloudManagerGroup->connectionManager, messageBus), kAdmin);
 
     /**%apidoc[proprietary] POST /api/restoreState
@@ -2214,7 +2213,8 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string systemName New system name
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(serverModule()), kAdmin);
+    reg("api/setupLocalSystem", new nx::vms::server::SetupLocalSystemRestHandler(
+        serverModule()), kAdmin);
 
     /**%apidoc POST /api/setupCloudSystem
      * Configure server system name and attach it to cloud. This function can be called for server
@@ -2226,7 +2226,8 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string cloudSystemID could system id
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(serverModule(), cloudManagerGroup), kAdmin);
+    reg("api/setupCloudSystem", new nx::vms::server::SetupCloudSystemRestHandler(
+        serverModule(), cloudManagerGroup), kAdmin);
 
     /**%apidoc POST /api/mergeSystems
      * Merge two Systems. <br/> The System that joins another System is called the current System,
@@ -2272,7 +2273,7 @@ void MediaServerProcess::registerRestHandlers(
      *             customization.
      *         %value "BACKUP_ERROR" The database backup could not be created.
      */
-    reg("api/mergeSystems", new QnMergeSystemsRestHandler(serverModule()), kAdmin);
+    reg("api/mergeSystems", new nx::vms::server::MergeSystemsRestHandler(serverModule()), kAdmin);
 
     /**%apidoc GET /api/backupDatabase
      * Back up server database.
@@ -2311,7 +2312,7 @@ void MediaServerProcess::registerRestHandlers(
      * %permissions Owner.
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("api/execute", new QnExecScript(serverModule()->settings().dataDir()), kAdmin);
+    reg("api/execute", new nx::vms::server::ExecScript(serverModule()->settings().dataDir()), kAdmin);
 
     /**%apidoc[proprietary] GET /api/scriptList
      * Return list of scripts to execute.
@@ -2328,7 +2329,7 @@ void MediaServerProcess::registerRestHandlers(
      * call this method without parameters.
      * Example: /api/systemSettings?smtpTimeout=30&amp;smtpUser=test
      */
-    reg("api/systemSettings", new QnSystemSettingsHandler());
+    reg("api/systemSettings", new nx::vms::server::SystemSettingsHandler());
 
     reg("api/transmitAudio", new nx::vms::server::AudioTransmissionRestHandler(serverModule()));
 
@@ -2707,7 +2708,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/startLiteClient", new QnStartLiteClientRestHandler(serverModule()));
 
     #if defined(_DEBUG)
-        reg("api/debugEvent", new QnDebugEventsRestHandler(serverModule()));
+        reg("api/debugEvent", new nx::vms::server::DebugEventsRestHandler(serverModule()));
     #endif
 
     reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());

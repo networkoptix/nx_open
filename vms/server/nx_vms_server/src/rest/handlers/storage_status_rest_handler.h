@@ -12,7 +12,6 @@ class QnStorageStatusRestHandler:
 public:
     QnStorageStatusRestHandler(QnMediaServerModule* serverModule);
 
-    // TODO: rest::ini().allowGetModifications.
     virtual int executeGet(
         const QString &path,
         const QnRequestParams &params,

@@ -9,9 +9,6 @@
 
 struct SetupLocalSystemData: public PasswordData
 {
-    SetupLocalSystemData();
-    SetupLocalSystemData(const QnRequestParams& params);
-
     QString systemName;
     QHash<QString, QString> systemSettings;
 };

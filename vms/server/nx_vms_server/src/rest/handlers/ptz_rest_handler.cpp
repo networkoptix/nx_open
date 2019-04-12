@@ -2,26 +2,26 @@
 
 #include <QtConcurrent/QtConcurrent>
 
+#include <api/helpers/camera_id_helper.h>
+#include <common/common_module.h>
+#include <core/ptz/abstract_ptz_controller.h>
+#include <core/ptz/ptz_controller_pool.h>
+#include <core/ptz/ptz_data.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
+#include <media_server/media_server_module.h>
+#include <network/tcp_connection_priv.h>
+#include <network/tcp_listener.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/lexical.h>
-#include <network/tcp_connection_priv.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_resource.h>
-#include <core/ptz/abstract_ptz_controller.h>
-#include <core/ptz/ptz_data.h>
-#include <core/ptz/ptz_controller_pool.h>
 #include <nx/network/http/http_types.h>
-#include <rest/server/rest_connection_processor.h>
-#include <core/resource_access/resource_access_manager.h>
-#include <core/resource/user_resource.h>
-#include <api/helpers/camera_id_helper.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
 #include <nx/utils/log/log.h>
-#include <common/common_module.h>
-#include <rest/server/rest_connection_processor.h>
-#include <network/tcp_listener.h>
 #include <nx/utils/log/log_main.h>
-#include <media_server/media_server_module.h>
+#include <rest/server/rest_connection_processor.h>
+#include <rest/server/rest_connection_processor.h>
 
 namespace {
 
@@ -197,6 +197,12 @@ int QnPtzRestHandler::executeGet(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
+    if (!nx::network::rest::ini().allowGetModifications
+        && !params.value("command").toLower().startsWith("get"))
+    {
+        return nx::network::http::StatusCode::forbidden;
+    }
+
     return executePost(path, params, {}, result, owner);
 }
 

@@ -1,11 +1,5 @@
 #include "setup_cloud_rest_handler.h"
 
-#include <nx/network/http/http_types.h>
-
-#include <nx/vms/cloud_integration/cloud_connection_manager.h>
-#include <nx/vms/cloud_integration/vms_cloud_connection_processor.h>
-#include <nx/vms/utils/vms_utils.h>
-
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 #include <api/model/password_data.h>
@@ -15,50 +9,57 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
+#include <nx/vms/cloud_integration/cloud_connection_manager.h>
+#include <nx/vms/cloud_integration/vms_cloud_connection_processor.h>
+#include <nx/vms/utils/vms_utils.h>
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
 #include "save_cloud_system_credentials.h"
 #include "system_settings_handler.h"
 
-QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
+namespace nx::vms::server {
+
+SetupCloudSystemRestHandler::SetupCloudSystemRestHandler(
     QnMediaServerModule* serverModule,
-    nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
+    cloud_integration::CloudManagerGroup* cloudManagerGroup)
     :
-    nx::vms::server::ServerModuleAware(serverModule),
+    ServerModuleAware(serverModule),
     m_cloudManagerGroup(cloudManagerGroup)
 {
 }
 
-int QnSetupCloudSystemRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+nx::network::rest::Response SetupCloudSystemRestHandler::executeGet(
+    const nx::network::rest::Request& request)
 {
-    return execute(std::move(SetupCloudSystemData(params)), owner, result);
+    if (!nx::network::rest::ini().allowGetModifications)
+        return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
+
+    return executePost(request);
 }
 
-int QnSetupCloudSystemRestHandler::executePost(
-    const QString& /*path*/,
-    const QnRequestParams& /*params*/,
-    const QByteArray& body,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+nx::network::rest::Response SetupCloudSystemRestHandler::executePost(
+    const nx::network::rest::Request& request)
 {
-    const SetupCloudSystemData data = QJson::deserialized<SetupCloudSystemData>(body);
-    return execute(std::move(data), owner, result);
+    auto data = request.parseContentOrThrow<SetupCloudSystemData>();
+    nx::network::rest::JsonResult result;
+    const auto status = execute(data, request.owner, result);
+    auto response = nx::network::rest::Response::result(result);
+    response.statusCode = status;
+    return response;
 }
 
-int QnSetupCloudSystemRestHandler::execute(
+nx::network::http::StatusCode::Value SetupCloudSystemRestHandler::execute(
     SetupCloudSystemData data,
     const QnRestConnectionProcessor* owner,
-    QnJsonRestResult& result)
+    nx::network::rest::JsonResult& result)
 {
     if (QnPermissionsHelper::isSafeMode(serverModule()))
-        return QnPermissionsHelper::safeModeError(result);
+        return (nx::network::http::StatusCode::Value) QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
-        return QnPermissionsHelper::notOwnerError(result);
+        return (nx::network::http::StatusCode::Value) QnPermissionsHelper::notOwnerError(result);
 
     nx::vms::cloud_integration::VmsCloudConnectionProcessor vmsCloudConnectionProcessor(
         owner->commonModule(),
@@ -74,3 +75,5 @@ int QnSetupCloudSystemRestHandler::execute(
         data,
         &result);
 }
+
+} // namespace nx::vms::server

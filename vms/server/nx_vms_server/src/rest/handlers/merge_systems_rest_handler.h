@@ -1,7 +1,7 @@
 #pragma once
 
 #include <api/model/configure_system_data.h>
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/merge_systems_common.h>
 
@@ -9,37 +9,30 @@
 #include <nx/vms/server/server_module_aware.h>
 
 struct MergeSystemData;
-
 namespace ec2 { class AbstractTransactionMessageBus; }
-
 class QnCommonModule;
 
-class QnMergeSystemsRestHandler:
-    public QnJsonRestHandler, public /*mixin*/ nx::vms::server::ServerModuleAware
+namespace nx::vms::server {
+
+class MergeSystemsRestHandler:
+    public nx::network::rest::Handler,
+    public /*mixin*/ ServerModuleAware
 {
-    Q_OBJECT
-
 public:
-    QnMergeSystemsRestHandler(QnMediaServerModule* serverModule);
+    MergeSystemsRestHandler(QnMediaServerModule* serverModule);
 
-    // TODO: rest::ini().allowGetModifications.
-    virtual int executeGet(
-        const QString &path,
-        const QnRequestParams &params,
-        QnJsonRestResult &result,
-        const QnRestConnectionProcessor *owner) override;
+protected:
+    virtual nx::network::rest::Response executeGet(
+        const nx::network::rest::Request& request) override;
 
-    virtual int executePost(
-        const QString &path,
-        const QnRequestParams &params,
-        const QByteArray &body,
-        QnJsonRestResult &result,
-        const QnRestConnectionProcessor*owner) override;
+    virtual nx::network::rest::Response executePost(
+        const nx::network::rest::Request& request) override;
+
 private:
-    int execute(
+    nx::network::http::StatusCode::Value execute(
         MergeSystemData data,
         const QnRestConnectionProcessor* owner,
-        QnJsonRestResult &result);
+        nx::network::rest::JsonResult& result);
 
 private:
     ec2::AbstractTransactionMessageBus* m_messageBus;
@@ -52,3 +45,5 @@ private:
         const QUrl& remoteModuleUrl,
         const nx::vms::api::ModuleInformationWithAddresses& remoteModuleInformation);
 };
+
+} // namespace nx::vms::server

@@ -8,18 +8,32 @@
 #include "recorder/device_file_catalog.h"
 #include "recorder/storage_manager.h"
 #include "core/resource/storage_resource.h"
+#include <nx/network/rest/nx_network_rest_ini.h>
 
-QnRebuildArchiveRestHandler::QnRebuildArchiveRestHandler(QnMediaServerModule* serverModule):
-    nx::vms::server::ServerModuleAware(serverModule)
+namespace nx::vms::server {
+
+RebuildArchiveRestHandler::RebuildArchiveRestHandler(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
 {
 }
 
-int QnRebuildArchiveRestHandler::executeGet(const QString& /*path*/, const QnRequestParams& params,
-    QnJsonRestResult& result, const QnRestConnectionProcessor*)
+nx::network::rest::Response RebuildArchiveRestHandler::executeGet(
+    const nx::network::rest::Request& request)
 {
-    QString method = params.value("action");
-    bool useMainPool = !params.contains("mainPool") || params.value("mainPool").toInt() != 0;
-    auto storagePool = useMainPool ? serverModule()->normalStorageManager() : serverModule()->backupStorageManager();
+    if (!nx::network::rest::ini().allowGetModifications && request.param("action"))
+        return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
+
+    return executePost(request);
+}
+
+nx::network::rest::Response RebuildArchiveRestHandler::executePost(
+    const nx::network::rest::Request& request)
+{
+    const auto method = request.paramOrDefault("action");
+    const auto mainPool = request.param("mainPool");
+    const auto storagePool = (!mainPool || mainPool->toInt() != 0)
+        ? serverModule()->normalStorageManager()
+        : serverModule()->backupStorageManager();
 
     auto reply = storagePool->rebuildInfo();
     if (method == "start")
@@ -27,6 +41,7 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& /*path*/, const QnReq
     else if (method == "stop")
         storagePool->cancelRebuildCatalogAsync();
 
-    result.setReply(reply);
-    return nx::network::http::StatusCode::ok;
+    return nx::network::rest::Response::reply(reply);
 }
+
+} // namespace nx::vms::server

@@ -173,6 +173,27 @@ TEST_F(RestRequestTest, GetWithUrlParams)
     EXPECT_EQ((SomeData{true, 42, "hi"}), *data);
 }
 
+TEST_F(RestRequestTest, GetWithJsonInString)
+{
+    const auto request = restRequest({
+        "GET /some/path?s={\"b\":true,\"i\":7,\"s\":\"hi\"} HTTP/1.1",
+        ""
+    });
+
+    EXPECT_EQ("GET", request->method());
+    EXPECT_EQ("/some/path", request->path());
+    EXPECT_EQ(Params({{"s", R"json({"b":true,"i":7,"s":"hi"})json"}}), request->params());
+
+    const auto innerData1 = QJson::deserialized<SomeData>(request->paramOrThrow("s").toUtf8());
+    EXPECT_EQ((SomeData{true, 7, "hi"}), innerData1);
+
+    const auto data = request->parseContent<SomeData>();
+    ASSERT_TRUE(data);
+
+    const auto innerData2 = QJson::deserialized<SomeData>(data->s.toUtf8());
+    EXPECT_EQ((SomeData{true, 7, "hi"}), innerData2);
+}
+
 TEST_F(RestRequestTest, GetWithSomeBools)
 {
     const auto request = restRequest({
@@ -356,6 +377,51 @@ TEST_F(RestRequestTest, PostBadJson)
     EXPECT_EQ(Params(), request->params());
 
     ASSERT_FALSE(request->parseContent<SomeData>());
+}
+
+TEST_F(RestRequestTest, PostWithJsonInString)
+{
+    const auto request = restRequest({
+        "POST /some/path HTTP/1.1",
+        "Content-Type: application/json",
+        "Content-Length: 42",
+        "",
+        R"json({"s":"{\"b\":true,\"i\":7,\"s\":\"hi\"}"})json"
+    });
+
+    EXPECT_EQ("POST", request->method());
+    EXPECT_EQ("/some/path", request->path());
+    EXPECT_EQ(Params({{"s", R"json({"b":true,"i":7,"s":"hi"})json"}}), request->params());
+
+    const auto innerData1 = QJson::deserialized<SomeData>(request->paramOrThrow("s").toUtf8());
+    EXPECT_EQ((SomeData{true, 7, "hi"}), innerData1);
+
+    const auto data = request->parseContent<SomeData>();
+    ASSERT_TRUE(data);
+
+    const auto innerData2 = QJson::deserialized<SomeData>(data->s.toUtf8());
+    EXPECT_EQ((SomeData{true, 7, "hi"}), innerData2);
+}
+
+TEST_F(RestRequestTest, PostWithEmbeddedJson)
+{
+    const auto request = restRequest({
+        "POST /some/path HTTP/1.1",
+        "Content-Type: application/json",
+        "Content-Length: 32",
+        "",
+        R"json({"s":{"b":true,"i":7,"s":"hi"}})json"
+    });
+
+    EXPECT_EQ("POST", request->method());
+    EXPECT_EQ("/some/path", request->path());
+    EXPECT_EQ(Params({{"s", R"json({"b":true,"i":7,"s":"hi"})json"}}), request->params());
+
+    const auto innerData1 = QJson::deserialized<SomeData>(request->paramOrThrow("s").toUtf8());
+    EXPECT_EQ((SomeData{true, 7, "hi"}), innerData1);
+
+    const auto data = request->parseContent<SomeData>();
+    ASSERT_TRUE(data);
 }
 
 TEST_F(RestRequestTest, PostWithUrlParams)
