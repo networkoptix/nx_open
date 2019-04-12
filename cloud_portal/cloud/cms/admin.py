@@ -234,8 +234,8 @@ admin.site.register(Product, ProductAdmin)
 
 
 class ContextAdmin(CMSAdmin):
-    list_display = ('name', 'description', 'url', 'translatable', 'is_global')
-    list_filter = ('product_type',)
+    list_display = ('name', 'description', 'url', 'translatable', 'is_global', 'hidden')
+    list_filter = ('product_type', 'translatable', 'is_global', 'hidden')
 
 
 admin.site.register(Context, ContextAdmin)

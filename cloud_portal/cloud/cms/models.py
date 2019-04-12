@@ -296,7 +296,7 @@ class Context(models.Model):
         permissions = (
             ("edit_content", "Can edit content and send for review"),
         )
-    # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
+    # TODO: Remove this after release of 19.1 - Task: CLOUD-2299
     product = models.ForeignKey(Product, null=True)
     product_type = models.ForeignKey(ProductType, null=True)
     name = models.CharField(max_length=1024)

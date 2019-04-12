@@ -264,7 +264,7 @@ def fill_content(product,
                 # keep incremental value
                 pass
 
-    global_contexts = Context.objects.filter(is_global=True, product_type=product.product_type)
+    global_contexts = Context.objects.filter(is_global=True, hidden=False, product_type=product.product_type)
 
     if not preview:
         if version_id is not None:
