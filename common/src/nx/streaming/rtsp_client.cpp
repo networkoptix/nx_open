@@ -805,7 +805,12 @@ void QnRtspClient::parseSDP()
             const auto codecType = trackParams[0];
             sdpTrack->trackType = SDPTrackInfo::trackTypeFromString(codecType);
             if (trackParams.size() >= 2)
-                sdpTrack->serverPort = trackParams[1].toInt();
+            {
+                const auto mediaPort = trackParams[1].toInt();
+                sdpTrack->serverPort = mediaPort;
+                if (mediaPort)
+                    sdpTrack->ioDevice->updateRemoteMulticastPorts(mediaPort, mediaPort + 1);
+            }
 
             if (trackParams.size() >= 4)
                 sdpTrack->setMapNumber(trackParams[3].toInt());
