@@ -513,8 +513,7 @@ private:
     ErrorCode removeHelper(
         const QnUuid& id,
         ApiCommand::Value command,
-        PostProcessList* const transactionsPostProcessList,
-        TransactionType::Value transactionType = TransactionType::Regular);
+        PostProcessList* const transactionsPostProcessList);
 
     ErrorCode removeObjAttrHelper(
         const QnUuid& id,
@@ -532,8 +531,7 @@ private:
 
     ErrorCode removeResourceStatusHelper(
         const QnUuid& id,
-        PostProcessList* const transactionsPostProcessList,
-        TransactionType::Value transactionType = TransactionType::Regular);
+        PostProcessList* const transactionsPostProcessList);
 
     class AccessRightGrant
     {
@@ -639,8 +637,7 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsPostProcessList,
-                        TransactionType::Local),
+                        transactionsPostProcessList),
                     lit("Remove resource status failed"));
 
                 break;
@@ -655,8 +652,7 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsPostProcessList,
-                        tran.transactionType),
+                        transactionsPostProcessList),
                     lit("Remove resource status failed"));
 
                 break;
