@@ -1387,6 +1387,7 @@ bool QnRtspClient::sendSetup()
 
             if (m_prefferedTransport != nx::vms::api::RtpTransportType::tcp)
             {
+                trackInfo->ioDevice->setTransport(m_prefferedTransport);
                 transportStr += m_prefferedTransport == nx::vms::api::RtpTransportType::multicast
                     ? "port="
                     : "client_port=";

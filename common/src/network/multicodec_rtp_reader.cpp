@@ -577,7 +577,6 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_tracks.clear();
     m_gotKeyDataInfo.clear();
     m_gotData = false;
-
     const qint64 position = m_positionUsec.exchange(AV_NOPTS_VALUE);
     const CameraDiagnostics::Result result = m_RtpSession.open(m_currentStreamUrl, position);
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
