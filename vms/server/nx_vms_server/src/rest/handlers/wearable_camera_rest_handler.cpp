@@ -370,6 +370,7 @@ int QnWearableCameraRestHandler::executeRelease(const QnRequestParams& params,
     reply.progress = state.progress();
     result.setReply(reply);
     uploader->release(cameraId);
+    serverModule()->normalStorageManager()->updateCameraHistory();
 
     return nx::network::http::StatusCode::ok;
 }

@@ -12,6 +12,8 @@
 
 namespace nx::vms::server::test {
 
+static const int kTestFileDurationMs = 60000;
+
 class FtWearableCameraUpload: public test_support::MediaserverWithStorageFixture
 {
 protected:
@@ -24,17 +26,19 @@ protected:
     void givenSingleFileOnDisk()
     {
         using namespace std::chrono;
-        auto content = test_support::createTestMkvFileData(60, 640, 480);
+        auto content = test_support::createTestMkvFileData(kTestFileDurationMs / 1000, 640, 480);
         m_testFileStartTimeMs =
             duration_cast<milliseconds>((system_clock::now() - hours(24)).time_since_epoch()).count();
 
-        m_testFileName = QString("%1_%2.mkv").arg(m_testFileStartTimeMs).arg(60000);
+        m_testFileName = QString("%1_%2.mkv").arg(m_testFileStartTimeMs).arg(kTestFileDurationMs);
         m_testFilePath = QDir(m_storagePath).absoluteFilePath(m_testFileName);
         test_support::updateMkvMetaData(content, m_testFileStartTimeMs);
 
         QFile testFile(m_testFilePath);
         ASSERT_TRUE(testFile.open(QIODevice::WriteOnly));
         ASSERT_TRUE(testFile.write(content));
+
+        m_timePeriodsToCheck.append(QnTimePeriod(m_testFileStartTimeMs, kTestFileDurationMs));
     }
 
     void whenWearableCameraIsCreated()
@@ -97,9 +101,7 @@ protected:
 
         ASSERT_TRUE((bool)camera);
         const auto archiveReader = test_support::createArchiveStreamReader(camera);
-
-        QnTimePeriod periodToCheck(m_testFileStartTimeMs, 60000);
-        test_support::checkPlaybackCorrecteness(archiveReader.get(), { periodToCheck });
+        test_support::checkPlaybackCorrecteness(archiveReader.get(), m_timePeriodsToCheck);
     }
 
     void thenArchiveShouldBePlayedWithoutGaps()
@@ -155,12 +157,35 @@ protected:
             QByteArray());
     }
 
+    void thenGetTimePeriodsShouldReturnCorrectResult()
+    {
+        using namespace nx::test;
+        QnJsonRestResult timePeriodsResult;
+        NX_TEST_API_GET(
+            m_server.get(),
+            QString("/ec2/recordedTimePeriods?cameraId=%1").arg(m_wearableCameraId.toString()),
+            &timePeriodsResult);
+
+        ASSERT_EQ(timePeriodsResult.error, network::rest::Result::NoError);
+        MultiServerPeriodDataList serverTimePeriods =
+            timePeriodsResult.deserialized<MultiServerPeriodDataList>();
+        ASSERT_EQ(m_timePeriodsToCheck.size(), serverTimePeriods[0].periods.size());
+
+        const auto& testCameraTimePeriods = serverTimePeriods[0].periods;
+        for (int i = 0; i < m_timePeriodsToCheck.size(); ++i)
+        {
+            ASSERT_EQ(m_timePeriodsToCheck[i].startTimeMs, testCameraTimePeriods[i].startTimeMs);
+            ASSERT_LE(m_timePeriodsToCheck[i].endTimeMs() - testCameraTimePeriods[i].endTimeMs(), 40);
+        }
+    }
+
 private:
     QString m_testFilePath;
     QString m_testFileName;
     const QString m_wearableCameraName = "testCamera";
     QnUuid m_wearableCameraId;
     int64_t m_testFileStartTimeMs;
+    QnTimePeriodList m_timePeriodsToCheck;
 };
 
 TEST_F(FtWearableCameraUpload, UploadSingleFile)
@@ -175,6 +200,7 @@ TEST_F(FtWearableCameraUpload, UploadSingleFile)
 
     whenPlayArchiveRequestIsIssued();
     thenArchiveShouldBePlayedWithoutGaps();
+    thenGetTimePeriodsShouldReturnCorrectResult();
 }
 
 } // namespace nx::vms::server::test

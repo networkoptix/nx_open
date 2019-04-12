@@ -191,11 +191,11 @@ public:
     * Return camera list with existing archive. Camera Unique ID is used as camera ID
     */
     std::vector<QnUuid> getCamerasWithArchiveHelper() const;
+    void updateCameraHistory() const;
 
     QnScheduleSync* scheduleSync() const;
     static Qn::StorageStatuses storageStatus(
-        QnMediaServerModule* serverModule,
-        const QnStorageResourcePtr& storage);
+        QnMediaServerModule* serverModule, const QnStorageResourcePtr& storage);
 
 signals:
     void storagesAvailable();
@@ -282,7 +282,6 @@ private:
         int64_t                     duration,
         const QnStorageResourcePtr  &storage
     );
-    void updateCameraHistory() const;
     static std::vector<QnUuid> getCamerasWithArchive(QnMediaServerModule* serverModule);
     int64_t calculateNxOccupiedSpace(int storageIndex) const;
     bool hasArchive(int storageIndex) const;

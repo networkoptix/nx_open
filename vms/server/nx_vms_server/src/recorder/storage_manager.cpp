@@ -1790,8 +1790,7 @@ void QnStorageManager::updateCameraHistory() const
     auto archivedListNew = getCamerasWithArchive(serverModule());
     NX_VERBOSE(this, lm("Got %1 cameras with archive").arg(archivedListNew.size()));
 
-    std::vector<QnUuid> archivedListOld =
-        cameraHistoryPool()->getServerFootageData(moduleGUID());
+    std::vector<QnUuid> archivedListOld = cameraHistoryPool()->getServerFootageData(moduleGUID());
     std::sort(archivedListOld.begin(), archivedListOld.end());
 
     NX_VERBOSE(this, lm("Got %1 old cameras with archive").arg(archivedListOld.size()));
