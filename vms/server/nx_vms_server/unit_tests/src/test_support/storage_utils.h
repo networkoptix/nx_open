@@ -33,11 +33,15 @@ static const int kHiQualityFileWidth = 640;
 static const int kHiQualityFileHeight = 480;
 static const int kLowQualityFileWidth = 320;
 static const int kLowQualityFileHeight = 240;
+static const int64_t kMediaFileDurationMs = 60000;
+static const int64_t kMediaFilesGapMs = 40;
 
 Catalog generateCameraArchive(
     const QString& baseDir, const QString& cameraName, qint64 startTimeMs, int count);
 
-QByteArray createTestMkvFileData(int lengthSec, int width, int height);
+QByteArray createTestMkvFileData(
+    int lengthSec, int width, int height, const QString& container = "matroska",
+    const QString& codec = "h263p");
 void updateMkvMetaData(QByteArray& payload, int64_t startTimeMs);
 std::unique_ptr<QnArchiveStreamReader> createArchiveStreamReader(
     const QnVirtualCameraResourcePtr& camera);
@@ -49,6 +53,7 @@ QnVirtualCameraResourcePtr getCamera(QnResourcePool* resourcePool, const QString
  * above happens or forever.
  */
 void checkPlaybackCorrecteness(
-    QnArchiveStreamReader* archiveReader, const QnTimePeriodList& expectedTimePeriods);
+    QnArchiveStreamReader* archiveReader, const QnTimePeriodList& expectedTimePeriods,
+    int64_t mediaFileDurationMs = kMediaFileDurationMs, int64_t mediaFileGapMs = kMediaFileGapMs);
 
 } // namespace nx::vms::server::test::test_support

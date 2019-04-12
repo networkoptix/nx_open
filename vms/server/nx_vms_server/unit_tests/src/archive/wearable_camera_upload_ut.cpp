@@ -14,7 +14,37 @@ namespace nx::vms::server::test {
 
 static const int kTestFileDurationMs = 60000;
 
-class FtWearableCameraUpload: public test_support::MediaserverWithStorageFixture
+struct UploadTestParameters
+{
+    QString container;
+    QString codec;
+
+    UploadTestParameters(const QString& container, const QString& codec):
+        container(container),
+        codec(codec)
+    {}
+};
+
+struct FileData
+{
+    QString path;
+    int64_t startTimeMs;
+
+    FileData(const QString& path, int64_t startTimeMs):
+        path(path),
+        startTimeMs(startTimeMs)
+    {}
+};
+
+struct TimePeriodWithFiles
+{
+    QnTimePeriod period;
+    QList<FileData> files;
+};
+
+class FtWearableCameraUpload:
+    public test_support::MediaserverWithStorageFixture,
+    public ::testing::WithParamInterface<UploadTestParameters>
 {
 protected:
     virtual void SetUp() override
@@ -23,22 +53,10 @@ protected:
         m_server->addSetting("appserverPassword", "admin");
     }
 
-    void givenSingleFileOnDisk()
+    void givenSomeFilesOnDisk()
     {
-        using namespace std::chrono;
-        auto content = test_support::createTestMkvFileData(kTestFileDurationMs / 1000, 640, 480);
-        m_testFileStartTimeMs =
-            duration_cast<milliseconds>((system_clock::now() - hours(24)).time_since_epoch()).count();
-
-        m_testFileName = QString("%1_%2.mkv").arg(m_testFileStartTimeMs).arg(kTestFileDurationMs);
-        m_testFilePath = QDir(m_storagePath).absoluteFilePath(m_testFileName);
-        test_support::updateMkvMetaData(content, m_testFileStartTimeMs);
-
-        QFile testFile(m_testFilePath);
-        ASSERT_TRUE(testFile.open(QIODevice::WriteOnly));
-        ASSERT_TRUE(testFile.write(content));
-
-        m_timePeriodsToCheck.append(QnTimePeriod(m_testFileStartTimeMs, kTestFileDurationMs));
+        createTestFiles(4);
+        createTimePeriods(2, 2);
     }
 
     void whenWearableCameraIsCreated()
@@ -57,41 +75,10 @@ protected:
         m_wearableCameraId = reply.id;
     }
 
-    void whenFileIsUploaded()
+    void whenFilesAreUploaded()
     {
-        QFileInfo fileInfo(m_testFilePath);
-        ASSERT_TRUE(fileInfo.exists());
-        const auto fileSize = fileInfo.size();
-        const auto ttl = 1000 * 60 * 10;
-        const auto chunkSize = fileSize;
-
-        QFile testFile(m_testFilePath);
-        ASSERT_TRUE(testFile.open(QIODevice::ReadOnly));
-        const auto fileData = testFile.readAll();
-
-        nx::utils::QnCryptographicHash hash(nx::utils::QnCryptographicHash::Md5);
-        hash.addData(fileData);
-        const auto md5 = hash.result();
-
-        using namespace nx::test;
-        const auto createUploadUrl =
-            QString("/api/downloads/%1?size=%2&chunkSize=%3&md5=%4&ttl=%5&upload=true")
-                .arg(m_testFileName).arg(fileSize).arg(chunkSize)
-                .arg(QString::fromLatin1(md5.toHex())).arg(ttl);
-
-        NX_TEST_API_POST(m_server.get(), createUploadUrl, QByteArray());
-        NX_TEST_API_POST(
-            m_server.get(), QString("/api/downloads/%1/chunks/0").arg(m_testFileName),
-            fileData, nullptr, nx::network::http::StatusCode::ok, "admin", "admin", nullptr,
-            "application/octet-stream");
-
-        using namespace vms::common::p2p::downloader;
-        QnJsonRestResult uploadResult;
-        NX_TEST_API_GET(
-            m_server.get(), QString("/api/downloads/%1/status").arg(m_testFileName), &uploadResult);
-        ASSERT_EQ(QnRestResult::Error::NoError, uploadResult.error);
-        const auto fileInformation = uploadResult.deserialized<FileInformation>();
-        ASSERT_TRUE(fileInformation.status == FileInformation::Status::downloaded);
+        for (int i = 0; i < m_testFilePaths.size(); ++i)
+            uploadSingleFile(i);
     }
 
     void whenPlayArchiveRequestIsIssued()
@@ -180,27 +167,95 @@ protected:
     }
 
 private:
-    QString m_testFilePath;
-    QString m_testFileName;
+    QList<QString> m_testFilePaths;
     const QString m_wearableCameraName = "testCamera";
     QnUuid m_wearableCameraId;
     int64_t m_testFileStartTimeMs;
     QnTimePeriodList m_timePeriodsToCheck;
+
+    void createTimePeriods(int periodCount, int filesPerPeriod)
+    {
+        for (int p = 0; p < periodCount; ++p)
+        {
+            m_timePeriodsToCheck.append(
+                QnTimePeriod(m_testFileStartTimeMs, kTestFileDurationMs * filesPerPeriod));
+        }
+    }
+
+    QList<TimePeriodWithFiles> generateTestFileData(const QList<int>& filePerPeriodList)
+    {
+        using namespace std::chrono;
+        for (int i = 0; i < fileCount; ++i)
+        {
+            auto content = test_support::createTestMkvFileData(
+                kTestFileDurationMs / 1000, 640, 480, GetParam().container, GetParam().codec);
+
+            m_testFilePaths.append(
+                QDir(m_storagePath).absoluteFilePath(QString("test_media_file_%1.mkv").arg(i)));
+
+            QFile testFile(m_testFilePaths.back());
+            ASSERT_TRUE(testFile.open(QIODevice::WriteOnly));
+            ASSERT_TRUE(testFile.write(content));
+        }
+    }
+
+    void uploadSingleFile(int index)
+    {
+        const QFileInfo fileInfo(m_testFilePaths[index]);
+        ASSERT_TRUE(fileInfo.exists());
+        const auto fileSize = fileInfo.size();
+        const auto ttl = 1000 * 60 * 10;
+        const auto chunkSize = fileSize;
+
+        QFile testFile(m_testFilePaths[index]);
+        ASSERT_TRUE(testFile.open(QIODevice::ReadOnly));
+        const auto fileData = testFile.readAll();
+
+        nx::utils::QnCryptographicHash hash(nx::utils::QnCryptographicHash::Md5);
+        hash.addData(fileData);
+        const auto md5 = hash.result();
+
+        using namespace nx::test;
+        const auto createUploadUrl =
+            QString("/api/downloads/%1?size=%2&chunkSize=%3&md5=%4&ttl=%5&upload=true")
+            .arg(fileInfo.fileName()).arg(fileSize).arg(chunkSize)
+            .arg(QString::fromLatin1(md5.toHex())).arg(ttl);
+
+        NX_TEST_API_POST(m_server.get(), createUploadUrl, QByteArray());
+        NX_TEST_API_POST(
+            m_server.get(), QString("/api/downloads/%1/chunks/0").arg(fileInfo.fileName()),
+            fileData, nullptr, nx::network::http::StatusCode::ok, "admin", "admin", nullptr,
+            "application/octet-stream");
+
+        using namespace vms::common::p2p::downloader;
+        QnJsonRestResult uploadResult;
+        NX_TEST_API_GET(
+            m_server.get(), QString("/api/downloads/%1/status").arg(m_testFileName), &uploadResult);
+        ASSERT_EQ(QnRestResult::Error::NoError, uploadResult.error);
+        const auto fileInformation = uploadResult.deserialized<FileInformation>();
+        ASSERT_TRUE(fileInformation.status == FileInformation::Status::downloaded);
+    }
 };
 
-TEST_F(FtWearableCameraUpload, UploadSingleFile)
+TEST_P(FtWearableCameraUpload, UploadSingleFile)
 {
-    givenSingleFileOnDisk();
+    givenSomeFilesOnDisk();
     whenServerStarted();
     thenArchiveShouldBeScannedCorreclty();
 
     whenWearableCameraIsCreated();
-    whenFileIsUploaded();
+    whenFilesAreUploaded();
     whenUploadedFileAddedToTheCamera();
 
     whenPlayArchiveRequestIsIssued();
     thenArchiveShouldBePlayedWithoutGaps();
     thenGetTimePeriodsShouldReturnCorrectResult();
 }
+
+INSTANTIATE_TEST_CASE_P(
+    UploadTestDifferentContainersAndCodecs, FtWearableCameraUpload,
+    ::testing::Values(
+        UploadTestParameters("matroska","h263p"), UploadTestParameters("mp4","h263p"),
+        UploadTestParameters("mov","h263p"), UploadTestParameters("avi","h263p")));
 
 } // namespace nx::vms::server::test

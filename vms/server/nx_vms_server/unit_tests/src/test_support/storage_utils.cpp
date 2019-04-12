@@ -241,9 +241,9 @@ static uint64_t getTimestampFromFrame(const AVFrame* frame)
 class MkvBufferContext
 {
 public:
-    MkvBufferContext(int width, int height)
+    MkvBufferContext(int width, int height, const QString& container, const QString& codec)
     {
-        allocateFfmpegObjects();
+        allocateFfmpegObjects(container, codec);
         setupCodecContext(width, height);
         setupStream();
         setupFrame();
@@ -293,9 +293,9 @@ private:
     std::vector<char> m_buffer;
     int64_t m_pts = 0;
 
-    void allocateFfmpegObjects()
+    void allocateFfmpegObjects(const QString& container, const QString& codec)
     {
-        if (!(m_codec = avcodec_find_encoder_by_name("h263p")))
+        if (!(m_codec = avcodec_find_encoder_by_name(codec.toLatin1().constData())))
             throw std::runtime_error("Failed to initialize ffmpeg: codec");
 
         if (!(m_codecContext = avcodec_alloc_context3(m_codec)))
@@ -307,8 +307,11 @@ private:
         if (!(m_frame = av_frame_alloc()))
             throw std::runtime_error("Failed to initialize ffmpeg: frame");
 
-        if (avformat_alloc_output_context2(&m_formatContext, nullptr, "matroska", nullptr) < 0)
+        if (avformat_alloc_output_context2(
+                &m_formatContext, nullptr, container.toLatin1().constData(), nullptr) < 0)
+        {
             throw std::runtime_error("Failed to initialize ffmpeg: alloc_output_context");
+        }
     }
 
     void setupMetadata()
@@ -479,11 +482,12 @@ static int64_t ffmpegSeek(void* userCtx, int64_t pos, int whence)
     return (mkvContext->m_pos = absolutePos);
 }
 
-QByteArray createTestMkvFileData(int lengthSec, int width, int height)
+QByteArray createTestMkvFileData(
+    int lengthSec, int width, int height, const QString& container, const QString& codec)
 {
     try
     {
-        const auto result = MkvBufferContext(width, height).create(lengthSec);
+        const auto result = MkvBufferContext(width, height, container, codec).create(lengthSec);
         return QByteArray(result.data(), (int) result.size());
     }
     catch (const std::exception& e)
@@ -534,7 +538,12 @@ QnVirtualCameraResourcePtr getCamera(QnResourcePool* resourcePool, const QString
 class PlaybackChecker : public QnAbstractMediaDataReceptor
 {
 public:
-    PlaybackChecker(const QnTimePeriodList& timePeriods): m_timePeriods(timePeriods)
+    PlaybackChecker(
+        const QnTimePeriodList& timePeriods, int64_t mediaFileDurationMs, int64_t mediaFileGapMs)
+        :
+        m_timePeriods(timePeriods),
+        m_mediaFileDurationMs(mediaFileDurationMs),
+        m_mediaFileGapMs(mediaFileGapMs)
     {
         std::sort(m_timePeriods.begin(), m_timePeriods.end());
         selectNextTimePeriod(false);
@@ -582,10 +591,10 @@ public:
             decoder->decode(video, &outFrame);
             auto frameTimestampMs = getTimestampFromFrame(outFrame.get());
             if (frameTimestampMs == 0
-                && dataTimestampMs - m_firstFileFrameTime == kMediaFileDurationMs + kMediaFilesGapMs)
+                && dataTimestampMs - m_firstFileFrameTime == m_mediaFileDurationMs + m_mediaFileGapMs)
             {
                 // A new file.
-                m_firstFileFrameTime += kMediaFileDurationMs + kMediaFilesGapMs;
+                m_firstFileFrameTime += m_mediaFileDurationMs + m_mediaFileGapMs;
             }
             ASSERT_EQ(dataTimestampMs - m_firstFileFrameTime, frameTimestampMs);
         }
@@ -621,6 +630,8 @@ private:
     int64_t m_startTime = 0;
     int64_t m_endTime = 0;
     std::map<AVCodecID, std::unique_ptr<QnFfmpegVideoDecoder>> m_decoders;
+    int64_t m_mediaFileDurationMs = 0;
+    int64_t m_mediaFileGapMs = 0;
 
     void selectNextTimePeriod(bool removeFirst)
     {
@@ -646,9 +657,10 @@ private:
 };
 
 void checkPlaybackCorrecteness(
-    QnArchiveStreamReader* archiveReader, const QnTimePeriodList& expectedTimePeriods)
+    QnArchiveStreamReader* archiveReader, const QnTimePeriodList& expectedTimePeriods,
+    int64_t mediaFileDurationMs, int64_t mediaFileGapMs)
 {
-    PlaybackChecker playbackChecker(expectedTimePeriods);
+    PlaybackChecker playbackChecker(expectedTimePeriods, mediaFileDurationMs, mediaFileGapMs);
     archiveReader->addDataProcessor(&playbackChecker);
     archiveReader->start();
     playbackChecker.wait();
