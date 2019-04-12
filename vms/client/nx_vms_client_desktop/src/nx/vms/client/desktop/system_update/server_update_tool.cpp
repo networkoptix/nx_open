@@ -795,13 +795,23 @@ void ServerUpdateTool::requestStartUpdate(
 void ServerUpdateTool::requestInstallAction(
     const QSet<QnUuid>& targets)
 {
+    // Filtering out only 'server' components.
+    QSet<QnUuid> servers;
+    for (const auto& id: targets)
+    {
+        auto item = m_stateTracker->findItemById(id);
+        if (item->component == UpdateItem::Component::server)
+            servers.insert(id);
+    }
+
     if (!m_activeRequests.empty())
         m_skippedRequests.unite(m_activeRequests);
-    NX_VERBOSE(this) << "requestInstallAction() for" << targets;
+
+    NX_VERBOSE(this) << "requestInstallAction() for" << servers;
     m_remoteUpdateStatus = {};
 
     m_timeStartedInstall = qnSyncTime->currentMSecsSinceEpoch();
-    m_serversAreInstalling = targets;
+    m_serversAreInstalling = servers;
 
     auto callback = [tool = QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
         {
@@ -816,7 +826,7 @@ void ServerUpdateTool::requestInstallAction(
 
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        if (auto handle = connection->updateActionInstall(targets, callback, thread()))
+        if (auto handle = connection->updateActionInstall(servers, callback, thread()))
             m_requestingInstall.insert(handle);
     }
 }
@@ -880,7 +890,7 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
             {
                 if (response.error != QnRestResult::NoError)
                 {
-                    NX_DEBUG(this,
+                    NX_VERBOSE(this,
                         "requestRemoteUpdateStateAsync: An error in response to the /ec2/updateStatus request: code=%1, err=%2",
                         response.error, response.errorString);
                 }

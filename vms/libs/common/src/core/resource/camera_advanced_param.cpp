@@ -33,6 +33,7 @@ const QString kNumberDataType = lit("Number");
 const QString kEnumerationDataType = lit("Enumeration");
 const QString kButtonDataType = lit("Button");
 const QString kStringDataType = lit("String");
+const QString kTextDataType = lit("Text");
 const QString kSeparatorDataType = lit("Separator");
 
 // Vertical slider with additional buttons.
@@ -178,6 +179,8 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
             return kButtonDataType;
         case DataType::String:
             return kStringDataType;
+        case DataType::Text:
+            return kTextDataType;
         case DataType::Separator:
             return kSeparatorDataType;
         case DataType::PtrControl:
@@ -197,6 +200,7 @@ QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(
         << DataType::Enumeration
         << DataType::Button
         << DataType::String
+        << DataType::Text
         << DataType::Separator
         << DataType::SliderControl
         << DataType::PtrControl;

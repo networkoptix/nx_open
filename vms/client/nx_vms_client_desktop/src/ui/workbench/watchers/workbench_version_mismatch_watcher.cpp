@@ -28,6 +28,14 @@ QnWorkbenchVersionMismatchWatcher::QnWorkbenchVersionMismatchWatcher(QObject* pa
 
             connect(server, &QnMediaServerResource::versionChanged,
                 this, &QnWorkbenchVersionMismatchWatcher::updateComponents);
+
+            connect(server, &QnResource::statusChanged, this,
+                [this](const QnResourcePtr& resource, Qn::StatusChangeReason /*reason*/)
+                {
+                    NX_DEBUG(NX_SCOPE_TAG, "Server %1 status changed", resource->getName());
+                    updateComponents();
+                });
+
             updateComponents();
         });
 
@@ -46,6 +54,12 @@ QnWorkbenchVersionMismatchWatcher::QnWorkbenchVersionMismatchWatcher(QObject* pa
     {
         connect(server, &QnMediaServerResource::versionChanged,
             this, &QnWorkbenchVersionMismatchWatcher::updateComponents);
+        connect(server, &QnResource::statusChanged, this,
+            [this](const QnResourcePtr& resource, Qn::StatusChangeReason /*reason*/)
+            {
+                NX_DEBUG(NX_SCOPE_TAG, "Server %1 status changed", resource->getName());
+                updateComponents();
+            });
     }
 
     updateComponents();
@@ -108,7 +122,7 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches()
         newestServer = newestComponent;
 
     m_hasMismatches = std::any_of(m_components.cbegin(), m_components.cend(),
-		[newestServer](const Data& data)
+        [newestServer](const Data& data)
         {
             return data.component == Component::server
                 && versionMismatches(data.version, newestServer, /*concernBuild*/ true);
@@ -124,6 +138,8 @@ void QnWorkbenchVersionMismatchWatcher::updateComponents()
 
     for (const auto& server: resourcePool()->getAllServers(Qn::AnyStatus))
     {
+        if (!server->isOnline())
+            continue;
         Data msData(Component::server, server->getVersion());
         msData.server = server;
         m_components.push_back(msData);

@@ -13,5 +13,6 @@ GroupBox
 
     property alias childrenItem: control.contentItem
 
+    width: parent.width
     contentItem: AlignedColumn {}
 }

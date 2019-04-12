@@ -38,6 +38,7 @@ EulaDialog::EulaDialog(QWidget* parent):
     font.setPixelSize(font.pixelSize() + 2);
     ui->titleLabel->setFont(font);
     ui->titleLabel->setForegroundRole(QPalette::Light);
+    ui->copyToClipboard->setType(ClipboardButton::StandardType::copyLong);
 
     //ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     // We have replaced standard buttons to keep our own button order and style.
@@ -84,8 +85,11 @@ void EulaDialog::setEulaHtml(const QString& html)
         lit("<head><style>%1</style>").arg(eulaHtmlStyle));
 
     ui->eulaView->setHtml(eulaText);
+
     // We do not want to copy embedded style to clipboard.
-    ui->copyToClipboard->setClipboardText(html);
+    //ui->copyToClipboard->setClipboardText(html);
+    // We will copy style as well, until we catch all font problems.
+    ui->copyToClipboard->setClipboardText(eulaText);
 }
 
 bool EulaDialog::hasHeightForWidth() const

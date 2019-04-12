@@ -655,6 +655,8 @@ ConditionWrapper canForgetPassword();
 /** Whether showreel can be created using the given resources. */
 ConditionWrapper canMakeShowreel();
 
+ConditionWrapper isWorkbenchVisible();
+
 } // namespace condition
 
 } // namespace action

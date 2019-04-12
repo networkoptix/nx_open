@@ -122,6 +122,12 @@ ClipboardButton* ClipboardButton::createInline(QLineEdit* parent, StandardType t
     return button;
 }
 
+void ClipboardButton::setType(StandardType type)
+{
+    setMainText(typicalText(type));
+    setConfirmationText(typicalConfirmation(type));
+}
+
 QString ClipboardButton::clipboardText()
 {
     return qApp->clipboard()->text();
