@@ -315,7 +315,8 @@ angular.module('nxCommon')
             if (time) {
                 data.time = time;
             } else {
-                endpoint += '?ignoreExternalArchive&time=LATEST';
+                endpoint += '?ignoreExternalArchive';
+                data.time = 'LATEST';
             }
             
             if (width) {
