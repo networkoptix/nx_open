@@ -611,13 +611,13 @@
                 };
                 
                 
-                systemAPI.checkPermissions(CONFIG.globalViewArchivePermission).then(function (result) {
+                systemAPI.checkPermissions(CONFIG.globalViewArchivePermission).then(function(result) {
                     $scope.canViewArchive = result;
-                    return $scope.camerasProvider.requestResources();
-                }).then(function () {
                     // instead of requesting gettime once - we request it for all servers to know each timezone
                     return $scope.camerasProvider.getServerTimes();
-                }).then(function () {
+                }).then(function() {
+                    return $scope.camerasProvider.requestResources();
+                }).then(function() {
                     if (!isActive('embed') && $scope.activeCamera.id !== $scope.storage.cameraId) {
                         $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
                     }
