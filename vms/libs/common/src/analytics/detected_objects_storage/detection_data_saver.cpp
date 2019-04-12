@@ -30,7 +30,7 @@ void DetectionDataSaver::load(ObjectTrackAggregator* trackAggregator)
     m_objectsToUpdate = m_objectCache->getObjectsToUpdate();
     m_objectSearchData = trackAggregator->getAggregatedData();
 
-    resolveObjectIds(*m_objectCache);
+    resolveObjectIds();
 }
 
 bool DetectionDataSaver::empty() const
@@ -47,7 +47,7 @@ void DetectionDataSaver::save(nx::sql::QueryContext* queryContext)
     saveObjectSearchData(queryContext);
 }
 
-void DetectionDataSaver::resolveObjectIds(const ObjectCache& objectCache)
+void DetectionDataSaver::resolveObjectIds()
 {
     for (auto& objectSearchGridCell: m_objectSearchData)
     {
@@ -65,12 +65,20 @@ void DetectionDataSaver::resolveObjectIds(const ObjectCache& objectCache)
             if (newObjectIter == m_objectsToInsert.end())
             {
                 // Object MUST be known.
-                const auto dbId = objectCache.dbIdFromObjectId(objectId);
-                NX_ASSERT(dbId != kInvalidDbId);
+                const auto dbId = m_objectCache->dbIdFromObjectId(objectId);
                 if (dbId == kInvalidDbId)
                 {
-                    it = objectSearchGridCell.objectIds.erase(it);
-                    continue;
+                    if (auto object = m_objectCache->getObjectToInsertForced(objectId);
+                        object)
+                    {
+                        m_objectsToInsert.push_back(std::move(*object));
+                    }
+                    else
+                    {
+                        NX_ASSERT(false);
+                        it = objectSearchGridCell.objectIds.erase(it);
+                        continue;
+                    }
                 }
 
                 m_objectGuidToId[objectId] = dbId;

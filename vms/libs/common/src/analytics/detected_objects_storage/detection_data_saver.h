@@ -41,7 +41,7 @@ private:
     std::vector<AggregatedTrackData> m_objectSearchData;
     std::map<QnUuid, long long> m_objectGuidToId;
 
-    void resolveObjectIds(const ObjectCache& objectCache);
+    void resolveObjectIds();
 
     void insertObjects(nx::sql::QueryContext* queryContext);
     void updateObjects(nx::sql::QueryContext* queryContext);
