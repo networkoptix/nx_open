@@ -38,7 +38,7 @@ protected:
     }
 
 private:
-    nx::utils::Url buildUrl(const Mediator& mediator, bool useHttps) const
+    nx::utils::Url buildUrl(const MediatorFunctionalTest& mediator, bool useHttps) const
     {
         return network::url::Builder()
             .setScheme(useHttps

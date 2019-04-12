@@ -6,9 +6,6 @@
 #include <nx/cloud/discovery/test_support/discovery_server.h>
 
 namespace nx::hpm::test {
-
-using Mediator = MediatorFunctionalTest;
-
 /**
  * Provides support for mediators running in "cluster" mode.
  */
@@ -25,17 +22,27 @@ public:
      * NOTE: Does NOT call startAndWaitUntilStarted() on the mediator to allow further processing
      * by the user.
      */
-    Mediator& addMediator(
-        std::vector <const char*> args = {},
-        Mediator::MediatorTestFlags = Mediator::MediatorTestFlags::allFlags);
+    MediatorFunctionalTest& addMediator(
+        int flags = MediatorFunctionalTest::MediatorTestFlags::allFlags,
+        const QString& testDir = QString());
+
+    /**
+     * Adds a mediator to the cluster with necessary arguments for cluster operation.
+     * NOTE: Does NOT call startAndWaitUntilStarted() on the mediator to allow further processing
+     * by the user.
+     */
+    MediatorFunctionalTest& addMediator(
+        std::vector <const char*> args,
+        int flags = MediatorFunctionalTest::MediatorTestFlags::allFlags,
+        const QString& testDir = QString());
 
     /*
      * Get the number of nodes (mediators) in the cluster
      */
     int size() const;
 
-    Mediator& mediator(int index);
-    const Mediator& mediator(int index) const;
+    MediatorFunctionalTest& mediator(int index);
+    const MediatorFunctionalTest& mediator(int index) const;
 
     /**
      * returns true if ALL Mediator's have peerDomainName.
@@ -48,7 +55,10 @@ public:
     bool peerInformationIsAbsentFromCluster(const std::string& peerDomainName) const;
 
 private:
-    std::vector<std::unique_ptr<Mediator>> m_mediators;
+    void addClusterArgs(MediatorFunctionalTest* mediator);
+
+private:
+    std::vector<std::unique_ptr<MediatorFunctionalTest>> m_mediators;
     nx::cloud::discovery::test::DiscoveryServer m_discoveryServer;
 };
 

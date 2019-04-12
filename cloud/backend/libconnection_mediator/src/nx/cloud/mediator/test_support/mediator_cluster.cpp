@@ -12,7 +12,7 @@ namespace {
 
 static constexpr char kClusterId[] = "mediator_test_cluster";
 
-static bool mediatorHasPeer(Mediator* mediator, const std::string& peerDomainName)
+static bool mediatorHasPeer(MediatorFunctionalTest* mediator, const std::string& peerDomainName)
 {
     nx::utils::SyncQueue<bool> hasEndpoint;
     mediator->moduleInstance()->impl()->listeningPeerDb().findMediatorByPeerDomain(
@@ -32,34 +32,23 @@ MediatorCluster::MediatorCluster()
         throw std::runtime_error("Failed to initialize discovery server");
 }
 
-Mediator& MediatorCluster::addMediator(
-    std::vector<const char*> args,
-    Mediator::MediatorTestFlags flags)
+MediatorFunctionalTest& MediatorCluster::addMediator(int flags, const QString& testDir)
 {
-    std::string nodeId = lm("mediator_%1").arg(m_mediators.size()).toStdString();
-    std::string discoveryServiceUrl = m_discoveryServer.url().toStdString();
-
-    auto& mediator = m_mediators.emplace_back(std::make_unique<Mediator>(flags));
-
-    //m_mediators.back()->addArg("-https/listenOn", "127.0.0.1");
-    //m_mediators.back()->addArg("-http/connectionInactivityTimeout", "10m");
-    m_mediators.back()->addArg("-server/name", "127.0.0.1");
-    m_mediators.back()->addArg("-listeningPeerDb/connectionRetryDelay", "100ms");
-    m_mediators.back()->addArg("-listeningPeerDb/cluster/discovery/enabled", "true");
-    m_mediators.back()->addArg(
-        "-listeningPeerDb/cluster/discovery/discoveryServiceUrl",
-        discoveryServiceUrl.c_str());
-    m_mediators.back()->addArg("-listeningPeerDb/cluster/discovery/roundTripPadding", "1ms");
-    m_mediators.back()->addArg("-listeningPeerDb/cluster/discovery/registrationErrorDelay", "10ms");
-    m_mediators.back()->addArg("-listeningPeerDb/cluster/discovery/onlineNodesRequestDelay", "10ms");
-    m_mediators.back()->addArg("-listeningPeerDb/cluster/nodeConnectRetryTimeout", "100ms");
-    m_mediators.back()->addArg("-listeningPeerDb/cluster/clusterId", kClusterId);
-    m_mediators.back()->addArg("-listeningPeerDb/cluster/nodeId", nodeId.c_str());
-
-    for (const char* arg : args)
-        mediator->addArg(arg);
-
+    auto& mediator =
+        m_mediators.emplace_back(std::make_unique<MediatorFunctionalTest>(flags, testDir));
+    addClusterArgs(mediator.get());
     return *mediator;
+}
+
+MediatorFunctionalTest& MediatorCluster::addMediator(
+    std::vector<const char*> args,
+    int flags,
+    const QString& testDir)
+{
+    auto& mediator = addMediator(flags, testDir);
+    for (const char* arg : args)
+        mediator.addArg(arg);
+    return mediator;
 }
 
 int MediatorCluster::size() const
@@ -67,12 +56,12 @@ int MediatorCluster::size() const
     return static_cast<int>(m_mediators.size());
 }
 
-Mediator& MediatorCluster::mediator(int index)
+MediatorFunctionalTest& MediatorCluster::mediator(int index)
 {
     return *m_mediators[index];
 }
 
-const Mediator& MediatorCluster::mediator(int index) const
+const MediatorFunctionalTest& MediatorCluster::mediator(int index) const
 {
     return *m_mediators[index];
 }
@@ -97,6 +86,25 @@ bool MediatorCluster::peerInformationIsAbsentFromCluster(const std::string& peer
     }
 
     return true;
+}
+
+void MediatorCluster::addClusterArgs(MediatorFunctionalTest* mediator)
+{
+    std::string nodeId = lm("mediator_%1").arg(m_mediators.size()).toStdString();
+    std::string discoveryServiceUrl = m_discoveryServer.url().toStdString();
+
+    mediator->addArg("-server/name", "127.0.0.1");
+    mediator->addArg("-listeningPeerDb/connectionRetryDelay", "100ms");
+    mediator->addArg("-listeningPeerDb/cluster/discovery/enabled", "true");
+    mediator->addArg(
+        "-listeningPeerDb/cluster/discovery/discoveryServiceUrl",
+        discoveryServiceUrl.c_str());
+    mediator->addArg("-listeningPeerDb/cluster/discovery/roundTripPadding", "1ms");
+    mediator->addArg("-listeningPeerDb/cluster/discovery/registrationErrorDelay", "10ms");
+    mediator->addArg("-listeningPeerDb/cluster/discovery/onlineNodesRequestDelay", "10ms");
+    mediator->addArg("-listeningPeerDb/cluster/nodeConnectRetryTimeout", "100ms");
+    mediator->addArg("-listeningPeerDb/cluster/clusterId", kClusterId);
+    mediator->addArg("-listeningPeerDb/cluster/nodeId", nodeId.c_str());
 }
 
 } // namespace nx::hpm::test
