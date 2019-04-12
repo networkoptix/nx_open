@@ -17,31 +17,11 @@ std::optional<nx::hpm::api::SystemCredentials> MediatorScalabilityTestFixture::g
     return systemCredentials;
 }
 
-void MediatorScalabilityTestFixture::SetUp()
-{
-    ASSERT_TRUE(m_discoveryServer.bindAndListen());
-}
-
 void MediatorScalabilityTestFixture::addMediator()
 {
-    std::string nodeId = lm("mediator_%1").arg(m_mediatorCluster.size()).toStdString();
-    std::string discoveryServiceUrl = m_discoveryServer.url().toStdString();
-    std::string maxMediatorCount = std::to_string(kMaxMediators);
-
     auto& mediator = m_mediatorCluster.addMediator({
         "-https/listenOn", "127.0.0.1",
-        "-http/connectionInactivityTimeout", "10m",
-        "-server/name", "127.0.0.1",
-        "-listeningPeerDb/connectionRetryDelay", "100ms",
-        "-listeningPeerDb/cluster/discovery/enabled", "true",
-        "-listeningPeerDb/cluster/discovery/discoveryServiceUrl", discoveryServiceUrl.c_str(),
-        "-listeningPeerDb/cluster/discovery/roundTripPadding", "1ms",
-        "-listeningPeerDb/cluster/discovery/registrationErrorDelay", "10ms",
-        "-listeningPeerDb/cluster/discovery/onlineNodesRequestDelay", "10ms",
-        "-listeningPeerDb/cluster/nodeConnectRetryTimeout", "100ms",
-        "-listeningPeerDb/cluster/clusterId", kClusterId,
-        "-listeningPeerDb/cluster/nodeId", nodeId.c_str(),
-        "-listeningPeerDb/cluster/maxConcurrentConnectionsFromSystem", maxMediatorCount.c_str()});
+        "-http/connectionInactivityTimeout", "10m"});
 
     ASSERT_TRUE(mediator.startAndWaitUntilStarted());
 }
