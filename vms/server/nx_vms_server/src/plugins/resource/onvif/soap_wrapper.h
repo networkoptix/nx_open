@@ -165,7 +165,19 @@ public:
 
     virtual QString getLastErrorDescription() override
     {
-        return SoapErrorHelper::fetchDescription(m_bindingProxy.soap_fault());
+        SOAP_ENV__Fault* faultInfo = m_bindingProxy.soap_fault();
+
+        // NOTE: On some unknown reason, sometimes the fault structure is not created by the
+        // generated code, until soap_set_fault() is not called. This behavior was observed with
+        // SOAP_TYPE error.
+        if (faultInfo == nullptr)
+        {
+            soap_set_fault(soap());
+            faultInfo = m_bindingProxy.soap_fault();
+        }
+
+        auto result = SoapErrorHelper::fetchDescription(faultInfo);
+        return result;
     }
     virtual bool lastErrorIsNotAuthenticated() override
     {
@@ -689,6 +701,7 @@ public:
     int getCompatibleAudioDecoderConfigurations(GetCompatibleAudioDecoderConfigurationsReq& request, GetCompatibleAudioDecoderConfigurationsResp& response);
     int addAudioDecoderConfiguration(AddAudioDecoderConfigurationReq& request, AddAudioDecoderConfigurationResp& response);
 
+    int getAudioEncoderConfiguration(AudioConfigReq& request, AudioConfigResp& response);
     int getAudioEncoderConfigurationOptions(AudioOptionsReq& request, AudioOptionsResp& response);
     int getAudioEncoderConfigurations(AudioConfigsReq& request, AudioConfigsResp& response);
     int getAudioSourceConfigurations(AudioSrcConfigsReq& request, AudioSrcConfigsResp& response);

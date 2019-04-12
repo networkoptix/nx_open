@@ -2703,7 +2703,8 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const MediaServe
             backup_days_of_the_week,                             \
             backup_start,                                        \
             backup_duration,                                     \
-            backup_bitrate                                       \
+            backup_bitrate,                                      \
+            metadata_storage_id                                  \
         )                                                        \
         VALUES(                                                  \
             :serverId,                                           \
@@ -2714,7 +2715,8 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const MediaServe
             :backupDaysOfTheWeek,                                \
             :backupStart,                                        \
             :backupDuration,                                     \
-            :backupBitrate                                       \
+            :backupBitrate,                                      \
+            :metadataStorageId                                   \
         )                                                        \
         ");
     QnSql::bind(data, &insQuery);
@@ -3586,6 +3588,7 @@ ErrorCode QnDbManager::doQueryNoLock(
         SELECT id, timestamp, merged_system_local_id AS mergedSystemLocalId,
             merged_system_cloud_id AS mergedSystemCloudId, username, signature
         FROM system_merge_history
+        ORDER BY id
         )sql");
     if (!fetchMergeHistoryQuery.exec())
     {
@@ -4108,7 +4111,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, MediaServerUserAtt
             backup_days_of_the_week as backupDaysOfTheWeek,         \
             backup_start as backupStart,                            \
             backup_duration as backupDuration,                      \
-            backup_bitrate as backupBitrate                         \
+            backup_bitrate as backupBitrate,                        \
+            metadata_storage_id as metadataStorageId                \
         FROM vms_server_user_attributes                             \
         %1                                                          \
         ORDER BY server_guid                                        \

@@ -151,7 +151,7 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
         closeStream();
         return CameraDiagnostics::CameraInvalidParams(lm("Not empty query: [%1]").args(url));
     }
-    url.setQuery(lm("primary=%1&fps=%2").args(getRole() == Qn::CR_LiveVideo, params.fps));
+    url.setQuery(lm("primary=%1&fps=%2").args(getRole() == Qn::CR_LiveVideo ? "1" : "0", params.fps));
 
     if (m_tcpSock->isClosed())
     {
@@ -170,7 +170,7 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
     }
 
     const QByteArray data = url.toString(QUrl::RemoveAuthority | QUrl::RemoveScheme).toUtf8();
-    if (!m_tcpSock->send(data.data(), data.size() + 1))
+    if (m_tcpSock->send(data.data(), data.size() + 1) <= 0)
     {
        closeStream();
        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url.toString(), url.port());

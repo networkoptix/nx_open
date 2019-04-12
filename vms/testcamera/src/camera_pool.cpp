@@ -35,27 +35,15 @@ public:
 protected:
     virtual void run() override
     {
-        std::unique_ptr<nx::network::AbstractDatagramSocket>
-            discoverySock(nx::network::SocketFactory::createDatagramSocket().release() );
+        auto discoverySock = nx::network::SocketFactory::createDatagramSocket();
 #if 1
         discoverySock->bind(nx::network::SocketAddress(
             nx::network::HostAddress::anyHost, testCameraIni().discoveryPort));
         for (const auto& addr: m_localInterfacesToListen)
         {
-            if (QHostAddress(addr).isLoopback())
-            {
-                IpRangeV4 netRange;
-                netRange.firstIp = QHostAddress("127.0.0.0").toIPv4Address();
-                netRange.lastIp = QHostAddress("127.255.255.255").toIPv4Address();
-                m_allowedIpRanges.push_back(netRange);
-                qDebug() << "Listening for discovery from range ("
-                         << "127.0.0.0" << ", "
-                         << "127.255.255.255" << ")";
-                continue;
-            }
-
             for (const auto& iface: nx::network::getAllIPv4Interfaces(
-                nx::network::InterfaceListPolicy::keepAllAddressesPerInterface))
+                nx::network::InterfaceListPolicy::keepAllAddressesPerInterface,
+                /*ignoreLoopback*/ false))
             {
                 if (iface.address == QHostAddress(addr))
                 {

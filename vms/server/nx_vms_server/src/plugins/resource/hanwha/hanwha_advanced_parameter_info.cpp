@@ -20,6 +20,7 @@ static const QString kSortingAux = lit("sorting");
 static const QString kGroupAux = lit("group");
 static const QString kGroupLeadAux = lit("groupLead");
 static const QString kGropupIncludeAux = lit("groupInclude");
+static const QString kGropupIncludeContainsAux = lit("groupIncludeContains");
 static const QString kStreamsToReopenAux = lit("streamsToReopen");
 static const QString kShouldAffectAllChannels = lit("shouldAffectAllChannels");
 static const QString kDeviceTypesAux = lit("deviceTypes");
@@ -73,6 +74,7 @@ HanwhaAdavancedParameterInfo::kStringAuxes = {
     {kSortingAux, &HanwhaAdavancedParameterInfo::m_sorting},
     {kGroupAux, &HanwhaAdavancedParameterInfo::m_group},
     {kGropupIncludeAux, &HanwhaAdavancedParameterInfo::m_groupIncludeCondition},
+    {kGropupIncludeContainsAux, &HanwhaAdavancedParameterInfo::m_groupIncludeContainsCondition},
     {kGroupLeadAux, &HanwhaAdavancedParameterInfo::m_group},
     {kAssociationCondition, &HanwhaAdavancedParameterInfo::m_associationCondition},
 };
@@ -183,6 +185,11 @@ bool HanwhaAdavancedParameterInfo::isGroupLead() const
 QString HanwhaAdavancedParameterInfo::groupIncludeCondition() const
 {
     return m_groupIncludeCondition;
+}
+
+QString HanwhaAdavancedParameterInfo::groupIncludeContainsCondition() const
+{
+    return m_groupIncludeContainsCondition;
 }
 
 QString HanwhaAdavancedParameterInfo::cgi() const

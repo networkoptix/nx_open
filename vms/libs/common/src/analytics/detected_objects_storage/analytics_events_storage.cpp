@@ -1,27 +1,85 @@
 #include "analytics_events_storage.h"
 
+#include <cmath>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/sql/filter.h>
 #include <nx/sql/sql_cursor.h>
 #include <nx/utils/log/log.h>
 
+#include "detection_data_saver.h"
+
 namespace nx {
 namespace analytics {
 namespace storage {
 
-constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833-456437eaa7c7";
+static constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833-456437eaa7c7";
+static constexpr int kUsecPerMsec = 1000;
+
+static constexpr auto kMaxTimePeriodLength = std::chrono::minutes(10);
+static constexpr auto kTimePeriodPreemptiveLength = std::chrono::minutes(1);
+static constexpr int kMaxObjectLookupResultSet = 1000;
+
+// NOTE: Limiting filtered_events subquery to make query
+// CPU/memory requirements much less dependent of DB size.
+// Assuming that objects tracks are whether interleaved or quite short.
+// So, in situation, when there is a single 100,000 - records long object track
+// selected by filter less objects than requested filter.maxObjectsToSelect would be returned.
+static constexpr int kMaxExpectedTrackLength = 100;
+static constexpr int kMaxFilterEventsResultSize =
+    kMaxExpectedTrackLength * kMaxObjectLookupResultSet;
+
+static constexpr auto kTrackAggregationPeriod = std::chrono::seconds(5);
+static constexpr auto kMaxCachedObjectLifeTime = std::chrono::minutes(1);
+static constexpr auto kTrackSearchResolutionX = 44;
+static constexpr auto kTrackSearchResolutionY = 32;
+
+namespace detail {
+
+std::chrono::milliseconds TimePeriod::length() const
+{
+    return endTime - startTime;
+}
+
+bool TimePeriod::addPacketToPeriod(
+    std::chrono::milliseconds timestamp,
+    std::chrono::milliseconds duration)
+{
+    if (length() > kMaxTimePeriodLength ||
+        startTime > timestamp || //< Packet from the past?
+        (timestamp > endTime && timestamp - endTime > kMinTimePeriodAggregationPeriod))
+    {
+        return false;
+    }
+
+    if (endTime < timestamp + duration)
+        endTime = timestamp + duration;
+
+    return true;
+}
+
+} // namespace detail
+
+//-------------------------------------------------------------------------------------------------
 
 EventsStorage::EventsStorage(const Settings& settings):
     m_settings(settings),
-    m_dbController(settings.dbConnectionOptions)
+    m_dbController(settings.dbConnectionOptions),
+    m_objectCache(kTrackAggregationPeriod, kMaxCachedObjectLifeTime),
+    m_trackAggregator(
+        kTrackSearchResolutionX,
+        kTrackSearchResolutionY,
+        kTrackAggregationPeriod)
 {
+    NX_CRITICAL(std::pow(10, kCoordinateDecimalDigits) < kCoordinatesPrecision);
 }
 
 bool EventsStorage::initialize()
 {
     return m_dbController.initialize()
-        && readMaximumEventTimestamp();
+        && readMaximumEventTimestamp()
+        && loadDictionaries();
 }
 
 void EventsStorage::save(
@@ -29,24 +87,68 @@ void EventsStorage::save(
     StoreCompletionHandler completionHandler)
 {
     using namespace std::placeholders;
+    using namespace std::chrono;
 
     NX_VERBOSE(this, "Saving packet %1", *packet);
 
     {
         QnMutexLocker lock(&m_mutex);
-        m_maxRecordedTimestamp = std::max(
+        m_maxRecordedTimestamp = std::max<milliseconds>(
             m_maxRecordedTimestamp,
-            std::chrono::microseconds(packet->timestampUsec));
+            duration_cast<milliseconds>(microseconds(packet->timestampUsec)));
     }
 
-    m_dbController.queryExecutor().executeUpdate(
-        std::bind(&EventsStorage::savePacket, this, _1, std::move(packet)),
-        [this, completionHandler = std::move(completionHandler)](
-            sql::DBResult resultCode)
+    if (!kUseTrackAggregation)
+    {
+        m_dbController.queryExecutor().executeUpdate(
+            std::bind(&EventsStorage::savePacket, this, _1, std::move(packet)),
+            [this, completionHandler = std::move(completionHandler)](
+                sql::DBResult resultCode)
+            {
+                completionHandler(dbResultToResultCode(resultCode));
+            },
+            kSaveEventQueryAggregationKey);
+    }
+    else
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        m_objectCache.add(packet);
+
+        for (const auto& detectedObject: packet->objects)
         {
-            completionHandler(dbResultToResultCode(resultCode));
-        },
-        kSaveEventQueryAggregationKey);
+            m_trackAggregator.add(
+                detectedObject.objectId,
+                duration_cast<milliseconds>(microseconds(packet->timestampUsec)),
+                detectedObject.boundingBox);
+        }
+
+        DetectionDataSaver detectionDataSaver(
+            &m_attributesDao,
+            &m_deviceDao,
+            &m_objectTypeDao);
+
+        detectionDataSaver.load(&m_objectCache, &m_trackAggregator);
+
+        m_objectCache.removeExpiredData();
+
+        if (!detectionDataSaver.empty())
+        {
+            m_dbController.queryExecutor().executeUpdate(
+                [this, detectionDataSaver = std::move(detectionDataSaver)](
+                    nx::sql::QueryContext* queryContext) mutable
+                {
+                    detectionDataSaver.save(queryContext);
+                    return nx::sql::DBResult::ok;
+                },
+                [this, completionHandler = std::move(completionHandler)](
+                    sql::DBResult resultCode)
+                {
+                    completionHandler(dbResultToResultCode(resultCode));
+                },
+                kSaveEventQueryAggregationKey);
+        }
+    }
 }
 
 void EventsStorage::createLookupCursor(
@@ -145,14 +247,37 @@ bool EventsStorage::readMaximumEventTimestamp()
     try
     {
         m_maxRecordedTimestamp = m_dbController.queryExecutor().executeSelectQuerySync(
-            [](nx::sql::QueryContext* queryContext) -> std::chrono::microseconds
+            [](nx::sql::QueryContext* queryContext)
             {
                 auto query = queryContext->connection()->createQuery();
                 query->prepare("SELECT max(timestamp_usec_utc) FROM event");
                 query->exec();
                 if (query->next())
-                    return std::chrono::microseconds(query->value(0).toLongLong());
-                return std::chrono::microseconds::zero();
+                    return std::chrono::milliseconds(query->value(0).toLongLong());
+                return std::chrono::milliseconds::zero();
+            });
+    }
+    catch (const std::exception& e)
+    {
+        NX_WARNING(this, "Failed to read maximum event timestamp from the DB. %1", e.what());
+        return false;
+    }
+
+    return true;
+}
+
+bool EventsStorage::loadDictionaries()
+{
+    try
+    {
+        m_dbController.queryExecutor().executeSelectQuerySync(
+            [this](nx::sql::QueryContext* queryContext)
+            {
+                m_objectTypeDao.loadObjectTypeDictionary(queryContext);
+                m_deviceDao.loadDeviceDictionary(queryContext);
+                fillCurrentTimePeriodsCache(queryContext);
+                // TODO: #ak Remove when executeSelectQuerySync supports void functors.
+                return true;
             });
     }
     catch (const std::exception& e)
@@ -170,62 +295,215 @@ sql::DBResult EventsStorage::savePacket(
 {
     for (const auto& detectedObject: packet->objects)
     {
-        const auto eventId = insertEvent(queryContext, *packet, detectedObject);
-        insertEventAttributes(queryContext, eventId, detectedObject.labels);
+        updateDictionariesIfNeeded(queryContext, *packet, detectedObject);
+
+        const auto attributesId = m_attributesDao.insertOrFetchAttributes(
+            queryContext,
+            detectedObject.labels);
+
+        const auto timePeriodId = insertOrUpdateTimePeriod(queryContext, *packet);
+
+        insertEvent(
+            queryContext,
+            *packet,
+            detectedObject,
+            attributesId,
+            timePeriodId);
     }
 
     return sql::DBResult::ok;
 }
 
-std::int64_t EventsStorage::insertEvent(
-    sql::QueryContext* queryContext,
+void EventsStorage::updateDictionariesIfNeeded(
+    nx::sql::QueryContext* queryContext,
     const common::metadata::DetectionMetadataPacket& packet,
     const common::metadata::DetectedObject& detectedObject)
+{
+    m_deviceDao.insertOrFetch(queryContext, packet.deviceId);
+    m_objectTypeDao.insertOrFetch(queryContext, detectedObject.objectTypeId);
+}
+
+void EventsStorage::insertEvent(
+    sql::QueryContext* queryContext,
+    const common::metadata::DetectionMetadataPacket& packet,
+    const common::metadata::DetectedObject& detectedObject,
+    long long attributesId,
+    long long /*timePeriodId*/)
 {
     sql::SqlQuery insertEventQuery(queryContext->connection());
     insertEventQuery.prepare(QString::fromLatin1(R"sql(
         INSERT INTO event(timestamp_usec_utc, duration_usec,
-            device_guid, object_type_id, object_id, attributes,
+            device_id, object_type_id, object_id, attributes_id,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
-        VALUES(:timestampUsec, :durationUsec, :deviceId, :objectTypeId, :objectAppearanceId, :attributes,
+        VALUES(:timestampMs, :durationUsec, :deviceId,
+            :objectTypeId, :objectAppearanceId, :attributesId,
             :boxTopLeftX, :boxTopLeftY, :boxBottomRightX, :boxBottomRightY)
     )sql"));
-    insertEventQuery.bindValue(":timestampUsec", packet.timestampUsec);
+    insertEventQuery.bindValue(":timestampMs", packet.timestampUsec / kUsecPerMsec);
     insertEventQuery.bindValue(":durationUsec", packet.durationUsec);
-    insertEventQuery.bindValue(":deviceId", QnSql::serialized_field(packet.deviceId));
+    insertEventQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(packet.deviceId));
     insertEventQuery.bindValue(
         ":objectTypeId",
-        QnSql::serialized_field(detectedObject.objectTypeId));
+        m_objectTypeDao.objectTypeIdFromName(detectedObject.objectTypeId));
     insertEventQuery.bindValue(
         ":objectAppearanceId",
         QnSql::serialized_field(detectedObject.objectId));
-    insertEventQuery.bindValue(":attributes", QJson::serialized(detectedObject.labels));
 
-    insertEventQuery.bindValue(":boxTopLeftX", detectedObject.boundingBox.topLeft().x());
-    insertEventQuery.bindValue(":boxTopLeftY", detectedObject.boundingBox.topLeft().y());
-    insertEventQuery.bindValue(":boxBottomRightX", detectedObject.boundingBox.bottomRight().x());
-    insertEventQuery.bindValue(":boxBottomRightY", detectedObject.boundingBox.bottomRight().y());
+    insertEventQuery.bindValue(":attributesId", attributesId);
+
+    insertEventQuery.bindValue(
+        ":boxTopLeftX",
+        packCoordinate(detectedObject.boundingBox.topLeft().x()));
+
+    insertEventQuery.bindValue(
+        ":boxTopLeftY",
+        packCoordinate(detectedObject.boundingBox.topLeft().y()));
+
+    insertEventQuery.bindValue(
+        ":boxBottomRightX",
+        packCoordinate(detectedObject.boundingBox.bottomRight().x()));
+
+    insertEventQuery.bindValue(
+        ":boxBottomRightY",
+        packCoordinate(detectedObject.boundingBox.bottomRight().y()));
 
     insertEventQuery.exec();
-    return insertEventQuery.impl().lastInsertId().toLongLong();
 }
 
-void EventsStorage::insertEventAttributes(
-    sql::QueryContext* queryContext,
-    std::int64_t eventId,
-    const std::vector<common::metadata::Attribute>& eventAttributes)
+long long EventsStorage::insertOrUpdateTimePeriod(
+    nx::sql::QueryContext* queryContext,
+    const common::metadata::DetectionMetadataPacket& packet)
 {
-    sql::SqlQuery insertEventAttributesQuery(queryContext->connection());
-    insertEventAttributesQuery.prepare(QString::fromLatin1(R"sql(
-        INSERT INTO event_properties(docid, content)
-        VALUES(:eventId, :content)
-    )sql"));
-    insertEventAttributesQuery.bindValue(":eventId", static_cast<qint64>(eventId));
-    insertEventAttributesQuery.bindValue(
-        ":content",
-        containerString(eventAttributes, "; " /*delimiter*/,
-            QString() /*prefix*/, QString() /*suffix*/, QString() /*empty*/));
-    insertEventAttributesQuery.exec();
+    using namespace std::chrono;
+
+    const auto packetTimestamp = duration_cast<milliseconds>(microseconds(packet.timestampUsec));
+    const auto packetDuration = duration_cast<milliseconds>(microseconds(packet.durationUsec));
+    const auto deviceId = m_deviceDao.deviceIdFromGuid(packet.deviceId);
+
+    auto currentPeriod = insertOrFetchCurrentTimePeriod(
+        queryContext, deviceId, packetTimestamp, packetDuration);
+
+    if (!currentPeriod->addPacketToPeriod(packetTimestamp, packetDuration))
+    {
+        closeCurrentTimePeriod(queryContext, deviceId);
+
+        // Adding new period.
+        currentPeriod = insertOrFetchCurrentTimePeriod(
+            queryContext, deviceId, packetTimestamp, packetDuration);
+    }
+    else if (currentPeriod->lastSavedEndTime < currentPeriod->endTime)
+    {
+        currentPeriod->lastSavedEndTime = currentPeriod->endTime + kTimePeriodPreemptiveLength;
+
+        saveTimePeriodEnd(
+            queryContext,
+            currentPeriod->id,
+            currentPeriod->lastSavedEndTime);
+    }
+
+    return currentPeriod->id;
+}
+
+detail::TimePeriod* EventsStorage::insertOrFetchCurrentTimePeriod(
+    nx::sql::QueryContext* queryContext,
+    long long deviceId,
+    std::chrono::milliseconds packetTimestamp,
+    std::chrono::milliseconds packetDuration)
+{
+    auto periodIter = m_deviceIdToCurrentTimePeriod.find(deviceId);
+    if (periodIter != m_deviceIdToCurrentTimePeriod.end())
+        return &periodIter->second;
+
+    detail::TimePeriod timePeriod;
+
+    timePeriod.deviceId = deviceId;
+    timePeriod.startTime = packetTimestamp;
+    timePeriod.endTime = packetTimestamp + packetDuration;
+
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(R"sql(
+        INSERT INTO time_period_full(device_id, period_start_ms, period_end_ms)
+        VALUES (:deviceId, :periodStartMs, :periodEndMs)
+    )sql");
+    query->bindValue(":deviceId", deviceId);
+    query->bindValue(":periodStartMs", (long long) packetTimestamp.count());
+    // Filling period end so that this period is used in queries.
+    query->bindValue(":periodEndMs", (long long) (timePeriod.endTime + kTimePeriodPreemptiveLength).count());
+
+    query->exec();
+
+    timePeriod.id = query->lastInsertId().toLongLong();
+    timePeriod.lastSavedEndTime = timePeriod.endTime + kTimePeriodPreemptiveLength;
+
+    periodIter = m_deviceIdToCurrentTimePeriod.emplace(deviceId, timePeriod).first;
+    m_idToTimePeriod[periodIter->second.id] = periodIter;
+
+    NX_VERBOSE(this, "Added new time period %1 (device %2, start time %3)",
+        timePeriod.id, m_deviceDao.deviceGuidFromId(timePeriod.deviceId), timePeriod.startTime);
+
+    return &periodIter->second;
+}
+
+void EventsStorage::closeCurrentTimePeriod(
+    nx::sql::QueryContext* queryContext,
+    long long deviceId)
+{
+    auto periodIter = m_deviceIdToCurrentTimePeriod.find(deviceId);
+    NX_ASSERT(periodIter != m_deviceIdToCurrentTimePeriod.end());
+    if (periodIter == m_deviceIdToCurrentTimePeriod.end())
+        return;
+
+    saveTimePeriodEnd(
+        queryContext,
+        periodIter->second.id,
+        periodIter->second.endTime);
+
+    NX_VERBOSE(this, "Closed time period %1 (device %2)",
+        periodIter->second.id, m_deviceDao.deviceGuidFromId(deviceId));
+
+    m_idToTimePeriod.erase(periodIter->second.id);
+    m_deviceIdToCurrentTimePeriod.erase(periodIter);
+}
+
+void EventsStorage::saveTimePeriodEnd(
+    nx::sql::QueryContext* queryContext,
+    long long id,
+    std::chrono::milliseconds endTime)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(
+        "UPDATE time_period_full SET period_end_ms=:periodEndMs WHERE id=:id");
+
+    query->bindValue(":id", id);
+    query->bindValue(":periodEndMs", (long long) endTime.count());
+    query->exec();
+
+    NX_VERBOSE(this, "Updated end of time period %1 to %2", id, endTime);
+}
+
+void EventsStorage::fillCurrentTimePeriodsCache(
+    nx::sql::QueryContext* queryContext)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(R"sql(
+        SELECT id, device_id, period_start_ms, period_end_ms
+        FROM time_period_full
+        GROUP BY device_id
+        HAVING max(rowid)
+    )sql");
+
+    while (query->next())
+    {
+        detail::TimePeriod timePeriod;
+
+        timePeriod.id = query->value("id").toLongLong();
+        timePeriod.deviceId = query->value("device_id").toLongLong();
+        timePeriod.startTime = std::chrono::milliseconds(query->value("period_start_ms").toLongLong());
+        timePeriod.endTime = std::chrono::milliseconds(query->value("period_end_ms").toLongLong());
+
+        auto it = m_deviceIdToCurrentTimePeriod.emplace(timePeriod.deviceId, timePeriod).first;
+        m_idToTimePeriod[timePeriod.id] = it;
+    }
 }
 
 void EventsStorage::prepareCursorQuery(
@@ -235,22 +513,25 @@ void EventsStorage::prepareCursorQuery(
     QString eventsFilteredByFreeTextSubQuery;
     const auto sqlQueryFilter =
         prepareSqlFilterExpression(filter, &eventsFilteredByFreeTextSubQuery);
+
+    std::string whereClause = "WHERE e.attributes_id = attrs.id";
+
     auto sqlQueryFilterStr = sqlQueryFilter.toString();
     if (!sqlQueryFilterStr.empty())
-        sqlQueryFilterStr = "WHERE " + sqlQueryFilterStr;
+        whereClause += " AND " + sqlQueryFilterStr;
 
     // TODO: #ak Think over limit in the following query.
     query->prepare(lm(R"sql(
-        SELECT timestamp_usec_utc, duration_usec, device_guid,
-            object_type_id, object_id, attributes,
+        SELECT timestamp_usec_utc, duration_usec, device_id,
+            object_type_id, object_id, attrs.content as attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
-        FROM %1
+        FROM %1 as e, unique_attributes attrs
         %2
         ORDER BY timestamp_usec_utc %3, object_id %3
         LIMIT 30000;
     )sql").args(
         eventsFilteredByFreeTextSubQuery,
-        sqlQueryFilterStr,
+        whereClause,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
     sqlQueryFilter.bindFields(query);
 }
@@ -283,27 +564,22 @@ void EventsStorage::prepareLookupQuery(
     if (!sqlQueryFilterStr.empty())
         sqlQueryFilterStr = "WHERE " + sqlQueryFilterStr;
 
-    QString sqlLimitStr;
+    int maxObjectsToSelect = kMaxObjectLookupResultSet;
     if (filter.maxObjectsToSelect > 0)
-        sqlLimitStr = lm("LIMIT %1").args(filter.maxObjectsToSelect).toQString();
+        maxObjectsToSelect = std::min<int>(filter.maxObjectsToSelect, maxObjectsToSelect);
 
-    // NOTE: Limiting filtered_events subquery to make query
-    // CPU/memory requirements much less dependent of DB size.
-    // Assuming that objects tracks are whether interleaved or quite short.
-    // So, in situation, when there is a single 100,000 - records long object track
-    // selected by filter less objects than requested filter.maxObjectsToSelect would be returned.
-    constexpr int kMaxFilterEventsResultSize = 100000;
+    auto sqlLimitStr = lm("LIMIT %1").args(maxObjectsToSelect).toQString();
 
     query->prepare(lm(R"sql(
         WITH filtered_events AS
-        (SELECT timestamp_usec_utc, duration_usec, device_guid,
-            object_type_id, object_id, attributes,
+        (SELECT timestamp_usec_utc, duration_usec, device_id,
+            object_type_id, object_id, attributes_id,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
          FROM %1
          %2
          ORDER BY timestamp_usec_utc DESC
          LIMIT %3)
-        SELECT *
+        SELECT *, attrs.content as attributes
         FROM filtered_events e
             INNER JOIN
             (SELECT object_id AS id, MIN(timestamp_usec_utc) AS track_start_time
@@ -311,7 +587,9 @@ void EventsStorage::prepareLookupQuery(
              GROUP BY object_id
              ORDER BY MIN(timestamp_usec_utc) DESC
              %4) object
-            ON e.object_id = object.id
+            ON e.object_id = object.id,
+            unique_attributes attrs
+        WHERE e.attributes_id = attrs.id
         ORDER BY object.track_start_time %5, e.timestamp_usec_utc ASC
     )sql").args(
         eventsFilteredByFreeTextSubQuery,
@@ -332,9 +610,9 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
     if (!filter.deviceIds.empty())
     {
         auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
-            "device_guid", ":deviceId");
-        for (const auto& deviceId: filter.deviceIds)
-            condition->addValue(QnSql::serialized_field(deviceId));
+            "device_id", ":deviceId");
+        for (const auto& deviceGuid: filter.deviceIds)
+            condition->addValue(m_deviceDao.deviceIdFromGuid(deviceGuid));
         sqlFilter.addCondition(std::move(condition));
     }
 
@@ -348,7 +626,7 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
         addObjectTypeIdToFilter(filter.objectTypeId, &sqlFilter);
 
     if (!filter.timePeriod.isNull())
-        addTimePeriodToFilter(filter.timePeriod, &sqlFilter);
+        addTimePeriodToFilter(filter.timePeriod, &sqlFilter, "timestamp_usec_utc", "timestamp_usec_utc");
 
     if (!filter.boundingBox.isNull())
         addBoundingBoxToFilter(filter.boundingBox, &sqlFilter);
@@ -356,9 +634,8 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
     if (!filter.freeText.isEmpty())
     {
         *eventsFilteredByFreeTextSubQuery = lm(R"sql(
-            (SELECT rowid, *
-             FROM event
-             WHERE rowid IN (SELECT docid FROM event_properties WHERE content MATCH '%1*'))
+            (SELECT rowid, * FROM event WHERE attributes_id IN
+             (SELECT docid FROM attributes_text_index WHERE content MATCH '%1*'))
         )sql").args(filter.freeText);
     }
     else
@@ -370,37 +647,38 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
 }
 
 void EventsStorage::addObjectTypeIdToFilter(
-    const std::vector<QString>& objectTypeIds,
+    const std::vector<QString>& objectTypes,
     nx::sql::Filter* sqlFilter)
 {
     auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
         "object_type_id", ":objectTypeId");
-    for (const auto& objectTypeId: objectTypeIds)
-        condition->addValue(QnSql::serialized_field(objectTypeId));
+    for (const auto& objectType: objectTypes)
+        condition->addValue(m_objectTypeDao.objectTypeIdFromName(objectType));
     sqlFilter->addCondition(std::move(condition));
 }
 
 void EventsStorage::addTimePeriodToFilter(
     const QnTimePeriod& timePeriod,
-    nx::sql::Filter* sqlFilter)
+    nx::sql::Filter* sqlFilter,
+    const char* leftBoundaryFieldName,
+    const char* rightBoundaryFieldName)
 {
     using namespace std::chrono;
 
     auto startTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
-        "timestamp_usec_utc",
-        ":startTimeUsec",
-        QnSql::serialized_field(duration_cast<microseconds>(
+        rightBoundaryFieldName,
+        ":startTimeMs",
+        QnSql::serialized_field(duration_cast<milliseconds>(
             timePeriod.startTime()).count()));
     sqlFilter->addCondition(std::move(startTimeFilterField));
 
     if (timePeriod.durationMs != QnTimePeriod::kInfiniteDuration &&
-        timePeriod.startTimeMs + timePeriod.durationMs <
-            duration_cast<milliseconds>(m_maxRecordedTimestamp).count())
+        timePeriod.startTime() + timePeriod.duration() <= m_maxRecordedTimestamp)
     {
         auto endTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldLess>(
-            "timestamp_usec_utc",
-            ":endTimeUsec",
-            QnSql::serialized_field(duration_cast<microseconds>(
+            leftBoundaryFieldName,
+            ":endTimeMs",
+            QnSql::serialized_field(duration_cast<milliseconds>(
                 timePeriod.endTime()).count()));
         sqlFilter->addCondition(std::move(endTimeFilterField));
     }
@@ -413,25 +691,25 @@ void EventsStorage::addBoundingBoxToFilter(
     auto topLeftXFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
         "box_top_left_x",
         ":boxTopLeftX",
-        QnSql::serialized_field(boundingBox.bottomRight().x()));
+        QnSql::serialized_field(packCoordinate(boundingBox.bottomRight().x())));
     sqlFilter->addCondition(std::move(topLeftXFilter));
 
     auto bottomRightXFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
         "box_bottom_right_x",
         ":boxBottomRightX",
-        QnSql::serialized_field(boundingBox.topLeft().x()));
+        QnSql::serialized_field(packCoordinate(boundingBox.topLeft().x())));
     sqlFilter->addCondition(std::move(bottomRightXFilter));
 
     auto topLeftYFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
         "box_top_left_y",
         ":boxTopLeftY",
-        QnSql::serialized_field(boundingBox.bottomRight().y()));
+        QnSql::serialized_field(packCoordinate(boundingBox.bottomRight().y())));
     sqlFilter->addCondition(std::move(topLeftYFilter));
 
     auto bottomRightYFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
         "box_bottom_right_y",
         ":boxBottomRightY",
-        QnSql::serialized_field(boundingBox.topLeft().y()));
+        QnSql::serialized_field(packCoordinate(boundingBox.topLeft().y())));
     sqlFilter->addCondition(std::move(bottomRightYFilter));
 }
 
@@ -499,8 +777,8 @@ void EventsStorage::loadObject(
 {
     object->objectAppearanceId = QnSql::deserialized_field<QnUuid>(
         selectEventsQuery->value("object_id"));
-    object->objectTypeId = QnSql::deserialized_field<QString>(
-        selectEventsQuery->value("object_type_id"));
+    object->objectTypeId =
+        m_objectTypeDao.objectTypeFromId(selectEventsQuery->value("object_type_id").toLongLong());
     QJson::deserialize(
         selectEventsQuery->value("attributes").toString(),
         &object->attributes);
@@ -508,17 +786,18 @@ void EventsStorage::loadObject(
     object->track.push_back(ObjectPosition());
     ObjectPosition& objectPosition = object->track.back();
 
-    objectPosition.deviceId = QnSql::deserialized_field<QnUuid>(
-        selectEventsQuery->value("device_guid"));
-    objectPosition.timestampUsec = selectEventsQuery->value("timestamp_usec_utc").toLongLong();
+    objectPosition.deviceId = m_deviceDao.deviceGuidFromId(
+        selectEventsQuery->value("device_id").toLongLong());
+    objectPosition.timestampUsec =
+        selectEventsQuery->value("timestamp_usec_utc").toLongLong() * kUsecPerMsec;
     objectPosition.durationUsec = selectEventsQuery->value("duration_usec").toLongLong();
 
     objectPosition.boundingBox.setTopLeft(QPointF(
-        selectEventsQuery->value("box_top_left_x").toDouble(),
-        selectEventsQuery->value("box_top_left_y").toDouble()));
+        unpackCoordinate(selectEventsQuery->value("box_top_left_x").toInt()),
+        unpackCoordinate(selectEventsQuery->value("box_top_left_y").toInt())));
     objectPosition.boundingBox.setBottomRight(QPointF(
-        selectEventsQuery->value("box_bottom_right_x").toDouble(),
-        selectEventsQuery->value("box_bottom_right_y").toDouble()));
+        unpackCoordinate(selectEventsQuery->value("box_bottom_right_x").toInt()),
+        unpackCoordinate(selectEventsQuery->value("box_bottom_right_y").toInt())));
 }
 
 void EventsStorage::mergeObjects(
@@ -580,8 +859,8 @@ void EventsStorage::queryTrackInfo(
         trackInfoQuery.exec();
         if (!trackInfoQuery.next())
             continue;
-        object.firstAppearanceTimeUsec = trackInfoQuery.value(0).toLongLong();
-        object.lastAppearanceTimeUsec = trackInfoQuery.value(1).toLongLong();
+        object.firstAppearanceTimeUsec = trackInfoQuery.value(0).toLongLong() * kUsecPerMsec;
+        object.lastAppearanceTimeUsec = trackInfoQuery.value(1).toLongLong() * kUsecPerMsec;
     }
 }
 
@@ -591,6 +870,75 @@ nx::sql::DBResult EventsStorage::selectTimePeriods(
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
+    auto query = queryContext->connection()->createQuery();
+    query->setForwardOnly(true);
+
+    Filter localFilter = filter;
+    localFilter.deviceIds.clear();
+    localFilter.timePeriod.clear();
+
+    if (localFilter.empty())
+    {
+        prepareSelectTimePeriodsUnfilteredQuery(
+            query.get(), filter.deviceIds, filter.timePeriod, options);
+    }
+    else
+    {
+        prepareSelectTimePeriodsFilteredQuery(query.get(), filter, options);
+    }
+
+    query->exec();
+    loadTimePeriods(query.get(), filter.timePeriod, options, result);
+
+    return nx::sql::DBResult::ok;
+}
+
+void EventsStorage::prepareSelectTimePeriodsUnfilteredQuery(
+    nx::sql::AbstractSqlQuery* query,
+    const std::vector<QnUuid>& deviceGuids,
+    const QnTimePeriod& timePeriod,
+    const TimePeriodsLookupOptions& /*options*/)
+{
+    nx::sql::Filter sqlFilter;
+
+    if (!deviceGuids.empty())
+    {
+        auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
+            "device_id", ":deviceId");
+        for (const auto& deviceGuid: deviceGuids)
+            condition->addValue(m_deviceDao.deviceIdFromGuid(deviceGuid));
+        sqlFilter.addCondition(std::move(condition));
+    }
+
+    if (!timePeriod.isEmpty())
+    {
+        auto localTimePeriod = timePeriod;
+        if (localTimePeriod.durationMs == QnTimePeriod::kInfiniteDuration)
+            localTimePeriod.setEndTime(m_maxRecordedTimestamp);
+
+        addTimePeriodToFilter(
+            localTimePeriod, &sqlFilter, "period_end_ms", "period_start_ms");
+    }
+
+    std::string whereClause;
+    const auto sqlFilterStr = sqlFilter.toString();
+    if (!sqlFilterStr.empty())
+        whereClause = "WHERE " + sqlFilterStr;
+
+    query->prepare(lm(R"sql(
+        SELECT id, device_id, period_start_ms, period_end_ms - period_start_ms AS duration_ms
+        FROM time_period_full
+        %1
+        ORDER BY period_start_ms ASC
+    )sql").args(whereClause));
+    sqlFilter.bindFields(query);
+}
+
+void EventsStorage::prepareSelectTimePeriodsFilteredQuery(
+    nx::sql::AbstractSqlQuery* query,
+    const Filter& filter,
+    const TimePeriodsLookupOptions& /*options*/)
+{
     QString eventsFilteredByFreeTextSubQuery;
     const auto sqlQueryFilter =
         prepareSqlFilterExpression(filter, &eventsFilteredByFreeTextSubQuery);
@@ -598,42 +946,55 @@ nx::sql::DBResult EventsStorage::selectTimePeriods(
     if (!sqlQueryFilterStr.empty())
         sqlQueryFilterStr = "WHERE " + sqlQueryFilterStr;
 
-    // TODO: #ak Aggregate in query.
-
-    sql::SqlQuery query(queryContext->connection());
-    query.setForwardOnly(true);
-    query.prepare(lm(R"sql(
-        SELECT timestamp_usec_utc, duration_usec
+    query->prepare(lm(R"sql(
+        SELECT -1 AS id, timestamp_usec_utc AS period_start_ms, duration_usec / 1000 AS duration_ms
         FROM %1
         %2
         ORDER BY timestamp_usec_utc ASC
     )sql").args(eventsFilteredByFreeTextSubQuery, sqlQueryFilterStr));
-    sqlQueryFilter.bindFields(&query);
-
-    query.exec();
-    loadTimePeriods(query, options, result);
-    return nx::sql::DBResult::ok;
+    sqlQueryFilter.bindFields(query);
 }
 
 void EventsStorage::loadTimePeriods(
-    nx::sql::SqlQuery& query,
+    nx::sql::AbstractSqlQuery* query,
+    const QnTimePeriod& timePeriodFilter,
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
     using namespace std::chrono;
 
-    constexpr int kUsecPerMs = 1000;
-
-    while (query.next())
+    while (query->next())
     {
         QnTimePeriod timePeriod(
-            milliseconds(query.value("timestamp_usec_utc").toLongLong() / kUsecPerMs),
-            milliseconds(query.value("duration_usec").toLongLong() / kUsecPerMs));
+            milliseconds(query->value("period_start_ms").toLongLong()),
+            milliseconds(query->value("duration_ms").toLongLong()));
+
+        // Fixing time period end if needed.
+        const auto id = query->value("id").toLongLong();
+        if (auto it = m_idToTimePeriod.find(id); it != m_idToTimePeriod.end())
+            timePeriod.setEndTime(it->second->second.endTime);
+
+        // Truncating time period by the filter
+        if (!timePeriodFilter.isEmpty())
+        {
+            if (timePeriod.startTime() < timePeriodFilter.startTime())
+                timePeriod.setStartTime(timePeriodFilter.startTime());
+
+            if (timePeriodFilter.durationMs != QnTimePeriod::kInfiniteDuration &&
+                timePeriod.endTime() > timePeriodFilter.endTime())
+            {
+                timePeriod.setEndTime(timePeriodFilter.endTime());
+            }
+        }
+
+        if (!result->empty() && result->back() == timePeriod)
+            continue;
+
         result->push_back(timePeriod);
     }
 
     *result = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
-        *result, options.detailLevel);
+        *result, std::max<milliseconds>(options.detailLevel, kMinTimePeriodAggregationPeriod));
 }
 
 nx::sql::DBResult EventsStorage::cleanupData(
@@ -664,21 +1025,22 @@ void EventsStorage::cleanupEvents(
     sql::SqlQuery deleteEventsQuery(queryContext->connection());
     deleteEventsQuery.prepare(R"sql(
         DELETE FROM event
-        WHERE device_guid=:deviceId AND timestamp_usec_utc < :timestampUsec
+        WHERE device_id=:deviceId AND timestamp_usec_utc < :timestampMs
     )sql");
+    deleteEventsQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(deviceId));
     deleteEventsQuery.bindValue(
-        ":deviceId",
-        QnSql::serialized_field(deviceId));
-    deleteEventsQuery.bindValue(
-        ":timestampUsec",
-        (qint64)microseconds(oldestDataToKeepTimestamp).count());
+        ":timestampMs",
+        (qint64) milliseconds(oldestDataToKeepTimestamp).count());
 
     deleteEventsQuery.exec();
 }
 
 void EventsStorage::cleanupEventProperties(
-    nx::sql::QueryContext* queryContext)
+    nx::sql::QueryContext* /*queryContext*/)
 {
+    // TODO: #ak META-222
+
+#if 0
     sql::SqlQuery query(queryContext->connection());
 
     query.prepare(R"sql(
@@ -687,6 +1049,17 @@ void EventsStorage::cleanupEventProperties(
     )sql");
 
     query.exec();
+#endif
+}
+
+int EventsStorage::packCoordinate(double value)
+{
+    return (int) (value * kCoordinatesPrecision);
+}
+
+double EventsStorage::unpackCoordinate(int packedValue)
+{
+    return packedValue / (double) kCoordinatesPrecision;
 }
 
 //-------------------------------------------------------------------------------------------------

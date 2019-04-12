@@ -8,6 +8,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/api/types/motion_types.h>
+#include <nx/vms/api/types/smtp_types.h>
 
 namespace nx::vms::api {
 namespace test {
@@ -148,6 +149,15 @@ TEST(Lexical, peerType)
     ASSERT_EQ(
         PeerType::oldServer,
         QnLexical::deserialized<PeerType>("PT_OldServer"));
+}
+
+TEST(Lexical, smtpConnectionType)
+{
+    ASSERT_EQ("Unsecure", QnLexical::serialized<ConnectionType>(ConnectionType::unsecure).toStdString());
+
+    ASSERT_EQ(
+        ConnectionType::unsecure,
+        QnLexical::deserialized<ConnectionType>("Unsecure"));
 }
 
 } // namespace test

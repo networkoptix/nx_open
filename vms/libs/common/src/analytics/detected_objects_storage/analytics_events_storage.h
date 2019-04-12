@@ -1,7 +1,12 @@
 #pragma once
 
 #include <chrono>
+#include <map>
 #include <vector>
+
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/member.hpp>
 
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
@@ -17,9 +22,13 @@
 #include "analytics_events_storage_settings.h"
 #include "analytics_events_storage_types.h"
 
-namespace nx {
-namespace analytics {
-namespace storage {
+#include "attributes_dao.h"
+#include "device_dao.h"
+#include "object_cache.h"
+#include "object_track_aggregator.h"
+#include "object_type_dao.h"
+
+namespace nx::analytics::storage {
 
 using StoreCompletionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/)>;
@@ -93,6 +102,26 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
+namespace detail {
+
+class TimePeriod
+{
+public:
+    long long id = -1;
+    long long deviceId = -1;
+    std::chrono::milliseconds startTime = std::chrono::milliseconds::zero();
+    std::chrono::milliseconds endTime = std::chrono::milliseconds::zero();
+    std::chrono::milliseconds lastSavedEndTime = std::chrono::milliseconds::zero();
+
+    std::chrono::milliseconds length() const;
+
+    bool addPacketToPeriod(
+        std::chrono::milliseconds timestamp,
+        std::chrono::milliseconds duration);
+};
+
+} // namespace detai;
+
 class EventsStorage:
     public AbstractEventsStorage
 {
@@ -123,12 +152,25 @@ public:
         std::chrono::milliseconds oldestDataToKeepTimestamp) override;
 
 private:
+    using DeviceIdToCurrentTimePeriod = std::map<long long, detail::TimePeriod>;
+    using IdToTimePeriod = std::map<long long, DeviceIdToCurrentTimePeriod::iterator>;
+
     const Settings& m_settings;
     DbController m_dbController;
-    std::chrono::microseconds m_maxRecordedTimestamp = std::chrono::microseconds::zero();
+    std::chrono::milliseconds m_maxRecordedTimestamp = std::chrono::milliseconds::zero();
     mutable QnMutex m_mutex;
+    DeviceIdToCurrentTimePeriod m_deviceIdToCurrentTimePeriod;
+    IdToTimePeriod m_idToTimePeriod;
+    AttributesDao m_attributesDao;
+    ObjectTypeDao m_objectTypeDao;
+    DeviceDao m_deviceDao;
+
+    ObjectCache m_objectCache;
+    ObjectTrackAggregator m_trackAggregator;
 
     bool readMaximumEventTimestamp();
+
+    bool loadDictionaries();
 
     nx::sql::DBResult savePacket(
         nx::sql::QueryContext*,
@@ -138,18 +180,41 @@ private:
      * @return Inserted event id.
      * Throws on error.
      */
-    std::int64_t insertEvent(
+    void insertEvent(
+        nx::sql::QueryContext* queryContext,
+        const common::metadata::DetectionMetadataPacket& packet,
+        const common::metadata::DetectedObject& detectedObject,
+        long long attributesId,
+        long long timePeriodId);
+
+    void updateDictionariesIfNeeded(
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject);
 
     /**
-     * Throws on error.
+     * @return Id of the current time period.
      */
-    void insertEventAttributes(
+    long long insertOrUpdateTimePeriod(
         nx::sql::QueryContext* queryContext,
-        std::int64_t eventId,
-        const std::vector<common::metadata::Attribute>& eventAttributes);
+        const common::metadata::DetectionMetadataPacket& packet);
+
+    detail::TimePeriod* insertOrFetchCurrentTimePeriod(
+        nx::sql::QueryContext* queryContext,
+        long long deviceId,
+        std::chrono::milliseconds packetTimestamp,
+        std::chrono::milliseconds packetDuration);
+
+    void closeCurrentTimePeriod(
+        nx::sql::QueryContext* queryContext,
+        long long deviceId);
+
+    void saveTimePeriodEnd(
+        nx::sql::QueryContext* queryContext,
+        long long id,
+        std::chrono::milliseconds endTime);
+
+    void fillCurrentTimePeriodsCache(nx::sql::QueryContext* queryContext);
 
     void prepareCursorQuery(const Filter& filter, nx::sql::SqlQuery* query);
 
@@ -170,7 +235,9 @@ private:
 
     void addTimePeriodToFilter(
         const QnTimePeriod& timePeriod,
-        nx::sql::Filter* sqlFilter);
+        nx::sql::Filter* sqlFilter,
+        const char* leftBoundaryFieldName,
+        const char* rightBoundaryFieldName);
 
     void addBoundingBoxToFilter(
         const QRectF& boundingBox,
@@ -197,8 +264,20 @@ private:
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 
+    void prepareSelectTimePeriodsUnfilteredQuery(
+        nx::sql::AbstractSqlQuery* query,
+        const std::vector<QnUuid>& deviceIds,
+        const QnTimePeriod& timePeriod,
+        const TimePeriodsLookupOptions& options);
+
+    void prepareSelectTimePeriodsFilteredQuery(
+        nx::sql::AbstractSqlQuery* query,
+        const Filter& filter,
+        const TimePeriodsLookupOptions& options);
+
     void loadTimePeriods(
-        nx::sql::SqlQuery& query,
+        nx::sql::AbstractSqlQuery* query,
+        const QnTimePeriod& timePeriod,
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 
@@ -213,6 +292,9 @@ private:
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void cleanupEventProperties(nx::sql::QueryContext* queryContext);
+
+    static int packCoordinate(double);
+    static double unpackCoordinate(int);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -234,6 +316,4 @@ private:
     std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction(const Settings&);
 };
 
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::storage

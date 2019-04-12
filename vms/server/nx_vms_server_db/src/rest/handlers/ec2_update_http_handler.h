@@ -476,7 +476,7 @@ private:
                 fieldName.isEmpty() ? "" : lm(" field \"%1\"").arg(fieldName);
             *outErrorMessage = lm("Request%1 has invalid type. Expected type \"%2\", actual type \"%3\"")
                 .args(fieldReference, toString(existingValue->type()), toString(incompleteValue.type()));
-            NX_WARNING(this, *outErrorMessage);
+            NX_DEBUG(this, *outErrorMessage);
             return false;
         }
 

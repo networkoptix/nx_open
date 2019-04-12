@@ -48,7 +48,7 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_sequence(0),
     m_lastFrameTimeUs(AV_NOPTS_VALUE),
     m_lastDisplayedTimeUs(AV_NOPTS_VALUE),
-    m_emptyPacketCounter(0),
+    m_eofPacketCounter(0),
     m_audioEnabled(true),
     m_needToResetAudio(true),
     m_renderContextSynchronizer(renderContextSynchronizer)
@@ -173,7 +173,7 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
     auto emptyFrame = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
     if (emptyFrame)
         return processEmptyFrame(emptyFrame);
-    m_emptyPacketCounter = 0;
+    m_eofPacketCounter = 0;
 
     updateMediaEvent(mediaData);
 
@@ -194,25 +194,30 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 
 bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& data)
 {
-    if (!data->flags.testFlag(QnAbstractMediaData::QnAbstractMediaData::MediaFlags_AfterEOF)
-        && !data->flags.testFlag(QnAbstractMediaData::MediaFlags_GotFromRemotePeer))
-    {
-        // In case of it is not 'out of archive range' packet then
-        // ignore locally generated packets. It occurs when TCP connection is closed.
-        return true;
-    }
-
     if (m_awaitingJumpCounter > 0)
         return true; //< ignore EOF due to we are going set new position
 
-    ++m_emptyPacketCounter;
-    if (m_emptyPacketCounter > kEmptyPacketThreshold)
+    if (data->flags.testFlag(QnAbstractMediaData::MediaFlags_AfterEOF))
     {
-        QVideoFramePtr eofPacket(new QVideoFrame());
-        FrameMetadata metadata = FrameMetadata(data);
-        metadata.serialize(eofPacket);
-        enqueueVideoFrame(eofPacket);
+        // Allow 'kEmptyPacketThreshold' attempts to reconnect before report an issue
+        // because RtspClientArchiveDelegate reports EOF packet on each stream read error.
+        ++m_eofPacketCounter;
+        if (m_eofPacketCounter <= kEmptyPacketThreshold)
+            return true;
     }
+    else
+    {
+        // Not eof empty packet mean 'filler' packet. Is is used by NVR devices with own archive
+        // (#VMAX, HANWHA NVR) in case of this archive plays synchroniously across several cameras.
+        // Sometimes channel may stop and wait to another but connection to devices
+        // stay opened.
+        m_eofPacketCounter = 0;
+    }
+
+    QVideoFramePtr packet(new QVideoFrame());
+    FrameMetadata metadata = FrameMetadata(data);
+    metadata.serialize(packet);
+    enqueueVideoFrame(packet);
     return true;
 }
 
@@ -427,7 +432,7 @@ void PlayerDataConsumer::onBeforeJump(qint64 timeUsec)
     // This function is called directly from an archiveReader thread. Should be thread safe.
     QnMutexLocker lock(&m_jumpMutex);
     ++m_awaitingJumpCounter;
-    m_emptyPacketCounter = 0; //< ignore EOF due to we are going to set new position
+    m_eofPacketCounter = 0; //< ignore EOF due to we are going to set new position
 
     // The purpose of this variable is prevent doing delay between frames while they are displayed.
     // We supposed to decode/display them at maximum speed unless the last jump command is

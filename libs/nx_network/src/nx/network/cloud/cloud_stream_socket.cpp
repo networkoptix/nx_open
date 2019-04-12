@@ -460,7 +460,7 @@ void CloudStreamSocket::onConnectDone(
             connection.reset();
         if (cloudTunnelAttributes)
         {
-            NX_VERBOSE(this, lm("Got connection to %1").arg(cloudTunnelAttributes->remotePeerName));
+            NX_VERBOSE(this, lm("Got connection to [%1]").arg(cloudTunnelAttributes->remotePeerName));
             m_cloudTunnelAttributes = std::move(*cloudTunnelAttributes);
         }
         else

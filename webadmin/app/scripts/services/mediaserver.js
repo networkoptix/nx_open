@@ -105,7 +105,7 @@ angular.module('webadminApp')
                     });
                 }).catch(function(error){
                     $log.error(error);
-                    $log.log("fall back to login dialog");
+                    $log.log('fall back to login dialog');
                     callLogin();
                 });
             }
@@ -119,7 +119,7 @@ angular.module('webadminApp')
                     offlineDialog = $uibModal.open({
                         templateUrl: Config.viewsDir + 'components/offline.html',
                         controller: 'OfflineCtrl',
-                        keyboard:false,
+                        keyboard: false,
                         backdrop:'static'
                     });
                     offlineDialog.result.then(function (/*info*/) {//Dialog closed - means server is online
@@ -132,8 +132,8 @@ angular.module('webadminApp')
             request.catch(offlineHandler);
             return request;
         }
-        function wrapPost(url,data){
-            return wrapRequest($http.post(url,data));
+        function wrapPost(url, data){
+            return wrapRequest($http.post(url, data));
         }
         function wrapGet(url, data){
             var canceller = $q.defer();
@@ -187,8 +187,8 @@ angular.module('webadminApp')
                     userName:login
                 };
                 if(url){
-                    if(url.indexOf("http")<0){
-                        url = "http://" + url;
+                    if(url.indexOf('http') < 0){
+                        url = 'http://' + url;
                     }
                     params.url = url;
                 }
@@ -238,7 +238,7 @@ angular.module('webadminApp')
                 var self = this;
 
                 function sendLogin(){
-                    $log.log("Login1: getNonce for " + login);
+                    $log.log('Login1: getNonce for ' + login);
                     return self.getNonce(login).then(function(data){
                         var realm = data.data.reply.realm;
                         var nonce = data.data.reply.nonce;
@@ -246,17 +246,19 @@ angular.module('webadminApp')
                         var auth = self.digest(login, password, realm, nonce);
                         var authRtsp = self.digest(login, password, realm, nonce, 'PLAY');
 
-                        $log.log("Login2: nonce is " + nonce);
-                        $log.log("Login2: auth is " + auth);
+                        $log.log('Login2: nonce is ' + nonce);
+                        $log.log('Login2: auth is ' + auth);
 
-                        $log.log("Login2: cookieLogin");
+                        $log.log('Login2: cookieLogin');
                         // Check auth again - without catching errors
                         return $http.post(proxy + '/web/api/cookieLogin',{
                             auth: auth
                         }).then(function(data){
-                            $log.log("Login3: cookieLogin result");
-                            if(data.data.error != "0"){
-                                $log.log("Login3: cookieLogin failed: " + data.data.error);
+                            $log.log('Login3: cookieLogin result');
+                            if(data.data.error !== '0'){
+                                var resHeaders = data.headers();
+                                $log.log('Login3: cookieLogin failed: ' + data.data.error);
+                                data.data.authResult = 'x-auth-result' in resHeaders ? resHeaders['x-auth-result'] : '';
                                 return $q.reject(data.data);
                             }
                             
@@ -266,9 +268,8 @@ angular.module('webadminApp')
                             $localStorage.realm = realm;
                             $localStorage.auth = auth;
                             $localStorage.authRtsp = authRtsp;
-
                             systemAPI.setAuthKeys(auth, null, authRtsp);
-                            $log.log("Login3: cookieLogin success!");
+                            $log.log('Login3: cookieLogin success!');
                             return data.data.reply;
                         });
                     });
@@ -316,7 +317,7 @@ angular.module('webadminApp')
             },
             pingServer:function(url){
                 return $http.get(url + '/web/api/moduleInformation',{
-                    timeout: 3*1000
+                    timeout: 6*1000
                 });
             },
             getModuleInformation: function(reload) {
@@ -414,7 +415,7 @@ angular.module('webadminApp')
                 // 1. get remote nonce
                 var self = this;
                 return self.getNonce(remoteLogin, url).then(function(data){
-                    if(data.data.error && data.data.error!="0"){
+                    if(data.data.error && data.data.error!='0'){
                         return $q.reject(data);
                     }
                     // 2. calculate digest
@@ -440,7 +441,7 @@ angular.module('webadminApp')
                 var self = this;
                 return self.getNonce(remoteLogin, url).then(function(data) {
 
-                    if(data.data.error && data.data.error!="0"){
+                    if(data.data.error && data.data.error!='0'){
                         return $q.reject(data);
                     }
                     var realm = data.data.reply.realm;
@@ -526,8 +527,8 @@ angular.module('webadminApp')
                 var delimeter = url.indexOf('?')>=0? '&':'?';
                 var params = '';
 
-                credentials = credentials ? (credentials.login + ":" + credentials.password + "@") : "";
-                var host = window.location.protocol + "//" +
+                credentials = credentials ? (credentials.login + ':' + credentials.password + '@') : '';
+                var host = window.location.protocol + '//' +
                            credentials +
                            window.location.hostname +
                            (window.location.port ? ':' + window.location.port: '');

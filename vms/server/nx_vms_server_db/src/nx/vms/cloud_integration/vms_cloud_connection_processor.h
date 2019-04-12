@@ -61,7 +61,8 @@ private:
 
     bool fetchCloudUserOfflineAuthInfo(
         const CloudCredentialsData& data,
-        nx::cloud::db::api::AuthInfo* cloudOwnerOfflineAuthInfo);
+        nx::cloud::db::api::AuthInfo* cloudOwnerOfflineAuthInfo,
+        QnJsonRestResult* result);
 
     bool saveCloudData(
         const CloudCredentialsData& data,

@@ -93,7 +93,8 @@ void updateTimer(nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
 {
     if (*timerId != 0)
     {
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(*timerId);
+        // Can be called from IO thread. Non blocking call should be used here.
+        nx::utils::TimerManager::instance()->deleteTimer(*timerId);
         *timerId = 0;
     }
 
@@ -1264,7 +1265,7 @@ void QnPlOnvifResource::handleOneNotification(
     /*
         TODO: #szaitsev: This function should be completely rewritten in 4.1.
         In does not correspond onvif specification.
-        ONVIF Core Specification – Ver. 18.12 (or later), paragraph 9.
+        ONVIF Core Specification Ver. 18.12 (or later), paragraph 9.
     */
     const auto now = qnSyncTime->currentUSecsSinceEpoch();
     if (m_clearInputsTimeoutUSec > 0)

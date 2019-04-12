@@ -17,7 +17,7 @@ bool ObjectPosition::operator==(const ObjectPosition& right) const
     return deviceId == right.deviceId
         && timestampUsec == right.timestampUsec
         && durationUsec == right.durationUsec
-        && equalWithPrecision(boundingBox, right.boundingBox, 6)
+        && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && attributes == right.attributes;
 }
 
@@ -36,14 +36,32 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json)(ubjson),
     _analytics_storage_Fields)
 
+QByteArray serializeTrack(const std::vector<ObjectPosition>& /*track*/)
+{
+    NX_ASSERT(false);
+    // TODO
+    return QByteArray();
+}
+
+std::vector<ObjectPosition> deserializeTrack(const QByteArray& /*serializedData*/)
+{
+    // TODO
+    return {};
+}
+
 //-------------------------------------------------------------------------------------------------
+
+bool Filter::empty() const
+{
+    return *this == Filter();
+}
 
 bool Filter::operator==(const Filter& right) const
 {
     return objectTypeId == right.objectTypeId
         && objectAppearanceId == right.objectAppearanceId
         && timePeriod == right.timePeriod
-        && equalWithPrecision(boundingBox, right.boundingBox, 6)
+        && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && requiredAttributes == right.requiredAttributes
         && freeText == right.freeText
         && sortOrder == right.sortOrder;
@@ -174,7 +192,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 
     os << "maxObjectsToSelect " << filter.maxObjectsToSelect << "; ";
     os << "maxTrackSize " << filter.maxTrackSize << "; ";
-    os << "sortOrder " << 
+    os << "sortOrder " <<
         (filter.sortOrder == Qt::SortOrder::DescendingOrder ? "DESC" : "ASC");
 
     return os;
