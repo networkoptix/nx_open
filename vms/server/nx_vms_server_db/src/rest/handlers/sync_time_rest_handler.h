@@ -4,8 +4,7 @@
 #include <nx/network/rest/handler.h>
 #include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
-namespace rest {
-namespace handlers {
+namespace rest::handlers {
 
 class SyncTimeRestHandler: public nx::network::rest::Handler
 {
@@ -16,5 +15,4 @@ public:
     static SyncTimeData execute(nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager);
 };
 
-} // namespace handlers
-} // namespace rest
+} // namespace rest::handlers

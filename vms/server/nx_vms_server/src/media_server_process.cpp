@@ -1690,9 +1690,9 @@ void MediaServerProcess::registerRestHandlers(
      *         %param:string reply.osTime Local OS time on the Server, in milliseconds since epoch.
      *         %param:string reply.vmsTime Synchronized time, in milliseconds since epoch.
      */
-    reg(kGetTimePath, new nx::vms::server::rest::GetTimeHandler());
+    reg(kGetTimePath, new nx::vms::server::GetTimeHandler());
 
-    reg("ec2/getTimeOfServers", new nx::vms::server::rest::ServerTimeHandler("/" + kGetTimePath));
+    reg("ec2/getTimeOfServers", new nx::vms::server::ServerTimeHandler("/" + kGetTimePath));
 
     /**%apidoc GET /api/gettime
      * Get the Server time, time zone and authentication realm (realm is added for convenience).
@@ -1706,7 +1706,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %param:string reply.timezoneId Identification of the time zone in the text form.
      *         %param:string reply.utcTime Server time, in milliseconds since epoch.
      */
-    reg("api/gettime", new nx::vms::server::rest::DeprecatedTimeRestHandler());
+    reg("api/gettime", new nx::vms::server::DeprecatedTimeRestHandler());
 
     /**%apidoc GET /api/getTimeZones
      * Return the complete list of time zones supported by the server machine.
@@ -1760,9 +1760,9 @@ void MediaServerProcess::registerRestHandlers(
      * Get hardware information
      * %return:object JSON with hardware information.
      */
-    reg("api/getHardwareInfo", new nx::vms::server::rest::HardwareInfoHandler());
+    reg("api/getHardwareInfo", new nx::vms::server::HardwareInfoHandler());
 
-    reg("api/testLdapSettings", new nx::vms::server::rest::TestLdapSettingsHandler());
+    reg("api/testLdapSettings", new nx::vms::server::TestLdapSettingsHandler());
 
     /**%apidoc GET /api/ping
      * Ping the server.
@@ -2681,7 +2681,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:integer aggregationCount How many events were aggregated together for this action.
      */
     reg("api/executeEventAction",
-        new nx::vms::server::rest::QnExecuteEventActionRestHandler(serverModule()));
+        new nx::vms::server::QnExecuteEventActionRestHandler(serverModule()));
 
     /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system
@@ -2756,7 +2756,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param settings JSON object consisting of name-value settings pairs.
      */
     reg("ec2/analyticsEngineSettings",
-        new nx::vms::server::rest::AnalyticsEngineSettingsHandler(serverModule()));
+        new nx::vms::server::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
      * Return settings values of the specified device-engine pair.
@@ -2771,7 +2771,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param settings JSON object consisting of name-value settings pairs.
      */
     reg("ec2/deviceAnalyticsSettings",
-        new nx::vms::server::rest::DeviceAnalyticsSettingsHandler(serverModule()));
+        new nx::vms::server::DeviceAnalyticsSettingsHandler(serverModule()));
 
     reg(
         nx::network::http::Method::options,

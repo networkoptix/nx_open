@@ -4,7 +4,7 @@
 #include "licensing/hardware_info.h"
 #include "llutil/hardware_id.h"
 
-namespace nx::vms::server::rest {
+namespace nx::vms::server {
 
 nx::network::rest::Response HardwareInfoHandler::executeGet(
     const nx::network::rest::Request& /*request*/)
@@ -12,4 +12,4 @@ nx::network::rest::Response HardwareInfoHandler::executeGet(
     return nx::network::rest::Response::reply(LLUtil::getHardwareInfo());
 }
 
-} // namespace nx::vms::server::rest
+} // namespace nx::vms::server

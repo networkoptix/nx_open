@@ -2,7 +2,7 @@
 
 #include <nx/network/rest/handler.h>
 
-namespace nx::vms::server::rest {
+namespace nx::vms::server {
 
 class ServerTimeHandler: public nx::network::rest::Handler
 {
@@ -16,4 +16,4 @@ private:
     QString m_getTimeHandlerPath;
 };
 
-} // namespace nx::vms::server::rest
+} // namespace nx::vms::server

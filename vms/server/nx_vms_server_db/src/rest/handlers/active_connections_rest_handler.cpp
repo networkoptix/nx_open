@@ -3,12 +3,11 @@
 #include <transaction/message_bus_adapter.h>
 #include <nx/fusion/model_functions.h>
 
-namespace rest {
-namespace handlers {
+namespace rest::handlers {
 
 ActiveConnectionsRestHandler::ActiveConnectionsRestHandler(
     const ec2::AbstractTransactionMessageBus* messageBus)
-:
+    :
     m_messageBus(messageBus)
 {
 }
@@ -19,5 +18,4 @@ nx::network::rest::Response ActiveConnectionsRestHandler::executeGet(
     return nx::network::rest::Response::reply(m_messageBus->connectionsInfo());
 }
 
-} // namespace handlers
-} // namespace rest
+} // namespace rest::handlers

@@ -5,7 +5,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
-namespace nx::vms::server::rest {
+namespace nx::vms::server {
 
 QnExecuteEventActionRestHandler::QnExecuteEventActionRestHandler(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule)
@@ -39,4 +39,4 @@ nx::network::rest::Response QnExecuteEventActionRestHandler::executePost(
     return nx::network::rest::Response(nx::network::http::StatusCode::ok);
 }
 
-} //namespace nx::vms::server::rest
+} //namespace nx::vms::server
