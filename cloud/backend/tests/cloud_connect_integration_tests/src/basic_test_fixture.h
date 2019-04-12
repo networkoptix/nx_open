@@ -18,7 +18,7 @@
 
 #include <nx/cloud/relay/model/abstract_remote_relay_peer_pool.h>
 #include <nx/cloud/relay/test_support/traffic_relay_launcher.h>
-#include <nx/cloud/mediator/test_support/mediator_functional_test.h>
+#include <nx/cloud/mediator/test_support/mediator_cluster.h>
 
 namespace nx {
 namespace network {
@@ -114,9 +114,10 @@ protected:
      * Mediator.
      */
 
-    void startMediator();
-    void restartMediator();
-    nx::hpm::MediatorFunctionalTest& mediator();
+    void addMediator();
+    void startMediator(int index = 0);
+    void restartMediator(int index = 0);
+    nx::hpm::MediatorFunctionalTest& mediator(int index = 0);
     void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
     void configureProxyBeforeMediator();
     void blockDownTrafficThroughExistingConnectionsToMediator();
@@ -142,7 +143,10 @@ protected:
      * Listening server.
      */
 
-    void startServer();
+    /**
+     * Starts the server on mediator(mediatorIndex).
+     */
+    void startServer(int mediatorIndex = 0);
     void stopServer();
     std::string serverSocketCloudAddress() const;
     const hpm::api::SystemCredentials& cloudSystemCredentials() const;
@@ -206,7 +210,7 @@ private:
 
     QnMutex m_mutex;
     const nx::network::http::BufferType m_staticMsgBody;
-    nx::hpm::MediatorFunctionalTest m_mediator;
+    nx::hpm::test::MediatorCluster m_mediatorCluster;
     hpm::api::SystemCredentials m_cloudSystemCredentials;
     std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
     nx::network::http::TestHttpServer m_cloudModulesXmlProvider;

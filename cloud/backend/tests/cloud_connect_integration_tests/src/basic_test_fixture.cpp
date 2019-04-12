@@ -8,6 +8,7 @@
 #include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
 #include <nx/network/url/url_builder.h>
 
+#include <nx/cloud/mediator/listening_peer_db.h>
 #include <nx/cloud/mediator/listening_peer_pool.h>
 #include <nx/cloud/mediator/mediator_service.h>
 #include <nx/cloud/relay/model/remote_relay_peer_pool.h>
@@ -107,17 +108,25 @@ BasicTestFixture::BasicTestFixture(
     :
     base_type("cloud_connect_integration"),
     m_staticMsgBody("Hello, hren!"),
-    m_mediator(
-        nx::hpm::MediatorFunctionalTest::allFlags &
-            ~nx::hpm::MediatorFunctionalTest::initializeConnectivity,
-        testDataDir() + "/mediator"),
     m_unfinishedRequestsLeft(0),
     m_relayCount(relayCount),
     m_disconnectedPeerTimeout(disconnectedPeerTimeout)
 {
-    m_mediator.setUseProxy(true);
-    m_mediator.addArg("-stun/addrToListenList", "127.0.0.1:0");
-    m_mediator.addArg("-http/addrToListenList", "127.0.0.1:0");
+    addMediator();
+}
+
+BasicTestFixture::~BasicTestFixture()
+{
+    std::list<std::unique_ptr<nx::network::http::AsyncClient>> httpClients;
+    {
+        QnMutexLocker lock(&m_mutex);
+        httpClients.swap(m_httpClients);
+    }
+
+    for (const auto& httpClient : httpClients)
+        httpClient->pleaseStopSync();
+
+    m_httpServer.reset();
 }
 
 void BasicTestFixture::setUpPublicIpFactoryFunc()
@@ -135,20 +144,6 @@ void BasicTestFixture::setUpRemoteRelayPeerPoolFactoryFunc()
             return std::make_unique<MemoryRemoteRelayPeerPool>(this);
         };
     RemoteRelayPeerPoolFactory::instance().setCustomFunc(createRemoteRelayPeerPoolFunc);
-}
-
-BasicTestFixture::~BasicTestFixture()
-{
-    std::list<std::unique_ptr<nx::network::http::AsyncClient>> httpClients;
-    {
-        QnMutexLocker lock(&m_mutex);
-        httpClients.swap(m_httpClients);
-    }
-
-    for (const auto& httpClient: httpClients)
-        httpClient->pleaseStopSync();
-
-    m_httpServer.reset();
 }
 
 void BasicTestFixture::setInitFlags(int flags)
@@ -184,36 +179,48 @@ void BasicTestFixture::SetUp()
 //-------------------------------------------------------------------------------------------------
 // Mediator.
 
-void BasicTestFixture::startMediator()
+void BasicTestFixture::addMediator()
+{
+    auto& mediator = m_mediatorCluster.addMediator({
+            "-stun/addrToListenLismt", "127.0.0.1:0",
+            "-http/addrToListenList", "127.0.0.1:0"
+        },
+        nx::hpm::MediatorFunctionalTest::allFlags &
+            ~nx::hpm::MediatorFunctionalTest::initializeConnectivity,
+        testDataDir() + "/mediator");
+    mediator.setUseProxy(true);
+}
+
+void BasicTestFixture::startMediator(int index)
 {
     if (!m_relays.empty())
-        m_mediator.addArg("-trafficRelay/url", relayUrl().toString().toStdString().c_str());
+        mediator(index).addArg("-trafficRelay/url", relayUrl().toString().toStdString().c_str());
 
-    ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
+    ASSERT_TRUE(mediator(index).startAndWaitUntilStarted());
 
     if (m_proxyBeforeMediator)
     {
         switch (m_mediatorApiProtocol)
         {
             case MediatorApiProtocol::stun:
-                m_proxyBeforeMediator->proxy.setProxyDestination(m_mediator.stunTcpEndpoint());
+                m_proxyBeforeMediator->proxy.setProxyDestination(mediator(index).stunTcpEndpoint());
                 break;
 
             case MediatorApiProtocol::http:
-                m_proxyBeforeMediator->proxy.setProxyDestination(m_mediator.httpEndpoint());
+                m_proxyBeforeMediator->proxy.setProxyDestination(mediator(index).httpEndpoint());
                 break;
         }
     }
 }
 
-void BasicTestFixture::restartMediator()
+void BasicTestFixture::restartMediator(int index)
 {
-    m_mediator.restart();
+    mediator(index).restart();
 }
 
-nx::hpm::MediatorFunctionalTest& BasicTestFixture::mediator()
+nx::hpm::MediatorFunctionalTest& BasicTestFixture::mediator(int index)
 {
-    return m_mediator;
+    return m_mediatorCluster.mediator(index);
 }
 
 void BasicTestFixture::setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol)
@@ -357,9 +364,9 @@ nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
 //-------------------------------------------------------------------------------------------------
 // Listening server.
 
-void BasicTestFixture::startServer()
+void BasicTestFixture::startServer(int mediatorIndex)
 {
-    auto cloudSystemCredentials = m_mediator.addRandomSystem();
+    auto cloudSystemCredentials = mediator(mediatorIndex).addRandomSystem();
 
     m_cloudSystemCredentials.systemId = cloudSystemCredentials.id;
     m_cloudSystemCredentials.serverId = QnUuid::createUuid().toSimpleByteArray();
@@ -473,16 +480,9 @@ void BasicTestFixture::assertDataHasBeenExchangedCorrectly()
 
 void BasicTestFixture::waitUntilServerIsRegisteredOnMediator()
 {
-    for (;;)
-    {
-        if (!m_mediator.moduleInstance()->impl()->listeningPeerPool()->findPeersBySystemId(
-                m_cloudSystemCredentials.systemId).empty())
-        {
-            break;
-        }
-
+    std::string systemId = m_cloudSystemCredentials.systemId.toStdString();
+    while (!m_mediatorCluster.peerInformationSynchronizedInCluster(systemId))
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
 }
 
 void BasicTestFixture::waitUntilServerIsRegisteredOnTrafficRelay()
@@ -530,8 +530,8 @@ void BasicTestFixture::initializeCloudModulesXmlWithDirectStunPort()
     m_cloudModulesXmlProvider.registerStaticProcessor(
         kCloudModulesXmlPath,
         lm(kCloudModulesXmlTemplate).args(
-            m_proxyBeforeMediator ? m_proxyBeforeMediator->endpoint : m_mediator.stunTcpEndpoint(),
-            m_mediator.stunUdpEndpoint()).toUtf8(),
+            m_proxyBeforeMediator ? m_proxyBeforeMediator->endpoint : mediator().stunTcpEndpoint(),
+            mediator().stunUdpEndpoint()).toUtf8(),
         "application/xml");
 }
 
@@ -547,8 +547,8 @@ void BasicTestFixture::initializeCloudModulesXmlWithStunOverHttp()
     m_cloudModulesXmlProvider.registerStaticProcessor(
         kCloudModulesXmlPath,
         lm(kCloudModulesXmlTemplate)
-            .args(m_proxyBeforeMediator ? m_proxyBeforeMediator->endpoint : m_mediator.httpEndpoint(),
-                nx::hpm::api::kMediatorApiPrefix, m_mediator.stunUdpEndpoint()).toUtf8(),
+            .args(m_proxyBeforeMediator ? m_proxyBeforeMediator->endpoint : mediator().httpEndpoint(),
+                nx::hpm::api::kMediatorApiPrefix, mediator().stunUdpEndpoint()).toUtf8(),
         "application/xml");
 }
 
