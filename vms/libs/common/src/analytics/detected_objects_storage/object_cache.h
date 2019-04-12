@@ -1,8 +1,10 @@
 #pragma once
 
 #include <chrono>
+#include <map>
 #include <vector>
 
+#include <nx/utils/elapsed_timer_pool.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <analytics/common/object_detection_metadata.h>
@@ -31,6 +33,9 @@ class ObjectCache
 {
 public:
     /**
+     * @param aggregationPeriod Object is reported with this delay to minimize the number of
+     * inserts to the DB.
+     *
      * Object is removed from the cache if:
      * - every change made to the object was reported using getObjectsToInsert and getObjectsToUpdate
      * - AND there was no new object data during the aggregationPeriod
@@ -44,9 +49,16 @@ public:
     void add(const common::metadata::ConstDetectionMetadataPacketPtr& packet);
 
     /**
-     * @return Objects that are to be inserted
+     * Objects are provided only after the aggregation period passes.
+     * @return Objects that are to be inserted.
      */
     std::vector<DetectedObject> getObjectsToInsert();
+
+    /**
+     * Provides new object regardless of the aggregation period.
+     * NOTE: Should be avoided when possible.
+     */
+    std::optional<DetectedObject> getObjectToInsertForced(const QnUuid& objectGuid);
 
     /**
      * Provides data only for objects with known dbId.
@@ -69,14 +81,41 @@ public:
     long long getAttributesIdByObjectGuid(const QnUuid& guid) const;
 
     /**
-     * NOTE: Data removal happens inly in this method.
+     * NOTE: Data removal happens only in this method.
      * So, it MUST be called periodically.
      */
     void removeExpiredData();
 
 private:
+    struct ObjectContext
+    {
+        long long dbId = -1;
+        long long attributesDbId = -1;
+
+        DetectedObject object;
+        std::vector<common::metadata::Attribute> newAttributesSinceLastUpdate;
+
+        std::chrono::steady_clock::time_point lastReportTime;
+        bool insertionReported = false;
+
+        std::map<QString, QString> allAttributes;
+    };
+
     const std::chrono::milliseconds m_aggregationPeriod;
     const std::chrono::milliseconds m_maxObjectLifetime;
+    mutable QnMutex m_mutex;
+    std::map<QnUuid, ObjectContext> m_objectsById;
+    nx::utils::ElapsedTimerPool<QnUuid> m_timerPool;
+
+    void updateObject(
+        const nx::common::metadata::DetectedObject& detectedObject,
+        const nx::common::metadata::DetectionMetadataPacket& packet);
+
+    void addNewAttributes(
+        const std::vector<common::metadata::Attribute>& attributes,
+        ObjectContext* objectContext);
+
+    void removeObject(const QnUuid& objectGuid);
 };
 
 } // namespace nx::analytics::storage
