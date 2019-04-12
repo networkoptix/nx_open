@@ -13,8 +13,8 @@ angular.module('cloudApp')
                 scope.Config = Config;
                 scope.openClient = process.init(function () {
                     return urlProtocol.open(scope.system && scope.system.id)
-                        .then(function(error) {},
-                            function(error){
+                        .then(function() {},
+                            function(){
                                 dialogs.noClientDetected();
                                 return true;
                             });
