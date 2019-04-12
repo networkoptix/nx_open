@@ -606,7 +606,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     std::set<QnRtspIoDevice::AddressInfo> addressInfoToRegister;
     for (const auto& track: tracks)
     {
-        if (!track->ioDevice)
+        if (!track->ioDevice || !track->setupSuccess)
             continue;
 
         if (track->trackType == QnRtspClient::TrackType::TT_AUDIO ||
