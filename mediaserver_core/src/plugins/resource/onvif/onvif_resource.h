@@ -238,6 +238,11 @@ public:
         Qn::StreamIndex streamIndex,
         std::string token);
 
+    std::string audioEncoderConfigurationToken(Qn::StreamIndex streamIndex) const;
+    void setAudioEncoderConfigurationToken(
+        Qn::StreamIndex streamIndex,
+        std::string token);
+
     QString getPtzUrl() const;
     void setPtzUrl(const QString& src);
 
@@ -547,6 +552,7 @@ private:
     QString m_ptzProfileToken;
     QString m_ptzConfigurationToken;
     std::map<Qn::StreamIndex, std::string> m_videoEncoderConfigurationTokens;
+    std::map<Qn::StreamIndex, std::string> m_audioEncoderConfigurationTokens;
     mutable int m_timeDrift;
     mutable QElapsedTimer m_timeDriftTimer;
     mutable QTimeZone m_cameraTimeZone;

@@ -6,6 +6,8 @@
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <core/resource/camera_advanced_param.h>
 
+#include <nx/utils/log/log.h>
+
 namespace nx {
 namespace vms {
 namespace server {
@@ -24,6 +26,18 @@ bool getVideoEncoderConfigurationViaMedia1(
     return soapWrapper->getVideoEncoderConfiguration(
         videoEncoderConfigurationRequest,
         *outConfigurationResponse) == SOAP_OK;
+}
+
+onvifXsd__AudioEncoderConfiguration* getAudioEncoderConfiguration(
+    std::string token, MediaSoapWrapper* soapWrapper)
+{
+    AudioConfigResp response;
+    AudioConfigReq request;
+    request.ConfigurationToken = std::move(token);
+    int result = soapWrapper->getAudioEncoderConfiguration(request, response);
+    if (result != SOAP_OK || !response.Configuration)
+        return nullptr;
+    return response.Configuration;
 }
 
 template<typename Configuration>
@@ -113,7 +127,25 @@ bool setVideoEncoderConfigurationViaMedia1(
     return result == SOAP_OK;
 }
 
+bool setAudioEncoderConfiguration(
+    onvifXsd__AudioEncoderConfiguration* configuration, MediaSoapWrapper* soapWrapper)
+{
+    SetAudioConfigResp response;
+    SetAudioConfigReq request;
+    request.Configuration = configuration;
+    int result = soapWrapper->setAudioEncoderConfiguration(request, response);
+    return result == SOAP_OK;
+}
+
 } // namespace
+
+QString MulticastParameters::toString() const
+{
+    return lm("address: %1. port: %2, ttl: %3").args(
+        address ? *address : "",
+        port ? *port : 0,
+        ttl ? *ttl : 0);
+}
 
 OnvifMulticastParametersProxy::OnvifMulticastParametersProxy(
     QnPlOnvifResource* onvifResource,
@@ -157,7 +189,56 @@ bool OnvifMulticastParametersProxy::setMulticastParameters(MulticastParameters p
 
     auto configuration = configurationResponse.Configuration;
     updateConfigurationWithMulticastParameters(configuration, parameters);
-    return setVideoEncoderConfigurationViaMedia1(configuration, &media, m_resource);
+    if (!setVideoEncoderConfigurationViaMedia1(configuration, &media, m_resource))
+        return false;
+
+    // NOTE: Configuring multicast for audio too, 'cause some cameras have separate multicast
+    // address for audio. We does not care here if setAudioEncoder fails' cause it most probably
+    // will not affect behavior of most of the cameras.
+    setAudioEncoderMulticastParameters(parameters);
+    return true;
+}
+
+bool OnvifMulticastParametersProxy::setAudioEncoderMulticastParameters(
+    MulticastParameters &parameters)
+{
+    std::string audioToken = m_resource->audioEncoderConfigurationToken(m_streamIndex);
+    if (audioToken.empty())
+    {
+        NX_VERBOSE(this, "Skipping audio encoder configuration: no audio token");
+        return false;
+    }
+
+    const auto auth = m_resource->getAuth();
+    MediaSoapWrapper media(
+        m_resource->getMediaUrl().toStdString().c_str(),
+        auth.user(),
+        auth.password(),
+        m_resource->getTimeDrift());
+
+    auto audioConfiguration = getAudioEncoderConfiguration(audioToken, &media);
+    if (!audioConfiguration)
+    {
+        NX_VERBOSE(this,
+            lm("Skipping audio encoder configuration: can't get audio configuration (%1)")
+                .args(media.getLastError()));
+        return false;
+    }
+
+    MediaSoapWrapper mediaSet(
+        m_resource->getMediaUrl().toStdString().c_str(),
+        auth.user(),
+        auth.password(),
+        m_resource->getTimeDrift());
+    updateConfigurationWithMulticastParameters(audioConfiguration, parameters);
+    if (!setAudioEncoderConfiguration(audioConfiguration, &mediaSet))
+    {
+        NX_VERBOSE(this,
+            lm("Skipping audio encoder configuration: can't set audio configuration (%1)")
+                .args(media.getLastError()));
+        return false;
+    }
+    return true;
 }
 
 } // namespace resource

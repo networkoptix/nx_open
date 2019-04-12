@@ -1447,6 +1447,26 @@ void QnPlOnvifResource::setVideoEncoderConfigurationToken(
     m_videoEncoderConfigurationTokens[streamIndex] = std::move(token);
 }
 
+std::string QnPlOnvifResource::audioEncoderConfigurationToken(Qn::StreamIndex streamIndex) const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (const auto it = m_audioEncoderConfigurationTokens.find(streamIndex);
+        it != m_audioEncoderConfigurationTokens.cend())
+    {
+        return it->second;
+    }
+
+    return std::string();
+}
+
+void QnPlOnvifResource::setAudioEncoderConfigurationToken(
+    Qn::StreamIndex streamIndex,
+    std::string token)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_audioEncoderConfigurationTokens[streamIndex] = std::move(token);
+}
+
 QString QnPlOnvifResource::getPtzUrl() const
 {
     QnMutexLocker lock(&m_mutex);

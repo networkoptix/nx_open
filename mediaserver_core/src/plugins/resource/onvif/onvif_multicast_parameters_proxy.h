@@ -1,6 +1,8 @@
 #pragma once
 
 #include <optional>
+#include <string>
+#include <QtCore/QString>
 
 struct QnCameraAdvancedParams;
 class QnPlOnvifResource;
@@ -15,6 +17,8 @@ struct MulticastParameters
     std::optional<std::string> address;
     std::optional<int> port;
     std::optional<int> ttl;
+
+    QString toString() const;
 };
 
 class OnvifMulticastParametersProxy
@@ -26,7 +30,10 @@ public:
 
     MulticastParameters multicastParameters();
 
-    bool setMulticastParameters(const MulticastParameters parameters);
+    bool setMulticastParameters(MulticastParameters parameters);
+
+private:
+    bool setAudioEncoderMulticastParameters(MulticastParameters& parameters);
 
 private:
     QnPlOnvifResource* m_resource = nullptr;

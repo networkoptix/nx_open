@@ -537,6 +537,12 @@ int MediaSoapWrapper::getVideoEncoderConfigurationOptions(VideoOptionsReq& reque
     return m_soapProxy->GetVideoEncoderConfigurationOptions(m_endpoint, NULL, &request, &response);
 }
 
+int MediaSoapWrapper::getAudioEncoderConfiguration(AudioConfigReq& request, AudioConfigResp& response)
+{
+    beforeMethodInvocation<AudioConfigReq>();
+    return m_soapProxy->GetAudioEncoderConfiguration(m_endpoint, NULL, &request, &response);
+}
+
 int MediaSoapWrapper::getAudioOutputConfigurations(GetAudioOutputConfigurationsReq& request, GetAudioOutputConfigurationsResp& response)
 {
     beforeMethodInvocation<GetAudioOutputConfigurationsReq>();

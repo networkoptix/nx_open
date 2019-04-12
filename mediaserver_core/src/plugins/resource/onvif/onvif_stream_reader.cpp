@@ -226,7 +226,13 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    fetchUpdateAudioEncoder(soapWrapper, info, isPrimary, isCameraControlRequired);
+    result = fetchUpdateAudioEncoder(soapWrapper, info, isPrimary, isCameraControlRequired);
+    if (result)
+    {
+        m_onvifRes->setAudioEncoderConfigurationToken(
+            QnSecurityCamResource::toStreamIndex(getRole()),
+            info.audioEncoderId.toStdString());
+    }
 
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
