@@ -45,7 +45,7 @@ export class MessageModalContent {
         this.title = this.language.lang.messageType[this.messageType].replace('{{product}}', this.product);
 
         this.sendMessage = this.process.init(() => {
-            return this.cloudApi.sendMessage(this.messageType, this.productId, this.message);
+            return this.cloudApi.sendMessage(this.messageType, this.productId, this.message, this.userName, this.userEmail);
         }, {
             successMessage: this.language.lang.dialogs.messageSent
         }).then(() => {
