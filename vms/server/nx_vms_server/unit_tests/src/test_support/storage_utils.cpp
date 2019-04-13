@@ -110,9 +110,6 @@ void addTestStorage(MediaServerLauncher* server, const QString& storagePath)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Test data generation
 
-static const int64_t kMediaFileDurationMs = 60000;
-static const int64_t kMediaFilesGapMs = 40;
-
 static void replaceValue(QByteArray& payload, const QByteArray& key, const QByteArray& newValue)
 {
     const int keyPos = payload.indexOf(key);
