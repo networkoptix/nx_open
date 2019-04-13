@@ -20,6 +20,8 @@ from django.shortcuts import redirect
 from django.views.generic.base import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
+from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.migrations.executor import MigrationExecutor
 from django.http import HttpResponse
 
 admin.site.disable_action('delete_selected')  # Remove delete action from all models in admin
@@ -35,8 +37,15 @@ def redirect_login(request):
         target_url += '?%s' % request.META['QUERY_STRING']
     return redirect(target_url)
 
+def health_check(request):
+    executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
+    plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
+    status = 503 if plan else 200
+    return HttpResponse(status=status)
+
 
 urlpatterns = [
+    url(r'^health/', health_check),
     url(r'^admin/login/', redirect_login),
     url(r'^admin/cms/', include('cms.urls')),
     url(r'^admin/notifications/', include('notifications.admin_urls')),
