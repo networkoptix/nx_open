@@ -130,6 +130,14 @@
     "devices": "devices", 
     "disclaimer": "This list is limited to actual devices auto-reporting data to {{value}}, as approved by anonymous system users. The complete list of supported manufacturers and models is greater in scope.", 
     "downloads": {
+        "mobile": {
+            "android": {
+                "link": "%ANDROID_APPLICATION_LINK%"
+            }, 
+            "ios": {
+                "link": "%IOS_APPLICATION_LINK%"
+            }
+        }, 
         "platforms": {
             "win86": "x86", 
             "bananapi": "Banana Pi", 
@@ -139,22 +147,6 @@
             "linux64": "x64", 
             "rpi": " Raspberry Pi", 
             "linux86": "x86"
-        }, 
-        "mobile": {
-            "android": {
-                "link": "%ANDROID_APPLICATION_LINK%"
-            }, 
-            "ios": {
-                "link": "%IOS_APPLICATION_LINK%"
-            }
-        }, 
-        "noClientDetectedTitle": "Install %VMS_NAME% to view your System", 
-        "appTypes": {
-            "package": "Package", 
-            "client": "Client only", 
-            "servertool": "Configuration tool", 
-            "bundle": "Client and Server", 
-            "server": "Server only"
         }, 
         "releasesTypes": {
             "patches": "Patches", 
@@ -202,7 +194,13 @@
                 "label": "SDK"
             }
         }, 
-        "action": "Download %VMS_NAME%"
+        "appTypes": {
+            "package": "Package", 
+            "client": "Client only", 
+            "servertool": "Configuration tool", 
+            "bundle": "Client and Server", 
+            "server": "Server only"
+        }
     }, 
     "integration": {
         "backToEditText": "Back to the editing interfaces", 

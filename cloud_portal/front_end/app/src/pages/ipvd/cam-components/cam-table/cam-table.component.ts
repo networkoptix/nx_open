@@ -103,8 +103,19 @@ export class CamTableComponent implements OnChanges, OnInit {
         let byParam;
 
         if (param === 'maxResolution') {
-            byParam = NxUtilsService.byResolution((elm) => {
-                return elm[param].split('x');
+            byParam = NxUtilsService.byParam((elm) => {
+                // sanitize max resolution field and calc total pixels to sort
+                // Found variations:
+                // 1920x1080, 1920 x 1080, '2MP, 1080p'
+                let pixels = 0;
+                let res = elm[param].replace(/[^x\d]+/gi, '');
+                if (res === '21080') { // camera reports "2MP, 1080p"
+                    pixels = 1920 * 1080; // 1920x1080
+                } else {
+                    res = res.split('x');
+                    pixels = res[0] * res[1];
+                }
+                return pixels;
             }, !this.sortOrderASC);
 
         } else if (param === 'maxFps') {

@@ -29,6 +29,22 @@ export class BoolIconComponent implements OnInit {
             if (this.value && changes.param && changes.param.currentValue === 'isTwAudioSupported') {
                 this.additional = '2-way';
             }
+
+            // maxResolution is not boolean - we need to overwrite '0x0'
+            if (this.value &&
+                changes.param &&
+                changes.param.currentValue === 'maxResolution') {
+
+                this.value = null;
+            }
+
+            // maxFps is not boolean - we need to overwrite '0'
+            if (!this.value &&
+                changes.param &&
+                changes.param.currentValue === 'maxFps') {
+
+                this.value = null;
+            }
         }
     }
 }
