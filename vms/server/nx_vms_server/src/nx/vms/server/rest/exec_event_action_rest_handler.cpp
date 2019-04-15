@@ -7,12 +7,12 @@
 
 namespace nx::vms::server {
 
-QnExecuteEventActionRestHandler::QnExecuteEventActionRestHandler(QnMediaServerModule* serverModule):
+ExecuteEventActionRestHandler::ExecuteEventActionRestHandler(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule)
 {
 }
 
-nx::network::rest::Response QnExecuteEventActionRestHandler::executePost(
+nx::network::rest::Response ExecuteEventActionRestHandler::executePost(
     const nx::network::rest::Request& request)
 {
     if (!request.content)

@@ -5,10 +5,10 @@
 
 namespace nx::vms::server {
 
-class QnExecuteEventActionRestHandler: public QnJsonRestHandler, public ServerModuleAware
+class ExecuteEventActionRestHandler: public QnJsonRestHandler, public ServerModuleAware
 {
 public:
-    QnExecuteEventActionRestHandler(QnMediaServerModule* serverModule);
+    ExecuteEventActionRestHandler(QnMediaServerModule* serverModule);
 
     virtual nx::network::rest::Response executePost(
         const nx::network::rest::Request& request) override;

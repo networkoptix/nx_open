@@ -59,13 +59,12 @@ nx::network::rest::Response ConfigureRestHandler::executePost(
     auto data = request.parseContentOrThrow<ConfigureSystemData>();
     if (nx::network::rest::ini().allowGetModifications)
     {
-        // Compatibility with previous version.
-        if (auto value = request.param<quint64>("tranLogTimeSequence"))
-            data.tranLogTime.sequence = *value;
-        if (auto value = request.param<quint64>("tranLogTimeTicks"))
-            data.tranLogTime.ticks = *value;
         if (data.currentPassword.isEmpty())
             data.currentPassword = request.paramOrDefault("oldPassword");
+
+        auto& log = data.tranLogTime;
+        log.sequence = request.paramOrDefault<quint64>("tranLogTimeSequence", log.sequence);
+        log.ticks = request.paramOrDefault<quint64>("tranLogTimeTicks", log.ticks);
     }
 
     nx::network::rest::JsonResult result;

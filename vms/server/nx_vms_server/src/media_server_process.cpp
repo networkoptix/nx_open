@@ -1523,6 +1523,8 @@ void MediaServerProcess::registerRestHandlers(
      * Start searching for the cameras in manual mode. There are two ways to call this method:
      * IP range search and single host search. To scan an IP range, "start_ip" and "end_ip" must be
      * specified. To run a single host search, "url" must be specified.
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * %param[opt]:string url A valid URL, hostname or hostname:port are accepted.
      * %param[opt]:string start_ip First IP address in the range to scan. Conflicts with "url".
      * %param[opt]:string end_ip Last IP address in the range to scan. Conflicts with "url".
@@ -1550,9 +1552,8 @@ void MediaServerProcess::registerRestHandlers(
      *
      **%apidoc POST /api/manualCamera/add
      * Manually add camera(s).
-     * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object:
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". Example of such object:
      * <pre><code>
      * {
      *     "user": "some_user",
@@ -1566,7 +1567,7 @@ void MediaServerProcess::registerRestHandlers(
      *         }
      *     ]
      * }
-     * </code></pre></p>
+     * </code></pre>
      * %param[opt]:string user Username for the cameras.
      * %param[opt]:string password Password for the cameras.
      * %param:array cameras List of objects representing the cameras.
@@ -1583,7 +1584,9 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/wearableCamera", new QnWearableCameraRestHandler(serverModule()));
 
     /**%apidoc POST /api/ptz
-     * Perform reading or writing PTZ operation
+     * Perform reading or writing PTZ operation.
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
      * %param:enum command PTZ operation
@@ -1624,20 +1627,28 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/ptz", new QnPtzRestHandler(serverModule()));
 
-    /**%apidoc GET /api/createEvent
+    /**%apidoc POST /api/createEvent
      * Using this method it is possible to trigger a generic event in the system from a 3rd party
      * system. Such event will be handled and logged according to current event rules.
      * Parameters of the generated event, such as "source", "caption" and "description", are
      * intended to be analyzed by these rules.
-     * <tt>
-     *     <br/>Example:
-     *     <pre><![CDATA[
-     * http://127.0.0.1:7001/api/createEvent?timestamp=2016-09-16T16:02:41Z&caption=CreditCardUsed&metadata={"cameraRefs":["3A4AD4EA-9269-4B1F-A7AA-2CEC537D0248","3A4AD4EA-9269-4B1F-A7AA-2CEC537D0240"]}
-     *     ]]></pre>
-     *     This example triggers a generic event informing the system that a
-     *     credit card has been used on September 16, 2016 at 16:03:41 UTC in a POS
-     *     terminal being watched by the two specified cameras.
-     * </tt>
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". Example:
+     * <pre>
+     * {
+     *     "timestamp": "2016-09-16T16:02:41Z",
+     *     "caption": "CreditCardUsed",
+     *     "metadata": {
+     *         "cameraRefs": [
+     *             "3A4AD4EA-9269-4B1F-A7AA-2CEC537D0248",
+     *             "3A4AD4EA-9269-4B1F-A7AA-2CEC537D0240"
+     *         ]
+     *     }
+     * }
+     * </pre>
+     * This example triggers a generic event informing the system that a
+     * credit card has been used on September 16, 2016 at 16:03:41 UTC in a POS
+     * terminal being watched by the two specified cameras.
      * %param[opt]:string timestamp Event date and time (as a string containing time in
      *     milliseconds since epoch, or a local time formatted like
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
@@ -1668,6 +1679,16 @@ void MediaServerProcess::registerRestHandlers(
      *     %value Inactive A "long" action associated with this generic event in event rules will
      *         stop.
      * %return:object JSON object with error message and error code (0 means OK).
+     *
+     **%apidoc GET /api/createEvent
+     * Does the same as POST version, but accepts parameters in URL, which is easier to use by 3rd
+     * parties.
+     * <br/>WARNING: This method is not secure, in future versions it will be disabled by default.
+     * Please, use POST version whenever possible.
+     * <br/>Example:
+     * <pre><![CDATA[
+     * http://127.0.0.1:7001/api/createEvent?timestamp=2016-09-16T16:02:41Z&caption=CreditCardUsed&metadata={"cameraRefs":["3A4AD4EA-9269-4B1F-A7AA-2CEC537D0248","3A4AD4EA-9269-4B1F-A7AA-2CEC537D0240"]}
+     * ]]></pre>
      */
     reg("api/createEvent", new nx::vms::server::ExternalEventRestHandler(serverModule()));
 
@@ -1826,6 +1847,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/rebuildArchive
      * Start or stop the server archive rebuilding, also can report this process status.
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * %param[opt]:enum action What to do and what to report about the server archive rebuild.
      *     %value start Start server archive rebuild.
      *     %value stop Stop rebuild.
@@ -1836,7 +1859,9 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/rebuildArchive", new nx::vms::server::RebuildArchiveRestHandler(serverModule()));
 
     /**%apidoc POST /api/backupControl
-     * Start or stop the recorded data backup process, also can report this process status.
+     * Start or stop the recorded data backup process, also reports this process status.
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * %param[opt]:enum action What to do and what to report about the backup process.
      *     %value start Start backup just now.
      *     %value stop Stop backup.
@@ -2679,7 +2704,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:integer aggregationCount How many events were aggregated together for this action.
      */
     reg("api/executeEventAction",
-        new nx::vms::server::QnExecuteEventActionRestHandler(serverModule()));
+        new nx::vms::server::ExecuteEventActionRestHandler(serverModule()));
 
     /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system

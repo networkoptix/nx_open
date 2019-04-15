@@ -40,6 +40,9 @@ nx::network::rest::Response MergeSystemsRestHandler::executePost(
     const nx::network::rest::Request& request)
 {
     auto data = request.parseContentOrThrow<MergeSystemData>();
+    if (nx::network::rest::ini().allowGetModifications)
+        data.mergeOneServer = request.paramOrDefault<bool>("oneServer", data.mergeOneServer);
+
     nx::network::rest::JsonResult result;
     const auto status = execute(data, request.owner, result);
     auto response = nx::network::rest::Response::result(result);
