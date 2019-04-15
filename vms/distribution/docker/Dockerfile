@@ -30,7 +30,7 @@ ENTRYPOINT ["/sbin/init", "--log-target=journal"]
 # This is strange workaround for systemd stdout problem. Not sure what is going on, actually.
 CMD []
 
-RUN mkdir /debs
+RUN mkdir -p /debs
 
 COPY "${mediaserver_deb}" /debs/
 

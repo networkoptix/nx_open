@@ -88,4 +88,4 @@ else
 fi
 
 echo "Building container at folder $DOCKER_WS using mediaserver_deb=$DEB_NAME name=$CONTAINER_NAME"
-docker build -t $CONTAINER_NAME --build-arg mediaserver_deb="$DEB_NAME" - < $DOCKERFILE
+docker build -t $CONTAINER_NAME --build-arg mediaserver_deb="$DEB_NAME" -f - . < $DOCKERFILE

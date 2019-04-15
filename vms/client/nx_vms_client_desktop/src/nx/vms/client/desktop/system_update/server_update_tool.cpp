@@ -1232,11 +1232,6 @@ QUrl generateUpdatePackageUrl(
         if (!server)
             continue;
 
-        bool incompatible = (server->getStatus() == Qn::Incompatible);
-
-        if (server->getStatus() != Qn::Online && !incompatible)
-            continue;
-
         if (!server->getSystemInfo().isValid())
             continue;
 
