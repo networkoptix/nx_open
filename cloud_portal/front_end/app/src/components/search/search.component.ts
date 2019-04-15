@@ -1,6 +1,6 @@
 import {
-    Component, OnInit, Input, ElementRef,
-    forwardRef, Renderer2, ViewEncapsulation
+    Component, OnInit, Input,
+    forwardRef, ViewEncapsulation
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { ActivatedRoute, Router }                  from '@angular/router';
@@ -8,6 +8,19 @@ import { NxConfigService }                         from '../../services/nx-confi
 import { isArray }                                 from 'rxjs/internal-compatibility';
 import { NxUriService }                            from '../../services/uri.service';
 import { TranslateService }                        from '@ngx-translate/core';
+
+
+/* Usage
+ <nx-search
+     name="filterModel"
+     [(ngModel)]="filterModel"
+     (ngModelChange)="modelChanged($event)"
+     expandable?  <- does it have advanced search
+     layout?="[compact | full]"     <- DEFAULT "full"
+     [placeholder]?="placeholder"   <- DEFAULT "Search"
+     ngDefaultControl?>
+ </nx-search>
+ */
 
 @Component({
     selector     : 'nx-search',
