@@ -38,8 +38,17 @@ def target_file(file_name, customization, language_code, preview):
     return target_file_name
 
 
+def global_contexts_to_dict_183_hotfix(contexts, customization):
+    data_structure_dict = {}
+    for context in contexts:
+        for data_structure in context.datastructure_set.all():
+            data_structure_dict[data_structure.name] = customization.read_global_value(data_structure.name)
+
+    return data_structure_dict
+
+
 def process_context_structure(customization, context, content,
-                              language, version_id, preview, force_global_files):
+                              language, version_id, preview, force_global_files, context_dict=None):
     def replace_in(adict, key, value):
         for dict_key in adict.keys():
             itm_type = type(adict[dict_key])
@@ -62,7 +71,10 @@ def process_context_structure(customization, context, content,
 
     for datastructure in context.datastructure_set.order_by('order').all():
         try:
-            content_value = datastructure.find_actual_value(customization, language, version_id)
+            if context_dict and datastructure.name in context_dict:
+                content_value = context_dict[datastructure.name]
+            else:
+                content_value = datastructure.find_actual_value(customization, language, version_id)
             # replace marker with value
             if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
                 if type(content) == dict:
@@ -106,7 +118,7 @@ def save_content(filename, content):
         file.write(content)
 
 
-def process_context(context, language_code, customization, preview, version_id, global_contexts):
+def process_context(context, language_code, customization, preview, version_id, global_contexts, global_context_dict=None):
     language = Language.by_code(language_code, customization.default_language)
     skin = customization.read_global_value('%SKIN%')
     context_template_text = context.template_for_language(language, customization.default_language, skin)
@@ -122,11 +134,11 @@ def process_context(context, language_code, customization, preview, version_id, 
         context_template_text = ''
 
     content = process_context_structure(customization, context, context_template_text, language,
-                                        version_id, preview, context.is_global)  # if context is global - process it
+                                        version_id, preview, context.is_global, global_context_dict)  # if context is global - process it
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
             content = process_context_structure(
-                customization, global_context, content, None, version_id, preview, False)
+                customization, global_context, content, None, version_id, preview, False, global_context_dict)
 
     # If json -> dump it to string
     if type(content) == dict:
@@ -173,8 +185,8 @@ def read_customized_file(filename, customization_name, language_code=None, versi
         return None  # nothing helps
 
 
-def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts):
-    content = process_context(context, language_code, customization, preview, version_id, global_contexts)
+def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts, global_context_dict):
+    content = process_context(context, language_code, customization, preview, version_id, global_contexts, global_context_dict)
     language = Language.by_code(language_code, customization.default_language)
     skin = customization.read_global_value('%SKIN%')
     if context.template_for_language(language, customization.default_language, skin):  # if we have template - save context to file
@@ -256,7 +268,8 @@ def fill_content(customization_name='default', product_name='cloud_portal',
                 # keep incremental value
                 pass
 
-    global_contexts = Context.objects.filter(is_global=True, product_id=product_id)
+    global_contexts = Context.objects.filter(is_global=True, hidden=False, product_id=product_id)
+    global_context_dict = global_contexts_to_dict_183_hotfix(global_contexts, customization)
 
     if not preview:
         if version_id is not None:
@@ -329,9 +342,9 @@ def fill_content(customization_name='default', product_name='cloud_portal',
         # update affected languages
         if context.translatable:
             for language_code in changed_languages:
-                save_context(context, context.file_path, language_code, customization, preview, version_id, global_contexts)
+                save_context(context, context.file_path, language_code, customization, preview, version_id, global_contexts, global_context_dict)
         else:
-            save_context(context, context.file_path, None, customization, preview, version_id, global_contexts)
+            save_context(context, context.file_path, None, customization, preview, version_id, global_contexts, global_context_dict)
 
     generate_languages_json(customization, preview)
 
