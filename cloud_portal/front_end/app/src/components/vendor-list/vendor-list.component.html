@@ -1,6 +1,6 @@
 <nx-pre-loader *ngIf="!vendors" type="page"></nx-pre-loader>
 
-<nx-block *ngIf="vendors">
+<nx-block *ngIf="vendors" id="vendors">
     <header>
         {{ vendors.length + remainingVendors }} <span translate>manufacturers</span>
     </header>
@@ -18,7 +18,7 @@
     </nx-section>
 </nx-block>
 
-<nx-block *ngIf="cameras">
+<nx-block *ngIf="cameras" id="cameras">
     <header>
         {{ cameras }} <span translate>devices</span>
     </header>
