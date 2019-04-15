@@ -34,10 +34,9 @@ MediatorCluster::MediatorCluster()
 
 MediatorFunctionalTest& MediatorCluster::addMediator(int flags, const QString& testDir)
 {
-    auto& mediator =
-        m_mediators.emplace_back(std::make_unique<MediatorFunctionalTest>(flags, testDir));
-    addClusterArgs(mediator.get());
-    return *mediator;
+    m_mediators.emplace_back(std::make_unique<MediatorFunctionalTest>(flags, testDir));
+    addClusterArgs(m_mediators.back().get());
+    return *m_mediators.back();
 }
 
 MediatorFunctionalTest& MediatorCluster::addMediator(

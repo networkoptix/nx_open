@@ -81,6 +81,42 @@ private:
     BasicTestFixture* m_relayTest;
 };
 
+//-------------------------------------------------------------------------------------------------
+
+
+class MediatorConnectorCluster
+{
+public:
+    struct Context
+    {
+        nx::hpm::MediatorFunctionalTest& mediator;
+        nx::hpm::api::MediatorConnector connector;
+
+        Context(
+            nx::hpm::MediatorFunctionalTest& mediator,
+            const QString& cloudHost);
+
+        Context(const Context&) = delete;
+        Context& operator =(const Context&) = delete;
+    };
+
+public:
+    Context& addContext(const std::vector<const char*> args = {},
+        int flags = nx::hpm::MediatorFunctionalTest::MediatorTestFlags::allFlags,
+        const QString& testDir = QString(),
+        const QString& cloudHost = QString());
+
+    Context& context(int index);
+
+    const nx::hpm::test::MediatorCluster& cluster() const;
+
+private:
+    nx::hpm::test::MediatorCluster m_cluster;
+    std::vector<std::unique_ptr<Context>> m_mediators;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 class BasicTestFixture:
     public nx::utils::test::TestWithTemporaryDirectory
 {
@@ -115,9 +151,11 @@ protected:
      */
 
     void addMediator();
+    int mediatorCount() const;
     void startMediator(int index = 0);
     void restartMediator(int index = 0);
     nx::hpm::MediatorFunctionalTest& mediator(int index = 0);
+    MediatorConnectorCluster::Context& mediatorContext(int index = 0);
     void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
     void configureProxyBeforeMediator();
     void blockDownTrafficThroughExistingConnectionsToMediator();
@@ -210,7 +248,7 @@ private:
 
     QnMutex m_mutex;
     const nx::network::http::BufferType m_staticMsgBody;
-    nx::hpm::test::MediatorCluster m_mediatorCluster;
+    MediatorConnectorCluster m_mediatorCluster;
     hpm::api::SystemCredentials m_cloudSystemCredentials;
     std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
     nx::network::http::TestHttpServer m_cloudModulesXmlProvider;
@@ -234,7 +272,7 @@ private:
 
     void initializeCloudModulesXmlWithDirectStunPort();
     void initializeCloudModulesXmlWithStunOverHttp();
-    void startHttpServer();
+    void startHttpServer(nx::hpm::api::MediatorConnector* connector);
     void onHttpRequestDone(
         std::list<std::unique_ptr<nx::network::http::AsyncClient>>::iterator clientIter);
     void waitForServerStatusOnRelay(ServerRelayStatus status);
