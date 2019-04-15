@@ -137,7 +137,7 @@ Page
         {
             anchors.centerIn: parent
             anchors.verticalCenterOffset: parent.height / 4
-            text: qsTr("Press %1 to exit").arg("Esc")
+            text: qsTr("Press %1 to exit", "%1 is a key name (like Esc)").arg("Esc")
             font.pixelSize: 28
             color: ColorTheme.base11
         }

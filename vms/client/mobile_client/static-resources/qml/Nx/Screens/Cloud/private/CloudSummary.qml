@@ -40,7 +40,7 @@ Item
 
         LinkButton
         {
-            text: qsTr("Go to %1").arg(applicationInfo.cloudName())
+            text: qsTr("Go to %1", "%1 is the short cloud name (like 'Cloud')").arg(applicationInfo.cloudName())
             width: parent.width
             onClicked: Qt.openUrlExternally(cloudUrlHelper.mainUrl())
         }

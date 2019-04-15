@@ -97,7 +97,7 @@ Page
 
                     if (!lastCredentials)
                     {
-                        title = qsTr("Delete login \"%1\"?").arg(credentialsEditor.login)
+                        title = qsTr("Delete login \"%1\"?", "%1 is a user name").arg(credentialsEditor.login)
                         message = qsTr(
                             "Server addresses and other logins will remain saved. "
                                 + "To delete all connection information "

@@ -61,7 +61,7 @@ Pane
             width: parent.width - x
             text: login
                 ? login
-                : qsTr("Log in to %1").arg(applicationInfo.cloudName())
+                : qsTr("Log in to %1", "%1 is the short cloud name (like 'Cloud')").arg(applicationInfo.cloudName())
             anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: 14
             font.weight: Font.DemiBold

@@ -121,7 +121,8 @@ DummyMessage
                 title: qsTr("I/O interface not supported yet")
                 description: qsTr(
                     "In this app I/O module can be used as a sound input device only."
-                    + " To use it as a control module, please use desktop version of %1")
+                    + " To use it as a control module, please use desktop version of %1",
+                    "%1 is the short desktop client name (like 'Nx Witness')")
                     .arg(applicationInfo.productName())
                 image: lp("/images/alert_io.png")
             }

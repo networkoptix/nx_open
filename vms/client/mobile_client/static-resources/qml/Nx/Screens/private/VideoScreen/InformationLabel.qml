@@ -84,11 +84,11 @@ Pane
         }
         InformationText
         {
-            text: qsTr("%1 fps").arg(d.framerate.toFixed(2))
+            text: qsTr("%1 fps", "%1 is a count of frames per second").arg(d.framerate.toFixed(2))
         }
         InformationText
         {
-            text: qsTr("%1 Mbps").arg(d.bitrate.toFixed(2))
+            text: qsTr("%1 Mbps", "%1 is a mebgabits per second").arg(d.bitrate.toFixed(2))
         }
         InformationText
         {
