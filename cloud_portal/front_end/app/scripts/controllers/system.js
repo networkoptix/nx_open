@@ -200,7 +200,6 @@ angular.module('cloudApp')
                         } else {
                             responseError = responseError.replace('{{secondarySystem}}', error.targetSystem.name);
                         }
-                        responseError = responseError.replace('{{supportLink}}', Config.supportLink);
                         dialogBody += '<p>' + responseError + '</p>';
                         dialogs.confirm(dialogBody, L.merging.mergeFailedTitle, L.dialogs.okButton, 'btn-primary', null);
                     });
