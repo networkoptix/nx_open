@@ -22,6 +22,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.executor import MigrationExecutor
+from django.http import HttpResponse
 
 admin.site.disable_action('delete_selected')  # Remove delete action from all models in admin
 admin.site.index_template = 'admin/index.html'
