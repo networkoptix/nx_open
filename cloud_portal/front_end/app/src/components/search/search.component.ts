@@ -12,14 +12,22 @@ import { TranslateService }                        from '@ngx-translate/core';
 
 /* Usage
  <nx-search
-     name="filterModel"
+     name="NAME"
      [(ngModel)]="filterModel"
      (ngModelChange)="modelChanged($event)"
-     expandable?  <- does it have advanced search
-     layout?="[compact | full]"     <- DEFAULT "full"
-     [placeholder]?="placeholder"   <- DEFAULT "Search"
+     layout?="[compact | full]"     <- DEFAULT to "full"
+     [placeholder]?="placeholder"   <- DEFAULT to "Search"
      ngDefaultControl?>
  </nx-search>
+
+ * "Compact" layout (used in Integration page)
+    - will hide labels and adjust spacing
+    - will not show advanced search and filters selected buttons
+
+ * "Full" layout (used in IPVD page)
+    - will show labels and adjust spacing
+    - will show advanced search and selected filters buttons
+
  */
 
 @Component({
@@ -35,7 +43,6 @@ import { TranslateService }                        from '@ngx-translate/core';
 })
 
 export class NxSearchComponent implements OnInit, ControlValueAccessor {
-    @Input() expandable: any;
     @Input() layout: any;
     @Input() placeholder: any;
     @Input() dataLoaded: boolean;
@@ -65,9 +72,8 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     ngOnInit() {
         this.dataLoaded = this.dataLoaded === undefined ? true : this.dataLoaded;
         this.placeholder = this.placeholder || '';  // optional param
-        this.layout = (this.layout !== undefined) ? this.layout : 'full';  // optional param
-        this.expandable = (this.expandable !== undefined);  // optional param
-        this.showAdvancedOptions = !this.expandable;
+        this.layout = (this.layout !== undefined) ? this.layout : 'full';
+        this.showAdvancedOptions = !(this.layout === 'full'); // hide advanced search in "full" layout
         this.filterSelected = '';
 
         // Example URI
