@@ -161,7 +161,14 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
     NX_ASSERT(!version.isNull());
+    NX_VERBOSE(this, "setUpdateTarget(%1)", version);
     m_targetVersion = version;
+
+    // VMS-13789: Should set client version to target version, if client has installed it.
+    if (m_clientItem && m_clientItem->state == StatusCode::latestUpdateInstalled)
+    {
+        m_clientItem->version = version;
+    }
 
     for (auto& item: m_items)
     {
@@ -172,7 +179,7 @@ void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version
 
             if (installed != item->installed)
             {
-                item->installed = true;
+                item->installed = installed;
                 NX_INFO(this, "setUpdateTarget() - peer %1 changed installed=%2", item->id, item->installed);
             }
             emit itemChanged(item);
@@ -256,6 +263,8 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
 
                 // Ignoring 'offline' status from /ec2/updateStatus.
                 //item->offline = (status.second.code == StatusCode::offline);
+
+                item->lastStatusTime = UpdateItem::Clock::now();
 
                 if (changed)
                     itemsChanged.append(item);
@@ -500,14 +509,26 @@ void PeerStateTracker::processDownloadTaskSet()
             continue;
 
         if (item->statusUnknown)
+        {
+            auto delta = now - item->lastStatusTime;
+            if (delta > m_waitForServerReturn)
+            {
+                NX_VERBOSE(this, "processDownloadTaskSet() "
+                    "peer %1 had no status updates for too long. Skipping it.", id);
+                m_peersActive.remove(id);
+                m_peersFailed.insert(id);
+                item->state = StatusCode::error;
+                item->statusMessage = tr("The server is taking too long to respond");
+            }
             continue;
+        }
 
         if (item->incompatible)
             continue;
 
         if (item->offline || state == StatusCode::offline)
         {
-            auto delta = now - item->lastTimeOnline;
+            auto delta = now - item->lastOnlineTime;
             if (delta > m_waitForServerReturn)
             {
                 NX_VERBOSE(this, "processDownloadTaskSet() "
@@ -520,7 +541,7 @@ void PeerStateTracker::processDownloadTaskSet()
         {
             if (m_peersActive.contains(id))
             {
-                NX_VERBOSE(this, "processDownloadTaskSet() ",
+                NX_VERBOSE(this, "processDownloadTaskSet() "
                     "peer %1 has already installed this package.", id);
                 m_peersActive.remove(id);
             }
@@ -783,8 +804,15 @@ void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
 
 void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete)
 {
-    NX_ASSERT(m_clientItem);
     using State = ClientUpdateTool::State;
+    NX_ASSERT(m_clientItem);
+    if (!m_clientItem)
+    {
+        NX_VERBOSE(this, "atClientupdateStateChanged(%1, %2) - client item is already destroyed",
+            ClientUpdateTool::toString(State(state)), percentComplete);
+        return;
+    }
+
     NX_VERBOSE(this, "atClientupdateStateChanged(%1, %2)",
         ClientUpdateTool::toString(State(state)), percentComplete);
 
@@ -815,6 +843,8 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
         case State::readyRestart:
             m_clientItem->statusMessage = tr("Ready to restart to the new version");
             m_clientItem->state = StatusCode::readyToInstall;
+            NX_ASSERT(!m_targetVersion.isNull());
+            m_clientItem->version = m_targetVersion;
             m_clientItem->installed = true;
             m_clientItem->progress = 100;
             break;
@@ -825,6 +855,8 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
             break;
         case State::complete:
             m_clientItem->state = StatusCode::latestUpdateInstalled;
+            NX_ASSERT(!m_targetVersion.isNull());
+            m_clientItem->version = m_targetVersion;
             m_clientItem->installing = false;
             m_clientItem->installed = true;
             m_clientItem->progress = 100;
@@ -850,7 +882,7 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
     NX_ASSERT(server);
     if (!server)
         return nullptr;
-    NX_VERBOSE(this, "addItemForServer(%1)", server->getName());
+    NX_VERBOSE(this, "addItemForServer(name=%1, id=%2)", server->getName(), server->getId());
     UpdateItemPtr item = std::make_shared<UpdateItem>();
     item->id = server->getId();
     item->component = UpdateItem::Component::server;
@@ -927,7 +959,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
         if (viewAsOffline)
         {
             // TODO: Should track online->offline changes for task sets
-            item->lastTimeOnline = UpdateItem::Clock::now();
+            item->lastOnlineTime = UpdateItem::Clock::now();
             item->statusUnknown = false;
         }
         else
