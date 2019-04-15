@@ -185,7 +185,7 @@ def read_customized_file(filename, customization_name, language_code=None, versi
         return None  # nothing helps
 
 
-def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts, global_context_dict):
+def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts, global_context_dict=None):
     content = process_context(context, language_code, customization, preview, version_id, global_contexts, global_context_dict)
     language = Language.by_code(language_code, customization.default_language)
     skin = customization.read_global_value('%SKIN%')
