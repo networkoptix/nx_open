@@ -144,8 +144,6 @@ struct QnFfmpegAvPacket: AVPacket
  * around a given pointer to an existing AVFrame without owning it (doing nothing in the
  * destructor).
  */
-#if 0
-template <typename AvFrameType = AVFrame>
 class AvFrameHolder
 {
 public:
@@ -157,40 +155,7 @@ public:
         m_avFrame->data[0] = nullptr;
     }
 
-    /** Wraps around the existing AVFrame without owning it. */
-    AvFrameHolder(AvFrameType* avFrame):
-        m_avFrame(avFrame),
-        m_owned(false)
-    {
-		static_assert(const_cast<AVFrame*>(avFrame), "Arg should be AVFrame* or const AVFrame*");
-		NX_CRITICAL(avFrame);
-    }
-
-    ~AvFrameHolder()
-    {
-        if (m_owned)
-            av_freep(&m_avFrame->data[0]);
-    }
-
-    AvFrameType* operator->() { return m_avFrame; }
-
-private:
-    AvFrameType* const m_avFrame;
-    bool m_owned = false;
-};
-#else // 0
-class AvFrameHolder
-{
-public:
-    /** Creates and owns an instance of AVFrame. */
-    AvFrameHolder():
-        m_avFrame(new AVFrame),
-        m_owned(true)
-    {
-        m_avFrame->data[0] = nullptr;
-    }
-
-    /** Wraps around the existing AVFrame without owning it. */
+    /** Wraps the existing AVFrame without owning it. */
     AvFrameHolder(AVFrame* avFrame):
         m_avFrame(avFrame),
         m_owned(false)
@@ -198,18 +163,16 @@ public:
         NX_CRITICAL(avFrame);
     }
 
-    /** Wraps around the existing AVFrame without owning it. */
-    AvFrameHolder(const AVFrame* avFrame):
-        m_avFrame(const_cast<AVFrame*>(avFrame)),
-        m_owned(false)
-    {
-        NX_CRITICAL(avFrame);
-    }
+    /** Wraps the existing const AVFrame without owning it. */
+    AvFrameHolder(const AVFrame* avFrame): AvFrameHolder(const_cast<AVFrame*>(avFrame)) {}
 
     ~AvFrameHolder()
     {
         if (m_owned)
+        {
             av_freep(&m_avFrame->data[0]);
+            delete m_avFrame;
+        }
     }
 
 	AvFrameHolder(const AvFrameHolder&) = delete;
@@ -224,6 +187,5 @@ private:
     AVFrame* const m_avFrame;
     const bool m_owned;
 };
-#endif // 0
 
 QString toString(AVPixelFormat pixelFormat);
