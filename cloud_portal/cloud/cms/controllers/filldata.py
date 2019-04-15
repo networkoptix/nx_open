@@ -40,8 +40,16 @@ def target_file(file_name, save_location, language_code, preview):
     return target_file_name
 
 
+def global_contexts_to_dict(contexts, product):
+    data_structure_dict = {}
+    for context in contexts:
+        for data_structure in context.datastructure_set.all():
+            data_structure_dict[data_structure.name] = product.read_global_value(data_structure.name)
+    return data_structure_dict
+
+
 def process_context_structure(product, context, content, language,
-                              version_id, preview, force_global_files):
+                              version_id, preview, force_global_files, context_dict=None):
 
     def replace_in(adict, key, value):
         for dict_key in adict.keys():
@@ -67,7 +75,10 @@ def process_context_structure(product, context, content, language,
     location = product.product_root
     for datastructure in context.datastructure_set.order_by('order').all():
         try:
-            content_value = datastructure.find_actual_value(product, language, version_id)
+            if context_dict and datastructure.name in context_dict:
+                content_value = context_dict[datastructure.name]
+            else:
+                content_value = datastructure.find_actual_value(product, language, version_id)
             # replace marker with value
             if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
                 if type(content) == dict:
@@ -114,7 +125,7 @@ def save_content(filename, content):
 
 
 def process_context(product, context, language_code,
-                    preview, version_id, global_contexts):
+                    preview, version_id, global_contexts, global_contexts_dict):
     default_language = product.default_language
     language = Language.by_code(language_code, default_language)
     skin = product.read_global_value('%SKIN%')
@@ -133,7 +144,7 @@ def process_context(product, context, language_code,
                                         language, version_id, preview, context.is_global)  # if context is global - process it
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
-            content = process_context_structure(product, global_context, content, None, version_id, preview, False)
+            content = process_context_structure(product, global_context, content, None, version_id, preview, False, global_contexts_dict)
 
     # If json -> dump it to string
     if type(content) == dict:
@@ -180,9 +191,9 @@ def read_customized_file(filename, product, language_code=None,
 
 
 def save_context(product, context, context_path, language_code,
-                 preview, version_id, global_contexts):
+                 preview, version_id, global_contexts, global_contexts_dict):
     content = process_context(product, context, language_code,
-                              preview, version_id, global_contexts)
+                              preview, version_id, global_contexts, global_contexts_dict)
 
     default_language = product.default_language
     language = Language.by_code(language_code, default_language)
@@ -265,6 +276,7 @@ def fill_content(product,
                 pass
 
     global_contexts = Context.objects.filter(is_global=True, hidden=False, product_type=product.product_type)
+    global_contexts_dict = global_contexts_to_dict(global_contexts, product)
 
     if not preview:
         if version_id is not None:
@@ -321,7 +333,7 @@ def fill_content(product,
                 changed_records = changed_records.filter(id__in=changed_records_ids)
 
     if not incremental:  # If not incremental - iterate all contexts and all languages
-        changed_contexts = Context.objects.filter(product_type=product.product_type).all()
+        changed_contexts = Context.objects.filter(product_type=product.product_type).exclude(is_global=True)
         changed_languages = product.languages_list
 
     default_language_code = product.default_language.code
@@ -342,9 +354,9 @@ def fill_content(product,
         # update affected languages
         if context.translatable:
             for language_code in changed_languages:
-                save_context(product, context, context.file_path, language_code, preview, version_id, global_contexts)
+                save_context(product, context, context.file_path, language_code, preview, version_id, global_contexts, global_contexts_dict)
         else:
-            save_context(product, context, context.file_path, None, preview, version_id, global_contexts)
+            save_context(product, context, context.file_path, None, preview, version_id, global_contexts, global_contexts_dict)
 
     generate_languages_json(product.product_root, languages_list,  preview)
 

@@ -26,6 +26,7 @@ dir=../skins/$SKIN
     pushd ../front_end
         npm run setSkin $SKIN
         npm run build
+        rm -rf dist/src
         # Save the repository info.
         echo "Create version.txt"
         hg log -r . --repository "$2" | head -n 7 > dist/version.txt
