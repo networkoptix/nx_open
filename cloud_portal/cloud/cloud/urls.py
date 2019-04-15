@@ -20,6 +20,7 @@ from django.shortcuts import redirect
 from django.views.generic.base import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponse
 
 admin.site.disable_action('delete_selected')  # Remove delete action from all models in admin
 admin.site.index_template = 'admin/index.html'
