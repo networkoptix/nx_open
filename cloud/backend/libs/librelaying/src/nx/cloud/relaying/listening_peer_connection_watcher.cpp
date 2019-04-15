@@ -49,7 +49,7 @@ void ListeningPeerConnectionWatcher::startTunnel(
     notification.setClientEndpoint(clientInfo.endpoint);
     notification.setClientPeerName(clientInfo.peerName.c_str());
 
-    dispatch(
+    post(
         [this, notification = std::move(notification),
             handler = std::move(handler)]() mutable
         {
