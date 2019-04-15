@@ -19,10 +19,6 @@
       <translation>נדרש אימות</translation>
     </message>
     <message>
-      <source>Offline</source>
-      <translation>לא מקוון</translation>
-    </message>
-    <message>
       <source>Password required</source>
       <translation>נדרשת סיסמה</translation>
     </message>
@@ -30,11 +26,16 @@
       <source>Unsupported firmware version</source>
       <translation>גרסת קושחה לא נתמכת</translation>
     </message>
+    <message>
+      <source>Offline</source>
+      <translation>לא מקוון</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>התחבר ל %1</translation>
     </message>
   </context>
@@ -54,6 +55,7 @@
     </message>
     <message>
       <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>עבור אל %1</translation>
     </message>
   </context>
@@ -64,12 +66,16 @@
       <translation>דוא"ל</translation>
     </message>
     <message>
+      <source>Resend activation email</source>
+      <translation>שלח שוב הודעת אימייל להפעלה</translation>
+    </message>
+    <message>
       <source>Password</source>
       <translation>סיסמה</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <translation>למידע נוסף על %1</translation>
+      <source>Log in</source>
+      <translation>התחברות</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -78,18 +84,6 @@
     <message>
       <source>Forgot your password?</source>
       <translation>שכחת ססמה?</translation>
-    </message>
-    <message>
-      <source>Cannot connect to %1</source>
-      <translation>לא ניתן להתחבר ל %1</translation>
-    </message>
-    <message>
-      <source>Log in</source>
-      <translation>התחברות</translation>
-    </message>
-    <message>
-      <source>Resend activation email</source>
-      <translation>שלח שוב הודעת אימייל להפעלה</translation>
     </message>
     <message>
       <source>Activation email sent</source>
@@ -127,24 +121,26 @@
       <source>Password cannot be empty</source>
       <translation>הסיסמה לא יכולה להיות ריקה</translation>
     </message>
+    <message>
+      <source>Learn more about %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>למד עוד אודות %1</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>אין אפשרות להתחבר אל %1</translation>
+    </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
-    <message>
-      <source>Delete</source>
-      <translation>מחק</translation>
-    </message>
     <message>
       <source>Connect to Server</source>
       <translation>התחבר לשרת</translation>
     </message>
     <message>
-      <source>Enter server address</source>
-      <translation>הזן כתובת שרת</translation>
-    </message>
-    <message>
-      <source>Delete login &quot;%1&quot;?</source>
-      <translation>האם למחוק את פרטי ההתחברות &quot;%1&quot;?</translation>
+      <source>Delete</source>
+      <translation>מחק</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -155,12 +151,21 @@
       <translation>האם למחוק את החיבור?</translation>
     </message>
     <message>
+      <source>Enter server address</source>
+      <translation>הזן כתובת שרת</translation>
+    </message>
+    <message>
       <source>Login cannot be empty</source>
       <translation>לא ניתן להותיר את שדה שם המשתמש ריק</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
       <translation>לא ניתן להותיר את שדה הסיסמה ריק</translation>
+    </message>
+    <message>
+      <source>Delete login &quot;%1&quot;?</source>
+      <comment>%1 is a user name</comment>
+      <translation>האם למחוק את פרטי ההתחברות &quot;%1&quot;?</translation>
     </message>
   </context>
   <context>
@@ -263,14 +268,6 @@
       <translation>לא ידוע</translation>
     </message>
     <message>
-      <source>%1 fps</source>
-      <translation>%1 fps</translation>
-    </message>
-    <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>רזולוציה גבוהה</translation>
     </message>
@@ -285,6 +282,16 @@
     <message>
       <source>Custom-Res</source>
       <translation>התאמה אישית</translation>
+    </message>
+    <message>
+      <source>%1 fps</source>
+      <comment>%1 is a count of frames per second</comment>
+      <translation>%1 fps</translation>
+    </message>
+    <message>
+      <source>%1 Mbps</source>
+      <comment>%1 is a mebgabits per second</comment>
+      <translation>%1 Mbps</translation>
     </message>
   </context>
   <context>
@@ -301,20 +308,20 @@
       <translation>אין אפשרות להפעיל לקוח</translation>
     </message>
     <message>
-      <source>Cannot stop client</source>
-      <translation>לא ניתן לעצור את הלקוח</translation>
-    </message>
-    <message>
       <source>Please make sure that display is connected to %1.</source>
       <translation>ודא שהתצוגה מחוברת ל- %1.</translation>
     </message>
     <message>
-      <source>%1 is offline</source>
-      <translation>%1 נמצא במצב לא מקוון</translation>
+      <source>Cannot stop client</source>
+      <translation>לא ניתן לעצור את הלקוח</translation>
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
       <translation>סיבוב תמונות אינו נתמך במצב מסך מלא</translation>
+    </message>
+    <message>
+      <source>%1 is offline</source>
+      <translation>%1 נמצא במצב לא מקוון</translation>
     </message>
   </context>
   <context>
@@ -343,15 +350,15 @@
     </message>
     <message>
       <source>Server or network is not available</source>
-      <translation type="unfinished">Server or network is not available</translation>
+      <translation>שרת או רשת אינם זמינים</translation>
     </message>
     <message>
       <source>Incompatible server</source>
-      <translation type="unfinished">Incompatible server</translation>
+      <translation>השרת אינו תואם</translation>
     </message>
     <message>
       <source>Incompatible server version %1</source>
-      <translation type="unfinished">Incompatible server version %1</translation>
+      <translation>השרת אינו תואם %1</translation>
     </message>
   </context>
   <context>
@@ -450,6 +457,10 @@
       <translation>מתחבר...</translation>
     </message>
     <message>
+      <source>Cannot connect to server</source>
+      <translation>לא ניתן להתחבר לשרת</translation>
+    </message>
+    <message>
       <source>No cameras available on this layout</source>
       <translation>אין מצלמות זמינות בפריסה זו</translation>
     </message>
@@ -462,11 +473,8 @@
       <translation>לא נמצא דבר</translation>
     </message>
     <message>
-      <source>Cannot connect to server</source>
-      <translation>לא ניתן להתחבר לשרת</translation>
-    </message>
-    <message>
       <source>Press %1 to exit</source>
+      <comment>%1 is a key name (like Esc)</comment>
       <translation>לחץ על %1 ליציאה</translation>
     </message>
   </context>
@@ -521,20 +529,20 @@
   <context>
     <name>SessionItem</name>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>לשרת זה יש גרסה ישנה מדי. עדכן אותה לגרסה העדכנית ביותר.</translation>
+      <source>INCOMPATIBLE</source>
+      <translation>לא תואם</translation>
     </message>
     <message>
       <source>OFFLINE</source>
       <translation>לא מקוון</translation>
     </message>
     <message>
-      <source>INCOMPATIBLE</source>
-      <translation>לא תואם</translation>
-    </message>
-    <message>
       <source>UNREACHABLE</source>
       <translation>בלתי ניתן להשגה</translation>
+    </message>
+    <message>
+      <source>This server has too old version. Please update it to the latest version.</source>
+      <translation>לשרת זה יש גרסה ישנה מדי. עדכן אותה לגרסה העדכנית ביותר.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -543,18 +551,6 @@
   </context>
   <context>
     <name>SessionsScreen</name>
-    <message>
-      <source>Log in to %1</source>
-      <translation>התחבר אל %1</translation>
-    </message>
-    <message>
-      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation>בדוק את חיבור הרשת או לחץ על &quot;%1&quot; כדי להזין כתובת שרת.</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>בדוק את חיבור הרשת או פנה למנהל מערכת</translation>
-    </message>
     <message>
       <source>Connect to Server...</source>
       <translation>התחבר לשרת...</translation>
@@ -568,12 +564,27 @@
       <translation>לא נמצאו מערכות</translation>
     </message>
     <message>
-      <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation>אין אפשרות להתחבר למערכת "%1";</translation>
-    </message>
-    <message>
       <source>Cannot connect to Server</source>
       <translation>לא ניתן להתחבר לשרת</translation>
+    </message>
+    <message>
+      <source>Check your network connection or contact a system administrator</source>
+      <translation>בדוק את חיבור הרשת או פנה למנהל מערכת</translation>
+    </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>התחבר ל %1</translation>
+    </message>
+    <message>
+      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
+      <comment>%1 is a button name</comment>
+      <translation>בדוק את חיבור הרשת או לחץ על &quot;%1&quot; כדי להזין כתובת שרת.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to System &quot;%1&quot;</source>
+      <comment>%1 is a system name</comment>
+      <translation>אין אפשרות להתחבר למערכת "%1";</translation>
     </message>
   </context>
   <context>
@@ -606,6 +617,10 @@
       <translation>חיבור חדש</translation>
     </message>
     <message>
+      <source>Disconnect from Server</source>
+      <translation>התנתקת מהשרת</translation>
+    </message>
+    <message>
       <source>Settings</source>
       <translation>הגדרות</translation>
     </message>
@@ -616,10 +631,6 @@
     <message>
       <source>Stop test</source>
       <translation>עצור בדיקה</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation>התנתקת מהשרת</translation>
     </message>
   </context>
   <context>
@@ -639,12 +650,12 @@
   <context>
     <name>SystemInformationBlock</name>
     <message>
-      <source>Unknown</source>
-      <translation>לא ידוע</translation>
-    </message>
-    <message>
       <source>New Server</source>
       <translation>שרת חדש</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>לא ידוע</translation>
     </message>
   </context>
   <context>
@@ -698,6 +709,22 @@
   <context>
     <name>VideoDummy</name>
     <message>
+      <source>Offline</source>
+      <translation>לא מקוון</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation>לא מורשה</translation>
+    </message>
+    <message>
+      <source>Cannot load video</source>
+      <translation>לא ניתן לטעון וידאו</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation>לא ניתן להציג אף זרם וידאו</translation>
+    </message>
+    <message>
       <source>Server offline</source>
       <translation>השרת במצב לא מקוון</translation>
     </message>
@@ -708,22 +735,6 @@
     <message>
       <source>Camera offline</source>
       <translation>המצלמה לא זמינה</translation>
-    </message>
-    <message>
-      <source>Cannot load video</source>
-      <translation>לא ניתן לטעון וידאו</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>לא מקוון</translation>
-    </message>
-    <message>
-      <source>Unauthorized</source>
-      <translation>לא מורשה</translation>
-    </message>
-    <message>
-      <source>Cannot play any video stream</source>
-      <translation>לא ניתן להציג אף זרם וידאו</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -755,11 +766,24 @@
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>ניתן להשתמש במודול קלט / פלט של אפליקציה זו כמכשיר קלט קול בלבד. כדי להשתמש בו כמודול בקרה, אנא השתמש בגירסת שולחן העבודה של %1</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
+    <message>
+      <source>No motion data for this camera</source>
+      <translation type="unfinished">No motion data for this camera</translation>
+    </message>
+    <message>
+      <source>No motion found in the selected area</source>
+      <translation type="unfinished">No motion found in the selected area</translation>
+    </message>
+    <message>
+      <source>No motion found in the visible area</source>
+      <translation type="unfinished">No motion found in the visible area</translation>
+    </message>
     <message>
       <source>No Archive</source>
       <translation>ללא ארכיון</translation>
@@ -772,12 +796,28 @@
   <context>
     <name>VideoScreen</name>
     <message>
+      <source>Area</source>
+      <translation type="unfinished">Area</translation>
+    </message>
+    <message>
       <source>Change Quality</source>
       <translation>שינוי איכות</translation>
     </message>
     <message>
       <source>Information</source>
       <translation>מידע</translation>
+    </message>
+    <message>
+      <source>Tap and hold to select an area</source>
+      <translation type="unfinished">Tap and hold to select an area</translation>
+    </message>
+    <message>
+      <source>Enable motion search first to select an area</source>
+      <translation type="unfinished">Enable motion search first to select an area</translation>
+    </message>
+    <message>
+      <source>Invalid custom area. Please draw a correct one.</source>
+      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
   </context>
   <context>
@@ -791,10 +831,11 @@
     <name>main</name>
     <message>
       <source>Server offline. Reconnecting...</source>
-      <translation>שרת במצב לא מקוון. מתחבר מחדש ...</translation>
+      <translation>שרת במצב לא מקוון. מתחבר מחדש...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>אין אפשרות להתחבר אל %1</translation>
     </message>
   </context>

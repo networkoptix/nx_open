@@ -19,10 +19,6 @@
       <translation>Kimlik doğrulaması gerekli</translation>
     </message>
     <message>
-      <source>Offline</source>
-      <translation>Çevrimdışı</translation>
-    </message>
-    <message>
       <source>Password required</source>
       <translation>Şifre gerekli</translation>
     </message>
@@ -30,11 +26,16 @@
       <source>Unsupported firmware version</source>
       <translation>Desteklenmeyen yazılım versiyonu</translation>
     </message>
+    <message>
+      <source>Offline</source>
+      <translation>Çevrimdışı</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>%1 e giriş yapın</translation>
     </message>
   </context>
@@ -43,7 +44,7 @@
     <message>
       <source>%1 Account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>%1heSap</translation>
+      <translation>%1 Hesap</translation>
     </message>
   </context>
   <context>
@@ -54,6 +55,7 @@
     </message>
     <message>
       <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>%1 e git</translation>
     </message>
   </context>
@@ -64,12 +66,16 @@
       <translation>Eposta</translation>
     </message>
     <message>
+      <source>Resend activation email</source>
+      <translation>Doğrulama e-postasını yeniden gönder</translation>
+    </message>
+    <message>
       <source>Password</source>
       <translation>Parola</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <translation>%1 Detay</translation>
+      <source>Log in</source>
+      <translation>Giriş yap</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -78,18 +84,6 @@
     <message>
       <source>Forgot your password?</source>
       <translation>Parolanızı mı unuttunuz?</translation>
-    </message>
-    <message>
-      <source>Cannot connect to %1</source>
-      <translation>%1 e bağlanılamıyor</translation>
-    </message>
-    <message>
-      <source>Log in</source>
-      <translation>Giriş yap</translation>
-    </message>
-    <message>
-      <source>Resend activation email</source>
-      <translation>Doğrulama e-postasını yeniden gönder</translation>
     </message>
     <message>
       <source>Activation email sent</source>
@@ -127,24 +121,26 @@
       <source>Password cannot be empty</source>
       <translation>Parola boş olamaz</translation>
     </message>
+    <message>
+      <source>Learn more about %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 hakkında daha fazla bilgi</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 e bağlanılamıyor</translation>
+    </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
-    <message>
-      <source>Delete</source>
-      <translation>Sil</translation>
-    </message>
     <message>
       <source>Connect to Server</source>
       <translation>Sunucuya bağlan</translation>
     </message>
     <message>
-      <source>Enter server address</source>
-      <translation>Sunucu adresini girin</translation>
-    </message>
-    <message>
-      <source>Delete login &quot;%1&quot;?</source>
-      <translation>Giriş &quot;%1&quot; silinsin mi?</translation>
+      <source>Delete</source>
+      <translation>Sil</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -155,12 +151,21 @@
       <translation>Bağlantıyı silmek istiyor musunuz?</translation>
     </message>
     <message>
+      <source>Enter server address</source>
+      <translation>Sunucu adresini girin</translation>
+    </message>
+    <message>
       <source>Login cannot be empty</source>
       <translation>Giriş bilgileri boş bırakılamaz</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
       <translation>Parola boş olamaz</translation>
+    </message>
+    <message>
+      <source>Delete login &quot;%1&quot;?</source>
+      <comment>%1 is a user name</comment>
+      <translation>Giriş &quot;%1&quot; silinsin mi?</translation>
     </message>
   </context>
   <context>
@@ -263,14 +268,6 @@
       <translation>Belirtilmemiş</translation>
     </message>
     <message>
-      <source>%1 fps</source>
-      <translation>%1 fps</translation>
-    </message>
-    <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>Yüksek Kalite</translation>
     </message>
@@ -285,6 +282,16 @@
     <message>
       <source>Custom-Res</source>
       <translation>Özel Çözünürlük</translation>
+    </message>
+    <message>
+      <source>%1 fps</source>
+      <comment>%1 is a count of frames per second</comment>
+      <translation>%1 fps</translation>
+    </message>
+    <message>
+      <source>%1 Mbps</source>
+      <comment>%1 is a mebgabits per second</comment>
+      <translation>%1 Mbps</translation>
     </message>
   </context>
   <context>
@@ -301,20 +308,20 @@
       <translation>İstemci başlatılamıyor</translation>
     </message>
     <message>
-      <source>Cannot stop client</source>
-      <translation>İstemci kapatılamadı</translation>
-    </message>
-    <message>
       <source>Please make sure that display is connected to %1.</source>
       <translation>Lütfen %1 e ekran bağlandığına emin olun.</translation>
     </message>
     <message>
-      <source>%1 is offline</source>
-      <translation>%1 Kapalı</translation>
+      <source>Cannot stop client</source>
+      <translation>İstemci kapatılamadı</translation>
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
       <translation>Görüntü rotasyonu tam ekran modunda desteklenmiyor</translation>
+    </message>
+    <message>
+      <source>%1 is offline</source>
+      <translation>%1 Kapalı</translation>
     </message>
   </context>
   <context>
@@ -343,15 +350,15 @@
     </message>
     <message>
       <source>Server or network is not available</source>
-      <translation type="unfinished">Server or network is not available</translation>
+      <translation>Sunucu Müsait Değil</translation>
     </message>
     <message>
       <source>Incompatible server</source>
-      <translation type="unfinished">Incompatible server</translation>
+      <translation>Sunucu uyuşmazlığı</translation>
     </message>
     <message>
       <source>Incompatible server version %1</source>
-      <translation type="unfinished">Incompatible server version %1</translation>
+      <translation>Uyumsuz Sunucu versiyonu %1</translation>
     </message>
   </context>
   <context>
@@ -450,6 +457,10 @@
       <translation>Bağlantı kuruluyor...</translation>
     </message>
     <message>
+      <source>Cannot connect to server</source>
+      <translation>Sunucuya bağlanılamıyor</translation>
+    </message>
+    <message>
       <source>No cameras available on this layout</source>
       <translation>Bu düzende erişilebilir kamera yok</translation>
     </message>
@@ -462,11 +473,8 @@
       <translation>Hiçbir şey bulunamadı</translation>
     </message>
     <message>
-      <source>Cannot connect to server</source>
-      <translation>Sunucuya bağlanılamıyor</translation>
-    </message>
-    <message>
       <source>Press %1 to exit</source>
+      <comment>%1 is a key name (like Esc)</comment>
       <translation>Çıkmak için %1 e basın</translation>
     </message>
   </context>
@@ -521,20 +529,20 @@
   <context>
     <name>SessionItem</name>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Sunucu versiyonu çok eski. Lütfen en son sürüme güncelleyin.</translation>
+      <source>INCOMPATIBLE</source>
+      <translation>UYUMSUZ</translation>
     </message>
     <message>
       <source>OFFLINE</source>
       <translation>ÇEVRİMDIŞI</translation>
     </message>
     <message>
-      <source>INCOMPATIBLE</source>
-      <translation>UYUMSUZ</translation>
-    </message>
-    <message>
       <source>UNREACHABLE</source>
       <translation>ULAŞILAMAZ</translation>
+    </message>
+    <message>
+      <source>This server has too old version. Please update it to the latest version.</source>
+      <translation>Sunucu versiyonu çok eski. Lütfen en son sürüme güncelleyin.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -543,18 +551,6 @@
   </context>
   <context>
     <name>SessionsScreen</name>
-    <message>
-      <source>Log in to %1</source>
-      <translation>%1 e giriş yapın</translation>
-    </message>
-    <message>
-      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation>Ağ bağlantısını kontrol edin veya daha önce bağlanılan bir sunucu için &quot;%1&quot; e basın.</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Bağlanıtınızı kontrol edin veya sistem yöneticinize başvurun</translation>
-    </message>
     <message>
       <source>Connect to Server...</source>
       <translation>Sunucuya Bağlan...</translation>
@@ -568,12 +564,27 @@
       <translation>Hiçbir sistem bulundu</translation>
     </message>
     <message>
-      <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation>Sisteme bağlanılamıyor &quot;%1&quot;</translation>
-    </message>
-    <message>
       <source>Cannot connect to Server</source>
       <translation>Sunucuya bağlanılamıyor</translation>
+    </message>
+    <message>
+      <source>Check your network connection or contact a system administrator</source>
+      <translation>Bağlanıtınızı kontrol edin veya sistem yöneticinize başvurun</translation>
+    </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 e giriş yapın</translation>
+    </message>
+    <message>
+      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
+      <comment>%1 is a button name</comment>
+      <translation>Ağ bağlantısını kontrol edin veya daha önce bağlanılan bir sunucu için &quot;%1&quot; e basın.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to System &quot;%1&quot;</source>
+      <comment>%1 is a system name</comment>
+      <translation>Sisteme bağlanılamıyor &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -606,6 +617,10 @@
       <translation>Yeni bağlantı</translation>
     </message>
     <message>
+      <source>Disconnect from Server</source>
+      <translation>Sunucu ile bağlantıyı kes</translation>
+    </message>
+    <message>
       <source>Settings</source>
       <translation>Ayarlar</translation>
     </message>
@@ -616,10 +631,6 @@
     <message>
       <source>Stop test</source>
       <translation>Testi durdur</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation>Sunucu ile bağlantıyı kes</translation>
     </message>
   </context>
   <context>
@@ -639,12 +650,12 @@
   <context>
     <name>SystemInformationBlock</name>
     <message>
-      <source>Unknown</source>
-      <translation>Belirtilmemiş</translation>
-    </message>
-    <message>
       <source>New Server</source>
       <translation>Yeni Sunucu</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Belirtilmemiş</translation>
     </message>
   </context>
   <context>
@@ -698,6 +709,22 @@
   <context>
     <name>VideoDummy</name>
     <message>
+      <source>Offline</source>
+      <translation>Çevrimdışı</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation>Yetkisiz</translation>
+    </message>
+    <message>
+      <source>Cannot load video</source>
+      <translation>Video yüklenemiyor</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation>Herhangi bir video akışı oynatılamıyor</translation>
+    </message>
+    <message>
       <source>Server offline</source>
       <translation>Sunucu Çevrimdışı</translation>
     </message>
@@ -708,22 +735,6 @@
     <message>
       <source>Camera offline</source>
       <translation>Kamera çevrimdışı</translation>
-    </message>
-    <message>
-      <source>Cannot load video</source>
-      <translation>Video yüklenemiyor</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>Çevrimdışı</translation>
-    </message>
-    <message>
-      <source>Unauthorized</source>
-      <translation>Yetkisiz</translation>
-    </message>
-    <message>
-      <source>Cannot play any video stream</source>
-      <translation>Herhangi bir video akışı oynatılamıyor</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -755,11 +766,24 @@
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>Bu uygulamada I / O modülü sadece bir ses girişi aygıtı olarak kullanılabilir. Bir kontrol modülü olarak kullanmak için lütfen %1masaüstü sürümünü kullanın</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
+    <message>
+      <source>No motion data for this camera</source>
+      <translation>Bu kamera için hareket verisi yok</translation>
+    </message>
+    <message>
+      <source>No motion found in the selected area</source>
+      <translation>Seçilen alanda hareket bulunamadı</translation>
+    </message>
+    <message>
+      <source>No motion found in the visible area</source>
+      <translation>Görünür alanda hareket bulunamadı</translation>
+    </message>
     <message>
       <source>No Archive</source>
       <translation>Arşiv yok</translation>
@@ -772,12 +796,28 @@
   <context>
     <name>VideoScreen</name>
     <message>
+      <source>Area</source>
+      <translation>Alan</translation>
+    </message>
+    <message>
       <source>Change Quality</source>
       <translation>Kaliteyi değiştir</translation>
     </message>
     <message>
       <source>Information</source>
       <translation>Bilgi</translation>
+    </message>
+    <message>
+      <source>Tap and hold to select an area</source>
+      <translation>Bir alan seçmek için dokunun ve basılı tutun</translation>
+    </message>
+    <message>
+      <source>Enable motion search first to select an area</source>
+      <translation>Bir alan seçmek için önce hareket aramayı etkinleştirin</translation>
+    </message>
+    <message>
+      <source>Invalid custom area. Please draw a correct one.</source>
+      <translation>Geçersiz özel alan. Lütfen doğru bir tane çizin.</translation>
     </message>
   </context>
   <context>
@@ -791,10 +831,11 @@
     <name>main</name>
     <message>
       <source>Server offline. Reconnecting...</source>
-      <translation>Sunucu çevrimdışı. Yeniden bağlanıyor ...</translation>
+      <translation>Sunucu çevrimdışı. Yeniden bağlanıyor...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>%1 e bağlanılamıyor</translation>
     </message>
   </context>

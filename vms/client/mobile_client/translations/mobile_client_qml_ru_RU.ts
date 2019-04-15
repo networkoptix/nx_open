@@ -19,10 +19,6 @@
       <translation>Требуется аутентификация</translation>
     </message>
     <message>
-      <source>Offline</source>
-      <translation>Не в сети</translation>
-    </message>
-    <message>
       <source>Password required</source>
       <translation>Требуется пароль</translation>
     </message>
@@ -30,11 +26,16 @@
       <source>Unsupported firmware version</source>
       <translation>Неподдерживаемая версия прошивки</translation>
     </message>
+    <message>
+      <source>Offline</source>
+      <translation>Не в сети</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Войти в %1</translation>
     </message>
   </context>
@@ -54,6 +55,7 @@
     </message>
     <message>
       <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Перейти в %1</translation>
     </message>
   </context>
@@ -64,12 +66,16 @@
       <translation>Email</translation>
     </message>
     <message>
+      <source>Resend activation email</source>
+      <translation>Повторно выслать письмо с активацией</translation>
+    </message>
+    <message>
       <source>Password</source>
       <translation>Пароль</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <translation>Подробнее о %1</translation>
+      <source>Log in</source>
+      <translation>Войти</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -78,18 +84,6 @@
     <message>
       <source>Forgot your password?</source>
       <translation>Забыли пароль?</translation>
-    </message>
-    <message>
-      <source>Cannot connect to %1</source>
-      <translation>Не удаётся подключиться к %1</translation>
-    </message>
-    <message>
-      <source>Log in</source>
-      <translation>Войти</translation>
-    </message>
-    <message>
-      <source>Resend activation email</source>
-      <translation>Повторно выслать письмо с активацией</translation>
     </message>
     <message>
       <source>Activation email sent</source>
@@ -127,24 +121,26 @@
       <source>Password cannot be empty</source>
       <translation>Пароль не может быть пустым</translation>
     </message>
+    <message>
+      <source>Learn more about %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Подробнее о %1</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Не удаётся подключиться к %1</translation>
+    </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
-    <message>
-      <source>Delete</source>
-      <translation>Удалить</translation>
-    </message>
     <message>
       <source>Connect to Server</source>
       <translation>Подключиться к серверу</translation>
     </message>
     <message>
-      <source>Enter server address</source>
-      <translation>Адрес сервера</translation>
-    </message>
-    <message>
-      <source>Delete login &quot;%1&quot;?</source>
-      <translation>Удалить логин &quot;%1&quot;?</translation>
+      <source>Delete</source>
+      <translation>Удалить</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -155,12 +151,21 @@
       <translation>Удалить подключение?</translation>
     </message>
     <message>
+      <source>Enter server address</source>
+      <translation>Адрес сервера</translation>
+    </message>
+    <message>
       <source>Login cannot be empty</source>
       <translation>Логин должен быть задан</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
       <translation>Пароль не может быть пустым</translation>
+    </message>
+    <message>
+      <source>Delete login &quot;%1&quot;?</source>
+      <comment>%1 is a user name</comment>
+      <translation>Удалить логин &quot;%1&quot;?</translation>
     </message>
   </context>
   <context>
@@ -263,14 +268,6 @@
       <translation>Неизвестный</translation>
     </message>
     <message>
-      <source>%1 fps</source>
-      <translation>%1 кадр/с</translation>
-    </message>
-    <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Мбит/с</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>Выс</translation>
     </message>
@@ -285,6 +282,16 @@
     <message>
       <source>Custom-Res</source>
       <translation>Др</translation>
+    </message>
+    <message>
+      <source>%1 fps</source>
+      <comment>%1 is a count of frames per second</comment>
+      <translation>%1 кадр/с</translation>
+    </message>
+    <message>
+      <source>%1 Mbps</source>
+      <comment>%1 is a mebgabits per second</comment>
+      <translation>%1 Мбит/с</translation>
     </message>
   </context>
   <context>
@@ -301,20 +308,20 @@
       <translation>Не удаётся запустить клиент</translation>
     </message>
     <message>
-      <source>Cannot stop client</source>
-      <translation>Не удаётся остановить клиент</translation>
-    </message>
-    <message>
       <source>Please make sure that display is connected to %1.</source>
       <translation>Пожалуйста, убедитесь, что дисплей подключён к %1.</translation>
     </message>
     <message>
-      <source>%1 is offline</source>
-      <translation>%1 не в сети</translation>
+      <source>Cannot stop client</source>
+      <translation>Не удаётся остановить клиент</translation>
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
       <translation>Вращение через ПО не поддерживается в полноэкранном режиме</translation>
+    </message>
+    <message>
+      <source>%1 is offline</source>
+      <translation>%1 не в сети</translation>
     </message>
   </context>
   <context>
@@ -450,6 +457,10 @@
       <translation>Соединение...</translation>
     </message>
     <message>
+      <source>Cannot connect to server</source>
+      <translation>Не удаётся подключиться к серверу</translation>
+    </message>
+    <message>
       <source>No cameras available on this layout</source>
       <translation>Нет камер на раскладке</translation>
     </message>
@@ -462,11 +473,8 @@
       <translation>Ничего не найдено</translation>
     </message>
     <message>
-      <source>Cannot connect to server</source>
-      <translation>Не удаётся подключиться к серверу</translation>
-    </message>
-    <message>
       <source>Press %1 to exit</source>
+      <comment>%1 is a key name (like Esc)</comment>
       <translation>Нажмите %1 для выхода</translation>
     </message>
   </context>
@@ -521,20 +529,20 @@
   <context>
     <name>SessionItem</name>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Версия этого сервера устарела. Пожалуйста, обновите его до последней версии.</translation>
+      <source>INCOMPATIBLE</source>
+      <translation>НЕСОВМЕСТИМАЯ</translation>
     </message>
     <message>
       <source>OFFLINE</source>
       <translation>НЕ В СЕТИ</translation>
     </message>
     <message>
-      <source>INCOMPATIBLE</source>
-      <translation>НЕСОВМЕСТИМАЯ</translation>
-    </message>
-    <message>
       <source>UNREACHABLE</source>
       <translation>НЕДОСТУПНА</translation>
+    </message>
+    <message>
+      <source>This server has too old version. Please update it to the latest version.</source>
+      <translation>Версия этого сервера устарела. Пожалуйста, обновите его до последней версии.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -543,18 +551,6 @@
   </context>
   <context>
     <name>SessionsScreen</name>
-    <message>
-      <source>Log in to %1</source>
-      <translation>Войти в %1</translation>
-    </message>
-    <message>
-      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation>Проверьте сетевое подключение или нажмите кнопку &quot;%1&quot; для ввода адреса известного сервера.</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Проверьте сетевое подключение или обратитесь к системному администратору</translation>
-    </message>
     <message>
       <source>Connect to Server...</source>
       <translation>Подключиться к серверу...</translation>
@@ -568,12 +564,27 @@
       <translation>Системы не найдены</translation>
     </message>
     <message>
-      <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation>Не удаётся подключиться к системе &quot;%1&quot;</translation>
-    </message>
-    <message>
       <source>Cannot connect to Server</source>
       <translation>Не удаётся подключиться к серверу</translation>
+    </message>
+    <message>
+      <source>Check your network connection or contact a system administrator</source>
+      <translation>Проверьте сетевое подключение или обратитесь к системному администратору</translation>
+    </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Войти в %1</translation>
+    </message>
+    <message>
+      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
+      <comment>%1 is a button name</comment>
+      <translation>Проверьте сетевое подключение или нажмите кнопку &quot;%1&quot; для ввода адреса известного сервера.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to System &quot;%1&quot;</source>
+      <comment>%1 is a system name</comment>
+      <translation>Не удаётся подключиться к системе &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -606,6 +617,10 @@
       <translation>Новое соединение</translation>
     </message>
     <message>
+      <source>Disconnect from Server</source>
+      <translation>Отключение от сервера</translation>
+    </message>
+    <message>
       <source>Settings</source>
       <translation>Настройки</translation>
     </message>
@@ -616,10 +631,6 @@
     <message>
       <source>Stop test</source>
       <translation>Остановить тест</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation>Отключение от сервера</translation>
     </message>
   </context>
   <context>
@@ -639,12 +650,12 @@
   <context>
     <name>SystemInformationBlock</name>
     <message>
-      <source>Unknown</source>
-      <translation>Неизвестный</translation>
-    </message>
-    <message>
       <source>New Server</source>
       <translation>Новый сервер</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Неизвестный</translation>
     </message>
   </context>
   <context>
@@ -698,6 +709,22 @@
   <context>
     <name>VideoDummy</name>
     <message>
+      <source>Offline</source>
+      <translation>Не в сети</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation>Не авторизован</translation>
+    </message>
+    <message>
+      <source>Cannot load video</source>
+      <translation>Ошибка при получении видео</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation>Невозможно воспроизвести ни один видеопоток</translation>
+    </message>
+    <message>
       <source>Server offline</source>
       <translation>Сервер не в сети</translation>
     </message>
@@ -708,22 +735,6 @@
     <message>
       <source>Camera offline</source>
       <translation>Камера не в сети</translation>
-    </message>
-    <message>
-      <source>Cannot load video</source>
-      <translation>Ошибка при получении видео</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>Не в сети</translation>
-    </message>
-    <message>
-      <source>Unauthorized</source>
-      <translation>Не авторизован</translation>
-    </message>
-    <message>
-      <source>Cannot play any video stream</source>
-      <translation>Невозможно воспроизвести ни один видеопоток</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -755,11 +766,24 @@
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>В этом приложении модуль ввода/вывода может использоваться только как устройство ввода звука. Чтобы использовать его в качестве модуля управления, используйте клиентское приложение %1</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
+    <message>
+      <source>No motion data for this camera</source>
+      <translation type="unfinished">No motion data for this camera</translation>
+    </message>
+    <message>
+      <source>No motion found in the selected area</source>
+      <translation type="unfinished">No motion found in the selected area</translation>
+    </message>
+    <message>
+      <source>No motion found in the visible area</source>
+      <translation type="unfinished">No motion found in the visible area</translation>
+    </message>
     <message>
       <source>No Archive</source>
       <translation>Нет архива</translation>
@@ -772,12 +796,28 @@
   <context>
     <name>VideoScreen</name>
     <message>
+      <source>Area</source>
+      <translation type="unfinished">Area</translation>
+    </message>
+    <message>
       <source>Change Quality</source>
       <translation>Изменить качество</translation>
     </message>
     <message>
       <source>Information</source>
       <translation>Информация о продукте</translation>
+    </message>
+    <message>
+      <source>Tap and hold to select an area</source>
+      <translation type="unfinished">Tap and hold to select an area</translation>
+    </message>
+    <message>
+      <source>Enable motion search first to select an area</source>
+      <translation type="unfinished">Enable motion search first to select an area</translation>
+    </message>
+    <message>
+      <source>Invalid custom area. Please draw a correct one.</source>
+      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
   </context>
   <context>
@@ -795,6 +835,7 @@
     </message>
     <message>
       <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Не удаётся подключиться к %1</translation>
     </message>
   </context>

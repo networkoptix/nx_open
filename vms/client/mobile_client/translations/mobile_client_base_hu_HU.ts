@@ -12,7 +12,7 @@
     <name>nx::client::mobile::ActionButtonsModel</name>
     <message>
       <source>Press and hold to speak</source>
-      <translation type="unfinished">Press and hold to speak</translation>
+      <translation>Nyomja és tartsa lenyomva a beszédhez</translation>
     </message>
   </context>
 </TS>

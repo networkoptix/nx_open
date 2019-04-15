@@ -6,7 +6,7 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Byte</numerusform>
         <numerusform>Bytes</numerusform>
       </translation>
@@ -27,7 +27,7 @@
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation type="unfinished">KB</translation>
+      <translation>KB</translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
@@ -40,7 +40,7 @@
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation type="unfinished">MB</translation>
+      <translation>MB</translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
@@ -53,7 +53,7 @@
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation type="unfinished">GB</translation>
+      <translation>Gb</translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
@@ -66,7 +66,7 @@
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>Tb</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
@@ -199,7 +199,7 @@
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>

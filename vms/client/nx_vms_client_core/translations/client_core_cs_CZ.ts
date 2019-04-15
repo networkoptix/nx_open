@@ -6,11 +6,11 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bajtů</numerusform>
         <numerusform>Bajtů</numerusform>
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
+        <numerusform>Bytů</numerusform>
+        <numerusform>Bytů</numerusform>
       </translation>
     </message>
     <message>
@@ -286,31 +286,31 @@
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>milisekund</numerusform>
         <numerusform>milisekund</numerusform>
         <numerusform>milisekund</numerusform>
-        <numerusform>milliseconds</numerusform>
+        <numerusform>milisekundy</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>sekundy</numerusform>
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
+        <numerusform>sekundy</numerusform>
+        <numerusform>sekundy</numerusform>
+        <numerusform>sekundy</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>minuty</numerusform>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
+        <numerusform>minut</numerusform>
+        <numerusform>minut</numerusform>
+        <numerusform>minut</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -326,11 +326,11 @@
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>dny</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
+        <numerusform>dny</numerusform>
+        <numerusform>dny</numerusform>
+        <numerusform>dny</numerusform>
       </translation>
     </message>
     <message numerus="yes">

@@ -106,6 +106,11 @@
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
       <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
     </message>
+    <message>
+      <source>Cloud systems have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -1567,11 +1572,11 @@
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n uživatelů</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+        <numerusform>%n uživatelé</numerusform>
+        <numerusform>%n uživatelé</numerusform>
+        <numerusform>%n uživatelé</numerusform>
       </translation>
     </message>
     <message numerus="yes">

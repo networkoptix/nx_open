@@ -19,10 +19,6 @@
       <translation>需要身份驗證</translation>
     </message>
     <message>
-      <source>Offline</source>
-      <translation>離線</translation>
-    </message>
-    <message>
       <source>Password required</source>
       <translation>需要密碼</translation>
     </message>
@@ -30,12 +26,17 @@
       <source>Unsupported firmware version</source>
       <translation>不支援的分位版本</translation>
     </message>
+    <message>
+      <source>Offline</source>
+      <translation>離線</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation>登入到 %1</translation>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>登錄到 %1</translation>
     </message>
   </context>
   <context>
@@ -54,6 +55,7 @@
     </message>
     <message>
       <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>跳到 %1</translation>
     </message>
   </context>
@@ -64,12 +66,16 @@
       <translation>Email</translation>
     </message>
     <message>
+      <source>Resend activation email</source>
+      <translation>重新發送啟用電子郵件</translation>
+    </message>
+    <message>
       <source>Password</source>
       <translation>密碼</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <translation>瞭解更多 %1</translation>
+      <source>Log in</source>
+      <translation>登入</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -78,18 +84,6 @@
     <message>
       <source>Forgot your password?</source>
       <translation>忘了密碼？</translation>
-    </message>
-    <message>
-      <source>Cannot connect to %1</source>
-      <translation>無法連接到 %1</translation>
-    </message>
-    <message>
-      <source>Log in</source>
-      <translation>登入</translation>
-    </message>
-    <message>
-      <source>Resend activation email</source>
-      <translation>重新發送啟用電子郵件</translation>
     </message>
     <message>
       <source>Activation email sent</source>
@@ -127,24 +121,26 @@
       <source>Password cannot be empty</source>
       <translation>密碼不能為空</translation>
     </message>
+    <message>
+      <source>Learn more about %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>瞭解更多 %1</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>無法連接到 %1</translation>
+    </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
-    <message>
-      <source>Delete</source>
-      <translation>刪除</translation>
-    </message>
     <message>
       <source>Connect to Server</source>
       <translation>連線到伺服器</translation>
     </message>
     <message>
-      <source>Enter server address</source>
-      <translation>輸入伺服器位址</translation>
-    </message>
-    <message>
-      <source>Delete login &quot;%1&quot;?</source>
-      <translation>刪除帳號 &quot;%1&quot;？</translation>
+      <source>Delete</source>
+      <translation>刪除</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -155,12 +151,21 @@
       <translation>刪除連線?</translation>
     </message>
     <message>
+      <source>Enter server address</source>
+      <translation>輸入伺服器位址</translation>
+    </message>
+    <message>
       <source>Login cannot be empty</source>
       <translation>帳號不能為空值</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
       <translation>密碼不能為空值</translation>
+    </message>
+    <message>
+      <source>Delete login &quot;%1&quot;?</source>
+      <comment>%1 is a user name</comment>
+      <translation>刪除帳號 &quot;%1&quot;？</translation>
     </message>
   </context>
   <context>
@@ -263,14 +268,6 @@
       <translation>未知</translation>
     </message>
     <message>
-      <source>%1 fps</source>
-      <translation>%1 fps</translation>
-    </message>
-    <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>高解析度</translation>
     </message>
@@ -285,6 +282,16 @@
     <message>
       <source>Custom-Res</source>
       <translation>自訂解析度</translation>
+    </message>
+    <message>
+      <source>%1 fps</source>
+      <comment>%1 is a count of frames per second</comment>
+      <translation>%1 fps</translation>
+    </message>
+    <message>
+      <source>%1 Mbps</source>
+      <comment>%1 is a mebgabits per second</comment>
+      <translation>%1 Mbps</translation>
     </message>
   </context>
   <context>
@@ -301,20 +308,20 @@
       <translation>無法啟動用戶端</translation>
     </message>
     <message>
-      <source>Cannot stop client</source>
-      <translation>無法停止用戶端</translation>
-    </message>
-    <message>
       <source>Please make sure that display is connected to %1.</source>
       <translation>請確認螢幕已連接到 %1.</translation>
     </message>
     <message>
-      <source>%1 is offline</source>
-      <translation>%1 已離線</translation>
+      <source>Cannot stop client</source>
+      <translation>無法停止用戶端</translation>
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
       <translation>在全螢幕模式下不支援軟體影像旋轉</translation>
+    </message>
+    <message>
+      <source>%1 is offline</source>
+      <translation>%1 已離線</translation>
     </message>
   </context>
   <context>
@@ -343,15 +350,15 @@
     </message>
     <message>
       <source>Server or network is not available</source>
-      <translation type="unfinished">Server or network is not available</translation>
+      <translation>無法連上伺服器或網路</translation>
     </message>
     <message>
       <source>Incompatible server</source>
-      <translation type="unfinished">Incompatible server</translation>
+      <translation>不相容的伺服器</translation>
     </message>
     <message>
       <source>Incompatible server version %1</source>
-      <translation type="unfinished">Incompatible server version %1</translation>
+      <translation>不相容的伺服器版本 %1</translation>
     </message>
   </context>
   <context>
@@ -450,6 +457,10 @@
       <translation>連線中...</translation>
     </message>
     <message>
+      <source>Cannot connect to server</source>
+      <translation>無法連線至伺服器</translation>
+    </message>
+    <message>
       <source>No cameras available on this layout</source>
       <translation>佈局上無任何攝影機</translation>
     </message>
@@ -462,11 +473,8 @@
       <translation>未找到任何內容</translation>
     </message>
     <message>
-      <source>Cannot connect to server</source>
-      <translation>無法連線至伺服器</translation>
-    </message>
-    <message>
       <source>Press %1 to exit</source>
+      <comment>%1 is a key name (like Esc)</comment>
       <translation>按 %1 退出</translation>
     </message>
   </context>
@@ -521,20 +529,20 @@
   <context>
     <name>SessionItem</name>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>此伺服器版本太舊. 請更新到最新版本.</translation>
+      <source>INCOMPATIBLE</source>
+      <translation>不相容</translation>
     </message>
     <message>
       <source>OFFLINE</source>
       <translation>離線</translation>
     </message>
     <message>
-      <source>INCOMPATIBLE</source>
-      <translation>不相容</translation>
-    </message>
-    <message>
       <source>UNREACHABLE</source>
       <translation>無法連接</translation>
+    </message>
+    <message>
+      <source>This server has too old version. Please update it to the latest version.</source>
+      <translation>此伺服器版本太舊. 請更新到最新版本.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -543,18 +551,6 @@
   </context>
   <context>
     <name>SessionsScreen</name>
-    <message>
-      <source>Log in to %1</source>
-      <translation>登錄到 %1</translation>
-    </message>
-    <message>
-      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation>請檢查您的網路連接或按 &quot;%1&quot; 按鈕來輸入已知的伺服器位址.</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>請檢查您的網路連接或與系統管理員聯繫</translation>
-    </message>
     <message>
       <source>Connect to Server...</source>
       <translation>連線至伺服器...</translation>
@@ -568,12 +564,27 @@
       <translation>找不到任何系統</translation>
     </message>
     <message>
-      <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation>無法連接到系統 &quot;%1&quot;</translation>
-    </message>
-    <message>
       <source>Cannot connect to Server</source>
       <translation>無法連線至伺服器</translation>
+    </message>
+    <message>
+      <source>Check your network connection or contact a system administrator</source>
+      <translation>請檢查您的網路連接或與系統管理員聯繫</translation>
+    </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>登錄到 %1</translation>
+    </message>
+    <message>
+      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
+      <comment>%1 is a button name</comment>
+      <translation>請檢查您的網路連接或按 &quot;%1&quot; 按鈕來輸入已知的伺服器位址.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to System &quot;%1&quot;</source>
+      <comment>%1 is a system name</comment>
+      <translation>無法連接到系統 &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -606,6 +617,10 @@
       <translation>建立新的連線</translation>
     </message>
     <message>
+      <source>Disconnect from Server</source>
+      <translation>中斷連線</translation>
+    </message>
+    <message>
       <source>Settings</source>
       <translation>設定</translation>
     </message>
@@ -616,10 +631,6 @@
     <message>
       <source>Stop test</source>
       <translation>停止測試</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation>中斷連線</translation>
     </message>
   </context>
   <context>
@@ -639,12 +650,12 @@
   <context>
     <name>SystemInformationBlock</name>
     <message>
-      <source>Unknown</source>
-      <translation>未知</translation>
-    </message>
-    <message>
       <source>New Server</source>
       <translation>新的伺服器</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>未知</translation>
     </message>
   </context>
   <context>
@@ -685,7 +696,7 @@
     </message>
     <message>
       <source>(Space)</source>
-      <translation>(所佔空間)</translation>
+      <translation>(已佔空間)</translation>
     </message>
   </context>
   <context>
@@ -698,6 +709,22 @@
   <context>
     <name>VideoDummy</name>
     <message>
+      <source>Offline</source>
+      <translation>離線</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation>未經身分認証</translation>
+    </message>
+    <message>
+      <source>Cannot load video</source>
+      <translation>無法載入影像</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation>無法播放任何影像</translation>
+    </message>
+    <message>
       <source>Server offline</source>
       <translation>伺服器離線</translation>
     </message>
@@ -708,22 +735,6 @@
     <message>
       <source>Camera offline</source>
       <translation>攝影機離線</translation>
-    </message>
-    <message>
-      <source>Cannot load video</source>
-      <translation>無法載入影像</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>離線</translation>
-    </message>
-    <message>
-      <source>Unauthorized</source>
-      <translation>未經身分認証</translation>
-    </message>
-    <message>
-      <source>Cannot play any video stream</source>
-      <translation>無法播放任何影像</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -755,11 +766,24 @@
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>在這個應用程序中，I / O模組只能用作聲音輸入。要將其用作控制模組，請使用桌面應用版本 %1</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
+    <message>
+      <source>No motion data for this camera</source>
+      <translation type="unfinished">No motion data for this camera</translation>
+    </message>
+    <message>
+      <source>No motion found in the selected area</source>
+      <translation type="unfinished">No motion found in the selected area</translation>
+    </message>
+    <message>
+      <source>No motion found in the visible area</source>
+      <translation type="unfinished">No motion found in the visible area</translation>
+    </message>
     <message>
       <source>No Archive</source>
       <translation>無歷史影像</translation>
@@ -772,12 +796,28 @@
   <context>
     <name>VideoScreen</name>
     <message>
+      <source>Area</source>
+      <translation type="unfinished">Area</translation>
+    </message>
+    <message>
       <source>Change Quality</source>
       <translation>變更品質</translation>
     </message>
     <message>
       <source>Information</source>
       <translation>資訊</translation>
+    </message>
+    <message>
+      <source>Tap and hold to select an area</source>
+      <translation type="unfinished">Tap and hold to select an area</translation>
+    </message>
+    <message>
+      <source>Enable motion search first to select an area</source>
+      <translation type="unfinished">Enable motion search first to select an area</translation>
+    </message>
+    <message>
+      <source>Invalid custom area. Please draw a correct one.</source>
+      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
   </context>
   <context>
@@ -795,6 +835,7 @@
     </message>
     <message>
       <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>無法連接到 %1</translation>
     </message>
   </context>

@@ -19,10 +19,6 @@
       <translation>Authentifizierung erforderlich</translation>
     </message>
     <message>
-      <source>Offline</source>
-      <translation>Offline</translation>
-    </message>
-    <message>
       <source>Password required</source>
       <translation>Passwort erforderlich</translation>
     </message>
@@ -30,11 +26,16 @@
       <source>Unsupported firmware version</source>
       <translation>Nicht unterstützte Firmwareversion</translation>
     </message>
+    <message>
+      <source>Offline</source>
+      <translation>Offline</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Bei %1 anmelden</translation>
     </message>
   </context>
@@ -54,6 +55,7 @@
     </message>
     <message>
       <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Gehe zu %1</translation>
     </message>
   </context>
@@ -64,12 +66,16 @@
       <translation>Email</translation>
     </message>
     <message>
+      <source>Resend activation email</source>
+      <translation>Aktivierungsmail erneut senden</translation>
+    </message>
+    <message>
       <source>Password</source>
       <translation>Passwort</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <translation>Erfahren Sie mehr über %1</translation>
+      <source>Log in</source>
+      <translation>Anmelden</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -78,18 +84,6 @@
     <message>
       <source>Forgot your password?</source>
       <translation>Passwort vergessen?</translation>
-    </message>
-    <message>
-      <source>Cannot connect to %1</source>
-      <translation>Kann keine Verbindung zu %1 herstellen</translation>
-    </message>
-    <message>
-      <source>Log in</source>
-      <translation>Anmelden</translation>
-    </message>
-    <message>
-      <source>Resend activation email</source>
-      <translation>Aktivierungsmail erneut senden</translation>
     </message>
     <message>
       <source>Activation email sent</source>
@@ -127,24 +121,26 @@
       <source>Password cannot be empty</source>
       <translation>Passwort darf nicht leer sein</translation>
     </message>
+    <message>
+      <source>Learn more about %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Erfahren Sie mehr über %1</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Kann keine Verbindung zu %1 herstellen</translation>
+    </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
-    <message>
-      <source>Delete</source>
-      <translation>Löschen</translation>
-    </message>
     <message>
       <source>Connect to Server</source>
       <translation>Mit Server verbinden</translation>
     </message>
     <message>
-      <source>Enter server address</source>
-      <translation>Serveradresse eingeben</translation>
-    </message>
-    <message>
-      <source>Delete login &quot;%1&quot;?</source>
-      <translation>Login löschen &quot;%1&quot;?</translation>
+      <source>Delete</source>
+      <translation>Löschen</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -155,12 +151,21 @@
       <translation>Verbindung löschen?</translation>
     </message>
     <message>
+      <source>Enter server address</source>
+      <translation>Serveradresse eingeben</translation>
+    </message>
+    <message>
       <source>Login cannot be empty</source>
       <translation>Der Login darf nicht leer sein</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
       <translation>Passwort darf nicht leer sein</translation>
+    </message>
+    <message>
+      <source>Delete login &quot;%1&quot;?</source>
+      <comment>%1 is a user name</comment>
+      <translation>Login löschen &quot;%1&quot;?</translation>
     </message>
   </context>
   <context>
@@ -263,14 +268,6 @@
       <translation>Unbekannt</translation>
     </message>
     <message>
-      <source>%1 fps</source>
-      <translation>%1 fps</translation>
-    </message>
-    <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>Hi-Res</translation>
     </message>
@@ -285,6 +282,16 @@
     <message>
       <source>Custom-Res</source>
       <translation>Custom-Res</translation>
+    </message>
+    <message>
+      <source>%1 fps</source>
+      <comment>%1 is a count of frames per second</comment>
+      <translation>%1 fps</translation>
+    </message>
+    <message>
+      <source>%1 Mbps</source>
+      <comment>%1 is a mebgabits per second</comment>
+      <translation>%1 Mbps</translation>
     </message>
   </context>
   <context>
@@ -301,20 +308,20 @@
       <translation>Client kann nicht gestartet werden</translation>
     </message>
     <message>
-      <source>Cannot stop client</source>
-      <translation>Client kann nicht gestoppt werden</translation>
-    </message>
-    <message>
       <source>Please make sure that display is connected to %1.</source>
       <translation>Bitte stellen Sie sicher, dass der Monitor mit %1 verbunden ist.</translation>
     </message>
     <message>
-      <source>%1 is offline</source>
-      <translation>%1 ist offline</translation>
+      <source>Cannot stop client</source>
+      <translation>Client kann nicht gestoppt werden</translation>
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
       <translation>Die Software-Bilddrehung wird im Vollbildmodus nicht unterstützt</translation>
+    </message>
+    <message>
+      <source>%1 is offline</source>
+      <translation>%1 ist offline</translation>
     </message>
   </context>
   <context>
@@ -450,6 +457,10 @@
       <translation>Verbinde...</translation>
     </message>
     <message>
+      <source>Cannot connect to server</source>
+      <translation>Es kann keine Verbindung zum Server hergestellt werden</translation>
+    </message>
+    <message>
       <source>No cameras available on this layout</source>
       <translation>Keine Kameras auf diesem Layout verfügbar</translation>
     </message>
@@ -462,11 +473,8 @@
       <translation>Nichts gefunden</translation>
     </message>
     <message>
-      <source>Cannot connect to server</source>
-      <translation>Es kann keine Verbindung zum Server hergestellt werden</translation>
-    </message>
-    <message>
       <source>Press %1 to exit</source>
+      <comment>%1 is a key name (like Esc)</comment>
       <translation>Drücken Sie %1, um zu beenden</translation>
     </message>
   </context>
@@ -521,20 +529,20 @@
   <context>
     <name>SessionItem</name>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Dieser Server hat eine veraltete Version. Bitte aktualisieren Sie diesen auf die neueste Version.</translation>
+      <source>INCOMPATIBLE</source>
+      <translation>NICHT KOMPATIBEL</translation>
     </message>
     <message>
       <source>OFFLINE</source>
       <translation>OFFLINE</translation>
     </message>
     <message>
-      <source>INCOMPATIBLE</source>
-      <translation>NICHT KOMPATIBEL</translation>
-    </message>
-    <message>
       <source>UNREACHABLE</source>
       <translation>NICHT ERREICHBAR</translation>
+    </message>
+    <message>
+      <source>This server has too old version. Please update it to the latest version.</source>
+      <translation>Dieser Server hat eine veraltete Version. Bitte aktualisieren Sie diesen auf die neueste Version.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -543,18 +551,6 @@
   </context>
   <context>
     <name>SessionsScreen</name>
-    <message>
-      <source>Log in to %1</source>
-      <translation>Anmelden bei %1</translation>
-    </message>
-    <message>
-      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation>Überprüfen Sie Ihre Netzwerkverbindung oder drücken Sie &quot;%1&quot;, um eine Serveradresse einzugeben.</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Überprüfen Sie Ihre Netzwerkverbindung oder wenden Sie sich an einen Systemadministrator</translation>
-    </message>
     <message>
       <source>Connect to Server...</source>
       <translation>Mit Server verbinden...</translation>
@@ -568,12 +564,27 @@
       <translation>Keine Systeme gefunden</translation>
     </message>
     <message>
-      <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation>Keine Verbindung mit System &quot;%1&quot;</translation>
-    </message>
-    <message>
       <source>Cannot connect to Server</source>
       <translation>Kann keine Verbindung zum Server herstellen</translation>
+    </message>
+    <message>
+      <source>Check your network connection or contact a system administrator</source>
+      <translation>Überprüfen Sie Ihre Netzwerkverbindung oder wenden Sie sich an einen Systemadministrator</translation>
+    </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Bei %1 anmelden</translation>
+    </message>
+    <message>
+      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
+      <comment>%1 is a button name</comment>
+      <translation>Überprüfen Sie Ihre Netzwerkverbindung oder drücken Sie &quot;%1&quot;, um eine Serveradresse einzugeben.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to System &quot;%1&quot;</source>
+      <comment>%1 is a system name</comment>
+      <translation>Keine Verbindung mit System &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -606,6 +617,10 @@
       <translation>Neue Verbindung</translation>
     </message>
     <message>
+      <source>Disconnect from Server</source>
+      <translation>Serververbindung trennen</translation>
+    </message>
+    <message>
       <source>Settings</source>
       <translation>Einstellungen</translation>
     </message>
@@ -616,10 +631,6 @@
     <message>
       <source>Stop test</source>
       <translation>Test stoppen</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation>Serververbindung trennen</translation>
     </message>
   </context>
   <context>
@@ -639,12 +650,12 @@
   <context>
     <name>SystemInformationBlock</name>
     <message>
-      <source>Unknown</source>
-      <translation>Unbekannt</translation>
-    </message>
-    <message>
       <source>New Server</source>
       <translation>Neuer Server</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Unbekannt</translation>
     </message>
   </context>
   <context>
@@ -698,6 +709,22 @@
   <context>
     <name>VideoDummy</name>
     <message>
+      <source>Offline</source>
+      <translation>Offline</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation>Nicht autorisiert</translation>
+    </message>
+    <message>
+      <source>Cannot load video</source>
+      <translation>Video kann nicht geladen werden</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation>Kann keinen Videostream spielen</translation>
+    </message>
+    <message>
       <source>Server offline</source>
       <translation>Server ist offline</translation>
     </message>
@@ -708,22 +735,6 @@
     <message>
       <source>Camera offline</source>
       <translation>Kamera ist offline</translation>
-    </message>
-    <message>
-      <source>Cannot load video</source>
-      <translation>Video kann nicht geladen werden</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>Offline</translation>
-    </message>
-    <message>
-      <source>Unauthorized</source>
-      <translation>Nicht autorisiert</translation>
-    </message>
-    <message>
-      <source>Cannot play any video stream</source>
-      <translation>Kann keinen Videostream spielen</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -755,11 +766,24 @@
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>In dieser App kann das I/O-Modul nur als Soundeingabegerät verwendet werden. Um es als Steuermodul zu verwenden, verwenden Sie bitte die Desktopversion von %1</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
+    <message>
+      <source>No motion data for this camera</source>
+      <translation>Keine Bewegungsdaten für diese Kamera</translation>
+    </message>
+    <message>
+      <source>No motion found in the selected area</source>
+      <translation>Keine Bewegung im ausgewählten Bereich gefunden</translation>
+    </message>
+    <message>
+      <source>No motion found in the visible area</source>
+      <translation>Keine Bewegung im sichtbaren Bereich gefunden</translation>
+    </message>
     <message>
       <source>No Archive</source>
       <translation>Kein Archiv</translation>
@@ -772,12 +796,28 @@
   <context>
     <name>VideoScreen</name>
     <message>
+      <source>Area</source>
+      <translation>Bereich</translation>
+    </message>
+    <message>
       <source>Change Quality</source>
       <translation>Qualität ändern</translation>
     </message>
     <message>
       <source>Information</source>
       <translation>Informationen</translation>
+    </message>
+    <message>
+      <source>Tap and hold to select an area</source>
+      <translation>Tippen und halten Sie, um einen Bereich auszuwählen</translation>
+    </message>
+    <message>
+      <source>Enable motion search first to select an area</source>
+      <translation>Aktivieren Sie zuerst die Bewegungssuche, um einen Bereich auszuwählen</translation>
+    </message>
+    <message>
+      <source>Invalid custom area. Please draw a correct one.</source>
+      <translation>Ungültiger benutzerdefinierter Bereich. Bitte ziehe einen richtigen.</translation>
     </message>
   </context>
   <context>
@@ -795,6 +835,7 @@
     </message>
     <message>
       <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Kann keine Verbindung zu %1 herstellen</translation>
     </message>
   </context>

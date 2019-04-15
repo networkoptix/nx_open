@@ -5,7 +5,7 @@
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <translation>Nhấn và giữ để</translation>
     </message>
   </context>
   <context>
@@ -19,22 +19,23 @@
       <translation>Yêu cầu xác thực</translation>
     </message>
     <message>
-      <source>Offline</source>
-      <translation>Ẩn</translation>
-    </message>
-    <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Mật khẩu bắt buộc</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Không Hỗ Trợ Firmware Cho Phiên Bản Này</translation>
+    </message>
+    <message>
+      <source>Offline</source>
+      <translation>Ẩn</translation>
     </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Đăng nhập %1</translation>
     </message>
   </context>
@@ -54,6 +55,7 @@
     </message>
     <message>
       <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Chuyển đến %1</translation>
     </message>
   </context>
@@ -64,12 +66,16 @@
       <translation>Email</translation>
     </message>
     <message>
+      <source>Resend activation email</source>
+      <translation>Gửi lại email kich hoạt</translation>
+    </message>
+    <message>
       <source>Password</source>
       <translation>Mật khẩu</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <translation>Tìm hiểu thêm về %1</translation>
+      <source>Log in</source>
+      <translation>Đăng nhập</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -80,36 +86,24 @@
       <translation>Quên mật khẩu?</translation>
     </message>
     <message>
-      <source>Cannot connect to %1</source>
-      <translation>Không thể kết nối với %1</translation>
-    </message>
-    <message>
-      <source>Log in</source>
-      <translation>Đăng nhập</translation>
-    </message>
-    <message>
-      <source>Resend activation email</source>
-      <translation type="unfinished">Resend activation email</translation>
-    </message>
-    <message>
       <source>Activation email sent</source>
-      <translation type="unfinished">Activation email sent</translation>
+      <translation>Email kích hoạt đã được gửi</translation>
     </message>
     <message>
       <source>Cannot send activation email</source>
-      <translation type="unfinished">Cannot send activation email</translation>
+      <translation>Không thể gửi email kích hoạt</translation>
     </message>
     <message>
       <source>Check your inbox and visit provided link to activate account</source>
-      <translation type="unfinished">Check your inbox and visit provided link to activate account</translation>
+      <translation>Kiểm tra hộp thư đến của bạn và truy cập vào liên kết được cung cấp để kích hoạt tài khoản</translation>
     </message>
     <message>
       <source>Check your internet connection or try again later</source>
-      <translation type="unfinished">Check your internet connection or try again later</translation>
+      <translation>Kiểm tra kết nối internet của bạn hoặc thử lại sau</translation>
     </message>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Không tìm thấy tài khoản</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -117,7 +111,7 @@
     </message>
     <message>
       <source>Account not activated</source>
-      <translation type="unfinished">Account not activated</translation>
+      <translation>Tài khoản không được kích hoạt</translation>
     </message>
     <message>
       <source>Email cannot be empty</source>
@@ -127,24 +121,26 @@
       <source>Password cannot be empty</source>
       <translation>Mật khẩu không được để trống</translation>
     </message>
+    <message>
+      <source>Learn more about %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Tìm hiểu thêm về %1</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Không thể kết nối với %1</translation>
+    </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
-    <message>
-      <source>Delete</source>
-      <translation>Xóa bỏ</translation>
-    </message>
     <message>
       <source>Connect to Server</source>
       <translation>Kết nối với máy chủ</translation>
     </message>
     <message>
-      <source>Enter server address</source>
-      <translation>Nhập địa chỉ máy chủ</translation>
-    </message>
-    <message>
-      <source>Delete login &quot;%1&quot;?</source>
-      <translation>Xóa đăng nhập &quot;%1&quot;?</translation>
+      <source>Delete</source>
+      <translation>Xóa bỏ</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -155,12 +151,21 @@
       <translation>Xóa kết nối?</translation>
     </message>
     <message>
+      <source>Enter server address</source>
+      <translation>Nhập địa chỉ máy chủ</translation>
+    </message>
+    <message>
       <source>Login cannot be empty</source>
       <translation>Đăng nhập không thể để trống</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
       <translation>Password không có sản phẩm nào</translation>
+    </message>
+    <message>
+      <source>Delete login &quot;%1&quot;?</source>
+      <comment>%1 is a user name</comment>
+      <translation>Xóa đăng nhập &quot;%1&quot;?</translation>
     </message>
   </context>
   <context>
@@ -263,14 +268,6 @@
       <translation>Không xác định</translation>
     </message>
     <message>
-      <source>%1 fps</source>
-      <translation>%1 fps</translation>
-    </message>
-    <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>Độ phân giải cao</translation>
     </message>
@@ -285,6 +282,16 @@
     <message>
       <source>Custom-Res</source>
       <translation>Tùy chỉnh-Res</translation>
+    </message>
+    <message>
+      <source>%1 fps</source>
+      <comment>%1 is a count of frames per second</comment>
+      <translation>%1 fps</translation>
+    </message>
+    <message>
+      <source>%1 Mbps</source>
+      <comment>%1 is a mebgabits per second</comment>
+      <translation>%1 Mbps</translation>
     </message>
   </context>
   <context>
@@ -301,20 +308,20 @@
       <translation>Không thể bắt đầu từ máy trạm</translation>
     </message>
     <message>
-      <source>Cannot stop client</source>
-      <translation>Không thể dừng máy trạm</translation>
-    </message>
-    <message>
       <source>Please make sure that display is connected to %1.</source>
       <translation>Hãy đảm bảo rằng màn hình được kết nối với %1.</translation>
     </message>
     <message>
-      <source>%1 is offline</source>
-      <translation>%1 đang ẩn</translation>
+      <source>Cannot stop client</source>
+      <translation>Không thể dừng máy trạm</translation>
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
       <translation>Phần mềm xoay ảnh sẽ không hỗ trợ ở chế độ toàn màn hình</translation>
+    </message>
+    <message>
+      <source>%1 is offline</source>
+      <translation>%1 đang ẩn</translation>
     </message>
   </context>
   <context>
@@ -343,15 +350,15 @@
     </message>
     <message>
       <source>Server or network is not available</source>
-      <translation type="unfinished">Server or network is not available</translation>
+      <translation>Máy chủ hoặc mạng là không có sẵn</translation>
     </message>
     <message>
       <source>Incompatible server</source>
-      <translation type="unfinished">Incompatible server</translation>
+      <translation>Máy chủ không tương thích</translation>
     </message>
     <message>
       <source>Incompatible server version %1</source>
-      <translation type="unfinished">Incompatible server version %1</translation>
+      <translation>Phiên bản máy chủ không tương thích %1</translation>
     </message>
   </context>
   <context>
@@ -450,6 +457,10 @@
       <translation>Kết nối...</translation>
     </message>
     <message>
+      <source>Cannot connect to server</source>
+      <translation>Không thể kết nối tới máy chủ</translation>
+    </message>
+    <message>
       <source>No cameras available on this layout</source>
       <translation>Không có camera nào trên layout này</translation>
     </message>
@@ -462,11 +473,8 @@
       <translation>Không tìm thấy kết quả nào</translation>
     </message>
     <message>
-      <source>Cannot connect to server</source>
-      <translation>Không thể kết nối tới máy chủ</translation>
-    </message>
-    <message>
       <source>Press %1 to exit</source>
+      <comment>%1 is a key name (like Esc)</comment>
       <translation>Nhấn %1 để thoát</translation>
     </message>
   </context>
@@ -521,20 +529,20 @@
   <context>
     <name>SessionItem</name>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Máy chủ này có phiên bản quá cũ. Vui lòng cập nhật lên phiên bản mới nhất.</translation>
+      <source>INCOMPATIBLE</source>
+      <translation>KHÔNG THÍCH HỢP</translation>
     </message>
     <message>
       <source>OFFLINE</source>
       <translation>OFFLINE</translation>
     </message>
     <message>
-      <source>INCOMPATIBLE</source>
-      <translation>KHÔNG THÍCH HỢP</translation>
-    </message>
-    <message>
       <source>UNREACHABLE</source>
       <translation>Không thể sử dụng được</translation>
+    </message>
+    <message>
+      <source>This server has too old version. Please update it to the latest version.</source>
+      <translation>Máy chủ này có phiên bản quá cũ. Vui lòng cập nhật lên phiên bản mới nhất.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -543,18 +551,6 @@
   </context>
   <context>
     <name>SessionsScreen</name>
-    <message>
-      <source>Log in to %1</source>
-      <translation>Đăng nhập %1</translation>
-    </message>
-    <message>
-      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation>Kiểm tra kết nối mạng của bạn hoặc nhấn nút &quot;%1&quot; để nhập địa chỉ máy chủ đã biết.</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Kiểm tra kết nối mạng của bạn hoặc liên hệ với quản trị viên hệ thống</translation>
-    </message>
     <message>
       <source>Connect to Server...</source>
       <translation>Kết nối đến máy chủ...</translation>
@@ -568,12 +564,27 @@
       <translation>Không tìm thấy Hệ thống</translation>
     </message>
     <message>
-      <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation>Không thể kết nối với Hệ thống &quot;%1&quot;</translation>
-    </message>
-    <message>
       <source>Cannot connect to Server</source>
       <translation>Không thể kết nối tới máy chủ</translation>
+    </message>
+    <message>
+      <source>Check your network connection or contact a system administrator</source>
+      <translation>Kiểm tra kết nối mạng của bạn hoặc liên hệ với quản trị viên hệ thống</translation>
+    </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Đăng nhập %1</translation>
+    </message>
+    <message>
+      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
+      <comment>%1 is a button name</comment>
+      <translation>Kiểm tra kết nối mạng của bạn hoặc nhấn nút &quot;%1&quot; để nhập địa chỉ máy chủ đã biết.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to System &quot;%1&quot;</source>
+      <comment>%1 is a system name</comment>
+      <translation>Không thể kết nối với Hệ thống &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -592,7 +603,7 @@
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
-      <translation type="unfinished">What to do with currently saved passwords?</translation>
+      <translation>Phải làm gì với mật khẩu hiện đã lưu?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -606,6 +617,10 @@
       <translation>Kết nối mới</translation>
     </message>
     <message>
+      <source>Disconnect from Server</source>
+      <translation>Ngắt kết nối với máy chủ</translation>
+    </message>
+    <message>
       <source>Settings</source>
       <translation>Cài đặt</translation>
     </message>
@@ -616,10 +631,6 @@
     <message>
       <source>Stop test</source>
       <translation>Dừng kiểm tra</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation>Ngắt kết nối với máy chủ</translation>
     </message>
   </context>
   <context>
@@ -639,12 +650,12 @@
   <context>
     <name>SystemInformationBlock</name>
     <message>
-      <source>Unknown</source>
-      <translation>Không xác định</translation>
-    </message>
-    <message>
       <source>New Server</source>
       <translation>Máy chủ mới</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Không xác định</translation>
     </message>
   </context>
   <context>
@@ -698,6 +709,22 @@
   <context>
     <name>VideoDummy</name>
     <message>
+      <source>Offline</source>
+      <translation>Ẩn</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation>Chưa được xác thực</translation>
+    </message>
+    <message>
+      <source>Cannot load video</source>
+      <translation>Không thể tải video</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation>Không thể phát bất kỳ luồng video nào</translation>
+    </message>
+    <message>
       <source>Server offline</source>
       <translation>Tổ ẩn</translation>
     </message>
@@ -710,56 +737,53 @@
       <translation>Máy quay</translation>
     </message>
     <message>
-      <source>Cannot load video</source>
-      <translation>Không thể tải video</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>Ẩn</translation>
-    </message>
-    <message>
-      <source>Unauthorized</source>
-      <translation>Chưa được xác thực</translation>
-    </message>
-    <message>
-      <source>Cannot play any video stream</source>
-      <translation>Không thể phát bất kỳ luồng video nào</translation>
-    </message>
-    <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Không đủ giấy phép</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Mật khẩu bắt buộc</translation>
     </message>
     <message>
       <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
-      <translation type="unfinished">Set password on this camera using Wisenet WAVE client or camera web-page to view video</translation>
+      <translation>Đặt mật khẩu trên máy ảnh này bằng ứng dụng Wisenet WAVE hoặc trang web của máy ảnh để xem video</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Không Hỗ Trợ Firmware Cho Phiên Bản Này</translation>
     </message>
     <message>
       <source>Please update firmware</source>
-      <translation type="unfinished">Please update firmware</translation>
+      <translation>Vui lòng cập nhật chương trình cơ sở</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>Quá nhiều kết nối</translation>
     </message>
     <message>
       <source>I/O interface not supported yet</source>
-      <translation type="unfinished">I/O interface not supported yet</translation>
+      <translation>I/O giao diện không được hỗ trợ được</translation>
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <translation type="unfinished">In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</translation>
+      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
+      <translation>Trong mô-đun I / O ứng dụng này chỉ có thể được sử dụng làm thiết bị đầu vào âm thanh. Để sử dụng nó làm mô-đun điều khiển, vui lòng sử dụng phiên bản dành cho máy tính để bàn %1</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
+    <message>
+      <source>No motion data for this camera</source>
+      <translation type="unfinished">No motion data for this camera</translation>
+    </message>
+    <message>
+      <source>No motion found in the selected area</source>
+      <translation type="unfinished">No motion found in the selected area</translation>
+    </message>
+    <message>
+      <source>No motion found in the visible area</source>
+      <translation type="unfinished">No motion found in the visible area</translation>
+    </message>
     <message>
       <source>No Archive</source>
       <translation>Không Lưu Trữ</translation>
@@ -772,12 +796,28 @@
   <context>
     <name>VideoScreen</name>
     <message>
+      <source>Area</source>
+      <translation type="unfinished">Area</translation>
+    </message>
+    <message>
       <source>Change Quality</source>
       <translation>Thay đổi chất lượng</translation>
     </message>
     <message>
       <source>Information</source>
       <translation>Tin tức</translation>
+    </message>
+    <message>
+      <source>Tap and hold to select an area</source>
+      <translation type="unfinished">Tap and hold to select an area</translation>
+    </message>
+    <message>
+      <source>Enable motion search first to select an area</source>
+      <translation type="unfinished">Enable motion search first to select an area</translation>
+    </message>
+    <message>
+      <source>Invalid custom area. Please draw a correct one.</source>
+      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
   </context>
   <context>
@@ -791,10 +831,11 @@
     <name>main</name>
     <message>
       <source>Server offline. Reconnecting...</source>
-      <translation type="unfinished">Server offline. Reconnecting...</translation>
+      <translation>Máy chủ ngoại tuyến. Kết nối lại...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Không thể kết nối với %1</translation>
     </message>
   </context>

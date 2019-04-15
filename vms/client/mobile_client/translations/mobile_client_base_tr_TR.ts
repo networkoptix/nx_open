@@ -12,7 +12,7 @@
     <name>nx::client::mobile::ActionButtonsModel</name>
     <message>
       <source>Press and hold to speak</source>
-      <translation>Kayıt için basılı tutun</translation>
+      <translation>Konuşmak için basılı tutun</translation>
     </message>
   </context>
 </TS>

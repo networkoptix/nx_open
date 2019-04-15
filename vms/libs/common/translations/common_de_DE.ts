@@ -106,6 +106,11 @@
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
       <translation>Systeme können nicht zusammengeführt werden, da sie mindestens einen Server mit derselben ID haben. Bitte entfernen Sie diesen Server und versuchen Sie es erneut.</translation>
     </message>
+    <message>
+      <source>Cloud systems have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Cloudsysteme haben unterschiedliche Besitzer. Zusammenführen ist nicht zulässig.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>

@@ -6,7 +6,7 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Byte</numerusform>
         <numerusform>Bytes</numerusform>
       </translation>

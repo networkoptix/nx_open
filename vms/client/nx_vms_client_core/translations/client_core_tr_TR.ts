@@ -127,11 +127,11 @@
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1 geçici olarak devre dışıdır. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>Ağ hatası. Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.</translation>
     </message>
   </context>
   <context>

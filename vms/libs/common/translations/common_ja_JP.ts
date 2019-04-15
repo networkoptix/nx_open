@@ -5,11 +5,11 @@
     <name>DateTimeFormats</name>
     <message>
       <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
+      <translation>MM/dd</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -104,7 +104,12 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>同じIDを持つサーバーが少なくとも1つあるため、システムを統合できません　このサーバーを削除してやり直してください。</translation>
+    </message>
+    <message>
+      <source>Cloud systems have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>クラウドシステムのオーナーが異なります。統合は許可されていません</translation>
     </message>
   </context>
   <context>
@@ -331,15 +336,15 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>プラグインエラー %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>プラグインは利用できません</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>内部サーバーエラー %1</translation>
     </message>
   </context>
   <context>
@@ -378,7 +383,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>サンプルバッファを割り当てることができませんでした</translation>
     </message>
   </context>
   <context>
@@ -581,12 +586,12 @@
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>無料ライセンス</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n 無料ライセンス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -655,8 +660,8 @@
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 無料ライセンス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -733,11 +738,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>システムごとに許可されるスターターライセンスは1つだけです</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>すでに1つのスターターライセンスがアクティベートされています</translation>
     </message>
   </context>
   <context>
@@ -799,38 +804,38 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n カメラ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n カメラ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n IOモジュール</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n IOモジュール</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n デバイス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n デバイス</numerusform>
       </translation>
     </message>
   </context>
@@ -989,19 +994,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>Zip ファイルが壊れています</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>ターゲットディレクトリが見つかりませんでした</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>書き込み用にファイルを開けませんでした</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>ディスクに空き容量がありません</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1009,22 +1014,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>抽出は取り消されました</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>抽出が忙しい</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>暗号化されたストリームサイズが正しくありません</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>暗号化されたストリームヘッダーが破損しています</translation>
     </message>
   </context>
   <context>
@@ -1164,7 +1169,7 @@
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
       <translation>
-        <numerusform>カメラのIPの競合</numerusform>
+        <numerusform>カメラIPの競合</numerusform>
       </translation>
     </message>
     <message>
@@ -1508,19 +1513,19 @@
     </message>
     <message>
       <source>Plugin Event</source>
-      <translation type="unfinished">Plugin Event</translation>
+      <translation>プラグインイベント</translation>
     </message>
     <message>
       <source>Unknown plugin event</source>
-      <translation type="unfinished">Unknown plugin event</translation>
+      <translation>不明なプラグインイベント</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>カメラ時間が使用できませんでした、時間がかかりすぎます　システム時間が使用されます</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>カメラの時間が通常に戻りました</translation>
     </message>
   </context>
   <context>

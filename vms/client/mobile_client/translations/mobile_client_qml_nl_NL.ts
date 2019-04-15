@@ -19,10 +19,6 @@
       <translation>Authenticatie vereist</translation>
     </message>
     <message>
-      <source>Offline</source>
-      <translation>Offline</translation>
-    </message>
-    <message>
       <source>Password required</source>
       <translation>Wachtwoord vereist</translation>
     </message>
@@ -30,12 +26,17 @@
       <source>Unsupported firmware version</source>
       <translation>Niet-ondersteunde firmwareversie</translation>
     </message>
+    <message>
+      <source>Offline</source>
+      <translation>Offline</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation>Inloggen op %1</translation>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Log in op %1</translation>
     </message>
   </context>
   <context>
@@ -54,6 +55,7 @@
     </message>
     <message>
       <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Ga naar %1</translation>
     </message>
   </context>
@@ -61,15 +63,19 @@
     <name>CredentialsEditor</name>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
+    </message>
+    <message>
+      <source>Resend activation email</source>
+      <translation>Stuur activeringsmail opnieuw</translation>
     </message>
     <message>
       <source>Password</source>
       <translation>Wachtwoord</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <translation>Meer informatie over %1</translation>
+      <source>Log in</source>
+      <translation>Inloggen</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -80,24 +86,12 @@
       <translation>Wachtwoord vergeten?</translation>
     </message>
     <message>
-      <source>Cannot connect to %1</source>
-      <translation>Kan niet verbinden met %1</translation>
-    </message>
-    <message>
-      <source>Log in</source>
-      <translation>Inloggen</translation>
-    </message>
-    <message>
-      <source>Resend activation email</source>
-      <translation>Stuur activeringsmail opnieuw</translation>
-    </message>
-    <message>
       <source>Activation email sent</source>
       <translation>Activeringsmail verzonden</translation>
     </message>
     <message>
       <source>Cannot send activation email</source>
-      <translation>Kan de activerings-e-mail niet verzenden</translation>
+      <translation>Kan de activerings-Email niet verzenden</translation>
     </message>
     <message>
       <source>Check your inbox and visit provided link to activate account</source>
@@ -127,24 +121,26 @@
       <source>Password cannot be empty</source>
       <translation>Wachtwoord mag niet leeg zijn</translation>
     </message>
+    <message>
+      <source>Learn more about %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Meer informatie over %1</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Kan niet verbinden met %1</translation>
+    </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
-    <message>
-      <source>Delete</source>
-      <translation>Verwijder</translation>
-    </message>
     <message>
       <source>Connect to Server</source>
       <translation>Verbinden met server</translation>
     </message>
     <message>
-      <source>Enter server address</source>
-      <translation>Voer het serveradres in</translation>
-    </message>
-    <message>
-      <source>Delete login &quot;%1&quot;?</source>
-      <translation>Verwijder login &quot;%1&quot;?</translation>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -155,12 +151,21 @@
       <translation>Verwijder verbinding?</translation>
     </message>
     <message>
+      <source>Enter server address</source>
+      <translation>Voer het serveradres in</translation>
+    </message>
+    <message>
       <source>Login cannot be empty</source>
       <translation>Login mag niet leeg zijn</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
       <translation>Wachtwoord mag niet leeg zijn</translation>
+    </message>
+    <message>
+      <source>Delete login &quot;%1&quot;?</source>
+      <comment>%1 is a user name</comment>
+      <translation>Verwijder login &quot;%1&quot;?</translation>
     </message>
   </context>
   <context>
@@ -263,14 +268,6 @@
       <translation>Onbekend</translation>
     </message>
     <message>
-      <source>%1 fps</source>
-      <translation>%1 fps</translation>
-    </message>
-    <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>Hi-Res</translation>
     </message>
@@ -285,6 +282,16 @@
     <message>
       <source>Custom-Res</source>
       <translation>Aangepaste-Res</translation>
+    </message>
+    <message>
+      <source>%1 fps</source>
+      <comment>%1 is a count of frames per second</comment>
+      <translation>%1 fps</translation>
+    </message>
+    <message>
+      <source>%1 Mbps</source>
+      <comment>%1 is a mebgabits per second</comment>
+      <translation>%1 Mbps</translation>
     </message>
   </context>
   <context>
@@ -301,20 +308,20 @@
       <translation>Kan de client niet starten</translation>
     </message>
     <message>
-      <source>Cannot stop client</source>
-      <translation>Kan de client niet stoppen</translation>
-    </message>
-    <message>
       <source>Please make sure that display is connected to %1.</source>
       <translation>Zorg ervoor dat het scherm is aangesloten op %1.</translation>
     </message>
     <message>
-      <source>%1 is offline</source>
-      <translation>%1 is offline</translation>
+      <source>Cannot stop client</source>
+      <translation>Kan de client niet stoppen</translation>
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
       <translation>De beeldrotatie van software wordt niet ondersteund in de modus fullscreen</translation>
+    </message>
+    <message>
+      <source>%1 is offline</source>
+      <translation>%1 is offline</translation>
     </message>
   </context>
   <context>
@@ -343,15 +350,15 @@
     </message>
     <message>
       <source>Server or network is not available</source>
-      <translation type="unfinished">Server or network is not available</translation>
+      <translation>De server of het netwerk is niet beschikbaar</translation>
     </message>
     <message>
       <source>Incompatible server</source>
-      <translation type="unfinished">Incompatible server</translation>
+      <translation>Incompatibele server</translation>
     </message>
     <message>
       <source>Incompatible server version %1</source>
-      <translation type="unfinished">Incompatible server version %1</translation>
+      <translation>Incompatibele server versie %1</translation>
     </message>
   </context>
   <context>
@@ -450,6 +457,10 @@
       <translation>Verbinden...</translation>
     </message>
     <message>
+      <source>Cannot connect to server</source>
+      <translation>Kan geen verbinding maken met de server</translation>
+    </message>
+    <message>
       <source>No cameras available on this layout</source>
       <translation>Er zijn geen camera's beschikbaar op deze layout</translation>
     </message>
@@ -462,11 +473,8 @@
       <translation>Niets gevonden</translation>
     </message>
     <message>
-      <source>Cannot connect to server</source>
-      <translation>Kan geen verbinding maken met de server</translation>
-    </message>
-    <message>
       <source>Press %1 to exit</source>
+      <comment>%1 is a key name (like Esc)</comment>
       <translation>Druk op %1 om af te sluiten</translation>
     </message>
   </context>
@@ -521,20 +529,20 @@
   <context>
     <name>SessionItem</name>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Deze server heeft een te oude versie. Update deze naar de nieuwste versie.</translation>
+      <source>INCOMPATIBLE</source>
+      <translation>INCOMPATIBLE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
       <translation>OFFLINE</translation>
     </message>
     <message>
-      <source>INCOMPATIBLE</source>
-      <translation>INCOMPATIBLE</translation>
-    </message>
-    <message>
       <source>UNREACHABLE</source>
       <translation>ONBEREIKBAAR</translation>
+    </message>
+    <message>
+      <source>This server has too old version. Please update it to the latest version.</source>
+      <translation>Deze server heeft een te oude versie. Update deze naar de nieuwste versie.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -543,18 +551,6 @@
   </context>
   <context>
     <name>SessionsScreen</name>
-    <message>
-      <source>Log in to %1</source>
-      <translation>Log in op %1</translation>
-    </message>
-    <message>
-      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation>Controleer uw netwerkverbinding of druk op &quot;%1&quot; knop om een ​​bekend serveradres in te voeren.</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Controleer uw netwerkverbinding of neem contact op met een systeembeheerder</translation>
-    </message>
     <message>
       <source>Connect to Server...</source>
       <translation>Verbinden met server...</translation>
@@ -568,12 +564,27 @@
       <translation>Geen systemen gevonden</translation>
     </message>
     <message>
-      <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation>Kan geen verbinding maken met Systeem &quot;%1&quot;</translation>
-    </message>
-    <message>
       <source>Cannot connect to Server</source>
       <translation>Kan geen verbinding maken met de server</translation>
+    </message>
+    <message>
+      <source>Check your network connection or contact a system administrator</source>
+      <translation>Controleer uw netwerkverbinding of neem contact op met een systeembeheerder</translation>
+    </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Log in op %1</translation>
+    </message>
+    <message>
+      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
+      <comment>%1 is a button name</comment>
+      <translation>Controleer uw netwerkverbinding of druk op &quot;%1&quot; knop om een ​​bekend serveradres in te voeren.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to System &quot;%1&quot;</source>
+      <comment>%1 is a system name</comment>
+      <translation>Kan geen verbinding maken met Systeem &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -606,6 +617,10 @@
       <translation>Nieuwe verbinding</translation>
     </message>
     <message>
+      <source>Disconnect from Server</source>
+      <translation>Verbinding verbreken met de server</translation>
+    </message>
+    <message>
       <source>Settings</source>
       <translation>Instellingen</translation>
     </message>
@@ -616,10 +631,6 @@
     <message>
       <source>Stop test</source>
       <translation>Stop test</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation>Verbinding verbreken met de server</translation>
     </message>
   </context>
   <context>
@@ -639,12 +650,12 @@
   <context>
     <name>SystemInformationBlock</name>
     <message>
-      <source>Unknown</source>
-      <translation>Onbekend</translation>
-    </message>
-    <message>
       <source>New Server</source>
       <translation>Nieuwe server</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Onbekend</translation>
     </message>
   </context>
   <context>
@@ -698,6 +709,22 @@
   <context>
     <name>VideoDummy</name>
     <message>
+      <source>Offline</source>
+      <translation>Offline</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation>Ongeautoriseerd</translation>
+    </message>
+    <message>
+      <source>Cannot load video</source>
+      <translation>Kan video niet laden</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation>Kan geen enkele videostream afspelen</translation>
+    </message>
+    <message>
       <source>Server offline</source>
       <translation>Server offline</translation>
     </message>
@@ -708,22 +735,6 @@
     <message>
       <source>Camera offline</source>
       <translation>Camera offline</translation>
-    </message>
-    <message>
-      <source>Cannot load video</source>
-      <translation>Kan video niet laden</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>Offline</translation>
-    </message>
-    <message>
-      <source>Unauthorized</source>
-      <translation>Ongeautoriseerd</translation>
-    </message>
-    <message>
-      <source>Cannot play any video stream</source>
-      <translation>Kan geen enkele videostream afspelen</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -755,11 +766,24 @@
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>In deze app kan de I/O-module alleen als geluidsinvoerapparaat worden gebruikt. Gebruik de desktopversie van %1 om hem als een controlemodule te gebruiken</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
+    <message>
+      <source>No motion data for this camera</source>
+      <translation type="unfinished">No motion data for this camera</translation>
+    </message>
+    <message>
+      <source>No motion found in the selected area</source>
+      <translation type="unfinished">No motion found in the selected area</translation>
+    </message>
+    <message>
+      <source>No motion found in the visible area</source>
+      <translation type="unfinished">No motion found in the visible area</translation>
+    </message>
     <message>
       <source>No Archive</source>
       <translation>Geen archief</translation>
@@ -772,12 +796,28 @@
   <context>
     <name>VideoScreen</name>
     <message>
+      <source>Area</source>
+      <translation type="unfinished">Area</translation>
+    </message>
+    <message>
       <source>Change Quality</source>
       <translation>Kwaliteit wijzigen</translation>
     </message>
     <message>
       <source>Information</source>
       <translation>Informatie</translation>
+    </message>
+    <message>
+      <source>Tap and hold to select an area</source>
+      <translation type="unfinished">Tap and hold to select an area</translation>
+    </message>
+    <message>
+      <source>Enable motion search first to select an area</source>
+      <translation type="unfinished">Enable motion search first to select an area</translation>
+    </message>
+    <message>
+      <source>Invalid custom area. Please draw a correct one.</source>
+      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
   </context>
   <context>
@@ -795,7 +835,8 @@
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation>Kan geen verbinding maken met %1</translation>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Kan niet verbinden met %1</translation>
     </message>
   </context>
 </TS>

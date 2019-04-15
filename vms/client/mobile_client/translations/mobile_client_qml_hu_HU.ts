@@ -5,7 +5,7 @@
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <translation>Nyomja és tartsa lenyomva</translation>
     </message>
   </context>
   <context>
@@ -19,22 +19,23 @@
       <translation>Hitelesítés szükséges</translation>
     </message>
     <message>
-      <source>Offline</source>
-      <translation>Offline</translation>
-    </message>
-    <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Jelszó szükséges</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Nem támogatott firmware verzió</translation>
+    </message>
+    <message>
+      <source>Offline</source>
+      <translation>Offline</translation>
     </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Bejelentkezés %1</translation>
     </message>
   </context>
@@ -54,6 +55,7 @@
     </message>
     <message>
       <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Belépés %1 portálba</translation>
     </message>
   </context>
@@ -64,12 +66,16 @@
       <translation>E-mail</translation>
     </message>
     <message>
+      <source>Resend activation email</source>
+      <translation>Aktiváló e-mail újraküldése</translation>
+    </message>
+    <message>
       <source>Password</source>
       <translation>Jelszó</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <translation>Tudjon meg többet erről: %1</translation>
+      <source>Log in</source>
+      <translation>Bejelentkezés</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -80,36 +86,24 @@
       <translation>Elfelejtette a jelszavát?</translation>
     </message>
     <message>
-      <source>Cannot connect to %1</source>
-      <translation>Nem lehet kapcsolódni ehhez: %1</translation>
-    </message>
-    <message>
-      <source>Log in</source>
-      <translation>Bejelentkezés</translation>
-    </message>
-    <message>
-      <source>Resend activation email</source>
-      <translation type="unfinished">Resend activation email</translation>
-    </message>
-    <message>
       <source>Activation email sent</source>
-      <translation type="unfinished">Activation email sent</translation>
+      <translation>Megerősítő e-mail elküldve</translation>
     </message>
     <message>
       <source>Cannot send activation email</source>
-      <translation type="unfinished">Cannot send activation email</translation>
+      <translation>Megerősítő e-mailt nem lehet elküldeni</translation>
     </message>
     <message>
       <source>Check your inbox and visit provided link to activate account</source>
-      <translation type="unfinished">Check your inbox and visit provided link to activate account</translation>
+      <translation>Ellenőrizze a bejövő postafiókot, és keresse meg a megadott linket a fiók aktiválásához</translation>
     </message>
     <message>
       <source>Check your internet connection or try again later</source>
-      <translation type="unfinished">Check your internet connection or try again later</translation>
+      <translation>Ellenőrizd az internetkapcsolatot, vagy próbáld meg később</translation>
     </message>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>A fiók nem található</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -117,7 +111,7 @@
     </message>
     <message>
       <source>Account not activated</source>
-      <translation type="unfinished">Account not activated</translation>
+      <translation>Felhasználói fiók nincs aktiválva</translation>
     </message>
     <message>
       <source>Email cannot be empty</source>
@@ -127,24 +121,26 @@
       <source>Password cannot be empty</source>
       <translation>A jelszó nem lehet üres</translation>
     </message>
+    <message>
+      <source>Learn more about %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Tudjon meg többet erről: %1</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Nem lehet kapcsolódni ehhez: %1</translation>
+    </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
-    <message>
-      <source>Delete</source>
-      <translation>Törlés</translation>
-    </message>
     <message>
       <source>Connect to Server</source>
       <translation>Csatlakozás a szerverhez</translation>
     </message>
     <message>
-      <source>Enter server address</source>
-      <translation>Adja meg a szerver címét</translation>
-    </message>
-    <message>
-      <source>Delete login &quot;%1&quot;?</source>
-      <translation>&quot;%1&quot; login törlése?</translation>
+      <source>Delete</source>
+      <translation>Törlés</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -155,12 +151,21 @@
       <translation>Kapcsolat törlése?</translation>
     </message>
     <message>
+      <source>Enter server address</source>
+      <translation>Adja meg a szerver címét</translation>
+    </message>
+    <message>
       <source>Login cannot be empty</source>
       <translation>A bejelentkezési adatokat ki kell tölteni</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
       <translation>A jelszó nem lehet üres</translation>
+    </message>
+    <message>
+      <source>Delete login &quot;%1&quot;?</source>
+      <comment>%1 is a user name</comment>
+      <translation>&quot;%1&quot; login törlése?</translation>
     </message>
   </context>
   <context>
@@ -263,14 +268,6 @@
       <translation>Ismeretlen</translation>
     </message>
     <message>
-      <source>%1 fps</source>
-      <translation>%1 fps</translation>
-    </message>
-    <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>Nagy felbontás</translation>
     </message>
@@ -285,6 +282,16 @@
     <message>
       <source>Custom-Res</source>
       <translation>Egyedi felbontás</translation>
+    </message>
+    <message>
+      <source>%1 fps</source>
+      <comment>%1 is a count of frames per second</comment>
+      <translation>%1 fps</translation>
+    </message>
+    <message>
+      <source>%1 Mbps</source>
+      <comment>%1 is a mebgabits per second</comment>
+      <translation>%1 Mbps</translation>
     </message>
   </context>
   <context>
@@ -301,20 +308,20 @@
       <translation>Kliens nem indítható</translation>
     </message>
     <message>
-      <source>Cannot stop client</source>
-      <translation>Kliens nem állítható le</translation>
-    </message>
-    <message>
       <source>Please make sure that display is connected to %1.</source>
       <translation>Győződjön meg arról, hogy a kijelző kapcsolódik ehhez: %1.</translation>
     </message>
     <message>
-      <source>%1 is offline</source>
-      <translation>%1 offline</translation>
+      <source>Cannot stop client</source>
+      <translation>Kliens nem állítható le</translation>
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
       <translation>Szoftveres képelforgatás nem támogatott teljesképernyős módban</translation>
+    </message>
+    <message>
+      <source>%1 is offline</source>
+      <translation>%1 offline</translation>
     </message>
   </context>
   <context>
@@ -343,15 +350,15 @@
     </message>
     <message>
       <source>Server or network is not available</source>
-      <translation type="unfinished">Server or network is not available</translation>
+      <translation>A szerver vagy hálózat nem elérhető</translation>
     </message>
     <message>
       <source>Incompatible server</source>
-      <translation type="unfinished">Incompatible server</translation>
+      <translation>Nem kompatibilis szerver</translation>
     </message>
     <message>
       <source>Incompatible server version %1</source>
-      <translation type="unfinished">Incompatible server version %1</translation>
+      <translation>Nem kompatibilis szerver verzió %1</translation>
     </message>
   </context>
   <context>
@@ -450,6 +457,10 @@
       <translation>Csatlakozás...</translation>
     </message>
     <message>
+      <source>Cannot connect to server</source>
+      <translation>Nem lehet kapcsolódni a szerverhez</translation>
+    </message>
+    <message>
       <source>No cameras available on this layout</source>
       <translation>Nincsenek kamerák ezen a elrendezésen</translation>
     </message>
@@ -462,11 +473,8 @@
       <translation>Nincs találat</translation>
     </message>
     <message>
-      <source>Cannot connect to server</source>
-      <translation>Nem lehet kapcsolódni a szerverhez</translation>
-    </message>
-    <message>
       <source>Press %1 to exit</source>
+      <comment>%1 is a key name (like Esc)</comment>
       <translation>Nyomja meg %1 a kilépéshez</translation>
     </message>
   </context>
@@ -521,20 +529,20 @@
   <context>
     <name>SessionItem</name>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Szerver verzió túl régi. Frissítsen a legújabb verzióra.</translation>
+      <source>INCOMPATIBLE</source>
+      <translation>NEM KOMPATIBILIS</translation>
     </message>
     <message>
       <source>OFFLINE</source>
       <translation>OFFLINE</translation>
     </message>
     <message>
-      <source>INCOMPATIBLE</source>
-      <translation>NEM KOMPATIBILIS</translation>
-    </message>
-    <message>
       <source>UNREACHABLE</source>
       <translation>NEM ELÉRHETŐ</translation>
+    </message>
+    <message>
+      <source>This server has too old version. Please update it to the latest version.</source>
+      <translation>Szerver verzió túl régi. Frissítsen a legújabb verzióra.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -543,18 +551,6 @@
   </context>
   <context>
     <name>SessionsScreen</name>
-    <message>
-      <source>Log in to %1</source>
-      <translation>Bejelentkezés %1</translation>
-    </message>
-    <message>
-      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation>Ellenőrizze a hálózati kapcsolatot, vagy nyomja meg a &quot;%1&quot; gombot egy ismert szerver cím megadásához.</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Ellenőrizze a hálózati kapcsolatot, vagy lépjen kapcsolatba egy rendszer adminisztrátorral</translation>
-    </message>
     <message>
       <source>Connect to Server...</source>
       <translation>Csatlakozás szerverhez...</translation>
@@ -568,12 +564,27 @@
       <translation>Nem találhatók rendszerek</translation>
     </message>
     <message>
-      <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation>Nem lehet &quot;%1&quot; szerverhez csatlakozni</translation>
-    </message>
-    <message>
       <source>Cannot connect to Server</source>
       <translation>Nem lehet kapcsolódni a szerverhez</translation>
+    </message>
+    <message>
+      <source>Check your network connection or contact a system administrator</source>
+      <translation>Ellenőrizze a hálózati kapcsolatot, vagy lépjen kapcsolatba egy rendszer adminisztrátorral</translation>
+    </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Bejelentkezés %1</translation>
+    </message>
+    <message>
+      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
+      <comment>%1 is a button name</comment>
+      <translation>Ellenőrizze a hálózati kapcsolatot, vagy nyomja meg a &quot;%1&quot; gombot egy ismert szerver cím megadásához.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to System &quot;%1&quot;</source>
+      <comment>%1 is a system name</comment>
+      <translation>Nem lehet &quot;%1&quot; szerverhez csatlakozni</translation>
     </message>
   </context>
   <context>
@@ -592,7 +603,7 @@
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
-      <translation type="unfinished">What to do with currently saved passwords?</translation>
+      <translation>Mi a teendő a jelenleg mentett jelszavakkal?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -606,6 +617,10 @@
       <translation>Új kapcsolat</translation>
     </message>
     <message>
+      <source>Disconnect from Server</source>
+      <translation>Lekapcsolódás a szerverről</translation>
+    </message>
+    <message>
       <source>Settings</source>
       <translation>Beállítások</translation>
     </message>
@@ -616,10 +631,6 @@
     <message>
       <source>Stop test</source>
       <translation>Tesztelésleállítása</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation>Lekapcsolódás a szerverről</translation>
     </message>
   </context>
   <context>
@@ -639,12 +650,12 @@
   <context>
     <name>SystemInformationBlock</name>
     <message>
-      <source>Unknown</source>
-      <translation>Ismeretlen</translation>
-    </message>
-    <message>
       <source>New Server</source>
       <translation>Új szerver</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Ismeretlen</translation>
     </message>
   </context>
   <context>
@@ -698,6 +709,22 @@
   <context>
     <name>VideoDummy</name>
     <message>
+      <source>Offline</source>
+      <translation>Offline</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation>Jogosulatlan</translation>
+    </message>
+    <message>
+      <source>Cannot load video</source>
+      <translation>A videót nem lehet betölteni</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation>Nincs lejátszható videó-stream</translation>
+    </message>
+    <message>
       <source>Server offline</source>
       <translation>Szerver offline</translation>
     </message>
@@ -710,56 +737,53 @@
       <translation>Kamera offline</translation>
     </message>
     <message>
-      <source>Cannot load video</source>
-      <translation>A videót nem lehet betölteni</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>Offline</translation>
-    </message>
-    <message>
-      <source>Unauthorized</source>
-      <translation>Jogosulatlan</translation>
-    </message>
-    <message>
-      <source>Cannot play any video stream</source>
-      <translation>Nincs lejátszható videó-stream</translation>
-    </message>
-    <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Nincs elég licensz</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Jelszó szükséges</translation>
     </message>
     <message>
       <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
-      <translation type="unfinished">Set password on this camera using Wisenet WAVE client or camera web-page to view video</translation>
+      <translation>Állítsa be a jelszót ezen a kamerán a Wisenet WAVE kliens használatával, vagy a kamera webfelületén keresztül a videó megtekintéséhez</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Nem támogatott firmware verzió</translation>
     </message>
     <message>
       <source>Please update firmware</source>
-      <translation type="unfinished">Please update firmware</translation>
+      <translation>Kérem frissítse a Firmware-t</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>Túl sok kapcsolat</translation>
     </message>
     <message>
       <source>I/O interface not supported yet</source>
-      <translation type="unfinished">I/O interface not supported yet</translation>
+      <translation>I / O interfész még nem támogatott</translation>
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <translation type="unfinished">In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</translation>
+      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
+      <translation>Ebben az appban az I / O modul csak hangbemeneti eszközként használható. Ha azt vezérlőmodulként kívánja használni, kérjük, használja az %1 asztali verzióját</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
+    <message>
+      <source>No motion data for this camera</source>
+      <translation type="unfinished">No motion data for this camera</translation>
+    </message>
+    <message>
+      <source>No motion found in the selected area</source>
+      <translation type="unfinished">No motion found in the selected area</translation>
+    </message>
+    <message>
+      <source>No motion found in the visible area</source>
+      <translation type="unfinished">No motion found in the visible area</translation>
+    </message>
     <message>
       <source>No Archive</source>
       <translation>Nincs rögzítés</translation>
@@ -772,12 +796,28 @@
   <context>
     <name>VideoScreen</name>
     <message>
+      <source>Area</source>
+      <translation type="unfinished">Area</translation>
+    </message>
+    <message>
       <source>Change Quality</source>
       <translation>Minőség megváltozása</translation>
     </message>
     <message>
       <source>Information</source>
       <translation>Információ</translation>
+    </message>
+    <message>
+      <source>Tap and hold to select an area</source>
+      <translation type="unfinished">Tap and hold to select an area</translation>
+    </message>
+    <message>
+      <source>Enable motion search first to select an area</source>
+      <translation type="unfinished">Enable motion search first to select an area</translation>
+    </message>
+    <message>
+      <source>Invalid custom area. Please draw a correct one.</source>
+      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
   </context>
   <context>
@@ -791,10 +831,11 @@
     <name>main</name>
     <message>
       <source>Server offline. Reconnecting...</source>
-      <translation type="unfinished">Server offline. Reconnecting...</translation>
+      <translation>Szerver nem elérhető. Újracsatlakozás...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Nem lehet kapcsolódni ehhez: %1</translation>
     </message>
   </context>
