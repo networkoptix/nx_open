@@ -63,6 +63,9 @@ All GET methods which allowed to porform changes on a server side should not be 
     /api/setupCloudSystem
     /api/setupLocalSystem
     /api/systemSettings
+    /ec2/bookmarks/add
+    /ec2/bookmarks/delete
+    /ec2/bookmarks/update
 </pre>
 POST methods with the same path and parameters encoded as a JSON content should be used instead.
 Example:
@@ -83,6 +86,11 @@ do not cause any server changes are still allowed:
     /api/backupControl
     /api/manualCamera/status
     /api/ptz with "command" URL param which starts with "Get"
+</pre>
+Also, some other modifying GET methods are going to be forbidden because there is already incompatible
+POST version available, see their documentation for details.
+<pre>
+    /api/setCameraParam
 </pre>
 </p>
 <!--============================================================================================-->

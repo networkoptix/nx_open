@@ -25,6 +25,7 @@
 #include <core/resource/resource_command.h>
 #include <media_server/media_server_module.h>
 #include <core/resource/resource_command_processor.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
 
 static const QString kCameraIdParam = "cameraId";
 static const QString kDeprecatedResIdParam = "res_id";
@@ -271,6 +272,9 @@ int QnCameraSettingsRestHandler::executeGet(
     }
     else if (action == "setCameraParam")
     {
+        if (!nx::network::rest::ini().allowGetModifications)
+            return nx::network::http::StatusCode::forbidden;
+
         statusCode = handleSetParamsRequest(owner, camera, values, &outParameterMap);
     }
     else

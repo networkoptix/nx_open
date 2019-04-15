@@ -2449,8 +2449,10 @@ void MediaServerProcess::registerRestHandlers(
      *     non-binary, indentation and spacing will be used to improve readability.
      * %param[default]:enum format
      *
-     **%apidoc GET /ec2/bookmarks/add
+     **%apidoc POST /ec2/bookmarks/add
      * Add a bookmark to the target server.
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * %param:uuid guid Identifier of the bookmark.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
@@ -2467,7 +2469,9 @@ void MediaServerProcess::registerRestHandlers(
      *     non-binary, indentation and spacing will be used to improve readability.
      * %param[default]:enum format
      *
-     **%apidoc GET /ec2/bookmarks/delete
+     **%apidoc POST /ec2/bookmarks/delete
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * Remove a bookmark with the specified identifier.
      * %param:uuid guid Identifier of the bookmark.
      * %param[proprietary]:option local If present, the request should not be redirected to another
@@ -2485,8 +2489,10 @@ void MediaServerProcess::registerRestHandlers(
      *     non-binary, indentation and spacing will be used to improve readability.
      * %param[default]:enum format
      *
-     **%apidoc GET /ec2/bookmarks/update
+     **%apidoc POST /ec2/bookmarks/update
      * Update information for a bookmark.
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * %param:uuid guid Identifier of the bookmark.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).

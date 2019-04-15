@@ -11,6 +11,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
 
 namespace {
 
@@ -198,6 +199,29 @@ int QnMultiserverBookmarksRestHandler::executeGet(
     QByteArray& result,
     QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
+{
+    if (!nx::network::rest::ini().allowGetModifications)
+    {
+        switch (QnMultiserverBookmarksRestHandlerPrivate::getOperation(extractAction(path)))
+        {
+            case QnBookmarkOperation::Add:
+            case QnBookmarkOperation::Update:
+            case QnBookmarkOperation::Acknowledge:
+            case QnBookmarkOperation::Delete:
+                return nx::network::http::StatusCode::forbidden;
+            default:
+                break;
+        }
+    }
+
+    return executePost(
+        path, params, /*body*/ {}, /*srcBodyContentType*/ {}, result, contentType, processor);
+}
+
+int QnMultiserverBookmarksRestHandler::executePost(
+    const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/,
+    const QByteArray& /*srcBodyContentType*/, QByteArray& result,
+    QByteArray& contentType, const QnRestConnectionProcessor* processor)
 {
     const auto& commonModule = processor->commonModule();
     QString action = extractAction(path);
