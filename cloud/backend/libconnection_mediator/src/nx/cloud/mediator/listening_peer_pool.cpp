@@ -156,7 +156,7 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
             {
                 // Can't use "this" because the life time of m_listeningPeerDb is longer than "this".
                 // this handler with "this" may happen after "this" has been destroyed.
-                NX_VERBOSE(typeid(ListeningPeerPool), "Peer %1 added to RemoteRelayPeerPool: %2",
+                NX_VERBOSE(typeid(ListeningPeerPool), "Peer %1 added to ListeningPeerDb: %2",
                     hostName, added);
             });
     }
