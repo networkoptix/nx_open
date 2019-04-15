@@ -8,6 +8,7 @@
 
 #include <gtest/gtest.h>
 
+#include <udt/socket_addresss.h>
 #include <udt/udt.h>
 
 namespace udt::test {
@@ -18,13 +19,14 @@ class BasicFixture:
 public:
     void initializeUdt();
     void deinitializeUdt();
+    void setIpVersion(int ipVersion);
 
     void givenListeningServerSocket();
     void startAcceptingAsync();
     void whenAcceptConnection();
     void thenConnectionIsAccepted();
     void thenServerReceives(const std::string& data);
-    const struct sockaddr_in& serverAddress() const;
+    detail::SocketAddress serverAddress() const;
     void closeServerSocket();
 
     void givenConnectingClientSocket();
@@ -39,9 +41,10 @@ public:
     void givenTwoConnectedSockets();
 
 private:
+    int m_ipVersion = AF_INET;
     UDTSOCKET m_serverSocket = -1;
     UDTSOCKET m_acceptedConnection = -1;
-    struct sockaddr_in m_serverAddress;
+    detail::SocketAddress m_serverAddress;
     UDTSOCKET m_clientSocket = -1;
 
     void connectToServer();

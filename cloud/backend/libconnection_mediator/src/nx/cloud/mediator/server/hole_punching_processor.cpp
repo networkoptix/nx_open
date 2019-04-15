@@ -6,12 +6,15 @@
 #include <nx/utils/time.h>
 #include <nx/utils/thread/barrier_handler.h>
 
+#include "../listening_peer_db.h"
 #include "../listening_peer_pool.h"
 #include "../settings.h"
 #include "../statistics/collector.h"
 
 namespace nx {
 namespace hpm {
+
+namespace {
 
 static QString logRequest(
     const RequestSourceDescriptor& requestSourceDescriptor,
@@ -21,6 +24,8 @@ static QString logRequest(
         .args(request.originatingPeerId, requestSourceDescriptor.sourceAddress,
             request.destinationHostName, request.connectSessionId);
 }
+
+} // namespace
 
 HolePunchingProcessor::HolePunchingProcessor(
     const conf::Settings& settings,

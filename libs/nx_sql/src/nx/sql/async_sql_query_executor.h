@@ -27,6 +27,8 @@ class NX_SQL_API AbstractAsyncSqlQueryExecutor
 public:
     virtual ~AbstractAsyncSqlQueryExecutor() = default;
 
+    virtual void pleaseStopSync() = 0;
+
     virtual const ConnectionOptions& connectionOptions() const = 0;
 
     virtual void setQueryPriority(QueryType queryType, int newPriority) = 0;
@@ -186,6 +188,8 @@ public:
 
     AsyncSqlQueryExecutor(const ConnectionOptions& connectionOptions);
     virtual ~AsyncSqlQueryExecutor();
+
+    virtual void pleaseStopSync() override;
 
     virtual const ConnectionOptions& connectionOptions() const override;
 

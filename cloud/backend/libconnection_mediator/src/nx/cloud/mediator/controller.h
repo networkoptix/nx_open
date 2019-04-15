@@ -27,6 +27,8 @@ public:
     PeerRegistrator& listeningPeerRegistrator();
     const PeerRegistrator& listeningPeerRegistrator() const;
 
+    AbstractCloudDataProvider& cloudDataProvider();
+
     HolePunchingProcessor& cloudConnectProcessor();
 
     nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool();

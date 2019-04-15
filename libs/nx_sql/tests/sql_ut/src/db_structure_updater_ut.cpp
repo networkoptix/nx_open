@@ -21,6 +21,10 @@ public:
         const QByteArray& script,
         nx::sql::QueryContext* const queryContext)> CustomExecSqlScriptFunc;
 
+    virtual void pleaseStopSync() override
+    {
+    }
+
     TestAsyncSqlQueryExecutor(AbstractAsyncSqlQueryExecutor* _delegate):
         m_delegate(_delegate)
     {

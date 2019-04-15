@@ -75,16 +75,16 @@ public:
 
     void addNodeContext(const nx::utils::Url& discoveryServiceUrl)
     {
-        m_fixture.addPeer(/*startAndWaitUntilStarted*/ false);
-        Peer& peer = m_fixture.peer(m_fixture.peerCount() - 1);
+        Peer& peer = m_fixture.addPeer(/*startAndWaitUntilStarted*/ false);
 
-        peer.process().addArg("-discovery/enabled", "true");
+        peer.process().addArg("-p2pDb/discovery/enabled", "true");
         peer.process().addArg(
-            "-discovery/discoveryServiceUrl",
+            "-p2pDb/discovery/discoveryServiceUrl",
             discoveryServiceUrl.toStdString().c_str());
-        peer.process().addArg("-discovery/roundTripPadding", "2ms");
-        peer.process().addArg("-discovery/registrationErrorDelay", "10ms");
-        peer.process().addArg("-discovery/onlineNodesRequestDelay", "2ms");
+        peer.process().addArg("-p2pDb/discovery/roundTripPadding", "2ms");
+        peer.process().addArg("-p2pDb/discovery/registrationErrorDelay", "10ms");
+        peer.process().addArg("-p2pDb/discovery/onlineNodesRequestDelay", "2ms");
+        peer.process().addArg("-p2pDb/nodeConnectRetryTimeout", "100ms");
 
         ASSERT_TRUE(peer.process().startAndWaitUntilStarted());
 

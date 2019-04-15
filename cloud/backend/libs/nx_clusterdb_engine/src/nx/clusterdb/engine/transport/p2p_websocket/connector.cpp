@@ -94,10 +94,10 @@ void Connector::handleUpgradeCompletion()
 {
     if (m_connectionUpgradeClient->failed())
     {
-        m_connectionUpgradeClient.reset();
+        auto connectionUpgradeClient = std::exchange(m_connectionUpgradeClient, nullptr);
 
         NX_DEBUG(this, "Connection to %1 has failed. %2",
-            m_remoteNodeUrl, SystemError::toString(m_connectionUpgradeClient->lastSysErrorCode()));
+            m_remoteNodeUrl, SystemError::toString(connectionUpgradeClient->lastSysErrorCode()));
         nx::utils::swapAndCall(m_completionHandler, SystemError::connectionRefused, nullptr);
         return;
     }

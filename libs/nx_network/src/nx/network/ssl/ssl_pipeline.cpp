@@ -16,6 +16,16 @@ Pipeline::Pipeline(SSL_CTX* sslContext):
     initSslBio(sslContext);
 }
 
+void Pipeline::setServerName(const std::string& serverName)
+{
+    SSL_set_tlsext_host_name(m_ssl.get(), serverName.c_str());
+}
+
+std::string Pipeline::serverNameFromClientHello() const
+{
+    return SSL_get_servername(m_ssl.get(), TLSEXT_NAMETYPE_host_name);
+}
+
 int Pipeline::write(const void* data, size_t size)
 {
     if (m_failed)

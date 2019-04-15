@@ -52,8 +52,16 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
 
 AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
 {
-    m_connectionsToDropQueue.push(nullptr);
-    m_dropConnectionThread.join();
+    pleaseStopSync();
+}
+
+void AsyncSqlQueryExecutor::pleaseStopSync()
+{
+    if (m_dropConnectionThread.joinable())
+    {
+        m_connectionsToDropQueue.push(nullptr);
+        m_dropConnectionThread.join();
+    }
 
     std::vector<std::unique_ptr<detail::BaseQueryExecutor>> dbThreadPool;
     decltype(m_cursorProcessorContexts) cursorProcessorContexts;

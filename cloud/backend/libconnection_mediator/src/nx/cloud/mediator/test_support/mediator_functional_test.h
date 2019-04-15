@@ -61,6 +61,7 @@ public:
     network::SocketAddress stunUdpEndpoint() const;
     network::SocketAddress stunTcpEndpoint() const;
     network::SocketAddress httpEndpoint() const;
+    network::SocketAddress httpsEndpoint() const;
     nx::utils::Url httpUrl() const;
 
     std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
@@ -103,6 +104,7 @@ private:
     std::optional<network::SocketAddress> m_stunUdpEndpoint;
     network::SocketAddress m_stunTcpEndpoint;
     network::SocketAddress m_httpEndpoint;
+    network::SocketAddress m_httpsEndpoint;
     TcpProxyContext m_httpProxy;
     TcpProxyContext m_stunProxy;
     bool m_tcpPortsAllocated = false;

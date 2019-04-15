@@ -359,7 +359,7 @@ void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
     insert_(1, u);
 }
 
-int CSndUList::pop(sockaddr*& addr, CPacket& pkt)
+int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
 {
     std::lock_guard<std::mutex> listguard(m_ListLock);
 
@@ -535,7 +535,7 @@ void CSndQueue::worker()
                 m_timer->sleepto(ts);
 
             // it is time to send the next pkt
-            sockaddr* addr;
+            detail::SocketAddress addr;
             CPacket pkt;
             if (m_pSndUList->pop(addr, pkt) < 0)
                 continue;
@@ -557,7 +557,7 @@ void CSndQueue::worker()
     }
 }
 
-int CSndQueue::sendto(const sockaddr* addr, CPacket& packet)
+int CSndQueue::sendto(const detail::SocketAddress& addr, CPacket& packet)
 {
 #ifdef DEBUG_RECORD_PACKET_HISTORY
     packetVerifier.beforeSendingPacket(packet);
@@ -691,7 +691,6 @@ void SocketByIdDict::remove(int32_t id)
 
 CRendezvousQueue::CRL::CRL()
 {
-    memset(&peerAddr, 0, sizeof(peerAddr));
 }
 
 CRendezvousQueue::CRendezvousQueue()
@@ -706,8 +705,7 @@ CRendezvousQueue::~CRendezvousQueue()
 void CRendezvousQueue::insert(
     const UDTSOCKET& id,
     std::weak_ptr<CUDT> u,
-    int ipVersion,
-    const sockaddr* addr,
+    const detail::SocketAddress& addr,
     uint64_t ttl)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -715,8 +713,7 @@ void CRendezvousQueue::insert(
     CRL r;
     r.id = id;
     r.socket = u;
-    memcpy(&r.peerAddr, addr, sizeof(*addr));
-    r.peerAddr.sa_family = ipVersion;
+    r.peerAddr = addr;
     r.ttl = ttl;
 
     m_rendezvousSockets.push_back(r);
@@ -737,7 +734,7 @@ void CRendezvousQueue::remove(const UDTSOCKET& id)
 }
 
 std::shared_ptr<CUDT> CRendezvousQueue::getByAddr(
-    const sockaddr* addr,
+    const detail::SocketAddress& addr,
     UDTSOCKET& id) const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -745,8 +742,7 @@ std::shared_ptr<CUDT> CRendezvousQueue::getByAddr(
     // TODO: optimize search
     for (const auto& crl: m_rendezvousSockets)
     {
-        if (CIPAddress::ipcmp(addr, &crl.peerAddr) &&
-            (id == 0 || id == crl.id))
+        if (addr == crl.peerAddr && (id == 0 || id == crl.id))
         {
             id = crl.id;
             return crl.socket.lock();
@@ -792,7 +788,7 @@ void CRendezvousQueue::updateConnStatus()
             int hs_size = udtSocket->payloadSize();
             udtSocket->connReq().serialize(reqdata, hs_size);
             request.setLength(hs_size);
-            udtSocket->sndQueue().sendto(&i->peerAddr, request);
+            udtSocket->sndQueue().sendto(i->peerAddr, request);
             udtSocket->setLastReqTime(CTimer::getTime());
             delete[] reqdata;
         }
@@ -860,7 +856,7 @@ void CRcvQueue::stop()
 
 void CRcvQueue::worker()
 {
-    sockaddr* addr = (AF_INET == m_UnitQueue.m_iIPversion) ? (sockaddr*) new sockaddr_in : (sockaddr*) new sockaddr_in6;
+    detail::SocketAddress addr(m_UnitQueue.m_iIPversion);
     int32_t id;
 
     while (!m_bClosing)
@@ -928,7 +924,7 @@ void CRcvQueue::worker()
 
                 if (auto u = m_socketByIdDict.lookup(id))
                 {
-                    if (CIPAddress::ipcmp(addr, u->peerAddr()))
+                    if (addr == u->peerAddr())
                     {
                         if (u->connected() && !u->broken() && !u->isClosing())
                         {
@@ -986,11 +982,6 @@ void CRcvQueue::worker()
         // Check connection requests status for all sockets in the RendezvousQueue.
         m_pRendezvousQueue->updateConnStatus();
     }
-
-    if (AF_INET == m_UnitQueue.m_iIPversion)
-        delete (sockaddr_in*)addr;
-    else
-        delete (sockaddr_in6*)addr;
 }
 
 int CRcvQueue::recvfrom(int32_t id, CPacket& packet)
@@ -1051,11 +1042,10 @@ bool CRcvQueue::setListener(std::weak_ptr<ServerSideConnectionAcceptor> listener
 void CRcvQueue::registerConnector(
     const UDTSOCKET& id,
     std::shared_ptr<CUDT> u,
-    int ipVersion,
-    const sockaddr* addr,
+    const detail::SocketAddress& addr,
     uint64_t ttl)
 {
-    m_pRendezvousQueue->insert(id, u, ipVersion, addr, ttl);
+    m_pRendezvousQueue->insert(id, u, addr, ttl);
 }
 
 void CRcvQueue::removeConnector(const UDTSOCKET& id)

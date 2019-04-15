@@ -72,11 +72,7 @@ Yunhong Gu, last updated 01/27/2011
 
 
 UdpChannel::UdpChannel():
-    m_iIPversion(AF_INET),
-    m_iSockAddrSize(sizeof(sockaddr_in)),
-    m_iSocket(INVALID_SOCKET),
-    m_iSndBufSize(65536),
-    m_iRcvBufSize(65536)
+    UdpChannel(AF_INET)
 {
 }
 
@@ -86,7 +82,6 @@ UdpChannel::UdpChannel(int version):
     m_iSndBufSize(65536),
     m_iRcvBufSize(65536)
 {
-    m_iSockAddrSize = (AF_INET == m_iIPversion) ? sizeof(sockaddr_in) : sizeof(sockaddr_in6);
 }
 
 UdpChannel::~UdpChannel()
@@ -94,7 +89,7 @@ UdpChannel::~UdpChannel()
     closeSocket();
 }
 
-void UdpChannel::open(const sockaddr* addr)
+void UdpChannel::open(const std::optional<detail::SocketAddress>& addr)
 {
     // construct an socket
     m_iSocket = ::socket(m_iIPversion, SOCK_DGRAM, 0);
@@ -102,11 +97,9 @@ void UdpChannel::open(const sockaddr* addr)
     if (INVALID_SOCKET == m_iSocket)
         throw CUDTException(1, 0, NET_ERROR);
 
-    if (NULL != addr)
+    if (addr)
     {
-        socklen_t namelen = m_iSockAddrSize;
-
-        if (0 != ::bind(m_iSocket, addr, namelen))
+        if (0 != ::bind(m_iSocket, addr->get(), addr->size()))
             throw CUDTException(1, 3, NET_ERROR);
     }
     else
@@ -206,19 +199,21 @@ void UdpChannel::setRcvBufSize(int size)
     m_iRcvBufSize = size;
 }
 
-void UdpChannel::getSockAddr(sockaddr* addr) const
+detail::SocketAddress UdpChannel::getSockAddr() const
 {
-    socklen_t namelen = m_iSockAddrSize;
-    ::getsockname(m_iSocket, addr, &namelen);
+    detail::SocketAddress socketAddress;
+    ::getsockname(m_iSocket, socketAddress.get(), &socketAddress.length());
+    return socketAddress;
 }
 
-void UdpChannel::getPeerAddr(sockaddr* addr) const
+detail::SocketAddress UdpChannel::getPeerAddr() const
 {
-    socklen_t namelen = m_iSockAddrSize;
-    ::getpeername(m_iSocket, addr, &namelen);
+    detail::SocketAddress socketAddress;
+    ::getpeername(m_iSocket, socketAddress.get(), &socketAddress.length());
+    return socketAddress;
 }
 
-int UdpChannel::sendto(const sockaddr* addr, CPacket& packet) const
+int UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packet) const
 {
     assert(m_iSocket != INVALID_SOCKET);
 
@@ -240,9 +235,11 @@ int UdpChannel::sendto(const sockaddr* addr, CPacket& packet) const
     }
 
 #ifndef _WIN32
+    detail::SocketAddress localAddr(addr);
+
     msghdr mh;
-    mh.msg_name = (sockaddr*)addr;
-    mh.msg_namelen = m_iSockAddrSize;
+    mh.msg_name = localAddr.get();
+    mh.msg_namelen = localAddr.size();
     mh.msg_iov = (iovec*)packet.m_PacketVector;
     mh.msg_iovlen = 2;
     mh.msg_control = NULL;
@@ -252,8 +249,11 @@ int UdpChannel::sendto(const sockaddr* addr, CPacket& packet) const
     int res = ::sendmsg(m_iSocket, &mh, 0);
 #else
     DWORD size = CPacket::m_iPktHdrSize + packet.getLength();
-    int addrsize = m_iSockAddrSize;
-    int res = ::WSASendTo(m_iSocket, (LPWSABUF)packet.m_PacketVector, 2, &size, 0, addr, addrsize, NULL, NULL);
+    int res = ::WSASendTo(
+        m_iSocket,
+        (LPWSABUF)packet.m_PacketVector, 2, &size, 0,
+        addr.get(), addr.size(),
+        NULL, NULL);
     res = (0 == res) ? size : -1;
 #endif
 
@@ -276,14 +276,17 @@ int UdpChannel::sendto(const sockaddr* addr, CPacket& packet) const
     return res;
 }
 
-int UdpChannel::recvfrom(sockaddr* addr, CPacket& packet) const
+int UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) const
 {
     assert(m_iSocket != INVALID_SOCKET);
 
+    // Reserving size for any address.
+    addr = detail::SocketAddress(AF_INET6);
+
 #ifndef _WIN32
     msghdr mh;
-    mh.msg_name = addr;
-    mh.msg_namelen = m_iSockAddrSize;
+    mh.msg_name = addr.get();
+    mh.msg_namelen = addr.size();
     mh.msg_iov = packet.m_PacketVector;
     mh.msg_iovlen = 2;
     mh.msg_control = NULL;
@@ -304,9 +307,12 @@ int UdpChannel::recvfrom(sockaddr* addr, CPacket& packet) const
 #else
     DWORD size = CPacket::m_iPktHdrSize + packet.getLength();
     DWORD flag = 0;
-    int addrsize = m_iSockAddrSize;
 
-    int res = ::WSARecvFrom(m_iSocket, (LPWSABUF)packet.m_PacketVector, 2, &size, &flag, addr, &addrsize, NULL, NULL);
+    int res = ::WSARecvFrom(
+        m_iSocket,
+        (LPWSABUF)packet.m_PacketVector, 2, &size, &flag,
+        addr.get(), &addr.length(),
+        NULL, NULL);
     res = (0 == res) ? size : -1;
 #endif
 

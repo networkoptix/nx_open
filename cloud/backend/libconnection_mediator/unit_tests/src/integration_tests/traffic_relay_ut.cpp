@@ -24,7 +24,7 @@ TEST_F(TrafficRelay, listen_reports_taffic_relay_url)
     assertTrafficRelayUrlHasBeenReported();
 }
 
-TEST_F(TrafficRelay, connect_reports_taffic_relay_url)
+TEST_F(TrafficRelay, connect_reports_traffic_relay_url)
 {
     givenListeningServer();
     issueConnectRequest();

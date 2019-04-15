@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -17,14 +18,14 @@ func calculateExpirationTime(request *http.Request) Date {
 
 	requestDate := request.Header.Get("Date")
 	if len(requestDate) == 0 {
-		log.Println(
+		log.Printf(
 			"Http request missing \"Date\" header, returning %d minute expire time",
 			minutes)
 		return date
 	}
 	requestTime, err := ParseDate(requestDate)
 	if err != nil {
-		log.Println(
+		log.Printf(
 			"Failed to parse \"Date\" header, returning %d minute expire time: %s",
 			minutes, err)
 		return date
@@ -32,7 +33,7 @@ func calculateExpirationTime(request *http.Request) Date {
 	travelTime := now.Sub(requestTime)
 	if travelTime < 0 {
 		const nsecToMsec = 1000000
-		log.Println("Expected positive travel time, got: ", travelTime/nsecToMsec, "millieconds")
+		log.Printf("Expected positive travel time, got: %d millieconds", travelTime/nsecToMsec)
 		return date
 	}
 	date.Time = date.Time.Add(-travelTime)
@@ -40,6 +41,7 @@ func calculateExpirationTime(request *http.Request) Date {
 }
 
 func writeError(httpStatusCode int, writer http.ResponseWriter, err error) {
+	writer.Header().Set("Content-Type", "text/plain; charset=UTF-8")
 	writer.WriteHeader(httpStatusCode)
 	if err != nil {
 		writer.Write([]byte(err.Error()))
@@ -47,8 +49,6 @@ func writeError(httpStatusCode int, writer http.ResponseWriter, err error) {
 }
 
 func getOnlineNodes(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
-
 	dao, err := NewDAO()
 	if err != nil {
 		log.Println("getOnlineNodes: error connecting to db:", err)
@@ -58,19 +58,27 @@ func getOnlineNodes(writer http.ResponseWriter, request *http.Request, params ht
 
 	onlineNodes, err := dao.GetOnlineNodes(params.ByName("clusterId"))
 	if err != nil {
-		log.Println("getOnlineNodes: error fetching onlineNodes from db:", err,
+		log.Println("getOnlineNodes: error fetching online nodes from db:", err,
 			", clusterId:", params.ByName("clusterId"))
 		writeError(http.StatusInternalServerError, writer, err)
 		return
 	}
 
+	if len(onlineNodes) == 0 {
+		errStr := "getOnlineNodes: no nodes matching clusterId: " + params.ByName("clusterId")
+		writeError(http.StatusNotFound, writer, errors.New(errStr))
+		return
+	}
+
+	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	writer.WriteHeader(http.StatusOK)
 	json.NewEncoder(writer).Encode(onlineNodes) //< Serializing directly into the message body
+	if err != nil {
+		log.Println("getOnlineNodes: error encoding to json:", err)
+	}
 }
 
 func postNode(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
-
 	dao, err := NewDAO()
 	if err != nil {
 		log.Println("postNode: db access error: ", err)
@@ -100,6 +108,7 @@ func postNode(writer http.ResponseWriter, request *http.Request, params httprout
 		return
 	}
 
+	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	writer.WriteHeader(http.StatusCreated)     //< Need to write the header before message body
 	err = json.NewEncoder(writer).Encode(node) //< Serializing directly into the message body
 	if err != nil {

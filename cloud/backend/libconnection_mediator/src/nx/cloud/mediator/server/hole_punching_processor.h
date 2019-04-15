@@ -11,6 +11,7 @@
 #include "udp_hole_punching_connection_initiation_fsm.h"
 #include "../relay/abstract_relay_cluster_client.h"
 #include "../request_processor.h"
+#include "../listening_peer_db.h"
 
 namespace nx {
 namespace hpm {
