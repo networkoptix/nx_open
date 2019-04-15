@@ -94,6 +94,8 @@ QnCameraStatsData QnRecordingStats::transformStatsToModelData(const QnRecordingS
         data.chartScale.recordedBytes = qMax(data.chartScale.recordedBytes, value.recordedBytes);
         data.chartScale.recordedSecs = qMax(data.chartScale.recordedSecs, value.recordedSecs);
         data.chartScale.averageBitrate = qMax(data.chartScale.averageBitrate, value.averageBitrate);
+        data.chartScale.archiveDurationSecs =
+            qMax(data.chartScale.archiveDurationSecs, value.archiveDurationSecs);
     }
 
     // Set "totals" text to use in names column.

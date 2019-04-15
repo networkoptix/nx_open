@@ -471,7 +471,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     {
         static QAtomicInt swDecoderCount = 0;
         DecoderConfig config = DecoderConfig::fromMediaResource(m_resource);
-        config.disableMtDecoding = qnSettings->disableMtDecoding();
+        config.allowMtDecoding = qnSettings->allowMtDecoding();
         dec = new QnFfmpegVideoDecoder(
             config,
             data->compressionType, data, /*mtDecoding*/ enableFrameQueue, &swDecoderCount);

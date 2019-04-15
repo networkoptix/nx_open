@@ -100,8 +100,10 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     m_prevTimestamp(AV_NOPTS_VALUE),
     m_spsFound(false)
 {
-    if (config.disableMtDecoding)
+    if (!config.allowMtDecoding)
+    {
         m_forcedMtDecoding = ForceMtDecodingType::forcedOff;
+    }
     else
     {
         for (auto& codecName: config.disabledCodecsForMtDecoding)

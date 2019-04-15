@@ -20,6 +20,8 @@ FocusScope
     implicitHeight: Math.max(label.implicitHeight, contentItem ? contentItem.implicitHeight : 0)
     implicitWidth: label.width + (contentItem ? contentItem.implicitWidth + spacing : 0)
 
+    width: parent.width
+
     Label
     {
         id: label

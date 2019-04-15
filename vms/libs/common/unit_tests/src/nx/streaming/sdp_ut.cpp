@@ -133,9 +133,11 @@ TEST(Sdp, h264AndAudio)
     Sdp sdp;
     sdp.parse(sdpString2);
 
-    ASSERT_EQ("127.0.0.1", sdp.serverAddress.toString());
-
     ASSERT_EQ(2, sdp.media.size());
+
+    ASSERT_EQ("127.0.0.1", sdp.media[0].connectionAddress.toString());
+    ASSERT_EQ("127.0.0.1", sdp.media[1].connectionAddress.toString());
+
     ASSERT_EQ(96, sdp.media[0].payloadType);
     ASSERT_EQ(Sdp::MediaType::Video, sdp.media[0].mediaType);
     ASSERT_EQ("track1", sdp.media[0].control);
@@ -169,3 +171,35 @@ TEST(Sdp, h264AndAudio)
 }
 
 
+TEST(Sdp, ConnectionAddress)
+{
+    QString sdpString =
+        "v=0\r\n"
+        "o=- 1001 1 IN IP4 192.168.0.86\r\n"
+        "s=VCP IPC Realtime stream\r\n"
+        "m=video 5002 RTP/AVP 105\r\n"
+        "c=IN IP4 241.0.0.2/127\r\n"
+        "a=control:rtsp://192.168.0.86/media/video2/multicast/video\r\n"
+        "a=rtpmap:105 H264/90000\r\n"
+        "a=fmtp:105 profile-level-id=64001e; packetization-mode=1; sprop-parameter-sets=Z2QAHqwsaoLQSabgICAoAAAfQAAAfQQg,aO4xshs=\r\n"
+        "a=recvonly\r\n"
+        "m=audio 5004 RTP/AVP 0\r\n"
+        "c=IN IP4 241.0.0.2/127\r\n"
+        "a=fmtp:0 RTCP=0\r\n"
+        "a=control:rtsp://192.168.0.86/media/video0/multicast/audio\r\n"
+        "a=recvonly\r\n"
+        "m=application 0 RTP/AVP 107\r\n"
+        "c=IN IP4 241.0.0.2/127\r\n"
+        "a=control:rtsp://192.168.0.86/media/video2/multicast/metadata\r\n"
+        "a=rtpmap:107 vnd.onvif.metadata/90000\r\n"
+        "a=fmtp:107 DecoderTag=h3c-v3 RTCP=0\r\n"
+        "a=recvonly\r\n";
+    Sdp sdp;
+    sdp.parse(sdpString);
+
+    ASSERT_EQ(3, sdp.media.size());
+
+    ASSERT_EQ("241.0.0.2", sdp.media[0].connectionAddress.toString());
+    ASSERT_EQ("241.0.0.2", sdp.media[1].connectionAddress.toString());
+    ASSERT_EQ("241.0.0.2", sdp.media[2].connectionAddress.toString());
+}

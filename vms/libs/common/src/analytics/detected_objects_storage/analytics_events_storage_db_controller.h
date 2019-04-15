@@ -2,9 +2,7 @@
 
 #include <nx/sql/db_instance_controller.h>
 
-namespace nx {
-namespace analytics {
-namespace storage {
+namespace nx::analytics::storage {
 
 class DbController:
     public nx::sql::InstanceController
@@ -17,6 +15,4 @@ public:
     using base_type::initialize;
 };
 
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::storage

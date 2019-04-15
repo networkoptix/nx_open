@@ -19,6 +19,7 @@
 #include <ui/style/helper.h>
 
 #include <nx/utils/interval.h>
+#include <nx/utils/pending_operation.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
@@ -117,6 +118,8 @@ private:
 
     void closeExpiredTiles();
 
+    void loadNextPreview();
+
     int scrollValue() const;
     int totalTopMargin() const; //< Top margin and viewport header.
 
@@ -206,6 +209,8 @@ private:
 
     int m_topMargin = style::Metrics::kStandardPadding;
     int m_bottomMargin = style::Metrics::kStandardPadding;
+
+    nx::utils::ImplPtr<nx::utils::PendingOperation> m_previewLoad;
 };
 
 } // namespace nx::vms::client::desktop

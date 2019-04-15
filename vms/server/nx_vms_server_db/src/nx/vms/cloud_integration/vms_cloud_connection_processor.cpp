@@ -52,7 +52,7 @@ nx::network::http::StatusCode::Value VmsCloudConnectionProcessor::bindSystemToCl
         return nx::network::http::StatusCode::badRequest;
 
     nx::cloud::db::api::AuthInfo cloudOwnerOfflineAuthInfo;
-    if (!fetchCloudUserOfflineAuthInfo(data, &cloudOwnerOfflineAuthInfo))
+    if (!fetchCloudUserOfflineAuthInfo(data, &cloudOwnerOfflineAuthInfo, result))
         return nx::network::http::StatusCode::badRequest;
 
     if (!saveCloudData(data, cloudOwnerOfflineAuthInfo, result))
@@ -329,7 +329,8 @@ bool VmsCloudConnectionProcessor::checkInternetConnection(
 
 bool VmsCloudConnectionProcessor::fetchCloudUserOfflineAuthInfo(
     const CloudCredentialsData& data,
-    nx::cloud::db::api::AuthInfo* cloudOwnerOfflineAuthInfo)
+    nx::cloud::db::api::AuthInfo* cloudOwnerOfflineAuthInfo,
+    QnJsonRestResult* result)
 {
     namespace cdbApi = nx::cloud::db::api;
     using namespace std::chrono;
@@ -351,8 +352,10 @@ bool VmsCloudConnectionProcessor::fetchCloudUserOfflineAuthInfo(
             std::placeholders::_1);
     if (cdbResultCode != cdbApi::ResultCode::ok)
     {
-        NX_INFO(this, "Error fetching cloud nonce for system %1. %2",
-            data.cloudSystemID, toString(cdbResultCode));
+        const auto errorMessage = lm("Error fetching cloud nonce for system %1. %2")
+            .args(data.cloudSystemID, toString(cdbResultCode)).toQString();
+        NX_INFO(this, errorMessage);
+        result->setError(QnJsonRestResult::CantProcessRequest, errorMessage);
         return false;
     }
 
@@ -370,8 +373,10 @@ bool VmsCloudConnectionProcessor::fetchCloudUserOfflineAuthInfo(
             std::placeholders::_1);
     if (cdbResultCode != cdbApi::ResultCode::ok)
     {
-        NX_INFO(this, "Error fetching cloud auth keys for system %1, user %2. %3",
-            data.cloudSystemID, data.cloudAccountName, toString(cdbResultCode));
+        const auto errorMessage = lm("Error fetching cloud auth keys for system %1, user %2. %3")
+            .args(data.cloudSystemID, data.cloudAccountName, toString(cdbResultCode)).toQString();
+        NX_INFO(this, errorMessage);
+        result->setError(QnJsonRestResult::CantProcessRequest, errorMessage);
         return false;
     }
 

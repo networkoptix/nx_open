@@ -93,7 +93,8 @@ void updateTimer(nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
 {
     if (*timerId != 0)
     {
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(*timerId);
+        // Can be called from IO thread. Non blocking call should be used here.
+        nx::utils::TimerManager::instance()->deleteTimer(*timerId);
         *timerId = 0;
     }
 

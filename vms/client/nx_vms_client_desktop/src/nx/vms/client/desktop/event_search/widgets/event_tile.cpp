@@ -18,7 +18,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
 #include <nx/utils/log/log_message.h>
@@ -106,6 +106,9 @@ struct EventTile::Private
     CommandActionPtr action; //< Button action.
     QnElidedLabel* const progressLabel;
     const QScopedPointer<QTimer> loadPreviewTimer;
+    bool automaticPreviewLoad = true;
+    bool isPreviewLoadNeeded = false;
+    bool forceNextPreviewUpdate = false;
     qreal progressValue = 0.0;
     bool isRead = false;
     bool footerEnabled = true;
@@ -190,31 +193,68 @@ struct EventTile::Private
         return q->preview() && q->previewEnabled();
     }
 
-    void requestPreview()
+    bool isPreviewUpdateRequired() const
     {
-        if (!isPreviewNeeded())
-            return;
+        if (!isPreviewNeeded() || !NX_ASSERT(q->preview()))
+            return false;
+
+        if (forceNextPreviewUpdate)
+            return true;
 
         switch (q->preview()->status())
         {
             case Qn::ThumbnailStatus::Invalid:
             case Qn::ThumbnailStatus::NoData:
-                NX_VERBOSE(this, "Requesting tile preview");
-                q->preview()->loadAsync();
-                break;
+                return true;
 
             default:
-                break;
+                return false;
+        }
+    }
+
+    void requestPreview()
+    {
+        if (!isPreviewUpdateRequired())
+            return;
+
+        NX_VERBOSE(this, "Requesting tile preview");
+        forceNextPreviewUpdate = false;
+
+        if (automaticPreviewLoad)
+        {
+            q->preview()->loadAsync();
+        }
+        else
+        {
+            isPreviewLoadNeeded = true;
+            emit q->needsPreviewLoad();
         }
     }
 
     void updatePreview(milliseconds delay)
     {
-        if (isPreviewNeeded())
+        if (isPreviewUpdateRequired())
             loadPreviewTimer->start(delay);
         else
             loadPreviewTimer->stop();
     }
+
+    void showDebugPreviewTimestamp()
+    {
+        auto provider = qobject_cast<ResourceThumbnailProvider*>(q->preview());
+        if (provider)
+        {
+            q->ui->debugPreviewTimeLabel->setText(
+                lm("Preview: %2 us").arg(provider->timestamp().count()));
+            q->ui->debugPreviewTimeLabel->setVisible(
+                provider->status() == Qn::ThumbnailStatus::Loaded);
+        }
+        else
+        {
+            q->ui->debugPreviewTimeLabel->hide();
+            q->ui->debugPreviewTimeLabel->setText({});
+        }
+    };
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -251,8 +291,11 @@ EventTile::EventTile(QWidget* parent):
     ui->wideHolder->hide();
 
     ui->previewWidget->setAutoScaleDown(false);
-    ui->previewWidget->setCropMode(AsyncImageWidget::CropMode::notHovered);
     ui->previewWidget->setReloadMode(AsyncImageWidget::ReloadMode::showPreviousImage);
+
+    ui->previewWidget->setCropMode(ini().rightPanelHoverPreviewCrop
+        ? AsyncImageWidget::CropMode::notHovered
+        : AsyncImageWidget::CropMode::always);
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
@@ -483,50 +526,39 @@ ImageProvider* EventTile::preview() const
     return ui->previewWidget->imageProvider();
 }
 
-void EventTile::setPreview(ImageProvider* value)
+void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
 {
+    if (preview() == value && !forceUpdate)
+        return;
+
     if (preview())
         preview()->disconnect(this);
 
     ui->previewWidget->setImageProvider(value);
     ui->previewWidget->parentWidget()->setHidden(!value);
 
+    d->isPreviewLoadNeeded = false;
+    d->forceNextPreviewUpdate = true;
     d->updatePreview(previewLoadDelay());
 
-    if (preview() && kPreviewReloadDelay > 0s)
-    {
-        connect(preview(), &ImageProvider::statusChanged, this,
-            [this](Qn::ThumbnailStatus status)
-            {
-                if (status == Qn::ThumbnailStatus::NoData)
-                    d->updatePreview(kPreviewReloadDelay);
-            });
-    }
+    if (ini().showDebugTimeInformationInRibbon)
+        d->showDebugPreviewTimestamp();
 
-    if (!ini().showDebugTimeInformationInRibbon)
+    if (!preview())
         return;
 
-    const auto showPreviewTimestamp =
-        [this]()
+    connect(preview(), &ImageProvider::statusChanged, this,
+        [this](Qn::ThumbnailStatus status)
         {
-            auto provider = qobject_cast<CameraThumbnailProvider*>(preview());
-            if (provider)
-            {
-                ui->debugPreviewTimeLabel->setText(lm("Preview: %2 us").arg(provider->timestampUs()));
-                ui->debugPreviewTimeLabel->setVisible(
-                    provider->status() == Qn::ThumbnailStatus::Loaded);
-            }
-            else
-            {
-                ui->debugPreviewTimeLabel->hide();
-                ui->debugPreviewTimeLabel->setText({});
-            }
-        };
+            if (status != Qn::ThumbnailStatus::Invalid)
+                d->isPreviewLoadNeeded = false;
 
-    showPreviewTimestamp();
+            if (status == Qn::ThumbnailStatus::NoData && kPreviewReloadDelay > 0s)
+                d->updatePreview(kPreviewReloadDelay);
 
-    if (preview())
-        connect(preview(), &ImageProvider::statusChanged, this, showPreviewTimestamp);
+            if (ini().showDebugTimeInformationInRibbon)
+                d->showDebugPreviewTimestamp();
+        });
 }
 
 QRectF EventTile::previewCropRect() const
@@ -537,6 +569,26 @@ QRectF EventTile::previewCropRect() const
 void EventTile::setPreviewCropRect(const QRectF& relativeRect)
 {
     ui->previewWidget->setHighlightRect(relativeRect);
+}
+
+bool EventTile::automaticPreviewLoad() const
+{
+    return d->automaticPreviewLoad;
+}
+
+void EventTile::setAutomaticPreviewLoad(bool value)
+{
+    if (d->automaticPreviewLoad == value)
+        return;
+
+    d->automaticPreviewLoad = value;
+    d->isPreviewLoadNeeded = d->isPreviewLoadNeeded && !d->automaticPreviewLoad;
+    d->updatePreview(previewLoadDelay());
+}
+
+bool EventTile::isPreviewLoadNeeded() const
+{
+    return d->isPreviewNeeded() && d->isPreviewLoadNeeded;
 }
 
 CommandActionPtr EventTile::action() const
@@ -837,7 +889,7 @@ void EventTile::clear()
     setFooterText({});
     setTimestamp({});
     setIcon({});
-    setPreview({});
+    setPreview({}, false);
     setPreviewCropRect({});
     setAction({});
     setBusyIndicatorVisible(false);

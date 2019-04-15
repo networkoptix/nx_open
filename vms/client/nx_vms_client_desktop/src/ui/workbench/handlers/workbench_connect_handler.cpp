@@ -98,6 +98,7 @@
 #include <watchers/cloud_status_watcher.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
+#include <nx/vms/client/desktop/ui/dialogs/session_expired_dialog.h>
 
 #include <nx/vms/client/desktop/ini.h>
 
@@ -1009,6 +1010,9 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(DisconnectFlags flags)
 
     if (!force)
         qnGlobalSettings->synchronizeNow();
+
+    if (flags.testFlag(SessionTimeout))
+        executeDelayedParented([this]() { SessionExpiredDialog::exec(context()); }, this);
 
     if (isErrorReason && mainWindow()->welcomeScreen())
         mainWindow()->welcomeScreen()->openConnectingTile();

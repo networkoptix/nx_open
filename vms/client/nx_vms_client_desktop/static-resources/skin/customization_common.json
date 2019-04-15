@@ -531,14 +531,6 @@
         "colors": ["yellow_core", "green_l2", "red_l2"]
     },
 
-    "QnServerUpdatesModel": {
-        "colors": {
-            "latest": "green_l2",
-            "target": "yellow_core",
-            "error": "red_l2"
-        }
-    },
-
     "nx::vms::client::desktop::ServerUpdatesModel": {
         "colors": {
             "latest": "green_l2",

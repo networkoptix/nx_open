@@ -1,14 +1,14 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
+
+#include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 
 class QGraphicsProxyWidget;
 
 namespace nx::vms::client::desktop {
 
-class AsyncImageWidget;
 class TextEditLabel;
 class ImageProvider;
 
@@ -19,6 +19,8 @@ class QnGraphicsToolTipWidget: public QnStyledTooltipWidget
     Q_OBJECT
 
     using base_type = QnStyledTooltipWidget;
+    using AsyncImageWidget = nx::vms::client::desktop::AsyncImageWidget;
+
 public:
     QnGraphicsToolTipWidget(QGraphicsItem* parent = nullptr);
 
@@ -44,6 +46,9 @@ public:
     //reimp
     void pointTo(const QPointF& pos);
     virtual void updateTailPos() override;
+
+    AsyncImageWidget::CropMode cropMode() const;
+    void setCropMode(AsyncImageWidget::CropMode value);
 
 signals:
     void thumbnailClicked();

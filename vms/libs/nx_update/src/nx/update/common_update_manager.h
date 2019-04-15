@@ -63,6 +63,7 @@ private:
 
     virtual vms::common::p2p::downloader::Downloader* downloader() = 0;
     virtual CommonUpdateInstaller* installer() = 0;
+    virtual int64_t freeSpace(const QString& path) const = 0;
 };
 
 } // namespace nx

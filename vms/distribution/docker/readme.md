@@ -4,11 +4,25 @@ This is a docker image based on `ubuntu` that runs `networkoptix-mediaserver` wi
 
 ## Building ##
 
-TODO: Pass the name for mediaserver.deb through arguments
-
 Building an image from current directory
+
+You can use build.sh utility:
+
 ```bash
-docker build -t mediaserver .
+# Building from existing debian package. It will copy it to build folder and build an image.
+build.sh -d ~/Downloads/nxwitness-server-4.0.0.28737-linux64-beta-test.deb
+
+# Or using url to debian package. It will download it and build an image.
+build.sh -u https://beta.networkoptix.com/beta-builds/default/28608/linux/nxwitness-server-4.0.0.28608-linux64-beta-prod.deb
+```
+
+The script will use current directory as a docker workspace. It also copies necessary files (deb package) to 
+this folder. This allows to run `build.sh` out of `nx_vms` source folder.
+
+You can use docker directly:
+
+```bash
+docker build -t mediaserver --build-arg mediaserver_deb=path_to_mediaserver.deb .
 ```
 
 It will fetch all necessary layers and build docker image with name `mediaserver`.

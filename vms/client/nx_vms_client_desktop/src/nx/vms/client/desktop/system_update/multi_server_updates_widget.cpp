@@ -72,7 +72,7 @@ static constexpr int kSectionMinHeight = 30;
 constexpr auto kLatestVersionBannerLabelFontSizePixels = 22;
 constexpr auto kLatestVersionBannerLabelFontWeight = QFont::Light;
 
-const auto kWaitForUpdateCheck = std::chrono::milliseconds(1);
+const auto kWaitForUpdateCheckFuture = std::chrono::milliseconds(1);
 const auto kDelayForCheckingInstallStatus = std::chrono::minutes(1);
 const auto kPeriodForCheckingInstallStatus = std::chrono::seconds(10);
 
@@ -242,6 +242,8 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         });
 
     ui->advancedUpdateSettings->setIcon(qnSkin->icon("text_buttons/collapse.png"));
+
+    setAccentStyle(ui->downloadButton);
     // This button is hidden for now. We will implement it in future.
     ui->downloadAndInstall->hide();
 
@@ -448,7 +450,8 @@ void MultiServerUpdatesWidget::initDropdownActions()
     m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::internetSpecific) + "...",
         [this]()
         {
-            setUpdateSourceMode(UpdateSourceType::internetSpecific);
+            // We are forcing this change to make appear dialog for picking a build.
+            setUpdateSourceMode(UpdateSourceType::internetSpecific, true);
         });
 
     m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::file) + "...",
@@ -683,7 +686,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
 
     // We poll all our tools for new information. Then we update UI if there are any changes
     if (m_updateCheck.valid()
-        && m_updateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
+        && m_updateCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready)
     {
         auto checkResponse = m_updateCheck.get();
         NX_VERBOSE(this) << "atUpdateCurrentState got update info:"
@@ -869,9 +872,9 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
     }
 }
 
-void MultiServerUpdatesWidget::setUpdateSourceMode(UpdateSourceType mode)
+void MultiServerUpdatesWidget::setUpdateSourceMode(UpdateSourceType mode, bool force)
 {
-    if (m_updateSourceMode == mode)
+    if (m_updateSourceMode == mode && !force)
         return;
 
     switch(mode)
@@ -1115,8 +1118,27 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool /*success*/)
 {
     if (m_widgetState == WidgetUpdateState::finishingInstall)
     {
-        m_clientUpdateTool->resetState();
+        bool shouldRestartClient = m_clientUpdateTool->hasUpdate()
+            && m_clientUpdateTool->shouldRestartTo(m_updateInfo.getVersion());
+
         setTargetState(WidgetUpdateState::initial, {});
+        if (shouldRestartClient)
+        {
+            // 1. Check if there is any server who completed installation
+            // 2. Check if there is online servers. - What for?
+            auto complete = m_stateTracker->getPeersCompleteInstall();
+            QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
+            // 1. Everything is complete
+            messageBox->setIcon(QnMessageBoxIcon::Success);
+            messageBox->setText(tr("Nx Witness Client will be restarted to the updated version."));
+            messageBox->setStandardButtons(QDialogButtonBox::Ok);
+            messageBox->exec();
+            completeInstallation(true);
+        }
+        else
+        {
+            m_clientUpdateTool->resetState();
+        }
     }
 }
 
@@ -1320,9 +1342,9 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         return;
     }
 
-    if (m_serverUpdateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready
+    if (m_serverUpdateCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready
         && m_serverStatusCheck.valid()
-        && m_serverStatusCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
+        && m_serverStatusCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready)
     {
         auto updateInfo = m_serverUpdateCheck.get();
         auto serverStatus = m_serverStatusCheck.get();
@@ -1367,6 +1389,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
             NX_INFO(NX_SCOPE_TAG, "taking update info from mediaserver");
             m_updateInfo = updateInfo;
             m_updateReport = calculateUpdateVersionReport(m_updateInfo);
+            m_stateTracker->setUpdateTarget(m_updateInfo.getVersion());
             m_clientUpdateTool->setUpdateTarget(m_updateInfo);
             m_haveValidUpdate = true;
         }
@@ -1456,7 +1479,7 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
         // 3. All other cases. Some servers have failed
         messageBox->setIcon(QnMessageBoxIcon::Critical);
-        messageBox->setText(tr("Failed to download update packages to some servers"));
+        messageBox->setText(tr("Failed to download update packages to some components"));
 
         // TODO: Client can be here as well, but it would not be displayed.
         // Should we display it somehow?
@@ -1641,7 +1664,16 @@ bool MultiServerUpdatesWidget::processRemoteChanges()
     {
         auto idle = m_stateTracker->getPeersInState(StatusCode::idle);
         auto all = m_stateTracker->getAllPeers();
-        if (idle.size() == all.size() && m_serverUpdateTool->haveActiveUpdate())
+        auto downloading = m_stateTracker->getPeersInState(StatusCode::downloading);
+
+        if (!downloading.empty())
+        {
+            // According to VMS-13655, we should go to downloading stage if we have merged
+            // another system. This system will start update automatically, so we just need
+            // to change UI state.
+            setTargetState(WidgetUpdateState::downloading, downloading, false);
+        }
+        else if (idle.size() == all.size() && m_serverUpdateTool->haveActiveUpdate())
         {
             setTargetState(WidgetUpdateState::ready, {});
         }
@@ -1921,7 +1953,8 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         && (m_updateInfo.error == nx::update::InformationError::networkError
             || m_updateInfo.error == nx::update::InformationError::httpError
             // If one wants to download a file in another place.
-            || m_updateInfo.error == nx::update::InformationError::noError);
+            || m_updateInfo.error == nx::update::InformationError::noError)
+        && m_widgetState != WidgetUpdateState::readyInstall;
 
     ui->manualDownloadButton->setVisible(showButton);
 
