@@ -35,7 +35,11 @@ Camera::Camera(QnMediaServerModule* serverModule):
     m_lastInitTime.invalidate();
 
     connect(this, &Camera::groupIdChanged, [this]() { reinitAsync(); });
-    connect(this, &QnResource::initializedChanged, [this]() { fixInputPortMonitoring(); });
+    connect(this, &QnResource::initializedChanged, [this]()
+    {
+        QnMutexLocker lk(&m_initMutex);
+        fixInputPortMonitoring();
+    });
 
     const auto updateIoCache =
         [this](const QnResourcePtr&, const QString& id, bool value, qint64 timestamp)
