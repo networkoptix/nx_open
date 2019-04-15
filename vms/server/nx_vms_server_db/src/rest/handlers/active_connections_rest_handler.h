@@ -4,8 +4,7 @@
 
 namespace ec2 { class AbstractTransactionMessageBus; }
 
-namespace rest {
-namespace handlers {
+namespace rest::handlers {
 
 class ActiveConnectionsRestHandler: public nx::network::rest::Handler
 {
@@ -19,5 +18,4 @@ private:
     const ec2::AbstractTransactionMessageBus* m_messageBus;
 };
 
-} // namespace handlers
-} // namespace rest
+} // namespace rest::handlers

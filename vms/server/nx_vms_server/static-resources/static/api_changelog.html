@@ -39,6 +39,53 @@ params can be <strong>renamed</strong>, though often <strong>deprecated names</s
 supported for a while, when noted below.
 </p>
 <!--============================================================================================-->
+<hr/><h2>VMS <b>4.1</b> relative to <i>4.0</i></h2>
+<!--............................................................................................-->
+<h3>Retaining compatibility until expired</h3>
+<p>
+All GET methods which allowed to porform changes on a server side should not be used any longer.
+<pre>
+    /api/transmitAudio
+    /api/backupControl with non empty "action" URL param
+    /api/backupDatabase
+    /api/configure
+    /api/debugEvent
+    /api/detachFromSystem
+    /api/execute*
+    /api/createEvent
+    /api/manualCamera/search
+    /api/manualCamera/stop
+    /api/manualCamera/add
+    /api/mergeSystems
+    /api/ptz with "command" URL param which does not start with "Get"
+    /api/rebuildArchive
+    /api/settime
+    /api/setupCloudSystem
+    /api/setupLocalSystem
+    /api/systemSettings
+</pre>
+POST methods with the same path and parameters encoded as a JSON content should be used instead.
+Example:
+<pre>
+    GET /api/systemSettings?smtpTimeout=30&smtpUser=test HTTP/1.1
+</pre>
+Should be replaced with POST alternative:
+<pre>
+    POST /api/systemSettings HTTP/1.1
+    Content-Type: application/json
+    Content-Length: 40
+
+    {"smtpTimeout": 30, "smtpUser": "test"}
+</pre>
+GET methods will still be supported until 4.2, or possibly later. Get methods with paramiters which
+do not cause any server changes are still allowed:
+<pre>
+    /api/backupControl
+    /api/manualCamera/status
+    /api/ptz with "command" URL param which starts with "Get"
+</pre>
+</p>
+<!--============================================================================================-->
 <hr/><h2>VMS <b>4.0</b> relative to <i>3.2</i></h2>
 <!--............................................................................................-->
 <h3>Breaking compatibility</h3>

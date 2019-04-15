@@ -64,6 +64,9 @@ public:
 
     void updateDecorationsState();
 
+    bool isWorkbenchVisible() const;
+    bool isWelcomeScreenVisible() const;
+
     /**
      * Handle key press.
      * @returns true if key was handled.

@@ -23,6 +23,7 @@ public:
         const QnRequestParams& params,
         QnJsonRestResult& result,
         const QnRestConnectionProcessor* connectionProcessor) override;
+
 private:
     QString scriptFileName() const;
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QObject>
 
 #include <client/client_globals.h>
@@ -34,6 +36,8 @@ public:
 
     nx::api::CameraImageRequest::StreamSelectionMode streamSelectionMode() const;
     void setStreamSelectionMode(nx::api::CameraImageRequest::StreamSelectionMode value);
+
+    std::chrono::microseconds timestamp() const; //< For cameras returns precise frame timestamp.
 
 protected:
     virtual void doLoadAsync() override;

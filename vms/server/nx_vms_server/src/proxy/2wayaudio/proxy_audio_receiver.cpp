@@ -158,38 +158,29 @@ void QnAudioProxyReceiver::run()
 
     parseRequest();
 
-    auto queryItems = QUrlQuery(d->request.requestLine.url.query()).queryItems();
+    const auto params = nx::vms::server::AudioTransmissionRestHandler::parseParams(d->request);
+    if (!params)
+        return sendResponse(nx::network::http::StatusCode::badRequest, QByteArray());
 
-    QnRequestParams params;
-    for(auto itr = queryItems.begin(); itr != queryItems.end(); ++itr)
-        params.insertMulti(itr->first, itr->second);
-
-    QString errorStr;
-    if (!QnAudioTransmissionRestHandler::validateParams(params, errorStr))
-    {
-        sendResponse(nx::network::http::StatusCode::badRequest, QByteArray());
-        return;
-    }
     sendResponse(nx::network::http::StatusCode::ok, QByteArray());
-
-    auto resourceId = params[kResourceIdParamName];
-    QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction)
-        ? QnAudioStreamerPool::Action::Start
-        : QnAudioStreamerPool::Action::Stop;
 
     // process 2-nd POST request with unlimited length
     QByteArray payloadData;
     if (!readHttpHeaders(d->socket.get(), &payloadData))
         return;
 
-    auto bufferedSocket = std::make_unique<nx::network::BufferedStreamSocket>(takeSocket(), payloadData);
+    auto bufferedSocket = std::make_unique<nx::network::BufferedStreamSocket>(
+        takeSocket(), payloadData);
 
-    QnProxyDesktopDataProviderPtr desktopDataProvider(new QnProxyDesktopDataProvider(QnUuid::fromStringSafe(resourceId)));
+    QnProxyDesktopDataProviderPtr desktopDataProvider(new QnProxyDesktopDataProvider(
+        params->resourceId));
     desktopDataProvider->setSocket(std::move(bufferedSocket));
 
     QString errString;
-    if (!m_serverModule->audioStreamPool()->startStopStreamToResource(desktopDataProvider, QnUuid(resourceId), action, errString))
+    if (!m_serverModule->audioStreamPool()->startStopStreamToResource(
+            desktopDataProvider, params->resourceId, params->action, errString))
     {
-        qWarning() << "Cant start audio uploading to camera" << resourceId << errString;
+        NX_WARNING(this, "Cant start audio uploading to camera %1: %2",
+            params->resourceId, errString);
     }
 }

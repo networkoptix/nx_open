@@ -66,7 +66,7 @@ static void loadRemoteDataAsync(
 
 } // namespace
 
-namespace nx::vms::server::rest {
+namespace nx::vms::server {
 
 ServerTimeHandler::ServerTimeHandler(const QString &getTimeHandlerPath):
     m_getTimeHandlerPath(getTimeHandlerPath)
@@ -99,4 +99,4 @@ nx::network::rest::Response ServerTimeHandler::executeGet(const nx::network::res
     return nx::network::rest::Response::reply(outputData);
 }
 
-} // namespace nx::vms::server::rest
+} // namespace nx::vms::server

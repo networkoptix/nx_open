@@ -6,7 +6,7 @@
 #include <nx/vms/server/ldap_manager.h>
 #include <utils/common/ldap.h>
 
-namespace nx::vms::server::rest {
+namespace nx::vms::server {
 
 nx::network::rest::Response TestLdapSettingsHandler::executePost(
     const nx::network::rest::Request& request)
@@ -25,4 +25,4 @@ nx::network::rest::Response TestLdapSettingsHandler::executePost(
     return nx::network::rest::Response::reply(ldapUsers);
 }
 
-} // namespace nx::vms::server::rest
+} // namespace nx::vms::server

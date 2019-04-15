@@ -79,6 +79,19 @@ update::Status CommonUpdateManager::start()
         return updateStatus;
     }
 
+    const double requiredSpace = package.size * 2 * 1.2;
+    const int64_t deviceFreeSpace = freeSpace(installer()->dataDirectoryPath());
+    if (deviceFreeSpace < requiredSpace)
+    {
+        NX_WARNING(
+            this,
+            "Can't start downloading an update package because lack of free space on disk. " \
+            "Required: %1, free Space: %2",
+            requiredSpace, deviceFreeSpace);
+        return nx::update::Status(
+            peerId, update::Status::Code::error, "Not enough free space for keeping update files");
+    }
+
     FileInformation fileInformation;
     fileInformation.name = package.file;
     fileInformation.md5 = QByteArray::fromHex(package.md5.toLatin1());

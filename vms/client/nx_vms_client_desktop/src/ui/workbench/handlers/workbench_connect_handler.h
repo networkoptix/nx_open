@@ -58,7 +58,8 @@ public:
         NoFlags = 0x0,
         Force = 0x1,
         ErrorReason = 0x2,
-        ClearAutoLogin = 0x4
+        ClearAutoLogin = 0x4,
+        SessionTimeout = 0x8,
     };
     Q_DECLARE_FLAGS(DisconnectFlags, DisconnectFlag)
 

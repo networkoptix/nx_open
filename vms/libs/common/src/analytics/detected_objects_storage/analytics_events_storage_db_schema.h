@@ -1,8 +1,6 @@
 #pragma once
 
-namespace nx {
-namespace analytics {
-namespace storage {
+namespace nx::analytics::storage {
 
 static const char kCreateAnalyticsEventsSchema[] =
 R"sql(
@@ -164,6 +162,44 @@ GROUP BY device_id, timestamp_usec_utc/60000;
 
 )sql";
 
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+//-------------------------------------------------------------------------------------------------
+// META-225
+// TODO: Add indexes.
+static constexpr char kSplitDataToObjectAndSearch[] =
+R"sql(
+
+DROP INDEX idx_event_timestamp;
+DROP INDEX idx_event_object_id;
+DROP INDEX idx_event_device_guid;
+DROP INDEX idx_event_for_streaming_cursor;
+DROP INDEX event_attributes_id;
+DROP TABLE event;
+
+CREATE TABLE object(
+    id                          INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id                   INTEGER,
+    object_type_id              INTEGER,
+    guid                        BLOB,
+    track_start_timestamp_ms    INTEGER,
+    track_detail                BLOB,
+    attributes_id               INTEGER
+);
+
+CREATE TABLE object_search(
+    id                          INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp_seconds_utc       INTEGER,
+    box_top_left_x              INTEGER,
+    box_top_left_y              INTEGER,
+    box_bottom_right_x          INTEGER,
+    box_bottom_right_y          INTEGER,
+    object_id_list              BLOB
+);
+
+CREATE TABLE unique_attributes_to_object_search(
+    attributes_id               INTEGER,
+    object_search_id            INTEGER
+);
+
+)sql";
+
+} // namespace nx::analytics::storage

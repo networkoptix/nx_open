@@ -27,6 +27,14 @@ static QString findCodecById(int num)
     }
 }
 
+static QHostAddress parseConnectionAddress(const QString& line)
+{
+    auto fields = line.split(' ');
+    if (fields.size() >= 3 && fields[1].toUpper() == "IP4")
+        return QHostAddress(fields[2].split('/').front());
+    return QHostAddress();
+}
+
 bool parseRtpMap(const QString& line, Sdp::RtpMap* outRtpmap, int* outPayloadType)
 {
     QStringList params = line.split(' ');
@@ -113,24 +121,19 @@ Sdp::Media parseMedia(QStringList& lines)
         {
             media.sendOnly = true;
         }
+        else if (line.startsWith("c=", Qt::CaseInsensitive))
+        {
+            media.connectionAddress = parseConnectionAddress(line);
+        }
     }
     return media;
 }
 
-static QHostAddress parseServerAddress(const QString& line)
-{
-    auto fields = line.split(' ');
-    if (fields.size() >= 3 && fields[1].toUpper() == "IP4")
-        return QHostAddress(fields[2].split('/').front());
-    return QHostAddress();
-}
-
 void Sdp::parse(const QString& sdpData)
 {
-    serverAddress.clear();
     controlUrl.clear();
     media.clear();
-
+    QHostAddress sessionConnectionAddress;
     QStringList lines = sdpData.split('\n');
     while(!lines.isEmpty())
     {
@@ -143,10 +146,18 @@ void Sdp::parse(const QString& sdpData)
         {
             const static QString kControlUrlPrefix = "a=control:";
             if (line.startsWith("c=", Qt::CaseInsensitive))
-                serverAddress = parseServerAddress(line);
+                sessionConnectionAddress = parseConnectionAddress(line);
             else if (line.startsWith(kControlUrlPrefix, Qt::CaseInsensitive))
                 controlUrl = line.mid(kControlUrlPrefix.length());
             lines.pop_front();
+        }
+    }
+    if (!sessionConnectionAddress.isNull())
+    {
+        for(auto& mediaIter: media)
+        {
+            if (mediaIter.connectionAddress.isNull())
+                mediaIter.connectionAddress = sessionConnectionAddress;
         }
     }
 }

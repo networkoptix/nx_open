@@ -59,7 +59,7 @@ inline void serialize(QnJsonContext *, const double &value, QJsonValue *target) 
     *target = QJsonValue(value);
 }
 
-inline bool deserialize(QnJsonContext *, const QJsonValue &value, double *target) {
+inline bool deserialize(QnJsonContext *context, const QJsonValue &value, double *target) {
     if(value.type() == QJsonValue::Double) {
         *target = value.toDouble();
         return true;
@@ -68,6 +68,10 @@ inline bool deserialize(QnJsonContext *, const QJsonValue &value, double *target
          * but at this point we cannot say what it really was. */
         *target = qQNaN();
         return true;
+    } else if(value.type() == QJsonValue::String && context->areStringConvesionsAllowed()){
+        bool isOk = false;
+        *target = value.toString().toDouble(&isOk);
+        return isOk;
     } else {
         return false;
     }
@@ -252,10 +256,40 @@ inline bool deserialize(QnJsonContext *, const QJsonValue &value, TYPE *target) 
 }
 
 QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(QString,      String, toString)
-QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(bool,         Bool,   toBool)
 QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(QJsonArray,   Array,  toArray)
 QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(QJsonObject,  Object, toObject)
 #undef QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS
+
+
+inline void serialize(QnJsonContext *, const bool &value, QJsonValue *target) {
+    *target = QJsonValue(value);
+}
+
+inline bool deserialize(QnJsonContext *context, const QJsonValue &value, bool *target) {
+    if(value.type() == QJsonValue::Bool) {
+        *target = value.toBool();
+        return true;
+    }
+
+    if (value.type() == QJsonValue::String && context->areStringConvesionsAllowed()) {
+        const auto stringValue = value.toString();
+        for (const auto& key: {QStringLiteral("1"), QStringLiteral("true"), QStringLiteral("on")}) {
+            if (QString::compare(stringValue, key, Qt::CaseInsensitive) == 0) {
+                *target = true;
+                return true;
+            }
+        }
+
+        for (const auto& key: {QStringLiteral("0"), QStringLiteral("false"), QStringLiteral("off")}) {
+            if (QString::compare(stringValue, key, Qt::CaseInsensitive) == 0) {
+                *target = false;
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
 
 
 inline void serialize(QnJsonContext *, const std::string &value, QJsonValue *target) {

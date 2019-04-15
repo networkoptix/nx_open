@@ -8,10 +8,12 @@
 
 static const QString kAction("action");
 
-namespace nx::vms::server::rest {
+using namespace nx::network;
+
+namespace nx::vms::server {
 
 BackupControlRestHandler::BackupControlRestHandler(QnMediaServerModule* serverModule):
-    nx::vms::server::ServerModuleAware(serverModule)
+    ServerModuleAware(serverModule)
 {
 }
 
@@ -27,7 +29,7 @@ nx::network::rest::Response BackupControlRestHandler::executeGet(
         execute(*action);
     }
 
-    return nx::network::rest::Response::reply(
+    return rest::Response::reply(
         serverModule()->backupStorageManager()->scheduleSync()->getStatus());
 }
 
@@ -52,4 +54,4 @@ int BackupControlRestHandler::execute(const QString& action)
     throw nx::network::rest::Exception(nx::network::rest::Result::InvalidParameter, kAction, action);
 }
 
-} // namespace nx::vms::server::rest
+} // namespace nx::vms::server

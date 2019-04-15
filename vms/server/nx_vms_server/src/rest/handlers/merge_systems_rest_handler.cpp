@@ -1,7 +1,6 @@
 #include "merge_systems_rest_handler.h"
 
 #include <chrono>
-
 #include <QtCore/QRegExp>
 
 #include <audit/audit_manager.h>
@@ -12,6 +11,7 @@
 #include <media_server/server_connector.h>
 #include <media_server/serverutil.h>
 #include <network/connection_validator.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/utils/system_merge_processor.h>
 #include <nx/vms/utils/vms_utils.h>
@@ -20,35 +20,40 @@
 
 #include "private/multiserver_request_helper.h"
 
-QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(QnMediaServerModule* serverModule):
-    QnJsonRestHandler(),
+namespace nx::vms::server {
+
+MergeSystemsRestHandler::MergeSystemsRestHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
-{}
-
-int QnMergeSystemsRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
 {
-    return execute(std::move(MergeSystemData(params)), owner, result);
 }
 
-int QnMergeSystemsRestHandler::executePost(
-    const QString& /*path*/,
-    const QnRequestParams& /*params*/,
-    const QByteArray& body,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+nx::network::rest::Response MergeSystemsRestHandler::executeGet(
+    const nx::network::rest::Request& request)
 {
-    MergeSystemData data = QJson::deserialized<MergeSystemData>(body);
-    return execute(std::move(data), owner, result);
+    if (!nx::network::rest::ini().allowGetModifications)
+        return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
+
+    return executePost(request);
 }
 
-int QnMergeSystemsRestHandler::execute(
+nx::network::rest::Response MergeSystemsRestHandler::executePost(
+    const nx::network::rest::Request& request)
+{
+    auto data = request.parseContentOrThrow<MergeSystemData>();
+    if (nx::network::rest::ini().allowGetModifications)
+        data.mergeOneServer = request.paramOrDefault<bool>("oneServer", data.mergeOneServer);
+
+    nx::network::rest::JsonResult result;
+    const auto status = execute(data, request.owner, result);
+    auto response = nx::network::rest::Response::result(result);
+    response.statusCode = status;
+    return response;
+}
+
+nx::network::http::StatusCode::Value MergeSystemsRestHandler::execute(
     MergeSystemData data,
     const QnRestConnectionProcessor* owner,
-    QnJsonRestResult &result)
+    nx::network::rest::JsonResult& result)
 {
     // TODO: Require password at all times when we support required password in client, cloud and
     //     all tests, see VMS-12623.
@@ -99,7 +104,7 @@ int QnMergeSystemsRestHandler::execute(
     return nx::network::http::StatusCode::ok;
 }
 
-void QnMergeSystemsRestHandler::updateLocalServerAuthKeyInConfig(
+void MergeSystemsRestHandler::updateLocalServerAuthKeyInConfig(
     QnCommonModule* commonModule)
 {
     QnMediaServerResourcePtr server =
@@ -111,7 +116,7 @@ void QnMergeSystemsRestHandler::updateLocalServerAuthKeyInConfig(
     helper.setAuthKey(server->getAuthKey().toUtf8());
 }
 
-void QnMergeSystemsRestHandler::initiateConnectionToRemoteServer(
+void MergeSystemsRestHandler::initiateConnectionToRemoteServer(
     QnCommonModule* commonModule,
     const QUrl& remoteModuleUrl,
     const nx::vms::api::ModuleInformationWithAddresses& remoteModuleInformation)
@@ -128,3 +133,5 @@ void QnMergeSystemsRestHandler::initiateConnectionToRemoteServer(
     if (connectionResult == Qn::SuccessConnectionResult && serverModule()->serverConnector())
         serverModule()->serverConnector()->addConnection(module);
 }
+
+} // namespace nx::vms::server

@@ -26,6 +26,7 @@
 #include <media/filters/h264_mp4_to_annexb.h>
 
 #include <nx/vms/client/desktop/ini.h>
+#include <utils/common/delayed.h>
 
 QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader) :
     base_type(nullptr),
@@ -63,7 +64,6 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
                 &m_camdispay, &QnCamDisplay::onSkippingFrames, Qt::DirectConnection);
         }
     }
-
 }
 
 QnClientVideoCamera::~QnClientVideoCamera()
@@ -153,7 +153,6 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     QnMutexLocker lock( &m_exportMutex );
     if (!m_exportRecorder)
     {
-
         auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
             m_resource->toResourcePtr());
         QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (tmpReader);
@@ -192,32 +191,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
 
         m_exportReader = archiveReader;
 
-
-        connect(m_exportReader, &QnAbstractArchiveStreamReader::finished, this,
-            [this]()
-            {
-                {
-                    QnMutexLocker lock(&m_exportMutex);
-                    m_exportReader.clear();
-                }
-
-                sender()->deleteLater();
-            });
-
         m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
-        connect(m_exportRecorder, &QnStreamRecorder::finished, this,
-            [this]
-            {
-                {
-                    QnMutexLocker lock(&m_exportMutex);
-                    if (m_exportReader && m_exportRecorder)
-                        m_exportReader->removeDataProcessor(m_exportRecorder);
-                    m_exportRecorder.clear();
-                }
-
-                /* There is a possibility we have already cleared the smart pointer, e.g. in stopExport() method. */
-                sender()->deleteLater();
-            });
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);
@@ -264,22 +238,31 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
 
 void QnClientVideoCamera::stopExport()
 {
+    // This function is now synchronous - it will wait for other threads to finish.
     if (m_exportReader)
     {
         if (m_exportRecorder)
             m_exportReader->removeDataProcessor(m_exportRecorder);
-        m_exportReader->pleaseStop();  // it will be deleted in finished() signal handle
+        m_exportReader->pleaseStop();
+        m_exportReader->wait(); //< We should wait for reader to stop.
+        m_exportReader->deleteLater();
     }
     if (m_exportRecorder)
     {
-        // clean signature flag; in other case file will be recreated on writing finish
-        // TODO: #vasilenko get rid of this magic
-        m_exportRecorder->setNeedCalcSignature(false);
-
-        connect(m_exportRecorder, &QnStreamRecorder::finished, this, &QnClientVideoCamera::exportStopped);
-        m_exportRecorder->pleaseStop(); // it will be deleted in finished() signal handle
+        bool exportFinishedOk = m_exportReader->isFinished();
+        if (!exportFinishedOk)
+        {
+            // clean signature flag; in other case file will be recreated on writing finish
+            // TODO: #vasilenko get rid of this magic
+            m_exportRecorder->setNeedCalcSignature(false);
+            m_exportRecorder->pleaseStop();
+            m_exportReader->wait(); //< We should wait for recorder to stop.
+            // executeLater is used to make it work similar to previous code.
+            emit exportStopped();
+        }
+        m_exportRecorder->deleteLater();
     }
-    QnMutexLocker lock(&m_exportMutex);
+
     m_exportReader.clear();
     m_exportRecorder.clear();
 }

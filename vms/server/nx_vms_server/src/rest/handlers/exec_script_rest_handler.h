@@ -1,17 +1,27 @@
 #pragma once
 
-#include "rest/server/json_rest_handler.h"
+#include <nx/network/rest/handler.h>
 
+namespace nx::vms::server {
 
-class QnExecScript: public QnJsonRestHandler
+class ExecScript: public nx::network::rest::Handler
 {
-    Q_OBJECT
 public:
-    QnExecScript(const QString& dataDirectory);
+    ExecScript(const QString& dataDirectory);
 
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
-private:
-    void afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner) override;
+protected:
+    virtual nx::network::rest::Response executeGet(
+        const nx::network::rest::Request& request) override;
+
+    virtual nx::network::rest::Response executePost(
+        const nx::network::rest::Request& request) override;
+
+    virtual void afterExecute(
+        const nx::network::rest::Request& request,
+        const nx::network::rest::Response& response) override;
+
 private:
     const QString m_dataDirectory;
 };
+
+} // namespace nx::vms::server

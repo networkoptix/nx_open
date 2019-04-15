@@ -4,21 +4,32 @@
 #include "media_server/serverutil.h"
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
 
-QnBackupDbRestHandler::QnBackupDbRestHandler(QnMediaServerModule* serverModule):
-    nx::vms::server::ServerModuleAware(serverModule)
+using namespace nx::network;
+
+namespace nx::vms::server {
+
+BackupDbRestHandler::BackupDbRestHandler(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
 {
 }
 
-int QnBackupDbRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& /*params*/,
-    QnJsonRestResult& /*result*/,
-    const QnRestConnectionProcessor* /*owner*/)
+rest::Response BackupDbRestHandler::executeGet(const rest::Request& request)
+{
+    if (!rest::ini().allowGetModifications)
+        return rest::Response::error(nx::network::rest::Result::Forbidden);
+
+    return executePost(request);
+}
+
+rest::Response BackupDbRestHandler::executePost(const rest::Request& /*request*/)
 {
     nx::vms::server::Utils utils(serverModule());
     if (!utils.backupDatabase())
-        return nx::network::http::StatusCode::internalServerError;
+        return rest::Response::error(rest::Result::InternalServerError);
 
-    return nx::network::http::StatusCode::ok;
+    return rest::Response::result(rest::JsonResult());
 }
+
+} // namespace nx::vms::server

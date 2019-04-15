@@ -2,11 +2,6 @@
 
 #include <QtCore/QSettings>
 
-#include <nx/network/http/http_types.h>
-#include <nx/utils/log/log.h>
-
-#include <nx/vms/utils/vms_utils.h>
-
 #include <api/global_settings.h>
 #include <api/model/configure_reply.h>
 #include <api/model/configure_system_data.h>
@@ -15,23 +10,25 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <media_server/media_server_module.h>
+#include <media_server/new_system_flag_watcher.h>
+#include <media_server/serverutil.h>
+#include <media_server/settings.h>
 #include <network/tcp_listener.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec_api.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/utils/system_merge_processor.h>
+#include <nx/vms/utils/vms_utils.h>
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
-#include "media_server/media_server_module.h"
-#include "media_server/serverutil.h"
-#include "media_server/settings.h"
-#include <nx/vms/utils/system_merge_processor.h>
-
 #include "private/multiserver_request_helper.h"
-#include <media_server/new_system_flag_watcher.h>
 
-namespace
-{
+namespace nx::vms::server {
 
 enum Result
 {
@@ -40,43 +37,50 @@ enum Result
     ResultSkip
 };
 
-} // namespace
-
-QnConfigureRestHandler::QnConfigureRestHandler(
+ConfigureRestHandler::ConfigureRestHandler(
     QnMediaServerModule* serverModule)
     :
-    QnJsonRestHandler(),
-    nx::vms::server::ServerModuleAware(serverModule)
+    ServerModuleAware(serverModule)
 {
 }
 
-int QnConfigureRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+nx::network::rest::Response ConfigureRestHandler::executeGet(
+    const nx::network::rest::Request& request)
 {
-    return execute(ConfigureSystemData(params), result, owner);
+    if (!nx::network::rest::ini().allowGetModifications)
+        return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
+
+    return executePost(request);
 }
 
-int QnConfigureRestHandler::executePost(
-    const QString& /*path*/,
-    const QnRequestParams& /*params*/,
-    const QByteArray& body,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+nx::network::rest::Response ConfigureRestHandler::executePost(
+    const nx::network::rest::Request& request)
 {
-    ConfigureSystemData data = QJson::deserialized<ConfigureSystemData>(body);
-    return execute(std::move(data), result, owner);
+    auto data = request.parseContentOrThrow<ConfigureSystemData>();
+    if (nx::network::rest::ini().allowGetModifications)
+    {
+        if (data.currentPassword.isEmpty())
+            data.currentPassword = request.paramOrDefault("oldPassword");
+
+        auto& log = data.tranLogTime;
+        log.sequence = request.paramOrDefault<quint64>("tranLogTimeSequence", log.sequence);
+        log.ticks = request.paramOrDefault<quint64>("tranLogTimeTicks", log.ticks);
+    }
+
+    nx::network::rest::JsonResult result;
+    const auto status = execute(data, result, request.owner);
+    auto response = nx::network::rest::Response::result(result);
+    response.statusCode = status;
+    return response;
 }
 
 // NOTE: Some parameters are undocumented and are used only by the server internally before calling
 // /api/mergeSystem.
 // TODO: Consider splitting into two methods: a public one (similar to the currently documented),
 // and the proprietary one for the internal server use.
-int QnConfigureRestHandler::execute(
+nx::network::http::StatusCode::Value ConfigureRestHandler::execute(
     const ConfigureSystemData& data,
-    QnJsonRestResult &result,
+    nx::network::rest::JsonResult& result,
     const QnRestConnectionProcessor* owner)
 {
     nx::vms::server::Utils utils(serverModule());
@@ -97,9 +101,9 @@ int QnConfigureRestHandler::execute(
     }
 
     if (QnPermissionsHelper::isSafeMode(serverModule()))
-        return QnPermissionsHelper::safeModeError(result);
+        return (nx::network::http::StatusCode::Value) QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
-        return QnPermissionsHelper::notOwnerError(result);
+        return (nx::network::http::StatusCode::Value) QnPermissionsHelper::notOwnerError(result);
 
     QString errStr;
     if (!nx::vms::utils::validatePasswordData(data, &errStr))
@@ -208,7 +212,7 @@ int QnConfigureRestHandler::execute(
     return nx::network::http::StatusCode::ok;
 }
 
-int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, int port)
+int ConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, int port)
 {
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
@@ -250,3 +254,5 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
     serverModule()->mutableSettings()->port.set(port);
     return ResultOk;
 }
+
+} // namespace nx::vms::server

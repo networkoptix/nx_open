@@ -664,7 +664,11 @@ void QnClientModule::initSkin()
             QDir(QApplication::applicationDirPath()).absoluteFilePath(
                 nx::utils::AppInfo::isMacOsX() ? "../Resources/fonts" : "fonts"));
 
-        QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
+        if (qnRuntime->isVideoWallMode())
+            QApplication::setWindowIcon(qnSkin->icon(":/videowall.ico"));
+        else
+            QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
+
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }
 

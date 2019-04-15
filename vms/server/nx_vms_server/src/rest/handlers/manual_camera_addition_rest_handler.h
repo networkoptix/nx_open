@@ -3,43 +3,47 @@
 #include <nx/utils/uuid.h>
 
 #include <core/resource_management/manual_camera_searcher.h>
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 #include <api/model/manual_camera_data.h>
 #include <nx/vms/server/server_module_aware.h>
 
 #include <memory>
 #include <unordered_map>
 
-class QnManualCameraAdditionRestHandler:
-    public QnJsonRestHandler,
-    public /*mixin*/ nx::vms::server::ServerModuleAware
+namespace nx::vms::server {
+
+class ManualCameraAdditionRestHandler:
+    public nx::network::rest::Handler,
+    public /*mixin*/ ServerModuleAware
 {
-    Q_OBJECT
-
 public:
-    QnManualCameraAdditionRestHandler(QnMediaServerModule* serverModule);
-    ~QnManualCameraAdditionRestHandler();
+    ManualCameraAdditionRestHandler(QnMediaServerModule* serverModule);
+    ~ManualCameraAdditionRestHandler();
 
-    virtual int executeGet(
-        const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
-        const QnRestConnectionProcessor*) override;
+protected:
+    virtual nx::network::rest::Response executeGet(
+        const nx::network::rest::Request& request) override;
 
-    virtual int executePost(
-        const QString& path, const QnRequestParams& params, const QByteArray& body,
-        QnJsonRestResult& result, const QnRestConnectionProcessor* owner) override;
+    virtual nx::network::rest::Response executePost(
+        const nx::network::rest::Request& request) override;
 
 private:
-    int searchStartAction(
-        const QnRequestParams& params,
-        QnJsonRestResult& result,
-        const QnRestConnectionProcessor* owner);
-    int searchStatusAction(const QnRequestParams& params, QnJsonRestResult& result);
-    int searchStopAction(const QnRequestParams& params, QnJsonRestResult& result);
-    int addCamerasAction(const QnRequestParams& params, QnJsonRestResult& result,
+    nx::network::http::StatusCode::Value searchStartAction(
+        const nx::network::rest::Params& params,
+        nx::network::rest::JsonResult& result,
         const QnRestConnectionProcessor* owner);
 
-    int extractSearchStartParams(QnJsonRestResult* const result,
-        const QnRequestParams& params,
+    nx::network::http::StatusCode::Value searchStatusAction(
+        const nx::network::rest::Params& params,
+        nx::network::rest::JsonResult& result);
+
+    nx::network::http::StatusCode::Value searchStopAction(
+        const nx::network::rest::Params& params,
+        nx::network::rest::JsonResult& result);
+
+    nx::network::http::StatusCode::Value extractSearchStartParams(
+        nx::network::rest::JsonResult* const result,
+        const nx::network::rest::Params& params,
         nx::utils::Url* const outUrl,
         std::optional<std::pair<nx::network::HostAddress, nx::network::HostAddress>>* const outIpRange);
 
@@ -57,9 +61,9 @@ private:
      */
     bool isSearchActive(const QnUuid& searchProcessUuid);
 
-    int addCameras(
+    nx::network::http::StatusCode::Value addCameras(
         const AddManualCameraData& data,
-        QnJsonRestResult& result,
+        nx::network::rest::JsonResult& result,
         const QnRestConnectionProcessor* owner);
 
 private:
@@ -69,3 +73,5 @@ private:
     QnMutex m_searchProcessMutex;
     std::unordered_map<QnUuid, QnManualCameraSearcherPtr> m_searchProcesses;
 };
+
+} // namespace nx::vms::server

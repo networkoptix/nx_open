@@ -13,7 +13,7 @@
 
 #include <nx/vms/api/analytics/settings_response.h>
 
-namespace nx::vms::server::rest {
+namespace nx::vms::server {
 
 using namespace nx::network;
 
@@ -157,4 +157,4 @@ nx::network::rest::Response DeviceAnalyticsSettingsHandler::makeSettingsResponse
     return nx::network::rest::Response::reply(response);
 }
 
-} // namespace nx::vms::server::rest
+} // namespace nx::vms::server

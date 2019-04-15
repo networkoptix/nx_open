@@ -1,14 +1,16 @@
 #include "system_settings_handler.h"
 
+#include <api/global_settings.h>
+#include <api/model/system_settings_reply.h>
+#include <api/resource_property_adaptor.h>
+#include <audit/audit_manager.h>
+#include <common/common_module.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/http_types.h>
-
-#include <api/global_settings.h>
-#include <api/resource_property_adaptor.h>
-#include <api/model/system_settings_reply.h>
-#include <audit/audit_manager.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
 #include <rest/server/rest_connection_processor.h>
-#include <common/common_module.h>
+
+namespace nx::vms::server {
 
 SystemSettingsProcessor::SystemSettingsProcessor(
     QnCommonModule* commonModule,
@@ -43,25 +45,38 @@ void SystemSettingsProcessor::systemNameChanged(
 
 //-------------------------------------------------------------------------------------------------
 
-int QnSystemSettingsHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+nx::network::rest::Response SystemSettingsHandler::executeGet(
+    const nx::network::rest::Request& request)
 {
-    bool status = updateSettings(
-        owner->commonModule(),
-        params,
-        result,
-        owner->accessRights(),
-        owner->authSession());
-    return status ? nx::network::http::StatusCode::ok : nx::network::http::StatusCode::forbidden;
+    if (!nx::network::rest::ini().allowGetModifications && request.params().isEmpty())
+        return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
+
+    return executePost(request);
 }
 
-bool QnSystemSettingsHandler::updateSettings(
+nx::network::rest::Response SystemSettingsHandler::executePost(
+    const nx::network::rest::Request& request)
+{
+    nx::network::rest::JsonResult result;
+    bool status = updateSettings(
+        request.owner->commonModule(),
+        request.params(),
+        result,
+        request.owner->accessRights(),
+        request.owner->authSession());
+
+    auto response = nx::network::rest::Response::result(result);
+    response.statusCode = status
+        ? nx::network::http::StatusCode::ok
+        : nx::network::http::StatusCode::forbidden;
+
+    return response;
+}
+
+bool SystemSettingsHandler::updateSettings(
     QnCommonModule* commonModule,
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
+    const nx::network::rest::Params& params,
+    nx::network::rest::JsonResult& result,
     const Qn::UserAccessData& accessRights,
     const QnAuthSession& authSession)
 {
@@ -69,3 +84,5 @@ bool QnSystemSettingsHandler::updateSettings(
     return systemSettingsProcessor.updateSettings(accessRights, authSession, params, &result) ==
         nx::network::http::StatusCode::ok;
 }
+
+} // namespace nx::vms::server

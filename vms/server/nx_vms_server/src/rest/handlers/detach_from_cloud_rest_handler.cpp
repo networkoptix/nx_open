@@ -26,15 +26,6 @@ QnDetachFromCloudRestHandler::QnDetachFromCloudRestHandler(
 {
 }
 
-int QnDetachFromCloudRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& /*params*/,
-    QnJsonRestResult& /*result*/,
-    const QnRestConnectionProcessor* /*owner*/)
-{
-    return nx::network::http::StatusCode::forbidden;
-}
-
 int QnDetachFromCloudRestHandler::executePost(
     const QString& /*path*/,
     const QnRequestParams& /*params*/,

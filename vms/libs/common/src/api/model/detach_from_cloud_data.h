@@ -6,9 +6,9 @@
 
 struct DetachFromCloudData: public PasswordData, public CurrentPasswordData
 {
-    DetachFromCloudData();
-    DetachFromCloudData(const PasswordData& source, const CurrentPasswordData& currentPassword);
-    DetachFromCloudData(const QnRequestParams& params);
+    DetachFromCloudData(
+        const PasswordData& source = {},
+        const CurrentPasswordData& currentPassword = {});
 };
 
 #define DetachFromCloudData_Fields PasswordData_Fields CurrentPasswordData_Fields

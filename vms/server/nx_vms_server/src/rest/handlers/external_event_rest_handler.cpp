@@ -2,128 +2,118 @@
 
 #include <QtCore/QFileInfo>
 
+#include <api/helpers/camera_id_helper.h>
 #include <common/common_module.h>
-#include <core/resource/resource.h>
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
+#include <media_server/media_server_module.h>
 #include <network/tcp_connection_priv.h>
-#include <rest/server/rest_connection_processor.h>
-#include <utils/common/util.h>
-#include <utils/common/synctime.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/server/event/event_connector.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
 #include <nx/utils/string.h>
 #include <nx/vms/event/event_parameters.h>
-#include <media_server/media_server_module.h>
-#include <api/helpers/camera_id_helper.h>
+#include <nx/vms/server/event/event_connector.h>
+#include <rest/server/rest_connection_processor.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
 
-using namespace nx;
+using namespace nx::network;
 
-QnExternalEventRestHandler::QnExternalEventRestHandler(QnMediaServerModule* serverModule):
-    nx::vms::server::ServerModuleAware(serverModule)
+namespace nx::vms::server {
+
+ExternalEventRestHandler::ExternalEventRestHandler(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
 {
 }
 
-int QnExternalEventRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+rest::Response ExternalEventRestHandler::executeGet(const rest::Request& request)
 {
+    // TODO: There should be system wide setting to enable this particular method when all GET
+    // modifications are disabled by default. This may be required for some 3rd party integrations.
+    if (!rest::ini().allowGetModifications)
+        return rest::Response::error(nx::network::rest::Result::Forbidden);
+
+    return executePost(request);
+}
+
+rest::Response ExternalEventRestHandler::executePost(const rest::Request& request)
+{
+    bool ok = false;
+    const auto invalidParameter =
+        [&](const QString& name, const QString& value)
+        {
+            return rest::Response::error(
+                http::StatusCode::ok, rest::Result::InvalidParameter, name, value);
+        };
+
     vms::event::EventParameters businessParams;
-    QString errStr;
-    vms::api::EventState eventState = vms::api::EventState::undefined;
-    bool ok;
-
-    if (params.contains("event_type"))
+    if (const auto value = request.param("event_type"))
     {
-        businessParams.eventType = QnLexical::deserialized<vms::api::EventType>(
-            params["event_type"], vms::api::EventType(), &ok);
+        businessParams.eventType = QnLexical::deserialized<vms::api::EventType>(*value, {}, &ok);
         if (!ok)
-        {
-            result.setError(QnRestResult::InvalidParameter,
-                "Invalid value for parameter 'event_type'.");
-            return nx::network::http::StatusCode::ok;
-        }
+            return invalidParameter("event_type", *value);
     }
 
-    if (params.contains("timestamp"))
-        businessParams.eventTimestampUsec = nx::utils::parseDateTime(params["timestamp"]);
+    if (const auto value = request.param("timestamp"))
+        businessParams.eventTimestampUsec = nx::utils::parseDateTime(*value);
 
-    if (params.contains("eventResourceId"))
+    if (const auto value = request.param("eventResourceId"))
+    {
         businessParams.eventResourceId = nx::camera_id_helper::flexibleIdToId(
-            owner->commonModule()->resourcePool(),
-            params["eventResourceId"]);
-
-    if (params.contains("state"))
-    {
-        eventState = QnLexical::deserialized<vms::api::EventState>(
-            params["state"], vms::api::EventState::undefined, &ok);
-        if (!ok)
-        {
-            result.setError(QnRestResult::InvalidParameter,
-                "Invalid value for parameter 'state'.");
-            return nx::network::http::StatusCode::ok;
-        }
+            request.owner->commonModule()->resourcePool(), *value);
     }
 
-    if (params.contains("reasonCode"))
+    vms::api::EventState eventState = vms::api::EventState::undefined;
+    if (const auto value = request.param("state"))
     {
-        businessParams.reasonCode = QnLexical::deserialized<vms::api::EventReason>(
-            params["reasonCode"], vms::api::EventReason(), &ok);
+        eventState = QnLexical::deserialized<vms::api::EventState>(*value, {}, &ok);
         if (!ok)
-        {
-            result.setError(QnRestResult::InvalidParameter,
-                "Invalid value for parameter 'reasonCode'.");
-            return nx::network::http::StatusCode::ok;
-        }
+            return invalidParameter("state", *value);
     }
 
-    if (params.contains("inputPortId"))
-        businessParams.inputPortId = params["inputPortId"];
-
-    auto fromEncoded = [](const QString& s)
+    if (const auto value = request.param("reasonCode"))
     {
-        return QUrl::fromPercentEncoding(QString(s).replace('+', "%20").toUtf8());
-    };
+        businessParams.reasonCode = QnLexical::deserialized<vms::api::EventReason>(*value, {}, &ok);
+        if (!ok)
+            return invalidParameter("reasonCode", *value);
+    }
 
-    if (params.contains("source"))
-        businessParams.resourceName = fromEncoded(params["source"]);
+    const auto decoded =
+        [&](const QString& name)
+        {
+            return request.paramOrDefault(name).replace('+', "%20");
+        };
 
-    if (params.contains("caption"))
-        businessParams.caption = fromEncoded(params["caption"]);
+    businessParams.resourceName = decoded("inputPortId");
+    businessParams.caption = decoded("source");
+    businessParams.description = decoded("caption");
+    businessParams.inputPortId = decoded("description");
 
-    if (params.contains("description"))
-        businessParams.description = fromEncoded(params["description"]);
-
-    if (params.contains("metadata"))
+    if (const auto value = request.param("metadata"))
     {
         businessParams.metadata = QJson::deserialized<vms::event::EventMetaData>(
-            params["metadata"].toUtf8(), vms::event::EventMetaData(), &ok);
+            value->toUtf8(), {}, &ok);
         if (!ok)
-        {
-            result.setError(QnRestResult::InvalidParameter,
-                "Invalid value for parameter 'metadata'. "
-                "It should be a json object. See documentation for more details.");
-            return nx::network::http::StatusCode::ok;
-        }
+            return invalidParameter("metadata", *value);
     }
 
     if (businessParams.eventTimestampUsec == 0)
         businessParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
 
-    businessParams.sourceServerId = owner->commonModule()->moduleGUID();
+    businessParams.sourceServerId = request.owner->commonModule()->moduleGUID();
 
     if (businessParams.eventType == vms::api::EventType::undefinedEvent)
         businessParams.eventType = vms::api::EventType::userDefinedEvent;
 
-    const auto& userId = owner->accessRights().userId;
+    const auto& userId = request.owner->accessRights().userId;
 
-    if (!serverModule()->eventConnector()->createEventFromParams(
-        businessParams, eventState, userId, &errStr))
-    {
-        result.setError(QnRestResult::InvalidParameter, errStr);
-    }
+    const auto connector = serverModule()->eventConnector();
+    QString error;
+    if (connector->createEventFromParams(businessParams, eventState, userId, &error))
+        return rest::Response::result(rest::JsonResult());
 
-    return nx::network::http::StatusCode::ok;
+    return rest::Response::error(http::StatusCode::ok, rest::Result::InvalidParameter, error);
 }
+
+} // namespace nx::vms::server

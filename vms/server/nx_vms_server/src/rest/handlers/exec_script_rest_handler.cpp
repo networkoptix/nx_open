@@ -1,63 +1,75 @@
 #include "exec_script_rest_handler.h"
-#include <nx/network/http/http_types.h>
-#include <QFileInfo>
-#include "media_server/serverutil.h"
+
 #include <QProcess>
+#include <QFileInfo>
+
+#include <media_server/serverutil.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
 #include <nx/utils/file_system.h>
 
-namespace
+static const QString kAllowedParamChars = lit("^[a-zA-Z0-9_ =\\-\\+\\.]*$");
+
+using namespace nx::network;
+
+namespace nx::vms::server {
+
+ExecScript::ExecScript(const QString& dataDirectory):
+    m_dataDirectory(dataDirectory)
 {
-    const QString allowedParamChars = lit("^[a-zA-Z0-9_ =\\-\\+\\.]*$");
 }
 
-QnExecScript::QnExecScript(const QString& dataDirectory): m_dataDirectory(dataDirectory)
+rest::Response ExecScript::executeGet(const rest::Request& request)
 {
+    if (!rest::ini().allowGetModifications)
+        return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
+
+    return executePost(request);
 }
 
-int QnExecScript::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+rest::Response ExecScript::executePost(const rest::Request& request)
 {
-    if (path.contains(lit("..")) || path.contains('\\')) {
-        result.setError(QnRestResult::InvalidParameter, "Path contains forbidden characters");
-        return nx::network::http::StatusCode::ok;
-    }
+    if (request.path().contains(lit("..")) || request.path().contains('\\'))
+        return rest::Response::error(rest::Result::Forbidden);
 
-    QString scriptName = QFileInfo(path).fileName();
+    QString scriptName = QFileInfo(request.path()).fileName();
     QString fileName = m_dataDirectory + "/scripts/" + scriptName;
-    if (!QFile::exists(fileName)) {
-        result.setError(QnRestResult::InvalidParameter, lit( "Script '%1' is missing at the server").arg(scriptName));
-        return nx::network::http::StatusCode::ok;
+    if (!QFile::exists(fileName))
+    {
+        return rest::Response::error(
+            rest::Result::CantProcessRequest,
+            lm("Script '%1' is missing at the server").arg(scriptName));
     }
 
     QStringList args;
-    for (auto itr = params.begin(); itr != params.end(); ++itr)
-        args << lit("%1=%2").arg(itr.key()).arg(itr.value());
+    for (const auto& param: request.params().toList())
+        args << lit("%1=%2").arg(param.first).arg(param.second);
 
-    QRegExp regExpr(allowedParamChars);
+    QRegExp regExpr(kAllowedParamChars);
     for (const auto& arg: args)
     {
-        if (!regExpr.exactMatch(arg)) {
-            result.setError(QnRestResult::InvalidParameter, "Script params contain forbidden characters");
-            return nx::network::http::StatusCode::ok;
+        if (!regExpr.exactMatch(arg))
+        {
+            return rest::Response::error(
+                rest::Result::CantProcessRequest,
+                "Script params contain forbidden characters");
         }
     }
 
-    return nx::network::http::StatusCode::ok;
+    return rest::Response::result(rest::JsonResult());
 }
 
-void QnExecScript::afterExecute(const QString& path, const QnRequestParamList& params,
-    const QByteArray& body, const QnRestConnectionProcessor*)
+void ExecScript::afterExecute(const rest::Request& request, const rest::Response& /*response*/)
 {
-    QnJsonRestResult reply;
-    if (!QJson::deserialize(body, &reply) || reply.error !=  QnJsonRestResult::NoError)
-        return;
-
-    QString scriptName = QFileInfo(path).fileName();
+    QString scriptName = QFileInfo(request.path()).fileName();
     QString fileName = m_dataDirectory + "/scripts/" + scriptName;
 
     QStringList args;
-    for (const auto& param: params.toList())
+    for (const auto& param: request.params().toList())
         args << lit("%1=%2").arg(param.first).arg(param.second);
 
     if (!QProcess::startDetached(fileName, args))
         qWarning() << lit( "Can't start script '%1' because of system error").arg(scriptName);
 }
+
+} // namespace nx::vms::server

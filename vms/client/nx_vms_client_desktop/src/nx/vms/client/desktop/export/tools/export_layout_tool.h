@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QScopedPointer>
+
 #include <core/resource/resource_fwd.h>
 
 #include <nx/vms/client/desktop/export/tools/abstract_export_tool.h>
@@ -44,8 +46,6 @@ private slots:
     void at_camera_exportFinished(const StreamRecorderErrorStruct& status,
         const QString& filename);
 
-    void at_camera_exportStopped();
-
 private:
     /** Info about layout items */
     struct ItemInfo {
@@ -82,7 +82,7 @@ private:
     /** Stage field, used to show correct progress in multi-video layout. */
     int m_offset = -1;
 
-    QnClientVideoCamera* m_currentCamera = nullptr;
+    QScopedPointer<QnClientVideoCamera> m_currentCamera;
 
     bool m_isExportToExe = false;
 };

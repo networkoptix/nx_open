@@ -137,7 +137,6 @@
 #include <rest/handlers/activate_license_rest_handler.h>
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
-#include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/start_update_rest_handler.h>
 #include <rest/handlers/finish_update_rest_handler.h>
@@ -1520,10 +1519,12 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/setCameraParam", new QnCameraSettingsRestHandler(serverModule()->resourceCommandProcessor()));
 
-    /**%apidoc GET /api/manualCamera/search
+    /**%apidoc POST /api/manualCamera/search
      * Start searching for the cameras in manual mode. There are two ways to call this method:
      * IP range search and single host search. To scan an IP range, "start_ip" and "end_ip" must be
      * specified. To run a single host search, "url" must be specified.
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * %param[opt]:string url A valid URL, hostname or hostname:port are accepted.
      * %param[opt]:string start_ip First IP address in the range to scan. Conflicts with "url".
      * %param[opt]:string end_ip Last IP address in the range to scan. Conflicts with "url".
@@ -1549,24 +1550,10 @@ void MediaServerProcess::registerRestHandlers(
      *     of /api/manualCamera/search.
      * %return:object JSON object with error message and error code (0 means OK).
      *
-     **%apidoc[proprietary] GET /api/manualCamera/add
-     * Manually add camera(s). If several cameras are added, parameters "url" and "manufacturer"
-     * must be defined several times with incrementing suffix "0", "1", etc.
-     * %param:string url0 Camera url, can be obtained from "reply.cameras[].url" field in the
-     *     result of /api/manualCamera/status.
-     * %param:string uniqueId0 Camera physical id, can be obtained from "reply.cameras[].uniqueId"
-     *     field in the result of /api/manualCamera/status.
-     * %param:string manufacturer0 Camera manufacturer, can be obtained from
-     *     "reply.cameras[].manufacturer" field in the result of /api/manualCamera/status.
-     * %param[opt]:string user Username for the cameras.
-     * %param[opt]:string password Password for the cameras.
-     * %return:object JSON object with error message and error code (0 means OK).
-     *
      **%apidoc POST /api/manualCamera/add
      * Manually add camera(s).
-     * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object:
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". Example of such object:
      * <pre><code>
      * {
      *     "user": "some_user",
@@ -1580,7 +1567,7 @@ void MediaServerProcess::registerRestHandlers(
      *         }
      *     ]
      * }
-     * </code></pre></p>
+     * </code></pre>
      * %param[opt]:string user Username for the cameras.
      * %param[opt]:string password Password for the cameras.
      * %param:array cameras List of objects representing the cameras.
@@ -1592,12 +1579,14 @@ void MediaServerProcess::registerRestHandlers(
      *         "reply.cameras[].manufacturer" field in the result of /api/manualCamera/status.
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("api/manualCamera", new QnManualCameraAdditionRestHandler(serverModule()));
+    reg("api/manualCamera", new nx::vms::server::ManualCameraAdditionRestHandler(serverModule()));
 
     reg("api/wearableCamera", new QnWearableCameraRestHandler(serverModule()));
 
-    /**%apidoc GET /api/ptz
-     * Perform reading or writing PTZ operation
+    /**%apidoc POST /api/ptz
+     * Perform reading or writing PTZ operation.
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
      * %param:enum command PTZ operation
@@ -1628,23 +1617,38 @@ void MediaServerProcess::registerRestHandlers(
      *     %value GetPresetsPtzCommand Read PTZ presets list.
      *     %value GetPresetsPtzCommand Read PTZ presets list.
      * %return:object JSON object with error message and error code (0 means OK).
+     *
+     **%apidoc GET /api/ptz
+     * Perform reading PTZ operation
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
+     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param:enum command PTZ operation, only Get* values are supported.
+     * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("api/ptz", new QnPtzRestHandler(serverModule()));
 
-    /**%apidoc GET /api/createEvent
+    /**%apidoc POST /api/createEvent
      * Using this method it is possible to trigger a generic event in the system from a 3rd party
      * system. Such event will be handled and logged according to current event rules.
      * Parameters of the generated event, such as "source", "caption" and "description", are
      * intended to be analyzed by these rules.
-     * <tt>
-     *     <br/>Example:
-     *     <pre><![CDATA[
-     * http://127.0.0.1:7001/api/createEvent?timestamp=2016-09-16T16:02:41Z&caption=CreditCardUsed&metadata={"cameraRefs":["3A4AD4EA-9269-4B1F-A7AA-2CEC537D0248","3A4AD4EA-9269-4B1F-A7AA-2CEC537D0240"]}
-     *     ]]></pre>
-     *     This example triggers a generic event informing the system that a
-     *     credit card has been used on September 16, 2016 at 16:03:41 UTC in a POS
-     *     terminal being watched by the two specified cameras.
-     * </tt>
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". Example:
+     * <pre>
+     * {
+     *     "timestamp": "2016-09-16T16:02:41Z",
+     *     "caption": "CreditCardUsed",
+     *     "metadata": {
+     *         "cameraRefs": [
+     *             "3A4AD4EA-9269-4B1F-A7AA-2CEC537D0248",
+     *             "3A4AD4EA-9269-4B1F-A7AA-2CEC537D0240"
+     *         ]
+     *     }
+     * }
+     * </pre>
+     * This example triggers a generic event informing the system that a
+     * credit card has been used on September 16, 2016 at 16:03:41 UTC in a POS
+     * terminal being watched by the two specified cameras.
      * %param[opt]:string timestamp Event date and time (as a string containing time in
      *     milliseconds since epoch, or a local time formatted like
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
@@ -1675,8 +1679,18 @@ void MediaServerProcess::registerRestHandlers(
      *     %value Inactive A "long" action associated with this generic event in event rules will
      *         stop.
      * %return:object JSON object with error message and error code (0 means OK).
+     *
+     **%apidoc GET /api/createEvent
+     * Does the same as POST version, but accepts parameters in URL, which is easier to use by 3rd
+     * parties.
+     * <br/>WARNING: This method is not secure, in future versions it will be disabled by default.
+     * Please, use POST version whenever possible.
+     * <br/>Example:
+     * <pre><![CDATA[
+     * http://127.0.0.1:7001/api/createEvent?timestamp=2016-09-16T16:02:41Z&caption=CreditCardUsed&metadata={"cameraRefs":["3A4AD4EA-9269-4B1F-A7AA-2CEC537D0248","3A4AD4EA-9269-4B1F-A7AA-2CEC537D0240"]}
+     * ]]></pre>
      */
-    reg("api/createEvent", new QnExternalEventRestHandler(serverModule()));
+    reg("api/createEvent", new nx::vms::server::ExternalEventRestHandler(serverModule()));
 
     static const QString kGetTimePath("api/getTime");
     /**%apidoc GET /api/getTime
@@ -1691,9 +1705,9 @@ void MediaServerProcess::registerRestHandlers(
      *         %param:string reply.osTime Local OS time on the Server, in milliseconds since epoch.
      *         %param:string reply.vmsTime Synchronized time, in milliseconds since epoch.
      */
-    reg(kGetTimePath, new nx::vms::server::rest::GetTimeHandler());
+    reg(kGetTimePath, new nx::vms::server::GetTimeHandler());
 
-    reg("ec2/getTimeOfServers", new nx::vms::server::rest::ServerTimeHandler("/" + kGetTimePath));
+    reg("ec2/getTimeOfServers", new nx::vms::server::ServerTimeHandler("/" + kGetTimePath));
 
     /**%apidoc GET /api/gettime
      * Get the Server time, time zone and authentication realm (realm is added for convenience).
@@ -1707,7 +1721,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %param:string reply.timezoneId Identification of the time zone in the text form.
      *         %param:string reply.utcTime Server time, in milliseconds since epoch.
      */
-    reg("api/gettime", new nx::vms::server::rest::DeprecatedTimeRestHandler());
+    reg("api/gettime", new nx::vms::server::DeprecatedTimeRestHandler());
 
     /**%apidoc GET /api/getTimeZones
      * Return the complete list of time zones supported by the server machine.
@@ -1761,9 +1775,9 @@ void MediaServerProcess::registerRestHandlers(
      * Get hardware information
      * %return:object JSON with hardware information.
      */
-    reg("api/getHardwareInfo", new nx::vms::server::rest::HardwareInfoHandler());
+    reg("api/getHardwareInfo", new nx::vms::server::HardwareInfoHandler());
 
-    reg("api/testLdapSettings", new nx::vms::server::rest::TestLdapSettingsHandler());
+    reg("api/testLdapSettings", new nx::vms::server::TestLdapSettingsHandler());
 
     /**%apidoc GET /api/ping
      * Ping the server.
@@ -1831,8 +1845,10 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/changeCameraPassword", new QnChangeCameraPasswordRestHandler(), kAdmin);
 
-    /**%apidoc GET /api/rebuildArchive
+    /**%apidoc POST /api/rebuildArchive
      * Start or stop the server archive rebuilding, also can report this process status.
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * %param[opt]:enum action What to do and what to report about the server archive rebuild.
      *     %value start Start server archive rebuild.
      *     %value stop Stop rebuild.
@@ -1840,17 +1856,23 @@ void MediaServerProcess::registerRestHandlers(
      * %param:integer mainPool 1 (for the main storage) or 0 (for the backup storage)
      * %return:object Rebuild progress status or an error code.
      */
-    reg("api/rebuildArchive", new QnRebuildArchiveRestHandler(serverModule()));
+    reg("api/rebuildArchive", new nx::vms::server::RebuildArchiveRestHandler(serverModule()));
 
-    /**%apidoc GET /api/backupControl
-     * Start or stop the recorded data backup process, also can report this process status.
+    /**%apidoc POST /api/backupControl
+     * Start or stop the recorded data backup process, also reports this process status.
+     * <br/> Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * %param[opt]:enum action What to do and what to report about the backup process.
      *     %value start Start backup just now.
      *     %value stop Stop backup.
      *     %value <any_other_value_or_no_parameter> Report the backup process status.
-     * %return:object Bakcup process progress status or an error code.
+     * %return:object Backup process progress status or an error code.
+     *
+     **%apidoc GET /api/backupControl
+     * Return recorded data backup processs status.
+     * %return:object Backup process progress status or an error code.
      */
-    reg("api/backupControl", new nx::vms::server::rest::BackupControlRestHandler(serverModule()));
+    reg("api/backupControl", new nx::vms::server::BackupControlRestHandler(serverModule()));
 
     /**%apidoc[proprietary] GET /api/events
      * Return event log in the proprietary binary format.
@@ -2131,7 +2153,7 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
      */
-    reg("api/settime", new QnSetTimeRestHandler(), kAdmin); //< deprecated
+    reg("api/settime", new nx::vms::server::SetTimeRestHandler(), kAdmin); //< deprecated
 
     /**%apidoc POST /api/setTime
      * Set current time on the server machine.
@@ -2155,7 +2177,7 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
      */
-    reg("api/setTime", new QnSetTimeRestHandler(), kAdmin); //< new version
+    reg("api/setTime", new nx::vms::server::SetTimeRestHandler(), kAdmin); //< new version
 
     /**%apidoc GET /api/moduleInformationAuthenticated
      * The same as moduleInformation but requires authentication. Useful to test connection.
@@ -2174,7 +2196,7 @@ void MediaServerProcess::registerRestHandlers(
      *     server must be restarted to apply settings. Error string contains a hint to identify the
      *     problem: "SYSTEM_NAME" or "PORT".
      */
-    reg("api/configure", new QnConfigureRestHandler(serverModule()), kAdmin);
+    reg("api/configure", new nx::vms::server::ConfigureRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /api/detachFromCloud
      * Detaches the Server from the Cloud. Local admin user is enabled, admin password is changed to
@@ -2193,7 +2215,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string currentPassword Current user password.
      * %return JSON result with error code.
      */
-    reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
+    reg("api/detachFromSystem", new nx::vms::server::DetachFromSystemRestHandler(
         serverModule(), &cloudManagerGroup->connectionManager, messageBus), kAdmin);
 
     /**%apidoc[proprietary] POST /api/restoreState
@@ -2214,7 +2236,8 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string systemName New system name
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(serverModule()), kAdmin);
+    reg("api/setupLocalSystem", new nx::vms::server::SetupLocalSystemRestHandler(
+        serverModule()), kAdmin);
 
     /**%apidoc POST /api/setupCloudSystem
      * Configure server system name and attach it to cloud. This function can be called for server
@@ -2226,7 +2249,8 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string cloudSystemID could system id
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(serverModule(), cloudManagerGroup), kAdmin);
+    reg("api/setupCloudSystem", new nx::vms::server::SetupCloudSystemRestHandler(
+        serverModule(), cloudManagerGroup), kAdmin);
 
     /**%apidoc POST /api/mergeSystems
      * Merge two Systems. <br/> The System that joins another System is called the current System,
@@ -2272,13 +2296,13 @@ void MediaServerProcess::registerRestHandlers(
      *             customization.
      *         %value "BACKUP_ERROR" The database backup could not be created.
      */
-    reg("api/mergeSystems", new QnMergeSystemsRestHandler(serverModule()), kAdmin);
+    reg("api/mergeSystems", new nx::vms::server::MergeSystemsRestHandler(serverModule()), kAdmin);
 
-    /**%apidoc GET /api/backupDatabase
+    /**%apidoc POST /api/backupDatabase
      * Back up server database.
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("api/backupDatabase", new QnBackupDbRestHandler(serverModule()));
+    reg("api/backupDatabase", new nx::vms::server::BackupDbRestHandler(serverModule()));
 
     /**%apidoc GET /api/discoveredPeers
      * Return a list of the discovered peers.
@@ -2304,14 +2328,14 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/logLevel", new QnLogLevelRestHandler());
 
-    /**%apidoc[proprietary] GET /api/execute
+    /**%apidoc[proprietary] POST /api/execute
      * Execute any script from subfolder "scripts" of media server. Script name provides directly
      * in a URL path like "/api/execute/script1.sh". All URL parameters are passed directly to
      * a script as an parameters.
      * %permissions Owner.
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("api/execute", new QnExecScript(serverModule()->settings().dataDir()), kAdmin);
+    reg("api/execute", new nx::vms::server::ExecScript(serverModule()->settings().dataDir()), kAdmin);
 
     /**%apidoc[proprietary] GET /api/scriptList
      * Return list of scripts to execute.
@@ -2328,9 +2352,9 @@ void MediaServerProcess::registerRestHandlers(
      * call this method without parameters.
      * Example: /api/systemSettings?smtpTimeout=30&amp;smtpUser=test
      */
-    reg("api/systemSettings", new QnSystemSettingsHandler());
+    reg("api/systemSettings", new nx::vms::server::SystemSettingsHandler());
 
-    reg("api/transmitAudio", new QnAudioTransmissionRestHandler(serverModule()));
+    reg("api/transmitAudio", new nx::vms::server::AudioTransmissionRestHandler(serverModule()));
 
     // TODO: Introduce constants for API methods registered here, also use them in
     // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors,
@@ -2680,7 +2704,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:integer aggregationCount How many events were aggregated together for this action.
      */
     reg("api/executeEventAction",
-        new nx::vms::server::rest::QnExecuteEventActionRestHandler(serverModule()));
+        new nx::vms::server::ExecuteEventActionRestHandler(serverModule()));
 
     /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system
@@ -2707,7 +2731,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/startLiteClient", new QnStartLiteClientRestHandler(serverModule()));
 
     #if defined(_DEBUG)
-        reg("api/debugEvent", new QnDebugEventsRestHandler(serverModule()));
+        reg("api/debugEvent", new nx::vms::server::DebugEventsRestHandler(serverModule()));
     #endif
 
     reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
@@ -2755,7 +2779,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param settings JSON object consisting of name-value settings pairs.
      */
     reg("ec2/analyticsEngineSettings",
-        new nx::vms::server::rest::AnalyticsEngineSettingsHandler(serverModule()));
+        new nx::vms::server::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
      * Return settings values of the specified device-engine pair.
@@ -2770,7 +2794,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param settings JSON object consisting of name-value settings pairs.
      */
     reg("ec2/deviceAnalyticsSettings",
-        new nx::vms::server::rest::DeviceAnalyticsSettingsHandler(serverModule()));
+        new nx::vms::server::DeviceAnalyticsSettingsHandler(serverModule()));
 
     reg(
         nx::network::http::Method::options,

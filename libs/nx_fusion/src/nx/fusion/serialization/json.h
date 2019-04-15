@@ -40,8 +40,13 @@ class QnJsonContext: public QnSerializationContext<QnJsonSerializer>
 public:
     bool areSomeFieldsNotFound() const { return m_someFieldsNotFound; }
     void setSomeFieldsNotFound(bool value) { m_someFieldsNotFound = value; }
+
+    bool areStringConvesionsAllowed() const { return m_allowStringConvesions; }
+    void setAllowStringConvesions(bool value) { m_allowStringConvesions = value; }
+
 private:
     bool m_someFieldsNotFound{false};
+    bool m_allowStringConvesions{false};
 };
 
 class QnJsonSerializer:

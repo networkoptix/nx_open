@@ -4,8 +4,7 @@
 #include <common/common_module.h>
 #include <nx_ec/ec_api.h>
 
-namespace rest {
-namespace handlers {
+namespace rest::handlers {
 
 nx::network::rest::Response SyncTimeRestHandler::executeGet(
     const nx::network::rest::Request& request)
@@ -22,5 +21,4 @@ SyncTimeData SyncTimeRestHandler::execute(
     return reply;
 }
 
-} // namespace handlers
-} // namespace rest
+} // namespace rest::handlers
