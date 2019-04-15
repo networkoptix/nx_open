@@ -35,7 +35,8 @@
     <name>CloudPanel</name>
     <message>
         <source>Log in to %1</source>
-        <translation></translation>
+        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -54,7 +55,8 @@
     </message>
     <message>
         <source>Go to %1</source>
-        <translation></translation>
+        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -73,10 +75,6 @@
     </message>
     <message>
         <source>Log in</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Learn more about %1</source>
         <translation></translation>
     </message>
     <message>
@@ -116,16 +114,22 @@
         <translation></translation>
     </message>
     <message>
-        <source>Cannot connect to %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Email cannot be empty</source>
         <translation></translation>
     </message>
     <message>
         <source>Password cannot be empty</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Learn more about %1</source>
+        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to %1</source>
+        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -136,10 +140,6 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete login &quot;%1&quot;?</source>
         <translation></translation>
     </message>
     <message>
@@ -161,6 +161,11 @@
     <message>
         <source>Password cannot be empty</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Delete login &quot;%1&quot;?</source>
+        <comment>%1 is a user name</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -280,11 +285,13 @@
     </message>
     <message>
         <source>%1 fps</source>
-        <translation></translation>
+        <comment>%1 is a count of frames per second</comment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Mbps</source>
-        <translation></translation>
+        <comment>%1 is a mebgabits per second</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -454,10 +461,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Press %1 to exit</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>No cameras available on this layout</source>
         <translation></translation>
     </message>
@@ -468,6 +471,11 @@
     <message>
         <source>Nothing found</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Press %1 to exit</source>
+        <comment>%1 is a key name (like Esc)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -544,10 +552,6 @@
 <context>
     <name>SessionsScreen</name>
     <message>
-        <source>Log in to %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation></translation>
     </message>
@@ -560,20 +564,27 @@
         <translation></translation>
     </message>
     <message>
-        <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cannot connect to System &quot;%1&quot;</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Cannot connect to Server</source>
         <translation></translation>
     </message>
     <message>
         <source>Check your network connection or contact a system administrator</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Log in to %1</source>
+        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
+        <comment>%1 is a button name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to System &quot;%1&quot;</source>
+        <comment>%1 is a system name</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -755,7 +766,8 @@
     </message>
     <message>
         <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-        <translation></translation>
+        <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -823,7 +835,8 @@
     </message>
     <message>
         <source>Cannot connect to %1</source>
-        <translation></translation>
+        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
