@@ -35,9 +35,13 @@ public:
     Q_INVOKABLE bool isNull() const;
     const QByteArray toByteArray() const;
     const QByteArray toRfc4122() const;
+
+    /** @return GUID in braces. */
     Q_INVOKABLE const QString toString() const;
+
     /** @return GUID without braces */
     Q_INVOKABLE QString toSimpleString() const;
+
     QByteArray toSimpleByteArray() const;
     std::string toStdString() const;
     QUuid toQUuid() const;
