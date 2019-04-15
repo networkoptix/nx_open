@@ -1217,11 +1217,12 @@ ec2::TransactionType::Value getStatusTransactionTypeFromDb(
     return TransactionType::Local;
 }
 
+template <typename ParamsType>
 struct SetStatusTransactionType
 {
     ec2::TransactionType::Value operator()(
         QnCommonModule* commonModule,
-        const nx::vms::api::ResourceStatusData& params,
+        const ParamsType& params,
         AbstractPersistentStorage* db)
     {
         const auto& resPool = commonModule->resourcePool();

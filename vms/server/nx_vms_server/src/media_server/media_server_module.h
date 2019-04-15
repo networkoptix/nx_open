@@ -52,6 +52,7 @@ namespace nx::vms::common::p2p::downloader { class Downloader; }
 namespace nx::vms::server::hls { class SessionPool; }
 namespace nx::vms::server { class CmdLineArguments; }
 namespace nx::vms::server::analytics { class SdkObjectFactory; }
+namespace nx::vms::server::network { class MulticastAddressRegistry;  }
 
 namespace nx::vms::server::event {
     class ExtendedRuleProcessor;
@@ -156,6 +157,7 @@ public:
     QnMdnsListener* mdnsListener() const;
     nx::network::upnp::DeviceSearcher* upnpDeviceSearcher() const;
     nx::vms::server::hls::SessionPool* hlsSessionPool() const;
+    nx::vms::server::network::MulticastAddressRegistry* multicastAddressRegistry() const;
 
     void initializeP2PDownloader();
 
@@ -217,4 +219,5 @@ private:
     std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
     nx::vms::server::analytics::SdkObjectFactory* m_sdkObjectFactory;
     nx::vms::server::hls::SessionPool* m_hlsSessionPool = nullptr;
+    nx::vms::server::network::MulticastAddressRegistry* m_multicastAddressRegistry = nullptr;
 };

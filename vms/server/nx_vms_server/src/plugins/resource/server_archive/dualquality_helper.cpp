@@ -259,7 +259,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
         findMethod,
         preciseFind,
         searchStack,
-        previousDistance,
+        currentDistance,
         ignoreChunks
     );
 }

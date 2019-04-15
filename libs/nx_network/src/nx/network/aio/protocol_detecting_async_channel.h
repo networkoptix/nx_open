@@ -76,7 +76,9 @@ protected:
      * @return true if protocol has been detected and processor created. False otherwise.
      */
     bool analyzeMoreData(nx::Buffer data);
+
     AsyncChannelInterface& actualDataChannel();
+    const AsyncChannelInterface& actualDataChannel() const;
 
     virtual std::unique_ptr<AsyncChannelInterface> installProtocolHandler(
         ProtocolProcessorFactoryFunc& factoryFunc,
@@ -347,6 +349,15 @@ bool BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::analyzeMore
 template<typename Base, typename AsyncChannelInterface>
 AsyncChannelInterface&
     BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::actualDataChannel()
+{
+    if (m_delegate)
+        return *m_delegate;
+    return *m_dataSource;
+}
+
+template<typename Base, typename AsyncChannelInterface>
+const AsyncChannelInterface&
+    BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::actualDataChannel() const
 {
     if (m_delegate)
         return *m_delegate;

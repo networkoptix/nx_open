@@ -131,6 +131,10 @@ private:
         TrackInfo& track,
         int rtpChannel);
 
+    CameraDiagnostics::Result registerMulticastAddress(
+        const QnRtspIoDevice::AddressInfo& addressInfo);
+    void unregisterMulticastAddresses();
+
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr& res, const QString& key);
@@ -172,6 +176,7 @@ private:
 
     static nx::utils::Mutex s_defaultTransportMutex;
     static nx::vms::api::RtpTransportType s_defaultTransportToUse;
+    std::set<nx::network::SocketAddress> m_registeredMulticastAddresses;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)
