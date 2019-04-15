@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include <utils/media/ffmpeg_helper.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
@@ -23,9 +24,7 @@ class UncompressedVideoFrame:
 {
 public:
     /**
-     * Creates the owning wrapper for AVFrame - shared_ptr's deleter will be called on destruction;
-     * thus, if the ownership is not needed, an empty deleter should be supplied. To protect
-     * against unintended ownership, missing deleter produces an error condition.
+     * Creates the owning wrapper for AvFrameHolder which may or may not own its AVFrame.
      *
      * On error, the message is logged, an assertion fails and an internal flag is assigned so
      * that the subsequent isValid() returns false.
@@ -35,7 +34,7 @@ public:
      *     in microseconds since epoch, contrary to ffmpeg doc (which states it should be in
      *     time_base units).
      */
-    explicit UncompressedVideoFrame(std::shared_ptr<const AVFrame> avFrame);
+    explicit UncompressedVideoFrame(std::shared_ptr<const AvFrameHolder> avFrame);
 
     /**
      * Whether the frame was successfully constructed. If this method returns false, no other
@@ -61,7 +60,7 @@ private:
 
 private:
     bool m_valid = false;
-    std::shared_ptr<const AVFrame> m_avFrame;
+    const std::shared_ptr<const AvFrameHolder> m_avFrame;
     PixelFormat m_pixelFormat;
     const AVPixFmtDescriptor* m_avPixFmtDescriptor;
     std::vector<int> m_dataSize;

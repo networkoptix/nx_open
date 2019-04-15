@@ -495,36 +495,38 @@ bool CLVideoDecoderOutput::convertUsingSimdIntrTo(
     return true;
 }
 
-std::shared_ptr<const AVFrame> CLVideoDecoderOutput::convertTo(AVPixelFormat dstPixelFormat) const
+std::shared_ptr<const AvFrameHolder> CLVideoDecoderOutput::convertTo(AVPixelFormat dstPixelFormat) const
 {
     if (!NX_ASSERT(format >= 0))
         return nullptr;
 
     if (format == dstPixelFormat)
-        return std::shared_ptr<const AVFrame>((AVFrame*) this, /*empty deleter*/ [](AVFrame*) {});
+        return std::make_shared<const AvFrameHolder>(this);
 
-    AVFrame* const avFramePtr = new AVFrame;
-    avFramePtr->data[0] = nullptr; //< Required by the deleter.
-    std::shared_ptr<AVFrame> frame(avFramePtr,
-        /*deleter*/ [](AVFrame* avFrame) { av_freep(&avFrame->data[0]); });
+    const auto frame = std::make_shared<AvFrameHolder>();
 
     const int r = av_image_alloc(
-        frame->data, frame->linesize, width, height, dstPixelFormat, CL_MEDIA_ALIGNMENT);
+        frame->avFrame()->data,
+		frame->avFrame()->linesize,
+		width,
+		height,
+		dstPixelFormat,
+		CL_MEDIA_ALIGNMENT);
     if (!NX_ASSERT(r > 0, lm("av_image_alloc() failed for pixel format %1").args(dstPixelFormat)))
         return nullptr;
 
-    if (convertUsingSimdIntrTo(dstPixelFormat, frame.get()))
+    if (convertUsingSimdIntrTo(dstPixelFormat, frame->avFrame()))
         return frame;
 
     if (convertImageFormat(
         width, height,
         data, linesize, (AVPixelFormat) format,
-        frame->data, frame->linesize, dstPixelFormat, /*logTag*/ this))
+        frame->avFrame()->data, frame->avFrame()->linesize, dstPixelFormat, /*logTag*/ this))
     {
         return frame;
     }
 
-    return nullptr; //< AVFrame will be de-allocated by its deleter at this point.
+    return nullptr;
 }
 
 void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)

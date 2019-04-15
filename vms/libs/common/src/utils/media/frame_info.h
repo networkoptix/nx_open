@@ -9,18 +9,19 @@
 #include <QtCore/QAtomicInt>
 #include <QtGui/QImage>
 
-extern "C"
-{
-    #include <libavcodec/avcodec.h>
-}
-#include "nx/streaming/media_data_packet.h"
+extern "C" {
+
+#include <libavcodec/avcodec.h>
+
+} // extern "C"
+
+#include <nx/streaming/media_data_packet.h>
+#include <utils/media/ffmpeg_helper.h>
 
 #include "transcoding/filters/filter_helper.h"
 
-
 #define AV_REVERSE_BLOCK_START QnAbstractMediaData::MediaFlags_ReverseBlockStart
 #define AV_REVERSE_REORDERED   QnAbstractMediaData::MediaFlags_ReverseReordered
-
 
 //!base class for differently-stored pictures
 /*!
@@ -171,11 +172,11 @@ public:
     QImage toImage() const;
 
     /**
-     * @param dstPixelFormat If identical to the current pixel format, a shared pointer to `this` with
-     *     an empty deleter will be returned, otherwise, a shared pointer to the newly allocated
-     *     frame with a de-allocating deleter will be returned.
+     * @param dstPixelFormat If identical to the current pixel format, a non-owning reference to
+	 *     `this` is returned, otherwise, an owning reference to the newly allocated AVFrame with a
+	 *     proper de-allocator is returned.
      */
-    std::shared_ptr<const AVFrame> convertTo(AVPixelFormat dstPixelFormat) const;
+    std::shared_ptr<const AvFrameHolder> convertTo(AVPixelFormat dstPixelFormat) const;
 
     static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);

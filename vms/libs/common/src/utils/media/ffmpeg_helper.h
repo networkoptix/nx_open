@@ -2,11 +2,13 @@
 
 #include "core/resource/resource_fwd.h"
 
-extern "C"
-{
+extern "C" {
+
 #include <libavcodec/avcodec.h>
 #include <libavformat/avio.h>
-}
+#include <libavutil/mem.h>
+
+} // extern "C"
 
 #include <QtCore/QIODevice>
 
@@ -136,5 +138,92 @@ struct QnFfmpegAvPacket: AVPacket
     QnFfmpegAvPacket(const QnFfmpegAvPacket&) = delete;
     QnFfmpegAvPacket& operator=(const QnFfmpegAvPacket&) = delete;
 };
+
+/**
+ * Wrapper around ffmpeg's AVFrame which either owns an AVFrame properly de-allocating it, or wraps
+ * around a given pointer to an existing AVFrame without owning it (doing nothing in the
+ * destructor).
+ */
+#if 0
+template <typename AvFrameType = AVFrame>
+class AvFrameHolder
+{
+public:
+    /** Creates and owns an instance of AVFrame. */
+    AvFrameHolder():
+        m_avFrame(new AVFrame),
+        m_owned(true)
+    {
+        m_avFrame->data[0] = nullptr;
+    }
+
+    /** Wraps around the existing AVFrame without owning it. */
+    AvFrameHolder(AvFrameType* avFrame):
+        m_avFrame(avFrame),
+        m_owned(false)
+    {
+		static_assert(const_cast<AVFrame*>(avFrame), "Arg should be AVFrame* or const AVFrame*");
+		NX_CRITICAL(avFrame);
+    }
+
+    ~AvFrameHolder()
+    {
+        if (m_owned)
+            av_freep(&m_avFrame->data[0]);
+    }
+
+    AvFrameType* operator->() { return m_avFrame; }
+
+private:
+    AvFrameType* const m_avFrame;
+    bool m_owned = false;
+};
+#else // 0
+class AvFrameHolder
+{
+public:
+    /** Creates and owns an instance of AVFrame. */
+    AvFrameHolder():
+        m_avFrame(new AVFrame),
+        m_owned(true)
+    {
+        m_avFrame->data[0] = nullptr;
+    }
+
+    /** Wraps around the existing AVFrame without owning it. */
+    AvFrameHolder(AVFrame* avFrame):
+        m_avFrame(avFrame),
+        m_owned(false)
+    {
+        NX_CRITICAL(avFrame);
+    }
+
+    /** Wraps around the existing AVFrame without owning it. */
+    AvFrameHolder(const AVFrame* avFrame):
+        m_avFrame(const_cast<AVFrame*>(avFrame)),
+        m_owned(false)
+    {
+        NX_CRITICAL(avFrame);
+    }
+
+    ~AvFrameHolder()
+    {
+        if (m_owned)
+            av_freep(&m_avFrame->data[0]);
+    }
+
+	AvFrameHolder(const AvFrameHolder&) = delete;
+	AvFrameHolder& operator=(const AvFrameHolder&) = delete;
+	AvFrameHolder(AvFrameHolder&&) = delete;
+	AvFrameHolder& operator=(AvFrameHolder&&) = delete;
+
+    AVFrame* avFrame() { return m_avFrame; }
+    const AVFrame* avFrame() const { return m_avFrame; }
+
+private:
+    AVFrame* const m_avFrame;
+    const bool m_owned;
+};
+#endif // 0
 
 QString toString(AVPixelFormat pixelFormat);
