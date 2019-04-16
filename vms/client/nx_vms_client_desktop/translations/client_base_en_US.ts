@@ -3205,6 +3205,14 @@ to %1</source>
         <source>Folder already added</source>
         <translation></translation>
     </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
@@ -5877,14 +5885,6 @@ to %1</source>
 <context>
     <name>QnSystemSettingsWidget</name>
     <message>
-        <source>Enable devices and servers auto discovery</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable cameras and servers auto discovery</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Allow System to optimize device settings</source>
         <translation></translation>
     </message>
@@ -5899,6 +5899,22 @@ to %1</source>
     <message>
         <source>Does not include any personal information and is completely anonymous.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable devices and servers autodiscovery and automated device status check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7079,6 +7095,17 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+        <source>Your session has expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session duration limit can be changed by the system administrators</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>StreamQualityStrings</name>
     <message>
         <source>Lowest</source>
@@ -7282,6 +7309,14 @@ to %1</source>
         <source>Show Only with &quot;Objects&quot; Tab</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do Not Show</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7459,6 +7494,10 @@ to %1</source>
             <numerusform>This ID is already used on the following camera:</numerusform>
             <numerusform>This ID is already used on the following %n cameras:</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>UDP Multicast</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7897,14 +7936,6 @@ to %1</source>
 </context>
 <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
-    <message>
-        <source>I Agree</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I Do Not Agree</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Please review and agree to the %1 in order to proceed</source>
         <translation type="unfinished"></translation>
@@ -8514,10 +8545,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Failed to download update packages to some servers</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Please make sure they have enough free storage space and stable network connection.</source>
         <translation></translation>
     </message>
@@ -8672,6 +8699,10 @@ to %1</source>
         <source>Cancel update and delete all downloaded data?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to download update packages to some components</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8696,6 +8727,26 @@ to %1</source>
     <message>
         <source>Acknowledge</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Generic Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Plugin Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module was disconnected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8734,6 +8785,45 @@ to %1</source>
     <message>
         <source>None of selected user roles contain users. Action will not work.</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+        <source>The server is taking too long to respond</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No update task</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ready to download update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ready to restart to the new version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to download update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to install update</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8878,16 +8968,16 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>User will be automatically logged out after this period of time.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>minutes</source>
         <translation></translation>
     </message>
     <message>
         <source>hours</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8908,13 +8998,13 @@ to %1</source>
         <source>Downloaded</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Waiting for server to respond...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-        <source>Current Version</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Status</source>
         <translation></translation>
@@ -8933,6 +9023,10 @@ to %1</source>
     </message>
     <message>
         <source>Component</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installed Version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9231,6 +9325,26 @@ to %1</source>
     </message>
     <message>
         <source>Starting export...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saving layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Saving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saving failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starting saving...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>We are preparing files for the export process. Please wait for a few seconds.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1098,6 +1098,24 @@
     </message>
 </context>
 <context>
+    <name>EulaDialog</name>
+    <message>
+        <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
+        <source>Copy to Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>I Do Not Agree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>I Agree</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
@@ -1393,11 +1411,6 @@
     <message>
         <location/>
         <source>First Source</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>None</source>
         <translation></translation>
     </message>
     <message>
@@ -2850,13 +2863,18 @@
     </message>
     <message>
         <location/>
-        <source>Limit Session Length</source>
+        <source>to</source>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>to</source>
-        <translation></translation>
+        <source>Limit session duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
