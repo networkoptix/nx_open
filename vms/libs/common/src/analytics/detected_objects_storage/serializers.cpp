@@ -14,7 +14,7 @@ int serialize(long long value, QByteArray* buf)
     static constexpr int kBufSize = 10;
     std::uint8_t valueBuf[kBufSize];
     int bytesWritten = 0;
-    while (uValue != 0)
+    do
     {
         auto bitsToWrite = (std::uint8_t)(uValue & 0x7f);
         uValue >>= 7;
@@ -23,7 +23,7 @@ int serialize(long long value, QByteArray* buf)
         if (bytesWritten != 0)
             bitsToWrite |= 0x80; //< One more byte is needed.
         valueBuf[kBufSize - (++bytesWritten)] = bitsToWrite;
-    }
+    } while (uValue != 0);
 
     buf->append((char*) valueBuf + (kBufSize - bytesWritten), bytesWritten);
     return bytesWritten;
