@@ -125,7 +125,7 @@ def save_content(filename, content):
 
 
 def process_context(product, context, language_code,
-                    preview, version_id, global_contexts, global_contexts_dict):
+                    preview, version_id, global_contexts, global_contexts_dict=None):
     default_language = product.default_language
     language = Language.by_code(language_code, default_language)
     skin = product.read_global_value('%SKIN%')
