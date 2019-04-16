@@ -74,7 +74,7 @@ protected:
 
     void thenConnectionSucceeded()
     {
-        assertCloudConnectionCanBeEstablished();
+        waitUntilCloudConnectionCanBeEstablished();
     }
 
     void andDataIsExchangedBetweenClientAndServer()
@@ -143,6 +143,7 @@ TEST_F(MediatorScalability, mediator_info_updated_in_cluster_after_reconnect)
     thenConnectionSucceeded();
 
     andDataIsExchangedBetweenClientAndServer();
+    andServerConnectionInfoIsUpdated();
 }
 
 } // nx::network::cloud::test
