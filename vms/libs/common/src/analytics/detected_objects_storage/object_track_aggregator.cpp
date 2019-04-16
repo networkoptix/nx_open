@@ -33,9 +33,9 @@ void ObjectTrackAggregator::add(
         : timestamp;
 }
 
-std::vector<AggregatedTrackData> ObjectTrackAggregator::getAggregatedData()
+std::vector<AggregatedTrackData> ObjectTrackAggregator::getAggregatedData(bool flush)
 {
-    if (length() < m_aggregationPeriod)
+    if (!flush && length() < m_aggregationPeriod)
         return {};
 
     std::vector<AggregatedTrackData> result;

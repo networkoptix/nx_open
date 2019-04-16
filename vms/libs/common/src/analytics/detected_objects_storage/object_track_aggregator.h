@@ -40,7 +40,10 @@ public:
         std::chrono::milliseconds timestamp,
         const QRectF& box);
 
-    std::vector<AggregatedTrackData> getAggregatedData();
+    /**
+     * @param flush If true then all data is loaded, the aggregation period is ignored.
+     */
+    std::vector<AggregatedTrackData> getAggregatedData(bool flush);
 
     std::chrono::milliseconds length() const;
 
