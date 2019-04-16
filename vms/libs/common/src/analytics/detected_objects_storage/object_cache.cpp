@@ -20,7 +20,7 @@ void ObjectCache::add(const common::metadata::ConstDetectionMetadataPacketPtr& p
         updateObject(detectedObject, *packet);
 }
 
-std::vector<DetectedObject> ObjectCache::getObjectsToInsert()
+std::vector<DetectedObject> ObjectCache::getObjectsToInsert(bool flush)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -29,7 +29,7 @@ std::vector<DetectedObject> ObjectCache::getObjectsToInsert()
     std::vector<DetectedObject> result;
     for (auto& [objectId, ctx]: m_objectsById)
     {
-        if (currentClock - ctx.lastReportTime < m_aggregationPeriod ||
+        if (!flush && currentClock - ctx.lastReportTime < m_aggregationPeriod ||
             ctx.insertionReported)
         {
             continue;
@@ -75,7 +75,7 @@ std::optional<DetectedObject> ObjectCache::getObjectToInsertForced(const QnUuid&
     return result;
 }
 
-std::vector<ObjectUpdate> ObjectCache::getObjectsToUpdate()
+std::vector<ObjectUpdate> ObjectCache::getObjectsToUpdate(bool flush)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -84,7 +84,7 @@ std::vector<ObjectUpdate> ObjectCache::getObjectsToUpdate()
     std::vector<ObjectUpdate> result;
     for (auto& [objectId, ctx]: m_objectsById)
     {
-        if (currentClock - ctx.lastReportTime < m_aggregationPeriod ||
+        if (!flush && currentClock - ctx.lastReportTime < m_aggregationPeriod ||
             !ctx.insertionReported ||
             ctx.object.track.empty())
         {

@@ -50,9 +50,10 @@ public:
 
     /**
      * Objects are provided only after the aggregation period passes.
+     * @param flush If true, all available data is provided.
      * @return Objects that are to be inserted.
      */
-    std::vector<DetectedObject> getObjectsToInsert();
+    std::vector<DetectedObject> getObjectsToInsert(bool flush = false);
 
     /**
      * Provides new object regardless of the aggregation period.
@@ -64,7 +65,7 @@ public:
      * Provides data only for objects with known dbId.
      * Db id is set using ObjectCache::setObjectIdInDb.
      */
-    std::vector<ObjectUpdate> getObjectsToUpdate();
+    std::vector<ObjectUpdate> getObjectsToUpdate(bool flush = false);
 
     /**
      * MUST be invoked after inserting object to the DB.
