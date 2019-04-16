@@ -1,90 +1,91 @@
 import {
     Component, Input, Output, EventEmitter,
     OnChanges, SimpleChanges,
-    OnInit, ViewEncapsulation } from '@angular/core';
-import { NxPagerService }       from '../../../../services/pager.service';
-import { NxConfigService }      from '../../../../services/nx-config';
-import { TranslateService }     from '@ngx-translate/core';
-import { NxUriService }         from '../../../../services/uri.service';
-import { NxUtilsService }       from '../../../../services/utils.service';
+    OnInit, ViewEncapsulation
+}                           from '@angular/core';
+import { NxPagerService }   from '../../../../services/pager.service';
+import { NxConfigService }  from '../../../../services/nx-config';
+import { TranslateService } from '@ngx-translate/core';
+import { NxUriService }     from '../../../../services/uri.service';
+import { NxUtilsService }   from '../../../../services/utils.service';
 
 @Component({
-  selector: 'nx-cam-table',
-  templateUrl: './cam-table.component.html',
-  styleUrls: ['./cam-table.component.scss'],
+    selector     : 'nx-cam-table',
+    templateUrl  : './cam-table.component.html',
+    styleUrls    : ['./cam-table.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
 export class CamTableComponent implements OnChanges, OnInit {
 
-  // @Input() headers: string[];
-  @Input() elements: any[];
-  @Input() allowedParameters: string[];
-  @Input() activeCamera: any;
+    // @Input() headers: string[];
+    @Input() elements: any[];
+    @Input() allowedParameters: string[];
+    @Input() activeCamera: any;
 
-  @Output() public onRowClick: EventEmitter<any> = new EventEmitter<any>();
+    @Output() public onRowClick: EventEmitter<any> = new EventEmitter<any>();
 
-  public selectedHeader;
-  public showHeaders;
+    public selectedHeader;
+    public showHeaders;
 
-  private _elements: any[];
-  private selectedRow;
-  private sortOrderASC: boolean;
-  private results;
-  private cameraHeaders;
-  private paramsShown;
-  private lang;
-  private params: any;
-  private debug: boolean;
+    private _elements: any[];
+    private selectedRow;
+    private sortOrderASC: boolean;
+    private results;
+    private cameraHeaders;
+    private paramsShown;
+    private lang;
+    private params: any;
+    private debug: boolean;
 
-  pager: any = {};
-  pagedItems: any[];
-  pagerMaxSize: number;
-  CONFIG: any = {};
+    pager: any = {};
+    pagedItems: any[];
+    pagerMaxSize: number;
+    CONFIG: any = {};
 
-  // Options for the Excel export
-  public csvFilename: any;
-  public csvCameraData: any[];
-  public csvOptions = {
-    fieldSeparator: ',',
-    quoteStrings: '"',
-    decimalseparator: '.',
-    showLabels: true,
-    headers: ['Vendor', 'Model', 'Max Resolution', 'Max FPS', 'Codec', '2-Way Audio', 'Advanced PTZ', 'Fisheye', 'Motion', 'I/O'],
-    showTitle: true,
-    title: 'Camera List',
-    useBom: false,
-    removeNewLines: true
-  };
+    // Options for the Excel export
+    public csvFilename: any;
+    public csvCameraData: any[];
+    public csvOptions = {
+        fieldSeparator  : ',',
+        quoteStrings    : '"',
+        decimalseparator: '.',
+        showLabels      : true,
+        headers         : ['Vendor', 'Model', 'Max Resolution', 'Max FPS', 'Codec', '2-Way Audio', 'Advanced PTZ', 'Fisheye', 'Motion', 'I/O'],
+        showTitle       : true,
+        title           : 'Camera List',
+        useBom          : false,
+        removeNewLines  : true
+    };
 
-  constructor(private pagerService: NxPagerService,
-              private translate: TranslateService,
-              private uri: NxUriService,
-              config: NxConfigService) {
+    constructor(private pagerService: NxPagerService,
+                private translate: TranslateService,
+                private uri: NxUriService,
+                config: NxConfigService) {
 
-      this.lang = this.translate.translations[this.translate.currentLang];
-      this.CONFIG = config.getConfig();
+        this.lang = this.translate.translations[this.translate.currentLang];
+        this.CONFIG = config.getConfig();
 
-      this.sortOrderASC = true;
-      this._elements = this.elements;
+        this.sortOrderASC = true;
+        this._elements = this.elements;
 
-      this.paramsShown = 6;
-      this.cameraHeaders = [
-          this.lang.ipvd.vendor,
-          this.lang.ipvd.model,
-          this.lang.ipvd.hardwareType,
-          this.lang.ipvd.maxResolution,
-          this.lang.ipvd.maxFps,
-          this.lang.ipvd.primaryCodec,
-          this.lang.ipvd.isAudioSupported,
-          this.lang.ipvd.isPtzSupported,
-          this.lang.ipvd.isFisheye,
-          this.lang.ipvd.isMdSupported,
-          this.lang.ipvd.isIoSupported,
-          this.lang.ipvd.count
-      ];
+        this.paramsShown = 6;
+        this.cameraHeaders = [
+            this.lang.ipvd.vendor,
+            this.lang.ipvd.model,
+            this.lang.ipvd.hardwareType,
+            this.lang.ipvd.maxResolution,
+            this.lang.ipvd.maxFps,
+            this.lang.ipvd.primaryCodec,
+            this.lang.ipvd.isAudioSupported,
+            this.lang.ipvd.isPtzSupported,
+            this.lang.ipvd.isFisheye,
+            this.lang.ipvd.isMdSupported,
+            this.lang.ipvd.isIoSupported,
+            this.lang.ipvd.count
+        ];
 
-      this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSize;
-  }
+        this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSize;
+    }
 
     toggleHeaderSort(param) {
         let filter;
@@ -202,7 +203,7 @@ export class CamTableComponent implements OnChanges, OnInit {
     }
 
     showParametersFor(item) {
-         const showParameters = [...this.allowedParameters];
+        const showParameters = [...this.allowedParameters];
         // adjust PTZ and Audio params
         let idxToBeRemoved;
         let param;
@@ -303,7 +304,7 @@ export class CamTableComponent implements OnChanges, OnInit {
                 {
                     key: 'page', value: this.pager.currentPage
                 }, {
-                    key  : 'camera', value: undefined
+                    key: 'camera', value: undefined
                 }]);
         }
 
@@ -313,21 +314,21 @@ export class CamTableComponent implements OnChanges, OnInit {
         }
     }
 
-  getCsvData() {
-      return this._elements.map(camera => ({
-                    'Vendor': camera.vendor,
-                    'Model': camera.model,
+    getCsvData() {
+        return this._elements.map(camera => ({
+                    'Vendor'        : camera.vendor,
+                    'Model'         : camera.model,
                     'Max Resolution': camera.maxResolution,
-                    'Max FPS': camera.maxFps,
-                    'Codec': camera.primaryCodec,
-                    '2-Way Audio': NxUtilsService.yesNo(camera.isTwAudioSupported),
-                    'Advanced PTZ': NxUtilsService.yesNo(camera.isAptzSupported),
-                    'Fisheye': NxUtilsService.yesNo(camera.isFisheye),
-                    'Motion': NxUtilsService.yesNo(camera.isMdSupported),
-                    'I/O': NxUtilsService.yesNo(camera.isIoSupported)
-               })
+                    'Max FPS'       : camera.maxFps,
+                    'Codec'         : camera.primaryCodec,
+                    '2-Way Audio'   : NxUtilsService.yesNo(camera.isTwAudioSupported),
+                    'Advanced PTZ'  : NxUtilsService.yesNo(camera.isAptzSupported),
+                    'Fisheye'       : NxUtilsService.yesNo(camera.isFisheye),
+                    'Motion'        : NxUtilsService.yesNo(camera.isMdSupported),
+                    'I/O'           : NxUtilsService.yesNo(camera.isIoSupported)
+                })
         );
-  }
+    }
 
     isBoolean(x: any): boolean {
         return !(typeof x === 'string' || typeof x === 'number');
