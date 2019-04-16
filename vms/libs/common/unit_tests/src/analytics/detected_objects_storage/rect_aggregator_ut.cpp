@@ -131,11 +131,15 @@ TEST_F(RectAggregator, example3)
 TEST_F(RectAggregator, rects_with_same_value_are_aggregated)
 {
     const auto expected = std::vector<AggregatedRect>{
-        AggregatedRect{QRect(1, 1, 5, 5), {1, 2}}};
+        AggregatedRect{QRect(1, 1, 5, 5), {1, 2}},
+        AggregatedRect{QRect(9, 9, 5, 5), {1, 2}} };
 
     const auto actual = aggregate(
         AggregatedRect{QRect(1, 1, 5, 5), {1}},
-        AggregatedRect{QRect(1, 1, 5, 5), {2}});
+        AggregatedRect{QRect(1, 1, 5, 5), {2}},
+        AggregatedRect{QRect(9, 9, 5, 5), {1}},
+        AggregatedRect{QRect(9, 9, 5, 5), {2}}
+    );
 
     assertEqual(expected, actual);
 }
