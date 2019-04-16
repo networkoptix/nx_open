@@ -6,6 +6,7 @@
 #include <nx/utils/random.h>
 
 #include <analytics/detected_objects_storage/serializers.h>
+#include <test_support/analytics/storage/analytics_storage_types.h>
 
 namespace nx::analytics::storage::test {
 
@@ -54,6 +55,44 @@ TEST_F(CompactInt, integer_serialize_and_deserialize_are_symmetric)
 TEST_F(CompactInt, sequence_serialize_and_deserialize_are_symmetric)
 {
     assertSerializeAndDeserializeAreSymmetric(generateRandomIntegerSequence());
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class AnalyticsDbTrackSerializer:
+    public ::testing::Test
+{
+protected:
+    std::vector<ObjectPosition> generateRandomTrack()
+    {
+        std::vector<ObjectPosition> track;
+        track.resize(nx::utils::random::number<int>(1, 17));
+
+        for (auto& position: track)
+        {
+            position.boundingBox = generateRandomRectf();
+            position.timestampUsec = nx::utils::random::number<long long>();
+            position.durationUsec = nx::utils::random::number<long long>();
+            // TODO: attributes
+        }
+
+        return track;
+    }
+
+    void assertSerializeAndDeserializeAreSymmetric(
+        const std::vector<ObjectPosition>& value)
+    {
+        const auto result = storage::TrackSerializer::deserialized(
+            storage::TrackSerializer::serialized(value));
+
+        ASSERT_EQ(value, result);
+    }
+};
+
+TEST_F(AnalyticsDbTrackSerializer, serialize_and_deserialize_are_symmetric)
+{
+    const auto track = generateRandomTrack();
+    assertSerializeAndDeserializeAreSymmetric(track);
 }
 
 } // namespace nx::analytics::storage::test

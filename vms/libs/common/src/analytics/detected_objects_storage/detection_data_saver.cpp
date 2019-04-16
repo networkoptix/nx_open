@@ -109,7 +109,7 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         query->bindValue(1, objectTypeDbId);
         query->bindValue(2, QnSql::serialized_field(object.objectAppearanceId));
         query->bindValue(3, object.track.front().timestampUsec / kMsInUsec);
-        query->bindValue(4, TrackSerializer::serialize(object.track));
+        query->bindValue(4, TrackSerializer::serialized(object.track));
         query->bindValue(5, attributesId);
 
         query->exec();
@@ -136,7 +136,7 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         const auto newAttributesId = m_attributesDao->insertOrFetchAttributes(
             queryContext, objectUpdate.allAttributes);
 
-        updateObjectQuery->bindValue(0, TrackSerializer::serialize(objectUpdate.appendedTrack));
+        updateObjectQuery->bindValue(0, TrackSerializer::serialized(objectUpdate.appendedTrack));
         updateObjectQuery->bindValue(1, newAttributesId);
         updateObjectQuery->bindValue(2, objectUpdate.dbId);
         updateObjectQuery->exec();

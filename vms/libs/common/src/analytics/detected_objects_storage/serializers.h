@@ -75,11 +75,29 @@ class TrackSerializer
 {
 public:
     /**
-     * Two serialization results can be appended to each other safely.
+     * NOTE: Two serialization results can be appended to each other safely.
      */
-    static QByteArray serialize(const std::vector<ObjectPosition>& /*track*/);
+    static QByteArray serialized(const std::vector<ObjectPosition>& track);
 
-    static std::vector<ObjectPosition> deserialize(const QByteArray& /*serializedData*/);
+    static std::vector<ObjectPosition> deserialized(const QByteArray& serializedData);
+
+private:
+    static void serialize(
+        qint64 baseTimestamp,
+        const ObjectPosition& position,
+        QByteArray* buf);
+
+    static void serialize(const QRect& rect, QByteArray* buf);
+
+    static void deserialize(
+        qint64 baseTimestamp,
+        QnByteArrayConstRef* buf,
+        ObjectPosition* position);
+
+    static void deserialize(QnByteArrayConstRef* buf, QRect* rect);
+
+    static QRect translate(const QRectF& box);
+    static QRectF translate(const QRect& box);
 };
 
 } // namespace nx::analytics::storage
