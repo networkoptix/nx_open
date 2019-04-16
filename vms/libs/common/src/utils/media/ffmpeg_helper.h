@@ -7,12 +7,14 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avio.h>
 #include <libavutil/mem.h>
+#include <libavutil/imgutils.h>
 
 } // extern "C"
 
 #include <QtCore/QIODevice>
 
 #include "audioformat.h"
+#include <nx/streaming/config.h>
 #include <nx/streaming/media_context.h>
 #include <nx/streaming/media_context_serializable_data.h>
 
@@ -147,44 +149,66 @@ struct QnFfmpegAvPacket: AVPacket
 class AvFrameHolder
 {
 public:
-    /** Creates and owns an instance of AVFrame. */
-    AvFrameHolder():
-        m_avFrame(new AVFrame),
+    /**
+     * Creates and owns an instance of AVFrame, allocating its buffers and setting its fields. On
+     * error, fails an assertion and holds a null pointer to AVFrame.
+     */
+    AvFrameHolder(int width, int height, AVPixelFormat pixelFormat):
+        m_avFrame(av_frame_alloc()),
         m_owned(true)
     {
-        m_avFrame->data[0] = nullptr;
+        if (!NX_ASSERT(m_avFrame) || !NX_ASSERT(width > 0, width) || !NX_ASSERT(height > 0, height)
+            || !NX_ASSERT((int) pixelFormat >= 0, toString(pixelFormat)))
+        {
+            deallocateIfNeeded();
+            return;
+        }
+
+        m_avFrame->width = width;
+        m_avFrame->height = height;
+        m_avFrame->format = pixelFormat;
+
+        const int r = av_image_alloc(
+            m_avFrame->data,
+		    m_avFrame->linesize,
+		    width,
+		    height,
+		    pixelFormat,
+		    CL_MEDIA_ALIGNMENT);
+
+        if (!NX_ASSERT(r > 0, lm("av_image_alloc() failed for pixel format %1").arg(pixelFormat)))
+            deallocateIfNeeded();
     }
 
     /** Wraps the existing AVFrame without owning it. */
-    AvFrameHolder(AVFrame* avFrame):
-        m_avFrame(avFrame),
+    AvFrameHolder(const AVFrame* avFrame):
+        m_avFrame(const_cast<AVFrame*>(avFrame)),
         m_owned(false)
     {
         NX_CRITICAL(avFrame);
     }
 
-    /** Wraps the existing const AVFrame without owning it. */
-    AvFrameHolder(const AVFrame* avFrame): AvFrameHolder(const_cast<AVFrame*>(avFrame)) {}
-
-    ~AvFrameHolder()
-    {
-        if (m_owned)
-        {
-            av_freep(&m_avFrame->data[0]);
-            delete m_avFrame;
-        }
-    }
+    ~AvFrameHolder() { deallocateIfNeeded(); }
 
 	AvFrameHolder(const AvFrameHolder&) = delete;
 	AvFrameHolder& operator=(const AvFrameHolder&) = delete;
 	AvFrameHolder(AvFrameHolder&&) = delete;
 	AvFrameHolder& operator=(AvFrameHolder&&) = delete;
 
-    AVFrame* avFrame() { return m_avFrame; }
     const AVFrame* avFrame() const { return m_avFrame; }
 
 private:
-    AVFrame* const m_avFrame;
+    void deallocateIfNeeded()
+    {
+        if (m_owned && m_avFrame)
+        {
+            av_freep(&m_avFrame->data[0]);
+            av_frame_free(&m_avFrame);
+        }
+    }
+
+private:
+    AVFrame* m_avFrame;
     const bool m_owned;
 };
 
