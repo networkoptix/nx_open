@@ -383,6 +383,9 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
 
 CameraDiagnostics::Result Camera::initInternal()
 {
+    // This property is for debug purpose only.
+    setProperty("driverClass", toString(typeid(*this)));
+
     auto resData = resourceData();
     auto timeoutSec = resData.value<int>(ResourceDataKey::kUnauthorizedTimeoutSec);
     auto credentials = getAuth();

@@ -1,23 +1,39 @@
 #include "api_statistics.h"
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/param.h>
 #include <core/resource/resource_type.h>
-
+#include <nx/analytics/properties.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/std/algorithm.h>
 
 using namespace nx::vms;
 
-const static QString __CAMERA_EXCEPT_PARAMS[] =
+const static std::set<QString> kCameraParamsToRemove =
 {
     ResourcePropertyKey::kCredentials,
     ResourcePropertyKey::kDefaultCredentials,
     ResourcePropertyKey::kCameraAdvancedParams,
     ResourcePropertyKey::Onvif::kDeviceID,
     ResourcePropertyKey::Onvif::kDeviceUrl,
-    ResourcePropertyKey::Onvif::kMediaUrl
+    ResourcePropertyKey::Onvif::kMediaUrl,
+    QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty,
+    QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty,
+    QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty,
+    QnVirtualCameraResource::kDeviceAgentManifestsProperty,
 };
 
-const static QString __CAMERA_RESOURCE_PARAMS[] =
+const static std::set<QString> kServerParamsToRemove =
+{
+    nx::analytics::kPluginDescriptorsProperty,
+    nx::analytics::kEngineDescriptorsProperty,
+    nx::analytics::kGroupDescriptorsProperty,
+    nx::analytics::kEventTypeDescriptorsProperty,
+    nx::analytics::kObjectTypeDescriptorsProperty,
+    nx::analytics::kDeviceDescriptorsProperty,
+};
+
+const static std::vector<QString> kCameraParamsToDefault =
 {
     ResourcePropertyKey::kAnalog,
     ResourcePropertyKey::kCameraCapabilities,
@@ -28,9 +44,6 @@ const static QString __CAMERA_RESOURCE_PARAMS[] =
     ResourcePropertyKey::kStreamFpsSharing,
     ResourcePropertyKey::kSupportedMotion,
 };
-
-// TODO: remove this hack when VISUAL STUDIO supports initializer lists
-#define INIT_LIST(array) &array[0], &array[(sizeof(array)/sizeof(array[0]))]
 
 namespace ec2 {
 
@@ -45,18 +58,14 @@ ApiCameraDataStatistics::ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& da
         [&defCred](const auto& param) { return param.name == defCred; });
     const bool isDefCred = (it != nx::vms::api::CameraDataEx::addParams.end()) && !it->value.isEmpty();
 
-    // remove confidential information
-    auto rm = std::remove_if(addParams.begin(), addParams.end(),
-                                [](const auto& param)
-                                { return EXCEPT_PARAMS.count(param.name); });
+    nx::utils::remove_if(
+        addParams, [](const auto& param) { return kCameraParamsToRemove.count(param.name); });
 
-    addParams.erase(rm, addParams.end());
     addParams.push_back(nx::vms::api::ResourceParamData(defCred, isDefCred
         ? lit("true")
         : lit("false")));
 
-    // update resource defaults if not in addParams
-    for (const auto& param : RESOURCE_PARAMS)
+    for (const auto& param : kCameraParamsToDefault)
     {
         if (!qnResTypePool)
             return;
@@ -77,12 +86,6 @@ ApiCameraDataStatistics::ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& da
     }
 }
 
-const std::set<QString> ApiCameraDataStatistics::EXCEPT_PARAMS(
-        INIT_LIST(__CAMERA_EXCEPT_PARAMS));
-
-const std::set<QString> ApiCameraDataStatistics::RESOURCE_PARAMS(
-        INIT_LIST(__CAMERA_RESOURCE_PARAMS));
-
 ApiStorageDataStatistics::ApiStorageDataStatistics()
 {
 }
@@ -99,6 +102,9 @@ ApiMediaServerDataStatistics::ApiMediaServerDataStatistics()
 ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(api::MediaServerDataEx&& data):
     api::MediaServerDataEx(std::move(data))
 {
+    nx::utils::remove_if(
+        addParams, [](const auto& param) { return kServerParamsToRemove.count(param.name); });
+
     for (auto& s: api::MediaServerDataEx::storages)
         storages.push_back(std::move(s));
 
