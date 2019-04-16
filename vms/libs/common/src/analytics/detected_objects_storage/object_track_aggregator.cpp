@@ -50,6 +50,9 @@ std::vector<AggregatedTrackData> ObjectTrackAggregator::getAggregatedData()
         result.back().timestamp = *m_aggregationStartTimestamp;
     }
 
+    m_aggregationStartTimestamp = std::nullopt;
+    m_aggregationEndTimestamp = std::nullopt;
+
     return result;
 }
 
