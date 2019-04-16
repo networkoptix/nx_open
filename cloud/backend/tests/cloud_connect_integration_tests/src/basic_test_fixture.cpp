@@ -235,7 +235,7 @@ int BasicTestFixture::mediatorCount() const
 void BasicTestFixture::startMediator(int index)
 {
     if (!m_relays.empty())
-        mediator(index).addArg("-trafficRelay/url", relayUrl().toString().toStdString().c_str());
+        mediator(index).addArg("-trafficRelay/url", relayUrl().toStdString().c_str());
 
     ASSERT_TRUE(mediator(index).startAndWaitUntilStarted());
 
@@ -423,7 +423,6 @@ void BasicTestFixture::startServer(int mediatorIndex)
     m_cloudSystemCredentials.serverId = QnUuid::createUuid().toSimpleByteArray();
     m_cloudSystemCredentials.key = cloudSystemCredentials.authKey;
 
-    //SocketGlobals::cloud().mediatorConnector().setSystemCredentials(m_cloudSystemCredentials);
     mediatorContext(mediatorIndex).connector.setSystemCredentials(m_cloudSystemCredentials);
 
     startHttpServer(&mediatorContext(mediatorIndex).connector);
@@ -535,16 +534,6 @@ void BasicTestFixture::waitUntilServerIsRegisteredOnMediator()
     std::string systemId = m_cloudSystemCredentials.systemId.toStdString();
     while (!m_mediatorCluster.cluster().peerInformationSynchronizedInCluster(systemId))
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-
-    /*for (;;)
-    {
-        if (!mediator().moduleInstance()->impl()->listeningPeerPool()->findPeersBySystemId(
-            m_cloudSystemCredentials.systemId).empty())
-        {
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }*/
 }
 
 void BasicTestFixture::waitUntilServerIsRegisteredOnTrafficRelay()
