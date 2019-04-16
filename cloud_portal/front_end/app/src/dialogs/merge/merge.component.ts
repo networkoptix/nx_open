@@ -182,7 +182,7 @@ export class MergeModalContent {
 
     selectDefaultSystem() {
         if (this.systems.length < 1) {
-            console.error('Error User needs to be the owner of more that 1 system');
+            console.error('Error User needs to be the owner of more than 1 system');
             return {};
         }
         for (const i in this.systems) {
