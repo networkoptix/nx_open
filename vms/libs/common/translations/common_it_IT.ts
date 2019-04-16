@@ -1028,19 +1028,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation>File zip è corrotto.</translation>
+      <translation>File zip è danneggiato.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>Impossibile trovare la directory di destinazione.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>Impossibile aprire il file per la scrittura.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>Non è piu' disponibile spazio libero sul disco.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1048,22 +1048,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>Estrazione annullata.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>L'estrattore è occupato.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>Dimensione del flusso criptato errata.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>Intestazione del flusso criptato danneggiata.</translation>
     </message>
   </context>
   <context>
@@ -1551,23 +1551,23 @@
     </message>
     <message>
       <source>Plugin Event</source>
-      <translation type="unfinished">Plugin Event</translation>
+      <translation>Evento Plugin</translation>
     </message>
     <message>
       <source>Unknown plugin event</source>
-      <translation type="unfinished">Unknown plugin event</translation>
+      <translation>Evento plugin sconosciuto</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>Impossibile forzare l'uso dell'orario della telecamera, la differenza è troppa, l'orario di sistema verrà utilizzato</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>L'orario della telecamera è tornato alla normalità</translation>
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>Si sono verificati più eventi %1</translation>
     </message>
   </context>
   <context>

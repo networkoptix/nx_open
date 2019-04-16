@@ -1,5 +1,5 @@
 <div class="container">
-    <h1><a href="#/metrics/">New: System health report</a></h1>
+    <h1><a href="#/metrics/">Novità: report sullo stato del sistema</a></h1>
 </div>
 <div class="container">
     <h1>Impostazioni avanzate del server</h1>
@@ -120,7 +120,7 @@
     <h2>Impostazioni registro</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">{{name}} livello di registro</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">Nessuno: log disabilitato.</option>
@@ -128,7 +128,7 @@
                     <option value="error">Errore: solo errori di registro.</option>
                     <option value="warning">Avviso: registra avvisi ed errori.</option>
                     <option value="info">Info: registra errori, avvisi e tutti i messaggi.</option>
-                    <option value="debug">Debug: Log every System message and debug information.</option>
+                    <option value="debug">Debug: registra tutti i messaggi di sistema e le informazioni di debug.</option>
                     <option value="verbose">Verbose: registra tutte le informazioni disponibili.</option>
                 </select>
             </div>
@@ -138,7 +138,7 @@
         </div>
     </form>
 
-    <h1>Advanced System settings</h1>
+    <h1>Impostazioni avanzate di sistema</h1>
     <div class="alert alert-danger" role="alert">
         <b> Attenzione! </b> Qualsiasi modifica in questa pagina può causare il funzionamento non corretto del server.
     </div>

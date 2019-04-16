@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "사용자 이름 또는 비밀번호가 잘못되었습니다.",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "시도 횟수가 너무 많습니다. 1 분 후에 다시 시도하십시오."
     },
     "navigaion": {
         "cannotGetUser": "서버 오류: 현재 사용자 데이터를 검색할 수 없습니다"

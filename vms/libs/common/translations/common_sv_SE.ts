@@ -527,77 +527,77 @@
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Licenses</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n Analoga licenser</numerusform>
+        <numerusform>%n Analoga licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Professional Licenses</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n Professionella Licenser</numerusform>
+        <numerusform>%n Professionella Licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Edge Licenses</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n Edge Licenser</numerusform>
+        <numerusform>%n Edge Licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n Vmax Licenser</numerusform>
+        <numerusform>%n Vmax Licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n Analoga Encoder Licenser</numerusform>
+        <numerusform>%n Analoga Encoder Licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Video Wall Licenses</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n Videovägg Licenser</numerusform>
+        <numerusform>%n Videovägg Licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n i/o-modul licenser</numerusform>
+        <numerusform>%n i/o-modul licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n Startlicenser</numerusform>
+        <numerusform>%n Startlicenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n bridge licenser</numerusform>
+        <numerusform>%n bridge licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n ogiltiga licenser</numerusform>
+        <numerusform>%n ogiltiga licenser</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Gratis Licenser</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>

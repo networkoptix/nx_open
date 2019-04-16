@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Impossibile configurare il sistema</h2>
-    <p class="master-description">The System cannot be configured. <br>
+    <p class="master-description">Il sistema non può essere configurato. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -65,13 +65,13 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">Advanced System settings</a>
+        <a href="" ng-click="next('advanced', true)">Impostazioni avanzate di sistema</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>Advanced System settings</h2>
+    <h2>Impostazioni avanzate di sistema</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -138,7 +138,7 @@
     </div>
     <h2>{{Config.cloud.productName}} account</h2>
     <p class="master-description">
-        An account is required to use the cloud System {{Config.cloud.productName}}
+        Per utilizzare il sistema cloud è necessario un account {{Config.cloud.productName}}
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus> Crea un nuovo account </button>&nbsp;&nbsp;
@@ -276,7 +276,7 @@
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
-    <h2>Connect the server to the existing System</h2>
+    <h2>Connettere il server al sistema esistente</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
 
@@ -288,7 +288,7 @@
                    uib-typeahead-show-hint="true"
                    uib-typeahead-focus-first="false"
                    uib-typeahead-focus
- placeholder="Existing System URL (https://host:port)"
+ placeholder="URL del sistema esistente (https://host:porta)"
                    ng-change="clearRemoteError()"
                    required
  class="form-control">
@@ -335,19 +335,18 @@
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
     <h2>Unione sistemi ...</h2>
-    <p class="master-description">Trying to connect to the System</p>
+    <p class="master-description">Tentativo di connessione al sistema</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot merge Systems</h2>
+    <h2>Impossibile unire i sistemi</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
-        <button class="btn btn-default" ng-click="skip()">Setup a separate System</button>
+        <button class="btn btn-default" ng-click="retry()"> Riprova </button> <button class="btn btn-default" ng-click="skip()"> Imposta un sistema separato </button>
     </p>
 </div>
 
@@ -413,8 +412,7 @@
         Impostare la connessione Internet sul server per poter <br> collegarsi ad esso ovunque utilizzando {{Config.cloud.productName}}.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
-        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
+        <button class="btn btn-default" ng-click="retry()"> Riprova </button> <button class="btn btn-default" ng-click="skip()"> Imposta il sistema locale </button>
     </p>
     <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
         <a href="" ng-click="next('configureNetworkForInternet')">Configurare le impostazioni di rete</a>
@@ -428,8 +426,7 @@
         Controlla la connessione Internet.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
-        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
+        <button class="btn btn-default" ng-click="retry()"> Riprova </button> <button class="btn btn-default" ng-click="skip()"> Imposta il sistema locale </button>
     </p>
 </div>
 
@@ -440,8 +437,7 @@
         {{cloudError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
-        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
+        <button class="btn btn-default" ng-click="retry()"> Riprova </button> <button class="btn btn-default" ng-click="skip()"> Imposta il sistema locale </button>
     </p>
 </div>
 

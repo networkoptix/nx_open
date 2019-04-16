@@ -861,7 +861,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Esporta segnalibro...</translation>
     </message>
     <message>
       <source>Forget password</source>
@@ -5916,7 +5916,7 @@ to %1</source>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>Se abilitato, il sistema rileva continuamente nuove telecamere e server e invia richieste di rilevamento alle telecamere per l'aggiornamento dello stato.</translation>
     </message>
   </context>
   <context>
