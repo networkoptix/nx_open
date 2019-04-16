@@ -231,6 +231,7 @@ export class CamTableComponent implements OnChanges, OnInit {
             this.results = this._elements.length;
 
             this.sortElements(true /* keep uri params */);
+            this.csvCameraData = this.getCsvData();
         }
 
         if (changes.activeCamera) {
