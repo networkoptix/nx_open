@@ -250,17 +250,9 @@ class Product(models.Model):
 
     def read_global_value(self, record_name):
         global_contexts = self.product_type.context_set.filter(is_global=True)
-        data_structure = None
-        for context in global_contexts:
-            data_structures = context.datastructure_set.filter(name=record_name)
-            if data_structures.exists():
-                data_structure = data_structures.last()
-                break
+        data_structure = DataStructure.objects.filter(name=record_name, context__in=global_contexts).last()
 
-        if not data_structure:
-            return None
-
-        return data_structure.find_actual_value(product=self, version_id=self.version_id())
+        return data_structure.find_actual_value(product=self, version_id=self.version_id()) if data_structure else None
 
     def save(self, *args, **kwargs):
         need_update = False
@@ -403,7 +395,7 @@ class DataStructure(models.Model):
         content_value = ""
         if not product:
             return self.default
-        content_record = DataRecord.objects.filter(product=product, data_structure=self)
+        content_record = DataRecord.objects.filter(product=product, data_structure=self).order_by('version_id')
         if not draft:
             content_record = content_record.\
                 exclude(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.rejected)
@@ -415,9 +407,9 @@ class DataStructure(models.Model):
             elif product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
                 content_record = content_record.filter(language=product.customizations.first().default_language)
 
-        if content_record and content_record.exists():
+        if content_record.exists():
             if not version_id:
-                content_value = content_record.latest('created_date').value
+                content_value = content_record.last().value
             else:  # Here find a datarecord with version_id
                 # which is not more than version_id
                 # filter only accepted content_records
@@ -432,7 +424,7 @@ class DataStructure(models.Model):
                     else:
                         content_record = content_record.filter(version__accepted_by__isnull=False)
                 if content_record.exists():
-                    content_value = content_record.latest('version_id').value
+                    content_value = content_record.last().value
 
         # if no value or optional and type file - use default value from structure
         if not content_value and (not self.optional or
