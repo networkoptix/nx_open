@@ -92,7 +92,7 @@ struct Ini: nx::kit::IniConfig
         "Enables watermarks preview and setup.");
     NX_INI_FLAG(1, enableCaseExport,
         "Enables case export.");
-    NX_INI_FLAG(0, enableSessionTimeout,
+    NX_INI_FLAG(1, enableSessionTimeout,
         "Enables admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode,
         "Specifies one of password preview activation modes: \"press\", \"hover\" or \"toggle\".");
