@@ -417,7 +417,7 @@ QImage CLVideoDecoderOutput::toImage() const
     const AVPixelFormat targetFormat = AV_PIX_FMT_BGRA;
 
     if (width == 0 || height == 0)
-        return QImage();
+        return {};
 
     CLVideoDecoderOutputPtr target(new CLVideoDecoderOutput(width, height, intermediateFormat));
 
