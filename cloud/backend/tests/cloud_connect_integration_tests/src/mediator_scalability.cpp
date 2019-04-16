@@ -5,7 +5,11 @@
 
 namespace nx::network::cloud::test {
 
+namespace {
+
 static constexpr int kMaxMediatorCount = 2;
+
+} // namespace
 
 class MediatorScalability:
     public BasicTestFixture,
