@@ -5901,10 +5901,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failover server measures may still request camera status updates regardless of this setting.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5914,6 +5910,10 @@ to %1</source>
     </message>
     <message>
         <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6859,9 +6859,9 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>You can upload these files to a different instance of a Virtual Camera.</source>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation type="unfinished">
+            <numerusform>You can upload this file to a different instance of a Virtual Camera.</numerusform>
+            <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
         </translation>
     </message>
     <message>
@@ -7467,10 +7467,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
         <translation></translation>
     </message>
@@ -7497,6 +7493,10 @@ to %1</source>
     </message>
     <message>
         <source>UDP Multicast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8767,10 +8767,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Local layouts can only be shown to their owners. </source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Select layout...</source>
         <translation></translation>
     </message>
@@ -9117,8 +9113,8 @@ to %1</source>
     <message numerus="yes">
         <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Double click to add camera to the current layout or ctrl+click to open in a new tab</numerusform>
+            <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
         </translation>
     </message>
     <message>
