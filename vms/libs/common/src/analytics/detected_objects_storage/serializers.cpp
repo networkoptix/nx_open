@@ -1,5 +1,7 @@
 #include "serializers.h"
 
+#include "analytics_events_storage_types.h"
+
 namespace nx::analytics::storage {
 
 namespace compact_int {
@@ -40,42 +42,34 @@ int serialize(
 
 //-------------------------------------------------------------------------------------------------
 
-int deserialize(const QByteArray& buf, long long* value)
+void deserialize(QnByteArrayConstRef* buf, long long* value)
 {
     unsigned long long uValue = 0;
 
-    const char* bufPos = buf.data();
-    while (bufPos - buf.data() < buf.size())
+    while (!buf->isEmpty())
     {
-        const auto byte = (std::uint8_t) *bufPos;
-        const bool endOfNumber = (*bufPos & 0x80) == 0;
+        const auto byte = (std::uint8_t) *buf->data();
+        const bool endOfNumber = (byte & 0x80) == 0;
 
         uValue <<= 7;
         uValue |= byte & 0x7f;
 
-        ++bufPos;
+        buf->pop_front();
         if (endOfNumber)
             break;
     }
 
     *value = (long long) uValue;
-
-    return bufPos - buf.data();
 }
 
-int deserialize(const QByteArray& buf, std::vector<long long>* numbers)
+void deserialize(QnByteArrayConstRef* buf, std::vector<long long>* numbers)
 {
-    int bytesRead = 0;
-    while (bytesRead < buf.size())
+    while (!buf->isEmpty())
     {
         long long value = 0;
-        bytesRead += deserialize(
-            QByteArray::fromRawData(buf.data() + bytesRead, buf.size() - bytesRead),
-            &value);
+        deserialize(buf, &value);
         numbers->push_back(value);
     }
-
-    return bytesRead;
 }
 
 } // namespace compact_int

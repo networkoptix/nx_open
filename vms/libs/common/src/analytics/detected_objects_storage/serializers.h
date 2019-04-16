@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/utils/qnbytearrayref.h>
+
 #include "analytics_events_storage_types.h"
 
 namespace nx::analytics::storage {
@@ -45,22 +47,23 @@ QByteArray serialized(const T& value)
 //-------------------------------------------------------------------------------------------------
 
 /**
- * @return bytesRead.
+ * NOTE: Deserialized bytes are removed from the buf.
  */
-int deserialize(const QByteArray& buf, long long* value);
+void deserialize(QnByteArrayConstRef* buf, long long* value);
 
 /**
  * Deserializes the whole buf as a sequence of compressed integers.
  * So, end of the buffer == end of the sequence.
- * @return bytesRead.
+ * NOTE: Deserialized bytes are removed from the buf.
  */
-int deserialize(const QByteArray& buf, std::vector<long long>* numbers);
+void deserialize(QnByteArrayConstRef* buf, std::vector<long long>* numbers);
 
 template<typename T>
 T deserialized(const QByteArray& buf)
 {
     T value;
-    deserialize(buf, &value);
+    QnByteArrayConstRef localBuf(buf);
+    deserialize(&localBuf, &value);
     return value;
 }
 
