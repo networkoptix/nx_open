@@ -32,7 +32,7 @@ protected:
     void assertSerializeAndDeserializeAreSymmetric(T value)
     {
         const auto result =
-            compact_int::deserialized<std::remove_const<decltype(value)>::type>
+            compact_int::deserialized<typename std::remove_const<decltype(value)>::type>
                 (compact_int::serialized(value));
 
         ASSERT_EQ(value, result);
