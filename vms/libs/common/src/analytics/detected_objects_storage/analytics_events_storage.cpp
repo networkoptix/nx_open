@@ -8,8 +8,6 @@
 #include <nx/sql/sql_cursor.h>
 #include <nx/utils/log/log.h>
 
-#include "detection_data_saver.h"
-
 namespace nx {
 namespace analytics {
 namespace storage {
@@ -60,9 +58,7 @@ bool EventsStorage::initialize()
         && loadDictionaries();
 }
 
-void EventsStorage::save(
-    common::metadata::ConstDetectionMetadataPacketPtr packet,
-    StoreCompletionHandler completionHandler)
+void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packet)
 {
     using namespace std::placeholders;
     using namespace std::chrono;
@@ -80,36 +76,16 @@ void EventsStorage::save(
     {
         m_dbController.queryExecutor().executeUpdate(
             std::bind(&EventsStorage::savePacket, this, _1, std::move(packet)),
-            [this, completionHandler = std::move(completionHandler)](
-                sql::DBResult resultCode)
-            {
-                completionHandler(dbResultToResultCode(resultCode));
-            },
+            [this](sql::DBResult resultCode) { logDataSaveResult(resultCode); },
             kSaveEventQueryAggregationKey);
     }
     else
     {
         QnMutexLocker lock(&m_mutex);
 
-        m_objectCache.add(packet);
+        savePacketDataToCache(lock, packet);
 
-        for (const auto& detectedObject: packet->objects)
-        {
-            m_trackAggregator.add(
-                detectedObject.objectId,
-                duration_cast<milliseconds>(microseconds(packet->timestampUsec)),
-                detectedObject.boundingBox);
-        }
-
-        DetectionDataSaver detectionDataSaver(
-            &m_attributesDao,
-            &m_deviceDao,
-            &m_objectTypeDao,
-            &m_objectCache);
-
-        detectionDataSaver.load(&m_trackAggregator);
-
-        m_objectCache.removeExpiredData();
+        auto detectionDataSaver = takeDataToSave(lock, /*flush*/ false);
 
         if (!detectionDataSaver.empty())
         {
@@ -121,11 +97,7 @@ void EventsStorage::save(
                     detectionDataSaver.save(queryContext);
                     return nx::sql::DBResult::ok;
                 },
-                [this, completionHandler = std::move(completionHandler)](
-                    sql::DBResult resultCode)
-                {
-                    completionHandler(dbResultToResultCode(resultCode));
-                },
+                [this](sql::DBResult resultCode) { logDataSaveResult(resultCode); },
                 kSaveEventQueryAggregationKey);
         }
     }
@@ -222,6 +194,34 @@ void EventsStorage::markDataAsDeprecated(
         });
 }
 
+void EventsStorage::flush(StoreCompletionHandler completionHandler)
+{
+    m_dbController.queryExecutor().executeUpdate(
+        [this](nx::sql::QueryContext* queryContext)
+        {
+            NX_DEBUG(this, "Flushing unsaved data");
+
+            if (kUseTrackAggregation)
+            {
+                QnMutexLocker lock(&m_mutex);
+                auto detectionDataSaver = takeDataToSave(lock, /*flush*/ true);
+                lock.unlock();
+
+                if (!detectionDataSaver.empty())
+                    detectionDataSaver.save(queryContext);
+            }
+
+            // Since sqlite supports only one update thread this will be executed after every
+            // packet has been saved.
+
+            return sql::DBResult::ok;
+        },
+        [completionHandler = std::move(completionHandler)](sql::DBResult resultCode)
+        {
+            completionHandler(dbResultToResultCode(resultCode));
+        });
+}
+
 bool EventsStorage::readMaximumEventTimestamp()
 {
     try
@@ -230,7 +230,10 @@ bool EventsStorage::readMaximumEventTimestamp()
             [](nx::sql::QueryContext* queryContext)
             {
                 auto query = queryContext->connection()->createQuery();
-                query->prepare("SELECT max(timestamp_usec_utc) FROM event");
+                if (kUseTrackAggregation)
+                    query->prepare("SELECT max(timestamp_seconds_utc) * 1000 FROM object_search");
+                else
+                    query->prepare("SELECT max(timestamp_usec_utc) FROM event");
                 query->exec();
                 if (query->next())
                     return std::chrono::milliseconds(query->value(0).toLongLong());
@@ -348,6 +351,40 @@ void EventsStorage::insertEvent(
         packCoordinate(detectedObject.boundingBox.bottomRight().y()));
 
     insertEventQuery.exec();
+}
+
+void EventsStorage::savePacketDataToCache(
+    const QnMutexLockerBase& /*lock*/,
+    const common::metadata::ConstDetectionMetadataPacketPtr& packet)
+{
+    using namespace std::chrono;
+
+    m_objectCache.add(packet);
+
+    for (const auto& detectedObject : packet->objects)
+    {
+        m_trackAggregator.add(
+            detectedObject.objectId,
+            duration_cast<milliseconds>(microseconds(packet->timestampUsec)),
+            detectedObject.boundingBox);
+    }
+}
+
+DetectionDataSaver EventsStorage::takeDataToSave(
+    const QnMutexLockerBase& /*lock*/,
+    bool flushData)
+{
+    DetectionDataSaver detectionDataSaver(
+        &m_attributesDao,
+        &m_deviceDao,
+        &m_objectTypeDao,
+        &m_objectCache);
+
+    detectionDataSaver.load(&m_trackAggregator, flushData);
+
+    m_objectCache.removeExpiredData();
+
+    return detectionDataSaver;
 }
 
 void EventsStorage::prepareCursorQuery(
@@ -897,6 +934,18 @@ void EventsStorage::cleanupEventProperties(
 
     query.exec();
 #endif
+}
+
+void EventsStorage::logDataSaveResult(sql::DBResult resultCode)
+{
+    if (resultCode != sql::DBResult::ok)
+    {
+        NX_DEBUG(this, "Error saving detection metadata packet. %1", resultCode);
+    }
+    else
+    {
+        NX_VERBOSE(this, "Detection metadata packet has been saved successfully");
+    }
 }
 
 int EventsStorage::packCoordinate(double value)

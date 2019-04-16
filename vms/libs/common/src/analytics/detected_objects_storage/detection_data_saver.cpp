@@ -24,11 +24,13 @@ DetectionDataSaver::DetectionDataSaver(
 {
 }
 
-void DetectionDataSaver::load(ObjectTrackAggregator* trackAggregator)
+void DetectionDataSaver::load(
+    ObjectTrackAggregator* trackAggregator,
+    bool flush)
 {
-    m_objectsToInsert = m_objectCache->getObjectsToInsert();
-    m_objectsToUpdate = m_objectCache->getObjectsToUpdate();
-    m_objectSearchData = trackAggregator->getAggregatedData();
+    m_objectsToInsert = m_objectCache->getObjectsToInsert(flush);
+    m_objectsToUpdate = m_objectCache->getObjectsToUpdate(flush);
+    m_objectSearchData = trackAggregator->getAggregatedData(flush);
 
     resolveObjectIds();
 }

@@ -24,6 +24,7 @@
 
 #include "attributes_dao.h"
 #include "device_dao.h"
+#include "detection_data_saver.h"
 #include "object_cache.h"
 #include "object_track_aggregator.h"
 #include "object_type_dao.h"
@@ -62,9 +63,11 @@ public:
      */
     virtual bool initialize() = 0;
 
-    virtual void save(
-        common::metadata::ConstDetectionMetadataPacketPtr packet,
-        StoreCompletionHandler completionHandler) = 0;
+    /**
+     * Packet is saved asynchronously.
+     * To make sure the data is written call AbstractEventsStorage::flush.
+     */
+    virtual void save(common::metadata::ConstDetectionMetadataPacketPtr packet) = 0;
 
     /**
      * Newly-created cursor points just before the first element.
@@ -99,6 +102,11 @@ public:
     virtual void markDataAsDeprecated(
         QnUuid deviceId,
         std::chrono::milliseconds oldestDataToKeepTimestamp) = 0;
+
+    /**
+     * Flushes to the DB all data passed with AbstractEventsStorage::save before this call.
+     */
+    virtual void flush(StoreCompletionHandler completionHandler) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -112,9 +120,7 @@ public:
 
     virtual bool initialize() override;
 
-    virtual void save(
-        common::metadata::ConstDetectionMetadataPacketPtr packet,
-        StoreCompletionHandler completionHandler) override;
+    virtual void save(common::metadata::ConstDetectionMetadataPacketPtr packet) override;
 
     virtual void createLookupCursor(
         Filter filter,
@@ -132,6 +138,8 @@ public:
     virtual void markDataAsDeprecated(
         QnUuid deviceId,
         std::chrono::milliseconds oldestDataToKeepTimestamp) override;
+
+    virtual void flush(StoreCompletionHandler completionHandler) override;
 
 private:
     const Settings& m_settings;
@@ -169,6 +177,12 @@ private:
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject);
+
+    void savePacketDataToCache(
+        const QnMutexLockerBase& /*lock*/,
+        const common::metadata::ConstDetectionMetadataPacketPtr& packet);
+
+    DetectionDataSaver takeDataToSave(const QnMutexLockerBase& /*lock*/, bool flushData);
 
     void prepareCursorQuery(const Filter& filter, nx::sql::SqlQuery* query);
 
@@ -246,6 +260,8 @@ private:
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void cleanupEventProperties(nx::sql::QueryContext* queryContext);
+
+    void logDataSaveResult(sql::DBResult resultCode);
 
     static int packCoordinate(double);
     static double unpackCoordinate(int);

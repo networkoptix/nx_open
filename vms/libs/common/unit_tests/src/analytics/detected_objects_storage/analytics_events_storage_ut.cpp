@@ -48,7 +48,7 @@ protected:
     {
         m_analyticsDataPackets.push_back(generateRandomPacket(1));
         whenIssueSavePacket(m_analyticsDataPackets[0]);
-        thenSaveSucceeded();
+        flushData();
     }
 
     void whenSaveMultipleEventsConcurrently()
@@ -60,15 +60,12 @@ protected:
             whenIssueSavePacket(m_analyticsDataPackets.back());
         }
 
-        for (int i = 0; i < packetCount; ++i)
-            thenSaveSucceeded();
+        flushData();
     }
 
     void whenIssueSavePacket(common::metadata::ConstDetectionMetadataPacketPtr packet)
     {
-        m_eventsStorage->save(
-            packet,
-            [this](ResultCode resultCode) { m_savePacketResultQueue.push(resultCode); });
+        m_eventsStorage->save(packet);
     }
 
     void whenRestartStorage()
@@ -87,11 +84,6 @@ protected:
             {
                 m_lookupResultQueue.push(LookupResult{resultCode, std::move(eventsFound)});
             });
-    }
-
-    void thenSaveSucceeded()
-    {
-        ASSERT_EQ(ResultCode::ok, m_savePacketResultQueue.pop());
     }
 
     void thenAllEventsCanBeRead()
@@ -427,8 +419,7 @@ protected:
         std::for_each(analyticsDataPackets.begin(), analyticsDataPackets.end(),
             [this](const auto& packet) { whenIssueSavePacket(packet); });
 
-        std::for_each(analyticsDataPackets.begin(), analyticsDataPackets.end(),
-            [this](const auto&) { thenSaveSucceeded(); });
+        flushData();
     }
 
     EventsStorage& eventsStorage()
@@ -482,7 +473,6 @@ private:
     std::unique_ptr<EventsStorage> m_eventsStorage;
     Settings m_settings;
     std::vector<common::metadata::DetectionMetadataPacketPtr> m_analyticsDataPackets;
-    nx::utils::SyncQueue<ResultCode> m_savePacketResultQueue;
     nx::utils::SyncQueue<LookupResult> m_lookupResultQueue;
     boost::optional<LookupResult> m_prevLookupResult;
 
@@ -495,6 +485,13 @@ private:
     {
         m_eventsStorage = std::make_unique<EventsStorage>(m_settings);
         return m_eventsStorage->initialize();
+    }
+
+    void flushData()
+    {
+        std::promise<ResultCode> done;
+        m_eventsStorage->flush([&done](ResultCode result) { done.set_value(result); });
+        ASSERT_EQ(ResultCode::ok, done.get_future().get());
     }
 
     bool satisfiesFilter(
