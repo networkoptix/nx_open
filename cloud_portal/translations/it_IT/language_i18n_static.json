@@ -1,0 +1,157 @@
+{
+	"search": {
+		"Search": "Ricerca",
+		"search_ipvd": "Cerca per modello o produttore",
+		"filter applied": "filtro applicato",
+		"filters applied": "filtri applicati",
+		"Any": "Qualsiasi",
+		"selected": "selezionato",
+		"vendor": "Produttore",
+		"vendors": "produttori",
+		"hardwareType": "Tipo",
+		"hardwareTypes": "tipi",
+		"minResolution": "Risoluzione minima"
+	},
+	"cameraFilters": {
+		"ptz": "Telecamere PTZ",
+		"aptz": "Telecamere con PTZ avanzato",
+		"fisheye": "Telecamere Fisheye",
+		"H265": "Telecamere H.265",
+		"IO": "Moduli I / O",
+		"multiSensor": "Telecamere multisensore",
+		"TwWayAudio": "Dispositivi audio a 2 vie",
+		"audio": "Telecamere con audio",
+		"encoder": "Encoder",
+		"highRes": "Telecamere ad altissima risoluzione"
+	},
+	"downloads": {
+		"mobile": {
+			"ios": {
+				"link": "%IOS_APPLICATION_LINK%"
+			},
+			"android": {
+				"link": "%ANDROID_APPLICATION_LINK%"
+			}
+		},
+		"groups": {
+			"windows": {
+				"label": "Windows",
+				"supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+			},
+			"mac": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"linux": {
+				"label": "Ubuntu Linux",
+				"shortLabel": "Ubuntu",
+				"supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+			},
+			"macos": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"ios": {
+				"label": "iOS",
+				"shortLabel": "iOS"
+			},
+			"android": {
+				"label": "Android",
+				"shortLabel": "Android"
+			},
+			"arm": {
+				"label": "ARM",
+				"shortLabel": "ARM",
+				"supported": "Debian/Ubuntu"
+			},
+			"sdk": {
+				"label": "SDK",
+				"shortLabel": "SDK",
+				"supported": "SDK cross-platform C ++"
+			}
+		},
+		"platforms": {
+			"win64": "x64",
+			"win86": "x86",
+			"linux64": "x64",
+			"linux86": "x86",
+			"mac": "X",
+			"bananapi": "Banana Pi",
+			"bpi": "Nx1",
+			"rpi": " Raspberry Pi"
+		},
+		"appTypes": {
+			"client": "Solo cliente",
+			"server": "Solo server",
+			"bundle": "Client e Server",
+			"servertool": "Strumenti di configurazione",
+			"package": "Pacchetto"
+		},
+		"releasesTypes": {
+			"beta": "Beta",
+			"betas": "Versioni beta",
+			"rc": "Versione Candidate",
+			"release": "Rilascio",
+			"releases": "Versioni",
+			"patch": "Patch",
+			"patches": "Patch"
+		}
+	},
+	"ipvd": {
+		"count": "Conteggio",
+		"vendor": "Produttore",
+		"model": "Modello",
+		"hardwareType": "Tipo",
+		"maxResolution": "Risoluzione massima",
+		"maxFps": "FPS massimo",
+		"primaryCodec": "Codec",
+		"isAudioSupported": "Audio",
+		"isTwAudioSupported": "Audio a 2 vie",
+		"isPtzSupported": "PTZ",
+		"isAptzSupported": "PTZ avanzato",
+		"isAptzSupportedShort": "Adv. PTZ",
+		"isFisheye": "Fisheye",
+		"isMdSupported": "Movimento",
+		"isIoSupported": "I/O",
+		"isH265": "H.265",
+		"isMultiSensor": "Multi sensore",
+		"camera": "Telecamera / e",
+		"multiSensorCamera": "Telecamera multisensore",
+		"encoder": "Encoder",
+		"dvr": "DVR",
+		"other": "Altro",
+		"PTZ cameras": "Telecamere PTZ",
+		"Advanced PTZ cameras": "Telecamere PTZ avanzato",
+		"Fisheye Cameras": "Telecamere Fisheye",
+		"Cameras supporting H.265": "Telecamere che supportano H.265",
+		"I / O modules": "Moduli I / O",
+		"Multisensor Cameras": "Telecamere Multisensore",
+		"Cameras with 2-way audio": "Telecamere con audio a 2 vie",
+		"Extra high resolution cameras": "Telecamere ad altissima risoluzione",
+		"feedback": {
+			"a_Please": "Si prega di",
+			"b_Link": "invia una richiesta",
+			"c_Info": "per ulteriori domande / dubbi sui dispositivi supportati."
+		}
+	},
+	"integration": {
+		"previewRibbonText": "Questa pagina è un'anteprima delle ultime modifiche e non corrisponde alla versione disponibile al pubblico.",
+		"backToEditText": "Torna alle interfacce di modifica",
+		"Access Control": "Controllo accesso",
+		"Connector": "Connettore",
+		"Data Analytics": "Dati e analisi",
+		"Drone": "Drone",
+		"Health Monitor": "Monitor prestazioni",
+		"Storage": "Archiviazione"
+	},
+	"messageDialogPlaceholders": {
+		"feedback": "Assicurati di includere il modello della telecamera e il produttore..."
+	},
+	"About %PRODUCT_NAME%": "Informazioni su %PRODUCT_NAME%",
+	"Download %VMS_NAME%": "Scarica %VMS_NAME%",
+	"Integrations": "Integrazioni",
+	"Support": "Supporto",
+	"Terms": "Termini di servizio",
+	"Privacy": "Privacy",
+	"Supported Devices": "Dispositivi supportati"
+}

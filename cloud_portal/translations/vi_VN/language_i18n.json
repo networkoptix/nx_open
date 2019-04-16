@@ -4,7 +4,7 @@
     "Account Settings": "Cài đặt tài khoản",
     "Account not activated": "Tài khoản không được kích hoạt",
     "Account not found": "Không tìm thấy tài khoản",
-    "Additional information": "Additional information",
+    "Administration": "Administration",
     "Advanced PTZ": "Advanced PTZ",
     "Advanced search": "Advanced search",
     "All Systems": "Tất cả Hệ thống",
@@ -20,7 +20,6 @@
     "Cancel": "Hủy bỏ",
     "Change Password": "Đổi mật khẩu",
     "Choose which properties should be visible to customers:": "Chọn những thuộc tính sẽ được hiển thị cho khách hàng:",
-    "Clear All": "Clear All",
     "Close": "Gần",
     "Codec": "Codec",
     "Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.": "Kết nối Hệ thống bạn muốn kết hợp với hệ thống này với %PRODUCT_NAME% hoặc hợp nhất cục bộ bằng %VMS_NAME% Client.",
@@ -73,7 +72,6 @@
     "Password:": "Mật khẩu:",
     "Permissions": "Quyền truy nhập",
     "Popularity": "Popularity",
-    "Portal management": "Quản lý cổng thông tin",
     "Privacy": "Privacy",
     "Release Notes": "Ghi chú Phát hành",
     "Release notes": "Ghi chú Phát hành",
@@ -114,29 +112,94 @@
     "You can only merge Systems in which you have owner permissions.": "Bạn chỉ có thể hợp nhất các Hệ thống mà bạn có quyền của chủ sở hữu.",
     "Your Name": "Your Name",
     "Your browser is not supported": "Trình duyệt của bạn không được hỗ trợ",
+    "and_x_more": "... and {{value}} more",
     "before proceeding.": "before proceeding.",
-    "campage": {
-        "isH265": "H.265",
-        "vendor": "Manufacturer",
-        "isAptzSupported": "Advanced PTZ",
-        "isFisheye": "Fisheye",
-        "isTwAudioSupported": "2-way Audio",
-        "camera": "Camera",
-        "hardwareType": "Type",
-        "primaryCodecamera": "Codec",
-        "isAptzSupportedShort": "Adv. PTZ",
-        "other": "Other",
-        "isIoSupported": "I/O",
-        "multiSensorCamera": "Multi-Sensor Camera",
-        "isMdSupported": "Motion",
-        "isAudioSupported": "Audio",
-        "maxResolution": "Max Resolution",
-        "model": "Model",
-        "encoder": "Encoder",
-        "isMultiSensor": "Multi Sensor",
-        "maxFps": "Max FPS",
-        "isPtzSupported": "PTZ",
-        "dvr": "DVR"
+    "cameraFilters": {
+        "TwWayAudio": "2-way audio devices",
+        "H265": "H.265 Cameras",
+        "encoder": "Encoders",
+        "multiSensor": "Multi-sensor cameras",
+        "ptz": "PTZ cameras",
+        "IO": "I / O modules",
+        "highRes": "Extra high resolution cameras",
+        "aptz": "Cameras with advanced PTZ",
+        "audio": "Cameras with audio",
+        "fisheye": "Fisheye cameras"
+    },
+    "devices": "thiết bị",
+    "disclaimer": "This list is limited to actual devices auto-reporting data to {{value}}, as approved by anonymous system users. The complete list of supported manufacturers and models is greater in scope.",
+    "downloads": {
+        "mobile": {
+            "android": {
+                "link": "%ANDROID_APPLICATION_LINK%"
+            },
+            "ios": {
+                "link": "%IOS_APPLICATION_LINK%"
+            }
+        },
+        "platforms": {
+            "win86": "x86",
+            "bananapi": "Banana Pi",
+            "bpi": "Nx1",
+            "win64": "x64",
+            "mac": "X",
+            "linux64": "x64",
+            "rpi": " Raspberry Pi",
+            "linux86": "x86"
+        },
+        "releasesTypes": {
+            "patches": "Bản vá lỗi",
+            "releases": "Phát hành",
+            "patch": "Patch",
+            "beta": "Beta",
+            "betas": "Betas",
+            "rc": "Release Candidate",
+            "release": "Release"
+        },
+        "groups": {
+            "macos": {
+                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra",
+                "label": "Mac OS"
+            },
+            "windows": {
+                "supported": "7, 8, 8.1, 10, Server 2008, Server 2012",
+                "label": "Windows"
+            },
+            "ios": {
+                "shortLabel": "iOS",
+                "label": "iOS"
+            },
+            "mac": {
+                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra",
+                "label": "Mac OS"
+            },
+            "linux": {
+                "shortLabel": "Ubuntu",
+                "supported": "Ubuntu 14.04 LTS, 16.04 LTS",
+                "label": "Ubuntu Linux"
+            },
+            "android": {
+                "shortLabel": "Android",
+                "label": "Android"
+            },
+            "arm": {
+                "shortLabel": "ARM",
+                "supported": "Debian/Ubuntu based",
+                "label": "ARM"
+            },
+            "sdk": {
+                "shortLabel": "SDK",
+                "supported": "C++ cross platform SDK",
+                "label": "SDK"
+            }
+        },
+        "appTypes": {
+            "package": "Package",
+            "client": "Chỉ máy trạm",
+            "servertool": "Công cụ cấu hình",
+            "bundle": "Máy chủ và Máy trạm",
+            "server": "Chỉ máy chủ"
+        }
     },
     "integration": {
         "backToEditText": "Back to the editing interfaces",
@@ -148,8 +211,62 @@
         "Drone": "Drone",
         "Data Analytics": "Data Analytics"
     },
+    "ipvd": {
+        "Cameras supporting H.265": "Cameras supporting H.265",
+        "feedback": {
+            "c_Info": "for additional questions/concerns regarding supported devices.",
+            "b_Link": "submit a request",
+            "a_Please": "Please"
+        },
+        "isAptzSupported": "Advanced PTZ",
+        "hardwareType": "Type",
+        "isAptzSupportedShort": "Adv. PTZ",
+        "isIoSupported": "I/O",
+        "isMdSupported": "Motion",
+        "Multisensor Cameras": "Multisensor Cameras",
+        "Advanced PTZ cameras": "Advanced PTZ cameras",
+        "primaryCodec": "Codec",
+        "PTZ cameras": "PTZ cameras",
+        "camera": "Camera",
+        "multiSensorCamera": "Multi-Sensor Camera",
+        "Extra high resolution cameras": "Extra high resolution cameras",
+        "vendor": "Manufacturer",
+        "isFisheye": "Fisheye",
+        "isTwAudioSupported": "2-way Audio",
+        "Cameras with 2-way audio": "Cameras with 2-way audio",
+        "isMultiSensor": "Multi Sensor",
+        "encoder": "Encoder",
+        "maxResolution": "Max Resolution",
+        "maxFps": "Max FPS",
+        "I / O modules": "I / O modules",
+        "count": "Count",
+        "isH265": "H.265",
+        "Fisheye Cameras": "Fisheye Cameras",
+        "isAudioSupported": "Audio",
+        "model": "Model",
+        "other": "Other",
+        "isPtzSupported": "PTZ",
+        "dvr": "DVR"
+    },
     "is incompatible and cannot be merged with the current one.": "is incompatible and cannot be merged with the current one.",
     "is offline and cannot be merged with the current one.": "is offline and cannot be merged with the current one.",
     "latest build": "latest build",
+    "manufacturers": "manufacturers",
+    "messageDialogPlaceholders": {
+        "feedback": "Make sure you include your camera model and manufacturer..."
+    },
+    "search": {
+        "Search": "Tìm kiếm",
+        "filter applied": "filter applied",
+        "vendor": "Manufacturer",
+        "selected": "selected",
+        "hardwareType": "Type",
+        "search_ipvd": "Search by model or manufacturer",
+        "vendors": "manufacturers",
+        "filters applied": "filters applied",
+        "Any": "Any",
+        "hardwareTypes": "types",
+        "minResolution": "Minimum Resolution"
+    },
     "servers in the merged System.": "servers in the merged System."
 }

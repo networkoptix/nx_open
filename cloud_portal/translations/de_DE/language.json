@@ -11,14 +11,17 @@
     "logoutAuthorisedTitle": "Sie sind bereits eingeloggt",
     "logoutAuthorisedContinueButton": "Fortfahren",
     "logoutAuthorisedLogoutButton": "Abmelden",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "Nachricht konnte nicht gesendet werden.",
+    "messageSent": "Die Nachricht wurde gesendet.",
+    "noClientDetectedTitle": "Installieren Sie %VMS_NAME%, um Ihr System anzusehen",
+    "download": "%VMS_NAME% herunterladen"
   },
   "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+    "ipvd_feedback_page": "Rückmeldung der Kameraseite",
+    "ipvd_feedback_device": "Feedback zu {{product}}",
+    "sales_inquiry": "Anfrage für {{product}}",
+    "request_support": "Support für {{product}} anfordern",
+    "unknown": "Unbekannter Nachrichtentyp"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -46,7 +49,7 @@
   },
   "systemStatuses": {
     "activated": "aktiviert",
-    "merging": "merging",
+    "merging": "zusammenführen",
     "notActivated": "nicht aktiviert",
     "online": "online",
     "offline": "offline",
@@ -149,7 +152,7 @@
     "oldSafariNotSupported": "Versionen von Safari älter als 10 werden nicht unterstützt",
     "DUPLICATE_MEDIASERVER_FOUND": "Doppelte Server wurden auf einem der Systeme gefunden.<br>Entfernen Sie alte Server von jedem System, das Sie zusammenführen möchten, und versuchen Sie es erneut.",
     "mergedSystemIsOffline": "Eines der zusammenzuführenden Systeme ist offline. Stellen Sie sicher, dass sie online sind und versuchen Sie es erneut.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "INCOMPATIBLE": "Versionen für Systeme sind inkompatibel. Um dieses Problem zu beheben, stellen Sie sicher, dass die Systeme die gleiche Version haben."
   },
   "passwordRequirements": {
     "good": "gut",
@@ -197,7 +200,7 @@
     "successDeleted": "Das System {{systemName}} wurde erfolgreich von Ihrem Account gelöscht",
     "successMerge": "Systemzusammenführung abgeschlossen",
     "permissionsRemoved": "Berechtigungen wurden von {{email}} entfernt",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Unbekannter Name für das System (verursacht durch Cloud-Merge)"
   },
   "account": {
     "accountSavedSuccess": "Ihr Account wurde erfolgreich gespeichert",
@@ -206,72 +209,6 @@
     "changePassword": "Passwort ändern",
     "newPasswordLabel": "Neues Passwort",
     "saveChanges": "Speichern"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Installieren Sie %VMS_NAME%, um Ihr System anzusehen",
-    "action": "%VMS_NAME% herunterladen",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Nur Client",
-      "server": "Nur Server",
-      "bundle": "Client und Server",
-      "servertool": "Konfigurationstool"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Beta-Versionen",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Aktivierungslink erneut zusenden",

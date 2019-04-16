@@ -1,0 +1,12 @@
+Hola,
+
+Has sido invitado a %PRODUCT_NAME%.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+Por favor crea una cuenta en %PRODUCT_NAME%
+utilizando su dirección de correo electrónico actual y siga las instrucciones adicionales.
+
+Registre su cuenta usando este enlace: {{ config.portal_url }}/ registrar /{{ message.code }}

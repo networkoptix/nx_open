@@ -1,0 +1,12 @@
+Hallo,
+
+U bent uitgenodigd voor %PRODUCT_NAME%.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+Maak een account aan op %PRODUCT_NAME%
+gebruik je huidige e-mailadres en volg verdere instructies.
+
+Registreer uw account via deze link: {{ config.portal_url }}/ register /{{ message.code }}

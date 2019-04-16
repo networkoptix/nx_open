@@ -5,8 +5,8 @@
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">เปลี่ยนชื่อระบบ</button>
         </p>
-        <p>
-            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">ผสานกับระบบอื่น</button>
+        <p ng-if="canMerge || debugMode || betaMode">
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="mergeSystems()">ผสานกับระบบอื่น</button>
         </p>
         <hr />
         <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">ตัดการเชื่อมต่อจาก <span class="product-name"> {{PRODUCT_NAME}} </span></button>

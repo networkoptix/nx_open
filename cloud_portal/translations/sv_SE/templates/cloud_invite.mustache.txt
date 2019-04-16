@@ -1,0 +1,12 @@
+Hej,
+
+Du har blivit inbjuden till %PRODUCT_NAME%.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+Vänligen skapa konto på %PRODUCT_NAME%
+använd din nuvarande e-postadress och följ ytterligare instruktioner.
+
+Registrera ditt konto med den här länken: {{ config.portal_url }}/ register /{{ message.code }}

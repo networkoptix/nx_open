@@ -13,7 +13,7 @@
                         <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="host:Puerto" required />
 
                         <ul uib-dropdown class="dropdown-menu" role="menu" id="discoveredUrls">
-                            <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>Sistemas no encontrados</a></li>
+                            <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>No se encontraron Sistemas</a></li>
                             <li ng-repeat="system in systems.discoveredUrls"
                                 ng-class="{disabled:!system.compatible}">
                                 <a ng-click="system.compatible && selectSystem(system);">{{system.visibleName}}</a>
@@ -48,23 +48,23 @@
         </ng-form>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <label for="currentSystemPassword" class="control-label">Current Password (for this System)</label>
+            <label for="currentSystemPassword" class="control-label"> Contraseña actual (para este Sistema) </label>
             <div class="">
                 <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Contraseña" required />
             </div>
         </div>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <p>The current System is about to be merged <b>{{systems.systemName}}</b> with System <b>{{systems.joinSystemName}}</b></p>
+            <p>El Sistema actual está a punto de fusionarse <b>{{systems.systemName}}</b> con el Sistema <b>{{systems.joinSystemName}}</b></p>
             <p>
-                The new System will have password and name from the following System:<br/>
-                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>
-                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
+                El nuevo Sistema tendrá la contraseña y el nombre del siguiente Sistema: <0 />
+                <label> <2 /> {{systems.systemName}} (actual) </label> <0 />
+                <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>
     <div class="modal-footer" >
-        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid">Find System</button>
-        <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid">Merge with {{systems.joinSystemName}}</button>
+        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid"> Buscar Sistema </button>
+        <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid"> fusionar con {{systems.joinSystemName}}</button>
     </div>
 </form>

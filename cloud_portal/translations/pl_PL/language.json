@@ -11,14 +11,17 @@
     "logoutAuthorisedTitle": "Jesteś już zalogowany",
     "logoutAuthorisedContinueButton": "Kontynuuj",
     "logoutAuthorisedLogoutButton": "Wyloguj",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "Wysyłanie wiadomości nie powiodło się.",
+    "messageSent": "Wiadomość została wysłana.",
+    "noClientDetectedTitle": "Zainstaluj %VMS_NAME%, aby przejrzeć swój system",
+    "download": "Pobierz %VMS_NAME%"
   },
   "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+    "ipvd_feedback_page": "Komentarze dotyczące obsługi kamer",
+    "ipvd_feedback_device": "Opinia o {{product}}",
+    "sales_inquiry": "Zapytanie o {{product}}",
+    "request_support": "Prośba o wsparcie dla {{product}}",
+    "unknown": "Nieznany typ wiadomości"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -46,7 +49,7 @@
   },
   "systemStatuses": {
     "activated": "aktywny",
-    "merging": "merging",
+    "merging": "łączenie",
     "notActivated": "nieaktywny",
     "online": "online",
     "offline": "offline",
@@ -149,7 +152,7 @@
     "oldSafariNotSupported": "Wersje Safari starsze niż 10 nie są obsługiwane",
     "DUPLICATE_MEDIASERVER_FOUND": "W jednym z systemów znaleziono duplikaty serwerów.<br>Usuń stare serwery z każdego systemu, z którym próbujesz się połączyć i spróbuj ponownie.",
     "mergedSystemIsOffline": "Jeden z systemów jest niedostępny w trakcie próby złączenia. Upewnij się, że wszystkie są dostępne i spróbuj ponownie.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "INCOMPATIBLE": "Wersje systemów są niekompatybilne. Aby rozwiązać ten problem, upewnij się, że systemy mają tę samą wersję."
   },
   "passwordRequirements": {
     "good": "dobre",
@@ -197,7 +200,7 @@
     "successDeleted": "System {{systemName}} został pomyślnie usunięty z Twojego konta",
     "successMerge": "Zakończono łączenie systemu",
     "permissionsRemoved": "Uprawnienia zostały usunięte z {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Nieznana nazwa systemu (złączenie w chmurze)"
   },
   "account": {
     "accountSavedSuccess": "Twoje konto zostało pomyślnie zapisane",
@@ -206,72 +209,6 @@
     "changePassword": "Zmień hasło",
     "newPasswordLabel": "Nowe hasło",
     "saveChanges": "Zachowaj"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Zainstaluj %VMS_NAME%, aby przejrzeć swój system",
-    "action": "Pobierz %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Tylko klient",
-      "server": "Tylko serwer",
-      "bundle": "Klient i serwer",
-      "servertool": "Narzędzie konfiguracji"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Bety",
-      "rc": "Release Candidate",
-      "release": "Wydanie",
-      "releases": "Wydania",
-      "patch": "Poprawka",
-      "patches": "Poprawki"
-    }
   },
   "activeActions": {
     "sendConfirm": "Wyślij ponownie link aktywacyjny",

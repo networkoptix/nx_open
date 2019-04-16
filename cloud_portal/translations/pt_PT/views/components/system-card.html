@@ -5,8 +5,8 @@
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Alterar o nome do Sistema</button>
         </p>
-        <p>
-            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Fazer o "Merge" com outro Sistema</button>
+        <p ng-if="canMerge || debugMode || betaMode">
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="mergeSystems()">Fazer o "Merge" com outro Sistema</button>
         </p>
         <hr />
         <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Desconectar de 
@@ -25,7 +25,7 @@
         </p>
 
         <p ng-if="system.permissions.isAdmin">
-            <button class="btn btn-default" ng-click="rename()" ng-disabled="currentlyMerging && !isMaster">Renomear sistema</button>
+            <button class="btn btn-default" ng-click="rename()" ng-disabled="currentlyMerging && !isMaster">Alterar o nome do Sistema</button>
         </p>
         <button class="btn btn-default" ng-click="delete()" ng-disabled="currentlyMerging">Desligar da minha conta</button>
     </div>

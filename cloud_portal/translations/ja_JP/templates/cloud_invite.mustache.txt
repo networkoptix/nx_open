@@ -1,0 +1,12 @@
+こんにちは
+
+%PRODUCT_NAME% に登録されました.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+%PRODUCT_NAME%アカウントを作成してください
+メールアドレスを使用して指示に従ってください
+
+登録してシステムを表示: {{ config.portal_url }}/登録/{{ message.code }}

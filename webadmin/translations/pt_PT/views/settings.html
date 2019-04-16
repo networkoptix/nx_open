@@ -9,8 +9,7 @@
                 Desligue o dispositivo e instale um disco rígido.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                Este dispositivo precisa de conexão de rede para funcionar. <br>
-                Conecte-o à rede local ou à Internet
+                Este dispositivo precisa de ligação de rede para funcionar.<br>Por favor, conecte-o à rede local ou Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Este dispositivo tem configuração de rede incorrecta. <br>

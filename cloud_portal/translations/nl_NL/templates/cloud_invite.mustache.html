@@ -1,0 +1,12 @@
+<h1>Hallo, </h1>
+
+<p>U bent uitgenodigd voor %PRODUCT_NAME%</p>
+
+{{#message.message}}
+<p>{{ message.message }}</p>
+{{/message.message}}
+
+<p>Om het systeem te kunnen bekijken en/of te beheren, maakt u een account aan op <a href="{{ config.portal_url }}">%PRODUCT_NAME%</a> met uw huidige e-mailadres en volgt u de verdere instructies.
+</p>
+
+<a class="btn" href="{{ config.portal_url }}/register/{{ message.code }}">Account registreren</a>

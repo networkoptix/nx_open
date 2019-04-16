@@ -4,7 +4,7 @@
     "Account Settings": "계정 설정",
     "Account not activated": "계정이 활성화되지 않았습니다",
     "Account not found": "계정을 찾을 수 없습니다",
-    "Additional information": "Additional information",
+    "Administration": "Administration",
     "Advanced PTZ": "Advanced PTZ",
     "Advanced search": "Advanced search",
     "All Systems": "모든 시스템",
@@ -20,7 +20,6 @@
     "Cancel": "취소",
     "Change Password": "패스워드 변경",
     "Choose which properties should be visible to customers:": "고객이 볼 수 있는 속성 선택:",
-    "Clear All": "Clear All",
     "Close": "닫기",
     "Codec": "Codec",
     "Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.": "시스템에 연결하여 당신이 원하는 %PRODUCT_NAME% 클라우드나 로컬시시스템을 %VMS_NAME%클라이언트로 병합하세요.",
@@ -73,7 +72,6 @@
     "Password:": "비밀번호:",
     "Permissions": "권한",
     "Popularity": "Popularity",
-    "Portal management": "포털 관리",
     "Privacy": "Privacy",
     "Release Notes": "업데이트 내용",
     "Release notes": "업데이트 내용",
@@ -114,29 +112,94 @@
     "You can only merge Systems in which you have owner permissions.": "소유자 권한이 있는 시스템 만 병합 할 수 있습니다.",
     "Your Name": "Your Name",
     "Your browser is not supported": "브라우저가 지원되지 않습니다.",
+    "and_x_more": "... and {{value}} more",
     "before proceeding.": "before proceeding.",
-    "campage": {
-        "isH265": "H.265",
-        "vendor": "Manufacturer",
-        "isAptzSupported": "Advanced PTZ",
-        "isFisheye": "Fisheye",
-        "isTwAudioSupported": "2-way Audio",
-        "camera": "Camera",
-        "hardwareType": "Type",
-        "primaryCodecamera": "Codec",
-        "isAptzSupportedShort": "Adv. PTZ",
-        "other": "Other",
-        "isIoSupported": "I/O",
-        "multiSensorCamera": "Multi-Sensor Camera",
-        "isMdSupported": "Motion",
-        "isAudioSupported": "Audio",
-        "maxResolution": "Max Resolution",
-        "model": "Model",
-        "encoder": "Encoder",
-        "isMultiSensor": "Multi Sensor",
-        "maxFps": "Max FPS",
-        "isPtzSupported": "PTZ",
-        "dvr": "DVR"
+    "cameraFilters": {
+        "TwWayAudio": "2-way audio devices",
+        "H265": "H.265 Cameras",
+        "encoder": "Encoders",
+        "multiSensor": "Multi-sensor cameras",
+        "ptz": "PTZ cameras",
+        "IO": "I / O modules",
+        "highRes": "Extra high resolution cameras",
+        "aptz": "Cameras with advanced PTZ",
+        "audio": "Cameras with audio",
+        "fisheye": "Fisheye cameras"
+    },
+    "devices": "장치",
+    "disclaimer": "This list is limited to actual devices auto-reporting data to {{value}}, as approved by anonymous system users. The complete list of supported manufacturers and models is greater in scope.",
+    "downloads": {
+        "mobile": {
+            "android": {
+                "link": "%ANDROID_APPLICATION_LINK%"
+            },
+            "ios": {
+                "link": "%IOS_APPLICATION_LINK%"
+            }
+        },
+        "platforms": {
+            "win86": "x86",
+            "bananapi": "Banana Pi",
+            "bpi": "Nx1",
+            "win64": "x64",
+            "mac": "X",
+            "linux64": "x64",
+            "rpi": " Raspberry Pi",
+            "linux86": "x86"
+        },
+        "releasesTypes": {
+            "patches": "패치들",
+            "releases": "릴리스",
+            "patch": "패치",
+            "beta": "베타",
+            "betas": "베타들",
+            "rc": "릴리스 후보",
+            "release": "릴리스"
+        },
+        "groups": {
+            "macos": {
+                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra",
+                "label": "Mac OS"
+            },
+            "windows": {
+                "supported": "7, 8, 8.1, 10, Server 2008, Server 2012",
+                "label": "윈도우즈"
+            },
+            "ios": {
+                "shortLabel": "iOS",
+                "label": "iOS"
+            },
+            "mac": {
+                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra",
+                "label": "Mac OS"
+            },
+            "linux": {
+                "shortLabel": "Ubuntu",
+                "supported": "Ubuntu 14.04 LTS, 16.04 LTS",
+                "label": "Ubuntu Linux"
+            },
+            "android": {
+                "shortLabel": "안드로이드",
+                "label": "안드로이드"
+            },
+            "arm": {
+                "shortLabel": "ARM",
+                "supported": "Debian/Ubuntu based",
+                "label": "ARM"
+            },
+            "sdk": {
+                "shortLabel": "SDK",
+                "supported": "C++ cross platform SDK",
+                "label": "SDK"
+            }
+        },
+        "appTypes": {
+            "package": "Package",
+            "client": "클라이언트만",
+            "servertool": "구성 도구",
+            "bundle": "클라이언트와 서버",
+            "server": "서버 만"
+        }
     },
     "integration": {
         "backToEditText": "Back to the editing interfaces",
@@ -148,8 +211,62 @@
         "Drone": "Drone",
         "Data Analytics": "Data Analytics"
     },
+    "ipvd": {
+        "Cameras supporting H.265": "Cameras supporting H.265",
+        "feedback": {
+            "c_Info": "for additional questions/concerns regarding supported devices.",
+            "b_Link": "submit a request",
+            "a_Please": "Please"
+        },
+        "isAptzSupported": "Advanced PTZ",
+        "hardwareType": "Type",
+        "isAptzSupportedShort": "Adv. PTZ",
+        "isIoSupported": "I/O",
+        "isMdSupported": "Motion",
+        "Multisensor Cameras": "Multisensor Cameras",
+        "Advanced PTZ cameras": "Advanced PTZ cameras",
+        "primaryCodec": "Codec",
+        "PTZ cameras": "PTZ cameras",
+        "camera": "Camera",
+        "multiSensorCamera": "Multi-Sensor Camera",
+        "Extra high resolution cameras": "Extra high resolution cameras",
+        "vendor": "Manufacturer",
+        "isFisheye": "Fisheye",
+        "isTwAudioSupported": "2-way Audio",
+        "Cameras with 2-way audio": "Cameras with 2-way audio",
+        "isMultiSensor": "Multi Sensor",
+        "encoder": "Encoder",
+        "maxResolution": "Max Resolution",
+        "maxFps": "Max FPS",
+        "I / O modules": "I / O modules",
+        "count": "Count",
+        "isH265": "H.265",
+        "Fisheye Cameras": "Fisheye Cameras",
+        "isAudioSupported": "Audio",
+        "model": "Model",
+        "other": "Other",
+        "isPtzSupported": "PTZ",
+        "dvr": "DVR"
+    },
     "is incompatible and cannot be merged with the current one.": "is incompatible and cannot be merged with the current one.",
     "is offline and cannot be merged with the current one.": "is offline and cannot be merged with the current one.",
     "latest build": "latest build",
+    "manufacturers": "manufacturers",
+    "messageDialogPlaceholders": {
+        "feedback": "Make sure you include your camera model and manufacturer..."
+    },
+    "search": {
+        "Search": "검색",
+        "filter applied": "filter applied",
+        "vendor": "Manufacturer",
+        "selected": "selected",
+        "hardwareType": "Type",
+        "search_ipvd": "Search by model or manufacturer",
+        "vendors": "manufacturers",
+        "filters applied": "filters applied",
+        "Any": "Any",
+        "hardwareTypes": "types",
+        "minResolution": "Minimum Resolution"
+    },
     "servers in the merged System.": "servers in the merged System."
 }

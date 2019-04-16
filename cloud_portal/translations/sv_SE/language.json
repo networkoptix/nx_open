@@ -11,14 +11,17 @@
     "logoutAuthorisedTitle": "Du är redan inloggad",
     "logoutAuthorisedContinueButton": "Fortsätt",
     "logoutAuthorisedLogoutButton": "Logga ut",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "Meddelandet gick inte att skicka.",
+    "messageSent": "Meddelandet har skickats.",
+    "noClientDetectedTitle": "Installera %VMS_NAME% om du vill visa ditt System",
+    "download": "Ladda ner %VMS_NAME%"
   },
   "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+    "ipvd_feedback_page": "Kamerasida återkoppling",
+    "ipvd_feedback_device": "Feedback om {{product}}",
+    "sales_inquiry": "Förfrågan för {{product}}",
+    "request_support": "Begär support för {{product}}",
+    "unknown": "Okänd meddelandetyp"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -46,7 +49,7 @@
   },
   "systemStatuses": {
     "activated": "aktiverad",
-    "merging": "merging",
+    "merging": "sammanslagning",
     "notActivated": "inte aktiverad",
     "online": "uppkopplad",
     "offline": "frånkopplade",
@@ -147,21 +150,21 @@
     "lostConnection": "Anslutning till {{systemName}} förlorad",
     "thisSystem": "systemet",
     "oldSafariNotSupported": "Versioner av Safari äldre än 10 stöds inte",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicerade servrar hittades på ett av systemen.<br>Ta bort gamla servrar från varje system som du försöker slå samman och försök igen.",
+    "mergedSystemIsOffline": "Ett av de system som slås samman är offline. Se till att de är online och försök igen.",
+    "INCOMPATIBLE": "Versioner för system är inkompatibla. För att åtgärda detta problem, se till att systemen har samma version."
   },
   "passwordRequirements": {
-    "good": "good",
-    "fair": "fair",
-    "minLength": "too short",
+    "good": "bra",
+    "fair": "skapligt",
+    "minLength": "för kort",
     "minLengthMessage": "Lösenordet måste innehålla minst 8 tecken",
-    "required": "incorrect",
+    "required": "felaktig",
     "requiredMessage": "Använd endast latinska bokstäver, siffror och tangentbordssymboler, undvik ledande och efterföljande mellanslag",
-    "weak": "weak",
+    "weak": "svagt",
     "weakMessage": "Använd siffror, stora bokstäver och specialtecken för att göra ditt lösenord starkare",
     "strongMessage": "Starkt lösenord!",
-    "common": "too common",
+    "common": "för vanligt",
     "commonMessage": "Detta lösenord är i topp populäraste lösenord i världen",
     "missingMessage": "Lösenord krävs"
   },
@@ -195,9 +198,9 @@
     "confirmUnshareAction": "Radera",
     "successDisconnected": "Systemet har kopplats bort från %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} har tagits bort från ditt konto",
-    "successMerge": "System merge completed",
+    "successMerge": "Systemsammanslagning slutförd",
     "permissionsRemoved": "Rättigheterna togs bort från {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Okänt namn för system (orsakad av molnsammanslagning)"
   },
   "account": {
     "accountSavedSuccess": "Ditt konto har sparats",
@@ -206,72 +209,6 @@
     "changePassword": "Ändra lösenord",
     "newPasswordLabel": "Nytt lösenord",
     "saveChanges": "Spara"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Installera %VMS_NAME% om du vill visa ditt System",
-    "action": "Ladda ner %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Endast klient",
-      "server": "Endast server",
-      "bundle": "Klient och Server",
-      "servertool": "Konfigurationsverktyg"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Skicka aktiveringslänk igen",

@@ -1,7 +1,7 @@
 %PRODUCT_NAME%'e hoş geldiniz
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) is inviting you to join %PRODUCT_NAME% and shared the system {{message.system_name}} with you.
+{{message.sharer_name}} ({{message.sharer_email}}) sizi %PRODUCT_NAME% e katılmak için ve {{message.system_name}} için davet etti.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}

@@ -1,0 +1,157 @@
+{
+	"search": {
+		"Search": "Sök",
+		"search_ipvd": "Sök efter modell eller tillverkare",
+		"filter applied": "filter används",
+		"filters applied": "filter används",
+		"Any": "Någon",
+		"selected": "vald",
+		"vendor": "Tillverkare",
+		"vendors": "tillverkare",
+		"hardwareType": "Typ",
+		"hardwareTypes": "typer",
+		"minResolution": "Minsta upplösning"
+	},
+	"cameraFilters": {
+		"ptz": "PTZ-kameror",
+		"aptz": "Kameror med avancerad PTZ",
+		"fisheye": "Fisheye-kameror",
+		"H265": "H.265 kameror",
+		"IO": "I/O-moduler",
+		"multiSensor": "Multi-sensorkameror",
+		"TwWayAudio": "2-vägs ljudenheter",
+		"audio": "Kameror med ljud",
+		"encoder": "Encoders",
+		"highRes": "Extra högupplösta kameror"
+	},
+	"downloads": {
+		"mobile": {
+			"ios": {
+				"link": "%IOS_APPLICATION_LINK%"
+			},
+			"android": {
+				"link": "%ANDROID_APPLICATION_LINK%"
+			}
+		},
+		"groups": {
+			"windows": {
+				"label": "Windows",
+				"supported": "7, 8, 8,1, 10, Server 2008, Server 2012"
+			},
+			"mac": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10,12 Sierra, OSX 10,13 High Sierra"
+			},
+			"linux": {
+				"label": "Ubuntu Linux",
+				"shortLabel": "Ubuntu",
+				"supported": "Ubuntu 14,04 LTS, 16,04 LTS"
+			},
+			"macos": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10,12 Sierra, OSX 10,13 High Sierra"
+			},
+			"ios": {
+				"label": "iOS",
+				"shortLabel": "iOS"
+			},
+			"android": {
+				"label": "Android",
+				"shortLabel": "Android"
+			},
+			"arm": {
+				"label": "ARM",
+				"shortLabel": "ARM",
+				"supported": "Debian/Ubuntu baserad"
+			},
+			"sdk": {
+				"label": "SDK",
+				"shortLabel": "SDK",
+				"supported": "C++ plattformsoberoende SDK"
+			}
+		},
+		"platforms": {
+			"win64": "x64",
+			"win86": "x86",
+			"linux64": "x64",
+			"linux86": "x86",
+			"mac": "X",
+			"bananapi": "Banana Pi",
+			"bpi": "Nx1",
+			"rpi": " Raspberry Pi"
+		},
+		"appTypes": {
+			"client": "Endast klient",
+			"server": "Endast server",
+			"bundle": "Klient och Server",
+			"servertool": "Konfigurationsverktyg",
+			"package": "Paket"
+		},
+		"releasesTypes": {
+			"beta": "Beta",
+			"betas": "Betor",
+			"rc": "Releasekandidat",
+			"release": "Release",
+			"releases": "Releaser",
+			"patch": "Patch",
+			"patches": "Patchar"
+		}
+	},
+	"ipvd": {
+		"count": "Räkna",
+		"vendor": "Tillverkare",
+		"model": "Modell",
+		"hardwareType": "Typ",
+		"maxResolution": "Max upplösning",
+		"maxFps": "Max FPS",
+		"primaryCodec": "Kodek",
+		"isAudioSupported": "Ljud",
+		"isTwAudioSupported": "2-vägs ljud",
+		"isPtzSupported": "PTZ",
+		"isAptzSupported": "Avancerad PTZ",
+		"isAptzSupportedShort": "Adv. PTZ",
+		"isFisheye": "Fisköga",
+		"isMdSupported": "Rörelse",
+		"isIoSupported": "I/O",
+		"isH265": "H.265",
+		"isMultiSensor": "Multisensor",
+		"camera": "Kamera",
+		"multiSensorCamera": "Multi-Sensor Kamera",
+		"encoder": "Encoder",
+		"dvr": "DVR",
+		"other": "Annat",
+		"PTZ cameras": "PTZ-kameror",
+		"Advanced PTZ cameras": "Avancerade PTZ-kameror",
+		"Fisheye Cameras": "Fisheye-kameror",
+		"Cameras supporting H.265": "Kameror som stöder H.265",
+		"I / O modules": "I/O-moduler",
+		"Multisensor Cameras": "Multisensorkameror",
+		"Cameras with 2-way audio": "Kameror med 2-vägs ljud",
+		"Extra high resolution cameras": "Extra högupplösta kameror",
+		"feedback": {
+			"a_Please": "Snälla",
+			"b_Link": "skicka förfrågan",
+			"c_Info": "för ytterligare frågor / problem angående stödda enheter."
+		}
+	},
+	"integration": {
+		"previewRibbonText": "Den här sidan är en förhandsvisning av de senaste ändringarna, och den matchar inte den offentligt tillgängliga versionen.",
+		"backToEditText": "Tillbaka till redigeringsgränssnittet",
+		"Access Control": "Åtkomstkontroll",
+		"Connector": "Anslutare",
+		"Data Analytics": "Dataanalys",
+		"Drone": "Drönare",
+		"Health Monitor": "Hälsoövervakning",
+		"Storage": "Lagring"
+	},
+	"messageDialogPlaceholders": {
+		"feedback": "Se till att du inkluderar din kameramodell och tillverkare..."
+	},
+	"About %PRODUCT_NAME%": "Om %PRODUCT_NAME%",
+	"Download %VMS_NAME%": "Ladda ner %VMS_NAME%",
+	"Integrations": "Integrationer",
+	"Support": "Support",
+	"Terms": "Villkor",
+	"Privacy": "Sekretess",
+	"Supported Devices": "Enheter som stöds"
+}

@@ -12,10 +12,13 @@
     "logoutAuthorisedContinueButton": "Continuer",
     "logoutAuthorisedLogoutButton": "Déconnecter",
     "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageSent": "Message has been sent.",
+    "noClientDetectedTitle": "Installer %VMS_NAME% pour visionner votre Système",
+    "download": "Télécharger %VMS_NAME%"
   },
   "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
+    "ipvd_feedback_page": "Cameras page feedback",
+    "ipvd_feedback_device": "Feedback about {{product}}",
     "sales_inquiry": "Inquiry for {{product}}",
     "request_support": "Request Support for {{product}}",
     "unknown": "Unknown Message Type"
@@ -206,72 +209,6 @@
     "changePassword": "Changer mot de passe",
     "newPasswordLabel": "Nouveau mot de passe",
     "saveChanges": "Enregistrer"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Installer %VMS_NAME% pour visionner votre Système",
-    "action": "Télécharger %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Client seulement",
-      "server": "Server seulement",
-      "bundle": "Client et serveur",
-      "servertool": "Outil de configuration"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Renvoyer lien d'activation",

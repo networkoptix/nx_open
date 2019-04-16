@@ -1,0 +1,12 @@
+<h1>Привіт, </h1>
+
+<p>Вас запросили до %PRODUCT_NAME%</p>
+
+{{#message.message}}
+<p>{{ message.message }}</p>
+{{/message.message}}
+
+<p>Будь ласка створіть обліковий запис на <a href="{{ config.portal_url }}">%PRODUCT_NAME%</a> використовуючи вашу електронну пошту та дотримуйтесь подальших інструкцій.
+</p>
+
+<a class="btn" href="{{ config.portal_url }}/register/{{ message.code }}">Зареєструвати обліковий запис</a>

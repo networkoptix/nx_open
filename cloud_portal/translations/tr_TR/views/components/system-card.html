@@ -5,8 +5,8 @@
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Sistemi yeniden adlandır</button>
         </p>
-        <p>
-            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Başka bir sistemle birleştir</button>
+        <p ng-if="canMerge || debugMode || betaMode">
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="mergeSystems()">Başka bir sistemle birleştir</button>
         </p>
         <hr />
         <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Çıkış yap

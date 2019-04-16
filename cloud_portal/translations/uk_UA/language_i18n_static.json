@@ -1,0 +1,157 @@
+{
+	"search": {
+		"Search": "Пошук",
+		"search_ipvd": "Пошук за моделлю або виробником",
+		"filter applied": "застосований фільтр",
+		"filters applied": "застосовані фільтри",
+		"Any": "Будь-які",
+		"selected": "вибрано",
+		"vendor": "Виробник",
+		"vendors": "виробники",
+		"hardwareType": "Тип",
+		"hardwareTypes": "типи",
+		"minResolution": "Мінімальна роздільна здатність"
+	},
+	"cameraFilters": {
+		"ptz": "PTZ камери",
+		"aptz": "Камери з передовою PTZ",
+		"fisheye": "Фіш-ай камери",
+		"H265": "Камери H.265",
+		"IO": "Модулі вводу-виводу",
+		"multiSensor": "Багатоканальні камери",
+		"TwWayAudio": "2-канальні аудіопристрої",
+		"audio": "Аудіо камери",
+		"encoder": "Енкодери",
+		"highRes": "Камери з високою роздільною здатністю"
+	},
+	"downloads": {
+		"mobile": {
+			"ios": {
+				"link": "%IOS_APPLICATION_LINK%"
+			},
+			"android": {
+				"link": "%ANDROID_APPLICATION_LINK%"
+			}
+		},
+		"groups": {
+			"windows": {
+				"label": "Windows",
+				"supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+			},
+			"mac": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"linux": {
+				"label": "Ubuntu Linux",
+				"shortLabel": "Ubuntu",
+				"supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+			},
+			"macos": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"ios": {
+				"label": "iOS",
+				"shortLabel": "iOS"
+			},
+			"android": {
+				"label": "Android",
+				"shortLabel": "Android"
+			},
+			"arm": {
+				"label": "ARM",
+				"shortLabel": "ARM",
+				"supported": "Debian/Ubuntu based"
+			},
+			"sdk": {
+				"label": "SDK",
+				"shortLabel": "SDK",
+				"supported": "C ++ крос-платформенний SDK"
+			}
+		},
+		"platforms": {
+			"win64": "x64",
+			"win86": "x86",
+			"linux64": "x64",
+			"linux86": "x86",
+			"mac": "X",
+			"bananapi": "Banana Pi",
+			"bpi": "Nx1",
+			"rpi": " Raspberry Pi"
+		},
+		"appTypes": {
+			"client": "Тільки клієнт",
+			"server": "Тільки сервер",
+			"bundle": "Клієнт і сервер",
+			"servertool": "Інструмент налаштування",
+			"package": "Package"
+		},
+		"releasesTypes": {
+			"beta": "Бета",
+			"betas": "Бета",
+			"rc": "Реліз-кандидат",
+			"release": "Реліз",
+			"releases": "Релізи",
+			"patch": "Патч",
+			"patches": "Патчі"
+		}
+	},
+	"ipvd": {
+		"count": "Підрахунок",
+		"vendor": "Виробник",
+		"model": "Модель",
+		"hardwareType": "Тип",
+		"maxResolution": "Максимальна роздільна здатність",
+		"maxFps": "Макс кадрів в секунду",
+		"primaryCodec": "Кодек",
+		"isAudioSupported": "Аудіо",
+		"isTwAudioSupported": "2-канальний звуковий потік",
+		"isPtzSupported": "PTZ",
+		"isAptzSupported": "Розширений PTZ",
+		"isAptzSupportedShort": "Розш. PTZ",
+		"isFisheye": "Риб'яче око",
+		"isMdSupported": "Рух",
+		"isIoSupported": "Ввід/вивід",
+		"isH265": "H.265",
+		"isMultiSensor": "Мультисенсор",
+		"camera": "Камера",
+		"multiSensorCamera": "Багатоканальна камера",
+		"encoder": "Енкодер",
+		"dvr": "DVR",
+		"other": "Інші",
+		"PTZ cameras": "PTZ камери",
+		"Advanced PTZ cameras": "PTZ камери",
+		"Fisheye Cameras": "Фіш-ай камери",
+		"Cameras supporting H.265": "Камери, що підтримують H.265",
+		"I / O modules": "Модулі вводу-виводу",
+		"Multisensor Cameras": "Мультиненсорні камери",
+		"Cameras with 2-way audio": "Камери з 2-смуговим звуком",
+		"Extra high resolution cameras": "Камери з високою роздільною здатністю",
+		"feedback": {
+			"a_Please": "Будь ласка",
+			"b_Link": "надіслати запит",
+			"c_Info": "додаткові питання / зауваження щодо підтримуваних пристроїв."
+		}
+	},
+	"integration": {
+		"previewRibbonText": "Ця сторінка є попереднім переглядом останніх змін і не відповідає загальнодоступній версії.",
+		"backToEditText": "Повернутися до інтерфейсів редагування",
+		"Access Control": "Контроль доступу",
+		"Connector": "З'єднувач",
+		"Data Analytics": "Аналітика даних",
+		"Drone": "Дрон",
+		"Health Monitor": "Моніторинг ресурсів",
+		"Storage": "Сховище"
+	},
+	"messageDialogPlaceholders": {
+		"feedback": "Make sure you include your camera model and manufacturer..."
+	},
+	"About %PRODUCT_NAME%": "Про %PRODUCT_NAME%",
+	"Download %VMS_NAME%": "Завантажити %VMS_NAME%",
+	"Integrations": "Інтеграції",
+	"Support": "Підтримка",
+	"Terms": "Умови",
+	"Privacy": "Приватність",
+	"Supported Devices": "Пристрої, що підтримуються"
+}

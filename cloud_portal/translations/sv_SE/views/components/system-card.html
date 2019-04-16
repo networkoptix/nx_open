@@ -5,8 +5,8 @@
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Byt namn på systemet</button>
         </p>
-        <p>
-            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Sammanfoga med ett annat system</button>
+        <p ng-if="canMerge || debugMode || betaMode">
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="mergeSystems()">Sammanfoga med ett annat system</button>
         </p>
         <hr />
         <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Koppla ifrån
@@ -52,8 +52,8 @@
         <div class="merge-info-text">
             <p>Beroende på databasens storlek kan det ta upp till flera timmar.</p>
             <p>Innan sammanslagningen är klar kan du logga in på det här systemet och titta på video, men kan inte ändra några inställningar.</p>
-            <p>When merge is finished, all users and cameras from this system will become available
-                in System "<span class="merge-system-name">{{mergeTargetSystem.name}}</span>", and this system will be deleted.</p>
+            <p>När sammanslagning är klar kommer alla användare och kameror från detta system att bli tillgängliga
+                i <span class="merge-system-name">{{mergeTargetSystem.name}}</span>.</p>
         </div>
     </div>
 </div>

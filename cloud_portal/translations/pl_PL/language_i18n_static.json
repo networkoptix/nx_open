@@ -1,0 +1,157 @@
+{
+	"search": {
+		"Search": "Szukaj",
+		"search_ipvd": "Wyszukaj według modelu lub producenta",
+		"filter applied": "zastosowany filtr",
+		"filters applied": "zastosowane filtry",
+		"Any": "Dowolny",
+		"selected": "wybrane",
+		"vendor": "Producent",
+		"vendors": "producenci",
+		"hardwareType": "Rodzaj",
+		"hardwareTypes": "typy",
+		"minResolution": "Minimalna rozdzielczość"
+	},
+	"cameraFilters": {
+		"ptz": "Kamery PTZ",
+		"aptz": "Kamery z zaawansowanym PTZ",
+		"fisheye": "Kamery fisheye",
+		"H265": "Kamery H.265",
+		"IO": "Moduły I/O",
+		"multiSensor": "Kamery wieloprzetwornikowe",
+		"TwWayAudio": "Urządzenia z 2-kierunkowym dźwiękiem",
+		"audio": "Kamery z dźwiękiem",
+		"encoder": "Enkodery",
+		"highRes": "Kamery o bardzo wysokiej rozdzielczości"
+	},
+	"downloads": {
+		"mobile": {
+			"ios": {
+				"link": "%IOS_APPLICATION_LINK%"
+			},
+			"android": {
+				"link": "%ANDROID_APPLICATION_LINK%"
+			}
+		},
+		"groups": {
+			"windows": {
+				"label": "Windows",
+				"supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+			},
+			"mac": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"linux": {
+				"label": "Ubuntu Linux",
+				"shortLabel": "Ubuntu",
+				"supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+			},
+			"macos": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"ios": {
+				"label": "iOS",
+				"shortLabel": "iOS"
+			},
+			"android": {
+				"label": "Android",
+				"shortLabel": "Android"
+			},
+			"arm": {
+				"label": "ARM",
+				"shortLabel": "ARM",
+				"supported": "Debian/Ubuntu lub zgodny"
+			},
+			"sdk": {
+				"label": "SDK",
+				"shortLabel": "SDK",
+				"supported": "C++ wieloplatformowe SDK"
+			}
+		},
+		"platforms": {
+			"win64": "x64",
+			"win86": "x86",
+			"linux64": "x64",
+			"linux86": "x86",
+			"mac": "X",
+			"bananapi": "Banana Pi",
+			"bpi": "Nx1",
+			"rpi": " Raspberry Pi"
+		},
+		"appTypes": {
+			"client": "Tylko klient",
+			"server": "Tylko serwer",
+			"bundle": "Klient i serwer",
+			"servertool": "Narzędzie konfiguracji",
+			"package": "Pakiet"
+		},
+		"releasesTypes": {
+			"beta": "Beta",
+			"betas": "Bety",
+			"rc": "Release Candidate",
+			"release": "Wydanie",
+			"releases": "Wydania",
+			"patch": "Poprawka",
+			"patches": "Poprawki"
+		}
+	},
+	"ipvd": {
+		"count": "Liczba",
+		"vendor": "Producent",
+		"model": "Model",
+		"hardwareType": "Rodzaj",
+		"maxResolution": "Max rozdzielczość",
+		"maxFps": "Max kl./s",
+		"primaryCodec": "Kodek",
+		"isAudioSupported": "Dźwięk",
+		"isTwAudioSupported": "Dwukierunkowe audio",
+		"isPtzSupported": "PTZ",
+		"isAptzSupported": "Zaawansowane PTZ",
+		"isAptzSupportedShort": "Zaaw. PTZ",
+		"isFisheye": "Fisheye",
+		"isMdSupported": "Ruch",
+		"isIoSupported": "I/O",
+		"isH265": "H.265",
+		"isMultiSensor": "Multi Sensor",
+		"camera": "Kamera",
+		"multiSensorCamera": "Kamera multi-sensor",
+		"encoder": "Enkoder",
+		"dvr": "DVR",
+		"other": "Inne",
+		"PTZ cameras": "Kamery PTZ",
+		"Advanced PTZ cameras": "Kamery z zaawansowanym PTZ",
+		"Fisheye Cameras": "Kamery fisheye",
+		"Cameras supporting H.265": "Kamery obsługujące H.265",
+		"I / O modules": "Moduły I/O",
+		"Multisensor Cameras": "Kamery wieloprzetwornikowe",
+		"Cameras with 2-way audio": "Kamery z 2-kierunkowym dźwiękiem",
+		"Extra high resolution cameras": "Kamery o bardzo wysokiej rozdzielczości",
+		"feedback": {
+			"a_Please": "Proszę",
+			"b_Link": "wyślij zapytanie",
+			"c_Info": "w przypadku dodatkowych pytań / wątpliwości dotyczących obsługiwanych urządzeń."
+		}
+	},
+	"integration": {
+		"previewRibbonText": "Ta strona to podgląd najnowszych zmian i nie jest zgodna z publicznie dostępną wersją.",
+		"backToEditText": "Powrót do edycji interfejsów",
+		"Access Control": "Kontrola dostępu",
+		"Connector": "Złącze",
+		"Data Analytics": "Analiza danych",
+		"Drone": "Dron",
+		"Health Monitor": "Monitor stanu technicznego",
+		"Storage": "Archiwum"
+	},
+	"messageDialogPlaceholders": {
+		"feedback": "Proszę podać model kamery i producenta..."
+	},
+	"About %PRODUCT_NAME%": "Informacje o %PRODUCT_NAME%",
+	"Download %VMS_NAME%": "Pobierz %VMS_NAME%",
+	"Integrations": "Integracje",
+	"Support": "Wsparcie",
+	"Terms": "Warunki",
+	"Privacy": "Prywatność",
+	"Supported Devices": "Obsługiwane urządzenia"
+}

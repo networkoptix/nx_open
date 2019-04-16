@@ -11,14 +11,17 @@
     "logoutAuthorisedTitle": "Ha già effettuato l'accesso",
     "logoutAuthorisedContinueButton": "Continua",
     "logoutAuthorisedLogoutButton": "Disconnetti",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "Impossibile inviare il messaggio.",
+    "messageSent": "Il messaggio è stato inviato.",
+    "noClientDetectedTitle": "Installa %VMS_NAME% per visualizzare il suo sistema",
+    "download": "Scarica %VMS_NAME%"
   },
   "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+    "ipvd_feedback_page": "Pagina feedback telecamere",
+    "ipvd_feedback_device": "Feedback su {{product}}",
+    "sales_inquiry": "Richiesta per {{product}}",
+    "request_support": "Richiedi supporto per {{product}}",
+    "unknown": "Tipo di messaggio sconosciuto"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -46,7 +49,7 @@
   },
   "systemStatuses": {
     "activated": "attivato",
-    "merging": "merging",
+    "merging": "unione",
     "notActivated": "non attivato",
     "online": "online",
     "offline": "offiline",
@@ -147,9 +150,9 @@
     "lostConnection": "Connessione a {{systemName}} persa",
     "thisSystem": "il sistema",
     "oldSafariNotSupported": "Le versioni di Safari precedenti alla 10 non sono supportate",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "Sono stati trovati server duplicati su uno dei sistemi.<br>Rimuovere i precedenti server da ciascun sistema che si sta tentando di unire e riprovare.",
+    "mergedSystemIsOffline": "Uno dei sistemi che vengono uniti è offline. Assicurati che siano online e riprova.",
+    "INCOMPATIBLE": "Le versioni per i sistemi sono incompatibili. Per risolvere questo problema, assicurati che i sistemi abbiano la stessa versione."
   },
   "passwordRequirements": {
     "good": "buono",
@@ -195,9 +198,9 @@
     "confirmUnshareAction": "Elimina",
     "successDisconnected": "Il sistema è stato scollegato correttamente da %PRODUCT_NAME%",
     "successDeleted": "Il sistema {{systemName}} è stato eliminato correttamente dal suo account",
-    "successMerge": "System merge completed",
+    "successMerge": "Unione del sistema completata",
     "permissionsRemoved": "Le autorizzazioni sono state rimosse da {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Nome sconosciuto per il sistema (causato da cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Il suo account è stato salvato con successo",
@@ -206,72 +209,6 @@
     "changePassword": "Cambia Password",
     "newPasswordLabel": "Nuova password",
     "saveChanges": "Salvare"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Installa %VMS_NAME% per visualizzare il suo sistema",
-    "action": "Scarica %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Solo cliente",
-      "server": "Solo server",
-      "bundle": "Client e Server",
-      "servertool": "Strumenti di configurazione"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Rinvia il link di attivazione",

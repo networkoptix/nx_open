@@ -12,10 +12,13 @@
     "logoutAuthorisedContinueButton": "Tiếp tục",
     "logoutAuthorisedLogoutButton": "Đăng xuất",
     "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageSent": "Message has been sent.",
+    "noClientDetectedTitle": "Cài đặt %VMS_NAME% để xem Hệ thống của bạn",
+    "download": "Tải xuống %VMS_NAME%"
   },
   "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
+    "ipvd_feedback_page": "Cameras page feedback",
+    "ipvd_feedback_device": "Feedback about {{product}}",
     "sales_inquiry": "Inquiry for {{product}}",
     "request_support": "Request Support for {{product}}",
     "unknown": "Unknown Message Type"
@@ -192,7 +195,7 @@
     "confirmUnshareFromMeAction": "Ngắt kết nối",
     "confirmUnshare": "Người dùng này sẽ không thể truy cập vào Hệ thống. Bạn có chắc không?",
     "confirmUnshareTitle": "Xóa người dùng?",
-    "confirmUnshareAction": "Xoá",
+    "confirmUnshareAction": "Xóa bỏ",
     "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ %PRODUCT_NAME%",
     "successDeleted": "Tài khoản {{systemName}} đã xóa thành công từ hệ thống của bạn",
     "successMerge": "System merge completed",
@@ -206,72 +209,6 @@
     "changePassword": "Đổi mật khẩu",
     "newPasswordLabel": "Mật khẩu mới",
     "saveChanges": "Tiết kiệm"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Cài đặt %VMS_NAME% để xem Hệ thống của bạn",
-    "action": "Tải xuống %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Chỉ máy trạm",
-      "server": "Chỉ máy chủ",
-      "bundle": "Máy chủ và Máy trạm",
-      "servertool": "Công cụ cấu hình"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Gửi lại link kích hoạt",

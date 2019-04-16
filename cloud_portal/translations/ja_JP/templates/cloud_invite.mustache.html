@@ -1,0 +1,14 @@
+<h1>こんにちは </h1>
+
+<p>%PRODUCT_NAME% に登録されました</p>
+
+{{#message.message}}
+<p>{{ message.message }}</p>
+{{/message.message}}
+
+<p>表示および管理を行うにはメールアドレスを使用して
+<a href="{{ config.portal_url }}"> %PRODUCT_NAME%</a>
+にアカウントを作成してください
+</p>
+
+<a class="btn" href="{{ config.portal_url }}/register/{{ message.code }}">アカウント登録</a>

@@ -1,0 +1,12 @@
+<h1>Merhaba, </h1>
+
+<p>%PRODUCT_NAME% davet edildin</p>
+
+{{#message.message}}
+<p>{{ message.message }}</p>
+{{/message.message}}
+
+<p><a href="{{ config.portal_url }}">%PRODUCT_NAME%</a> Mail adresinle bir hesap oluştur ve sonraki adımları takip et.
+</p>
+
+<a class="btn" href="{{ config.portal_url }}/register/{{ message.code }}">Hesap Kaydı</a>

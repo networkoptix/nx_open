@@ -1,0 +1,157 @@
+{
+	"search": {
+		"Search": "Hledat",
+		"search_ipvd": "Search by model or manufacturer",
+		"filter applied": "filter applied",
+		"filters applied": "filters applied",
+		"Any": "Any",
+		"selected": "selected",
+		"vendor": "Manufacturer",
+		"vendors": "manufacturers",
+		"hardwareType": "Typ",
+		"hardwareTypes": "types",
+		"minResolution": "Minimum Resolution"
+	},
+	"cameraFilters": {
+		"ptz": "PTZ cameras",
+		"aptz": "Cameras with advanced PTZ",
+		"fisheye": "Fisheye cameras",
+		"H265": "H.265 Cameras",
+		"IO": "I / O modules",
+		"multiSensor": "Multi-sensor cameras",
+		"TwWayAudio": "2-way audio devices",
+		"audio": "Cameras with audio",
+		"encoder": "Encoders",
+		"highRes": "Extra high resolution cameras"
+	},
+	"downloads": {
+		"mobile": {
+			"ios": {
+				"link": "%IOS_APPLICATION_LINK%"
+			},
+			"android": {
+				"link": "%ANDROID_APPLICATION_LINK%"
+			}
+		},
+		"groups": {
+			"windows": {
+				"label": "Windows",
+				"supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+			},
+			"mac": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"linux": {
+				"label": "Ubuntu Linux",
+				"shortLabel": "Ubuntu",
+				"supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+			},
+			"macos": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"ios": {
+				"label": "iOS",
+				"shortLabel": "iOS"
+			},
+			"android": {
+				"label": "Android",
+				"shortLabel": "Android"
+			},
+			"arm": {
+				"label": "ARM",
+				"shortLabel": "ARM",
+				"supported": "Debian/Ubuntu based"
+			},
+			"sdk": {
+				"label": "SDK",
+				"shortLabel": "SDK",
+				"supported": "C++ cross platform SDK"
+			}
+		},
+		"platforms": {
+			"win64": "x64",
+			"win86": "x86",
+			"linux64": "x64",
+			"linux86": "x86",
+			"mac": "X",
+			"bananapi": "Banana Pi",
+			"bpi": "Nx1",
+			"rpi": " Raspberry Pi"
+		},
+		"appTypes": {
+			"client": "Pouze klient",
+			"server": "Pouze server",
+			"bundle": "Klient a server",
+			"servertool": "Nástroj konfigurace",
+			"package": "Package"
+		},
+		"releasesTypes": {
+			"beta": "Beta",
+			"betas": "Beta verze",
+			"rc": "Release Candidate",
+			"release": "Release",
+			"releases": "Vydání",
+			"patch": "Patch",
+			"patches": "Opravy"
+		}
+	},
+	"ipvd": {
+		"count": "Count",
+		"vendor": "Manufacturer",
+		"model": "Model",
+		"hardwareType": "Typ",
+		"maxResolution": "Max Resolution",
+		"maxFps": "Max FPS",
+		"primaryCodec": "Codec",
+		"isAudioSupported": "Zvuk",
+		"isTwAudioSupported": "2-way Audio",
+		"isPtzSupported": "PTZ",
+		"isAptzSupported": "Advanced PTZ",
+		"isAptzSupportedShort": "Adv. PTZ",
+		"isFisheye": "Rybí oko",
+		"isMdSupported": "Pohyb",
+		"isIoSupported": "I/O",
+		"isH265": "H.265",
+		"isMultiSensor": "Multi Sensor",
+		"camera": "Kamera",
+		"multiSensorCamera": "Multi-Sensor Camera",
+		"encoder": "Encoder",
+		"dvr": "DVR",
+		"other": "Other",
+		"PTZ cameras": "PTZ cameras",
+		"Advanced PTZ cameras": "Advanced PTZ cameras",
+		"Fisheye Cameras": "Fisheye Cameras",
+		"Cameras supporting H.265": "Cameras supporting H.265",
+		"I / O modules": "I / O modules",
+		"Multisensor Cameras": "Multisensor Cameras",
+		"Cameras with 2-way audio": "Cameras with 2-way audio",
+		"Extra high resolution cameras": "Extra high resolution cameras",
+		"feedback": {
+			"a_Please": "Please",
+			"b_Link": "submit a request",
+			"c_Info": "for additional questions/concerns regarding supported devices."
+		}
+	},
+	"integration": {
+		"previewRibbonText": "This page is a preview of the latest changes, and it doesn't match publicly available version.",
+		"backToEditText": "Back to the editing interfaces",
+		"Access Control": "Access Control",
+		"Connector": "Connector",
+		"Data Analytics": "Data Analytics",
+		"Drone": "Drone",
+		"Health Monitor": "Monitor stavu",
+		"Storage": "Úložiště"
+	},
+	"messageDialogPlaceholders": {
+		"feedback": "Make sure you include your camera model and manufacturer..."
+	},
+	"About %PRODUCT_NAME%": "O aplikaci %PRODUCT_NAME%",
+	"Download %VMS_NAME%": "Stáhnout %VMS_NAME%",
+	"Integrations": "Integrations",
+	"Support": "Podpora",
+	"Terms": "Podmínky",
+	"Privacy": "Soukromí",
+	"Supported Devices": "Supported Devices"
+}

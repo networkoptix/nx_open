@@ -1,0 +1,6 @@
+Hola {{ message.userFullName }}
+{{ message.sender_name}} ({{ message.sender_email }}) dio el siguiente comentario para {{ message.product }}:
+<pre>{{ message.message }}</pre>
+
+------------------------------------------
+Se puede contactar al usuario: {{ message.sender_to_be_contacted}}

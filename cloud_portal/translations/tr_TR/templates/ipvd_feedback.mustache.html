@@ -1,0 +1,9 @@
+<h1>Merhaba, {{ message.userFullName }}</h1>
+
+<a href="mailto:{{ message.sender_email }}">{{ message.sender_name }}</a>aşağıdaki geribildirim için {{ message.product }} verdi:
+<div>{{ message.message }}</div>
+<br />
+<hr />
+<div>
+    Kullanıcıyla iletişime geçilebilir: {{ message.sender_to_be_contacted}}
+</div>

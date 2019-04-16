@@ -1,0 +1,157 @@
+{
+	"search": {
+		"Search": "Arama",
+		"search_ipvd": "Belirli bir üretici veya modele göre arama",
+		"filter applied": "filtre uygulandı",
+		"filters applied": "filtreler uygulandı",
+		"Any": "Herhangi",
+		"selected": "seçildi",
+		"vendor": "Üretici",
+		"vendors": "ureticiler",
+		"hardwareType": "Tür",
+		"hardwareTypes": "türler",
+		"minResolution": "Minimum Çözünürlük"
+	},
+	"cameraFilters": {
+		"ptz": "PTZ kameralar",
+		"aptz": "Gelişmiş PTZ'li kameralar",
+		"fisheye": "Balıkgözü kameralar",
+		"H265": "H.265 Kameralar",
+		"IO": "G / Ç modülleri",
+		"multiSensor": "Çok sensörlü kameralar",
+		"TwWayAudio": "Çift yönlü ses cihazları",
+		"audio": "Sesli kameralar",
+		"encoder": "Çeviriciler",
+		"highRes": "Eksta yüksek çözünürlüklü kameralar"
+	},
+	"downloads": {
+		"mobile": {
+			"ios": {
+				"link": "%IOS_APPLICATION_LINK%"
+			},
+			"android": {
+				"link": "%ANDROID_APPLICATION_LINK%"
+			}
+		},
+		"groups": {
+			"windows": {
+				"label": "Windows",
+				"supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+			},
+			"mac": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"linux": {
+				"label": "Ubuntu Linux",
+				"shortLabel": "Ubuntu",
+				"supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
+			},
+			"macos": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"ios": {
+				"label": "iOS",
+				"shortLabel": "iOS"
+			},
+			"android": {
+				"label": "Android",
+				"shortLabel": "Android"
+			},
+			"arm": {
+				"label": "ARM",
+				"shortLabel": "ARM",
+				"supported": "Debian/Ubuntu tabanlı"
+			},
+			"sdk": {
+				"label": "SDK",
+				"shortLabel": "SDK",
+				"supported": "C++ cross platform SDK"
+			}
+		},
+		"platforms": {
+			"win64": "x64",
+			"win86": "x86",
+			"linux64": "x64",
+			"linux86": "x86",
+			"mac": "X",
+			"bananapi": "Banana Pi",
+			"bpi": "Nx1",
+			"rpi": " Raspberry Pi"
+		},
+		"appTypes": {
+			"client": "Yalnızca istemci",
+			"server": "Yalnızca sunucu",
+			"bundle": "İstemci ve sunucu",
+			"servertool": "Konfigürasyon aracı",
+			"package": "Paket"
+		},
+		"releasesTypes": {
+			"beta": "Beta",
+			"betas": "Beta Sürümleri",
+			"rc": "Sürüm Adayı",
+			"release": "Sürüm",
+			"releases": "Sürümler",
+			"patch": "Düzeltme",
+			"patches": "Düzeltmeler"
+		}
+	},
+	"ipvd": {
+		"count": "Sayım",
+		"vendor": "Üretici",
+		"model": "Model",
+		"hardwareType": "Tür",
+		"maxResolution": "Maks. Çözünürlük",
+		"maxFps": "Maksimum FPS",
+		"primaryCodec": "Kodek",
+		"isAudioSupported": "Ses",
+		"isTwAudioSupported": "Çift Yönlü Ses",
+		"isPtzSupported": "PTZ",
+		"isAptzSupported": "Gelişmiş PTZ",
+		"isAptzSupportedShort": "Gelş. PTZ",
+		"isFisheye": "Fish-Eye",
+		"isMdSupported": "Hareket",
+		"isIoSupported": "G/Ç",
+		"isH265": "H.265",
+		"isMultiSensor": "Çoklu sensör",
+		"camera": "Kamera",
+		"multiSensorCamera": "Çok Sensörlü Kamera",
+		"encoder": "Kodlayıcı",
+		"dvr": "DVR",
+		"other": "Diğer",
+		"PTZ cameras": "PTZ kameralar",
+		"Advanced PTZ cameras": "Gelişmiş PTZ kameralar",
+		"Fisheye Cameras": "Balıkgözü kameralar",
+		"Cameras supporting H.265": "H.265'i destekleyen kameralar",
+		"I / O modules": "G / Ç modülleri",
+		"Multisensor Cameras": "Çok Sensörlü Kameralar",
+		"Cameras with 2-way audio": "Çift yönlü sesli kameralar",
+		"Extra high resolution cameras": "Eksta yüksek çözünürlüklü kameralar",
+		"feedback": {
+			"a_Please": "Lütfen",
+			"b_Link": "destek talebi gönder",
+			"c_Info": "desteklenen cihazlarla ilgili ek sorularınız için."
+		}
+	},
+	"integration": {
+		"previewRibbonText": "Bu sayfa en son değişikliklerin önizlemesidir ve herkese açık kullanılabilir sürümle eşleşmiyor.",
+		"backToEditText": "Düzeleme arayüzüne dön",
+		"Access Control": "Erişim Kontrolü",
+		"Connector": "Konnektör",
+		"Data Analytics": "Veri Analizleri",
+		"Drone": "Drone",
+		"Health Monitor": "Performans İzleme",
+		"Storage": "Depolama"
+	},
+	"messageDialogPlaceholders": {
+		"feedback": "Make sure you include your camera model and manufacturer..."
+	},
+	"About %PRODUCT_NAME%": "%PRODUCT_NAME% Hakkında",
+	"Download %VMS_NAME%": "İndir %VMS_NAME%",
+	"Integrations": "Entegrasyonlar",
+	"Support": "Destek",
+	"Terms": "Şartlar",
+	"Privacy": "Gizlilik",
+	"Supported Devices": "Desteklenen cihazlar"
+}

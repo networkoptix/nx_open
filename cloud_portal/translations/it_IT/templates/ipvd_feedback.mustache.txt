@@ -1,0 +1,6 @@
+Buongiorno, {{ message.userFullName }}
+{{ message.sender_name}} ({{ message.sender_email }}) ha dato il seguente feedback per {{ message.product }}:
+<pre>{{ message.message }}</pre>
+
+------------------------------------------
+L'utente può essere contattato: {{ message.sender_to_be_contacted}}

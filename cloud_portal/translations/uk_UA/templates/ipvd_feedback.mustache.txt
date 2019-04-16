@@ -1,0 +1,6 @@
+Привіт, {{ message.userFullName }}
+{{ message.sender_name}} ({{ message.sender_email }}) дав такі відгуки для {{ message.product }}:
+<pre>{{ message.message }}</pre>
+
+------------------------------------------
+Можна зв’язатися з користувачем: {{ message.sender_to_be_contacted}}

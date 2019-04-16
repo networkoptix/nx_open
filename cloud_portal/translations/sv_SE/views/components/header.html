@@ -18,17 +18,17 @@
 
                 <ul ng-if="active.integrations" class="nav navbar-nav d-none d-sm-flex">
                     <li class="active">
-                        <a class="inset" href=1>Integrations</a>
+                        <a class="inset" href=1>Integrationer</a>
                     </li>
                 </ul>
 
-                <ul ng-if="active.campage" class="nav navbar-nav d-none d-sm-flex">
+                <ul ng-if="active.ipvd" class="nav navbar-nav d-none d-sm-flex">
                     <li class="active">
-                        <a class="inset" href=1>Supported IP Video Devices</a>
+                        <a class="inset" href=1>IP-videoenheter som stöds</a>
                     </li>
                 </ul>
 
-                <ul ng-if="activeSystem && !active.integrations && !active.campage"
+                <ul ng-if="activeSystem && !active.integrations && !active.ipvd"
                     class="nav navbar-nav auth-visible d-none d-sm-flex">
 
                     <li ng-class="{ 'active' :active.view }">

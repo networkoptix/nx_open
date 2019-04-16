@@ -11,14 +11,17 @@
     "logoutAuthorisedTitle": "すでにログインしています",
     "logoutAuthorisedContinueButton": "続行",
     "logoutAuthorisedLogoutButton": "ログアウト",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "メッセージの送信に失敗しました",
+    "messageSent": "メッセージが送信されました",
+    "noClientDetectedTitle": "システムを表示するには %VMS_NAME% をインストールします",
+    "download": "%VMS_NAME% をダウンロード"
   },
   "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+    "ipvd_feedback_page": "Cameras page feedback",
+    "ipvd_feedback_device": "{{product}} についてのフィードバック",
+    "sales_inquiry": "{{product}} のお問い合わせ",
+    "request_support": "{{product}} サポートを依頼",
+    "unknown": "不明なメッセージタイプ"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -46,7 +49,7 @@
   },
   "systemStatuses": {
     "activated": "アクティベート済",
-    "merging": "merging",
+    "merging": "統合中",
     "notActivated": "アクティベートされていません",
     "online": "オンライン",
     "offline": "オフライン",
@@ -149,7 +152,7 @@
     "oldSafariNotSupported": "Safariのバージョン10以前はサポートされません",
     "DUPLICATE_MEDIASERVER_FOUND": "重複するサーバーが見つかりました。<br>統合する各システムから古いサーバーを削除してからやり直してください",
     "mergedSystemIsOffline": "統合されているシステムの1つがオフラインです　それらがオンラインであることを確認してからやり直してください",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "INCOMPATIBLE": "システムのバージョンは互換性がありません。この問題を解決するには、システムのバージョンが同じであることを確認してください"
   },
   "passwordRequirements": {
     "good": "良い",
@@ -197,7 +200,7 @@
     "successDeleted": "システム {{systemName}} はあなたのアカウントから正常に削除されました",
     "successMerge": "システムが統合されました",
     "permissionsRemoved": "{{email}} からアクセス権限が削除されました",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "システムの名前が不明です（クラウド統合が原因）"
   },
   "account": {
     "accountSavedSuccess": "あなたのアカウントは正常に保存されました",
@@ -206,72 +209,6 @@
     "changePassword": "パスワードを変更",
     "newPasswordLabel": "新規パスワード",
     "saveChanges": "保存"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "システムを表示するには %VMS_NAME% をインストールします",
-    "action": "%VMS_NAME% をダウンロード",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "クライアントのみ",
-      "server": "サーバーのみ",
-      "bundle": "クライアントとサーバー",
-      "servertool": "構成ツール"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "アクティベートリンク再送",

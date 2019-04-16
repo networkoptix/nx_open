@@ -1,0 +1,157 @@
+{
+	"search": {
+		"Search": "Suche",
+		"search_ipvd": "Suche nach Modell oder Hersteller",
+		"filter applied": "Angewandte Filter",
+		"filters applied": "Angewandte Filter",
+		"Any": "Alle",
+		"selected": "Ausgewählt",
+		"vendor": "Hersteller",
+		"vendors": "Hersteller",
+		"hardwareType": "Typ",
+		"hardwareTypes": "Typen",
+		"minResolution": "Minimale Auflösung"
+	},
+	"cameraFilters": {
+		"ptz": "PTZ-Kameras",
+		"aptz": "Kameras mit erweitertem PTZ",
+		"fisheye": "Fischaugenkameras",
+		"H265": "H.265-Kameras",
+		"IO": "I/O-Module",
+		"multiSensor": "Multisensorkameras",
+		"TwWayAudio": "2-Wege-Audiogeräte",
+		"audio": "Kameras mit Audio",
+		"encoder": "Encoder",
+		"highRes": "Extra hochauflösende Kameras"
+	},
+	"downloads": {
+		"mobile": {
+			"ios": {
+				"link": "%IOS_APPLICATION_LINK%"
+			},
+			"android": {
+				"link": "%ANDROID_APPLICATION_LINK%"
+			}
+		},
+		"groups": {
+			"windows": {
+				"label": "Windows",
+				"supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+			},
+			"mac": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"linux": {
+				"label": "Ubuntu Linux",
+				"shortLabel": "Ubuntu",
+				"supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+			},
+			"macos": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"ios": {
+				"label": "iOS",
+				"shortLabel": "iOS"
+			},
+			"android": {
+				"label": "Android",
+				"shortLabel": "Android"
+			},
+			"arm": {
+				"label": "ARM",
+				"shortLabel": "ARM",
+				"supported": "Debian/Ubuntu-basierend"
+			},
+			"sdk": {
+				"label": "SDK",
+				"shortLabel": "SDK",
+				"supported": "C++ plattformübergreifendes SDK"
+			}
+		},
+		"platforms": {
+			"win64": "x64",
+			"win86": "x86",
+			"linux64": "x64",
+			"linux86": "x86",
+			"mac": "X",
+			"bananapi": "Banana Pi",
+			"bpi": "Nx1",
+			"rpi": " Raspberry Pi"
+		},
+		"appTypes": {
+			"client": "Nur Client",
+			"server": "Nur Server",
+			"bundle": "Client und Server",
+			"servertool": "Konfigurationstool",
+			"package": "Paket"
+		},
+		"releasesTypes": {
+			"beta": "Beta",
+			"betas": "Betas",
+			"rc": "Beta-Versionen",
+			"release": "Release",
+			"releases": "Releases",
+			"patch": "Patch",
+			"patches": "Patches"
+		}
+	},
+	"ipvd": {
+		"count": "Anzahl",
+		"vendor": "Hersteller",
+		"model": "Modell",
+		"hardwareType": "Typ",
+		"maxResolution": "Max Auflösung",
+		"maxFps": "Max FPS",
+		"primaryCodec": "Codec",
+		"isAudioSupported": "Audio",
+		"isTwAudioSupported": "Zweiwege-Audio",
+		"isPtzSupported": "PTZ",
+		"isAptzSupported": "Erweiterte PTZ",
+		"isAptzSupportedShort": "Erw. PTZ",
+		"isFisheye": "Fischaugenobjektiv",
+		"isMdSupported": "Bewegung",
+		"isIoSupported": "I/O",
+		"isH265": "H.265",
+		"isMultiSensor": "Multisensor",
+		"camera": "Kamera",
+		"multiSensorCamera": "Multisensorkamera",
+		"encoder": "Encoder",
+		"dvr": "DVR",
+		"other": "Andere",
+		"PTZ cameras": "PTZ-Kameras",
+		"Advanced PTZ cameras": "Erweiterte PTZ-Kameras",
+		"Fisheye Cameras": "Fischaugenkameras",
+		"Cameras supporting H.265": "Kameras, die H.265 unterstützen",
+		"I / O modules": "I/O-Module",
+		"Multisensor Cameras": "Multisensorkameras",
+		"Cameras with 2-way audio": "Kameras mit 2-Wege-Audio",
+		"Extra high resolution cameras": "Extra hochauflösende Kameras",
+		"feedback": {
+			"a_Please": "Bitte",
+			"b_Link": "Anfrage abschicken",
+			"c_Info": "für weitere Fragen/Anliegen bezüglich der unterstützten Geräte."
+		}
+	},
+	"integration": {
+		"previewRibbonText": "Diese Seite ist eine Vorschau auf die neuesten Änderungen und entspricht nicht der öffentlich zugänglichen Version.",
+		"backToEditText": "Zurück zu den Bearbeitungsoberflächen",
+		"Access Control": "Zugangskontrolle",
+		"Connector": "Konnektor",
+		"Data Analytics": "Datenanalytik",
+		"Drone": "Drohne",
+		"Health Monitor": "Statusüberwachung",
+		"Storage": "Speicher"
+	},
+	"messageDialogPlaceholders": {
+		"feedback": "Make sure you include your camera model and manufacturer..."
+	},
+	"About %PRODUCT_NAME%": "Über %PRODUCT_NAME%",
+	"Download %VMS_NAME%": "%VMS_NAME% herunterladen",
+	"Integrations": "Integrationen",
+	"Support": "Support",
+	"Terms": "Bedingungen",
+	"Privacy": "Datenschutz",
+	"Supported Devices": "Unterstützte Geräte"
+}

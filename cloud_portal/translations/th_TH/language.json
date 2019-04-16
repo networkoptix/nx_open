@@ -12,10 +12,13 @@
     "logoutAuthorisedContinueButton": "ดำเนิน​การ",
     "logoutAuthorisedLogoutButton": "ออกจากระบบ",
     "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageSent": "Message has been sent.",
+    "noClientDetectedTitle": "ติดตั้ง %VMS_NAME% เพื่อดูระบบของคุณ",
+    "download": "ดาวน์โหลด %VMS_NAME%"
   },
   "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
+    "ipvd_feedback_page": "Cameras page feedback",
+    "ipvd_feedback_device": "Feedback about {{product}}",
     "sales_inquiry": "Inquiry for {{product}}",
     "request_support": "Request Support for {{product}}",
     "unknown": "Unknown Message Type"
@@ -206,72 +209,6 @@
     "changePassword": "เปลี่ยนรหัสผ่าน",
     "newPasswordLabel": "สร้างรหัสผ่านใหม่",
     "saveChanges": "บันทึก"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "ติดตั้ง %VMS_NAME% เพื่อดูระบบของคุณ",
-    "action": "ดาวน์โหลด %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "ไคลเอ็นต์เท่านั้น",
-      "server": "เซิร์ฟเวอร์เท่านั้น",
-      "bundle": "ไคลเอ็นต์และเซิร์ฟเวอร์",
-      "servertool": "เครื่องมือกำหนดค่า"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "ส่งการเชื่อมโยงการเปิดใช้งานอีกครั้ง",

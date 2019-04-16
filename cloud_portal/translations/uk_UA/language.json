@@ -11,14 +11,17 @@
     "logoutAuthorisedTitle": "Ви вже увійшли",
     "logoutAuthorisedContinueButton": "Продовжити",
     "logoutAuthorisedLogoutButton": "Вийти",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "Не вдалося надіслати повідомлення.",
+    "messageSent": "Повідомлення відправлено.",
+    "noClientDetectedTitle": "Встановіть %VMS_NAME% для роботи з системою",
+    "download": "Завантажити %VMS_NAME%"
   },
   "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+    "ipvd_feedback_page": "Зворотній зв'язок з камер",
+    "ipvd_feedback_device": "Відгук про {{product}}",
+    "sales_inquiry": "Запит на {{product}}",
+    "request_support": "Запит підтримки для {{product}}",
+    "unknown": "Невизначений тип повідомлення"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -46,7 +49,7 @@
   },
   "systemStatuses": {
     "activated": "активовано",
-    "merging": "merging",
+    "merging": "злиття",
     "notActivated": "не активовано",
     "online": "oнлайн",
     "offline": "поза мережею",
@@ -149,7 +152,7 @@
     "oldSafariNotSupported": "Версії Safari старше 10 не підтримуються",
     "DUPLICATE_MEDIASERVER_FOUND": "На одній з систем знайдено дублікати серверів.<br>Видаліть старі сервери з кожної системи, яку ви намагаєтеся об'єднати, і повторіть спробу.",
     "mergedSystemIsOffline": "Одна з об'єднаних систем перебуває по за мережею. Переконайтеся, що вони перебувають у мережі та спробуйте ще раз.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "INCOMPATIBLE": "Версії для систем несумісні. Для вирішення проблеми, переконайтеся, що системи мають однакову версію."
   },
   "passwordRequirements": {
     "good": "хороший",
@@ -197,7 +200,7 @@
     "successDeleted": "Система {{systemName}} успішно видалена з вашого облікового запису",
     "successMerge": "Злиття системи завершено",
     "permissionsRemoved": "{{email}} був позбавлений повноважень",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Невідоме ім’я для системи (викликане злиттям хмари)"
   },
   "account": {
     "accountSavedSuccess": "Ваш обліковий запис успішно збережено",
@@ -206,72 +209,6 @@
     "changePassword": "Змінити пароль",
     "newPasswordLabel": "Новий пароль",
     "saveChanges": "Зберегти"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Встановіть %VMS_NAME% для роботи з системою",
-    "action": "Завантажити %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Тільки клієнт",
-      "server": "Тільки сервер",
-      "bundle": "Клієнт і сервер",
-      "servertool": "Інструмент налаштування"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Відправити посилання активації ще раз",

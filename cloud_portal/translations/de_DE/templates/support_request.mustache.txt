@@ -1,0 +1,3 @@
+Hallo, {{ message.userFullName }}
+{{ message.sender_name}} ({{ message.sender_email }}) hat die folgende Frage:
+<pre>{{ message.message }}</pre>

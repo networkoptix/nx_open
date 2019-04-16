@@ -1,0 +1,12 @@
+Merhaba,
+
+%PRODUCT_NAME% davet edildin.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+Lütfen %PRODUCT_NAME% üzerinde hesabı oluşturun
+e posta adresinizi kullanın ve talimatları takip edin.
+
+Hesabınızı bu linkten kaydedin: {{ config.portal_url }}/register/{{ message.code }}

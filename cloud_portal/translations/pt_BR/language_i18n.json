@@ -4,7 +4,7 @@
     "Account Settings": "Configurações da conta",
     "Account not activated": "Conta não ativada",
     "Account not found": "Conta não encontrada",
-    "Additional information": "Additional information",
+    "Administration": "Administration",
     "Advanced PTZ": "Advanced PTZ",
     "Advanced search": "Advanced search",
     "All Systems": "Todos os sistemas",
@@ -20,7 +20,6 @@
     "Cancel": "Cancelar",
     "Change Password": "Mudar senha",
     "Choose which properties should be visible to customers:": "Escolha quais propriedades devem estar visíveis para os clientes:",
-    "Clear All": "Clear All",
     "Close": "Fechar",
     "Codec": "Codec",
     "Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.": "Ligue o Sistema que deseja fazer o \"Merge\" a %PRODUCT_NAME% ou faça o \"Merge\" localmente usando o Cliente %VMS_NAME%.",
@@ -73,7 +72,6 @@
     "Password:": "Senha:",
     "Permissions": "Permissões",
     "Popularity": "Popularity",
-    "Portal management": "Gestão de Portal",
     "Privacy": "Privacy",
     "Release Notes": "Notas de lançamento",
     "Release notes": "Notas de lançamento",
@@ -114,29 +112,94 @@
     "You can only merge Systems in which you have owner permissions.": "Você só pode fazer o \"Merge\" de sistemas nos quais possui permissões de proprietário.",
     "Your Name": "Your Name",
     "Your browser is not supported": "O seu browser não é suportado",
+    "and_x_more": "... and {{value}} more",
     "before proceeding.": "before proceeding.",
-    "campage": {
-        "isH265": "H.265",
-        "vendor": "Manufacturer",
-        "isAptzSupported": "Advanced PTZ",
-        "isFisheye": "Fisheye",
-        "isTwAudioSupported": "2-way Audio",
-        "camera": "Camera",
-        "hardwareType": "Type",
-        "primaryCodecamera": "Codec",
-        "isAptzSupportedShort": "Adv. PTZ",
-        "other": "Other",
-        "isIoSupported": "I/O",
-        "multiSensorCamera": "Multi-Sensor Camera",
-        "isMdSupported": "Motion",
-        "isAudioSupported": "Audio",
-        "maxResolution": "Max Resolution",
-        "model": "Model",
-        "encoder": "Encoder",
-        "isMultiSensor": "Multi Sensor",
-        "maxFps": "Max FPS",
-        "isPtzSupported": "PTZ",
-        "dvr": "DVR"
+    "cameraFilters": {
+        "TwWayAudio": "2-way audio devices",
+        "H265": "H.265 Cameras",
+        "encoder": "Encoders",
+        "multiSensor": "Multi-sensor cameras",
+        "ptz": "PTZ cameras",
+        "IO": "I / O modules",
+        "highRes": "Extra high resolution cameras",
+        "aptz": "Cameras with advanced PTZ",
+        "audio": "Cameras with audio",
+        "fisheye": "Fisheye cameras"
+    },
+    "devices": "dispositivos",
+    "disclaimer": "This list is limited to actual devices auto-reporting data to {{value}}, as approved by anonymous system users. The complete list of supported manufacturers and models is greater in scope.",
+    "downloads": {
+        "mobile": {
+            "android": {
+                "link": "%ANDROID_APPLICATION_LINK%"
+            },
+            "ios": {
+                "link": "%IOS_APPLICATION_LINK%"
+            }
+        },
+        "platforms": {
+            "win86": "x86",
+            "bananapi": "Banana Pi",
+            "bpi": "Nx1",
+            "win64": "x64",
+            "mac": "X",
+            "linux64": "x64",
+            "rpi": " Raspberry Pi",
+            "linux86": "x86"
+        },
+        "releasesTypes": {
+            "patches": "Patches",
+            "releases": "Versões",
+            "patch": "Patch",
+            "beta": "Beta",
+            "betas": "Betas",
+            "rc": "Release Candidate",
+            "release": "Release"
+        },
+        "groups": {
+            "macos": {
+                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra",
+                "label": "Mac OS"
+            },
+            "windows": {
+                "supported": "7, 8, 8.1, 10, Server 2008, Server 2012",
+                "label": "Windows"
+            },
+            "ios": {
+                "shortLabel": "iOS",
+                "label": "iOS"
+            },
+            "mac": {
+                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra",
+                "label": "Mac OS"
+            },
+            "linux": {
+                "shortLabel": "Ubuntu",
+                "supported": "Ubuntu 14.04 LTS, 16.04 LTS",
+                "label": "Ubuntu Linux"
+            },
+            "android": {
+                "shortLabel": "Android",
+                "label": "Android"
+            },
+            "arm": {
+                "shortLabel": "ARM",
+                "supported": "Debian/Ubuntu based",
+                "label": "ARM"
+            },
+            "sdk": {
+                "shortLabel": "SDK",
+                "supported": "C++ cross platform SDK",
+                "label": "SDK"
+            }
+        },
+        "appTypes": {
+            "package": "Package",
+            "client": "Somente cliente",
+            "servertool": "Ferramenta de configuração",
+            "bundle": "Cliente e Servidor",
+            "server": "Somente servidor"
+        }
     },
     "integration": {
         "backToEditText": "Back to the editing interfaces",
@@ -148,8 +211,62 @@
         "Drone": "Drone",
         "Data Analytics": "Data Analytics"
     },
+    "ipvd": {
+        "Cameras supporting H.265": "Cameras supporting H.265",
+        "feedback": {
+            "c_Info": "for additional questions/concerns regarding supported devices.",
+            "b_Link": "submit a request",
+            "a_Please": "Please"
+        },
+        "isAptzSupported": "Advanced PTZ",
+        "hardwareType": "Type",
+        "isAptzSupportedShort": "Adv. PTZ",
+        "isIoSupported": "I/O",
+        "isMdSupported": "Motion",
+        "Multisensor Cameras": "Multisensor Cameras",
+        "Advanced PTZ cameras": "Advanced PTZ cameras",
+        "primaryCodec": "Codec",
+        "PTZ cameras": "PTZ cameras",
+        "camera": "Camera",
+        "multiSensorCamera": "Multi-Sensor Camera",
+        "Extra high resolution cameras": "Extra high resolution cameras",
+        "vendor": "Manufacturer",
+        "isFisheye": "Fisheye",
+        "isTwAudioSupported": "2-way Audio",
+        "Cameras with 2-way audio": "Cameras with 2-way audio",
+        "isMultiSensor": "Multi Sensor",
+        "encoder": "Encoder",
+        "maxResolution": "Max Resolution",
+        "maxFps": "Max FPS",
+        "I / O modules": "I / O modules",
+        "count": "Count",
+        "isH265": "H.265",
+        "Fisheye Cameras": "Fisheye Cameras",
+        "isAudioSupported": "Audio",
+        "model": "Model",
+        "other": "Other",
+        "isPtzSupported": "PTZ",
+        "dvr": "DVR"
+    },
     "is incompatible and cannot be merged with the current one.": "is incompatible and cannot be merged with the current one.",
     "is offline and cannot be merged with the current one.": "is offline and cannot be merged with the current one.",
     "latest build": "latest build",
+    "manufacturers": "manufacturers",
+    "messageDialogPlaceholders": {
+        "feedback": "Make sure you include your camera model and manufacturer..."
+    },
+    "search": {
+        "Search": "Pesquisa",
+        "filter applied": "filter applied",
+        "vendor": "Manufacturer",
+        "selected": "selected",
+        "hardwareType": "Type",
+        "search_ipvd": "Search by model or manufacturer",
+        "vendors": "manufacturers",
+        "filters applied": "filters applied",
+        "Any": "Any",
+        "hardwareTypes": "types",
+        "minResolution": "Minimum Resolution"
+    },
     "servers in the merged System.": "servers in the merged System."
 }

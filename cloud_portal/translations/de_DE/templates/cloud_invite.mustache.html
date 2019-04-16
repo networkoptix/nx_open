@@ -1,0 +1,14 @@
+<h1>Hallo, </h1>
+
+<p>Sie wurden zu %PRODUCT_NAME% eingeladen</p>
+
+{{#message.message}}
+<p>{{ message.message }}</p>
+{{/message.message}}
+
+<p>Bitte erstellen Sie ein Konto für
+    <a href="{{ config.portal_url }}">%PRODUCT_NAME%</a>
+    und verwenden Sie Ihre aktuelle Emailadresse und folgen Sie den weiteren Anweisungen.
+</p>
+
+<a class="btn" href="{{ config.portal_url }}/register/{{ message.code }}">Account registrieren</a>

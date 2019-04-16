@@ -12,10 +12,13 @@
     "logoutAuthorisedContinueButton": "Folyatatás",
     "logoutAuthorisedLogoutButton": "Kijelentkezés",
     "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageSent": "Message has been sent.",
+    "noClientDetectedTitle": "Telepítse a %VMS_NAME% alkalmazást a rendszer megtekintéshez",
+    "download": "%VMS_NAME% letöltése"
   },
   "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
+    "ipvd_feedback_page": "Cameras page feedback",
+    "ipvd_feedback_device": "Feedback about {{product}}",
     "sales_inquiry": "Inquiry for {{product}}",
     "request_support": "Request Support for {{product}}",
     "unknown": "Unknown Message Type"
@@ -206,72 +209,6 @@
     "changePassword": "Jelszómódosítás",
     "newPasswordLabel": "Új jelszó",
     "saveChanges": "Mentés"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Telepítse a %VMS_NAME% alkalmazást a rendszer megtekintéshez",
-    "action": "%VMS_NAME% letöltése",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Csak kliens",
-      "server": "Csak szerver",
-      "bundle": "Kliens és szerver",
-      "servertool": "Konfigurációs eszköz"
-    },
-    "releasesTypes": {
-      "beta": "Béta",
-      "betas": "Béták",
-      "rc": "Kiadásra jelölt",
-      "release": "Kiadás",
-      "releases": "Kiadások",
-      "patch": "Javítás",
-      "patches": "Javítások"
-    }
   },
   "activeActions": {
     "sendConfirm": "Aktiválási link újraküldése",

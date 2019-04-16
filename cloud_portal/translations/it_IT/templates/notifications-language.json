@@ -18,15 +18,15 @@
     "emailSubject": "{{message.subject}}"
   },
   "cloud_invite": {
-    "emailSubject": "You have been invited to %PRODUCT_NAME%"
+    "emailSubject": "Sei stato invitato a %PRODUCT_NAME%"
   },
   "ipvd_feedback": {
-    "emailSubject": "Camera Page Feedback for {{message.product}}"
+    "emailSubject": "Feedback della pagina della telecamera per {{message.product}}"
   },
   "sales_inquiry": {
-    "emailSubject": "Sales inquiry for {{message.product}}"
+    "emailSubject": "Richiesta informazioni di vendita per {{message.product}}"
   },
   "support_request": {
-    "emailSubject": "Support request for {{message.product}}"
+    "emailSubject": "Richiesta di supporto per {{message.product}}"
   }
 }
