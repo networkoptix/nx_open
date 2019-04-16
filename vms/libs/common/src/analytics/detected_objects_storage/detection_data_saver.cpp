@@ -186,7 +186,8 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
     }
 }
 
-std::vector<long long> DetectionDataSaver::toDbIds(const std::vector<QnUuid>& objectIds)
+std::vector<long long> DetectionDataSaver::toDbIds(
+    const std::set<QnUuid>& objectIds)
 {
     std::vector<long long> dbIds;
     for (const auto& objectId: objectIds)

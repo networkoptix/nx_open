@@ -46,7 +46,7 @@ private:
     void insertObjects(nx::sql::QueryContext* queryContext);
     void updateObjects(nx::sql::QueryContext* queryContext);
     void saveObjectSearchData(nx::sql::QueryContext* queryContext);
-    std::vector<long long> toDbIds(const std::vector<QnUuid>& objectIds);
+    std::vector<long long> toDbIds(const std::set<QnUuid>& objectIds);
 };
 
 } // namespace nx::analytics::storage

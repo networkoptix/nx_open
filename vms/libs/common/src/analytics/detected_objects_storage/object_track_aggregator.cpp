@@ -1,5 +1,7 @@
 #include "object_track_aggregator.h"
 
+#include <nx/utils/time.h>
+
 namespace nx::analytics::storage {
 
 ObjectTrackAggregator::ObjectTrackAggregator(
@@ -14,17 +16,55 @@ ObjectTrackAggregator::ObjectTrackAggregator(
 }
 
 void ObjectTrackAggregator::add(
-    const QnUuid& /*objectId*/,
-    std::chrono::milliseconds /*timestamp*/,
-    const QRectF& /*box*/)
+    const QnUuid& objectId,
+    std::chrono::milliseconds timestamp,
+    const QRectF& box)
 {
-    // TODO
+    const auto translatedBox = translate(box);
+
+    m_rectAggregator.add(translatedBox, objectId);
+
+    m_aggregationStartTimestamp = m_aggregationStartTimestamp
+        ? std::min(*m_aggregationStartTimestamp, timestamp)
+        : timestamp;
+
+    m_aggregationEndTimestamp = m_aggregationEndTimestamp
+        ? std::max(*m_aggregationEndTimestamp, timestamp)
+        : timestamp;
 }
 
 std::vector<AggregatedTrackData> ObjectTrackAggregator::getAggregatedData()
 {
-    // TODO
-    return {};
+    if (length() < m_aggregationPeriod)
+        return {};
+
+    std::vector<AggregatedTrackData> result;
+
+    auto aggregated = m_rectAggregator.aggregatedData();
+    for (const auto& rect: aggregated)
+    {
+        result.push_back(AggregatedTrackData());
+        result.back().boundingBox = rect.rect;
+        result.back().objectIds = rect.values;
+        // TODO: #ak It would be better to use precise timestamp for this region.
+        result.back().timestamp = *m_aggregationStartTimestamp;
+    }
+
+    return result;
+}
+
+std::chrono::milliseconds ObjectTrackAggregator::length() const
+{
+    return m_aggregationStartTimestamp
+        ? *m_aggregationEndTimestamp - *m_aggregationStartTimestamp
+        : std::chrono::milliseconds::zero();
+}
+
+QRect ObjectTrackAggregator::translate(const QRectF& box)
+{
+    return QRect(
+        box.x() * m_resolutionX, box.y() * m_resolutionY,
+        box.width() * m_resolutionX, box.height() * m_resolutionY);
 }
 
 } // namespace nx::analytics::storage
