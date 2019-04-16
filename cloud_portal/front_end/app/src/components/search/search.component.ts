@@ -322,9 +322,8 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             });
         }
 
-        if (!this.numberFilters) {
-            queryParams.page = undefined;
-        }
+        // Reset page number after filter changed
+        queryParams.page = (!this.numberFilters) ? undefined : 1;
 
         this.uri.updateURI(this.uriPath, queryParams, true);
     }
