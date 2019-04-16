@@ -166,7 +166,7 @@ void HanwhaResourceSearcher::updateSocketList()
     {
         auto socket = nx::network::SocketFactory::createDatagramSocket();
         if (socket->setReuseAddrFlag(true) &&
-            socket->bind(network::BROADCAST_ADDRESS, kSunApiProbeSrcPort))
+            socket->bind(nx::network::BROADCAST_ADDRESS, kSunApiProbeSrcPort))
         {
             m_sunapiReceiveSocket = std::move(socket);
         }
@@ -263,7 +263,7 @@ void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceLi
 }
 
 bool HanwhaResourceSearcher::readSunApiResponseFromSocket(
-    network::AbstractDatagramSocket* socket,
+    nx::network::AbstractDatagramSocket* socket,
     QnResourceList* resultResourceList)
 {
     NX_ASSERT(socket);

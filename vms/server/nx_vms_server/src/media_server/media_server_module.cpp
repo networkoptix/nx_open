@@ -53,6 +53,7 @@
 #include <nx/vms/server/root_fs.h>
 #include <nx/vms/server/server_update_manager.h>
 #include <nx/vms/server/meta_types.h>
+#include <nx/vms/server/network/multicast_address_registry.h>
 
 #include <nx/vms/server/analytics/sdk_object_factory.h>
 
@@ -311,6 +312,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_sdkObjectFactory = store(new nx::vms::server::analytics::SdkObjectFactory(this));
 
     m_hlsSessionPool = store(new nx::vms::server::hls::SessionPool());
+    m_multicastAddressRegistry = store(new nx::vms::server::network::MulticastAddressRegistry());
 
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -686,6 +688,12 @@ nx::network::upnp::DeviceSearcher* QnMediaServerModule::upnpDeviceSearcher() con
 nx::vms::server::hls::SessionPool* QnMediaServerModule::hlsSessionPool() const
 {
     return m_hlsSessionPool;
+}
+
+nx::vms::server::network::MulticastAddressRegistry*
+    QnMediaServerModule::multicastAddressRegistry() const
+{
+    return m_multicastAddressRegistry;
 }
 
 QnStoragePluginFactory* QnMediaServerModule::storagePluginFactory() const

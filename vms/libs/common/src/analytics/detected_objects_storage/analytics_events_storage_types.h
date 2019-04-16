@@ -68,10 +68,6 @@ struct DetectedObject
     (objectAppearanceId)(objectTypeId)(attributes)(firstAppearanceTimeUsec)(lastAppearanceTimeUsec)(track)
 QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
 
-QByteArray serializeTrack(const std::vector<ObjectPosition>& track);
-
-std::vector<ObjectPosition> deserializeTrack(const QByteArray& serializedData);
-
 //-------------------------------------------------------------------------------------------------
 
 struct Filter

@@ -34,6 +34,8 @@ public:
     virtual void handshakeAsync(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
+    virtual std::string serverName() const override;
+
 private:
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_handshakeCompletionUserHandler;
     std::atomic<bool> m_sslUsed = false;

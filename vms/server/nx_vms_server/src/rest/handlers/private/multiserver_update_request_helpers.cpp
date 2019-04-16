@@ -16,23 +16,29 @@ void checkUpdateStatusRemotely(
     static const QString kOfflineMessage = "peer is offline";
     auto mergeFunction =
         [serverModule, reply](
-            const QnUuid& serverId,
-            bool success,
-            QnJsonRestResult& result,
-            QnJsonRestResult&)
+            const QnUuid& serverId, bool success, QnJsonRestResult& result, QnJsonRestResult&)
         {
             if (success)
             {
-                reply->append(result.deserialized<QList<nx::update::Status>>()[0]);
+                const auto remotePeerUpdateStatus =
+                    result.deserialized<QList<nx::update::Status>>()[0];
+
+                if (remotePeerUpdateStatus.serverId.isNull())
+                {
+                    reply->append(nx::update::Status(
+                        serverId, nx::update::Status::Code::offline, kOfflineMessage));
+                }
+                else
+                {
+                    reply->append(remotePeerUpdateStatus);
+                }
             }
             else
             {
                 if (serverId != serverModule->commonModule()->moduleGUID())
                 {
                     reply->append(nx::update::Status(
-                        serverId,
-                        nx::update::Status::Code::offline,
-                        kOfflineMessage));
+                        serverId, nx::update::Status::Code::offline, kOfflineMessage));
                 }
                 else
                 {

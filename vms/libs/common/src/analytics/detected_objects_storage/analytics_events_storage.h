@@ -27,6 +27,7 @@
 #include "object_cache.h"
 #include "object_track_aggregator.h"
 #include "object_type_dao.h"
+#include "time_period_dao.h"
 
 namespace nx::analytics::storage {
 
@@ -102,31 +103,12 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
-namespace detail {
-
-class TimePeriod
-{
-public:
-    long long id = -1;
-    long long deviceId = -1;
-    std::chrono::milliseconds startTime = std::chrono::milliseconds::zero();
-    std::chrono::milliseconds endTime = std::chrono::milliseconds::zero();
-    std::chrono::milliseconds lastSavedEndTime = std::chrono::milliseconds::zero();
-
-    std::chrono::milliseconds length() const;
-
-    bool addPacketToPeriod(
-        std::chrono::milliseconds timestamp,
-        std::chrono::milliseconds duration);
-};
-
-} // namespace detai;
-
 class EventsStorage:
     public AbstractEventsStorage
 {
 public:
     EventsStorage(const Settings& settings);
+    virtual ~EventsStorage();
 
     virtual bool initialize() override;
 
@@ -152,18 +134,14 @@ public:
         std::chrono::milliseconds oldestDataToKeepTimestamp) override;
 
 private:
-    using DeviceIdToCurrentTimePeriod = std::map<long long, detail::TimePeriod>;
-    using IdToTimePeriod = std::map<long long, DeviceIdToCurrentTimePeriod::iterator>;
-
     const Settings& m_settings;
     DbController m_dbController;
     std::chrono::milliseconds m_maxRecordedTimestamp = std::chrono::milliseconds::zero();
     mutable QnMutex m_mutex;
-    DeviceIdToCurrentTimePeriod m_deviceIdToCurrentTimePeriod;
-    IdToTimePeriod m_idToTimePeriod;
     AttributesDao m_attributesDao;
     ObjectTypeDao m_objectTypeDao;
     DeviceDao m_deviceDao;
+    TimePeriodDao m_timePeriodDao;
 
     ObjectCache m_objectCache;
     ObjectTrackAggregator m_trackAggregator;
@@ -191,30 +169,6 @@ private:
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject);
-
-    /**
-     * @return Id of the current time period.
-     */
-    long long insertOrUpdateTimePeriod(
-        nx::sql::QueryContext* queryContext,
-        const common::metadata::DetectionMetadataPacket& packet);
-
-    detail::TimePeriod* insertOrFetchCurrentTimePeriod(
-        nx::sql::QueryContext* queryContext,
-        long long deviceId,
-        std::chrono::milliseconds packetTimestamp,
-        std::chrono::milliseconds packetDuration);
-
-    void closeCurrentTimePeriod(
-        nx::sql::QueryContext* queryContext,
-        long long deviceId);
-
-    void saveTimePeriodEnd(
-        nx::sql::QueryContext* queryContext,
-        long long id,
-        std::chrono::milliseconds endTime);
-
-    void fillCurrentTimePeriodsCache(nx::sql::QueryContext* queryContext);
 
     void prepareCursorQuery(const Filter& filter, nx::sql::SqlQuery* query);
 

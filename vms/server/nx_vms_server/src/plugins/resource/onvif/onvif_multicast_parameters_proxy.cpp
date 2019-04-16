@@ -190,7 +190,8 @@ bool OnvifMulticastParametersProxy::setMulticastParameters(MulticastParameters p
         return false;
 
     // NOTE: Configuring multicast for audio too, 'cause some cameras have separate multicast
-    // address for audio.
+    // address for audio. We does not care here if setAudioEncoder fails' cause it most probably
+    // will not affect behavior of most of the cameras.
     setAudioEncoderMulticastParameters(parameters);
     return true;
 }

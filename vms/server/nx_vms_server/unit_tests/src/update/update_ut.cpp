@@ -226,18 +226,18 @@ private:
 
     std::vector<std::unique_ptr<MediaServerLauncher>> m_peers;
     nx::update::Information m_updateInformation;
-    network::http::TestHttpServer m_testHttpServer;
+    nx::network::http::TestHttpServer m_testHttpServer;
 
     void connectPeers()
     {
         for (int i = 0; i < m_peers.size() - 1; ++i)
         {
             const auto& to = m_peers[i + 1];
-            const auto toUrl = utils::url::parseUrlFields(to->endpoint().toString(),
-                network::http::kUrlSchemeName);
+            const auto toUrl = nx::utils::url::parseUrlFields(to->endpoint().toString(),
+                nx::network::http::kUrlSchemeName);
 
             m_peers[i]->serverModule()->ec2Connection()->messageBus()->addOutgoingConnectionToPeer(
-                to->commonModule()->moduleGUID(), vms::api::PeerType::server, toUrl);
+                to->commonModule()->moduleGUID(), nx::vms::api::PeerType::server, toUrl);
         }
 
         const auto firstPeerMessageBus = m_peers[0]->serverModule()->ec2Connection()->messageBus();
@@ -300,7 +300,7 @@ private:
         }
 
         NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
-            network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
+            nx::network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
         QnRestResult installResponse;
         QJson::deserialize(responseBuffer, &installResponse);
         ASSERT_EQ(expectedRestResult, installResponse.error);
@@ -315,7 +315,7 @@ private:
 
         QByteArray responseBuffer;
         NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
-            network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
+            nx::network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
 
         QnRestResult installResponse;
         QJson::deserialize(responseBuffer, &installResponse);
