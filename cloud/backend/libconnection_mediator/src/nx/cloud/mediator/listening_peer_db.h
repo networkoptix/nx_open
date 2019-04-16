@@ -21,6 +21,7 @@ struct MediatorEndpoint
 
     std::string toString() const;
     bool operator ==(const MediatorEndpoint& other) const;
+    bool operator !=(const MediatorEndpoint& other) const;
 };
 
 //-------------------------------------------------------------------------------------------------

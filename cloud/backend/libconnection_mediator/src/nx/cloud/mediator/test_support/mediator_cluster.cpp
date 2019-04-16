@@ -12,14 +12,16 @@ namespace {
 
 static constexpr char kClusterId[] = "mediator_test_cluster";
 
-static bool mediatorHasPeer(MediatorFunctionalTest* mediator, const std::string& peerDomainName)
+static MediatorEndpoint lookupMediatorEndpointSync(
+    MediatorFunctionalTest* mediator,
+    const std::string& peerDomainName)
 {
-    nx::utils::SyncQueue<bool> hasEndpoint;
+    nx::utils::SyncQueue<MediatorEndpoint> hasEndpoint;
     mediator->moduleInstance()->impl()->listeningPeerDb().findMediatorByPeerDomain(
         peerDomainName,
         [&hasEndpoint](MediatorEndpoint endpoint)
         {
-            hasEndpoint.push(!endpoint.domainName.empty());
+            hasEndpoint.push(endpoint);
         });
     return hasEndpoint.pop();
 }
@@ -68,7 +70,7 @@ bool MediatorCluster::peerInformationSynchronizedInCluster(const std::string& pe
 {
     for (const auto& mediator : m_mediators)
     {
-        if (!mediatorHasPeer(mediator.get(), peerDomainName))
+        if (!lookupMediatorEndpointSync(mediator.get(), peerDomainName).domainName.empty())
             return false;
     }
 
@@ -79,11 +81,23 @@ bool MediatorCluster::peerInformationIsAbsentFromCluster(const std::string& peer
 {
     for (const auto& mediator : m_mediators)
     {
-        if (mediatorHasPeer(mediator.get(), peerDomainName))
+        if (lookupMediatorEndpointSync(mediator.get(), peerDomainName).domainName.empty())
             return false;
     }
 
     return true;
+}
+
+std::optional<MediatorEndpoint> MediatorCluster::lookupMediatorEndpoint(
+    const std::string& peerDomainName) const
+{
+    for (const auto& mediator : m_mediators)
+    {
+        auto endpoint = lookupMediatorEndpointSync(mediator.get(), peerDomainName);
+        if (!endpoint.domainName.empty())
+            return endpoint;
+    }
+    return std::nullopt;
 }
 
 void MediatorCluster::addClusterArgs(MediatorFunctionalTest* mediator)

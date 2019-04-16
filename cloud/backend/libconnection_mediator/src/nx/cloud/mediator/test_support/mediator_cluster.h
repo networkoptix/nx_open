@@ -42,14 +42,19 @@ public:
     const MediatorFunctionalTest& mediator(int index) const;
 
     /**
-     * returns true if ALL Mediator's have peerDomainName.
+     * Returns true if ALL Mediator's have peerDomainName.
      */
     bool peerInformationSynchronizedInCluster(const std::string& peerDomainName) const;
 
     /**
-     * returns true if ALL Mediator's do NOT have peerDomainName.
+     * Returns true if ALL Mediator's do NOT have peerDomainName.
      */
     bool peerInformationIsAbsentFromCluster(const std::string& peerDomainName) const;
+
+    /**
+     * Get the endpoint that the given peer is listening on, or an std::nullopt if none is found
+     */
+    std::optional<MediatorEndpoint> lookupMediatorEndpoint(const std::string& peerDomainName) const;
 
 private:
     void addClusterArgs(MediatorFunctionalTest* mediator);

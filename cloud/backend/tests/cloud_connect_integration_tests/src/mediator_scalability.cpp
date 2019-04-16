@@ -7,7 +7,7 @@ namespace nx::network::cloud::test {
 
 namespace {
 
-static constexpr int kMaxMediatorCount = 2;
+static constexpr int kMaxMediatorCount = 3;
 
 } // namespace
 
@@ -25,7 +25,7 @@ protected:
         for (int i = mediatorCount(); i < kMaxMediatorCount; ++i)
         {
             addMediator();
-            startMediator(mediatorCount() - 1);
+            startMediator(i);
         }
     }
 
@@ -34,28 +34,42 @@ protected:
         // Done in SetUp().
     }
 
-    void whenStartServer()
+    void whenServerConnectsToMediator(int mediatorIndex)
     {
-        // Forcing connection to mediator 0.
-        startServer(0);
+        m_serverConnectionIndex = mediatorIndex;
+        startServer(mediatorIndex);
     }
 
-    void givenSynchronizedClusterWithServer()
+    void givenSynchronizedClusterWithServerListeningOnMediator(int mediatorIndex)
     {
         givenMultipleMediators();
-        whenStartServer();
+        whenServerConnectsToMediator(mediatorIndex);
         thenServerInfoIsSynchronized();
+        andServerConnectionInfoIsUpdated();
+
+        int differentMediator = mediatorIndex + 1 < mediatorCount()
+            ? mediatorIndex + 1
+            : 0;
+
+        whenClientConnectsToMediator(differentMediator);
+        thenConnectionSucceeded();
+        andDataIsExchangedBetweenClientAndServer();
     }
 
-    void whenConnectToServerOnDifferentMediator()
+    void whenClientConnectsToMediator(int mediatorIndex)
     {
-        // Configuring global mediator connector with info for mediator 1
-        configureGlobalMediatorConnector(1);
+        // Configuring global mediator connector with info for mediator 0
+        configureGlobalMediatorConnector(mediatorIndex);
+    }
+
+    void whenServerConnectionIsBroken()
+    {
+        mediator(m_serverConnectionIndex).restart();
     }
 
     void thenServerInfoIsSynchronized()
     {
-        waitUntilServerIsRegisteredOnMediator();
+        m_serverConnectionEndpoint = waitUntilServerIsRegisteredOnMediator();
     }
 
     void thenConnectionSucceeded()
@@ -69,6 +83,15 @@ protected:
             startExchangingFixedData();
 
         assertDataHasBeenExchangedCorrectly();
+    }
+
+    void andServerConnectionInfoIsUpdated()
+    {
+        auto expectedEndpoint =
+            mediator(m_serverConnectionIndex)
+                .moduleInstance()->impl()->listeningPeerDb().thisMediatorEndpoint();
+        while (expectedEndpoint != m_serverConnectionEndpoint)
+            thenServerInfoIsSynchronized();
     }
 
 private:
@@ -85,22 +108,37 @@ private:
         nx::hpm::api::ResultCode,
         nx::hpm::api::ConnectResponse>> m_connectResponseEvents;
     nx::network::stun::TransportHeader m_responseHeader;
+    int m_serverConnectionIndex;
+    nx::hpm::MediatorEndpoint m_serverConnectionEndpoint;
 };
 
 TEST_F(MediatorScalability, server_info_synchronizes_in_cluster)
 {
     givenMultipleMediators();
 
-    whenStartServer();
+    whenServerConnectsToMediator(1);
 
     thenServerInfoIsSynchronized();
 }
 
 TEST_F(MediatorScalability, connect_request_is_redirected)
 {
-    givenSynchronizedClusterWithServer();
+    givenSynchronizedClusterWithServerListeningOnMediator(1);
 
-    whenConnectToServerOnDifferentMediator();
+    whenClientConnectsToMediator(0);
+
+    thenConnectionSucceeded();
+
+    andDataIsExchangedBetweenClientAndServer();
+}
+
+TEST_F(MediatorScalability, mediator_info_updated_in_cluster_after_reconnect)
+{
+    givenSynchronizedClusterWithServerListeningOnMediator(1);
+
+    whenServerConnectionIsBroken();
+    whenServerConnectsToMediator(2);
+    whenClientConnectsToMediator(0);
 
     thenConnectionSucceeded();
 

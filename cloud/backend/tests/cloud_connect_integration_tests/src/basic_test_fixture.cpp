@@ -264,6 +264,11 @@ void BasicTestFixture::restartMediator(int index)
     mediator(index).restart();
 }
 
+const nx::hpm::test::MediatorCluster& BasicTestFixture::mediatorCluster() const
+{
+    return m_mediatorCluster.cluster();
+}
+
 nx::hpm::MediatorFunctionalTest& BasicTestFixture::mediator(int index)
 {
     return m_mediatorCluster.context(index).mediator;
@@ -529,11 +534,16 @@ void BasicTestFixture::assertDataHasBeenExchangedCorrectly()
     }
 }
 
-void BasicTestFixture::waitUntilServerIsRegisteredOnMediator()
+nx::hpm::MediatorEndpoint BasicTestFixture::waitUntilServerIsRegisteredOnMediator()
 {
     std::string systemId = m_cloudSystemCredentials.systemId.toStdString();
-    while (!m_mediatorCluster.cluster().peerInformationSynchronizedInCluster(systemId))
+    auto endpoint = m_mediatorCluster.cluster().lookupMediatorEndpoint(systemId);
+    while (!endpoint)
+    {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        endpoint = m_mediatorCluster.cluster().lookupMediatorEndpoint(systemId);
+    }
+    return *endpoint;
 }
 
 void BasicTestFixture::waitUntilServerIsRegisteredOnTrafficRelay()

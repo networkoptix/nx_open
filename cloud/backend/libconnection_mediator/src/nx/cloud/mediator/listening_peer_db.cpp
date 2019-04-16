@@ -88,6 +88,11 @@ bool MediatorEndpoint::operator==(const MediatorEndpoint &other) const
         && stunUdpPort == other.stunUdpPort;
 }
 
+bool MediatorEndpoint::operator !=(const MediatorEndpoint& other) const
+{
+    return !(*this == other);
+}
+
 //-------------------------------------------------------------------------------------------------
 // ListeningPeerDb
 

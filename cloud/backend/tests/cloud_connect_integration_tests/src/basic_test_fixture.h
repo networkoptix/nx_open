@@ -154,6 +154,7 @@ protected:
     int mediatorCount() const;
     void startMediator(int index = 0);
     void restartMediator(int index = 0);
+    const nx::hpm::test::MediatorCluster& mediatorCluster() const;
     nx::hpm::MediatorFunctionalTest& mediator(int index = 0);
     MediatorConnectorCluster::Context& mediatorContext(int index = 0);
     void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
@@ -211,7 +212,7 @@ protected:
     void startExchangingFixedData();
     void assertDataHasBeenExchangedCorrectly();
 
-    void waitUntilServerIsRegisteredOnMediator();
+    nx::hpm::MediatorEndpoint waitUntilServerIsRegisteredOnMediator();
     void waitUntilServerIsRegisteredOnTrafficRelay();
     void waitUntilServerIsUnRegisteredOnTrafficRelay();
 
