@@ -3281,6 +3281,14 @@ to %1</source>
       <source>Folder already added</source>
       <translation>Папка вже додана</translation>
     </message>
+    <message>
+      <source>None</source>
+      <translation>Ні</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation>Авто (%1)</translation>
+    </message>
   </context>
   <context>
     <name>QnGeneralSystemAdministrationWidget</name>
@@ -6000,19 +6008,11 @@ to %1</source>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>Помилка при синхронізації віддаленого архіву</translation>
     </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>Включити автовизначення пристроїв і серверів</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>Включити автовизначення камер і серверів</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>Дозволити системі оптимізувати настройки пристроїв</translation>
@@ -6028,6 +6028,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Не містить ніякої особистої інформації і є повністю анонімним.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation>Файловер серверу може вимагати оновлення статусу камери незалежно від цього налаштування.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation>Увімкнути автоматичне виявлення пристроїв і серверів і автоматичну перевірку стану пристрою</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation>Увімкніть автоматичне виявлення камер і серверів і автоматичну перевірку стану камери</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -7280,6 +7296,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation>Час сесії минув</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation>Межа тривалості сеансу може бути змінена системними адміністраторами</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7485,6 +7512,14 @@ to %1</source>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation>Показати лише за допомогою вкладки &quot;Об'єкт&quot; Tab</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>Показати</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation>Не показувати</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7639,10 +7674,6 @@ to %1</source>
       <translation>Оригінальне</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>Сервер не буде змінювати налаштування камер, він буде отримувати і використовувати потік з камери як є. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Допомагає вирішити проблеми з якістю зображення на деяких камерах; для інших це призведе до значного збільшення бітрейту.</translation>
     </message>
@@ -7668,6 +7699,14 @@ to %1</source>
         <numerusform>Цей ідентифікатор вже використовується для наступних %n камер:</numerusform>
         <numerusform>Цей ідентифікатор вже використовується для наступних %n камер:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>UDP Multicast</source>
+      <translation>UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Сервер не буде змінювати налаштування камер, він буде отримувати і використовувати потік з камери як є.</translation>
     </message>
   </context>
   <context>
@@ -7954,11 +7993,11 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>Недостатньо місця на диску для встановлення оновлення клієнта.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>Інсталяційний пакет було втрачено.</translation>
     </message>
   </context>
   <context>
@@ -8127,20 +8166,12 @@ to %1</source>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-    <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Щоб продовжити, перегляньте та погодьтеся з номером %1</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>Для використання програмного забезпечення ви повинні прийняти ліцензійну угоду кінцевого користувача</translation>
     </message>
   </context>
   <context>
@@ -8228,7 +8259,7 @@ to %1</source>
     </message>
     <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>Не відбулося ніяких подій</translation>
     </message>
   </context>
   <context>
@@ -8751,10 +8782,6 @@ to %1</source>
       <translation>Скасувати оновлення</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Не вдалося завантажити пакети оновлення для деяких серверів</translation>
-    </message>
-    <message>
       <source>Please make sure they have enough free storage space and stable network connection.</source>
       <translation>Переконайтеся, що вільного місця для зберігання достатньо, а мережеве з'єднання стабільне.</translation>
     </message>
@@ -8905,11 +8932,15 @@ to %1</source>
     </message>
     <message>
       <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+      <translation>Деякі сервери &apos;не завершили процес оновлення. Закінчити його все одно?</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>Скасувати оновлення та видалити всі завантажені дані?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Не вдалося завантажити пакети оновлення для деяких компонентів</translation>
     </message>
   </context>
   <context>
@@ -8938,6 +8969,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>Підтвердити</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Загальні події</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Event</source>
+      <translation>Невідомий плагін події</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation>Пристрій було відключено</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation>Камера була відключена</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation>Модуль вводу-виводу був відключений</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8957,10 +9008,6 @@ to %1</source>
       <translation>Жоден із вибраних користувачів не має доступу до обраної розкладки. Дія не буде працювати.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>Місцеві розкладки можуть бути показані лише їх власникам. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>Виберіть макет...</translation>
     </message>
@@ -8975,6 +9022,45 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Жодна з вибраних ролей не містить користувачів. Дія не спрацює.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation>Сервер надто довго реагує</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation>Немає завдання для оновлення</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation>Готовий до завантаження оновлення</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation>Завантажується оновлення</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation>Готовий до запуску нової версії</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation>Встановлення оновлення</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation>Встановлено</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation>Не вдалося завантажити оновлення</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation>Не вдалося інсталювати оновлення</translation>
     </message>
   </context>
   <context>
@@ -9121,16 +9207,16 @@ to %1</source>
       <translation>Відстежує і реєструє всі дії користувача.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation>Користувач автоматично вийде з системи після закінчення цього періоду часу.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>хвилина</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>година</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation>Користувачі будуть автоматично виключені, якщо їхня сесія перевищить вказану тривалість.</translation>
     </message>
   </context>
   <context>
@@ -9151,13 +9237,13 @@ to %1</source>
       <source>Downloaded</source>
       <translation>Завантажене</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation>Очікування відповіді сервера...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>Поточна версія</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>Статус</translation>
@@ -9177,6 +9263,10 @@ to %1</source>
     <message>
       <source>Component</source>
       <translation>Компонент</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation>Встановлена версія</translation>
     </message>
   </context>
   <context>
@@ -9486,6 +9576,26 @@ to %1</source>
       <source>Starting export...</source>
       <translation>Початок експорту...</translation>
     </message>
+    <message>
+      <source>Saving layout</source>
+      <translation>Зберегти макет</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation>Зупинити збереження</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation>Помилка збереження</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation>Початок збереження...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation>Ми готуємо файли для процесу експорту. Зачекайте кілька секунд.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
@@ -9521,7 +9631,7 @@ to %1</source>
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Відновити роздільну здатність</translation>
     </message>
   </context>
   <context>

@@ -3205,6 +3205,14 @@ to %1</source>
       <source>Folder already added</source>
       <translation>Ordner bereits hinzugefügt</translation>
     </message>
+    <message>
+      <source>None</source>
+      <translation>Keine</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation>Auto (%1)</translation>
+    </message>
   </context>
   <context>
     <name>QnGeneralSystemAdministrationWidget</name>
@@ -5872,19 +5880,11 @@ to %1</source>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>Bei der Remote-Archivsynchronisation ist ein Fehler aufgetreten</translation>
     </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>Automatische Suche nach Geräten und Servern aktivieren</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>Automatische Suche nach Kameras und Servern aktivieren</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>Erlauben Sie dem System die Geräteeinstellungen zu optimieren</translation>
@@ -5900,6 +5900,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Enthält keine persönlichen Daten und ist völlig anonym.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation>Failover-Servermaßnahmen können unabhängig von dieser Einstellung weiterhin Kamerastatusupdates anfordern.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation>Aktivieren Sie die automatische Erkennung von Geräten und Servern und die automatische Überprüfung des Gerätestatus</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation>Aktivieren Sie die automatische Erkennung von Kameras und Servern und die automatische Überprüfung des Kamerastatus</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -7080,6 +7096,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation>Ihre Sitzung ist abgelaufen</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation>Die Begrenzung der Sitzungsdauer kann von den Systemadministratoren geändert werden</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7283,6 +7310,14 @@ to %1</source>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation>Nur mit &quot;Objecte&quot;-Tab anzeigen</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>Anzeigen</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation>Nicht anzeigen</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7433,10 +7468,6 @@ to %1</source>
       <translation>Nativ</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>Der Server ändert keine Kameraeinstellungen, er empfängt und verwendet den Kamerastream wie er ist. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Hilft, Probleme mit der Bildqualität bei einigen Kameras zu beheben; bei anderen wird die Bitrate deutlich erhöht.</translation>
     </message>
@@ -7460,6 +7491,14 @@ to %1</source>
         <numerusform>Diese ID wird bereits für folgende %n Kamera verwendet:</numerusform>
         <numerusform>Diese ID wird bereits für folgende %n Kameras verwendet:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>UDP Multicast</source>
+      <translation>UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Der Server ändert keine Kameraeinstellungen, er empfängt und verwendet den Kamerastream wie er ist.</translation>
     </message>
   </context>
   <context>
@@ -7732,11 +7771,11 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>Nicht genügend Speicherplatz auf der Festplatte, um das Clientupdate zu installieren.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>Das Installationspaket ist verloren gegangen.</translation>
     </message>
   </context>
   <context>
@@ -7899,20 +7938,12 @@ to %1</source>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-    <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Bitte überprüfen und stimmen Sie der %1 zu, um fortzufahren</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>Um die Software nutzen zu können, müssen Sie der Endbenutzer-Lizenzvereinbarung zustimmen</translation>
     </message>
   </context>
   <context>
@@ -7998,7 +8029,7 @@ to %1</source>
     </message>
     <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>Es sind keine Ereignisse aufgetreten</translation>
     </message>
   </context>
   <context>
@@ -8515,10 +8546,6 @@ to %1</source>
       <translation>Update abbrechen</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Aktualisierungspakete konnten nicht auf einige Server heruntergeladen werden</translation>
-    </message>
-    <message>
       <source>Please make sure they have enough free storage space and stable network connection.</source>
       <translation>Bitte stellen Sie sicher, dass sie genügend freien Speicherplatz und eine stabile Netzwerkverbindung haben.</translation>
     </message>
@@ -8667,11 +8694,15 @@ to %1</source>
     </message>
     <message>
       <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+      <translation>Einige Server haben den Updateprozess nicht abgeschlossen. Trotzdem beenden?</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>Update abbrechen und alle heruntergeladenen Daten löschen?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Aktualisierungspakete für einige Komponenten konnten nicht heruntergeladen werden</translation>
     </message>
   </context>
   <context>
@@ -8698,6 +8729,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>Bestätigen</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Generisches Ereignis</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Event</source>
+      <translation>Unbekanntes Pluginereignis</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation>Gerät wurde getrennt</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation>Kamera wurde getrennt</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation>I/O-Modul wurde getrennt</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8717,10 +8768,6 @@ to %1</source>
       <translation>Keiner der ausgewählten Benutzer hat Zugriff auf das ausgewählte Layout. Aktion wird nicht funktionieren.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>Lokale Layouts können nur ihren Besitzern angezeigt werden. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>Layout auswählen...</translation>
     </message>
@@ -8735,6 +8782,45 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Keine der ausgewählten Benutzerrollen enthält Benutzer. Aktion wird nicht funktionieren.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation>Der Server braucht zu lange, um zu antworten</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation>Keine Aktualisierungsaufgabe</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation>Bereit zum Herunterladen des Updates</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation>Update wird heruntergeladen</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation>Bereit für den Neustart auf die neue Version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation>Update wird installiert</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation>Installiert</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation>Das Update konnte nicht heruntergeladen werden</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation>Das Update konnte nicht installiert werden</translation>
     </message>
   </context>
   <context>
@@ -8879,16 +8965,16 @@ to %1</source>
       <translation>Verfolgt und protokolliert alle Benutzeraktionen.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation>Der Benutzer wird nach dieser Zeit automatisch abgemeldet.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>minuten</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>stunden</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation>Benutzer werden automatisch abgemeldet, wenn ihre Sitzung die angegebene Dauer überschreitet.</translation>
     </message>
   </context>
   <context>
@@ -8909,13 +8995,13 @@ to %1</source>
       <source>Downloaded</source>
       <translation>Heruntergeladen</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation>Warte auf Antwort des Servers...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>Aktuelle Version</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>Status</translation>
@@ -8935,6 +9021,10 @@ to %1</source>
     <message>
       <source>Component</source>
       <translation>Komponente</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation>Installierte Version</translation>
     </message>
   </context>
   <context>
@@ -9234,6 +9324,26 @@ to %1</source>
       <source>Starting export...</source>
       <translation>Export starten...</translation>
     </message>
+    <message>
+      <source>Saving layout</source>
+      <translation>Layout speichern</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation>Speichern stoppen</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation>Speichern fehlgeschlagen</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation>Speichern beginnt...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation>Wir bereiten Dateien für den Export vor. Bitte warten Sie einige Sekunden.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
@@ -9269,7 +9379,7 @@ to %1</source>
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Auflösung rekonstruieren</translation>
     </message>
   </context>
   <context>

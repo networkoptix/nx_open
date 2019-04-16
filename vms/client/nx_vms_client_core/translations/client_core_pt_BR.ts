@@ -6,7 +6,7 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Byte</numerusform>
         <numerusform>Bytes</numerusform>
       </translation>
@@ -80,13 +80,6 @@
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
       <translation>PB</translation>
-    </message>
-  </context>
-  <context>
-    <name>QObject</name>
-    <message>
-      <source>None</source>
-      <translation>Nenhum</translation>
     </message>
   </context>
   <context>

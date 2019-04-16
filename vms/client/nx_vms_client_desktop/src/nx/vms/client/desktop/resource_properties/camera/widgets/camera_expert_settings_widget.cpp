@@ -180,7 +180,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
     ui->settingsDisableControlCheckBox->setHint(tr("Server will not change any cameras settings, "
-        "it will receive and use camera stream as-is. "));
+        "it will receive and use camera stream as-is."));
 
     setHelpTopic(ui->bitratePerGopCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
     ui->bitratePerGopCheckBox->setHint(tr("Helps fix image quality issues on some cameras; "

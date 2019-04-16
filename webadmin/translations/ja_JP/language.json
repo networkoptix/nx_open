@@ -124,7 +124,8 @@
         "updateStatus": "ステータス更新",
         "watermarkSettings": "透かし設定",
         "maxWebMTranscoders": "サーバーのWEBM接続の最大数Chromeは一度に2つの接続を開き、次に最初の接続を閉じます　したがって、このパラメータには2以上の値を設定することをお勧めします",
-        "maxEventLogRecords": "データベースに保存する最大イベントログレコード　削除されていないレコードの実際の量は、指定された値よりも最大20％大きくなる可能性があります"
+        "maxEventLogRecords": "データベースに保存する最大イベントログレコード　削除されていないレコードの実際の量は、指定された値よりも最大20％大きくなる可能性があります",
+        "forceLiveCacheForPrimaryStream": "Whether to cache some frames for the primary stream. Values: \"yes\" - always enabled (may use a lot of RAM), \"no\" - always disabled except when required by the playback (e.g. HLS), \"auto\" - similar to \"no\", but turned on when improves the user experience (e.g. when some Analytics plugin is working on the camera)."
     },
     "info": {
         "tabs": {
