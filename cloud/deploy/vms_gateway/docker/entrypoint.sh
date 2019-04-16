@@ -10,7 +10,7 @@ mv $tmp /opt/networkoptix/vms_gateway/etc/vms_gateway.conf
 
 if [ -n "$MODULE_CONFIGURATION" ]
 then
-    config_helper.py /opt/networkoptix/vms_gateway/etc/vms_gateway.conf "$MODULE_CONFIGURATION"
+    config_helper /opt/networkoptix/vms_gateway/etc/vms_gateway.conf "$MODULE_CONFIGURATION"
 fi
 
 echo $SSL_CERT | base64 -d > /opt/networkoptix/vms_gateway/var/cert.pem
