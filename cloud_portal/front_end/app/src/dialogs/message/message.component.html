@@ -32,7 +32,7 @@
                 <textarea class="form-control"
                           [(ngModel)]="message"
                           rows="5" id="message"
-                          placeholder="{{ 'Make sure you include your camera model and manufacture...' | translate}}"
+                          [placeholder]="placeholder"
                           name="message" type="text"
                           required nxFocusMe></textarea>
             </div>

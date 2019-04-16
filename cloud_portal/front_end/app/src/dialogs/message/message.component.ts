@@ -3,6 +3,7 @@ import { Location }                                                             
 import { NgbModal, NgbActiveModal, NgbModalRef }                                     from '@ng-bootstrap/ng-bootstrap';
 import { EmailValidator, NgForm }                                                    from '@angular/forms';
 import { NxConfigService }                                                           from '../../services/nx-config';
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
     selector: 'nx-modal-message-content',
@@ -16,6 +17,8 @@ export class MessageModalContent {
     @Input() closable;
 
     config: any;
+    lang: any;
+    placeholder: string;
     sendMessage: any;
     userName: string;
     userEmail: string;
@@ -29,6 +32,7 @@ export class MessageModalContent {
     constructor(private activeModal: NgbActiveModal,
                 private configService: NxConfigService,
                 private renderer: Renderer2,
+                private translation: TranslateService,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any,
@@ -36,11 +40,17 @@ export class MessageModalContent {
                 ) {
 
         this.config = configService.getConfig();
+        this.placeholder = '';
+        this.lang = this.translation.translations[this.translation.currentLang];
     }
 
     ngOnInit() {
         if (this.messageType === 'undefined') {
             this.messageType = this.language.messageType.unknown;
+        }
+
+        if (this.messageType.indexOf('_feedback_') > -1) {
+            this.placeholder = this.lang.messageDialogPlaceholders.feedback;
         }
         this.title = this.language.lang.messageType[this.messageType].replace('{{product}}', this.product);
 

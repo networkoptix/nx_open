@@ -144,6 +144,9 @@
 		"Health Monitor": "Health Monitor",
 		"Storage": "Storage"
 	},
+	"messageDialogPlaceholders": {
+		"feedback": "Make sure you include your camera model and manufacturer..."
+	},
 	"About %PRODUCT_NAME%": "About %PRODUCT_NAME%",
 	"Download %VMS_NAME%": "Download %VMS_NAME%",
 	"Integrations": "Integrations",

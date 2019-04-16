@@ -55,7 +55,6 @@
     "Log In": "Log In", 
     "Log Out": "Log Out", 
     "Log in to %PRODUCT_NAME%": "Log in to %PRODUCT_NAME%", 
-    "Make sure you include your camera model and manufacture...": "Make sure you include your camera model and manufacture...", 
     "Merge": "Merge", 
     "Merge Anyway": "Merge Anyway", 
     "Merge Systems": "Merge Systems", 
@@ -253,6 +252,9 @@
     "is offline and cannot be merged with the current one.": "is offline and cannot be merged with the current one.", 
     "latest build": "latest build", 
     "manufacturers": "manufacturers", 
+    "messageDialogPlaceholders": {
+        "feedback": "Make sure you include your camera model and manufacturer..."
+    }, 
     "search": {
         "Search": "Search", 
         "filter applied": "filter applied", 
