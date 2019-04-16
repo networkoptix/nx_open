@@ -116,7 +116,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>시도 횟수가 너무 많습니다. 1 분 후에 다시 시도하십시오.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>

@@ -817,7 +817,7 @@
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
+      <translation>Неприпустима обрана область. Будь ласка, намалюйте правильну.</translation>
     </message>
   </context>
   <context>
