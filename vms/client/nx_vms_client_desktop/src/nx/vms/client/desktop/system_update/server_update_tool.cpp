@@ -29,13 +29,14 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
-#include <nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
 #include "server_update_tool.h"
 #include "server_updates_model.h"
+
+using namespace nx::vms::common::p2p::downloader;
 
 namespace {
 
@@ -78,11 +79,7 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
         m_stateTracker.get(), &PeerStateTracker::setVersionInformation);
     m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
 
-    vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
-    m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
-    m_peerManager->setParent(this);
-
-    m_downloader.reset(new Downloader(m_outputDir, commonModule(), this));
+    m_downloader.reset(new Downloader(m_outputDir, commonModule()));
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ServerUpdateTool::atDownloaderStatusChanged);
 
@@ -105,7 +102,6 @@ ServerUpdateTool::~ServerUpdateTool()
     saveInternalState();
     m_downloader->disconnect(this);
     m_serverConnection.reset();
-    m_peerManager.reset();
     NX_VERBOSE(this) << "~ServerUpdateTool() done";
 }
 
@@ -685,12 +681,6 @@ bool ServerUpdateTool::haveActiveUpdate() const
     return m_updateManifest.isValid();
 }
 
-void ServerUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId)
-{
-    m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
-    m_peerManager->setServerUrl(serverUrl, serverId);
-}
-
 ServerUpdateTool::TimePoint::duration ServerUpdateTool::getInstallDuration() const
 {
     auto delta = qnSyncTime->currentMSecsSinceEpoch() - m_timeStartedInstall;
@@ -907,7 +897,7 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
 
         // Requesting remote update info.
         handle = connection->getUpdateInfo(
-            [this, tool = QPointer<ServerUpdateTool>(this)](
+            [tool = QPointer<ServerUpdateTool>(this)](
                 bool success, rest::Handle handle, rest::UpdateInformationData response)
             {
                 if (!tool)
@@ -981,12 +971,6 @@ std::shared_ptr<PeerStateTracker> ServerUpdateTool::getStateTracker()
 QSet<QnUuid> ServerUpdateTool::getServersInstalling() const
 {
     return m_serversAreInstalling;
-}
-
-ServerUpdateTool::PeerManagerPtr ServerUpdateTool::createPeerManager(
-    FileInformation::PeerSelectionPolicy /*peerPolicy*/, const QList<QnUuid>& /*additionalPeers*/)
-{
-    return m_peerManager.get();
 }
 
 const nx::update::Package* ServerUpdateTool::findPackageForFile(const QString& fileName) const

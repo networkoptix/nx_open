@@ -402,7 +402,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         QnUuid serverId = QnUuid(connectionInfo.ecsGuid);
         nx::utils::Url serverUrl = connectionInfo.ecUrl;
         m_clientUpdateTool->setServerUrl(serverUrl, serverId);
-        m_serverUpdateTool->setServerUrl(serverUrl, serverId);
         //m_clientUpdateTool->requestRemoteUpdateInfo();
     }
     // Force update when we open dialog.

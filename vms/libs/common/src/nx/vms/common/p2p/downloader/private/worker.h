@@ -17,11 +17,7 @@
 #include "../file_information.h"
 #include "abstract_peer_manager.h"
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
+namespace nx::vms::common::p2p::downloader {
 
 class Storage;
 class AbstractPeerManager;
@@ -45,6 +41,26 @@ public:
     };
     Q_ENUM(State)
 
+    struct Peer
+    {
+        QnUuid id;
+        AbstractPeerManager* manager = nullptr;
+
+        QString toString() const { return manager->peerString(id); }
+
+        bool isNull() const { return id.isNull(); }
+
+        bool operator==(const Peer& other) const
+        {
+            return id == other.id && manager == other.manager;
+        }
+
+        friend uint qHash(const Peer& peer)
+        {
+            return qHash(peer.id) + qHash(peer.manager);
+        }
+    };
+
     /**
      * Constructs a Worker
      * NOTE: we need to ensure that peerManager is alive for all lifetime of a Worker.
@@ -52,7 +68,8 @@ public:
     Worker(
         const QString& fileName,
         Storage* storage,
-        AbstractPeerManager* peerManager);
+        const QList<AbstractPeerManager*>& peerManagers,
+        const QnUuid& selfId);
     virtual ~Worker() override;
 
     State state() const;
@@ -62,13 +79,6 @@ public:
 
     bool haveChunksToDownload();
 
-    /**
-     * Preferred peers could be used to hint the worker where to find the file.
-     * This is used similarly to forced peers but does not limit the worker in selecting
-     * other peers.
-     */
-    void setPreferredPeers(const QList<QnUuid>& preferredPeers);
-
 signals:
     void finished(const QString& fileName);
     void failed(const QString& fileName);
@@ -76,19 +86,40 @@ signals:
     void stateChanged(State state);
 
 private:
+    struct RequestHandle
+    {
+        AbstractPeerManager* peerManager;
+        rest::Handle handle;
+
+        QString toString() const
+        {
+            return QString("0x%1:%2").arg((size_t) peerManager, 0, 16).arg(handle);
+        }
+
+        bool operator==(const RequestHandle& other) const
+        {
+            return peerManager == other.peerManager && handle == other.handle;
+        }
+
+        friend uint qHash(const RequestHandle& handle)
+        {
+            return qHash(handle.peerManager) + qHash(handle.handle);
+        }
+    };
+
     void setState(State state);
     void doWork();
     void requestFileInformationInternal();
     void requestFileInformation();
     void requestAvailableChunks();
     void handleFileInformationReply(
-        bool success, rest::Handle handle, const FileInformation& fileInfo);
+        bool success, RequestHandle handle, const FileInformation& fileInfo);
     void requestChecksums();
     void handleChecksumsReply(
-        bool success, rest::Handle handle, const QVector<QByteArray>& checksums);
+        bool success, RequestHandle handle, const QVector<QByteArray>& checksums);
     void downloadNextChunk();
     void handleDownloadChunkReply(
-        bool success, rest::Handle handle, int chunkIndex, const QByteArray& data);
+        bool success, RequestHandle handle, int chunkIndex, const QByteArray& data);
 
     void cancelRequests();
     void cancelRequestsByType(State type);
@@ -96,10 +127,8 @@ private:
 
     void finish(State state = State::finished);
 
-    void updateLogTag();
-
     bool addAvailableChunksInfo(const QBitArray& chunks);
-    QList<QnUuid> peersForChunk(int chunkIndex) const;
+    QList<Peer> peersForChunk(int chunkIndex) const;
 
     void setShouldWait(bool value);
     void setShouldWaitForAsyncOperationCompletion();
@@ -113,57 +142,54 @@ private:
 protected:
     FileInformation fileInformation() const;
 
-    QList<QnUuid> peersWithInternetConnection() const;
-    QList<QnUuid> selectPeersForOperation(
+    QList<Peer> selectPeersForOperation(AbstractPeerManager::Capability capability,
         int count = -1,
-        QList<QnUuid> peers = QList<QnUuid>(),
-        bool skipPeersWithMinimalRank = true) const;
+        const QList<Peer>& allowedPeers = {}) const;
+    QList<QnUuid> selectPeersForOperation(
+        AbstractPeerManager* peerManagers, int count = -1, QList<QnUuid> peers = {}) const;
     void revivePeersWithMinimalRank();
     int selectNextChunk() const;
 
-    bool isInternetAvailable(const QList<QnUuid>& peers = QList<QnUuid>()) const;
-    bool isFileReadyForInternetDownload() const;
-    QList<QnUuid> selectPeersForInternetDownload() const;
     bool needToFindBetterPeers() const;
 
     virtual void waitBeforeNextIteration(QnMutexLockerBase* lock);
 
-    void increasePeerRank(const QnUuid& peerId, int value = 1);
-    void decreasePeerRank(const QnUuid& peerId, int value = 1);
+    void increasePeerRank(const Peer& peer, int value = 1);
+    void decreasePeerRank(const Peer& peer, int value = 1);
 
-    void setPrintSelfPeerInLogs();
     static qint64 defaultStepDelay();
-    AbstractPeerManager* peerManager() const;
+    QList<AbstractPeerManager*> peerManagers() const;
 
 private:
     struct RequestContext
     {
-        QnUuid peerId;
+        Peer peer;
         State type = State::failed;
 
-        RequestContext(const QnUuid& peerId, State type):
-            peerId(peerId),
+        RequestContext(const Peer& peerId, State type):
+            peer(peerId),
             type(type)
         {}
 
         RequestContext() = default;
     };
 
+    QnUuid m_selfId;
     bool m_shouldWait = false;
     mutable QnMutex m_mutex;
     QnWaitCondition m_waitCondition;
     Storage* m_storage = nullptr;
-    AbstractPeerManager* m_peerManager = nullptr;
+    QList<AbstractPeerManager*> m_peerManagers;
     const QString m_fileName;
 
     nx::utils::log::Tag m_logTag;
-    bool m_printSelfPeerInLogs = false;
 
     State m_state = State::initial;
 
     bool m_started = false;
     utils::StandaloneTimerManager m_stepDelayTimer;
-    QHash<rest::Handle, RequestContext> m_contextByHandle;
+
+    QHash<RequestHandle, RequestContext> m_contextByHandle;
 
     QBitArray m_availableChunks;
     QBitArray m_downloadingChunks;
@@ -173,19 +199,16 @@ private:
     {
         QBitArray downloadedChunks;
         int rank = 0;
+        bool isInternet = false;
 
         void increaseRank(int value = 1);
         void decreaseRank(int value = 1);
     };
-    QHash<QnUuid, PeerInformation> m_peerInfoById;
+    QHash<Peer, PeerInformation> m_peerInfoByPeer;
 
     int m_subsequentChunksToDownload;
     bool m_usingInternet = false;
     bool m_fileInfoValidated = false;
 };
 
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::common::p2p::downloader
