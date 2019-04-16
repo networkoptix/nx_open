@@ -5845,10 +5845,6 @@ to %1</source>
       <translation>不包含任何個人資訊, 並且完全匿名</translation>
     </message>
     <message>
-      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </translation>
-    </message>
-    <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
       <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
     </message>
@@ -5859,6 +5855,10 @@ to %1</source>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
       <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -7372,10 +7372,6 @@ to %1</source>
       <translation>原生</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>伺服器不更動任何攝影機串流設定, 將直接使用攝影機所提供之串流並保留串流原始設定 </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>有助於修正一些攝影機的圖像質量問題; 但對於其他攝影機會導致明顯增加的位元速率。</translation>
     </message>
@@ -7402,6 +7398,10 @@ to %1</source>
     <message>
       <source>UDP Multicast</source>
       <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>伺服器不更動任何攝影機串流設定, 將直接使用攝影機所提供之串流並保留串流原始設定。</translation>
     </message>
   </context>
   <context>
@@ -8653,10 +8653,6 @@ to %1</source>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>所有使用者對所選佈局均不具有存取權限。佈局操作將無法正常執行。</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>本地佈局僅對其所有者顯示。 </translation>
     </message>
     <message>
       <source>Select layout...</source>

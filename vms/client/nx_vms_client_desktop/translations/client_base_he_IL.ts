@@ -6027,10 +6027,6 @@ to %1</source>
       <translation>אינו כולל מידע אישי והוא אנונימי לחלוטין.</translation>
     </message>
     <message>
-      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </translation>
-    </message>
-    <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
       <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
     </message>
@@ -6041,6 +6037,10 @@ to %1</source>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
       <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -7671,10 +7671,6 @@ to %1</source>
       <translation>מקורי</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>השרת לא ישנה הגדרות מצלמה, השרת ישתמש בזרם המצלמה כפי שהוא. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>מסייע לתקן בעיות באיכות תמונה בכמה מצלמות; עבור מצלמות אחרות עלול לגרום יגרום לעלייה משמעותית בBITRATE.</translation>
     </message>
@@ -7704,6 +7700,10 @@ to %1</source>
     <message>
       <source>UDP Multicast</source>
       <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>השרת לא ישנה הגדרות מצלמה, השרת ישתמש בזרם המצלמה כפי שהוא.</translation>
     </message>
   </context>
   <context>
@@ -9003,10 +9003,6 @@ to %1</source>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>לאף אחד מהמשתמשים שנבחרו אין גישה לפריסה שנבחרה. הפעולה לא תעבוד.</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>פריסות מקומיות יכולות להופיע רק לבעלים שלהן. </translation>
     </message>
     <message>
       <source>Select layout...</source>

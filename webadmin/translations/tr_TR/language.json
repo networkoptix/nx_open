@@ -125,7 +125,7 @@
         "watermarkSettings": "Watermark settings",
         "maxWebMTranscoders": "Sunucu için maksimum WEBM bağlantısı. Chrome aynı anda 2 bağlantı açar ardından ilkini kapatır. Bu nedenle parametreyi value>=2 olarak ayarlamanız önerilir.",
         "maxEventLogRecords": "Veritabanında tutulacak maksimum olay günlüğü kaydı. Silinmemiş kayıtların gerçek miktarı belirtilen değerden %20 daha yüksek olabilir.",
-        "forceLiveCacheForPrimaryStream": "Whether to cache some frames for the primary stream. Values: \"yes\" - always enabled (may use a lot of RAM), \"no\" - always disabled except when required by the playback (e.g. HLS), \"auto\" - similar to \"no\", but turned on when improves the user experience (e.g. when some Analytics plugin is working on the camera)."
+        "forceLiveCacheForPrimaryStream": "Birincil akış için bazı karelerin önbellekte saklanıp saklanmayacağı. Değer:\"evet\" - her zaman etkin ( çok fazla RAM kullanılabilir), \"hayır\" - geri oynatma işleminin gerektirdiği durumlar dışında devre dışı (örn. HLS), \"auto\" hayır'a benzer ancak etkinleştirildiğinde kullanıcı deneyimini arttırır (örneğin, bazı Analitik eklentileri kamera üzerinde çalışırken)."
     },
     "info": {
         "tabs": {

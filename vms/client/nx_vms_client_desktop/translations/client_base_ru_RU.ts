@@ -6031,10 +6031,6 @@ to %1</source>
       <translation>Не содержит никакой личной информации и является полностью анонимным.</translation>
     </message>
     <message>
-      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </translation>
-    </message>
-    <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
       <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
     </message>
@@ -6045,6 +6041,10 @@ to %1</source>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
       <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -7675,10 +7675,6 @@ to %1</source>
       <translation>Оригинальное</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>Сервер не будет изменять настройки камер, он будет получать и использовать поток с камеры как есть. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Помогает устранить проблемы с качеством изображения на некоторых камерах; для других это приведет к значительному увеличению битрейта.</translation>
     </message>
@@ -7708,6 +7704,10 @@ to %1</source>
     <message>
       <source>UDP Multicast</source>
       <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Сервер не будет изменять настройки камер, он будет получать и использовать поток с камеры как есть.</translation>
     </message>
   </context>
   <context>
@@ -9007,10 +9007,6 @@ to %1</source>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Ни один из выбранных пользователей не имеет доступа к выбранной раскладке. Действие не будет работать.</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>Локальные раскладки могут отображаться только их владельцам. </translation>
     </message>
     <message>
       <source>Select layout...</source>

@@ -5839,10 +5839,6 @@ to %1</source>
       <translation>Không bao gồm bất kỳ thông tin cá nhân nào và hoàn toàn ẩn danh.</translation>
     </message>
     <message>
-      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </translation>
-    </message>
-    <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
       <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
     </message>
@@ -5853,6 +5849,10 @@ to %1</source>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
       <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -7366,10 +7366,6 @@ to %1</source>
       <translation>Riêng</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>Máy chủ sẽ không thay đổi bất kỳ cài đặt máy ảnh nào, nó sẽ nhận và sử dụng luồng máy ảnh như hiện tại. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Giúp sửa các vấn đề về chất lượng hình ảnh trên một số máy ảnh; cho những người khác sẽ làm tăng đáng kể tốc độ bitrate.</translation>
     </message>
@@ -7396,6 +7392,10 @@ to %1</source>
     <message>
       <source>UDP Multicast</source>
       <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Máy chủ sẽ không thay đổi bất kỳ cài đặt máy ảnh nào, nó sẽ nhận và sử dụng luồng máy ảnh như hiện tại.</translation>
     </message>
   </context>
   <context>
@@ -8647,10 +8647,6 @@ to %1</source>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation type="unfinished">Local layouts can only be shown to their owners. </translation>
     </message>
     <message>
       <source>Select layout...</source>

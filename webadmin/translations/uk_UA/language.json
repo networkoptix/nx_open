@@ -125,7 +125,7 @@
         "watermarkSettings": "Налаштування водяного знака",
         "maxWebMTranscoders": "Максимальна кількість WEBM-з'єднань для сервера. Chrome одночасно відкриває 2 з'єднання, потім закриває перше. Отже, рекомендується встановити значення> = 2 для цього параметра.",
         "maxEventLogRecords": "Максимум запису журналу подій для зберігання в базі даних. Реальний обсяг відновлених записів може становити до 20% вище вказаного значення.",
-        "forceLiveCacheForPrimaryStream": "Whether to cache some frames for the primary stream. Values: \"yes\" - always enabled (may use a lot of RAM), \"no\" - always disabled except when required by the playback (e.g. HLS), \"auto\" - similar to \"no\", but turned on when improves the user experience (e.g. when some Analytics plugin is working on the camera)."
+        "forceLiveCacheForPrimaryStream": "Чи потрібно кешувати деякі кадри для первинного потоку. Значення: \"так\" - завжди включений (може використовувати багато оперативної пам'яті), \"ні\" - завжди вимикається, за винятком випадків, коли це вимагається відтворенням (наприклад, HLS), \"авто\" - схожена \"ні\", але увімкнено, коли покращується користувальницький досвід (наприклад, коли деякий плагін Analytics працює на камері)."
     },
     "info": {
         "tabs": {

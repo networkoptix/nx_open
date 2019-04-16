@@ -3212,7 +3212,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -4912,7 +4912,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Esporta segnalibro...</translation>
     </message>
   </context>
   <context>
@@ -5903,10 +5903,6 @@ to %1</source>
       <translation>Non include alcuna informazione personale ed è completamente anonimo.</translation>
     </message>
     <message>
-      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </source>
-      <translation>Se abilitato, il sistema rileva continuamente nuove telecamere e server e invia richieste di rilevamento alle telecamere per l'aggiornamento dello stato. </translation>
-    </message>
-    <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
       <translation>Il server di failover puo' comunque richiedere aggiornamenti dello stato della telecamera indipendentemente da questa impostazione.</translation>
     </message>
@@ -5917,6 +5913,10 @@ to %1</source>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
       <translation>Abilita l'individuazione automatica di dispositivi e server e il controllo automatico dello stato del dispositivo</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -7469,10 +7469,6 @@ to %1</source>
       <translation>Nativo</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>Il server non cambierà le impostazioni della telecamera, riceverà e userà lo streaming della videocamera così com'è. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Aiuta a correggere i problemi di qualità delle immagini su alcune telecamere; probabilmente causerà un aumento significativo del bitrate.</translation>
     </message>
@@ -7500,6 +7496,10 @@ to %1</source>
     <message>
       <source>UDP Multicast</source>
       <translation>Multicast UDP</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Il server non cambierà le impostazioni della telecamera, riceverà e userà lo streaming della telecamera così com'è.</translation>
     </message>
   </context>
   <context>
@@ -8769,10 +8769,6 @@ to %1</source>
       <translation>Nessuno degli utenti selezionati ha accesso al layout selezionato. L'azione non funzionerà.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>I layout locali possono essere mostrati solo ai loro proprietari. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>Seleziona il layout...</translation>
     </message>
@@ -8786,46 +8782,46 @@ to %1</source>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>Nessuno dei ruoli utente selezionati contiene utenti. L'azione non funzionerà.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>Il server sta impiegando troppo tempo per rispondere</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>Nessuna attività di aggiornamento</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>Pronto per scaricare l'aggiornamento</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>Download aggiornamento</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>Pronto per riavviare la nuova versione</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>Installazione aggiornamento</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Installato</translation>
     </message>
     <message>
       <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
+      <translation>Impossibile scaricare il pacchetto di aggiornamento</translation>
     </message>
     <message>
       <source>Failed to install update</source>
-      <translation type="unfinished">Failed to install update</translation>
+      <translation>Impossibile installare l'aggiornamento</translation>
     </message>
   </context>
   <context>
@@ -8903,7 +8899,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>Movimento + bassa risoluzione</translation>
     </message>
   </context>
   <context>
@@ -8979,18 +8975,18 @@ to %1</source>
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Gli utenti verranno automaticamente disconnessi se la loro sessione supera la durata specificata.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
     <message>
       <source>Skipped</source>
-      <translation>Saltato</translation>
+      <translation>Ignorato</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Installato</translation>
     </message>
     <message>
       <source>Installing...</source>
@@ -9002,7 +8998,7 @@ to %1</source>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>In attesa di risposta dal server...</translation>
     </message>
   </context>
   <context>
@@ -9017,7 +9013,7 @@ to %1</source>
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Archivio file di aggiornamento</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9025,11 +9021,11 @@ to %1</source>
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Componente</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>Versione installata</translation>
     </message>
   </context>
   <context>
@@ -9047,7 +9043,7 @@ to %1</source>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>Seleziona l'area sul video per filtrare i risultati</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -9074,11 +9070,11 @@ to %1</source>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Dispositivi selezionati</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>Media selezionato</translation>
     </message>
     <message>
       <source>none</source>
@@ -9097,9 +9093,9 @@ to %1</source>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>L'indirizzo email non è impostato per l'utente %1</numerusform>
+        <numerusform>L'indirizzo email non è impostato per l'utente %1</numerusform>
       </translation>
     </message>
     <message>
@@ -9118,14 +9114,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Fare doppio clic per aggiungere telecamere al layout corrente o Ctrl + clic per aprire in una nuova scheda</numerusform>
+        <numerusform>Fare doppio clic per aggiungere telecamere al layout corrente o Ctrl + clic per aprire in una nuova scheda</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Nessun archivio disponibile</translation>
     </message>
   </context>
   <context>
@@ -9136,7 +9132,7 @@ to %1</source>
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Fuso Orario</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9144,42 +9140,42 @@ to %1</source>
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Orario del server</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Tempo VMS</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Tempo, comune e sincronizzato tra tutti i server. Può essere diverso con l'ora del sistema operativo su qualsiasi server.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Sincronizzare l'orario con Internet</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Sincronizzato con l'ora locale sul server selezionato</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Non sincronizzato Ogni server utilizza la propria ora locale.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Uguale all'ora locale del server</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Nessuna connessione internet. L'orario non viene sincronizzato.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Il Time Server non è in linea. L'orario non viene sincronizzato.</translation>
     </message>
   </context>
   <context>
@@ -9205,7 +9201,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Impossibile creare il caricamento sul lato server</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9224,11 +9220,11 @@ to %1</source>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Il movimento viene rilevato solo durante il caricamento del video.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Abilitando o disabilitando questa impostazione non cambia nulla nell'archivio esistente.</translation>
     </message>
   </context>
   <context>
@@ -9315,7 +9311,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Diversi segnalibri possono essere esportati solo come layout.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
@@ -9327,27 +9323,27 @@ to %1</source>
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Avvio esportazione...</translation>
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Salva layout</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>Interrompere il salvataggio</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>Salvataggio non riuscito</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>Inizio salvataggio...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>Stiamo preparando i file per il processo di esportazione. Si prega di attendere qualche secondo.</translation>
     </message>
   </context>
   <context>
@@ -9384,7 +9380,7 @@ to %1</source>
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Ricostruisci la risoluzione</translation>
     </message>
   </context>
   <context>
@@ -9425,7 +9421,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::PluginEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Qualsiasi plugin</translation>
     </message>
   </context>
   <context>
@@ -9556,7 +9552,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Il layout è pieno</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9614,7 +9610,7 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Le telecamere virtuali non possono essere spostate tra i server</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -9626,7 +9622,7 @@ to %1</source>
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Tutto supportato</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9730,14 +9726,14 @@ to %1</source>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Impossibile cambiare la password su %n di %1 telecamere</numerusform>
+        <numerusform>Impossibile cambiare la password su %n di %1 telecamere</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Questa versione è solo a scopo di test.</translation>
     </message>
   </context>
   <context>

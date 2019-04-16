@@ -5840,10 +5840,6 @@ to %1</source>
       <translation>個人情報は含まず、完全に匿名です</translation>
     </message>
     <message>
-      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </translation>
-    </message>
-    <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
       <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
     </message>
@@ -5854,6 +5850,10 @@ to %1</source>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
       <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -7367,10 +7367,6 @@ to %1</source>
       <translation>Native</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>サーバーはカメラ設定を変更しません。そのままカメラストリームを受信して​​使用します </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>いくつかのカメラの画質の問題を修正することができますがビットレート増加の原因となります</translation>
     </message>
@@ -7397,6 +7393,10 @@ to %1</source>
     <message>
       <source>UDP Multicast</source>
       <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>サーバーはカメラ設定を変更しません。そのままカメラストリームを受信して​​使用します</translation>
     </message>
   </context>
   <context>
@@ -8648,10 +8648,6 @@ to %1</source>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>選択したレイアウトにアクセスできるユーザーが選択されていません。アクションは動作しません</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>ローカルレイアウトは所有者にのみ表示できます </translation>
     </message>
     <message>
       <source>Select layout...</source>

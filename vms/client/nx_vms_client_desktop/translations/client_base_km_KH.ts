@@ -5845,10 +5845,6 @@ to %1</translation>
       <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
     </message>
     <message>
-      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update. </translation>
-    </message>
-    <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
       <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
     </message>
@@ -5859,6 +5855,10 @@ to %1</translation>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
       <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -7372,10 +7372,6 @@ to %1</translation>
       <translation>Native</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
     </message>
@@ -7402,6 +7398,10 @@ to %1</translation>
     <message>
       <source>UDP Multicast</source>
       <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
     </message>
   </context>
   <context>
@@ -8653,10 +8653,6 @@ to %1</translation>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation type="unfinished">Local layouts can only be shown to their owners. </translation>
     </message>
     <message>
       <source>Select layout...</source>
