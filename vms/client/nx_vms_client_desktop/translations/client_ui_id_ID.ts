@@ -655,7 +655,7 @@
     <message>
       <location/>
       <source>Force motion detection for stream</source>
-      <translation type="unfinished">Force motion detection for stream</translation>
+      <translation>Force motion detection for stream</translation>
     </message>
     <message>
       <location/>
@@ -748,7 +748,7 @@
     <message>
       <location/>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Primary Stream</translation>
     </message>
     <message>
       <location/>
@@ -1019,7 +1019,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.ui"/>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>to</translation>
     </message>
     <message>
       <location/>
@@ -1095,6 +1095,24 @@
       <location/>
       <source>Default</source>
       <translation type="unfinished">Default</translation>
+    </message>
+  </context>
+  <context>
+    <name>EulaDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
+      <source>Copy to Clipboard</source>
+      <translation>Copy to Clipboard</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Do Not Agree</source>
+      <translation type="unfinished">I Do Not Agree</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Agree</source>
+      <translation type="unfinished">I Agree</translation>
     </message>
   </context>
   <context>
@@ -1394,11 +1412,6 @@
       <location/>
       <source>First Source</source>
       <translation>First Source</translation>
-    </message>
-    <message>
-      <location/>
-      <source>None</source>
-      <translation>None</translation>
     </message>
     <message>
       <location/>
@@ -2156,7 +2169,7 @@
     <message>
       <location/>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Download</translation>
     </message>
     <message>
       <location/>
@@ -2930,13 +2943,18 @@
     </message>
     <message>
       <location/>
-      <source>Limit Session Length</source>
-      <translation type="unfinished">Limit Session Length</translation>
+      <source>to</source>
+      <translation>to</translation>
     </message>
     <message>
       <location/>
-      <source>to</source>
-      <translation type="unfinished">to</translation>
+      <source>Limit session duration</source>
+      <translation type="unfinished">Limit session duration</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
     </message>
   </context>
   <context>

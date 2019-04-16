@@ -11,34 +11,34 @@
     <div>
         <h3>Générateur d’événements génériques</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party Systems to a System,
+            A Generic Event is a method of sending events from 3rd party systems to a System
             which can be used to trigger System actions in the Events & Rules engine.
-            Le Générateur d'événements génériques est un outil qui permet de générer des appels d'événements génériques HTTP.
+            The Generic Event Generator is a tool which helps developers and integrators build
+            and test HTTP Generic Event calls.
         </p>
         <p><a href="#/developers/events">Générateur d’événements génériques</a></p>
     </div>
     <div>
         <h3>API Serveur</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party Systems. It gives developers the ability to
-            access almost every System feature available in the regular client: query/manage System resources (servers,
-            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
-            control PTZ cameras, and more.
+            A REST API that gives developers the ability to access almost every system feature available in the regular
+            client: query/manage system resources (servers, cameras, users, permissions), pull live or recorded video
+            out of System, generate events, create rules, control PTZ cameras, and more.
         </p>
         <p>
-            <a href="#/developers/api"><b>Outil de test d'API (nouveau) </b></a>
-            - documentation interactive avec des outils pour tester les appels d'API<br>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation and tools for testing API calls<br>
             <a href="#/developers/changelog">API Changelog</a>
-            - liste des dernières modifications apportées à l'API<br>
-            <a id="api-doc" href="api.xml" target="_blank">Documentation API</a> <br>
-            <a href="#/developers/serverDocumentation">Documentation sur les paramètres du serveur</a>
+            - a list of breaking changes in API since the last release<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+            - a full list of available Server API calls
         </p>
 
     </div>
     <div>
         <h3>Panneau de détails caméra</h3>
         <p>
-            Affiche des informations supplémentaires destinées aux développeurs pour les caméras dans l'interface Web Admin:
+            Displays additional developer-friendly information for individual cameras in the Web Admin Interface’s View tab:
         </p>
         <ul>
             <li>ID Caméra</li>
@@ -51,9 +51,12 @@
         <p><a href="#/view/?cameraLinks">ouvrir panneau de détails caméra</a></p>
     </div>
     <div>
-        <h3>Intégration de vidéo source SDK</h3>
+        <h3>Video Source SDK</h3>
         <p>
-            Intégration de vidéo source SDK fournit l'abilité à intégrer au système pratiquement n’importe quelle source vidéo direct ou en différé (caméras IP, NVR, DVR, etc.). SDK permet de créer des méthodes pour découvrir, afficher, analyser et enregistrer vidéo. Il permet également d'intégrer des ports I/O de périphérique et les informations de détection de mouvement.
+            The Video Source SDK provides the ability to integrate almost any live or recorded video source (IP Cameras,
+            NVRs, DVRs, etc) into System and makes it possible to create methods for discovering, displaying, analyzing
+            and recording video. It also allows integrating I/O ports and devices, as well as pulling motion detection
+            information from 3rd party devices.
         </p>
         <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >obtenir SDK</a></p>
     </div>
@@ -61,7 +64,10 @@
     <div>
         <h3>Stockage SDK</h3>
         <p>
-            Stockage SDK fournit l'abilité potentiel d'intégrer l'info stockage système. Il permet aux développeurs de lire ou d’écrire sur n'importe quel emplacement de stockage: local, distant ou même nuage. Créer un plugin de stockage nécessite la mise en œuvre de fonctions standard telles que : flux e/s, si le fichier existe, supprimer le fichier, liste des fichiers dans le dossier, etc.. Stockage SDK contient également un exemple d’utilisation d’un serveur FTP comme un emplacement de stockage.
+            The Storage SDK allows developers to read from or write to any storage location: local, remote, and even
+            cloud one. Creating a storage plugin requires implementing standard functions such as: I/O stream, if file
+            exist, delete file, list of files in the folder, etc. The Storage SDK contains an example for using an FTP
+            server as a storage location.
         </p>
         <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >obtenir SDK</a></p>
     </div>

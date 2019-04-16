@@ -655,7 +655,7 @@
     <message>
       <location/>
       <source>Force motion detection for stream</source>
-      <translation type="unfinished">Force motion detection for stream</translation>
+      <translation>스트림에 대 한 강제 모션 감지</translation>
     </message>
     <message>
       <location/>
@@ -738,7 +738,7 @@
     <message>
       <location/>
       <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
+      <translation>카메라 ID</translation>
     </message>
     <message>
       <location/>
@@ -748,7 +748,7 @@
     <message>
       <location/>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>기본 스트림</translation>
     </message>
     <message>
       <location/>
@@ -1019,7 +1019,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.ui"/>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>로</translation>
     </message>
     <message>
       <location/>
@@ -1095,6 +1095,24 @@
       <location/>
       <source>Default</source>
       <translation>기본</translation>
+    </message>
+  </context>
+  <context>
+    <name>EulaDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
+      <source>Copy to Clipboard</source>
+      <translation>클립보드 복사</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Do Not Agree</source>
+      <translation type="unfinished">I Do Not Agree</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Agree</source>
+      <translation type="unfinished">I Agree</translation>
     </message>
   </context>
   <context>
@@ -1394,11 +1412,6 @@
       <location/>
       <source>First Source</source>
       <translation>첫 번째 소스</translation>
-    </message>
-    <message>
-      <location/>
-      <source>None</source>
-      <translation>없음</translation>
     </message>
     <message>
       <location/>
@@ -2156,7 +2169,7 @@
     <message>
       <location/>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>다운로드</translation>
     </message>
     <message>
       <location/>
@@ -2235,7 +2248,7 @@
     <message>
       <location/>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>레이아웃 선택...</translation>
     </message>
   </context>
   <context>
@@ -2930,13 +2943,18 @@
     </message>
     <message>
       <location/>
-      <source>Limit Session Length</source>
-      <translation type="unfinished">Limit Session Length</translation>
+      <source>to</source>
+      <translation>로</translation>
     </message>
     <message>
       <location/>
-      <source>to</source>
-      <translation type="unfinished">to</translation>
+      <source>Limit session duration</source>
+      <translation type="unfinished">Limit session duration</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
     </message>
   </context>
   <context>

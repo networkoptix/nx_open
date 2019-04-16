@@ -36,7 +36,7 @@
     <message>
       <location/>
       <source>Customer Support</source>
-      <translation type="unfinished">Customer Support</translation>
+      <translation>Kundsupport</translation>
     </message>
     <message>
       <location/>
@@ -655,12 +655,12 @@
     <message>
       <location/>
       <source>Force motion detection for stream</source>
-      <translation type="unfinished">Force motion detection for stream</translation>
+      <translation>Kör rörelsedetektering för ström</translation>
     </message>
     <message>
       <location/>
       <source>RTP transport</source>
-      <translation type="unfinished">RTP transport</translation>
+      <translation>RTP transport</translation>
     </message>
     <message>
       <location/>
@@ -738,7 +738,7 @@
     <message>
       <location/>
       <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
+      <translation>Kamera-ID</translation>
     </message>
     <message>
       <location/>
@@ -748,7 +748,7 @@
     <message>
       <location/>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Primär ström</translation>
     </message>
     <message>
       <location/>
@@ -879,7 +879,7 @@
     <message>
       <location/>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Välj kameror</translation>
     </message>
   </context>
   <context>
@@ -1019,7 +1019,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.ui"/>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>till</translation>
     </message>
     <message>
       <location/>
@@ -1095,6 +1095,24 @@
       <location/>
       <source>Default</source>
       <translation>Standard</translation>
+    </message>
+  </context>
+  <context>
+    <name>EulaDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
+      <source>Copy to Clipboard</source>
+      <translation>Kopiera till urklipp</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Do Not Agree</source>
+      <translation type="unfinished">I Do Not Agree</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Agree</source>
+      <translation type="unfinished">I Agree</translation>
     </message>
   </context>
   <context>
@@ -1274,7 +1292,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.ui"/>
       <source>Nothing matches your search</source>
-      <translation type="unfinished">Nothing matches your search</translation>
+      <translation>Inget matchar din sökning</translation>
     </message>
   </context>
   <context>
@@ -1397,11 +1415,6 @@
     </message>
     <message>
       <location/>
-      <source>None</source>
-      <translation>Ingen</translation>
-    </message>
-    <message>
-      <location/>
       <source>Second Source</source>
       <translation>Andra källa</translation>
     </message>
@@ -1426,7 +1439,7 @@
     <message>
       <location/>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Säkerhet</translation>
     </message>
     <message>
       <location/>
@@ -2156,12 +2169,12 @@
     <message>
       <location/>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Ladda ner</translation>
     </message>
     <message>
       <location/>
       <source>Browse</source>
-      <translation type="unfinished">Browse</translation>
+      <translation>Bläddra</translation>
     </message>
     <message>
       <location/>
@@ -2235,7 +2248,7 @@
     <message>
       <location/>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Välj layout...</translation>
     </message>
   </context>
   <context>
@@ -2266,7 +2279,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
       <source>Source:</source>
-      <translation type="unfinished">Source:</translation>
+      <translation>Källa:</translation>
     </message>
     <message>
       <location/>
@@ -2812,7 +2825,7 @@
     <message>
       <location/>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Ingenting hittades</translation>
     </message>
     <message>
       <location/>
@@ -2930,13 +2943,18 @@
     </message>
     <message>
       <location/>
-      <source>Limit Session Length</source>
-      <translation type="unfinished">Limit Session Length</translation>
+      <source>to</source>
+      <translation>till</translation>
     </message>
     <message>
       <location/>
-      <source>to</source>
-      <translation type="unfinished">to</translation>
+      <source>Limit session duration</source>
+      <translation type="unfinished">Limit session duration</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
     </message>
   </context>
   <context>
@@ -3176,7 +3194,7 @@
     <message>
       <location/>
       <source>Additional storage</source>
-      <translation type="unfinished">Additional storage</translation>
+      <translation>Ytterligare lagring</translation>
     </message>
     <message>
       <location/>

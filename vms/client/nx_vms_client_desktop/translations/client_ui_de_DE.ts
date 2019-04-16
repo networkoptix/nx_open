@@ -1098,6 +1098,24 @@
     </message>
   </context>
   <context>
+    <name>EulaDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
+      <source>Copy to Clipboard</source>
+      <translation>In Zwischenablage kopieren</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Do Not Agree</source>
+      <translation>Ich stimme nicht zu</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Agree</source>
+      <translation>Ich stimme zu</translation>
+    </message>
+  </context>
+  <context>
     <name>EventLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
@@ -1394,11 +1412,6 @@
       <location/>
       <source>First Source</source>
       <translation>Erste Quelle</translation>
-    </message>
-    <message>
-      <location/>
-      <source>None</source>
-      <translation>Keine</translation>
     </message>
     <message>
       <location/>
@@ -2930,13 +2943,18 @@
     </message>
     <message>
       <location/>
-      <source>Limit Session Length</source>
-      <translation>Sitzungslänge begrenzen</translation>
+      <source>to</source>
+      <translation>an</translation>
     </message>
     <message>
       <location/>
-      <source>to</source>
-      <translation>an</translation>
+      <source>Limit session duration</source>
+      <translation>Dauer der Sitzung begrenzen</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>Wasserzeichen werden nur für Nicht-Administratoren über Livevideos angezeigt, archiviert und exportiert. Sie und andere Administratoren werden sie nicht sehen.</translation>
     </message>
   </context>
   <context>

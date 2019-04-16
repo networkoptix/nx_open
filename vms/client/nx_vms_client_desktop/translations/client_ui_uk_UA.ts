@@ -1098,6 +1098,24 @@
     </message>
   </context>
   <context>
+    <name>EulaDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
+      <source>Copy to Clipboard</source>
+      <translation>Копіювати у буфер обміну</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Do Not Agree</source>
+      <translation>Я не згідний</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Agree</source>
+      <translation>Я згоден</translation>
+    </message>
+  </context>
+  <context>
     <name>EventLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
@@ -1394,11 +1412,6 @@
       <location/>
       <source>First Source</source>
       <translation>Перше джерело</translation>
-    </message>
-    <message>
-      <location/>
-      <source>None</source>
-      <translation>Ні</translation>
     </message>
     <message>
       <location/>
@@ -2930,13 +2943,18 @@
     </message>
     <message>
       <location/>
-      <source>Limit Session Length</source>
-      <translation>Обмеження довжини сеансу</translation>
+      <source>to</source>
+      <translation>до</translation>
     </message>
     <message>
       <location/>
-      <source>to</source>
-      <translation>до</translation>
+      <source>Limit session duration</source>
+      <translation type="unfinished">Limit session duration</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
     </message>
   </context>
   <context>

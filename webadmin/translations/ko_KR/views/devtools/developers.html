@@ -11,34 +11,34 @@
     <div>
         <h3>일반 이벤트 생성기</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party Systems to a System,
+            A Generic Event is a method of sending events from 3rd party systems to a System
             which can be used to trigger System actions in the Events & Rules engine.
-            일반 이벤트 생성기는 HTTP기반 일반 이벤트 호출을 생성하는 도구입니다.
+            The Generic Event Generator is a tool which helps developers and integrators build
+            and test HTTP Generic Event calls.
         </p>
         <p><a href="#/developers/events">일반 이벤트 생성기</a></p>
     </div>
     <div>
         <h3>서버 API</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party Systems. It gives developers the ability to
-            access almost every System feature available in the regular client: query/manage System resources (servers,
-            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
-            control PTZ cameras, and more.
+            A REST API that gives developers the ability to access almost every system feature available in the regular
+            client: query/manage system resources (servers, cameras, users, permissions), pull live or recorded video
+            out of System, generate events, create rules, control PTZ cameras, and more.
         </p>
         <p>
             <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - API 호출들을 시험할 수 있는 인터액티브한 문서와 도구<br>
+            - interactive documentation and tools for testing API calls<br>
             <a href="#/developers/changelog">API Changelog</a>
-            - API의 변경 내용 목록<br>
-            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a><br>
-            <a href="#/developers/serverDocumentation">Server Settings Documentation</a>
+            - a list of breaking changes in API since the last release<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+            - a full list of available Server API calls
         </p>
 
     </div>
     <div>
         <h3>카메라 세부 정보</h3>
         <p>
-            Web Admin 인터페이스의 카메라에 대한 개발자에게 친숙한 추가 정보를 표시합니다.
+            Displays additional developer-friendly information for individual cameras in the Web Admin Interface’s View tab:
         </p>
         <ul>
             <li>카메라 ID</li>
@@ -51,9 +51,12 @@
         <p><a href="#/view/?cameraLinks">카메라 세부 정보 보기</a></p>
     </div>
     <div>
-        <h3>영상관련 통합SDK</h3>
+        <h3>Video Source SDK</h3>
         <p>
-            영상관련 통합SDK는 시스템내 모든 라이브 또는 녹화영상정보(IP 카메라, NVR, DVR, 등...) 에 대하여 가상통합 하는 기능을 제공 합니다. SDK는 검색, 표시, 검출 및 영상녹화에 대한 방법을 생성할수 있습니다. I/O장치 및 모션 검출정보를 연동하는데 사용가능합니다.
+            The Video Source SDK provides the ability to integrate almost any live or recorded video source (IP Cameras,
+            NVRs, DVRs, etc) into System and makes it possible to create methods for discovering, displaying, analyzing
+            and recording video. It also allows integrating I/O ports and devices, as well as pulling motion detection
+            information from 3rd party devices.
         </p>
         <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >SDK 받기</a></p>
     </div>
@@ -61,7 +64,10 @@
     <div>
         <h3>저장소 관련 SDK</h3>
         <p>
-            저장소 SDK는 시스템에 잠재적인 스토리지를 통합 하는 기능을 제공 합니다. 이것을 통하여 개발자들은 모든저장소에 대하여 (내외부, 클라우드) 읽기 또는 쓰기를 수행할수 있습니다. 저장 장치 플러그인을 만들려면 I / O 스트림 (파일이있는 경우), 파일 삭제, 폴더의 파일 목록 등과 같은 표준 기능을 구현해야합니다. 저장소 SDK에는 FTP 서버를 저장 위치로 사용하기위한 예제가 포함되어 있습니다.
+            The Storage SDK allows developers to read from or write to any storage location: local, remote, and even
+            cloud one. Creating a storage plugin requires implementing standard functions such as: I/O stream, if file
+            exist, delete file, list of files in the folder, etc. The Storage SDK contains an example for using an FTP
+            server as a storage location.
         </p>
         <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >SDK 받기</a></p>
     </div>

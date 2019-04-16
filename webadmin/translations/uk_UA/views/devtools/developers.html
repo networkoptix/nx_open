@@ -11,30 +11,34 @@
     <div>
         <h3>Генератор довільних подій</h3>
         <p>
-            Довільний подія - спосіб відправки подій із сторонніх систем. Довільні події можуть використовуватися для запуску системних дій в механізмі подій і правил.
-            Генератор довільних подій - інструмент, який виконує виклики довільних подій HTTP.
+            A Generic Event is a method of sending events from 3rd party systems to a System
+            which can be used to trigger System actions in the Events & Rules engine.
+            The Generic Event Generator is a tool which helps developers and integrators build
+            and test HTTP Generic Event calls.
         </p>
         <p><a href="#/developers/events">Генератор довільних подій</a></p>
     </div>
     <div>
         <h3>API сервера</h3>
         <p>
-            API сервера забезпечує стандартний набір API викликів для зовнішніх систем. Це дає можливість розробникам отримувати доступ до майже кожної функції системи, доступної в звичайному клієнті: запиту і управління системними ресурсами (сервери, камери, користувачі, повноваження), отримання відео в реальному часі або архіву з системи, генеріраціі подій, створення правил, управління PTZ -Камера і багато чому іншому.
+            A REST API that gives developers the ability to access almost every system feature available in the regular
+            client: query/manage system resources (servers, cameras, users, permissions), pull live or recorded video
+            out of System, generate events, create rules, control PTZ cameras, and more.
         </p>
         <p>
-            <a href="#/developers/api"><b> Інструмент тестування API (новий) </b></a>
-             - інтерактивна документація з інструментами для тестування викликів API <br>
-             <a href="#/developers/changelog"> API-журнал змін </a>
-              - список змін в API, що можуть торкнутися поточний функціонал <br>
-             <a id="api-doc" href="api.xml" target="_blank"> Документація API </a> <br>
-             <a href="#/developers/serverDocumentation"> Документація з налагодження сервера </a>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation and tools for testing API calls<br>
+            <a href="#/developers/changelog">API Changelog</a>
+            - a list of breaking changes in API since the last release<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+            - a full list of available Server API calls
         </p>
 
     </div>
     <div>
         <h3>Панель відомостей про камеру</h3>
         <p>
-            Показує додаткову інформацію по камерах, корисну для розробників, в інтерфейсі Web Admin:
+            Displays additional developer-friendly information for individual cameras in the Web Admin Interface’s View tab:
         </p>
         <ul>
             <li>Ідентифікатор камери</li>
@@ -47,9 +51,12 @@
         <p><a href="#/view/?cameraLinks">відкрити панель відомостей про камеру</a></p>
     </div>
     <div>
-        <h3>SDK для інтеграції джерел відео</h3>
+        <h3>Video Source SDK</h3>
         <p>
-            SDK надає можливість інтеграції практично будь-якого джерела живого або записаного відео (IP-камер, NVR, цифрових відеореєстраторів, і т. д.) в систему. SDK дозволяє створювати методи для виявлення, відображення, аналізу та запису відео. Також можливо інтегрувати порти пристроїв введення-виведення і дані виявлення руху.
+            The Video Source SDK provides the ability to integrate almost any live or recorded video source (IP Cameras,
+            NVRs, DVRs, etc) into System and makes it possible to create methods for discovering, displaying, analyzing
+            and recording video. It also allows integrating I/O ports and devices, as well as pulling motion detection
+            information from 3rd party devices.
         </p>
         <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >отримати пакет SDK</a></p>
     </div>
@@ -57,7 +64,10 @@
     <div>
         <h3>SDK для інтеграції сховищ</h3>
         <p>
-            SDK зберігання даних надає можливість інтеграції потенційних сховищ в систему. Це дозволяє розробникам виконувати операції читання/запису в будь-яке місце зберігання: місцеве, віддалене і навіть хмарне. Створення плагіна зберігання даних вимагає реалізації стандартних функцій таких як: потоковий ввід/вивід, перевірка існування файлу, видалення файлу, отримання списку файлів в папці і ін. SDK також містить приклад використання FTP-сервера в якості сховища.
+            The Storage SDK allows developers to read from or write to any storage location: local, remote, and even
+            cloud one. Creating a storage plugin requires implementing standard functions such as: I/O stream, if file
+            exist, delete file, list of files in the folder, etc. The Storage SDK contains an example for using an FTP
+            server as a storage location.
         </p>
         <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >отримати пакет SDK</a></p>
     </div>
