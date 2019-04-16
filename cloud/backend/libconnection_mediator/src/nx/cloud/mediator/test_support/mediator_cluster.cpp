@@ -28,8 +28,7 @@ static bool mediatorHasPeer(MediatorFunctionalTest* mediator, const std::string&
 
 MediatorCluster::MediatorCluster()
 {
-    if (!m_discoveryServer.bindAndListen())
-        throw std::runtime_error("Failed to initialize discovery server");
+    NX_ASSERT(m_discoveryServer.bindAndListen(), "Failed to initialize discovery server");
 }
 
 MediatorFunctionalTest& MediatorCluster::addMediator(int flags, const QString& testDir)
@@ -90,14 +89,13 @@ bool MediatorCluster::peerInformationIsAbsentFromCluster(const std::string& peer
 void MediatorCluster::addClusterArgs(MediatorFunctionalTest* mediator)
 {
     std::string nodeId = lm("mediator_%1").arg(m_mediators.size()).toStdString();
-    std::string discoveryServiceUrl = m_discoveryServer.url().toStdString();
 
     mediator->addArg("-server/name", "127.0.0.1");
     mediator->addArg("-listeningPeerDb/connectionRetryDelay", "100ms");
     mediator->addArg("-listeningPeerDb/cluster/discovery/enabled", "true");
     mediator->addArg(
         "-listeningPeerDb/cluster/discovery/discoveryServiceUrl",
-        discoveryServiceUrl.c_str());
+        m_discoveryServer.url().toStdString().c_str());
     mediator->addArg("-listeningPeerDb/cluster/discovery/roundTripPadding", "1ms");
     mediator->addArg("-listeningPeerDb/cluster/discovery/registrationErrorDelay", "10ms");
     mediator->addArg("-listeningPeerDb/cluster/discovery/onlineNodesRequestDelay", "10ms");

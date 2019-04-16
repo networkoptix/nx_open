@@ -12,9 +12,6 @@ namespace nx::hpm::test {
 class MediatorCluster
 {
 public:
-    /**
-     * Throws runtime_error if internal discovery server fails to initialize.
-     */
     MediatorCluster();
 
     /**
