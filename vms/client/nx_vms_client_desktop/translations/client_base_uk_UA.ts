@@ -6043,7 +6043,7 @@ to %1</source>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>Коли ця функція ввімкнена, система постійно виявляє нові камери і сервери і надсилає запити до камер для оновлення статусів.</translation>
     </message>
   </context>
   <context>

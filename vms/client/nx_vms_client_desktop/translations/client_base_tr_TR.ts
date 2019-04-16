@@ -5914,7 +5914,7 @@ to %1</source>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>Etkinleştirildiğinde sistem sürekli yeni kamera ve sunucuları arar ayrıca durum güncellemesi için kameralarla iletişim kurar.</translation>
     </message>
   </context>
   <context>

@@ -6039,7 +6039,7 @@ to %1</source>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>Po włączeniu tej funkcji system stale wykrywa nowe kamery i serwery oraz wysyła zapytania do kamer w celu aktualizacji ich stanów.</translation>
     </message>
   </context>
   <context>

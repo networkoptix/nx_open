@@ -5915,7 +5915,7 @@ to %1</source>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>Indien ingeschakeld, ontdekt het systeem continu nieuwe camera's en servers en verzendt het detectieverzoeken naar camera's voor statusupdate.</translation>
     </message>
   </context>
   <context>
