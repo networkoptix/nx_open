@@ -9,6 +9,8 @@
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/clusterdb/engine/http/http_paths.h>
 
+#include "nx/cloud/relay/relay_selection/relay_selector_factory.h"
+
 namespace nx::cloud::relay::model {
 
 namespace {
@@ -23,6 +25,7 @@ static std::string toLowerReversed(std::string domainName)
 
 RemoteRelayPeerPool::RemoteRelayPeerPool(const conf::Settings& settings):
     m_settings(settings.listeningPeerDb()),
+    m_relaySelector(RelaySelectorFactory::instance().create(settings)),
     m_baseApiPath(nx::clusterdb::engine::kBaseSynchronizationPath)
 {
     // Try to connect immediately
@@ -92,6 +95,8 @@ void RemoteRelayPeerPool::findRelayByDomain(
     if (!m_map)
         return handler(std::string());
 
+    // NOTE: toLowerReversed() is used here in stead of toInternalStorageFormat() because we want
+    // to search only for the server's domain name.
     m_map->database().dataManager().getRangeWithPrefix(
         toLowerReversed(domainName),
         [this, domainName, handler = std::move(handler)](
@@ -108,9 +113,13 @@ void RemoteRelayPeerPool::findRelayByDomain(
                 containerString(map), domainName);
 
             if (map.empty())
-                handler(std::string());
-            else
-                handler(map.begin()->second);
+                return handler(std::string());
+
+            std::vector<std::string> relayDomains;
+            std::transform(map.begin(), map.end(), std::back_inserter(relayDomains),
+                [](auto& mapIter) { return mapIter.second; });
+
+            return handler(m_relaySelector->selectRelay(relayDomains));
         });
 }
 
@@ -124,7 +133,7 @@ void RemoteRelayPeerPool::addPeer(
         return handler(false);
 
     m_map->database().dataManager().insertOrUpdate(
-        toLowerReversed(domainName),
+        toInternalStorageFormat(domainName),
         m_domainName,
         [this, domainName, handler = std::move(handler)](ResultCode result)
         {
@@ -147,7 +156,7 @@ void RemoteRelayPeerPool::removePeer(
         return handler(false);
 
     m_map->database().dataManager().remove(
-        toLowerReversed(domainName),
+        toInternalStorageFormat(domainName),
         [this, domainName, handler = std::move(handler)](ResultCode result)
         {
             if (result != ResultCode::ok)
@@ -202,6 +211,14 @@ void RemoteRelayPeerPool::startDiscovery()
             m_settings.map.synchronizationSettings.clusterId,
             m_syncEngineUrl);
     }
+}
+
+std::string RemoteRelayPeerPool::toInternalStorageFormat(const std::string& peerDomain) const
+{
+    std::string s;
+    s.reserve(peerDomain.size() + m_domainName.size() + 1);
+    s += toLowerReversed(peerDomain);
+    return s.append(".").append(m_domainName);
 }
 
 //-------------------------------------------------------------------------------------------------
