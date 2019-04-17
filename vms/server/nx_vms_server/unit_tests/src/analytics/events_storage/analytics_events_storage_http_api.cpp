@@ -41,15 +41,8 @@ public:
         return true;
     }
 
-    virtual void save(
-        nx::common::metadata::ConstDetectionMetadataPacketPtr /*packet*/,
-        StoreCompletionHandler completionHandler) override
+    virtual void save(nx::common::metadata::ConstDetectionMetadataPacketPtr /*packet*/) override
     {
-        m_asyncCaller.post(
-            [completionHandler = std::move(completionHandler)]
-            {
-                completionHandler(ResultCode::ok);
-            });
     }
 
     virtual void createLookupCursor(
@@ -92,6 +85,11 @@ public:
         QnUuid /*deviceId*/,
         std::chrono::milliseconds /*oldestNeededDataTimestamp*/) override
     {
+    }
+
+    virtual void flush(StoreCompletionHandler /*completionHandler*/) override
+    { 
+        FAIL();
     }
 
 private:
