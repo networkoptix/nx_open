@@ -18,17 +18,6 @@ namespace storage {
 static constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833-456437eaa7c7";
 static constexpr int kUsecPerMsec = 1000;
 
-static constexpr int kMaxObjectLookupResultSet = 1000;
-
-// NOTE: Limiting filtered_events subquery to make query
-// CPU/memory requirements much less dependent of DB size.
-// Assuming that objects tracks are whether interleaved or quite short.
-// So, in situation, when there is a single 100,000 - records long object track
-// selected by filter less objects than requested filter.maxObjectsToSelect would be returned.
-static constexpr int kMaxExpectedTrackLength = 100;
-static constexpr int kMaxFilterEventsResultSize =
-    kMaxExpectedTrackLength * kMaxObjectLookupResultSet;
-
 static constexpr auto kTrackAggregationPeriod = std::chrono::seconds(5);
 static constexpr auto kMaxCachedObjectLifeTime = std::chrono::minutes(1);
 static constexpr auto kTrackSearchResolutionX = 44;
