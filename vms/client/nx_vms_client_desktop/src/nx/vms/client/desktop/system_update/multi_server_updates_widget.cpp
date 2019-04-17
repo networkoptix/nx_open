@@ -1424,6 +1424,8 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
                 << "processRemoteUpdateInformation() - servers"
                 << targets << "are in downloading or error state";
             setTargetState(WidgetUpdateState::downloading, targets);
+            if (!m_updateInfo.manualPackages.empty())
+                m_serverUpdateTool->startManualDownloads(m_updateInfo);
         }
         else if (!serversHaveDownloaded.empty())
         {

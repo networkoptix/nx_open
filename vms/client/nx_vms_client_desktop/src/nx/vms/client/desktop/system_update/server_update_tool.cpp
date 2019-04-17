@@ -352,6 +352,7 @@ QDir ServerUpdateTool::getDownloadDir() const
 void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
 {
     NX_ASSERT(m_downloader);
+
     // TODO: Stop previous manual downloads
     m_manualPackages = contents.manualPackages;
 
@@ -373,7 +374,7 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
         switch (code)
         {
             case Code::ok:
-                NX_VERBOSE(this) << "startManualDownloads() - downloading client package"
+                NX_VERBOSE(this) << "startManualDownloads() - downloading package"
                     << info.name << " from url=" << package.url;
                 m_activeDownloads.insert(std::make_pair(package.file, 0));
                 break;
@@ -389,7 +390,7 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
             // Some sort of an error here.
             {
                 QString error = vms::common::p2p::downloader::toString(code);
-                NX_VERBOSE(this) << "requestStartUpdate() - failed to add client package "
+                NX_VERBOSE(this) << "requestStartUpdate() - failed start downloading package"
                     << info.name << error;
                 m_failedDownloads.insert(file);
                 break;
