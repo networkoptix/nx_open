@@ -70,7 +70,7 @@ bool MediatorCluster::peerInformationSynchronizedInCluster(const std::string& pe
 {
     for (const auto& mediator : m_mediators)
     {
-        if (!lookupMediatorEndpointSync(mediator.get(), peerDomainName).domainName.empty())
+        if (lookupMediatorEndpointSync(mediator.get(), peerDomainName).domainName.empty())
             return false;
     }
 
@@ -81,7 +81,7 @@ bool MediatorCluster::peerInformationIsAbsentFromCluster(const std::string& peer
 {
     for (const auto& mediator : m_mediators)
     {
-        if (lookupMediatorEndpointSync(mediator.get(), peerDomainName).domainName.empty())
+        if (!lookupMediatorEndpointSync(mediator.get(), peerDomainName).domainName.empty())
             return false;
     }
 
