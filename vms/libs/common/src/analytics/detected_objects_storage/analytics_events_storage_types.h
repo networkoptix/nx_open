@@ -66,7 +66,7 @@ struct Filter
      * Coordinates are in range [0;1].
      */
     QRectF boundingBox;
-    std::vector<common::metadata::Attribute> requiredAttributes;
+
     /**
      * Set of words separated by spaces, commas, etc...
      * Search is done across all attributes (names and values).
@@ -98,7 +98,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
 QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
-    (deviceIds)(objectTypeId)(objectAppearanceId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
+    (deviceIds)(objectTypeId)(objectAppearanceId)(timePeriod)(boundingBox)(freeText)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------

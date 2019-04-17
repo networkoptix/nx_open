@@ -77,8 +77,6 @@ Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
             nx::utils::random::number<float>(0, 1));
     }
 
-    // TODO: requiredAttributes;
-
     if (nx::utils::random::number<bool>())
     {
         filter.freeText = attributeDictionary

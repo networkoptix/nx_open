@@ -51,7 +51,6 @@ bool Filter::operator==(const Filter& right) const
         && objectAppearanceId == right.objectAppearanceId
         && timePeriod == right.timePeriod
         && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
-        && requiredAttributes == right.requiredAttributes
         && freeText == right.freeText
         && sortOrder == right.sortOrder;
 }
@@ -82,8 +81,6 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
         params->insert(lit("x2"), QString::number(filter.boundingBox.bottomRight().x()));
         params->insert(lit("y2"), QString::number(filter.boundingBox.bottomRight().y()));
     }
-
-    // TODO: requiredAttributes
 
     if (!filter.freeText.isEmpty())
     {
@@ -137,8 +134,6 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
             params.value(lit("x2")).toDouble(),
             params.value(lit("y2")).toDouble()));
     }
-
-    // TODO: requiredAttributes.
 
     if (params.contains(lit("freeText")))
     {
