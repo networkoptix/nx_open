@@ -119,7 +119,8 @@ void AsyncImageWidget::setImageProvider(ImageProvider* provider)
         connect(m_imageProvider, &QObject::destroyed, this,
             [this]
             {
-                setImageProvider(nullptr);
+                updateThumbnailImage({});
+                updateThumbnailStatus(Qn::ThumbnailStatus::Invalid);
             });
     }
 

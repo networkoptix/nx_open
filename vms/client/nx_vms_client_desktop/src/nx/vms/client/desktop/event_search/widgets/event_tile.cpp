@@ -889,7 +889,7 @@ void EventTile::clear()
     setFooterText({});
     setTimestamp({});
     setIcon({});
-    setPreview({}, false);
+    setPreview({}, true);
     setPreviewCropRect({});
     setAction({});
     setBusyIndicatorVisible(false);
