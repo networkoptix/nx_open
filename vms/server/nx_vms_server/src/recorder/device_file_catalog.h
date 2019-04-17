@@ -146,11 +146,6 @@ public:
         iterator erase(iterator first, iterator last) = delete;
         iterator erase(const_iterator first, const_iterator last) = delete;
 
-        bool hasArchive(int storageIndex) const
-        {
-            return m_archivePresenceMap.find(storageIndex) != m_archivePresenceMap.cend();
-        }
-
         void reCalcArchivePresence()
         {
             m_archivePresenceMap.clear();

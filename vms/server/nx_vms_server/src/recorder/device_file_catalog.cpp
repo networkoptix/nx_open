@@ -125,12 +125,6 @@ qint64 DeviceFileCatalog::getSpaceByStorageIndex(int storageIndex) const
     return result;
 }
 
-bool DeviceFileCatalog::hasArchive(int storageIndex) const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_chunks.hasArchive(storageIndex);
-}
-
 QString getDirName(const QString& prefix, int currentParts[4], int i)
 {
     QString result = prefix;
