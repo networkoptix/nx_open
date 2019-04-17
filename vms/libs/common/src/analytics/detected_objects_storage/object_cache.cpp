@@ -29,7 +29,7 @@ std::vector<DetectedObject> ObjectCache::getObjectsToInsert(bool flush)
     std::vector<DetectedObject> result;
     for (auto& [objectId, ctx]: m_objectsById)
     {
-        if (!flush && currentClock - ctx.lastReportTime < m_aggregationPeriod ||
+        if ((!flush && currentClock - ctx.lastReportTime < m_aggregationPeriod) ||
             ctx.insertionReported)
         {
             continue;
@@ -84,7 +84,7 @@ std::vector<ObjectUpdate> ObjectCache::getObjectsToUpdate(bool flush)
     std::vector<ObjectUpdate> result;
     for (auto& [objectId, ctx]: m_objectsById)
     {
-        if (!flush && currentClock - ctx.lastReportTime < m_aggregationPeriod ||
+        if ((!flush && currentClock - ctx.lastReportTime < m_aggregationPeriod) ||
             !ctx.insertionReported ||
             ctx.object.track.empty())
         {
