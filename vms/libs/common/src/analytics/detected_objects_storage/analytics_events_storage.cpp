@@ -8,6 +8,7 @@
 #include <nx/sql/sql_cursor.h>
 #include <nx/utils/log/log.h>
 
+#include "config.h"
 #include "object_searcher.h"
 
 namespace nx {

@@ -4,6 +4,7 @@
 
 #include "analytics_events_storage_db_schema.h"
 #include "analytics_events_storage_types.h"
+#include "config.h"
 
 namespace nx::analytics::storage {
 

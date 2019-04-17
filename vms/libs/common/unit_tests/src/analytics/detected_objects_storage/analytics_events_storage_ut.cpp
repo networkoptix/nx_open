@@ -10,6 +10,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/detected_objects_storage/config.h>
 #include <test_support/analytics/storage/analytics_storage_types.h>
 
 namespace nx::analytics::storage::test {

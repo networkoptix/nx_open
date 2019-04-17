@@ -8,6 +8,8 @@
 #include <common/common_globals.h>
 #include <utils/math/math.h>
 
+#include "config.h"
+
 namespace nx {
 namespace analytics {
 namespace storage {
