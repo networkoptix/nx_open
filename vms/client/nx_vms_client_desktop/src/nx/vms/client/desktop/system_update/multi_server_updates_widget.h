@@ -58,6 +58,46 @@ public:
 
     virtual bool canDiscardChanges() const override;
 
+    /**
+     * Describes all possible display modes for update version.
+     * Variations for build number:
+     *  - Full build number, "4.0.0.20000".
+     *  - Specific build number "10821". Appears when we waiting for response for specific build.
+     *  - No version avalilable, "-----". Often happens if we have Error::networkError
+     *      or Error::httpError report. Can happen when source=internet
+     */
+    struct VersionReport
+    {
+        bool hasLatestVersion = false;
+        bool checking = false;
+        QString version;
+        /** Status messages. It is displayed under version when something went wrong. */
+        QStringList statusMessages;
+        /** Modes for displaying version number. */
+        enum class VersionMode
+        {
+            /** No version is available. We display '-----'.*/
+            empty,
+            /** Only build number is displayed. */
+            build,
+            /** Display full version. */
+            full,
+        };
+
+        VersionMode versionMode = VersionMode::full;
+        enum class HighlightMode
+        {
+            regular,
+            bright,
+            red,
+        };
+
+        HighlightMode versionHighlight = HighlightMode::regular;
+        HighlightMode statusHighlight = HighlightMode::regular;
+    };
+
+    static VersionReport calculateUpdateVersionReport(const nx::update::UpdateContents& contents, QnUuid clientId);
+
 protected:
     /** This one is called by timer periodically. */
     void atUpdateCurrentState();
@@ -148,47 +188,6 @@ private:
      * Repeat validation process for current update information. Will work only in 'Ready' state.
      */
     void repeatUpdateValidation();
-
-    /**
-     * Describes all possible display modes for update version.
-     * Variations for build number:
-     *  - Full build number, "4.0.0.20000".
-     *  - Specific build number "10821". Appears when we waiting for response for specific build.
-     *  - No version avalilable, "-----". Often happens if we have Error::networkError
-     *      or Error::httpError report. Can happen when source=internet
-     */
-    struct VersionReport
-    {
-        bool hasLatestVersion = false;
-        bool checking = false;
-        QString version;
-        /** Status messages. It is displayed under version when something went wrong. */
-        QStringList statusMessages;
-        /** Modes for displaying version number. */
-        enum class VersionMode
-        {
-            /** No version is available. We display '-----'.*/
-            empty,
-            /** Only build number is displayed. */
-            build,
-            /** Display full version. */
-            full,
-        };
-
-        VersionMode versionMode = VersionMode::full;
-        enum class HighlightMode
-        {
-            regular,
-            bright,
-            red,
-        };
-
-        HighlightMode versionHighlight = HighlightMode::regular;
-        HighlightMode statusHighlight = HighlightMode::regular;
-    };
-
-    VersionReport calculateUpdateVersionReport(const nx::update::UpdateContents& contents);
-
     void syncVersionReport(const VersionReport& report);
 
     /**

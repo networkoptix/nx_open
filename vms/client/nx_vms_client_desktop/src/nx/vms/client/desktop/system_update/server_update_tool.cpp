@@ -602,8 +602,12 @@ bool ServerUpdateTool::verifyUpdateManifest(
 {
     NX_ASSERT(m_stateTracker);
     std::map<QnUuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->getActiveServers();
-    return verifyUpdateContents(commonModule(), contents, activeServers, clientVersions,
-        checkClient ? m_stateTracker->getClientPeerId() : QnUuid());
+
+    ClientVerificationData clientData;
+    clientData.fillDefault();
+    clientData.clientId = checkClient ? m_stateTracker->getClientPeerId() : QnUuid();
+    clientData.installedVersions = clientVersions;
+    return verifyUpdateContents(commonModule(), contents, activeServers, clientData);
 }
 
 void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)

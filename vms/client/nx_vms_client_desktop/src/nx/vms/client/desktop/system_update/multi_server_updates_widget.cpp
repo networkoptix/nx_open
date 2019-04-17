@@ -539,7 +539,7 @@ void MultiServerUpdatesWidget::initDownloadActions()
 }
 
 MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdateVersionReport(
-    const nx::update::UpdateContents& contents)
+    const nx::update::UpdateContents& contents, QnUuid clientId)
 {
     VersionReport report;
 
@@ -557,6 +557,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
         report.versionMode = VersionReport::VersionMode::build;
         report.statusHighlight = VersionReport::HighlightMode::regular;
         report.statusMessages << tr("You have already installed this version.");
+        report.hasLatestVersion = true;
     }
     else if (contents.error == Error::noError)
     {
@@ -623,7 +624,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                 QStringList packageErrors;
                 auto missing = contents.missingUpdate.size()
                     + contents.unsuportedSystemsReport.size();
-                auto clientId = m_stateTracker->getClientPeerId();
+                //auto clientId = m_stateTracker->getClientPeerId();
 
                 if (missing)
                 {
@@ -710,7 +711,8 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
                     checkResponse.missingUpdate, tr("No update package available"));
             }
 
-            m_updateReport = calculateUpdateVersionReport(m_updateInfo);
+            m_updateReport = calculateUpdateVersionReport(
+                m_updateInfo, m_stateTracker->getClientPeerId());
 
             if (!m_updateInfo.clientPackage.isValid())
                 syncStatusVisibility();
@@ -1166,7 +1168,8 @@ void MultiServerUpdatesWidget::repeatUpdateValidation()
                     m_updateInfo.missingUpdate, tr("No update package available"));
             }
 
-            m_updateReport = calculateUpdateVersionReport(m_updateInfo);
+            m_updateReport = calculateUpdateVersionReport(
+                m_updateInfo, m_stateTracker->getClientPeerId());
             m_updateLocalStateChanged = true;
         }
         else
@@ -1387,7 +1390,8 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         {
             NX_INFO(NX_SCOPE_TAG, "taking update info from mediaserver");
             m_updateInfo = updateInfo;
-            m_updateReport = calculateUpdateVersionReport(m_updateInfo);
+            m_updateReport = calculateUpdateVersionReport(
+                m_updateInfo, m_stateTracker->getClientPeerId());
             m_stateTracker->setUpdateTarget(m_updateInfo.getVersion());
             m_clientUpdateTool->setUpdateTarget(m_updateInfo);
             m_haveValidUpdate = true;
