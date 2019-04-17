@@ -105,18 +105,7 @@ export class CamTableComponent implements OnChanges, OnInit {
 
         if (param === 'maxResolution') {
             byParam = NxUtilsService.byParam((elm) => {
-                // sanitize max resolution field and calc total pixels to sort
-                // Found variations:
-                // 1920x1080, 1920 x 1080, '2MP, 1080p'
-                let pixels = 0;
-                let res = elm[param].replace(/[^x\d]+/gi, '');
-                if (res === '21080') { // camera reports "2MP, 1080p"
-                    pixels = 1920 * 1080; // 1920x1080
-                } else {
-                    res = res.split('x');
-                    pixels = res[0] * res[1];
-                }
-                return pixels;
+                return elm.resolutionArea;
             }, !this.sortOrderASC);
 
         } else if (param === 'maxFps') {
@@ -188,18 +177,9 @@ export class CamTableComponent implements OnChanges, OnInit {
 
     filterAllowedParams() {
         // filter 'service' params
-        const serviceParams = ['count'];
-        this.allowedParameters.forEach((item, index) => {
-            if (serviceParams.indexOf(item) > -1) {
-                this.allowedParameters.splice(index, 1);
-            }
-        });
-
-        this.cameraHeaders.forEach((item, index) => {
-            if (serviceParams.indexOf(item.toLowerCase()) > -1) {
-                this.cameraHeaders.splice(index, 1);
-            }
-        });
+        const serviceParams = ['count', 'resolutionArea'];
+        this.allowedParameters = this.allowedParameters.filter((el) => !serviceParams.includes(el));
+        this.cameraHeaders = this.cameraHeaders.filter((el) => !serviceParams.includes(el.toLowerCase()));
     }
 
     showParametersFor(item) {
@@ -224,7 +204,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         const sortBy = (this.CONFIG.ipvd.sortSupportedDevicesByPopularity) ? 'count' : 'sortKey';
         this.toggleSort(sortBy, keepURI);
 
-        if (this.params.page) {
+        if (this.params && this.params.page) {
             this.setPage(+this.params.page, true);
         }
     }
@@ -256,6 +236,7 @@ export class CamTableComponent implements OnChanges, OnInit {
             .subscribe(params => {
                 this.params = { ...params };
                 this.debug = true;
+
                 if (params.debug === undefined) {
                     this.debug = false;
                     this.filterAllowedParams();
@@ -293,21 +274,17 @@ export class CamTableComponent implements OnChanges, OnInit {
         // get current page of items
         this.pagedItems = this._elements.slice(this.pager.startIndex, this.pager.endIndex + 1);
 
-        if (this.params && +this.params.page > this.pager.pages.length) {
-            this.uri.updateURI('/ipvd', [
-                {
-                    key: 'page', value: this.pager.currentPage
-                }
-            ]);
-        }
+        this.uri.updateURI('/ipvd', [
+            {
+                key: 'page', value: this.pager.currentPage
+            }
+        ]);
 
         if (!keep) {
             // clear selected camera
             this.setClickedRow(-1, {});
             this.uri.updateURI('/ipvd', [
                 {
-                    key: 'page', value: this.pager.currentPage
-                }, {
                     key: 'camera', value: undefined
                 }]);
         }
