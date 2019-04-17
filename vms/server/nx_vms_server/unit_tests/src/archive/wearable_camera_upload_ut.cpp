@@ -58,6 +58,8 @@ static GeneratedFileData generateTestFileData(
     result.fileData = test_support::createTestMkvFileData(
         kTestFileDurationMs / 1000, 640, 480, testParameters.container, testParameters.codec);
 
+	NX_ASSERT(!result.fileData.isEmpty());
+
     for (int filesInPeriod : filePerPeriodList)
     {
         if (fileStartTimeMs != globalStartTimeMs)
@@ -119,6 +121,7 @@ public:
                     .arg(adminId()));
 
             ASSERT_TRUE(reply.success);
+			qDebug() << "Progress:" << reply.progress;
             if (reply.progress == 100)
                 break;
 
@@ -229,17 +232,19 @@ protected:
 
     void whenFilesAreUploaded()
     {
-        const auto token = m_uploader->lockCamera(m_wearableCameraId);
+        QnUuid token;
+        ASSERT_NO_THROW([&]() { token = m_uploader->lockCamera(m_wearableCameraId); }());
         for (const auto& timePeriodData: m_generatedData.periods)
         {
             for (int64_t startTimeMs: timePeriodData.startTimeMsList)
             {
-                m_uploader->addFile(
-                    m_wearableCameraId, token, QString::number(startTimeMs),
-                    m_generatedData.fileData, startTimeMs);
+                ASSERT_NO_THROW(
+                    m_uploader->addFile(
+                        m_wearableCameraId, token, QString::number(startTimeMs),
+                        m_generatedData.fileData, startTimeMs));
             }
         }
-        m_uploader->releaseCamera(m_wearableCameraId, token);
+        ASSERT_NO_THROW(m_uploader->releaseCamera(m_wearableCameraId, token));
     }
 
     void whenPlayArchiveRequestIsIssued()
@@ -250,7 +255,8 @@ protected:
         ASSERT_TRUE((bool)camera);
         const auto archiveReader = test_support::createArchiveStreamReader(camera);
         test_support::checkPlaybackCorrecteness(
-            archiveReader.get(), timePeriodListFromGeneratedData(m_generatedData));
+            archiveReader.get(), timePeriodListFromGeneratedData(m_generatedData),
+            test_support::kMediaFileDurationMs, 0);
     }
 
     void thenArchiveShouldBePlayedWithoutGaps()
@@ -264,7 +270,7 @@ protected:
         QnJsonRestResult timePeriodsResult;
         NX_TEST_API_GET(
             m_server.get(),
-            QString("/ec2/recordedTimePeriods?cameraId=%1").arg(m_wearableCameraId.toString()),
+            QString("/ec2/recordedTimePeriods?cameraId=%1&detail=50").arg(m_wearableCameraId.toString()),
             &timePeriodsResult);
 
         ASSERT_EQ(timePeriodsResult.error, network::rest::Result::NoError);
@@ -289,7 +295,7 @@ private:
     std::unique_ptr<FileUploader> m_uploader;
 };
 
-TEST_P(FtWearableCameraUpload, UploadSingleFile)
+TEST_P(FtWearableCameraUpload, UploadMultipleFiles)
 {
     givenSomeFilesOnDisk();
     whenServerStarted();
@@ -306,7 +312,7 @@ TEST_P(FtWearableCameraUpload, UploadSingleFile)
 INSTANTIATE_TEST_CASE_P(
     UploadTestDifferentContainersAndCodecs, FtWearableCameraUpload,
     ::testing::Values(
-        UploadTestParameters("matroska","h263p"), UploadTestParameters("mp4","h263p"),
+        UploadTestParameters("matroska","h263p"), UploadTestParameters("mp4","mpeg4"),
         UploadTestParameters("mov","h263p"), UploadTestParameters("avi","h263p")));
 
 } // namespace nx::vms::server::test

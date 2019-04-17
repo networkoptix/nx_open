@@ -54,6 +54,6 @@ QnVirtualCameraResourcePtr getCamera(QnResourcePool* resourcePool, const QString
  */
 void checkPlaybackCorrecteness(
     QnArchiveStreamReader* archiveReader, const QnTimePeriodList& expectedTimePeriods,
-    int64_t mediaFileDurationMs = kMediaFileDurationMs, int64_t mediaFileGapMs = kMediaFilesGapMs);
+    int64_t mediaFileDurationMs, int64_t mediaFileGapMs, bool shouldSucceed = true);
 
 } // namespace nx::vms::server::test::test_support
