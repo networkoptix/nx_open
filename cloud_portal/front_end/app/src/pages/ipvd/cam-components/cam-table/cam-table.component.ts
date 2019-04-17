@@ -311,11 +311,6 @@ export class CamTableComponent implements OnChanges, OnInit {
                     key: 'camera', value: undefined
                 }]);
         }
-
-        // set look'n'feel for pagination element - don't ellipsize 1 page
-        if (this.pager.pages.length - 3 < this.pagerMaxSize) {
-            this.pagerMaxSize = this.pager.pages.length;
-        }
     }
 
     getCsvData() {
