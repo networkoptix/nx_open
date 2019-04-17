@@ -11,9 +11,7 @@
 #include "config.h"
 #include "object_searcher.h"
 
-namespace nx {
-namespace analytics {
-namespace storage {
+namespace nx::analytics::storage {
 
 static constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833-456437eaa7c7";
 static constexpr int kUsecPerMsec = 1000;
@@ -489,23 +487,12 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
 {
     nx::sql::Filter sqlFilter;
 
-    if (!filter.deviceIds.empty())
-    {
-        auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
-            "device_id", ":deviceId");
-        for (const auto& deviceGuid: filter.deviceIds)
-            condition->addValue(m_deviceDao.deviceIdFromGuid(deviceGuid));
-        sqlFilter.addCondition(std::move(condition));
-    }
-
-    if (!filter.objectAppearanceId.isNull())
-    {
-        sqlFilter.addCondition(std::make_unique<nx::sql::SqlFilterFieldEqual>(
-            "object_id", ":objectAppearanceId", QnSql::serialized_field(filter.objectAppearanceId)));
-    }
-
-    if (!filter.objectTypeId.empty())
-        addObjectTypeIdToFilter(filter.objectTypeId, &sqlFilter);
+    ObjectSearcher::addObjectFilterConditions(
+        filter,
+        m_deviceDao,
+        m_objectTypeDao,
+        {"object_id"},
+        &sqlFilter);
 
     if (!filter.timePeriod.isNull())
         addTimePeriodToFilter(filter.timePeriod, &sqlFilter, "timestamp_usec_utc", "timestamp_usec_utc");
@@ -526,17 +513,6 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
     }
 
     return sqlFilter;
-}
-
-void EventsStorage::addObjectTypeIdToFilter(
-    const std::vector<QString>& objectTypes,
-    nx::sql::Filter* sqlFilter)
-{
-    auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
-        "object_type_id", ":objectTypeId");
-    for (const auto& objectType: objectTypes)
-        condition->addValue(m_objectTypeDao.objectTypeIdFromName(objectType));
-    sqlFilter->addCondition(std::move(condition));
 }
 
 void EventsStorage::addTimePeriodToFilter(
@@ -979,6 +955,4 @@ std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunct
     return std::make_unique<EventsStorage>(settings);
 }
 
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::storage

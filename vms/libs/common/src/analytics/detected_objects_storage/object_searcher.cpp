@@ -3,6 +3,7 @@
 #include <nx/fusion/serialization/sql_functions.h>
 
 #include "attributes_dao.h"
+#include "config.h"
 #include "serializers.h"
 
 namespace nx::analytics::storage {
@@ -28,20 +29,72 @@ std::vector<DetectedObject> ObjectSearcher::lookup(
     return loadObjects(selectEventsQuery.get(), filter);
 }
 
+void ObjectSearcher::addObjectFilterConditions(
+    const Filter& filter,
+    const DeviceDao& deviceDao,
+    const ObjectTypeDao& objectTypeDao,
+    const FieldNames& fieldNames,
+    nx::sql::Filter* sqlFilter)
+{
+    if (!filter.deviceIds.empty())
+    {
+        auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
+            "device_id", ":deviceId");
+        for (const auto& deviceGuid: filter.deviceIds)
+            condition->addValue(deviceDao.deviceIdFromGuid(deviceGuid));
+        sqlFilter->addCondition(std::move(condition));
+    }
+
+    if (!filter.objectAppearanceId.isNull())
+    {
+        sqlFilter->addCondition(std::make_unique<nx::sql::SqlFilterFieldEqual>(
+            fieldNames.objectId, ":objectAppearanceId",
+            QnSql::serialized_field(filter.objectAppearanceId)));
+    }
+
+    if (!filter.objectTypeId.empty())
+        addObjectTypeIdToFilter(filter.objectTypeId, objectTypeDao, sqlFilter);
+}
+
 void ObjectSearcher::prepareLookupQuery(
     const Filter& filter,
     nx::sql::AbstractSqlQuery* query)
 {
+    const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
+    auto sqlQueryFilterStr = sqlQueryFilter.toString();
+    if (!sqlQueryFilterStr.empty())
+        sqlQueryFilterStr = " AND " + sqlQueryFilterStr;
+
+    // TODO: Full-text search.
+    // TODO: Object count limit.
+
     auto queryText = lm(R"sql(
         SELECT device_id, object_type_id, guid, track_start_timestamp_ms, track_detail, content
         FROM object o, unique_attributes attrs
-        WHERE o.attributes_id = attrs.id
-        ORDER BY track_start_timestamp_ms %1
-    )sql").args(filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC");
+        WHERE o.attributes_id = attrs.id %1
+        ORDER BY track_start_timestamp_ms %2
+    )sql").args(
+        sqlQueryFilterStr,
+        filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC");
 
     query->prepare(queryText);
+    sqlQueryFilter.bindFields(query);
+}
 
-    // TODO Applying filter.
+nx::sql::Filter ObjectSearcher::prepareSqlFilterExpression(const Filter& filter)
+{
+    nx::sql::Filter sqlFilter;
+
+    addObjectFilterConditions(
+        filter,
+        m_deviceDao,
+        m_objectTypeDao,
+        {"guid"},
+        &sqlFilter);
+
+    // TODO
+
+    return sqlFilter;
 }
 
 std::vector<DetectedObject> ObjectSearcher::loadObjects(
@@ -83,6 +136,18 @@ DetectedObject ObjectSearcher::loadObject(
     }
 
     return detectedObject;
+}
+
+void ObjectSearcher::addObjectTypeIdToFilter(
+    const std::vector<QString>& objectTypes,
+    const ObjectTypeDao& objectTypeDao,
+    nx::sql::Filter* sqlFilter)
+{
+    auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
+        "object_type_id", ":objectTypeId");
+    for (const auto& objectType: objectTypes)
+        condition->addValue(objectTypeDao.objectTypeIdFromName(objectType));
+    sqlFilter->addCondition(std::move(condition));
 }
 
 } // namespace nx::analytics::storage

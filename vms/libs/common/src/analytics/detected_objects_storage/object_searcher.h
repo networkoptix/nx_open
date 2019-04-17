@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/sql/filter.h>
 #include <nx/sql/query.h>
 #include <nx/sql/query_context.h>
 
@@ -8,6 +9,11 @@
 #include "object_type_dao.h"
 
 namespace nx::analytics::storage {
+
+struct FieldNames
+{
+    const char* objectId;
+};
 
 class ObjectSearcher
 {
@@ -23,6 +29,13 @@ public:
         nx::sql::QueryContext* queryContext,
         const Filter& filter);
 
+    static void addObjectFilterConditions(
+        const Filter& filter,
+        const DeviceDao& deviceDao,
+        const ObjectTypeDao& objectTypeDao,
+        const FieldNames& fieldNames,
+        nx::sql::Filter* sqlFilter);
+
 private:
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
@@ -31,6 +44,8 @@ private:
         const Filter& filter,
         nx::sql::AbstractSqlQuery* query);
 
+    nx::sql::Filter prepareSqlFilterExpression(const Filter& filter);
+
     std::vector<DetectedObject> loadObjects(
         nx::sql::AbstractSqlQuery* query,
         const Filter& filter);
@@ -38,6 +53,11 @@ private:
     DetectedObject loadObject(
         nx::sql::AbstractSqlQuery* query,
         const Filter& filter);
+
+    static void addObjectTypeIdToFilter(
+        const std::vector<QString>& objectTypes,
+        const ObjectTypeDao& objectTypeDao,
+        nx::sql::Filter* sqlFilter);
 };
 
 } // namespace nx::analytics::storage
