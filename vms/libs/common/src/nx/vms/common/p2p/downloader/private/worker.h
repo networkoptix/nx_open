@@ -103,7 +103,7 @@ private:
 
         friend uint qHash(const RequestHandle& handle)
         {
-            return qHash(handle.peerManager) + qHash(handle.handle);
+            return qHash(handle.peerManager) + ::qHash(handle.handle);
         }
     };
 
