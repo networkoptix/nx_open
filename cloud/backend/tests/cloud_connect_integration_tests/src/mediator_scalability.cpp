@@ -45,26 +45,20 @@ protected:
         givenMultipleMediators();
         whenServerConnectsToMediator(mediatorIndex);
         thenServerInfoIsSynchronized();
-        andServerConnectionInfoIsUpdated();
 
-        int differentMediator = mediatorIndex + 1 < mediatorCount()
-            ? mediatorIndex + 1
-            : 0;
-
-        whenClientConnectsToMediator(differentMediator);
-        thenConnectionSucceeded();
-        andDataIsExchangedBetweenClientAndServer();
+        // Verifying server connection by successfully connecting the client to server.
+        assertClientConnectsToServer();
     }
 
     void whenClientConnectsToMediator(int mediatorIndex)
     {
-        // Configuring global mediator connector with info for mediator 0
         configureGlobalMediatorConnector(mediatorIndex);
     }
 
     void whenServerConnectionIsBroken()
     {
-        mediator(m_serverConnectionIndex).restart();
+        stopServer();
+        restartMediator(m_serverConnectionIndex);
     }
 
     void thenServerInfoIsSynchronized()
@@ -72,7 +66,7 @@ protected:
         m_serverConnectionEndpoint = waitUntilServerIsRegisteredOnMediator();
     }
 
-    void thenConnectionSucceeded()
+    void thenClientConnectedToServer()
     {
         waitUntilCloudConnectionCanBeEstablished();
     }
@@ -102,13 +96,20 @@ private:
             mediatorContext(mediatorIndex).mediator.stunUdpEndpoint()});
     }
 
+    void assertClientConnectsToServer()
+    {
+        whenClientConnectsToMediator(m_serverConnectionIndex);
+        thenClientConnectedToServer();
+        andDataIsExchangedBetweenClientAndServer();
+    }
+
 private:
     std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> m_connection;
     nx::utils::SyncQueue<std::tuple<
         nx::hpm::api::ResultCode,
         nx::hpm::api::ConnectResponse>> m_connectResponseEvents;
     nx::network::stun::TransportHeader m_responseHeader;
-    int m_serverConnectionIndex;
+    int m_serverConnectionIndex = -1;
     nx::hpm::MediatorEndpoint m_serverConnectionEndpoint;
 };
 
@@ -127,12 +128,12 @@ TEST_F(MediatorScalability, connect_request_is_redirected)
 
     whenClientConnectsToMediator(0);
 
-    thenConnectionSucceeded();
+    thenClientConnectedToServer();
 
     andDataIsExchangedBetweenClientAndServer();
 }
 
-TEST_F(MediatorScalability, mediator_info_updated_in_cluster_after_reconnect)
+TEST_F(MediatorScalability, mediator_info_updated_in_cluster_after_server_reconnects)
 {
     givenSynchronizedClusterWithServerListeningOnMediator(1);
 
@@ -140,7 +141,7 @@ TEST_F(MediatorScalability, mediator_info_updated_in_cluster_after_reconnect)
     whenServerConnectsToMediator(2);
     whenClientConnectsToMediator(0);
 
-    thenConnectionSucceeded();
+    thenClientConnectedToServer();
 
     andDataIsExchangedBetweenClientAndServer();
     andServerConnectionInfoIsUpdated();
