@@ -38,14 +38,14 @@ std::vector<AggregatedTrackData> ObjectTrackAggregator::getAggregatedData(bool f
     if (!flush && length() < m_aggregationPeriod)
         return {};
 
+    auto aggregated = m_rectAggregator.takeAggregatedData();
     std::vector<AggregatedTrackData> result;
-
-    auto aggregated = m_rectAggregator.aggregatedData();
-    for (const auto& rect: aggregated)
+    result.reserve(aggregated.size());
+    for (auto& rect: aggregated)
     {
         result.push_back(AggregatedTrackData());
         result.back().boundingBox = rect.rect;
-        result.back().objectIds = rect.values;
+        result.back().objectIds = std::exchange(rect.values, {});
         // TODO: #ak It would be better to use precise timestamp for this region.
         result.back().timestamp = *m_aggregationStartTimestamp;
     }
@@ -66,8 +66,10 @@ std::chrono::milliseconds ObjectTrackAggregator::length() const
 QRect ObjectTrackAggregator::translate(const QRectF& box)
 {
     return QRect(
-        box.x() * m_resolutionX, box.y() * m_resolutionY,
-        box.width() * m_resolutionX, box.height() * m_resolutionY);
+        box.x() * m_resolutionX,
+        box.y() * m_resolutionY,
+        std::ceil(box.width() * m_resolutionX),
+        std::ceil(box.height() * m_resolutionY));
 }
 
 } // namespace nx::analytics::storage
