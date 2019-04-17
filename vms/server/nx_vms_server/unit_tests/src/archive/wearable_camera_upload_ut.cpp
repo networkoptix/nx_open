@@ -121,7 +121,6 @@ public:
                     .arg(adminId()));
 
             ASSERT_TRUE(reply.success);
-			qDebug() << "Progress:" << reply.progress;
             if (reply.progress == 100)
                 break;
 
