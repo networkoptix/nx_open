@@ -84,6 +84,12 @@ header {
         }
     }
     
+    .dropdown-menu > ul:last-of-type {
+        li:last-of-type {
+            margin-bottom : 4px;
+        }
+    }
+    
     .dropdown-menu {
         margin-top       : 0;
         background-color : $light4;
@@ -92,7 +98,7 @@ header {
         border           : none;
         border-radius    : 2px;
         width            : 100%;
-        padding          : 4px 0;
+        padding          : 4px 0 0;
         
         &--list {
             max-height      : $dropdown-list-height;
@@ -107,6 +113,12 @@ header {
             padding         : 0;
             margin          : 0;
             list-style-type : none;
+        }
+    
+        &--footer {
+            li:last-of-type {
+                margin-bottom : 4px;
+            }
         }
         
         .multi-column-dropdown {
