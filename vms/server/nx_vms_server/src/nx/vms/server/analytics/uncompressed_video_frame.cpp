@@ -15,13 +15,16 @@ UncompressedVideoFrame::UncompressedVideoFrame(std::shared_ptr<const AvFrameHold
 	if (!NX_ASSERT(frame))
 		return;
 
-    if (!NX_ASSERT(frame->width >= 1) || !NX_ASSERT(frame->height >= 1))
+    if (!NX_ASSERT(frame->width >= 1, QString::number(frame->width))
+        || !NX_ASSERT(frame->height >= 1, QString::number(frame->height)))
+    {
         return;
+    }
 
     const auto avPixelFormat = (AVPixelFormat) frame->format;
 
     const auto pixelFormat = nx::vms::server::sdk_support::avPixelFormatToSdk(avPixelFormat);
-    if (!NX_ASSERT(pixelFormat))
+    if (!NX_ASSERT(pixelFormat, toString(avPixelFormat)))
         return;
     m_pixelFormat = pixelFormat.value();
 
@@ -36,8 +39,11 @@ UncompressedVideoFrame::UncompressedVideoFrame(std::shared_ptr<const AvFrameHold
     m_dataSize.resize(m_avPixFmtDescriptor->nb_components);
     for (int plane = 0; plane < m_avPixFmtDescriptor->nb_components; ++plane)
     {
-        if (!NX_ASSERT(frame->data[plane]) || !NX_ASSERT(frame->linesize[plane] > 0))
+        if (!NX_ASSERT(frame->data[plane], QString::number(plane))
+            || !NX_ASSERT(frame->linesize[plane] > 0, QString::number(plane)))
+        {
             return;
+        }
 
         m_dataSize[plane] = frame->linesize[plane] * planeLineCount(plane);
     }
