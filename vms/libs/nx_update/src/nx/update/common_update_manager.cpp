@@ -177,8 +177,9 @@ bool CommonUpdateManager::canDownloadFile(
         NX_WARNING(
             this,
             "Can't start downloading an update package because lack of free space on disk. " \
-            "Required: %1, free Space: %2",
-            requiredSpace, deviceFreeSpace);
+            "Required: %1 Mb, free Space: %2 Mb",
+            static_cast<double>(requiredSpace) / (1024 * 1024),
+            static_cast<double>(deviceFreeSpace) / (1024 * 1024));
         *outUpdateStatus = nx::update::Status(
             peerId, update::Status::Code::error, "Not enough free space for keeping update files");
         return false;
