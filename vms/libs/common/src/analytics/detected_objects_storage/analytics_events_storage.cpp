@@ -8,6 +8,8 @@
 #include <nx/sql/sql_cursor.h>
 #include <nx/utils/log/log.h>
 
+#include "object_searcher.h"
+
 namespace nx {
 namespace analytics {
 namespace storage {
@@ -133,11 +135,21 @@ void EventsStorage::lookup(
     Filter filter,
     LookupCompletionHandler completionHandler)
 {
-    using namespace std::placeholders;
-
     auto result = std::make_shared<std::vector<DetectedObject>>();
     m_dbController.queryExecutor().executeSelect(
-        std::bind(&EventsStorage::selectObjects, this, _1, std::move(filter), result.get()),
+        [this, filter = std::move(filter), result](nx::sql::QueryContext* queryContext)
+        {
+            if (kUseTrackAggregation)
+            {
+                ObjectSearcher objectSearcher(m_deviceDao, m_objectTypeDao);
+                *result = objectSearcher.lookup(queryContext, filter);
+                return nx::sql::DBResult::ok;
+            }
+            else
+            {
+                return selectObjects(queryContext, std::move(filter), result.get());
+            }
+        },
         [this, result, completionHandler = std::move(completionHandler)](
             sql::DBResult resultCode)
         {
@@ -360,7 +372,7 @@ void EventsStorage::savePacketDataToCache(
 
     m_objectCache.add(packet);
 
-    for (const auto& detectedObject : packet->objects)
+    for (const auto& detectedObject: packet->objects)
     {
         m_trackAggregator.add(
             detectedObject.objectId,
