@@ -36,10 +36,6 @@
 QnMutex DeviceFileCatalog::m_rebuildMutex;
 QSet<void*> DeviceFileCatalog::m_pauseList;
 
-const quint16 DeviceFileCatalog::Chunk::FILE_INDEX_NONE = 0xffff;
-const quint16 DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION = 0xfffe;
-const int DeviceFileCatalog::Chunk::UnknownDuration = -1;
-
 namespace {
     std::array<QString, QnServer::ChunksCatalogCount> catalogPrefixes = {"low_quality", "hi_quality"};
 
@@ -59,40 +55,6 @@ QnServer::ChunksCatalog DeviceFileCatalog::catalogByPrefix(const QString &prefix
         if (catalogPrefixes[i] == prefix)
             return static_cast<QnServer::ChunksCatalog>(i);
     return QnServer::LowQualityCatalog; //default value
-}
-
-qint64 DeviceFileCatalog::Chunk::distanceToTime(qint64 timeMs) const
-{
-    if (timeMs >= startTimeMs)
-        return durationMs == -1 ? 0 : qMax(0ll, timeMs - (startTimeMs+durationMs));
-    else
-        return startTimeMs - timeMs;
-}
-
-qint64 DeviceFileCatalog::Chunk::endTimeMs() const
-{
-    if (durationMs == -1)
-        return DATETIME_NOW;
-    else
-        return startTimeMs + durationMs;
-}
-
-bool DeviceFileCatalog::Chunk::containsTime(qint64 timeMs) const
-{
-    if (startTimeMs == -1)
-        return false;
-    else
-        return qBetween(startTimeMs, timeMs, endTimeMs());
-}
-
-void DeviceFileCatalog::TruncableChunk::truncate(qint64 timeMs)
-{
-    if (!isTruncated)
-    {
-        originalDuration = durationMs;
-        isTruncated = true;
-    }
-    durationMs = qMax(0ll, timeMs - startTimeMs);
 }
 
 DeviceFileCatalog::DeviceFileCatalog(
@@ -868,17 +830,6 @@ void DeviceFileCatalog::updateChunkDuration(Chunk& chunk)
     ChunkMap::const_iterator itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
     if (itr != m_chunks.end() && itr->startTimeMs == chunk.startTimeMs)
         chunk.durationMs = itr->durationMs;
-}
-
-QString DeviceFileCatalog::Chunk::fileName() const
-{
-    QString baseName = (fileIndex != FILE_INDEX_NONE && fileIndex != FILE_INDEX_WITH_DURATION) ?
-                       strPadLeft(QString::number(fileIndex), 3, '0') :
-                       QString::number(startTimeMs) +
-                       (fileIndex == FILE_INDEX_WITH_DURATION ? lit("_") + QString::number(durationMs) :
-                                                                lit(""));
-
-    return baseName + QString(".mkv");
 }
 
 QString DeviceFileCatalog::fileDir(const Chunk& chunk) const

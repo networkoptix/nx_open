@@ -29,7 +29,6 @@
 #include "api/model/recording_stats_reply.h"
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <recorder/camera_info.h>
-#include <recorder/space_info.h>
 
 #include <atomic>
 #include <future>
