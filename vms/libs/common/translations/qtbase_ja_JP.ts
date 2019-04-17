@@ -16,11 +16,11 @@
     </message>
     <message>
       <source>Hide %1</source>
-      <translation>%1 を隠す</translation>
+      <translation>%1 を非表示</translation>
     </message>
     <message>
       <source>Hide Others</source>
-      <translation>ほかを隠す</translation>
+      <translation>他を非表示</translation>
     </message>
     <message>
       <source>Show All</source>
@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Preferences...</source>
-      <translation>設定...</translation>
+      <translation>環境設定...</translation>
     </message>
     <message>
       <source>Quit %1</source>
@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>Toggle</source>
-      <translation>トグル</translation>
+      <translation>切り替え</translation>
     </message>
     <message>
       <source>Scroll Left</source>
@@ -118,15 +118,15 @@
     </message>
     <message>
       <source>Shows the menu</source>
-      <translation>メニューを表示する</translation>
+      <translation>メニューを表示</translation>
     </message>
     <message>
       <source>Sets the focus</source>
-      <translation>フォーカスをセットする</translation>
+      <translation>フォーカスをセット</translation>
     </message>
     <message>
       <source>Toggles the state</source>
-      <translation>状態を反転させる</translation>
+      <translation>状態を切り替える。</translation>
     </message>
     <message>
       <source>Scrolls to the left</source>
