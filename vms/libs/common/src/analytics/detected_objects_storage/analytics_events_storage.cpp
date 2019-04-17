@@ -87,19 +87,18 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
 
         auto detectionDataSaver = takeDataToSave(lock, /*flush*/ false);
 
-        if (!detectionDataSaver.empty())
-        {
-            m_dbController.queryExecutor().executeUpdate(
-                [this, packet = packet, detectionDataSaver = std::move(detectionDataSaver)](
-                    nx::sql::QueryContext* queryContext) mutable
-                {
-                    m_timePeriodDao.insertOrUpdateTimePeriod(queryContext, *packet);
+        // TODO: #ak Avoid executeUpdate for every packet. We need it only to save a time period.
+        m_dbController.queryExecutor().executeUpdate(
+            [this, packet = packet, detectionDataSaver = std::move(detectionDataSaver)](
+                nx::sql::QueryContext* queryContext) mutable
+            {
+                m_timePeriodDao.insertOrUpdateTimePeriod(queryContext, *packet);
+                if (!detectionDataSaver.empty())
                     detectionDataSaver.save(queryContext);
-                    return nx::sql::DBResult::ok;
-                },
-                [this](sql::DBResult resultCode) { logDataSaveResult(resultCode); },
-                kSaveEventQueryAggregationKey);
-        }
+                return nx::sql::DBResult::ok;
+            },
+            [this](sql::DBResult resultCode) { logDataSaveResult(resultCode); },
+            kSaveEventQueryAggregationKey);
     }
 }
 

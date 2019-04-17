@@ -77,9 +77,8 @@ void DetectionDataSaver::resolveObjectIds()
                     }
                     else
                     {
-                        NX_ASSERT(false);
-                        it = objectSearchGridCell.objectIds.erase(it);
-                        continue;
+                        // The object insertion task may already be in the query queue.
+                        // So, the dbId will be available when we need to insert.
                     }
                 }
 
@@ -202,6 +201,15 @@ std::vector<long long> DetectionDataSaver::toDbIds(
             it != m_objectGuidToId.end())
         {
             dbIds.push_back(it->second);
+        }
+        else if (auto dbId = m_objectCache->dbIdFromObjectId(objectId);
+            dbId != -1)
+        {
+            dbIds.push_back(dbId);
+        }
+        else
+        {
+            NX_ASSERT(false);
         }
     }
 
