@@ -79,19 +79,6 @@ update::Status CommonUpdateManager::start()
         return updateStatus;
     }
 
-    const double requiredSpace = package.size * 2 * 1.2;
-    const int64_t deviceFreeSpace = freeSpace(installer()->dataDirectoryPath());
-    if (deviceFreeSpace < requiredSpace)
-    {
-        NX_WARNING(
-            this,
-            "Can't start downloading an update package because lack of free space on disk. " \
-            "Required: %1, free Space: %2",
-            requiredSpace, deviceFreeSpace);
-        return nx::update::Status(
-            peerId, update::Status::Code::error, "Not enough free space for keeping update files");
-    }
-
     FileInformation fileInformation;
     fileInformation.name = package.file;
     fileInformation.md5 = QByteArray::fromHex(package.md5.toLatin1());
@@ -138,6 +125,7 @@ update::Status CommonUpdateManager::start()
         return update::Status(peerId, update::Status::Code::error, "Not enough free space");
     default:
         NX_ASSERT(false, "Unexpected Downloader::addFile() result");
+        m_downloaderFailDetail = DownloaderFailDetail::internalError;
         return update::Status(peerId, update::Status::Code::error, "Unknown error");
     }
 
@@ -177,11 +165,24 @@ void CommonUpdateManager::startUpdate(const QByteArray& content)
 }
 
 bool CommonUpdateManager::canDownloadFile(
-    const QString& fileName,
-    update::Status* outUpdateStatus)
+    const nx::update::Package& package, update::Status* outUpdateStatus)
 {
-    auto fileInformation = downloader()->fileInformation(fileName);
+    auto fileInformation = downloader()->fileInformation(package.file);
     const auto peerId = commonModule()->moduleGUID();
+
+    const double requiredSpace = package.size * 2 * 1.2;
+    const int64_t deviceFreeSpace = freeSpace(installer()->dataDirectoryPath());
+    if (deviceFreeSpace < requiredSpace)
+    {
+        NX_WARNING(
+            this,
+            "Can't start downloading an update package because lack of free space on disk. " \
+            "Required: %1, free Space: %2",
+            requiredSpace, deviceFreeSpace);
+        *outUpdateStatus = nx::update::Status(
+            peerId, update::Status::Code::error, "Not enough free space for keeping update files");
+        return false;
+    }
 
     switch (m_downloaderFailDetail)
     {
@@ -420,14 +421,13 @@ bool CommonUpdateManager::updateLastInstallationRequestTime()
 }
 
 bool CommonUpdateManager::statusAppropriateForDownload(
-    nx::update::Package* outPackage,
-    update::Status* outStatus)
+    nx::update::Package* outPackage, update::Status* outStatus)
 {
     QString message;
     switch (findPackage(outPackage, &message))
     {
         case update::FindPackageResult::ok:
-            return canDownloadFile(outPackage->file, outStatus);
+            return canDownloadFile(*outPackage, outStatus);
         case update::FindPackageResult::otherError:
             *outStatus = update::Status(
                 commonModule()->moduleGUID(),
