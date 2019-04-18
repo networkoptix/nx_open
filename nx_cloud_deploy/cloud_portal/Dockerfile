@@ -8,7 +8,7 @@ COPY stage/cloud /app/app
 ARG CACHE_DATE
 COPY stage/cloud/requirements.txt /app/requirements.txt
 
-RUN pip2 install -r /app/requirements.txt
+RUN pip install -r /app/requirements.txt
 
 ENV CLOUD_PORTAL_BASE_CONF_DIR /app/app/static
 ENV C_FORCE_ROOT true
