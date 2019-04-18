@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include <utils/media/ffmpeg_helper.h>
+#include <utils/media/frame_info.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
@@ -17,33 +17,38 @@ extern "C" {
 namespace nx::vms::server::analytics {
 
 /**
- * Wrapper around ffmpeg's AVFrame.
+ * Wrapper around ffmpeg's AVFrame, either owning an instance or holding a reference to the shared
+ * instance (depending on which constructor is used).
+ *
+ * ATTENTION: The frame's field pkt_dts is treated as containing timestamp in microseconds since
+ * epoch, contrary to ffmpeg doc (which states it should be in time_base units).
  */
 class UncompressedVideoFrame:
     public nx::sdk::RefCountable<nx::sdk::analytics::IUncompressedVideoFrame>
 {
 public:
     /**
-     * Creates the owning wrapper for AvFrameHolder which may or may not own its AVFrame.
+     * Creates the wrapper for a shared instance of CLVideoDecoderOutput (inherits AVFrame). On
+     * error, an assertion fails and the subsequent calls to avFrame() return null.
      *
-     * On error, the message is logged, an assertion fails and an internal flag is assigned so
-     * that the subsequent isValid() returns false.
-     *
-     * @param avFrame Ffmpeg's frame which should be fully allocated and have one of the supported
-     *     pixel formats. ATTENTION: The frame's field pkt_dts is treated as containing timestamp
-     *     in microseconds since epoch, contrary to ffmpeg doc (which states it should be in
-     *     time_base units).
+     * @param clVideoDecoderOutput An existing AVFrame which is allocated and have one of the
+     *     supported pixel formats.
      */
-    explicit UncompressedVideoFrame(std::shared_ptr<const AvFrameHolder> avFrame);
+    explicit UncompressedVideoFrame(CLConstVideoDecoderOutputPtr clVideoDecoderOutput);
 
     /**
-     * Whether the frame was successfully constructed. If this method returns false, no other
-     * methods should be called except the destructor.
+     * Creates and owns an instance of AVFrame, allocating its buffers and setting its fields. On
+     * error, an assertion fails and the subsequent calls to avFrame() return null.
      */
-    bool isValid() const { return m_valid; }
+    explicit UncompressedVideoFrame(int width, int height, AVPixelFormat pixelFormat, int64_t dts);
+
+    /**
+     * @return The frame, either owned or referenced, and null in case an assertion has failed
+     *     in the constructor (if so, no other methods should be called except the destructor).
+     */
+    const AVFrame* avFrame() const { return m_avFrame; }
 
     virtual int64_t timestampUs() const override;
-
     virtual int width() const override;
     virtual int height() const override;
     virtual PixelAspectRatio pixelAspectRatio() const override;
@@ -54,13 +59,15 @@ public:
     virtual int lineSize(int plane) const override;
 
 private:
+    void acceptAvFrame(const AVFrame* avFrame);
     bool assertValid(const char* func) const;
     bool assertPlaneValid(int plane, const char* func) const;
-    int planeLineCount(int plane) const;
 
 private:
-    bool m_valid = false;
-    const std::shared_ptr<const AvFrameHolder> m_avFrame;
+    const CLConstVideoDecoderOutputPtr m_clVideoDecoderOutput; //< Used only if no m_ownedAvFrame.
+    std::shared_ptr<AVFrame> m_ownedAvFrame; //< Used only if no m_clVideoDecoderOutput.
+    const AVFrame* m_avFrame = nullptr; //< Either m_ownedAvFrame or m_clVideoDecoderOutput.
+
     PixelFormat m_pixelFormat;
     const AVPixFmtDescriptor* m_avPixFmtDescriptor;
     std::vector<int> m_dataSize;

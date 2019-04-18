@@ -18,15 +18,32 @@ static nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrameFromVid
     const CLConstVideoDecoderOutputPtr& frame,
     PixelFormat pixelFormat)
 {
+    if (!NX_ASSERT(frame))
+        return nullptr;
+
     const auto avPixelFormat = nx::vms::server::sdk_support::sdkToAvPixelFormat(pixelFormat);
     if (avPixelFormat == AV_PIX_FMT_NONE)
         return nullptr; //< Assertion failed.
 
-    const auto uncompressedVideoFrame = nx::sdk::makePtr<UncompressedVideoFrame>(
-        frame->convertTo(avPixelFormat));
+    if (avPixelFormat == frame->format)
+    {
+        const auto uncompressedVideoFrame = nx::sdk::makePtr<UncompressedVideoFrame>(frame);
 
-    if (!uncompressedVideoFrame->isValid())
-        return nullptr; //< Error logged or assertion failed; the wrapper will be destroyed.
+        if (!uncompressedVideoFrame->avFrame())
+            return nullptr; //< An assertion already failed.
+
+        return uncompressedVideoFrame;
+    }
+
+    const auto uncompressedVideoFrame = nx::sdk::makePtr<UncompressedVideoFrame>(
+        frame->width, frame->height, avPixelFormat, frame->pkt_dts);
+
+    if (!uncompressedVideoFrame->avFrame()
+        || !frame->convertTo(uncompressedVideoFrame->avFrame()))
+    {
+        // An assertion already failed or an error message printed.
+        return nullptr;
+    }
 
     return uncompressedVideoFrame;
 }

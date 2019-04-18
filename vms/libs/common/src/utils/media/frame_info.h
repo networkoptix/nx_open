@@ -172,11 +172,10 @@ public:
     QImage toImage() const;
 
     /**
-     * @param dstPixelFormat If identical to the current pixel format, a non-owning reference to
-	 *     `this` is returned, otherwise, an owning reference to the newly allocated AVFrame with a
-	 *     proper de-allocator is returned.
+     * Copies the frame to another already allocated frame, converting to the required pixel format
+     * if needed.
      */
-    std::shared_ptr<const AvFrameHolder> convertTo(AVPixelFormat dstPixelFormat) const;
+    bool convertTo(const AVFrame* avFrame) const;
 
     static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
@@ -228,7 +227,7 @@ private:
     CLVideoDecoderOutput( const CLVideoDecoderOutput& );
     const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );
 
-    bool convertUsingSimdIntrTo(AVPixelFormat dstAvPixelFormat, const AVFrame* frameData) const;
+    bool convertUsingSimdIntrTo(const AVFrame* avFrame) const;
 };
 typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;
 typedef QSharedPointer<const CLVideoDecoderOutput> CLConstVideoDecoderOutputPtr;

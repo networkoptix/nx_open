@@ -450,11 +450,11 @@ QImage CLVideoDecoderOutput::toImage() const
  * Convert the frame using the optimized conversion, if it is available for the source and
  * destination pixel formats.
  *
- * @param dstAvFrame Should be properly allocated according to dstAvPixelFormat.
+ * @param avFrame Should be properly allocated and have the same size.
+ *
  * @return Whether the optimized conversion was available.
  */
-bool CLVideoDecoderOutput::convertUsingSimdIntrTo(
-    AVPixelFormat dstAvPixelFormat, const AVFrame* dstAvFrame) const
+bool CLVideoDecoderOutput::convertUsingSimdIntrTo(const AVFrame* avFrame) const
 {
     // Currently, the optimized conversion is not supported on arms (neon).
     #if !defined(__i386) && !defined(__amd64) && !defined(_WIN32)
@@ -463,7 +463,7 @@ bool CLVideoDecoderOutput::convertUsingSimdIntrTo(
 
     // NOTE: Despite the names of ..._argb32_simd_intr() converters, they actually convert
     // to BGRA (instead of ARGB as their names may suggest).
-    if (dstAvPixelFormat != AV_PIX_FMT_BGRA)
+    if (avFrame->format != AV_PIX_FMT_BGRA)
         return false;
 
     const auto convertFrame = //< Pointer to the appropriate conversion function.
@@ -476,18 +476,19 @@ bool CLVideoDecoderOutput::convertUsingSimdIntrTo(
     if (!convertFrame)
         return false;
 
-    if (!NX_ASSERT(linesize[1] == linesize[2], "Src frame U and V planes have different strides.")
-        || !NX_ASSERT(dstAvFrame->linesize[0] >= width * 4)
-        || !NX_ASSERT(dstAvFrame->linesize[0] % CL_MEDIA_ALIGNMENT == 0))
+    if (!NX_ASSERT(linesize[1] == linesize[2],
+            lm("Src frame U stride is %1 but V stride is %2").args(linesize[1], linesize[2]))
+        || !NX_ASSERT(avFrame->linesize[0] >= width * 4)
+        || !NX_ASSERT(avFrame->linesize[0] % CL_MEDIA_ALIGNMENT == 0))
     {
         return false;
     }
 
     convertFrame(
-        dstAvFrame->data[0],
+        avFrame->data[0],
         data[0], data[1], data[2],
         width, height,
-        /*dst_stride*/ dstAvFrame->linesize[0],
+        /*dst_stride*/ avFrame->linesize[0],
         /*y_stride*/ linesize[0],
         /*uv_stride*/ linesize[1],
         /*alpha*/ 255);
@@ -495,31 +496,24 @@ bool CLVideoDecoderOutput::convertUsingSimdIntrTo(
     return true;
 }
 
-std::shared_ptr<const AvFrameHolder> CLVideoDecoderOutput::convertTo(
-    AVPixelFormat dstPixelFormat) const
+bool CLVideoDecoderOutput::convertTo(const AVFrame* avFrame) const
 {
-    if (!NX_ASSERT(format >= 0))
-        return nullptr;
-
-    if (format == dstPixelFormat)
-        return std::make_shared<const AvFrameHolder>(this);
-
-    const auto frame = std::make_shared<const AvFrameHolder>(width, height, dstPixelFormat);
-    if (!frame->avFrame())
-        return nullptr; //< Frame allocation produced an error; assertion already failed.
-
-    if (convertUsingSimdIntrTo(dstPixelFormat, frame->avFrame()))
-        return frame;
-
-    if (convertImageFormat(
-        width, height,
-        data, linesize, (AVPixelFormat) format,
-        frame->avFrame()->data, frame->avFrame()->linesize, dstPixelFormat, /*logTag*/ this))
+    if (!NX_ASSERT(avFrame)
+        || !NX_ASSERT(width == avFrame->width,
+            lm("Src width is %1 but dst is %2").args(width, avFrame->width))
+        || !NX_ASSERT(height == avFrame->height,
+            lm("Src height is %1 but dst is %2").args(height, avFrame->height)))
     {
-        return frame;
+        return false;
     }
 
-    return nullptr;
+    if (convertUsingSimdIntrTo(avFrame))
+        return true;
+
+    return convertImageFormat(
+        width, height,
+        data, linesize, (AVPixelFormat) format,
+        avFrame->data, avFrame->linesize, (AVPixelFormat) avFrame->format, /*logTag*/ this);
 }
 
 void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)
