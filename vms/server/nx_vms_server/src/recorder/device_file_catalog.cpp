@@ -1057,28 +1057,7 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
     return result;
 }
 
-bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other)
+bool DeviceFileCatalog::ScanFilter::intersects(const QnTimePeriod& period) const
 {
-    return first < other.startTimeMs;
-}
-
-bool operator < (const DeviceFileCatalog::Chunk& first, qint64 other)
-{
-    return first.startTimeMs < other;
-}
-
-bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog::Chunk& other)
-{
-    return first.startTimeMs < other.startTimeMs;
-}
-
-bool operator == (const DeviceFileCatalog::Chunk &lhs, const DeviceFileCatalog::Chunk &rhs)
-{
-    return lhs.startTimeMs == rhs.startTimeMs && lhs.durationMs == rhs.durationMs &&
-           lhs.fileIndex == rhs.fileIndex && lhs.getFileSize() == rhs.getFileSize() &&
-           lhs.timeZone == rhs.timeZone && lhs.storageIndex == rhs.storageIndex;
-}
-
-bool DeviceFileCatalog::ScanFilter::intersects(const QnTimePeriod& period) const {
     return QnTimePeriod(scanPeriod.startTimeMs, scanPeriod.durationMs).intersects(period);
 }

@@ -8,7 +8,6 @@
 #include <QtCore/QFileInfo>
 #include <nx/utils/thread/mutex.h>
 
-#include <deque>
 #include <unordered_map>
 #include <set>
 #include <QtCore/QFileInfo>
@@ -20,6 +19,9 @@
 #include "api/model/recording_stats_reply.h"
 #include <nx/vms/server/server_module_aware.h>
 
+#include "chunk.h"
+#include "chunks_deque.h"
+
 extern "C" {
 
 #include <libavutil/avutil.h>
@@ -29,6 +31,8 @@ extern "C" {
 class QnTimePeriodList;
 struct QnTimePeriod;
 class QnStorageManager;
+
+using namespace nx::vms::server;
 
 class DeviceFileCatalog: public QObject, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
@@ -55,7 +59,7 @@ public:
     );
     //void deserializeTitleFile();
     void addRecord(const Chunk& chunk, bool sideRecorder = false);
-    Chunk updateDuration(
+    nx::vms::server::Chunk updateDuration(
         int durationMs,
         qint64 fileSize,
         bool indexWithDuration,
@@ -63,12 +67,12 @@ public:
 
     qint64 lastChunkStartTime() const;
     qint64 lastChunkStartTime(int storageIndex) const;
-    Chunk takeChunk(qint64 startTimeMs, qint64 durationMs);
+    nx::vms::server::Chunk takeChunk(qint64 startTimeMs, qint64 durationMs);
 
-    Chunk deleteFirstRecord();
+    nx::vms::server::Chunk deleteFirstRecord();
 
     /** Delete first N records. Return deleted file timestamps */
-    QVector<Chunk> deleteRecordsBefore(int idx);
+    QVector<nx::vms::server::Chunk> deleteRecordsBefore(int idx);
 
     bool isEmpty() const;
     size_t size() const {return m_chunks.size();}
@@ -76,10 +80,10 @@ public:
     void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     int findNextFileIndex(qint64 startTimeMs) const;
-    void updateChunkDuration(Chunk& chunk);
-    QString fileDir(const Chunk& chunk) const;
-    QString fullFileName(const Chunk& chunk) const;
-    Chunk chunkAt(int index) const;
+    void updateChunkDuration(nx::vms::server::Chunk& chunk);
+    QString fileDir(const nx::vms::server::Chunk& chunk) const;
+    QString fullFileName(const nx::vms::server::Chunk& chunk) const;
+    nx::vms::server::Chunk chunkAt(int index) const;
     bool isLastChunk(qint64 startTimeMs) const;
     bool containTime(qint64 timeMs, qint64 eps = 5 * 1000) const;
     bool containTime(const QnTimePeriod& period) const;
@@ -90,10 +94,6 @@ public:
     qint64 firstTime() const;
     QnServer::ChunksCatalog getCatalog() const { return m_catalog; }
     //QByteArray getMac() const { return m_macAddress.toUtf8(); }
-
-    // Detail level determine time duration (in microseconds) visible at 1 screen pixel
-    // All information less than detail level is discarded
-    typedef std::deque<Chunk> ChunkMap;
 
     QnTimePeriodList getTimePeriods(
         qint64 startTimeMs,
@@ -130,11 +130,11 @@ public:
         bool intersects(const QnTimePeriod& period) const;
     };
 
-    void scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList,
+    void scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, nx::vms::server::Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList,
         const ScanFilter& filter);
 
-    static std::deque<Chunk> mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2);
-    void addChunks(const std::deque<Chunk>& chunk);
+    static std::deque<nx::vms::server::Chunk> mergeChunks(const std::deque<nx::vms::server::Chunk>& chunk1, const std::deque<nx::vms::server::Chunk>& chunk2);
+    void addChunks(const std::deque<nx::vms::server::Chunk>& chunk);
 
     template<typename It>
     void assignChunksUnsafe(It begin, It end) { m_chunks.assign(begin, end); }
@@ -148,17 +148,20 @@ public:
     bool hasArchive(int storageIndex) const;
 
     // only for unit tests, don't use in production.
-    std::deque<Chunk> &getChunksUnsafe() { return m_chunks; }
+    nx::vms::server::ChunksDeque &getChunksUnsafe() { return m_chunks; }
 private:
 
-    bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
-    bool addChunk(const Chunk& chunk);
+    bool csvMigrationCheckFile(const nx::vms::server::Chunk& chunk, QnStorageResourcePtr storage);
+    bool addChunk(const nx::vms::server::Chunk& chunk);
     QSet<QDate> recordedMonthList();
 
-    void readStorageData(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& scanFilter);
-    Chunk chunkFromFile(const QnStorageResourcePtr &storage, const QString& fileName);
+    void readStorageData(
+        const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog,
+        QMap<qint64, nx::vms::server::Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList,
+        const ScanFilter& scanFilter);
+    nx::vms::server::Chunk chunkFromFile(const QnStorageResourcePtr &storage, const QString& fileName);
     QnTimePeriod timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName);
-    void replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog);
+    void replaceChunks(int storageIndex, const std::deque<nx::vms::server::Chunk>& newCatalog);
     void removeChunks(int storageIndex);
     void removeRecord(int idx);
     int detectTimeZone(qint64 startTimeMs, const QString& fileName);
@@ -170,7 +173,7 @@ private:
 
     mutable QnMutex m_mutex;
     //QFile m_file;
-    ChunksDeque m_chunks;
+    nx::vms::server::ChunksDeque m_chunks;
     QString m_cameraUniqueId;
 
     typedef QVector<QPair<int, bool> > CachedDirInfo;
@@ -196,30 +199,3 @@ private:
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;
 
-bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog::Chunk& other);
-bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other);
-bool operator < (const DeviceFileCatalog::Chunk& other, qint64 first);
-bool operator == (const DeviceFileCatalog::Chunk &lhs, const DeviceFileCatalog::Chunk &rhs);
-
-inline bool operator == (const DeviceFileCatalog::UniqueChunk    &lhs,
-                         const DeviceFileCatalog::UniqueChunk    &rhs)
-{
-    return lhs.chunk.toBaseChunk().startTimeMs == rhs.chunk.toBaseChunk().startTimeMs &&
-           lhs.chunk.toBaseChunk().durationMs == rhs.chunk.toBaseChunk().durationMs &&
-           lhs.cameraId == rhs.cameraId && lhs.quality == rhs.quality &&
-           lhs.isBackup == rhs.isBackup;
-}
-
-inline bool operator < (const DeviceFileCatalog::UniqueChunk    &lhs,
-                        const DeviceFileCatalog::UniqueChunk    &rhs)
-{
-    if (lhs.cameraId != rhs.cameraId || lhs.quality != rhs.quality || lhs.isBackup != rhs.isBackup) {
-        return lhs.cameraId < rhs.cameraId ?
-               true : lhs.cameraId > rhs.cameraId ?
-                      false : lhs.quality < rhs.quality ?
-                            true : lhs.quality > rhs.quality ?
-                                false : lhs.isBackup < rhs.isBackup;
-    } else {
-        return lhs.chunk.startTimeMs < rhs.chunk.startTimeMs;
-    }
-}

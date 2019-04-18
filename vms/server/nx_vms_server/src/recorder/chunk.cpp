@@ -1,21 +1,25 @@
 #include "chunk.h"
 
+#include <nx/utils/datetime.h>
+#include <utils/math/math.h>
+#include <utils/common/util.h>
+
 namespace nx::vms::server {
 
-const quint16 Chunk::FILE_INDEX_NONE = 0xffff;
-const quint16 Chunk::FILE_INDEX_WITH_DURATION = 0xfffe;
+const uint16_t Chunk::FILE_INDEX_NONE = 0xffff;
+const uint16_t Chunk::FILE_INDEX_WITH_DURATION = 0xfffe;
 const int Chunk::UnknownDuration = -1;
 
-Chunk(
-    qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone,
-    quint16 fileSizeHi = 0, quint32 fileSizeLo = 0)
+Chunk::Chunk(
+    int64_t startTimeMs, int storageIndex, int fileIndex, int _duration, int16_t timeZone,
+    uint16_t fileSizeHi, uint32_t fileSizeLo)
     :
-    startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex),
-    fileIndex(_fileIndex), timeZone(_timeZone), fileSizeHi(fileSizeHi), fileSizeLo(fileSizeLo)
+    startTimeMs(startTimeMs), durationMs(_duration), storageIndex(storageIndex),
+    fileIndex(fileIndex), timeZone(timeZone), fileSizeHi(fileSizeHi), fileSizeLo(fileSizeLo)
 {
 }
 
-qint64 Chunk::distanceToTime(qint64 timeMs) const
+int64_t Chunk::distanceToTime(int64_t timeMs) const
 {
     if (timeMs >= startTimeMs)
         return durationMs == -1 ? 0 : qMax(0ll, timeMs - (startTimeMs+durationMs));
@@ -23,7 +27,7 @@ qint64 Chunk::distanceToTime(qint64 timeMs) const
         return startTimeMs - timeMs;
 }
 
-qint64 Chunk::endTimeMs() const
+int64_t Chunk::endTimeMs() const
 {
     if (durationMs == -1)
         return DATETIME_NOW;
@@ -31,7 +35,7 @@ qint64 Chunk::endTimeMs() const
         return startTimeMs + durationMs;
 }
 
-bool Chunk::containsTime(qint64 timeMs) const
+bool Chunk::containsTime(int64_t timeMs) const
 {
     if (startTimeMs == -1)
         return false;
@@ -42,7 +46,7 @@ bool Chunk::containsTime(qint64 timeMs) const
 QString Chunk::fileName() const
 {
     const auto basePart = fileIndex != FILE_INDEX_NONE && fileIndex != FILE_INDEX_WITH_DURATION
-        ? strPadLeft(QString::number(fileIndex), 3, '0') : QString::number(startTimeMs)
+        ? strPadLeft(QString::number(fileIndex), 3, '0') : QString::number(startTimeMs);
 
     const auto durationPostfix = fileIndex == FILE_INDEX_WITH_DURATION
         ? "_" + QString::number(durationMs) : "";
@@ -50,7 +54,7 @@ QString Chunk::fileName() const
     return basePart + durationPostfix + ".mkv";
 }
 
-void TruncableChunk::truncate(qint64 timeMs)
+void TruncableChunk::truncate(int64_t timeMs)
 {
     if (!isTruncated)
     {
@@ -58,6 +62,52 @@ void TruncableChunk::truncate(qint64 timeMs)
         isTruncated = true;
     }
     durationMs = qMax(0ll, timeMs - startTimeMs);
+}
+
+bool operator<(int64_t first, const Chunk& other)
+{
+    return first < other.startTimeMs;
+}
+
+bool operator<(const Chunk& first, int64_t other)
+{
+    return first.startTimeMs < other;
+}
+
+bool operator<(const Chunk& first, const Chunk& other)
+{
+    return first.startTimeMs < other.startTimeMs;
+}
+
+bool operator==(const Chunk& lhs, const Chunk& rhs)
+{
+    return lhs.startTimeMs == rhs.startTimeMs && lhs.durationMs == rhs.durationMs &&
+        lhs.fileIndex == rhs.fileIndex && lhs.getFileSize() == rhs.getFileSize() &&
+        lhs.timeZone == rhs.timeZone && lhs.storageIndex == rhs.storageIndex;
+}
+
+bool operator==(const UniqueChunk& lhs, const UniqueChunk& rhs)
+{
+    return lhs.chunk.toBaseChunk().startTimeMs == rhs.chunk.toBaseChunk().startTimeMs &&
+        lhs.chunk.toBaseChunk().durationMs == rhs.chunk.toBaseChunk().durationMs &&
+        lhs.cameraId == rhs.cameraId && lhs.quality == rhs.quality &&
+        lhs.isBackup == rhs.isBackup;
+}
+
+bool operator<(const UniqueChunk& lhs, const UniqueChunk& rhs)
+{
+    if (lhs.cameraId != rhs.cameraId || lhs.quality != rhs.quality || lhs.isBackup != rhs.isBackup)
+    {
+        return lhs.cameraId < rhs.cameraId
+            ? true : lhs.cameraId > rhs.cameraId
+                ? false : lhs.quality < rhs.quality
+                    ? true : lhs.quality > rhs.quality
+                        ? false : lhs.isBackup < rhs.isBackup;
+    }
+    else
+    {
+        return lhs.chunk.startTimeMs < rhs.chunk.startTimeMs;
+    }
 }
 
 } // namespace nx::vms::server
