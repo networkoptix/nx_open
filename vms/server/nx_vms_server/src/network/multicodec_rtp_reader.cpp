@@ -638,31 +638,8 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
             "Can't open RTSP stream: SETUP request has been failed");
     }
 
-    auto tracks = m_RtpSession.getTrackInfo();
-    if (tracks.empty())
-    {
-        NX_WARNING(this, "Tracks are empty for [%1]", m_currentStreamUrl);
-        return CameraDiagnostics::CameraInvalidParams("The list of tracks are empty");
-    }
-
-    std::set<QnRtspIoDevice::AddressInfo> addressInfoToRegister;
-    for (const auto& track: tracks)
-    {
-        if (!track.ioDevice || !track.setupSuccess)
-            continue;
-
-        addressInfoToRegister.insert(track.ioDevice->mediaAddressInfo());
-        addressInfoToRegister.insert(track.ioDevice->rtcpAddressInfo());
-    }
-
-    for (const auto& addressInfo: addressInfoToRegister)
-    {
-        if (!registerMulticastAddress(addressInfo))
-        {
-            return CameraDiagnostics::CameraInvalidParams(
-                "Multicast media address conflict detected");
-        }
-    }
+    if (const auto result = registerMulticastAddressesIfNeeded(); !result)
+        return result;
 
     if (!m_RtpSession.playPhase2(position, AV_NOPTS_VALUE, m_RtpSession.getScale()))
     {
@@ -951,7 +928,38 @@ void QnMulticodecRtpReader::updateOnvifTime(
         track.onvifExtensionTimestamp = onvifExtension.ntp;
 }
 
-CameraDiagnostics::Result QnMulticodecRtpReader::registerMulticastAddress(
+CameraDiagnostics::Result QnMulticodecRtpReader::registerMulticastAddressesIfNeeded()
+{
+    auto tracks = m_RtpSession.getTrackInfo();
+    if (tracks.empty())
+    {
+        NX_WARNING(this, "Tracks are empty for [%1]", m_currentStreamUrl);
+        return CameraDiagnostics::CameraInvalidParams("The list of tracks are empty");
+    }
+
+    std::set<QnRtspIoDevice::AddressInfo> addressInfoToRegister;
+    for (const auto& track : tracks)
+    {
+        if (!track.ioDevice || !track.setupSuccess)
+            continue;
+
+        addressInfoToRegister.insert(track.ioDevice->mediaAddressInfo());
+        addressInfoToRegister.insert(track.ioDevice->rtcpAddressInfo());
+    }
+
+    for (const auto& addressInfo : addressInfoToRegister)
+    {
+        if (!registerAddressIfNeeded(addressInfo))
+        {
+            return CameraDiagnostics::CameraInvalidParams(
+                "Multicast media address conflict detected");
+        }
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result QnMulticodecRtpReader::registerAddressIfNeeded(
     const QnRtspIoDevice::AddressInfo& addressInfo)
 {
     if (addressInfo.transport != nx::vms::api::RtpTransportType::multicast)

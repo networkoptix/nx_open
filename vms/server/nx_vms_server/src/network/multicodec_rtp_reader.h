@@ -131,8 +131,10 @@ private:
         TrackInfo& track,
         int rtpChannel);
 
-    CameraDiagnostics::Result registerMulticastAddress(
+    CameraDiagnostics::Result registerMulticastAddressesIfNeeded();
+    CameraDiagnostics::Result registerAddressIfNeeded(
         const QnRtspIoDevice::AddressInfo& addressInfo);
+
     void unregisterMulticastAddresses();
 
 private slots:
