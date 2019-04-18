@@ -159,10 +159,16 @@ Search can be cleared by x button
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    ${tiles}    Get WebElements    //div[contains(@class,"card ")]
+    ${len}    Get Length    ${tiles}
     Input Text    ${SYSTEMS SEARCH INPUT}    ${TEST FIRST NAME}
     Wait Until Element Is Visible    ${SYSTEM SEARCH X BUTTON}
     Click Link    ${SYSTEM SEARCH X BUTTON}
     Element Text Should Be    ${SYSTEMS SEARCH INPUT}    ${EMPTY}
+    ${tiles2}    Get WebElements    //div[contains(@class,"card ")]
+    ${len2}    Get Length    ${tiles2}
+    Should Be Equal    ${len}    ${len2}
+
 
 Searching for owner email should only show systems with that owner
     [tags]    C41891    Threaded
