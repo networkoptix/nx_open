@@ -1,4 +1,4 @@
-FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.1.3
+FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:2.03
 
 COPY docker/merge_config.py /usr/local/bin/
 COPY docker/pip.conf /root/.config/pip/pip.conf
