@@ -44,6 +44,16 @@ private:
     QScopedPointer<QnCryptographicHashPrivate> d;
 };
 
+inline QByteArray md5(const QByteArray& data)
+{
+    return QnCryptographicHash::hash(data, QnCryptographicHash::Md5);
+}
+
+inline QByteArray sha1(const QByteArray& data)
+{
+    return QnCryptographicHash::hash(data, QnCryptographicHash::Sha1);
+}
+
 }
 }
 

@@ -3,13 +3,12 @@
 #include <nx/fusion/serialization/sql_functions.h>
 
 #include "attributes_dao.h"
+#include "config.h"
 #include "device_dao.h"
 #include "object_type_dao.h"
 #include "serializers.h"
 
 namespace nx::analytics::storage {
-
-static constexpr int kMsInUsec = 1000;
 
 DetectionDataSaver::DetectionDataSaver(
     AttributesDao* attributesDao,
@@ -24,11 +23,13 @@ DetectionDataSaver::DetectionDataSaver(
 {
 }
 
-void DetectionDataSaver::load(ObjectTrackAggregator* trackAggregator)
+void DetectionDataSaver::load(
+    ObjectTrackAggregator* trackAggregator,
+    bool flush)
 {
-    m_objectsToInsert = m_objectCache->getObjectsToInsert();
-    m_objectsToUpdate = m_objectCache->getObjectsToUpdate();
-    m_objectSearchData = trackAggregator->getAggregatedData();
+    m_objectsToInsert = m_objectCache->getObjectsToInsert(flush);
+    m_objectsToUpdate = m_objectCache->getObjectsToUpdate(flush);
+    m_objectSearchData = trackAggregator->getAggregatedData(flush);
 
     resolveObjectIds();
 }
@@ -75,9 +76,8 @@ void DetectionDataSaver::resolveObjectIds()
                     }
                     else
                     {
-                        NX_ASSERT(false);
-                        it = objectSearchGridCell.objectIds.erase(it);
-                        continue;
+                        // The object insertion task may already be in the query queue.
+                        // So, the dbId will be available when we need to insert.
                     }
                 }
 
@@ -93,9 +93,9 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(R"sql(
-        INSERT INTO object (device_id, object_type_id, guid, track_start_timestamp_ms,
-            track_detail, attributes_id)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO object (device_id, object_type_id, guid,
+            track_start_ms, track_end_ms, track_detail, attributes_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     )sql");
 
     for (const auto& object: m_objectsToInsert)
@@ -105,12 +105,15 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         const auto attributesId = m_attributesDao->insertOrFetchAttributes(
             queryContext, object.attributes);
 
+        auto [trackMinTimestamp, trackMaxTimestamp] = findMinMaxTimestamp(object.track);
+
         query->bindValue(0, deviceDbId);
         query->bindValue(1, objectTypeDbId);
         query->bindValue(2, QnSql::serialized_field(object.objectAppearanceId));
-        query->bindValue(3, object.track.front().timestampUsec / kMsInUsec);
-        query->bindValue(4, TrackSerializer::serialize(object.track));
-        query->bindValue(5, attributesId);
+        query->bindValue(3, trackMinTimestamp / kUsecInMs);
+        query->bindValue(4, trackMaxTimestamp / kUsecInMs);
+        query->bindValue(5, TrackSerializer::serialized(object.track));
+        query->bindValue(6, attributesId);
 
         query->exec();
 
@@ -122,12 +125,33 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
     }
 }
 
+std::pair<qint64, qint64> DetectionDataSaver::findMinMaxTimestamp(
+    const std::vector<ObjectPosition>& track)
+{
+    auto timestamps = std::make_pair<qint64, qint64>(
+        std::numeric_limits<qint64>::max(),
+        std::numeric_limits<qint64>::min());
+
+    for (const auto& pos: track)
+    {
+        if (pos.timestampUsec < timestamps.first)
+            timestamps.first = pos.timestampUsec;
+        if (pos.timestampUsec > timestamps.second)
+            timestamps.second = pos.timestampUsec;
+    }
+
+    return timestamps;
+}
+
 void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
 {
     auto updateObjectQuery = queryContext->connection()->createQuery();
     updateObjectQuery->prepare(R"sql(
         UPDATE object
-        SET track_detail = track_detail || ?, attributes_id = ?
+        SET track_detail = track_detail || ?,
+            attributes_id = ?,
+            track_start_ms = min(track_start_ms, ?),
+            track_end_ms = max(track_end_ms, ?)
         WHERE id = ?
     )sql");
 
@@ -136,9 +160,14 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         const auto newAttributesId = m_attributesDao->insertOrFetchAttributes(
             queryContext, objectUpdate.allAttributes);
 
-        updateObjectQuery->bindValue(0, TrackSerializer::serialize(objectUpdate.appendedTrack));
+        auto [trackMinTimestamp, trackMaxTimestamp] =
+            findMinMaxTimestamp(objectUpdate.appendedTrack);
+
+        updateObjectQuery->bindValue(0, TrackSerializer::serialized(objectUpdate.appendedTrack));
         updateObjectQuery->bindValue(1, newAttributesId);
-        updateObjectQuery->bindValue(2, objectUpdate.dbId);
+        updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
+        updateObjectQuery->bindValue(3, trackMaxTimestamp / kUsecInMs);
+        updateObjectQuery->bindValue(4, objectUpdate.dbId);
         updateObjectQuery->exec();
 
         m_objectCache->saveObjectGuidToAttributesId(objectUpdate.objectId, newAttributesId);
@@ -165,12 +194,16 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
 
     for (const auto& objectSearchGridCell: m_objectSearchData)
     {
-        insertObjectSearchCell->bindValue(0, (long long) duration_cast<seconds>(objectSearchGridCell.timestamp).count());
+        insertObjectSearchCell->bindValue(0,
+            (long long) duration_cast<seconds>(objectSearchGridCell.timestamp).count());
+
         insertObjectSearchCell->bindValue(1, objectSearchGridCell.boundingBox.topLeft().x());
         insertObjectSearchCell->bindValue(2, objectSearchGridCell.boundingBox.topLeft().y());
         insertObjectSearchCell->bindValue(3, objectSearchGridCell.boundingBox.bottomRight().x());
         insertObjectSearchCell->bindValue(4, objectSearchGridCell.boundingBox.bottomRight().y());
-        insertObjectSearchCell->bindValue(5, serialize(toDbIds(objectSearchGridCell.objectIds)));
+
+        insertObjectSearchCell->bindValue(5,
+            compact_int::serialized(toDbIds(objectSearchGridCell.objectIds)));
 
         insertObjectSearchCell->exec();
         const auto objectSearchCellId = insertObjectSearchCell->lastInsertId().toLongLong();
@@ -186,7 +219,8 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
     }
 }
 
-std::vector<long long> DetectionDataSaver::toDbIds(const std::vector<QnUuid>& objectIds)
+std::vector<long long> DetectionDataSaver::toDbIds(
+    const std::set<QnUuid>& objectIds)
 {
     std::vector<long long> dbIds;
     for (const auto& objectId: objectIds)
@@ -195,6 +229,15 @@ std::vector<long long> DetectionDataSaver::toDbIds(const std::vector<QnUuid>& ob
             it != m_objectGuidToId.end())
         {
             dbIds.push_back(it->second);
+        }
+        else if (auto dbId = m_objectCache->dbIdFromObjectId(objectId);
+            dbId != -1)
+        {
+            dbIds.push_back(dbId);
+        }
+        else
+        {
+            NX_ASSERT(false);
         }
     }
 

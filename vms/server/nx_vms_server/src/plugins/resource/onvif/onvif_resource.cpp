@@ -88,20 +88,6 @@ onvifXsd__H264Profile fromStringToH264Profile(const QString& str)
         return onvifXsd__H264Profile::Baseline;
 };
 
-void updateTimer(nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
-    nx::utils::MoveOnlyFunc<void(nx::utils::TimerId)> function)
-{
-    if (*timerId != 0)
-    {
-        // Can be called from IO thread. Non blocking call should be used here.
-        nx::utils::TimerManager::instance()->deleteTimer(*timerId);
-        *timerId = 0;
-    }
-
-    *timerId = nx::utils::TimerManager::instance()->addTimer(
-        std::move(function), timeout);
-}
-
 /* Some cameras declare invalid max resolution */
 struct StrictResolution
 {
@@ -149,6 +135,28 @@ QString QnOnvifServiceUrls::getUrl(OnvifWebService onvifWebService) const
 
 //-------------------------------------------------------------------------------------------------
 // QnPlOnvifResource::VideoEncoderCapabilities
+
+void QnPlOnvifResource::updateTimer(
+    nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
+    nx::utils::MoveOnlyFunc<void(nx::utils::TimerId)> function)
+{
+    if (*timerId != 0)
+    {
+        // Can be called from IO thread. Non blocking call should be used here.
+        nx::utils::TimerManager::instance()->deleteTimer(*timerId);
+        *timerId = 0;
+    }
+
+    *timerId = nx::utils::TimerManager::instance()->addTimer(
+        [operationGuard = m_asyncConnectGuard.sharedGuard(),
+        function = std::move(function)](nx::utils::TimerId timerId) mutable
+        {
+            if (const auto lock = operationGuard->lock())
+                function(timerId);
+        },
+        timeout);
+}
+
 
 QnPlOnvifResource::VideoEncoderCapabilities::VideoEncoderCapabilities(
     std::string videoEncoderToken,
@@ -464,6 +472,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
     }
 
     stopInputPortStatesMonitoring();
+    m_asyncConnectGuard->terminate();
 
     QnMutexLocker lock(&m_physicalParamsMutex);
     m_imagingParamsProxy.reset();

@@ -36,6 +36,9 @@ class QnVirtualCameraResource : public QnSecurityCamResource
 
 public:
     static const QString kCompatibleAnalyticsEnginesProperty;
+    static const QString kUserEnabledAnalyticsEnginesProperty;
+    static const QString kDeviceAgentsSettingsValuesProperty;
+    static const QString kDeviceAgentManifestsProperty;
 
 public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);

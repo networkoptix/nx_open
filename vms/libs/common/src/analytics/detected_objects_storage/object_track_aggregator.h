@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <optional>
 #include <vector>
 
 #include <QtCore/QRect>
@@ -17,7 +18,7 @@ struct AggregatedTrackData
      * Resolution is defined by ObjectTrackAggregator settings.
      */
     QRect boundingBox;
-    std::vector<QnUuid> objectIds;
+    std::set<QnUuid> objectIds;
 };
 
 /**
@@ -39,12 +40,23 @@ public:
         std::chrono::milliseconds timestamp,
         const QRectF& box);
 
-    std::vector<AggregatedTrackData> getAggregatedData();
+    /**
+     * @param flush If true then all data is loaded, the aggregation period is ignored.
+     */
+    std::vector<AggregatedTrackData> getAggregatedData(bool flush);
+
+    std::chrono::milliseconds length() const;
 
 private:
     const int m_resolutionX;
     const int m_resolutionY;
     const std::chrono::milliseconds m_aggregationPeriod;
+
+    std::optional<std::chrono::milliseconds> m_aggregationStartTimestamp;
+    std::optional<std::chrono::milliseconds> m_aggregationEndTimestamp;
+    RectAggregator<QnUuid /*objectId*/> m_rectAggregator;
+
+    QRect translate(const QRectF& box);
 };
 
 } // namespace nx::analytics::storage

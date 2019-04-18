@@ -22,6 +22,9 @@ public:
         nx::sql::QueryContext* queryContext,
         const std::vector<common::metadata::Attribute>& eventAttributes);
 
+    static std::vector<common::metadata::Attribute> deserialize(
+        const QString& attributesStr);
+
 private:
     struct AttributesCacheEntry
     {

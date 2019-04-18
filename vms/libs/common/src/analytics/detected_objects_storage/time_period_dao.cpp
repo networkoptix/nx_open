@@ -1,5 +1,6 @@
 #include "time_period_dao.h"
 
+#include "config.h"
 #include "device_dao.h"
 
 namespace nx::analytics::storage {
