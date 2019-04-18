@@ -3,13 +3,12 @@
 #include <nx/fusion/serialization/sql_functions.h>
 
 #include "attributes_dao.h"
+#include "config.h"
 #include "device_dao.h"
 #include "object_type_dao.h"
 #include "serializers.h"
 
 namespace nx::analytics::storage {
-
-static constexpr int kMsInUsec = 1000;
 
 DetectionDataSaver::DetectionDataSaver(
     AttributesDao* attributesDao,
@@ -94,9 +93,9 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(R"sql(
-        INSERT INTO object (device_id, object_type_id, guid, track_start_timestamp_ms,
-            track_detail, attributes_id)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO object (device_id, object_type_id, guid,
+            track_start_ms, track_end_ms, track_detail, attributes_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     )sql");
 
     for (const auto& object: m_objectsToInsert)
@@ -106,12 +105,15 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         const auto attributesId = m_attributesDao->insertOrFetchAttributes(
             queryContext, object.attributes);
 
+        auto [trackMinTimestamp, trackMaxTimestamp] = findMinMaxTimestamp(object.track);
+
         query->bindValue(0, deviceDbId);
         query->bindValue(1, objectTypeDbId);
         query->bindValue(2, QnSql::serialized_field(object.objectAppearanceId));
-        query->bindValue(3, object.track.front().timestampUsec / kMsInUsec);
-        query->bindValue(4, TrackSerializer::serialized(object.track));
-        query->bindValue(5, attributesId);
+        query->bindValue(3, trackMinTimestamp / kUsecInMs);
+        query->bindValue(4, trackMaxTimestamp / kUsecInMs);
+        query->bindValue(5, TrackSerializer::serialized(object.track));
+        query->bindValue(6, attributesId);
 
         query->exec();
 
@@ -123,12 +125,33 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
     }
 }
 
+std::pair<qint64, qint64> DetectionDataSaver::findMinMaxTimestamp(
+    const std::vector<ObjectPosition>& track)
+{
+    auto timestamps = std::make_pair<qint64, qint64>(
+        std::numeric_limits<qint64>::max(),
+        std::numeric_limits<qint64>::min());
+
+    for (const auto& pos: track)
+    {
+        if (pos.timestampUsec < timestamps.first)
+            timestamps.first = pos.timestampUsec;
+        if (pos.timestampUsec > timestamps.second)
+            timestamps.second = pos.timestampUsec;
+    }
+
+    return timestamps;
+}
+
 void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
 {
     auto updateObjectQuery = queryContext->connection()->createQuery();
     updateObjectQuery->prepare(R"sql(
         UPDATE object
-        SET track_detail = track_detail || ?, attributes_id = ?
+        SET track_detail = track_detail || ?,
+            attributes_id = ?,
+            track_start_ms = min(track_start_ms, ?),
+            track_end_ms = max(track_end_ms, ?)
         WHERE id = ?
     )sql");
 
@@ -137,9 +160,14 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         const auto newAttributesId = m_attributesDao->insertOrFetchAttributes(
             queryContext, objectUpdate.allAttributes);
 
+        auto [trackMinTimestamp, trackMaxTimestamp] =
+            findMinMaxTimestamp(objectUpdate.appendedTrack);
+
         updateObjectQuery->bindValue(0, TrackSerializer::serialized(objectUpdate.appendedTrack));
         updateObjectQuery->bindValue(1, newAttributesId);
-        updateObjectQuery->bindValue(2, objectUpdate.dbId);
+        updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
+        updateObjectQuery->bindValue(3, trackMaxTimestamp / kUsecInMs);
+        updateObjectQuery->bindValue(4, objectUpdate.dbId);
         updateObjectQuery->exec();
 
         m_objectCache->saveObjectGuidToAttributesId(objectUpdate.objectId, newAttributesId);

@@ -180,7 +180,8 @@ CREATE TABLE object(
     device_id                   INTEGER,
     object_type_id              INTEGER,
     guid                        BLOB,
-    track_start_timestamp_ms    INTEGER,
+    track_start_ms              INTEGER,
+    track_end_ms                INTEGER,
     track_detail                BLOB,
     attributes_id               INTEGER
 );

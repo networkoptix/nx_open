@@ -95,4 +95,20 @@ TEST_F(AnalyticsDbTrackSerializer, serialize_and_deserialize_are_symmetric)
     assertSerializeAndDeserializeAreSymmetric(track);
 }
 
+TEST_F(AnalyticsDbTrackSerializer, appended_serialization_results_can_be_deserialized)
+{
+    std::vector<ObjectPosition> track;
+    QByteArray serialized;
+    for (int i = 0; i < 3; ++i)
+    {
+        auto trackPart = generateRandomTrack();
+        serialized += storage::TrackSerializer::serialized(trackPart);
+        std::move(trackPart.begin(), trackPart.end(), std::back_inserter(track));
+    }
+
+    const auto deserialized = storage::TrackSerializer::deserialized(serialized);
+
+    ASSERT_EQ(track, deserialized);
+}
+
 } // namespace nx::analytics::storage::test

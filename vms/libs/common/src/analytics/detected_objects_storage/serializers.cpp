@@ -78,20 +78,8 @@ void deserialize(QnByteArrayConstRef* buf, std::vector<long long>* numbers)
 
 QByteArray TrackSerializer::serialized(const std::vector<ObjectPosition>& track)
 {
-    if (track.empty())
-        return QByteArray();
-
     QByteArray buf;
-    buf.reserve(9 + 2 + track.size() * 11);
-
-    // Writing base timestamp. All timestamps will be saved as an offset from this base.
-    compact_int::serialize(track.front().timestampUsec, &buf);
-
-    compact_int::serialize((long long) track.size(), &buf);
-
-    for (const auto& position: track)
-        serialize(track.front().timestampUsec, position, &buf);
-
+    serializeTrackSequence(track, &buf);
     return buf;
 }
 
@@ -100,21 +88,30 @@ std::vector<ObjectPosition> TrackSerializer::deserialized(
 {
     QnByteArrayConstRef buf(serializedData);
 
-    long long baseTimestamp = 0;
-    compact_int::deserialize(&buf, &baseTimestamp);
-
-    long long trackSize = 0;
-    compact_int::deserialize(&buf, &trackSize);
-
     std::vector<ObjectPosition> track;
-    track.reserve(trackSize);
-    for (long long i = 0; i < trackSize; ++i)
-    {
-        track.push_back(ObjectPosition());
-        deserialize(baseTimestamp, &buf, &track.back());
-    }
+
+    while (!buf.isEmpty())
+        deserializeTrackSequence(&buf, &track);
 
     return track;
+}
+
+void TrackSerializer::serializeTrackSequence(
+    const std::vector<ObjectPosition>& track,
+    QByteArray* buf)
+{
+    if (track.empty())
+        return;
+
+    buf->reserve(buf->size() + 9 + 2 + track.size() * 11);
+
+    // Writing base timestamp. All timestamps will be saved as an offset from this base.
+    compact_int::serialize(track.front().timestampUsec, buf);
+
+    compact_int::serialize((long long)track.size(), buf);
+
+    for (const auto& position: track)
+        serialize(track.front().timestampUsec, position, buf);
 }
 
 void TrackSerializer::serialize(
@@ -135,6 +132,24 @@ void TrackSerializer::serialize(const QRect& rect, QByteArray* buf)
     compact_int::serialize(rect.y(), buf);
     compact_int::serialize(rect.width(), buf);
     compact_int::serialize(rect.height(), buf);
+}
+
+void TrackSerializer::deserializeTrackSequence(
+    QnByteArrayConstRef* buf,
+    std::vector<ObjectPosition>* track)
+{
+    long long baseTimestamp = 0;
+    compact_int::deserialize(buf, &baseTimestamp);
+
+    long long trackSize = 0;
+    compact_int::deserialize(buf, &trackSize);
+
+    track->reserve(track->size() + trackSize);
+    for (long long i = 0; i < trackSize; ++i)
+    {
+        track->push_back(ObjectPosition());
+        deserialize(baseTimestamp, buf, &track->back());
+    }
 }
 
 void TrackSerializer::deserialize(

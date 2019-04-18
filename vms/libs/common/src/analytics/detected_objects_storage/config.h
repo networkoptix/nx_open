@@ -34,4 +34,6 @@ static constexpr int kMaxFilterEventsResultSize =
  */
 static constexpr auto kMinTimePeriodAggregationPeriod = std::chrono::seconds(3);
 
+static constexpr int kUsecInMs = 1000;
+
 } // namespace nx::analytics::storage
