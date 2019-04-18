@@ -27,9 +27,9 @@ class QnScheduleSync:
 private:
     struct ChunkKey
     {
-        DeviceFileCatalog::Chunk chunk;
-        QString                  cameraId;
-        QnServer::ChunksCatalog  catalog;
+        nx::vms::server::Chunk chunk;
+        QString cameraId;
+        QnServer::ChunksCatalog catalog;
     };
     friend bool operator < (const ChunkKey &key1, const ChunkKey &key2);
 
@@ -82,7 +82,7 @@ public:
     virtual void run() override;
     virtual void pleaseStop() override;
 private:
-    DeviceFileCatalog::Chunk findLastSyncChunkUnsafe() const;
+    nx::vms::server::Chunk findLastSyncChunkUnsafe() const;
 
 #define COPY_ERROR_LIST(APPLY) \
     APPLY(GetCatalogError) \

@@ -88,7 +88,7 @@ public:
     }
 
     virtual void flush(StoreCompletionHandler /*completionHandler*/) override
-    { 
+    {
         FAIL();
     }
 
@@ -184,7 +184,7 @@ private:
     }
 
     std::unique_ptr<AbstractEventsStorage> createEventsStorageMock(
-        const Settings& /*settings*/)
+        const nx::analytics::storage::Settings& /*settings*/)
     {
         return std::make_unique<EventsStorageMock>(&m_lookupRequests);
     }

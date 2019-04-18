@@ -130,10 +130,14 @@ public:
         bool intersects(const QnTimePeriod& period) const;
     };
 
-    void scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, nx::vms::server::Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList,
+    void scanMediaFiles(
+        const QString& folder, const QnStorageResourcePtr &storage,
+        QMap<qint64, nx::vms::server::Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList,
         const ScanFilter& filter);
 
-    static std::deque<nx::vms::server::Chunk> mergeChunks(const std::deque<nx::vms::server::Chunk>& chunk1, const std::deque<nx::vms::server::Chunk>& chunk2);
+    static std::deque<nx::vms::server::Chunk> mergeChunks(
+        const std::deque<nx::vms::server::Chunk>& chunks1,
+        const std::deque<nx::vms::server::Chunk>& chunks2);
     void addChunks(const std::deque<nx::vms::server::Chunk>& chunk);
 
     template<typename It>
@@ -149,6 +153,8 @@ public:
 
     // only for unit tests, don't use in production.
     nx::vms::server::ChunksDeque &getChunksUnsafe() { return m_chunks; }
+    int64_t occupiedSpace(int storageIndex) const;
+
 private:
 
     bool csvMigrationCheckFile(const nx::vms::server::Chunk& chunk, QnStorageResourcePtr storage);

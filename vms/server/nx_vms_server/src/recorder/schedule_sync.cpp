@@ -48,10 +48,10 @@ void QnScheduleSync::updateLastSyncChunk()
     NX_VERBOSE(this, lit("[Backup] GetLastSyncPoint: %1").arg(m_syncTimePoint));
 }
 
-DeviceFileCatalog::Chunk QnScheduleSync::findLastSyncChunkUnsafe() const
+nx::vms::server::Chunk QnScheduleSync::findLastSyncChunkUnsafe() const
 {
-    DeviceFileCatalog::Chunk resultChunk;
-    DeviceFileCatalog::Chunk prevResultChunk;
+    nx::vms::server::Chunk resultChunk;
+    nx::vms::server::Chunk prevResultChunk;
     resultChunk.startTimeMs = resultChunk.durationMs
                             = prevResultChunk.startTimeMs
                             = prevResultChunk.durationMs = 0;

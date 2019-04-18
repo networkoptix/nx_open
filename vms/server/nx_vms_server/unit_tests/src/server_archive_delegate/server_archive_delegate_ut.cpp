@@ -462,7 +462,7 @@ public:
 
     void addRecord(DeviceFileCatalogPtr catalog, qint64 startTimeSec, qint64 durationSec)
     {
-        DeviceFileCatalog::Chunk chunk;
+        nx::vms::server::Chunk chunk;
         chunk.startTimeMs = startTimeSec * 1000;
         chunk.durationMs = durationSec * 1000;
         catalog->addRecord(chunk);
@@ -512,13 +512,13 @@ public:
         addRecord(lqCatalog, 299, 100 + 1 + 5);
         addRecord(lqCatalog, 506, 100);
 
-        DeviceFileCatalog::UniqueChunkCont ignoreList;
+        nx::vms::server::UniqueChunkCont ignoreList;
         QnDualQualityHelper qualityHelper(
             serverModule->normalStorageManager(),
             serverModule->backupStorageManager());
         qualityHelper.setResource(testCamera);
 
-        DeviceFileCatalog::TruncableChunk resultChunk;
+        nx::vms::server::TruncableChunk resultChunk;
         DeviceFileCatalogPtr resultCatalog;
 
         // Before hole LQ > HQ, after hole LQ < HQ, but both <eps/2
@@ -593,13 +593,13 @@ TEST_F(ChunkQualityChooserTest, fourChunkTest)
     addRecord(lqCatalogBackup, 0, 100);
     addRecord(hqCatalogMain, 300, 100);
 
-    DeviceFileCatalog::UniqueChunkCont ignoreList;
+    nx::vms::server::UniqueChunkCont ignoreList;
     QnDualQualityHelper qualityHelper(
         serverModule->normalStorageManager(),
         serverModule->backupStorageManager());
     qualityHelper.setResource(testCamera);
 
-    DeviceFileCatalog::TruncableChunk resultChunk;
+    nx::vms::server::TruncableChunk resultChunk;
     DeviceFileCatalogPtr resultCatalog;
 
     qualityHelper.findDataForTime(
