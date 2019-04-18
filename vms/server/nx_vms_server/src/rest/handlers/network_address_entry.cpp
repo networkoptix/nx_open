@@ -81,7 +81,7 @@ QnNetworkAddressEntryList systemNetworkAddressEntryList(bool* isOk, bool addFrom
 {
     QnNetworkAddressEntryList entryList;
     using namespace nx::network;
-    const auto policy = QnAppInfo::isBpi()
+    const auto policy = QnAppInfo::isNx1()
         ? InterfaceListPolicy::allowInterfacesWithoutAddress : InterfaceListPolicy::oneAddressPerInterface;
     for (const auto& iface: getAllIPv4Interfaces(policy))
     {

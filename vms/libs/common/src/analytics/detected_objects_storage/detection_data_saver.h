@@ -52,8 +52,14 @@ private:
     void resolveObjectIds();
 
     void insertObjects(nx::sql::QueryContext* queryContext);
+
+    std::pair<qint64, qint64> findMinMaxTimestamp(
+        const std::vector<ObjectPosition>& track);
+
     void updateObjects(nx::sql::QueryContext* queryContext);
+
     void saveObjectSearchData(nx::sql::QueryContext* queryContext);
+
     std::vector<long long> toDbIds(const std::set<QnUuid>& objectIds);
 };
 

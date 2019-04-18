@@ -79,15 +79,27 @@ public:
      */
     static QByteArray serialized(const std::vector<ObjectPosition>& track);
 
-    static std::vector<ObjectPosition> deserialized(const QByteArray& serializedData);
+    /**
+     * Concatenated results of TrackSerializer::serialized are allowed.
+     * So, all data from the buf is deserialized.
+     */
+    static std::vector<ObjectPosition> deserialized(const QByteArray& buf);
 
 private:
+    static void serializeTrackSequence(
+        const std::vector<ObjectPosition>& track,
+        QByteArray* buf);
+
     static void serialize(
         qint64 baseTimestamp,
         const ObjectPosition& position,
         QByteArray* buf);
 
     static void serialize(const QRect& rect, QByteArray* buf);
+
+    static void deserializeTrackSequence(
+        QnByteArrayConstRef* buf,
+        std::vector<ObjectPosition>* track);
 
     static void deserialize(
         qint64 baseTimestamp,

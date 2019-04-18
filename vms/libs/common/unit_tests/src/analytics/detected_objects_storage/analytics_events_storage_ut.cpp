@@ -10,12 +10,10 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/detected_objects_storage/config.h>
 #include <test_support/analytics/storage/analytics_storage_types.h>
 
-namespace nx {
-namespace analytics {
-namespace storage {
-namespace test {
+namespace nx::analytics::storage::test {
 
 static const auto kUsecInMs = 1000;
 
@@ -80,9 +78,9 @@ protected:
             filter,
             [this](
                 ResultCode resultCode,
-                std::vector<DetectedObject> eventsFound)
+                std::vector<DetectedObject> objectsFound)
             {
-                m_lookupResultQueue.push(LookupResult{resultCode, std::move(eventsFound)});
+                m_lookupResultQueue.push(LookupResult{resultCode, std::move(objectsFound)});
             });
     }
 
@@ -139,7 +137,7 @@ protected:
         auto objects = toDetectedObjects(expected);
         const auto filteredObjects =
             filterObjectsAndApplySortOrder(filter, std::move(objects));
-        return filteredObjects == m_prevLookupResult->eventsFound;
+        return filteredObjects == m_prevLookupResult->objectsFound;
     }
 
     void thenLookupSucceded()
@@ -151,7 +149,7 @@ protected:
     void andLookupResultEquals(
         const std::vector<DetectedObject>& expected)
     {
-        ASSERT_EQ(expected, m_prevLookupResult->eventsFound);
+        ASSERT_EQ(expected, m_prevLookupResult->objectsFound);
     }
 
     std::vector<DetectedObject> toDetectedObjects(
@@ -467,7 +465,7 @@ private:
     struct LookupResult
     {
         ResultCode resultCode;
-        std::vector<DetectedObject> eventsFound;
+        std::vector<DetectedObject> objectsFound;
     };
 
     std::unique_ptr<EventsStorage> m_eventsStorage;
@@ -1437,7 +1435,4 @@ TEST_F(AnalyticsDbCleanup, removing_data_up_to_minimal_available_timestamp)
     thenDataIsNotChanged();
 }
 
-} // namespace test
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::storage::test

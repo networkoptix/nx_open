@@ -49,6 +49,13 @@ long long AttributesDao::insertOrFetchAttributes(
     return id;
 }
 
+std::vector<common::metadata::Attribute> AttributesDao::deserialize(
+    const QString& attributesStr)
+{
+    return QJson::deserialized<std::vector<common::metadata::Attribute>>(
+        attributesStr.toUtf8());
+}
+
 void AttributesDao::addToAttributesCache(
     long long id,
     const QByteArray& content)

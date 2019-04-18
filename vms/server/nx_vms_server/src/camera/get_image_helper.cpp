@@ -14,6 +14,7 @@
 #include "transcoding/filters/tiled_image_filter.h"
 #include "transcoding/filters/scale_image_filter.h"
 #include "transcoding/filters/rotate_image_filter.h"
+#include "transcoding/filters/crop_image_filter.h"
 
 #include "plugins/resource/server_archive/server_archive_delegate.h"
 #include "media_server/media_server_module.h"
@@ -601,6 +602,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
 
     QList<QnAbstractImageFilterPtr> filterChain;
     const QSize dstSize = updateDstSize(camera.get(), request.size, *frame, request.aspectRatio);
+
+    if (!request.crop.isNull())
+        filterChain << QnAbstractImageFilterPtr(new QnCropImageFilter(request.crop));
     filterChain << QnAbstractImageFilterPtr(new QnScaleImageFilter(dstSize));
     filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
     filterChain << QnAbstractImageFilterPtr(new QnRotateImageFilter(rotation));

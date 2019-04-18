@@ -53,7 +53,7 @@ private:
     update::FindPackageResult findPackage(
         nx::update::Package* outPackage,
         QString* outMessage = nullptr) const;
-    bool canDownloadFile(const QString& fileName, update::Status* outUpdateStatus);
+    bool canDownloadFile(const nx::update::Package& package, update::Status* outUpdateStatus);
     bool statusAppropriateForDownload(nx::update::Package* outPackage, update::Status* outStatus);
     bool installerState(update::Status* outUpdateStatus, const QnUuid& peerId);
     update::Status start();

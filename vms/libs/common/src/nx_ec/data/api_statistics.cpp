@@ -9,42 +9,6 @@
 
 using namespace nx::vms;
 
-const static std::set<QString> kCameraParamsToRemove =
-{
-    ResourcePropertyKey::kCredentials,
-    ResourcePropertyKey::kDefaultCredentials,
-    ResourcePropertyKey::kCameraAdvancedParams,
-    ResourcePropertyKey::Onvif::kDeviceID,
-    ResourcePropertyKey::Onvif::kDeviceUrl,
-    ResourcePropertyKey::Onvif::kMediaUrl,
-    QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty,
-    QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty,
-    QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty,
-    QnVirtualCameraResource::kDeviceAgentManifestsProperty,
-};
-
-const static std::set<QString> kServerParamsToRemove =
-{
-    nx::analytics::kPluginDescriptorsProperty,
-    nx::analytics::kEngineDescriptorsProperty,
-    nx::analytics::kGroupDescriptorsProperty,
-    nx::analytics::kEventTypeDescriptorsProperty,
-    nx::analytics::kObjectTypeDescriptorsProperty,
-    nx::analytics::kDeviceDescriptorsProperty,
-};
-
-const static std::vector<QString> kCameraParamsToDefault =
-{
-    ResourcePropertyKey::kAnalog,
-    ResourcePropertyKey::kCameraCapabilities,
-    ResourcePropertyKey::kHasDualStreaming,
-    ResourcePropertyKey::kIsAudioSupported,
-    ResourcePropertyKey::kMediaCapabilities,
-    ResourcePropertyKey::kPtzCapabilities,
-    ResourcePropertyKey::kStreamFpsSharing,
-    ResourcePropertyKey::kSupportedMotion,
-};
-
 namespace ec2 {
 
 ApiCameraDataStatistics::ApiCameraDataStatistics() {}
@@ -58,12 +22,37 @@ ApiCameraDataStatistics::ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& da
         [&defCred](const auto& param) { return param.name == defCred; });
     const bool isDefCred = (it != nx::vms::api::CameraDataEx::addParams.end()) && !it->value.isEmpty();
 
+    const static std::set<QString> kCameraParamsToRemove =
+    {
+        ResourcePropertyKey::kCredentials,
+        ResourcePropertyKey::kDefaultCredentials,
+        ResourcePropertyKey::kCameraAdvancedParams,
+        ResourcePropertyKey::Onvif::kDeviceID,
+        ResourcePropertyKey::Onvif::kDeviceUrl,
+        ResourcePropertyKey::Onvif::kMediaUrl,
+        QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty,
+        QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty,
+        QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty,
+        QnVirtualCameraResource::kDeviceAgentManifestsProperty,
+    };
     nx::utils::remove_if(
         addParams, [](const auto& param) { return kCameraParamsToRemove.count(param.name); });
 
     addParams.push_back(nx::vms::api::ResourceParamData(defCred, isDefCred
         ? lit("true")
         : lit("false")));
+
+    const static std::vector<QString> kCameraParamsToDefault =
+    {
+        ResourcePropertyKey::kAnalog,
+        ResourcePropertyKey::kCameraCapabilities,
+        ResourcePropertyKey::kHasDualStreaming,
+        ResourcePropertyKey::kIsAudioSupported,
+        ResourcePropertyKey::kMediaCapabilities,
+        ResourcePropertyKey::kPtzCapabilities,
+        ResourcePropertyKey::kStreamFpsSharing,
+        ResourcePropertyKey::kSupportedMotion,
+    };
 
     for (const auto& param : kCameraParamsToDefault)
     {
@@ -102,6 +91,16 @@ ApiMediaServerDataStatistics::ApiMediaServerDataStatistics()
 ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(api::MediaServerDataEx&& data):
     api::MediaServerDataEx(std::move(data))
 {
+    const static std::set<QString> kServerParamsToRemove =
+    {
+        nx::analytics::kPluginDescriptorsProperty,
+        nx::analytics::kEngineDescriptorsProperty,
+        nx::analytics::kGroupDescriptorsProperty,
+        nx::analytics::kEventTypeDescriptorsProperty,
+        nx::analytics::kObjectTypeDescriptorsProperty,
+        nx::analytics::kDeviceDescriptorsProperty,
+    };
+
     nx::utils::remove_if(
         addParams, [](const auto& param) { return kServerParamsToRemove.count(param.name); });
 

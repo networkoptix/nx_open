@@ -180,10 +180,16 @@ CREATE TABLE object(
     device_id                   INTEGER,
     object_type_id              INTEGER,
     guid                        BLOB,
-    track_start_timestamp_ms    INTEGER,
+    track_start_ms              INTEGER,
+    track_end_ms                INTEGER,
     track_detail                BLOB,
     attributes_id               INTEGER
 );
+
+CREATE INDEX idx_object_device_id ON object(device_id);
+CREATE INDEX idx_object_object_type_id ON object(object_type_id);
+CREATE INDEX idx_object_guid ON object(guid);
+CREATE INDEX idx_track_time_ms ON object(track_start_ms, track_end_ms);
 
 CREATE TABLE object_search(
     id                          INTEGER PRIMARY KEY AUTOINCREMENT,

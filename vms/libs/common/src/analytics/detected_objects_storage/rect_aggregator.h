@@ -49,6 +49,9 @@ public:
             ++it)
         {
             const auto& aggregatedRect = *it;
+            if (!rect.intersects(aggregatedRect.rect))
+                continue;
+
             const auto intersectionRegion = region.intersected(aggregatedRect.rect);
             if (intersectionRegion.isEmpty())
                 continue;
@@ -59,7 +62,8 @@ public:
             const auto intersection = *intersectionRegion.begin();
             if (aggregatedRect.values.find(value) == aggregatedRect.values.end())
             {
-                it = splitRectInplace(it, intersection);
+                if (intersection != aggregatedRect.rect)
+                    it = splitRectInplace(it, intersection);
                 it->values.insert(value);
             }
             region -= intersection;
@@ -75,6 +79,11 @@ public:
     const std::vector<AggregatedRect>& aggregatedData() const
     {
         return m_aggregatedRects;
+    }
+
+    std::vector<AggregatedRect> takeAggregatedData()
+    {
+        return std::exchange(m_aggregatedRects, {});
     }
 
     void clear()

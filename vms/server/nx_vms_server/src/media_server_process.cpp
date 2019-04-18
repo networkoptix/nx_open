@@ -2573,6 +2573,8 @@ void MediaServerProcess::registerRestHandlers(
      *     %value source Use the source frame aspect ratio, despite the value in camera settings.
      * %param[opt]:option ignoreExternalArchive If present and "time" parameter has value
      *     "latest", the image will not be downloaded from archive of the dts-based devices.
+     * %param[opt]:string crop Apply cropping to the source image. Parameter defines rect in range [0..1].
+     *     Format: 'left,top,widthxheight'. Example: '0.5,0.4,0.25x0.3'.
      * %param[proprietary]:option local If present, the request should not be redirected to another
      *     server.
      * %param[proprietary]:option extraFormatting If present and the requested result format is

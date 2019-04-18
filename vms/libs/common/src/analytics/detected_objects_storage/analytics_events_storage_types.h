@@ -15,23 +15,6 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
-/**
- * Enables META-225.
- */
-static constexpr bool kUseTrackAggregation = false;
-
-// Using 14 bits for coordinates. That allows using only 2 bytes when compressing the value.
-static constexpr int kCoordinatesBits = 14;
-static constexpr int kCoordinatesPrecision = (1 << kCoordinatesBits) - 1;
-static constexpr int kCoordinateDecimalDigits = nx::common::metadata::kCoordinateDecimalDigits;
-// NOTE: If the assertion fails, all constants here must be modified and analytics DB data migrated.
-static_assert(kCoordinateDecimalDigits == 4);
-
-/**
- * Time periods shorter than this value are always aggregated.
- */
-static constexpr auto kMinTimePeriodAggregationPeriod = std::chrono::seconds(3);
-
 struct ObjectPosition
 {
     /** Device object has been detected on. */
@@ -83,7 +66,7 @@ struct Filter
      * Coordinates are in range [0;1].
      */
     QRectF boundingBox;
-    std::vector<common::metadata::Attribute> requiredAttributes;
+
     /**
      * Set of words separated by spaces, commas, etc...
      * Search is done across all attributes (names and values).
@@ -115,7 +98,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
 QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
-    (deviceIds)(objectTypeId)(objectAppearanceId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
+    (deviceIds)(objectTypeId)(objectAppearanceId)(timePeriod)(boundingBox)(freeText)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------
