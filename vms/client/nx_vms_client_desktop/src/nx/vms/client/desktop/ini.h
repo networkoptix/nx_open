@@ -122,7 +122,7 @@ struct Ini: nx::kit::IniConfig
         "Enables a check if all sync play items are paused upon every request.");
     NX_INI_STRING("", autoUpdatesCheckChangesetOverride,
         "Background updates check will use this changeset instead of \"latest\".");
-    NX_INI_INT(0, massSystemUpdateWaitForServerOnlineOverride,
+    NX_INI_INT(0, massSystemUpdateWaitForServerOnlineSecOverride,
         "Time to wait until Server goes online in seconds. Default value is used when set to 0.");
     NX_INI_INT(0, tilePreviewLoadDelayOverrideMs,
         "Tiles in the Right Panel will request previews only after this period (in milliseconds)\n"

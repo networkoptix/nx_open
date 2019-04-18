@@ -499,7 +499,7 @@ void MultiServerUpdatesWidget::initDownloadActions()
     downloadLinkMenu->addAction(tr("Download in External Browser"),
         [this]()
         {
-            QSet<QnUuid> targets = m_stateTracker->getAllPeers();
+            QSet<QnUuid> targets = m_stateTracker->allPeers();
             auto url = generateUpdatePackageUrl(
                 commonModule()->engineVersion(),
                 m_updateInfo, targets,
@@ -511,7 +511,7 @@ void MultiServerUpdatesWidget::initDownloadActions()
     downloadLinkMenu->addAction(tr("Copy Link to Clipboard"),
         [this]()
         {
-            QSet<QnUuid> targets = m_stateTracker->getAllPeers();
+            QSet<QnUuid> targets = m_stateTracker->allPeers();
             auto url = generateUpdatePackageUrl(
                 commonModule()->engineVersion(),
                 m_updateInfo,
@@ -907,7 +907,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
 
     if (m_widgetState == WidgetUpdateState::readyInstall)
     {
-        auto targets = m_stateTracker->getPeersInState(StatusCode::readyToInstall);
+        auto targets = m_stateTracker->peersInState(StatusCode::readyToInstall);
         if (targets.empty() && !m_clientUpdateTool->hasUpdate())
         {
             NX_WARNING(this) << "atStartUpdateAction() - no server can install anything";
@@ -928,13 +928,13 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         if (showEula && !EulaDialog::acceptEulaHtml(m_updateInfo.info.eula, newEula, mainWindowWidget()))
             return;
 
-        auto targets = m_stateTracker->getAllPeers();
+        auto targets = m_stateTracker->allPeers();
 
         // Remove the servers which should not be updated. These are the servers with more recent
         // version. So we should not track update progress for them.
         targets.subtract(m_updateInfo.ignorePeers);
 
-        auto offlineServers = m_stateTracker->getOfflineServers();
+        auto offlineServers = m_stateTracker->offlineServers();
         targets.subtract(offlineServers);
         if (!offlineServers.empty())
         {
@@ -960,7 +960,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
                 return;
         }
 
-        auto incompatible = m_stateTracker->getLegacyServers();
+        auto incompatible = m_stateTracker->legacyServers();
         if (!incompatible.empty())
         {
             /*
@@ -1048,7 +1048,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         // Should send 'cancel' command to all the servers?
         NX_INFO(this) << "atCancelCurrentAction() at" << toString(m_widgetState);
 
-        auto serversToCancel = m_stateTracker->getPeersInstalling();
+        auto serversToCancel = m_stateTracker->peersInstalling();
 
         QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
         // 3. All other cases. Some servers have failed
@@ -1127,7 +1127,7 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool /*success*/)
         {
             // 1. Check if there is any server who completed installation
             // 2. Check if there is online servers. - What for?
-            auto complete = m_stateTracker->getPeersCompleteInstall();
+            auto complete = m_stateTracker->peersCompleteInstall();
             QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
             // 1. Everything is complete
             messageBox->setIcon(QnMessageBoxIcon::Success);
@@ -1233,8 +1233,8 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
     }
     else if (m_widgetState == WidgetUpdateState::downloading)
     {
-        auto peersIssued = m_stateTracker->getPeersIssued();
-        auto peersActive = m_stateTracker->getPeersActive();
+        auto peersIssued = m_stateTracker->peersIssued();
+        auto peersActive = m_stateTracker->peersActive();
         // Note: we can get here right after we clicked 'download' but before
         // we got an update from /ec2/updateStatus. Most servers will be in 'idle' state.
         // We even can get a stale callback from /ec2/updateStatus, with data actual to
@@ -1296,7 +1296,7 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
         || m_widgetState == WidgetUpdateState::installingStalled)
     {
         // We will show simplified progress for this stage.
-        auto peersActive = m_stateTracker->getPeersInstalling();
+        auto peersActive = m_stateTracker->peersInstalling();
         result.installingServers = !peersActive.empty();
         result.current = 0;
         result.max = 0;
@@ -1397,11 +1397,11 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
             m_haveValidUpdate = true;
         }
 
-        auto serversHaveDownloaded = m_stateTracker->getPeersInState(StatusCode::readyToInstall);
-        auto serversAreDownloading = m_stateTracker->getPeersInState(StatusCode::downloading);
-        auto serversWithError = m_stateTracker->getPeersInState(StatusCode::error);
+        auto serversHaveDownloaded = m_stateTracker->peersInState(StatusCode::readyToInstall);
+        auto serversAreDownloading = m_stateTracker->peersInState(StatusCode::downloading);
+        auto serversWithError = m_stateTracker->peersInState(StatusCode::error);
         auto peersAreInstalling = m_serverUpdateTool->getServersInstalling();
-        auto serversHaveInstalled = m_stateTracker->getPeersCompleteInstall();
+        auto serversHaveInstalled = m_stateTracker->peersCompleteInstall();
 
         m_updateLocalStateChanged = true;
 
@@ -1461,11 +1461,11 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
 {
     m_stateTracker->processDownloadTaskSet();
 
-    auto peersActive = m_stateTracker->getPeersActive();
-    auto peersUnknown = m_stateTracker->getPeersWithUnknownStatus();
-    auto peersFailed = m_stateTracker->getPeersFailed();
-    auto peersComplete = m_stateTracker->getPeersComplete();
-    auto peersIssued = m_stateTracker->getPeersIssued();
+    auto peersActive = m_stateTracker->peersActive();
+    auto peersUnknown = m_stateTracker->peersWithUnknownStatus();
+    auto peersFailed = m_stateTracker->peersFailed();
+    auto peersComplete = m_stateTracker->peersComplete();
+    auto peersIssued = m_stateTracker->peersIssued();
 
     if (peersActive.size() + peersUnknown.size() > 0 && peersFailed.empty())
         return;
@@ -1528,13 +1528,13 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
         && duration > kLongInstallWarningTimeout)
     {
         NX_VERBOSE(this) << "processRemoteInstalling() - detected stalled installation";
-        setTargetState(WidgetUpdateState::installingStalled, m_stateTracker->getPeersIssued());
+        setTargetState(WidgetUpdateState::installingStalled, m_stateTracker->peersIssued());
     }
 
-    auto peersInstalling = m_stateTracker->getPeersInstalling();
-    auto peersComplete = m_stateTracker->getPeersComplete();
-    auto readyToInstall = m_stateTracker->getPeersInState(StatusCode::readyToInstall);
-    auto peersFailed = m_stateTracker->getPeersFailed();
+    auto peersInstalling = m_stateTracker->peersInstalling();
+    auto peersComplete = m_stateTracker->peersComplete();
+    auto readyToInstall = m_stateTracker->peersInState(StatusCode::readyToInstall);
+    auto peersFailed = m_stateTracker->peersFailed();
 
     // No peers are doing anything right now. We should check if installation is complete.
     if (peersInstalling.empty())
@@ -1606,7 +1606,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
 
 void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
 {
-    auto updatedProtocol = m_stateTracker->getServersWithChangedProtocol();
+    auto updatedProtocol = m_stateTracker->serversWithChangedProtocol();
     bool clientInstallerRequired = false;
     m_serverUpdateTool->requestFinishUpdate(true);
 
@@ -1667,9 +1667,9 @@ bool MultiServerUpdatesWidget::processRemoteChanges()
     }
     else if (m_widgetState == WidgetUpdateState::readyInstall)
     {
-        auto idle = m_stateTracker->getPeersInState(StatusCode::idle);
-        auto all = m_stateTracker->getAllPeers();
-        auto downloading = m_stateTracker->getPeersInState(StatusCode::downloading);
+        auto idle = m_stateTracker->peersInState(StatusCode::idle);
+        auto all = m_stateTracker->allPeers();
+        auto downloading = m_stateTracker->peersInState(StatusCode::downloading);
 
         if (!downloading.empty())
         {
