@@ -28,16 +28,15 @@ Item
 
         Repeater
         {
+            id: repeater
+
             model: QnCalendarModel { id: calendarModel }
 
             Item
             {
                 id: calendarDay
 
-                property bool current: currentDate.getMonth() + 1 == month &&
-                                       currentDate.getFullYear() === model.date.getFullYear() &&
-                                       currentDate.getMonth() === model.date.getMonth() &&
-                                       currentDate.getDate() === model.date.getDate()
+                property bool current: repeater.model.isCurrent(currentDate, model.display)
 
                 width: grid.cellWidth
                 height: grid.cellHeight

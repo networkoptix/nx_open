@@ -44,6 +44,8 @@ public:
     QnCameraChunkProvider *chunkProvider() const;
     void setChunkProvider(QnCameraChunkProvider *chunkProvider);
 
+    Q_INVOKABLE bool isCurrent(const QDateTime& value, int dayIndex);
+
 signals:
     void yearChanged();
     void monthChanged();

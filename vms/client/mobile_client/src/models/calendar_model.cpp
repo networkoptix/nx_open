@@ -23,7 +23,7 @@ namespace {
 
 QDate utcDateFromMilliseconds(qint64 timeMs)
 {
-    return QDateTime::fromMSecsSinceEpoch(timeMs, QTimeZone(0)).date();
+    return QDateTime::fromMSecsSinceEpoch(timeMs, Qt::UTC).date();
 }
 
 }
@@ -153,6 +153,12 @@ QnCameraChunkProvider *QnCalendarModel::chunkProvider() const {
     return d->chunkProvider;
 }
 
+bool QnCalendarModel::isCurrent(const QDateTime& value, int dayIndex)
+{
+    Q_D(QnCalendarModel);
+    return value.date() == d->days[dayIndex].date;
+}
+
 void QnCalendarModel::setChunkProvider(QnCameraChunkProvider *chunkProvider) {
     Q_D(QnCalendarModel);
 
@@ -270,7 +276,7 @@ void QnCalendarModelPrivate::updateArchiveInfo() {
 
         const auto startDate = utcDateFromMilliseconds(it->startTimeMs);
         const auto endDate = it->isInfinite()
-            ? utcDateFromMilliseconds(QDateTime::currentMSecsSinceEpoch())
+            ? QDateTime::currentDateTimeUtc().date()
             : utcDateFromMilliseconds(it->endTimeMs());
 
         while (i < days.size() && days[i].date < startDate)
