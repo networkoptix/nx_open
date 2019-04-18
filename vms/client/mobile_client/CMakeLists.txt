@@ -196,7 +196,8 @@ if(IOS)
 
     set(app_dir "$<TARGET_FILE_DIR:mobile_client>")
     add_custom_command(TARGET mobile_client PRE_LINK
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${fonts_directory}/bin/fonts ${app_dir}/fonts
+        COMMAND ${CMAKE_COMMAND}
+            -E copy_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/fonts ${app_dir}/fonts
         COMMENT "Copying fonts"
     )
 endif()
