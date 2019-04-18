@@ -101,28 +101,48 @@ void ObjectSearcher::prepareLookupQuery(
     const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
     auto sqlQueryFilterStr = sqlQueryFilter.toString();
     if (!sqlQueryFilterStr.empty())
-        sqlQueryFilterStr = " AND " + sqlQueryFilterStr;
+        sqlQueryFilterStr += sqlQueryFilterStr + " AND ";
 
     std::string limitStr;
     if (filter.maxObjectsToSelect > 0)
         limitStr = lm("LIMIT %1").args(filter.maxObjectsToSelect).toStdString();
 
-    // TODO: Full-text search.
-    // TODO: Object count limit.
+    QString queryTemplate;
+    if (filter.freeText.isEmpty())
+    {
+        queryTemplate = R"sql(
+            SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, content
+            FROM object o, unique_attributes attrs
+            WHERE %1
+                o.attributes_id = attrs.id
+            ORDER BY track_start_ms %2
+            %3
+        )sql";
+    }
+    else
+    {
+        queryTemplate = R"sql(
+            SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
+                attrs.content AS content
+            FROM object o, unique_attributes attrs, attributes_text_index fts
+            WHERE %1
+                fts.content MATCH :textQuery AND fts.docid = o.attributes_id AND
+                o.attributes_id = attrs.id
+            ORDER BY track_start_ms %2
+            %3
+        )sql";
+    }
 
-    auto queryText = lm(R"sql(
-        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, content
-        FROM object o, unique_attributes attrs
-        WHERE o.attributes_id = attrs.id %1
-        ORDER BY track_start_ms %2
-        %3
-    )sql").args(
+    auto queryText = lm(queryTemplate).args(
         sqlQueryFilterStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC",
         limitStr);
 
     query->prepare(queryText);
+
     sqlQueryFilter.bindFields(query);
+    if (!filter.freeText.isEmpty())
+        query->bindValue(":textQuery", filter.freeText + "*");
 }
 
 nx::sql::Filter ObjectSearcher::prepareSqlFilterExpression(const Filter& filter)
