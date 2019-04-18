@@ -96,10 +96,12 @@ void CompatibilityVersionInstallationDialog::processUpdateContents(
     nx::update::UpdateContents verifiedContents = contents;
     // We need to supply non-zero Uuid for the client to make verification work.
     // commonModule->globalSettings()->localSystemId() is zero right now.
-    auto clientId = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
-    std::set<nx::utils::SoftwareVersion> clientVersions = {};
+    nx::vms::client::desktop::ClientVerificationData clientData;
+    clientData.clientId = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+    clientData.fillDefault();
+
     if (nx::vms::client::desktop::verifyUpdateContents(
-        commonModule, verifiedContents, {}, clientVersions, clientId))
+        commonModule, verifiedContents, /*servers=*/{}, clientData))
     {
         if (m_private->updateContents.preferOtherUpdate(verifiedContents))
             m_private->updateContents = verifiedContents;

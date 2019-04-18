@@ -321,10 +321,7 @@ QnMediaServerModule::QnMediaServerModule(
 void QnMediaServerModule::initializeP2PDownloader()
 {
     m_p2pDownloader = store(new nx::vms::common::p2p::downloader::Downloader(
-        downloadsDirectory(),
-        commonModule(),
-        nullptr,
-        this));
+        downloadsDirectory(), commonModule(), {}, this));
 }
 
 QDir QnMediaServerModule::downloadsDirectory() const

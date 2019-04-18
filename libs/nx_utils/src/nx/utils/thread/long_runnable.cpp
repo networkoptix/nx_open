@@ -8,7 +8,6 @@
 class QnLongRunnablePoolPrivate
 {
 public:
-    QnLongRunnablePoolPrivate() {}
 
     void stopAll()
     {
@@ -63,6 +62,8 @@ public:
         m_waitCondition.wakeAll();
     }
 
+    // Deadlocks if some QnLongRunnables are dangling.
+    // Set m_relaxedChecking to cancel this behaviour.
     void waitForDestruction()
     {
         QnMutexLocker lock(&m_mutex);
@@ -70,8 +71,15 @@ public:
         {
             for (const auto created: m_created)
                 NX_DEBUG(this, lm("Still created: %1").args(created));
-            m_waitCondition.wait(&m_mutex);
+            if (m_relaxedChecking)
+                break;
+			m_waitCondition.wait(&m_mutex);
         }
+    }
+
+    void setRelaxedChecking(bool relaxed)
+    {
+        m_relaxedChecking = relaxed;
     }
 
 private:
@@ -86,6 +94,7 @@ private:
     QnWaitCondition m_waitCondition;
     QSet<QnLongRunnable*> m_created;
     QSet<QnLongRunnable*> m_running;
+    bool m_relaxedChecking = false;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -153,4 +162,9 @@ void QnLongRunnablePool::stopAll()
 void QnLongRunnablePool::waitAll()
 {
     d->waitAll();
+}
+
+void QnLongRunnablePool::setRelaxedChecking(bool relaxed)
+{
+    d->setRelaxedChecking(relaxed);
 }
