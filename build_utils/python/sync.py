@@ -1,35 +1,31 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
+import os
 import sys
 import posixpath
 import argparse
 from rdep import Rdep
 import rdep_configure
 
-
 def print_package(package, status):
-    print(">> [{0}]: {1}".format(package, status))
-
+    print ">> [{0}]: {1}".format(package, status)
 
 def print_summary(packages):
     for package, status in packages.items():
         print_package(package, status)
 
-
 def sync_package(rdep, package):
     target, pack = posixpath.split(package)
     if not target:
-        print("No target specified for [{0}]".format(package), file=sys.stderr)
+        print >> sys.stderr, "No target specified for [{0}]".format(package)
         return False, "SKIPPED"
 
-    rdep.targets = [target]
+    rdep.targets = [ target ]
     ok = rdep.sync_package(pack)
     status = "OK" if ok else "FAILED"
     return ok, status
 
-
-def sync(packages, skip_failed=False):
+def sync(packages, skip_failed = False):
     rdep = Rdep(rdep_configure.REPOSITORY_PATH)
     rdep.fast_check = True
     rdep.load_timestamps_for_fast_check()
@@ -42,7 +38,6 @@ def sync(packages, skip_failed=False):
             return False, result
 
     return True, result
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
