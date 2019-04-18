@@ -66,23 +66,25 @@ Item
                 {
                     anchors.centerIn: parent
                     text: model.display
-                    color: calendarDay.current ? ColorTheme.base3
-                                               : model.date > _today ? ColorTheme.base15
-                                                                     : ColorTheme.windowText
+                    color:
+                    {
+                        if (calendarDay.current)
+                            return ColorTheme.base3
+
+                        return clickArea.enabled ? ColorTheme.windowText : ColorTheme.base15
+                    }
+
                     font.pixelSize: 16
                 }
 
                 MouseArea
                 {
+                    id: clickArea
+
                     anchors.fill: parent
+                    enabled: model.date <= _today
                     onClicked:
                     {
-                        if (model.date.getMonth() + 1 !== calendarModel.month ||
-                            model.date > _today)
-                        {
-                            return
-                        }
-
                         currentDate = model.date
                         monthGrid.datePicked(model.date)
                     }
