@@ -622,11 +622,13 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if(m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return m_openStreamResult;
 
+    m_RtpSession.setKeepAliveTimeout(std::chrono::milliseconds::zero());
+
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(getResource());
     if (camera)
         m_RtpSession.setAudioEnabled(camera->isAudioEnabled());
 
-    if (!m_RtpSession.playPhase1())
+    if (!m_RtpSession.sendSetupIfNotPlaying())
     {
         NX_WARNING(this, "Can't open RTSP stream [%1], SETUP request has been failed",
             m_currentStreamUrl);
@@ -638,8 +640,9 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if (const auto result = registerMulticastAddressesIfNeeded(); !result)
         return result;
 
-    if (!m_RtpSession.playPhase2(position, AV_NOPTS_VALUE, m_RtpSession.getScale()))
+    if (!m_RtpSession.sendPlay(position, AV_NOPTS_VALUE, m_RtpSession.getScale()))
     {
+        m_RtpSession.setTrackInfo({});
         NX_WARNING(this, "Can't open RTSP stream [%1], PLAY request has been failed",
             m_currentStreamUrl);
 
