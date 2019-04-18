@@ -20,6 +20,8 @@
 #include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <nx/streaming/rtp/camera_time_helper.h>
 
+#include <nx/vms/server/network/multicast_address_registry.h>
+
 namespace nx::streaming::rtp  { class StreamParser; }
 
 class QnMulticodecRtpReader:
@@ -30,6 +32,34 @@ class QnMulticodecRtpReader:
     public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
+
+    class RegisteredAddress
+    {
+    public:
+        RegisteredAddress(
+            nx::vms::server::network::MulticastAddressRegistry* addressRegistry,
+            nx::network::SocketAddress address)
+            :
+            m_addressRegistry(addressRegistry),
+            m_address(std::move(address))
+        {
+            NX_ASSERT(addressRegistry);
+        }
+
+        ~RegisteredAddress()
+        {
+            m_addressRegistry->unregisterAddress(m_address);
+        }
+
+        bool operator<(const RegisteredAddress& other) const
+        {
+            return m_address < other.m_address;
+        }
+
+    private:
+        nx::vms::server::network::MulticastAddressRegistry* m_addressRegistry = nullptr;
+        nx::network::SocketAddress m_address;
+    };
 
 public:
     using OnSocketReadTimeoutCallback = nx::utils::MoveOnlyFunc<QnAbstractMediaDataPtr()>;
@@ -135,8 +165,6 @@ private:
     CameraDiagnostics::Result registerAddressIfNeeded(
         const QnRtspIoDevice::AddressInfo& addressInfo);
 
-    void unregisterMulticastAddresses();
-
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr& res, const QString& key);
@@ -178,7 +206,7 @@ private:
 
     static nx::utils::Mutex s_defaultTransportMutex;
     static nx::vms::api::RtpTransportType s_defaultTransportToUse;
-    std::set<nx::network::SocketAddress> m_registeredMulticastAddresses;
+    std::set<RegisteredAddress> m_registeredMulticastAddresses;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

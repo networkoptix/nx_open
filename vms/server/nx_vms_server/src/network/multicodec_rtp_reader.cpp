@@ -40,7 +40,6 @@
 #include "nx/network/rtsp/rtsp_types.h"
 
 #include <nx/vms/server/resource/camera.h>
-#include <nx/vms/server/network/multicast_address_registry.h>
 
 using namespace nx;
 
@@ -129,8 +128,6 @@ QnMulticodecRtpReader::~QnMulticodecRtpReader()
 
     for (unsigned int i = 0; i < m_demuxedData.size(); ++i)
         delete m_demuxedData[i];
-
-    unregisterMulticastAddresses();
 }
 
 void QnMulticodecRtpReader::setRequest(const QString& request)
@@ -611,7 +608,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     const QnNetworkResource* nres = dynamic_cast<QnNetworkResource*>(getResource().data());
 
-    unregisterMulticastAddresses();
+    m_registeredMulticastAddresses.clear();
     calcStreamUrl();
 
     m_RtpSession.setAuth(nres->getAuth(), m_prefferedAuthScheme);
@@ -776,7 +773,7 @@ void QnMulticodecRtpReader::closeStream()
             m_demuxedData[i]->clear();
     }
 
-    unregisterMulticastAddresses();
+    m_registeredMulticastAddresses.clear();
 }
 
 bool QnMulticodecRtpReader::isStreamOpened() const
@@ -1025,36 +1022,10 @@ CameraDiagnostics::Result QnMulticodecRtpReader::registerAddressIfNeeded(
     }
     else
     {
-        m_registeredMulticastAddresses.insert(multicastAddress);
+        m_registeredMulticastAddresses.emplace(multicastAddressRegistry, multicastAddress);
     }
 
     return CameraDiagnostics::NoErrorResult();
-}
-
-void QnMulticodecRtpReader::unregisterMulticastAddresses()
-{
-    auto serverCamera = getResource().dynamicCast<nx::vms::server::resource::Camera>();
-    if (!serverCamera)
-    {
-        NX_WARNING(this,
-            "%1() -> Unable to convert resource %2 to nx::vms::server::resource::Camera",
-            __func__, m_resource);
-        return;
-    }
-
-    auto multicastAddressRegistry = serverCamera->serverModule()->multicastAddressRegistry();
-    if (!multicastAddressRegistry)
-    {
-        NX_WARNING(this,
-            "%1() -> Unable to access multicast address registry for resource %2",
-            __func__, m_resource);
-        return;
-    }
-
-    for (const auto& multicastAddress: m_registeredMulticastAddresses)
-        multicastAddressRegistry->unregisterAddress(multicastAddress);
-
-    m_registeredMulticastAddresses.clear();
 }
 
 void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(
