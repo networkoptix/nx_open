@@ -7,7 +7,7 @@ import zipfile
 import distutils.dir_util
 import errno
 import traceback
-from StringIO import StringIO
+from io import StringIO
 
 from cloud.debug import timer
 

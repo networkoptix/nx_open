@@ -10,7 +10,7 @@ from django.utils.http import urlencode
 from api.helpers.exceptions import api_success, APINotAuthorisedException, APIException, log_error
 from api.controllers import cloud_api, cloud_gateway
 
-from models import *
+from zapier.models import *
 from cloud import settings
 import logging
 from html_sanitizer import Sanitizer

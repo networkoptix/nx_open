@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 from dal import autocomplete
 
 import base64
-from api.account_backend import AccountBackend
+from api.account_backend import AccountManager
 from api.models import Account
 from cms.models import Customization, Product, UserGroupsToProductPermissions
 from notifications import notifications_api
@@ -97,7 +97,7 @@ class UserInviteFrom(forms.Form):
         email = request.POST['email']
         customization = request.POST['customization']
         message = request.POST['message']
-        if AccountBackend.is_email_in_portal(email):
+        if AccountManager.is_email_in_portal(email):
             messages.error(request, "User already has a cloud account!")
             return Account.objects.get(email=email).id
 

@@ -89,7 +89,7 @@ def language(request):
         request.session['language'] = lang
 
         # Save account value
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             request.user.language = lang
             request.user.save()
 

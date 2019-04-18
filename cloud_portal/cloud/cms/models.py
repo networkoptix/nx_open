@@ -137,7 +137,7 @@ class Customization(models.Model):
         )
     name = models.CharField(max_length=255, unique=True)
     default_language = models.ForeignKey(
-        Language, related_name='default_in_%(class)s')
+        Language, related_name='default_in_%(class)s', on_delete=models.CASCADE)
     languages = models.ManyToManyField(Language)
     filter_horizontal = ('languages',)
 
@@ -155,7 +155,8 @@ class Customization(models.Model):
                                - If the parent rejects a review it will automatically be rejected for this
                                customization.<br><br>
                                If there is no parent selected or the parent is not in the review an integration
-                               can be reviewed whenever.""")
+                               can be reviewed whenever.""",
+                               on_delete=models.CASCADE)
     trust_parent = models.BooleanField(default=False, help_text="""Automatically accepts integrations the parent
                                                                    customization accepts.""")
 
@@ -210,9 +211,9 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
-        blank=True, related_name='created_%(class)s')
+        blank=True, related_name='created_%(class)s', on_delete=models.CASCADE)
     customizations = models.ManyToManyField(Customization, default=None, blank=True)
-    product_type = models.ForeignKey(ProductType, default=None, null=True)
+    product_type = models.ForeignKey(ProductType, default=None, null=True, on_delete=models.CASCADE)
 
     PREVIEW_STATUS = Choices((0, 'draft', 'draft'), (1, 'review', 'review'))
     preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
@@ -289,8 +290,8 @@ class Context(models.Model):
             ("edit_content", "Can edit content and send for review"),
         )
     # TODO: Remove this after release of 19.1 - Task: CLOUD-2299
-    product = models.ForeignKey(Product, null=True)
-    product_type = models.ForeignKey(ProductType, null=True)
+    product = models.ForeignKey(Product, null=True, on_delete=models.CASCADE)
+    product_type = models.ForeignKey(ProductType, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=1024)
     description = models.TextField(blank=True, default="")
     translatable = models.BooleanField(default=True)
@@ -324,8 +325,8 @@ class ContextTemplate(models.Model):
     class Meta:
         unique_together = ('context', 'language', 'skin')
 
-    context = models.ForeignKey(Context)
-    language = models.ForeignKey(Language, null=True)
+    context = models.ForeignKey(Context, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, null=True, on_delete=models.CASCADE)
     template = models.TextField()
     skin = models.CharField(max_length=16, default=settings.DEFAULT_SKIN, blank=True)
     # Skin is a bit hacky for now:
@@ -349,7 +350,7 @@ class DataStructure(models.Model):
         index_together = [
             ["context", "order"],
         ]
-    context = models.ForeignKey(Context)
+    context = models.ForeignKey(Context, on_delete=models.CASCADE)
     name = models.CharField(max_length=1024)
     description = models.TextField()
     label = models.CharField(max_length=1024, blank=True, default='')
@@ -443,8 +444,8 @@ class DataStructure(models.Model):
 
 # CMS settings. Release engineer can change that
 class UserGroupsToProductPermissions(models.Model):
-    group = models.ForeignKey(Group)
-    product = models.ForeignKey(Product, default=None, null=True)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, default=None, null=True, on_delete=models.CASCADE)
 
     @staticmethod
     def check_permission(user, product, permission=None):
@@ -478,19 +479,19 @@ class ContentVersion(models.Model):
         verbose_name_plural = 'revisions'
 
     # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
-    customization = models.ForeignKey(Customization, default=None, null=True)
-    product = models.ForeignKey(Product, default=1)
+    customization = models.ForeignKey(Customization, default=None, null=True, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, default=1, on_delete=models.CASCADE)
     name = models.CharField(max_length=1024)
 
     created_date = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
-        blank=True, related_name='created_%(class)s')
+        blank=True, related_name='created_%(class)s', on_delete=models.CASCADE)
 
     accepted_date = models.DateTimeField(null=True, blank=True)
     accepted_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,
-        related_name='accepted_%(class)s')
+        related_name='accepted_%(class)s', on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.id)
@@ -531,14 +532,14 @@ class ProductCustomizationReview(models.Model):
                             (1, "accepted", "Accepted"),
                             (2, "rejected", "Rejected"),
                             (3, "blocked", "Blocked"))
-    customization = models.ForeignKey(Customization)
-    version = models.ForeignKey(ContentVersion)
+    customization = models.ForeignKey(Customization, on_delete=models.CASCADE)
+    version = models.ForeignKey(ContentVersion, on_delete=models.CASCADE)
     state = models.IntegerField(choices=REVIEW_STATES, default=REVIEW_STATES.pending)
     notes = models.TextField(default="", blank=True)
     reviewed_date = models.DateTimeField(null=True, blank=True)
     reviewed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,
-        related_name='accepted_%(class)s')
+        related_name='accepted_%(class)s', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.version.product.__str__()
@@ -583,10 +584,10 @@ class ProductCustomizationReview(models.Model):
 
 
 class ExternalFile(models.Model):
-    data_structure = models.ForeignKey(DataStructure, default=None, null=True)
+    data_structure = models.ForeignKey(DataStructure, default=None, null=True, on_delete=models.CASCADE)
     file = models.FileField(upload_to=rename_file, storage=MediaStorage())
     md5 = models.CharField(max_length=1024, default='')
-    product = models.ForeignKey(Product, default=None, null=True)
+    product = models.ForeignKey(Product, default=None, null=True, on_delete=models.CASCADE)
     size = models.FloatField(default=0.0)
 
     def __str__(self):
@@ -594,20 +595,20 @@ class ExternalFile(models.Model):
 
 
 class DataRecord(models.Model):
-    data_structure = models.ForeignKey(DataStructure)
-    product = models.ForeignKey(Product, default=None, null=True)
-    language = models.ForeignKey(Language, null=True, blank=True)
+    data_structure = models.ForeignKey(DataStructure, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, default=None, null=True, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, null=True, blank=True, on_delete=models.CASCADE)
     # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
-    customization = models.ForeignKey(Customization, default=None, blank=True, null=True)
-    version = models.ForeignKey(ContentVersion, null=True, blank=True)
+    customization = models.ForeignKey(Customization, default=None, blank=True, null=True, on_delete=models.CASCADE)
+    version = models.ForeignKey(ContentVersion, null=True, blank=True, on_delete=models.CASCADE)
 
     created_date = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
-        blank=True, related_name='created_%(class)s')
+        blank=True, related_name='created_%(class)s', on_delete=models.CASCADE)
 
     value = models.TextField(default='', blank=True)
-    external_file = models.ForeignKey(ExternalFile, default=None, blank=True, null=True)
+    external_file = models.ForeignKey(ExternalFile, default=None, blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.value

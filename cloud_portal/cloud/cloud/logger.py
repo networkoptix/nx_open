@@ -1,9 +1,9 @@
+import traceback
+from django.conf import settings
 from django.http import HttpResponse
 from django.utils.log import AdminEmailHandler
-import md5, traceback
+from hashlib import md5
 from rest_framework import status
-
-from cloud.settings import DEBUG
 
 import logging
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ class LimitAdminEmailHandler(AdminEmailHandler):
 
     def increment_counter(self, record):
         key_postfix = record.message[:self.KEY_LENGTH]
-        key_postfix = md5.md5(key_postfix).hexdigest()
+        key_postfix = md5.update(key_postfix).hexdigest()
         from django.core.cache import cache
         try:
             cache.incr(self.COUNTER_CACHE_KEY + key_postfix)
@@ -48,5 +48,5 @@ class CatchExceptionMiddleware(object):
         logging.critical("{}: {}\nCall Stack:\n{}".format(exception.__class__.__name__,
                                                           exception.message,
                                                           traceback.format_exc().replace("Traceback", "")))
-        if not DEBUG:
+        if not settings.DEBUG:
             return HttpResponse("Error with request", status=status.HTTP_500_INTERNAL_SERVER_ERROR)

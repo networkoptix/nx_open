@@ -38,7 +38,7 @@ subinclude:robot_tests/.hgignore
 *.log
 *.sql
 
-env
+env*
 cloud/.idea
 cloud/static
 cloud/notifications/static/templates/*.mustache

@@ -1,8 +1,7 @@
 import pystache
 from django.core.mail import EmailMultiAlternatives
 from django.core.mail.backends.smtp import EmailBackend
-# from email.mime.image import MIMEImage  # python 3
-from email.MIMEImage import MIMEImage  # python 2
+from email.mime.image import MIMEImage  # python 3
 import json
 import os
 from cms.models import cloud_portal_customization_cache, check_update_cache, get_cloud_portal_product

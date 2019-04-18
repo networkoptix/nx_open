@@ -112,7 +112,7 @@ def get_integrations(request):
                contentversion__productcustomizationreview__state=PENDING,
                contentversion__productcustomizationreview__customization__name=settings.CUSTOMIZATION)
 
-    if not request.user.is_anonymous():
+    if not request.user.is_anonymous:
         # Users with manager permissions all accepted products and pending drafts
         if UserGroupsToProductPermissions.\
                 check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
