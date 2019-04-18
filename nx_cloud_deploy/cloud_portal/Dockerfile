@@ -1,4 +1,4 @@
-FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
+FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.1.3
 
 COPY docker/merge_config.py /usr/local/bin/
 COPY docker/pip.conf /root/.config/pip/pip.conf
@@ -7,8 +7,7 @@ COPY stage/cloud /app/app
 
 ARG CACHE_DATE
 COPY stage/cloud/requirements.txt /app/requirements.txt
-
-RUN pip install -r /app/requirements.txt
+RUN pip2 install -r /app/requirements.txt
 
 ENV CLOUD_PORTAL_BASE_CONF_DIR /app/app/static
 ENV C_FORCE_ROOT true
