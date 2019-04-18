@@ -201,12 +201,6 @@ private:
         const std::vector<QString>& objectTypeIds,
         nx::sql::Filter* sqlFilter);
 
-    void addTimePeriodToFilter(
-        const QnTimePeriod& timePeriod,
-        nx::sql::Filter* sqlFilter,
-        const char* leftBoundaryFieldName,
-        const char* rightBoundaryFieldName);
-
     void addBoundingBoxToFilter(
         const QRectF& boundingBox,
         nx::sql::Filter* sqlFilter);

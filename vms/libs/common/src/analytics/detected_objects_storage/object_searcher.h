@@ -13,6 +13,8 @@ namespace nx::analytics::storage {
 struct FieldNames
 {
     const char* objectId;
+    const char* timeRangeStart;
+    const char* timeRangeEnd;
 };
 
 class ObjectSearcher
@@ -35,6 +37,13 @@ public:
         const ObjectTypeDao& objectTypeDao,
         const FieldNames& fieldNames,
         nx::sql::Filter* sqlFilter);
+
+    static void addTimePeriodToFilter(
+        const QnTimePeriod& timePeriod,
+        nx::sql::Filter* sqlFilter,
+        const char* leftBoundaryFieldName,
+        const char* rightBoundaryFieldName,
+        std::optional<std::chrono::milliseconds> maxRecordedTimestamp = std::nullopt);
 
 private:
     const DeviceDao& m_deviceDao;

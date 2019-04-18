@@ -54,6 +54,44 @@ void ObjectSearcher::addObjectFilterConditions(
 
     if (!filter.objectTypeId.empty())
         addObjectTypeIdToFilter(filter.objectTypeId, objectTypeDao, sqlFilter);
+
+    if (!filter.timePeriod.isNull())
+    {
+        addTimePeriodToFilter(
+            filter.timePeriod,
+            sqlFilter,
+            fieldNames.timeRangeStart,
+            fieldNames.timeRangeEnd);
+    }
+}
+
+void ObjectSearcher::addTimePeriodToFilter(
+    const QnTimePeriod& timePeriod,
+    nx::sql::Filter* sqlFilter,
+    const char* leftBoundaryFieldName,
+    const char* rightBoundaryFieldName,
+    std::optional<std::chrono::milliseconds> maxRecordedTimestamp)
+{
+    using namespace std::chrono;
+
+    auto startTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
+        rightBoundaryFieldName,
+        ":startTimeMs",
+        QnSql::serialized_field(duration_cast<milliseconds>(
+            timePeriod.startTime()).count()));
+    sqlFilter->addCondition(std::move(startTimeFilterField));
+
+    if (timePeriod.durationMs != QnTimePeriod::kInfiniteDuration &&
+        (!maxRecordedTimestamp ||
+            timePeriod.startTime() + timePeriod.duration() <= *maxRecordedTimestamp))
+    {
+        auto endTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldLess>(
+            leftBoundaryFieldName,
+            ":endTimeMs",
+            QnSql::serialized_field(duration_cast<milliseconds>(
+                timePeriod.endTime()).count()));
+        sqlFilter->addCondition(std::move(endTimeFilterField));
+    }
 }
 
 void ObjectSearcher::prepareLookupQuery(
@@ -69,10 +107,10 @@ void ObjectSearcher::prepareLookupQuery(
     // TODO: Object count limit.
 
     auto queryText = lm(R"sql(
-        SELECT device_id, object_type_id, guid, track_start_timestamp_ms, track_detail, content
+        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, content
         FROM object o, unique_attributes attrs
         WHERE o.attributes_id = attrs.id %1
-        ORDER BY track_start_timestamp_ms %2
+        ORDER BY track_start_ms %2
     )sql").args(
         sqlQueryFilterStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC");
@@ -89,7 +127,7 @@ nx::sql::Filter ObjectSearcher::prepareSqlFilterExpression(const Filter& filter)
         filter,
         m_deviceDao,
         m_objectTypeDao,
-        {"guid"},
+        {"guid", "track_start_ms", "track_end_ms"},
         &sqlFilter);
 
     // TODO
@@ -114,7 +152,7 @@ std::vector<DetectedObject> ObjectSearcher::loadObjects(
 
 DetectedObject ObjectSearcher::loadObject(
     nx::sql::AbstractSqlQuery* query,
-    const Filter& filter)
+    const Filter& /*filter*/)
 {
     DetectedObject detectedObject;
 
@@ -124,13 +162,15 @@ DetectedObject ObjectSearcher::loadObject(
         query->value("object_type_id").toLongLong());
     detectedObject.objectAppearanceId = QnSql::deserialized_field<QnUuid>(query->value("guid"));
     detectedObject.attributes = AttributesDao::deserialize(query->value("content").toString());
+    detectedObject.firstAppearanceTimeUsec =
+        query->value("track_start_ms").toLongLong() * kUsecInMs;
+    detectedObject.lastAppearanceTimeUsec =
+        query->value("track_end_ms").toLongLong() * kUsecInMs;
 
     detectedObject.track = TrackSerializer::deserialized(
         query->value("track_detail").toByteArray());
     if (!detectedObject.track.empty())
     {
-        detectedObject.firstAppearanceTimeUsec = detectedObject.track.front().timestampUsec;
-        detectedObject.lastAppearanceTimeUsec = detectedObject.track.back().timestampUsec;
         for (auto& position: detectedObject.track)
             position.deviceId = detectedObject.deviceId;
     }

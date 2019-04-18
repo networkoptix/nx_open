@@ -491,11 +491,8 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
         filter,
         m_deviceDao,
         m_objectTypeDao,
-        {"object_id"},
+        {"object_id", "timestamp_usec_utc", "timestamp_usec_utc"},
         &sqlFilter);
-
-    if (!filter.timePeriod.isNull())
-        addTimePeriodToFilter(filter.timePeriod, &sqlFilter, "timestamp_usec_utc", "timestamp_usec_utc");
 
     if (!filter.boundingBox.isNull())
         addBoundingBoxToFilter(filter.boundingBox, &sqlFilter);
@@ -513,33 +510,6 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
     }
 
     return sqlFilter;
-}
-
-void EventsStorage::addTimePeriodToFilter(
-    const QnTimePeriod& timePeriod,
-    nx::sql::Filter* sqlFilter,
-    const char* leftBoundaryFieldName,
-    const char* rightBoundaryFieldName)
-{
-    using namespace std::chrono;
-
-    auto startTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
-        rightBoundaryFieldName,
-        ":startTimeMs",
-        QnSql::serialized_field(duration_cast<milliseconds>(
-            timePeriod.startTime()).count()));
-    sqlFilter->addCondition(std::move(startTimeFilterField));
-
-    if (timePeriod.durationMs != QnTimePeriod::kInfiniteDuration &&
-        timePeriod.startTime() + timePeriod.duration() <= m_maxRecordedTimestamp)
-    {
-        auto endTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldLess>(
-            leftBoundaryFieldName,
-            ":endTimeMs",
-            QnSql::serialized_field(duration_cast<milliseconds>(
-                timePeriod.endTime()).count()));
-        sqlFilter->addCondition(std::move(endTimeFilterField));
-    }
 }
 
 void EventsStorage::addBoundingBoxToFilter(
@@ -774,8 +744,8 @@ void EventsStorage::prepareSelectTimePeriodsUnfilteredQuery(
         if (localTimePeriod.durationMs == QnTimePeriod::kInfiniteDuration)
             localTimePeriod.setEndTime(m_maxRecordedTimestamp);
 
-        addTimePeriodToFilter(
-            localTimePeriod, &sqlFilter, "period_end_ms", "period_start_ms");
+        ObjectSearcher::addTimePeriodToFilter(
+            localTimePeriod, &sqlFilter, "period_end_ms", "period_start_ms", m_maxRecordedTimestamp);
     }
 
     std::string whereClause;

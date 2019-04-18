@@ -186,6 +186,11 @@ CREATE TABLE object(
     attributes_id               INTEGER
 );
 
+CREATE INDEX idx_object_device_id ON object(device_id);
+CREATE INDEX idx_object_object_type_id ON object(object_type_id);
+CREATE INDEX idx_object_guid ON object(guid);
+CREATE INDEX idx_track_time_ms ON object(track_start_ms, track_end_ms);
+
 CREATE TABLE object_search(
     id                          INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp_seconds_utc       INTEGER,
