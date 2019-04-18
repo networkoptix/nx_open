@@ -156,6 +156,8 @@ QnCameraChunkProvider *QnCalendarModel::chunkProvider() const {
 bool QnCalendarModel::isCurrent(const QDateTime& value, int dayIndex)
 {
     Q_D(QnCalendarModel);
+    if (dayIndex < 0 || dayIndex >= d->days.size())
+        return false;
     return value.date() == d->days[dayIndex].date;
 }
 
