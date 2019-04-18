@@ -136,7 +136,7 @@ public:
     void setMetadataStorageId(const QnUuid& value);
 
     static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
-
+    QnMediaServerUserAttributesPtr userAttributes() const;
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);

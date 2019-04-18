@@ -248,7 +248,6 @@ private:
     void createResourceProcessor();
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
     void loadResourceParamsData();
-    void removeDatabase(const QString& databasePath) const;
 private:
     int m_argc = 0;
     char** m_argv = nullptr;

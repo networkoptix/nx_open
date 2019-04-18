@@ -744,6 +744,8 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         serverModule()->normalStorageManager()->initDone();
         serverModule()->backupStorageManager()->initDone();
+
+        initializeAnalyticsEvents();
     });
 }
 
@@ -819,14 +821,18 @@ QnMediaServerResourcePtr MediaServerProcess::registerServer(
     // insert server user attributes if defined
     QString dir = serverModule()->settings().staticDataDir();
 
-    QFile f(closeDirPath(dir) + "server_settings.json");
-    if (!f.open(QFile::ReadOnly))
-        return server;
-    QByteArray data = f.readAll();
     nx::vms::api::MediaServerUserAttributesData userAttrsData;
-    if (!QJson::deserialize(data, &userAttrsData))
-        return server;
-    userAttrsData.serverId = server->getId();
+    ec2::fromResourceToApi(server->userAttributes(), userAttrsData);
+
+    QFile f(closeDirPath(dir) + "server_settings.json");
+    if (f.open(QFile::ReadOnly))
+    {
+        QByteArray data = f.readAll();
+        if (QJson::deserialize(data, &userAttrsData))
+            userAttrsData.serverId = server->getId();
+        else
+            NX_WARNING(this, "Can not deserialize server_settings.json file");
+    }
 
     nx::vms::api::MediaServerUserAttributesDataList attrsList;
     attrsList.push_back(userAttrsData);
@@ -4074,21 +4080,15 @@ QnUuid MediaServerProcess::selectDefaultStorageForAnalyticsEvents(QnMediaServerR
     return result;
 }
 
-void MediaServerProcess::removeDatabase(const QString& databasePath) const
-{
-    if (!QFile::remove(databasePath))
-        NX_WARNING(this, "Can not remove database %1", databasePath);
-}
-
 bool MediaServerProcess::initializeAnalyticsEvents()
 {
     auto storageResource = commonModule()->resourcePool()->getResourceById<QnStorageResource>(
         m_mediaServer->metadataStorageId());
 
     auto settings = this->serverModule()->analyticEventsStorageSettings();
-    settings.dbConnectionOptions.dbName = storageResource ? storageResource->getPath()
+    const auto pathBase = storageResource ? storageResource->getPath()
         : nx::network::url::normalizePath(serverModule()->settings().dataDir());
-    settings.dbConnectionOptions.dbName += "/object_detection.sqlite";
+    settings.dbConnectionOptions.dbName = closeDirPath(pathBase) + "object_detection.sqlite";
 
     if (!this->serverModule()->analyticsEventsStorage()->initialize(settings))
     {
@@ -4100,7 +4100,10 @@ bool MediaServerProcess::initializeAnalyticsEvents()
     {
         auto globalSettings = commonModule()->globalSettings();
         if (globalSettings->metadataStorageChangePolicy() == MetadataStorageChangePolicy::Remove)
-            removeDatabase(m_oldAnalyticsStoragePath);
+        {
+            if (!QFile::remove(m_oldAnalyticsStoragePath))
+                NX_WARNING(this, "Can not remove database %1", m_oldAnalyticsStoragePath);
+        }
     }
 
     m_oldAnalyticsStoragePath = settings.dbConnectionOptions.dbName;
@@ -4597,8 +4600,6 @@ void MediaServerProcess::run()
     initNewSystemStateIfNeeded(foundOwnServerInDb, settingsProxy);
 
     commonModule()->globalSettings()->takeFromSettings(serverModule->roSettings(), m_mediaServer);
-
-    initializeAnalyticsEvents();
 
     updateRootPassword();
 

@@ -498,6 +498,12 @@ int QnMediaServerResource::getMaxCameras() const
     return (*lk)->maxCameras;
 }
 
+QnMediaServerUserAttributesPtr QnMediaServerResource::userAttributes() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
+    return *lk;
+}
+
 QnUuid QnMediaServerResource::metadataStorageId() const
 {
     QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
