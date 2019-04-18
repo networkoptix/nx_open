@@ -481,8 +481,8 @@ private:
 
     bool initializeStorage()
     {
-        m_eventsStorage = std::make_unique<EventsStorage>(m_settings);
-        return m_eventsStorage->initialize();
+        m_eventsStorage = std::make_unique<EventsStorage>();
+        return m_eventsStorage->initialize(m_settings);
     }
 
     void flushData()
@@ -1083,8 +1083,8 @@ protected:
 
 private:
     std::vector<common::metadata::ConstDetectionMetadataPacketPtr> m_packetsRead;
-    nx::utils::SyncQueue<std::unique_ptr<AbstractCursor>> m_createdCursorsQueue;
-    std::unique_ptr<AbstractCursor> m_cursor;
+    nx::utils::SyncQueue<std::shared_ptr<AbstractCursor>> m_createdCursorsQueue;
+    std::shared_ptr<AbstractCursor> m_cursor;
 
     void readAllDataFromCursor()
     {
@@ -1094,9 +1094,9 @@ private:
 
     void saveCursor(
         ResultCode /*resultCode*/,
-        std::unique_ptr<AbstractCursor> cursor)
+        std::shared_ptr<AbstractCursor> cursor)
     {
-        m_createdCursorsQueue.push(std::move(cursor));
+        m_createdCursorsQueue.push(cursor);
     }
 };
 

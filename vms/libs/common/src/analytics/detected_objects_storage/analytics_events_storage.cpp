@@ -23,9 +23,7 @@ static constexpr auto kTrackSearchResolutionY = 32;
 
 //-------------------------------------------------------------------------------------------------
 
-EventsStorage::EventsStorage(const Settings& settings):
-    m_settings(settings),
-    m_dbController(settings.dbConnectionOptions),
+EventsStorage::EventsStorage():
     m_timePeriodDao(&m_deviceDao),
     m_objectCache(kTrackAggregationPeriod, kMaxCachedObjectLifeTime),
     m_trackAggregator(
@@ -41,9 +39,22 @@ EventsStorage::~EventsStorage()
     // TODO: Waiting for completion or cancelling posted queries.
 }
 
-bool EventsStorage::initialize()
+bool EventsStorage::initialize(const Settings& settings)
 {
-    return m_dbController.initialize()
+    NX_DEBUG(this, "Openning analytics event storage from [%1]",
+        settings.dbConnectionOptions.dbName);
+    QnMutexLocker lock(&m_dbControllerMutex);
+    {
+        QnMutexLocker cursorLock(&m_cursorsMutex);
+        m_closingDbController = true;
+        for (auto& cursor: m_openedCursors)
+            cursor->close();
+        m_openedCursors.clear();
+    }
+    m_dbController.reset();
+    m_closingDbController = false;
+    m_dbController = std::make_shared<DbController>(settings.dbConnectionOptions);
+    return m_dbController->initialize()
         && readMaximumEventTimestamp()
         && loadDictionaries();
 }
@@ -64,7 +75,8 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
 
     if (!kUseTrackAggregation)
     {
-        m_dbController.queryExecutor().executeUpdate(
+        QnMutexLocker lock(&m_dbControllerMutex);
+        m_dbController->queryExecutor().executeUpdate(
             std::bind(&EventsStorage::savePacket, this, _1, std::move(packet)),
             [this](sql::DBResult resultCode) { logDataSaveResult(resultCode); },
             kSaveEventQueryAggregationKey);
@@ -78,7 +90,8 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
         auto detectionDataSaver = takeDataToSave(lock, /*flush*/ false);
 
         // TODO: #ak Avoid executeUpdate for every packet. We need it only to save a time period.
-        m_dbController.queryExecutor().executeUpdate(
+        QnMutexLocker dbLock(&m_dbControllerMutex);
+        m_dbController->queryExecutor().executeUpdate(
             [this, packet = packet, detectionDataSaver = std::move(detectionDataSaver)](
                 nx::sql::QueryContext* queryContext) mutable
             {
@@ -101,7 +114,8 @@ void EventsStorage::createLookupCursor(
 
     NX_VERBOSE(this, "Requested cursor with filter %1", filter);
 
-    m_dbController.queryExecutor().createCursor<DetectedObject>(
+    QnMutexLocker lock(&m_dbControllerMutex);
+    m_dbController->queryExecutor().createCursor<DetectedObject>(
         std::bind(&EventsStorage::prepareCursorQuery, this, filter, _1),
         std::bind(&EventsStorage::loadObject, this, _1, _2),
         [this, completionHandler = std::move(completionHandler)](
@@ -111,12 +125,31 @@ void EventsStorage::createLookupCursor(
             if (resultCode != sql::DBResult::ok)
                 return completionHandler(ResultCode::error, nullptr);
 
+            QnMutexLocker lock(&m_cursorsMutex);
+            if (m_closingDbController)
+                return completionHandler(ResultCode::ok, nullptr);
+
+            auto cursor = std::make_shared<Cursor>(std::make_unique<sql::Cursor<DetectedObject>>(
+                &m_dbController->queryExecutor(),
+                dbCursorId));
+
+            m_openedCursors.push_back(cursor);
             completionHandler(
                 ResultCode::ok,
-                std::make_unique<Cursor>(std::make_unique<sql::Cursor<DetectedObject>>(
-                    &m_dbController.queryExecutor(),
-                    dbCursorId)));
+                cursor);
         });
+}
+
+void EventsStorage::closeCursor(const std::shared_ptr<AbstractCursor>& cursorToRemove)
+{
+    QnMutexLocker lock(&m_cursorsMutex);
+    m_openedCursors.remove_if(
+        [cursorToRemove] (std::shared_ptr<Cursor> cursor)
+        {
+            auto cursorPtr = static_cast<AbstractCursor*>(cursor.get());
+            return cursorToRemove.get() == cursorPtr;
+        });
+
 }
 
 void EventsStorage::lookup(
@@ -124,7 +157,8 @@ void EventsStorage::lookup(
     LookupCompletionHandler completionHandler)
 {
     auto result = std::make_shared<std::vector<DetectedObject>>();
-    m_dbController.queryExecutor().executeSelect(
+    QnMutexLocker lock(&m_dbControllerMutex);
+    m_dbController->queryExecutor().executeSelect(
         [this, filter = std::move(filter), result](nx::sql::QueryContext* queryContext)
         {
             if (kUseTrackAggregation)
@@ -155,7 +189,8 @@ void EventsStorage::lookupTimePeriods(
     using namespace std::placeholders;
 
     auto result = std::make_shared<QnTimePeriodList>();
-    m_dbController.queryExecutor().executeSelect(
+    QnMutexLocker lock(&m_dbControllerMutex);
+    m_dbController->queryExecutor().executeSelect(
         std::bind(&EventsStorage::selectTimePeriods, this,
             _1, std::move(filter), std::move(options), result.get()),
         [this, result, completionHandler = std::move(completionHandler)](
@@ -176,7 +211,8 @@ void EventsStorage::markDataAsDeprecated(
     NX_VERBOSE(this, "Cleaning data of device %1 up to timestamp %2",
         deviceId, oldestDataToKeepTimestamp.count());
 
-    m_dbController.queryExecutor().executeUpdate(
+    QnMutexLocker lock(&m_dbControllerMutex);
+    m_dbController->queryExecutor().executeUpdate(
         std::bind(&EventsStorage::cleanupData, this, _1, deviceId, oldestDataToKeepTimestamp),
         [this, deviceId, oldestDataToKeepTimestamp](sql::DBResult resultCode)
         {
@@ -195,7 +231,8 @@ void EventsStorage::markDataAsDeprecated(
 
 void EventsStorage::flush(StoreCompletionHandler completionHandler)
 {
-    m_dbController.queryExecutor().executeUpdate(
+    QnMutexLocker lock(&m_dbControllerMutex);
+    m_dbController->queryExecutor().executeUpdate(
         [this](nx::sql::QueryContext* queryContext)
         {
             NX_DEBUG(this, "Flushing unsaved data");
@@ -225,7 +262,7 @@ bool EventsStorage::readMaximumEventTimestamp()
 {
     try
     {
-        m_maxRecordedTimestamp = m_dbController.queryExecutor().executeSelectQuerySync(
+        m_maxRecordedTimestamp = m_dbController->queryExecutor().executeSelectQuerySync(
             [](nx::sql::QueryContext* queryContext)
             {
                 auto query = queryContext->connection()->createQuery();
@@ -252,7 +289,7 @@ bool EventsStorage::loadDictionaries()
 {
     try
     {
-        m_dbController.queryExecutor().executeSelectQuerySync(
+        m_dbController->queryExecutor().executeSelectQuerySync(
             [this](nx::sql::QueryContext* queryContext)
             {
                 m_objectTypeDao.loadObjectTypeDictionary(queryContext);
@@ -908,8 +945,7 @@ double EventsStorage::unpackCoordinate(int packedValue)
 //-------------------------------------------------------------------------------------------------
 
 EventsStorageFactory::EventsStorageFactory():
-    base_type(std::bind(&EventsStorageFactory::defaultFactoryFunction, this,
-        std::placeholders::_1))
+    base_type(std::bind(&EventsStorageFactory::defaultFactoryFunction, this))
 {
 }
 
@@ -919,10 +955,9 @@ EventsStorageFactory& EventsStorageFactory::instance()
     return staticInstance;
 }
 
-std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunction(
-    const Settings& settings)
+std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunction()
 {
-    return std::make_unique<EventsStorage>(settings);
+    return std::make_unique<EventsStorage>();
 }
 
 } // namespace nx::analytics::storage

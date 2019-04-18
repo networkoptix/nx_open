@@ -1043,6 +1043,11 @@ void MediaServerProcess::at_databaseDumped()
     restartServer(500);
 }
 
+void MediaServerProcess::at_metadataStorageIdChanged(const QnResourcePtr& /*resource*/)
+{
+    initializeAnalyticsEvents();
+}
+
 void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
 {
     if (isStopping())
@@ -3563,6 +3568,10 @@ bool MediaServerProcess::setUpMediaServerResource(
     commonModule()->setModuleInformation(selfInformation);
     commonModule()->bindModuleInformation(m_mediaServer);
 
+
+    connect(m_mediaServer.get(), &QnMediaServerResource::metadataStorageIdChanged, this,
+        &MediaServerProcess::at_metadataStorageIdChanged);
+
     return foundOwnServerInDb;
 }
 
@@ -4035,11 +4044,37 @@ void MediaServerProcess::setUpDataFromSettings()
     nx::network::SocketFactory::setIpVersion(ipVersion);
 }
 
-void MediaServerProcess::initializeAnalyticsEvents()
+bool MediaServerProcess::initializeAnalyticsEvents()
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        commonModule()->mediaServerUserAttributesPool(), m_mediaServer->getId());
+    auto storageResource = commonModule()->resourcePool()->getResourceById<QnFileStorageResource>(
+        (*lk)->metadataStorageId);
+    NX_DEBUG(this, "Try to initialize analytics events storage on storage [%1]",
+        (*lk)->metadataStorageId);
+    if (!storageResource)
+    {
+        // TODO if first start set metadataStorgaId
+        NX_ERROR(this,
+            "Failed to change analytics events storage, required storage id[%1] not found",
+            (*lk)->metadataStorageId);
+        return false;
+    }
+    auto settings = this->serverModule()->analyticEventsStorageSettings();
+    settings.dbConnectionOptions.dbName = storageResource->getPath() + "/object_detection.sqlite";
+    if (!this->serverModule()->analyticsEventsStorage()->initialize(settings))
+    {
+        NX_ERROR(this, "Failed to change analytics events storage, initialization error");
+        return false;
+    }
+    return true;
+}
+
+void MediaServerProcess::initializeAnalyticsEventsForced()
 {
     while (!needToStop())
     {
-        if (serverModule()->analyticsEventsStorage()->initialize())
+        if (initializeAnalyticsEvents())
             break;
 
         NX_WARNING(this, lm("Failed to initialize analytics events storage. Retrying..."));
@@ -4446,8 +4481,6 @@ void MediaServerProcess::run()
     m_discoveryMonitor = std::make_unique<nx::vms::server::discovery::DiscoveryMonitor>(
         m_ec2ConnectionFactory->messageBus());
 
-    initializeAnalyticsEvents();
-
     if (needToStop())
         return;
 
@@ -4539,6 +4572,8 @@ void MediaServerProcess::run()
     initNewSystemStateIfNeeded(foundOwnServerInDb, settingsProxy);
 
     commonModule()->globalSettings()->takeFromSettings(serverModule->roSettings(), m_mediaServer);
+
+    initializeAnalyticsEventsForced(); // TODO check for raise during initialization
 
     updateRootPassword();
 
