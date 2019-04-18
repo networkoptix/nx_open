@@ -119,6 +119,7 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
 
         const auto objectDbId = query->lastInsertId().toLongLong();
         m_objectGuidToId[object.objectAppearanceId] = objectDbId;
+        m_objectCache->setObjectIdInDb(object.objectAppearanceId, objectDbId);
 
         m_objectCache->saveObjectGuidToAttributesId(
             object.objectAppearanceId, attributesId);
@@ -148,7 +149,7 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
     auto updateObjectQuery = queryContext->connection()->createQuery();
     updateObjectQuery->prepare(R"sql(
         UPDATE object
-        SET track_detail = track_detail || ?,
+        SET track_detail = CAST(track_detail || CAST(? AS BLOB) AS BLOB),
             attributes_id = ?,
             track_start_ms = min(track_start_ms, ?),
             track_end_ms = max(track_end_ms, ?)
@@ -163,11 +164,14 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         auto [trackMinTimestamp, trackMaxTimestamp] =
             findMinMaxTimestamp(objectUpdate.appendedTrack);
 
+        const auto serializedTrack = TrackSerializer::serialized(objectUpdate.appendedTrack);
         updateObjectQuery->bindValue(0, TrackSerializer::serialized(objectUpdate.appendedTrack));
         updateObjectQuery->bindValue(1, newAttributesId);
         updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
         updateObjectQuery->bindValue(3, trackMaxTimestamp / kUsecInMs);
-        updateObjectQuery->bindValue(4, objectUpdate.dbId);
+        updateObjectQuery->bindValue(4, objectUpdate.dbId != -1
+            ? objectUpdate.dbId
+            : m_objectCache->dbIdFromObjectId(objectUpdate.objectId));
         updateObjectQuery->exec();
 
         m_objectCache->saveObjectGuidToAttributesId(objectUpdate.objectId, newAttributesId);
