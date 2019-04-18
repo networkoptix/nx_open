@@ -27,6 +27,9 @@ static constexpr milliseconds kMessageDurationMs = 3s;
 static constexpr milliseconds kFindServicesTimeoutMs = 10s;
 static constexpr milliseconds kUpdateStatusMs = 500ms;
 
+static const QString kStartMediaServerId = "startMediaServer";
+static const QString kStopMediaServerId = "stopMediaServer";
+
 } // namespace
 
 QnSystrayWindow::QnSystrayWindow():
@@ -70,9 +73,10 @@ QnSystrayWindow::~QnSystrayWindow()
 
 void QnSystrayWindow::executeAction(const QString& actionName)
 {
-    QAction* action = actionByName(actionName);
-    if (action && action->isEnabled())
-        action->activate(QAction::Trigger);
+    if (actionName == kStartMediaServerId)
+        at_mediaServerStartAction();
+    else if (actionName == kStopMediaServerId)
+        at_mediaServerStopAction();
 }
 
 void QnSystrayWindow::findServiceInfo()
@@ -389,18 +393,10 @@ void QnSystrayWindow::at_mediaServerWebAction()
     QDesktopServices::openUrl(QUrl(serverAdminUrl));
 }
 
-QnElevationChecker::QnElevationChecker(
-    QObject* parent,
-    QString actionName,
-    QObject* target,
-    const char* slot):
+QnElevationChecker::QnElevationChecker(const QString& actionId, QObject* parent):
     QObject(parent),
-    m_actionName(actionName),
-    m_target(target),
-    m_slot(slot),
-    m_rightWarnShowed(false)
+    m_actionId(actionId)
 {
-    connect(this, SIGNAL(elevationCheckPassed()), target, slot);
 }
 
 bool QnElevationChecker::isUserAnAdmin()
@@ -439,13 +435,13 @@ bool QnElevationChecker::isUserAnAdmin()
 }
 
 
-void QnElevationChecker::triggered()
+void QnElevationChecker::trigger()
 {
     if (isUserAnAdmin())
     {
         emit elevationCheckPassed();
     }
-    else if (qApp->arguments().size() > 1 && !m_rightWarnShowed)
+    else if (qApp->arguments().size() > 1 && !m_errorDisplayedOnce)
     {
         // Already elevated, but not admin. Prevent recursion calls here
         const auto systray = static_cast<QnSystrayWindow*>(parent());
@@ -453,7 +449,7 @@ void QnElevationChecker::triggered()
             tr("Insufficient rights to manage services."),
             tr("UAC must be enabled to request privileges for non-admin users."),
             QSystemTrayIcon::Warning);
-        m_rightWarnShowed = true;
+        m_errorDisplayedOnce = true;
     }
     else
     {
@@ -463,7 +459,7 @@ void QnElevationChecker::triggered()
         int size = qApp->arguments()[0].toWCharArray(name);
         name[size] = 0;
 
-        size = m_actionName.toWCharArray(args);
+        size = m_actionId.toWCharArray(args);
         args[size] = 0;
 
         SHELLEXECUTEINFO shExecInfo;
@@ -484,58 +480,44 @@ void QnElevationChecker::triggered()
     }
 }
 
-void QnSystrayWindow::connectElevatedAction(
-    QAction* source,
-    const char* signal,
-    QObject* target,
-    const char* slot)
-{
-    QnElevationChecker* checker = new QnElevationChecker(this, nameByAction(source), target, slot);
-    connect(source, signal, checker, SLOT(triggered()));
-}
-
 void QnSystrayWindow::createActions()
 {
     m_quitAction = new QAction(tr("&Quit"), this);
-    connect(m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(m_quitAction, &QAction::triggered, qApp, &QApplication::quit);
 
     m_showMediaServerLogAction = new QAction(tr("Show Server Log"), this);
-    m_showMediaServerLogAction->setObjectName(lit("showMediaServerLog"));
-    m_actions.push_back(m_showMediaServerLogAction);
-    connectElevatedAction(
+
+    connect(
         m_showMediaServerLogAction,
-        SIGNAL(triggered()),
+        &QAction::triggered,
         this,
-        SLOT(onShowMediaServerLogAction()));
+        &QnSystrayWindow::onShowMediaServerLogAction);
 
-    m_mediaServerStartAction = new QAction(QString(tr("Start Server")), this);
-    m_mediaServerStartAction->setObjectName(lit("startMediaServer"));
-    m_actions.push_back(m_mediaServerStartAction);
-    connectElevatedAction(
-        m_mediaServerStartAction,
-        SIGNAL(triggered()),
-        this,
-        SLOT(at_mediaServerStartAction()));
-    m_mediaServerStartAction->setVisible(false);
+    {
+        m_mediaServerStartAction = new QAction(QString(tr("Start Server")), this);
+        const auto checker = new QnElevationChecker(kStartMediaServerId, this);
+        connect(m_mediaServerStartAction, &QAction::triggered, checker,
+            &QnElevationChecker::trigger);
+        connect(checker, &QnElevationChecker::elevationCheckPassed, this,
+            &QnSystrayWindow::at_mediaServerStartAction);
+    }
 
-    m_mediaServerStopAction = new QAction(QString(tr("Stop Server")), this);
-    m_mediaServerStopAction->setObjectName(lit("stopMediaServer"));
-    m_actions.push_back(m_mediaServerStopAction);
-    connectElevatedAction(
-        m_mediaServerStopAction,
-        SIGNAL(triggered()),
-        this,
-        SLOT(at_mediaServerStopAction()));
-    m_mediaServerStopAction->setVisible(false);
+    {
+        m_mediaServerStopAction = new QAction(QString(tr("Stop Server")), this);
+        const auto checker = new QnElevationChecker(kStopMediaServerId, this);
+        connect(m_mediaServerStopAction, &QAction::triggered, checker,
+            &QnElevationChecker::trigger);
+        connect(checker, &QnElevationChecker::elevationCheckPassed, this,
+            &QnSystrayWindow::at_mediaServerStopAction);
+        m_mediaServerStopAction->setVisible(false);
+    }
 
     m_mediaServerWebAction = new QAction(QString(tr("Server Web Page")), this);
-    m_mediaServerWebAction->setObjectName(lit("startMediaServer"));
-    m_actions.push_back(m_mediaServerWebAction);
-    QObject::connect(
+    connect(
         m_mediaServerWebAction,
-        SIGNAL(triggered()),
+        &QAction::triggered,
         this,
-        SLOT(at_mediaServerWebAction()));
+        &QnSystrayWindow::at_mediaServerWebAction);
 
     updateActions();
 }
@@ -555,22 +537,9 @@ void QnSystrayWindow::onShowMediaServerLogAction()
     QProcess::startDetached(lit("notepad ") + logFileName);
 };
 
-QAction* QnSystrayWindow::actionByName(const QString& name)
-{
-    foreach(QAction *action, m_actions)
-        if (action->objectName() == name)
-            return action;
-    return NULL;
-}
-
-QString QnSystrayWindow::nameByAction(QAction* action)
-{
-    return action->objectName();
-}
-
 void QnSystrayWindow::createTrayIcon()
 {
-    QMenu* trayIconMenu = new QMenu(this);
+    auto trayIconMenu = new QMenu(this);
 
     trayIconMenu->addAction(m_mediaServerWebAction);
 

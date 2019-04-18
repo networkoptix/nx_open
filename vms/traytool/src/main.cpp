@@ -58,10 +58,8 @@ int main(int argc, char* argv[])
         clientName);
 
     /* Init crash dumps as early as possible. */
-    #ifdef Q_OS_WIN
     win32_exception::installGlobalUnhandledExceptionHandler();
     win32_exception::setCreateFullCrashDump(readIsFullCrashDumpFromSettings(clientSettings));
-    #endif
 
     QApplication::setOrganizationName(QnAppInfo::organizationName());
     QApplication::setApplicationName(QnTraytoolAppInfo::applicationName());

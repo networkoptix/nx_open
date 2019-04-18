@@ -24,30 +24,26 @@ class QPushButton;
 class QSpinBox;
 class QTextEdit;
 
-namespace Ui {
-class SettingsDialog;
-}
+namespace Ui { class SettingsDialog; }
 
 class QnElevationChecker: public QObject
 {
-Q_OBJECT
-
+    Q_OBJECT
 public:
-    QnElevationChecker(QObject* parent, QString actionName, QObject* target, const char* slot);
+    explicit QnElevationChecker(
+        const QString& actionId,
+        QObject* parent = nullptr);
 
     static bool isUserAnAdmin();
+
+    void trigger();
 
 signals:
     void elevationCheckPassed();
 
-private slots:
-    void triggered();
-
 private:
-    QString m_actionName;
-    QObject* m_target;
-    const char* m_slot;
-    bool m_rightWarnShowed;
+    const QString m_actionId;
+    bool m_errorDisplayedOnce = false;
 };
 
 class StopServiceAsyncTask: public QObject, public QRunnable
@@ -127,14 +123,6 @@ private slots:
     void mediaServerInfoUpdated(quint64 status);
 
 private:
-    QAction* actionByName(const QString& name);
-    QString nameByAction(QAction* action);
-
-    void connectElevatedAction(
-        QAction* source,
-        const char* signal,
-        QObject* target,
-        const char* slot);
     void updateServiceInfoInternal(
         SC_HANDLE handle,
         DWORD status,
@@ -165,7 +153,6 @@ private:
     bool m_needStartMediaServer = false;
     int m_prevMediaServerStatus = -1;
 
-    QList<QAction*> m_actions;
     QTime m_lastMessageTimer;
 
     struct DelayedMessage
