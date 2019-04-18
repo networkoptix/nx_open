@@ -63,6 +63,10 @@ private:
         nx::sql::AbstractSqlQuery* query,
         const Filter& filter);
 
+    void filterTrack(
+        const Filter& filter,
+        std::vector<ObjectPosition>* const track);
+
     static void addObjectTypeIdToFilter(
         const std::vector<QString>& objectTypes,
         const ObjectTypeDao& objectTypeDao,

@@ -15,8 +15,6 @@
 
 namespace nx::analytics::storage::test {
 
-static const auto kUsecInMs = 1000;
-
 class AnalyticsDb:
     public nx::utils::test::TestWithTemporaryDirectory,
     public ::testing::Test
@@ -763,6 +761,7 @@ protected:
         using namespace std::chrono;
 
         m_specificObjectAppearanceId = QnUuid::createUuid();
+        const auto deviceId = QnUuid::createUuid();
         auto analyticsDataPackets = generateEventsByCriteria();
 
         qint64 objectTrackStartTime = std::numeric_limits<qint64>::max();
@@ -773,6 +772,7 @@ protected:
             objectTrackStartTime = std::min(objectTrackStartTime, packet->timestampUsec);
             objectTrackEndTime =
                 std::max(objectTrackEndTime, packet->timestampUsec + packet->durationUsec);
+            packet->deviceId = deviceId;
 
             for (auto& object: packet->objects)
             {
@@ -932,7 +932,7 @@ TEST_F(AnalyticsDbLookup, lookup_by_empty_time_period)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsDbLookup, full_track_timestamps)
+TEST_F(AnalyticsDbLookup, filtering_part_of_track_by_time_period)
 {
     givenObjectWithLongTrack();
     whenLookupByRandomNonEmptyTimePeriodCoveringPartOfTrack();

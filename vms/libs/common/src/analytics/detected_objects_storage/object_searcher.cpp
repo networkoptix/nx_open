@@ -152,7 +152,7 @@ std::vector<DetectedObject> ObjectSearcher::loadObjects(
 
 DetectedObject ObjectSearcher::loadObject(
     nx::sql::AbstractSqlQuery* query,
-    const Filter& /*filter*/)
+    const Filter& filter)
 {
     DetectedObject detectedObject;
 
@@ -169,6 +169,7 @@ DetectedObject ObjectSearcher::loadObject(
 
     detectedObject.track = TrackSerializer::deserialized(
         query->value("track_detail").toByteArray());
+    filterTrack(filter, &detectedObject.track);
     if (!detectedObject.track.empty())
     {
         for (auto& position: detectedObject.track)
@@ -176,6 +177,41 @@ DetectedObject ObjectSearcher::loadObject(
     }
 
     return detectedObject;
+}
+
+void ObjectSearcher::filterTrack(
+    const Filter& filter,
+    std::vector<ObjectPosition>* const track)
+{
+    using namespace std::chrono;
+
+    auto doesNotSatisfiesFilter =
+        [&filter](const ObjectPosition& position)
+        {
+            if (!filter.timePeriod.isNull())
+            {
+                if (microseconds(position.timestampUsec) >= filter.timePeriod.endTime() ||
+                    microseconds(position.timestampUsec + position.durationUsec) < filter.timePeriod.startTime())
+                {
+                    return true;
+                }
+            }
+
+            // TODO: Filter box
+
+            return false;
+        };
+
+    track->erase(
+        std::remove_if(track->begin(), track->end(), doesNotSatisfiesFilter),
+        track->end());
+
+    std::sort(
+        track->begin(), track->end(),
+        [](const auto& left, const auto& right) { return left.timestampUsec < right.timestampUsec; });
+
+    if (filter.maxTrackSize > 0 && track->size() > filter.maxTrackSize)
+        track->erase(track->begin() + filter.maxTrackSize, track->end());
 }
 
 void ObjectSearcher::addObjectTypeIdToFilter(
