@@ -283,6 +283,7 @@
 
 #include <providers/speech_synthesis_data_provider.h>
 #include <nx/utils/file_system.h>
+#include <nx/network/url/url_builder.h>
 
 #if defined(__arm__)
     #include "nx/vms/server/system/nx1/info.h"
@@ -3489,6 +3490,15 @@ bool MediaServerProcess::setUpMediaServerResource(
             server->setId(serverGuid);
             server->setMaxCameras(nx::utils::AppInfo::isEdgeServer() ? 1 : 128);
 
+            if (!serverModule->settings().noInitStoragesOnStartup())
+            {
+                auto storages = createStorages(server);
+                saveStorages(ec2Connection, storages);
+                for (const QnStorageResourcePtr &storage: storages)
+                    m_serverMessageProcessor->updateResource(storage, ec2::NotificationSource::Local);
+                server->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(server));
+            }
+
             QString serverName(getDefaultServerName());
             auto beforeRestoreDbData = commonModule()->beforeRestoreDbData();
             if (!beforeRestoreDbData.serverName.isEmpty())
@@ -4044,42 +4054,57 @@ void MediaServerProcess::setUpDataFromSettings()
     nx::network::SocketFactory::setIpVersion(ipVersion);
 }
 
+QnUuid MediaServerProcess::selectDefaultStorageForAnalyticsEvents(QnMediaServerResourcePtr server)
+{
+    QnUuid result;
+    qint64 maxTotalSpace = 0;
+
+    for (const auto& storage: server->getStorages())
+    {
+        if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+        {
+            if (fileStorage->isLocal() && fileStorage->getTotalSpace() > maxTotalSpace)
+            {
+                maxTotalSpace = fileStorage->getTotalSpace();
+                result = fileStorage->getId();
+            }
+        }
+    }
+
+    return result;
+}
+
+void MediaServerProcess::removeDatabase(const QString& databasePath) const
+{
+    if (!QFile::remove(databasePath))
+        NX_WARNING(this, "Can not remove database %1", databasePath);
+}
+
 bool MediaServerProcess::initializeAnalyticsEvents()
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        commonModule()->mediaServerUserAttributesPool(), m_mediaServer->getId());
-    auto storageResource = commonModule()->resourcePool()->getResourceById<QnFileStorageResource>(
-        (*lk)->metadataStorageId);
-    NX_DEBUG(this, "Try to initialize analytics events storage on storage [%1]",
-        (*lk)->metadataStorageId);
-    if (!storageResource)
-    {
-        // TODO if first start set metadataStorgaId
-        NX_ERROR(this,
-            "Failed to change analytics events storage, required storage id[%1] not found",
-            (*lk)->metadataStorageId);
-        return false;
-    }
+    auto storageResource = commonModule()->resourcePool()->getResourceById<QnStorageResource>(
+        m_mediaServer->metadataStorageId());
+
     auto settings = this->serverModule()->analyticEventsStorageSettings();
-    settings.dbConnectionOptions.dbName = storageResource->getPath() + "/object_detection.sqlite";
+    settings.dbConnectionOptions.dbName = storageResource ? storageResource->getPath()
+        : nx::network::url::normalizePath(serverModule()->settings().dataDir());
+    settings.dbConnectionOptions.dbName += "/object_detection.sqlite";
+
     if (!this->serverModule()->analyticsEventsStorage()->initialize(settings))
     {
         NX_ERROR(this, "Failed to change analytics events storage, initialization error");
         return false;
     }
-    return true;
-}
 
-void MediaServerProcess::initializeAnalyticsEventsForced()
-{
-    while (!needToStop())
+    if (!m_oldAnalyticsStoragePath.isEmpty())
     {
-        if (initializeAnalyticsEvents())
-            break;
-
-        NX_WARNING(this, lm("Failed to initialize analytics events storage. Retrying..."));
-        QnSleep::msleep(1000);
+        auto globalSettings = commonModule()->globalSettings();
+        if (globalSettings->metadataStorageChangePolicy() == MetadataStorageChangePolicy::Remove)
+            removeDatabase(m_oldAnalyticsStoragePath);
     }
+
+    m_oldAnalyticsStoragePath = settings.dbConnectionOptions.dbName;
+    return true;
 }
 
 void MediaServerProcess::setUpTcpLogReceiver()
@@ -4573,7 +4598,7 @@ void MediaServerProcess::run()
 
     commonModule()->globalSettings()->takeFromSettings(serverModule->roSettings(), m_mediaServer);
 
-    initializeAnalyticsEventsForced(); // TODO check for raise during initialization
+    initializeAnalyticsEvents();
 
     updateRootPassword();
 

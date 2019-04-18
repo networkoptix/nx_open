@@ -132,6 +132,9 @@ public:
      */
     QSet<QnUuid> activeAnalyticsEngineIds() const;
 
+    QnUuid metadataStorageId() const;
+    void setMetadataStorageId(const QnUuid& value);
+
     static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
 
 private slots:

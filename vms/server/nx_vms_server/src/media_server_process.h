@@ -234,7 +234,7 @@ private:
     void connectStorageSignals(QnStorageManager* storage);
     void setUpDataFromSettings();
     bool initializeAnalyticsEvents();
-    void initializeAnalyticsEventsForced();
+    QnUuid selectDefaultStorageForAnalyticsEvents(QnMediaServerResourcePtr server);
     void setUpTcpLogReceiver();
     void initNewSystemStateIfNeeded(
         bool foundOwnServerInDb,
@@ -248,7 +248,7 @@ private:
     void createResourceProcessor();
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
     void loadResourceParamsData();
-
+    void removeDatabase(const QString& databasePath) const;
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
@@ -269,6 +269,7 @@ private:
     std::unique_ptr<QTimer> m_createDbBackupTimer;
     QVector<QString> m_hardwareIdHlist;
     QnServerMessageProcessor* m_serverMessageProcessor = nullptr;
+    QString m_oldAnalyticsStoragePath;
 
     static std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
     std::weak_ptr<QnMediaServerModule> m_serverModule;

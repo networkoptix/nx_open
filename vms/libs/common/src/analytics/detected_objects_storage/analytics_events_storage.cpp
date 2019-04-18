@@ -52,6 +52,7 @@ bool EventsStorage::initialize(const Settings& settings)
         m_openedCursors.clear();
     }
     m_dbController.reset();
+
     m_closingDbController = false;
     m_dbController = std::make_shared<DbController>(settings.dbConnectionOptions);
     return m_dbController->initialize()
