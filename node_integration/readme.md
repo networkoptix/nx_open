@@ -6,8 +6,8 @@
 -->
 # Nx Node.js Integration
 
-A framework that allows developers and integrators to quickly and easily make integrations
-    with Nx Witness Server.
+A framework that allows developers and integrators to quickly and easily make integrations with Nx
+    Witness Server.
 
 ## Features
 - Send Events to the System: Automate sending generic Events
@@ -18,15 +18,13 @@ A framework that allows developers and integrators to quickly and easily make in
 ## Examples
 ### Quick explanation of the class we are going to use.
 * GenericEvent - Sends a Generic Event to the Server.
-* NodeServer - Listens for HTTP requests and executes callback functions for
-    NodeHttpActions.
-* NodeHttpAction - Creates a rule on the Server that sends an HTTP action to the
-    NodeServer and does some user defined callback.
-* Rule - Helps combine Event and Action classes in a way that simplifies the api call for
-    making a rule on the Server.
+* NodeServer - Listens for HTTP requests and executes callback functions for NodeHttpActions.
+* NodeHttpAction - Creates a rule on the Server that sends an HTTP action to the NodeServer and
+    does some user defined callback.
+* Rule - Helps combine Event and Action classes in a way that simplifies the api call for making a
+    rule on the Server.
 * SoftTrigger - Creates a soft trigger event for a rule on the Server.
-* System - Interacts with the VMS Server api to get information and create objects in the
-    Server.
+* System - Interacts with the VMS Server api to get information and create objects in the Server.
 
 ### How to connect to the VMS Server using the System class.  
 ```typescript
@@ -59,10 +57,9 @@ server.saveRuleToSystem(rule1).then((rule: Rule | null) => {
 });
 ```
 ### Creating a soft trigger that executes a nodejs callback
-This example execute code creates a rule that will send an http action to the NodeServer
-   when a user presses the soft trigger created by this script.
-   When the NodeServer receives the http action the callback sends a Generic Event to the
-   Server.
+This example execute code creates a rule that will send an http action to the NodeServer when a
+    user presses the soft trigger created by this script. When the NodeServer receives the http
+    action the callback sends a Generic Event to the Server.
 ```typescript
 import { 
     GenericEvent, NodeHttpAction, NodeServer, Rule, SoftTrigger
@@ -74,8 +71,7 @@ const nodeCallback: NodeHttpAction = new NodeHttpAction();
 nodeCallback.configDefaultHandler('example', () => {
     server.sendEvent({event: genericEvent});
 });
-const rule1: Rule = new Rule('Soft trigger that makes the express server send a ' +
- 'Generic Event')
+const rule1: Rule = new Rule('Soft trigger that makes the express server send a Generic Event')
     .on(softTrigger)
     .do(nodeCallback);
 server.saveRuleToSystem(rule1).then((rule: Rule | null) => {
@@ -83,8 +79,8 @@ server.saveRuleToSystem(rule1).then((rule: Rule | null) => {
 });
 ```
 
-**Note: We are not saving the rules anywhere. As a result of this the rules will be
-    recreated every time the script is run.**
+**Note: We are not saving the rules anywhere. As a result of this the rules will be recreated
+    every time the script is run.**
 
 ### How to prevent rules from being created every time the script is run.
 ```typescript
@@ -154,8 +150,8 @@ To get latest beta version - apply for Developer Early Access Program here:
 1) Run 'npm install'.
 2) Go to the examples directory
 3) Run 'tsc *.ts'
-4) Edit the nodeConfig.json file with the following. **Note: Leave the rules section
-    empty, the scripts will fill it in automatically.**
+4) Edit the nodeConfig.json file with the following. **Note: Leave the rules section empty, the 
+    scripts will fill it in automatically.**
   ```json
    {
        "systemUrl": "{{Ip address and port of your System running the VMS Server}}",
@@ -184,16 +180,15 @@ To get latest beta version - apply for Developer Early Access Program here:
    node softTriggerHttpAction.js
    ```
 6) Open the NxWitness desktop client.
-7) Open a camera on the grid. There should be a soft trigger called "Node callback -
-    simple".
-8) Press the soft trigger and you will see a log message in the terminal that says
-    "Callback works".
+7) Open a camera on the grid. There should be a soft trigger called "Node callback - simple".
+8) Press the soft trigger and you will see a log message in the terminal that says "Callback
+    works".
 
 ## Authors
 
 **Network Optix**
 
 ## License
-This project is licensed under the [Mozilla Public License, v. 2.0](
-http://mozilla.org/MPL/2.0/) - see the [LICENSE.md]() file for details.
+This project is licensed under the [Mozilla Public License, v. 2.0](http://mozilla.org/MPL/2.0/) -
+    see the [LICENSE.md]() file for details.
 
