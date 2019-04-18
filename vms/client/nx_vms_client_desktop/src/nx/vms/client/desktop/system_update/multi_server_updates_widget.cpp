@@ -1673,7 +1673,7 @@ bool MultiServerUpdatesWidget::processRemoteChanges()
 
         if (!downloading.empty())
         {
-            // According to VMS-13655, we should go to downloading stage if we have merged
+            // We should go to downloading stage if we have merged
             // another system. This system will start update automatically, so we just need
             // to change UI state.
             setTargetState(WidgetUpdateState::downloading, downloading, false);
