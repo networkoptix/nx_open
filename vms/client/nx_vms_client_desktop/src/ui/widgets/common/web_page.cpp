@@ -5,33 +5,23 @@
 
 #include <nx/utils/log/log.h>
 
-namespace {
-
-void trace(const QString& message)
-{
-#ifdef _DEBUG
-    for (const QString& line : message.split(lit("\n"), QString::SkipEmptyParts))
-        qDebug() << line;
-#endif
-    NX_INFO(typeid(QnWebPage), message);
-}
-
-}
 
 QnWebPage::QnWebPage(QObject* parent):
     base_type(parent)
 {
     connect(this->networkAccessManager(), &QNetworkAccessManager::sslErrors, this,
-        [](QNetworkReply* reply, const QList<QSslError>& errors)
+        [this](QNetworkReply* reply, const QList<QSslError>& errors)
         {
             for (auto e: errors)
-                trace(e.errorString());
-            reply->ignoreSslErrors();
+                NX_INFO(this, "SSL error: %1 (%2)", e.errorString(), int(e.error()));
+
+            reply->ignoreSslErrors(
+                QList{QSslError(QSslError::SelfSignedCertificate, reply->sslConfiguration().peerCertificate()),
+                QSslError(QSslError::HostNameMismatch, reply->sslConfiguration().peerCertificate())});
         });
 }
 
 void QnWebPage::javaScriptConsoleMessage(const QString& message, int lineNumber, const QString& sourceID)
 {
-    QString logMessage = lit("JS Console: %1:%2 %3").arg(sourceID, QString::number(lineNumber), message);
-    trace(logMessage);
+      NX_INFO(this, "JS Console: %1:%2 %3", sourceID, lineNumber, message);
 }
