@@ -30,13 +30,17 @@ Item
         {
             id: repeater
 
-            model: QnCalendarModel { id: calendarModel }
+            model: QnCalendarModel
+            {
+                id: calendarModel
+                currentDate: monthGrid.currentDate
+            }
 
             Item
             {
                 id: calendarDay
 
-                property bool current: repeater.model.isCurrent(currentDate, model.display)
+                property bool current: model.isCurrent
 
                 width: grid.cellWidth
                 height: grid.cellHeight

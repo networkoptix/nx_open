@@ -44,6 +44,7 @@ public:
 
     QnCalendarModel *q_ptr;
 
+    QDate currentDate;
     bool populated;
 
     QList<CalendarDay> days;
@@ -91,6 +92,8 @@ QVariant QnCalendarModel::data(const QModelIndex &index, int role) const {
         return day.date.day();
     case DateRole:
         return day.date;
+    case IsCurrentRole:
+        return day.date == d->currentDate;
     case HasArchiveRole:
         return day.hasArchive;
     }
@@ -102,6 +105,7 @@ QHash<int, QByteArray> QnCalendarModel::roleNames() const {
     QHash<int, QByteArray> roleNames = QAbstractListModel::roleNames();
     roleNames[DayRole] = "day";
     roleNames[DateRole] = "date";
+    roleNames[IsCurrentRole] = "isCurrent";
     roleNames[HasArchiveRole] = "hasArchive";
     return roleNames;
 }
@@ -153,12 +157,25 @@ QnCameraChunkProvider *QnCalendarModel::chunkProvider() const {
     return d->chunkProvider;
 }
 
-bool QnCalendarModel::isCurrent(const QDateTime& value, int dayIndex)
+void QnCalendarModel::setCurrentDate(const QDate& date)
 {
     Q_D(QnCalendarModel);
-    if (dayIndex < 0 || dayIndex >= d->days.size())
-        return false;
-    return value.date() == d->days[dayIndex].date;
+    if (d->currentDate == date)
+        return;
+
+    d->currentDate = date;
+    emit currentDateChanged();
+
+    if (!rowCount())
+        return;
+
+    emit dataChanged(index(0, 0), index(rowCount() - 1, 0), QVector<int>() << IsCurrentRole);
+}
+
+QDate QnCalendarModel::currentDate() const
+{
+    Q_D(const QnCalendarModel);
+    return d->currentDate;
 }
 
 void QnCalendarModel::setChunkProvider(QnCameraChunkProvider *chunkProvider) {

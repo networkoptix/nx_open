@@ -15,12 +15,14 @@ class QnCalendarModel : public QAbstractListModel
     Q_PROPERTY(int month READ month WRITE setMonth NOTIFY monthChanged)
     Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged)
     Q_PROPERTY(QnCameraChunkProvider* chunkProvider READ chunkProvider WRITE setChunkProvider NOTIFY chunkProviderChanged)
+    Q_PROPERTY(QDate currentDate READ currentDate WRITE setCurrentDate NOTIFY currentDateChanged)
 
 public:
 
     enum Roles {
         DateRole = Qt::UserRole + 1,
         DayRole,
+        IsCurrentRole,
         HasArchiveRole
     };
 
@@ -44,7 +46,8 @@ public:
     QnCameraChunkProvider *chunkProvider() const;
     void setChunkProvider(QnCameraChunkProvider *chunkProvider);
 
-    Q_INVOKABLE bool isCurrent(const QDateTime& value, int dayIndex);
+    void setCurrentDate(const QDate& date);
+    QDate currentDate() const;
 
 signals:
     void yearChanged();
@@ -52,6 +55,7 @@ signals:
     void mondayIsFirstDayChanged();
     void chunkProviderChanged();
     void localeChanged();
+    void currentDateChanged();
 
 private:
     Q_DECLARE_PRIVATE(QnCalendarModel)
