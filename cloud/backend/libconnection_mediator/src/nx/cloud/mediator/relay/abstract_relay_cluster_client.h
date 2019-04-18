@@ -10,6 +10,9 @@
 namespace nx {
 namespace hpm {
 
+using RelayInstanceSelectCompletionHandler =
+nx::utils::MoveOnlyFunc<void(cloud::relay::api::ResultCode, std::vector<QUrl>)>;
+
 using RelayInstanceSearchCompletionHandler =
     nx::utils::MoveOnlyFunc<void(cloud::relay::api::ResultCode, QUrl /*relayInstanceUrl*/)>;
 
@@ -23,7 +26,7 @@ public:
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& peerId,
-        RelayInstanceSearchCompletionHandler completionHandler) = 0;
+        RelayInstanceSelectCompletionHandler completionHandler) = 0;
 
     virtual void findRelayInstancePeerIsListeningOn(
         const std::string& peerId,

@@ -67,7 +67,7 @@ struct Statistics
 
 struct TrafficRelay
 {
-    QString url;
+    std::vector<QUrl>urls;
 };
 
 struct ListeningPeer

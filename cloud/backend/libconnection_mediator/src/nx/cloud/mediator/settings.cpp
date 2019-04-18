@@ -145,7 +145,7 @@ const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
 
 // Traffic Relay - related settings.
 
-const QLatin1String kTrafficRelayUrl("trafficRelay/url");
+const QLatin1String kTrafficRelayUrls("trafficRelay/urls");
 
 const QLatin1String kListeningPeerConnectionInactivityTimeout(
     "listeningPeer/connectionInactivityTimeout");
@@ -464,7 +464,9 @@ void Settings::loadConnectionParameters()
 
 void Settings::loadTrafficRelay()
 {
-    m_trafficRelay.url = settings().value(kTrafficRelayUrl).toString();
+    auto urls = settings().value(kTrafficRelayUrls).toString().split(',', QString::SkipEmptyParts);
+    std::transform(urls.begin(), urls.end(), std::back_inserter(m_trafficRelay.urls),
+        [](const QString& url) { return url.trimmed(); });
 }
 
 void Settings::loadListeningPeer()

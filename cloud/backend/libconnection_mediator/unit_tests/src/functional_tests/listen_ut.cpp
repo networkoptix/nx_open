@@ -317,7 +317,7 @@ public:
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& /*peerId*/,
-        RelayInstanceSearchCompletionHandler completionHandler) override
+        RelayInstanceSelectCompletionHandler completionHandler) override
     {
         post(
             [this, completionHandler = std::move(completionHandler)]() mutable
@@ -347,12 +347,12 @@ public:
                 nx::utils::swapAndCall(
                     m_selectRelayInstanceForListeningPeerHandler,
                     cloud::relay::api::ResultCode::ok,
-                    QUrl("http://some-relay-instance.com"));
+                    std::vector<QUrl>({QUrl("http://some-relay-instance.com")}));
             });
     }
 
 private:
-    RelayInstanceSearchCompletionHandler m_selectRelayInstanceForListeningPeerHandler;
+    RelayInstanceSelectCompletionHandler m_selectRelayInstanceForListeningPeerHandler;
     nx::utils::SyncQueue<int> m_selectRelayInstanceForListeningPeerRequestQueue;
 };
 

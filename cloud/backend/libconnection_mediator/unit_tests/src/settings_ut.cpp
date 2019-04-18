@@ -128,13 +128,21 @@ TEST_F(Settings, nat_traversal_method_delay)
     ASSERT_EQ(milliseconds(999), settings().connectionParameters().directTcpConnectStartDelay);
 }
 
-TEST_F(Settings, traffic_relay_url)
+TEST_F(Settings, traffic_relay_urls)
 {
-    const std::string relayUrl = "http://nxvms.com/relay";
+    const std::vector<QUrl> relayUrls{
+        QUrl("http://nxvms.com/relay"),
+        QUrl("http://nxvms.com/relay2")};
 
-    addSetting("--trafficRelay/url=" + relayUrl);
+    QString urls;
+    for (const auto& url : relayUrls)
+        urls += url.toString().append(",");
+    urls.chop(1); //< Remove trailing comma
+
+    addSetting("--trafficRelay/urls=" + urls.toStdString());
     loadSettings();
-    ASSERT_EQ(relayUrl, settings().trafficRelay().url.toStdString());
+
+    ASSERT_EQ(relayUrls, settings().trafficRelay().urls);
 }
 
 } // namespace test

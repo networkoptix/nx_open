@@ -161,7 +161,7 @@ private:
     void sendConnectResponse(
         api::ResultCode resultCode,
         api::ConnectResponse connectResponse);
-    
+
     void fixConnectResponseForBuggyClient(
         api::ResultCode resultCode,
         api::ConnectResponse* const connectResponse);
@@ -175,7 +175,7 @@ private:
     static const char* toString(State);
 
     UDPHolePunchingConnectionInitiationFsm(UDPHolePunchingConnectionInitiationFsm&&) = delete;
-    
+
     UDPHolePunchingConnectionInitiationFsm&
         operator=(UDPHolePunchingConnectionInitiationFsm&&) = delete;
 };

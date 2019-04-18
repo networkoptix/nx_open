@@ -28,7 +28,7 @@ class TestRelayClusterClient:
 public:
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& /*peerId*/,
-        RelayInstanceSearchCompletionHandler /*completionHandler*/)
+        RelayInstanceSelectCompletionHandler /*completionHandler*/)
     {
         // Unused.
     }
@@ -70,7 +70,7 @@ public:
     {
         using namespace std::placeholders;
 
-        m_programArguments.addArg("-trafficRelay/url", m_trafficRelayUrl.c_str());
+        m_programArguments.addArg("-trafficRelay/urls", m_trafficRelayUrl.c_str());
 
         m_connectSessionId = nx::utils::generateRandomName(7);
         m_listeningPeerConnection = std::make_shared<TestServerConnection>();
@@ -346,7 +346,7 @@ TEST_F(UDPHolePunchingConnectionInitiationFsm, find_a_relay_instance_takes_a_lon
 TEST_F(UDPHolePunchingConnectionInitiationFsm, connect_over_tcp)
 {
     whenIssueConnectRequestOverTcp();
-    
+
     thenConnectResultIsReported();
     andConnectionResultIsSuccess();
     andResponseContainsRelayInfo();

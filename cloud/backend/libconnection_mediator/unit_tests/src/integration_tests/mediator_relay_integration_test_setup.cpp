@@ -21,12 +21,14 @@ public:
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& /*peerId*/,
-        RelayInstanceSearchCompletionHandler completionHandler) override
+        RelayInstanceSelectCompletionHandler completionHandler) override
     {
         m_aioThreadBinder.post(
             [this, completionHandler = std::move(completionHandler)]()
             {
-                completionHandler(cloud::relay::api::ResultCode::ok, m_relayUrl);
+                completionHandler(
+                    cloud::relay::api::ResultCode::ok,
+                    std::vector<QUrl>({m_relayUrl}));
             });
     }
 
@@ -88,7 +90,7 @@ MediatorRelayIntegrationTestSetup::~MediatorRelayIntegrationTestSetup()
 
 void MediatorRelayIntegrationTestSetup::SetUp()
 {
-    //addArg(("--trafficRelay/url=" + m_relayUrl.toString().toStdString()).c_str());
+    //addArg(("--trafficRelay/urls=" + m_relayUrl.toString().toStdString()).c_str());
 
     ASSERT_TRUE(startAndWaitUntilStarted());
     const auto system = addRandomSystem();

@@ -15,22 +15,18 @@ RelayClusterClient::~RelayClusterClient()
 
 void RelayClusterClient::selectRelayInstanceForListeningPeer(
     const std::string& /*peerId*/,
-    RelayInstanceSearchCompletionHandler completionHandler)
+    RelayInstanceSelectCompletionHandler completionHandler)
 {
-    // TODO: #ak Selecting any online relay instance.
+    // TODO: #Nate selecting online relays in same geograpic region instead of from settings.
 
     m_aioThreadBinder.post(
         [this, completionHandler = std::move(completionHandler)]()
         {
-            QUrl relayInstanceUrl;
-            if (!m_settings.trafficRelay().url.isEmpty())
-                relayInstanceUrl = m_settings.trafficRelay().url;
-
             completionHandler(
-                !relayInstanceUrl.isEmpty()
+                !m_settings.trafficRelay().urls.empty()
                     ? cloud::relay::api::ResultCode::ok
                     : cloud::relay::api::ResultCode::notFound,
-                relayInstanceUrl);
+                m_settings.trafficRelay().urls);
         });
 }
 
@@ -38,17 +34,17 @@ void RelayClusterClient::findRelayInstancePeerIsListeningOn(
     const std::string& /*peerId*/,
     RelayInstanceSearchCompletionHandler completionHandler)
 {
-    // TODO: #ak Selecting relay instance listening peer can be found on.
+    // TODO: #Nate find relay instance that this peer is listening on from online relays db?
 
     m_aioThreadBinder.post(
         [this, completionHandler = std::move(completionHandler)]()
         {
             QUrl relayInstanceUrl;
-            if (!m_settings.trafficRelay().url.isEmpty())
-                relayInstanceUrl = m_settings.trafficRelay().url;
+            if (!m_settings.trafficRelay().urls.empty())
+                relayInstanceUrl = m_settings.trafficRelay().urls.front();
 
             completionHandler(
-                !relayInstanceUrl.isEmpty()
+                !m_settings.trafficRelay().urls.empty()
                     ? cloud::relay::api::ResultCode::ok
                     : cloud::relay::api::ResultCode::notFound,
                 relayInstanceUrl);
