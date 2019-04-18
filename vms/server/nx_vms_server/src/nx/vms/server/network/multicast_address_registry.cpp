@@ -5,34 +5,6 @@
 
 namespace nx::vms::server::network {
 
-MulticastAddressRegistry::RegisteredAddressHolder::RegisteredAddressHolder(
-    nx::vms::server::network::MulticastAddressRegistry* addressRegistry,
-    nx::network::SocketAddress address)
-    :
-    m_addressRegistry(addressRegistry),
-    m_address(std::move(address))
-{
-    NX_ASSERT(addressRegistry);
-}
-
-MulticastAddressRegistry::RegisteredAddressHolder::~RegisteredAddressHolder()
-{
-    NX_DEBUG(m_addressRegistry, "Unregistering address %1", m_address);
-    if (m_addressRegistry)
-        m_addressRegistry->unregisterAddress(m_address);
-}
-
-bool MulticastAddressRegistry::RegisteredAddressHolder::operator<(
-    const RegisteredAddressHolder& other) const
-{
-    return m_address < other.m_address;
-}
-
-MulticastAddressRegistry::RegisteredAddressHolder::operator bool() const
-{
-    return m_addressRegistry != nullptr;
-}
-
 MulticastAddressRegistry::RegisteredAddressHolderPtr MulticastAddressRegistry::registerAddress(
     resource::CameraPtr resource,
     nx::vms::api::StreamIndex streamIndex,
@@ -48,16 +20,17 @@ MulticastAddressRegistry::RegisteredAddressHolderPtr MulticastAddressRegistry::r
         NX_WARNING(this,
             "Multicast address %1 is already registered by resource %2, on stream: %3",
             address, usageInfo.device.toStrongRef(), usageInfo.stream);
-        return std::make_unique<RegisteredAddressHolder>();
+        return nullptr;
     }
 
     NX_DEBUG(this, "Successfully registered a multicast address %1 for resource %2 on stream %3",
         address, resource, streamIndex);
     m_registry[address] = { resource.toWeakRef(), streamIndex };
-    return std::make_unique<RegisteredAddressHolder>(this, address);
+    return std::make_unique<RegisteredAddressHolder>(
+        [this, address = std::move(address)]() { unregisterAddress(std::move(address)); });
 }
 
-bool MulticastAddressRegistry::unregisterAddress(nx::network::SocketAddress address)
+bool MulticastAddressRegistry::unregisterAddress(const nx::network::SocketAddress& address)
 {
     QnMutexLocker lock(&m_mutex);
     NX_DEBUG(this, "Unregistering a multicast address %1", address);

@@ -513,7 +513,7 @@ bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
 
     if (!sendPlay(positionStart, positionEnd, scale))
     {
-        setTrackInfo({});
+        m_sdpTracks.clear();
         return false;
     }
 
@@ -1507,11 +1507,6 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& r
 QByteArray QnRtspClient::serverInfo() const
 {
     return m_serverInfo;
-}
-
-void QnRtspClient::setTrackInfo(std::vector<SDPTrackInfo> trackInfo)
-{
-    m_sdpTracks = std::move(trackInfo);
 }
 
 const std::vector<QnRtspClient::SDPTrackInfo>& QnRtspClient::getTrackInfo() const

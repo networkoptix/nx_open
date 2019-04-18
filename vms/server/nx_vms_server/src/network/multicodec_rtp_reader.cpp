@@ -622,13 +622,13 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if(m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return m_openStreamResult;
 
+    // Keep alive timeout will be overridden after SETUP request.
     m_RtpSession.setKeepAliveTimeout(std::chrono::milliseconds::zero());
-
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(getResource());
     if (camera)
         m_RtpSession.setAudioEnabled(camera->isAudioEnabled());
 
-    if (!m_RtpSession.sendSetupIfNotPlaying())
+    if (!m_RtpSession.sendSetup())
     {
         NX_WARNING(this, "Can't open RTSP stream [%1], SETUP request has been failed",
             m_currentStreamUrl);
@@ -642,7 +642,6 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     if (!m_RtpSession.sendPlay(position, AV_NOPTS_VALUE, m_RtpSession.getScale()))
     {
-        m_RtpSession.setTrackInfo({});
         NX_WARNING(this, "Can't open RTSP stream [%1], PLAY request has been failed",
             m_currentStreamUrl);
 
@@ -938,7 +937,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::registerMulticastAddressesIfNee
     }
 
     std::set<QnRtspIoDevice::AddressInfo> addressInfoToRegister;
-    for (const auto& track : tracks)
+    for (const auto& track: tracks)
     {
         if (!track.ioDevice || !track.setupSuccess)
             continue;
@@ -947,7 +946,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::registerMulticastAddressesIfNee
         addressInfoToRegister.insert(track.ioDevice->rtcpAddressInfo());
     }
 
-    for (const auto& addressInfo : addressInfoToRegister)
+    for (const auto& addressInfo: addressInfoToRegister)
     {
         if (!registerAddressIfNeeded(addressInfo))
         {
@@ -988,8 +987,8 @@ CameraDiagnostics::Result QnMulticodecRtpReader::registerAddressIfNeeded(
 
     auto serverCamera = resource.dynamicCast<nx::vms::server::resource::Camera>();
     if (!NX_ASSERT(serverCamera,
-            lm("Unable to convert resource %1 to nx::vms::server::resource::Camera").args(
-            serverCamera)))
+        lm("Unable to convert resource %1 to nx::vms::server::resource::Camera")
+            .args(serverCamera)))
     {
         return CameraDiagnostics::InternalServerErrorResult(
             "Unable to convert resource to the needed type");
@@ -1008,7 +1007,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::registerAddressIfNeeded(
         Qn::toStreamIndex(m_role),
         multicastAddress);
 
-    if (*registeredAddress)
+    if (registeredAddress)
     {
         m_registeredMulticastAddresses.insert(std::move(registeredAddress));
     }

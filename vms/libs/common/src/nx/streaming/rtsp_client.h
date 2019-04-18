@@ -195,7 +195,6 @@ public:
      */
     nx::vms::api::RtpTransportType getActualTransport() const { return m_actualTransport; }
 
-    void setTrackInfo(std::vector<SDPTrackInfo> trackInfo);
     const std::vector<SDPTrackInfo>& getTrackInfo() const;
     QString getTrackCodec(int rtpChannelNum);
     int getTrackNum(int rtpChannelNum);
@@ -206,11 +205,11 @@ public:
     float getScale() const;
     void setScale(float value);
 
+    bool sendSetup();
     bool sendPlay(qint64 startPos, qint64 endPos, double scale);
     bool sendPause();
     bool sendSetParameter(const QByteArray& paramName, const QByteArray& paramValue);
     bool sendTeardown();
-    bool sendSetupIfNotPlaying();
 
     int lastSendedCSeq() const { return m_csec-1; }
 
@@ -281,8 +280,8 @@ private:
     nx::network::http::Request createDescribeRequest();
     bool sendDescribe();
     bool sendOptions();
-    bool sendSetup();
     bool sendKeepAlive();
+    bool sendSetupIfNotPlaying();
 
     bool readTextResponce(QByteArray &responce);
     void addAuth( nx::network::http::Request* const request );

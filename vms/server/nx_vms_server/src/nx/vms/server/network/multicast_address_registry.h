@@ -4,6 +4,7 @@
 
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/network/socket_common.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx::vms::server::network {
 
@@ -18,26 +19,7 @@ public:
         nx::vms::api::StreamIndex stream;
     };
 
-    class RegisteredAddressHolder
-    {
-    public:
-        RegisteredAddressHolder() = default;
-
-        RegisteredAddressHolder(
-            nx::vms::server::network::MulticastAddressRegistry* addressRegistry,
-            nx::network::SocketAddress address);
-
-        ~RegisteredAddressHolder();
-
-        bool operator<(const RegisteredAddressHolder& other) const;
-
-        operator bool() const;
-
-    private:
-        nx::vms::server::network::MulticastAddressRegistry* m_addressRegistry = nullptr;
-        nx::network::SocketAddress m_address;
-    };
-
+    using RegisteredAddressHolder = nx::utils::ScopeGuard<std::function<void()>>;
     using RegisteredAddressHolderPtr = std::unique_ptr<RegisteredAddressHolder>;
 
 public:
@@ -49,7 +31,7 @@ public:
     AddressUsageInfo addressUsageInfo(const nx::network::SocketAddress& address) const;
 
 private:
-    bool unregisterAddress(nx::network::SocketAddress address);
+    bool unregisterAddress(const nx::network::SocketAddress& address);
 
 private:
     mutable QnMutex m_mutex;
