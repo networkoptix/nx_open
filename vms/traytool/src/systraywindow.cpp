@@ -23,15 +23,17 @@ using namespace std::chrono;
 
 namespace {
 
-static const QString kMediaServerName(nx::utils::AppInfo::organizationName() + " Media Server");
 static constexpr milliseconds kMessageDurationMs = 3s;
 static constexpr milliseconds kFindServicesTimeoutMs = 10s;
 static constexpr milliseconds kUpdateStatusMs = 500ms;
 
 } // namespace
 
-QnSystrayWindow::QnSystrayWindow()
-    : m_mediaServerSettings(QSettings::SystemScope, qApp->organizationName(), kMediaServerName)
+QnSystrayWindow::QnSystrayWindow():
+    m_mediaServerSettings(
+        QSettings::SystemScope,
+        nx::utils::AppInfo::organizationName(),
+        QnTraytoolAppInfo::mediaServerRegistryKey())
 {
     m_mediaServerServiceName = nx::utils::AppInfo::customizationName() + "MediaServer";
     m_lastMessageTimer.restart();

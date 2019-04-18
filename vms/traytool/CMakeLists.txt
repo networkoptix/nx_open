@@ -5,8 +5,8 @@ find_package(Qt5
     COMPONENTS
         Widgets)
 
-nx_configure_file(maven/filter-resources/traytool_app_info_impl.cpp
-    ${CMAKE_CURRENT_BINARY_DIR})
+nx_configure_file(traytool_app_info_impl.cpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/traytool_app_info_impl.cpp)
 
 nx_add_target(traytool EXECUTABLE SIGNED
     ADDITIONAL_SOURCES
