@@ -17,4 +17,7 @@ nx_add_target(traytool EXECUTABLE SIGNED
         Qt5::Widgets
         qtsingleapplication
         common
+    PRIVATE_LIBS
+        Shell32
+        AdvApi32
 )

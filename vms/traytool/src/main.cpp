@@ -38,7 +38,6 @@ bool readIsFullCrashDumpFromSettings(const QSettings& settings)
 
 void initTranslations(const QSettings& settings)
 {
-
     Q_INIT_RESOURCE(common);
     Q_INIT_RESOURCE(traytool);
 
@@ -50,16 +49,19 @@ void initTranslations(const QSettings& settings)
     QnTranslationManager::installTranslation(translation);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     static const QString clientName(QnTraytoolAppInfo::clientName());
-    const QSettings clientSettings(QSettings::UserScope, QnAppInfo::organizationName(), clientName);
+    const QSettings clientSettings(
+        QSettings::UserScope,
+        QnAppInfo::organizationName(),
+        clientName);
 
     /* Init crash dumps as early as possible. */
-#ifdef Q_OS_WIN
+    #ifdef Q_OS_WIN
     win32_exception::installGlobalUnhandledExceptionHandler();
     win32_exception::setCreateFullCrashDump(readIsFullCrashDumpFromSettings(clientSettings));
-#endif
+    #endif
 
     QApplication::setOrganizationName(QnAppInfo::organizationName());
     QApplication::setApplicationName(QnTraytoolAppInfo::applicationName());
@@ -89,7 +91,7 @@ int main(int argc, char *argv[])
 
     if (app.isRunning())
     {
-        if (MyIsUserAnAdmin())
+        if (QnElevationChecker::isUserAnAdmin())
         {
             app.sendMessage(lit("quit"));
 
@@ -98,7 +100,8 @@ int main(int argc, char *argv[])
             while (app.isRunning())
                 Sleep(100);
         }
-        else {
+        else
+        {
             app.sendMessage(lit("activate"));
             return 0;
         }
@@ -111,14 +114,19 @@ int main(int argc, char *argv[])
         QMessageBox::critical(
             NULL,
             QObject::tr("System Tray"),
-            QObject::tr("There is no system tray on this system.") + L'\n' + QObject::tr("Application will now quit.")
-            );
+            QObject::tr("There is no system tray on this system.") + L'\n' + QObject::tr(
+                "Application will now quit.")
+        );
         return 1;
     }
 
     QnSystrayWindow window;
 
-    QObject::connect(&app, &QtSingleApplication::messageReceived, &window, &QnSystrayWindow::handleMessage);
+    QObject::connect(
+        &app,
+        &QtSingleApplication::messageReceived,
+        &window,
+        &QnSystrayWindow::handleMessage);
 
     if (!argument.isEmpty())
         window.executeAction(argument);
