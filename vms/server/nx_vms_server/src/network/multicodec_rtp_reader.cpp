@@ -648,14 +648,11 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     std::set<QnRtspIoDevice::AddressInfo> addressInfoToRegister;
     for (const auto& track: tracks)
     {
-        if (!track.ioDevice)
+        if (!track.ioDevice || !track.setupSuccess)
             continue;
 
-        if (track.sdpMedia.mediaType != nx::streaming::Sdp::MediaType::Unknown)
-        {
-            addressInfoToRegister.insert(track.ioDevice->mediaAddressInfo());
-            addressInfoToRegister.insert(track.ioDevice->rtcpAddressInfo());
-        }
+        addressInfoToRegister.insert(track.ioDevice->mediaAddressInfo());
+        addressInfoToRegister.insert(track.ioDevice->rtcpAddressInfo());
     }
 
     for (const auto& addressInfo: addressInfoToRegister)
