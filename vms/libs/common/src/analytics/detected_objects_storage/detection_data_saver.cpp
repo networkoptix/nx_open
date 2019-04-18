@@ -164,7 +164,6 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         auto [trackMinTimestamp, trackMaxTimestamp] =
             findMinMaxTimestamp(objectUpdate.appendedTrack);
 
-        const auto serializedTrack = TrackSerializer::serialized(objectUpdate.appendedTrack);
         updateObjectQuery->bindValue(0, TrackSerializer::serialized(objectUpdate.appendedTrack));
         updateObjectQuery->bindValue(1, newAttributesId);
         updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
