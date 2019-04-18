@@ -17,9 +17,6 @@ import json
 import sys
 from util.config import get_config
 
-reload(sys)
-sys.setdefaultencoding("utf-8")
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCAL_ENVIRONMENT = 'runserver' in sys.argv
 conf = get_config()
@@ -86,7 +83,6 @@ MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -200,10 +196,10 @@ if LOCAL_ENVIRONMENT:
     # Ask Ivan V to provide you with config and credentials files for AWS and save them to ~/.aws/ directory
     # Or go through file history in source control to find the last time it was here (changeset 49115a0427b3 or 4923e6b2575d)
 
-    CACHES["global"] = {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'portal_cache',
-    }
+    # CACHES["global"] = {
+    #     'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+    #     'LOCATION': 'portal_cache',
+    # }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -296,7 +292,7 @@ LOGGING = {
 
 STATIC_URL = '/static/'
 MEDIA_ROOT = BASE_DIR + '/static/integrations/'
-MEDIA_URL = '/static/integrations/'
+MEDIA_URL = '/integrations/'
 # #End of s3 config
 
 
