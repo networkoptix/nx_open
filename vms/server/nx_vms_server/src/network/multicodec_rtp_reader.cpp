@@ -1003,15 +1003,25 @@ CameraDiagnostics::Result QnMulticodecRtpReader::registerAddressIfNeeded(
             "Unable to access multicast address registry");
     }
 
-    if (!multicastAddressRegistry->registerAddress(serverCamera, multicastAddress))
+    auto registeredAddress = multicastAddressRegistry->registerAddress(
+        serverCamera,
+        Qn::toStreamIndex(m_role),
+        multicastAddress);
+
+    if (*registeredAddress)
     {
-        const auto currentAddressUser = multicastAddressRegistry->addressUser(multicastAddress);
-        const auto currentAddressUserName = currentAddressUser
-            ? currentAddressUser->getUserDefinedName()
-            : QString();
+        m_registeredMulticastAddresses.insert(std::move(registeredAddress));
+    }
+    else
+    {
+        const auto addressUsageInfo =
+            multicastAddressRegistry->addressUsageInfo(multicastAddress);
+
+        const auto device = addressUsageInfo.device.toStrongRef();
+        const auto deviceName = device ? device->getUserDefinedName() : QString();
 
         nx::vms::event::NetworkIssueEvent::MulticastAddressConflictParameters
-            eventParameters { multicastAddress, currentAddressUserName };
+            eventParameters{ multicastAddress, deviceName, addressUsageInfo.stream };
 
         emit networkIssue(
             serverCamera,
@@ -1021,11 +1031,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::registerAddressIfNeeded(
 
         return CameraDiagnostics::CameraInvalidParams(
             lm("Multicast address %1 is already in use by %2")
-                .args(multicastAddress, currentAddressUserName));
-    }
-    else
-    {
-        m_registeredMulticastAddresses.emplace(multicastAddressRegistry, multicastAddress);
+                .args(multicastAddress, deviceName));
     }
 
     return CameraDiagnostics::NoErrorResult();

@@ -33,34 +33,6 @@ class QnMulticodecRtpReader:
 {
     Q_OBJECT
 
-    class RegisteredAddress
-    {
-    public:
-        RegisteredAddress(
-            nx::vms::server::network::MulticastAddressRegistry* addressRegistry,
-            nx::network::SocketAddress address)
-            :
-            m_addressRegistry(addressRegistry),
-            m_address(std::move(address))
-        {
-            NX_ASSERT(addressRegistry);
-        }
-
-        ~RegisteredAddress()
-        {
-            m_addressRegistry->unregisterAddress(m_address);
-        }
-
-        bool operator<(const RegisteredAddress& other) const
-        {
-            return m_address < other.m_address;
-        }
-
-    private:
-        nx::vms::server::network::MulticastAddressRegistry* m_addressRegistry = nullptr;
-        nx::network::SocketAddress m_address;
-    };
-
 public:
     using OnSocketReadTimeoutCallback = nx::utils::MoveOnlyFunc<QnAbstractMediaDataPtr()>;
 
@@ -206,7 +178,8 @@ private:
 
     static nx::utils::Mutex s_defaultTransportMutex;
     static nx::vms::api::RtpTransportType s_defaultTransportToUse;
-    std::set<RegisteredAddress> m_registeredMulticastAddresses;
+    std::set<nx::vms::server::network::MulticastAddressRegistry::RegisteredAddressHolderPtr>
+        m_registeredMulticastAddresses;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)
