@@ -236,7 +236,7 @@ void ObjectSearcher::filterTrack(
         track->begin(), track->end(),
         [](const auto& left, const auto& right) { return left.timestampUsec < right.timestampUsec; });
 
-    if (filter.maxTrackSize > 0 && track->size() > filter.maxTrackSize)
+    if (filter.maxTrackSize > 0 && (int) track->size() > filter.maxTrackSize)
         track->erase(track->begin() + filter.maxTrackSize, track->end());
 }
 
