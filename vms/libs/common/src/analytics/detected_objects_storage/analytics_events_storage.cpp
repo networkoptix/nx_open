@@ -355,12 +355,12 @@ void EventsStorage::insertEvent(
         INSERT INTO event(timestamp_usec_utc, duration_usec,
             device_id, object_type_id, object_id, attributes_id,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
-        VALUES(:timestampMs, :durationUsec, :deviceId,
+        VALUES(:timestampMs, :durationMs, :deviceId,
             :objectTypeId, :objectAppearanceId, :attributesId,
             :boxTopLeftX, :boxTopLeftY, :boxBottomRightX, :boxBottomRightY)
     )sql"));
     insertEventQuery.bindValue(":timestampMs", packet.timestampUsec / kUsecPerMsec);
-    insertEventQuery.bindValue(":durationUsec", packet.durationUsec);
+    insertEventQuery.bindValue(":durationMs", packet.durationUsec / kUsecPerMsec);
     insertEventQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(packet.deviceId));
     insertEventQuery.bindValue(
         ":objectTypeId",
@@ -654,9 +654,10 @@ void EventsStorage::loadObject(
 
     objectPosition.deviceId = m_deviceDao.deviceGuidFromId(
         selectEventsQuery->value("device_id").toLongLong());
+    // NOTE: *_usec fields actually contain ms until the completion of META-225.
     objectPosition.timestampUsec =
         selectEventsQuery->value("timestamp_usec_utc").toLongLong() * kUsecPerMsec;
-    objectPosition.durationUsec = selectEventsQuery->value("duration_usec").toLongLong();
+    objectPosition.durationUsec = selectEventsQuery->value("duration_usec").toLongLong() * kUsecInMs;
 
     objectPosition.boundingBox.setTopLeft(QPointF(
         unpackCoordinate(selectEventsQuery->value("box_top_left_x").toInt()),
@@ -813,7 +814,7 @@ void EventsStorage::prepareSelectTimePeriodsFilteredQuery(
         sqlQueryFilterStr = "WHERE " + sqlQueryFilterStr;
 
     query->prepare(lm(R"sql(
-        SELECT -1 AS id, timestamp_usec_utc AS period_start_ms, duration_usec / 1000 AS duration_ms
+        SELECT -1 AS id, timestamp_usec_utc AS period_start_ms, duration_usec AS duration_ms
         FROM %1
         %2
         ORDER BY timestamp_usec_utc ASC

@@ -163,6 +163,17 @@ GROUP BY device_id, timestamp_usec_utc/60000;
 )sql";
 
 //-------------------------------------------------------------------------------------------------
+// META-223
+// NOTE: Not renaming duration_usec since renaming a field is complicated and the next scheme update
+// just drops the 'event' table.
+static constexpr char kConvertDurationToMillis[] =
+R"sql(
+
+UPDATE event SET duration_usec = duration_usec / 1000
+
+)sql";
+
+//-------------------------------------------------------------------------------------------------
 // META-225
 // TODO: Add indexes.
 static constexpr char kSplitDataToObjectAndSearch[] =
