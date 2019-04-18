@@ -103,6 +103,10 @@ void ObjectSearcher::prepareLookupQuery(
     if (!sqlQueryFilterStr.empty())
         sqlQueryFilterStr = " AND " + sqlQueryFilterStr;
 
+    std::string limitStr;
+    if (filter.maxObjectsToSelect > 0)
+        limitStr = lm("LIMIT %1").args(filter.maxObjectsToSelect).toStdString();
+
     // TODO: Full-text search.
     // TODO: Object count limit.
 
@@ -111,9 +115,11 @@ void ObjectSearcher::prepareLookupQuery(
         FROM object o, unique_attributes attrs
         WHERE o.attributes_id = attrs.id %1
         ORDER BY track_start_ms %2
+        %3
     )sql").args(
         sqlQueryFilterStr,
-        filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC");
+        filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC",
+        limitStr);
 
     query->prepare(queryText);
     sqlQueryFilter.bindFields(query);
