@@ -835,7 +835,8 @@ Item
             d.resumePosition = -1
             // TODO: Make refactoring and get rid of serverTimeZoneShift (etc) properties.
             // Timeline and calendar should work in a same way.
-            var targetTime = date.getTime() - timeline.serverTimeZoneShift
+            var localZoneOffset = (new Date()).getTimezoneOffset() * 60 * 1000;
+            var targetTime = date.getTime() + localZoneOffset - timeline.serverTimeZoneShift
             timeline.jumpTo(targetTime)
             videoScreenController.setPosition(targetTime, true)
         }
