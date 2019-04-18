@@ -135,7 +135,6 @@ TEST_F(UpdateVerificationTest, testSpecificBuild)
 {
     nx::update::UpdateContents contents;
     contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
-    MultiServerUpdatesWidget::VersionReport report;
     ASSERT_TRUE(QJson::deserialize<nx::update::Information>(packageRawData, &contents.info));
     ASSERT_FALSE(contents.isEmpty());
 
@@ -151,7 +150,7 @@ TEST_F(UpdateVerificationTest, testSpecificBuild)
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
     EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
     {
-        auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
+        const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
             contents, clientData.clientId);
         EXPECT_TRUE(report.hasLatestVersion);
     }
@@ -166,7 +165,7 @@ TEST_F(UpdateVerificationTest, testSpecificBuild)
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
     EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
     {
-        auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
+        const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
             contents, clientData.clientId);
         EXPECT_TRUE(report.hasLatestVersion);
     }

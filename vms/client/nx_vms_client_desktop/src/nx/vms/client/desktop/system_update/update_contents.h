@@ -25,15 +25,6 @@ public:
 };
 
 /**
- * Tries to find update package for the specified server.
- * @param server
- * @param updateInfo
- * @return pointer to package found, or nullptr.
- */
-const nx::update::Package* findPackageForServer(
-    QnMediaServerResourcePtr server, const nx::update::Information& updateInfo);
-
-/**
  * Checks if cloud host is compatible with our system
  * @param commonModule
  * @param targetVersion - target version of system update.
@@ -68,10 +59,10 @@ struct ClientVerificationData
  * @param commonModule - everybody needs commonModule.
  * @param contents - update contents. Result is stored inside its fields.
  * @param servers - servers to be used for update verification.
- * @param context - contains additional client data necessary for verification.
+ * @param clientData - contains additional client data necessary for verification.
  * @returns true if everything is ok. Detailed error can be found inside 'contents'.
  */
-bool verifyUpdateContents(
+NX_VMS_CLIENT_DESKTOP_API bool verifyUpdateContents(
     QnCommonModule* commonModule,
     nx::update::UpdateContents& contents,
     std::map<QnUuid, QnMediaServerResourcePtr> servers,

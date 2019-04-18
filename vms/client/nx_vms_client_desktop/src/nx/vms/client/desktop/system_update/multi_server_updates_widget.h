@@ -32,7 +32,7 @@ struct UpdateItem;
  * Deals with update for multiple servers.
  * It is spawned as a tab for System Administraton menu.
  */
-class MultiServerUpdatesWidget:
+class NX_VMS_CLIENT_DESKTOP_API MultiServerUpdatesWidget:
     public QnAbstractPreferencesWidget,
     public QnSessionAwareDelegate
 {
