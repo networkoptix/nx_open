@@ -115,9 +115,14 @@ void RemoteRelayPeerPool::findRelayByDomain(
             if (map.empty())
                 return handler(std::string());
 
+
             std::vector<std::string> relayDomains;
-            std::transform(map.begin(), map.end(), std::back_inserter(relayDomains),
-                [](auto& mapIter) { return mapIter.second; });
+            for (auto& peerAndRelayDomains : map)
+            {
+                // Avoid redirecting to this relay instance by not adding this relay to the list.
+                if (peerAndRelayDomains.second.find(m_domainName) == std::string::npos)
+                    relayDomains.emplace_back(std::move(peerAndRelayDomains.second));
+            }
 
             return handler(m_relaySelector->selectRelay(relayDomains));
         });

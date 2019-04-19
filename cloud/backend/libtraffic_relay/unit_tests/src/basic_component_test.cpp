@@ -6,6 +6,7 @@
 
 #include <nx/cloud/relay/controller/relay_public_ip_discovery.h>
 #include <nx/cloud/relay/model/remote_relay_peer_pool.h>
+#include <nx/cloud/relaying/listening_peer_pool.h>
 
 namespace nx {
 namespace cloud {
@@ -100,6 +101,9 @@ bool BasicComponentTest::peerInformationSynchronizedInCluster(
     const auto doesRelayhaveHostname =
         [](const Relay* relay, const std::string& hostname)->bool
         {
+            if (relay->moduleInstance()->listeningPeerPool().isPeerOnline(hostname))
+                return true;
+
             nx::utils::SyncQueue<bool> hasHostname;
             relay->moduleInstance()->remoteRelayPeerPool().findRelayByDomain(
                 hostname,
