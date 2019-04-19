@@ -62,7 +62,7 @@ public:
     int roundBitrate(int srcBitrateKbps) const;
     QString formatBitrateString(int bitrateKbps) const;
 
-    RtpTransport::Value getDesiredTransport() const;
+    nx::vms::api::RtpTransportType getDesiredTransport() const;
 
     bool isAudioSupported() const;
 
@@ -226,7 +226,7 @@ private:
     QMap<int, QString> m_availableBitrates;
     QMap<ComparableSize, int> m_maxSecondaryFps;
     QSet<QString> m_availableEncoders;
-    RtpTransport::Value m_desiredTransport;
+    nx::vms::api::RtpTransportType m_desiredTransport;
 
     int m_rtspPort;
     bool m_hasAudio;

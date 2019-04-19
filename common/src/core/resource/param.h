@@ -110,6 +110,7 @@ namespace Qn
         "userIsAllowedToOverridePtzCapabilities");
 
     static const QString kPtzCapabilitiesAddedByUser("ptzCapabilitiesAddedByUser");
+    static const QString kMulticastIsSupported("multicastIsSupported");
 
     // Mediaserver common info
     static const QString kTimezoneUtcOffset = lit("timezoneUtcOffset");

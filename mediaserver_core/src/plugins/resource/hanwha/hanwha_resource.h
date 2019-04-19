@@ -153,6 +153,8 @@ public:
     bool isBypassSupported() const;
     boost::optional<int> bypassChannel() const;
 
+    CameraDiagnostics::Result ensureMulticastEnabled(Qn::ConnectionRole role);
+
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
@@ -161,6 +163,8 @@ protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     virtual bool allowRtspVideoLayout() const override { return false; }
+    virtual std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+        advancedParametersProviders() override;
     virtual void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList) override;
 
 private:
@@ -198,6 +202,8 @@ private:
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
 
     CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
+    CameraDiagnostics::Result enableMulticast(
+        const HanwhaVideoProfile& profile, Qn::ConnectionRole role);
 
     void cleanUpOnProxiedDeviceChange();
 

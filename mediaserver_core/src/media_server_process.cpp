@@ -279,6 +279,7 @@
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
 #include <nx/mediaserver/root_tool.h>
+#include <nx/streaming/rtsp_client.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -287,6 +288,7 @@
 
 #include <streaming/audio_streamer_pool.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
+#include <nx/fusion/model_functions.h>
 
 #if defined(__arm__)
     #include "nx1/info.h"
@@ -3607,7 +3609,9 @@ void MediaServerProcess::run()
     commonModule()->setResourceDiscoveryManager(new QnMServerResourceDiscoveryManager(commonModule()));
     QUrl appServerUrl = appServerConnectionUrl(*settings);
 
-    QnMulticodecRtpReader::setDefaultTransport( qnServerModule->roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
+    QnMulticodecRtpReader::setDefaultTransport(QnLexical::deserialized(
+        qnServerModule->roSettings()->value("rtspTransport").toString(),
+        nx::vms::api::RtpTransportType::automatic));
 
     connect(commonModule()->resourceDiscoveryManager(), &QnResourceDiscoveryManager::CameraIPConflict, this, &MediaServerProcess::at_cameraIPConflict);
     connect(qnNormalStorageMan, &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);

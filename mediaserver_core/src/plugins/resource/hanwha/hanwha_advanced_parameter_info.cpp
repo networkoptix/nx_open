@@ -24,8 +24,10 @@ static const QString kStreamsToReopenAux = lit("streamsToReopen");
 static const QString kShouldAffectAllChannels = lit("shouldAffectAllChannels");
 static const QString kDeviceTypesAux = lit("deviceTypes");
 static const QString kAssociatedParametersAux = lit("associatedWith");
+static const QString kAssociationCondition = lit("associationCondition");
 static const QString kPtzTraitsAux = lit("ptzTraits");
 static const QString kPtzCapabilitiesAux = lit("ptzCapabilities");
+static const QString kMulticastAux = lit("multicast");
 
 static const QString kPrimaryProfile = lit("primary");
 static const QString kSecondaryProfile = lit("secondary");
@@ -71,7 +73,8 @@ HanwhaAdavancedParameterInfo::kStringAuxes = {
     {kSortingAux, &HanwhaAdavancedParameterInfo::m_sorting},
     {kGroupAux, &HanwhaAdavancedParameterInfo::m_group},
     {kGropupIncludeAux, &HanwhaAdavancedParameterInfo::m_groupIncludeCondition},
-    {kGroupLeadAux, &HanwhaAdavancedParameterInfo::m_group}
+    {kGroupLeadAux, &HanwhaAdavancedParameterInfo::m_group},
+    {kAssociationCondition, &HanwhaAdavancedParameterInfo::m_associationCondition},
 };
 
 const std::map<QString, bool HanwhaAdavancedParameterInfo::*>
@@ -79,7 +82,7 @@ HanwhaAdavancedParameterInfo::kBoolAuxes = {
     {kSpecificAux, &HanwhaAdavancedParameterInfo::m_isSpecific},
     {kNoChannelAux, &HanwhaAdavancedParameterInfo::m_channelIndependent},
     {kCodecAux, &HanwhaAdavancedParameterInfo::m_isCodecDependent},
-    {kShouldAffectAllChannels, &HanwhaAdavancedParameterInfo::m_shouldAffectAllChannels}
+    {kShouldAffectAllChannels, &HanwhaAdavancedParameterInfo::m_shouldAffectAllChannels},
 };
 
 const std::map<QString, QSet<QString> HanwhaAdavancedParameterInfo::*>
@@ -225,6 +228,11 @@ QSet<QString> HanwhaAdavancedParameterInfo::associatedParameters() const
     return m_associatedParameters;
 }
 
+QString HanwhaAdavancedParameterInfo::associationCondition() const
+{
+    return m_associationCondition;
+}
+
 QSet<QString> HanwhaAdavancedParameterInfo::ptzTraits() const
 {
     return m_ptzTraits;
@@ -233,6 +241,11 @@ QSet<QString> HanwhaAdavancedParameterInfo::ptzTraits() const
 Ptz::Capabilities HanwhaAdavancedParameterInfo::ptzCapabilities() const
 {
     return m_ptzCapabilities;
+}
+
+bool HanwhaAdavancedParameterInfo::isMulticastParameter() const
+{
+    return m_isMulticast;
 }
 
 bool HanwhaAdavancedParameterInfo::isValid() const
@@ -318,6 +331,8 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
                 auxValue,
                 Ptz::NoPtzCapabilities);
         }
+        if (auxName == kMulticastAux)
+            m_isMulticast = fromString<bool>(auxValue);
     }
 }
 

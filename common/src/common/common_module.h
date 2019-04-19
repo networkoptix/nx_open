@@ -48,6 +48,14 @@ class MetadataPluginFactory;
 } // namespace analytics
 } // namespace nx
 
+namespace nx {
+namespace streaming {
+
+class MulticastAddressRegistry;
+
+} // namespace streaming
+} // namespace nx
+
 struct BeforeRestoreDbData
 {
     void saveToSettings(QSettings* settings);
@@ -258,6 +266,8 @@ public:
 
     QnCommonMessageProcessor* messageProcessor() const;
 
+    nx::streaming::MulticastAddressRegistry* multicastAddressRegistry() const;
+
     template <class MessageProcessorType>
     MessageProcessorType* createMessageProcessor()
     {
@@ -274,7 +284,7 @@ public:
     void setVideowallGuid(const QnUuid &uuid);
 
     /**
-     * Turn on/off connections to the remove peers. 
+     * Turn on/off connections to the remove peers.
      * Media server will not receive connections from another peers while it is disabled.
      * Hive mode is enabled by default.
      */
@@ -345,4 +355,6 @@ private:
 
     QnUuid m_videowallGuid;
     bool m_standaloneMode = false;
+
+    nx::streaming::MulticastAddressRegistry* m_multicastAddressRegistry = nullptr;
 };

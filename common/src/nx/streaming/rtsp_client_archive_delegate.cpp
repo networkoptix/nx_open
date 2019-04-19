@@ -1000,7 +1000,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePt
         session->setAdditionAttribute(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     }
 
-    session->setTransport(QLatin1String("TCP"));
+    session->setTransport(nx::vms::api::RtpTransportType::tcp);
 }
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)

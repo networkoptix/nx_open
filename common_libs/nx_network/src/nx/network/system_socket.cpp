@@ -46,6 +46,13 @@ typedef void raw_type;       // Type used for raw data on this platform
 #define SOCKET_ERROR (-1)
 #endif
 
+// Needed only for bpi build, that use old C Library headers.
+#ifdef __linux__
+    #ifndef IP_MULTICAST_ALL
+        #define IP_MULTICAST_ALL 49
+    #endif
+#endif
+
 namespace nx {
 namespace network {
 
@@ -656,7 +663,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
 
     int sended = doInterruptableSystemCallWithTimeout<>(
         std::bind(&::send, this->m_fd, (const void*)buffer, (size_t)bufferLen,
-#ifdef __linux
+#ifdef __linux__
             MSG_NOSIGNAL
 #else
             0
@@ -1573,6 +1580,16 @@ bool UDPSocket::setMulticastIF(const QString& multicastIF)
 
 bool UDPSocket::joinGroup(const QString &multicastGroup)
 {
+#ifdef __linux__
+    int mcAll = 0;
+    if (setsockopt(handle(), IPPROTO_IP, IP_MULTICAST_ALL, (raw_type *)&mcAll, sizeof(mcAll)) < 0)
+    {
+        NX_WARNING(this,
+            lm("Failed to disable IP_MULTICAST_ALL socket option for group %1. %2").args(
+                multicastGroup, SystemError::getLastOSErrorText()));
+        return false;
+    }
+#endif
     struct ip_mreq multicastRequest;
     memset(&multicastRequest, 0, sizeof(multicastRequest));
 
@@ -1590,6 +1607,16 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)
 
 bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicastIF)
 {
+#ifdef __linux__
+    int mcAll = 0;
+    if (setsockopt(handle(), IPPROTO_IP, IP_MULTICAST_ALL, (raw_type *)&mcAll, sizeof(mcAll)) < 0)
+    {
+        NX_WARNING(this,
+            lm("Failed to disable IP_MULTICAST_ALL socket option for group %1. %2").args(
+                multicastGroup, SystemError::getLastOSErrorText()));
+        return false;
+    }
+#endif
     struct ip_mreq multicastRequest;
     memset(&multicastRequest, 0, sizeof(multicastRequest));
 

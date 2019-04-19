@@ -4,6 +4,8 @@
 
 #include "socket_global.h"
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx {
 namespace network {
 
@@ -342,3 +344,19 @@ QString SocketAddress::trimIpV6(const QString& ip)
 
     return ip;
 }
+
+void serialize(
+    class QnJsonContext*,
+    const HostAddress& value,
+    QJsonValue* target)
+{
+    *target = value.toString();
+}
+
+bool deserialize(QnJsonContext*, const QJsonValue& source, HostAddress* value)
+{
+    *value = HostAddress(source.toString());
+    return true;
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SocketAddress, (json), (address)(port))

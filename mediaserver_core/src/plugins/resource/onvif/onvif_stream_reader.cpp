@@ -29,6 +29,14 @@
 
 static const int MAX_CAHCE_URL_TIME = 1000 * 15;
 
+static onvifXsd__StreamType streamTypeFromRtpTransport(nx::vms::api::RtpTransportType rtpTransport)
+{
+    if (rtpTransport == nx::vms::api::RtpTransportType::multicast)
+        return onvifXsd__StreamType::onvifXsd__StreamType__RTP_Multicast;
+
+    return onvifXsd__StreamType::onvifXsd__StreamType__RTP_Unicast;
+}
+
 struct CameraInfoParams
 {
     CameraInfoParams() {}
@@ -207,13 +215,24 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
         soapWrapper, info, isPrimary, isCameraControlRequired, params);
     if( !result  )
         return result;
+
+    m_onvifRes->setVideoEncoderConfigurationToken(
+        QnSecurityCamResource::toStreamIndex(getRole()),
+        info.videoEncoderId.toStdString());
+
     info.videoSourceId = m_onvifRes->getVideoSourceId();
     info.videoSourceToken = m_onvifRes->getVideoSourceToken();
 
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    fetchUpdateAudioEncoder(soapWrapper, info, isPrimary, isCameraControlRequired);
+    result = fetchUpdateAudioEncoder(soapWrapper, info, isPrimary, isCameraControlRequired);
+    if (result)
+    {
+        m_onvifRes->setAudioEncoderConfigurationToken(
+            QnSecurityCamResource::toStreamIndex(getRole()),
+            info.audioEncoderId.toStdString());
+    }
 
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
@@ -380,7 +399,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
 
     request.StreamSetup = &streamSetup;
     request.StreamSetup->Transport = &transport;
-    request.StreamSetup->Stream = onvifXsd__StreamType__RTP_Unicast;
+    request.StreamSetup->Stream = streamTypeFromRtpTransport(m_onvifRes->preferredRtpTransport());
     request.StreamSetup->Transport->Tunnel = 0;
     request.StreamSetup->Transport->Protocol = onvifXsd__TransportProtocol__RTSP;
     request.ProfileToken = profileToken.toStdString();

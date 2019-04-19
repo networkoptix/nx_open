@@ -49,6 +49,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         IsPlaybackSpeedSupported            = 0x2000, //< For NVR which support playback speed 1,2,4 e.t.c natively.
         DeviceBasedSync                     = 0x4000, //< For NVR if channels are depend on each other and can play synchronously only.
         DualStreamingForLiveOnly            = 0x8000,
+        MulticastStreamCapability           = 0x80000, //< Camera supports multicast streaming.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)

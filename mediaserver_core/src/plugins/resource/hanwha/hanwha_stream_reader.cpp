@@ -15,6 +15,8 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -25,6 +27,32 @@ static const QString kLive4NvrProfileName = lit("Live4NVR");
 static const int kHanwhaDefaultPrimaryStreamProfile = 2;
 static const std::chrono::milliseconds kNvrSocketReadTimeout(500);
 static const std::chrono::milliseconds kTimeoutToExtrapolateTime(1000 * 5);
+
+QString toHanwhaStreamingType(nx::vms::api::RtpTransportType rtpTransport)
+{
+    using namespace nx::vms::api;
+    if (rtpTransport == nx::vms::api::RtpTransportType::multicast)
+        return kHanwhaRtpMulticast;
+
+    return kHanwhaRtpUnicast;
+}
+
+QString toHanwhaTransportProtocol(nx::vms::api::RtpTransportType rtpTransport)
+{
+    using namespace nx::vms::api;
+    switch (rtpTransport)
+    {
+    case RtpTransportType::automatic:
+    case RtpTransportType::tcp:
+        return kHanwhaTcp;
+    case RtpTransportType::udp:
+    case RtpTransportType::multicast:
+        return kHanwhaUdp;
+    default:
+        NX_ASSERT(false, "Invalid RTP transport");
+        return kHanwhaTcp;
+    }
+}
 
 } // namespace
 
@@ -66,6 +94,21 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
         // QUrl isn't used here intentionally, since session parameter works correct
         // if it added to the end of URL only.
         streamUrlString.append(lit("&session=%1").arg(m_sessionContext->sessionId));
+    }
+    else
+    {
+        // If multicast transport used, ensure that camera configured accordingly.
+        const auto rtpTransportString =
+            m_hanwhaResource->getProperty(QnMediaResource::rtpTransportKey());
+        const auto transport = QnLexical::deserialized<nx::vms::api::RtpTransportType>(
+            rtpTransportString,
+            nx::vms::api::RtpTransportType::automatic);
+        if (transport == nx::vms::api::RtpTransportType::multicast)
+        {
+            auto result = m_hanwhaResource->ensureMulticastEnabled(getRole());
+            if (!result)
+                return result;
+        }
     }
 
     const auto role = getRole();
@@ -175,13 +218,16 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
         return CameraDiagnostics::NoErrorResult();
     }
 
+    const nx::vms::api::RtpTransportType preferredRtpTransport =
+        m_hanwhaResource->preferredRtpTransport();
+
     using ParameterMap = std::map<QString, QString>;
     ParameterMap params =
     {
         {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
         {kHanwhaStreamingModeProperty, kHanwhaFullMode},
-        {kHanwhaStreamingTypeProperty, kHanwhaRtpUnicast},
-        {kHanwhaTransportProtocolProperty, rtpTransport()},
+        {kHanwhaStreamingTypeProperty, toHanwhaStreamingType(preferredRtpTransport)},
+        {kHanwhaTransportProtocolProperty, toHanwhaTransportProtocol(preferredRtpTransport)},
         {kHanwhaRtspOverHttpProperty, kHanwhaFalse}
     };
 
@@ -265,12 +311,11 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
 
 QString HanwhaStreamReader::rtpTransport() const
 {
-    QString transportStr = m_hanwhaResource
-        ->getProperty(QnMediaResource::rtpTransportKey())
-            .toUpper()
-            .trimmed();
+    auto transport = QnLexical::deserialized(
+        m_hanwhaResource->getProperty(QnMediaResource::rtpTransportKey()),
+        nx::vms::api::RtpTransportType::automatic);
 
-    if (transportStr == RtpTransport::udp)
+    if (transport == nx::vms::api::RtpTransportType::udp)
         return kHanwhaUdp;
 
     return kHanwhaTcp;

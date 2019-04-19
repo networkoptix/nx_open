@@ -102,7 +102,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
     if (isCameraControlRequired)
     {
         CLHttpStatus status;
-        if (desiredTransport == RtpTransport::udp)
+        if (desiredTransport == nx::vms::api::RtpTransportType::udp)
         {
             QByteArray result = m_actiRes->makeActiRequest(
                 QLatin1String("encoder"),

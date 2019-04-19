@@ -27,6 +27,31 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/system_error.h>
+#include <nx/network/nettools.h>
+#include <nx/network/socket_factory.h>
+#include <nx/network/socket_common.h>
+
+#include <nx/fusion/model_functions.h>
+
+namespace nx {
+namespace vms {
+namespace api {
+
+QString toString(RtpTransportType transport)
+{
+    return QnLexical::serialized(transport);
+}
+
+} // namespace api
+} // namespace vms
+} // namespace nx
+
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::RtpTransportType, (numeric))
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, RtpTransportType,
+    (nx::vms::api::RtpTransportType::automatic, "Auto")
+    (nx::vms::api::RtpTransportType::tcp, "TCP")
+    (nx::vms::api::RtpTransportType::udp, "UDP")
+    (nx::vms::api::RtpTransportType::multicast, "Multicast"))
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (10*1000)
@@ -54,6 +79,40 @@ QString FFMPEG_STR(lit("FFMPEG"));
 const quint8 METADATA_CODE = 126;
 const QString METADATA_STR(lit("ffmpeg-metadata"));
 const QString DEFAULT_REALM(lit("NetworkOptix"));
+constexpr int kSocketBufferSize = 512 * 1024;
+
+struct RtspPorts
+{
+    quint16 mediaPort = 0;
+    quint16 rtcpPort = 0;
+};
+
+RtspPorts parsePorts(const QString& parameterString)
+{
+    const auto nameAndValue = parameterString.splitRef('=');
+    if (nameAndValue.size() != 2)
+        return {};
+
+    const auto ports = nameAndValue[1].split('-');
+    if (nameAndValue.size() != 2)
+        return {};
+
+    const auto mediaPort = ports[0].toUShort();
+    const auto rtcpPort = ports[1].toUShort();
+
+    if (!mediaPort || !rtcpPort)
+        return {};
+
+    return { mediaPort, rtcpPort };
+}
+
+QHostAddress parseServerAddress(const QByteArray& line)
+{
+    auto fields = line.split(' ');
+    if (fields.size() >= 3 && fields[1].toUpper() == "IP4")
+        return QHostAddress(QString::fromUtf8(fields[2].split('/').front()));
+    return QHostAddress();
+}
 
 } // namespace
 
@@ -69,75 +128,112 @@ const QByteArray QnRtspClient::kTeardownCommand("TEARDOWN");
 //-------------------------------------------------------------------------------------------------
 // QnRtspIoDevice
 
-QnRtspIoDevice::QnRtspIoDevice(QnRtspClient* owner, bool useTCP, quint16 mediaPort, quint16 rtcpPort):
+QnRtspIoDevice::QnRtspIoDevice(
+    QnRtspClient* owner,
+    nx::vms::api::RtpTransportType rtpTransport,
+    quint16 mediaPort,
+    quint16 rtcpPort)
+    :
     m_owner(owner),
-    m_tcpMode(useTCP),
-    m_mediaSocket(0),
-    m_rtcpSocket(0),
-    m_mediaPort(mediaPort),
-    m_remoteEndpointRtcpPort(rtcpPort),
-    ssrc(0),
-    m_reportTimerStarted(false),
-    m_forceRtcpReports(false)
+    m_remoteMediaPort(mediaPort),
+    m_remoteRtcpPort(rtcpPort)
 {
-    if (!m_tcpMode)
-    {
-        m_mediaSocket = SocketFactory::createDatagramSocket().release();
-        m_mediaSocket->bind(SocketAddress(HostAddress::anyHost, 0));
-        m_mediaSocket->setRecvTimeout(500);
-
-        m_rtcpSocket = SocketFactory::createDatagramSocket().release();
-        m_rtcpSocket->bind(SocketAddress(HostAddress::anyHost, 0));
-        m_rtcpSocket->setRecvTimeout(500);
-    }
+    if (m_remoteRtcpPort == 0 && m_remoteMediaPort != 0)
+        m_remoteRtcpPort = m_remoteMediaPort + 1;
+    setTransport(rtpTransport);
 }
 
 QnRtspIoDevice::~QnRtspIoDevice()
 {
-    delete m_mediaSocket;
-    delete m_rtcpSocket;
+    if (m_transport == nx::vms::api::RtpTransportType::multicast)
+    {
+        if (m_mediaSocket)
+            m_mediaSocket->leaveGroup(m_multicastAddress.toString());
+        if (m_rtcpSocket)
+            m_rtcpSocket->leaveGroup(m_multicastAddress.toString());
+    }
+}
+
+void QnRtspIoDevice::bindToMulticastAddress(
+    const QHostAddress& address,
+    const QString& interfaceAddress)
+{
+    if (m_mediaSocket)
+        m_mediaSocket->joinGroup(address.toString(), interfaceAddress);
+    if (m_rtcpSocket)
+        m_rtcpSocket->joinGroup(address.toString(), interfaceAddress);
+    m_multicastAddress = address;
+}
+
+void QnRtspIoDevice::updateRemoteMulticastPorts(quint16 mediaPort, quint16 rtcpPort)
+{
+    if (m_transport != nx::vms::api::RtpTransportType::multicast)
+        return;
+
+    m_remoteMediaPort = mediaPort;
+    m_remoteRtcpPort = rtcpPort;
+    updateSockets();
 }
 
 qint64 QnRtspIoDevice::read(char *data, qint64 maxSize)
 {
     int bytesRead;
-    if (m_tcpMode)
-    {
+    if (m_transport == nx::vms::api::RtpTransportType::tcp)
         bytesRead = m_owner->readBinaryResponce((quint8*) data, maxSize); // demux binary data from TCP socket
-    }
     else
-    {
         bytesRead = m_mediaSocket->recv(data, maxSize);
-    }
+
     m_owner->sendKeepAliveIfNeeded();
-    if (!m_tcpMode)
+    if (m_transport != nx::vms::api::RtpTransportType::tcp)
         processRtcpData();
     return bytesRead;
 }
 
 AbstractCommunicatingSocket* QnRtspIoDevice::getMediaSocket()
 {
-    if (m_tcpMode)
+    if (m_transport == nx::vms::api::RtpTransportType::tcp)
         return m_owner->m_tcpSock.get();
     else
-        return m_mediaSocket;
+        return m_mediaSocket.get();
 }
 
 void QnRtspIoDevice::shutdown()
 {
-    if (m_tcpMode)
+    if (m_transport == nx::vms::api::RtpTransportType::tcp)
         m_owner->shutdown();
     else
         m_mediaSocket->shutdown();
 }
 
-void QnRtspIoDevice::setTcpMode(bool value)
+void QnRtspIoDevice::setTransport(nx::vms::api::RtpTransportType rtpTransport)
 {
-    m_tcpMode = value;
-    if (m_tcpMode && m_mediaSocket) {
-        m_mediaSocket->close();
-        m_rtcpSocket->close();
+    m_transport = rtpTransport;
+    if (m_transport == nx::vms::api::RtpTransportType::tcp)
+    {
+        m_mediaSocket.reset();
+        m_rtcpSocket.reset();
+        return;
     }
+
+    auto createSocket =
+        [this](int port)
+        {
+            auto result = SocketFactory::createDatagramSocket();
+            if (m_transport == nx::vms::api::RtpTransportType::multicast)
+                result->setReuseAddrFlag(true);
+
+            result->bind(SocketAddress(HostAddress::anyHost, port));
+            result->setRecvTimeout(500);
+            return result;
+        };
+
+    m_mediaSocket = createSocket(m_transport == nx::vms::api::RtpTransportType::multicast
+        ? m_remoteMediaPort
+        : 0);
+
+    m_rtcpSocket = createSocket(m_transport == nx::vms::api::RtpTransportType::multicast
+        ? m_remoteRtcpPort
+        : 0);
 }
 
 void QnRtspIoDevice::processRtcpData()
@@ -185,7 +281,7 @@ void QnRtspIoDevice::processRtcpData()
             int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
-                auto remoteEndpoint = SocketAddress(m_hostAddress, m_remoteEndpointRtcpPort);
+                auto remoteEndpoint = SocketAddress(m_hostAddress, m_remoteRtcpPort);
                 if (!m_rtcpSocket->setDestAddr(remoteEndpoint))
                 {
                     qWarning()
@@ -198,6 +294,61 @@ void QnRtspIoDevice::processRtcpData()
             m_reportTimer.restart();
         }
     }
+}
+
+void QnRtspIoDevice::updateSockets()
+{
+    if (m_transport == nx::vms::api::RtpTransportType::tcp)
+    {
+        m_mediaSocket.reset();
+        m_rtcpSocket.reset();
+        m_owner->m_tcpSock->setRecvBufferSize(kSocketBufferSize);
+        return;
+    }
+
+    auto createSocket =
+        [this](int port)
+        {
+            auto result = SocketFactory::createDatagramSocket();
+            if (m_transport == nx::vms::api::RtpTransportType::multicast)
+                result->setReuseAddrFlag(true);
+
+            const auto res = result->bind(SocketAddress(HostAddress::anyHost, port));
+            result->setRecvTimeout(500);
+            result->setRecvBufferSize(kSocketBufferSize);
+            result->setNonBlockingMode(true);
+            return result;
+        };
+
+    m_mediaSocket = createSocket(m_transport == nx::vms::api::RtpTransportType::multicast
+        ? m_remoteMediaPort
+        : 0);
+
+    m_rtcpSocket = createSocket(m_transport == nx::vms::api::RtpTransportType::multicast
+        ? m_remoteRtcpPort
+        : 0);
+}
+
+QnRtspIoDevice::AddressInfo QnRtspIoDevice::mediaAddressInfo() const
+{
+    return addressInfo(m_remoteMediaPort);
+}
+
+QnRtspIoDevice::AddressInfo QnRtspIoDevice::rtcpAddressInfo() const
+{
+    return addressInfo(m_remoteRtcpPort);
+}
+
+QnRtspIoDevice::AddressInfo QnRtspIoDevice::addressInfo(int port) const
+{
+    AddressInfo info;
+    info.transport = m_transport;
+    info.address.address = m_transport == nx::vms::api::RtpTransportType::multicast
+        ? HostAddress(m_multicastAddress.toString())
+        : HostAddress(m_hostAddress.toString());
+
+    info.address.port = port;
+    return info;
 }
 
 void QnRtspClient::SDPTrackInfo::setSSRC(quint32 value)
@@ -502,7 +653,7 @@ QnRtspClient::QnRtspClient(
     m_config(config),
     m_csec(2),
     //m_rtpIo(*this),
-    m_transport(TRANSPORT_UDP),
+    m_transport(nx::vms::api::RtpTransportType::udp),
     m_selectedAudioChannel(0),
     m_startTime(DATETIME_NOW),
     m_openedTime(AV_NOPTS_VALUE),
@@ -550,14 +701,41 @@ void QnRtspClient::usePredefinedTracks()
     if (!m_sdpTracks.isEmpty())
         return;
 
+    static const int kUnknownServerPort = 0;
+
     int trackNum = 0;
     for (; trackNum < m_numOfPredefinedChannels; ++trackNum)
     {
-        m_sdpTracks << QSharedPointer<SDPTrackInfo>(new SDPTrackInfo(FFMPEG_STR, QByteArray("video"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, this, true));
+        m_sdpTracks << QSharedPointer<SDPTrackInfo>(
+            new SDPTrackInfo(
+                /*codecName*/ FFMPEG_STR,
+                /*trackTypeStr*/ QByteArray("video"),
+                /*setupUrl*/ QByteArray("trackID=") + QByteArray::number(trackNum),
+                /*mapNumber*/ FFMPEG_CODE,
+                /*owner*/ this,
+                /*transport*/ nx::vms::api::RtpTransportType::tcp,
+                /*serverPort*/ kUnknownServerPort));
     }
 
-    m_sdpTracks << QSharedPointer<SDPTrackInfo>(new SDPTrackInfo(FFMPEG_STR, QByteArray("audio"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, this, true));
-    m_sdpTracks << QSharedPointer<SDPTrackInfo>(new SDPTrackInfo(METADATA_STR, QByteArray("metadata"), QByteArray("trackID=7"), METADATA_CODE, this, true));
+    m_sdpTracks << QSharedPointer<SDPTrackInfo>(
+        new SDPTrackInfo(
+            /*codecName*/ FFMPEG_STR,
+            /*trackTypeStr*/ QByteArray("audio"),
+            /*setupUrl*/ QByteArray("trackID=") + QByteArray::number(trackNum),
+            /*mapNumber*/ FFMPEG_CODE,
+            /*owner*/ this,
+            /*transport*/ nx::vms::api::RtpTransportType::tcp,
+            /*serverPort*/ kUnknownServerPort));
+
+    m_sdpTracks << QSharedPointer<SDPTrackInfo>(
+        new SDPTrackInfo(
+            /*codecName*/ METADATA_STR,
+            /*trackTypeStr*/ QByteArray("metadata"),
+            /*trackTypeStr*/ QByteArray("trackID=7"),
+            /*mapNumber*/ METADATA_CODE,
+            /*owner*/ this,
+            /*transport*/ nx::vms::api::RtpTransportType::tcp,
+            /*serverPort*/ kUnknownServerPort));
 }
 
 bool trackNumLess(const QSharedPointer<QnRtspClient::SDPTrackInfo>& track1, const QSharedPointer<QnRtspClient::SDPTrackInfo>& track2)
@@ -611,8 +789,8 @@ void QnRtspClient::updateTrackNum()
 void QnRtspClient::parseSDP()
 {
     QList<QByteArray> lines = m_sdp.split('\n');
-
-    QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(this, m_transport == TRANSPORT_TCP));
+    m_serverAddress = QHostAddress();
+    QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(this, m_transport));
     for (QByteArray line : lines)
     {
         line = line.trimmed();
@@ -621,11 +799,19 @@ void QnRtspClient::parseSDP()
         {
             if (sdpTrack->isValid())
                 m_sdpTracks << sdpTrack;
-            sdpTrack.reset(new SDPTrackInfo(this, m_transport == TRANSPORT_TCP));
+            sdpTrack.reset(new SDPTrackInfo(this, m_transport));
 
             QList<QByteArray> trackParams = lineLower.mid(2).split(' ');
             const auto codecType = trackParams[0];
             sdpTrack->trackType = SDPTrackInfo::trackTypeFromString(codecType);
+            if (trackParams.size() >= 2)
+            {
+                const auto mediaPort = trackParams[1].toInt();
+                sdpTrack->serverPort = mediaPort;
+                if (mediaPort)
+                    sdpTrack->ioDevice->updateRemoteMulticastPorts(mediaPort, mediaPort + 1);
+            }
+
             if (trackParams.size() >= 4)
                 sdpTrack->setMapNumber(trackParams[3].toInt());
         }
@@ -654,6 +840,13 @@ void QnRtspClient::parseSDP()
         {
             sdpTrack->isBackChannel = true;
         }
+        else if (QString::fromUtf8(lineLower).startsWith("c=", Qt::CaseInsensitive))
+        {
+            if (sdpTrack->isValid())
+                sdpTrack->connectionAddress = parseServerAddress(lineLower);
+            else
+                m_serverAddress = parseServerAddress(lineLower);
+        }
     }
     if (sdpTrack->isValid())
         m_sdpTracks << sdpTrack;
@@ -668,9 +861,19 @@ void QnRtspClient::parseSDP()
         }),
         m_sdpTracks.end());
 
+    if (!m_serverAddress.isNull())
+    {
+        for (auto& track: m_sdpTracks)
+        {
+            if (track->connectionAddress.isNull())
+                track->connectionAddress = m_serverAddress;
+        }
+    }
+
+    if (m_serverAddress.isMulticast())
+        m_transport = nx::vms::api::RtpTransportType::multicast;
 
     updateTrackNum();
-
 }
 
 void QnRtspClient::parseRangeHeader(const QString& rangeStr)
@@ -839,21 +1042,37 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     return result;
 }
 
-QnRtspClient::TrackMap QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
+bool QnRtspClient::playPhase1()
 {
     m_prefferedTransport = m_transport;
-    if (m_prefferedTransport == TRANSPORT_AUTO)
-        m_prefferedTransport = TRANSPORT_TCP;
+    if (m_prefferedTransport == nx::vms::api::RtpTransportType::automatic)
+        m_prefferedTransport = nx::vms::api::RtpTransportType::tcp;
     m_TimeOut = 0; // default timeout 0 ( do not send keep alive )
     if (!m_numOfPredefinedChannels) {
         if (!sendSetup() || m_sdpTracks.isEmpty())
-            return TrackMap();
+            return false;
     }
 
-    if (!sendPlay(positionStart, positionEnd, scale))
-        m_sdpTracks.clear();
+    return true;
+}
 
-    return m_sdpTracks;
+bool QnRtspClient::playPhase2(qint64 positionStart, qint64 positionEnd, double scale)
+{
+    if (!sendPlay(positionStart, positionEnd, scale))
+    {
+        m_sdpTracks.clear();
+        return false;
+    }
+
+    return true;
+}
+
+bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
+{
+    if (!playPhase1())
+        return false;
+
+    return playPhase2(positionStart, positionEnd, scale);
 }
 
 bool QnRtspClient::stop()
@@ -1157,12 +1376,22 @@ bool QnRtspClient::sendSetup()
 
         {   //generating transport header
             nx_http::StringType transportStr = "RTP/AVP/";
-            transportStr += m_prefferedTransport == TRANSPORT_UDP ? "UDP" : "TCP";
-            transportStr += ";unicast;";
 
-            if (m_prefferedTransport == TRANSPORT_UDP)
+            transportStr += m_prefferedTransport == nx::vms::api::RtpTransportType::tcp
+                ? "TCP"
+                : "UDP";
+
+            transportStr += m_prefferedTransport == nx::vms::api::RtpTransportType::multicast
+                ? ";multicast;"
+                : ";unicast;";
+
+            if (m_prefferedTransport != nx::vms::api::RtpTransportType::tcp)
             {
-                transportStr += "client_port=";
+                trackInfo->ioDevice->setTransport(m_prefferedTransport);
+                transportStr += m_prefferedTransport == nx::vms::api::RtpTransportType::multicast
+                    ? "port="
+                    : "client_port=";
+
                 transportStr += QString::number(trackInfo->ioDevice->getMediaSocket()->getLocalAddress().port);
                 transportStr += '-';
                 transportStr += QString::number(trackInfo->ioDevice->getRtcpSocket()->getLocalAddress().port);
@@ -1186,14 +1415,17 @@ bool QnRtspClient::sendSetup()
 
         if (!responce.startsWith("RTSP/1.0 200"))
         {
-            if (m_transport == TRANSPORT_AUTO && m_prefferedTransport == TRANSPORT_TCP) {
-                m_prefferedTransport = TRANSPORT_UDP;
+            if (m_transport == nx::vms::api::RtpTransportType::automatic
+                && m_prefferedTransport == nx::vms::api::RtpTransportType::tcp)
+            {
+                m_prefferedTransport = nx::vms::api::RtpTransportType::udp;
                 if (!sendSetup()) //< Try UDP transport.
                     return false;
             }
             else
                 return false;
         }
+        trackInfo->setupSuccess = true;
 
         QString sessionParam = extractRTSPParam(QLatin1String(responce), QLatin1String("Session:"));
         if (sessionParam.size() > 0)
@@ -1250,15 +1482,24 @@ bool QnRtspClient::sendSetup()
                         }
                     }
                 }
+                else if (m_transport == nx::vms::api::RtpTransportType::multicast
+                    && tmpList[k].startsWith("port"))
+                {
+                    const auto ports = parsePorts(tmpList[k]);
+                    if (ports.mediaPort && ports.rtcpPort)
+                    {
+                        trackInfo->ioDevice->updateRemoteMulticastPorts(
+                            ports.mediaPort, ports.rtcpPort);
+
+                        trackInfo->ioDevice->bindToMulticastAddress(
+                            trackInfo->connectionAddress,
+                            m_tcpSock->getLocalAddress().address.toString());
+                    }
+                }
             }
         }
-
         updateTransportHeader(responce);
     }
-
-    bool tcpMode =  m_prefferedTransport == TRANSPORT_TCP;
-    for (int i = 0; i < m_sdpTracks.size(); ++i)
-        m_sdpTracks[i]->ioDevice->setTcpMode(tcpMode);
 
     return true;
 }
@@ -1817,19 +2058,9 @@ void QnRtspClient::updateTransportHeader(QByteArray& responce)
     }
 }
 
-void QnRtspClient::setTransport(TransportType transport)
+void QnRtspClient::setTransport(nx::vms::api::RtpTransportType transport)
 {
     m_transport = transport;
-}
-
-void QnRtspClient::setTransport(const QString& transport)
-{
-    if (transport == QLatin1String("TCP"))
-        m_transport = TRANSPORT_TCP;
-    else if (transport == QLatin1String("UDP"))
-        m_transport = TRANSPORT_UDP;
-    else
-        m_transport = TRANSPORT_AUTO;
 }
 
 QString QnRtspClient::getTrackFormatByRtpChannelNum(int channelNum)
@@ -1990,11 +2221,6 @@ void QnRtspClient::setUsePredefinedTracks(int numOfVideoChannel)
 void QnRtspClient::setUserAgent(const QString& value)
 {
     m_userAgent = value.toUtf8();
-}
-
-bool QnRtspClient::setTCPReadBufferSize(int value)
-{
-    return m_tcpSock->setRecvBufferSize(value);
 }
 
 QString QnRtspClient::getVideoLayout() const

@@ -27,6 +27,8 @@ extern "C"
 #include <network/client_authenticate_helper.h>
 #include <nx/utils/elapsed_timer.h>
 
+#include <nx/fusion/model_functions_fwd.h>
+
 //#define DEBUG_TIMINGS
 //#define _DUMP_STREAM
 
@@ -40,6 +42,25 @@ static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadata
 static const int RTSP_FFMPEG_MAX_HEADER_SIZE = RTSP_FFMPEG_GENERIC_HEADER_SIZE + RTSP_FFMPEG_METADATA_HEADER_SIZE;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
+namespace nx {
+namespace vms {
+namespace api {
+
+enum class RtpTransportType
+{
+    automatic,
+    tcp,
+    udp,
+    multicast,
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RtpTransportType)
+
+QString toString(RtpTransportType transport);
+
+} // namespace api
+} // namespace vms
+} // namespace nx
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::RtpTransportType, (lexical));
 
 // Class name is quite misleading.
 // Actually it is RTCP statistics + NTP time from Onvif extension.
@@ -128,37 +149,70 @@ private:
 class QnRtspIoDevice
 {
 public:
-    explicit QnRtspIoDevice(QnRtspClient* owner, bool useTCP, quint16 mediaPort = 0, quint16 rtcpPort = 0);
+    struct AddressInfo
+    {
+        nx::vms::api::RtpTransportType transport{ nx::vms::api::RtpTransportType::automatic };
+        SocketAddress address;
+    };
+
+public:
+    explicit QnRtspIoDevice(
+        QnRtspClient* owner,
+        nx::vms::api::RtpTransportType rtpTransport,
+        quint16 mediaPort = 0,
+        quint16 rtcpPort = 0);
+
     virtual ~QnRtspIoDevice();
     virtual qint64 read(char * data, qint64 maxSize );
     const QnRtspStatistic& getStatistic() { return m_statistic; }
     void setStatistic(const QnRtspStatistic& value) { m_statistic = value; }
     AbstractCommunicatingSocket* getMediaSocket();
-    AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket; }
+    AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket.get(); }
     void shutdown();
-    void setTcpMode(bool value);
+    void setTransport(nx::vms::api::RtpTransportType rtpTransport);
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
 
-    void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteEndpointRtcpPort = rtcpPort;}
+    void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteRtcpPort = rtcpPort;}
     void setHostAddress(const HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
+
+    void bindToMulticastAddress(const QHostAddress& address, const QString& interfaceAddress);
+
+    void updateRemoteMulticastPorts(quint16 mediaPort, quint16 rtcpPort);
+
+    AddressInfo mediaAddressInfo() const;
+    AddressInfo rtcpAddressInfo() const;
+
 private:
+    AddressInfo addressInfo(int port) const;
     void processRtcpData();
+    void updateSockets();
 private:
-    QnRtspClient* m_owner;
-    bool m_tcpMode;
+    QnRtspClient* m_owner = nullptr;
+    nx::vms::api::RtpTransportType m_transport = nx::vms::api::RtpTransportType::tcp;
     QnRtspStatistic m_statistic;
-    AbstractDatagramSocket* m_mediaSocket;
-    AbstractDatagramSocket* m_rtcpSocket;
-    quint16 m_mediaPort;
-    quint16 m_remoteEndpointRtcpPort;
+    std::unique_ptr<AbstractDatagramSocket> m_mediaSocket;
+    std::unique_ptr<AbstractDatagramSocket> m_rtcpSocket;
+    quint16 m_remoteMediaPort = 0;
+    quint16 m_remoteRtcpPort = 0;
     HostAddress m_hostAddress;
-    quint32 ssrc;
+    quint32 ssrc = 0;
     QElapsedTimer m_reportTimer;
-    bool m_reportTimerStarted;
-    bool m_forceRtcpReports;
+    bool m_reportTimerStarted = false;
+    bool m_forceRtcpReports = false;
+    QHostAddress m_multicastAddress;
 };
+
+inline bool operator<(
+    const QnRtspIoDevice::AddressInfo& lhs,
+    const QnRtspIoDevice::AddressInfo& rhs)
+{
+    if (lhs.transport != rhs.transport)
+        return lhs.transport < rhs.transport;
+
+    return lhs.address < rhs.address;
+}
 
 class QnRtspClient: public QObject
 {
@@ -172,7 +226,6 @@ public:
     };
 
     enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN, TT_UNKNOWN2};
-    enum TransportType {TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
 
     static const QByteArray kPlayCommand;
     static const QByteArray kSetupCommand;
@@ -197,18 +250,20 @@ public:
             const QByteArray& setupURL,
             int mapNumber,
             QnRtspClient* owner,
-            bool useTCP)
+            nx::vms::api::RtpTransportType rtpTransport,
+            int serverPort)
             :
-            SDPTrackInfo(owner, useTCP)
+            SDPTrackInfo(owner, rtpTransport)
         {
             this->codecName = codecName;
             this->trackType = trackTypeFromString(trackTypeStr);
             this->setupURL = setupURL;
             this->mapNumber = mapNumber;
+            this->serverPort = serverPort;
         }
-        SDPTrackInfo(QnRtspClient* owner, bool useTCP)
+        SDPTrackInfo(QnRtspClient* owner, nx::vms::api::RtpTransportType rtpTransport)
         {
-            ioDevice = new QnRtspIoDevice(owner, useTCP);
+            ioDevice = new QnRtspIoDevice(owner, rtpTransport);
             ioDevice->setHostAddress(HostAddress(owner->getUrl().host()));
         }
         ~SDPTrackInfo() { delete ioDevice; }
@@ -268,6 +323,9 @@ public:
         QnRtspIoDevice* ioDevice = nullptr;
         bool isBackChannel = false;
         int timeBase = 0;
+        int serverPort = 0;
+        bool setupSuccess = false;
+        QHostAddress connectionAddress;
     };
 
     static QString mediaTypeToStr(TrackType tt);
@@ -284,13 +342,21 @@ public:
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
     CameraDiagnostics::Result open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
 
+    /**
+    * TODO: #dmishin the two methods below are hacks to make multicodec RTP reader work properly
+    * with multicast streams. We need to refactor it.
+    */
+    bool playPhase1(); //< Sends SETUP if needed.
+
+    bool playPhase2(qint64 positionStart, qint64 positionEnd, double scale); //< Sends actual PLAY.
+
     /*
     * Start playing RTSP sessopn.
     * @param positionStart start position at mksec
     * @param positionEnd end position at mksec
     * @param scale playback speed
     */
-    QnRtspClient::TrackMap play(qint64 positionStart, qint64 positionEnd, double scale);
+    bool play(qint64 positionStart, qint64 positionEnd, double scale);
 
     // returns true if there is no error delivering STOP
     bool stop();
@@ -308,10 +374,17 @@ public:
 
     bool sendKeepAliveIfNeeded();
 
-    void setTransport(TransportType transport);
-    void setTransport(const QString& transport);
-    TransportType getTransport() const { return m_transport; }
-    bool isTcpMode() const { return m_prefferedTransport != TRANSPORT_UDP; }
+    void setTransport(nx::vms::api::RtpTransportType transport);
+
+    // RTP transport configured by user.
+    nx::vms::api::RtpTransportType getTransport() const { return m_transport; }
+
+    /**
+     * Actual session RTP transport If user set 'automatic', it can be 'tcp' or 'udp',
+     * otherwise it should be equal to result of getTransport().
+     */
+    nx::vms::api::RtpTransportType getActualTransport() const { return m_prefferedTransport; }
+
     QString getTrackFormatByRtpChannelNum(int channelNum);
     TrackType getTrackTypeByRtpChannelNum(int channelNum);
     int getChannelNum(int rtpChannelNum);
@@ -381,8 +454,6 @@ public:
 
     static quint8* prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve);
 
-    bool setTCPReadBufferSize(int value);
-
     QString getVideoLayout() const;
     TrackMap getTrackInfo() const;
 
@@ -444,7 +515,7 @@ private:
 
     // 'initialization in order' block
     unsigned int m_csec;
-    TransportType m_transport;
+    nx::vms::api::RtpTransportType m_transport;
     int m_selectedAudioChannel;
     qint64 m_startTime;
     qint64 m_openedTime;
@@ -479,7 +550,7 @@ private:
     QAuthenticator m_auth;
     boost::optional<SocketAddress> m_proxyAddress;
     QString m_contentBase;
-    TransportType m_prefferedTransport;
+    nx::vms::api::RtpTransportType m_prefferedTransport;
 
     static QByteArray m_guid; // client guid. used in proprietary extension
     static QnMutex m_guidMutex;
@@ -505,6 +576,7 @@ private:
     using RequestName = QString;
     QMap<RequestName, nx_http::HttpHeaders> m_additionalHeaders;
     QElapsedTimer m_lastReceivedDataTimer;
+    QHostAddress m_serverAddress;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

@@ -47,10 +47,12 @@ public:
     // Parameter can be applied only to certain device types.
     bool isDeviceTypeSupported(HanwhaDeviceType deviceType) const;
     QSet<QString> associatedParameters() const;
+    QString associationCondition() const;
 
     QSet<QString> ptzTraits() const;
     Ptz::Capabilities ptzCapabilities() const;
 
+    bool isMulticastParameter() const;
     bool isValid() const;
 
 private:
@@ -77,6 +79,7 @@ private:
     QString m_groupIncludeCondition;
     bool m_isGroupLead = false;
     bool m_shouldAffectAllChannels = false;
+    bool m_isMulticast = false;
     std::set<HanwhaDeviceType> m_deviceTypes;
 
     QString m_cgi;
@@ -85,6 +88,7 @@ private:
     QString m_parameterValue;
 
     QSet<QString> m_associatedParameters;
+    QString m_associationCondition;
     QSet<QString> m_ptzTraits;
     Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
 

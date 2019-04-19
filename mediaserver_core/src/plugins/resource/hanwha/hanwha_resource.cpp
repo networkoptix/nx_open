@@ -327,6 +327,10 @@ static const QString kFramePriorityProperty = lit("PriorityType");
 static const QString kHanwhaVideoSourceStateOn = lit("On");
 static const int kHanwhaInvalidInputValue = 604;
 
+static constexpr int kHanwhaDefaultMulticastPort = 5000;
+static const QString kHanwhaDefaultMulticastAddress = "239.0.0.1";
+static const QString kHanwhaDefaultSecondaryMulticastAddress = "239.0.0.2";
+
 //Taken from Hanwha metadata plugin manifest.json
 static const QnUuid kHanwhaInputPortEventId =
     QnUuid(lit("{1BAB8A57-5F19-4E3A-B73B-3641058D46B8}"));
@@ -442,6 +446,61 @@ struct GroupParameterInfo
 HanwhaResource::~HanwhaResource()
 {
     m_timerHolder.terminate();
+}
+
+CameraDiagnostics::Result HanwhaResource::enableMulticast(
+    const HanwhaVideoProfile& profile, Qn::ConnectionRole role)
+{
+    int port = profile.rtpMulticastPort;
+    QString address = profile.rtpMulticastAddress;
+    if (address.isEmpty())
+    {
+        address = role == Qn::ConnectionRole::CR_LiveVideo
+            ? kHanwhaDefaultMulticastAddress
+            : kHanwhaDefaultSecondaryMulticastAddress;
+    }
+
+    if (port <= 0)
+        port = kHanwhaDefaultMulticastPort;
+
+    HanwhaRequestHelper helper(sharedContext());
+    const auto response = helper.update(
+        lit("media/videoprofile"),
+        {
+            {kHanwhaProfileNumberProperty, QString::number(profile.number)},
+            {kHanwhaRtpMulticastEnable, kHanwhaTrue},
+            {kHanwhaRtpMulticastAddress, address},
+            {kHanwhaRtpMulticastPort, QString::number(port)},
+        });
+
+    NX_DEBUG(this, lm("Enable multicast: [%1]").args(response.requestUrl()));
+    if (!response.isSuccessful())
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            response.requestUrl(),
+            lit("Can't update video profile to enable multicast"));
+    }
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::ensureMulticastEnabled(Qn::ConnectionRole role)
+{
+    boost::optional<HanwhaVideoProfile> profile;
+    auto result = findProfiles(
+        role == Qn::ConnectionRole::CR_LiveVideo ? &profile : nullptr,
+        role == Qn::ConnectionRole::CR_SecondaryLiveVideo ? &profile : nullptr,
+        /*totalProfileNumber*/ nullptr,
+        /*profilesToRemove*/ nullptr);
+    if (!result)
+        return result;
+
+    if (profile && !profile->rtpMulticastEnable)
+    {
+        result = enableMulticast(profile.value(), role);
+        if (!result)
+            return result;
+    }
+    return CameraDiagnostics::NoErrorResult();
 }
 
 QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
@@ -1109,6 +1168,13 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 {
     if (!ini().initMedia)
         return CameraDiagnostics::NoErrorResult();
+
+    const auto multicastSupportAttribute = attributes().attribute<bool>(
+        lm("Media/Stream.Multicast/%1").arg(getChannel()));
+
+    setCameraCapability(
+        Qn::CameraCapability::MulticastStreamCapability,
+        multicastSupportAttribute && *multicastSupportAttribute);
 
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
@@ -2727,6 +2793,10 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         if (!info)
             continue;
 
+        // Drop multicast params if NVR.
+        if (info->isMulticastParameter() && isNvr())
+            continue;
+
         if (info->isService()) //< E.g, "Reset profiles to default" button.
         {
             supportedIds.insert(id);
@@ -3300,7 +3370,17 @@ QnCameraAdvancedParamValueList HanwhaResource::addAssociatedParameters(
 {
     std::map<QString, QString> parameterValues;
     for (const auto& value: values)
+    {
+        const auto info = advancedParameterInfo(value.id);
+        if (!info)
+            continue;
+
+        const auto associationCondition = info->associationCondition();
+        if (!associationCondition.isEmpty() && associationCondition != value.value)
+            continue;
+
         parameterValues[value.id] = value.value;
+    }
 
     QSet<QString> parametersToFetch;
     for (const auto& entry: parameterValues)
@@ -3664,6 +3744,12 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
         return new HanwhaArchiveDelegate(toSharedPointer());
 
     return nullptr;
+}
+
+std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+    HanwhaResource::advancedParametersProviders()
+{
+    return { &m_advancedParametersProvider };
 }
 
 void HanwhaResource::setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList)

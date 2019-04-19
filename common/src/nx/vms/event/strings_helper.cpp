@@ -24,6 +24,8 @@
 
 #include <nx/utils/log/assert.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace {
 
 nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePtr& camera,
@@ -488,6 +490,23 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         case EventReason::networkNoResponseFromDevice:
         {
             return tr("Device does not respond to network requests.");
+        }
+        case EventReason::networkMulticastAddressConflict:
+        {
+            const auto params =
+                QJson::deserialized<NetworkIssueEvent::MulticastAddressConflictParameters>(
+                    reasonParamsEncoded.toUtf8());
+
+            return tr("Multicast address conflict detected. Address %1 is already in use by %2")
+                .arg(params.address.toString())
+                .arg(params.addressUser);
+        }
+        case EventReason::networkMulticastAddressIsInvalid:
+        {
+            const auto params = QJson::deserialized<SocketAddress>(
+                reasonParamsEncoded.toUtf8());
+
+            return tr("Network address %1 is not a multicast address").arg(params.toString());
         }
         case EventReason::serverTerminated:
         {

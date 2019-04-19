@@ -63,7 +63,7 @@ void OnvifAudioTransmitter::prepare()
     if (!resourceData.value<bool>("dontSendBackChannelRtspAttribute"))
         m_rtspConnection->setAdditionAttribute("Require", "www.onvif.org/ver20/backchannel");
 
-    m_rtspConnection->setTransport(QnRtspClient::TRANSPORT_TCP);
+    m_rtspConnection->setTransport(nx::vms::api::RtpTransportType::tcp);
 
     const QString url = m_resource->sourceUrl(Qn::CR_LiveVideo);
     const CameraDiagnostics::Result result = m_rtspConnection->open(url);
@@ -89,7 +89,13 @@ void OnvifAudioTransmitter::prepare()
     tracks[0]->interleaved = QPair<int, int>(0, 1);
 
     m_rtspConnection->setTrackInfo(tracks);
-    auto tracksToPlay = m_rtspConnection->play(DATETIME_NOW, AV_NOPTS_VALUE, 1.0);
+    if (!m_rtspConnection->play(DATETIME_NOW, AV_NOPTS_VALUE, 1.0))
+    {
+        close();
+        return;
+    }
+
+    auto tracksToPlay = m_rtspConnection->getTrackInfo();
     if (tracksToPlay.isEmpty())
     {
         close();
