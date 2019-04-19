@@ -1,1 +1,30 @@
 HDWitness.xcworkspace
+.hg*
+syntax: glob
+
+# IDE and misc software files.
+.idea
+.vscode
+*~*.TMP
+*.kdev4
+.DS_Store
+*.swp
+CMakeLists.txt.user
+
+# Precompiled files.
+*.pyc
+*.qmlc
+*.jsc
+
+# Repository temp files.
+*.orig
+*.rej
+
+# Project-specific items.
+subinclude:vms/artifacts/.hgignore
+subinclude:cloud_portal/.hgignore
+subinclude:webadmin/.hgignore
+
+# Build folders in the repository root.
+re:^build/
+re:^build-.*/
