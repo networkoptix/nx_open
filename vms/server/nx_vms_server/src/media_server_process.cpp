@@ -4098,8 +4098,8 @@ bool MediaServerProcess::initializeAnalyticsEvents()
 
     if (!m_oldAnalyticsStoragePath.isEmpty())
     {
-        auto globalSettings = commonModule()->globalSettings();
-        if (globalSettings->metadataStorageChangePolicy() == MetadataStorageChangePolicy::Remove)
+        auto policy = commonModule()->globalSettings()->metadataStorageChangePolicy();
+        if (policy == nx::vms::api::MetadataStorageChangePolicy::remove)
         {
             if (!QFile::remove(m_oldAnalyticsStoragePath))
                 NX_WARNING(this, "Can not remove database %1", m_oldAnalyticsStoragePath);

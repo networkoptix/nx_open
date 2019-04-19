@@ -116,16 +116,6 @@ const QString kMetadataStorageChangePolicyName(lit("metadataStorageChangePolicy"
 
 using FileToPeerList = QMap<QString, QList<QnUuid>>;
 
-enum class MetadataStorageChangePolicy
-{
-    Keep,
-    Remove,
-    Move,
-};
-Q_DECLARE_METATYPE(MetadataStorageChangePolicy);
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MetadataStorageChangePolicy);
-QN_FUSION_DECLARE_FUNCTIONS(MetadataStorageChangePolicy, (numeric));
-
 class QnGlobalSettings: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
@@ -377,8 +367,8 @@ public:
     QString forceLiveCacheForPrimaryStream() const;
     void setForceLiveCacheForPrimaryStream(const QString& value);
 
-    MetadataStorageChangePolicy metadataStorageChangePolicy() const;
-    void setMetadataStorageChangePolicy(MetadataStorageChangePolicy value);
+    nx::vms::api::MetadataStorageChangePolicy metadataStorageChangePolicy() const;
+    void setMetadataStorageChangePolicy(nx::vms::api::MetadataStorageChangePolicy value);
 
 signals:
     void initialized();
@@ -537,7 +527,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_defaultExportVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_lowQualityScreenVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_forceLiveCacheForPrimaryStreamAdaptor = nullptr;
-    QnResourcePropertyAdaptor<MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

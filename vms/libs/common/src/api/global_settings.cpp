@@ -692,9 +692,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         "auto",
         this);
 
-    m_metadataStorageChangePolicyAdaptor = new QnLexicalResourcePropertyAdaptor<MetadataStorageChangePolicy>(
+    m_metadataStorageChangePolicyAdaptor = new QnLexicalResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>(
         kMetadataStorageChangePolicyName,
-        MetadataStorageChangePolicy::Keep,
+        nx::vms::api::MetadataStorageChangePolicy::keep,
         this);
 
     connect(
@@ -1745,12 +1745,12 @@ bool QnGlobalSettings::isGlobalSetting(const nx::vms::api::ResourceParamWithRefD
     return QnUserResource::kAdminGuid == param.resourceId;
 }
 
-MetadataStorageChangePolicy QnGlobalSettings::metadataStorageChangePolicy() const
+nx::vms::api::MetadataStorageChangePolicy QnGlobalSettings::metadataStorageChangePolicy() const
 {
     return m_metadataStorageChangePolicyAdaptor->value();
 }
 
-void QnGlobalSettings::setMetadataStorageChangePolicy(MetadataStorageChangePolicy value)
+void QnGlobalSettings::setMetadataStorageChangePolicy(nx::vms::api::MetadataStorageChangePolicy value)
 {
     m_metadataStorageChangePolicyAdaptor->setValue(value);
 }
