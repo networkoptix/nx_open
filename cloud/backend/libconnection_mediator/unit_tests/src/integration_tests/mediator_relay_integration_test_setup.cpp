@@ -214,7 +214,7 @@ void MediatorRelayIntegrationTestSetup::assertUrlsEquality(
     const std::vector<nx::String>& test)
 {
     ASSERT_EQ(expected.size(), test.size());
-    for (int i = 0; i < expected.size(); ++i)
+    for (std::size_t i = 0; i < expected.size(); ++i)
     {
         ASSERT_EQ(expected[i].toString().toStdString(), test[i].toStdString());
     }
