@@ -277,11 +277,11 @@
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
-      <translation type="unfinished">Keyfr + Lo-Res</translation>
+      <translation>Keyfr + Lo-Res</translation>
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation type="unfinished">Custom-Res</translation>
+      <translation>Custom-Res</translation>
     </message>
     <message>
       <source>%1 fps</source>
@@ -397,7 +397,7 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>PRESETS</translation>
     </message>
   </context>
   <context>
@@ -774,15 +774,15 @@
     <name>VideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation type="unfinished">No motion data for this camera</translation>
+      <translation>Não há dados de movimento para esta câmara</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation type="unfinished">No motion found in the selected area</translation>
+      <translation>Nenhum movimento encontrado na área selecionada</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation type="unfinished">No motion found in the visible area</translation>
+      <translation>Nenhum movimento encontrado na área visível</translation>
     </message>
     <message>
       <source>No Archive</source>
@@ -797,7 +797,7 @@
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>Área</translation>
     </message>
     <message>
       <source>Change Quality</source>
@@ -809,15 +809,15 @@
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation type="unfinished">Tap and hold to select an area</translation>
+      <translation>Pressione e arraste para seleccionar uma área</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation type="unfinished">Enable motion search first to select an area</translation>
+      <translation>Activar primeiro a pesquisa de movimento para selecionar uma área</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
+      <translation>Área personalizada inválida. Por favor, desenhe uma área correta.</translation>
     </message>
   </context>
   <context>

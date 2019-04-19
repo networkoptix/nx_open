@@ -774,15 +774,15 @@
     <name>VideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation type="unfinished">No motion data for this camera</translation>
+      <translation>אין נתוני תנועה עבור מצלמה זו</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation type="unfinished">No motion found in the selected area</translation>
+      <translation>לא נמצאה תנועה באזור הגילוי הנבחר</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation type="unfinished">No motion found in the visible area</translation>
+      <translation>לא נמצאה תנועה באזור הגלוי</translation>
     </message>
     <message>
       <source>No Archive</source>
@@ -797,7 +797,7 @@
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>אזור</translation>
     </message>
     <message>
       <source>Change Quality</source>
@@ -809,15 +809,15 @@
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation type="unfinished">Tap and hold to select an area</translation>
+      <translation>הקש והחזק כדי לבחור אזור</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation type="unfinished">Enable motion search first to select an area</translation>
+      <translation>אפשר גילוי תנועה תחילה כדי לבחור אזור גילוי</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
+      <translation>האזור שסומן לא תקין. נא לסמן אזור מחדש.</translation>
     </message>
   </context>
   <context>

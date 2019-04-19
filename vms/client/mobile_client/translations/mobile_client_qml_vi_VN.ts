@@ -797,7 +797,7 @@
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>Khu vực</translation>
     </message>
     <message>
       <source>Change Quality</source>
