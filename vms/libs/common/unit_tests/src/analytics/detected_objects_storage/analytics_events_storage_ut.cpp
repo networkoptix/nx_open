@@ -1232,11 +1232,19 @@ private:
 
     QnTimePeriodList expectedLookupResult()
     {
-        return filterTimePeriods(
+        auto timePeriods = filterTimePeriods(
             filter(),
             toTimePeriods(
                 filterPackets(filter(), analyticsDataPackets()),
                 m_lookupOptions));
+
+        if (kUseTrackAggregation)
+        {
+            timePeriods = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+                timePeriods, kTrackAggregationPeriod);
+        }
+
+        return timePeriods;
     }
 
     QnTimePeriodList filterTimePeriods(
