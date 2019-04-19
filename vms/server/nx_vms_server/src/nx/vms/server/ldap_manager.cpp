@@ -38,6 +38,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace vms::server {
@@ -410,7 +411,7 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
             lerrstr = NULL;
         };
 
-    const auto memoryGuard = makeScopeGuard(
+    const auto memoryGuard = nx::utils::makeScopeGuard(
         [&]()
         {
             cleanUpCookie();
