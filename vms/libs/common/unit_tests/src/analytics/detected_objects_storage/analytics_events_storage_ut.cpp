@@ -154,78 +154,14 @@ protected:
     std::vector<DetectedObject> toDetectedObjects(
         const std::vector<common::metadata::DetectionMetadataPacketPtr>& analyticsDataPackets) const
     {
-        std::vector<DetectedObject> result;
-        for (const auto& packet: analyticsDataPackets)
-        {
-            for (const auto& object: packet->objects)
-            {
-                DetectedObject detectedObject;
-                detectedObject.objectAppearanceId = object.objectId;
-                detectedObject.objectTypeId = object.objectTypeId;
-                detectedObject.attributes = object.labels;
-                detectedObject.track.push_back(ObjectPosition());
-                ObjectPosition& objectPosition = detectedObject.track.back();
-                objectPosition.boundingBox = object.boundingBox;
-                objectPosition.timestampUsec = packet->timestampUsec;
-                objectPosition.durationUsec = packet->durationUsec;
-                objectPosition.deviceId = packet->deviceId;
+        std::vector<DetectedObject> objects;
 
-                result.push_back(std::move(detectedObject));
-            }
-        }
+        convertPacketsToObjects(analyticsDataPackets, &objects);
+        groupObjects(&objects);
+        if (kUseTrackAggregation)
+            removeDuplicateAttributes(&objects);
 
-        // Groupping object track.
-        std::sort(
-            result.begin(), result.end(),
-            [](const DetectedObject& left, const DetectedObject& right)
-            {
-                return left.objectAppearanceId < right.objectAppearanceId;
-            });
-
-        for (auto it = result.begin(); it != result.end();)
-        {
-            auto nextIter = std::next(it);
-            if (nextIter == result.end())
-                break;
-
-            if (it->objectAppearanceId == nextIter->objectAppearanceId)
-            {
-                // Merging.
-                it->firstAppearanceTimeUsec =
-                    std::min(it->firstAppearanceTimeUsec, nextIter->firstAppearanceTimeUsec);
-                it->lastAppearanceTimeUsec =
-                    std::max(it->lastAppearanceTimeUsec, nextIter->lastAppearanceTimeUsec);
-                std::move(
-                    nextIter->track.begin(), nextIter->track.end(),
-                    std::back_inserter(it->track));
-                std::move(
-                    nextIter->attributes.begin(), nextIter->attributes.end(),
-                    std::back_inserter(it->attributes));
-                result.erase(nextIter);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-
-        for (auto& detectedObject: result)
-        {
-            std::sort(
-                detectedObject.track.begin(), detectedObject.track.end(),
-                [](const ObjectPosition& left, const ObjectPosition& right)
-                    { return left.timestampUsec < right.timestampUsec; });
-
-            if (!detectedObject.track.empty())
-            {
-                detectedObject.firstAppearanceTimeUsec =
-                    detectedObject.track.begin()->timestampUsec;
-                detectedObject.lastAppearanceTimeUsec =
-                    detectedObject.track.rbegin()->timestampUsec;
-            }
-        }
-
-        return result;
+        return objects;
     }
 
     std::vector<DetectedObject> filterObjects(
@@ -626,6 +562,97 @@ private:
         }
 
         return true;
+    }
+
+    static void convertPacketsToObjects(
+        const std::vector<common::metadata::DetectionMetadataPacketPtr>& analyticsDataPackets,
+        std::vector<DetectedObject>* objects)
+    {
+        for (const auto& packet: analyticsDataPackets)
+        {
+            for (const auto& object: packet->objects)
+            {
+                DetectedObject detectedObject;
+                detectedObject.objectAppearanceId = object.objectId;
+                detectedObject.objectTypeId = object.objectTypeId;
+                detectedObject.attributes = object.labels;
+                detectedObject.track.push_back(ObjectPosition());
+                ObjectPosition& objectPosition = detectedObject.track.back();
+                objectPosition.boundingBox = object.boundingBox;
+                objectPosition.timestampUsec = packet->timestampUsec;
+                objectPosition.durationUsec = packet->durationUsec;
+                objectPosition.deviceId = packet->deviceId;
+
+                objects->push_back(std::move(detectedObject));
+            }
+        }
+    }
+
+    static void groupObjects(std::vector<DetectedObject>* objects)
+    {
+        std::sort(
+            objects->begin(), objects->end(),
+            [](const DetectedObject& left, const DetectedObject& right)
+            {
+                return left.objectAppearanceId < right.objectAppearanceId;
+            });
+
+        for (auto it = objects->begin(); it != objects->end();)
+        {
+            auto nextIter = std::next(it);
+            if (nextIter == objects->end())
+                break;
+
+            if (it->objectAppearanceId == nextIter->objectAppearanceId)
+            {
+                // Merging.
+                it->firstAppearanceTimeUsec =
+                    std::min(it->firstAppearanceTimeUsec, nextIter->firstAppearanceTimeUsec);
+                it->lastAppearanceTimeUsec =
+                    std::max(it->lastAppearanceTimeUsec, nextIter->lastAppearanceTimeUsec);
+                std::move(
+                    nextIter->track.begin(), nextIter->track.end(),
+                    std::back_inserter(it->track));
+                std::move(
+                    nextIter->attributes.begin(), nextIter->attributes.end(),
+                    std::back_inserter(it->attributes));
+                objects->erase(nextIter);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+
+        for (auto& detectedObject: *objects)
+        {
+            std::sort(
+                detectedObject.track.begin(), detectedObject.track.end(),
+                [](const ObjectPosition& left, const ObjectPosition& right)
+                { return left.timestampUsec < right.timestampUsec; });
+
+            if (!detectedObject.track.empty())
+            {
+                detectedObject.firstAppearanceTimeUsec =
+                    detectedObject.track.begin()->timestampUsec;
+                detectedObject.lastAppearanceTimeUsec =
+                    detectedObject.track.rbegin()->timestampUsec;
+            }
+        }
+    }
+
+    static void removeDuplicateAttributes(std::vector<DetectedObject>* objects)
+    {
+        for (auto& detectedObject: *objects)
+        {
+            std::map<QString, QString> uniqueAttributes;
+            for (const auto& attribute: detectedObject.attributes)
+                uniqueAttributes[attribute.name] = attribute.value;
+            detectedObject.attributes.clear();
+
+            for (const auto& [name, value]: uniqueAttributes)
+                detectedObject.attributes.push_back({name, value});
+        }
     }
 };
 
