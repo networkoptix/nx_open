@@ -424,7 +424,7 @@ QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& strea
 {
     if (streamingFormat == "webm")
         return "video/webm";
-    else if (streamingFormat == "mpegts")
+    else if (streamingFormat == "mpegts" || streamingFormat == "ts")
         return "video/mp2t";
     else if (streamingFormat == "mp4")
         return "video/mp4";
@@ -462,6 +462,8 @@ void QnProgressiveDownloadingConsumer::updateCodecByFormat(const QByteArray& str
         d->videoCodec = AV_CODEC_ID_H264;  //TODO #ak need to use "copy"
     else if (streamingFormat == "f4v")
         d->videoCodec = AV_CODEC_ID_H264;  //TODO #ak need to use "copy"
+    else if (streamingFormat == "ismv")
+        d->videoCodec = AV_CODEC_ID_H264;
 }
 
 void QnProgressiveDownloadingConsumer::sendMediaEventErrorResponse(
@@ -545,6 +547,11 @@ void QnProgressiveDownloadingConsumer::run()
             sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
             return;
         }
+
+        // If user request 'mp4' format use smooth streaming format to make mp4 streamable.
+        if (d->streamingFormat == "mp4")
+            d->streamingFormat = "ismv";
+
         updateCodecByFormat(d->streamingFormat);
 
         const QUrlQuery decodedUrlQuery( getDecodedUrl().toQUrl() );
