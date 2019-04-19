@@ -262,22 +262,8 @@ DetectedObject ObjectSearcher::loadObject(
     filterTrack(filter, &detectedObject.track);
     if (!detectedObject.track.empty())
     {
-        bool intersects = false;
-
         for (auto& position: detectedObject.track)
-        {
             position.deviceId = detectedObject.deviceId;
-
-            if (!filter.boundingBox.isEmpty())
-            {
-                intersects = intersects ||
-                    translate(filter.boundingBox, kSearchResolution)
-                        .intersects(translate(position.boundingBox, kSearchResolution));
-            }
-        }
-
-        if (!filter.boundingBox.isEmpty() && !intersects)
-            int x = 0;
     }
 
     return detectedObject;
