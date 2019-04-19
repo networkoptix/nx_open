@@ -13,13 +13,13 @@ angular.module('nxCommon')
             try {
                 this.castPlayer = new CastPlayer();
                 this.castPlayer.initializeCastPlayer();
+    
+                this.load = function(stream, mimeType) {
+                    this.castPlayer.playerHandler.setStream(stream, mimeType);
+                };
             } catch (err) {
                 console.error('CastPlayer failed with: ', err);
             }
-            
-            this.load = function(stream, mimeType) {
-                this.castPlayer.playerHandler.setStream(stream, mimeType);
-            };
         }
     }]);
 })();
