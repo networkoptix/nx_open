@@ -31,6 +31,11 @@ void SqlQuery::prepare(const QString& query)
     }
 }
 
+void SqlQuery::addBindValue(const QVariant& value) noexcept
+{
+    m_sqlQuery.addBindValue(value);
+}
+
 void SqlQuery::bindValue(const QString& placeholder, const QVariant& value) noexcept
 {
     m_sqlQuery.bindValue(placeholder, value);
