@@ -73,7 +73,7 @@ bool isCodecCompatibleWithFormat(AVCodecID codec, const QByteArray& streamingFor
     return false;
 }
 
-const CameraMediaStreamInfo* findCompatibleStream(
+const std::optional<CameraMediaStreamInfo> findCompatibleStream(
     const std::vector<CameraMediaStreamInfo>& streams,
     const QByteArray& streamingFormat,
     const QString& requestedResolution)
@@ -84,10 +84,10 @@ const CameraMediaStreamInfo* findCompatibleStream(
             isCodecCompatibleWithFormat((AVCodecID)streamInfo.codec, streamingFormat) &&
             (requestedResolution.isEmpty() || requestedResolution == streamInfo.resolution))
         {
-            return &streamInfo;
+            return streamInfo;
         }
     }
-    return nullptr;
+    return std::nullopt;
 }
 
 }
