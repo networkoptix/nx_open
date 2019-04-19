@@ -13,13 +13,25 @@ namespace test {
 class TrafficRelay:
     public MediatorRelayIntegrationTestSetup
 {
-public:
+protected:
+    void givenMultipleTrafficRelayUrls()
+    {
+        // Base type constructor adds a url, so we only need to add one.
+        addTrafficRelayUrl("http://traffic-relay-test.com");
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
 
 TEST_F(TrafficRelay, listen_reports_taffic_relay_url)
 {
+    issueListenRequest();
+    assertTrafficRelayUrlHasBeenReported();
+}
+
+TEST_F(TrafficRelay, listen_reports_multiple_relay_urls)
+{
+    givenMultipleTrafficRelayUrls();
     issueListenRequest();
     assertTrafficRelayUrlHasBeenReported();
 }

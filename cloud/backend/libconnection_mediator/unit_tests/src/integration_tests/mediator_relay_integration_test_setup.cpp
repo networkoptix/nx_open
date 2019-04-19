@@ -8,14 +8,14 @@ namespace nx {
 namespace hpm {
 namespace test {
 
-namespace {
+namespace detail {
 
 class RelayClusterClientStub:
     public AbstractRelayClusterClient
 {
 public:
-    RelayClusterClientStub(QUrl relayUrl):
-        m_relayUrl(relayUrl)
+    RelayClusterClientStub(const std::vector<QUrl>& relayUrls):
+        m_relayUrls(relayUrls)
     {
     }
 
@@ -25,11 +25,11 @@ public:
     {
         m_aioThreadBinder.post(
             [this, completionHandler = std::move(completionHandler)]()
-            {
-                completionHandler(
-                    cloud::relay::api::ResultCode::ok,
-                    std::vector<QUrl>({m_relayUrl}));
-            });
+        {
+            completionHandler(
+                cloud::relay::api::ResultCode::ok,
+                m_relayUrls);
+        });
     }
 
     virtual void findRelayInstancePeerIsListeningOn(
@@ -38,23 +38,29 @@ public:
     {
         m_aioThreadBinder.post(
             [this, completionHandler = std::move(completionHandler)]()
-            {
-                completionHandler(cloud::relay::api::ResultCode::ok, m_relayUrl);
-            });
+        {
+            ASSERT_TRUE(!m_relayUrls.empty());
+            completionHandler(cloud::relay::api::ResultCode::ok, m_relayUrls.front());
+        });
+    }
+
+    void addTrafficRelayUrl(const QString& url)
+    {
+        m_relayUrls.emplace_back(url);
     }
 
 private:
     network::aio::BasicPollable m_aioThreadBinder;
-    QUrl m_relayUrl;
+    std::vector<QUrl> m_relayUrls;
 };
 
-} // namespace
+} // namespace detail
 
 //-------------------------------------------------------------------------------------------------
 
-MediatorRelayIntegrationTestSetup::MediatorRelayIntegrationTestSetup():
-    m_relayUrl("http://nxvms.com/relay")
+MediatorRelayIntegrationTestSetup::MediatorRelayIntegrationTestSetup()
 {
+    addTrafficRelayUrl("http://nxvms.com/relay");
     m_factoryFuncBak = RelayClusterClientFactory::instance().setCustomFunc(
         std::bind(&MediatorRelayIntegrationTestSetup::createRelayClusterClient, this, std::placeholders::_1));
 }
@@ -85,6 +91,7 @@ MediatorRelayIntegrationTestSetup::~MediatorRelayIntegrationTestSetup()
         m_mediaServerEmulator.reset();
     }
 
+    m_relayClusterClientStub = nullptr;
     RelayClusterClientFactory::instance().setCustomFunc(std::move(m_factoryFuncBak));
 }
 
@@ -113,6 +120,13 @@ void MediatorRelayIntegrationTestSetup::SetUp()
 
     m_mediatorUdpClient = std::make_unique<api::MediatorClientUdpConnection>(
         stunUdpEndpoint());
+}
+
+void MediatorRelayIntegrationTestSetup::addTrafficRelayUrl(const QString& url)
+{
+    m_relayUrls.emplace_back(url);
+    if (m_relayClusterClientStub)
+        m_relayClusterClientStub->addTrafficRelayUrl(url);
 }
 
 void MediatorRelayIntegrationTestSetup::issueListenRequest()
@@ -171,16 +185,15 @@ void MediatorRelayIntegrationTestSetup::assertTrafficRelayUrlHasBeenReported()
     if (m_listenResponse)
     {
         ASSERT_TRUE(!m_listenResponse->trafficRelayUrls.empty());
-        ASSERT_EQ(
-            m_relayUrl.toString().toStdString(),
-            m_listenResponse->trafficRelayUrls.front().toStdString());
+        assertUrlsEquality(m_relayUrls, m_listenResponse->trafficRelayUrls);
+        ASSERT_TRUE(static_cast<bool>(m_listenResponse->trafficRelayUrl));
     }
 
     if (m_connectResponse)
     {
         ASSERT_TRUE(m_connectResponse->trafficRelayUrl);
         ASSERT_EQ(
-            m_relayUrl.toString().toStdString(),
+            m_relayUrls.front().toString().toStdString(),
             m_connectResponse->trafficRelayUrl->toStdString());
     }
 }
@@ -196,6 +209,17 @@ std::optional<nx::String> MediatorRelayIntegrationTestSetup::reportedTrafficRela
     return std::nullopt;
 }
 
+void MediatorRelayIntegrationTestSetup::assertUrlsEquality(
+    const std::vector<QUrl>& expected,
+    const std::vector<nx::String>& test)
+{
+    ASSERT_EQ(expected.size(), test.size());
+    for (int i = 0; i < expected.size(); ++i)
+    {
+        ASSERT_EQ(expected[i].toString().toStdString(), test[i].toStdString());
+    }
+}
+
 std::optional<api::SystemCredentials> MediatorRelayIntegrationTestSetup::getSystemCredentials() const
 {
     return m_systemCredentials;
@@ -204,7 +228,9 @@ std::optional<api::SystemCredentials> MediatorRelayIntegrationTestSetup::getSyst
 std::unique_ptr<AbstractRelayClusterClient> MediatorRelayIntegrationTestSetup::createRelayClusterClient(
     const conf::Settings& /*settings*/)
 {
-    return std::make_unique<RelayClusterClientStub>(m_relayUrl);
+    auto relayClusterClientStub = std::make_unique<detail::RelayClusterClientStub>(m_relayUrls);
+    m_relayClusterClientStub = relayClusterClientStub.get();
+    return relayClusterClientStub;
 }
 
 } // namespace test
