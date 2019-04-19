@@ -48,7 +48,7 @@ private:
 
     HanwhaSharedResourceContext* m_resourceConext = nullptr;
     QMetaObject::Connection m_syncTymeConnection;
-    network::aio::Timer m_timer;
+    nx::network::aio::Timer m_timer;
     nx::network::http::AsyncClient m_httpClient;
 
     std::list<utils::promise<void>*> m_startPromises;

@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.41",
+    "version": "1.0.1.48",
     "data": [
         {
             "keys": [
@@ -889,8 +889,7 @@
             "keys": [
                 "ISD|XPM-FL72-48MP",
                 "DW|XPM-FL72-48MP",
-                "DW|DWC-PZV2M72T",
-                "DigitalWatchdog|DWC-PZV2M72T"
+                "DW|DWC-PZV2M72T"
             ],
             "isdDwCam": true,
             "showUrl": true,
@@ -1651,7 +1650,7 @@
         },
         {
             "keys": [
-                "HITRON|NFX-22153D1", "DigitalWatchdog|DWC-MPTZ30X", "DW|DWC-MPTZ30X"
+                "HITRON|NFX-22153D1", "DW|DWC-MPTZ30X"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -2249,20 +2248,17 @@
         {
             "keys":[
                 "DW|DWC-MTT4W*",
-                "DigitalWatchdog|DWC-MTT4W*",
                 "DW|DWC-MVT4W*",
-                "DigitalWatchdog|DWC-MVT4W*",
-                "DW|DWC-MBT4W*",
-                "DigitalWatchdog|DWC-MBT4W*"
+                "DW|DWC-MBT4W*"
              ],
-             "trustToVideoSourceSize": false
+             "trustToVideoSourceSize": false,
+             "forceOnvifAdvancedParameters": true
         },
         {
             "keys":[
-                "Digital_Watchdog|DWC-PF5M1TIR",
-                "DigitalWatchdog|DWC-MD85DiA",
-                "DigitalWatchdog|DWC-MV85DiA",
-                "Digital_Watchdog|DWC-MV85DiA"
+                "DW|DWC-PF5M1TIR",
+                "DW|DWC-MD85DiA",
+                "DW|DWC-MV85DiA"
             ],
             "highStreamBitrateBounds": {
                 "min": 32,
@@ -2583,22 +2579,6 @@
                 "Surveillance Camera|DVB-4100-VS"
             ],
             "ignoreCameraTimeIfBigJitter": true
-        },
-        {
-            "keys": [
-                "DigitalWatchdog|DWC-MTT4Wi36",
-                "DigitalWatchdog|DWC-MVT4Wi28",
-                "DigitalWatchdog|DWC-MVT4Wi36",
-                "DigitalWatchdog|DWC-MVT4Wi6",
-                "DigitalWatchdog|DWC-MBT4Wi28",
-                "DigitalWatchdog|DWC-MBT4Wi36",
-                "DigitalWatchdog|DWC-MVT4WiA",
-                "DigitalWatchdog|DWC-MTT4Wi28",
-                "DigitalWatchdog|DWC-MTT4Wi36",
-                "DigitalWatchdog|DWC-MTT4Wi6",
-                "DigitalWatchdog|DWC-MTT4WiA"
-            ],
-            "forceOnvifAdvancedParameters": true
         },
         {
             "keys": [

@@ -36,7 +36,11 @@ Camera::Camera(QnMediaServerModule* serverModule):
     m_lastInitTime.invalidate();
 
     connect(this, &Camera::groupIdChanged, [this]() { reinitAsync(); });
-    connect(this, &QnResource::initializedChanged, [this]() { fixInputPortMonitoring(); });
+    connect(this, &QnResource::initializedChanged, [this]()
+    {
+        QnMutexLocker lk(&m_initMutex);
+        fixInputPortMonitoring();
+    });
 
     connect(this, &Camera::propertyChanged,
     [this](const QnResourcePtr& /*resource*/, const QString& key)
@@ -393,6 +397,9 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
 
 CameraDiagnostics::Result Camera::initInternal()
 {
+    // This property is for debug purpose only.
+    setProperty("driverClass", toString(typeid(*this)));
+
     auto resData = resourceData();
     auto timeoutSec = resData.value<int>(ResourceDataKey::kUnauthorizedTimeoutSec);
     auto credentials = getAuth();

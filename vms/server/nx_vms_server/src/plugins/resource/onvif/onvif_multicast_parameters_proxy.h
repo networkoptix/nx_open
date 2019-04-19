@@ -1,10 +1,11 @@
 #pragma once
 
 #include <optional>
+#include <string>
+#include <QString>
 
 struct QnCameraAdvancedParams;
 class QnPlOnvifResource;
-class QString;
 
 namespace nx::vms::server::resource {
 

@@ -163,7 +163,7 @@ private:
 
     void at_cameraPrepared(
         bool success,
-        const rest::Handle& requestId,
+        const ::rest::Handle& requestId,
         const nx::vms::api::CameraHistoryDataList& periods,
         callbackFunction callback);
 
@@ -192,7 +192,7 @@ private:
     QSet<QnUuid> m_historyValidCameras;
 
     //typedef QMap<int, callbackFunction> HandlerMap;
-    QMap<QnUuid, rest::Handle> m_asyncRunningRequests;
+    QMap<QnUuid, ::rest::Handle> m_asyncRunningRequests;
     QSet<QnUuid> m_syncRunningRequests;
     mutable QnMutex m_syncLoadMutex;
     QnWaitCondition m_syncLoadWaitCond;

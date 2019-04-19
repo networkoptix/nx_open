@@ -106,7 +106,7 @@ protected:
 
         for (const auto& chunk: (*serverCatalogIt)->getChunksUnsafe())
         {
-            const auto fullFileName = (*serverCatalogIt)->fullFileName(chunk);
+            const auto fullFileName = (*serverCatalogIt)->fullFileName(chunk.chunk());
             const auto folderPath = QFileInfo(fullFileName).absolutePath();
             if (folder1Path.isEmpty())
             {
@@ -152,7 +152,7 @@ protected:
 
         for (const auto& chunk: (*serverCatalogIt)->getChunksUnsafe())
         {
-            const auto fullFileName = (*serverCatalogIt)->fullFileName(chunk);
+            const auto fullFileName = (*serverCatalogIt)->fullFileName(chunk.chunk());
             if (file1Path.isEmpty())
             {
                 file1Path = fullFileName;

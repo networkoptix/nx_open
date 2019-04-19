@@ -537,7 +537,8 @@ struct RemoveResourceAccess
             .dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
 
-        bool result = result = commonModule->resourceAccessManager()->hasPermission(userResource, target, Qn::RemovePermission);
+        bool result = commonModule->resourceAccessManager()->hasPermission(
+            userResource, target, Qn::RemovePermission);
 
         if (!result)
             NX_INFO(this, "Remove resource access returned false. User resource: %1. Target resource: %2",
@@ -1217,11 +1218,12 @@ ec2::TransactionType::Value getStatusTransactionTypeFromDb(
     return TransactionType::Local;
 }
 
+template <typename ParamsType>
 struct SetStatusTransactionType
 {
     ec2::TransactionType::Value operator()(
         QnCommonModule* commonModule,
-        const nx::vms::api::ResourceStatusData& params,
+        const ParamsType& params,
         AbstractPersistentStorage* db)
     {
         const auto& resPool = commonModule->resourcePool();

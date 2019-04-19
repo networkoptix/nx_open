@@ -520,7 +520,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
             error);
         if (result != nx::network::http::StatusCode::ok || error->error)
             return result;
-        
+
         if (!serverModule()->hlsSessionPool()->add(
                 std::unique_ptr<Session>(session), kDefaultHlsSessionLiveTimeout))
         {
@@ -574,11 +574,11 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getVariantPlayl
     const std::multimap<QString, QString>& /*requestParams*/,
     QByteArray* serializedPlaylist)
 {
-    network::hls::VariantPlaylist playlist;
+    nx::network::hls::VariantPlaylist playlist;
 
     nx::utils::Url baseUrl;
 
-    network::hls::VariantPlaylistData playlistData;
+    nx::network::hls::VariantPlaylistData playlistData;
     playlistData.url = baseUrl;
     playlistData.url.setPath(request.requestLine.url.path());
     //if needed, adding proxy information to playlist url
@@ -721,7 +721,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
         i < chunkList.size();
         ++i)
     {
-        network::hls::Chunk hlsChunk;
+        nx::network::hls::Chunk hlsChunk;
         hlsChunk.duration = chunkList[i].duration / (double)kUsecPerSec;
         hlsChunk.url = baseChunkUrl;
         QUrlQuery hlsChunkUrlQuery(hlsChunk.url.query());

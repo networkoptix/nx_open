@@ -29,7 +29,6 @@
 #include "api/model/recording_stats_reply.h"
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <recorder/camera_info.h>
-#include <recorder/space_info.h>
 
 #include <atomic>
 #include <future>
@@ -168,7 +167,7 @@ public:
     void clearMaxDaysData(QnServer::ChunksCatalog catalogIdx);
 
     void deleteRecordsToTime(DeviceFileCatalogPtr catalog, qint64 minTime);
-    void clearDbByChunk(DeviceFileCatalogPtr catalog, const DeviceFileCatalog::Chunk& chunk);
+    void clearDbByChunk(DeviceFileCatalogPtr catalog, const nx::vms::server::Chunk& chunk);
 
     bool isWritableStoragesAvailable() const;
 
@@ -260,7 +259,7 @@ private:
     void updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths);
     void findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog);
     void addDataFromDatabase(const QnStorageResourcePtr &storage);
-    bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
+    bool writeCSVCatalog(const QString& fileName, const QVector<nx::vms::server::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
     void getCamerasWithArchiveInternal(std::set<QString>& result,  const FileCatalogMap& catalog) const;
     void testStoragesDone();
@@ -286,6 +285,7 @@ private:
     static std::vector<QnUuid> getCamerasWithArchive(QnMediaServerModule* serverModule);
     int64_t calculateNxOccupiedSpace(int storageIndex) const;
     bool hasArchive(int storageIndex) const;
+    int64_t occupiedSpace(int storageIndex) const;
     QnStorageResourcePtr getStorageByIndex(int index) const;
     bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
     void startAuxTimerTasks();
@@ -345,7 +345,6 @@ private:
     std::atomic<bool> m_firstStoragesTestDone;
 
     bool m_isRenameDisabled;
-    nx::recorder::SpaceInfo m_spaceInfo;
     nx::caminfo::ServerWriterHandler m_camInfoWriterHandler;
     nx::caminfo::Writer m_camInfoWriter;
 

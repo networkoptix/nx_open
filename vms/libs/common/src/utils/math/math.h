@@ -278,9 +278,14 @@ inline bool equalWithPrecision(const QPointF& one, const QPointF& two, int preci
         && equalWithPrecision(one.y(), two.y(), precision);
 }
 
+inline bool equalWithPrecision(const QSizeF& one, const QSizeF& two, int precision) {
+    return equalWithPrecision(one.width(), two.width(), precision)
+        && equalWithPrecision(one.height(), two.height(), precision);
+}
+
 inline bool equalWithPrecision(const QRectF& one, const QRectF& two, int precision) {
     return equalWithPrecision(one.topLeft(), two.topLeft(), precision)
-        && equalWithPrecision(one.bottomRight(), two.bottomRight(), precision);
+        && equalWithPrecision(one.size(), two.size(), precision);
 }
 
 #endif // QN_MATH_H

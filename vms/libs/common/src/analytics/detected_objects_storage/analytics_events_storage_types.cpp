@@ -8,6 +8,8 @@
 #include <common/common_globals.h>
 #include <utils/math/math.h>
 
+#include "config.h"
+
 namespace nx {
 namespace analytics {
 namespace storage {
@@ -35,19 +37,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (ObjectPosition)(DetectedObject),
     (json)(ubjson),
     _analytics_storage_Fields)
-
-QByteArray serializeTrack(const std::vector<ObjectPosition>& /*track*/)
-{
-    NX_ASSERT(false);
-    // TODO
-    return QByteArray();
-}
-
-std::vector<ObjectPosition> deserializeTrack(const QByteArray& /*serializedData*/)
-{
-    // TODO
-    return {};
-}
 
 //-------------------------------------------------------------------------------------------------
 
@@ -113,8 +102,6 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
         params->insert(lit("y2"), QString::number(filter.boundingBox.bottomRight().y()));
     }
 
-    // TODO: requiredAttributes
-
     if (!filter.freeText.isEmpty())
     {
         params->insert(
@@ -167,8 +154,6 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
             params.value(lit("x2")).toDouble(),
             params.value(lit("y2")).toDouble()));
     }
-
-    // TODO: requiredAttributes.
 
     if (params.contains(lit("freeText")))
     {
