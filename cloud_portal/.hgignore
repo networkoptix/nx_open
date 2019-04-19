@@ -36,8 +36,22 @@ front_end/app/{main,polyfills,vendor,overrides.d,app.module,app.component,ajs-up
 *.log
 
 env
+env3
+
 cloud/.idea
 cloud/static
 cloud/notifications/static/templates/*.mustache
 cloud/notifications/static/templates/email_logo.png
 .DS_Store
+
+cloud_portal/robot_tests/test-cases/looper.robot
+cloud_portal/robot_tests/chromedriver.exe
+cloud_portal/robot_tests/Screenshots
+cloud_portal/robot_tests/log*.html
+cloud_portal/robot_tests/output*.xml
+cloud_portal/robot_tests/report*.html
+cloud_portal/robot_tests/MicrosoftWebDriver.exe
+cloud_portal/robot_tests/geckodriver.exe
+cloud_portal/robot_tests/test-cases/outputs/*
+cloud_portal/robot_tests/outputs/
+cloud_portal/robot_tests/IEDriverServer.exe
