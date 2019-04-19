@@ -143,6 +143,8 @@ struct Ini: nx::kit::IniConfig
         "Period to check for new updates, in seconds. Set to zero to use the built-in value.");
     NX_INI_FLAG(1, rightPanelHoverPreviewCrop,
         "Whether mouse hover toggles crop mode on Right Panel tiles and tooltips.");
+    NX_INI_FLAG(0, pluginInformationInServerSettings,
+        "Show information about installed plugin libraries in Server Settings.");
 };
 
 inline Ini& ini()

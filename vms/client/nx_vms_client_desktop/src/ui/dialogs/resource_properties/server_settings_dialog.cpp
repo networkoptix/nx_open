@@ -22,6 +22,7 @@
 #include <utils/common/html.h>
 
 #include <nx/network/http/http_types.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/resource_properties/server/redux/server_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/server/redux/server_settings_dialog_store.h>
@@ -50,7 +51,9 @@ struct QnServerSettingsDialog::Private
         generalPage(new QnServerSettingsWidget(q)),
         statisticsPage(new QnStorageAnalyticsWidget(q)),
         storagesPage(new QnStorageConfigWidget(q)),
-        pluginsPage(new ServerPluginsSettingsWidget(store, qnClientCoreModule->mainQmlEngine(), q)),
+        pluginsPage(ini().pluginInformationInServerSettings
+            ? new ServerPluginsSettingsWidget(store, qnClientCoreModule->mainQmlEngine(), q)
+            : nullptr),
         webPageLink(new QLabel(q))
     {
     }
@@ -86,7 +89,9 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     addPage(SettingsPage, d->generalPage, tr("General"));
     addPage(StorageManagmentPage, d->storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, d->statisticsPage, tr("Storage Analytics"));
-    addPage(PluginsPage, new Private::PluginSettingsAdapter(d.get()), tr("Plugins"));
+
+    if (ini().pluginInformationInServerSettings)
+        addPage(PluginsPage, new Private::PluginSettingsAdapter(d.get()), tr("Plugins"));
 
     setupShowWebServerLink();
 
