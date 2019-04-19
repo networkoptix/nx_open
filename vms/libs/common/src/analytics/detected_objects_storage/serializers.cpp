@@ -22,7 +22,8 @@ int serialize(long long value, QByteArray* buf)
         // NOTE: Filling valueBuf in reverse order so that the most significant bits are in the beginning.
         if (bytesWritten != 0)
             bitsToWrite |= 0x80; //< One more byte is needed.
-        valueBuf[kBufSize - (++bytesWritten)] = bitsToWrite;
+        ++bytesWritten;
+        valueBuf[kBufSize - bytesWritten] = bitsToWrite;
     } while (uValue != 0);
 
     buf->append((char*) valueBuf + (kBufSize - bytesWritten), bytesWritten);
@@ -33,6 +34,10 @@ int serialize(
     const std::vector<long long>& numbers,
     QByteArray* buf)
 {
+    constexpr int kAverageSerializedNumberSize = 5;
+
+    buf->reserve(buf->size() + numbers.size() * kAverageSerializedNumberSize);
+
     return (int) std::accumulate(numbers.begin(), numbers.end(), 0,
         [buf](long long bytesWritten, long long value)
         {
