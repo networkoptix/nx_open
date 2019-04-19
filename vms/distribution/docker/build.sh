@@ -1,12 +1,9 @@
 #!/bin/bash
 
-DOCKERFILE="`dirname \"$0\"`/Dockerfile"
-DOCKER_WS=`pwd`
-
-# This is helper for building docker image from debian package for mediaserver
+# This is helper script for building docker image from debian package for mediaserver
 
 display_usage() {
-	echo "This is helper for building docker image from debian package for mediaserver."
+	echo "I am helper script for building docker image from debian package for mediaserver."
 	echo -e "Usage:\nbuild.sh [-u url ] | [-d deb] | path\n"
 	echo "Possible arguments:"
 	echo -e "\t-d|--deb PATH - uses deb file as a source"
@@ -14,36 +11,51 @@ display_usage() {
 	echo -e "\t-u|--url URL - uses URL as a source for debian file"
 }
 
+# Path to a folder with Dockerfile and necessary scripts
+DOCKER_SOURCE="`dirname \"$0\"`"
+
+DOCKERFILE="$DOCKER_SOURCE/Dockerfile"
+
+# Path to current docker build folder
+DOCKER_WS=`pwd`
+
 # Name of docker container to be built
 CONTAINER_NAME=mediaserver
-
+CLOUD_OVERRIDE=
 POSITIONAL=()
 
+
+# Processing command line arguments
 while [[ $# -gt 0 ]] ; do
 	key="$1"
 
 	case $key in
-		-d|--deb)
+	-d|--deb)
 		# Will use existing deb file
 		DEB_FILE="$2"
 		shift
 		shift
 		;;
-		-b|--build)
+	-b|--build)
 		# Will use nx_vms build folder as source
 		BUILD_PATH="$2"
 		shift
 		shift
 		;;
-		-u|--url)
+	-u|--url)
 		# Will use url to deb file as source
 		DEB_URL="$2"
 		shift
 		shift
 		;;
-		-n|--name)
+	-n|--name)
 		# Name for container. By default it is 'mediaserver'
 		CONTAINER_NAME="$2"
+		shift
+		shift
+		;;
+	-c|--cloud)
+		CLOUD_OVERRIDE="$2"
 		shift
 		shift
 		;;
@@ -52,9 +64,9 @@ while [[ $# -gt 0 ]] ; do
 		shift
 		;;
 	esac
-
 done
 
+# Trying to guess what to do with positional arguments
 for path in "${POSITIONAL[@]}" ; do
 	if [[ $path == http://* ]] || [[ $path == https://* ]] ; then
 		#echo "The path ${SS}$path${EE} looks like URL. I will try to download it"
@@ -75,8 +87,9 @@ SS="\e[4m"
 EE="\e[0m"
 
 # It checks whether deb file exists and suits us.
-check_dpkg () {
-	file=$1
+check_dpkg ()
+{
+	local file=$1
 
 	if [[ ! -r $file ]]; then
 		raise_error "File ${SS}$file${EE} does not exist or I can not access it"
@@ -94,6 +107,7 @@ check_dpkg () {
 if [ ! -r $DOCKERFILE ] ; then
 	raise_error "${SS}${DOCKERFILE}${EE} does not exists. It should be near to build.sh script"
 fi
+
 
 if [ ! -z "$DEB_FILE" ] ; then
 	echo -e "I will try to use deb file ${SS}${DEB_FILE}${EE}"
@@ -120,4 +134,5 @@ else
 fi
 
 echo -e "Building container at ${SS}${DOCKER_WS}${EE} using mediaserver_deb=$DEB_NAME name=$CONTAINER_NAME"
-docker build -t $CONTAINER_NAME --build-arg mediaserver_deb="$DEB_NAME" -f - . < $DOCKERFILE
+cp "$DOCKER_SOURCE/manage.sh" "$DOCKER_WS"
+docker build -t $CONTAINER_NAME --build-arg mediaserver_deb="$DEB_NAME" --build-arg cloud_host="$CLOUD_OVERRIDE" -f - . < $DOCKERFILE

@@ -1422,7 +1422,7 @@ State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
     for (const auto& id: value)
     {
         if (analyticsEngineIsPresentInList(id, state))
-            actualValue.insert(id)
+            actualValue.insert(id);
     }
 
     state.analytics.enabledEngines.setUser(actualValue);
