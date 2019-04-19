@@ -48,6 +48,7 @@ extern "C" {
 
 } // extern "C"
 
+class WritableStorageManager;
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
@@ -69,7 +70,7 @@ public:
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;   /* Map by camera unique id. */
     typedef QMap<QString, QSet<QDate>> UsedMonthsMap; /* Map by camera unique id. */
 
-    static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
+    static const int64_t kBigStorageTreshold = 10;
 
     QnStorageManager(
         QnMediaServerModule* serverModule,
@@ -328,11 +329,13 @@ private:
 
     QnStorageScanData m_archiveRebuildInfo;
 
+    friend class WritableStorageManager;
     friend class RebuildAsyncTask;
     friend class AuxiliaryTask;
     friend class ArchiveIndexer;
 
     std::unique_ptr<ArchiveIndexer> m_archiveIndexer;
+    std::unique_ptr<WritableStorageManager> m_writableStorageManager;
 
     bool m_initInProgress;
     QMap<QString, QSet<int>> m_oldStorageIndexes;

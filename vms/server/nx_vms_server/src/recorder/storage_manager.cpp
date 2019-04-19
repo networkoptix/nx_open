@@ -194,6 +194,225 @@ static void remove(const QnStorageResourcePtr &storage)
 
 } // namespace
 
+class WritableStorageManager
+{
+public:
+    WritableStorageManager(QnStorageManager* owner): m_owner(owner)
+    {
+    }
+
+    QnStorageResourceList list() const
+    {
+        QnStorageResourceList result = onlineStorages();
+        result = filterOutSpaceless(result);
+        result = filterOutSmall(result);
+        result = filterOutSmallSystem(result);
+
+
+
+
+
+        QnStorageResourceList storageRoots;
+        auto storageMap = getAllStorages();
+        for (auto itr = storageMap.cbegin(); itr != storageMap.cend(); ++itr)
+            storageRoots.append(itr.value());
+
+        if (additionalStorages)
+        {
+            for (auto storage: *additionalStorages)
+                storageRoots.append(storage);
+        }
+
+        qint64 bigStorageThreshold = 0;
+        for (auto itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+        {
+            QnStorageResourcePtr fileStorage = *itr;
+            if (fileStorage->getStatus() != Qn::Offline)
+            {
+                qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
+                bigStorageThreshold = qMax(bigStorageThreshold, available);
+                NX_VERBOSE(
+                    this,
+                    "[ApiStorageSpace, Writable storages] candidate: %1, available: %2, threshold: %3",
+                    nx::utils::url::hidePassword(fileStorage->getUrl()), available, bigStorageThreshold);
+            }
+            else
+            {
+                NX_VERBOSE(
+                    this,
+                    "[ApiStorageSpace, Writable storages] candidate: %1 is offline and thus neglected",
+                    nx::utils::url::hidePassword(fileStorage->getUrl()));
+            }
+        }
+        bigStorageThreshold /= BIG_STORAGE_THRESHOLD_COEFF;
+
+        for (auto itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+        {
+            QnStorageResourcePtr fileStorage = *itr;
+            if (fileStorage->getStatus() != Qn::Offline)
+            {
+                qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
+                if (available >= bigStorageThreshold)
+                {
+                    result << fileStorage;
+                    fileStorage->setStatusFlag(fileStorage->statusFlag() & ~Qn::StorageStatus::tooSmall);
+                    NX_VERBOSE(
+                        this,
+                        "[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate",
+                        nx::utils::url::hidePassword(fileStorage->getUrl()));
+                }
+                else
+                {
+                    fileStorage->setStatusFlag(fileStorage->statusFlag() | Qn::StorageStatus::tooSmall);
+                    NX_VERBOSE(
+                        this,
+                        "[ApiStorageSpace, Writable storages] candidate: %1 available size %2 is less than the treshold %3.",
+                        nx::utils::url::hidePassword(fileStorage->getUrl()), available, bigStorageThreshold);
+                }
+            }
+        }
+
+        const qint64 kSystemStorageTreshold = 5;
+
+        qint64 totalNonSystemStoragesSpace = 0;
+        qint64 systemStorageSpace = 0;
+        std::vector<QSet<QnStorageResourcePtr>::iterator> systemStorageItVec;
+
+        for (auto it = result.begin(); it != result.end(); ++it)
+        {
+            if (!(*it)->isSystem())
+                totalNonSystemStoragesSpace += (*it)->getTotalSpace();
+            else
+            {
+                (*it)->setStatusFlag((*it)->statusFlag() & ~Qn::StorageStatus::tooSmall);
+                systemStorageItVec.push_back(it);
+                systemStorageSpace += (*it)->getTotalSpace();
+            }
+        }
+
+        if (totalNonSystemStoragesSpace > systemStorageSpace * kSystemStorageTreshold && !systemStorageItVec.empty())
+        {
+            for (auto it: systemStorageItVec)
+            {
+                NX_VERBOSE(
+                    this,
+                    "[ApiStorageSpace, Writable storages] Removing system storage %1 out of candidates",
+                    nx::utils::url::hidePassword((*it)->getUrl()));
+
+                (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::tooSmall);
+                result.remove(*it);
+            }
+        }
+
+        return result;
+    }
+
+    QnStorageResourcePtr optimalStorageForRecording() const
+    {
+
+    }
+
+private:
+    QnStorageManager* m_owner;
+
+    QnStorageResourceList onlineStorages() const
+    {
+        QnStorageResourceList result;
+        for (const auto& storage: m_owner->getAllStorages())
+        {
+            if (!storage->isOnline())
+            {
+                NX_DEBUG(
+                    this, "Storage %1 is offline", nx::utils::url::hidePassword(storage->getUrl()));
+                continue;
+            }
+
+            result.append(storage);
+        }
+
+        return result;
+    }
+
+    QnStorageResourceList filterOutSpaceless(const QnStorageResourceList& storages)
+    {
+        QnStorageResourceList result;
+        for (auto it = storages.begin(); it < storages.end(); ++it)
+        {
+            const auto freeSpace = (*it)->getFreeSpace();
+            const auto spaceLimit = (*it)->getSpaceLimit();
+            NX_ASSERT(freeSpace >= 0);
+            NX_ASSERT(spaceLimit >= 0);
+            if (freeSpace < 0 || spaceLimit < 0)
+            {
+                NX_WARNING(
+                    this, "Can't obtain free space (%1) of space limit (%2) for a storage (%3)",
+                    freeSpace, spaceLimit, nx::utils::url::hidePassword((*it)->getUrl()));
+                continue;
+            }
+            const auto nxOccupiedSpace =
+                m_owner->occupiedSpace(m_owner->storageDbPool()->getStorageIndex(*it));
+            if (nxOccupiedSpace + freeSpace < spaceLimit)
+            {
+                NX_DEBUG(
+                    this, "Skipping storage %1 because nxOccupiedSpace (%1) + "
+                          "freeSpace (%2) < spaceLimit (%3)",
+                    nxOccupiedSpace, freeSpace, spaceLimit);
+                continue;
+            }
+            result.append(*it);
+        }
+
+        return result;
+    }
+
+    static QnStorageResourceList filterOutSmall(const QnStorageResourceList& storages)
+    {
+        const auto storageWithMaxSpace = std::max_element(
+            storages.cbegin(), storages.cend(),
+            [](const auto& storage1, const auto& storage2)
+            {
+                return spaceAvailable(storage1) - spaceAvailable(storage2);
+            });
+
+        const auto maxSpaceValue = spaceAvailable(*storageWithMaxSpace);
+        const auto maxSpaceTreshold = maxSpaceValue / kBigStorageTreshold;
+
+        return filterOutWithSpaceLessThan(storages, maxSpaceTreshold);
+    }
+
+    static int64_t spaceAvailable(const QnStorageResourcePtr& storage)
+    {
+        return storage->getTotalSpace() - storage->getSpaceLimit();
+    }
+
+    static QnStorageResourceList filterOutWithSpaceLessThan(
+        const QnStorageResourceList& storages, int64_t maxSpaceTreshold)
+    {
+        QnStorageResourceList result;
+        std::copy_if(
+            storages.cbegin(), storages.cend(),
+            [maxSpaceTreshold](const auto& storage)
+            {
+                return spaceAvailable(storage) >= maxSpaceTreshold;
+            },
+            std::back_inserter(result));
+
+        return result;
+    }
+
+    static QnStorageResourceList filterOutSmallSystem(const QnStorageResourceList& storages)
+    {
+        int64_t totalNonSystemSpaceAvailable = 0;
+        for (const auto& storage: storages)
+        {
+            if (!storage->isSystem())
+                totalNonSystemSpaceAvailable += spaceAvailable(storage);
+        }
+        QnStorageResourceList result;
+
+    }
+};
+
 class ArchiveScanPosition: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
@@ -777,6 +996,7 @@ QnStorageManager::QnStorageManager(
         : QString("StorageIndexer");
     m_archiveIndexer.reset(new ArchiveIndexer(this, storageIndexerThreadName));
     m_archiveIndexer->start();
+    m_writableStorageManager.reset(new WritableStorageManager(this));
 
     m_clearMotionTimer.restart();
     m_clearBookmarksTimer.restart();
@@ -828,6 +1048,19 @@ bool QnStorageManager::hasArchive(int storageIndex) const
     }
 
     return false;
+}
+
+int64_t QnStorageManager::occupiedSpace(int storageIndex) const
+{
+    int64_t result = 0LL;
+    for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
+    {
+        QnMutexLocker lock(&m_mutexCatalog);
+        for (auto it = m_devFileCatalog[i].cbegin(); it != m_devFileCatalog[i].cend(); ++it)
+            result += it.value()->occupiedSpace(storageIndex) > 0LL;
+    }
+
+    return result;
 }
 
 void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras)

@@ -437,11 +437,8 @@ bool DeviceFileCatalog::needRebuildPause()
 }
 
 void DeviceFileCatalog::scanMediaFiles(
-    const QString& folder,
-    const QnStorageResourcePtr &storage,
-    QMap<qint64, Chunk>& allChunks,
-    QVector<EmptyFileInfo>& emptyFileList,
-    const ScanFilter& filter)
+    const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks,
+    QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
     NX_VERBOSE(this, "%1 Processing directory %2", __func__, nx::utils::url::hidePassword(folder));
     QnAbstractStorageResource::FileInfoList files;
@@ -457,7 +454,8 @@ void DeviceFileCatalog::scanMediaFiles(
             return; // canceled
         }
 
-        if (fi.isDir()) {
+        if (fi.isDir())
+        {
             QnTimePeriod folderPeriod = timePeriodFromDir(storage, fi.absoluteFilePath());
             if (!filter.isEmpty() && !filter.intersects(folderPeriod))
                 continue;
@@ -485,47 +483,50 @@ void DeviceFileCatalog::scanMediaFiles(
             break;
         }
 
-        nx::utils::concurrent::run( &tp, [&]()
-        {
-            //QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
-            QString fileName = fi.absoluteFilePath();
-            qint64 fileTime = QFileInfo(fileName).baseName().toLongLong();
-
-            if (!filter.isEmpty() && fileTime > filter.scanPeriod.endTimeMs())
-                return;
-
-            Chunk chunk = chunkFromFile(storage, fileName);
-            chunk.setFileSize(fi.size());
-            if (!filter.isEmpty() && chunk.startTimeMs > filter.scanPeriod.endTimeMs())
+        nx::utils::concurrent::run(
+            &tp,
+            [&]()
             {
-                return;
-            }
+                //QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
+                QString fileName = fi.absoluteFilePath();
+                qint64 fileTime = QFileInfo(fileName).baseName().toLongLong();
 
-            QnMutexLocker lock(&scanFilesMutex);
-            if (chunk.durationMs > 0 && chunk.startTimeMs > 0) {
-                QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);
-                if (itr != allChunks.begin())
+                if (!filter.isEmpty() && fileTime > filter.scanPeriod.endTimeMs())
+                    return;
+
+                Chunk chunk = chunkFromFile(storage, fileName);
+                chunk.setFileSize(fi.size());
+                if (!filter.isEmpty() && chunk.startTimeMs > filter.scanPeriod.endTimeMs())
+                    return;
+
+                QnMutexLocker lock(&scanFilesMutex);
+                if (chunk.durationMs > 0 && chunk.startTimeMs > 0)
                 {
-                    Chunk& prevChunk = *(itr-1);
-                    qint64 delta = chunk.startTimeMs - prevChunk.endTimeMs();
-                    if (delta < MAX_FRAME_DURATION_MS && !fi.baseName().contains("_") /*Old version file*/)
-                        prevChunk.durationMs = chunk.startTimeMs - prevChunk.startTimeMs;
+                    QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);
+                    if (itr != allChunks.begin())
+                    {
+                        Chunk& prevChunk = *(itr-1);
+                        qint64 delta = chunk.startTimeMs - prevChunk.endTimeMs();
+                        if (delta < MAX_FRAME_DURATION_MS
+                            && !fi.baseName().contains("_")) //< An old version file.
+                        {
+                            prevChunk.durationMs = chunk.startTimeMs - prevChunk.startTimeMs;
+                        }
+                    }
+
+                    if (allChunks.size() % 1000 == 0)
+                        qWarning() << allChunks.size() << "media files processed...";
+
                 }
-
-                if (allChunks.size() % 1000 == 0)
-                    qWarning() << allChunks.size() << "media files processed...";
-
-            }
-            else if (fi.fileName().indexOf(".txt") == -1) {
-                qDebug() << "remove file" << fi.absoluteFilePath() << "because of empty chunk. duration=" << chunk.durationMs << "startTime=" << chunk.startTimeMs;
-                emptyFileList
-                    << EmptyFileInfo(/*fi.created().toMSecsSinceEpoch()*/
-                           chunk.startTimeMs,
-                           fi.absoluteFilePath()
-                       );
-            }
-        }
-        );
+                else if (fi.fileName().indexOf(".txt") == -1)
+                {
+                    qDebug()
+                        << "remove file" << fi.absoluteFilePath()
+                        << "because of empty chunk. duration=" << chunk.durationMs
+                        << "startTime=" << chunk.startTimeMs;
+                    emptyFileList << EmptyFileInfo(chunk.startTimeMs, fi.absoluteFilePath());
+                }
+            });
     }
     tp.waitForDone();
 
