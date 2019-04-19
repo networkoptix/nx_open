@@ -21,7 +21,6 @@ export class NxDialogsService {
                 private mergeModal: NxModalMergeComponent,
                 private embedModal: NxModalEmbedComponent,
                 private shareModal: NxModalShareComponent) {
-
     }
 
     dismiss() {
@@ -33,6 +32,7 @@ export class NxDialogsService {
         hold = hold || false;
 
         return this.toast.create({
+            additionalClasses: 'button-fix',
             className: type,
             content: message,
             dismissOnTimeout: !hold,

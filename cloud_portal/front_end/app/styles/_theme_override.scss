@@ -289,3 +289,8 @@ ngb-tabset {
         }
     }
 }
+
+.button-fix > div.alert > button {
+    padding: 0 !important;
+    margin-top: 2px;
+}
