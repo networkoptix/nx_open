@@ -1417,9 +1417,14 @@ State CameraSettingsDialogStateReducer::setAnalyticsSettingsLoading(State state,
 State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
     State state, const QSet<QnUuid>& value)
 {
-    // Sometimes we get an empty uuid here. Removing it on the cpp side.
-    QSet<QnUuid> actualValue = value;
-    actualValue.remove(QnUuid());
+    // Filter out engines which are not available anymore.
+    QSet<QnUuid> actualValue;
+    for (const auto& id: value)
+    {
+        if (analyticsEngineIsPresentInList(id, state))
+            actualValue.insert(id)
+    }
+
     state.analytics.enabledEngines.setUser(actualValue);
     state.hasChanges = true;
     return state;
