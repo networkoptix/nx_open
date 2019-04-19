@@ -235,7 +235,7 @@ int BasicTestFixture::mediatorCount() const
 void BasicTestFixture::startMediator(int index)
 {
     if (!m_relays.empty())
-        mediator(index).addArg("-trafficRelay/urls", relayUrl().toStdString().c_str());
+        mediator(index).addArg("-trafficRelay/url", relayUrl().toStdString().c_str());
 
     ASSERT_TRUE(mediator(index).startAndWaitUntilStarted());
 
