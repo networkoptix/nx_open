@@ -1,5 +1,3 @@
-import * as $ from 'jquery';
-
 (function () {
 
 'use strict';
@@ -503,15 +501,17 @@ angular.module('nxCommon').controller('ViewCtrl',
             // record actice camera again as only one camera should be selected per system
             $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
         }
+    
+        $scope.$watch('camerasProvider.cameras', function () {
+            if (!$scope.activeCamera && Object.keys($scope.camerasProvider.cameras).length !== 0) {
+                $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
+            }
+        }, true);
         
         $scope.$watch('activeCamera', function(){
             if(!$scope.activeCamera){
-                if (Object.keys($scope.camerasProvider.cameras).length !== 0) {
-                    $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
-                } else {
-                    $scope.showCameraPanel = false;
-                    return;
-                }
+                $scope.showCameraPanel = false;
+                return;
             }
             
             resetSystemActiveCamera();
@@ -584,10 +584,10 @@ angular.module('nxCommon').controller('ViewCtrl',
         systemAPI.checkPermissions(Config.globalViewArchivePermission)
             .then(function (result) {
                 $scope.canViewArchive = result;
-                return $scope.camerasProvider.requestResources();
-            }).then(function () {
                 // instead of requesting gettime once - we request it for all servers to know each timezone
                 return $scope.camerasProvider.getServerTimes();
+            }).then(function () {
+                return $scope.camerasProvider.requestResources();
             }).then(function () {
                 if (!isActive('embed') && (!$scope.activeCamera || $scope.activeCamera.id !== $scope.storage.cameraId)) {
                     $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);

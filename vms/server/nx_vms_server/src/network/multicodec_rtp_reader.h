@@ -20,6 +20,8 @@
 #include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <nx/streaming/rtp/camera_time_helper.h>
 
+#include <nx/vms/server/network/multicast_address_registry.h>
+
 namespace nx::streaming::rtp  { class StreamParser; }
 
 class QnMulticodecRtpReader:
@@ -66,8 +68,8 @@ public:
     void setRole(Qn::ConnectionRole role);
     void setPrefferedAuthScheme(const nx::network::http::header::AuthScheme::Value scheme);
 
-    static void setDefaultTransport(const QString& defaultTransportToUse);
-    void setRtpTransport(RtspTransport value);
+    static void setDefaultTransport(nx::vms::api::RtpTransportType defaultTransportToUse);
+    void setRtpTransport(nx::vms::api::RtpTransportType value);
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
     void setUserAgent(const QString& value);
@@ -92,7 +94,7 @@ public:
         std::chrono::milliseconds timeout,
         OnSocketReadTimeoutCallback callback);
 
-    RtspTransport getRtpTransport() const;
+    nx::vms::api::RtpTransportType getRtpTransport() const;
 
 signals:
     void networkIssue(
@@ -131,6 +133,10 @@ private:
         TrackInfo& track,
         int rtpChannel);
 
+    CameraDiagnostics::Result registerMulticastAddressesIfNeeded();
+    CameraDiagnostics::Result registerAddressIfNeeded(
+        const QnRtspIoDevice::AddressInfo& addressInfo);
+
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr& res, const QString& key);
@@ -160,7 +166,7 @@ private:
     bool m_rtpStarted;
     nx::network::http::header::AuthScheme::Value m_prefferedAuthScheme;
     nx::utils::Url m_currentStreamUrl;
-    RtspTransport m_rtpTransport;
+    nx::vms::api::RtpTransportType m_rtpTransport;
 
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
@@ -171,7 +177,9 @@ private:
     std::optional<std::chrono::steady_clock::time_point> m_packetLossReportTime;
 
     static nx::utils::Mutex s_defaultTransportMutex;
-    static RtspTransport s_defaultTransportToUse;
+    static nx::vms::api::RtpTransportType s_defaultTransportToUse;
+    std::set<nx::vms::server::network::MulticastAddressRegistry::RegisteredAddressHolderPtr>
+        m_registeredMulticastAddresses;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

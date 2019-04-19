@@ -3208,6 +3208,14 @@ a %1</translation>
       <source>Folder already added</source>
       <translation>Carpeta ya agregada</translation>
     </message>
+    <message>
+      <source>None</source>
+      <translation>Ninguno</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
+    </message>
   </context>
   <context>
     <name>QnGeneralSystemAdministrationWidget</name>
@@ -5874,19 +5882,11 @@ a %1</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>Se produjo un error durante la sincronización remota de archivos</translation>
     </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>Habilitar el descubrimiento automático de dispositivos y servidores</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>Habilitar el descubrimiento automático de cámaras y servidores</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>Permitir el sistema optimizar la configuración de dispositivos</translation>
@@ -5902,6 +5902,22 @@ a %1</translation>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>No incluye información personal y es completamente anónimo.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -7082,6 +7098,17 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7285,6 +7312,14 @@ a %1</translation>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation>Mostrar solo con &quot;objetos&quot; pestaña</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>Mostrar</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7435,10 +7470,6 @@ a %1</translation>
       <translation>Nativo</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>El servidor no cambiará la configuración de la cámara, recibirá y utilizará la transmisión de la cámara como está. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Ayuda a solucionar problemas de calidad de imagen en algunas cámaras; para otros causará un aumento significativo en la velocidad de bits.</translation>
     </message>
@@ -7462,6 +7493,14 @@ a %1</translation>
         <numerusform>Este ID ya se utiliza en las siguientes %n cámaras:</numerusform>
         <numerusform>Este ID ya se utiliza en las siguientes %n cámaras:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>UDP Multicast</source>
+      <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>El servidor no cambiará las configuraciones de las cámaras, recibirá y usará la transmisión de la cámara tal como está.</translation>
     </message>
   </context>
   <context>
@@ -7570,7 +7609,7 @@ a %1</translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>No tienes camaras</translation>
     </message>
   </context>
   <context>
@@ -7698,35 +7737,35 @@ a %1</translation>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>No se encontró el archivo de actualización</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>El paquete de actualización está dañado</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>Error al descargar el paquete de actualización: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>El paquete de actualización está dañado: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Esta actualización ya está instalada.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Esta versión no está instalada.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Formato de versión no válido.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>Paquete de actualización roto.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7734,11 +7773,11 @@ a %1</translation>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>No hay suficiente espacio en el disco para instalar la actualización del cliente.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>El paquete de instalación se ha perdido.</translation>
     </message>
   </context>
   <context>
@@ -7791,7 +7830,7 @@ a %1</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>Algunas de las cámaras seleccionadas requieren una contraseña para ser configuradas.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -7873,13 +7912,13 @@ a %1</translation>
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>Todos los dispositivos ya están agregados</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>Se están agregando %n dispositivos. Puedes cerrar este diálogo o iniciar una nueva búsqueda</numerusform>
+        <numerusform>Se están agregando %n dispositivos. Puedes cerrar este diálogo o iniciar una nueva búsqueda</numerusform>
       </translation>
     </message>
     <message>
@@ -7895,26 +7934,18 @@ a %1</translation>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>El campo de dirección no puede estar vacío</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-    <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Por favor revise y acepte el %1 para proceder</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>Para utilizar el software, debe aceptar el acuerdo de licencia del usuario final</translation>
     </message>
   </context>
   <context>
@@ -7949,39 +7980,39 @@ a %1</translation>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Eventos del servidor</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Eventos analíticos</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Cualquier problema del dispositivo</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Cualquier problema con la cámara</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Cualquier evento del servidor</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Problemas con el dispositivo</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Problemas con la cámara</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Cualquier evento</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Cualquier evento analítico</translation>
     </message>
     <message>
       <source>No events</source>
@@ -7996,11 +8027,11 @@ a %1</translation>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>motor analítico sin nombre</translation>
     </message>
     <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>No ocurrieron eventos</translation>
     </message>
   </context>
   <context>
@@ -8017,7 +8048,7 @@ a %1</translation>
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>Por favor introduzca la contraseña.</translation>
     </message>
   </context>
   <context>
@@ -8166,7 +8197,7 @@ a %1</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>Estás a punto de exportar un video largo. Puede requerir una gran cantidad de espacio de almacenamiento y tomar mucho tiempo.</translation>
     </message>
   </context>
   <context>
@@ -8238,16 +8269,16 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n nuevo</numerusform>
+        <numerusform>%n nuevo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>%n dispositivos en total</numerusform>
+        <numerusform>%n dispositivos en total</numerusform>
       </translation>
     </message>
   </context>
@@ -8517,10 +8548,6 @@ a %1</translation>
       <translation>Cancelar actualización</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Error al descargar los paquetes de actualización a algunos servidores</translation>
-    </message>
-    <message>
       <source>Please make sure they have enough free storage space and stable network connection.</source>
       <translation>Asegúrese de que tengan suficiente espacio de almacenamiento libre y una conexión de red estable.</translation>
     </message>
@@ -8582,11 +8609,11 @@ a %1</translation>
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>Cargando actualizaciones...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>Descargando el paquete de cliente...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -8594,7 +8621,7 @@ a %1</translation>
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>Instalando actualizaciones de cliente...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -8610,7 +8637,7 @@ a %1</translation>
     </message>
     <message>
       <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <translation>Sistema actualizado a</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8630,7 +8657,7 @@ a %1</translation>
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
+      <translation>Actualizar desde servidores</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
@@ -8638,18 +8665,18 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
+        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>Falta el paquete de actualización para el cliente</translation>
     </message>
     <message>
       <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
+      <translation>Finalizar actualización</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -8657,23 +8684,27 @@ a %1</translation>
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
+      <translation>La última versión ya está instalada</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
+      <translation>Esta versión ya está instalada</translation>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
+      <translation>No hay servidores en línea para actualizar.</translation>
     </message>
     <message>
       <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+      <translation>Algunos servidores no han completado el proceso de actualización. ¿Terminarlo de todos modos?</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>¿Cancelar actualización y eliminar todos los datos descargados?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
     </message>
   </context>
   <context>
@@ -8687,7 +8718,7 @@ a %1</translation>
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>No tienes ningún diseño</translation>
     </message>
   </context>
   <context>
@@ -8699,6 +8730,26 @@ a %1</translation>
     <message>
       <source>Acknowledge</source>
       <translation>Reconocer</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Evento genérico</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Event</source>
+      <translation type="unfinished">Unknown Plugin Event</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
     </message>
   </context>
   <context>
@@ -8719,10 +8770,6 @@ a %1</translation>
       <translation>Ninguno de los usuarios seleccionados tiene acceso al diseño seleccionado. La acción no funcionará.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>Los diseños locales solo se pueden mostrar a sus propietarios. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>Seleccionar diseño...</translation>
     </message>
@@ -8736,7 +8783,46 @@ a %1</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>Ninguno de los roles de usuario seleccionados contiene usuarios. La acción no funcionará.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation>Instalado</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
     </message>
   </context>
   <context>
@@ -8814,7 +8900,7 @@ a %1</translation>
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>Movimiento + Bajo-Res</translation>
     </message>
   </context>
   <context>
@@ -8881,16 +8967,16 @@ a %1</translation>
       <translation>Rastrea y registra todas las acciones del usuario.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>minutos</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>horas</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
     </message>
   </context>
   <context>
@@ -8901,23 +8987,23 @@ a %1</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Instalado</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Instalando...</translation>
     </message>
     <message>
       <source>Downloaded</source>
       <translation>Descargada</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>Versión actual</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>Estatus</translation>
@@ -8928,7 +9014,7 @@ a %1</translation>
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Almacenar archivos de actualización</translation>
     </message>
     <message>
       <source>Client</source>
@@ -8936,7 +9022,11 @@ a %1</translation>
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Componente</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
     </message>
   </context>
   <context>
@@ -8954,7 +9044,7 @@ a %1</translation>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>Seleccione el área en el video para filtrar los resultados</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -8981,11 +9071,11 @@ a %1</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Dispositivo seleccionado</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>Medios seleccionados</translation>
     </message>
     <message>
       <source>none</source>
@@ -9004,9 +9094,9 @@ a %1</translation>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>La dirección de correo electrónico no está configurada para %n usuarios</numerusform>
+        <numerusform>La dirección de correo electrónico no está configurada para %n usuarios</numerusform>
       </translation>
     </message>
     <message>
@@ -9025,14 +9115,14 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Haga doble clic para agregar cámaras al diseño actual o presione ctrl + clic para abrir en una nueva pestaña</numerusform>
+        <numerusform>Haga doble clic para agregar cámaras al diseño actual o presione ctrl + clic para abrir en una nueva pestaña</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>No hay archivo disponible</translation>
     </message>
   </context>
   <context>
@@ -9043,7 +9133,7 @@ a %1</translation>
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Zona horaria</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9051,42 +9141,42 @@ a %1</translation>
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Hora del servidor OS</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Tiempo del VMS</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Tiempo, común y sincronizado entre todos los servidores. Puede ser diferente con el tiempo del sistema operativo en cualquier servidor en particular.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Sincronizado con internet</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Sincronizado con la hora local en el servidor seleccionado</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>No sincronizado. Cada servidor utiliza su propia hora local.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Igual a la hora local del servidor</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Sin conexión a Internet. El tiempo no se está sincronizando.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Time Server está fuera de línea. El tiempo no se está sincronizando.</translation>
     </message>
   </context>
   <context>
@@ -9112,7 +9202,7 @@ a %1</translation>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>No se pudo crear la carga en el lado del servidor: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9131,11 +9221,11 @@ a %1</translation>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>El movimiento se está detectando sólo durante la subida de vídeo.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Habilitar o deshabilitar esta configuración no cambia nada en el archivo existente.</translation>
     </message>
   </context>
   <context>
@@ -9234,7 +9324,27 @@ a %1</translation>
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Iniciando exportación...</translation>
+    </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
     </message>
   </context>
   <context>
@@ -9271,7 +9381,7 @@ a %1</translation>
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Reconstruir la resolución</translation>
     </message>
   </context>
   <context>
@@ -9312,7 +9422,7 @@ a %1</translation>
     <name>nx::vms::client::desktop::ui::PluginEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Cualquier Plugin</translation>
     </message>
   </context>
   <context>
@@ -9443,7 +9553,7 @@ a %1</translation>
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Diseño está lleno</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9501,7 +9611,7 @@ a %1</translation>
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Las cámaras virtuales no se pueden mover entre servidores</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -9513,7 +9623,7 @@ a %1</translation>
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Todo compatible</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9617,14 +9727,14 @@ a %1</translation>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Error al cambiar la contraseña en %n cámaras de %1</numerusform>
+        <numerusform>Error al cambiar la contraseña en %n cámaras de %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Esta compilación es sólo para fines de prueba.</translation>
     </message>
   </context>
   <context>

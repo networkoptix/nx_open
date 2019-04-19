@@ -6,10 +6,11 @@
 #include <utils/media/frame_info.h>
 #include <utils/color_space/yuvconvert.h>
 #include "utils/common/app_info.h"
+#include <nx/utils/log/log_main.h>
 
 extern "C" {
 #include <libswscale/swscale.h>
-}
+} // extern "C"
 
 namespace {
 
@@ -102,21 +103,29 @@ CLVideoDecoderOutputPtr ImageToFramePainter::drawToFfmpeg(const CLVideoDecoderOu
             m_finalImage.width(), m_finalImage.height(), (AVPixelFormat)frame->format,
             m_finalImage.width(), m_finalImage.height(), AV_PIX_FMT_BGRA,
             SWS_BILINEAR, nullptr, nullptr, nullptr);
-
+    }
+    if (!m_fromImageContext)
+    {
         m_fromImageContext = sws_getContext(
             m_finalImage.width(), m_finalImage.height(), AV_PIX_FMT_BGRA,
             m_finalImage.width(), m_finalImage.height(), (AVPixelFormat)frame->format,
             SWS_BILINEAR, nullptr, nullptr, nullptr);
     }
 
+    if (!m_toImageContext || !m_fromImageContext)
+    {
+        NX_WARNING(this, "Can't allocate sws scale context for color conversion");
+        return frame;
+    }
+
     quint8* frameData[4] = {
         frame->data[0] + yPlaneOffset,
         frame->data[1] + uvPlaneOffset,
         frame->data[2] + uvPlaneOffset,
-        0
+        nullptr
     };
 
-    quint8* dstData[4] = { (quint8*)m_finalImage.bits(), 0, 0, 0 };
+    quint8* dstData[4] = { (quint8*)m_finalImage.bits(), nullptr, nullptr, nullptr };
     int dstStride[4] = { m_finalImage.bytesPerLine(), 0, 0, 0 };
     sws_scale(
         m_toImageContext, frameData, frame->linesize,
@@ -188,7 +197,6 @@ void ImageToFramePainter::clearImages()
     m_finalImage = QImage();
     m_finalImageBytes.reset();
 }
-
 
 void ImageToFramePainter::updateTargetImage()
 {

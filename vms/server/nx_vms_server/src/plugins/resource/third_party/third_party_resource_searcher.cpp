@@ -260,7 +260,7 @@ QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
         return createResListFromCameraInfoList( &*it, cameraInfoTempArray );
     }
 
-    NX_VERBOSE(this, "Custom search did not found any cameras");
+    NX_VERBOSE(this, "Custom search did not find any cameras");
     return QnResourceList();
 }
 

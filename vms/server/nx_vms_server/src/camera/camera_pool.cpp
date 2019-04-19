@@ -30,6 +30,11 @@ VideoCameraLocker::~VideoCameraLocker()
 
 void QnVideoCameraPool::stop()
 {
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_isStopped = true; //< Make sure m_cameras will not be modifyed.
+    }
+
     for( const QnVideoCameraPtr& camera: m_cameras.values())
         camera->beforeStop();
 
@@ -59,15 +64,22 @@ QnVideoCameraPool::~QnVideoCameraPool()
 void QnVideoCameraPool::updateActivity()
 {
     QnMutexLocker lock(&m_mutex);
-    for (const auto&camera: m_cameras)
+    if (m_isStopped)
+        return;
+
+    for (const auto& camera: m_cameras)
         camera->updateActivity();
 }
 
 QnVideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res) const
 {
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
-        return QnVideoCameraPtr();
+        return {};
+
     QnMutexLocker lock(&m_mutex);
+    if (m_isStopped)
+        return {};
+
     CameraMap::const_iterator itr = m_cameras.find(res);
     return itr == m_cameras.cend() ? QnVideoCameraPtr() : itr.value();
 }
@@ -75,8 +87,12 @@ QnVideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res) con
 QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res)
 {
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
-        return QnVideoCameraPtr();
+        return {};
+
     QnMutexLocker lock(&m_mutex);
+    if (m_isStopped)
+        return {};
+
     return m_cameras.insert(
         res, QnVideoCameraPtr(new QnVideoCamera(m_settings, m_dataProviderFactory, res))).value();
 }
@@ -85,7 +101,11 @@ bool QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res, QnVideoCameraPt
 {
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
         return false;
+
     QnMutexLocker lock(&m_mutex);
+    if (m_isStopped)
+        return true;
+
     m_cameras.insert(res, camera);
     return true;
 }
@@ -93,7 +113,10 @@ bool QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res, QnVideoCameraPt
 void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
 {
     QnMutexLocker lock( &m_mutex );
-    m_cameras.remove( res );
+    if (m_isStopped)
+        return;
+
+    m_cameras.remove(res);
 }
 
 std::unique_ptr<VideoCameraLocker>

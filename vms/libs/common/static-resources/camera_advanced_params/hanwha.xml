@@ -278,6 +278,65 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
+                
+                <param id="PRIMARY%SERVICE%multicastSeparator"
+                    dataType="Separator"
+                    name="sep"
+                    aux="multicast=true"/>
+                    
+                <param id="PRIMARY%media/videoprofile/RTPMulticastEnable"
+                    name="Enable Multicast"
+                    dataType="Bool"
+                    writeCmd="update"
+                    aux="range=media/videoprofile/add_update/RTPMulticastEnable;profile=primary;groupLead=primaryStreamMulticast;associatedWith=PRIMARY%media/videoprofile/RTPMulticastAddress,PRIMARY%media/videoprofile/RTPMulticastTTL,PRIMARY%media/videoprofile/RTPMulticastPort;associationCondition=true;multicast=true"/>
+                    
+                <param id="PRIMARY%media/videoprofile/RTPMulticastAddress"
+                    name="Multicast Address"
+                    dataType="String"
+                    writeCmd="update"
+                    aux="range=media/videoprofile/add_update/RTPMulticastAddress;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastTTL,PRIMARY%media/videoprofile/RTPMulticastPort;multicast=true">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="PRIMARY%media/videoprofile/RTPMulticastEnable"
+                                    condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                    
+                <param id="PRIMARY%media/videoprofile/RTPMulticastPort"
+                    name="Port"
+                    dataType="Number"
+                    writeCmd="update"
+                    aux="range=media/videoprofile/add_update/RTPMulticastPort;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastAddress,PRIMARY%media/videoprofile/RTPMulticastTTL;multicast=true">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="PRIMARY%media/videoprofile/RTPMulticastEnable"
+                                    condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                    
+                <param id="PRIMARY%media/videoprofile/RTPMulticastTTL"
+                    name="TTL"
+                    dataType="Number"
+                    writeCmd="update"
+                    aux="range=media/videoprofile/add_update/RTPMulticastTTL;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastAddress,PRIMARY%media/videoprofile/RTPMulticastPort;multicast=true">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="PRIMARY%media/videoprofile/RTPMulticastEnable"
+                                    condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
 
                 <param id="PRIMARY%SERVICE%lastSeparator"
                     dataType="Separator"
@@ -500,6 +559,65 @@
                                 <condition
                                     watch="SECONDARY%media/videoprofile/EncodingType"
                                     condition="value=H265"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="SECONDARY%SERVICE%multicastSeparator"
+                    dataType="Separator"
+                    name="sep"
+                    aux="multicast=true"/>
+                    
+                <param id="SECONDARY%media/videoprofile/RTPMulticastEnable"
+                    name="Enable Multicast"
+                    dataType="Bool"
+                    writeCmd="update"
+                    aux="range=media/videoprofile/add_update/RTPMulticastEnable;profile=secondary;groupLead=secondaryStreamMulticast;associatedWith=SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastTTL,SECONDARY%media/videoprofile/RTPMulticastPort;associationCondition=true;multicast=true"/>
+                    
+                <param id="SECONDARY%media/videoprofile/RTPMulticastAddress"
+                    name="Multicast Address"
+                    dataType="String"
+                    writeCmd="update"
+                    aux="range=media/videoprofile/add_update/RTPMulticastAddress;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastTTL,SECONDARY%media/videoprofile/RTPMulticastPort;multicast=true">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="SECONDARY%media/videoprofile/RTPMulticastEnable"
+                                    condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                    
+                <param id="SECONDARY%media/videoprofile/RTPMulticastPort"
+                    name="Port"
+                    dataType="Number"
+                    writeCmd="update"
+                    aux="range=media/videoprofile/add_update/RTPMulticastPort;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastTTL;multicast=true">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="SECONDARY%media/videoprofile/RTPMulticastEnable"
+                                    condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                    
+                <param id="SECONDARY%media/videoprofile/RTPMulticastTTL"
+                    name="TTL"
+                    dataType="Number"
+                    writeCmd="update"
+                    aux="range=media/videoprofile/add_update/RTPMulticastTTL;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastPort;multicast=true">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="SECONDARY%media/videoprofile/RTPMulticastEnable"
+                                    condition="value=true"/>
                             </conditional-show>
                         </dependencies-show>
                     </dependencies>
@@ -900,13 +1018,13 @@
                         dataType="Enumeration"
                         range="Open:Color/Close:BW,Open:BW/Close:Color"
                         internalRange="SwitchToBWIfCloses,SwitchToBWIfOpens"
-                        aux="group=dn;groupInclude=External">
+                        aux="group=dn;groupIncludeContains=External">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
                                 <condition
                                     watch="image/camera/DayNightMode"
-                                    condition="value=External"/>
+                                    condition="valueContains=External"/>
                             </conditional-show>
                         </dependencies-show>
                     </dependencies>
@@ -931,26 +1049,40 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
-                <param id="image/imageenhacements/Gamma"
+                <param id="image/imageenhancements/Gamma"
                         name="Gamma"
                         dataType="Number"/>
-                <param id="image/imageenhacements/Saturation"
+                <param id="image/imageenhancements/Saturation"
                         name="ColorLevel"
                         dataType="Number"/>
-                <param id="image/imageenhacements/LDCEnable"
-                        name="LDC"
-                        dataType="Bool"
-                        aux="groupLead=ldc"/>
-                <param id="image/imageenhacements/LDCLevel"
-                        name="LDC Level"
-                        dataType="Number"
-                        aux="group=ldc;groupInclude=true">
+                <!-- 
+                    LDCMode - LDCLevel dependency is based on XND-6085V, LDCEnable is not used
+                    because it's handled by LDCMode. 
+                -->
+                <param id="image/imageenhancements/LDCMode"
+                        name="LDC Mode"
+                        dataType="Enumeration"
+                        aux="groupLead=ldc">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
                                 <condition
                                     watch="image/imageenhancements/LDCEnable"
                                     condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                <param id="image/imageenhancements/LDCLevel"
+                        name="LDC Level"
+                        dataType="Number"
+                        aux="group=ldc;groupInclude=Manual">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/imageenhancements/LDCMode"
+                                    condition="value=Manual"/>
                             </conditional-show>
                         </dependencies-show>
                     </dependencies>

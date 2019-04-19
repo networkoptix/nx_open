@@ -65,7 +65,7 @@
    </item>
    <item>
     <widget class="QWidget" name="settingsGroupsWidget" native="true">
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
       <property name="leftMargin">
        <number>16</number>
       </property>
@@ -77,6 +77,9 @@
       </property>
       <property name="bottomMargin">
        <number>16</number>
+      </property>
+      <property name="horizontalSpacing">
+       <number>24</number>
       </property>
       <item row="1" column="1">
        <widget class="QGroupBox" name="backupGroupBox">

@@ -22,11 +22,12 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 
+#include <nx_vms_server_ini.h>
 #include <nx/utils/switch.h>
 #include <media_server/media_server_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 #include <nx/vms/server/settings.h>
-#include <mediaserver_ini.h>
+#include <nx_vms_server_ini.h>
 
 class QnDataProviderFactory;
 

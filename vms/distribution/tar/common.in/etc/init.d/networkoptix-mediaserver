@@ -42,6 +42,12 @@ FULL_VERSION="$version-$changeSet-$customization"
 
 #--------------------------------------------------------------------------------------------------
 
+# Check whether Systemd is in use.
+is_systemd_used()
+{
+    [[ $(readlink -m /sbin/init) =~ systemd$ ]]
+}
+
 # Redirect all output of this script to the log file.
 redirectOutput() # log_file
 {
@@ -49,10 +55,13 @@ redirectOutput() # log_file
 
     # If the old log file exists, rename it to first available "filename_#.log", stopping at 9.
     OLD_LOG_FILE_MESSAGE=""
-    if [ -f "$LOG_FILE" ]; then
-        for i in $(seq 1 9); do
+    if [ -f "$LOG_FILE" ]
+    then
+        for i in $(seq 1 9)
+        do
             OLD_LOG_FILE="${LOG_FILE%.*}_$i.log" #< Remove the extension and add the new suffix.
-            if [ ! -f "$OLD_LOG_FILE" ]; then # Unused filename found.
+            if [ ! -f "$OLD_LOG_FILE" ]
+            then # Unused filename found.
                 break
             fi
         done
@@ -72,7 +81,8 @@ logArgs() # "$@"
 {
     echo "Script [$0] started with pid $$ (parent pid $PPID), with $# arg(s):"
     echo "{"
-    for ARG in "$@"; do
+    for ARG in "$@"
+    do
         echo "    [$ARG]"
     done
     echo "}"
@@ -81,17 +91,20 @@ logArgs() # "$@"
 
 process_core_dump()
 {
-    if ! which gdb >/dev/null; then
+    if ! which gdb >/dev/null
+    then
         return 0 # no gdb on the host
     fi
-    if pidof gdb; then
+    if pidof gdb
+    then
         return 0 # gdb is alrady engaged
     fi
 
     CORE_ORIG=$(dirname "$BIN_FILE")/core
     TIME=$(date +"%s")
     CORE="$CORE_ORIG.$TIME"
-    if mv "$CORE_ORIG" "$CORE" 2>/dev/null; then
+    if mv "$CORE_ORIG" "$CORE" 2>/dev/null
+    then
         REPORT="${BIN_NAME}_${FULL_VERSION}_$TIME.gdb-bt"
 
         echo "Generate crash report (in background) $REPORT"
@@ -105,7 +118,8 @@ process_core_dump()
 start()
 {
     SERVICE_PID=$(pidof "$BIN_NAME")
-    if [ ! -z "$SERVICE_PID" ]; then
+    if [ ! -z "$SERVICE_PID" ]
+    then
        echo "$SERVICE_NAME is already running with pid $SERVICE_PID"
        return 0
     fi
@@ -113,16 +127,19 @@ start()
     process_core_dump
 
     local -r DISK=$(fdisk -l |grep "Disk" |grep "dev/sd" |awk '{print substr($2, 0, length($2))}')
-    if which hdparm >/dev/null; then
+    if which hdparm >/dev/null
+    then
         local -r HDPARM="hdparm"
     else
         local -r HDPARM="$MEDIASERVER_DIR/bin/hdparm"
     fi
-    if [ ! -z "$DISK" ]; then
+    if [ ! -z "$DISK" ]
+    then
         "$HDPARM" -I /dev/sd? |grep 'Model' >/tmp/hddlist
     fi
 
-    if [ -f "$MEDIASERVER_OUT_FLAG" ]; then
+    if [ -f "$MEDIASERVER_OUT_FLAG" ]
+    then
         REDIRECT_OUTPUT="$MEDIASERVER_OUT_LOG"
     else
         REDIRECT_OUTPUT="/dev/null"
@@ -135,7 +152,8 @@ start()
 
     sleep 1
     # See if mediaserver instantly crashes.
-    if [ ! -z "$(pidof "$BIN_NAME")" ]; then
+    if [ ! -z "$(pidof "$BIN_NAME")" ]
+    then
         echo "OK"
     else
         echo "FAILED"
@@ -155,10 +173,12 @@ stop() # [signal]
     echo "Stopping $BIN_NAME..."
     killall $SIGNAL "$BIN_NAME" >/dev/null 2>&1
     local i=0
-    while [ ! -z "$(pidof "$BIN_NAME")" ]; do
+    while [ ! -z "$(pidof "$BIN_NAME")" ]
+    do
         sleep 1
         let i++
-        if [ $i -gt $SECONDS_TO_WAIT_BEFORE_KILL_9 ]; then
+        if [ $i -gt $SECONDS_TO_WAIT_BEFORE_KILL_9 ]
+        then
             echo "$SERVICE_NAME not stopped after $i seconds; doing killall -9"
             killall -9 "$BIN_NAME" >/dev/null 2>&1
         fi
@@ -174,7 +194,8 @@ printWatchdogPid()
 start_watchdog()
 {
     WATCHDOG_PID=$(printWatchdogPid)
-    if [ ! -z "$WATCHDOG_PID" ]; then
+    if [ ! -z "$WATCHDOG_PID" ]
+    then
         echo "$SERVICE_NAME watchdog is already running with pid $WATCHDOG_PID"
         return 0
     fi
@@ -186,7 +207,8 @@ start_watchdog()
 stop_watchdog()
 {
     WATCHDOG_PID=$(printWatchdogPid)
-    if [ -z "$WATCHDOG_PID" ]; then
+    if [ -z "$WATCHDOG_PID" ]
+    then
         echo "$SERVICE_NAME watchdog is not running"
         return 0
     fi
@@ -195,7 +217,8 @@ stop_watchdog()
     kill "$WATCHDOG_PID"
     sleep 1
     WATCHDOG_PID=$(printWatchdogPid)
-    if [ ! -z "$WATCHDOG_PID" ]; then
+    if [ ! -z "$WATCHDOG_PID" ]
+    then
         echo "$SERVICE_NAME watchdog still not killed; doing kill -9"
         kill -9 "$WATCHDOG_PID"
         sleep 1
@@ -205,8 +228,17 @@ stop_watchdog()
 
 run_watchdog()
 {
-    while true; do
-        start
+    while true
+    do
+        service $(basename "$0") status && continue
+
+        if is_systemd_used
+        then
+            service $(basename "$0") restart
+        else
+            start
+        fi
+
         sleep 20
     done
 }
@@ -234,7 +266,8 @@ EOF
 #--------------------------------------------------------------------------------------------------
 # main
 
-if [ -f "$OUT_FLAG" ]; then
+if [ -f "$OUT_FLAG" ]
+then
     redirectOutput "$OUT_LOG"
     logArgs "$@"
     set -x #< Log each command.
@@ -269,7 +302,8 @@ case "$1" in
         ;;
     status)
         SERVICE_PID=$(pidof "$BIN_NAME")
-        if [ ! -z "$SERVICE_PID" ]; then
+        if [ ! -z "$SERVICE_PID" ]
+        then
             echo "$SERVICE_NAME is running with pid $SERVICE_PID"
             exit 0
         else
@@ -278,7 +312,8 @@ case "$1" in
         fi
         ;;
     server_status)
-        if [ ! -z "$(pidof "$BIN_NAME")" ]; then
+        if [ ! -z "$(pidof "$BIN_NAME")" ]
+        then
             echo "1"
         fi
         ;;

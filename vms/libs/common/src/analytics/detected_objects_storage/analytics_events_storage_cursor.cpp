@@ -9,8 +9,19 @@ Cursor::Cursor(std::unique_ptr<nx::sql::Cursor<DetectedObject>> dbCursor):
 {
 }
 
+void Cursor::close()
+{
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    m_closed = true;
+    m_dbCursor.reset();
+}
+
 common::metadata::ConstDetectionMetadataPacketPtr Cursor::next()
 {
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    if (m_closed)
+        return nullptr;
+
     common::metadata::DetectionMetadataPacketPtr resultPacket;
     m_nextPacket.swap(resultPacket);
 

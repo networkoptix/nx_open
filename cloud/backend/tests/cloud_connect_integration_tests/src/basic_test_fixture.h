@@ -13,6 +13,7 @@
 #include <nx/network/stream_proxy.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/utils/std/optional.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/relay/model/abstract_remote_relay_peer_pool.h>
@@ -72,8 +73,11 @@ private:
     BasicTestFixture* m_relayTest;
 };
 
-class BasicTestFixture
+class BasicTestFixture:
+    public nx::utils::test::TestWithTemporaryDirectory
 {
+    using base_type = nx::utils::test::TestWithTemporaryDirectory;
+
 public:
     enum Flag
     {

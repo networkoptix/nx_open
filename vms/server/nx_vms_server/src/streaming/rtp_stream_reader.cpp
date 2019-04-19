@@ -14,7 +14,7 @@ QnRtpStreamReader::QnRtpStreamReader(
     CLServerPushStreamReader(res),
     m_rtpReader(res, res->getTimeOffset()),
     m_request(request),
-    m_rtpTransport(RtspTransport::notDefined),
+    m_rtpTransport(nx::vms::api::RtpTransportType::automatic),
     m_camera(res)
 {
 }
@@ -24,7 +24,7 @@ QnRtpStreamReader::~QnRtpStreamReader()
     stop();
 }
 
-void QnRtpStreamReader::setRtpTransport(const RtspTransport& transport)
+void QnRtpStreamReader::setRtpTransport(nx::vms::api::RtpTransportType transport)
 {
     m_rtpTransport = transport;
 }
@@ -57,7 +57,7 @@ QnAbstractMediaDataPtr QnRtpStreamReader::getNextData()
 
     if (!result)
     {
-        NX_VERBOSE(this, lm("Next data: end of stream %1")
+        NX_VERBOSE(this, lm("Next data: end of stream %1. Closing stream")
             .args(m_rtpReader.getCurrentStreamUrl()));
         closeStream();
     }

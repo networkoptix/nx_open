@@ -1,7 +1,12 @@
 #pragma once
 
 #include <chrono>
+#include <map>
 #include <vector>
+
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/member.hpp>
 
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
@@ -17,9 +22,15 @@
 #include "analytics_events_storage_settings.h"
 #include "analytics_events_storage_types.h"
 
-namespace nx {
-namespace analytics {
-namespace storage {
+#include "attributes_dao.h"
+#include "device_dao.h"
+#include "detection_data_saver.h"
+#include "object_cache.h"
+#include "object_track_aggregator.h"
+#include "object_type_dao.h"
+#include "time_period_dao.h"
+
+namespace nx::analytics::storage {
 
 using StoreCompletionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/)>;
@@ -35,7 +46,7 @@ using TimePeriodsLookupCompletionHandler =
 using CreateCursorCompletionHandler =
     nx::utils::MoveOnlyFunc<void(
         ResultCode /*resultCode*/,
-        std::unique_ptr<AbstractCursor> /*cursor*/)>;
+        std::shared_ptr<AbstractCursor> /*cursor*/)>;
 
 /**
  * NOTE: Every method of this class is asynchronous if other not specified.
@@ -50,11 +61,13 @@ public:
     /**
      * Initializes internal database. MUST be called just after object instantiation.
      */
-    virtual bool initialize() = 0;
+    virtual bool initialize(const Settings& settings) = 0;
 
-    virtual void save(
-        common::metadata::ConstDetectionMetadataPacketPtr packet,
-        StoreCompletionHandler completionHandler) = 0;
+    /**
+     * Packet is saved asynchronously.
+     * To make sure the data is written call AbstractEventsStorage::flush.
+     */
+    virtual void save(common::metadata::ConstDetectionMetadataPacketPtr packet) = 0;
 
     /**
      * Newly-created cursor points just before the first element.
@@ -63,6 +76,11 @@ public:
     virtual void createLookupCursor(
         Filter filter,
         CreateCursorCompletionHandler completionHandler) = 0;
+
+    /**
+     * Close created cursor.
+     */
+    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& cursor) = 0;
 
     /**
      * Selects all objects with non-empty track that satisfy to the filter.
@@ -89,6 +107,11 @@ public:
     virtual void markDataAsDeprecated(
         QnUuid deviceId,
         std::chrono::milliseconds oldestDataToKeepTimestamp) = 0;
+
+    /**
+     * Flushes to the DB all data passed with AbstractEventsStorage::save before this call.
+     */
+    virtual void flush(StoreCompletionHandler completionHandler) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -97,17 +120,18 @@ class EventsStorage:
     public AbstractEventsStorage
 {
 public:
-    EventsStorage(const Settings& settings);
+    EventsStorage();
+    virtual ~EventsStorage();
 
-    virtual bool initialize() override;
+    virtual bool initialize(const Settings& settings) override;
 
-    virtual void save(
-        common::metadata::ConstDetectionMetadataPacketPtr packet,
-        StoreCompletionHandler completionHandler) override;
+    virtual void save(common::metadata::ConstDetectionMetadataPacketPtr packet) override;
 
     virtual void createLookupCursor(
         Filter filter,
         CreateCursorCompletionHandler completionHandler) override;
+
+    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& cursor) override;
 
     virtual void lookup(
         Filter filter,
@@ -122,13 +146,27 @@ public:
         QnUuid deviceId,
         std::chrono::milliseconds oldestDataToKeepTimestamp) override;
 
+    virtual void flush(StoreCompletionHandler completionHandler) override;
+
 private:
-    const Settings& m_settings;
-    DbController m_dbController;
-    std::chrono::microseconds m_maxRecordedTimestamp = std::chrono::microseconds::zero();
+    std::shared_ptr<DbController> m_dbController;
+    std::list<std::shared_ptr<Cursor>> m_openedCursors;
+    QnMutex m_dbControllerMutex;
+    QnMutex m_cursorsMutex;
+    std::atomic<bool> m_closingDbController {false};
+    std::chrono::milliseconds m_maxRecordedTimestamp = std::chrono::milliseconds::zero();
     mutable QnMutex m_mutex;
+    AttributesDao m_attributesDao;
+    ObjectTypeDao m_objectTypeDao;
+    DeviceDao m_deviceDao;
+    TimePeriodDao m_timePeriodDao;
+
+    ObjectCache m_objectCache;
+    ObjectTrackAggregator m_trackAggregator;
 
     bool readMaximumEventTimestamp();
+
+    bool loadDictionaries();
 
     nx::sql::DBResult savePacket(
         nx::sql::QueryContext*,
@@ -138,18 +176,23 @@ private:
      * @return Inserted event id.
      * Throws on error.
      */
-    std::int64_t insertEvent(
+    void insertEvent(
+        nx::sql::QueryContext* queryContext,
+        const common::metadata::DetectionMetadataPacket& packet,
+        const common::metadata::DetectedObject& detectedObject,
+        long long attributesId,
+        long long timePeriodId);
+
+    void updateDictionariesIfNeeded(
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject);
 
-    /**
-     * Throws on error.
-     */
-    void insertEventAttributes(
-        nx::sql::QueryContext* queryContext,
-        std::int64_t eventId,
-        const std::vector<common::metadata::Attribute>& eventAttributes);
+    void savePacketDataToCache(
+        const QnMutexLockerBase& /*lock*/,
+        const common::metadata::ConstDetectionMetadataPacketPtr& packet);
+
+    DetectionDataSaver takeDataToSave(const QnMutexLockerBase& /*lock*/, bool flushData);
 
     void prepareCursorQuery(const Filter& filter, nx::sql::SqlQuery* query);
 
@@ -168,12 +211,8 @@ private:
         const std::vector<QString>& objectTypeIds,
         nx::sql::Filter* sqlFilter);
 
-    void addTimePeriodToFilter(
-        const QnTimePeriod& timePeriod,
-        nx::sql::Filter* sqlFilter);
-
     void addBoundingBoxToFilter(
-        const QRectF& boundingBox,
+        const QRect& boundingBox,
         nx::sql::Filter* sqlFilter);
 
     void loadObjects(
@@ -197,8 +236,20 @@ private:
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 
+    void prepareSelectTimePeriodsUnfilteredQuery(
+        nx::sql::AbstractSqlQuery* query,
+        const std::vector<QnUuid>& deviceIds,
+        const QnTimePeriod& timePeriod,
+        const TimePeriodsLookupOptions& options);
+
+    void prepareSelectTimePeriodsFilteredQuery(
+        nx::sql::AbstractSqlQuery* query,
+        const Filter& filter,
+        const TimePeriodsLookupOptions& options);
+
     void loadTimePeriods(
-        nx::sql::SqlQuery& query,
+        nx::sql::AbstractSqlQuery* query,
+        const QnTimePeriod& timePeriod,
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 
@@ -213,12 +264,19 @@ private:
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void cleanupEventProperties(nx::sql::QueryContext* queryContext);
+
+    void logDataSaveResult(sql::DBResult resultCode);
+
+    static QRect packRect(const QRectF& rectf);
+    static int packCoordinate(double);
+
+    static double unpackCoordinate(int);
 };
 
 //-------------------------------------------------------------------------------------------------
 
 using EventsStorageFactoryFunction =
-    std::unique_ptr<AbstractEventsStorage>(const Settings&);
+    std::unique_ptr<AbstractEventsStorage>();
 
 class EventsStorageFactory:
     public nx::utils::BasicFactory<EventsStorageFactoryFunction>
@@ -231,9 +289,7 @@ public:
     static EventsStorageFactory& instance();
 
 private:
-    std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction(const Settings&);
+    std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction();
 };
 
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::storage

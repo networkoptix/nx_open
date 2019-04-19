@@ -22,7 +22,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static constexpr QSize kDesiredSize{800, 900};
+static constexpr QSize kDesiredSize{800, 600};
 
 } // namespace
 
@@ -38,15 +38,24 @@ EulaDialog::EulaDialog(QWidget* parent):
     font.setPixelSize(font.pixelSize() + 2);
     ui->titleLabel->setFont(font);
     ui->titleLabel->setForegroundRole(QPalette::Light);
+    ui->copyToClipboard->setType(ClipboardButton::StandardType::copyLong);
 
-    ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    //ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    // We have replaced standard buttons to keep our own button order and style.
 
-    const auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    okButton->setText(tr("I Agree"));
-    setAccentStyle(okButton);
+    connect(ui->accept, &QPushButton::clicked, this,
+        [this]()
+        {
+            done(QDialog::DialogCode::Accepted);
+        });
 
-    const auto cancelButton = ui->buttonBox->button(QDialogButtonBox::Cancel);
-    cancelButton->setText(tr("I Do Not Agree"));
+    connect(ui->reject, &QPushButton::clicked, this,
+        [this]()
+        {
+            done(QDialog::DialogCode::Rejected);
+        });
+
+    setAccentStyle(ui->accept);
 
     NxUi::setupWebViewStyle(ui->eulaView, NxUi::WebViewStyle::eula);
 }
@@ -66,9 +75,21 @@ void EulaDialog::setTitle(const QString& value)
     ui->titleLabel->setText(value);
 }
 
-void EulaDialog::setEulaHtml(const QString& value)
+void EulaDialog::setEulaHtml(const QString& html)
 {
-    ui->eulaView->setHtml(value);
+    const auto eulaHtmlStyle = NxUi::generateCssStyle();
+
+    auto eulaText = html;
+    eulaText.replace(
+        lit("<head>"),
+        lit("<head><style>%1</style>").arg(eulaHtmlStyle));
+
+    ui->eulaView->setHtml(eulaText);
+
+    // We do not want to copy embedded style to clipboard.
+    //ui->copyToClipboard->setClipboardText(html);
+    // We will copy style as well, until we catch all font problems.
+    ui->copyToClipboard->setClipboardText(eulaText);
 }
 
 bool EulaDialog::hasHeightForWidth() const
@@ -82,7 +103,7 @@ void EulaDialog::updateSize()
     if (!window)
         return;
 
-    const auto maximumSize = window->screen()->size()
+    const auto maximumSize = window->screen()->availableSize()
         - client::core::Geometry::sizeDelta(window->frameMargins());
 
     setFixedSize(kDesiredSize.boundedTo(maximumSize));
@@ -104,7 +125,7 @@ bool EulaDialog::event(QEvent* event)
 
             updateSize();
             window->setFramePosition(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter,
-                window->frameGeometry().size(), window->screen()->geometry()).topLeft());
+                window->frameGeometry().size(), window->screen()->availableGeometry()).topLeft());
 
             break;
         }
@@ -116,7 +137,7 @@ bool EulaDialog::event(QEvent* event)
     return base_type::event(event);
 }
 
-bool EulaDialog::acceptEulaHtml(const QString& html, QWidget* parent)
+bool EulaDialog::acceptEulaHtml(const QString& html, int version, QWidget* parent)
 {
     // Regexp to dig out a title from html with EULA.
     QRegExp headerRegExp("<title>(.+)</title>", Qt::CaseInsensitive);
@@ -135,25 +156,19 @@ bool EulaDialog::acceptEulaHtml(const QString& html, QWidget* parent)
         eulaHeader = tr("To use the software you must agree with the end user license agreement");
     }
 
-    const auto eulaHtmlStyle = NxUi::generateCssStyle();
-
-    auto eulaText = html;
-    eulaText.replace(
-        lit("<head>"),
-        lit("<head><style>%1</style>").arg(eulaHtmlStyle));
-
     EulaDialog eulaDialog(parent);
     eulaDialog.setTitle(eulaHeader);
-    eulaDialog.setEulaHtml(eulaText);
+    eulaDialog.setEulaHtml(html);
+
     if (eulaDialog.exec() == QDialog::DialogCode::Accepted)
     {
-        qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
+        qnSettings->setAcceptedEulaVersion(version);
         return true;
     }
     return false;
 }
 
-bool EulaDialog::acceptEulaFromFile(const QString& path, QWidget* parent)
+bool EulaDialog::acceptEulaFromFile(const QString& path, int version, QWidget* parent)
 {
     if (!NX_ASSERT(!path.isEmpty()))
         return false;
@@ -166,7 +181,7 @@ bool EulaDialog::acceptEulaFromFile(const QString& path, QWidget* parent)
     }
 
     const auto eulaText = QString::fromUtf8(eula.readAll());
-    return acceptEulaHtml(eulaText, parent);
+    return acceptEulaHtml(eulaText, version, parent);
 }
 
 } // namespace nx::vms::client::desktop

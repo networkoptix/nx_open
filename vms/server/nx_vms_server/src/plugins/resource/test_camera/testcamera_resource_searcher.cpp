@@ -7,6 +7,7 @@
 #include "utils/common/util.h"
 #include <core/resource/test_camera_ini.h>
 #include <nx/utils/log/log.h>
+#include <nx/network/url/url_builder.h>
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
 
@@ -36,11 +37,11 @@ bool QnTestCameraResourceSearcher::updateSocketList()
     if (curretTime - m_sockUpdateTime > SOCK_UPDATE_INTERVAL)
     {
         clearSocketList();
-        for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
+        for (const auto& address: nx::network::allLocalAddresses(nx::network::ipV4))
         {
-            DiscoveryInfo info(
-                nx::network::SocketFactory::createDatagramSocket().release(), iface.address);
-            if (info.sock->bind(iface.address.toString(), 0))
+            DiscoveryInfo info(nx::network::SocketFactory::createDatagramSocket().release(),
+                QHostAddress(address.toString()));
+            if (info.sock->bind(address.toString(), 0))
                 m_sockList << info;
             else
                 delete info.sock;
@@ -69,11 +70,10 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
         QnSleep::msleep(1000);
     }
 
-    QSet<QHostAddress> foundDevSet; // to avoid duplicates
     QMap<QString, QnResourcePtr> resources;
     QSet<QString> processedMac;
 
-    for(const DiscoveryInfo& info: m_sockList)
+    for (const DiscoveryInfo& info: m_sockList)
     {
         nx::network::AbstractDatagramSocket* sock = info.sock;
         while (sock->hasData())
@@ -92,37 +92,41 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
             int videoPort = params[1].toInt();
             for (int j = 2; j < params.size(); ++j)
             {
+                QString mac(params[j]);
+                if (processedMac.contains(mac))
+                    continue;
+
                 QnTestCameraResourcePtr resource (new QnTestCameraResource(serverModule()));
                 QString model = QLatin1String(QnTestCameraResource::kModel);
                 QnUuid rt = qnResTypePool->getResourceTypeId(manufacturer(), model);
                 if (rt.isNull())
                     continue;
 
-                QLatin1String s(params[j]);
+                const nx::utils::Url url = nx::network::url::Builder()
+                        .setScheme("tcp")
+                        .setHost(remoteEndpoint.address.toString())
+                        .setPort(videoPort)
+                        .setPath(mac);
 
                 resource->setTypeId(rt);
                 resource->setName(model);
                 resource->setModel(model);
-                QString mac(s);
-                if (processedMac.contains(mac))
-                    continue;
-                processedMac << mac;
-
                 resource->setMAC(nx::utils::MacAddress(mac));
-                resource->setUrl(QLatin1String("tcp://") + remoteEndpoint.address.toString()
-                    + QLatin1Char(':') + QString::number(videoPort) + QLatin1Char('/')
-                    + QLatin1String(params[j]));
+                resource->setUrl(url.toString());
+
+                NX_VERBOSE(this, "Found test camera %1 (URL: %2)", resource, url);
+                processedMac << mac;
                 resources.insert(mac, resource);
             }
         }
     }
-    QnResourceList rez;
-    for(const QnResourcePtr& res: resources.values())
-        rez << res;
+    QnResourceList result;
+    for (const QnResourcePtr& res: resources.values())
+        result << res;
 
     sendBroadcast();
 
-    return rez;
+    return result;
 }
 
 QnResourcePtr QnTestCameraResourceSearcher::createResource(
@@ -147,7 +151,8 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(
     result = QnVirtualCameraResourcePtr(new QnTestCameraResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
-    NX_DEBUG(this, lm("Create test camera resource, type id: %1").arg(resourceTypeId));
+    NX_DEBUG(this, "Create test camera resource [%1], type id: [%2]",
+        result, resourceTypeId);
     return result;
 
 }

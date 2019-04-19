@@ -16,7 +16,7 @@
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/vms/server/plugins/utility_provider.h>
 
-#include "plugins_ini.h"
+#include "vms_server_plugins_ini.h"
 
 using namespace nx::sdk;
 

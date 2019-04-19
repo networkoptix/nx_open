@@ -359,7 +359,10 @@ bool QnRtspClientArchiveDelegate::openInternal()
         if (m_playNowModeAllowed)
         {
             // temporary solution
-            m_rtspDevice = std::make_unique<QnRtspIoDevice>(m_rtspSession.get(), RtspTransport::tcp);
+            m_rtspDevice = std::make_unique<QnRtspIoDevice>(
+                m_rtspSession.get(),
+                nx::vms::api::RtpTransportType::tcp);
+
             m_rtpData = m_rtspDevice.get();
         }
         else
@@ -741,12 +744,6 @@ void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
         return;
 
     m_singleShotMode = value;
-    /*
-    if (value)
-        m_rtspSession->sendPause();
-    else
-        m_rtspSession->sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession->getScale());
-    */
 }
 
 void QnRtspClientArchiveDelegate::setCustomVideoLayout(const QnCustomResourceVideoLayoutPtr& value)
@@ -952,7 +949,6 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
         QByteArray s = buffer.data().toBase64();
         m_rtspSession->setAdditionAttribute("x-motion-region", s);
     }
-    //m_rtspSession->sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession->getScale());
 }
 
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
@@ -1023,7 +1019,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePt
         session->setAdditionAttribute(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     }
 
-    session->setTransport(RtspTransport::tcp);
+    session->setTransport(nx::vms::api::RtpTransportType::tcp);
 }
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)

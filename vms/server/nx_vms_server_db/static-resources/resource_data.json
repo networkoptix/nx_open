@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.20",
+    "version": "1.0.1.49",
     "data": [
         {
             "keys": [
@@ -33,6 +33,12 @@
                 "DWC-MVT4Wi*|ONVIF"
             ],
             "obtainMacFromMulticast": "Never"
+        },
+        {
+            "keys": [
+                "DW|DWC-PF5M1TIR"
+            ],
+            "dontSendBackChannelRtspAttribute": true
         },
         {
             "keys": [
@@ -822,22 +828,54 @@
                 "dahua|dhi-nvr4216-4ks2",
                 "DW-ENHD16|DW-ENHD16-*",
                 "DW|DW-ENHD16*",
-                "DW-ENHD16|DW-ENCODWER"
+                "DW-ENHD16|DW-ENCODWER",
+                "dahua|dhi-nvr4216-4ks2",
+                "dahua|hcvr5104h-s2",
+                "hangzhou hikvision digital technology co., ltd|ds-8116hghi*",
+                "dahua|n52b3p",
+                "ds-7208hqhi-k2|embedded net dvr",
+                "tr2116a|embedded net dvr",
+                "vlr-enc-16|vlr-enc-16",
+                "dahua|dh-xvr5104c-x1",
+                "dahua|dhi-nvr5432-16p-4ks2e",
+                "dahua|dhi-nvr4104hs-4ks2",
+                "hangzhou hikvision digital technology co., ltd|ds-9016huhi*",
+                "uniview|nvr308-32r-b",
+                "onvif_encoder|mam-6me1012mta",
+                "costar|mam-6me1012mta",
+                "mam-6me1012mta|mam-6me1012mta-jh",
+                "mam-6me1012mta|hae-012",
+                "mam-6me1012mta|crt1200en",
+                "hangzhou hikvision digital technology co., ltd|ds-8116hqhi*",
+                "dahua|dhi-nvr5432-16p-i",
+                "scw|nvr-admp32p16",
+                "dahua|dhi-nvr4116-4ks2",
+                "ds-7616ni-k2|network video recorder",
+                "dahua|xvr7216a*",
+                "bosch|vip_x16_xf_e",
+                "private|dhi-nvr5216-4ks2",
+                "dh-nvr4208-8p-4k|private",
+                "dh-nvr608-32-4ks2|private"
             ],
             "analogEncoder": true
+        },
+        {
+            "keys": [
+                "DW-ENHD16|DW-ENHD16*",
+                "DW|DW-ENHD16*"
+            ],
+            "doUpdatePortInSubscriptionAddress": false
         },
         {
             "keys": ["UNIVIEW|DVS4116"],
             "enableAdditionalManufacturerNormalization": true
         },
-
         {
             "keys": [
                 "*|DW-CP04", "*|DW-CP16"
             ],
             "isRebrendedActiCamera": true
         },
-
         {
             "keys": [
                 "ISD|*"
@@ -857,8 +895,7 @@
             "keys": [
                 "ISD|XPM-FL72-48MP",
                 "DW|XPM-FL72-48MP",
-                "DW|DWC-PZV2M72T",
-                "DigitalWatchdog|DWC-PZV2M72T"
+                "DW|DWC-PZV2M72T"
             ],
             "isdDwCam": true,
             "showUrl": true,
@@ -1619,7 +1656,7 @@
         },
         {
             "keys": [
-                "HITRON|NFX-22153D1", "DigitalWatchdog|DWC-MPTZ30X", "DW|DWC-MPTZ30X"
+                "HITRON|NFX-22153D1", "DW|DWC-MPTZ30X"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -2217,20 +2254,17 @@
         {
             "keys":[
                 "DW|DWC-MTT4W*",
-                "DigitalWatchdog|DWC-MTT4W*",
                 "DW|DWC-MVT4W*",
-                "DigitalWatchdog|DWC-MVT4W*",
-                "DW|DWC-MBT4W*",
-                "DigitalWatchdog|DWC-MBT4W*"
+                "DW|DWC-MBT4W*"
              ],
-             "trustToVideoSourceSize": false
+             "trustToVideoSourceSize": false,
+             "forceOnvifAdvancedParameters": true
         },
         {
             "keys":[
-                "Digital_Watchdog|DWC-PF5M1TIR",
-                "DigitalWatchdog|DWC-MD85DiA",
-                "DigitalWatchdog|DWC-MV85DiA",
-                "Digital_Watchdog|DWC-MV85DiA"
+                "DW|DWC-PF5M1TIR",
+                "DW|DWC-MD85DiA",
+                "DW|DWC-MV85DiA"
             ],
             "highStreamBitrateBounds": {
                 "min": 32,
@@ -2284,6 +2318,7 @@
         },
         {
             "keys":["DW|DWC-PB6M4T"],
+            "operationalPtzCapabilities": "NoPtzCapabilities",
             "forcedOnvifParams":
             {
                 "videoEncoders":
@@ -2553,12 +2588,6 @@
         },
         {
             "keys": [
-                "DigitalWatchdog|DWC-MTT4Wi36"
-            ],
-            "forceOnvifAdvancedParameters": true
-        },
-        {
-            "keys": [
                 "UNIVIEW|IPC6253SR-X33*", "Securicorp|SCL-SDM03MVIR-WD3533X", "NONE|SCL-SDM03MVIR-WD3533X"
             ],
             "ptzMapper": {
@@ -2800,7 +2829,11 @@
             }
         },
         {
-            "keys": ["DW|DWC-MPZ20XFM"],
+            "keys": 
+            [
+                "DW|DWC-MPZ20XFM",
+                "DW|DWC-MD421D"
+            ],
             "mediaTraits": {
                 "aspectRatioDependent": {
                     "allowedAspectRatioDiff": "0.1"
@@ -3061,7 +3094,7 @@
         {
             "keys": [
                 "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
-                "Hikvision|DS-2DF8223*"
+                "Hikvision|DS-2DF8223*", "ONVIF|K20IC-*"
             ],
             "clearInputsTimeoutSec": 1,
             "comment": "considers input state as 0 after specified timeout"

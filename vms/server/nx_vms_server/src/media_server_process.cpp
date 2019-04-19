@@ -104,6 +104,7 @@
 #include <recorder/storage_manager.h>
 #include <recorder/schedule_sync.h>
 
+#include <nx/vms/server/rest/exec_event_action_rest_handler.h>
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/event_log_rest_handler.h>
 #include <rest/handlers/event_log2_rest_handler.h>
@@ -162,7 +163,6 @@
 #include <rest/handlers/discovered_peers_rest_handler.h>
 #include <rest/handlers/log_level_rest_handler.h>
 #include <rest/handlers/multiserver_chunks_rest_handler.h>
-#include <rest/handlers/multiserver_time_rest_handler.h>
 #include <rest/handlers/camera_history_rest_handler.h>
 #include <rest/handlers/multiserver_bookmarks_rest_handler.h>
 #include <rest/handlers/save_cloud_system_credentials.h>
@@ -188,6 +188,9 @@
 #endif
 #include <nx/vms/server/rest/device_analytics_settings_handler.h>
 #include <nx/vms/server/rest/analytics_engine_settings_handler.h>
+
+#include <nx/vms/server/rest/get_time_handler.h>
+#include <nx/vms/server/rest/server_time_handler.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -267,7 +270,7 @@
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/vms/server/root_fs.h>
 #include <nx/vms/server/server_update_manager.h>
-#include <mediaserver_ini.h>
+#include <nx_vms_server_ini.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
 #include <local_connection_factory.h>
 #include <core/resource/resource_command_processor.h>
@@ -280,6 +283,7 @@
 
 #include <providers/speech_synthesis_data_provider.h>
 #include <nx/utils/file_system.h>
+#include <nx/network/url/url_builder.h>
 
 #if defined(__arm__)
     #include "nx/vms/server/system/nx1/info.h"
@@ -740,6 +744,8 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         serverModule()->normalStorageManager()->initDone();
         serverModule()->backupStorageManager()->initDone();
+
+        initializeAnalyticsEvents();
     });
 }
 
@@ -815,14 +821,18 @@ QnMediaServerResourcePtr MediaServerProcess::registerServer(
     // insert server user attributes if defined
     QString dir = serverModule()->settings().staticDataDir();
 
-    QFile f(closeDirPath(dir) + "server_settings.json");
-    if (!f.open(QFile::ReadOnly))
-        return server;
-    QByteArray data = f.readAll();
     nx::vms::api::MediaServerUserAttributesData userAttrsData;
-    if (!QJson::deserialize(data, &userAttrsData))
-        return server;
-    userAttrsData.serverId = server->getId();
+    ec2::fromResourceToApi(server->userAttributes(), userAttrsData);
+
+    QFile f(closeDirPath(dir) + "server_settings.json");
+    if (f.open(QFile::ReadOnly))
+    {
+        QByteArray data = f.readAll();
+        if (QJson::deserialize(data, &userAttrsData))
+            userAttrsData.serverId = server->getId();
+        else
+            NX_WARNING(this, "Can not deserialize server_settings.json file");
+    }
 
     nx::vms::api::MediaServerUserAttributesDataList attrsList;
     attrsList.push_back(userAttrsData);
@@ -1038,6 +1048,11 @@ void MediaServerProcess::at_databaseDumped()
             ).saveToSettings(serverModule()->roSettings());
     NX_INFO(this, "Server restart is scheduled after dump database");
     restartServer(500);
+}
+
+void MediaServerProcess::at_metadataStorageIdChanged(const QnResourcePtr& /*resource*/)
+{
+    initializeAnalyticsEvents();
 }
 
 void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
@@ -1321,7 +1336,7 @@ void MediaServerProcess::at_connectionOpened()
 
     const auto& resPool = commonModule()->resourcePool();
     const QnUuid serverGuid(serverModule()->settings().serverGuid());
-    qint64 lastRunningTime = serverModule()->lastRunningTime().count();
+    qint64 lastRunningTime = serverModule()->lastRunningTimeBeforeRestart().count();
     if (lastRunningTime)
     {
         serverModule()->eventConnector()->at_serverFailure(
@@ -1675,7 +1690,23 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/createEvent", new QnExternalEventRestHandler(serverModule()));
 
-    static const char kGetTimePath[] = "api/gettime";
+    static const QString kGetTimePath("api/getTime");
+    /**%apidoc GET /api/getTime
+     * Get the Server time, time zone and authentication realm (realm is added for convenience).
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply Time-related data.
+     *         %param:string reply.realm Authentication realm.
+     *         %param:string reply.timeZoneOffset Time zone offset, in milliseconds.
+     *         %param:string reply.timeZoneId Identification of the time zone in the text form.
+     *         %param:string reply.osTime Local OS time on the Server, in milliseconds since epoch.
+     *         %param:string reply.vmsTime Synchronized time, in milliseconds since epoch.
+     */
+    reg(kGetTimePath, new nx::vms::server::rest::GetTimeHandler());
+
+    reg("ec2/getTimeOfServers", new nx::vms::server::rest::ServerTimeHandler("/" + kGetTimePath));
+
     /**%apidoc GET /api/gettime
      * Get the Server time, time zone and authentication realm (realm is added for convenience).
      * %// TODO: The name of this method and its timezoneId parameter use wrong case.
@@ -1688,9 +1719,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %param:string reply.timezoneId Identification of the time zone in the text form.
      *         %param:string reply.utcTime Server time, in milliseconds since epoch.
      */
-    reg(kGetTimePath, new QnTimeRestHandler());
-
-    reg("ec2/getTimeOfServers", new QnMultiserverTimeRestHandler(QLatin1String("/") + kGetTimePath));
+    reg("api/gettime", new QnTimeRestHandler());
 
     /**%apidoc GET /api/getTimeZones
      * Return the complete list of time zones supported by the server machine.
@@ -2304,10 +2333,12 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/scriptList", new QnScriptListRestHandler(serverModule()->settings().dataDir()), kAdmin);
 
     /**%apidoc GET /api/systemSettings
-     * Get or set global system settings. If called with no arguments, just returns list of all
-     * system settings with their values
-     * %param[opt]:string <param_name> name of system parameter. E.g., ec2AliveUpdateIntervalSec
-     * %param[opt]:string <param_value> New value for the specified parameter
+     * Get or set global system settings. If called with no arguments, just returns the list of all
+     * system settings with their values.
+     * To modify a settings, it is needed to specify the setting name as a query parameter. Thus,
+     * this method doesn't have fixed parameter names. To obtain the full list of possible names,
+     * call this method without parameters.
+     * Example: /api/systemSettings?smtpTimeout=30&amp;smtpUser=test
      */
     reg("api/systemSettings", new QnSystemSettingsHandler());
 
@@ -2554,6 +2585,8 @@ void MediaServerProcess::registerRestHandlers(
      *     %value source Use the source frame aspect ratio, despite the value in camera settings.
      * %param[opt]:option ignoreExternalArchive If present and "time" parameter has value
      *     "latest", the image will not be downloaded from archive of the dts-based devices.
+     * %param[opt]:string crop Apply cropping to the source image. Parameter defines rect in range [0..1].
+     *     Format: 'left,top,widthxheight'. Example: '0.5,0.4,0.25x0.3'.
      * %param[proprietary]:option local If present, the request should not be redirected to another
      *     server.
      * %param[proprietary]:option extraFormatting If present and the requested result format is
@@ -2607,6 +2640,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
 
+
     /**%apidoc POST /api/executeAnalyticsAction
      * Execute analytics action from the particular analytics plugin on this server. The action is
      * applied to the specified metadata object.
@@ -2629,7 +2663,40 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/executeAnalyticsAction", new QnExecuteAnalyticsActionRestHandler(serverModule()));
 
-    /**%apidoc POST /api/saveCloudSystemCredentials
+    /**%apidoc POST /api/executeEventAction
+     * Execute event action.
+     * %param:enum actionType Type of the action.
+     *     %value UndefinedAction
+     *     %value CameraOutputAction Change camera output state.
+     *     %value BookmarkAction
+     *     %value CameraRecordingAction Start camera recording.
+     *     %value PanicRecordingAction Activate panic recording mode.
+     *     %value SendMailAction Send an email.
+     *     %value DiagnosticsAction Write a record to the server's log.
+     *     %value ShowPopupAction
+     *     %value PlaySoundAction
+     *     %value PlaySoundOnceAction
+     *     %value SayTextAction
+     *     %value ExecutePtzPresetAction Execute given PTZ preset.
+     *     %value ShowTextOverlayAction Show text overlay over the given camera(s).
+     *     %value ShowOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
+     *     %value ExecHttpRequestAction Send HTTP request as an action.
+     * %param[opt]:enum EventState
+     *     %value inactive Event has been finished (for prolonged events).
+     *     %value active Event has been started (for prolonged events).
+     *     %value undefined Event state is undefined (for instant events).
+     * %param[proprietary]:boolean receivedFromRemoteHost
+     * %param:stringArray resourceIds List of ids for resources associated with the event.
+     *     Each id can be either camera id, camera MAC address or camera External id.
+     * %param[opt]:objectJson params Json object with action parameters.
+     * %param[opt]:objectJson runtimeParams Json object with event parameters.
+     * %param[opt]:integer ruleId Event rule id.
+     * %param[opt]:integer aggregationCount How many events were aggregated together for this action.
+     */
+    reg("api/executeEventAction",
+        new nx::vms::server::rest::QnExecuteEventActionRestHandler(serverModule()));
+
+    /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system
      * %param[opt]:string cloudSystemId
      * %param[opt]:string cloudAuthenticationKey
@@ -2643,7 +2710,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc[proprietary] GET /api/debug
      * Intended for debugging and experimenting.
-     * <br/>ATTENTION: Works only if enabled by mediaserver.ini.
+     * <br/>ATTENTION: Works only if enabled by nx_vms_server.ini.
      * %param[opt]:option crash Intentionally crashes the Server.
      * %param[opt]:option fullDump If specified together with "crash", creates full crash dump.
      * %param[opt]:option exit Terminates the Server normally, via "exit(64)".
@@ -3429,6 +3496,15 @@ bool MediaServerProcess::setUpMediaServerResource(
             server->setId(serverGuid);
             server->setMaxCameras(nx::utils::AppInfo::isEdgeServer() ? 1 : 128);
 
+            if (!serverModule->settings().noInitStoragesOnStartup())
+            {
+                auto storages = createStorages(server);
+                saveStorages(ec2Connection, storages);
+                for (const QnStorageResourcePtr &storage: storages)
+                    m_serverMessageProcessor->updateResource(storage, ec2::NotificationSource::Local);
+                server->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(server));
+            }
+
             QString serverName(getDefaultServerName());
             auto beforeRestoreDbData = commonModule()->beforeRestoreDbData();
             if (!beforeRestoreDbData.serverName.isEmpty())
@@ -3507,6 +3583,10 @@ bool MediaServerProcess::setUpMediaServerResource(
 
     commonModule()->setModuleInformation(selfInformation);
     commonModule()->bindModuleInformation(m_mediaServer);
+
+
+    connect(m_mediaServer.get(), &QnMediaServerResource::metadataStorageIdChanged, this,
+        &MediaServerProcess::at_metadataStorageIdChanged);
 
     return foundOwnServerInDb;
 }
@@ -3854,8 +3934,8 @@ void MediaServerProcess::connectSignals()
         [this]()
         {
             Downloader* downloader = this->serverModule()->findInstance<Downloader>();
-            downloader->startDownloads();
             downloader->findExistingDownloads();
+            downloader->startDownloads();
         });
 
     connect(commonModule()->resourceDiscoveryManager(),
@@ -3932,7 +4012,10 @@ void MediaServerProcess::connectSignals()
 
 void MediaServerProcess::setUpDataFromSettings()
 {
-    QnMulticodecRtpReader::setDefaultTransport(serverModule()->settings().rtspTransport());
+    QnMulticodecRtpReader::setDefaultTransport(QnLexical::deserialized(
+        serverModule()->settings().rtspTransport(),
+        nx::vms::api::RtpTransportType::automatic));
+
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     commonModule()->setDefaultAdminPassword(serverModule()->settings().appserverPassword());
     commonModule()->setUseLowPriorityAdminPasswordHack(
@@ -3977,16 +4060,54 @@ void MediaServerProcess::setUpDataFromSettings()
     nx::network::SocketFactory::setIpVersion(ipVersion);
 }
 
-void MediaServerProcess::initializeAnalyticsEvents()
+QnUuid MediaServerProcess::selectDefaultStorageForAnalyticsEvents(QnMediaServerResourcePtr server)
 {
-    while (!needToStop())
-    {
-        if (serverModule()->analyticsEventsStorage()->initialize())
-            break;
+    QnUuid result;
+    qint64 maxTotalSpace = 0;
 
-        NX_WARNING(this, lm("Failed to initialize analytics events storage. Retrying..."));
-        QnSleep::msleep(1000);
+    for (const auto& storage: server->getStorages())
+    {
+        if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+        {
+            if (fileStorage->isLocal() && fileStorage->getTotalSpace() > maxTotalSpace)
+            {
+                maxTotalSpace = fileStorage->getTotalSpace();
+                result = fileStorage->getId();
+            }
+        }
     }
+
+    return result;
+}
+
+bool MediaServerProcess::initializeAnalyticsEvents()
+{
+    auto storageResource = commonModule()->resourcePool()->getResourceById<QnStorageResource>(
+        m_mediaServer->metadataStorageId());
+
+    auto settings = this->serverModule()->analyticEventsStorageSettings();
+    const auto pathBase = storageResource ? storageResource->getPath()
+        : nx::network::url::normalizePath(serverModule()->settings().dataDir());
+    settings.dbConnectionOptions.dbName = closeDirPath(pathBase) + "object_detection.sqlite";
+
+    if (!this->serverModule()->analyticsEventsStorage()->initialize(settings))
+    {
+        NX_ERROR(this, "Failed to change analytics events storage, initialization error");
+        return false;
+    }
+
+    if (!m_oldAnalyticsStoragePath.isEmpty())
+    {
+        auto policy = commonModule()->globalSettings()->metadataStorageChangePolicy();
+        if (policy == nx::vms::api::MetadataStorageChangePolicy::remove)
+        {
+            if (!QFile::remove(m_oldAnalyticsStoragePath))
+                NX_WARNING(this, "Can not remove database %1", m_oldAnalyticsStoragePath);
+        }
+    }
+
+    m_oldAnalyticsStoragePath = settings.dbConnectionOptions.dbName;
+    return true;
 }
 
 void MediaServerProcess::setUpTcpLogReceiver()
@@ -4326,6 +4447,7 @@ void MediaServerProcess::run()
         initializeHardwareId();
 
     prepareOsResources();
+    serverModule->initializeP2PDownloader();
 
     updateAllowedInterfaces();
 
@@ -4368,7 +4490,10 @@ void MediaServerProcess::run()
     auto stopObjectsGuard = nx::utils::makeScopeGuard([this]() { stopObjects(); });
 
     if (!serverModule->serverDb()->open())
+    {
+        NX_ERROR(this, "Stopping media server because can't open database");
         return;
+    }
 
     auto utils = nx::vms::server::Utils(serverModule.get());
     if (utils.timeToMakeDbBackup())
@@ -4383,8 +4508,6 @@ void MediaServerProcess::run()
 
     m_discoveryMonitor = std::make_unique<nx::vms::server::discovery::DiscoveryMonitor>(
         m_ec2ConnectionFactory->messageBus());
-
-    initializeAnalyticsEvents();
 
     if (needToStop())
         return;
@@ -4716,6 +4839,7 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow(webPrefix + "/api/ping", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/camera_event.*", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/moduleInformation", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/getTime", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/gettime", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(
         webPrefix + nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.toStdString(),

@@ -83,13 +83,6 @@
     </message>
   </context>
   <context>
-    <name>QObject</name>
-    <message>
-      <source>None</source>
-      <translation>Inget</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
@@ -122,16 +115,16 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Alltför många försök. Försök igen om någon minut.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1 är tillfälligt otillgänglig. Vänligen försök igen senare.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>Nätverksfel. Kontrollera din Internetanslutning och försök igen.</translation>
     </message>
   </context>
   <context>

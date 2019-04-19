@@ -38,6 +38,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace vms::server {
@@ -277,7 +278,7 @@ LdapSession::~LdapSession()
 
 bool LdapSession::connect()
 {
-    NX_DEBUG(this, lm("Connect to %1").args(QJson::serialized(m_settings)));
+    NX_DEBUG(this, lm("Connect to %1").arg(m_settings));
     QUrl uri = m_settings.uri;
 
 #if defined Q_OS_WIN
@@ -361,7 +362,7 @@ QString LdapSession::getUserDn(const QString& login)
 
 bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
 {
-    NX_DEBUG(this, lm("Fetching users by filter '%1'").arg(customFilter));
+    NX_VERBOSE(this, lm("Fetching users with filter '%1'").arg(customFilter));
 
     LDAP_RESULT rc = ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
     if (rc != LDAP_SUCCESS)
@@ -370,16 +371,56 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
         return false;
     }
 
-    LDAPMessage *result, *e;
-
     QString filter = QnLdapFilter(m_dType->Filter()) &
         (customFilter.isEmpty() ? m_settings.searchFilter : customFilter);
 
     berval *cookie = NULL;
-    LDAPControl *pControl = NULL, *serverControls[2], **retServerControls = NULL;
+    const auto cleanUpCookie =
+        [&]()
+        {
+            if (cookie)
+                ber_bvfree(cookie);
+            cookie = NULL;
+        };
+
+    LDAPMessage* result = NULL;
+    LDAPControl* pControl = NULL;
+    LDAPControl* serverControls[2] = {NULL, NULL};
+    LDAPControl** retServerControls = NULL;
+    PWCHAR lerrstr = NULL;
+    const auto cleanUpControls =
+        [&]()
+        {
+            if (result)
+                ldap_msgfree(result);
+            result = NULL;
+
+            if (pControl)
+                ldap_control_free(pControl);
+            pControl = NULL;
+
+            serverControls[0] = NULL;
+            serverControls[1] = NULL;
+
+            if (retServerControls)
+                ldap_controls_free(retServerControls);
+            retServerControls = NULL;
+
+            if (lerrstr)
+                ldap_memfree(lerrstr);
+            lerrstr = NULL;
+        };
+
+    const auto memoryGuard = nx::utils::makeScopeGuard(
+        [&]()
+        {
+            cleanUpCookie();
+            cleanUpControls();
+        });
 
     do
     {
+        cleanUpControls();
         rc = ldap_create_page_control(m_ld, kPageSize, cookie, 1, &pControl);
         if (rc != LDAP_SUCCESS)
         {
@@ -404,82 +445,53 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
             /* res */ &result);
         if (rc != LDAP_SUCCESS)
         {
-            if (pControl)
-                ldap_control_free(pControl);
-
             m_lastErrorCode = rc;
             return false;
         }
 
         LDAP_RESULT lerrno = 0;
-        PWCHAR lerrstr = NULL;
-
-        if((rc = ldap_parse_result(m_ld, result, &lerrno,
-                                            NULL, &lerrstr, NULL,
-                                            &retServerControls, 0)) != LDAP_SUCCESS)
+        if((rc = ldap_parse_result(
+            m_ld, result, &lerrno, NULL, &lerrstr, NULL, &retServerControls, 0)) != LDAP_SUCCESS)
         {
-            if (pControl)
-                ldap_control_free(pControl);
-
             m_lastErrorCode = rc;
             return false;
-        }
-
-        ldap_memfree(lerrstr);
-
-        if(cookie)
-        {
-            ber_bvfree(cookie);
-            cookie = NULL;
         }
 
         LDAP_RESULT entcnt = 0;
-        if((rc = ldap_parse_page_control(m_ld, retServerControls, &entcnt, &cookie)) != LDAP_SUCCESS)
+        cleanUpCookie();
+        if((rc = ldap_parse_page_control(
+            m_ld, retServerControls, &entcnt, &cookie)) != LDAP_SUCCESS)
         {
-            if (pControl)
-                ldap_control_free(pControl);
-
             m_lastErrorCode = rc;
             return false;
         }
 
-        if (retServerControls)
-        {
-            ldap_controls_free(retServerControls);
-            retServerControls = NULL;
-        }
-
-        if (pControl)
-        {
-            ldap_control_free(pControl);
-            pControl = NULL;
-        }
-
-        for (e = ldap_first_entry(m_ld, result); e != NULL; e = ldap_next_entry(m_ld, e))
+        LDAPMessage *entry = NULL;
+        for (entry = ldap_first_entry(m_ld, result);
+             entry != NULL;
+             entry = ldap_next_entry(m_ld, entry))
         {
             PWSTR dn;
-            if ((dn = ldap_get_dn(m_ld, e)) != NULL)
+            if ((dn = ldap_get_dn(m_ld, entry)) != NULL)
             {
                 QnLdapUser user;
                 user.dn = FROM_WCHAR_ARRAY(dn);
 
-                user.login = GetFirstValue(m_ld, e, m_dType->UidAttr());
-                user.email = GetFirstValue(m_ld, e, MAIL);
-                user.fullName = GetFirstValue(m_ld, e, m_dType->FullNameAttr());
+                user.login = GetFirstValue(m_ld, entry, m_dType->UidAttr());
+                user.email = GetFirstValue(m_ld, entry, MAIL);
+                user.fullName = GetFirstValue(m_ld, entry, m_dType->FullNameAttr());
 
                 if (!user.login.isEmpty())
                     users.append(user);
                 ldap_memfree(dn);
             }
         }
-
-        ldap_msgfree(result);
     } while (cookie && cookie->bv_val != NULL && (strlen(cookie->bv_val) > 0));
 
-    if(cookie)
-        ber_bvfree(cookie);
+    NX_VERBOSE(this, lm("Fetched %1 user(s)%2").args(
+        users.size(),
+        users.size() < 10 ? " - " + containerString(users) : QString()));
 
-    NX_DEBUG(this, lm("Fetched %1 user(s)").arg(users.size()));
     return true;
 }
 

@@ -27,6 +27,8 @@
 
 #include <nx/vms/api/analytics/settings_response.h>
 #include <nx/vms/event/event_fwd.h>
+#include <nx/vms/api/data/time_reply.h>
+#include <nx/vms/api/data/event_rule_data.h>
 
 namespace rest {
 
@@ -56,7 +58,7 @@ struct RestResultWithData: public RestResultWithDataBase
 };
 
 using EventLogData = RestResultWithData<nx::vms::event::ActionDataList>;
-using MultiServerTimeData = RestResultWithData<ApiMultiserverServerDateTimeDataList>;
+using MultiServerTimeData = RestResultWithData<nx::vms::api::ServerTimeReplyList>;
 using UpdateStatusAllData = RestResultWithData<std::vector<nx::update::Status>>;
 using UpdateInformationData = RestResultWithData<nx::update::Information>;
 
@@ -164,12 +166,12 @@ public:
         GetCallback callback = nullptr,
         QThread* targetThread = nullptr);
 
-    Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
-        , QThread *targetThread = nullptr);
+    Handle getStatisticsSettingsAsync(
+        Result<QByteArray>::type callback, QThread* targetThread = nullptr);
 
-    Handle sendStatisticsAsync(const QnSendStatisticsRequestData &request
-        , PostCallback callback
-        , QThread *targetThread = nullptr);
+    Handle sendStatisticsAsync(
+        const QnSendStatisticsRequestData &request, PostCallback callback,
+        QThread* targetThread = nullptr);
 
     /**
      * Detach the system from cloud. Admin password will be changed to provided (if provided).
@@ -178,7 +180,7 @@ public:
     Handle detachSystemFromCloud(
         const QString& currentAdminPassword,
         const QString& resetAdminPassword,
-        Result<QnRestResult>::type callback, QThread *targetThread = nullptr);
+        Result<QnRestResult>::type callback, QThread* targetThread = nullptr);
 
     /**
      * Save the credentials returned by cloud to the database.
@@ -188,7 +190,7 @@ public:
         const QString &cloudAuthKey,
         const QString &cloudAccountName,
         Result<QnRestResult>::type callback,
-        QThread *targetThread = nullptr);
+        QThread* targetThread = nullptr);
 
     Handle startLiteClient(
         GetCallback callback,
@@ -278,18 +280,18 @@ public:
 
     Handle getTimeOfServersAsync(
         Result<MultiServerTimeData>::type callback,
-        QThread *targetThread = nullptr);
+        QThread* targetThread = nullptr);
 
     Handle testEventRule(const QnUuid& ruleId, nx::vms::api::EventState toggleState,
         GetCallback callback, QThread* targetThread = nullptr);
 
     Handle getEvents(QnEventLogRequestData request,
         Result<EventLogData>::type callback,
-        QThread *targetThread = nullptr);
+        QThread* targetThread = nullptr);
 
     Handle getEvents(const QnEventLogMultiserverRequestData& request,
         Result<EventLogData>::type callback,
-        QThread *targetThread = nullptr);
+        QThread* targetThread = nullptr);
 
     /**
      * Change user's password on a camera. This method doesn't create new user.
@@ -301,7 +303,7 @@ public:
         const QnUuid& id,
         const QAuthenticator& auth,
         Result<QnRestResult>::type callback,
-        QThread *targetThread = nullptr);
+        QThread* targetThread = nullptr);
 
     /**
      * Adds a new wearable camera to this server.
@@ -423,6 +425,11 @@ public:
         Result<QnJsonRestResult>::type callback,
         QThread* targetThread = nullptr);
 
+    Handle executeEventAction(
+        const nx::vms::api::EventActionData& action,
+        Result<QnJsonRestResult>::type callback,
+        QThread* targetThread = nullptr);
+
     Handle updateActionStart(
         const nx::update::Information& info,
         QThread* targetThread = nullptr);
@@ -463,7 +470,11 @@ public:
         QThread* targetThread = nullptr);
 
     Handle getModuleInformation(
-        Result<QList<nx::vms::api::ModuleInformation>>::type callback,
+        Result<RestResultWithData<nx::vms::api::ModuleInformation>>::type callback,
+        QThread* targetThread = nullptr);
+
+    Handle getModuleInformationAll(
+        Result<RestResultWithData<QList<nx::vms::api::ModuleInformation>>>::type callback,
         QThread* targetThread = nullptr);
 
     Handle getEngineAnalyticsSettings(
@@ -488,6 +499,12 @@ public:
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
         Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle debug(
+        const QString& action,
+        const QString& value,
+        PostCallback callback,
         QThread* targetThread = nullptr);
 
     /**

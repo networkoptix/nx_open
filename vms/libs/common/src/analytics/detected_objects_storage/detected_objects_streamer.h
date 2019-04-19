@@ -27,7 +27,7 @@ public:
 private:
     AbstractEventsStorage* m_storage;
     const QnUuid m_deviceId;
-    std::unique_ptr<AbstractCursor> m_cursor;
+    std::shared_ptr<AbstractCursor> m_cursor;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     // TODO: #ak Use cyclic array here.
     std::deque<common::metadata::ConstDetectionMetadataPacketPtr> m_packetCache;

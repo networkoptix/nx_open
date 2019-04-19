@@ -4,7 +4,6 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
 
-#include <nx/vms/client/desktop/ini.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
@@ -58,7 +57,6 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <nx/vms/client/desktop/ini.h>
 #include <api/global_settings.h>
 
 #include <nx/vms/client/desktop/export/tools/export_media_validator.h>
@@ -169,10 +167,12 @@ struct WorkbenchExportHandler::Private
     struct ExportContext
     {
         Filename filename;
-        bool silent = false;
+        bool saveExistingLayout = false;
         QPointer<QnProgressDialog> progressDialog;
     };
     QHash<QnUuid, ExportContext> runningExports;
+
+    QScopedPointer<QnMessageBox> startingExportMessageBox;
 
     explicit Private(WorkbenchExportHandler* owner):
         q(owner),
@@ -199,15 +199,16 @@ struct WorkbenchExportHandler::Private
         return false;
     }
 
-    QnUuid createExportContext(const Filename& fileName, bool silent = false)
+    QnUuid createExportContext(const Filename& fileName, bool saveExistingLayout = false)
     {
         const auto& manager = q->context()->instance<WorkbenchProgressManager>();
         QString fullPath = fileName.completeFileName();
-        const auto exportProcessId = manager->add(tr("Exporting video"), fullPath);
+        const auto exportProcessId = manager->add(
+            saveExistingLayout ? tr("Saving layout") : tr("Exporting video"), fullPath);
 
         const auto progressDialog = new QnProgressDialog(
             fullPath,
-            tr("Stop Export"),
+            saveExistingLayout ? tr("Stop Saving") :  tr("Stop Export"),
             0,
             100,
             q->mainWindowWidget());
@@ -224,7 +225,7 @@ struct WorkbenchExportHandler::Private
                 progressDialog->hide();
             });
 
-        runningExports.insert(exportProcessId, { fileName, silent, progressDialog });
+        runningExports.insert(exportProcessId, { fileName, saveExistingLayout, progressDialog });
 
         return exportProcessId;
     }
@@ -286,7 +287,7 @@ struct WorkbenchExportHandler::Private
             case FileExtension::exe64:
             case FileExtension::exe86:
             {
-                const auto layout = QnResourceDirectoryBrowser::layoutFromFile(
+                const auto layout = ResourceDirectoryBrowser::layoutFromFile(
                     completeFilename, resourcePool);
                 if (layout)
                     resourcePool->addResource(layout);
@@ -359,6 +360,8 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
     const auto exportContext = d->runningExports.take(info.id);
     context()->instance<WorkbenchProgressManager>()->remove(info.id);
 
+    d->startingExportMessageBox.reset(); //< Close "Starting Export..." messagebox if exists.
+
     if (auto dialog = exportContext.progressDialog)
     {
         dialog->hide();
@@ -372,12 +375,13 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
             const auto resource = d->ensureResourceIsInPool(exportContext.filename, resourcePool());
             if (const auto layout = resource.dynamicCast<QnLayoutResource>())
                 snapshotManager()->store(layout);
-            if (!exportContext.silent)
+            if (!exportContext.saveExistingLayout)
                 QnMessageBox::success(mainWindowWidget(), tr("Export completed"));
             break;
         }
         case ExportProcessStatus::failure:
-            QnMessageBox::critical(mainWindowWidget(), tr("Export failed"),
+            QnMessageBox::critical(mainWindowWidget(),
+                exportContext.saveExistingLayout ? tr("Saving failed") : tr("Export failed"),
                 ExportProcess::errorString(info.error));
             break;
 
@@ -530,19 +534,21 @@ void WorkbenchExportHandler::runExport(ExportToolInstance&& context)
     if (exportProcessId.isNull())
         return;
 
-    QScopedPointer<QnMessageBox> startingExportMessageBox;
-    startingExportMessageBox.reset(new QnMessageBox(QnMessageBoxIcon::Information,
-        tr("Starting export..."), QString(), QDialogButtonBox::NoButton,
-        QDialogButtonBox::NoButton, mainWindowWidget()));
+    bool savingExistingLayout = d->runningExports[exportProcessId].saveExistingLayout;
+
+    d->startingExportMessageBox.reset(new QnMessageBox(QnMessageBoxIcon::Information,
+        savingExistingLayout ? tr("Starting saving...") : tr("Starting export..."),
+        tr("We are preparing files for the export process. Please wait for a few seconds."),
+        QDialogButtonBox::NoButton, QDialogButtonBox::NoButton, mainWindowWidget()));
 
     // Only show this message if startExport() takes some time.
     // startExport() will call processEvents().
-    QTimer::singleShot(300, startingExportMessageBox.get(), &QDialog::show);
+    QTimer::singleShot(300, d->startingExportMessageBox.get(), &QDialog::show);
 
     d->exportManager->startExport(exportProcessId, std::move(exportTool));
 
     // If no processEvents() called, the messageBox is destroyed and no timer will be called.
-    startingExportMessageBox.reset();
+    d->startingExportMessageBox.reset();
 
     const auto info = d->exportManager->info(exportProcessId);
 
@@ -740,7 +746,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     std::unique_ptr<nx::vms::client::desktop::AbstractExportTool> exportTool;
     exportTool.reset(new ExportLayoutTool(layoutSettings));
 
-    QnUuid exportId = d->createExportContext(layoutSettings.fileName, true); //< No messagebox on success.
+    QnUuid exportId = d->createExportContext(layoutSettings.fileName, true);
 
     runExport(std::make_pair(exportId, std::move(exportTool)));
 }

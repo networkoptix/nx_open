@@ -114,6 +114,9 @@ int QnCameraDiagnosticsRestHandler::executeGet(
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailability(
     const nx::vms::server::resource::CameraPtr& cameraRes)
 {
+    if (cameraRes->hasFlags(Qn::desktop_camera))
+        return cameraRes->prevInitializationResult();
+
     if (!cameraRes->ping())
         return CameraDiagnostics::CannotEstablishConnectionResult(cameraRes->httpPort());
 

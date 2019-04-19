@@ -35,7 +35,11 @@ Camera::Camera(QnMediaServerModule* serverModule):
     m_lastInitTime.invalidate();
 
     connect(this, &Camera::groupIdChanged, [this]() { reinitAsync(); });
-    connect(this, &QnResource::initializedChanged, [this]() { fixInputPortMonitoring(); });
+    connect(this, &QnResource::initializedChanged, [this]()
+    {
+        QnMutexLocker lk(&m_initMutex);
+        fixInputPortMonitoring();
+    });
 
     const auto updateIoCache =
         [this](const QnResourcePtr&, const QString& id, bool value, qint64 timestamp)
@@ -379,6 +383,9 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
 
 CameraDiagnostics::Result Camera::initInternal()
 {
+    // This property is for debug purpose only.
+    setProperty("driverClass", toString(typeid(*this)));
+
     auto resData = resourceData();
     auto timeoutSec = resData.value<int>(ResourceDataKey::kUnauthorizedTimeoutSec);
     auto credentials = getAuth();
@@ -399,11 +406,10 @@ CameraDiagnostics::Result Camera::initInternal()
         ResourceDataKey::kMediaTraits,
         nx::media::CameraTraits());
 
-    setCameraCapability(Qn::CameraTimeCapability, true);
-
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
+    NX_VERBOSE(this, "Initialising camera driver");
     const auto driverResult = initializeCameraDriver();
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;

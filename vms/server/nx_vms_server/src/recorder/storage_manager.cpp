@@ -53,6 +53,7 @@
 #include "common/common_globals.h"
 #include <media_server/media_server_module.h>
 #include <media_server_process_aux.h>
+#include <nx/sql/database.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -866,7 +867,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
             return;
     }
 
-    QSqlDatabase sqlDb = QSqlDatabase::addDatabase(
+    QSqlDatabase sqlDb = nx::sql::Database::addDatabase(
         lit("QSQLITE"),
         QString("QnStorageManager_%1").arg(fileName));
 
@@ -952,7 +953,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     auto connectionName = sqlDb.connectionName();
     sqlDb.close();
     sqlDb = QSqlDatabase();
-    QSqlDatabase::removeDatabase(connectionName);
+    nx::sql::Database::removeDatabase(connectionName);
 
     QString depracatedFileName = fileName + lit("_deprecated");
     if (!QFile::remove(depracatedFileName))
@@ -2451,7 +2452,7 @@ void QnStorageManager::testStoragesDone()
 
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
 {
-    NX_VERBOSE(this, "Changing storage [%1] status to [%2]...", fileStorage, status);
+    NX_VERBOSE(this, "Changing storage [%1] status to [%2]", fileStorage, status);
 
     //QnMutexLocker lock( &m_mutexStorages );
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {

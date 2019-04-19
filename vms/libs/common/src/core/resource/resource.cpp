@@ -644,7 +644,7 @@ bool QnResource::init()
         if (m_initInProgress)
             return false; /* Skip request if init is already running. */
         m_initInProgress = true;
-        m_interuptInitialization = false;
+        m_interruptInitialization = false;
     }
 
     NX_DEBUG(this, "Initiatialize...");
@@ -656,7 +656,7 @@ bool QnResource::init()
     {
         QnMutexLocker lock(&m_initMutex);
         m_initInProgress = false;
-        if (m_interuptInitialization)
+        if (m_interruptInitialization)
         {
             NX_VERBOSE(this, "Initialization is interrupted");
             return init();
@@ -707,7 +707,7 @@ void QnResource::reinitAsync()
         QnMutexLocker lock(&m_initAsyncMutex);
         if (m_initInProgress)
         {
-            m_interuptInitialization = true;
+            m_interruptInitialization = true;
             return;
         }
 
@@ -764,7 +764,7 @@ void QnResource::initAsync(bool optional)
     if (!resourcePool->threadPool()->tryStart(task))
     {
         delete task;
-        NX_DEBUG(this, "Init task was not started");
+        NX_DEBUG(this, "Not running init task: thread pool is fully loaded");
         return;
     }
 

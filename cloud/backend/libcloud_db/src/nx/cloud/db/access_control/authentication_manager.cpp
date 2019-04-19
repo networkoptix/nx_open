@@ -149,13 +149,12 @@ AuthenticationHelper::AuthenticationHelper(
 
     if (m_authzHeader)
     {
-        m_validateHa1Func = std::bind(
-            &validateAuthorization,
-            request.requestLine.method,
-            m_username.c_str(),
-            boost::none,
-            std::placeholders::_1,
-            *m_authzHeader);
+        m_validateHa1Func =
+            [method = request.requestLine.method, username = m_username,
+                authzHeader = *m_authzHeader](const nx::Buffer& ha1)
+            {
+                return validateAuthorization(method, username.c_str(), {}, ha1, authzHeader);
+            };
     }
 }
 

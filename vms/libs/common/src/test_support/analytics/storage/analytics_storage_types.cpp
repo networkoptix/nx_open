@@ -77,8 +77,6 @@ Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
             nx::utils::random::number<float>(0, 1));
     }
 
-    // TODO: requiredAttributes;
-
     if (nx::utils::random::number<bool>())
     {
         filter.freeText = attributeDictionary
@@ -102,23 +100,15 @@ common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
 
     auto packet = std::make_shared<common::metadata::DetectionMetadataPacket>();
     packet->deviceId = QnUuid::createUuid();
-    packet->timestampUsec = nx::utils::random::number<qint64>();
-    packet->durationUsec = nx::utils::random::number<qint64>(0, 30000);
+    packet->timestampUsec = (nx::utils::random::number<qint64>() / 1000) * 1000;
+    packet->durationUsec = nx::utils::random::number<qint64>(0, 30) * 1000;
 
     for (int i = 0; i < eventCount; ++i)
     {
         common::metadata::DetectedObject detectedObject;
         detectedObject.objectTypeId = QnUuid::createUuid().toString();
         detectedObject.objectId = QnUuid::createUuid();
-        detectedObject.boundingBox.setTopLeft(QPointF(
-            nx::utils::random::number<float>(0, 1),
-            nx::utils::random::number<float>(0, 1)));
-        detectedObject.boundingBox.setWidth(nx::utils::random::number<float>(
-            0,
-            1 - detectedObject.boundingBox.topLeft().x()));
-        detectedObject.boundingBox.setHeight(nx::utils::random::number<float>(
-            0,
-            1 - detectedObject.boundingBox.topLeft().y()));
+        detectedObject.boundingBox = generateRandomRectf();
         detectedObject.labels.resize(nx::utils::random::number<int>(
             minAttributeCount, maxAttributeCount));
         for (auto& attribute: detectedObject.labels)
@@ -133,6 +123,17 @@ common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
     }
 
     return packet;
+}
+
+QRectF generateRandomRectf()
+{
+    QRectF rect;
+    rect.setTopLeft(QPointF(
+        nx::utils::random::number<float>(0, 1),
+        nx::utils::random::number<float>(0, 1)));
+    rect.setWidth(nx::utils::random::number<float>(0, 1 - rect.topLeft().x()));
+    rect.setHeight(nx::utils::random::number<float>(0, 1 - rect.topLeft().y()));
+    return rect;
 }
 
 } // namespace test

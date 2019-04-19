@@ -139,7 +139,7 @@ void Filter::bindFields(QSqlQuery* query) const
         filterField->bindFields(query);
 }
 
-void Filter::bindFields(SqlQuery* query) const
+void Filter::bindFields(AbstractSqlQuery* query) const
 {
     for (const auto& filterField: m_conditions)
         filterField->bindFields(&query->impl());
@@ -154,7 +154,7 @@ std::string joinFields(
     QStringList result;
     for (const auto& field: fields)
     {
-        result.push_back(QLatin1String(field.name()) + '=' + 
+        result.push_back(QLatin1String(field.name()) + '=' +
             QLatin1String(field.placeHolderName()));
     }
     return result.join(separator).toStdString();

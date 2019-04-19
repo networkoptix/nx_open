@@ -110,7 +110,7 @@ void QnMediaServerResource::beforeDestroy()
     m_firstCamera.clear();
 }
 
-QSet<QnUuid> QnMediaServerResource::activeAnalyticsEngines() const
+QSet<QnUuid> QnMediaServerResource::activeAnalyticsEngineIds() const
 {
     const auto commonModule = this->commonModule();
     if (!NX_ASSERT(commonModule))
@@ -365,7 +365,7 @@ void QnMediaServerResource::setPrimaryAddress(const nx::network::SocketAddress& 
 bool QnMediaServerResource::isSslAllowed() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_sslAllowed;
+    return m_sslAllowed || commonModule()->globalSettings()->isTrafficEncriptionForced();
 }
 
 void QnMediaServerResource::setSslAllowed(bool sslAllowed)
@@ -496,6 +496,24 @@ int QnMediaServerResource::getMaxCameras() const
 {
     QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
     return (*lk)->maxCameras;
+}
+
+QnMediaServerUserAttributesPtr QnMediaServerResource::userAttributes() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
+    return *lk;
+}
+
+QnUuid QnMediaServerResource::metadataStorageId() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
+    return (*lk)->metadataStorageId;
+}
+
+void QnMediaServerResource::setMetadataStorageId(const QnUuid& value)
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
+    (*lk)->metadataStorageId = value;
 }
 
 QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const

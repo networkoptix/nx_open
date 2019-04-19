@@ -146,28 +146,30 @@ void StreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 }
 
 bool StreamSocket::connect(
-    const SocketAddress& remoteSocketAddress,
+    const SocketAddress& endpoint,
     std::chrono::milliseconds timeout)
 {
-    if (!base_type::connect(remoteSocketAddress, timeout))
+    if (!base_type::connect(endpoint, timeout))
         return false;
 
     switchToSyncModeIfNeeded();
+    m_sslPipeline->setServerName(endpoint.address.toStdString());
     return m_sslPipeline->performHandshake();
 }
 
 void StreamSocket::connectAsync(
-    const SocketAddress& address,
+    const SocketAddress& endpoint,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     base_type::connectAsync(
-        address,
-        [this, handler = std::move(handler)](
+        endpoint,
+        [this, endpoint, handler = std::move(handler)](
             SystemError::ErrorCode connectResultCode) mutable
         {
             if (connectResultCode != SystemError::noError)
                 return handler(connectResultCode);
 
+            m_sslPipeline->setServerName(endpoint.address.toStdString());
             handshakeAsync(std::move(handler));
         });
 }
@@ -238,6 +240,11 @@ void StreamSocket::handshakeAsync(
 
             doHandshake();
         });
+}
+
+std::string StreamSocket::serverName() const
+{
+    return m_sslPipeline->serverNameFromClientHello();
 }
 
 void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)

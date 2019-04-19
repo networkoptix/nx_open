@@ -8,26 +8,33 @@
 
 #include <nx/vms/common/p2p/downloader/file_information.h>
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
+namespace nx::vms::common::p2p::downloader {
 
 class AbstractPeerManager: public QObject
 {
 public:
-    AbstractPeerManager(QObject* parent = nullptr);
-    virtual ~AbstractPeerManager();
+    enum Capability
+    {
+        FileInfo = 1 << 0,
+        Checksums = 1 << 1,
+        DownloadChunk = 1 << 2,
+        AllCapabilities = FileInfo | Checksums | DownloadChunk
+    };
+    Q_DECLARE_FLAGS(Capabilities, Capability)
 
-    virtual QnUuid selfId() const = 0;
+    AbstractPeerManager(Capabilities capabilities, QObject* parent = nullptr):
+        QObject(parent),
+        capabilities(capabilities)
+    {
+    }
+
+    virtual ~AbstractPeerManager() = default;
 
     /** @return Human readable peer name. This is mostly used in logs. */
-    virtual QString peerString(const QnUuid& peerId) const;
+    virtual QString peerString(const QnUuid& peerId) const { return peerId.toString(); }
     virtual QList<QnUuid> getAllPeers() const = 0;
     virtual QList<QnUuid> peers() const = 0;
     virtual int distanceTo(const QnUuid& peerId) const = 0;
-    virtual bool hasInternetConnection(const QnUuid& peerId) const = 0;
 
     using FileInfoCallback =
         std::function<void(bool, rest::Handle, const FileInformation&)>;
@@ -46,12 +53,6 @@ public:
     using ChunkCallback =
         std::function<void(bool, rest::Handle, const QByteArray&)>;
     virtual rest::Handle downloadChunk(
-        const QnUuid& peer,
-        const QString& fileName,
-        int chunkIndex,
-        ChunkCallback callback) = 0;
-
-    virtual rest::Handle downloadChunkFromInternet(
         const QnUuid& peerId,
         const QString& fileName,
         const nx::utils::Url& url,
@@ -60,26 +61,8 @@ public:
         ChunkCallback callback) = 0;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) = 0;
-    virtual bool hasAccessToTheUrl(const QString& url) const = 0;
+
+    const Capabilities capabilities;
 };
 
-class AbstractPeerManagerFactory
-{
-public:
-    virtual ~AbstractPeerManagerFactory();
-    virtual AbstractPeerManager* createPeerManager(
-        FileInformation::PeerSelectionPolicy peerPolicy,
-        const QList<QnUuid>& additionalPeers) = 0;
-};
-
-/*
-How it should really be
-using PeerManagerFactory = std::function<AbstractPeerManager*(
-        FileInformation::PeerSelectionPolicy policy,
-        const QList<QnUuid>& peers)>;*/
-
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::common::p2p::downloader

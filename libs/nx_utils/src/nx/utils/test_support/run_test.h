@@ -15,6 +15,7 @@
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/rlimit.h>
+#include <nx/utils/scope_guard.h>
 
 #include "test_options.h"
 
@@ -91,6 +92,23 @@ inline int runTest(
         std::move(extraInit),
         gtestRunFlags);
 }
+
+// TODO: Move to nx_kit?
+class IniConfigTweaks
+{
+public:
+    template<typename T>
+    void set(const T* iniField, T newValue)
+    {
+        const auto oldValue = *iniField;
+        T* mutableField = const_cast<T*>(iniField);
+        m_iniGuards.push_back(makeSharedGuard([=]() { *mutableField = oldValue; }));
+        *mutableField = newValue;
+    }
+
+private:
+    std::vector<SharedGuardPtr> m_iniGuards;
+};
 
 } // namespace test
 } // namespace utils

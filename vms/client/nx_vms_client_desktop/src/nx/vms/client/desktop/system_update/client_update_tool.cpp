@@ -9,10 +9,13 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/update/update_check.h>
-#include <nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h>
+#include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>
+#include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
+
+using namespace nx::vms::common::p2p::downloader;
 
 bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 {
@@ -39,18 +42,20 @@ bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 
 ClientUpdateTool::ClientUpdateTool(QObject *parent):
     base_type(parent),
-    m_outputDir(QDir::temp().absoluteFilePath("nx_updates/client"))
+    m_outputDir(QDir::temp().absoluteFilePath("nx_updates/client")),
+    m_peerManager(new ResourcePoolPeerManager(commonModule())),
+    m_proxyPeerManager(new ResourcePoolProxyPeerManager(commonModule()))
 {
     // Expecting m_outputDir to be like /temp/nx_updates/client
 
     if (ini().massSystemUpdateClearDownloads)
         clearDownloadFolder();
 
-    vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
-    m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
-    m_peerManager->setParent(this);
+    m_downloader.reset(new Downloader(
+        m_outputDir,
+        commonModule(),
+        {m_peerManager, new InternetOnlyPeerManager(), m_proxyPeerManager}));
 
-    m_downloader.reset(new Downloader(m_outputDir, commonModule(), this));
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ClientUpdateTool::atDownloaderStatusChanged);
 
@@ -84,11 +89,10 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 
 ClientUpdateTool::~ClientUpdateTool()
 {
+    // Forcing downloader to be destroyed before serverConnection.
     m_downloader->disconnect(this);
-    // Forcing downloader to be destroyed before peerManager and serverConnection.
     m_downloader.reset();
-    // And peer manager should die before serverConnection.
-    m_peerManager.reset();
+
     m_serverConnection.reset();
 }
 
@@ -129,6 +133,7 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
     if (m_serverConnection)
     {
         // Requesting remote update info.
+        // NOTE: This can be a 3.2 system, so we can fail this step completely.
         m_serverConnection->getInstalledUpdateInfo(
             [this, tool=QPointer<ClientUpdateTool>(this)](
                 bool success, rest::Handle /*handle*/, rest::UpdateInformationData response)
@@ -161,7 +166,8 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
 void ClientUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId)
 {
     m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
-    m_peerManager->setServerUrl(serverUrl, serverId);
+    m_peerManager->setServerDirectConnection(serverId, m_serverConnection);
+    m_proxyPeerManager->setServerDirectConnection(serverId, m_serverConnection);
 }
 
 void ClientUpdateTool::atRemoteUpdateInformation(
@@ -296,6 +302,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         setState(State::downloading);
 
         const auto code = m_downloader->addFile(info);
+        NX_VERBOSE(this, "setUpdateTarget(%1) m_downloader->addFile code=%2", contents.info.version, code);
         m_updateFile = m_downloader->filePath(m_clientPackage.file);
 
         if (code == common::p2p::downloader::ResultCode::fileAlreadyExists
@@ -468,12 +475,11 @@ bool ClientUpdateTool::installUpdateAsync()
             using Result = applauncher::api::ResultType::Value;
             static const int kMaxTries = 5;
             QString absolutePath = QFileInfo(updateFile).absoluteFilePath();
-            QString message;
 
             for (int retries = 0; retries < kMaxTries; ++retries)
             {
                 Result result = applauncher::api::installZip(updateVersion, absolutePath);
-                bool repeat = false;
+                QString message = applauncherErrorToString(result);
 
                 switch (result)
                 {
@@ -483,16 +489,17 @@ bool ClientUpdateTool::installUpdateAsync()
                     case Result::invalidVersionFormat:
                     case Result::notEnoughSpace:
                     case Result::notFound:
-                    case Result::ioError:
+                    case Result::ok:
                         return result;
+                    case Result::connectError:
+                    case Result::ioError:
                     default:
-                        repeat = true;
-                        // Other variats can be fixed by retrying installation, do they?
+                        NX_VERBOSE(NX_SCOPE_TAG, "failed to run zip installation: %1", message);
+                        // Other variants can be fixed by retrying installation, do they?
                         break;
                 }
 
-                if (!repeat)
-                    break;
+                std::this_thread::sleep_for(std::chrono::seconds(1));
             }
 
             return Result::otherError;
@@ -571,7 +578,7 @@ bool ClientUpdateTool::restartClient(QString authString)
     static const int kMaxTries = 5;
     for (int i = 0; i < kMaxTries; ++i)
     {
-        QThread::msleep(100);
+        QThread::msleep(200);
         qApp->processEvents();
         if (applauncher::api::restartClient(m_updateVersion, authString) == Result::ok)
             return true;
@@ -623,12 +630,6 @@ bool ClientUpdateTool::hasUpdate() const
         && m_state != State::error
         && m_state != State::applauncherError
         && m_state != State::complete;
-}
-
-ClientUpdateTool::PeerManagerPtr ClientUpdateTool::createPeerManager(
-    FileInformation::PeerSelectionPolicy /*peerPolicy*/, const QList<QnUuid>& /*additionalPeers*/)
-{
-    return m_peerManager.get();
 }
 
 QString ClientUpdateTool::toString(State state)

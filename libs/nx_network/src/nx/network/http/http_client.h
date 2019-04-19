@@ -147,6 +147,7 @@ private:
     std::optional<SocketAddress> m_proxyEndpoint;
     bool m_isProxySecure = false;
     std::optional<AuthType> m_authType;
+    std::optional<Response> m_lastResponse;
 
     bool m_precalculatedAuthorizationDisabled = false;
     bool m_expectOnlyBody = false;

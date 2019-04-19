@@ -34,7 +34,7 @@
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <plugins/settings.h>
-#include <plugins/plugins_ini.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 class QnMediaServerModule;
 

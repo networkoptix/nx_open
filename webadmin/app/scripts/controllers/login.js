@@ -34,11 +34,21 @@ angular.module('webadminApp')
                 $scope.authorizing = true;
                 mediaserver.login(login,password).then(reload,function(error){
                     $scope.authorizing = false;
-                    if (error.error !== '3') {
-                        dialogs.alert(L.login.incorrectPassword);
-                    }
-                    else{
-                        dialogs.alert(L.login.authLockout);
+                    if(error.authResult !== '') {
+                        switch (error.authResult) {
+                            case 'Auth_WrongPassword':
+                                dialogs.alert(L.login.incorrectPassword);
+                                break;
+                            case 'Auth_LockedOut':
+                            default:
+                                dialogs.alert(L.login.authLockout);
+                        }
+                    } else {
+                        if(error.errorString.toLowerCase().indexOf('wrong') > -1) {
+                            dialogs.alert(L.login.incorrectPassword);
+                        } else {
+                            dialogs.alert(L.login.authLockout);
+                        }
                     }
                 }).then(function(){
                     nativeClient.updateCredentials(login,password,false,false);

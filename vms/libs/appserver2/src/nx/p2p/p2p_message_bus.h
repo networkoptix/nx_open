@@ -83,7 +83,7 @@ public:
     void sendTransaction(const ec2::QnTransaction<vms::api::RuntimeData>& tran)
     {
         QnMutexLocker lock(&m_mutex);
-        vms::api::PersistentIdData peerId(tran.peerID, tran.params.peer.persistentId);
+        vms::api::PersistentIdData peerId(tran.params.peer);
         m_lastRuntimeInfo[peerId] = tran.params;
         for (const auto& connection : m_connections)
             sendTransactionImpl(connection, tran, TransportHeader());

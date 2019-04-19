@@ -20,7 +20,7 @@ class BasicFixture:
     public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
-    BasicFixture();
+    BasicFixture(const std::string& testModuleName);
     ~BasicFixture();
 
 protected:
@@ -100,6 +100,11 @@ private:
 class BaseDbTest:
     public BasicFixture
 {
+    using base_type = BasicFixture;
+
+public:
+    using base_type::base_type;
+
 protected:
     virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
     virtual void closeDatabase() override;
@@ -114,6 +119,11 @@ private:
 class FixtureWithQueryExecutorOnly:
     public BasicFixture
 {
+    using base_type = BasicFixture;
+
+public:
+    using base_type::base_type;
+
 protected:
     virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
     virtual void closeDatabase() override;

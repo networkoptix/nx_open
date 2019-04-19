@@ -119,15 +119,13 @@
         "upnpPortMappingEnabled": "Przekierowywanie portów UPNP włączone",
         "useTextEmailFormat": "Wysyłaj e-maile czystym tekstem",
         "useWindowsEmailLineFeed": "Używaj w e-mailach znaków końca linii zgodnych z Windows",
-        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Limit czasu fragmentacji wiadomości",
-        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: limit czasu odpowiedzi na fragment",
-        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Pokaż alternatywne sterowanie PTZ na obrazie",
         "trafficEncryptionForced": "Wymuszaj szyfrowanie transmisji",
         "videoTrafficEncryptionForced": "Wymuszaj szyfrowanie transmisji wideo",
         "updateStatus": "Aktualizacja statusu",
         "watermarkSettings": "Ustawienia znaku wodnego",
         "maxWebMTranscoders": "Maksymalna liczba połączeń WEBM do serwera. Chrome jednocześnie otwiera 2 połączenia, a następnie zamyka pierwsze z nich, dlatego zaleca się ustawienie wartości >= 2.",
-        "maxEventLogRecords": "Maksymalna liczba wpisów do dziennika zdarzeń przechowywanego w bazie danych. Rzeczywista ilość rekordów może być nawet o 20% wyższa niż podana wartość."
+        "maxEventLogRecords": "Maksymalna liczba wpisów do dziennika zdarzeń przechowywanego w bazie danych. Rzeczywista ilość rekordów może być nawet o 20% wyższa niż podana wartość.",
+        "forceLiveCacheForPrimaryStream": "Czy buforować niektóre ramki dla strumienia głównego. Wartości: „tak” - zawsze włączone (może zużywać dużo pamięci RAM), „nie” - zawsze wyłączone, chyba że wymaga tego odtwarzanie (np. HLS), „auto” - podobne do „nie”, ale włączone, gdy poprawia to wrażenia użytkownika (np. w niektórych wtyczkach analizy wideo)."
     },
     "info": {
         "tabs": {

@@ -179,7 +179,7 @@ void ServerConnection::trace(int handle, const QString& message) const
 
 Handle ServerConnection::getStatisticsSettingsAsync(
     Result<QByteArray>::type callback,
-    QThread *targetThread)
+    QThread* targetThread)
 {
     QnEmptyRequestData emptyRequest;
     emptyRequest.format = Qn::SerializationFormat::UbjsonFormat;
@@ -201,7 +201,7 @@ Handle ServerConnection::getStatisticsSettingsAsync(
 Handle ServerConnection::sendStatisticsAsync(
     const QnSendStatisticsRequestData& statisticsData,
     PostCallback callback,
-    QThread *targetThread)
+    QThread* targetThread)
 {
     static const auto path = lit("/ec2/statistics/send");
 
@@ -226,7 +226,15 @@ Handle ServerConnection::sendStatisticsAsync(
 }
 
 Handle ServerConnection::getModuleInformation(
-    Result<QList<nx::vms::api::ModuleInformation>>::type callback,
+    Result<RestResultWithData<nx::vms::api::ModuleInformation>>::type callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    return executeGet("/api/moduleInformation", params, callback, targetThread);
+}
+
+Handle ServerConnection::getModuleInformationAll(
+    Result<RestResultWithData<QList<nx::vms::api::ModuleInformation>>>::type callback,
     QThread* targetThread)
 {
     QnRequestParamList params;
@@ -422,6 +430,20 @@ Handle ServerConnection::executeAnalyticsAction(
 {
     return executePost(
         lit("/api/executeAnalyticsAction"),
+        QnRequestParamList(),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(action),
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::executeEventAction(
+    const nx::vms::api::EventActionData& action,
+    Result<QnJsonRestResult>::type callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/executeEventAction"),
         QnRequestParamList(),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         QJson::serialized(action),
@@ -744,7 +766,7 @@ Handle ServerConnection::getStatistics(
 
 Handle ServerConnection::getEvents(QnEventLogRequestData request,
     Result<EventLogData>::type callback,
-    QThread *targetThread)
+    QThread* targetThread)
 {
     request.format = Qn::SerializationFormat::UbjsonFormat;
     return executeGet(lit("/api/getEvents"), request.toParams(), callback, targetThread);
@@ -752,7 +774,7 @@ Handle ServerConnection::getEvents(QnEventLogRequestData request,
 
 Handle ServerConnection::getEvents(const QnEventLogMultiserverRequestData& request,
     Result<EventLogData>::type callback,
-    QThread *targetThread)
+    QThread* targetThread)
 {
     return executeGet(lit("/ec2/getEvents"), request.toParams(), callback, targetThread);
 }
@@ -1005,6 +1027,12 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
                 result.deserialized<nx::vms::api::analytics::SettingsResponse>());
         },
         targetThread);
+}
+
+Handle ServerConnection::debug(
+    const QString& action, const QString& value, PostCallback callback, QThread* targetThread)
+{
+    return executeGet("/api/debug", {{action, value}}, callback, targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------

@@ -134,7 +134,7 @@ void DeviceAdditionDialog::initializeControls()
 
     ui->addressEdit->setPlaceholderText(tr("IP / Hostname / RTSP link / UDP link"));
     ui->addressEdit->setExternalControls(ui->addressLabel, ui->addressHint);
-    ui->addressEdit->setHintColor(QPalette().color(QPalette::WindowText));
+    ui->addressEdit->setUseWarningStyleForControl(false);
     ui->addressHint->setVisible(false);
     ui->explanationLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
     ui->explanationLabel->setToolTip(tr("Examples:")

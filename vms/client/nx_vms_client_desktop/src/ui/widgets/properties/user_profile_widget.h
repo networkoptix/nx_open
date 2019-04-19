@@ -31,6 +31,7 @@ public:
     void updatePermissionsLabel(const QString& text);
 
 private:
+    void editPassword();
     void updateControlsAccess();
     bool validMode() const;
 

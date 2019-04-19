@@ -22,6 +22,7 @@ const QString kNotInRangeConditionType = lit("valueNotIn");
 const QString kPresenceConditionType = lit("present");
 const QString kLackOfPresenceConditionType = lit("notPresent");
 const QString kValueChangedConditionType = lit("valueChanged");
+const QString kContainsConditionType = lit("valueContains");
 
 const QString kShowDependencyType = lit("Show");
 const QString kRangeDependencyType = lit("Range");
@@ -32,6 +33,7 @@ const QString kNumberDataType = lit("Number");
 const QString kEnumerationDataType = lit("Enumeration");
 const QString kButtonDataType = lit("Button");
 const QString kStringDataType = lit("String");
+const QString kTextDataType = lit("Text");
 const QString kSeparatorDataType = lit("Separator");
 
 // Vertical slider with additional buttons.
@@ -177,6 +179,8 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
             return kButtonDataType;
         case DataType::String:
             return kStringDataType;
+        case DataType::Text:
+            return kTextDataType;
         case DataType::Separator:
             return kSeparatorDataType;
         case DataType::PtrControl:
@@ -196,6 +200,7 @@ QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(
         << DataType::Enumeration
         << DataType::Button
         << DataType::String
+        << DataType::Text
         << DataType::Separator
         << DataType::SliderControl
         << DataType::PtrControl;
@@ -519,33 +524,30 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
     switch (type)
     {
         case ConditionType::equal:
-        {
             return value == valueToCheck;
-        }
+
         case ConditionType::notEqual:
-        {
             return value != valueToCheck;
-        }
+
         case ConditionType::inRange:
-        {
-            auto valuesList = value.split(L',');
-            return valuesList.contains(valueToCheck);
-        }
+            return value.split(',').contains(valueToCheck);
+
         case ConditionType::notInRange:
-        {
-            auto valuesList = value.split(L',');
-            return !valuesList.contains(valueToCheck);
-        }
+            return !value.split(',').contains(valueToCheck);
+
         case ConditionType::valueChanged:
-        {
             return true;
-        }
-        default:
-        {
-            NX_ASSERT(false, "We should never get here.");
+
+        case ConditionType::contains:
+            return valueToCheck.contains(value);
+
+        case ConditionType::unknown:
+            NX_ASSERT(false, "Unexpected unknown condition");
             return false;
-        }
     }
+
+    NX_ASSERT(false, lm("Unexpected condition value: %1").args(static_cast<int>(type)));
+    return false;
 }
 
 void QnCameraAdvancedParameterDependency::autoFillId(const QString& prefix)
@@ -578,6 +580,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterCondition, Co
     (QnCameraAdvancedParameterCondition::ConditionType::present, kPresenceConditionType)
     (QnCameraAdvancedParameterCondition::ConditionType::notPresent, kLackOfPresenceConditionType)
     (QnCameraAdvancedParameterCondition::ConditionType::valueChanged, kValueChangedConditionType)
+    (QnCameraAdvancedParameterCondition::ConditionType::contains, kContainsConditionType)
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterDependency, DependencyType,

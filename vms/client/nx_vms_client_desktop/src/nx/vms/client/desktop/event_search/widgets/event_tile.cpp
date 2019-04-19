@@ -291,8 +291,11 @@ EventTile::EventTile(QWidget* parent):
     ui->wideHolder->hide();
 
     ui->previewWidget->setAutoScaleDown(false);
-    ui->previewWidget->setCropMode(AsyncImageWidget::CropMode::notHovered);
     ui->previewWidget->setReloadMode(AsyncImageWidget::ReloadMode::showPreviousImage);
+
+    ui->previewWidget->setCropMode(ini().rightPanelHoverPreviewCrop
+        ? AsyncImageWidget::CropMode::notHovered
+        : AsyncImageWidget::CropMode::always);
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
@@ -886,7 +889,7 @@ void EventTile::clear()
     setFooterText({});
     setTimestamp({});
     setIcon({});
-    setPreview({}, false);
+    setPreview({}, true);
     setPreviewCropRect({});
     setAction({});
     setBusyIndicatorVisible(false);

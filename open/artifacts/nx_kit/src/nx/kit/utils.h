@@ -120,7 +120,9 @@ void* mallocAligned(size_t size, size_t alignment, MallocFunc mallocFunc)
 /** Calls mallocAligned() passing standard malloc() as mallocFunc. */
 inline void* mallocAligned(size_t size, size_t alignment)
 {
-    return mallocAligned<>(size, alignment, ::malloc);
+    // NOTE: Lambda is used to suppress a warning that some ::malloc() implementations are using
+    // deprecated exception specification.
+    return mallocAligned<>(size, alignment, [](size_t size) { return ::malloc(size); });
 }
 
 /**
@@ -147,7 +149,9 @@ void freeAligned(void* ptr, FreeFunc freeFunc)
 /** Calls freeAligned() passing standard free() as freeFunc. */
 inline void freeAligned(void* ptr)
 {
-    return freeAligned<>(ptr, ::free);
+    // NOTE: Lambda is used to suppress a warning that some ::free() implementations are using
+    // deprecated exception specification.
+    return freeAligned<>(ptr, [](void* ptr) { return ::free(ptr); });
 }
 
 //-------------------------------------------------------------------------------------------------

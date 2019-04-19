@@ -36,20 +36,13 @@ public:
         m_asyncCaller.pleaseStopSync();
     }
 
-    virtual bool initialize() override
+    virtual bool initialize(const Settings& settings) override
     {
         return true;
     }
 
-    virtual void save(
-        nx::common::metadata::ConstDetectionMetadataPacketPtr /*packet*/,
-        StoreCompletionHandler completionHandler) override
+    virtual void save(nx::common::metadata::ConstDetectionMetadataPacketPtr /*packet*/) override
     {
-        m_asyncCaller.post(
-            [completionHandler = std::move(completionHandler)]
-            {
-                completionHandler(ResultCode::ok);
-            });
     }
 
     virtual void createLookupCursor(
@@ -61,6 +54,11 @@ public:
             {
                 completionHandler(ResultCode::error, nullptr);
             });
+    }
+
+    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& /*cursor*/) override
+    {
+
     }
 
     virtual void lookup(
@@ -94,6 +92,11 @@ public:
     {
     }
 
+    virtual void flush(StoreCompletionHandler /*completionHandler*/) override
+    { 
+        FAIL();
+    }
+
 private:
     nx::utils::SyncQueue<LookupRequestData>* m_lookupRequestQueue;
     nx::network::aio::BasicPollable m_asyncCaller;
@@ -119,7 +122,7 @@ public:
         using namespace std::placeholders;
 
         m_factoryBak = EventsStorageFactory::instance().setCustomFunc(
-            std::bind(&AnalyticsEventsStorageHttpApi::createEventsStorageMock, this, _1));
+            std::bind(&AnalyticsEventsStorageHttpApi::createEventsStorageMock, this));
     }
 
     ~AnalyticsEventsStorageHttpApi()
@@ -185,8 +188,7 @@ private:
         m_mediaserverClient = prepareMediaServerClient();
     }
 
-    std::unique_ptr<AbstractEventsStorage> createEventsStorageMock(
-        const Settings& /*settings*/)
+    std::unique_ptr<AbstractEventsStorage> createEventsStorageMock()
     {
         return std::make_unique<EventsStorageMock>(&m_lookupRequests);
     }

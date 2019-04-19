@@ -31,6 +31,10 @@ struct HanwhaVideoProfile
     int frameRate = kHanwhaInvalidFps;
     int compressionLevel = -1;
     int bitrateKbps = -1;
+    bool rtpMulticastEnable = false;
+    QString rtpMulticastAddress;
+    int rtpMulticastPort = 0;
+    int rtpMulticastTtl = 0;
 
     boost::optional<Qn::BitrateControl> bitrateControl;
     boost::optional<Qn::EncodingPriority> encodiingPriority;

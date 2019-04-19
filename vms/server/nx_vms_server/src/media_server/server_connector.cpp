@@ -8,6 +8,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include <nx/vms/api/types/connection_types.h>
+#include <transaction/message_bus_adapter.h>
 
 QnServerConnector::QnServerConnector(QnCommonModule* commonModule):
     QObject(),
@@ -113,8 +114,18 @@ void QnServerConnector::at_moduleChanged(nx::vms::discovery::ModuleEndpoint modu
 {
     if (QnConnectionValidator::isCompatibleToCurrentSystem(module, commonModule()))
         return addConnection(module);
-    else
-        return removeConnection(module.id);
+
+    // Don't drop connection to a peer if it online now. Module changed can occurs because
+    // merge system is in progress and this peer will change systemId too soon.
+    auto connections = commonModule()->ec2Connection()->messageBus()->connectionsInfo();
+    for (const auto& data: connections)
+    {
+        if (module.id == data.remotePeerId && data.state.toLower() == "connected")
+            return;
+    }
+
+    NX_DEBUG(this, "Remove connections to peer %1 because module information is changed", module.id);
+    return removeConnection(module.id);
 }
 
 void QnServerConnector::at_moduleLost(QnUuid id)

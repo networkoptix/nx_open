@@ -42,6 +42,7 @@ struct JsonRestResponse
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
     QnJsonRestResult json;
     bool isUndefinedContentLength = false;
+    nx::network::http::HttpHeaders httpHeaders;
 
     JsonRestResponse(
         nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined,

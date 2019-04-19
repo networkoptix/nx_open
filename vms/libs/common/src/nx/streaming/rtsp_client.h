@@ -28,25 +28,29 @@ extern "C"
 #include <utils/camera/camera_diagnostics.h>
 #include <network/client_authenticate_helper.h>
 
+#include <nx/vms/api/types/rtp_types.h>
+
 class QnRtspClient;
 
 static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
-enum class RtspTransport
-{
-    notDefined,
-    udp,
-    tcp,
-    multicast
-};
-RtspTransport rtspTransportFromString(const QString& value);
-QString toString(const RtspTransport& value);
-
 class QnRtspIoDevice
 {
 public:
-    explicit QnRtspIoDevice(QnRtspClient* owner, RtspTransport rtspTransport, quint16 mediaPort = 0, quint16 rtcpPort = 0);
+    struct AddressInfo
+    {
+        nx::vms::api::RtpTransportType transport{ nx::vms::api::RtpTransportType::automatic };
+        nx::network::SocketAddress address;
+    };
+
+public:
+    explicit QnRtspIoDevice(
+        QnRtspClient* owner,
+        nx::vms::api::RtpTransportType rtpTransport,
+        quint16 mediaPort = 0,
+        quint16 rtcpPort = 0);
+
     virtual ~QnRtspIoDevice();
     virtual qint64 read(char * data, qint64 maxSize );
     const nx::streaming::rtp::RtcpSenderReport& getSenderReport() { return m_senderReport; }
@@ -54,22 +58,30 @@ public:
     nx::network::AbstractCommunicatingSocket* getMediaSocket();
     nx::network::AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket.get(); }
     void shutdown();
-    void setTransport(RtspTransport rtspTransport);
+    void setTransport(nx::vms::api::RtpTransportType rtpTransport);
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
 
     void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteRtcpPort = rtcpPort;}
+
+    void updateRemoteMulticastPorts(quint16 mediaPort, quint16 rtcpPort);
     void setHostAddress(const nx::network::HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
 
 
     void bindToMulticastAddress(const QHostAddress& address, const QString& interfaceAddress);
+
+    AddressInfo mediaAddressInfo() const;
+    AddressInfo rtcpAddressInfo() const;
+
 private:
+    AddressInfo addressInfo(int port) const;
     void processRtcpData();
+    void updateSockets();
 
 private:
     QnRtspClient* m_owner = nullptr;
-    RtspTransport m_transport = RtspTransport::notDefined;
+    nx::vms::api::RtpTransportType m_transport = nx::vms::api::RtpTransportType::automatic;
 
     nx::streaming::rtp::RtcpSenderReport m_senderReport;
     std::unique_ptr<nx::network::AbstractDatagramSocket> m_mediaSocket;
@@ -83,6 +95,16 @@ private:
     bool m_forceRtcpReports = false;
     QHostAddress m_multicastAddress;
 };
+
+inline bool operator<(
+    const QnRtspIoDevice::AddressInfo& lhs,
+    const QnRtspIoDevice::AddressInfo& rhs)
+{
+    if (lhs.transport != rhs.transport)
+        return lhs.transport < rhs.transport;
+
+    return lhs.address < rhs.address;
+}
 
 class QnRtspClient
 {
@@ -111,7 +133,12 @@ public:
     struct SDPTrackInfo
     {
         SDPTrackInfo() = default;
-        SDPTrackInfo(const nx::streaming::Sdp::Media& sdpMedia, QnRtspClient* owner, RtspTransport transport, int serverPort):
+        SDPTrackInfo(
+            const nx::streaming::Sdp::Media& sdpMedia,
+            QnRtspClient* owner,
+            nx::vms::api::RtpTransportType transport,
+            int serverPort)
+            :
             sdpMedia(sdpMedia)
         {
             ioDevice = std::make_shared<QnRtspIoDevice>(owner, transport, serverPort);
@@ -119,6 +146,7 @@ public:
         }
         void setRemoteEndpointRtcpPort(quint16 rtcpPort) { ioDevice->setRemoteEndpointRtcpPort(rtcpPort); };
 
+        bool setupSuccess = false;
         nx::streaming::Sdp::Media sdpMedia;
         QPair<int, int> interleaved{ -1, -1 };
         std::shared_ptr<QnRtspIoDevice> ioDevice;
@@ -153,12 +181,19 @@ public:
 
     const nx::streaming::Sdp& getSdp() const;
 
+    void setKeepAliveTimeout(std::chrono::milliseconds keepAliveTimeout);
+
     bool sendKeepAliveIfNeeded();
 
-    void setTransport(RtspTransport transport);
-    RtspTransport getTransport() const { return m_transport; }
+    void setTransport(nx::vms::api::RtpTransportType transport);
 
-    RtspTransport getPreferedTransport() const { return m_prefferedTransport; }
+    // RTP transport configured by user
+    nx::vms::api::RtpTransportType getTransport() const { return m_transport; }
+
+    /* Actual session RTP transport. If user set 'automatic', it can be 'tcp' or 'udp',
+     * otherwise it should be equal to result of getTransport().
+     */
+    nx::vms::api::RtpTransportType getActualTransport() const { return m_actualTransport; }
 
     const std::vector<SDPTrackInfo>& getTrackInfo() const;
     QString getTrackCodec(int rtpChannelNum);
@@ -170,6 +205,7 @@ public:
     float getScale() const;
     void setScale(float value);
 
+    bool sendSetup();
     bool sendPlay(qint64 startPos, qint64 endPos, double scale);
     bool sendPause();
     bool sendSetParameter(const QByteArray& paramName, const QByteArray& paramValue);
@@ -223,7 +259,6 @@ public:
     void sendBynaryResponse(const quint8* buffer, int size);
     void setPlayNowModeAllowed(bool value);
     static quint8* prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve);
-    bool setTCPReadBufferSize(int value);
 
     QString getVideoLayout() const;
     nx::network::AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
@@ -245,8 +280,8 @@ private:
     nx::network::http::Request createDescribeRequest();
     bool sendDescribe();
     bool sendOptions();
-    bool sendSetup();
     bool sendKeepAlive();
+    bool sendSetupIfNotPlaying();
 
     bool readTextResponce(QByteArray &responce);
     void addAuth( nx::network::http::Request* const request );
@@ -275,7 +310,7 @@ private:
 
     // 'initialization in order' block
     unsigned int m_csec;
-    RtspTransport m_transport;
+    nx::vms::api::RtpTransportType m_transport;
     int m_selectedAudioChannel;
     qint64 m_startTime;
     qint64 m_openedTime;
@@ -285,7 +320,7 @@ private:
     nx::network::rtsp::StatusCodeValue m_responseCode;
     bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;
-    unsigned int m_TimeOut;
+    std::chrono::milliseconds m_keepAliveTimeOut{0};
     bool m_playNowMode = false;
     // end of initialized fields
 
@@ -306,7 +341,7 @@ private:
     QAuthenticator m_auth;
     boost::optional<nx::network::SocketAddress> m_proxyAddress;
     QString m_contentBase;
-    RtspTransport m_prefferedTransport;
+    nx::vms::api::RtpTransportType m_actualTransport;
 
     static QByteArray m_guid; // client guid. used in proprietary extension
     static QnMutex m_guidMutex;
@@ -321,9 +356,6 @@ private:
     QString m_reasonPhrase;
     QString m_videoLayout;
 
-    char* m_additionalReadBuffer;
-    int m_additionalReadBufferPos;
-    int m_additionalReadBufferSize;
     HttpAuthenticationClientContext m_rtspAuthCtx;
     QByteArray m_userAgent;
     nx::network::http::header::AuthScheme::Value m_defaultAuthScheme;

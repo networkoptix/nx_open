@@ -53,6 +53,12 @@ void* MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
         addRef();
         return static_cast<nxcip::CameraMediaEncoder*>(this);
     }
+    if (memcmp(&interfaceID, &nxcip::IID_CameraMediaEncoder5,
+            sizeof(nxcip::IID_CameraMediaEncoder)) == 0)
+    {
+        addRef();
+        return static_cast<nxcip::CameraMediaEncoder5*>(this);
+    }
     if (memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0)
     {
         addRef();
@@ -159,12 +165,9 @@ int MediaEncoder::getAudioFormat(nxcip::AudioFormat* audioFormat) const
     if (!m_camera->videoStream().pluggedIn())
         return nxcip::NX_IO_ERROR;
 
-    int ffmpegError = 0;
-    std::unique_ptr<ffmpeg::Codec> encoder = getDefaultAudioEncoder(&ffmpegError);
-    if (ffmpegError < 0)
+    AVCodecContext* context = m_camera->audioStream().getCodecContext();
+    if (context == nullptr)
         return nxcip::NX_UNSUPPORTED_CODEC;
-
-    AVCodecContext* context = encoder->codecContext();
 
     auto nxSampleType = ffmpeg::utils::toNxSampleType(context->sample_fmt);
     if (!nxSampleType.has_value())
@@ -187,6 +190,22 @@ int MediaEncoder::getAudioFormat(nxcip::AudioFormat* audioFormat) const
     audioFormat->bitsPerCodedSample = context->bits_per_coded_sample;
 
     return nxcip::NX_NO_ERROR;
+}
+
+const char* MediaEncoder::audioExtradata() const
+{
+    AVCodecContext* context = m_camera->audioStream().getCodecContext();
+    if (context == nullptr)
+        return nullptr;
+    return (char*)context->extradata;
+}
+
+int MediaEncoder::audioExtradataSize() const
+{
+    AVCodecContext* context = m_camera->audioStream().getCodecContext();
+    if (context == nullptr)
+        return 0;
+    return context->extradata_size;
 }
 
 int MediaEncoder::getResolutionList(
@@ -264,6 +283,34 @@ void MediaEncoder::fillResolutionList(
         ++j;
     }
     *outInfoListCount = j;
+}
+
+int MediaEncoder::getConfiguredLiveStreamReader(
+    nxcip::LiveStreamConfig* config, nxcip::StreamReader** reader)
+{
+    if (config)
+    {
+        setResolution({config->width, config->height});
+        int selectedBitrate;
+        setBitrate(config->bitrateKbps, &selectedBitrate);
+        float selectedFps;
+        setFps(config->framerate, &selectedFps);
+        bool audioEnabled = config->flags & nxcip::LiveStreamConfig::LIVE_STREAM_FLAG_AUDIO_ENABLED;
+        m_camera->setAudioEnabled(audioEnabled);
+    }
+    *reader = getLiveStreamReader();
+    return nxcip::NX_NO_ERROR;
+}
+
+int MediaEncoder::setMediaUrl(const char url[nxcip::MAX_TEXT_LEN])
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
+}
+
+int MediaEncoder::getVideoFormat(
+    nxcip::CompressionType* /*codec*/, nxcip::PixelFormat* /*pixelFormat*/) const
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
 }
 
 } // namespace nx::usb_cam

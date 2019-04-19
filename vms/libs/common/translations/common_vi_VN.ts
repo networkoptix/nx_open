@@ -1010,7 +1010,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Lỗi không xác định.</translation>
+      <translation>Lỗi không rõ.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>
