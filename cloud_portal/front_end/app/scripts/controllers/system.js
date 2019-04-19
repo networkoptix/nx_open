@@ -181,12 +181,28 @@ angular.module('cloudApp')
             };
 
             $scope.mergeSystems = function () {
+                var systems = $scope.systemsProvider.getMySystems($scope.account.email, $scope.system.id);
                 return dialogs
-                    .merge($scope.system)
+                    .merge($scope.system, systems, $scope.account)
                     .then(function (mergeInfo) {
                         if (mergeInfo) {
                            $scope.system.mergeInfo = mergeInfo;
                         }
+                    }, function(error) {
+                        var commonErrorMsg = L.merging.commonText
+                            .replace('{{primarySystem}}', $scope.system.info.name)
+                            .replace('{{secondarySystem}}', error.targetSystem.name);
+                        var dialogBody = '<p>' + commonErrorMsg + '</p>';
+                        var responseError = L.errorCodes[error.errorText] || L.errorCodes[error.responseCode];
+                        if (!responseError) {
+                            delete error.targetSystem;
+                            delete error.targetSystem;
+                            responseError = L.errorCodes.unknownError + ':<br><pre>' + JSON.stringify(error, null, 2) + '</pre>';
+                        } else {
+                            responseError = responseError.replace('{{secondarySystem}}', error.targetSystem.name);
+                        }
+                        dialogBody += '<p>' + responseError + '</p>';
+                        dialogs.confirm(dialogBody, L.merging.mergeFailedTitle, L.dialogs.okButton, 'btn-primary', null);
                     });
             };
 
