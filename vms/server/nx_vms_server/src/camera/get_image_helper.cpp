@@ -603,7 +603,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     QList<QnAbstractImageFilterPtr> filterChain;
     const QSize dstSize = updateDstSize(camera.get(), request.size, *frame, request.aspectRatio);
 
-    if (!request.crop.isNull())
+    if (!request.crop.isEmpty())
         filterChain << QnAbstractImageFilterPtr(new QnCropImageFilter(request.crop));
     filterChain << QnAbstractImageFilterPtr(new QnScaleImageFilter(dstSize));
     filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
