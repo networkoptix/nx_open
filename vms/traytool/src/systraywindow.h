@@ -1,5 +1,4 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#pragma once
 
 #include <QtWidgets/QDialog>
 #include <QtCore/QString>
@@ -25,43 +24,43 @@ class QPushButton;
 class QSpinBox;
 class QTextEdit;
 
-namespace Ui {
-    class SettingsDialog;
-}
+namespace Ui { class SettingsDialog; }
 
-bool MyIsUserAnAdmin();
-
-class QnElevationChecker : public QObject
+class QnElevationChecker: public QObject
 {
     Q_OBJECT
-
 public:
-    QnElevationChecker(QObject* parent, QString actionName, QObject* target, const char* slot);
+    explicit QnElevationChecker(
+        const QString& actionId,
+        QObject* parent = nullptr);
+
+    static bool isUserAnAdmin();
+
+    void trigger();
 
 signals:
     void elevationCheckPassed();
 
-private slots:
-    void triggered();
-
 private:
-    QString m_actionName;
-    QObject* m_target;
-    const char* m_slot;
-    bool m_rightWarnShowed;
+    const QString m_actionId;
+    bool m_errorDisplayedOnce = false;
 };
 
 class StopServiceAsyncTask: public QObject, public QRunnable
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    StopServiceAsyncTask(SC_HANDLE handle): m_handle(handle) {}
+    StopServiceAsyncTask(SC_HANDLE handle): m_handle(handle)
+    {
+    }
+
     void run()
     {
         SERVICE_STATUS serviceStatus;
         ControlService(m_handle, SERVICE_CONTROL_STOP, &serviceStatus);
         emit finished();
     }
+
 signals:
     void finished();
 private:
@@ -70,43 +69,49 @@ private:
 
 class GetServiceInfoAsyncTask: public QObject, public QRunnable
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    GetServiceInfoAsyncTask(SC_HANDLE handle): m_handle(handle) {}
+    GetServiceInfoAsyncTask(SC_HANDLE handle): m_handle(handle)
+    {
+    }
+
     void run()
     {
         SERVICE_STATUS serviceStatus;
         if (QueryServiceStatus(m_handle, &serviceStatus))
-            emit finished((quint64)serviceStatus.dwCurrentState);
+        emit finished((quint64)serviceStatus.dwCurrentState);
     }
+
 signals:
     void finished(quint64);
 private:
     SC_HANDLE m_handle;
 };
 
-class QnSystrayWindow : public QDialog
+class QnSystrayWindow: public QDialog
 {
-    Q_OBJECT
+Q_OBJECT
     typedef QDialog base_type;
 
 public:
     QnSystrayWindow();
 
     virtual ~QnSystrayWindow();
-    void executeAction(const QString &cmd);
+    void executeAction(const QString& cmd);
 
-    void showMessage(const QString &title, const QString &msg, QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information);
+    void showMessage(
+        const QString& title,
+        const QString& msg,
+        QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information);
 
     void handleMessage(const QString& message);
 protected:
-    virtual void closeEvent(QCloseEvent *event) override;
+    virtual void closeEvent(QCloseEvent* event) override;
 
 private slots:
     void onDelayedMessage();
 
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-
 
     void at_mediaServerStartAction();
     void at_mediaServerStopAction();
@@ -118,11 +123,11 @@ private slots:
     void mediaServerInfoUpdated(quint64 status);
 
 private:
-    QAction* actionByName(const QString& name);
-    QString nameByAction(QAction* action);
-
-    void connectElevatedAction(QAction* source, const char* signal, QObject* target, const char* slot);
-    void updateServiceInfoInternal(SC_HANDLE handle, DWORD status, QAction* startAction, QAction* stopAction);
+    void updateServiceInfoInternal(
+        SC_HANDLE handle,
+        DWORD status,
+        QAction* startAction,
+        QAction* stopAction);
 
     void createActions();
     void updateActions();
@@ -132,34 +137,35 @@ private:
 private:
     QSettings m_mediaServerSettings;
 
-    QAction *m_quitAction;
+    QSystemTrayIcon* m_trayIcon = nullptr;
 
-    QSystemTrayIcon *m_trayIcon;
+    SC_HANDLE m_scManager = nullptr;
+    SC_HANDLE m_mediaServerHandle = nullptr;
 
-    SC_HANDLE m_scManager;
-    SC_HANDLE m_mediaServerHandle;
+    QAction* m_quitAction = nullptr;
+    QAction* m_showMediaServerLogAction = nullptr;
+    QAction* m_mediaServerStartAction = nullptr;
+    QAction* m_mediaServerStopAction = nullptr;
+    QAction* m_mediaServerWebAction = nullptr;
 
-    QAction *m_showMediaServerLogAction;
-    QAction* m_mediaServerStartAction;
-    QAction* m_mediaServerStopAction;
-    QAction* m_mediaServerWebAction;
-    bool m_firstTimeToolTipError;
+    /** Flag if an error was already displayed for the user. */
+    bool m_errorDisplayedOnce = false;
+    bool m_needStartMediaServer = false;
+    int m_prevMediaServerStatus = -1;
 
-    bool m_needStartMediaServer;
-    int m_prevMediaServerStatus;
-
-    QList<QAction *> m_actions;
     QTime m_lastMessageTimer;
 
-    struct DelayedMessage {
+    struct DelayedMessage
+    {
         QString title;
         QString msg;
         QSystemTrayIcon::MessageIcon icon;
-        DelayedMessage(const QString &title, const QString &msg, QSystemTrayIcon::MessageIcon icon);
+        DelayedMessage(
+            const QString& title,
+            const QString& msg,
+            QSystemTrayIcon::MessageIcon icon);
     };
 
     QQueue<DelayedMessage> m_delayedMessages;
     QString m_mediaServerServiceName;
 };
-
-#endif

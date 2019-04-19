@@ -11,6 +11,8 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace std::chrono;
+
 EventListModel::EventListModel(QnWorkbenchContext* context, QObject* parent):
     base_type(context, parent),
     d(new Private(this))
@@ -48,6 +50,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
 
         case Qn::PreviewTimeRole:
             return QVariant::fromValue(event.previewTime);
+
+        case Qn::ForcePrecisePreviewRole:
+            return event.previewTime > 0us && event.previewTime.count() != DATETIME_NOW;
 
         case Qt::ToolTipRole:
             return QVariant::fromValue(event.toolTip);

@@ -74,22 +74,8 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         &QnUserProfileWidget::hasChangesChanged);
     connect(ui->emailInputField, &InputField::textChanged, this,
         &QnUserProfileWidget::hasChangesChanged);
-
-    connect(ui->changePasswordButton, &QPushButton::clicked, this, [this]()
-    {
-        if (!validMode())
-            return;
-
-        Qn::Permissions permissions = accessController()->permissions(m_model->user());
-        if (!permissions.testFlag(Qn::WritePasswordPermission))
-            return;
-
-        QScopedPointer<QnChangeUserPasswordDialog> dialog(new QnChangeUserPasswordDialog(this));
-        dialog->setWindowModality(Qt::ApplicationModal);
-        if (dialog->exec() != QDialog::Accepted)
-            return;
-        m_newPassword = dialog->newPassword();
-    });
+    connect(ui->changePasswordButton, &QPushButton::clicked, this,
+        &QnUserProfileWidget::editPassword);
 
     m_aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     m_aligner->registerTypeAccessor<QnCloudUserPanelWidget>(
@@ -206,6 +192,28 @@ bool QnUserProfileWidget::canApplyChanges() const
     if (!ui->emailInputField->isValid())
         return false;
     return true;
+}
+
+void QnUserProfileWidget::editPassword()
+{
+    if (!validMode())
+        return;
+
+    const auto permissions = accessController()->permissions(m_model->user());
+    if (!permissions.testFlag(Qn::WritePasswordPermission))
+        return;
+
+    const QScopedPointer<QnChangeUserPasswordDialog> dialog(new QnChangeUserPasswordDialog(this));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    if (dialog->exec() != QDialog::Accepted)
+        return;
+
+    const auto newPassword = dialog->newPassword();
+    if (m_newPassword == newPassword)
+        return;
+
+    m_newPassword = newPassword;
+    emit hasChangesChanged();
 }
 
 void QnUserProfileWidget::updateControlsAccess()

@@ -321,7 +321,7 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
 QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
 {
     QnMediaServerResourceList result;
-    auto items = m_stateTracker->getAllItems();
+    auto items = m_stateTracker->allItems();
     for (const auto& record: items)
     {
         auto server = m_stateTracker->getServer(record);
@@ -602,7 +602,7 @@ bool ServerUpdateTool::verifyUpdateManifest(
     bool checkClient) const
 {
     NX_ASSERT(m_stateTracker);
-    std::map<QnUuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->getActiveServers();
+    std::map<QnUuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->activeServers();
 
     ClientVerificationData clientData;
     clientData.fillDefault();

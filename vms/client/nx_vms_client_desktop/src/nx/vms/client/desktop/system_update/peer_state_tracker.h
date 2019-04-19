@@ -139,18 +139,18 @@ public:
     bool hasStatusErrors() const;
 
 public:
-    std::map<QnUuid, nx::update::Status::Code> getAllPeerStates() const;
-    std::map<QnUuid, QnMediaServerResourcePtr> getActiveServers() const;
+    std::map<QnUuid, nx::update::Status::Code> allPeerStates() const;
+    std::map<QnUuid, QnMediaServerResourcePtr> activeServers() const;
 
-    QList<UpdateItemPtr> getAllItems() const;
-    QSet<QnUuid> getAllPeers() const;
-    QSet<QnUuid> getPeersInState(StatusCode state) const;
-    QSet<QnUuid> getLegacyServers() const;
-    QSet<QnUuid> getOfflineServers() const;
-    QSet<QnUuid> getPeersInstalling() const;
-    QSet<QnUuid> getPeersCompleteInstall() const;
-    QSet<QnUuid> getServersWithChangedProtocol() const;
-    QSet<QnUuid> getPeersWithUnknownStatus() const;
+    QList<UpdateItemPtr> allItems() const;
+    QSet<QnUuid> allPeers() const;
+    QSet<QnUuid> peersInState(StatusCode state) const;
+    QSet<QnUuid> legacyServers() const;
+    QSet<QnUuid> offlineServers() const;
+    QSet<QnUuid> peersInstalling() const;
+    QSet<QnUuid> peersCompleteInstall() const;
+    QSet<QnUuid> serversWithChangedProtocol() const;
+    QSet<QnUuid> peersWithUnknownStatus() const;
 
     /**
      * Processing for task sets. These functions are called every 1sec from
@@ -161,16 +161,17 @@ public:
 
     /**
      * Getters for task sets.
+     * Task sets are relevant to current update action, like 'downloading' or 'installing'.
      */
 
-    /** Set task set of peers that completed current action. */
-    QSet<QnUuid> getPeersComplete() const;
-    /** Get task set of peers that are currently active. */
-    QSet<QnUuid> getPeersActive() const;
-    /** Get task set of peers that are participating in current action. */
-    QSet<QnUuid> getPeersIssued() const;
-    /** Get task set of peers that have failed current action. */
-    QSet<QnUuid> getPeersFailed() const;
+    /** Get a set of peers that completed current action. */
+    QSet<QnUuid> peersComplete() const;
+    /** Get a set of peers that are currently active. */
+    QSet<QnUuid> peersActive() const;
+    /** Get a set of peers that are participating in current action. */
+    QSet<QnUuid> peersIssued() const;
+    /** Get a set of peers that have failed current action. */
+    QSet<QnUuid> peersFailed() const;
 
     /**
      * We call it every time we start or stop next task, like ready->downloading,
@@ -239,21 +240,21 @@ private:
 
     /**
      * This sets are changed every time we are initiating some update action.
-     * Set of servers that are currently active.
+     * Set of peers that are currently active.
      */
     QSet<QnUuid> m_peersActive;
-    /** Set of servers that are used for the current task. */
+    /** Set of peers that are used for the current task. */
     QSet<QnUuid> m_peersIssued;
-    /** A set of servers that have completed current task. */
+    /** A set of peers that have completed current task. */
     QSet<QnUuid> m_peersComplete;
-    /** A set of servers that have failed current task. */
+    /** A set of peers that have failed current task. */
     QSet<QnUuid> m_peersFailed;
 
     /**
      * Time for server to become online. We will remove this server from the task set after
      * this time expires.
      */
-    UpdateItem::Clock::duration m_waitForServerReturn;
+    UpdateItem::Clock::duration m_timeForServerToReturn;
 };
 
 } // namespace nx::vms::client::desktop
