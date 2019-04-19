@@ -448,6 +448,13 @@ bool canForcePanTiltCapabilities(const Camera& camera)
         Ptz::Capability::ContinuousPanTiltCapabilities;
 };
 
+bool analyticsEngineIsPresentInList(const QnUuid& id, const State& state)
+{
+    const auto& engines = state.analytics.engines;
+    return std::any_of(engines.cbegin(), engines.cend(),
+        [&id](const auto& info) { return info.id == id; });
+}
+
 } // namespace
 
 State CameraSettingsDialogStateReducer::setReadOnly(State state, bool value)
@@ -513,7 +520,6 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.motionAlert = {};
     state.analytics.enabledEngines = {};
     state.analytics.settingsValuesByEngineId = {};
-    state.analytics.currentEngineId = {};
 
     state.deviceType = firstCamera
         ? QnDeviceDependentStrings::calculateDeviceType(firstCamera->resourcePool(), cameras)
@@ -1379,15 +1385,27 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
 State CameraSettingsDialogStateReducer::setAnalyticsEngines(
     State state, const QList<AnalyticsEngineInfo>& value)
 {
+    // If no engine is currently selected, select the first available.
     state.analytics.engines = value;
+    if (value.empty())
+        state.analytics.currentEngineId = {};
+    else if (!analyticsEngineIsPresentInList(state.analytics.currentEngineId, state))
+        state.analytics.currentEngineId = state.analytics.engines[0].id;
+
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setCurrentAnalyticsEngineId(
+std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngineId(
     State state, const QnUuid& value)
 {
+    if (state.analytics.currentEngineId == value)
+        return {false, std::move(state)};
+
+    if (!analyticsEngineIsPresentInList(value, state))
+        return {false, std::move(state)};
+
     state.analytics.currentEngineId = value;
-    return state;
+    return {true, std::move(state)};
 }
 
 State CameraSettingsDialogStateReducer::setAnalyticsSettingsLoading(State state, bool value)
@@ -1399,7 +1417,10 @@ State CameraSettingsDialogStateReducer::setAnalyticsSettingsLoading(State state,
 State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
     State state, const QSet<QnUuid>& value)
 {
-    state.analytics.enabledEngines.setUser(value);
+    // Sometimes we get an empty uuid here. Removing it on the cpp side.
+    QSet<QnUuid> actualValue = value;
+    actualValue.remove(QnUuid());
+    state.analytics.enabledEngines.setUser(actualValue);
     state.hasChanges = true;
     return state;
 }
