@@ -22,7 +22,7 @@ AudioTransmissionRestHandler::AudioTransmissionRestHandler(QnMediaServerModule* 
 
 rest::Response AudioTransmissionRestHandler::executeGet(const rest::Request& request)
 {
-    if (!rest::ini().allowGetModifications)
+    if (!rest::ini().allowModificationsViaGetMethod)
         throw nx::network::rest::Exception(nx::network::rest::Result::Forbidden);
 
     return executePost(request);

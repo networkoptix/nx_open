@@ -48,7 +48,7 @@ void SystemSettingsProcessor::systemNameChanged(
 nx::network::rest::Response SystemSettingsHandler::executeGet(
     const nx::network::rest::Request& request)
 {
-    if (!nx::network::rest::ini().allowGetModifications && request.params().isEmpty())
+    if (!nx::network::rest::ini().allowModificationsViaGetMethod && request.params().isEmpty())
         return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
 
     return executePost(request);

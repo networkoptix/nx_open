@@ -47,7 +47,7 @@ ConfigureRestHandler::ConfigureRestHandler(
 nx::network::rest::Response ConfigureRestHandler::executeGet(
     const nx::network::rest::Request& request)
 {
-    if (!nx::network::rest::ini().allowGetModifications)
+    if (!nx::network::rest::ini().allowModificationsViaGetMethod)
         return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
 
     return executePost(request);
@@ -57,7 +57,7 @@ nx::network::rest::Response ConfigureRestHandler::executePost(
     const nx::network::rest::Request& request)
 {
     auto data = request.parseContentOrThrow<ConfigureSystemData>();
-    if (nx::network::rest::ini().allowGetModifications)
+    if (nx::network::rest::ini().allowModificationsViaGetMethod)
     {
         if (data.currentPassword.isEmpty())
             data.currentPassword = request.paramOrDefault("oldPassword");

@@ -197,7 +197,7 @@ int QnPtzRestHandler::executeGet(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    if (!nx::network::rest::ini().allowGetModifications
+    if (!nx::network::rest::ini().allowModificationsViaGetMethod
         && !params.value("command").toLower().startsWith("get"))
     {
         return nx::network::http::StatusCode::forbidden;

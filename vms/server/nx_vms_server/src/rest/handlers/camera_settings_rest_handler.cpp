@@ -272,7 +272,7 @@ int QnCameraSettingsRestHandler::executeGet(
     }
     else if (action == "setCameraParam")
     {
-        if (!nx::network::rest::ini().allowGetModifications)
+        if (!nx::network::rest::ini().allowModificationsViaGetMethod)
             return nx::network::http::StatusCode::forbidden;
 
         statusCode = handleSetParamsRequest(owner, camera, values, &outParameterMap);

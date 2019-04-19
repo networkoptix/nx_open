@@ -299,8 +299,11 @@ nx::network::http::StatusCode::Value ManualCameraAdditionRestHandler::addCameras
 nx::network::rest::Response ManualCameraAdditionRestHandler::executeGet(
     const nx::network::rest::Request& request)
 {
-    if (!nx::network::rest::ini().allowGetModifications && extractAction(request.path()) != "status")
+    if (!nx::network::rest::ini().allowModificationsViaGetMethod
+        && extractAction(request.path()) != "status")
+    {
         return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
+    }
 
     return executePost(request);
 }

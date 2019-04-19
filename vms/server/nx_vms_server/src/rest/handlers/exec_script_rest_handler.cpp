@@ -21,7 +21,7 @@ ExecScript::ExecScript(const QString& dataDirectory):
 
 rest::Response ExecScript::executeGet(const rest::Request& request)
 {
-    if (!rest::ini().allowGetModifications)
+    if (!rest::ini().allowModificationsViaGetMethod)
         return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
 
     return executePost(request);
