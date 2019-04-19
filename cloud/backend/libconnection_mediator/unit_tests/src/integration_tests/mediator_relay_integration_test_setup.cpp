@@ -97,7 +97,7 @@ MediatorRelayIntegrationTestSetup::~MediatorRelayIntegrationTestSetup()
 
 void MediatorRelayIntegrationTestSetup::SetUp()
 {
-    //addArg(("--trafficRelay/urls=" + m_relayUrl.toString().toStdString()).c_str());
+    //addArg(("--trafficRelay/url=" + m_relayUrl.toString().toStdString()).c_str());
 
     ASSERT_TRUE(startAndWaitUntilStarted());
     const auto system = addRandomSystem();

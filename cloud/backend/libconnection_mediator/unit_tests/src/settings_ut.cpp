@@ -139,7 +139,7 @@ TEST_F(Settings, traffic_relay_urls)
         urls += url.toString().append(",");
     urls.chop(1); //< Remove trailing comma
 
-    addSetting("--trafficRelay/urls=" + urls.toStdString());
+    addSetting("--trafficRelay/url=" + urls.toStdString());
     loadSettings();
 
     ASSERT_EQ(relayUrls, settings().trafficRelay().urls);

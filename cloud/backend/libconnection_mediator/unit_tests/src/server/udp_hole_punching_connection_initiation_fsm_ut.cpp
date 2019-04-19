@@ -70,7 +70,7 @@ public:
     {
         using namespace std::placeholders;
 
-        m_programArguments.addArg("-trafficRelay/urls", m_trafficRelayUrl.c_str());
+        m_programArguments.addArg("-trafficRelay/url", m_trafficRelayUrl.c_str());
 
         m_connectSessionId = nx::utils::generateRandomName(7);
         m_listeningPeerConnection = std::make_shared<TestServerConnection>();
