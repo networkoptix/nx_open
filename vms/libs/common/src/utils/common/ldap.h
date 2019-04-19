@@ -5,7 +5,8 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <utils/common/ldap_fwd.h>
 
-struct QnLdapSettings {
+struct QnLdapSettings
+{
     QUrl uri;
     QString adminDn;
     QString adminPassword;
@@ -13,6 +14,7 @@ struct QnLdapSettings {
     QString searchFilter;
     int searchTimeoutS = 0;
 
+    QString toString() const;
     bool isValid() const;
 
     static int defaultPort(bool ssl = false);
@@ -20,11 +22,14 @@ struct QnLdapSettings {
 
 #define QnLdapSettings_Fields (uri)(adminDn)(adminPassword)(searchBase)(searchFilter)(searchTimeoutS)
 
-struct QnLdapUser {
+struct QnLdapUser
+{
     QString dn;
     QString login;
     QString fullName;
     QString email;
+
+    QString toString() const;
 };
 
 #define QnLdapUser_Fields (dn)(login)(fullName)(email)

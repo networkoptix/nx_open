@@ -76,6 +76,11 @@ void ProxyHandler::detectProxyTarget(
         if (targetHost.target.port == 0)
             targetHost.target.port = m_settings.http().proxyTargetPort;
     }
+    else
+    {
+        // NOTE: Cloud address should not have port.
+        targetHost.target.port = 0;
+    }
 
     if (targetHost.sslMode == SslMode::followIncomingConnection)
         targetHost.sslMode = m_settings.cloudConnect().preferedSslMode;

@@ -10,7 +10,7 @@
 namespace {
 
 static const QLatin1String kExtraFormatting("extraFormatting");
-static const QByteArray kJsonContetnType("application/json");
+static const QByteArray kJsonContentType("application/json");
 
 } // namespace
 
@@ -32,7 +32,7 @@ JsonRestResponse::JsonRestResponse(
 
 RestResponse JsonRestResponse::toRest(bool extraFormatting) const
 {
-    RestContent content{kJsonContetnType, QJson::serialized(json)};
+    RestContent content{kJsonContentType, QJson::serialized(json)};
     if (extraFormatting)
         content.body = nx::utils::formatJsonString(content.body);
 

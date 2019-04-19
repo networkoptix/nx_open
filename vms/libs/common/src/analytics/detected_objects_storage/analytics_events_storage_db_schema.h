@@ -163,6 +163,17 @@ GROUP BY device_id, timestamp_usec_utc/60000;
 )sql";
 
 //-------------------------------------------------------------------------------------------------
+// META-223
+// NOTE: Not renaming duration_usec since renaming a field is complicated and the next scheme update
+// just drops the 'event' table.
+static constexpr char kConvertDurationToMillis[] =
+R"sql(
+
+UPDATE event SET duration_usec = duration_usec / 1000
+
+)sql";
+
+//-------------------------------------------------------------------------------------------------
 // META-225
 // TODO: Add indexes.
 static constexpr char kSplitDataToObjectAndSearch[] =
@@ -190,6 +201,7 @@ CREATE INDEX idx_object_device_id ON object(device_id);
 CREATE INDEX idx_object_object_type_id ON object(object_type_id);
 CREATE INDEX idx_object_guid ON object(guid);
 CREATE INDEX idx_track_time_ms ON object(track_start_ms, track_end_ms);
+CREATE INDEX idx_object_attributes_id ON object(attributes_id);
 
 CREATE TABLE object_search(
     id                          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -201,9 +213,12 @@ CREATE TABLE object_search(
     object_id_list              BLOB
 );
 
-CREATE TABLE unique_attributes_to_object_search(
-    attributes_id               INTEGER,
-    object_search_id            INTEGER
+CREATE INDEX idx_object_search_box ON object_search(
+    box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y);
+
+CREATE TABLE object_search_to_object(
+    object_search_id            INTEGER,
+    object_id                   INTEGER
 );
 
 )sql";

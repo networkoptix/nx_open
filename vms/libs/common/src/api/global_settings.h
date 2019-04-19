@@ -110,6 +110,7 @@ const QString kDefaultVideoCodec(lit("defaultVideoCodec"));
 const QString kDefaultExportVideoCodec(lit("defaultExportVideoCodec"));
 const QString kLowQualityScreenVideoCodec(lit("lowQualityScreenVideoCodec"));
 const QString kForceLiveCacheForPrimaryStream(lit("forceLiveCacheForPrimaryStream"));
+const QString kMetadataStorageChangePolicyName(lit("metadataStorageChangePolicy"));
 
 } // namespace nx::settings_names
 
@@ -366,6 +367,9 @@ public:
     QString forceLiveCacheForPrimaryStream() const;
     void setForceLiveCacheForPrimaryStream(const QString& value);
 
+    nx::vms::api::MetadataStorageChangePolicy metadataStorageChangePolicy() const;
+    void setMetadataStorageChangePolicy(nx::vms::api::MetadataStorageChangePolicy value);
+
 signals:
     void initialized();
 
@@ -523,6 +527,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_defaultExportVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_lowQualityScreenVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_forceLiveCacheForPrimaryStreamAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

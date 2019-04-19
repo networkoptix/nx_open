@@ -76,6 +76,8 @@ void deserialize(QnByteArrayConstRef* buf, std::vector<long long>* numbers)
 
 //-------------------------------------------------------------------------------------------------
 
+static const QSize kResolution(kCoordinatesPrecision, kCoordinatesPrecision);
+
 QByteArray TrackSerializer::serialized(const std::vector<ObjectPosition>& track)
 {
     QByteArray buf;
@@ -121,7 +123,7 @@ void TrackSerializer::serialize(
 {
     compact_int::serialize(position.timestampUsec - baseTimestamp, buf);
     compact_int::serialize(position.durationUsec, buf);
-    serialize(translate(position.boundingBox), buf);
+    serialize(translate(position.boundingBox, kResolution), buf);
 
     // TODO: attributes?
 }
@@ -164,7 +166,7 @@ void TrackSerializer::deserialize(
 
     QRect translatedRect;
     deserialize(buf, &translatedRect);
-    position->boundingBox = translate(translatedRect);
+    position->boundingBox = translate(translatedRect, kResolution);
 
     // TODO: attributes?
 }
@@ -186,18 +188,20 @@ void TrackSerializer::deserialize(QnByteArrayConstRef* buf, QRect* rect)
     rect->setHeight(value);
 }
 
-QRect TrackSerializer::translate(const QRectF& box)
+QRect translate(const QRectF& box, const QSize& resolution)
 {
     return QRect(
-        box.x() * kCoordinatesPrecision, box.y() * kCoordinatesPrecision,
-        box.width() * kCoordinatesPrecision, box.height() * kCoordinatesPrecision);
+        box.x() * resolution.width(),
+        box.y() * resolution.height(),
+        std::ceil(box.width() * resolution.width()),
+        std::ceil(box.height() * resolution.height()));
 }
 
-QRectF TrackSerializer::translate(const QRect& box)
+QRectF translate(const QRect& box, const QSize& resolution)
 {
     return QRectF(
-        box.x() / (double)kCoordinatesPrecision, box.y() / (double)kCoordinatesPrecision,
-        box.width() / (double)kCoordinatesPrecision, box.height() / (double)kCoordinatesPrecision);
+        box.x() / (double) resolution.width(), box.y() / (double) resolution.height(),
+        box.width() / (double) resolution.width(), box.height() / (double) resolution.height());
 }
 
 } // namespace nx::analytics::storage

@@ -744,12 +744,6 @@ void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
         return;
 
     m_singleShotMode = value;
-    /*
-    if (value)
-        m_rtspSession->sendPause();
-    else
-        m_rtspSession->sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession->getScale());
-    */
 }
 
 void QnRtspClientArchiveDelegate::setCustomVideoLayout(const QnCustomResourceVideoLayoutPtr& value)
@@ -955,7 +949,6 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
         QByteArray s = buffer.data().toBase64();
         m_rtspSession->setAdditionAttribute("x-motion-region", s);
     }
-    //m_rtspSession->sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession->getScale());
 }
 
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)

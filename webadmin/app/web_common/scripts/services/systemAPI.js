@@ -161,54 +161,58 @@ angular.module('nxCommon')
 
         /* Authentication */
         ServerConnection.prototype.getCurrentUser = function (forcereload){
-            if(forcereload){ // Clean cache to
+            if (forcereload) { // Clean cache to
                 self.currentUser = null;
                 self.userRequest = null;
             }
-            if(this.currentUser){ // We have user - return him right away
+            if (this.currentUser) { // We have user - return him right away
                 return $q.resolve(this.currentUser);
             }
-            if(this.userRequest){ // Currently requesting user
+            if (this.userRequest) { // Currently requesting user
                 return this.userRequest;
             }
             
             var self = this;
-            if(self.userEmail){ // Cloud portal mode - getCurrentUser is not working
-                this.userRequest = this._get('/ec2/getUsers').then(function(result){
-                    self.currentUser = _.find(result.data, function(user){
-                        return user.name.toLowerCase() == self.userEmail.toLowerCase();
+            if (self.userEmail) { // Cloud portal mode - getCurrentUser is not working
+                return self.userRequest = this._get('/ec2/getUsers')
+                    .then(function(result) {
+                        self.currentUser = _.find(result.data, function (user) {
+                            return user.name.toLowerCase() == self.userEmail.toLowerCase();
+                        });
+                        return self.currentUser;
+                    })
+                    .finally(function() {
+                        self.userRequest = null; // Clear cache in case of errors
                     });
-                    return self.currentUser;
-                });
-            }else{ // Local system mode ???
-                this.userRequest = this._get('/api/getCurrentUser').then(function(result){
-                    self.currentUser = result.data.reply;
-                    return self.currentUser;
-                });
+            } else { // Local system mode ???
+                return self.userRequest = this._get('/api/getCurrentUser')
+                    .then(function(result) {
+                        self.currentUser = result.data.reply;
+                        
+                        if (!self.currentUser.isAdmin && !self.isEmptyId(self.currentUser.userRoleId)) {
+                            return self.getRolePermissions(self.currentUser.userRoleId)
+                                .then(function(role) {
+                                    self.currentUser.permissions = role.data[0].permissions;
+                                    return self.currentUser;
+                                });
+                        }
+                    })
+                    .finally(function() {
+                        self.userRequest = null; // Clear cache in case of errors
+                    });
             }
-
-            this.userRequest.finally(function(){
-                self.userRequest = null; // Clear cache in case of errors
-            });
-            return this.userRequest;
         };
 
         ServerConnection.prototype.getRolePermissions = function(roleId) {
             return this._get('/ec2/getUserRoles', {id:roleId});
         };
-
-        ServerConnection.prototype.checkPermissions = function(flag){
+    
+        ServerConnection.prototype.checkPermissions = function (flag) {
             // TODO: getCurrentUser will not work on portal for 3.0 systems, think of something
-            var self = this;
-            return this.getCurrentUser().then(function(user) {
-                if(!user.isAdmin && !self.isEmptyId(user.userRoleId)){
-                    return self.getRolePermissions(user.userRoleId).then(function(role){
-                        return role.data[0].permissions.indexOf(flag)>=0;
+            return this.getCurrentUser()
+                    .then(function(user) {
+                        return user.isAdmin || user.permissions.indexOf(flag) >= 0;
                     });
-                }
-                return user.isAdmin ||
-                       user.permissions.indexOf(flag)>=0;
-            });
         };
 
         ServerConnection.prototype.setAuthKeys = function(authGet, authPost, authPlay){

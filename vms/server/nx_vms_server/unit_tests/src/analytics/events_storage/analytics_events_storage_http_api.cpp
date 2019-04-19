@@ -36,7 +36,7 @@ public:
         m_asyncCaller.pleaseStopSync();
     }
 
-    virtual bool initialize() override
+    virtual bool initialize(const Settings& settings) override
     {
         return true;
     }
@@ -54,6 +54,11 @@ public:
             {
                 completionHandler(ResultCode::error, nullptr);
             });
+    }
+
+    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& /*cursor*/) override
+    {
+
     }
 
     virtual void lookup(
@@ -117,7 +122,7 @@ public:
         using namespace std::placeholders;
 
         m_factoryBak = EventsStorageFactory::instance().setCustomFunc(
-            std::bind(&AnalyticsEventsStorageHttpApi::createEventsStorageMock, this, _1));
+            std::bind(&AnalyticsEventsStorageHttpApi::createEventsStorageMock, this));
     }
 
     ~AnalyticsEventsStorageHttpApi()
@@ -183,8 +188,7 @@ private:
         m_mediaserverClient = prepareMediaServerClient();
     }
 
-    std::unique_ptr<AbstractEventsStorage> createEventsStorageMock(
-        const Settings& /*settings*/)
+    std::unique_ptr<AbstractEventsStorage> createEventsStorageMock()
     {
         return std::make_unique<EventsStorageMock>(&m_lookupRequests);
     }

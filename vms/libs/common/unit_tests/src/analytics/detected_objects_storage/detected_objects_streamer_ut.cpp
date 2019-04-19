@@ -62,7 +62,7 @@ public:
         m_asyncCaller.pleaseStopSync();
     }
 
-    virtual bool initialize() override
+    virtual bool initialize(const Settings& settings) override
     {
         return true;
     }
@@ -94,6 +94,8 @@ public:
                 completionHandler(ResultCode::ok, std::move(cursor));
             });
     }
+
+    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& /*cursor*/) override {}
 
     virtual void lookup(
         Filter /*filter*/,

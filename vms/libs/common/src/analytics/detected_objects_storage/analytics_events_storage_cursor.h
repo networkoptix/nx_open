@@ -30,9 +30,13 @@ public:
 
     virtual common::metadata::ConstDetectionMetadataPacketPtr next() override;
 
+    void close();
+
 private:
     std::unique_ptr<nx::sql::Cursor<DetectedObject>> m_dbCursor;
     common::metadata::DetectionMetadataPacketPtr m_nextPacket;
+    bool m_closed { false };
+    std::mutex m_mutex;
 
     common::metadata::DetectionMetadataPacketPtr toDetectionMetadataPacket(
         DetectedObject detectedObject);

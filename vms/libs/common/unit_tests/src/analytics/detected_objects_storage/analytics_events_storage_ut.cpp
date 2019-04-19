@@ -11,11 +11,10 @@
 
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <analytics/detected_objects_storage/config.h>
+#include <analytics/detected_objects_storage/serializers.h>
 #include <test_support/analytics/storage/analytics_storage_types.h>
 
 namespace nx::analytics::storage::test {
-
-static const auto kUsecInMs = 1000;
 
 class AnalyticsDb:
     public nx::utils::test::TestWithTemporaryDirectory,
@@ -481,8 +480,8 @@ private:
 
     bool initializeStorage()
     {
-        m_eventsStorage = std::make_unique<EventsStorage>(m_settings);
-        return m_eventsStorage->initialize();
+        m_eventsStorage = std::make_unique<EventsStorage>();
+        return m_eventsStorage->initialize(m_settings);
     }
 
     void flushData()
@@ -522,10 +521,23 @@ private:
         if (!satisfiesCommonConditions(filter, data))
             return false;
 
-        if (!filter.boundingBox.isNull() && !filter.boundingBox.intersects(data.boundingBox))
-            return false;
+        if (filter.boundingBox.isNull())
+            return true;
 
-        return true;
+        if (kUseTrackAggregation)
+        {
+            const auto filterBoundingBox = translate(
+                filter.boundingBox,
+                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+            const auto dataBoundingBox = translate(
+                data.boundingBox,
+                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+            return filterBoundingBox.intersects(dataBoundingBox);
+        }
+        else
+        {
+            return filter.boundingBox.intersects(data.boundingBox);
+        }
     }
 
     bool satisfiesFilter(
@@ -763,6 +775,7 @@ protected:
         using namespace std::chrono;
 
         m_specificObjectAppearanceId = QnUuid::createUuid();
+        const auto deviceId = QnUuid::createUuid();
         auto analyticsDataPackets = generateEventsByCriteria();
 
         qint64 objectTrackStartTime = std::numeric_limits<qint64>::max();
@@ -773,6 +786,7 @@ protected:
             objectTrackStartTime = std::min(objectTrackStartTime, packet->timestampUsec);
             objectTrackEndTime =
                 std::max(objectTrackEndTime, packet->timestampUsec + packet->durationUsec);
+            packet->deviceId = deviceId;
 
             for (auto& object: packet->objects)
             {
@@ -932,7 +946,7 @@ TEST_F(AnalyticsDbLookup, lookup_by_empty_time_period)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsDbLookup, full_track_timestamps)
+TEST_F(AnalyticsDbLookup, filtering_part_of_track_by_time_period)
 {
     givenObjectWithLongTrack();
     whenLookupByRandomNonEmptyTimePeriodCoveringPartOfTrack();
@@ -977,8 +991,6 @@ TEST_F(AnalyticsDbLookup, full_text_search)
     whenLookupByRandomTextFoundInData();
     thenResultMatchesExpectations();
 }
-
-// TEST_F(AnalyticsDb, lookup_by_attribute_value)
 
 TEST_F(AnalyticsDbLookup, lookup_by_bounding_box)
 {
@@ -1083,8 +1095,8 @@ protected:
 
 private:
     std::vector<common::metadata::ConstDetectionMetadataPacketPtr> m_packetsRead;
-    nx::utils::SyncQueue<std::unique_ptr<AbstractCursor>> m_createdCursorsQueue;
-    std::unique_ptr<AbstractCursor> m_cursor;
+    nx::utils::SyncQueue<std::shared_ptr<AbstractCursor>> m_createdCursorsQueue;
+    std::shared_ptr<AbstractCursor> m_cursor;
 
     void readAllDataFromCursor()
     {
@@ -1094,9 +1106,9 @@ private:
 
     void saveCursor(
         ResultCode /*resultCode*/,
-        std::unique_ptr<AbstractCursor> cursor)
+        std::shared_ptr<AbstractCursor> cursor)
     {
-        m_createdCursorsQueue.push(std::move(cursor));
+        m_createdCursorsQueue.push(cursor);
     }
 };
 

@@ -180,6 +180,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
+    nx::vms::api::StreamIndex toStreamIndex(ConnectionRole role);
+
     // TODO: #GDM split to server-only and client-only flags as they are always local
     enum ResourceFlag
     {

@@ -471,9 +471,11 @@ QString StringsHelper::eventReason(const EventParameters& params) const
                 QJson::deserialized<NetworkIssueEvent::MulticastAddressConflictParameters>(
                     reasonParamsEncoded.toUtf8());
 
-            return tr("Multicast address conflict detected. Address %1 is already in use by %2")
-                .arg(params.address.toString())
-                .arg(params.addressUser);
+            return tr("Multicast address conflict detected. "
+                "Address %1 is already in use by %2 on %3 stream")
+                    .arg(params.address.toString())
+                    .arg(params.deviceName)
+                    .arg(QnLexical::serialized(params.stream));
         }
         case EventReason::networkMulticastAddressIsInvalid:
         {
