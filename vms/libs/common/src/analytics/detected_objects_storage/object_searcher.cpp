@@ -8,6 +8,10 @@
 
 namespace nx::analytics::storage {
 
+static const QSize kSearchResolution(
+    kTrackSearchResolutionX,
+    kTrackSearchResolutionY);
+
 ObjectSearcher::ObjectSearcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao)
@@ -65,6 +69,35 @@ void ObjectSearcher::addObjectFilterConditions(
     }
 }
 
+void ObjectSearcher::addBoundingBoxToFilter(
+    const QRect& boundingBox,
+    nx::sql::Filter* sqlFilter)
+{
+    auto topLeftXFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
+        "box_top_left_x",
+        ":boxTopLeftX",
+        QnSql::serialized_field(boundingBox.bottomRight().x()));
+    sqlFilter->addCondition(std::move(topLeftXFilter));
+
+    auto bottomRightXFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
+        "box_bottom_right_x",
+        ":boxBottomRightX",
+        QnSql::serialized_field(boundingBox.topLeft().x()));
+    sqlFilter->addCondition(std::move(bottomRightXFilter));
+
+    auto topLeftYFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
+        "box_top_left_y",
+        ":boxTopLeftY",
+        QnSql::serialized_field(boundingBox.bottomRight().y()));
+    sqlFilter->addCondition(std::move(topLeftYFilter));
+
+    auto bottomRightYFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
+        "box_bottom_right_y",
+        ":boxBottomRightY",
+        QnSql::serialized_field(boundingBox.topLeft().y()));
+    sqlFilter->addCondition(std::move(bottomRightYFilter));
+}
+
 void ObjectSearcher::addTimePeriodToFilter(
     const QnTimePeriod& timePeriod,
     nx::sql::Filter* sqlFilter,
@@ -94,55 +127,88 @@ void ObjectSearcher::addTimePeriodToFilter(
     }
 }
 
+static constexpr char kObjectExpr[] = "%objectExpr%";
+static constexpr char kFullTextFrom[] = "%fullTextFrom%";
+static constexpr char kFullTextExpr[] = "%fullTextExpr%";
+static constexpr char kObjectSearchFrom[] = "%objectSearchFrom%";
+static constexpr char kJoinObjectToObjectSearch[] = "%joinObjectToObjectSearch%";
+static constexpr char kBoundingBoxExpr[] = "%boundingBoxExpr%";
+static constexpr char kObjectOrderByTrackStart[] = "%objectOrderByTrackStart%";
+static constexpr char kLimitObjectCount[] = "%limitObjectCount%";
+
 void ObjectSearcher::prepareLookupQuery(
     const Filter& filter,
     nx::sql::AbstractSqlQuery* query)
 {
+    QString queryText = R"sql(
+        SELECT DISTINCT o.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
+            track_detail, attrs.content AS content
+        FROM object o, unique_attributes attrs
+            %fullTextFrom%
+            %objectSearchFrom%
+        WHERE %objectExpr%
+            %fullTextExpr%
+            %joinObjectToObjectSearch% %boundingBoxExpr%
+            o.attributes_id = attrs.id
+        ORDER BY track_start_ms %objectOrderByTrackStart%
+        %limitObjectCount%
+    )sql";
+
+    std::map<QString, QString> queryTextParams({
+        {kObjectExpr, ""},
+        {kFullTextFrom, ""},
+        {kFullTextExpr, ""},
+        {kObjectSearchFrom, ""},
+        {kJoinObjectToObjectSearch, ""},
+        {kBoundingBoxExpr, ""},
+        {kObjectOrderByTrackStart, "DESC"},
+        {kLimitObjectCount, ""}});
+
     const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
-    auto sqlQueryFilterStr = sqlQueryFilter.toString();
-    if (!sqlQueryFilterStr.empty())
-        sqlQueryFilterStr += sqlQueryFilterStr + " AND ";
+    auto objectFilterSqlText = sqlQueryFilter.toString();
+    if (!objectFilterSqlText.empty())
+        queryTextParams[kObjectExpr] = (objectFilterSqlText + " AND ").c_str();
 
-    std::string limitStr;
     if (filter.maxObjectsToSelect > 0)
-        limitStr = lm("LIMIT %1").args(filter.maxObjectsToSelect).toStdString();
-
-    QString queryTemplate;
-    if (filter.freeText.isEmpty())
     {
-        queryTemplate = R"sql(
-            SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, content
-            FROM object o, unique_attributes attrs
-            WHERE %1
-                o.attributes_id = attrs.id
-            ORDER BY track_start_ms %2
-            %3
-        )sql";
-    }
-    else
-    {
-        queryTemplate = R"sql(
-            SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
-                attrs.content AS content
-            FROM object o, unique_attributes attrs, attributes_text_index fts
-            WHERE %1
-                fts.content MATCH :textQuery AND fts.docid = o.attributes_id AND
-                o.attributes_id = attrs.id
-            ORDER BY track_start_ms %2
-            %3
-        )sql";
+        queryTextParams[kLimitObjectCount] =
+            lm("LIMIT %1").args(filter.maxObjectsToSelect).toQString();
     }
 
-    auto queryText = lm(queryTemplate).args(
-        sqlQueryFilterStr,
-        filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC",
-        limitStr);
+    if (!filter.freeText.isEmpty())
+    {
+        queryTextParams[kFullTextFrom] = ", attributes_text_index fts";
+        queryTextParams[kFullTextExpr] =
+            "fts.content MATCH :textQuery AND fts.docid = o.attributes_id AND ";
+    }
+
+    nx::sql::Filter boundingBoxFilter;
+    if (!filter.boundingBox.isEmpty())
+    {
+        queryTextParams[kObjectSearchFrom] =
+            ", object_search os, object_search_to_object os_to_o";
+        queryTextParams[kJoinObjectToObjectSearch] =
+            "os_to_o.object_id = o.id AND os_to_o.object_search_id = os.id AND ";
+
+        addBoundingBoxToFilter(
+            translate(filter.boundingBox, kSearchResolution),
+            &boundingBoxFilter);
+        queryTextParams[kBoundingBoxExpr] = (boundingBoxFilter.toString() + " AND ").c_str();
+    }
+
+    queryTextParams[kObjectOrderByTrackStart] =
+        filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC";
+
+    for (const auto& [name, value]: queryTextParams)
+        queryText.replace(name, value);
 
     query->prepare(queryText);
 
     sqlQueryFilter.bindFields(query);
     if (!filter.freeText.isEmpty())
         query->bindValue(":textQuery", filter.freeText + "*");
+    if (!filter.boundingBox.isEmpty())
+        boundingBoxFilter.bindFields(query);
 }
 
 nx::sql::Filter ObjectSearcher::prepareSqlFilterExpression(const Filter& filter)
@@ -155,8 +221,6 @@ nx::sql::Filter ObjectSearcher::prepareSqlFilterExpression(const Filter& filter)
         m_objectTypeDao,
         {"guid", "track_start_ms", "track_end_ms"},
         &sqlFilter);
-
-    // TODO
 
     return sqlFilter;
 }
@@ -198,8 +262,22 @@ DetectedObject ObjectSearcher::loadObject(
     filterTrack(filter, &detectedObject.track);
     if (!detectedObject.track.empty())
     {
+        bool intersects = false;
+
         for (auto& position: detectedObject.track)
+        {
             position.deviceId = detectedObject.deviceId;
+
+            if (!filter.boundingBox.isEmpty())
+            {
+                intersects = intersects ||
+                    translate(filter.boundingBox, kSearchResolution)
+                        .intersects(translate(position.boundingBox, kSearchResolution));
+            }
+        }
+
+        if (!filter.boundingBox.isEmpty() && !intersects)
+            int x = 0;
     }
 
     return detectedObject;

@@ -14,12 +14,6 @@
 namespace nx::analytics::storage {
 
 static constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833-456437eaa7c7";
-static constexpr int kUsecPerMsec = 1000;
-
-static constexpr auto kTrackAggregationPeriod = std::chrono::seconds(5);
-static constexpr auto kMaxCachedObjectLifeTime = std::chrono::minutes(1);
-static constexpr auto kTrackSearchResolutionX = 44;
-static constexpr auto kTrackSearchResolutionY = 32;
 
 //-------------------------------------------------------------------------------------------------
 
@@ -359,8 +353,8 @@ void EventsStorage::insertEvent(
             :objectTypeId, :objectAppearanceId, :attributesId,
             :boxTopLeftX, :boxTopLeftY, :boxBottomRightX, :boxBottomRightY)
     )sql"));
-    insertEventQuery.bindValue(":timestampMs", packet.timestampUsec / kUsecPerMsec);
-    insertEventQuery.bindValue(":durationMs", packet.durationUsec / kUsecPerMsec);
+    insertEventQuery.bindValue(":timestampMs", packet.timestampUsec / kUsecInMs);
+    insertEventQuery.bindValue(":durationMs", packet.durationUsec / kUsecInMs);
     insertEventQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(packet.deviceId));
     insertEventQuery.bindValue(
         ":objectTypeId",
@@ -533,7 +527,7 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
         &sqlFilter);
 
     if (!filter.boundingBox.isNull())
-        addBoundingBoxToFilter(filter.boundingBox, &sqlFilter);
+        ObjectSearcher::addBoundingBoxToFilter(packRect(filter.boundingBox), &sqlFilter);
 
     if (!filter.freeText.isEmpty())
     {
@@ -548,35 +542,6 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
     }
 
     return sqlFilter;
-}
-
-void EventsStorage::addBoundingBoxToFilter(
-    const QRectF& boundingBox,
-    nx::sql::Filter* sqlFilter)
-{
-    auto topLeftXFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
-        "box_top_left_x",
-        ":boxTopLeftX",
-        QnSql::serialized_field(packCoordinate(boundingBox.bottomRight().x())));
-    sqlFilter->addCondition(std::move(topLeftXFilter));
-
-    auto bottomRightXFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
-        "box_bottom_right_x",
-        ":boxBottomRightX",
-        QnSql::serialized_field(packCoordinate(boundingBox.topLeft().x())));
-    sqlFilter->addCondition(std::move(bottomRightXFilter));
-
-    auto topLeftYFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
-        "box_top_left_y",
-        ":boxTopLeftY",
-        QnSql::serialized_field(packCoordinate(boundingBox.bottomRight().y())));
-    sqlFilter->addCondition(std::move(topLeftYFilter));
-
-    auto bottomRightYFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
-        "box_bottom_right_y",
-        ":boxBottomRightY",
-        QnSql::serialized_field(packCoordinate(boundingBox.topLeft().y())));
-    sqlFilter->addCondition(std::move(bottomRightYFilter));
 }
 
 void EventsStorage::loadObjects(
@@ -656,7 +621,7 @@ void EventsStorage::loadObject(
         selectEventsQuery->value("device_id").toLongLong());
     // NOTE: *_usec fields actually contain ms until the completion of META-225.
     objectPosition.timestampUsec =
-        selectEventsQuery->value("timestamp_usec_utc").toLongLong() * kUsecPerMsec;
+        selectEventsQuery->value("timestamp_usec_utc").toLongLong() * kUsecInMs;
     objectPosition.durationUsec = selectEventsQuery->value("duration_usec").toLongLong() * kUsecInMs;
 
     objectPosition.boundingBox.setTopLeft(QPointF(
@@ -726,8 +691,8 @@ void EventsStorage::queryTrackInfo(
         trackInfoQuery.exec();
         if (!trackInfoQuery.next())
             continue;
-        object.firstAppearanceTimeUsec = trackInfoQuery.value(0).toLongLong() * kUsecPerMsec;
-        object.lastAppearanceTimeUsec = trackInfoQuery.value(1).toLongLong() * kUsecPerMsec;
+        object.firstAppearanceTimeUsec = trackInfoQuery.value(0).toLongLong() * kUsecInMs;
+        object.lastAppearanceTimeUsec = trackInfoQuery.value(1).toLongLong() * kUsecInMs;
     }
 }
 
@@ -932,6 +897,17 @@ void EventsStorage::logDataSaveResult(sql::DBResult resultCode)
     {
         NX_VERBOSE(this, "Detection metadata packet has been saved successfully");
     }
+}
+
+QRect EventsStorage::packRect(const QRectF& rectf)
+{
+    QRect rect;
+    rect.setTopLeft(QPoint(
+        packCoordinate(rectf.topLeft().x()),
+        packCoordinate(rectf.topLeft().y())));
+    rect.setWidth(packCoordinate(rectf.width()));
+    rect.setHeight(packCoordinate(rectf.height()));
+    return rect;
 }
 
 int EventsStorage::packCoordinate(double value)

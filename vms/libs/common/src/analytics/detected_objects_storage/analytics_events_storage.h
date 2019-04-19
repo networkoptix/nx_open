@@ -212,7 +212,7 @@ private:
         nx::sql::Filter* sqlFilter);
 
     void addBoundingBoxToFilter(
-        const QRectF& boundingBox,
+        const QRect& boundingBox,
         nx::sql::Filter* sqlFilter);
 
     void loadObjects(
@@ -267,7 +267,9 @@ private:
 
     void logDataSaveResult(sql::DBResult resultCode);
 
+    static QRect packRect(const QRectF& rectf);
     static int packCoordinate(double);
+
     static double unpackCoordinate(int);
 };
 

@@ -11,6 +11,7 @@
 
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <analytics/detected_objects_storage/config.h>
+#include <analytics/detected_objects_storage/serializers.h>
 #include <test_support/analytics/storage/analytics_storage_types.h>
 
 namespace nx::analytics::storage::test {
@@ -520,10 +521,23 @@ private:
         if (!satisfiesCommonConditions(filter, data))
             return false;
 
-        if (!filter.boundingBox.isNull() && !filter.boundingBox.intersects(data.boundingBox))
-            return false;
+        if (filter.boundingBox.isNull())
+            return true;
 
-        return true;
+        if (kUseTrackAggregation)
+        {
+            const auto filterBoundingBox = translate(
+                filter.boundingBox,
+                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+            const auto dataBoundingBox = translate(
+                data.boundingBox,
+                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+            return filterBoundingBox.intersects(dataBoundingBox);
+        }
+        else
+        {
+            return filter.boundingBox.intersects(data.boundingBox);
+        }
     }
 
     bool satisfiesFilter(
@@ -977,8 +991,6 @@ TEST_F(AnalyticsDbLookup, full_text_search)
     whenLookupByRandomTextFoundInData();
     thenResultMatchesExpectations();
 }
-
-// TEST_F(AnalyticsDb, lookup_by_attribute_value)
 
 TEST_F(AnalyticsDbLookup, lookup_by_bounding_box)
 {

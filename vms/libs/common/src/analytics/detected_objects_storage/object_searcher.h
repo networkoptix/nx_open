@@ -38,6 +38,10 @@ public:
         const FieldNames& fieldNames,
         nx::sql::Filter* sqlFilter);
 
+    static void addBoundingBoxToFilter(
+        const QRect& boundingBox,
+        nx::sql::Filter* sqlFilter);
+
     static void addTimePeriodToFilter(
         const QnTimePeriod& timePeriod,
         nx::sql::Filter* sqlFilter,
