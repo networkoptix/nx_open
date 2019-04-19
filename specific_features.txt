@@ -6,3 +6,4 @@ set_camera_param_post=1
 primaryTimeServerDefinesInternetTimeSync=1
 restartMethodVersion=2
 layoutApiVersion=1
+merge_history=1
