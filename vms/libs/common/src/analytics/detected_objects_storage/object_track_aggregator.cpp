@@ -1,7 +1,5 @@
 #include "object_track_aggregator.h"
 
-#include <nx/utils/time.h>
-
 namespace nx::analytics::storage {
 
 ObjectTrackAggregator::ObjectTrackAggregator(
@@ -20,46 +18,88 @@ void ObjectTrackAggregator::add(
     std::chrono::milliseconds timestamp,
     const QRectF& box)
 {
-    const auto translatedBox = translate(box);
+    if (m_aggregations.empty() ||
+        std::chrono::abs(*m_aggregations.back().aggregationStartTimestamp - timestamp) >
+            m_aggregationPeriod)
+    {
+        m_aggregations.push_back(AggregationContext());
+    }
 
-    m_rectAggregator.add(translatedBox, objectId);
-
-    m_aggregationStartTimestamp = m_aggregationStartTimestamp
-        ? std::min(*m_aggregationStartTimestamp, timestamp)
-        : timestamp;
-
-    m_aggregationEndTimestamp = m_aggregationEndTimestamp
-        ? std::max(*m_aggregationEndTimestamp, timestamp)
-        : timestamp;
+    add(
+        &m_aggregations.back(),
+        objectId,
+        timestamp,
+        box);
 }
 
 std::vector<AggregatedTrackData> ObjectTrackAggregator::getAggregatedData(bool flush)
 {
-    if (!flush && length() < m_aggregationPeriod)
+    if (m_aggregations.empty())
         return {};
 
-    auto aggregated = m_rectAggregator.takeAggregatedData();
+    std::vector<AggregatedTrackData> totalAggregated;
+    while (m_aggregations.size() > 1)
+        takeOldestData(&totalAggregated);
+
+    if (flush || length(m_aggregations.front()) >= m_aggregationPeriod)
+        takeOldestData(&totalAggregated);
+
+    return totalAggregated;
+}
+
+void ObjectTrackAggregator::add(
+    AggregationContext* context,
+    const QnUuid& objectId,
+    std::chrono::milliseconds timestamp,
+    const QRectF& box)
+{
+    const auto translatedBox = translate(box);
+
+    context->rectAggregator.add(translatedBox, objectId);
+
+    context->aggregationStartTimestamp = context->aggregationStartTimestamp
+        ? std::min(*context->aggregationStartTimestamp, timestamp)
+        : timestamp;
+
+    context->aggregationEndTimestamp = context->aggregationEndTimestamp
+        ? std::max(*context->aggregationEndTimestamp, timestamp)
+        : timestamp;
+}
+
+std::vector<AggregatedTrackData> ObjectTrackAggregator::getAggregatedData(
+    AggregationContext* context)
+{
+    auto aggregated = context->rectAggregator.takeAggregatedData();
     std::vector<AggregatedTrackData> result;
     result.reserve(aggregated.size());
-    for (auto& rect: aggregated)
+    for (auto& rect : aggregated)
     {
         result.push_back(AggregatedTrackData());
         result.back().boundingBox = rect.rect;
         result.back().objectIds = std::exchange(rect.values, {});
         // TODO: #ak It would be better to use precise timestamp for this region.
-        result.back().timestamp = *m_aggregationStartTimestamp;
+        result.back().timestamp = *context->aggregationStartTimestamp;
     }
 
-    m_aggregationStartTimestamp = std::nullopt;
-    m_aggregationEndTimestamp = std::nullopt;
+    context->aggregationStartTimestamp = std::nullopt;
+    context->aggregationEndTimestamp = std::nullopt;
 
     return result;
 }
 
-std::chrono::milliseconds ObjectTrackAggregator::length() const
+void ObjectTrackAggregator::takeOldestData(
+    std::vector<AggregatedTrackData>* totalAggregated)
 {
-    return m_aggregationStartTimestamp
-        ? *m_aggregationEndTimestamp - *m_aggregationStartTimestamp
+    auto aggregated = getAggregatedData(&m_aggregations.front());
+    std::move(aggregated.begin(), aggregated.end(), std::back_inserter(*totalAggregated));
+    m_aggregations.pop_front();
+}
+
+std::chrono::milliseconds ObjectTrackAggregator::length(
+    const AggregationContext& context) const
+{
+    return context.aggregationStartTimestamp
+        ? *context.aggregationEndTimestamp - *context.aggregationStartTimestamp
         : std::chrono::milliseconds::zero();
 }
 
