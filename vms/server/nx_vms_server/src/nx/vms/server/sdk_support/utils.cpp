@@ -25,6 +25,7 @@
 namespace nx::vms::server::sdk_support {
 
 using namespace nx::sdk;
+using namespace nx::sdk::analytics;
 
 namespace {
 
@@ -40,9 +41,8 @@ nx::utils::log::Tag kLogTag(QString("SdkSupportUtils"));
 } // namespace
 
 nx::vms::api::analytics::PixelFormat fromSdkPixelFormat(
-    nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat sdkPixelFormat)
+    IUncompressedVideoFrame::PixelFormat sdkPixelFormat)
 {
-    using namespace nx::sdk::analytics;
     using namespace nx::vms::api::analytics;
 
     switch (sdkPixelFormat)
@@ -67,10 +67,9 @@ nx::vms::api::analytics::PixelFormat fromSdkPixelFormat(
     }
 }
 
-std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> toSdkPixelFormat(
+std::optional<IUncompressedVideoFrame::PixelFormat> toSdkPixelFormat(
     nx::vms::api::analytics::PixelFormat pixelFormat)
 {
-    using namespace nx::sdk::analytics;
     using namespace nx::vms::api::analytics;
 
     switch (pixelFormat)
@@ -92,6 +91,43 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> toSdkPix
         default:
             NX_ASSERT(false, lm("Wrong pixel format").args((int) pixelFormat));
             return std::nullopt;
+    }
+}
+
+AVPixelFormat sdkToAvPixelFormat(IUncompressedVideoFrame::PixelFormat pixelFormat)
+{
+    using PixelFormat = IUncompressedVideoFrame::PixelFormat;
+    switch (pixelFormat)
+    {
+        case PixelFormat::yuv420: return AV_PIX_FMT_YUV420P;
+        case PixelFormat::argb: return AV_PIX_FMT_ARGB;
+        case PixelFormat::abgr: return AV_PIX_FMT_ABGR;
+        case PixelFormat::rgba: return AV_PIX_FMT_RGBA;
+        case PixelFormat::bgra: return AV_PIX_FMT_BGRA;
+        case PixelFormat::rgb: return AV_PIX_FMT_RGB24;
+        case PixelFormat::bgr: return AV_PIX_FMT_BGR24;
+
+        default:
+            NX_ASSERT(false, lm("Unsupported PixelFormat value: %1").arg(
+                pixelFormatToStdString(pixelFormat)));
+            return AV_PIX_FMT_NONE;
+    }
+}
+
+std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> avPixelFormatToSdk(
+    AVPixelFormat avPixelFormat)
+{
+    using PixelFormat = IUncompressedVideoFrame::PixelFormat;
+    switch (avPixelFormat)
+    {
+        case AV_PIX_FMT_YUV420P: return PixelFormat::yuv420;
+        case AV_PIX_FMT_ARGB: return PixelFormat::argb;
+        case AV_PIX_FMT_ABGR: return PixelFormat::abgr;
+        case AV_PIX_FMT_RGBA: return PixelFormat::rgba;
+        case AV_PIX_FMT_BGRA: return PixelFormat::bgra;
+        case AV_PIX_FMT_RGB24: return PixelFormat::rgb;
+        case AV_PIX_FMT_BGR24: return PixelFormat::bgr;
+        default: return std::nullopt;
     }
 }
 
@@ -200,19 +236,19 @@ QVariantMap fromIStringMap(const IStringMap* map)
     return variantMap;
 }
 
-std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
+std::optional<IUncompressedVideoFrame::PixelFormat>
     pixelFormatFromEngineManifest(
         const nx::vms::api::analytics::EngineManifest& manifest,
         const QString& engineLogLabel)
 {
-    using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;
+    using PixelFormat = IUncompressedVideoFrame::PixelFormat;
     using Capability = nx::vms::api::analytics::EngineManifest::Capability;
 
     int uncompressedFrameCapabilityCount = 0; //< To check there is 0 or 1 of such capabilities.
     PixelFormat pixelFormat = PixelFormat::yuv420;
 
     // To assert that all pixel formats are tested.
-    auto pixelFormats = nx::sdk::analytics::getAllPixelFormats();
+    auto pixelFormats = getAllPixelFormats();
 
     auto checkCapability =
         [&](Capability value, PixelFormat correspondingPixelFormat)
@@ -272,18 +308,18 @@ nx::vms::api::EventLevel fromSdkPluginEventLevel(IPluginEvent::Level level)
     }
 }
 
-nx::sdk::Ptr<nx::sdk::analytics::ITimestampedObjectMetadata> createTimestampedObjectMetadata(
+nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
     const nx::analytics::storage::DetectedObject& detectedObject,
     const nx::analytics::storage::ObjectPosition& objectPosition)
 {
-    auto objectMetadata = nx::sdk::makePtr<nx::sdk::analytics::TimestampedObjectMetadata>();
+    auto objectMetadata = nx::sdk::makePtr<TimestampedObjectMetadata>();
     objectMetadata->setId(
         nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(detectedObject.objectAppearanceId));
     objectMetadata->setTypeId(detectedObject.objectTypeId.toStdString());
     objectMetadata->setTimestampUs(objectPosition.timestampUsec);
     const auto& boundingBox = objectPosition.boundingBox;
     objectMetadata->setBoundingBox(
-        nx::sdk::analytics::IObjectMetadata::Rect(
+        IObjectMetadata::Rect(
             boundingBox.x(),
             boundingBox.y(),
             boundingBox.width(),
@@ -291,7 +327,7 @@ nx::sdk::Ptr<nx::sdk::analytics::ITimestampedObjectMetadata> createTimestampedOb
 
     for (const auto& attribute: detectedObject.attributes)
     {
-        nx::sdk::analytics::Attribute sdkAttribute(
+        Attribute sdkAttribute(
             // Information about attribute types isn't stored in the database.
             nx::sdk::IAttribute::Type::undefined,
             attribute.name.toStdString(),
@@ -303,10 +339,10 @@ nx::sdk::Ptr<nx::sdk::analytics::ITimestampedObjectMetadata> createTimestampedOb
     return objectMetadata;
 }
 
-nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::ITimestampedObjectMetadata>> createObjectTrack(
+nx::sdk::Ptr<nx::sdk::IList<ITimestampedObjectMetadata>> createObjectTrack(
     const nx::analytics::storage::DetectedObject& detectedObject)
 {
-    auto track = nx::sdk::makePtr<nx::sdk::List<nx::sdk::analytics::ITimestampedObjectMetadata>>();
+    auto track = nx::sdk::makePtr<nx::sdk::List<ITimestampedObjectMetadata>>();
     for (const auto& objectPosition : detectedObject.track)
     {
         if (auto objectMetadataPtr =
@@ -319,7 +355,7 @@ nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::ITimestampedObjectMetadata>> cre
     return track;
 }
 
-nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> createUncompressedVideoFrame(
+nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(
     const CLVideoDecoderOutputPtr& frame,
     nx::vms::api::analytics::PixelFormat pixelFormat)
 {
@@ -329,19 +365,17 @@ nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> createUncompressedVide
         frame,
         &compressedFrameWarningIssued);
 
-    const auto sdkPixelFormat = toSdkPixelFormat(pixelFormat);
+    const std::optional<IUncompressedVideoFrame::PixelFormat> sdkPixelFormat =
+        toSdkPixelFormat(pixelFormat);
     if (!NX_ASSERT(sdkPixelFormat, lm("Wrong pixel format %1").args((int) pixelFormat)))
         return nullptr;
 
-    nx::sdk::Ptr<nx::sdk::analytics::IDataPacket> dataPacket(
-        frameConverter.getDataPacket(sdkPixelFormat));
+    const auto dataPacket = frameConverter.getDataPacket(sdkPixelFormat);
 
     if (!dataPacket)
         return nullptr;
 
-    // To avoid destruction after FrameConverter destruction.
-    dataPacket->addRef();
-    return nx::sdk::queryInterfacePtr<nx::sdk::analytics::IUncompressedVideoFrame>(dataPacket);
+    return nx::sdk::queryInterfacePtr<IUncompressedVideoFrame>(dataPacket);
 }
 
 } // namespace nx::vms::server::sdk_support

@@ -2,11 +2,14 @@
 
 #include <array>
 
+#include <nx/kit/utils.h>
 #include <nx/kit/debug.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
+
+// TODO: Consider changing PixelFormat values to power of 2; change std::array to std::map.
 
 using PixelFormat = IUncompressedVideoFrame::PixelFormat;
 using PixelFormatDescriptors = std::array<PixelFormatDescriptor, (int) PixelFormat::count>;
@@ -38,15 +41,24 @@ static PixelFormatDescriptors initPixelFormatDescriptors()
 
 static const PixelFormatDescriptors pixelFormatDescriptors = initPixelFormatDescriptors();
 
-const PixelFormatDescriptor* getPixelFormatDescriptor(PixelFormat pixelFormat)
+static const PixelFormatDescriptor* silentlyGetPixelFormatDescriptor(PixelFormat pixelFormat)
 {
     if ((int) pixelFormat < 0 || (int) pixelFormat >= (int) pixelFormatDescriptors.size())
+        return nullptr;
+    return &pixelFormatDescriptors[(int) pixelFormat];
+}
+
+const PixelFormatDescriptor* getPixelFormatDescriptor(PixelFormat pixelFormat)
+{
+    const auto pixelFormatDescriptor = silentlyGetPixelFormatDescriptor(pixelFormat);
+
+    if (!NX_KIT_ASSERT(pixelFormatDescriptor, "PixelFormatDescriptor is not available for "
+        + pixelFormatToStdString(pixelFormat)))
     {
-        NX_PRINT << "INTERNAL ERROR: PixelFormat value " << (int) pixelFormat << " not registered";
         return nullptr;
     }
 
-    return &pixelFormatDescriptors[(int) pixelFormat];
+    return pixelFormatDescriptor;
 }
 
 std::vector<PixelFormat> getAllPixelFormats()
@@ -73,13 +85,10 @@ bool pixelFormatFromStdString(const std::string& s, PixelFormat* outPixelFormat)
 
 std::string pixelFormatToStdString(PixelFormat pixelFormat)
 {
-    if ((int) pixelFormat < 0 || (int) pixelFormat >= (int) pixelFormatDescriptors.size())
-    {
-        NX_PRINT << "INTERNAL ERROR: PixelFormat value " << (int) pixelFormat << " not registered";
-        return "";
-    }
-
-    return pixelFormatDescriptors[(int) pixelFormat].name;
+    if (const auto pixelFormatDescriptor = silentlyGetPixelFormatDescriptor(pixelFormat))
+        return pixelFormatDescriptor->name;
+    else
+        return nx::kit::utils::format("PixelFormat(%d)", (int) pixelFormat);
 }
 
 std::string allPixelFormatsToStdString(const std::string& separator)

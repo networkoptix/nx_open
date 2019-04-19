@@ -75,7 +75,6 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     m_audioLayout.reset( new QnResourceCustomAudioLayout() );
 
     m_camManager.getCameraCapabilities( &m_cameraCapabilities );
-
     Qn::directConnect(
         res.data(), &QnResource::propertyChanged,
         this,
@@ -83,6 +82,12 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
         {
             if (propertyName == ResourcePropertyKey::kStreamUrls)
             {
+                {
+                    QnMutexLocker lock(&m_streamReaderMutex);
+                    if (m_thirdPartyRes->sourceUrl(getRole()) == m_lastSourceUrl)
+                        return;
+                }
+
                 NX_VERBOSE(this, "Reinitializing camera driver. 'hasDualStreaming' may be changed.");
                 m_resource->setStatus(Qn::Offline);
                 m_isMediaUrlValid.clear();
@@ -302,10 +307,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
         auto error = m_mediaEncoder2->getMediaUrl(mediaUrlBuf);
 
         if (error == nxcip::NX_NO_ERROR)
-        {
-            QString mediaUrlStr(mediaUrlBuf);
-            m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
-        }
+            updateSourceUrl(QString(mediaUrlBuf));
 
         return CameraDiagnostics::NoErrorResult();
     }
@@ -322,7 +324,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
             return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
         }
 
-        m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
+        updateSourceUrl(mediaUrlStr);
         NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3").arg(mediaUrlStr).arg(m_resource->getUrl()).arg(getRole()));
 
         //checking url type and creating corresponding data provider
@@ -339,7 +341,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
             rtspStreamReader->setUserAgent(nx::utils::AppInfo::productName());
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
-            m_thirdPartyRes->updateSourceUrl(rtspStreamReader->getCurrentStreamUrl(), getRole());
+            updateSourceUrl(rtspStreamReader->getCurrentStreamUrl().toString());
             QnMutexLocker lock(&m_streamReaderMutex);
             m_builtinStreamReader.reset( rtspStreamReader );
         }
@@ -568,6 +570,15 @@ nx::utils::TimeHelper* ThirdPartyStreamReader::timeHelper(const QnAbstractMediaD
                 []() { return qnSyncTime->currentTimePoint(); }));
     }
     return helperList->at(data->channelNumber).get();
+}
+
+void ThirdPartyStreamReader::updateSourceUrl(const QString& urlString)
+{
+    {
+        QnMutexLocker lock(&m_streamReaderMutex);
+        m_lastSourceUrl = urlString;
+    }
+    m_thirdPartyRes->updateSourceUrl(urlString, getRole());
 }
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const

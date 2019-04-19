@@ -167,49 +167,6 @@ TEST(Ptr, assign)
     ASSERT_TRUE(Data::s_destructorCalled);
 }
 
-TEST(Ptr, dynamicCast)
-{
-    Data::s_destructorCalled = false;
-    Base::s_destructorCalled = false;
-    {
-        const auto data = makePtr<Data>(42);
-        ASSERT_EQ(data->number(), 42);
-        ASSERT_EQ(1, data->refCount());
-
-        const auto base = makePtr<Base>();
-        ASSERT_EQ(1, base->refCount());
-
-        const Ptr<IBase> dataAsIBase(data);
-        ASSERT_EQ(2, data->refCount());
-
-        {
-            const Ptr<IBase> cast = dataAsIBase.dynamicCast<IBase>(); //< Cast to itself.
-            ASSERT_TRUE(cast);
-            assertEq(dataAsIBase, cast, /*expectedRefCount*/ 3);
-        }
-        ASSERT_EQ(2, data->refCount());
-
-        {
-            const Ptr<IRefCountable> cast = data.dynamicCast<IBase>(); //< Cast to base.
-            ASSERT_TRUE(cast);
-            ASSERT_EQ(3, data->refCount());
-        }
-        ASSERT_EQ(2, data->refCount());
-
-        {
-            const Ptr<IData> cast = dataAsIBase.dynamicCast<IData>(); //< Cast to derived.
-            ASSERT_TRUE(cast);
-            ASSERT_EQ(3, data->refCount());
-        }
-        ASSERT_EQ(2, data->refCount());
-
-        ASSERT_FALSE(Data::s_destructorCalled);
-        ASSERT_FALSE(Base::s_destructorCalled);
-    }
-    ASSERT_TRUE(Data::s_destructorCalled);
-    ASSERT_TRUE(Base::s_destructorCalled);
-}
-
 TEST(Ptr, releasePtrAndReset)
 {
     auto data1 = makePtr<Data>(1);
@@ -231,12 +188,17 @@ TEST(Ptr, queryInterfacePtrNonConst)
 {
     Data::s_destructorCalled = false;
     {
-        auto dataPtr = makePtr<Data>(42);
+        Data* const nullDataPtr = nullptr;
+        ASSERT_FALSE(queryInterfacePtr<IData>(nullDataPtr));
 
-        Ptr<IData> iDataPtrFromData{queryInterfacePtr<IData>(dataPtr.get())};
+        // NOTE: `auto` is not used to ensure proper return types of the tested functions.
+
+        const Ptr<Data> dataPtr = makePtr<Data>(42);
+
+        const Ptr<IData> iDataPtrFromData{queryInterfacePtr<IData>(dataPtr.get())};
         ASSERT_EQ(dataPtr, iDataPtrFromData);
 
-        Ptr<IData> iDataPtrFromIData{queryInterfacePtr<IData>(dataPtr)};
+        const Ptr<IData> iDataPtrFromIData{queryInterfacePtr<IData>(dataPtr)};
         ASSERT_EQ(dataPtr, iDataPtrFromIData);
     }
     ASSERT_TRUE(Data::s_destructorCalled);
@@ -246,12 +208,17 @@ TEST(Ptr, queryInterfacePtrConst)
 {
     Data::s_destructorCalled = false;
     {
-        const auto dataPtr = makePtr<Data>(42);
+        const Data* const nullDataPtr = nullptr;
+        ASSERT_FALSE(queryInterfacePtr<const IData>(nullDataPtr));
 
-        const Ptr<IData> iDataPtrFromData{queryInterfacePtr<IData>(dataPtr.get())};
+        // NOTE: `auto` is not used to ensure proper return types of the tested functions.
+
+        const Ptr<const Data> dataPtr = makePtr<const Data>(42);
+
+        const Ptr<const IData> iDataPtrFromData{queryInterfacePtr<const IData>(dataPtr.get())};
         ASSERT_EQ(dataPtr, iDataPtrFromData);
 
-        const Ptr<IData> iDataPtrFromIData{queryInterfacePtr<IData>(dataPtr)};
+        const Ptr<const IData> iDataPtrFromIData{queryInterfacePtr<const IData>(dataPtr)};
         ASSERT_EQ(dataPtr, iDataPtrFromIData);
     }
     ASSERT_TRUE(Data::s_destructorCalled);
