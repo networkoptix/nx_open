@@ -16,7 +16,7 @@ class TrafficRelay:
 protected:
     void givenMultipleTrafficRelayUrls()
     {
-        // Base type constructor adds a url, so we only need to add one.
+        // Base type constructor adds a url, so only one more is needed.
         addTrafficRelayUrl("http://traffic-relay-test.com");
     }
 };
