@@ -1,9 +1,7 @@
 #include "non_modal_dialog_constructor.h"
 
 #include <QtCore/QEvent>
-
 #include <QtGui/QWindow>
-
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QWidget>
@@ -25,6 +23,8 @@ void QnShowDialogHelper::show(QWidget* dialog, const QRect &targetGeometry) {
         if (!targetPoint.isNull())
             dialog->move(targetPoint);
     }
+
+    dialog->windowHandle()->requestUpdate();
 }
 
 QPoint QnShowDialogHelper::calculatePosition(QWidget* dialog) {
