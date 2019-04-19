@@ -55,7 +55,7 @@ def determine_package_versions(
     if platform == "windows":
         v["ffmpeg"] = "3.1.9"
 
-    if platform == "linux" and box == "none" and target != "linux-arm64":
+    if platform == "linux" and box == "none" and target not in ("linux_arm32", "linux-arm64"):
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial-1"
@@ -71,21 +71,19 @@ def determine_package_versions(
     if platform == "ios":
         v["libjpeg-turbo"] = "1.4.1"
 
-    if box in ("bpi", "bananapi"):
+    if box == "bpi":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "wheezy"
-
-    if box in ("bpi", "bananapi"):
         # Bpi original version is build with vdpau support which is no longer needed since lite
         # client is disasbled for bpi.
         v["ffmpeg"] = "3.1.1-bananapi"
 
-    if box == "rpi":
+    if target == "linux_arm32":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "jessie"
-        v["ffmpeg"] = "3.1.9"
+        v["ffmpeg-arm32"] = v["ffmpeg-rpi"] = "3.1.9"
 
     if box == "edge1":
         v["sysroot"] = "jessie"
@@ -132,12 +130,16 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
 
     sync("any/detection_plugin_interface")
 
-    if box in ("rpi", "bpi", "bananapi", "edge1") or (platform, arch) == ("linux", "arm64"):
+    if box in ("bpi", "edge1") or (platform == "linux" and arch in ("arm32", "arm64")):
         sync("linux-%s/openssl" % arch)
     else:
         sync("openssl")
 
-    sync("ffmpeg")
+    if (platform, arch) == ("linux", "arm32"):
+        sync("ffmpeg-arm32")
+        sync("ffmpeg-rpi")
+    else:
+        sync("ffmpeg")
 
     if platform == "linux":
         sync("sysroot", path_variable="sysroot_directory")
@@ -153,7 +155,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
 
-    if platform == "linux" and (box == "none" or arch == "arm64"):
+    if platform == "linux" and (box == "none" or arch in ("arm32", "arm64")):
         sync("cifs-utils")
 
     if platform == "windows":
@@ -217,7 +219,11 @@ def parse_target(target):
     arch = None
     box = "none"
 
-    if len(components) > 1:
+    if target == "linux_arm32":
+        platform = "linux"
+        arch = "arm32"
+        box = "none"
+    elif len(components) > 1:
         platform, arch = components
 
         if platform == "android":
@@ -291,10 +297,7 @@ def main():
     options = parse_options(args.options)
 
     syncher = RdepSyncher(args.packages_dir)
-    if args.target == "bananapi":
-        syncher.rdep_target = "bpi"
-    else:
-        syncher.rdep_target = args.target
+    syncher.rdep_target = args.target
     syncher.versions = determine_package_versions(
         args.target,
         platform,

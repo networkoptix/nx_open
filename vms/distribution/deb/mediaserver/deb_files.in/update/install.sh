@@ -65,7 +65,8 @@ update()
     fi
     installDeb "$DISTRIB"
 
-    echo "{\n    \"hwPlatform\": \"$(hw_platform)\"\n}" >"/opt/$COMPANY_NAME/installation_info.json"
+    echo -e "{\n    \"hwPlatform\": \"$(hw_platform)\"\n}" \
+        >"/opt/$COMPANY_NAME/installation_info.json"
 
     if is_rpi
     then
