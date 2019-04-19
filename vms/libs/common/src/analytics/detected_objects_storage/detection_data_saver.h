@@ -21,7 +21,15 @@ public:
         ObjectTypeDao* objectTypeDao,
         ObjectCache* objectCache);
 
-    void load(ObjectTrackAggregator* trackAggregator);
+    DetectionDataSaver(const DetectionDataSaver&) = delete;
+    DetectionDataSaver& operator=(const DetectionDataSaver&) = delete;
+    DetectionDataSaver(DetectionDataSaver&&) = default;
+    DetectionDataSaver& operator=(DetectionDataSaver&&) = default;
+
+    /**
+     * @param flush If true then all available data is loaded, the aggregation period is ignored.
+     */
+    void load(ObjectTrackAggregator* trackAggregator, bool flush);
 
     bool empty() const;
 
@@ -44,9 +52,15 @@ private:
     void resolveObjectIds();
 
     void insertObjects(nx::sql::QueryContext* queryContext);
+
+    std::pair<qint64, qint64> findMinMaxTimestamp(
+        const std::vector<ObjectPosition>& track);
+
     void updateObjects(nx::sql::QueryContext* queryContext);
+
     void saveObjectSearchData(nx::sql::QueryContext* queryContext);
-    std::vector<long long> toDbIds(const std::vector<QnUuid>& objectIds);
+
+    std::vector<long long> toDbIds(const std::set<QnUuid>& objectIds);
 };
 
 } // namespace nx::analytics::storage

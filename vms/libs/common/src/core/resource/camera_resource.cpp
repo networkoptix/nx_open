@@ -62,14 +62,19 @@ std::map<QnUuid, std::set<QString>> filterByActiveEngines(
     return entitiesByEngine;
 }
 
-static const QString kUserEnabledAnalyticsEnginesProperty("userEnabledAnalyticsEngines");
-static const QString kDeviceAgentsSettingsValuesProperty("deviceAgentsSettingsValuesProperty");
-static const QString kDeviceAgentManifestsProperty("deviceAgentManifests");
-
 } // namespace
 
 const QString QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty(
     "compatibleAnalyticsEngines");
+
+const QString QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty(
+    "userEnabledAnalyticsEngines");
+
+const QString QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty(
+    "deviceAgentsSettingsValuesProperty");
+
+const QString QnVirtualCameraResource::kDeviceAgentManifestsProperty(
+    "deviceAgentManifests");
 
 QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),

@@ -48,20 +48,7 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
         return;
     }
 
-    m_eventsStorage->save(
-        std::move(detectionMetadataPacket),
-        [this](ResultCode resultCode)
-        {
-            if (resultCode != ResultCode::ok)
-            {
-                NX_DEBUG(this, lm("Error saving detection metadata packet. %1")
-                    .args(QnLexical::serialized(resultCode)));
-            }
-            else
-            {
-                NX_VERBOSE(this, lm("Detection metadata packet has been saved successfully"));
-            }
-        });
+    m_eventsStorage->save(std::move(detectionMetadataPacket));
 }
 
 } // namespace storage

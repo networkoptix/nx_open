@@ -47,7 +47,8 @@ CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(const CLVideoDecoderOutpu
     {
         m_size = frame->size();
         QRect rect(cwiseMul(m_rectF, frame->size()).toRect());
-        m_rect = QnCodecTranscoder::roundRect(rect);
+        const auto frameRect = QRect(0, 0, frame->width, frame->height);
+        m_rect = QnCodecTranscoder::roundRect(rect).intersected(frameRect);
     }
 
     const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);

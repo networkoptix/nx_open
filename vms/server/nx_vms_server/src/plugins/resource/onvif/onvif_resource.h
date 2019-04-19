@@ -720,7 +720,9 @@ protected:
         const QString& text = QString());
 
     QString makeFailMessage(const QString& text) const;
-
+    void updateTimer(
+        nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
+        nx::utils::MoveOnlyFunc<void(nx::utils::TimerId)> function);
 private:
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;
@@ -729,7 +731,7 @@ private:
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
     mutable QnConstResourceVideoLayoutPtr m_videoLayout;
     mutable QnOnvifServiceUrls m_serviceUrls;
-
+    nx::utils::AsyncOperationGuard m_asyncConnectGuard;
 protected:
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     nx::vms::server::resource::OnvifMulticastParametersProvider m_primaryMulticastParametersProvider;

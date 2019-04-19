@@ -168,11 +168,11 @@ GROUP BY device_id, timestamp_usec_utc/60000;
 static constexpr char kSplitDataToObjectAndSearch[] =
 R"sql(
 
-DROP INDEX idx_event_timestamp;
-DROP INDEX idx_event_object_id;
-DROP INDEX idx_event_device_guid;
-DROP INDEX idx_event_for_streaming_cursor;
-DROP INDEX event_attributes_id;
+DROP INDEX IF EXISTS idx_event_timestamp;
+DROP INDEX IF EXISTS idx_event_object_id;
+DROP INDEX IF EXISTS idx_event_device_id;
+DROP INDEX IF EXISTS idx_event_for_streaming_cursor;
+DROP INDEX IF EXISTS event_attributes_id;
 DROP TABLE event;
 
 CREATE TABLE object(
@@ -180,10 +180,16 @@ CREATE TABLE object(
     device_id                   INTEGER,
     object_type_id              INTEGER,
     guid                        BLOB,
-    track_start_timestamp_ms    INTEGER,
+    track_start_ms              INTEGER,
+    track_end_ms                INTEGER,
     track_detail                BLOB,
     attributes_id               INTEGER
 );
+
+CREATE INDEX idx_object_device_id ON object(device_id);
+CREATE INDEX idx_object_object_type_id ON object(object_type_id);
+CREATE INDEX idx_object_guid ON object(guid);
+CREATE INDEX idx_track_time_ms ON object(track_start_ms, track_end_ms);
 
 CREATE TABLE object_search(
     id                          INTEGER PRIMARY KEY AUTOINCREMENT,
