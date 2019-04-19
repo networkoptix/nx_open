@@ -24,6 +24,8 @@ void QnShowDialogHelper::show(QWidget* dialog, const QRect &targetGeometry) {
             dialog->move(targetPoint);
     }
 
+    // If dialog's parent changed screens while the dialog was hidden,
+    // the dialog appears not painted when shown next time. This line is a workaround.
     dialog->windowHandle()->requestUpdate();
 }
 
