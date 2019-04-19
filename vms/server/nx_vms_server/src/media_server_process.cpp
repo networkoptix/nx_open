@@ -285,9 +285,7 @@
 #include <nx/utils/file_system.h>
 #include <nx/network/url/url_builder.h>
 
-#if defined(__arm__)
-    #include "nx/vms/server/system/nx1/info.h"
-#endif
+#include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
 
 using namespace nx::vms::server;
@@ -3014,7 +3012,7 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
     if (nx::utils::AppInfo::isEdgeServer())
         serverFlags |= nx::vms::api::SF_Edge;
 
-    if (QnAppInfo::isBpi())
+    if (QnAppInfo::isNx1())
     {
         serverFlags |= nx::vms::api::SF_IfListCtrl | nx::vms::api::SF_timeCtrl;
         QnStartLiteClientRestHandler handler(serverModule());
@@ -3806,13 +3804,11 @@ void MediaServerProcess::setUpServerRuntimeData()
     runtimeData.customization = QnAppInfo::customizationName();
     runtimeData.platform = QnAppInfo::applicationPlatform();
 
-#ifdef __arm__
-    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
+    if (QnAppInfo::isNx1())
     {
         runtimeData.nx1mac = Nx1::getMac();
         runtimeData.nx1serial = Nx1::getSerial();
     }
-#endif
 
     runtimeData.hardwareIds = m_hardwareIdHlist;
     commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo

@@ -16,6 +16,12 @@ static const QString kNxMediaServerId = lit("Media Server");
 
 } // namespace
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, HwPlatform,
+    (nx::vms::api::HwPlatform::unknown, "unknown")
+    (nx::vms::api::HwPlatform::raspberryPi, "raspberryPi")
+    (nx::vms::api::HwPlatform::bananaPi, "bananaPi")
+)
+
 namespace nx {
 namespace vms {
 namespace api {

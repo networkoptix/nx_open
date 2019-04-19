@@ -1,11 +1,10 @@
-
 #include "camera_manager.h"
 
 #include <cstring>
 
 #include <nx/utils/url.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/app_info.h>
+#include <nx/vms/utils/installation_info.h>
 
 #include "discovery_manager.h"
 #include "ffmpeg/utils.h"
@@ -25,8 +24,12 @@ CameraManager::CameraManager(const std::shared_ptr<Camera> camera):
             nxcip::BaseCameraManager::cameraTimeCapability)
 {
     m_pluginRef->addRef();
-    if (!nx::utils::AppInfo::isRaspberryPi() && m_camera->hasAudio())
+    if (nx::vms::utils::installationInfo().hwPlatform !=
+        nx::vms::api::HwPlatform::raspberryPi
+            && m_camera->hasAudio())
+    {
         m_capabilities |= nxcip::BaseCameraManager::audioCapability;
+    }
 }
 
 void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )

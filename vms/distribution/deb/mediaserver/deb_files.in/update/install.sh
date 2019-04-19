@@ -3,8 +3,39 @@
 DISTRIB="@server_distribution_name@.deb"
 COMPANY_NAME="@deb.customization.company.name@"
 WITH_ROOT_TOOL="@withRootTool@"
+TARGET_DEVICE="@targetDevice@"
 
 RELEASE_YEAR=$(lsb_release -a |grep "Release:" |awk {'print $2'} |awk -F  "." '/1/ {print $1}')
+
+is_rpi() {
+    if [[ $TARGET_DEVICE == "linux_arm32" ]]
+    then
+        grep '^Hardware.*:.*BCM2835[[:space:]]*$' /proc/cpuinfo &>/dev/null
+    else
+        false
+    fi
+}
+
+is_bananapi() {
+    if [[ $TARGET_DEVICE == "linux_arm32" ]]
+    then
+        grep '^Hardware.*:.*sun8i[[:space:]]*$' /proc/cpuinfo &>/dev/null
+    else
+        false
+    fi
+}
+
+hw_platform() {
+    if is_rpi
+    then
+        echo "raspberryPi"
+    elif is_bananapi
+    then
+        echo "bananaPi"
+    else
+        echo "unknown"
+    fi
+}
 
 installDeb()
 {
@@ -33,11 +64,20 @@ update()
         [ -d "ubuntu${RELEASE_YEAR}" ] && installDeb ubuntu${RELEASE_YEAR}/cifs-utils/*.deb
     fi
     installDeb "$DISTRIB"
+
+    echo "{\n    \"hwPlatform\": \"$(hw_platform)\"\n}" >"/opt/$COMPANY_NAME/installation_info.json"
+
+    if is_rpi
+    then
+        bash nx_rpi_cam_setup.sh
+        reboot
+        exit 0
+    fi
 }
 
 if [ "$1" != "" ]
 then
-    update >> $1 2>&1
+    update >>$1 2>&1
 else
     update 2>&1
 fi
