@@ -44,6 +44,7 @@ namespace {
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(const DecoderConfig& config, AVCodecID codecId)
     :
     QnVideoTranscoder(codecId),
+    m_config(config),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),
     m_firstEncodedPts(AV_NOPTS_VALUE),

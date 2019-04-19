@@ -1,6 +1,9 @@
 #include "onvif_audio_transmitter.h"
 #include <rtsp/rtsp_encoder.h>
 #include <nx/streaming/rtp_stream_parser.h>
+#include <common/static_common_module.h>
+#include <core/resource_management/resource_data_pool.h>
+
 
 namespace nx {
 namespace mediaserver_core {
@@ -54,7 +57,12 @@ void OnvifAudioTransmitter::prepare()
     QnRtspClient::Config config{/*shouldGuessAuthDigest*/ false, /*backChannelAudioOnly*/ true};
     m_rtspConnection.reset(new QnRtspClient(config));
     m_rtspConnection->setAuth(m_resource->getAuth(), nx_http::header::AuthScheme::digest);
-    m_rtspConnection->setAdditionAttribute("Require", "www.onvif.org/ver20/backchannel");
+
+    // Some DW cameras don't support 2-way audio in case of they receive "Require" attribute.
+    auto resourceData = qnStaticCommon->dataPool()->data(m_resource->getVendor(), m_resource->getModel());
+    if (!resourceData.value<bool>("dontSendBackChannelRtspAttribute"))
+        m_rtspConnection->setAdditionAttribute("Require", "www.onvif.org/ver20/backchannel");
+
     m_rtspConnection->setTransport(nx::vms::api::RtpTransportType::tcp);
 
     const QString url = m_resource->sourceUrl(Qn::CR_LiveVideo);

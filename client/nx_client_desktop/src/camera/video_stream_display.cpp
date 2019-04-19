@@ -467,8 +467,10 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         const QnAbstractRenderer* renderer = m_renderList.isEmpty() ? 0 : *m_renderList.constBegin();
         const QnResourceWidgetRenderer* widgetRenderer = dynamic_cast<const QnResourceWidgetRenderer*>(renderer);
 
+        DecoderConfig config = DecoderConfig::fromMediaResource(m_resource);
+        config.allowMtDecoding = qnSettings->allowMtDecoding();
         dec = QnVideoDecoderFactory::createDecoder(
-                DecoderConfig::fromMediaResource(m_resource),
+                config,
                 data,
                 enableFrameQueue,
                 widgetRenderer ? widgetRenderer->glContext() : NULL);

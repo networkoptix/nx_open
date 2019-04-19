@@ -26,9 +26,12 @@ bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
 
     using namespace nx::mediaserver::plugins::hikvision;
     auto hikvisionEvent = AttributesParser::parseEventXml(buffer, m_manifest);
-    if (!hikvisionEvent)
-        return false;
-    return m_monitor->processEvent(*hikvisionEvent);
+    if (hikvisionEvent)
+        m_monitor->processEvent(*hikvisionEvent);
+
+    // MultipartContentParser is not designed to receive false from here.
+    // After MultipartContentParser refactoring in 4.1 this function should return void.
+    return true;
 }
 
 } // namespace hikvision

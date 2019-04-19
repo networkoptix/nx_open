@@ -68,7 +68,7 @@
             "internalName": "AVD",
             "alarmName": "colorAbnormal",
             "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Abnormal color detection"
-        },
+        }
     ],
     "ignoredOutputEventTypes": [
         {
@@ -86,7 +86,7 @@
             "internalName": "VFD",
             "alarmName": "vfdAlarm",
             "group": 1
-        }
+        },
         {
             "eventTypeId": "ba0cde26-a5c9-4101-ae59-7cda70a2fa76",
             "eventName": { "value": "Crowd Density [exclusive]", "localization": {} },

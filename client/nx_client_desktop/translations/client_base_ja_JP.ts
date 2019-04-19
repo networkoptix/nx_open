@@ -5345,7 +5345,7 @@ to %1</source>
     </message>
     <message>
       <source>Information</source>
-      <translation>情報（ビデオテクニカ株式会社ローカライズ版）</translation>
+      <translation>情報</translation>
     </message>
     <message>
       <source>Rotate</source>

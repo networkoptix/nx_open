@@ -180,7 +180,7 @@ private:
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
     std::atomic<qint64> m_positionUsec{AV_NOPTS_VALUE};
-    boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime{0};
+    boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime;
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
 
