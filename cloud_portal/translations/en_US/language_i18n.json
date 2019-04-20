@@ -19,10 +19,10 @@
     "Cameras menu": "Cameras menu", 
     "Cancel": "Cancel", 
     "Change Password": "Change Password", 
+    "Checking...": "Checking...", 
     "Choose which properties should be visible to customers:": "Choose which properties should be visible to customers:", 
     "Close": "Close", 
     "Codec": "Codec", 
-    "Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.": "Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.", 
     "Contact": "Contact", 
     "Create Account": "Create Account", 
     "Create account": "Create account", 
@@ -38,8 +38,8 @@
     "Email": "Email", 
     "Embed": "Embed", 
     "Enter \"Public User\" credentials:": "Enter \"Public User\" credentials:", 
+    "Enter password for your account to continue": "Enter password for your account to continue", 
     "Enter password to continue.": "Enter password to continue.", 
-    "Enter password to your account.": "Enter password to your account.", 
     "Export all to CSV": "Export all to CSV", 
     "FPS(max)": "FPS(max)", 
     "Firmware version": "Firmware version", 
@@ -55,14 +55,13 @@
     "Log In": "Log In", 
     "Log Out": "Log Out", 
     "Log in to %PRODUCT_NAME%": "Log in to %PRODUCT_NAME%", 
-    "Merge": "Merge", 
-    "Merge Anyway": "Merge Anyway", 
     "Merge Systems": "Merge Systems", 
     "Merge current System with": "Merge current System with", 
     "Message": "Message", 
     "Motion Detection": "Motion Detection", 
     "Multi Sensor": "Multi Sensor", 
     "Nothing Found": "Nothing Found", 
+    "OK": "OK", 
     "Ok": "Ok", 
     "Other packages:": "Other packages:", 
     "Other releases, patches and beta versions": "Other releases, patches and beta versions", 
@@ -89,10 +88,10 @@
     "Some of your servers don't support cloud System merge because of outdated software version.": "Some of your servers don't support cloud System merge because of outdated software version.", 
     "Support": "Support", 
     "Supported Devices": "Supported Devices", 
-    "System": "System", 
     "System name": "System name", 
     "System name is required": "System name is required", 
     "System will be accessible through local network with local administrator account.": "System will be accessible through local network with local administrator account.", 
+    "System {{targetSystem.name}} is offline and cannot be merged with the current one.": "System {{targetSystem.name}} is offline and cannot be merged with the current one.", 
     "Systems": "Systems", 
     "Systems of such size may work but will be unstable and have troubles with updates and synchronisation.": "Systems of such size may work but will be unstable and have troubles with updates and synchronisation.", 
     "Take System name and settings from": "Take System name and settings from", 
@@ -104,7 +103,6 @@
     "Updated": "Updated", 
     "User": "User", 
     "View": "View", 
-    "We'd recommend consulting with": "We'd recommend consulting with", 
     "We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.": "We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.", 
     "What's new?": "What's new?", 
     "Wrong password": "Wrong password", 
@@ -113,7 +111,6 @@
     "Your Name": "Your Name", 
     "Your browser is not supported": "Your browser is not supported", 
     "and_x_more": "... and {{value}} more", 
-    "before proceeding.": "before proceeding.", 
     "cameraFilters": {
         "TwWayAudio": "2-way audio devices", 
         "H265": "H.265 Cameras", 
@@ -126,6 +123,7 @@
         "audio": "Cameras with audio", 
         "fisheye": "Fisheye cameras"
     }, 
+    "connectToCloud": "Connect System you want to merge with this one to <strong>{{productName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.", 
     "devices": "devices", 
     "disclaimer": "This list is limited to actual devices auto-reporting data to {{value}}, as approved by anonymous system users. The complete list of supported manufacturers and models is greater in scope.", 
     "downloads": {
@@ -248,13 +246,13 @@
         "isPtzSupported": "PTZ", 
         "dvr": "DVR"
     }, 
-    "is incompatible and cannot be merged with the current one.": "is incompatible and cannot be merged with the current one.", 
-    "is offline and cannot be merged with the current one.": "is offline and cannot be merged with the current one.", 
     "latest build": "latest build", 
     "manufacturers": "manufacturers", 
+    "mergeConfirmation": "You are about to merge systems <strong>{{system}}</strong> and <strong>{{targetSystem}}</strong>. Settings and the name will be taken from the <strong>{{system}}</strong>.", 
     "messageDialogPlaceholders": {
         "feedback": "Make sure you include your camera model and manufacturer..."
     }, 
+    "primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current system. Update the current system to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.", 
     "search": {
         "Search": "Search", 
         "filter applied": "filter applied", 
@@ -268,5 +266,8 @@
         "hardwareTypes": "types", 
         "minResolution": "Minimum Resolution"
     }, 
-    "servers in the merged System.": "servers in the merged System."
+    "secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current system. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.", 
+    "servers in the merged System.": "servers in the merged System.", 
+    "support": "support", 
+    "systemUnavailable": "System {{targetSystem}} is currently unreachable. Try again in a few minutes or contact"
 }
