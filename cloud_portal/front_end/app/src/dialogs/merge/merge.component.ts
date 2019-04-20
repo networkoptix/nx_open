@@ -201,7 +201,7 @@ export class MergeModalContent {
     updateState() {
         switch (this.state) {
             case 'select':
-                this.state = this.tooManySystems || 1 ? 'warning' : 'confirm';
+                this.state = this.tooManySystems ? 'warning' : 'confirm';
                 break;
             case 'warning':
                 this.state = 'confirm';
