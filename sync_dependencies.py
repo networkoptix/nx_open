@@ -130,12 +130,12 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
 
     sync("any/detection_plugin_interface")
 
-    if box in ("bpi", "edge1") or (platform == "linux" and arch in ("arm32", "arm64")):
+    if box in ("bpi", "edge1") or (platform == "linux" and arch in ("arm", "arm64")):
         sync("linux-%s/openssl" % arch)
     else:
         sync("openssl")
 
-    if (platform, arch) == ("linux", "arm32"):
+    if (platform, arch) == ("linux", "arm") and box == "none":
         sync("ffmpeg-arm32")
         sync("ffmpeg-rpi")
     else:
@@ -155,7 +155,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
 
-    if platform == "linux" and (box == "none" or arch in ("arm32", "arm64")):
+    if platform == "linux" and (box == "none" or arch in ("arm", "arm64")):
         sync("cifs-utils")
 
     if platform == "windows":
@@ -221,7 +221,7 @@ def parse_target(target):
 
     if target == "linux_arm32":
         platform = "linux"
-        arch = "arm32"
+        arch = "arm"
         box = "none"
     elif len(components) > 1:
         platform, arch = components
