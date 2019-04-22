@@ -5,6 +5,8 @@ elseif(arch STREQUAL "x86")
     set(os.arch "i386")
 elseif(arch STREQUAL "arm64")
     set(os.arch "arm64")
+elseif(arch STREQUAL "arm")
+    set(os.arch "armhf")
 endif()
 set(target.arch "${os.arch}")
 

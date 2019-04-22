@@ -22,17 +22,24 @@ list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf
 
 nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
 
-set(zip_file ${distribution_output_dir}/${server_update_distribution_name}.zip)
+set(zip_files ${distribution_output_dir}/${server_update_distribution_name}.zip)
 set(deb_file ${distribution_output_dir}/${server_distribution_name}.deb)
-set(installer_output_list ${zip_file} ${deb_file})
+
+if(targetDevice STREQUAL "linux_arm32")
+    list(APPEND zip_files
+        ${distribution_output_dir}/${server_update_distribution_name_rpi}.zip
+        ${distribution_output_dir}/${server_update_distribution_name_bananapi}.zip
+    )
+endif()
+
+set(installer_output_list ${zip_files} ${deb_file})
 
 set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh)
 add_custom_command(
     OUTPUT ${installer_output_list}
     COMMAND /bin/bash ${script}
     DEPENDS ${script} ${depends} ${configured_files}
-    COMMENT "Creating mediaserver .deb package"
-)
+    COMMENT "Creating mediaserver .deb package")
 
 add_custom_target(distribution_deb_mediaserver ALL
     DEPENDS ${installer_output_list}

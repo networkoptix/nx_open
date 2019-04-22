@@ -150,7 +150,7 @@ QSize VideoDecoderRegistry::platformMaxFfmpegResolution()
 {
     if (QnAppInfo::isArm())
     {
-        return QnAppInfo::isBpi()
+        return QnAppInfo::isNx1()
             ? QSize(1280, 720)
             : QSize(1920, 1080);
     }

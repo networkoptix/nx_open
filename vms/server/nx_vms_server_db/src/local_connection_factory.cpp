@@ -960,6 +960,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value storageTooSlow
      *             %value storageFull
      *             %value systemStorageFull
+     *             %value metadataStorageOffline
+     *             %value metadataStorageFull
      *             %value licenseRemoved
      *             %value backupFailedNoBackupStorageError
      *             %value backupFailedSourceStorageError

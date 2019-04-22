@@ -1,9 +1,6 @@
 function(set_distribution_names)
     set(prefix ${installer.name})
 
-    # Allowed values are: win64, win86, linux64, linux86, linux-arm64, mac, android, ios,
-    # bpi, rpi, bananapi, isd, isd_s2.
-    # linux64 and linux86 are planned to be renamed to linux-x64 and linux-x86 accordingly.
     set(distribution_platform "${targetDevice}")
     if(platform STREQUAL "windows")
         if(arch STREQUAL "x64")
@@ -17,7 +14,7 @@ function(set_distribution_names)
         elseif(arch STREQUAL "x86")
             set(distribution_platform "linux86")
         elseif(arch STREQUAL "arm64")
-            set(distribution_platform "linux-arm64")
+            set(distribution_platform "linux_arm64")
         else()
             set(distribution_platform "${box}")
         endif()
@@ -31,10 +28,18 @@ function(set_distribution_names)
 
     if(beta)
         set(beta_suffix "-beta")
-        set(suffix "${distribution_platform}${beta_suffix}-${cloudGroup}")
+        set(suffix "${targetDevice}${beta_suffix}-${cloudGroup}")
+        if(targetDevice STREQUAL "linux_arm32")
+            set(suffix_rpi "rpi${beta_suffix}-${cloudGroup}")
+            set(suffix_bananapi "bananapi${beta_suffix}-${cloudGroup}")
+        endif()
     else()
         set(beta_suffix)
-        set(suffix "${distribution_platform}")
+        set(suffix "${targetDevice}")
+        if(targetDevice STREQUAL "linux_arm32")
+            set(suffix_rpi "rpi")
+            set(suffix_bananapi "bananapi")
+        endif()
     endif()
 
     set(client_distribution_name
@@ -49,6 +54,14 @@ function(set_distribution_names)
         "${prefix}-client_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(server_update_distribution_name
         "${prefix}-server_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+
+    if(targetDevice STREQUAL "linux_arm32")
+        set(server_update_distribution_name_rpi
+            "${prefix}-server_update-${releaseVersion.full}-${suffix_rpi}" PARENT_SCOPE)
+        set(server_update_distribution_name_bananapi
+            "${prefix}-server_update-${releaseVersion.full}-${suffix_bananapi}" PARENT_SCOPE)
+    endif()
+
     set(cdb_distribution_name
         "${prefix}-cdb-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(hpm_distribution_name

@@ -473,16 +473,6 @@ copyAdditionalSysrootFilesIfNeeded()
             echo "Copying (sysroot) $LIB"
             cp -r "$SYSROOT_LIB_DIR/$LIB"* "$STAGE_LIB/"
         done
-    elif [ "$BOX" = "bananapi" ]
-    then
-        echo "Copying (sysroot) libglib required for bananapi on Debian 8 \"Jessie\""
-        cp -r "$SYSROOT_LIB_DIR/libglib"* "$STAGE_LIB/"
-        echo "Copying (sysroot) hdparm required for bananapi on Debian 8 \"Jessie\""
-        cp -r "$SYSROOT_SBIN_DIR/hdparm" "$STAGE_VMS/mediaserver/bin/"
-    elif [ "$BOX" = "rpi" ]
-    then
-        echo "Copying (sysroot) hdparm"
-        cp -r "$SYSROOT_SBIN_DIR/hdparm" "$STAGE_VMS/mediaserver/bin/"
     fi
 }
 

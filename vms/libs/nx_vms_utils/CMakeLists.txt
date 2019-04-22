@@ -11,7 +11,9 @@ nx_add_target(nx_vms_utils LIBRARY ${library_type}
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info.cpp"
     PUBLIC_LIBS
-        nx_utils)
+        nx_utils
+        nx_vms_api
+)
 
 target_compile_definitions(nx_vms_utils
     PRIVATE NX_VMS_UTILS_API=${API_EXPORT_MACRO}
