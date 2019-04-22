@@ -31,7 +31,7 @@ elseif(LINUX AND (
     add_subdirectory(deb)
 elseif(MACOSX)
     add_subdirectory(dmg)
-elseif(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
+elseif(targetDevice MATCHES "bpi|edge1")
     add_subdirectory(tar)
 endif()
 

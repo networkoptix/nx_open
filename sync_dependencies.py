@@ -55,7 +55,7 @@ def determine_package_versions(
     if platform == "windows":
         v["ffmpeg"] = "3.1.9"
 
-    if platform == "linux" and box == "none" and target not in ("linux_arm32", "linux-arm64"):
+    if platform == "linux" and box == "none" and target not in ("linux_arm32", "linux_arm64"):
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial-1"
@@ -88,10 +88,11 @@ def determine_package_versions(
     if box == "edge1":
         v["sysroot"] = "jessie"
 
-    if target == "linux-arm64":
+    if target == "linux_arm64":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
+        v["ffmpeg"] = "3.1.9"
 
     if "festival-vox" not in v:
         v["festival-vox"] = v["festival"]
@@ -114,6 +115,8 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform == "linux":
         if box == "bpi":
             sync("bpi/gcc")
+        elif arch == "arm64":
+            sync("linux_arm64/gcc")
         else:
             sync("linux-%s/gcc" % arch)
 
@@ -155,7 +158,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
 
-    if platform == "linux" and (box == "none" or arch in ("arm", "arm64")):
+    if platform == "linux" and box != "edge1":
         sync("cifs-utils")
 
     if platform == "windows":
@@ -222,6 +225,10 @@ def parse_target(target):
     if target == "linux_arm32":
         platform = "linux"
         arch = "arm"
+        box = "none"
+    elif target == "linux_arm64":
+        platform = "linux"
+        arch = "arm64"
         box = "none"
     elif len(components) > 1:
         platform, arch = components

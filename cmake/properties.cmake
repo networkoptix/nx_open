@@ -32,7 +32,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(installation.root "/Applications/")
 endif()
 
-if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
+if(targetDevice MATCHES "bpi")
     set(liteMode "true")
 else()
     set(liteMode "false")

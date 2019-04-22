@@ -1,5 +1,5 @@
 function(detect_target)
-    if(targetDevice STREQUAL "linux-arm64")
+    if(targetDevice STREQUAL "linux_arm64")
         set(LINUX TRUE PARENT_SCOPE)
         set(detected_arch "arm64")
         set(detected_platform "linux")

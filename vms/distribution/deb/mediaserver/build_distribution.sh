@@ -333,7 +333,7 @@ buildDistribution()
     copyFestivalVox
     copyFiles
 
-    if [[ $TARGET == 'linux-arm64' ]]
+    if [[ $TARGET_DEVICE == 'linux_arm64' ]]
     then
         copyTegraSpecificFiles
     fi
