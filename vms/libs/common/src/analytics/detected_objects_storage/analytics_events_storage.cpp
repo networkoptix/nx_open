@@ -10,6 +10,7 @@
 
 #include "config.h"
 #include "object_searcher.h"
+#include "serializers.h"
 #include "time_period_fetcher.h"
 
 namespace nx::analytics::storage {
@@ -621,9 +622,9 @@ void EventsStorage::loadObject(
         selectEventsQuery->value("object_id"));
     object->objectTypeId =
         m_objectTypeDao.objectTypeFromId(selectEventsQuery->value("object_type_id").toLongLong());
-    QJson::deserialize(
-        selectEventsQuery->value("attributes").toString(),
-        &object->attributes);
+
+    object->attributes = AttributesDao::deserialize(
+        selectEventsQuery->value("attributes").toString());
 
     object->track.push_back(ObjectPosition());
     ObjectPosition& objectPosition = object->track.back();

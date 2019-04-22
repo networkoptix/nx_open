@@ -2,6 +2,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include "config.h"
+
 namespace nx::analytics::storage {
 
 AttributesDao::AttributesDao()
@@ -15,7 +17,9 @@ long long AttributesDao::insertOrFetchAttributes(
     sql::QueryContext* queryContext,
     const std::vector<common::metadata::Attribute>& eventAttributes)
 {
-    const auto content = QnUbjson::serialized(eventAttributes);
+    const auto content = kUseTrackAggregation
+        ? QnUbjson::serialized(eventAttributes)
+        : QJson::serialized(eventAttributes);
 
     auto attributesId = findAttributesIdInCache(content);
     if (attributesId >= 0)
@@ -59,8 +63,11 @@ long long AttributesDao::insertOrFetchAttributes(
 std::vector<common::metadata::Attribute> AttributesDao::deserialize(
     const QString& attributesStr)
 {
-    return QnUbjson::deserialized<std::vector<common::metadata::Attribute>>(
-        attributesStr.toUtf8());
+    return kUseTrackAggregation
+        ? QnUbjson::deserialized<std::vector<common::metadata::Attribute>>(
+            attributesStr.toUtf8())
+        : QJson::deserialized<std::vector<common::metadata::Attribute>>(
+            attributesStr.toUtf8());
 }
 
 void AttributesDao::addToAttributesCache(
