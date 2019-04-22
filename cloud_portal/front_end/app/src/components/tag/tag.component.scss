@@ -3,7 +3,7 @@
 @import '../../../styles/theme_variables';
 @import '../../styles/mixins';
 
-button {
+.btn {
     font-family: $font-family-regular;
     font-size: rem(13px);
     font-weight: 400;
