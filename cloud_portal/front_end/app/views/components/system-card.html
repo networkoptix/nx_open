@@ -4,7 +4,7 @@
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Rename System</button>
         </p>
-        <p ng-if="systems.length > 1 && system.canMerge || debugMode || betaMode">
+        <p ng-if="systems.length > 1 && canMerge || debugMode || betaMode">
             <button class="btn btn-default"
                     ng-disabled="(currentlyMerging || !system.isOnline || !system.isAvailable) && !(debugMode || betaMode)"
                     ng-click="mergeSystems()">Merge with Another System</button>

@@ -43,11 +43,6 @@
     }
 }
 
-
-button {
-    min-width: 80px;
-}
-
 .modal {
     &-holder {
         animation : slide-up-fade-in ease .1s;
@@ -186,8 +181,14 @@ button {
     }
 
     &-footer {
-        justify-content : flex-start;
-        align-items     : baseline;
-        padding         : 1rem;
+        & {
+            justify-content: flex-start;
+            align-items: baseline;
+            padding: 1rem;
+        }
+
+        button {
+            min-width: 80px;
+        }
     }
 }

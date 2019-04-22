@@ -10,11 +10,14 @@ angular.module('cloudApp')
             $scope.currentlyMerging = false;
             $scope.debugMode = Config.allowDebugMode;
             $scope.betaMode = Config.allowBetaMode;
+            $scope.canMerge = Config.cloudMerge || false;
 
             authorizationCheckService.requireLogin().then(function (account) {
                 $scope.account = account;
                 $scope.system = system(systemId, account.email);
                 $scope.gettingSystem.run();
+
+                $scope.canMerge = $scope.system.canMerge || $scope.canMerge;
 
                 $scope.$watch('system.info.name', function (value) {
                     page.title(value ? value + ' -' : '');
