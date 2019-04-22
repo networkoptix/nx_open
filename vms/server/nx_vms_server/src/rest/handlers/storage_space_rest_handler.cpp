@@ -47,7 +47,7 @@ int QnStorageSpaceRestHandler::executeGet(
 
     auto enumerate = [fastRequest, &reply, this](
         const QnStorageResourceList& storages,
-        const QSet<QnStorageResourcePtr>& writableStorages)
+        const QnStorageResourceList& writableStorages)
         {
             for (const auto& storage: storages)
             {
@@ -63,12 +63,12 @@ int QnStorageSpaceRestHandler::executeGet(
     enumerate(
         serverModule()->normalStorageManager()->getStorages(),
         fastRequest
-            ? QSet<QnStorageResourcePtr>()
+            ? QnStorageResourceList()
             : serverModule()->normalStorageManager()->getAllWritableStorages());
     enumerate(
         serverModule()->backupStorageManager()->getStorages(),
         fastRequest
-            ? QSet<QnStorageResourcePtr>()
+            ? QnStorageResourceList()
             : serverModule()->backupStorageManager()->getAllWritableStorages());
 
     if (!fastRequest)
@@ -184,8 +184,8 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
 
             QnStorageResourceList additionalStorages;
             additionalStorages.append(storage);
-            auto writableStoragesIfCurrentWasAdded = serverModule()->normalStorageManager()->getAllWritableStorages(
-                &additionalStorages);
+            auto writableStoragesIfCurrentWasAdded =
+                serverModule()->normalStorageManager()->getAllWritableStorages(additionalStorages);
 
             bool wouldBeWritableIfAmongstServerStorages =
                 writableStoragesIfCurrentWasAdded.contains(storage);

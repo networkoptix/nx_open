@@ -226,15 +226,12 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             }
         }
 
-        auto optimalRootBackupPred = [](const QnStorageResourcePtr & storage) {
-            return storage->getFreeSpace() > storage->getSpaceLimit() / 2;
-        };
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
-        auto toStorage = serverModule()->backupStorageManager()->getOptimalStorageRoot(optimalRootBackupPred);
+        auto toStorage = serverModule()->backupStorageManager()->getOptimalStorageRoot();
 
         if (!toStorage) {
             serverModule()->backupStorageManager()->clearSpace(true);
-            toStorage = serverModule()->backupStorageManager()->getOptimalStorageRoot(optimalRootBackupPred);
+            toStorage = serverModule()->backupStorageManager()->getOptimalStorageRoot();
             if (!toStorage)
                 return CopyError::NoBackupStorageError;
         }

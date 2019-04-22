@@ -70,7 +70,7 @@ public:
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;   /* Map by camera unique id. */
     typedef QMap<QString, QSet<QDate>> UsedMonthsMap; /* Map by camera unique id. */
 
-    static const int64_t kBigStorageTreshold = 10;
+    static constexpr int64_t kBigStorageTreshold = 10;
 
     QnStorageManager(
         QnMediaServerModule* serverModule,
@@ -134,13 +134,7 @@ public:
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
 
-    QnStorageResourcePtr getOptimalStorageRoot(
-        std::function<bool(const QnStorageResourcePtr &)> pred =
-            [](const QnStorageResourcePtr &storage) {
-                return !storage->hasFlags(Qn::storage_fastscan) ||
-                        storage->getFreeSpace() > storage->getSpaceLimit();
-            });
-
+    QnStorageResourcePtr getOptimalStorageRoot();
     QnStorageResourceList getStorages() const;
 
     /*
@@ -152,8 +146,8 @@ public:
     /*
      * Return all storages which can be used for writing
      */
-    QSet<QnStorageResourcePtr> getAllWritableStorages(
-        const QnStorageResourceList* additionalStorages = nullptr) const;
+    QnStorageResourceList getAllWritableStorages(
+        const QnStorageResourceList& additional = QnStorageResourceList()) const;
 
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;

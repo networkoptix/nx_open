@@ -55,7 +55,7 @@ public:
             m_deque(deque)
         {
             m_proxyChunk.deque = deque;
-            if (originalIterator != deque->end())
+            if (originalIterator != static_cast<ChunksDeque::Base*>(deque)->end())
                 m_proxyChunk.originalChunk = &(*originalIterator);
         }
 

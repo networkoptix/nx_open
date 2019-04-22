@@ -7,6 +7,7 @@
 #include <utils/fs/file.h>
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <core/resource_management/resource_pool.h>
@@ -201,124 +202,133 @@ public:
     {
     }
 
-    QnStorageResourceList list() const
+    QnStorageResourceList list(
+        const QnStorageResourceList& additional = QnStorageResourceList()) const
     {
-        QnStorageResourceList result = onlineStorages();
-        result = filterOutSpaceless(result);
-        result = filterOutSmall(result);
-        result = filterOutSmallSystem(result);
-
-
-
-
-
-        QnStorageResourceList storageRoots;
-        auto storageMap = getAllStorages();
-        for (auto itr = storageMap.cbegin(); itr != storageMap.cend(); ++itr)
-            storageRoots.append(itr.value());
-
-        if (additionalStorages)
-        {
-            for (auto storage: *additionalStorages)
-                storageRoots.append(storage);
-        }
-
-        qint64 bigStorageThreshold = 0;
-        for (auto itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
-        {
-            QnStorageResourcePtr fileStorage = *itr;
-            if (fileStorage->getStatus() != Qn::Offline)
-            {
-                qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
-                bigStorageThreshold = qMax(bigStorageThreshold, available);
-                NX_VERBOSE(
-                    this,
-                    "[ApiStorageSpace, Writable storages] candidate: %1, available: %2, threshold: %3",
-                    nx::utils::url::hidePassword(fileStorage->getUrl()), available, bigStorageThreshold);
-            }
-            else
-            {
-                NX_VERBOSE(
-                    this,
-                    "[ApiStorageSpace, Writable storages] candidate: %1 is offline and thus neglected",
-                    nx::utils::url::hidePassword(fileStorage->getUrl()));
-            }
-        }
-        bigStorageThreshold /= BIG_STORAGE_THRESHOLD_COEFF;
-
-        for (auto itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
-        {
-            QnStorageResourcePtr fileStorage = *itr;
-            if (fileStorage->getStatus() != Qn::Offline)
-            {
-                qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
-                if (available >= bigStorageThreshold)
-                {
-                    result << fileStorage;
-                    fileStorage->setStatusFlag(fileStorage->statusFlag() & ~Qn::StorageStatus::tooSmall);
-                    NX_VERBOSE(
-                        this,
-                        "[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate",
-                        nx::utils::url::hidePassword(fileStorage->getUrl()));
-                }
-                else
-                {
-                    fileStorage->setStatusFlag(fileStorage->statusFlag() | Qn::StorageStatus::tooSmall);
-                    NX_VERBOSE(
-                        this,
-                        "[ApiStorageSpace, Writable storages] candidate: %1 available size %2 is less than the treshold %3.",
-                        nx::utils::url::hidePassword(fileStorage->getUrl()), available, bigStorageThreshold);
-                }
-            }
-        }
-
-        const qint64 kSystemStorageTreshold = 5;
-
-        qint64 totalNonSystemStoragesSpace = 0;
-        qint64 systemStorageSpace = 0;
-        std::vector<QSet<QnStorageResourcePtr>::iterator> systemStorageItVec;
-
-        for (auto it = result.begin(); it != result.end(); ++it)
-        {
-            if (!(*it)->isSystem())
-                totalNonSystemStoragesSpace += (*it)->getTotalSpace();
-            else
-            {
-                (*it)->setStatusFlag((*it)->statusFlag() & ~Qn::StorageStatus::tooSmall);
-                systemStorageItVec.push_back(it);
-                systemStorageSpace += (*it)->getTotalSpace();
-            }
-        }
-
-        if (totalNonSystemStoragesSpace > systemStorageSpace * kSystemStorageTreshold && !systemStorageItVec.empty())
-        {
-            for (auto it: systemStorageItVec)
-            {
-                NX_VERBOSE(
-                    this,
-                    "[ApiStorageSpace, Writable storages] Removing system storage %1 out of candidates",
-                    nx::utils::url::hidePassword((*it)->getUrl()));
-
-                (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::tooSmall);
-                result.remove(*it);
-            }
-        }
-
-        return result;
+        auto candidates = online(additional);
+        const auto resultStorages = SpaceInfo::toStorageList(resultInfos(candidates));
+        adjustFlags(SpaceInfo::toStorageList(candidates), resultStorages);
+        return resultStorages;
     }
 
     QnStorageResourcePtr optimalStorageForRecording() const
     {
+        int64_t totalEffectiveSpace = 0LL;
+        const auto infos = resultInfos(online());
+        NX_DEBUG(this, "Optimal storage selection: candidates number: %1", infos.size());
+        for (const auto& info: infos)
+        {
+            NX_DEBUG(this, "Optimal storage selection: candidate: %1", info);
+            totalEffectiveSpace += info.effective;
+        }
 
+        const double selectionPoint = nx::utils::random::number<double>(0, 1);
+        NX_DEBUG(
+            this, "Optimal storage selection: total effective space: %1, selection point: %2",
+            totalEffectiveSpace, selectionPoint);
+
+        double runningSum = 0.0;
+        for (const auto& info: infos)
+        {
+            runningSum += static_cast<double>(info.effective) / totalEffectiveSpace;
+            NX_DEBUG(this, "Optimal storage selection: running sum: %1", runningSum);
+            if (selectionPoint < runningSum)
+            {
+                NX_DEBUG(this, "Optimal storage selection: final result: %1", info.url);
+                return info.storage;
+            }
+        }
+
+        return QnStorageResourcePtr();
     }
 
 private:
+    struct SpaceInfo
+    {
+        int64_t totalSpace = -1LL;
+        int64_t freeSpace = -1LL;
+        int64_t spaceLimit = -1LL;
+        int64_t nxOccupied = -1LL;
+        int64_t available = -1LL;
+        int64_t effective = -1LL;
+        std::string url;
+        bool isSystem = false;
+        QnStorageResourcePtr storage;
+
+        static SpaceInfo from(const QnStorageResourcePtr& storage, QnStorageManager* owner)
+        {
+            SpaceInfo result;
+            result.url = nx::utils::url::hidePassword(storage->getUrl()).toStdString();
+            result.totalSpace = getOrThrow(storage->getTotalSpace(), "total space", result.url);
+            result.freeSpace = getOrThrow(storage->getFreeSpace(), "free space", result.url);
+            result.spaceLimit = getOrThrow(storage->getSpaceLimit(), "space limit", result.url);
+            result.nxOccupied = getOrThrow(owner->occupiedSpace(
+                owner->storageDbPool()->getStorageIndex(storage)), "nx occupied space", result.url);
+
+            result.available = result.totalSpace - result.spaceLimit;
+            result.effective = result.nxOccupied + result.freeSpace;
+            result.isSystem = storage->isSystem();
+            result.storage = storage;
+
+            return result;
+        }
+
+        static QnStorageResourceList toStorageList(const std::vector<SpaceInfo>& infos)
+        {
+            QnStorageResourceList result;
+            std::transform(
+                infos.cbegin(), infos.cend(), std::back_inserter(result),
+                [](const auto& info) { return info.storage; });
+            return result;
+        }
+
+        std::string toString() const
+        {
+            std::stringstream ss;
+            ss
+                << "SpaceInfo { totalSpace: " << totalSpace << ", "
+                << "freeSpace: " << freeSpace << ", "
+                << "spaceLimit: " << spaceLimit << ", "
+                << "nxOccupied: " << nxOccupied << ", "
+                << "available: " << available << ", "
+                << "effective: " << effective << ", "
+                << "url: " << url << ", "
+                << "isSystem: " << isSystem << " }";
+
+            return ss.str();
+        }
+
+    private:
+        static int64_t getOrThrow(
+            int64_t value, const std::string& description, const std::string& url)
+        {
+            if (value < 0)
+            {
+                std::stringstream ss;
+                ss << "Failed to get " << description << " for the storage " << url;
+                throw std::runtime_error(ss.str());
+            }
+
+            return value;
+        }
+    };
+
     QnStorageManager* m_owner;
 
-    QnStorageResourceList onlineStorages() const
+    std::vector<SpaceInfo> resultInfos(const std::vector<SpaceInfo>& candidates) const
     {
-        QnStorageResourceList result;
-        for (const auto& storage: m_owner->getAllStorages())
+        auto result = filterOutSpaceless(candidates);
+        result = filterOutSmall(result);
+        return filterOutSmallSystem(result);
+    }
+
+    std::vector<SpaceInfo> online(
+        const QnStorageResourceList& additional = QnStorageResourceList()) const
+    {
+        std::vector<SpaceInfo> result;
+        auto candidates = m_owner->getAllStorages().values() + additional;
+        candidates = unique(candidates);
+        for (const auto& storage: candidates)
         {
             if (!storage->isOnline())
             {
@@ -327,89 +337,126 @@ private:
                 continue;
             }
 
-            result.append(storage);
+            try
+            {
+                result.push_back(SpaceInfo::from(storage, m_owner));
+            }
+            catch(const std::exception& e)
+            {
+                NX_WARNING(this, e.what());
+                continue;
+            }
         }
 
         return result;
     }
 
-    QnStorageResourceList filterOutSpaceless(const QnStorageResourceList& storages)
+    static QnStorageResourceList unique(const QnStorageResourceList& candidates)
     {
-        QnStorageResourceList result;
-        for (auto it = storages.begin(); it < storages.end(); ++it)
-        {
-            const auto freeSpace = (*it)->getFreeSpace();
-            const auto spaceLimit = (*it)->getSpaceLimit();
-            NX_ASSERT(freeSpace >= 0);
-            NX_ASSERT(spaceLimit >= 0);
-            if (freeSpace < 0 || spaceLimit < 0)
-            {
-                NX_WARNING(
-                    this, "Can't obtain free space (%1) of space limit (%2) for a storage (%3)",
-                    freeSpace, spaceLimit, nx::utils::url::hidePassword((*it)->getUrl()));
-                continue;
-            }
-            const auto nxOccupiedSpace =
-                m_owner->occupiedSpace(m_owner->storageDbPool()->getStorageIndex(*it));
-            if (nxOccupiedSpace + freeSpace < spaceLimit)
-            {
-                NX_DEBUG(
-                    this, "Skipping storage %1 because nxOccupiedSpace (%1) + "
-                          "freeSpace (%2) < spaceLimit (%3)",
-                    nxOccupiedSpace, freeSpace, spaceLimit);
-                continue;
-            }
-            result.append(*it);
-        }
-
-        return result;
-    }
-
-    static QnStorageResourceList filterOutSmall(const QnStorageResourceList& storages)
-    {
-        const auto storageWithMaxSpace = std::max_element(
-            storages.cbegin(), storages.cend(),
+        auto result = candidates;
+        std::sort(
+            result.begin(), result.end(),
             [](const auto& storage1, const auto& storage2)
             {
-                return spaceAvailable(storage1) - spaceAvailable(storage2);
+                return storage1->getUrl() < storage2->getUrl();
             });
 
-        const auto maxSpaceValue = spaceAvailable(*storageWithMaxSpace);
-        const auto maxSpaceTreshold = maxSpaceValue / kBigStorageTreshold;
-
-        return filterOutWithSpaceLessThan(storages, maxSpaceTreshold);
-    }
-
-    static int64_t spaceAvailable(const QnStorageResourcePtr& storage)
-    {
-        return storage->getTotalSpace() - storage->getSpaceLimit();
-    }
-
-    static QnStorageResourceList filterOutWithSpaceLessThan(
-        const QnStorageResourceList& storages, int64_t maxSpaceTreshold)
-    {
-        QnStorageResourceList result;
-        std::copy_if(
-            storages.cbegin(), storages.cend(),
-            [maxSpaceTreshold](const auto& storage)
+        auto last = std::unique(
+            result.begin(), result.end(),
+            [](const auto& storage1, const auto& storage2)
             {
-                return spaceAvailable(storage) >= maxSpaceTreshold;
-            },
-            std::back_inserter(result));
+                return storage1->getUrl() == storage2->getUrl();
+            });
+
+        result.erase(last, result.end());
+        NX_ASSERT(candidates.size() == result.size());
+        if (candidates.size() != result.size())
+        {
+            QString diffString;
+            for (const auto& storage: candidates)
+            {
+                if (!result.contains(storage))
+                {
+                    diffString +=
+                        QString("(%1) ").arg(nx::utils::url::hidePassword(storage->getUrl()));
+                }
+            }
+            NX_WARNING(typeid(WritableStorageManager), "Found duplicate storages: %1", diffString);
+        }
 
         return result;
     }
 
-    static QnStorageResourceList filterOutSmallSystem(const QnStorageResourceList& storages)
+    static std::vector<SpaceInfo> filterOutSpaceless(const std::vector<SpaceInfo>& infos)
+    {
+        std::vector<SpaceInfo> result;
+        for (const auto& info: infos)
+        {
+            if (info.effective < info.spaceLimit)
+            {
+                NX_DEBUG(
+                    typeid(WritableStorageManager),
+                    "Skipping storage (%1) because nxOccupiedSpace (%2) + freeSpace (%3) < spaceLimit (%4)",
+                    info.url, info.nxOccupied, info.freeSpace, info.spaceLimit);
+                continue;
+            }
+            result.push_back(info);
+        }
+
+        return result;
+    }
+
+    static std::vector<SpaceInfo> filterOutSmall(const std::vector<SpaceInfo>& infos)
+    {
+        const auto maxIt = std::max_element(
+            infos.cbegin(), infos.cend(),
+            [](const auto& info1, const auto& info2) { return info1.available - info2.available; });
+
+        if (maxIt == infos.cend())
+            return infos;
+
+        const auto maxSpaceTreshold = maxIt->available / QnStorageManager::kBigStorageTreshold;
+        std::vector<SpaceInfo> result;
+        std::copy_if(
+            infos.cbegin(), infos.cend(), std::back_inserter(result),
+            [maxSpaceTreshold](const auto& info) { return info.available >= maxSpaceTreshold; });
+
+        return result;
+    }
+
+    static std::vector<SpaceInfo> filterOutSmallSystem(const std::vector<SpaceInfo>& infos)
     {
         int64_t totalNonSystemSpaceAvailable = 0;
-        for (const auto& storage: storages)
+        for (const auto& info: infos)
         {
-            if (!storage->isSystem())
-                totalNonSystemSpaceAvailable += spaceAvailable(storage);
+            if (!info.isSystem)
+                totalNonSystemSpaceAvailable += info.available;
         }
-        QnStorageResourceList result;
 
+        std::vector<SpaceInfo> result;
+        std::copy_if(
+            infos.cbegin(), infos.cend(), std::back_inserter(result),
+            [totalNonSystemSpaceAvailable](const auto& info)
+            {
+                if (!info.isSystem)
+                    return true;
+
+                return totalNonSystemSpaceAvailable <= info.available * 5;
+            });
+
+        return result;
+    }
+
+    static void adjustFlags(
+        const QnStorageResourceList& candidates, const QnStorageResourceList& result)
+    {
+        for (const auto& storage: candidates)
+        {
+            if (result.contains(storage))
+                storage->setStatusFlag(storage->statusFlag() & ~Qn::StorageStatus::tooSmall);
+            else
+                storage->setStatusFlag(storage->statusFlag() | Qn::StorageStatus::tooSmall);
+        }
     }
 };
 
@@ -2586,104 +2633,10 @@ QSet<QnStorageResourcePtr> QnStorageManager::getClearableStorages() const
     return result;
 }
 
-QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
-    const QnStorageResourceList* additionalStorages) const
+QnStorageResourceList QnStorageManager::getAllWritableStorages(
+    const QnStorageResourceList& additional) const
 {
-    QSet<QnStorageResourcePtr> result;
-
-    QnStorageResourceList storageRoots;
-    auto storageMap = getAllStorages();
-    for (auto itr = storageMap.cbegin(); itr != storageMap.cend(); ++itr)
-        storageRoots.append(itr.value());
-
-    if (additionalStorages)
-    {
-        for (auto storage: *additionalStorages)
-            storageRoots.append(storage);
-    }
-
-    qint64 bigStorageThreshold = 0;
-    for (auto itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
-    {
-        QnStorageResourcePtr fileStorage = *itr;
-        if (fileStorage->getStatus() != Qn::Offline)
-        {
-            qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
-            bigStorageThreshold = qMax(bigStorageThreshold, available);
-            NX_VERBOSE(
-                this,
-                "[ApiStorageSpace, Writable storages] candidate: %1, available: %2, threshold: %3",
-                nx::utils::url::hidePassword(fileStorage->getUrl()), available, bigStorageThreshold);
-        }
-        else
-        {
-            NX_VERBOSE(
-                this,
-                "[ApiStorageSpace, Writable storages] candidate: %1 is offline and thus neglected",
-                nx::utils::url::hidePassword(fileStorage->getUrl()));
-        }
-    }
-    bigStorageThreshold /= BIG_STORAGE_THRESHOLD_COEFF;
-
-    for (auto itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
-    {
-        QnStorageResourcePtr fileStorage = *itr;
-        if (fileStorage->getStatus() != Qn::Offline)
-        {
-            qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
-            if (available >= bigStorageThreshold)
-            {
-                result << fileStorage;
-                fileStorage->setStatusFlag(fileStorage->statusFlag() & ~Qn::StorageStatus::tooSmall);
-                NX_VERBOSE(
-                    this,
-                    "[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate",
-                    nx::utils::url::hidePassword(fileStorage->getUrl()));
-            }
-            else
-            {
-                fileStorage->setStatusFlag(fileStorage->statusFlag() | Qn::StorageStatus::tooSmall);
-                NX_VERBOSE(
-                    this,
-                    "[ApiStorageSpace, Writable storages] candidate: %1 available size %2 is less than the treshold %3.",
-                    nx::utils::url::hidePassword(fileStorage->getUrl()), available, bigStorageThreshold);
-            }
-        }
-    }
-
-    const qint64 kSystemStorageTreshold = 5;
-
-    qint64 totalNonSystemStoragesSpace = 0;
-    qint64 systemStorageSpace = 0;
-    std::vector<QSet<QnStorageResourcePtr>::iterator> systemStorageItVec;
-
-    for (auto it = result.begin(); it != result.end(); ++it)
-    {
-        if (!(*it)->isSystem())
-            totalNonSystemStoragesSpace += (*it)->getTotalSpace();
-        else
-        {
-            (*it)->setStatusFlag((*it)->statusFlag() & ~Qn::StorageStatus::tooSmall);
-            systemStorageItVec.push_back(it);
-            systemStorageSpace += (*it)->getTotalSpace();
-        }
-    }
-
-    if (totalNonSystemStoragesSpace > systemStorageSpace * kSystemStorageTreshold && !systemStorageItVec.empty())
-    {
-        for (auto it: systemStorageItVec)
-        {
-            NX_VERBOSE(
-                this,
-                "[ApiStorageSpace, Writable storages] Removing system storage %1 out of candidates",
-                nx::utils::url::hidePassword((*it)->getUrl()));
-
-            (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::tooSmall);
-            result.remove(*it);
-        }
-    }
-
-    return result;
+    return m_writableStorageManager->list(additional);
 }
 
 void QnStorageManager::testStoragesDone()
@@ -2739,7 +2692,6 @@ void QnStorageManager::checkWritableStoragesExist()
         return; //< Not ready to check yet.
 
     bool hasWritableStorages = getOptimalStorageRoot() != nullptr;
-
     if (!m_hasWritableStorages.has_value() || hasWritableStorages != *m_hasWritableStorages)
     {
         if (hasWritableStorages)
@@ -2863,34 +2815,9 @@ QnStorageResourcePtr QnStorageManager::getStorageByIndex(int index) const
     return m_storageRoots.value(index);
 }
 
-QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
-    std::function<bool(const QnStorageResourcePtr &)> pred)
+QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot()
 {
-    QnStorageResourcePtr result;
-    std::vector<int> allowedIndexes;
-
-    auto emitFailureAndReturnNullStorage = [this](int optimalStorageIndex)
-    {
-        NX_VERBOSE(this, lit("[Storage, Selection] Failed to find storage for index %1").arg(optimalStorageIndex));
-        return QnStorageResourcePtr();
-    };
-
-    for (const auto& storage: getUsedWritableStorages())
-    {
-        if (pred(storage) &&
-            storage->getFreeSpace() > kMinStorageFreeSpace)
-        {
-            allowedIndexes.push_back(storageDbPool()->getStorageIndex(storage));
-        }
-    }
-
-    if (result)
-    {
-        NX_VERBOSE(this, "[Storage, Selection] Selected storage %1", nx::utils::url::hidePassword(result->getUrl()));
-        return result;
-    }
-
-    return emitFailureAndReturnNullStorage(-1);
+    return m_writableStorageManager->optimalStorageForRecording();
 }
 
 QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, const QnNetworkResourcePtr &camera, const QString& prefix, const QnStorageResourcePtr& storage)

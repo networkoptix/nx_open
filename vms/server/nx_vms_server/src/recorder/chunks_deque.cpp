@@ -1,5 +1,3 @@
-#pragma once
-
 #include "chunks_deque.h"
 
 namespace nx::vms::server {
