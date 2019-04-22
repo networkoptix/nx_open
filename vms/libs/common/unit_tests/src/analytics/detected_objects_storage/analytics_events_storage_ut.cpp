@@ -400,9 +400,13 @@ private:
         auto objects = toDetectedObjects(packets);
         objects = filterObjectsAndApplySortOrder(filter, std::move(objects));
 
-        // NOTE: Object box is stored in the DB with limited precision.
-        // So, lowering precision to that in the DB.
-        objects = applyTrackBoxPrecision(std::move(objects));
+        if (kUseTrackAggregation)
+        {
+            // NOTE: Object box is stored in the DB with limited precision.
+            // So, lowering precision to that in the DB.
+            objects = applyTrackBoxPrecision(std::move(objects));
+        }
+
         return objects;
     }
 
