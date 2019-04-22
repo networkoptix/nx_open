@@ -34,12 +34,14 @@
                 </a>
             </li>
         </ul>
-        <ul class="dropdown-menu--footer">
-            <li class="dropdown-divider" role="separator" *ngIf="settings.is_staff"></li>
+        <ul class="dropdown-menu--footer" *ngIf="settings.is_staff">
+            <li class="dropdown-divider" role="separator"></li>
 
             <li class="dropdown-item-container">
-                <a class="dropdown-item inset" (click)="show = false; return;" [href]="'/admin/'" target="_blank"
-                   *ngIf="settings.is_staff"><span translate>Administration</span>
+                <a class="dropdown-item inset"
+                   (click)="show = false; return;"
+                   href="/admin/" target="_blank">
+                   <span translate>Administration</span>
                 </a>
             </li>
         </ul>
