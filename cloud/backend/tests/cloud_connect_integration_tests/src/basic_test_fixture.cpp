@@ -103,15 +103,6 @@ void MemoryRemoteRelayPeerPool::removePeer(
         });
 }
 
-void MemoryRemoteRelayPeerPool::findRelayByDomain(
-    const std::string& domainName,
-    nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const
-{
-    base_type::findRelayByDomain(
-        domainName,
-        std::move(handler));
-}
-
 //-------------------------------------------------------------------------------------------------
 
 

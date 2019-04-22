@@ -57,10 +57,6 @@ public:
         const nx::cloud::relay::conf::Settings& settings,
         BasicTestFixture* relayTest);
 
-    virtual void findRelayByDomain(
-        const std::string& domainName,
-        nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const override;
-
     virtual void addPeer(
         const std::string& domainName,
         nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override;
