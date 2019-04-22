@@ -189,4 +189,18 @@ QString toString(StatusChangeReason reason)
     return QnLexical::serialized(reason);
 }
 
+nx::vms::api::StreamIndex toStreamIndex(ConnectionRole role)
+{
+    using namespace nx::vms::api;
+    switch (role)
+    {
+        case ConnectionRole::CR_LiveVideo:
+            return StreamIndex::primary;
+        case ConnectionRole::CR_SecondaryLiveVideo:
+            return StreamIndex::secondary;
+        default:
+            return StreamIndex::undefined;
+    }
+}
+
 } // namespace Qn

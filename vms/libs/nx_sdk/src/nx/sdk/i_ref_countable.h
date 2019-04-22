@@ -3,6 +3,7 @@
 #include <cstring>
 #include <cstdarg>
 #include <cassert>
+#include <type_traits>
 
 namespace nx {
 namespace sdk {

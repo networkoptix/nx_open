@@ -119,6 +119,7 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
 
         const auto objectDbId = query->lastInsertId().toLongLong();
         m_objectGuidToId[object.objectAppearanceId] = objectDbId;
+        m_objectCache->setObjectIdInDb(object.objectAppearanceId, objectDbId);
 
         m_objectCache->saveObjectGuidToAttributesId(
             object.objectAppearanceId, attributesId);
@@ -148,7 +149,7 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
     auto updateObjectQuery = queryContext->connection()->createQuery();
     updateObjectQuery->prepare(R"sql(
         UPDATE object
-        SET track_detail = track_detail || ?,
+        SET track_detail = CAST(track_detail || CAST(? AS BLOB) AS BLOB),
             attributes_id = ?,
             track_start_ms = min(track_start_ms, ?),
             track_end_ms = max(track_end_ms, ?)
@@ -167,7 +168,9 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         updateObjectQuery->bindValue(1, newAttributesId);
         updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
         updateObjectQuery->bindValue(3, trackMaxTimestamp / kUsecInMs);
-        updateObjectQuery->bindValue(4, objectUpdate.dbId);
+        updateObjectQuery->bindValue(4, objectUpdate.dbId != -1
+            ? objectUpdate.dbId
+            : m_objectCache->dbIdFromObjectId(objectUpdate.objectId));
         updateObjectQuery->exec();
 
         m_objectCache->saveObjectGuidToAttributesId(objectUpdate.objectId, newAttributesId);
@@ -188,7 +191,7 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
 
     auto insertObjectSearchToAttributesBinding = queryContext->connection()->createQuery();
     insertObjectSearchToAttributesBinding->prepare(R"sql(
-        INSERT OR IGNORE INTO unique_attributes_to_object_search(attributes_id, object_search_id)
+        INSERT OR IGNORE INTO object_search_to_object(object_search_id, object_id)
         VALUES (?, ?)
     )sql");
 
@@ -210,10 +213,10 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
 
         for (const auto& objectId: objectSearchGridCell.objectIds)
         {
-            const auto attributesId = m_objectCache->getAttributesIdByObjectGuid(objectId);
+            const auto objectDbId = m_objectCache->dbIdFromObjectId(objectId);
 
-            insertObjectSearchToAttributesBinding->bindValue(0, attributesId);
-            insertObjectSearchToAttributesBinding->bindValue(1, objectSearchCellId);
+            insertObjectSearchToAttributesBinding->bindValue(0, objectSearchCellId);
+            insertObjectSearchToAttributesBinding->bindValue(1, objectDbId);
             insertObjectSearchToAttributesBinding->exec();
         }
     }

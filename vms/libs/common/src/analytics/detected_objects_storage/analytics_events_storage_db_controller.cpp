@@ -26,6 +26,7 @@ DbController::DbController(
     dbStructureUpdater().addUpdateScript(kConvertTimestampToMillis);
     dbStructureUpdater().addUpdateScript(lm(kPackCoordinates).args(kCoordinatesPrecision).toUtf8());
     dbStructureUpdater().addUpdateScript(kAddFullTimePeriods);
+    dbStructureUpdater().addUpdateScript(kConvertDurationToMillis);
     if (kUseTrackAggregation)
         dbStructureUpdater().addUpdateScript(kSplitDataToObjectAndSearch);
 }

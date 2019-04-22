@@ -159,6 +159,19 @@ bool Filter::accepts(const Tag& tag) const
     if (!isValid())
         return false;
 
+    if (ini().disableRegexInLogFilter)
+    {
+        const auto pattern = m_filter.pattern();
+        if (pattern.length() < 2)
+            return false;
+
+        const auto prefix = (pattern[0] == '^' && pattern[pattern.length() - 1] == '$')
+            ? pattern.midRef(1, pattern.length() - 2)
+            : QStringRef(&pattern);
+
+        return tag.toString().startsWith(prefix);
+    }
+
     return m_filter.match(tag.toString()).hasMatch();
 }
 

@@ -38,6 +38,10 @@ public:
         const FieldNames& fieldNames,
         nx::sql::Filter* sqlFilter);
 
+    static void addBoundingBoxToFilter(
+        const QRect& boundingBox,
+        nx::sql::Filter* sqlFilter);
+
     static void addTimePeriodToFilter(
         const QnTimePeriod& timePeriod,
         nx::sql::Filter* sqlFilter,
@@ -62,6 +66,10 @@ private:
     DetectedObject loadObject(
         nx::sql::AbstractSqlQuery* query,
         const Filter& filter);
+
+    void filterTrack(
+        const Filter& filter,
+        std::vector<ObjectPosition>* const track);
 
     static void addObjectTypeIdToFilter(
         const std::vector<QString>& objectTypes,

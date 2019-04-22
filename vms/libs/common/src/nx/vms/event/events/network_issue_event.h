@@ -16,9 +16,10 @@ public:
     struct MulticastAddressConflictParameters
     {
         nx::network::SocketAddress address;
-        QString addressUser;
+        QString deviceName;
+        nx::vms::api::StreamIndex stream;
     };
-    #define MulticastAddressConflictParameters_Fields (address)(addressUser)
+    #define MulticastAddressConflictParameters_Fields (address)(deviceName)(stream)
 
 public:
     explicit NetworkIssueEvent(const QnResourcePtr& resource, qint64 timeStamp,

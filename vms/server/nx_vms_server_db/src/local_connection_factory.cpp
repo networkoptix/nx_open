@@ -337,6 +337,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param backupDuration Duration of the synchronization period (in seconds). -1 if not set.
      * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative
      *     value if not limited.
+     * %param metadataStorageId Storage identifier to keep metadata SQL database.
      * %// AbstractMediaServerManager::saveUserAttributes
      */
     regUpdate<MediaServerUserAttributesDataList>(p, ApiCommand::saveMediaServerUserAttributesList);

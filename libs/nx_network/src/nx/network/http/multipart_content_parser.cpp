@@ -68,6 +68,9 @@ bool MultipartContentParser::processData(const QnByteArrayConstRef& data)
                 if ((size_t)m_currentFrame.size() == m_contentLength)
                 {
                     m_state = waitingBoundary;
+
+                    // TODO #szaitsev: no 'if' and no 'return' should be here.
+                    // This fix should be done and tested in 4.1.
                     if (!m_nextFilter->processData(m_currentFrame))
                         return false;
                     m_currentFrame.clear();

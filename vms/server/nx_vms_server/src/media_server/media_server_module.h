@@ -101,6 +101,7 @@ public:
 
     const nx::vms::server::Settings& settings() const { return m_settings->settings(); }
     nx::vms::server::Settings* mutableSettings() { return m_settings->mutableSettings(); }
+    nx::analytics::storage::Settings analyticEventsStorageSettings() { return m_settings->analyticEventsStorage(); }
 
     QnStoragePluginFactory* storagePluginFactory() const;
 

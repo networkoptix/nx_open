@@ -19,7 +19,10 @@
 
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/web_widget.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/url/url_builder.h>
 
 #include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
@@ -170,8 +173,8 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
         NX_ASSERT(d->credentials.login.hasValue() && d->credentials.password.hasValue());
         const auto currentServerUrl = commonModule()->currentUrl();
 
-        const auto targetUrl = network::url::Builder()
-            .setScheme(lit("http"))
+        const auto targetUrl = nx::network::url::Builder()
+            .setScheme(nx::network::http::kUrlSchemeName)
             .setHost(currentServerUrl.host())
             .setPort(currentServerUrl.port())
             .setPath(state.singleCameraProperties.settingsUrlPath)
@@ -180,25 +183,41 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
         NX_ASSERT(targetUrl.isValid());
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
+
+        // NOTE: Work-around to create ssl tunnel between gateway and server (not between the client
+        // and server over proxy like in the normal case), because there is a bug in
+        // QNetworkAccessManager (or with something related) which ignores proxy settings for some
+        // requests from QWebPage when loading camera web page. Perhaps this is not a bug, but a
+        // consequence of our non-standard proxying made by the server.
         if (gateway->isSslEnabled())
         {
+            int port = currentServerUrl.port();
+            if (nx::network::SocketGlobals::addressResolver()
+                .isCloudHostName(currentServerUrl.host()))
+            {
+                // NOTE: Cloud address should not have port.
+                port = 0;
+            }
+            NX_ASSERT(port >= 0);
+
             gateway->enforceSslFor(
-                nx::network::SocketAddress(currentServerUrl.host(), currentServerUrl.port()),
-                currentServerUrl.scheme() == lit("https"));
+                nx::network::SocketAddress(currentServerUrl.host(), port),
+                currentServerUrl.scheme() == nx::network::http::kSecureUrlSchemeName);
         }
 
         const auto gatewayAddress = gateway->endpoint();
-        const QNetworkProxy gatewayProxy(
+        QNetworkProxy gatewayProxy(
             QNetworkProxy::HttpProxy,
             gatewayAddress.address.toString(), gatewayAddress.port,
             currentServerUrl.userName(), currentServerUrl.password());
-
         d->webWidget->view()->page()->networkAccessManager()->setProxy(gatewayProxy);
 
         const QNetworkRequest request(targetUrl);
         if (d->lastRequest == request)
             return;
 
+        NX_VERBOSE(this, "Loading state with request [%1] via proxy [%2:%3]",
+            targetUrl, gatewayAddress.address.toString(), gatewayAddress.port);
         d->lastRequest = request;
         d->webWidget->reset();
     }

@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.48",
+    "version": "1.0.1.49",
     "data": [
         {
             "keys": [
@@ -33,6 +33,12 @@
                 "DWC-MVT4Wi*|ONVIF"
             ],
             "obtainMacFromMulticast": "Never"
+        },
+        {
+            "keys": [
+                "DW|DWC-PF5M1TIR"
+            ],
+            "dontSendBackChannelRtspAttribute": true
         },
         {
             "keys": [

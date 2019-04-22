@@ -283,6 +283,7 @@
 
 #include <providers/speech_synthesis_data_provider.h>
 #include <nx/utils/file_system.h>
+#include <nx/network/url/url_builder.h>
 
 #if defined(__arm__)
     #include "nx/vms/server/system/nx1/info.h"
@@ -743,6 +744,8 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         serverModule()->normalStorageManager()->initDone();
         serverModule()->backupStorageManager()->initDone();
+
+        initializeAnalyticsEvents();
     });
 }
 
@@ -818,14 +821,18 @@ QnMediaServerResourcePtr MediaServerProcess::registerServer(
     // insert server user attributes if defined
     QString dir = serverModule()->settings().staticDataDir();
 
-    QFile f(closeDirPath(dir) + "server_settings.json");
-    if (!f.open(QFile::ReadOnly))
-        return server;
-    QByteArray data = f.readAll();
     nx::vms::api::MediaServerUserAttributesData userAttrsData;
-    if (!QJson::deserialize(data, &userAttrsData))
-        return server;
-    userAttrsData.serverId = server->getId();
+    ec2::fromResourceToApi(server->userAttributes(), userAttrsData);
+
+    QFile f(closeDirPath(dir) + "server_settings.json");
+    if (f.open(QFile::ReadOnly))
+    {
+        QByteArray data = f.readAll();
+        if (QJson::deserialize(data, &userAttrsData))
+            userAttrsData.serverId = server->getId();
+        else
+            NX_WARNING(this, "Can not deserialize server_settings.json file");
+    }
 
     nx::vms::api::MediaServerUserAttributesDataList attrsList;
     attrsList.push_back(userAttrsData);
@@ -1041,6 +1048,11 @@ void MediaServerProcess::at_databaseDumped()
             ).saveToSettings(serverModule()->roSettings());
     NX_INFO(this, "Server restart is scheduled after dump database");
     restartServer(500);
+}
+
+void MediaServerProcess::at_metadataStorageIdChanged(const QnResourcePtr& /*resource*/)
+{
+    initializeAnalyticsEvents();
 }
 
 void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
@@ -3484,6 +3496,15 @@ bool MediaServerProcess::setUpMediaServerResource(
             server->setId(serverGuid);
             server->setMaxCameras(nx::utils::AppInfo::isEdgeServer() ? 1 : 128);
 
+            if (!serverModule->settings().noInitStoragesOnStartup())
+            {
+                auto storages = createStorages(server);
+                saveStorages(ec2Connection, storages);
+                for (const QnStorageResourcePtr &storage: storages)
+                    m_serverMessageProcessor->updateResource(storage, ec2::NotificationSource::Local);
+                server->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(server));
+            }
+
             QString serverName(getDefaultServerName());
             auto beforeRestoreDbData = commonModule()->beforeRestoreDbData();
             if (!beforeRestoreDbData.serverName.isEmpty())
@@ -3562,6 +3583,10 @@ bool MediaServerProcess::setUpMediaServerResource(
 
     commonModule()->setModuleInformation(selfInformation);
     commonModule()->bindModuleInformation(m_mediaServer);
+
+
+    connect(m_mediaServer.get(), &QnMediaServerResource::metadataStorageIdChanged, this,
+        &MediaServerProcess::at_metadataStorageIdChanged);
 
     return foundOwnServerInDb;
 }
@@ -4035,16 +4060,54 @@ void MediaServerProcess::setUpDataFromSettings()
     nx::network::SocketFactory::setIpVersion(ipVersion);
 }
 
-void MediaServerProcess::initializeAnalyticsEvents()
+QnUuid MediaServerProcess::selectDefaultStorageForAnalyticsEvents(QnMediaServerResourcePtr server)
 {
-    while (!needToStop())
-    {
-        if (serverModule()->analyticsEventsStorage()->initialize())
-            break;
+    QnUuid result;
+    qint64 maxTotalSpace = 0;
 
-        NX_WARNING(this, lm("Failed to initialize analytics events storage. Retrying..."));
-        QnSleep::msleep(1000);
+    for (const auto& storage: server->getStorages())
+    {
+        if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+        {
+            if (fileStorage->isLocal() && fileStorage->getTotalSpace() > maxTotalSpace)
+            {
+                maxTotalSpace = fileStorage->getTotalSpace();
+                result = fileStorage->getId();
+            }
+        }
     }
+
+    return result;
+}
+
+bool MediaServerProcess::initializeAnalyticsEvents()
+{
+    auto storageResource = commonModule()->resourcePool()->getResourceById<QnStorageResource>(
+        m_mediaServer->metadataStorageId());
+
+    auto settings = this->serverModule()->analyticEventsStorageSettings();
+    const auto pathBase = storageResource ? storageResource->getPath()
+        : nx::network::url::normalizePath(serverModule()->settings().dataDir());
+    settings.dbConnectionOptions.dbName = closeDirPath(pathBase) + "object_detection.sqlite";
+
+    if (!this->serverModule()->analyticsEventsStorage()->initialize(settings))
+    {
+        NX_ERROR(this, "Failed to change analytics events storage, initialization error");
+        return false;
+    }
+
+    if (!m_oldAnalyticsStoragePath.isEmpty())
+    {
+        auto policy = commonModule()->globalSettings()->metadataStorageChangePolicy();
+        if (policy == nx::vms::api::MetadataStorageChangePolicy::remove)
+        {
+            if (!QFile::remove(m_oldAnalyticsStoragePath))
+                NX_WARNING(this, "Can not remove database %1", m_oldAnalyticsStoragePath);
+        }
+    }
+
+    m_oldAnalyticsStoragePath = settings.dbConnectionOptions.dbName;
+    return true;
 }
 
 void MediaServerProcess::setUpTcpLogReceiver()
@@ -4445,8 +4508,6 @@ void MediaServerProcess::run()
 
     m_discoveryMonitor = std::make_unique<nx::vms::server::discovery::DiscoveryMonitor>(
         m_ec2ConnectionFactory->messageBus());
-
-    initializeAnalyticsEvents();
 
     if (needToStop())
         return;

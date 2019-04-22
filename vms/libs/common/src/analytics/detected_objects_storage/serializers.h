@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QSize>
+
 #include <nx/utils/qnbytearrayref.h>
 
 #include "analytics_events_storage_types.h"
@@ -107,9 +109,18 @@ private:
         ObjectPosition* position);
 
     static void deserialize(QnByteArrayConstRef* buf, QRect* rect);
-
-    static QRect translate(const QRectF& box);
-    static QRectF translate(const QRect& box);
 };
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Translates rect coordinates from [0; 1] to [0; resolution.width()] and [0; resolution.height()].
+ */
+QRect translate(const QRectF& box, const QSize& resolution);
+
+/**
+ * Translates rect coordinates from [0; resolution.width()] and [0; resolution.height()] to [0; 1].
+ */
+QRectF translate(const QRect& box, const QSize& resolution);
 
 } // namespace nx::analytics::storage

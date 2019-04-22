@@ -86,6 +86,14 @@
         <source>New Server</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>WelcomeScreen</name>
