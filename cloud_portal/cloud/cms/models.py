@@ -237,6 +237,7 @@ class Customization(models.Model):
     preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
     public_release_history = models.BooleanField(default=False)
     public_downloads = models.BooleanField(default=True)
+    reveal_cloud_merge = models.BooleanField(default=False, help_text="Shows the cloud merge button for all systems.")
 
     def __str__(self):
         return self.name

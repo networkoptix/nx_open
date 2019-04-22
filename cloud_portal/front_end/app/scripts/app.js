@@ -94,6 +94,9 @@ window.L = {};
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
                     appState.supportLink = response.supportLink;
+                    if (response.cloudMerge) {
+                        appState.cloudMerge = response.cloudMerge;
+                    }
                     angular.extend(CONFIG, appState);
                 });
 

@@ -211,6 +211,7 @@ def get_settings(request):
 
     settings_object = {
         'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
+        'cloudMerge': customization.reveal_cloud_merge,
         'publicDownloads': customization.public_downloads,
         'publicReleases': customization.public_release_history,
         'supportLink': support_link

@@ -2,11 +2,6 @@
 @import '../../../app/styles/custom/custom_palette';
 @import '../../../app/styles/theme_variables';
 
-
-button {
-    min-width: 80px;
-}
-
 .modal {
     &-backdrop {
         background-color : $modal-backdrop-bg;
@@ -147,8 +142,14 @@ button {
     }
 
     &-footer {
-        justify-content : flex-start;
-        align-items     : baseline;
-        padding         : 1rem;
+        & {
+            justify-content: flex-start;
+            align-items: baseline;
+            padding: 1rem;
+        }
+
+        button {
+            min-width: 80px;
+        }
     }
 }

@@ -303,7 +303,7 @@ def fill_content(customization_name='default', product_name='cloud_portal',
         changed_context_ids = list(changed_records.values_list('data_structure__context_id', flat=True).distinct())
         changed_contexts = Context.objects.filter(id__in=changed_context_ids)
 
-        changed_global_contexts = changed_contexts.filter(is_global = True)
+        changed_global_contexts = changed_contexts.filter(is_global=True)
         if changed_global_contexts.exists():  # global context was changed - force full rebuild
             incremental = False
         changed_contexts = changed_contexts.all()
