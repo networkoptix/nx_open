@@ -21,6 +21,7 @@ export class CamTableComponent implements OnChanges, OnInit {
     @Input() elements: any[];
     @Input() allowedParameters: string[];
     @Input() activeCamera: any;
+    @Input() params: any = {};
 
     @Output() public onRowClick: EventEmitter<any> = new EventEmitter<any>();
 
@@ -34,7 +35,6 @@ export class CamTableComponent implements OnChanges, OnInit {
     private cameraHeaders;
     private paramsShown;
     private lang;
-    private params: any;
     private debug: boolean;
 
     pager: any = {};
@@ -224,42 +224,39 @@ export class CamTableComponent implements OnChanges, OnInit {
                 this.selectedRow = undefined;
             }
         }
+
+        if (changes.params && changes.params.currentValue.page) {
+            this.debug = true;
+
+            if (this.params.debug === undefined) {
+                this.debug = false;
+                this.filterAllowedParams();
+            }
+
+            this.showHeaders = this.cameraHeaders;
+
+            if (this.params.page) {
+                this.setPage(+this.params.page, true);
+            }
+
+            if (this.params.camera) {
+                const row = this.pagedItems.findIndex((camera) => {
+                    return camera.model === this.params.camera;
+                });
+
+                const camera = this.pagedItems.find((camera) => {
+                    return camera.model === this.params.camera;
+                });
+
+                this.setClickedRow(row, { key: row, value: camera });
+            }
+        }
     }
 
     ngOnInit() {
         this.results = this._elements.length;
         this.csvFilename = Date.now();
         this.csvCameraData = this.getCsvData();
-
-        this.uri
-            .getURI()
-            .subscribe(params => {
-                this.params = { ...params };
-                this.debug = true;
-
-                if (params.debug === undefined) {
-                    this.debug = false;
-                    this.filterAllowedParams();
-                }
-
-                this.showHeaders = this.cameraHeaders;
-
-                if (this.params.page) {
-                    this.setPage(+this.params.page, true);
-                }
-
-                if (this.params.camera) {
-                    const row = this.pagedItems.findIndex((camera) => {
-                        return camera.model === this.params.camera;
-                    });
-
-                    const camera = this.pagedItems.find((camera) => {
-                        return camera.model === this.params.camera;
-                    });
-
-                    this.setClickedRow(row, { key: row, value: camera });
-                }
-            });
     }
 
     setClickedRow(index, element) {
