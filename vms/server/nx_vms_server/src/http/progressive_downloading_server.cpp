@@ -658,7 +658,7 @@ void QnProgressiveDownloadingConsumer::run()
             transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
             videoCodec = getPrefferedVideoCodec(streamingFormat);
             NX_DEBUG(this,
-                "Compatible video stream not found, transcoding will used to codec id[%1]",
+                "Compatible video stream not found, transcoding will used, codec id[%1]",
                 videoCodec);
         }
 
