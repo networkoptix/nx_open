@@ -377,21 +377,12 @@ void EventsStorage::insertEvent(
 
     insertEventQuery.bindValue(":attributesId", attributesId);
 
-    insertEventQuery.bindValue(
-        ":boxTopLeftX",
-        packCoordinate(detectedObject.boundingBox.topLeft().x()));
+    const auto packedBoundingBox = packRect(detectedObject.boundingBox);
 
-    insertEventQuery.bindValue(
-        ":boxTopLeftY",
-        packCoordinate(detectedObject.boundingBox.topLeft().y()));
-
-    insertEventQuery.bindValue(
-        ":boxBottomRightX",
-        packCoordinate(detectedObject.boundingBox.bottomRight().x()));
-
-    insertEventQuery.bindValue(
-        ":boxBottomRightY",
-        packCoordinate(detectedObject.boundingBox.bottomRight().y()));
+    insertEventQuery.bindValue(":boxTopLeftX", packedBoundingBox.topLeft().x());
+    insertEventQuery.bindValue(":boxTopLeftY", packedBoundingBox.topLeft().y());
+    insertEventQuery.bindValue(":boxBottomRightX", packedBoundingBox.bottomRight().x());
+    insertEventQuery.bindValue(":boxBottomRightY", packedBoundingBox.bottomRight().y());
 
     insertEventQuery.exec();
 }
@@ -636,12 +627,14 @@ void EventsStorage::loadObject(
         selectEventsQuery->value("timestamp_usec_utc").toLongLong() * kUsecInMs;
     objectPosition.durationUsec = selectEventsQuery->value("duration_usec").toLongLong() * kUsecInMs;
 
-    objectPosition.boundingBox.setTopLeft(QPointF(
-        unpackCoordinate(selectEventsQuery->value("box_top_left_x").toInt()),
-        unpackCoordinate(selectEventsQuery->value("box_top_left_y").toInt())));
-    objectPosition.boundingBox.setBottomRight(QPointF(
-        unpackCoordinate(selectEventsQuery->value("box_bottom_right_x").toInt()),
-        unpackCoordinate(selectEventsQuery->value("box_bottom_right_y").toInt())));
+    const QRect packedBoundingBox(
+        QPoint(
+            selectEventsQuery->value("box_top_left_x").toInt(),
+            selectEventsQuery->value("box_top_left_y").toInt()),
+        QPoint(
+            selectEventsQuery->value("box_bottom_right_x").toInt(),
+            selectEventsQuery->value("box_bottom_right_y").toInt()));
+    objectPosition.boundingBox = unpackRect(packedBoundingBox);
 }
 
 void EventsStorage::mergeObjects(
@@ -913,23 +906,12 @@ void EventsStorage::logDataSaveResult(sql::DBResult resultCode)
 
 QRect EventsStorage::packRect(const QRectF& rectf)
 {
-    QRect rect;
-    rect.setTopLeft(QPoint(
-        packCoordinate(rectf.topLeft().x()),
-        packCoordinate(rectf.topLeft().y())));
-    rect.setWidth(packCoordinate(rectf.width()));
-    rect.setHeight(packCoordinate(rectf.height()));
-    return rect;
+    return translate(rectf, QSize(kCoordinatesPrecision, kCoordinatesPrecision));
 }
 
-int EventsStorage::packCoordinate(double value)
+QRectF EventsStorage::unpackRect(const QRect& rect)
 {
-    return (int) (value * kCoordinatesPrecision);
-}
-
-double EventsStorage::unpackCoordinate(int packedValue)
-{
-    return packedValue / (double) kCoordinatesPrecision;
+    return translate(rect, QSize(kCoordinatesPrecision, kCoordinatesPrecision));
 }
 
 //-------------------------------------------------------------------------------------------------

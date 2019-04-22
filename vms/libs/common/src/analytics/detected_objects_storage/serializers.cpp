@@ -127,8 +127,8 @@ QRect translate(const QRectF& box, const QSize& resolution)
             box.x() * resolution.width(),
             box.y() * resolution.height()),
         QPoint(
-            std::ceil(box.bottomRight().x() * resolution.width()),
-            std::ceil(box.bottomRight().y() * resolution.height()))
+            std::round(box.bottomRight().x() * resolution.width()),
+            std::round(box.bottomRight().y() * resolution.height()))
     );
 }
 

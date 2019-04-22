@@ -268,9 +268,7 @@ private:
     void logDataSaveResult(sql::DBResult resultCode);
 
     static QRect packRect(const QRectF& rectf);
-    static int packCoordinate(double);
-
-    static double unpackCoordinate(int);
+    static QRectF unpackRect(const QRect& rect);
 };
 
 //-------------------------------------------------------------------------------------------------
