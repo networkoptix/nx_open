@@ -743,6 +743,13 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         serverModule()->normalStorageManager()->initDone();
         serverModule()->backupStorageManager()->initDone();
 
+        if (m_mediaServer->metadataStorageId().isNull() && !QFile::exists(getMetadataDatabaseName()))
+        {
+            m_mediaServer->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(m_mediaServer));
+            nx::vms::api::MediaServerUserAttributesData userAttrsData;
+            ec2::fromResourceToApi(m_mediaServer->userAttributes(), userAttrsData);
+            saveMediaServerUserAttributes(ec2Connection, userAttrsData);
+        }
         initializeAnalyticsEvents();
     });
 }
@@ -823,25 +830,30 @@ QnMediaServerResourcePtr MediaServerProcess::registerServer(
     ec2::fromResourceToApi(server->userAttributes(), userAttrsData);
 
     QFile f(closeDirPath(dir) + "server_settings.json");
-    if (f.open(QFile::ReadOnly))
+    if (!f.open(QFile::ReadOnly))
+        return server;
+    QByteArray data = f.readAll();
+    if (QJson::deserialize(data, &userAttrsData))
     {
-        QByteArray data = f.readAll();
-        if (QJson::deserialize(data, &userAttrsData))
-            userAttrsData.serverId = server->getId();
-        else
-            NX_WARNING(this, "Can not deserialize server_settings.json file");
+        userAttrsData.serverId = server->getId();
+        saveMediaServerUserAttributes(ec2Connection, userAttrsData);
     }
+    else
+    {
+        NX_WARNING(this, "Can not deserialize server_settings.json file");
+    }
+    return server;
+}
 
+void MediaServerProcess::saveMediaServerUserAttributes(
+    ec2::AbstractECConnectionPtr ec2Connection,
+    const nx::vms::api::MediaServerUserAttributesData& userAttrsData)
+{
     nx::vms::api::MediaServerUserAttributesDataList attrsList;
     attrsList.push_back(userAttrsData);
-    rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
+    auto rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
     if (rez != ec2::ErrorCode::ok)
-    {
         qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
-        return QnMediaServerResourcePtr();
-    }
-
-    return server;
 }
 
 void MediaServerProcess::saveStorages(
@@ -3494,15 +3506,6 @@ bool MediaServerProcess::setUpMediaServerResource(
             server->setId(serverGuid);
             server->setMaxCameras(nx::utils::AppInfo::isEdgeServer() ? 1 : 128);
 
-            if (!serverModule->settings().noInitStoragesOnStartup())
-            {
-                auto storages = createStorages(server);
-                saveStorages(ec2Connection, storages);
-                for (const QnStorageResourcePtr &storage: storages)
-                    m_serverMessageProcessor->updateResource(storage, ec2::NotificationSource::Local);
-                server->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(server));
-            }
-
             QString serverName(getDefaultServerName());
             auto beforeRestoreDbData = commonModule()->beforeRestoreDbData();
             if (!beforeRestoreDbData.serverName.isEmpty())
@@ -4065,7 +4068,10 @@ QnUuid MediaServerProcess::selectDefaultStorageForAnalyticsEvents(QnMediaServerR
     {
         if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
         {
-            if (fileStorage->isLocal() && fileStorage->getTotalSpace() > maxTotalSpace)
+            if (fileStorage->isLocal()
+                && !fileStorage->isSystem()
+                && fileStorage->isUsedForWriting()
+                && fileStorage->getTotalSpace() > maxTotalSpace)
             {
                 maxTotalSpace = fileStorage->getTotalSpace();
                 result = fileStorage->getId();
@@ -4076,15 +4082,19 @@ QnUuid MediaServerProcess::selectDefaultStorageForAnalyticsEvents(QnMediaServerR
     return result;
 }
 
-bool MediaServerProcess::initializeAnalyticsEvents()
+QString MediaServerProcess::getMetadataDatabaseName() const
 {
     auto storageResource = commonModule()->resourcePool()->getResourceById<QnStorageResource>(
         m_mediaServer->metadataStorageId());
-
-    auto settings = this->serverModule()->analyticEventsStorageSettings();
     const auto pathBase = storageResource ? storageResource->getPath()
         : nx::network::url::normalizePath(serverModule()->settings().dataDir());
-    settings.dbConnectionOptions.dbName = closeDirPath(pathBase) + "object_detection.sqlite";
+    return closeDirPath(pathBase) + "object_detection.sqlite";
+}
+
+bool MediaServerProcess::initializeAnalyticsEvents()
+{
+    auto settings = this->serverModule()->analyticEventsStorageSettings();
+    settings.dbConnectionOptions.dbName = getMetadataDatabaseName();
 
     if (!this->serverModule()->analyticsEventsStorage()->initialize(settings))
     {
