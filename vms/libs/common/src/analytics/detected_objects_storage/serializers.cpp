@@ -196,10 +196,13 @@ void TrackSerializer::deserialize(QnByteArrayConstRef* buf, QRect* rect)
 QRect translate(const QRectF& box, const QSize& resolution)
 {
     return QRect(
-        box.x() * resolution.width(),
-        box.y() * resolution.height(),
-        std::ceil(box.width() * resolution.width()),
-        std::ceil(box.height() * resolution.height()));
+        QPoint(
+            box.x() * resolution.width(),
+            box.y() * resolution.height()),
+        QPoint(
+            std::ceil(box.bottomRight().x() * resolution.width()),
+            std::ceil(box.bottomRight().y() * resolution.height()))
+    );
 }
 
 QRectF translate(const QRect& box, const QSize& resolution)
