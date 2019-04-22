@@ -19,6 +19,12 @@ public:
     virtual ~AbstractCursor() = default;
 
     virtual common::metadata::ConstDetectionMetadataPacketPtr next() = 0;
+
+    /**
+     * The implementation MUST free the DB cursor in the method and every subsequent
+     * AbstractCursor::next() call MUST return nullptr.
+     */
+    virtual void close() = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -30,7 +36,7 @@ public:
 
     virtual common::metadata::ConstDetectionMetadataPacketPtr next() override;
 
-    void close();
+    virtual void close() override;
 
 private:
     std::unique_ptr<nx::sql::Cursor<DetectedObject>> m_dbCursor;

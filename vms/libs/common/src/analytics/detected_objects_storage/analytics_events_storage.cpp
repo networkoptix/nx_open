@@ -136,16 +136,10 @@ void EventsStorage::createLookupCursor(
         });
 }
 
-void EventsStorage::closeCursor(const std::shared_ptr<AbstractCursor>& cursorToRemove)
+void EventsStorage::closeCursor(const std::shared_ptr<AbstractCursor>& cursor)
 {
     QnMutexLocker lock(&m_cursorsMutex);
-    m_openedCursors.remove_if(
-        [cursorToRemove] (std::shared_ptr<Cursor> cursor)
-        {
-            auto cursorPtr = static_cast<AbstractCursor*>(cursor.get());
-            return cursorToRemove.get() == cursorPtr;
-        });
-
+    m_openedCursors.remove(cursor);
 }
 
 void EventsStorage::lookup(

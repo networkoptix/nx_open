@@ -150,7 +150,7 @@ public:
 
 private:
     std::shared_ptr<DbController> m_dbController;
-    std::list<std::shared_ptr<Cursor>> m_openedCursors;
+    std::list<std::shared_ptr<AbstractCursor>> m_openedCursors;
     QnMutex m_dbControllerMutex;
     QnMutex m_cursorsMutex;
     std::atomic<bool> m_closingDbController {false};
