@@ -1,6 +1,7 @@
 #include "detection_data_saver.h"
 
 #include <nx/fusion/serialization/sql_functions.h>
+#include <nx/utils/compact_int.h>
 
 #include "attributes_dao.h"
 #include "config.h"
@@ -206,7 +207,7 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
         insertObjectSearchCell->bindValue(4, objectSearchGridCell.boundingBox.bottomRight().y());
 
         insertObjectSearchCell->bindValue(5,
-            compact_int::serialized(toDbIds(objectSearchGridCell.objectIds)));
+            nx::utils::compact_int::serialized(toDbIds(objectSearchGridCell.objectIds)));
 
         insertObjectSearchCell->exec();
         const auto objectSearchCellId = insertObjectSearchCell->lastInsertId().toLongLong();
