@@ -15,7 +15,7 @@ long long AttributesDao::insertOrFetchAttributes(
     sql::QueryContext* queryContext,
     const std::vector<common::metadata::Attribute>& eventAttributes)
 {
-    const auto content = QJson::serialized(eventAttributes);
+    const auto content = QnUbjson::serialized(eventAttributes);
 
     auto attributesId = findAttributesIdInCache(content);
     if (attributesId >= 0)
@@ -59,7 +59,7 @@ long long AttributesDao::insertOrFetchAttributes(
 std::vector<common::metadata::Attribute> AttributesDao::deserialize(
     const QString& attributesStr)
 {
-    return QJson::deserialized<std::vector<common::metadata::Attribute>>(
+    return QnUbjson::deserialized<std::vector<common::metadata::Attribute>>(
         attributesStr.toUtf8());
 }
 
