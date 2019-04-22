@@ -49,18 +49,16 @@ enum class MediatorApiProtocol
 class BasicTestFixture;
 
 class MemoryRemoteRelayPeerPool:
-    public nx::cloud::relay::model::AbstractRemoteRelayPeerPool
+    public nx::cloud::relay::model::RemoteRelayPeerPool
 {
+    using base_type = nx::cloud::relay::model::RemoteRelayPeerPool;
 public:
-    MemoryRemoteRelayPeerPool(BasicTestFixture* relayTest):
-        m_relayTest(relayTest)
-    {}
-
-    virtual bool connectToDb() override;
-    virtual bool isConnected() const override;
+    MemoryRemoteRelayPeerPool(
+        const nx::cloud::relay::conf::Settings& settings,
+        BasicTestFixture* relayTest);
 
     virtual void findRelayByDomain(
-        const std::string& /*domainName*/,
+        const std::string& domainName,
         nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const override;
 
     virtual void addPeer(
@@ -70,8 +68,6 @@ public:
     virtual void removePeer(
         const std::string& domainName,
         nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override;
-
-    virtual void setPublicUrl(const nx::utils::Url& /*publicUrl*/) override {}
 
 private:
     BasicTestFixture* m_relayTest;

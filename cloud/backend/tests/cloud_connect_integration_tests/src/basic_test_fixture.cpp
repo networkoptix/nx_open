@@ -66,38 +66,50 @@ std::optional<hpm::api::SystemCredentials>
 
 //-------------------------------------------------------------------------------------------------
 
+MemoryRemoteRelayPeerPool::MemoryRemoteRelayPeerPool(
+    const nx::cloud::relay::conf::Settings& settings,
+    BasicTestFixture* relayTest)
+    :
+    base_type(settings),
+    m_relayTest(relayTest)
+{
+}
+
 void MemoryRemoteRelayPeerPool::addPeer(
     const std::string& domainName,
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
 {
-    m_relayTest->peerAdded(domainName);
-    return handler(true);
-}
-
-bool MemoryRemoteRelayPeerPool::connectToDb()
-{
-    return true;
-}
-
-bool MemoryRemoteRelayPeerPool::isConnected() const
-{
-    return true;
+    base_type::addPeer(
+        domainName,
+        [this, domainName, handler = std::move(handler)](bool added)
+        {
+            if (added)
+                m_relayTest->peerAdded(domainName);
+            handler(added);
+        });
 }
 
 void MemoryRemoteRelayPeerPool::removePeer(
     const std::string& domainName,
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
 {
-    m_relayTest->peerRemoved(domainName);
-    return handler(true);
+    base_type::removePeer(
+        domainName,
+        [this, domainName, handler = std::move(handler)](bool removed)
+        {
+            if (removed)
+                m_relayTest->peerRemoved(domainName);
+            handler(removed);
+        });
 }
 
 void MemoryRemoteRelayPeerPool::findRelayByDomain(
-    const std::string& /*domainName*/,
+    const std::string& domainName,
     nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const
 {
-    auto redirectToEndpoint = m_relayTest->relayInstanceEndpoint(0).toStdString();
-    return handler(std::move(redirectToEndpoint));
+    base_type::findRelayByDomain(
+        domainName,
+        std::move(handler));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -186,9 +198,9 @@ void BasicTestFixture::setUpRemoteRelayPeerPoolFactoryFunc()
 {
     using namespace nx::cloud::relay::model;
     auto createRemoteRelayPeerPoolFunc =
-        [this](const conf::Settings&)
+        [this](const conf::Settings& settings)
         {
-            return std::make_unique<MemoryRemoteRelayPeerPool>(this);
+            return std::make_unique<MemoryRemoteRelayPeerPool>(settings, this);
         };
     RemoteRelayPeerPoolFactory::instance().setCustomFunc(createRemoteRelayPeerPoolFunc);
 }
@@ -419,8 +431,8 @@ nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
             .setEndpoint(httpsEndpoints[0]);
     }
 
-        return nx::utils::Url();
-    }
+    return nx::utils::Url();
+}
 
 //-------------------------------------------------------------------------------------------------
 // Listening server.
