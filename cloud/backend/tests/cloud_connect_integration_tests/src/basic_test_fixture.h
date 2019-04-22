@@ -16,8 +16,9 @@
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/relay/model/abstract_remote_relay_peer_pool.h>
-#include <nx/cloud/relay/test_support/traffic_relay_launcher.h>
+#include <nx/cloud/relay/model/remote_relay_peer_pool.h>
+#include <nx/cloud/relay/test_support/traffic_relay_cluster.h>
+#include <nx/cloud/relay/settings.h>
 #include <nx/cloud/mediator/test_support/mediator_cluster.h>
 
 namespace nx {
@@ -44,11 +45,6 @@ enum class MediatorApiProtocol
     stun,
     http
 };
-
-using Relay = nx::cloud::relay::test::Launcher;
-using RelayPtr = std::unique_ptr<Relay>;
-
-using RelayPtrList = std::vector<RelayPtr>;
 
 class BasicTestFixture;
 
@@ -101,6 +97,7 @@ public:
     };
 
 public:
+    MediatorConnectorCluster(const nx::utils::Url& discoveryServiceUrl);
     Context& addContext(const std::vector<const char*> args = {},
         int flags = nx::hpm::MediatorFunctionalTest::MediatorTestFlags::allFlags,
         const QString& testDir = QString(),
@@ -137,7 +134,7 @@ public:
      * @param flags Bitset of BasicTestFixture::Flag values.
      */
     void setInitFlags(int flags);
-    network::SocketAddress relayInstanceEndpoint(RelayPtrList::size_type index) const;
+    network::SocketAddress relayInstanceEndpoint(int index) const;
 
     void addRelayStartupArgument(
         const std::string& name,
@@ -249,7 +246,8 @@ private:
 
     QnMutex m_mutex;
     const nx::network::http::BufferType m_staticMsgBody;
-    MediatorConnectorCluster m_mediatorCluster;
+    nx::cloud::discovery::test::DiscoveryServer m_discoveryServer;
+    std::unique_ptr<MediatorConnectorCluster> m_mediatorCluster;
     hpm::api::SystemCredentials m_cloudSystemCredentials;
     std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
     nx::network::http::TestHttpServer m_cloudModulesXmlProvider;
@@ -267,7 +265,7 @@ private:
 
     std::unique_ptr<ProxyContext> m_proxyBeforeMediator;
 
-    RelayPtrList m_relays;
+    std::unique_ptr<nx::cloud::relay::test::TrafficRelayCluster> m_relays;
     int m_relayCount;
     std::optional<std::chrono::seconds> m_disconnectedPeerTimeout;
 

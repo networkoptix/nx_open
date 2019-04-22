@@ -8,7 +8,7 @@ protected:
     void whenTryToConnectToServerOnDifferentMediator(bool useHttps = false)
     {
         // m_mediaServer is connected to m_mediatorCluster.mediator(0);
-        auto& differentMediator = m_mediatorCluster.mediator(1);
+        auto& differentMediator = m_mediatorCluster->mediator(1);
 
         m_httpClient = std::make_unique<api::Client>(buildUrl(differentMediator, useHttps));
 

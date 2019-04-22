@@ -28,9 +28,9 @@ static MediatorEndpoint lookupMediatorEndpointSync(
 
 } //namespace
 
-MediatorCluster::MediatorCluster()
+MediatorCluster::MediatorCluster(const nx::utils::Url& discoveryServiceUrl):
+    m_discoveryServiceUrl(discoveryServiceUrl)
 {
-    NX_ASSERT(m_discoveryServer.bindAndListen(), "Failed to initialize discovery server");
 }
 
 MediatorFunctionalTest& MediatorCluster::addMediator(int flags, const QString& testDir)
@@ -109,7 +109,7 @@ void MediatorCluster::addClusterArgs(MediatorFunctionalTest* mediator)
     mediator->addArg("-listeningPeerDb/cluster/discovery/enabled", "true");
     mediator->addArg(
         "-listeningPeerDb/cluster/discovery/discoveryServiceUrl",
-        m_discoveryServer.url().toStdString().c_str());
+        m_discoveryServiceUrl.toStdString().c_str());
     mediator->addArg("-listeningPeerDb/cluster/discovery/roundTripPadding", "1ms");
     mediator->addArg("-listeningPeerDb/cluster/discovery/registrationErrorDelay", "10ms");
     mediator->addArg("-listeningPeerDb/cluster/discovery/onlineNodesRequestDelay", "10ms");

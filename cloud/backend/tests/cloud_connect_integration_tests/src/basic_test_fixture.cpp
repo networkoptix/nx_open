@@ -112,6 +112,13 @@ MediatorConnectorCluster::Context::Context(
 {
 }
 
+MediatorConnectorCluster::MediatorConnectorCluster(
+    const nx::utils::Url& discoveryServiceUrl)
+    :
+    m_cluster(discoveryServiceUrl)
+{
+}
+
 MediatorConnectorCluster::Context& MediatorConnectorCluster::addContext(
     const std::vector<const char*> args,
     int flags,
@@ -148,6 +155,10 @@ BasicTestFixture::BasicTestFixture(
     m_relayCount(relayCount),
     m_disconnectedPeerTimeout(disconnectedPeerTimeout)
 {
+    NX_ASSERT(m_discoveryServer.bindAndListen());
+    m_mediatorCluster = std::make_unique<MediatorConnectorCluster>(m_discoveryServer.url());
+    m_relays =
+        std::make_unique<nx::cloud::relay::test::TrafficRelayCluster>(m_discoveryServer.url());
     addMediator();
 }
 
@@ -187,9 +198,9 @@ void BasicTestFixture::setInitFlags(int flags)
     m_initFlags = flags;
 }
 
-network::SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::size_type index) const
+network::SocketAddress BasicTestFixture::relayInstanceEndpoint(int index) const
 {
-    return m_relays[index]->moduleInstance()->httpEndpoints()[0];
+    return m_relays->relay(index).httpEndpoint(0);
 }
 
 void BasicTestFixture::addRelayStartupArgument(
@@ -205,7 +216,7 @@ void BasicTestFixture::SetUp()
     setUpRemoteRelayPeerPoolFactoryFunc();
     startRelays();
 
-    ASSERT_EQ(m_relayCount, m_relays.size());
+    ASSERT_EQ(m_relayCount, m_relays->size());
 
     startMediator();
 
@@ -217,7 +228,7 @@ void BasicTestFixture::SetUp()
 
 void BasicTestFixture::addMediator()
 {
-    auto& mediatorContext = m_mediatorCluster.addContext({
+    auto& mediatorContext = m_mediatorCluster->addContext({
             "-stun/addrToListenList", "127.0.0.1:0",
             "-http/addrToListenList", "127.0.0.1:0"
         },
@@ -229,12 +240,12 @@ void BasicTestFixture::addMediator()
 
 int BasicTestFixture::mediatorCount() const
 {
-    return m_mediatorCluster.cluster().size();
+    return m_mediatorCluster->cluster().size();
 }
 
 void BasicTestFixture::startMediator(int index)
 {
-    if (!m_relays.empty())
+    if (!m_relays->empty())
         mediator(index).addArg("-trafficRelay/url", relayUrl().toStdString().c_str());
 
     ASSERT_TRUE(mediator(index).startAndWaitUntilStarted());
@@ -266,17 +277,17 @@ void BasicTestFixture::restartMediator(int index)
 
 const nx::hpm::test::MediatorCluster& BasicTestFixture::mediatorCluster() const
 {
-    return m_mediatorCluster.cluster();
+    return m_mediatorCluster->cluster();
 }
 
 nx::hpm::MediatorFunctionalTest& BasicTestFixture::mediator(int index)
 {
-    return m_mediatorCluster.context(index).mediator;
+    return m_mediatorCluster->context(index).mediator;
 }
 
 MediatorConnectorCluster::Context& BasicTestFixture::mediatorContext(int index)
 {
-    return m_mediatorCluster.context(index);
+    return m_mediatorCluster->context(index);
 }
 
 void BasicTestFixture::setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol)
@@ -361,43 +372,39 @@ void BasicTestFixture::startRelays()
 
 void BasicTestFixture::startRelay(int index)
 {
-    auto newRelay = std::make_unique<Relay>();
-
-    std::string endpointString = "127.0.0.1:0";
-    newRelay->addArg("-http/listenOn", endpointString.c_str());
+    auto& newRelay = m_relays->addRelay();
 
     const auto dataDirString = lm("%1/relay_%2").args(testDataDir(), index).toStdString();
-    newRelay->addArg("-dataDir", dataDirString.c_str());
+    newRelay.addArg("-dataDir", dataDirString.c_str());
 
     for (const auto& argument : m_relayStartupArguments)
     {
-        newRelay->removeArgByName(argument.name.c_str());
-        newRelay->addArg(
+        newRelay.removeArgByName(argument.name.c_str());
+        newRelay.addArg(
             lm("--%1=%2").args(argument.name, argument.value).toStdString().c_str());
     }
 
     if ((bool)m_disconnectedPeerTimeout)
     {
-        newRelay->addArg(
+        newRelay.addArg(
             "-listeningPeer/disconnectedPeerTimeout",
             std::to_string(m_disconnectedPeerTimeout->count()).c_str());
     }
 
-    ASSERT_TRUE(newRelay->startAndWaitUntilStarted());
-    m_relays.push_back(std::move(newRelay));
+    ASSERT_TRUE(newRelay.startAndWaitUntilStarted());
 }
 
 nx::cloud::relay::test::Launcher& BasicTestFixture::trafficRelay()
 {
-    return *m_relays[0];
+    return m_relays->relay(0);
 }
 
 nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
 {
-    NX_ASSERT(relayNum < (int)m_relays.size());
+    NX_ASSERT(relayNum < (int)m_relays->size());
 
-    const auto& httpEndpoints = m_relays[relayNum]->moduleInstance()->httpEndpoints();
-    const auto& httpsEndpoints = m_relays[relayNum]->moduleInstance()->httpsEndpoints();
+    const auto& httpEndpoints = m_relays->relay(relayNum).moduleInstance()->httpEndpoints();
+    const auto& httpsEndpoints = m_relays->relay(relayNum).moduleInstance()->httpsEndpoints();
 
     if (!httpEndpoints.empty())
     {
@@ -411,11 +418,9 @@ nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
             .setScheme(network::http::kSecureUrlSchemeName)
             .setEndpoint(httpsEndpoints[0]);
     }
-    else
-    {
+
         return nx::utils::Url();
     }
-}
 
 //-------------------------------------------------------------------------------------------------
 // Listening server.
@@ -459,7 +464,7 @@ void BasicTestFixture::stopCloud()
 {
     m_cloudModulesXmlProvider.httpMessageDispatcher().clear();
     mediator().stop();
-    m_relays.clear();
+    m_relays->clear();
 }
 
 void BasicTestFixture::startCloud()
@@ -537,11 +542,11 @@ void BasicTestFixture::assertDataHasBeenExchangedCorrectly()
 nx::hpm::MediatorEndpoint BasicTestFixture::waitUntilServerIsRegisteredOnMediator()
 {
     std::string systemId = m_cloudSystemCredentials.systemId.toStdString();
-    auto endpoint = m_mediatorCluster.cluster().lookupMediatorEndpoint(systemId);
+    auto endpoint = m_mediatorCluster->cluster().lookupMediatorEndpoint(systemId);
     while (!endpoint)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        endpoint = m_mediatorCluster.cluster().lookupMediatorEndpoint(systemId);
+        endpoint = m_mediatorCluster->cluster().lookupMediatorEndpoint(systemId);
     }
     return *endpoint;
 }
@@ -558,7 +563,7 @@ void BasicTestFixture::waitUntilServerIsUnRegisteredOnTrafficRelay()
 
 void BasicTestFixture::waitForServerStatusOnRelay(ServerRelayStatus status)
 {
-    const auto& listeningPool = m_relays[0]->moduleInstance()->listeningPeerPool();
+    const auto& listeningPool = m_relays->relay(0).moduleInstance()->listeningPeerPool();
     auto serverId = m_cloudSystemCredentials.systemId.toStdString();
     auto getServerStatus = [&]() { return listeningPool.isPeerOnline(serverId); };
 
@@ -623,7 +628,7 @@ void BasicTestFixture::startHttpServer(nx::hpm::api::MediatorConnector* connecto
 
     ASSERT_TRUE(m_httpServer->bindAndListen());
 
-    if (!m_relays.empty())
+    if (!m_relays->empty())
         waitUntilServerIsRegisteredOnTrafficRelay();
 }
 

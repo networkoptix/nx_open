@@ -21,6 +21,8 @@ public:
     virtual std::optional<nx::hpm::api::SystemCredentials> getSystemCredentials() const override;
 
 protected:
+    virtual void SetUp() override;
+
     void addMediator();
 
     void givenMultipleMediators();
@@ -38,7 +40,8 @@ protected:
     void thenRequestIsRedirected();
 
 protected:
-    MediatorCluster m_mediatorCluster;
+    nx::cloud::discovery::test::DiscoveryServer m_discoveryServer;
+    std::unique_ptr<MediatorCluster> m_mediatorCluster;
 
     AbstractCloudDataProvider::System m_system;
     std::unique_ptr<MediaServerEmulator> m_mediaServer;

@@ -17,9 +17,15 @@ std::optional<nx::hpm::api::SystemCredentials> MediatorScalabilityTestFixture::g
     return systemCredentials;
 }
 
+void MediatorScalabilityTestFixture::SetUp()
+{
+    ASSERT_TRUE(m_discoveryServer.bindAndListen());
+    m_mediatorCluster = std::make_unique<MediatorCluster>(m_discoveryServer.url());
+}
+
 void MediatorScalabilityTestFixture::addMediator()
 {
-    auto& mediator = m_mediatorCluster.addMediator({
+    auto& mediator = m_mediatorCluster->addMediator({
         "-https/listenOn", "127.0.0.1",
         "-http/connectionInactivityTimeout", "10m"});
 
@@ -43,8 +49,8 @@ void MediatorScalabilityTestFixture::givenSynchronizedClusterWithListeningServer
 
 void MediatorScalabilityTestFixture::whenAddServer()
 {
-    m_system = m_mediatorCluster.mediator(0).addRandomSystem();
-    m_mediaServer = m_mediatorCluster.mediator(0).addRandomServer(m_system);
+    m_system = m_mediatorCluster->mediator(0).addRandomSystem();
+    m_mediaServer = m_mediatorCluster->mediator(0).addRandomServer(m_system);
     m_mediaServerFullName = m_mediaServer->fullName().toStdString();
 
     auto resultCodeAndResponse = m_mediaServer->listen();
@@ -58,13 +64,13 @@ void MediatorScalabilityTestFixture::whenMediaServerGoesOffline()
 
 void MediatorScalabilityTestFixture::thenServerInfoIsSynchronized()
 {
-    while (!m_mediatorCluster.peerInformationSynchronizedInCluster(m_mediaServerFullName))
+    while (!m_mediatorCluster->peerInformationSynchronizedInCluster(m_mediaServerFullName))
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
 
 void MediatorScalabilityTestFixture::thenServerInfoIsDroppedFromCluster()
 {
-    while (!m_mediatorCluster.peerInformationIsAbsentFromCluster(m_mediaServerFullName))
+    while (!m_mediatorCluster->peerInformationIsAbsentFromCluster(m_mediaServerFullName))
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
 

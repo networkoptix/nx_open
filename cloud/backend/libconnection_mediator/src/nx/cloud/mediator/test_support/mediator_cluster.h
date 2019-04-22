@@ -12,7 +12,7 @@ namespace nx::hpm::test {
 class MediatorCluster
 {
 public:
-    MediatorCluster();
+    MediatorCluster(const nx::utils::Url& url);
 
     /**
      * Adds a mediator to the cluster with necessary arguments for cluster operation.
@@ -61,7 +61,7 @@ private:
 
 private:
     std::vector<std::unique_ptr<MediatorFunctionalTest>> m_mediators;
-    nx::cloud::discovery::test::DiscoveryServer m_discoveryServer;
+    nx::utils::Url m_discoveryServiceUrl;
 };
 
 } // namespace nx::hpm::test
