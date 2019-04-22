@@ -42,7 +42,7 @@ protected:
     api::Client& relayClient()
     {
         if (!m_relayClient)
-            m_relayClient = std::make_unique<api::Client>(relay().basicUrl());
+            m_relayClient = std::make_unique<api::Client>(relay().httpUrl());
         return *m_relayClient;
     }
 
@@ -259,7 +259,7 @@ protected:
         using namespace std::placeholders;
 
         m_httpClient = std::make_unique<GetStatisticsHttpClient>(
-            nx::network::url::Builder(relay().basicUrl())
+            nx::network::url::Builder(relay().httpUrl())
                 .setPath(api::kRelayStatisticsMetricsPath).toUrl(),
             nx::network::http::AuthInfo());
         m_httpClient->execute(

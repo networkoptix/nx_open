@@ -60,10 +60,10 @@ protected:
         addRelayInstance();
 
         m_clientSideApiClient = std::make_unique<ClientSideApiClient>(
-            relay().basicUrl(), nullptr);
+            relay().httpUrl(), nullptr);
 
         m_serverSideApiClient = std::make_unique<ServerSideApiClient>(
-            relay().basicUrl(), nullptr);
+            relay().httpUrl(), nullptr);
     }
 
     //---------------------------------------------------------------------------------------------
