@@ -39,7 +39,7 @@ set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0032")
 
 # Installer Customizations
-set(installer.language "zh_TW")
+set(installerLanguage "zh_TW")
 set(installer.cultures "zh-tw")
 
 # Localization
