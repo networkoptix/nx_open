@@ -6,12 +6,16 @@
     border-color : $light4;
     
     &--header {
+        height           : rem(48px);
+        display          : flex;
+        align-items      : center;
         background-color : $additional_light1;
-        padding          : 1rem;
+        padding          : 0 1rem;
         border-bottom    : 1px solid $light3;
         
         h4 {
             margin : 0;
+            width  : 100%;
         }
     
         &-logo {
@@ -81,6 +85,13 @@
     &.fixed-height {
         height   : rem(300px);
         overflow : hidden;
+    }
+    
+    &.extended-header {
+        .card--header {
+            height  : auto;
+            padding : 1rem;
+        }
     }
 }
 
