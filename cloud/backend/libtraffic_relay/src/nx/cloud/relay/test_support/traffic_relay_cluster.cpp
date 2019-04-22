@@ -31,7 +31,7 @@ nx::network::SocketAddress TrafficRelay::httpEndpoint(int index) const
 
 nx::network::SocketAddress TrafficRelay::httpsEndpoint(int index) const
 {
-    NX_ASSERT(index < moduleInstance()->httpsEndpoints().size());
+    NX_ASSERT(index < static_cast<int>(moduleInstance()->httpsEndpoints().size()));
     return moduleInstance()->httpsEndpoints().empty()
         ? nx::network::SocketAddress()
         : moduleInstance()->httpsEndpoints()[index];
