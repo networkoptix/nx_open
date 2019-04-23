@@ -518,6 +518,18 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             result = tr("System disk \"%1\" is almost full.").arg(storageUrl);
             break;
         }
+        case EventReason::metadataStorageOffline:
+        {
+            QString storageUrl = reasonParamsEncoded;
+            result = tr("Analytics storage \"%1\" is offline.").arg(storageUrl);
+            break;
+        }
+        case EventReason::metadataStorageFull:
+        {
+            QString storageUrl = reasonParamsEncoded;
+            result = tr("Analytics storage \"%1\" is almost full.").arg(storageUrl);
+            break;
+        }
         case EventReason::backupFailedNoBackupStorageError:
         {
             result = tr("Archive backup failed: No available backup storages with sufficient free space");

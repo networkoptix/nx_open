@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <deque>
 #include <optional>
 #include <vector>
 
@@ -45,16 +46,33 @@ public:
      */
     std::vector<AggregatedTrackData> getAggregatedData(bool flush);
 
-    std::chrono::milliseconds length() const;
-
 private:
+    struct AggregationContext
+    {
+        std::optional<std::chrono::milliseconds> aggregationStartTimestamp;
+        std::optional<std::chrono::milliseconds> aggregationEndTimestamp;
+        RectAggregator<QnUuid /*objectId*/> rectAggregator;
+    };
+
     const int m_resolutionX;
     const int m_resolutionY;
     const std::chrono::milliseconds m_aggregationPeriod;
 
-    std::optional<std::chrono::milliseconds> m_aggregationStartTimestamp;
-    std::optional<std::chrono::milliseconds> m_aggregationEndTimestamp;
-    RectAggregator<QnUuid /*objectId*/> m_rectAggregator;
+    std::deque<AggregationContext> m_aggregations;
+
+    void add(
+        AggregationContext* context,
+        const QnUuid& objectId,
+        std::chrono::milliseconds timestamp,
+        const QRectF& box);
+
+    std::vector<AggregatedTrackData> getAggregatedData(
+        AggregationContext* context);
+
+    void takeOldestData(
+        std::vector<AggregatedTrackData>* const totalAggregated);
+
+    std::chrono::milliseconds length(const AggregationContext& context) const;
 
     QRect translate(const QRectF& box);
 };

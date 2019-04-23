@@ -843,7 +843,7 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
         case State::readyInstall:
             m_clientItem->state = StatusCode::readyToInstall;
             m_clientItem->progress = 100;
-            m_clientItem->statusMessage = tr("Ready to download update");
+            m_clientItem->statusMessage = tr("Ready to install update");
             break;
         case State::readyRestart:
             m_clientItem->statusMessage = tr("Ready to restart to the new version");

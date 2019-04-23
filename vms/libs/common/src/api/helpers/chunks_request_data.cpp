@@ -32,18 +32,21 @@ const QString kGroupByParamName(lit("groupBy"));
 
 bool isValidMotionRect(const QRect& rect)
 {
-    return !rect.isEmpty()
-        && rect.left() >= 0
-        && rect.top() >= 0
-        && rect.right() < Qn::kMotionGridWidth
-        && rect.bottom() < Qn::kMotionGridHeight;
+    return rect.isEmpty()
+        || (rect.left() >= 0 && rect.right() < Qn::kMotionGridWidth
+            && rect.top() >= 0 && rect.bottom() < Qn::kMotionGridHeight);
 };
 
 bool isValidMotionRegion(const QRegion& region)
 {
-    return region.rectCount() > 0
-        && std::all_of(region.cbegin(), region.cend(), isValidMotionRect);
+    return region.isNull()
+        || std::all_of(region.cbegin(), region.cend(), isValidMotionRect);
 };
+
+bool isNullRegion(const QRegion& region)
+{
+    return region.isNull();
+}
 
 } // namespace
 
@@ -164,7 +167,9 @@ bool QnChunksRequestData::isValid() const
     if (periodsType == Qn::MotionContent && !filter.trimmed().isEmpty())
     {
         const auto motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
-        if (!std::all_of(motionRegions.cbegin(), motionRegions.cend(), isValidMotionRegion))
+        if (!std::any_of(motionRegions.cbegin(), motionRegions.cend(), isValidMotionRegion))
+            return false;
+        if (std::all_of(motionRegions.cbegin(), motionRegions.cend(), isNullRegion))
             return false;
     }
 

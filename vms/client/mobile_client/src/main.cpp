@@ -189,7 +189,7 @@ int runUi(QtSingleGuiApplication* application)
 
         if (QnAppInfo::isArm())
         {
-            if (QnAppInfo::isBpi() && !QnAppInfo::isMobile())
+            if (QnAppInfo::isNx1())
             {
                 maxFfmpegResolution = QSize(1280, 720);
                 maxFfmpegHevcResolution = QSize(640, 480);

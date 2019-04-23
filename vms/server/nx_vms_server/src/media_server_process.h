@@ -234,6 +234,10 @@ private:
     void connectStorageSignals(QnStorageManager* storage);
     void setUpDataFromSettings();
     bool initializeAnalyticsEvents();
+    void saveMediaServerUserAttributes(
+        ec2::AbstractECConnectionPtr ec2Connection,
+        const nx::vms::api::MediaServerUserAttributesData& userAttrsData);
+    QString getMetadataDatabaseName() const;
     QnUuid selectDefaultStorageForAnalyticsEvents(QnMediaServerResourcePtr server);
     void setUpTcpLogReceiver();
     void initNewSystemStateIfNeeded(

@@ -157,7 +157,6 @@ void QnPlOnvifResource::updateTimer(
         timeout);
 }
 
-
 QnPlOnvifResource::VideoEncoderCapabilities::VideoEncoderCapabilities(
     std::string videoEncoderToken,
     const onvifXsd__VideoEncoderConfigurationOptions& options,
@@ -1720,21 +1719,17 @@ std::string QnPlOnvifResource::videoEncoderConfigurationToken(
     nx::vms::api::StreamIndex streamIndex) const
 {
     QnMutexLocker lock(&m_mutex);
-    if (const auto it = m_videoEncoderConfigurationTokens.find(streamIndex);
-        it != m_videoEncoderConfigurationTokens.cend())
+    if (streamIndex == nx::vms::api::StreamIndex::primary
+        && !m_primaryStreamCapabilitiesList.empty())
     {
-        return it->second;
+        return m_primaryStreamCapabilitiesList[0].videoEncoderToken;
     }
-
+    if (streamIndex == nx::vms::api::StreamIndex::secondary
+        && !m_secondaryStreamCapabilitiesList.empty())
+    {
+        return m_secondaryStreamCapabilitiesList[0].videoEncoderToken;
+    }
     return std::string();
-}
-
-void QnPlOnvifResource::setVideoEncoderConfigurationToken(
-    nx::vms::api::StreamIndex streamIndex,
-    std::string token)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_videoEncoderConfigurationTokens[streamIndex] = std::move(token);
 }
 
 std::string QnPlOnvifResource::audioSourceConfigurationToken() const

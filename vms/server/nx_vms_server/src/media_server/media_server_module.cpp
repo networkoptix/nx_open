@@ -251,13 +251,11 @@ QnMediaServerModule::QnMediaServerModule(
         isRootToolEnabled,
         qApp->applicationFilePath());
 
-    #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-        if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
-        {
-            m_settings->mutableSettings()->setBootedFromSdCard(
-                Nx1::isBootedFromSD(m_rootFileSystem.get()));
-        }
-    #endif
+    if (QnAppInfo::isNx1())
+    {
+        m_settings->mutableSettings()->setBootedFromSdCard(
+            Nx1::isBootedFromSD(m_rootFileSystem.get()));
+    }
 
     m_fileDeletor = store(new QnFileDeletor(this));
 

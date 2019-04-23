@@ -41,7 +41,6 @@ template<typename T>
 QByteArray serialized(const T& value)
 {
     QByteArray buf;
-    buf.reserve(256);
     serialize(value, &buf);
     return buf;
 }

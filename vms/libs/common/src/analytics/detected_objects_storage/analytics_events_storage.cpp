@@ -10,6 +10,7 @@
 
 #include "config.h"
 #include "object_searcher.h"
+#include "time_period_fetcher.h"
 
 namespace nx::analytics::storage {
 
@@ -186,8 +187,24 @@ void EventsStorage::lookupTimePeriods(
     auto result = std::make_shared<QnTimePeriodList>();
     QnMutexLocker lock(&m_dbControllerMutex);
     m_dbController->queryExecutor().executeSelect(
-        std::bind(&EventsStorage::selectTimePeriods, this,
-            _1, std::move(filter), std::move(options), result.get()),
+        [this, filter = std::move(filter), options = std::move(options), result](
+            nx::sql::QueryContext* queryContext)
+        {
+            if (kUseTrackAggregation)
+            {
+                TimePeriodFetcher timePeriodFetcher(
+                    m_deviceDao,
+                    m_objectTypeDao,
+                    m_timePeriodDao,
+                    m_maxRecordedTimestamp);
+                return timePeriodFetcher.selectTimePeriods(
+                    queryContext, filter, options, result.get());
+            }
+            else
+            {
+                return selectTimePeriods(queryContext, filter, options, result.get());
+            }
+        },
         [this, result, completionHandler = std::move(completionHandler)](
             sql::DBResult resultCode)
         {

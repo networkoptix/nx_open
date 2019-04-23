@@ -17,7 +17,8 @@ if("${platform}" STREQUAL "linux")
         set(_withMobileClient OFF)
         set(_withTests OFF)
 
-        if("${box}" STREQUAL "bpi")
+        if("${box}" STREQUAL "none"
+            OR "${box}" STREQUAL "bpi")
             set(_withTests ON)
         endif()
     elseif("${arch}" STREQUAL "arm64")
