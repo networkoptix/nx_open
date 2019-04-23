@@ -238,6 +238,10 @@ bool OnvifMulticastParametersProxy::setVideoEncoderMulticastParameters(
         NX_DEBUG(this, errorFormatString, "set", media2.soapErrorAsString());
         return false;
     }
+
+    NX_DEBUG(this, "Camera [%1], change multicast parameters, reopen stream: %2",
+        m_resource->getId(), m_streamIndex);
+    m_resource->reopenStream(m_streamIndex);
     return true;
 }
 

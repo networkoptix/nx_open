@@ -977,7 +977,6 @@ bool QnRtspClient::sendTeardown()
     return sendRequestInternal(std::move(request));
 }
 
-
 void QnRtspClient::setKeepAliveTimeout(std::chrono::milliseconds keepAliveTimeout)
 {
     m_keepAliveTimeOut = std::move(keepAliveTimeout);
