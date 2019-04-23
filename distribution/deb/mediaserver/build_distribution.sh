@@ -155,6 +155,7 @@ copyBins()
     install -m 755 "$BUILD_DIR/bin/external.dat" "$STAGE_BIN/" #< TODO: Why "+x" is needed?
     install -m 755 "$SCRIPTS_DIR/config_helper.py" "$STAGE_BIN/"
     install -m 755 "$SCRIPTS_DIR/shell_utils.sh" "$STAGE_BIN/"
+    install -m 755 "$SOURCE_DIR/nx_log_viewer.html" "$STAGE_BIN/"
 
     echo "Copying mediaserver startup script"
     install -m 755 "bin/mediaserver" "$STAGE_BIN/"
