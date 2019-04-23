@@ -19,7 +19,8 @@
 }
 
 .dropdown-menu {
-    width : auto !important;
+    width          : auto !important;
+    padding-bottom : 4px;
 
     @media (max-width : $collapse-first-width) {
         right : 0;

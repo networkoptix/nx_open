@@ -113,7 +113,7 @@ correct items are shown for admin
     [tags]    C41561    Threaded
     Log in to Auto Tests System    ${EMAIL ADMIN}
     Wait Until Element Is Visible    ${USERS LIST}
-    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OWNER LABEL}    ${OWNER NAME}    ${OWNER EMAIL}
+    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OWNER LABEL}    ${OWNER NAME}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[contains(text(), ${ADMIN TEXT})]
 
 correct items are shown for advanced viewer and below
     [tags]    C41562    Threaded

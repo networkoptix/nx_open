@@ -235,6 +235,7 @@ select {
 
 #badge-large {
     height    : 32px;
+    font-family: $font-family-regular;
     font-size : rem(13px);
     padding   : 0 12px;
 }
@@ -338,4 +339,9 @@ ngb-tabset {
             }
         }
     }
+}
+
+.button-fix > div.alert > button {
+    padding: 0 1.25rem !important;
+    margin-top: 2px;
 }

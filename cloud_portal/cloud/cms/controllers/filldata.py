@@ -333,7 +333,7 @@ def fill_content(product,
                 changed_records = changed_records.filter(id__in=changed_records_ids)
 
     if not incremental:  # If not incremental - iterate all contexts and all languages
-        changed_contexts = Context.objects.filter(product_type=product.product_type).exclude(is_global=True)
+        changed_contexts = Context.objects.filter(product_type=product.product_type)
         changed_languages = product.languages_list
 
     default_language_code = product.default_language.code

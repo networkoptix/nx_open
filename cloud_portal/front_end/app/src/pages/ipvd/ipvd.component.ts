@@ -57,7 +57,7 @@ export class NxIpvdComponent implements OnInit {
             'vendor', 'model', 'hardwareType',
             'maxResolution', 'maxFps', 'primaryCodec', 'isAudioSupported',
             'isTwAudioSupported', 'isPtzSupported', 'isAptzSupported',
-            'isFisheye', 'isMdSupported', 'isIoSupported', 'count'
+            'isFisheye', 'isMdSupported', 'isIoSupported', 'count', 'resolutionArea'
         ];
 
         this.placeholder = '';

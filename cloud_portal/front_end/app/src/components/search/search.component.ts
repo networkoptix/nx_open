@@ -323,7 +323,9 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         }
 
         // Reset page number after filter changed
-        queryParams.page = (!this.numberFilters) ? undefined : 1;
+        if (this.params && !this.params.page) {
+            queryParams.page = (!this.numberFilters) ? undefined : 1;
+        }
 
         this.uri.updateURI(this.uriPath, queryParams, true);
     }

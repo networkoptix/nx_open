@@ -1,6 +1,7 @@
 import django
 import logging
 import json
+import time
 import traceback
 
 from rest_framework.response import Response
@@ -298,6 +299,8 @@ def log_error(request, error, log_level):
     user_name = 'not authorized'
     request_data = ''
     ip = 'unknown'
+    login_type = 'temp key'
+    session_time = 0
 
     if isinstance(request, Request):
         page_url = request.build_absolute_uri()
@@ -305,6 +308,11 @@ def log_error(request, error, log_level):
         ip = get_client_ip(request)
         if not isinstance(request.user, AnonymousUser):
             user_name = request.user.email
+        if request.session:
+            if 'login' in request.session and request.session['login'] == request.user.email:
+                login_type = 'email and password'
+            if 'time' in request.session:
+                session_time = (time.time() - request.session['time'])/1000.0
 
     if isinstance(request_data, QueryDict):
         request_data = request_data.dict()
@@ -326,18 +334,23 @@ def log_error(request, error, log_level):
     clean_passwords(request_data)
 
     if log_level == logging.INFO:
-        error_formatted = ' {}:{} ({} at {}) Request: {}'. \
+        error_formatted = ' {}:{}\nUser: {} Login: {} Session Time: {} IP: {}\n{} Request: {}'. \
             format(error.__class__.__name__,
                    error_text,
                    user_name,
+                   login_type,
+                   session_time,
+                   ip,
                    page_url,
                    request_data
                    )
     else:
-        error_formatted = ' {}:{}\n{}({}) at {} Request: {}\n{}\nCall Stack: \n{}'. \
+        error_formatted = ' {}:{}\nUser: {} Login: {} Session Time: {} IP: {}\n{} Request: {}\n{}\nCall Stack: \n{}'. \
             format(error.__class__.__name__,
                    error_text,
                    user_name,
+                   login_type,
+                   session_time,
                    ip,
                    page_url,
                    request_data,
@@ -353,6 +366,7 @@ def kill_session(request):
     request.session.pop('login', None)
     request.session.pop('password', None)
     request.session.pop('timezone', None)
+    request.session.pop('time', None)
     django.contrib.auth.logout(request)
 
 

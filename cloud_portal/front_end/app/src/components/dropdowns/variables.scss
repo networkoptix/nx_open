@@ -1,4 +1,9 @@
 //** Dropdown
 $dropdown-header-height : 32px;
-$dropdown-list-height : 312px;
-$dropdown-multi-list-height : $dropdown-list-height - $dropdown-header-height;
+$dropdown-item-height : 26px;
+$dropdown-items-visible : 10;
+
+
+
+$dropdown-list-height : ($dropdown-item-height * $dropdown-items-visible) - ($dropdown-item-height / 2) + 3px;
+$dropdown-multi-list-height : $dropdown-list-height - $dropdown-header-height + 2px;

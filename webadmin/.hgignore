@@ -1,4 +1,13 @@
 syntax: glob
+.idea
+.sass-cache
 .tmp
+
+dist
 node_modules
+static
+translation/language_pack
+
+external.zip
+external.dat
 package-lock.json

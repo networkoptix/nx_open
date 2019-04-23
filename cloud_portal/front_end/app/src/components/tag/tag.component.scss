@@ -3,13 +3,6 @@
 @import '../../../styles/theme_variables';
 @import '../../styles/mixins';
 
-button {
-    font-family: $font-family-regular;
-    font-size: rem(13px);
-    font-weight: 400;
-    white-space: nowrap;
-}
-
 .close-button {
     border-radius: 2px;
     display: flex;

@@ -2,9 +2,10 @@
   "language": "en_US",
   "language_name": "LANGUAGE_NAME",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "Cancel",
     "loginTitle": "Log in to %PRODUCT_NAME%",
     "loginButton": "Log in",
@@ -49,6 +50,7 @@
   },
   "systemStatuses": {
     "activated": "activated",
+    "incompatible": "incompatible",
     "merging": "merging",
     "notActivated": "not activated",
     "online": "online",
@@ -150,9 +152,14 @@
     "lostConnection": "Connection to {{systemName}} lost",
     "thisSystem": "the system",
     "oldSafariNotSupported": "Versions of Safari older than 10 are not supported",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "good",
@@ -198,6 +205,7 @@
     "confirmUnshareAction": "Delete",
     "successDisconnected": "System is successfully disconnected from %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} is successfully deleted from your account",
+    "failedMerge": "System merge failed",
     "successMerge":"System merge completed",
     "permissionsRemoved": "Permissions were removed from {{email}}",
     "unknownName": "Unknown Name for System (Caused by cloud merge)"
@@ -271,5 +279,10 @@
       "stop listening"      : "stop listening",
       "help"                : "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "We'd recommend consulting with",
+    "b_support": "support",
+    "c_proceeding": "before proceeding."
   }
 }

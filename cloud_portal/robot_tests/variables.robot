@@ -220,6 +220,21 @@ ${PATCHES TAB}                        //span[@class='tab-heading' and text()='Pa
 ${BETAS TAB}                          //span[@class='tab-heading' and text()='Betas']/..
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1
 
+#IPVD
+${IPVD TITLE}                        //header//li[@class="active"]/a[contains(text(),"${IPVD TITLE TEXT}")]
+${IPVD SEARCH BAR}                   //ipvd//input[@name="query"]
+${IPVD ADVANCED SEARCH BUTTON}       //ipvd//span[contains(text(),"${IPVD ADVANCED SEARCH BUTTON TEXT}")]
+${IPVD MANFUACTURERS PANE}           //ipvd//header/span[contains(text(),"manufacturers")]/../../../..
+${IPVD DEVICES PANE}                 //ipvd//header/span[contains(text(),"devices")]/../../../..
+${IPVD CLEAR FILTERS BUTTON}         //ipvd//span[@class="close-button"]
+${IPVD TABLE}                        //ipvd//table
+${IPVD FIRST TABLE ITEM}             ${IPVD TABLE}/tbody/tr[1]
+${IPVD LAST TABLE ITEM}              ${IPVD TABLE}/tbody/tr[0=count(following-sibling::tr)]//td
+${IPVD PREVIOUS BUTTON}              //ipvd//a/span[contains(text(),"«")]
+${IPVD NEXT BUTTON}                  //ipvd//a/span[contains(text(),"»")]
+${IPVD LAST PAGE BUTTON}             //ipvd//ul/[@class="pagination"]/li[@class="page-item disabled"]/following-sibling::li/a
+${IPVD CLOSE DETAILS BUTTON}         //ipvd//header//span[@class="glyphicon close-icon detailsClose"]
+
 #Footer
 ${FOOTER ABOUT LINK}                 //footer//a[contains(text(),"${ABOUT} ${PRODUCT_NAME}")]
 ${FOOTER KNOWN LIMITS LINK}          //footer//a[contains(text(),"${KNOWN LIMITATIONS}")]

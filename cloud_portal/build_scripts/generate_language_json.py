@@ -70,7 +70,7 @@ def generate_languages_files(languages, template_filename):
             data = json.load(file_descriptor)
             data["language"] = lang
 
-            if data["language_name"]=='LANGUAGE_NAME':
+            if data["language_name"] == 'LANGUAGE_NAME':
                 sys.stderr.write('ERROR: For BORIS to fix: language.json has wrong language_name. '
                                  'File: ' + language_json_filename + '\n')
                 data["language_name"] = lang

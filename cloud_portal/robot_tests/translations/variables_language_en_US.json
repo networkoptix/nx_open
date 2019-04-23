@@ -99,5 +99,8 @@
     "PASSWORD IS WEAK BADGE TEXT"          :    "weak",
     "PASSWORD IS FAIR BADGE TEXT"          :    "fair",
     "PASSWORD IS GOOD BADGE TEXT"          :    "good",
-    "PASSWORD INCORRECT BADGE TEXT"        :    "incorrect"
+    "PASSWORD INCORRECT BADGE TEXT"        :    "incorrect",
+
+    "IPVD TITLE TEXT"                      :    "Supported IP Video Devices",
+    "IPVD ADVANCED SEARCH BUTTON TEXT"     :    "Advanced search"
 }
