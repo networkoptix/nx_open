@@ -1147,12 +1147,12 @@ protected:
 
     void givenObjectsWithInterleavedTracks()
     {
-        constexpr int objectsCount = 3;
+        constexpr int objectCount = 3;
 
         auto newPackets = generateEventsByCriteria();
 
         const auto deviceId = QnUuid::createUuid();
-        std::vector<QnUuid> objectIds(3, QnUuid());
+        std::vector<QnUuid> objectIds(objectCount, QnUuid());
         std::generate(objectIds.begin(), objectIds.end(), &QnUuid::createUuid);
 
         for (auto& packet: newPackets)
