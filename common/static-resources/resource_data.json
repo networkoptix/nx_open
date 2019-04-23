@@ -3316,6 +3316,7 @@
             "_comment1": "Mapped for 2.623.0000000.1.R, Build Date 2018-06-27",
             "keys": [
                 "Dahua|DH-SD50225U*", "DH-SD50225U*|Dahua",
+                "Dahua|SD50225U*", "SD50225U*|Dahua",
                 "Dahua|DH-SD59225U*", "DH-SD59225U*|Dahua"
             ],
             "ptzMapper": {
