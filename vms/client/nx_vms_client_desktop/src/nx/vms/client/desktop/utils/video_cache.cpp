@@ -14,11 +14,13 @@ VideoCache::VideoCache(QObject* parent):
 
 void VideoCache::setCacheSize(std::chrono::microseconds value)
 {
+    QnMutexLocker lock(&m_mutex);
     m_cacheSize = value;
 }
 
 std::chrono::microseconds VideoCache::cacheSize() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_cacheSize;
 }
 
@@ -39,7 +41,7 @@ void VideoCache::setCachedDevices(QSet<QnUuid>& value)
 QImage VideoCache::image(
     const QnUuid& resourceId,
     std::chrono::microseconds timestamp,
-    std::chrono::microseconds* outImageTimestamp)
+    std::chrono::microseconds* outImageTimestamp) const
 {
     QnMutexLocker lock(&m_mutex);
     if (outImageTimestamp)

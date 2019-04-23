@@ -29,14 +29,14 @@ public:
     QImage image(
         const QnUuid& resourceId,
         std::chrono::microseconds timestamp,
-        std::chrono::microseconds* outImageTimestamp = nullptr);
+        std::chrono::microseconds* outImageTimestamp = nullptr) const;
 
     void add(const QnUuid& resourceId, const CLVideoDecoderOutputPtr& frame);
 
     void setCacheSize(std::chrono::microseconds value);
     std::chrono::microseconds cacheSize() const;
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     QMap<QnUuid, std::deque<CLVideoDecoderOutputPtr>> m_cache;
     std::chrono::microseconds m_cacheSize{};
 };
