@@ -7,6 +7,7 @@
 #include <core/resource/camera_advanced_param.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/fusion/model_functions.h>
 
 namespace nx {
 namespace vms {
@@ -196,6 +197,10 @@ bool OnvifMulticastParametersProxy::setMulticastParameters(MulticastParameters p
     // address for audio. We does not care here if setAudioEncoder fails' cause it most probably
     // will not affect behavior of most of the cameras.
     setAudioEncoderMulticastParameters(parameters);
+
+    NX_DEBUG(this, lm("Camera [%1], change multicast parameters, reopen stream: %2")
+        .args(m_resource->getId(), QnLexical::serialized(m_streamIndex)));
+    m_resource->reopenStream(m_streamIndex);
     return true;
 }
 

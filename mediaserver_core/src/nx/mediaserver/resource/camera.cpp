@@ -12,7 +12,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <nx/fusion/fusion/fusion.h>
-#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/model_functions.h>
 
 #include "camera_advanced_parameters_providers.h"
 
@@ -579,6 +579,26 @@ QnConstResourceAudioLayoutPtr Camera::getAudioLayout(const QnAbstractStreamDataP
         }
     }
     return base_type::getAudioLayout(dataProvider);
+}
+
+void Camera::reopenStream(Qn::StreamIndex streamIndex)
+{
+    auto camera = qnCameraPool ->getVideoCamera(toSharedPointer(this));
+    if (!camera)
+        return;
+
+    QnLiveStreamProviderPtr reader;
+    if (streamIndex == Qn::StreamIndex::primary)
+        reader = camera->getPrimaryReader();
+    else if (streamIndex == Qn::StreamIndex::secondary)
+        reader = camera->getSecondaryReader();
+
+    if (reader && reader->isRunning())
+    {
+        NX_DEBUG(this, lm("Camera [%1], reopen reader: %2").args(
+            getId(), QnLexical::serialized(streamIndex)));
+        reader->pleaseReopenStream();
+    }
 }
 
 } // namespace resource

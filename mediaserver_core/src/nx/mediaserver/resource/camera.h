@@ -4,6 +4,9 @@
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/media_stream_capability.h>
 
+#include <camera/camera_pool.h>
+#include <camera/video_camera.h>
+
 namespace nx {
 namespace mediaserver {
 namespace resource {
@@ -131,6 +134,8 @@ public:
     };
 
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
+
+    void reopenStream(Qn::StreamIndex streamIndex);
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
