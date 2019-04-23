@@ -266,7 +266,9 @@ bool SortedPeerUpdatesModel::lessThan(const QModelIndex& leftIndex, const QModel
         return left < right;
 
     if (left->offline != right->offline)
-        return !left->offline;
+    {
+        return left->state != nx::update::Status::Code::offline;
+    }
 
     QString lname = leftIndex.data(Qt::DisplayRole).toString();
     QString rname = rightIndex.data(Qt::DisplayRole).toString();

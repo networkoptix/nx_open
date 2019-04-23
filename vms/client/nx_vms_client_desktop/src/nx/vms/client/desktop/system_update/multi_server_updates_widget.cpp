@@ -738,7 +738,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
 
     if (stateHasProgress(m_widgetState))
         syncProgress();
-    if (m_serverUpdateTool->hasRemoteChanges() || m_updateLocalStateChanged)
+    if (m_updateRemoteStateChanged || m_updateLocalStateChanged)
         loadDataToUi();
 
     syncDebugInfoToUi();
@@ -1354,6 +1354,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         ServerUpdateTool::RemoteStatus remoteStatus;
         m_serverUpdateTool->getServersStatusChanges(remoteStatus);
         m_stateTracker->setUpdateStatus(remoteStatus);
+        m_stateTracker->processUnknownStates();
 
         /*
          * TODO: We should deal with starting client update.
@@ -1646,7 +1647,12 @@ bool MultiServerUpdatesWidget::processRemoteChanges()
     // TODO: It could be moved to UpdateTool
     ServerUpdateTool::RemoteStatus remoteStatus;
     if (m_serverUpdateTool->getServersStatusChanges(remoteStatus))
-        m_stateTracker->setUpdateStatus(remoteStatus);
+    {
+        if (m_stateTracker->setUpdateStatus(remoteStatus) > 0)
+            m_updateRemoteStateChanged = true;
+    }
+
+    m_stateTracker->processUnknownStates();
 
     m_clientUpdateTool->checkInternalState();
 
@@ -1670,7 +1676,7 @@ bool MultiServerUpdatesWidget::processRemoteChanges()
         auto idle = m_stateTracker->peersInState(StatusCode::idle);
         auto all = m_stateTracker->allPeers();
         auto downloading = m_stateTracker->peersInState(StatusCode::downloading);
-
+        downloading.subtract(m_stateTracker->offlineServers());
         if (!downloading.empty())
         {
             // We should go to downloading stage if we have merged
@@ -1892,15 +1898,22 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         {
             if (m_haveValidUpdate)
             {
-                if (m_updateSourceMode == UpdateSourceType::file)
+                if (m_widgetState == WidgetUpdateState::readyInstall)
                 {
-                    ui->downloadButton->setText(tr("Upload"));
-                    ui->downloadAndInstall->setText(tr("Upload && Install"));
+                    ui->downloadButton->setText(tr("Install update"));
                 }
-                else // LatestVersion or SpecificBuild)
+                else
                 {
-                    ui->downloadButton->setText(tr("Download"));
-                    ui->downloadAndInstall->setText(tr("Download && Install"));
+                    if (m_updateSourceMode == UpdateSourceType::file)
+                    {
+                        ui->downloadButton->setText(tr("Upload"));
+                        ui->downloadAndInstall->setText(tr("Upload && Install"));
+                    }
+                    else // LatestVersion or SpecificBuild)
+                    {
+                        ui->downloadButton->setText(tr("Download"));
+                        ui->downloadAndInstall->setText(tr("Download && Install"));
+                    }
                 }
 
                 ui->releaseDescriptionLabel->setText(m_updateInfo.info.description);
@@ -2050,7 +2063,6 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
             break;
         case WidgetUpdateState::readyInstall:
             updateTitle = tr("Ready to update to");
-            ui->downloadButton->setText(tr("Install update"));
             break;
         case WidgetUpdateState::installing:
             updateTitle = tr("Updating to ...");
@@ -2059,7 +2071,6 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
             break;
         case WidgetUpdateState::complete:
             updateTitle = tr("System updated to");
-            ui->downloadButton->setText(tr("Install update"));
             break;
         default:
             break;
@@ -2097,6 +2108,19 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
         ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
     else
         ui->updateStackedWidget->setCurrentWidget(ui->updateControlsPage);
+
+    auto notVeryOffline = m_stateTracker->offlineNotTooLong();
+    if (m_widgetState == WidgetUpdateState::readyInstall && !notVeryOffline.empty())
+    {
+        ui->downloadButton->setEnabled(false);
+        ui->downloadButton->setToolTip(tr("Some servers have gone offline. "
+            "Please wait until they become online to continue."));
+    }
+    else
+    {
+        ui->downloadButton->setEnabled(true);
+        ui->downloadButton->setToolTip("");
+    }
 
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn, !m_showStorageSettings);
     QString icon = m_showStorageSettings
@@ -2180,9 +2204,6 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
         };
 
         debugState << QString("lowestVersion=%1").arg(m_stateTracker->lowestInstalledVersion().toString());
-        debugState << QString("size(peers)=%1").arg(m_stateTracker->peersCount());
-        debugState << QString("size(model)=%1").arg(m_updatesModel->rowCount());
-        debugState << QString("size(sorted)=%1").arg(m_sortedModel->rowCount());
 
         QStringList serversReport;
         for (auto server: m_serverUpdateTool->getServersInstalling())
