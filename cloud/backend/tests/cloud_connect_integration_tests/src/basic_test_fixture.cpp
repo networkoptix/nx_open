@@ -249,7 +249,14 @@ int BasicTestFixture::mediatorCount() const
 void BasicTestFixture::startMediator(int index)
 {
     if (!m_relays->empty())
-        mediator(index).addArg("-trafficRelay/url", relayUrl().toStdString().c_str());
+    {
+        std::string relayUrls;
+        for (int i = 0; i < m_relays->size(); ++i)
+            relayUrls.append(relayUrl(i).toStdString()).append(",");
+        relayUrls.pop_back(); //< dropping final comma
+
+        mediator(index).addArg("-trafficRelay/url", relayUrls.c_str());
+    }
 
     ASSERT_TRUE(mediator(index).startAndWaitUntilStarted());
 
@@ -397,9 +404,9 @@ void BasicTestFixture::startRelay(int index)
     ASSERT_TRUE(newRelay.startAndWaitUntilStarted());
 }
 
-nx::cloud::relay::test::Launcher& BasicTestFixture::trafficRelay()
+nx::cloud::relay::test::TrafficRelay& BasicTestFixture::trafficRelay(int index)
 {
-    return m_relays->relay(0);
+    return m_relays->relay(index);
 }
 
 nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const

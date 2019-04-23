@@ -164,7 +164,7 @@ protected:
     void setRelayCount(int count);
     void startRelays();
     void startRelay(int index);
-    nx::cloud::relay::test::Launcher& trafficRelay();
+    nx::cloud::relay::test::TrafficRelay& trafficRelay(int index = 0);
     nx::utils::Url relayUrl(int relayNum = 0) const;
 
     /**
