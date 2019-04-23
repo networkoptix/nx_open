@@ -3,7 +3,9 @@
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
 #include <nx/sql/query_context.h>
+#include <nx/sql/sql_cursor.h>
 
+#include "abstract_cursor.h"
 #include "analytics_events_storage_types.h"
 #include "device_dao.h"
 #include "object_type_dao.h"
@@ -22,14 +24,20 @@ class ObjectSearcher
 public:
     ObjectSearcher(
         const DeviceDao& deviceDao,
-        const ObjectTypeDao& objectTypeDao);
+        const ObjectTypeDao& objectTypeDao,
+        Filter filter);
 
     /**
      * Throws on failure.
      */
-    std::vector<DetectedObject> lookup(
-        nx::sql::QueryContext* queryContext,
-        const Filter& filter);
+    std::vector<DetectedObject> lookup(nx::sql::QueryContext* queryContext);
+
+    void prepareCursorQuery(nx::sql::SqlQuery* query);
+
+    void loadCurrentRecord(nx::sql::SqlQuery*, DetectedObject*);
+
+    static std::unique_ptr<AbstractCursor> createCursor(
+        std::unique_ptr<nx::sql::Cursor<DetectedObject>> sqlCursor);
 
     static void addObjectFilterConditions(
         const Filter& filter,
@@ -52,24 +60,14 @@ public:
 private:
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
+    const Filter m_filter;
 
-    void prepareLookupQuery(
-        const Filter& filter,
-        nx::sql::AbstractSqlQuery* query);
+    void prepareLookupQuery(nx::sql::AbstractSqlQuery* query);
+    nx::sql::Filter prepareSqlFilterExpression();
 
-    nx::sql::Filter prepareSqlFilterExpression(const Filter& filter);
-
-    std::vector<DetectedObject> loadObjects(
-        nx::sql::AbstractSqlQuery* query,
-        const Filter& filter);
-
-    DetectedObject loadObject(
-        nx::sql::AbstractSqlQuery* query,
-        const Filter& filter);
-
-    void filterTrack(
-        const Filter& filter,
-        std::vector<ObjectPosition>* const track);
+    std::vector<DetectedObject> loadObjects(nx::sql::AbstractSqlQuery* query);
+    DetectedObject loadObject(nx::sql::AbstractSqlQuery* query);
+    void filterTrack(std::vector<ObjectPosition>* const track);
 
     static void addObjectTypeIdToFilter(
         const std::vector<QString>& objectTypes,

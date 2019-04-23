@@ -8,8 +8,11 @@
 #include <nx/sql/sql_cursor.h>
 #include <nx/utils/log/log.h>
 
+#include "analytics_events_storage_cursor.h"
 #include "config.h"
+#include "cursor.h"
 #include "object_searcher.h"
+#include "serializers.h"
 #include "time_period_fetcher.h"
 
 namespace nx::analytics::storage {
@@ -111,41 +114,50 @@ void EventsStorage::createLookupCursor(
     NX_VERBOSE(this, "Requested cursor with filter %1", filter);
 
     QnMutexLocker lock(&m_dbControllerMutex);
-    m_dbController->queryExecutor().createCursor<DetectedObject>(
-        std::bind(&EventsStorage::prepareCursorQuery, this, filter, _1),
-        std::bind(&EventsStorage::loadObject, this, _1, _2),
-        [this, completionHandler = std::move(completionHandler)](
-            sql::DBResult resultCode,
-            QnUuid dbCursorId)
-        {
-            if (resultCode != sql::DBResult::ok)
-                return completionHandler(ResultCode::error, nullptr);
 
-            QnMutexLocker lock(&m_cursorsMutex);
-            if (m_closingDbController)
-                return completionHandler(ResultCode::ok, nullptr);
+    if (kUseTrackAggregation)
+    {
+        auto objectSearcher = std::make_shared<ObjectSearcher>(
+            m_deviceDao,
+            m_objectTypeDao,
+            std::move(filter));
 
-            auto cursor = std::make_shared<Cursor>(std::make_unique<sql::Cursor<DetectedObject>>(
-                &m_dbController->queryExecutor(),
-                dbCursorId));
-
-            m_openedCursors.push_back(cursor);
-            completionHandler(
-                ResultCode::ok,
-                cursor);
-        });
+        m_dbController->queryExecutor().createCursor<DetectedObject>(
+            [objectSearcher](auto&&... args)
+                { objectSearcher->prepareCursorQuery(std::forward<decltype(args)>(args)...); },
+            [objectSearcher](auto&&... args)
+                { objectSearcher->loadCurrentRecord(std::forward<decltype(args)>(args)...); },
+            [this, completionHandler = std::move(completionHandler)](
+                sql::DBResult resultCode,
+                QnUuid dbCursorId) mutable
+            {
+                reportCreateCursorCompletion(
+                    resultCode,
+                    dbCursorId,
+                    std::move(completionHandler));
+            });
+    }
+    else
+    {
+        m_dbController->queryExecutor().createCursor<DetectedObject>(
+            std::bind(&EventsStorage::prepareCursorQuery, this, filter, _1),
+            std::bind(&EventsStorage::loadObject, this, _1, _2),
+            [this, completionHandler = std::move(completionHandler)](
+                sql::DBResult resultCode,
+                QnUuid dbCursorId) mutable
+            {
+                reportCreateCursorCompletion(
+                    resultCode,
+                    dbCursorId,
+                    std::move(completionHandler));
+            });
+    }
 }
 
-void EventsStorage::closeCursor(const std::shared_ptr<AbstractCursor>& cursorToRemove)
+void EventsStorage::closeCursor(const std::shared_ptr<AbstractCursor>& cursor)
 {
     QnMutexLocker lock(&m_cursorsMutex);
-    m_openedCursors.remove_if(
-        [cursorToRemove] (std::shared_ptr<Cursor> cursor)
-        {
-            auto cursorPtr = static_cast<AbstractCursor*>(cursor.get());
-            return cursorToRemove.get() == cursorPtr;
-        });
-
+    m_openedCursors.remove(cursor);
 }
 
 void EventsStorage::lookup(
@@ -159,8 +171,11 @@ void EventsStorage::lookup(
         {
             if (kUseTrackAggregation)
             {
-                ObjectSearcher objectSearcher(m_deviceDao, m_objectTypeDao);
-                *result = objectSearcher.lookup(queryContext, filter);
+                ObjectSearcher objectSearcher(
+                    m_deviceDao,
+                    m_objectTypeDao,
+                    std::move(filter));
+                *result = objectSearcher.lookup(queryContext);
                 return nx::sql::DBResult::ok;
             }
             else
@@ -382,21 +397,12 @@ void EventsStorage::insertEvent(
 
     insertEventQuery.bindValue(":attributesId", attributesId);
 
-    insertEventQuery.bindValue(
-        ":boxTopLeftX",
-        packCoordinate(detectedObject.boundingBox.topLeft().x()));
+    const auto packedBoundingBox = packRect(detectedObject.boundingBox);
 
-    insertEventQuery.bindValue(
-        ":boxTopLeftY",
-        packCoordinate(detectedObject.boundingBox.topLeft().y()));
-
-    insertEventQuery.bindValue(
-        ":boxBottomRightX",
-        packCoordinate(detectedObject.boundingBox.bottomRight().x()));
-
-    insertEventQuery.bindValue(
-        ":boxBottomRightY",
-        packCoordinate(detectedObject.boundingBox.bottomRight().y()));
+    insertEventQuery.bindValue(":boxTopLeftX", packedBoundingBox.topLeft().x());
+    insertEventQuery.bindValue(":boxTopLeftY", packedBoundingBox.topLeft().y());
+    insertEventQuery.bindValue(":boxBottomRightX", packedBoundingBox.bottomRight().x());
+    insertEventQuery.bindValue(":boxBottomRightY", packedBoundingBox.bottomRight().y());
 
     insertEventQuery.exec();
 }
@@ -627,9 +633,9 @@ void EventsStorage::loadObject(
         selectEventsQuery->value("object_id"));
     object->objectTypeId =
         m_objectTypeDao.objectTypeFromId(selectEventsQuery->value("object_type_id").toLongLong());
-    QJson::deserialize(
-        selectEventsQuery->value("attributes").toString(),
-        &object->attributes);
+
+    object->attributes = AttributesDao::deserialize(
+        selectEventsQuery->value("attributes").toString());
 
     object->track.push_back(ObjectPosition());
     ObjectPosition& objectPosition = object->track.back();
@@ -641,12 +647,14 @@ void EventsStorage::loadObject(
         selectEventsQuery->value("timestamp_usec_utc").toLongLong() * kUsecInMs;
     objectPosition.durationUsec = selectEventsQuery->value("duration_usec").toLongLong() * kUsecInMs;
 
-    objectPosition.boundingBox.setTopLeft(QPointF(
-        unpackCoordinate(selectEventsQuery->value("box_top_left_x").toInt()),
-        unpackCoordinate(selectEventsQuery->value("box_top_left_y").toInt())));
-    objectPosition.boundingBox.setBottomRight(QPointF(
-        unpackCoordinate(selectEventsQuery->value("box_bottom_right_x").toInt()),
-        unpackCoordinate(selectEventsQuery->value("box_bottom_right_y").toInt())));
+    const QRect packedBoundingBox(
+        QPoint(
+            selectEventsQuery->value("box_top_left_x").toInt(),
+            selectEventsQuery->value("box_top_left_y").toInt()),
+        QPoint(
+            selectEventsQuery->value("box_bottom_right_x").toInt(),
+            selectEventsQuery->value("box_bottom_right_y").toInt()));
+    objectPosition.boundingBox = unpackRect(packedBoundingBox);
 }
 
 void EventsStorage::mergeObjects(
@@ -711,6 +719,37 @@ void EventsStorage::queryTrackInfo(
         object.firstAppearanceTimeUsec = trackInfoQuery.value(0).toLongLong() * kUsecInMs;
         object.lastAppearanceTimeUsec = trackInfoQuery.value(1).toLongLong() * kUsecInMs;
     }
+}
+
+void EventsStorage::reportCreateCursorCompletion(
+    sql::DBResult resultCode,
+    QnUuid dbCursorId,
+    CreateCursorCompletionHandler completionHandler)
+{
+    if (resultCode != sql::DBResult::ok)
+        return completionHandler(ResultCode::error, nullptr);
+
+    QnMutexLocker lock(&m_cursorsMutex);
+
+    if (m_closingDbController)
+        return completionHandler(ResultCode::ok, nullptr);
+
+    auto dbCursor = std::make_unique<sql::Cursor<DetectedObject>>(
+        &m_dbController->queryExecutor(),
+        dbCursorId);
+
+    std::shared_ptr<AbstractCursor> cursor;
+    if (kUseTrackAggregation)
+        cursor = ObjectSearcher::createCursor(std::move(dbCursor));
+    else
+        cursor = std::make_shared<deprecated::Cursor>(std::move(dbCursor));
+
+    m_openedCursors.push_back(cursor);
+    lock.unlock();
+
+    completionHandler(
+        ResultCode::ok,
+        cursor);
 }
 
 nx::sql::DBResult EventsStorage::selectTimePeriods(
@@ -918,23 +957,12 @@ void EventsStorage::logDataSaveResult(sql::DBResult resultCode)
 
 QRect EventsStorage::packRect(const QRectF& rectf)
 {
-    QRect rect;
-    rect.setTopLeft(QPoint(
-        packCoordinate(rectf.topLeft().x()),
-        packCoordinate(rectf.topLeft().y())));
-    rect.setWidth(packCoordinate(rectf.width()));
-    rect.setHeight(packCoordinate(rectf.height()));
-    return rect;
+    return translate(rectf, QSize(kCoordinatesPrecision, kCoordinatesPrecision));
 }
 
-int EventsStorage::packCoordinate(double value)
+QRectF EventsStorage::unpackRect(const QRect& rect)
 {
-    return (int) (value * kCoordinatesPrecision);
-}
-
-double EventsStorage::unpackCoordinate(int packedValue)
-{
-    return packedValue / (double) kCoordinatesPrecision;
+    return translate(rect, QSize(kCoordinatesPrecision, kCoordinatesPrecision));
 }
 
 //-------------------------------------------------------------------------------------------------

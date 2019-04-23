@@ -1,85 +1,12 @@
 #include "serializers.h"
 
+#include <cmath>
+
+#include <nx/utils/compact_int.h>
+
 #include "config.h"
 
 namespace nx::analytics::storage {
-
-namespace compact_int {
-
-int serialize(long long value, QByteArray* buf)
-{
-    // NOTE: Cannot shift negative numbers.
-    auto uValue = (unsigned long long) value;
-
-    static constexpr int kBufSize = 10;
-    std::uint8_t valueBuf[kBufSize];
-    int bytesWritten = 0;
-    do
-    {
-        auto bitsToWrite = (std::uint8_t)(uValue & 0x7f);
-        uValue >>= 7;
-
-        // NOTE: Filling valueBuf in reverse order so that the most significant bits are in the beginning.
-        if (bytesWritten != 0)
-            bitsToWrite |= 0x80; //< One more byte is needed.
-        ++bytesWritten;
-        valueBuf[kBufSize - bytesWritten] = bitsToWrite;
-    } while (uValue != 0);
-
-    buf->append((char*) valueBuf + (kBufSize - bytesWritten), bytesWritten);
-    return bytesWritten;
-}
-
-int serialize(
-    const std::vector<long long>& numbers,
-    QByteArray* buf)
-{
-    constexpr int kAverageSerializedNumberSize = 5;
-
-    buf->reserve(buf->size() + numbers.size() * kAverageSerializedNumberSize);
-
-    return (int) std::accumulate(numbers.begin(), numbers.end(), 0,
-        [buf](long long bytesWritten, long long value)
-        {
-            return bytesWritten + serialize(value, buf);
-        });
-}
-
-//-------------------------------------------------------------------------------------------------
-
-void deserialize(QnByteArrayConstRef* buf, long long* value)
-{
-    unsigned long long uValue = 0;
-
-    while (!buf->isEmpty())
-    {
-        const auto byte = (std::uint8_t) *buf->data();
-        const bool endOfNumber = (byte & 0x80) == 0;
-
-        uValue <<= 7;
-        uValue |= byte & 0x7f;
-
-        buf->pop_front();
-        if (endOfNumber)
-            break;
-    }
-
-    *value = (long long) uValue;
-}
-
-void deserialize(QnByteArrayConstRef* buf, std::vector<long long>* numbers)
-{
-    while (!buf->isEmpty())
-    {
-        long long value = 0;
-        deserialize(buf, &value);
-        numbers->push_back(value);
-    }
-}
-
-} // namespace compact_int
-
-//-------------------------------------------------------------------------------------------------
 
 static const QSize kResolution(kCoordinatesPrecision, kCoordinatesPrecision);
 
@@ -97,6 +24,8 @@ std::vector<ObjectPosition> TrackSerializer::deserialized(
 
     std::vector<ObjectPosition> track;
 
+    // TODO: #ak Return sorted track IF each track sequence is sorted.
+
     while (!buf.isEmpty())
         deserializeTrackSequence(&buf, &track);
 
@@ -113,9 +42,9 @@ void TrackSerializer::serializeTrackSequence(
     buf->reserve(buf->size() + 9 + 2 + track.size() * 11);
 
     // Writing base timestamp. All timestamps will be saved as an offset from this base.
-    compact_int::serialize(track.front().timestampUsec, buf);
+    nx::utils::compact_int::serialize(track.front().timestampUsec, buf);
 
-    compact_int::serialize((long long)track.size(), buf);
+    nx::utils::compact_int::serialize((long long)track.size(), buf);
 
     for (const auto& position: track)
         serialize(track.front().timestampUsec, position, buf);
@@ -126,8 +55,8 @@ void TrackSerializer::serialize(
     const ObjectPosition& position,
     QByteArray* buf)
 {
-    compact_int::serialize(position.timestampUsec - baseTimestamp, buf);
-    compact_int::serialize(position.durationUsec, buf);
+    nx::utils::compact_int::serialize(position.timestampUsec - baseTimestamp, buf);
+    nx::utils::compact_int::serialize(position.durationUsec, buf);
     serialize(translate(position.boundingBox, kResolution), buf);
 
     // TODO: attributes?
@@ -135,10 +64,10 @@ void TrackSerializer::serialize(
 
 void TrackSerializer::serialize(const QRect& rect, QByteArray* buf)
 {
-    compact_int::serialize(rect.x(), buf);
-    compact_int::serialize(rect.y(), buf);
-    compact_int::serialize(rect.width(), buf);
-    compact_int::serialize(rect.height(), buf);
+    nx::utils::compact_int::serialize(rect.x(), buf);
+    nx::utils::compact_int::serialize(rect.y(), buf);
+    nx::utils::compact_int::serialize(rect.width(), buf);
+    nx::utils::compact_int::serialize(rect.height(), buf);
 }
 
 void TrackSerializer::deserializeTrackSequence(
@@ -146,10 +75,10 @@ void TrackSerializer::deserializeTrackSequence(
     std::vector<ObjectPosition>* track)
 {
     long long baseTimestamp = 0;
-    compact_int::deserialize(buf, &baseTimestamp);
+    nx::utils::compact_int::deserialize(buf, &baseTimestamp);
 
     long long trackSize = 0;
-    compact_int::deserialize(buf, &trackSize);
+    nx::utils::compact_int::deserialize(buf, &trackSize);
 
     track->reserve(track->size() + trackSize);
     for (long long i = 0; i < trackSize; ++i)
@@ -164,10 +93,10 @@ void TrackSerializer::deserialize(
     QnByteArrayConstRef* buf,
     ObjectPosition* position)
 {
-    compact_int::deserialize(buf, &position->timestampUsec);
+    nx::utils::compact_int::deserialize(buf, &position->timestampUsec);
     position->timestampUsec += baseTimestamp;
 
-    compact_int::deserialize(buf, &position->durationUsec);
+    nx::utils::compact_int::deserialize(buf, &position->durationUsec);
 
     QRect translatedRect;
     deserialize(buf, &translatedRect);
@@ -180,26 +109,29 @@ void TrackSerializer::deserialize(QnByteArrayConstRef* buf, QRect* rect)
 {
     long long value = 0;
 
-    compact_int::deserialize(buf, &value);
+    nx::utils::compact_int::deserialize(buf, &value);
     rect->setX(value);
 
-    compact_int::deserialize(buf, &value);
+    nx::utils::compact_int::deserialize(buf, &value);
     rect->setY(value);
 
-    compact_int::deserialize(buf, &value);
+    nx::utils::compact_int::deserialize(buf, &value);
     rect->setWidth(value);
 
-    compact_int::deserialize(buf, &value);
+    nx::utils::compact_int::deserialize(buf, &value);
     rect->setHeight(value);
 }
 
 QRect translate(const QRectF& box, const QSize& resolution)
 {
     return QRect(
-        box.x() * resolution.width(),
-        box.y() * resolution.height(),
-        std::ceil(box.width() * resolution.width()),
-        std::ceil(box.height() * resolution.height()));
+        QPoint(
+            box.x() * resolution.width(),
+            box.y() * resolution.height()),
+        QPoint(
+            round(box.bottomRight().x() * resolution.width()),
+            round(box.bottomRight().y() * resolution.height()))
+    );
 }
 
 QRectF translate(const QRect& box, const QSize& resolution)

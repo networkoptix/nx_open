@@ -209,8 +209,7 @@ CREATE TABLE object_search(
     box_top_left_x              INTEGER,
     box_top_left_y              INTEGER,
     box_bottom_right_x          INTEGER,
-    box_bottom_right_y          INTEGER,
-    object_id_list              BLOB
+    box_bottom_right_y          INTEGER
 );
 
 CREATE INDEX idx_object_search_box ON object_search(

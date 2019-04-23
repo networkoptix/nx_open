@@ -1,5 +1,7 @@
 #include "camera.h"
 
+#include <camera/camera_pool.h>
+#include <camera/video_camera.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -448,6 +450,25 @@ void Camera::startInputPortStatesMonitoring()
 
 void Camera::stopInputPortStatesMonitoring()
 {
+}
+
+void Camera::reopenStream(nx::vms::api::StreamIndex streamIndex)
+{
+    auto camera = serverModule()->videoCameraPool()->getVideoCamera(toSharedPointer(this));
+    if (!camera)
+        return;
+
+    QnLiveStreamProviderPtr reader;
+    if (streamIndex == nx::vms::api::StreamIndex::primary)
+        reader = camera->getPrimaryReader();
+    else if (streamIndex == nx::vms::api::StreamIndex::secondary)
+        reader = camera->getSecondaryReader();
+
+    if (reader && reader->isRunning())
+    {
+        NX_DEBUG(this, "Camera [%1], reopen reader: %2", getId(), streamIndex);
+        reader->pleaseReopenStream();
+    }
 }
 
 CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()

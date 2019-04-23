@@ -1,5 +1,7 @@
 #include "object_track_aggregator.h"
 
+#include "serializers.h"
+
 namespace nx::analytics::storage {
 
 ObjectTrackAggregator::ObjectTrackAggregator(
@@ -7,8 +9,7 @@ ObjectTrackAggregator::ObjectTrackAggregator(
     int resolutionY,
     std::chrono::milliseconds aggregationPeriod)
     :
-    m_resolutionX(resolutionX),
-    m_resolutionY(resolutionY),
+    m_resolution(resolutionX, resolutionY),
     m_aggregationPeriod(aggregationPeriod)
 {
 }
@@ -53,7 +54,7 @@ void ObjectTrackAggregator::add(
     std::chrono::milliseconds timestamp,
     const QRectF& box)
 {
-    const auto translatedBox = translate(box);
+    const auto translatedBox = translate(box, m_resolution);
 
     context->rectAggregator.add(translatedBox, objectId);
 
@@ -101,15 +102,6 @@ std::chrono::milliseconds ObjectTrackAggregator::length(
     return context.aggregationStartTimestamp
         ? *context.aggregationEndTimestamp - *context.aggregationStartTimestamp
         : std::chrono::milliseconds::zero();
-}
-
-QRect ObjectTrackAggregator::translate(const QRectF& box)
-{
-    return QRect(
-        box.x() * m_resolutionX,
-        box.y() * m_resolutionY,
-        std::ceil(box.width() * m_resolutionX),
-        std::ceil(box.height() * m_resolutionY));
 }
 
 } // namespace nx::analytics::storage

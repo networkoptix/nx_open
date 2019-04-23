@@ -184,9 +184,8 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
     auto insertObjectSearchCell = queryContext->connection()->createQuery();
     insertObjectSearchCell->prepare(R"sql(
         INSERT INTO object_search(timestamp_seconds_utc,
-            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y,
-            object_id_list)
-        VALUES (?, ?, ?, ?, ?, ?)
+            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
+        VALUES (?, ?, ?, ?, ?)
     )sql");
 
     auto insertObjectSearchToAttributesBinding = queryContext->connection()->createQuery();
@@ -204,9 +203,6 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
         insertObjectSearchCell->bindValue(2, objectSearchGridCell.boundingBox.topLeft().y());
         insertObjectSearchCell->bindValue(3, objectSearchGridCell.boundingBox.bottomRight().x());
         insertObjectSearchCell->bindValue(4, objectSearchGridCell.boundingBox.bottomRight().y());
-
-        insertObjectSearchCell->bindValue(5,
-            compact_int::serialized(toDbIds(objectSearchGridCell.objectIds)));
 
         insertObjectSearchCell->exec();
         const auto objectSearchCellId = insertObjectSearchCell->lastInsertId().toLongLong();
