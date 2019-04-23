@@ -11,17 +11,13 @@ Cursor::Cursor(
 
 common::metadata::ConstDetectionMetadataPacketPtr Cursor::next()
 {
-    // Always storing the next detected object in advance.
-    // I.e., the one that has track_start_time larger than the current track position.
-
     while (!m_eof || !m_currentObjects.empty())
     {
+        loadObjectsIfNecessary();
+
         auto [object, trackPositionIndex] = readNextTrackPosition();
         if (!object)
-        {
-            loadNextObject();
-            continue;
-        }
+            break;
 
         if (!m_packet)
         {
@@ -50,8 +46,51 @@ void Cursor::close()
 
 std::tuple<const DetectedObject*, std::size_t /*track position*/> Cursor::readNextTrackPosition()
 {
-    std::tuple<const DetectedObject*, std::size_t /*track position*/> result;
+    // Selecting track position with minimal timestamp.
+    auto it = findTrackPosition();
+    if (it == m_currentObjects.end())
+        return std::make_tuple(nullptr, 0);
 
+    const auto result = std::make_tuple(&it->first, it->second);
+    ++it->second;
+    return result;
+}
+
+void Cursor::loadObjectsIfNecessary()
+{
+    if (m_eof)
+        return;
+
+    if (m_currentObjects.empty())
+        loadNextObject();
+
+    // Always storing the next detected object in advance.
+    // I.e., the one that has track_start_time larger than the current track position.
+
+    while (!m_eof && nextTrackPositionTimestamp() >= maxObjectTrackStartTimestamp())
+        loadNextObject();
+}
+
+void Cursor::loadNextObject()
+{
+    auto object = m_sqlCursor->next();
+    if (!object)
+    {
+        m_eof = true;
+        return;
+    }
+
+    m_currentObjects.emplace_back(std::move(*object), 0);
+}
+
+qint64 Cursor::nextTrackPositionTimestamp()
+{
+    auto it = findTrackPosition();
+    return it->first.track[it->second].timestampUsec;
+}
+
+Cursor::Objects::iterator Cursor::findTrackPosition()
+{
     // Selecting track position with minimal timestamp.
     qint64 currentMinTimestamp = std::numeric_limits<qint64>::max();
     int pos = -1;
@@ -66,29 +105,23 @@ std::tuple<const DetectedObject*, std::size_t /*track position*/> Cursor::readNe
         if (it->first.track[it->second].timestampUsec < currentMinTimestamp)
         {
             currentMinTimestamp = it->first.track[it->second].timestampUsec;
-            result = std::make_tuple(&it->first, it->second);
             pos = it - m_currentObjects.begin();
         }
 
         ++it;
     }
 
-    if (pos >= 0)
-        ++m_currentObjects[pos].second;
-
-    return result;
+    return pos >= 0
+        ? m_currentObjects.begin() + pos
+        : m_currentObjects.end();
 }
 
-void Cursor::loadNextObject()
+qint64 Cursor::maxObjectTrackStartTimestamp()
 {
-    auto object = m_sqlCursor->next();
-    if (!object)
-    {
-        m_eof = true;
-        return;
-    }
-
-    m_currentObjects.emplace_back(std::move(*object), 0);
+    qint64 result = std::numeric_limits<qint64>::min();
+    for (const auto& object: m_currentObjects)
+        result = std::max(result, object.first.firstAppearanceTimeUsec);
+    return result;
 }
 
 common::metadata::DetectionMetadataPacketPtr Cursor::createMetaDataPacket(

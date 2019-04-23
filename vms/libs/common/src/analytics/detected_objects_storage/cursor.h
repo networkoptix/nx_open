@@ -20,14 +20,22 @@ public:
     virtual void close() override;
 
 private:
+    using Objects =
+        std::vector<std::pair<DetectedObject, std::size_t /*current track position*/>>;
+
     std::unique_ptr<nx::sql::Cursor<DetectedObject>> m_sqlCursor;
     bool m_eof = false;
-    std::vector<std::pair<DetectedObject, std::size_t /*current track position*/>> m_currentObjects;
+    Objects m_currentObjects;
     common::metadata::DetectionMetadataPacketPtr m_packet;
 
-    std::tuple<const DetectedObject*, std::size_t /*track position*/> readNextTrackPosition();
-
+    void loadObjectsIfNecessary();
     void loadNextObject();
+
+    qint64 nextTrackPositionTimestamp();
+    Objects::iterator findTrackPosition();
+    qint64 maxObjectTrackStartTimestamp();
+
+    std::tuple<const DetectedObject*, std::size_t /*track position*/> readNextTrackPosition();
 
     common::metadata::DetectionMetadataPacketPtr createMetaDataPacket(
         const DetectedObject& object,

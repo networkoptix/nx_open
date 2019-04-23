@@ -1122,6 +1122,13 @@ class AnalyticsDbCursor:
 {
     using base_type = AnalyticsDbLookup;
 
+public:
+    AnalyticsDbCursor()
+    {
+        filter().sortOrder = Qt::AscendingOrder;
+        filter().maxTrackSize = 0;
+    }
+
 protected:
     void givenDetectedObjectsWithSameTimestamp()
     {
@@ -1136,6 +1143,35 @@ protected:
 
         saveAnalyticsDataPackets(std::move(newPackets));
         aggregateAnalyticsDataPacketsByTimestamp();
+    }
+
+    void givenObjectsWithInterleavedTracks()
+    {
+        constexpr int objectsCount = 3;
+
+        auto newPackets = generateEventsByCriteria();
+
+        const auto deviceId = QnUuid::createUuid();
+        std::vector<QnUuid> objectIds(3, QnUuid());
+        std::generate(objectIds.begin(), objectIds.end(), &QnUuid::createUuid);
+
+        for (auto& packet: newPackets)
+        {
+            packet->deviceId = deviceId;
+
+            while (packet->objects.size() < objectIds.size())
+                packet->objects.push_back(packet->objects.front());
+
+            for (std::size_t i = 0; i < packet->objects.size(); ++i)
+            {
+                packet->objects[i].objectId = objectIds[i];
+                packet->objects[i].objectTypeId = objectIds[i].toSimpleString();
+            }
+        }
+
+        saveAnalyticsDataPackets(std::move(newPackets));
+
+        filter().deviceIds = {deviceId};
     }
 
     void whenReadDataUsingCursor()
@@ -1167,7 +1203,10 @@ protected:
             filterPackets(filter(), analyticsDataPackets()),
             filter().sortOrder);
 
-        expected = sortObjectsById(std::move(expected));
+        sortObjectsById(&expected);
+
+        // TODO: Currently, attribute change history is not preserved.
+        removeLabels(&expected);
 
         std::vector<common::metadata::DetectionMetadataPacketPtr> actual;
         std::transform(
@@ -1177,7 +1216,8 @@ protected:
             {
                 return std::make_shared<common::metadata::DetectionMetadataPacket>(*constPacket);
             });
-        actual = sortObjectsById(std::exchange(actual, {}));
+        sortObjectsById(&actual);
+        removeLabels(&actual);
 
         assertEqual(expected, actual);
     }
@@ -1205,17 +1245,25 @@ private:
         m_createdCursorsQueue.push(cursor);
     }
 
-    std::vector<common::metadata::DetectionMetadataPacketPtr> sortObjectsById(
-        std::vector<common::metadata::DetectionMetadataPacketPtr> packets)
+    void sortObjectsById(
+        std::vector<common::metadata::DetectionMetadataPacketPtr>* packets)
     {
-        for (auto& packet: packets)
+        for (auto& packet: *packets)
         {
             std::sort(
                 packet->objects.begin(), packet->objects.end(),
                 [](const auto& left, const auto& right) { return left.objectId < right.objectId; });
         }
+    }
 
-        return packets;
+    void removeLabels(
+        std::vector<common::metadata::DetectionMetadataPacketPtr>* packets)
+    {
+        for (auto& packet: *packets)
+        {
+            for (auto& object: packet->objects)
+                object.labels.clear();
+        }
     }
 };
 
@@ -1243,6 +1291,15 @@ TEST_F(AnalyticsDbCursor, aggregates_objects_with_same_timestamp)
     thenResultMatchesExpectations();
     andObjectsWithSameTimestampAreDeliveredInSinglePacket();
 }
+
+TEST_F(AnalyticsDbCursor, interleaved_tracks_are_reported_interleaved)
+{
+    givenObjectsWithInterleavedTracks();
+    whenReadDataUsingCursor();
+    thenResultMatchesExpectations();
+}
+
+// TEST_F(AnalyticsDbCursor, attribute_change_history_is_preserved)
 
 //-------------------------------------------------------------------------------------------------
 // Time periods lookup.
