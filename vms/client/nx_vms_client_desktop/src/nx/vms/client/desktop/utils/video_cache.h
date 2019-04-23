@@ -17,7 +17,7 @@ public:
     /*
      * @brief Setup resource list to cache.
      */
-    void setCachedDevices(QSet<QnUuid>& value);
+    void setCachedDevices(const QSet<QnUuid>& value);
 
     /*
      * @brief Find image in the video cache.
