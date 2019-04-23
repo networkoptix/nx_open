@@ -1,5 +1,4 @@
 import QtQuick 2.11
-import QtQuick.Controls 1.4
 import Nx 1.0
 import Nx.Utils 1.0
 import Nx.Controls 1.0
@@ -103,7 +102,7 @@ Item
                     {
                         model: currentPluginDetails
 
-                        Label
+                        Text
                         {
                             text: modelData.name
                             color: ColorTheme.windowText
@@ -118,7 +117,7 @@ Item
                     {
                         model: currentPluginDetails
 
-                        Label
+                        Text
                         {
                             text: modelData.value
                             color: ColorTheme.light
