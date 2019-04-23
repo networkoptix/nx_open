@@ -73,6 +73,9 @@ private:
     void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
 
+    /** Called when layout access parameters has changed. */
+    void at_layoutAccessChanged();
+
 private:
     QColor nextZoomWindowColor() const;
 
@@ -109,7 +112,9 @@ private:
     QPointer<FixedArSelectionItem> m_selectionItem;
     QPointer<QWidget> m_viewport;
     QColor m_zoomWindowColor;
+    /** Cached value for selected widget. */
     QPointer<QnMediaResourceWidget> m_target;
+    /** Maps zoomed widget to a pair of overlay/zoom rectangle. */
     QHash<QObject*, ZoomData> m_dataByWidget;
     QSet<QObject*> m_processingWidgets;
     QPointer<QnMediaResourceWidget> m_zoomedWidget;
