@@ -22,9 +22,9 @@ public:
 private:
     std::unique_ptr<nx::sql::Cursor<DetectedObject>> m_sqlCursor;
     bool m_eof = false;
-    std::vector<std::pair<DetectedObject, int /*current track position*/>> m_currentObjects;
+    std::vector<std::pair<DetectedObject, std::size_t /*current track position*/>> m_currentObjects;
 
-    std::tuple<const DetectedObject*, int /*track position*/> readNextTrackPosition();
+    std::tuple<const DetectedObject*, std::size_t /*track position*/> readNextTrackPosition();
 
     void loadNextObject();
 

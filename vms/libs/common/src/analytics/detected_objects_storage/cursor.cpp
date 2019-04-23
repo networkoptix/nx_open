@@ -34,9 +34,9 @@ void Cursor::close()
     // TODO
 }
 
-std::tuple<const DetectedObject*, int /*track position*/> Cursor::readNextTrackPosition()
+std::tuple<const DetectedObject*, std::size_t /*track position*/> Cursor::readNextTrackPosition()
 {
-    std::tuple<const DetectedObject*, int /*track position*/> result;
+    std::tuple<const DetectedObject*, std::size_t /*track position*/> result;
 
     // Selecting track position with minimal timestamp.
     qint64 currentMinTimestamp = std::numeric_limits<qint64>::max();
