@@ -680,12 +680,12 @@
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Systeem</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Oorspronkelijke resolutie</translation>
     </message>
     <message>
       <location/>
