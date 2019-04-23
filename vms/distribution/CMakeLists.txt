@@ -23,11 +23,15 @@ get_distributable_plugins_list(server_plugins_optional_list nx_server_plugins_op
 
 if(WINDOWS)
     add_subdirectory(wix)
-elseif(LINUX AND (box STREQUAL "none" OR arch STREQUAL "arm64")) #< Desktop Linux or generic arm64 device.
+elseif(LINUX AND (
+    box STREQUAL "none" OR
+    arch STREQUAL "arm64" OR
+    targetDevice STREQUAL "linux_arm32"
+)) #< Desktop or generic Arm Linux device.
     add_subdirectory(deb)
 elseif(MACOSX)
     add_subdirectory(dmg)
-elseif(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
+elseif(targetDevice MATCHES "bpi|edge1")
     add_subdirectory(tar)
 endif()
 

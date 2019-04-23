@@ -81,9 +81,21 @@ macro(load_dependencies)
     include(${cmake_include_file})
 
     foreach(package_dir ${synched_package_dirs})
-        if(NOT EXISTS ${package_dir}/.nocopy)
-            nx_copy_package(${package_dir})
+        if(EXISTS ${package_dir}/.nocopy)
+            continue()
         endif()
+
+        if(targetDevice STREQUAL "linux_arm32" AND package_dir MATCHES "ffmpeg-arm32")
+            nx_copy_package_separately(${package_dir} "ffmpeg-arm32")
+            continue()
+        endif()
+
+        if(targetDevice STREQUAL "linux_arm32" AND package_dir MATCHES "ffmpeg-rpi")
+            nx_copy_package_separately(${package_dir} "ffmpeg-rpi")
+            continue()
+        endif()
+
+        nx_copy_package(${package_dir})
     endforeach()
 
     file(TO_CMAKE_PATH "${QT_DIR}" QT_DIR)

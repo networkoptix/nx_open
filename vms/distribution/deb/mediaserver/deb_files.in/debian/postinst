@@ -30,10 +30,20 @@ CAMERA_SETTINGS_OPTIMIZATION_DEFAULT=true
 STATISTICS_REPORT_ALLOWED_DEFAULT=true
 SYSTEM_USER=$COMPANY_NAME
 
+TARGET_DEVICE='@targetDevice@'
 WITH_ROOT_TOOL='@withRootTool@'
 
 is_systemd_used() {
     [[ $(readlink -m /sbin/init) =~ .*systemd$ ]]
+}
+
+is_rpi() {
+    if [[ $TARGET_DEVICE == "linux_arm32" ]]
+    then
+        grep '^Hardware.*:.*BCM2835[[:space:]]*$' /proc/cpuinfo &>/dev/null
+    else
+        false
+    fi
 }
 
 function is_local_addr {
@@ -88,6 +98,17 @@ function display_complete_setup_hint {
         db_fset @deb.customization.company.name@-mediaserver/complete-setup-hint seen false
         db_input critical @deb.customization.company.name@-mediaserver/complete-setup-hint || true
         db_go
+    fi
+}
+
+install_modification_specific_config()
+{
+    local -r target_device='@targetDevice@'
+    local -r config_file_path="${BASE_DIR}/share/configs/mediaserver.conf.$target_device.template"
+
+    if [[ -f ${config_file_path} ]]
+    then
+        cp  "${config_file_path}" "${BASE_DIR}/etc/mediaserver.conf"
     fi
 }
 
@@ -184,6 +205,18 @@ esac
 echo manual > /etc/init/apport.override
 systemctl disable apport >/dev/null 2>&1 || true
 service apport stop >/dev/null 2>&1 || true
+
+[[ -L "${BASE_DIR}/lib/ffmpeg" ]] && unlink "${BASE_DIR}/lib/ffmpeg"
+
+if is_rpi
+then
+    # RPi requires specially compiled ffmpeg with mmal support - for RPi camera.
+    ( cd "${BASE_DIR}/lib"; ln -s ffmpeg-rpi ffmpeg )
+else
+    ( cd "${BASE_DIR}/lib"; ln -s ffmpeg-arm32 ffmpeg )
+fi
+
+install_modification_specific_config
 
 if is_systemd_used
 then

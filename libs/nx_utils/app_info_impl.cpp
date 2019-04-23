@@ -132,16 +132,6 @@ bool AppInfo::isWin32()
     return isWindows() && !isWin64();
 }
     
-bool AppInfo::isBpi()
-{
-    return armBox() == "bpi";
-}
-
-bool AppInfo::isRaspberryPi()
-{
-    return armBox() == "rpi";
-}
-
 bool AppInfo::isNx1()
 {
     return armBox() == "nx1";

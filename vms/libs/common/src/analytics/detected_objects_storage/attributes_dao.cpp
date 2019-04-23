@@ -4,6 +4,13 @@
 
 namespace nx::analytics::storage {
 
+AttributesDao::AttributesDao()
+{
+    static constexpr int kCacheSize = 101;
+
+    m_attributesCache.setMaxCost(kCacheSize);
+}
+
 long long AttributesDao::insertOrFetchAttributes(
     sql::QueryContext* queryContext,
     const std::vector<common::metadata::Attribute>& eventAttributes)
@@ -60,14 +67,13 @@ void AttributesDao::addToAttributesCache(
     long long id,
     const QByteArray& content)
 {
-    static constexpr int kCacheSize = 101;
-
-    m_attributesCache.push_back({
-        QCryptographicHash::hash(content, QCryptographicHash::Md5),
-        id });
-
-    if (m_attributesCache.size() > kCacheSize)
-        m_attributesCache.pop_front();
+    auto cachedValue = std::make_unique<long long>(id);
+    if (m_attributesCache.insert(
+            QCryptographicHash::hash(content, QCryptographicHash::Md5),
+            cachedValue.get()))
+    {
+        cachedValue.release();
+    }
 }
 
 long long AttributesDao::findAttributesIdInCache(
@@ -75,11 +81,10 @@ long long AttributesDao::findAttributesIdInCache(
 {
     const auto md5 = QCryptographicHash::hash(content, QCryptographicHash::Md5);
 
-    const auto it = std::find_if(
-        m_attributesCache.rbegin(), m_attributesCache.rend(),
-        [&md5](const auto& entry) { return entry.md5 == md5; });
-
-    return it != m_attributesCache.rend() ? it->id : -1;
+    long long* id = m_attributesCache.object(md5);
+    if (id == nullptr)
+        return -1;
+    return *id;
 }
 
 } // namespace nx::analytics::storage

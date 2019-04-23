@@ -1,0 +1,9 @@
+{
+    "version" : "@release.version@.@buildNumber@",
+    "variantVersion": "14.04",
+    "platform" : "linux",
+    "arch" : "arm",
+    "modification" : "bananapi",
+    "cloudHost" : "@cloudHost@",
+    "executable" : "install.sh"
+}

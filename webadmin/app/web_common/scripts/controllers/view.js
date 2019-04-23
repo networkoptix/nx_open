@@ -502,9 +502,13 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
         }
     
-        $scope.$watch('camerasProvider.cameras', function () {
+        $scope.$watch('camerasProvider.cameras', function() {
             if (!$scope.activeCamera && Object.keys($scope.camerasProvider.cameras).length !== 0) {
-                $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
+                if ($scope.storage.cameraId) {
+                    $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+                } else {
+                    $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
+                }
             }
         }, true);
         

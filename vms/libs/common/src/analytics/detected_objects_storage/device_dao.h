@@ -11,22 +11,25 @@ namespace nx::analytics::storage {
 class DeviceDao
 {
 public:
-    void addDeviceToDictionary(long long id, const QnUuid& deviceGuid);
+    int deviceIdFromGuid(const QnUuid& deviceGuid) const;
 
-    long long deviceIdFromGuid(const QnUuid& deviceGuid) const;
+    QnUuid deviceGuidFromId(int id) const;
 
-    QnUuid deviceGuidFromId(long long id) const;
-
-    long long insertOrFetch(
+    /**
+     * @return Device id in the DB.
+     */
+    int insertOrFetch(
         nx::sql::QueryContext* queryContext,
         const QnUuid& deviceId);
 
     void loadDeviceDictionary(nx::sql::QueryContext* queryContext);
 
 private:
+    void addDeviceToDictionary(int id, const QnUuid& deviceGuid);
+
     mutable QnMutex m_mutex;
-    std::map<QnUuid, long long> m_deviceGuidToId;
-    std::map<long long, QnUuid> m_idToDeviceGuid;
+    std::map<QnUuid, int> m_deviceGuidToId;
+    std::map<int, QnUuid> m_idToDeviceGuid;
 };
 
 } // namespace nx::analytics::storage
