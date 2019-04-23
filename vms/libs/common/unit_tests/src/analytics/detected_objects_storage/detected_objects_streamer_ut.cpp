@@ -30,6 +30,8 @@ public:
 
     virtual common::metadata::ConstDetectionMetadataPacketPtr next() override;
 
+    virtual void close() override;
+
     const Filter& filter() const;
 
     nx::utils::SyncQueue<common::metadata::ConstDetectionMetadataPacketPtr>& packetsProvidedQueue();
@@ -62,7 +64,7 @@ public:
         m_asyncCaller.pleaseStopSync();
     }
 
-    virtual bool initialize(const Settings& settings) override
+    virtual bool initialize(const Settings& /*settings*/) override
     {
         return true;
     }
@@ -193,6 +195,10 @@ common::metadata::ConstDetectionMetadataPacketPtr Cursor::next()
     auto resultPacket = m_eventsStorageStub->m_detectionPackets[m_nextPacketPosition++];
     m_packetsProvidedQueue.push(resultPacket);
     return resultPacket;
+}
+
+void Cursor::close()
+{
 }
 
 const Filter& Cursor::filter() const

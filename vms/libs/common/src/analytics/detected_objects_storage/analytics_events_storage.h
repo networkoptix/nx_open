@@ -17,7 +17,7 @@
 #include <analytics/common/object_detection_metadata.h>
 #include <recording/time_period_list.h>
 
-#include "analytics_events_storage_cursor.h"
+#include "abstract_cursor.h"
 #include "analytics_events_storage_db_controller.h"
 #include "analytics_events_storage_settings.h"
 #include "analytics_events_storage_types.h"
@@ -150,7 +150,7 @@ public:
 
 private:
     std::shared_ptr<DbController> m_dbController;
-    std::list<std::shared_ptr<Cursor>> m_openedCursors;
+    std::list<std::shared_ptr<AbstractCursor>> m_openedCursors;
     QnMutex m_dbControllerMutex;
     QnMutex m_cursorsMutex;
     std::atomic<bool> m_closingDbController {false};
@@ -230,6 +230,11 @@ private:
         nx::sql::QueryContext* queryContext,
         std::vector<DetectedObject>* result);
 
+    void reportCreateCursorCompletion(
+        sql::DBResult resultCode,
+        QnUuid dbCursorId,
+        CreateCursorCompletionHandler completionHandler);
+
     nx::sql::DBResult selectTimePeriods(
         nx::sql::QueryContext* queryContext,
         const Filter& filter,
@@ -268,9 +273,7 @@ private:
     void logDataSaveResult(sql::DBResult resultCode);
 
     static QRect packRect(const QRectF& rectf);
-    static int packCoordinate(double);
-
-    static double unpackCoordinate(int);
+    static QRectF unpackRect(const QRect& rect);
 };
 
 //-------------------------------------------------------------------------------------------------

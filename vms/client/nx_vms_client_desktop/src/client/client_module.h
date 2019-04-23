@@ -22,6 +22,7 @@ namespace nx::vms::client::desktop {
 class AnalyticsMetadataProviderFactory;
 class UploadManager;
 class WearableManager;
+class VideoCache;
 
 } // namespace nx::vms::client::desktop
 
@@ -46,7 +47,7 @@ public:
     QnStartupParameters startupParameters() const;
     nx::vms::client::desktop::UploadManager* uploadManager() const;
     nx::vms::client::desktop::WearableManager* wearableManager() const;
-
+    nx::vms::client::desktop::VideoCache* videoCache() const;
 private:
     void initApplication();
     void initThread();
@@ -74,6 +75,7 @@ private:
     nx::vms::client::desktop::RadassController* m_radassController = nullptr;
     nx::vms::client::desktop::UploadManager* m_uploadManager = nullptr;
     nx::vms::client::desktop::WearableManager* m_wearableManager = nullptr;
+    nx::vms::client::desktop::VideoCache* m_videoCache = nullptr;
 };
 
 #define qnClientModule QnClientModule::instance()

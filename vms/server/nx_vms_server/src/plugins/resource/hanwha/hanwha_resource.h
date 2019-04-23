@@ -277,8 +277,6 @@ private:
         const HanwhaAdavancedParameterInfo& parameterInfo,
         const QString& str) const;
 
-    void reopenStreams(bool reopenPrimary, bool reopenSecondary);
-
     int suggestBitrate(
         const HanwhaCodecLimits& limits,
         Qn::BitrateControl bitrateControl,

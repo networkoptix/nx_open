@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <QtCore/QRect>
+#include <QtCore/QSize>
 
 #include "analytics_events_storage_types.h"
 #include "rect_aggregator.h"
@@ -54,8 +55,7 @@ private:
         RectAggregator<QnUuid /*objectId*/> rectAggregator;
     };
 
-    const int m_resolutionX;
-    const int m_resolutionY;
+    const QSize m_resolution;
     const std::chrono::milliseconds m_aggregationPeriod;
 
     std::deque<AggregationContext> m_aggregations;
@@ -73,8 +73,6 @@ private:
         std::vector<AggregatedTrackData>* const totalAggregated);
 
     std::chrono::milliseconds length(const AggregationContext& context) const;
-
-    QRect translate(const QRectF& box);
 };
 
 } // namespace nx::analytics::storage

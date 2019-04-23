@@ -544,7 +544,11 @@ void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const 
         && networkResource->mediaPort() != m_RtpSession.getUrl()
             .port(nx::network::rtsp::DEFAULT_RTSP_PORT);
     if (isTransportChanged || isMediaPortChanged)
+    {
+        NX_DEBUG(this, "Transport type or media port changed, stopping. Transport type: %1",
+            getRtpTransport());
         pleaseStop();
+    }
 
     if (key == ResourcePropertyKey::kTrustCameraTime && m_role != Qn::ConnectionRole::CR_Archive)
         m_timeHelper.setTimePolicy(getTimePolicy(m_resource));

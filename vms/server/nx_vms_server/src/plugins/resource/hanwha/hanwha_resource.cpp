@@ -662,9 +662,10 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
 
         const bool success = executeCommand(*buttonParameter);
         const auto streamsToReopen = buttonInfo->streamsToReopen();
-        reopenStreams(
-            streamsToReopen.contains(Qn::ConnectionRole::CR_LiveVideo),
-            streamsToReopen.contains(Qn::ConnectionRole::CR_SecondaryLiveVideo));
+        if (streamsToReopen.contains(Qn::ConnectionRole::CR_LiveVideo))
+            reopenStream(nx::vms::api::StreamIndex::primary);
+        if (streamsToReopen.contains(Qn::ConnectionRole::CR_SecondaryLiveVideo))
+            reopenStream(nx::vms::api::StreamIndex::secondary);
 
         return success ? QSet<QString>{buttonParameter->id} : QSet<QString>();
     }
@@ -749,7 +750,10 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
     {
         initMediaStreamCapabilities();
         saveProperties();
-        reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
+        if (reopenPrimaryStream)
+            reopenStream(nx::vms::api::StreamIndex::primary);
+        if (reopenSecondaryStream)
+            reopenStream(nx::vms::api::StreamIndex::secondary);
     }
 
     return success ? values.ids() : QSet<QString>();
@@ -3222,26 +3226,6 @@ QString HanwhaResource::fromHanwhaAdvancedParameterValue(
     }
 
     return str;
-}
-
-void HanwhaResource::reopenStreams(bool reopenPrimary, bool reopenSecondary)
-{
-    auto camera = serverModule()->videoCameraPool()->getVideoCamera(toSharedPointer(this));
-    if (!camera)
-        return;
-
-    static const auto reopen =
-        [](const QnLiveStreamProviderPtr& stream)
-        {
-            if (stream && stream->isRunning())
-                stream->pleaseReopenStream();
-        };
-
-    if (reopenPrimary)
-        reopen(camera->getPrimaryReader());
-
-    if (reopenSecondary)
-        reopen(camera->getSecondaryReader());
 }
 
 int HanwhaResource::suggestBitrate(
