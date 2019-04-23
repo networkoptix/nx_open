@@ -125,6 +125,7 @@
         <ComponentGroup Id="server_txt_files" Directory="InstallDirRoot" Source="$(var.CMAKE_BINARY_DIR)">
             <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
             <Component><File Name="specific_features.txt" KeyPath="yes"/></Component>
+            <Component><File Name="nx_log_viewer.html" KeyPath="yes"/></Component>
         </ComponentGroup>
 
         <Feature Id="ServerFeature" Title="$(var.productName) Media Server" Level="1"
