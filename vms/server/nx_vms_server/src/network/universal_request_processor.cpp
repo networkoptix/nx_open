@@ -145,6 +145,9 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         {
             if (result.code != Qn::Auth_WrongInternalLogin)
             {
+                NX_DEBUG(this, "Failure to authenticate request %1 with error %2. userName: %3",
+                    url.toString(QUrl::RemoveAuthority),
+                    toString(result.code), lastUnauthorizedData.userName);
                 lastUnauthorizedData.id = QnUuid::createUuid();
                 auto auditManager = d->owner->commonModule()->auditManager();
                 auditManager->addAuditRecord(auditManager->prepareRecord(
