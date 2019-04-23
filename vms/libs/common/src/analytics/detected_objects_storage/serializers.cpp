@@ -1,5 +1,7 @@
 #include "serializers.h"
 
+#include <cmath>
+
 #include <nx/utils/compact_int.h>
 
 #include "config.h"
@@ -127,8 +129,8 @@ QRect translate(const QRectF& box, const QSize& resolution)
             box.x() * resolution.width(),
             box.y() * resolution.height()),
         QPoint(
-            std::round(box.bottomRight().x() * resolution.width()),
-            std::round(box.bottomRight().y() * resolution.height()))
+            round(box.bottomRight().x() * resolution.width()),
+            round(box.bottomRight().y() * resolution.height()))
     );
 }
 
