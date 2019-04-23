@@ -344,7 +344,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         if (index < 0)
         {
             ui->comboBoxTransport->addItem(
-                tr("UDP Multicast"),
+                tr("Multicast"),
                 QVariant::fromValue(vms::api::RtpTransportType::multicast));
         }
     }
