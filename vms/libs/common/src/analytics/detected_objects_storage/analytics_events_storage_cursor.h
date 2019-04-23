@@ -10,9 +10,7 @@
 #include "abstract_cursor.h"
 #include "analytics_events_storage_types.h"
 
-namespace nx {
-namespace analytics {
-namespace storage {
+namespace nx::analytics::storage::deprecated {
 
 class Cursor:
     public AbstractCursor
@@ -32,12 +30,12 @@ private:
 
     common::metadata::DetectionMetadataPacketPtr toDetectionMetadataPacket(
         DetectedObject detectedObject);
+
     void addToPacket(
         DetectedObject detectedObject,
         common::metadata::DetectionMetadataPacket* packet);
+
     nx::common::metadata::DetectedObject toMetadataObject(DetectedObject detectedObject);
 };
 
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::storage::deprecated

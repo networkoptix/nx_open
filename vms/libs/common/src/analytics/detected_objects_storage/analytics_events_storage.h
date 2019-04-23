@@ -17,7 +17,7 @@
 #include <analytics/common/object_detection_metadata.h>
 #include <recording/time_period_list.h>
 
-#include "analytics_events_storage_cursor.h"
+#include "abstract_cursor.h"
 #include "analytics_events_storage_db_controller.h"
 #include "analytics_events_storage_settings.h"
 #include "analytics_events_storage_types.h"
@@ -229,6 +229,11 @@ private:
     void queryTrackInfo(
         nx::sql::QueryContext* queryContext,
         std::vector<DetectedObject>* result);
+
+    void reportCreateCursorCompletion(
+        sql::DBResult resultCode,
+        QnUuid dbCursorId,
+        CreateCursorCompletionHandler completionHandler);
 
     nx::sql::DBResult selectTimePeriods(
         nx::sql::QueryContext* queryContext,

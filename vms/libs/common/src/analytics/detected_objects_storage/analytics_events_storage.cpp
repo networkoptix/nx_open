@@ -8,7 +8,9 @@
 #include <nx/sql/sql_cursor.h>
 #include <nx/utils/log/log.h>
 
+#include "analytics_events_storage_cursor.h"
 #include "config.h"
+#include "cursor.h"
 #include "object_searcher.h"
 #include "serializers.h"
 #include "time_period_fetcher.h"
@@ -112,29 +114,44 @@ void EventsStorage::createLookupCursor(
     NX_VERBOSE(this, "Requested cursor with filter %1", filter);
 
     QnMutexLocker lock(&m_dbControllerMutex);
-    m_dbController->queryExecutor().createCursor<DetectedObject>(
-        std::bind(&EventsStorage::prepareCursorQuery, this, filter, _1),
-        std::bind(&EventsStorage::loadObject, this, _1, _2),
-        [this, completionHandler = std::move(completionHandler)](
-            sql::DBResult resultCode,
-            QnUuid dbCursorId)
-        {
-            if (resultCode != sql::DBResult::ok)
-                return completionHandler(ResultCode::error, nullptr);
 
-            QnMutexLocker lock(&m_cursorsMutex);
-            if (m_closingDbController)
-                return completionHandler(ResultCode::ok, nullptr);
+    if (kUseTrackAggregation)
+    {
+        auto objectSearcher = std::make_shared<ObjectSearcher>(
+            m_deviceDao,
+            m_objectTypeDao,
+            std::move(filter));
 
-            auto cursor = std::make_shared<Cursor>(std::make_unique<sql::Cursor<DetectedObject>>(
-                &m_dbController->queryExecutor(),
-                dbCursorId));
-
-            m_openedCursors.push_back(cursor);
-            completionHandler(
-                ResultCode::ok,
-                cursor);
-        });
+        m_dbController->queryExecutor().createCursor<DetectedObject>(
+            [objectSearcher](auto&&... args)
+                { objectSearcher->prepareCursorQuery(std::forward<decltype(args)>(args)...); },
+            [objectSearcher](auto&&... args)
+                { objectSearcher->loadCurrentRecord(std::forward<decltype(args)>(args)...); },
+            [this, completionHandler = std::move(completionHandler)](
+                sql::DBResult resultCode,
+                QnUuid dbCursorId) mutable
+            {
+                reportCreateCursorCompletion(
+                    resultCode,
+                    dbCursorId,
+                    std::move(completionHandler));
+            });
+    }
+    else
+    {
+        m_dbController->queryExecutor().createCursor<DetectedObject>(
+            std::bind(&EventsStorage::prepareCursorQuery, this, filter, _1),
+            std::bind(&EventsStorage::loadObject, this, _1, _2),
+            [this, completionHandler = std::move(completionHandler)](
+                sql::DBResult resultCode,
+                QnUuid dbCursorId) mutable
+            {
+                reportCreateCursorCompletion(
+                    resultCode,
+                    dbCursorId,
+                    std::move(completionHandler));
+            });
+    }
 }
 
 void EventsStorage::closeCursor(const std::shared_ptr<AbstractCursor>& cursor)
@@ -154,8 +171,11 @@ void EventsStorage::lookup(
         {
             if (kUseTrackAggregation)
             {
-                ObjectSearcher objectSearcher(m_deviceDao, m_objectTypeDao);
-                *result = objectSearcher.lookup(queryContext, filter);
+                ObjectSearcher objectSearcher(
+                    m_deviceDao,
+                    m_objectTypeDao,
+                    std::move(filter));
+                *result = objectSearcher.lookup(queryContext);
                 return nx::sql::DBResult::ok;
             }
             else
@@ -699,6 +719,37 @@ void EventsStorage::queryTrackInfo(
         object.firstAppearanceTimeUsec = trackInfoQuery.value(0).toLongLong() * kUsecInMs;
         object.lastAppearanceTimeUsec = trackInfoQuery.value(1).toLongLong() * kUsecInMs;
     }
+}
+
+void EventsStorage::reportCreateCursorCompletion(
+    sql::DBResult resultCode,
+    QnUuid dbCursorId,
+    CreateCursorCompletionHandler completionHandler)
+{
+    if (resultCode != sql::DBResult::ok)
+        return completionHandler(ResultCode::error, nullptr);
+
+    QnMutexLocker lock(&m_cursorsMutex);
+
+    if (m_closingDbController)
+        return completionHandler(ResultCode::ok, nullptr);
+
+    auto dbCursor = std::make_unique<sql::Cursor<DetectedObject>>(
+        &m_dbController->queryExecutor(),
+        dbCursorId);
+
+    std::shared_ptr<AbstractCursor> cursor;
+    if (kUseTrackAggregation)
+        cursor = ObjectSearcher::createCursor(std::move(dbCursor));
+    else
+        cursor = std::make_shared<deprecated::Cursor>(std::move(dbCursor));
+
+    m_openedCursors.push_back(cursor);
+    lock.unlock();
+
+    completionHandler(
+        ResultCode::ok,
+        cursor);
 }
 
 nx::sql::DBResult EventsStorage::selectTimePeriods(

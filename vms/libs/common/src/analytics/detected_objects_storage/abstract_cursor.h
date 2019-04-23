@@ -9,6 +9,9 @@ class AbstractCursor
 public:
     virtual ~AbstractCursor() = default;
 
+    /**
+     * @return nullptr signals end of data.
+     */
     virtual common::metadata::ConstDetectionMetadataPacketPtr next() = 0;
 
     /**

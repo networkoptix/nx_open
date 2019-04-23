@@ -795,25 +795,48 @@ protected:
 
     void givenRandomFilter()
     {
-        addRandomKnownDeviceIdToFilter();
+        const auto& randomPacket = nx::utils::random::choice(analyticsDataPackets());
+
+        m_filter.deviceIds.push_back(randomPacket->deviceId);
+        //addRandomKnownDeviceIdToFilter();
 
         if (nx::utils::random::number<bool>())
+        {
             addRandomNonEmptyTimePeriodToFilter();
+            if (!m_filter.timePeriod.contains(randomPacket->timestampUsec / kUsecInMs))
+            {
+                m_filter.timePeriod.addPeriod(
+                    QnTimePeriod(randomPacket->timestampUsec / kUsecInMs, 1));
+            }
+        }
 
         if (nx::utils::random::number<bool>())
-            addRandomObjectIdToFilter();
+            m_filter.objectAppearanceId = randomPacket->objects.front().objectId;
 
         if (nx::utils::random::number<bool>())
+        {
             addRandomObjectTypeIdToFilter();
+            if (!nx::utils::contains(m_filter.objectTypeId, randomPacket->objects.front().objectTypeId))
+                m_filter.objectTypeId.push_back(randomPacket->objects.front().objectTypeId);
+        }
 
         if (nx::utils::random::number<bool>())
             addMaxObjectsLimitToFilter();
 
         if (nx::utils::random::number<bool>())
+        {
             addRandomBoundingBoxToFilter();
+            if (!m_filter.boundingBox.intersects(randomPacket->objects.front().boundingBox))
+            {
+                m_filter.boundingBox =
+                    m_filter.boundingBox.united(randomPacket->objects.front().boundingBox);
+            }
+        }
 
         if (nx::utils::random::number<bool>())
+        {
             addRandomTextFoundInDataToFilter();
+        }
     }
 
     void givenRandomFilterWithMultipleDeviceIds()
@@ -1169,7 +1192,13 @@ private:
     }
 };
 
-TEST_F(AnalyticsDbCursor, cursor_provides_all_matched_data)
+TEST_F(AnalyticsDbCursor, reads_all_available_data)
+{
+    whenReadDataUsingCursor();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbCursor, reads_all_matched_data)
 {
     givenRandomFilter();
     setSortOrder(nx::utils::random::number<bool>() ? Qt::AscendingOrder : Qt::DescendingOrder);
