@@ -280,7 +280,7 @@ protected:
         const int eventsPerDevice = 11;
 
         std::vector<common::metadata::DetectionMetadataPacketPtr> analyticsDataPackets;
-        for (const auto& deviceId : m_allowedDeviceIds)
+        for (const auto& deviceId: m_allowedDeviceIds)
         {
             for (int i = 0; i < eventsPerDevice; ++i)
             {
@@ -336,8 +336,9 @@ protected:
         if (m_analyticsDataPackets.empty())
             return;
 
-        m_analyticsDataPackets =
-            sortPacketsByTimestamp(m_analyticsDataPackets, Qt::SortOrder::AscendingOrder);
+        m_analyticsDataPackets = sortPacketsByTimestamp(
+            std::exchange(m_analyticsDataPackets, {}),
+            Qt::SortOrder::AscendingOrder);
 
         auto prevPacketIter = m_analyticsDataPackets.begin();
         for (auto it = std::next(prevPacketIter);
@@ -350,6 +351,7 @@ protected:
                 std::move(
                     (*it)->objects.begin(), (*it)->objects.end(),
                     std::back_inserter((*prevPacketIter)->objects));
+
                 (*prevPacketIter)->durationUsec =
                     std::max((*it)->durationUsec, (*prevPacketIter)->durationUsec);
                 it = m_analyticsDataPackets.erase(it);
@@ -1161,14 +1163,26 @@ protected:
 
     void thenResultMatchesExpectations()
     {
-        assertEqual(
-            sortPacketsByTimestamp(
-                filterPackets(filter(), analyticsDataPackets()),
-                filter().sortOrder),
-            m_packetsRead);
+        auto expected = sortPacketsByTimestamp(
+            filterPackets(filter(), analyticsDataPackets()),
+            filter().sortOrder);
+
+        expected = sortObjectsById(std::move(expected));
+
+        std::vector<common::metadata::DetectionMetadataPacketPtr> actual;
+        std::transform(
+            m_packetsRead.begin(), m_packetsRead.end(),
+            std::back_inserter(actual),
+            [](const auto& constPacket)
+            {
+                return std::make_shared<common::metadata::DetectionMetadataPacket>(*constPacket);
+            });
+        actual = sortObjectsById(std::exchange(actual, {}));
+
+        assertEqual(expected, actual);
     }
 
-    void andObjectsWithSameTimestampAreDeiveredInSinglePacket()
+    void andObjectsWithSameTimestampAreDeliveredInSinglePacket()
     {
         // TODO
     }
@@ -1189,6 +1203,19 @@ private:
         std::shared_ptr<AbstractCursor> cursor)
     {
         m_createdCursorsQueue.push(cursor);
+    }
+
+    std::vector<common::metadata::DetectionMetadataPacketPtr> sortObjectsById(
+        std::vector<common::metadata::DetectionMetadataPacketPtr> packets)
+    {
+        for (auto& packet: packets)
+        {
+            std::sort(
+                packet->objects.begin(), packet->objects.end(),
+                [](const auto& left, const auto& right) { return left.objectId < right.objectId; });
+        }
+
+        return packets;
     }
 };
 
@@ -1214,7 +1241,7 @@ TEST_F(AnalyticsDbCursor, aggregates_objects_with_same_timestamp)
     whenReadDataUsingCursor();
 
     thenResultMatchesExpectations();
-    andObjectsWithSameTimestampAreDeiveredInSinglePacket();
+    andObjectsWithSameTimestampAreDeliveredInSinglePacket();
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -23,16 +23,25 @@ private:
     std::unique_ptr<nx::sql::Cursor<DetectedObject>> m_sqlCursor;
     bool m_eof = false;
     std::vector<std::pair<DetectedObject, std::size_t /*current track position*/>> m_currentObjects;
+    common::metadata::DetectionMetadataPacketPtr m_packet;
 
     std::tuple<const DetectedObject*, std::size_t /*track position*/> readNextTrackPosition();
 
     void loadNextObject();
 
-    common::metadata::ConstDetectionMetadataPacketPtr createMetaDataPacket(
+    common::metadata::DetectionMetadataPacketPtr createMetaDataPacket(
         const DetectedObject& object,
         int trackPositionIndex);
 
     nx::common::metadata::DetectedObject toMetadataObject(
+        const DetectedObject& object,
+        int trackPositionIndex);
+
+    bool canAddToTheCurrentPacket(
+        const DetectedObject& object,
+        int trackPositionIndex) const;
+
+    void addToCurrentPacket(
         const DetectedObject& object,
         int trackPositionIndex);
 };

@@ -14,7 +14,7 @@ common::metadata::ConstDetectionMetadataPacketPtr Cursor::next()
     // Always storing the next detected object in advance.
     // I.e., the one that has track_start_time larger than the current track position.
 
-    while (!m_eof)
+    while (!m_eof || !m_currentObjects.empty())
     {
         auto [object, trackPositionIndex] = readNextTrackPosition();
         if (!object)
@@ -23,10 +23,24 @@ common::metadata::ConstDetectionMetadataPacketPtr Cursor::next()
             continue;
         }
 
-        return createMetaDataPacket(*object, trackPositionIndex);
+        if (!m_packet)
+        {
+            m_packet = createMetaDataPacket(*object, trackPositionIndex);
+            continue;
+        }
+
+        if (m_packet && canAddToTheCurrentPacket(*object, trackPositionIndex))
+        {
+            addToCurrentPacket(*object, trackPositionIndex);
+            continue;
+        }
+
+        auto curPacket = std::exchange(m_packet, nullptr);
+        m_packet = createMetaDataPacket(*object, trackPositionIndex);
+        return curPacket;
     }
 
-    return nullptr;
+    return std::exchange(m_packet, nullptr);
 }
 
 void Cursor::close()
@@ -77,7 +91,7 @@ void Cursor::loadNextObject()
     m_currentObjects.emplace_back(std::move(*object), 0);
 }
 
-common::metadata::ConstDetectionMetadataPacketPtr Cursor::createMetaDataPacket(
+common::metadata::DetectionMetadataPacketPtr Cursor::createMetaDataPacket(
     const DetectedObject& object,
     int trackPositionIndex)
 {
@@ -100,6 +114,24 @@ nx::common::metadata::DetectedObject Cursor::toMetadataObject(
     result.boundingBox = object.track[trackPositionIndex].boundingBox;
     result.labels = object.attributes;
     return result;
+}
+
+bool Cursor::canAddToTheCurrentPacket(
+    const DetectedObject& object,
+    int trackPositionIndex) const
+{
+    return m_packet->deviceId == object.deviceId
+        && m_packet->timestampUsec == object.track[trackPositionIndex].timestampUsec;
+}
+
+void Cursor::addToCurrentPacket(
+    const DetectedObject& object,
+    int trackPositionIndex)
+{
+    m_packet->objects.push_back(toMetadataObject(object, trackPositionIndex));
+    m_packet->durationUsec = std::max(
+        m_packet->durationUsec,
+        object.track[trackPositionIndex].durationUsec);
 }
 
 } // namespace nx::analytics::storage
