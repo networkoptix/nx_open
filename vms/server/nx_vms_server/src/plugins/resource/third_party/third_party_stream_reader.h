@@ -58,6 +58,8 @@ private:
     //virtual bool needMetaData() const override;
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
     nx::utils::TimeHelper* timeHelper(const QnAbstractMediaDataPtr& data);
+    void updateSourceUrl(const QString& urlString);
+
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     std::unique_ptr<QnAbstractMediaStreamProvider> m_builtinStreamReader;
@@ -78,6 +80,7 @@ private:
     std::vector<TimeHelperPtr> m_videoTimeHelpers;
     std::vector<TimeHelperPtr> m_audioTimeHelpers;
     std::atomic_flag m_isMediaUrlValid;
+    QString m_lastSourceUrl;
 
     void initializeAudioContext( const nxcip::AudioFormat& audioFormat, const Extras& extras );
 };

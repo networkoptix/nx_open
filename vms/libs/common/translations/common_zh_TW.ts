@@ -1010,7 +1010,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>未知的錯誤.</translation>
+      <translation>未知錯誤.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>

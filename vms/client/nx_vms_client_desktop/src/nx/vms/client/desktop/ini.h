@@ -92,7 +92,7 @@ struct Ini: nx::kit::IniConfig
         "Enables watermarks preview and setup.");
     NX_INI_FLAG(1, enableCaseExport,
         "Enables case export.");
-    NX_INI_FLAG(0, enableSessionTimeout,
+    NX_INI_FLAG(1, enableSessionTimeout,
         "Enables admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode,
         "Specifies one of password preview activation modes: \"press\", \"hover\" or \"toggle\".");
@@ -122,7 +122,7 @@ struct Ini: nx::kit::IniConfig
         "Enables a check if all sync play items are paused upon every request.");
     NX_INI_STRING("", autoUpdatesCheckChangesetOverride,
         "Background updates check will use this changeset instead of \"latest\".");
-    NX_INI_INT(0, massSystemUpdateWaitForServerOnlineOverride,
+    NX_INI_INT(0, massSystemUpdateWaitForServerOnlineSecOverride,
         "Time to wait until Server goes online in seconds. Default value is used when set to 0.");
     NX_INI_INT(0, tilePreviewLoadDelayOverrideMs,
         "Tiles in the Right Panel will request previews only after this period (in milliseconds)\n"
@@ -143,6 +143,8 @@ struct Ini: nx::kit::IniConfig
         "Period to check for new updates, in seconds. Set to zero to use the built-in value.");
     NX_INI_FLAG(1, rightPanelHoverPreviewCrop,
         "Whether mouse hover toggles crop mode on Right Panel tiles and tooltips.");
+    NX_INI_FLAG(0, pluginInformationInServerSettings,
+        "Show information about installed plugin libraries in Server Settings.");
 };
 
 inline Ini& ini()

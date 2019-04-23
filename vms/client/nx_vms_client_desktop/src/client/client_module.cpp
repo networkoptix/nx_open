@@ -449,8 +449,9 @@ void QnClientModule::initSingletons()
 
     initializeStatisticsManager(commonModule);
 
-    /* Long runnables depend on QnCameraHistoryPool and other singletons. */
-    commonModule->store(new QnLongRunnablePool());
+    // Long runnables depend on QnCameraHistoryPool and other singletons.
+    // The pool is set to relaxed mode and can be destroyed with some QnLongRunnables dangling.
+    QnLongRunnablePool::instance()->setRelaxedChecking(true);
 
     commonModule->store(new QnCloudConnectionProvider());
     m_cloudStatusWatcher = commonModule->store(

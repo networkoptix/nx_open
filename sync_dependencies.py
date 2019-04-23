@@ -184,7 +184,8 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("any/help", path_variable="help_directory")
 
     if have_desktop_client or have_mobile_client:
-        sync("any/roboto-fonts", path_variable="fonts_directory")
+        sync("any/roboto-fonts")
+        sync("any/dejavu-fonts")
 
     if (have_mediaserver or have_desktop_client) and box != "edge1":
         sync("festival")

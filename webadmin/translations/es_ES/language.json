@@ -33,7 +33,7 @@
         "error": "Error: ",
         "restartNeeded": "Los cambios se han guardado. ¿Reinicie el servidor para aplicar la nueva configuración?",
         "settingsSaved": "Configuraciones guardadas",
-        "confirmHardwareRestart": "Restart server operation System?",
+        "confirmHardwareRestart": "¿Reiniciar el sistema de operación del servidor?",
         "confirmRestoreSettings": "¿Restaurar todas las configuraciones del servidor? Se guardará el archivo, pero se restablecerá la configuración de la red.",
         "confirmRestoreSettingsNotNetwork": "¿Restablecer la configuración del servidor? Configuración de red y el archivo se guardará.",
         "unavailable": "No Disponible",
@@ -42,7 +42,7 @@
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> todos los usuarios de la nube se eliminarán.</span> <br><br>Sistema será accesible a través de red local con cuenta de administrador local.",
         "confirmDisconnectFromCloudAction": "Desconectar",
         "disconnectedFromCloudSuccess": "Sistema fue desconectado de {{CLOUD_NAME}} con éxito",
-        "disconnectedFromCloudError": "Cannot disconnect the System",
+        "disconnectedFromCloudError": "No se puede desconectar el Sistema",
         "confirmDisconnectFromSystem": "Detach server from current System",
         "confirmDisconnectFromSystemAction": "Separar",
         "disconnectedFromSystemSuccess": "Server was detached from the System successfully",
@@ -124,7 +124,8 @@
         "updateStatus": "Update status",
         "watermarkSettings": "Watermark settings",
         "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter.",
-        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.",
+        "forceLiveCacheForPrimaryStream": "Whether to cache some frames for the primary stream. Values: \"yes\" - always enabled (may use a lot of RAM), \"no\" - always disabled except when required by the playback (e.g. HLS), \"auto\" - similar to \"no\", but turned on when improves the user experience (e.g. when some Analytics plugin is working on the camera)."
     },
     "info": {
         "tabs": {

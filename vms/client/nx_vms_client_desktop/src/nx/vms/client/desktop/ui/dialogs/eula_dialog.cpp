@@ -4,6 +4,7 @@
 #include <QtCore/QFile>
 #include <QtGui/QScreen>
 #include <QtGui/QWindow>
+#include <QtGui/QTextDocument>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
@@ -87,9 +88,10 @@ void EulaDialog::setEulaHtml(const QString& html)
     ui->eulaView->setHtml(eulaText);
 
     // We do not want to copy embedded style to clipboard.
-    //ui->copyToClipboard->setClipboardText(html);
-    // We will copy style as well, until we catch all font problems.
-    ui->copyToClipboard->setClipboardText(eulaText);
+    QTextDocument doc;
+    doc.setHtml( html );
+    QString plainText = doc.toPlainText();
+    ui->copyToClipboard->setClipboardText(plainText);
 }
 
 bool EulaDialog::hasHeightForWidth() const

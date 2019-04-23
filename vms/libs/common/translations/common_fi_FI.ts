@@ -981,7 +981,7 @@
     </message>
     <message>
       <source>Viewer</source>
-      <translation type="unfinished">Viewer</translation>
+      <translation>Katsoja</translation>
     </message>
     <message>
       <source>Live Viewer</source>
@@ -993,7 +993,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Asiakassuhde</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>

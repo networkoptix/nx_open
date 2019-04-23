@@ -11,34 +11,34 @@
     <div>
         <h3>Tạo các sự kiện chung</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party Systems to a System,
+            A Generic Event is a method of sending events from 3rd party systems to a System
             which can be used to trigger System actions in the Events & Rules engine.
-            Generator Event Generator là một công cụ giúp thiết lập và gọi các hàm HTTP Generic Event.
+            The Generic Event Generator is a tool which helps developers and integrators build
+            and test HTTP Generic Event calls.
         </p>
         <p><a href="#/developers/events">Tạo các sự kiện chung</a></p>
     </div>
     <div>
         <h3>Máy chủ API</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party Systems. It gives developers the ability to
-            access almost every System feature available in the regular client: query/manage System resources (servers,
-            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
-            control PTZ cameras, and more.
+            A REST API that gives developers the ability to access almost every system feature available in the regular
+            client: query/manage system resources (servers, cameras, users, permissions), pull live or recorded video
+            out of System, generate events, create rules, control PTZ cameras, and more.
         </p>
         <p>
-            <a href="#/developers/api"><b>API thử nghiệm công cụ (mới)</b></a>
-            - các tài liệu hướng dẫn tương tác với các công cụ để thử nghiệm API gọi <br>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation and tools for testing API calls<br>
             <a href="#/developers/changelog">API Changelog</a>
-            - danh sách phá vỡ những thay đổi trong API <br>
-            <a id="api-doc" href="api.xml" target="_blank">Tài liệu API</a> <br>
-            <a href="#/developers/serverDocumentation">Tài liệu hướng dẫn cài đặt máy chủ</a>
+            - a list of breaking changes in API since the last release<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+            - a full list of available Server API calls
         </p>
 
     </div>
     <div>
         <h3>Bảng thông tin về camera</h3>
         <p>
-            Hiển thị thông tin bổ sung dành cho nhà phát triển sử dụng giao diện quản trị web:
+            Displays additional developer-friendly information for individual cameras in the Web Admin Interface’s View tab:
         </p>
         <ul>
             <li>Tên Camera</li>
@@ -51,9 +51,12 @@
         <p><a href="#/view/?cameraLinks">mở bảng thông tin về camera</a></p>
     </div>
     <div>
-        <h3>Nguồn video tích hợp SDK</h3>
+        <h3>Video Source SDK</h3>
         <p>
-            Tích hợp nguồn video SDK cung cấp khả năng tích hợp hầu hết các nguồn video trực tiếp hoặc ghi lại (Máy quay IP, NVR, DVR, v. v...) vào Hệ thống. SDK tạo ra các phương pháp để phát hiện, hiển thị, phân tích và ghi video. Nó cũng cho phép tích hợp cổng I/O của thiết bị và thông tin phát hiện chuyển động.
+            The Video Source SDK provides the ability to integrate almost any live or recorded video source (IP Cameras,
+            NVRs, DVRs, etc) into System and makes it possible to create methods for discovering, displaying, analyzing
+            and recording video. It also allows integrating I/O ports and devices, as well as pulling motion detection
+            information from 3rd party devices.
         </p>
         <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >nhận được SDK</a></p>
     </div>
@@ -61,7 +64,10 @@
     <div>
         <h3>SDK lưu trữ</h3>
         <p>
-            Bộ nhớ SDK cung cấp khả năng tích hợp lưu trữ tiềm năng vào Hệ thống. Nó cho phép các nhà phát triển đọc hoặc ghi vào bất kỳ vị trí lưu trữ nào: địa phương, từ xa và thậm chí cả dữ liệu đám mây. Tạo một plugin lưu trữ đòi hỏi phải thực hiện các chức năng tiêu chuẩn như: luồng I/O, nếu tệp tồn tại, xóa tệp, danh sách tệp trong thư mục, etc.Storage SDK cũng chứa một ví dụ để sử dụng máy chủ FTP làm vị trí lưu trữ.
+            The Storage SDK allows developers to read from or write to any storage location: local, remote, and even
+            cloud one. Creating a storage plugin requires implementing standard functions such as: I/O stream, if file
+            exist, delete file, list of files in the folder, etc. The Storage SDK contains an example for using an FTP
+            server as a storage location.
         </p>
         <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >nhận được SDK</a></p>
     </div>

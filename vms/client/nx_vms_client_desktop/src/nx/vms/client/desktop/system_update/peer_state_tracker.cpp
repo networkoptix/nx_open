@@ -14,7 +14,7 @@
 
 namespace {
 
-auto kWaitForServerReturn = std::chrono::minutes(10);
+std::chrono::milliseconds kWaitForServerReturn = std::chrono::minutes(10);
 
 template<class Type> bool compareAndSet(const Type& from, Type& to)
 {
@@ -33,10 +33,15 @@ PeerStateTracker::PeerStateTracker(QObject* parent):
     QnWorkbenchContextAware(parent),
     m_dataLock(QnMutex::Recursive)
 {
-    if(ini().massSystemUpdateWaitForServerOnlineOverride)
-        m_waitForServerReturn = std::chrono::seconds(ini().massSystemUpdateWaitForServerOnlineOverride);
+    if (ini().massSystemUpdateWaitForServerOnlineSecOverride)
+    {
+        m_timeForServerToReturn = std::chrono::seconds(
+            ini().massSystemUpdateWaitForServerOnlineSecOverride);
+    }
     else
-        m_waitForServerReturn = kWaitForServerReturn;
+    {
+        m_timeForServerToReturn = kWaitForServerReturn;
+    }
 }
 
 bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
@@ -372,7 +377,7 @@ void PeerStateTracker::clearState()
         emit itemChanged(item);
 }
 
-std::map<QnUuid, nx::update::Status::Code> PeerStateTracker::getAllPeerStates() const
+std::map<QnUuid, nx::update::Status::Code> PeerStateTracker::allPeerStates() const
 {
     QnMutexLocker locker(&m_dataLock);
     std::map<QnUuid, nx::update::Status::Code> result;
@@ -382,7 +387,7 @@ std::map<QnUuid, nx::update::Status::Code> PeerStateTracker::getAllPeerStates() 
     return result;
 }
 
-std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::getActiveServers() const
+std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::activeServers() const
 {
     QnMutexLocker locker(&m_dataLock);
 
@@ -396,13 +401,13 @@ std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::getActiveServers() 
     return result;
 }
 
-QList<UpdateItemPtr> PeerStateTracker::getAllItems() const
+QList<UpdateItemPtr> PeerStateTracker::allItems() const
 {
     QnMutexLocker locker(&m_dataLock);
     return m_items;
 }
 
-QSet<QnUuid> PeerStateTracker::getAllPeers() const
+QSet<QnUuid> PeerStateTracker::allPeers() const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
@@ -411,7 +416,7 @@ QSet<QnUuid> PeerStateTracker::getAllPeers() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersInState(StatusCode state) const
+QSet<QnUuid> PeerStateTracker::peersInState(StatusCode state) const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
@@ -423,7 +428,7 @@ QSet<QnUuid> PeerStateTracker::getPeersInState(StatusCode state) const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getOfflineServers() const
+QSet<QnUuid> PeerStateTracker::offlineServers() const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
@@ -433,7 +438,7 @@ QSet<QnUuid> PeerStateTracker::getOfflineServers() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getLegacyServers() const
+QSet<QnUuid> PeerStateTracker::legacyServers() const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
@@ -447,7 +452,7 @@ QSet<QnUuid> PeerStateTracker::getLegacyServers() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersInstalling() const
+QSet<QnUuid> PeerStateTracker::peersInstalling() const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
@@ -457,7 +462,7 @@ QSet<QnUuid> PeerStateTracker::getPeersInstalling() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersCompleteInstall() const
+QSet<QnUuid> PeerStateTracker::peersCompleteInstall() const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
@@ -467,7 +472,7 @@ QSet<QnUuid> PeerStateTracker::getPeersCompleteInstall() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getServersWithChangedProtocol() const
+QSet<QnUuid> PeerStateTracker::serversWithChangedProtocol() const
 {
     int protocol = nx_ec::EC2_PROTO_VERSION;
     QnMutexLocker locker(&m_dataLock);
@@ -482,7 +487,7 @@ QSet<QnUuid> PeerStateTracker::getServersWithChangedProtocol() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersWithUnknownStatus() const
+QSet<QnUuid> PeerStateTracker::peersWithUnknownStatus() const
 {
     QSet<QnUuid> result;
     QnMutexLocker locker(&m_dataLock);
@@ -511,7 +516,7 @@ void PeerStateTracker::processDownloadTaskSet()
         if (item->statusUnknown)
         {
             auto delta = now - item->lastStatusTime;
-            if (delta > m_waitForServerReturn)
+            if (delta > m_timeForServerToReturn)
             {
                 NX_VERBOSE(this, "processDownloadTaskSet() "
                     "peer %1 had no status updates for too long. Skipping it.", id);
@@ -529,7 +534,7 @@ void PeerStateTracker::processDownloadTaskSet()
         if (item->offline || state == StatusCode::offline)
         {
             auto delta = now - item->lastOnlineTime;
-            if (delta > m_waitForServerReturn)
+            if (delta > m_timeForServerToReturn)
             {
                 NX_VERBOSE(this, "processDownloadTaskSet() "
                     "peer %1 has been offline for too long. Skipping it.", id);
@@ -673,24 +678,24 @@ void PeerStateTracker::processInstallTaskSet()
     }
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersComplete() const
+QSet<QnUuid> PeerStateTracker::peersComplete() const
 {
     return m_peersComplete;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersActive() const
+QSet<QnUuid> PeerStateTracker::peersActive() const
 {
     QnMutexLocker locker(&m_dataLock);
     return m_peersActive;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersIssued() const
+QSet<QnUuid> PeerStateTracker::peersIssued() const
 {
     QnMutexLocker locker(&m_dataLock);
     return m_peersIssued;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersFailed() const
+QSet<QnUuid> PeerStateTracker::peersFailed() const
 {
     QnMutexLocker locker(&m_dataLock);
     return m_peersFailed;
@@ -838,7 +843,7 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
         case State::readyInstall:
             m_clientItem->state = StatusCode::readyToInstall;
             m_clientItem->progress = 100;
-            m_clientItem->statusMessage = tr("Ready to download update");
+            m_clientItem->statusMessage = tr("Ready to install update");
             break;
         case State::readyRestart:
             m_clientItem->statusMessage = tr("Ready to restart to the new version");

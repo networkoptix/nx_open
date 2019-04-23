@@ -310,11 +310,17 @@ std::optional<ExtendedAnalyticsActionData>
     const auto& capabilities = actionTypeDescriptor.requirements.capabilities;
 
     if (!capabilities)
-        return extendedAnalyticsActionData;
+    {
+        NX_DEBUG(this, "The action type %1 has no addittional requirements."
+            "Track, best shot frame and position are not going to be fetched.", action.actionId);
+        return std::optional<ExtendedAnalyticsActionData>(extendedAnalyticsActionData);
+    }
 
     const bool needBestShotTimestamp =
-        capabilities.testFlag(EngineManifest::ObjectAction::Capability::needBestShotObjectMetadata)
-        || capabilities.testFlag(EngineManifest::ObjectAction::Capability::needBestShotVideoFrame);
+        capabilities.testFlag(
+            EngineManifest::ObjectAction::Capability::needBestShotObjectMetadata)
+        || capabilities.testFlag(
+            EngineManifest::ObjectAction::Capability::needBestShotVideoFrame);
 
     const bool needToFetchFullTrack =
         capabilities.testFlag(EngineManifest::ObjectAction::Capability::needTrack);
@@ -417,11 +423,16 @@ std::optional<nx::analytics::storage::ObjectPosition>
 
     static const seconds kSearchTimeRangeDuration(2);
 
+    NX_DEBUG(this,
+        "Trying to fetch an object position by timestamp. Track id: %1, timestamp: %2",
+        objectTrackId, timestampUs);
+
     Filter filter;
     filter.objectAppearanceId = objectTrackId;
     filter.timePeriod = QnTimePeriod(
         duration_cast<milliseconds>(microseconds(timestampUs) - kSearchTimeRangeDuration / 2),
         duration_cast<milliseconds>(kSearchTimeRangeDuration));
+    filter.maxTrackSize = 0;
 
     const auto result = makeDatabaseRequest(filter);
     if (!result || result->empty())
@@ -433,12 +444,12 @@ std::optional<nx::analytics::storage::ObjectPosition>
     public:
         bool operator()(const ObjectPosition& position, int64_t timestamp) const
         {
-            return position.timestampUsec < timestamp;
+            return position.timestampUsec > timestamp;
         };
 
         bool operator()(int64_t timestamp, const ObjectPosition& position) const
         {
-            return position.timestampUsec < timestamp;
+            return position.timestampUsec > timestamp;
         }
     };
 
@@ -449,10 +460,26 @@ std::optional<nx::analytics::storage::ObjectPosition>
         std::upper_bound(track.cbegin(), track.cend(), timestampUs, Comparator());
 
     if (lowerBound == track.cend() && upperBound == track.cend())
+    {
+        NX_DEBUG(this,
+            "Unable to find position with timestamp %1 in the track %2",
+            timestampUs, objectTrackId);
+
         return std::nullopt;
+    }
 
     if (lowerBound == track.cend())
+    {
+        NX_DEBUG(this,
+            "Unable to find lower bound for position with timestamp %1 in the track %2, "
+            "using upper bound %3",
+            timestampUs, objectTrackId, upperBound->timestampUsec);
+
         return *upperBound;
+    }
+
+    NX_DEBUG(this, "Got poistion for timestamp %1 for the track %2, position timestmap is %3",
+        timestampUs, objectTrackId, lowerBound->timestampUsec);
 
     return *lowerBound;
 }
@@ -466,6 +493,10 @@ std::optional<nx::analytics::storage::DetectedObject>
     Filter filter;
     filter.objectAppearanceId = objectTrackId;
     filter.maxTrackSize = needFullTrack ? /*unlimited length*/ 0 : 1;
+
+    NX_DEBUG(this,
+        "Trying to fetch track with id %1. Full track is needed: %2",
+        objectTrackId, needFullTrack);
 
     const auto lookupResult = makeDatabaseRequest(filter);
     if (!lookupResult)
@@ -481,6 +512,7 @@ std::optional<nx::analytics::storage::DetectedObject>
     if (!lookupResult->empty())
         return lookupResult->at(0);
 
+    NX_DEBUG(this, "Database lookup result is empty for object track %1", objectTrackId);
     return std::nullopt;
 }
 
@@ -490,11 +522,14 @@ int64_t QnExecuteAnalyticsActionRestHandler::tryToFindBestShotTimestampUsByAttru
     using namespace nx::analytics::storage;
     Filter filter;
     filter.objectAppearanceId = objectTrackId;
-    // filter.maxObjectsToSelect = 1; //< TODO: #dmishin uncomment this if needed or remove.
     filter.maxTrackSize = 1;
 
     // It's a hack needed because filter.requiredAttrributes field doesn't work.
     filter.freeText = kBestShotAttribute;
+
+    NX_DEBUG(this,
+        "Trying to fetch best shot timestamp by attribute for the track %1",
+        objectTrackId);
 
     auto lookupResult = makeDatabaseRequest(filter);
     if (!lookupResult || lookupResult->empty())
@@ -510,7 +545,23 @@ int64_t QnExecuteAnalyticsActionRestHandler::tryToFindBestShotTimestampUsByAttru
 
         bool success = false;
         int64_t timestampUs = attribute.value.toLongLong(&success);
-        return success ? timestampUs : AV_NOPTS_VALUE;
+        if (success)
+        {
+            NX_DEBUG(this,
+                "Best shot timestamp has been found by attribute for the track %1: %2",
+                objectTrackId, timestampUs);
+
+            return timestampUs;
+        }
+        else
+        {
+            NX_WARNING(this,
+                "Unable to convert best shot timestamp attribute value to a number. "
+                "Track id: %1, attribute value: %2",
+                objectTrackId, attribute.value);
+        }
+
+        break;
     }
 
     return AV_NOPTS_VALUE;
@@ -520,6 +571,9 @@ CLVideoDecoderOutputPtr  QnExecuteAnalyticsActionRestHandler::imageByTimestamp(
     const QnUuid& deviceId,
     const int64_t timestampUs)
 {
+    NX_DEBUG(this, "Trying to fetch image by timestamp. Device id: %1, timestamp: %2",
+        deviceId, timestampUs);
+
     const auto device = resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
     if (!device)
     {
@@ -537,12 +591,21 @@ CLVideoDecoderOutputPtr  QnExecuteAnalyticsActionRestHandler::imageByTimestamp(
         nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics;
 
     QnGetImageHelper helper(serverModule());
-    return helper.getImage(cameraImageRequest);
+    CLVideoDecoderOutputPtr result = helper.getImage(cameraImageRequest);
+    if (!result)
+    {
+        NX_DEBUG(this, "Unable to fetch image by timestamp %1. Device id: %2",
+            deviceId, timestampUs);
+    }
+
+    return result;
 }
 
 std::optional<LookupResult> QnExecuteAnalyticsActionRestHandler::makeDatabaseRequest(
     const Filter& filter)
 {
+    NX_DEBUG(this, "Executing analytics database request with filter %1", filter);
+
     nx::utils::promise<std::tuple<ResultCode, LookupResult>> lookupCompleted;
     serverModule()->analyticsEventsStorage()->lookup(
         filter,

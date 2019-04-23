@@ -11,7 +11,7 @@
 
 namespace nx::vms::common::p2p::downloader {
 
-class AbstractPeerManagerFactory;
+class AbstractPeerManager;
 
 class Downloader: public QObject, public /*mixin*/ QnCommonModuleAware
 {
@@ -21,7 +21,7 @@ public:
     Downloader(
         const QDir& downloadsDirectory,
         QnCommonModule* commonModule,
-        AbstractPeerManagerFactory* peerManagerFactory = nullptr,
+        const QList<AbstractPeerManager*>& peerManagers = {},
         QObject* parent = nullptr);
 
     virtual ~Downloader() override;
@@ -58,11 +58,6 @@ public:
     void startDownloads();
     void stopDownloads();
     void findExistingDownloads();
-
-    static void validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,
-        std::function<void(bool)> callback);
-
-    static bool validate(const QString& url, bool onlyConnectionCheck, int expectedSize);
 
 signals:
     void downloadFinished(const QString& fileName);

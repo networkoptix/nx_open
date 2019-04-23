@@ -16,7 +16,13 @@ ARG mediaserver_deb
 
 RUN ["/bin/bash", "-c", ": ${mediaserver_deb:?Missing source deb file. You should set --build-arg mediaserver_deb=path_to_mediaserver.deb!}"]
 
-RUN apt-get update && apt-get install -y dbus systemd lsb-release && apt-get clean && rm -rf /var/lib/apt/lists/*
+COPY manage.sh /setup/
+RUN chmod a+x /setup/manage.sh
+
+# We need:
+#  - bin-utils for patching cloud host
+#  - lsb-release is used as a part of install scripts inside our deb package
+RUN apt-get update && apt-get install -y dbus systemd lsb-release binutils && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN find /etc/systemd -name '*.timer' | xargs rm -v
 
@@ -27,12 +33,12 @@ STOPSIGNAL SIGRTMIN+3
 # Using systemd as an entry point. It will launch mediaserver according to systemd scripts.
 ENTRYPOINT ["/sbin/init", "--log-target=journal"]
 
-# This is strange workaround for systemd stdout problem. Not sure what is going on, actually.
-CMD []
+COPY "${mediaserver_deb}" /setup/
 
-RUN mkdir -p /debs
+# Installing the mediaserver. It will download and install requirements as well.
+RUN apt-get update -qq && apt install -y -qq --no-install-recommends "/setup/${mediaserver_deb}" && mkdir -p /opt/networkoptix/mediaserver/var
 
-COPY "${mediaserver_deb}" /debs/
-
-# Installing the mediaserver
-RUN apt-get update -qq && apt install -y -qq --no-install-recommends "/debs/${mediaserver_deb}" && mkdir -p /opt/networkoptix/mediaserver/var
+# Override for cloud host.
+# We keep this argumet last to prevent docker rebuilding all previous steps.
+ARG cloud_host
+RUN /setup/manage.sh --cloud "$cloud_host" --norestart

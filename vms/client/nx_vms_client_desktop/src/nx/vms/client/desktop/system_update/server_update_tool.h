@@ -20,11 +20,8 @@
 #include <nx/vms/client/desktop/utils/upload_state.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 
 #include "update_contents.h"
-
-namespace nx::vms::common::p2p::downloader { class SingleConnectionPeerManager; }
 
 namespace nx::vms::client::desktop {
 
@@ -45,22 +42,19 @@ struct UpdateItem;
  */
 class ServerUpdateTool:
     public Connective<QObject>,
-    public QnConnectionContextAware,
-    public nx::vms::common::p2p::downloader::AbstractPeerManagerFactory
+    public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
     using UpdateContents = nx::update::UpdateContents;
     using Downloader = vms::common::p2p::downloader::Downloader;
     using FileInformation = vms::common::p2p::downloader::FileInformation;
-    using SingleConnectionPeerManager = nx::vms::common::p2p::downloader::SingleConnectionPeerManager;
-    using PeerManagerPtr = nx::vms::common::p2p::downloader::AbstractPeerManager*;
     using Clock = std::chrono::steady_clock;
     using TimePoint = std::chrono::time_point<Clock>;
 
 public:
     ServerUpdateTool(QObject* parent = nullptr);
-    ~ServerUpdateTool();
+    virtual ~ServerUpdateTool() override;
 
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
@@ -200,10 +194,6 @@ public:
     QString getUpdateInformationUrl() const;
     QString getInstalledUpdateInfomationUrl() const;
 
-    virtual PeerManagerPtr createPeerManager(
-        FileInformation::PeerSelectionPolicy peerPolicy,
-        const QList<QnUuid>& additionalPeers) override;
-
     /** Starts downloading the packages for the servers without internet. */
     void startManualDownloads(const UpdateContents& contents);
 
@@ -320,8 +310,6 @@ private:
 
     /** We use this downloader when client downloads updates for server without internet. */
     std::unique_ptr<Downloader> m_downloader;
-    /** Special peer manager to be used in the downloader. */
-    std::unique_ptr<vms::common::p2p::downloader::SingleConnectionPeerManager> m_peerManager;
     /** List of packages to be downloaded and uploaded by the client. */
     QList<nx::update::Package> m_manualPackages;
     /** Direct connection to the mediaserver. */

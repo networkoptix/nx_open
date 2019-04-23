@@ -83,15 +83,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Sunucudan güncelleme bilgisi alınıyor</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Güncelleme paketi indiriliyor</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Yükleniyor</translation>
     </message>
   </context>
   <context>
@@ -861,11 +861,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Yer işaretlerini Dışa Aktar...</translation>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Şifremi unuttum</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -877,7 +877,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Analitik Motoru Ayarları...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -897,11 +897,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Sanal Kamera...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Yeni Sanal Kamera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -925,27 +925,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Bildirimler sekmesine geç</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Hareket sekmesine geç</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Yer İmleri sekmesine geç</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Etkinlikler sekmesine geç</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Nesneler sekmesine geç</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>Nesne Çerçeveleri ve Bilgi...</translation>
     </message>
   </context>
   <context>
@@ -991,23 +991,23 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Lütfen geçerli bir şifre girin</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Şifre geçersiz.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Yedeği Şifrele</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>%1 dosyası şifrelenmiştir. Lütfen şifreyi giriniz:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Lütfen %1 düzeni için şifreyi tekrar girin:</translation>
     </message>
   </context>
   <context>
@@ -1326,7 +1326,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>İzleme Penceresi Kilitlendi</translation>
     </message>
   </context>
   <context>
@@ -1586,17 +1586,17 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>İçin detaylar %n oturumları %1</numerusform>
+        <numerusform>İçin detaylar %n oturumları %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>%1%n kamera için detaylar</numerusform>
+        <numerusform>%1%n kamera için detaylar</numerusform>
       </translation>
     </message>
   </context>
@@ -1752,13 +1752,13 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Güncelleme yüklendi</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n işlemler</numerusform>
+        <numerusform>%n işlemler</numerusform>
       </translation>
     </message>
   </context>
@@ -2041,7 +2041,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <translation>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
     </message>
   </context>
   <context>
@@ -2580,7 +2580,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>Dahili sunucu hatası. Lütfen daha sonra tekrar deneyin.</translation>
     </message>
   </context>
   <context>
@@ -2734,11 +2734,11 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>İndir &amp;&amp; Yükle</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Sürüm %1 için uyumluluk moduna girilemedi</translation>
     </message>
   </context>
   <context>
@@ -2890,7 +2890,7 @@ to %1</source>
     </message>
     <message>
       <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
+      <translation>Ayarlanmış kodek: %1 bulunamadı, h263p kullanılacak</translation>
     </message>
   </context>
   <context>
@@ -3008,17 +3008,17 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>%1'den %2'ye Kadar Olan Durum Günlüğü - %n olaylar bulundu</numerusform>
+        <numerusform>%1'den %2'ye Kadar Olan Durum Günlüğü - %n olaylar bulundu</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>%1 için olay günlüğü - %n olay bulundu</numerusform>
+        <numerusform>%1 için olay günlüğü - %n olay bulundu</numerusform>
       </translation>
     </message>
   </context>
@@ -3096,9 +3096,9 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n kameralar)</numerusform>
+        <numerusform>%1 (%n kameralar)</numerusform>
       </translation>
     </message>
   </context>
@@ -3181,11 +3181,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Bu kamera seçili ekran düzeninde yok. İşlem yapılmadan önce kamera eklenirse işlem çalışacaktır.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Bu kamera seçili ekran düzenlerinin bazılarında yok. İşlem yapılmadan önce kamera eklenirse işlem çalışacaktır.</translation>
     </message>
   </context>
   <context>
@@ -3204,6 +3204,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>Dosya zaten ekli</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Yok</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation>Otomatik (%1)</translation>
     </message>
   </context>
   <context>
@@ -3372,7 +3380,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Lütfen bir değer giriniz.</translation>
     </message>
   </context>
   <context>
@@ -3775,7 +3783,7 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>Her lisans yalnızca birkaç kez devre dışı bırakılabilir.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -4079,7 +4087,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Alan Yakınlaştırma</translation>
     </message>
   </context>
   <context>
@@ -4234,11 +4242,11 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Sanal Kamera</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Sanal Kamera %1</translation>
     </message>
   </context>
   <context>
@@ -4463,9 +4471,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>yaklaşık %n dakika</numerusform>
+        <numerusform>yaklaşık %n dakika</numerusform>
       </translation>
     </message>
   </context>
@@ -4648,11 +4656,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Mevcut Bitrate</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>tahmin için veri yok</translation>
     </message>
   </context>
   <context>
@@ -4698,11 +4706,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>Yerel dosyalar</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Yerel dosya yok</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4718,7 +4726,7 @@ to %1</source>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>tümünü aç</translation>
     </message>
     <message>
       <source>All types</source>
@@ -4839,7 +4847,7 @@ to %1</source>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>Analitik Motorları</translation>
     </message>
   </context>
   <context>
@@ -4903,7 +4911,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Yer işaretlerini Dışa Aktar...</translation>
     </message>
   </context>
   <context>
@@ -5443,23 +5451,23 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Son 5 dakika</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Son 60 dakika</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Son 24 Saat</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Kullanılabilir en uzun periyot</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Tahmin yalnızca kayıt yapan kameralarda kullanılabilir.</translation>
     </message>
   </context>
   <context>
@@ -5851,39 +5859,31 @@ to %1</source>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Hiçbir sunucu zaman senkronizasyonu için internet bağlantısına sahip değil</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>Sistem Güvenli Modda</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>Zaman senkronizasyonu için sistem internete bağlı değil</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>Hiçbir sunucu zaman senkronizasyonu için internet bağlantısına sahip değil.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>Sistem güvenli modda çalışıyor.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>Uzak arşiv senkronizasyonu sırasında hata oluştu</translation>
     </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>Aygıtlar ve Sunucular için Otomatik Keşfetmeyi Etkinleştir</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>Kameralar ve Sunucular için Otomatik Keşfetmeyi Etkinleştir</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>Sistemin aygıt ayarlarını optimize etmesine izin ver</translation>
@@ -5900,6 +5900,22 @@ to %1</source>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Kişisel bilgiler içermez ve tamamen anonimdir.</translation>
     </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation>Failover sunucusu bu ayardan bağımsız olarak kamera durum güncellemelerini isteyebilir.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation>Cihazların ve sunucuların otomatik aranmasını ve cihaz durum kontrollerini etkinleştir</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation>Cihazların ve sunucuların otomatik aranmasını ve cihaz durum kontrollerini etkinleştir</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation>Etkinleştirildiğinde sistem sürekli yeni kamera ve sunucuları arar ayrıca durum güncellemesi için kameralarla iletişim kurar.</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -5913,11 +5929,11 @@ to %1</source>
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>HTML dosyası</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>Spread Sheet (CSV) Dosyası</translation>
     </message>
   </context>
   <context>
@@ -5951,11 +5967,11 @@ to %1</source>
     </message>
     <message>
       <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>VMS zamanı internet üzerinden senkronize edilmektedir ve yerel zaman sunucusuna bağlı değildir.</translation>
     </message>
     <message>
       <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>VMS zamanı seçilen suncular için yerel zaman sunucusundan senkronize edilmektedir ve diğer sunucular yerel zaman sunucusuna bağlı değildir.</translation>
     </message>
   </context>
   <context>
@@ -6475,15 +6491,15 @@ to %1</source>
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
-      <translation type="unfinished">%1 has been successfully configured.</translation>
+      <translation>%1 başarıyla konfigüre edildi.</translation>
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+      <translation>İşlemi tamamlamak için client versiyonunu %1 e güncelleyin.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation type="unfinished">Failed to merge %1 to our system.</translation>
+      <translation>%1 sizin sisteminizle birleştirilirken hata oluştu.</translation>
     </message>
   </context>
   <context>
@@ -6557,7 +6573,7 @@ to %1</source>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (Audio/Video Interleaved)</translation>
     </message>
   </context>
   <context>
@@ -6608,11 +6624,11 @@ to %1</source>
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>PNG Görüntüsü</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>PNG Görüntüsü</translation>
     </message>
   </context>
   <context>
@@ -6835,17 +6851,17 @@ to %1</source>
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>Sanal kamera eklenemedi</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>Sanal Kamera Kayıtlarını Aç...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Bu dosyaları sanal kameranın farklı bir örneğine yükleyebilirsiniz.</numerusform>
+        <numerusform>Bu dosyaları sanal kameranın farklı bir örneğine yükleyebilirsiniz.</numerusform>
       </translation>
     </message>
     <message>
@@ -7072,10 +7088,21 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>Bazı video dosyaları hala %n sanal kameralara yükleniyor:</numerusform>
+        <numerusform>Bazı video dosyaları hala %n sanal kameralara yükleniyor:</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation>Oturumunun süresi dolu</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation>Oturum süresi sınırı sistem yöneticileri tarafından değiştirilebilir</translation>
     </message>
   </context>
   <context>
@@ -7160,21 +7187,21 @@ to %1</source>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>Bu Linux platformu artık desteklenmiyor</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Bu işletim sistemi artık desteklenmiyor</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>Bu %1 versiyon artık desteklenmiyor</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 artık desteklenmiyor</translation>
     </message>
   </context>
   <context>
@@ -7249,23 +7276,23 @@ to %1</source>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Ekran düzenindeki cihazlar</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Ekran düzenindeki kameralar</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Herhangi bir cihaz</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Herhangi bir kamera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Seçilen cihazlar</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7276,11 +7303,19 @@ to %1</source>
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>Her zaman göster</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>Sadece &quot;Objects&quot; Sekmesini Göster</translation>
+    </message>
+    <message>
+      <source>Show</source>
+      <translation>Göster</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation>Gösterme</translation>
     </message>
   </context>
   <context>
@@ -7291,7 +7326,7 @@ to %1</source>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>silinen kamera</translation>
     </message>
   </context>
   <context>
@@ -7306,9 +7341,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n nesneler</numerusform>
+        <numerusform>%n nesneler</numerusform>
       </translation>
     </message>
     <message>
@@ -7317,11 +7352,11 @@ to %1</source>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Alan seç</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Videodaki bazı alanları seçin...</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -7329,7 +7364,7 @@ to %1</source>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>isim verilmemiş analitik motoru</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
@@ -7337,11 +7372,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Parametre girin</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+      <translation>Aksiyon için bazı parametrelerin doldurulması gereklidir.</translation>
     </message>
   </context>
   <context>
@@ -7355,7 +7390,7 @@ to %1</source>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>silinen kamera</translation>
     </message>
   </context>
   <context>
@@ -7432,10 +7467,6 @@ to %1</source>
       <translation>Doğal</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>Sunucu herhangi bir kamera ayarını değiştirmeyecek, kamera akışını olduğu bırakacak ve kullanacaktır. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Bazı kameralar için görüntü kalitesini artırabileceği gibi bazı kameralar için ise bitrate değerinde yükselmelere neden olabilir.</translation>
     </message>
@@ -7459,6 +7490,14 @@ to %1</source>
         <numerusform>Bu kimlik zaten aşağıdaki %n kameralarda kullanılıyor:</numerusform>
         <numerusform>Bu kimlik zaten aşağıdaki %n kameralarda kullanılıyor:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>UDP Multicast</source>
+      <translation>UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Sunucu herhangi bir kamera ayarını değiştirmeyecek, kamera akışını olduğu bırakacak ve kullanacaktır.</translation>
     </message>
   </context>
   <context>
@@ -7560,14 +7599,14 @@ to %1</source>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n kameralar</numerusform>
+        <numerusform>%n kameralar</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>Herhangi bir kamera bulunmamaktadır</translation>
     </message>
   </context>
   <context>
@@ -7695,35 +7734,35 @@ to %1</source>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Güncelleme dosyası bulunamadı</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>Güncelleme dosyası bozuk</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>Güncelleme paketi indirilemedi: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>Güncelleme paketi bozuk: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Bu güncelleme zaten yüklü.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Bu versiyon yüklü değil.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Bilinmeyen versiyon formatı.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>Bozuk güncelleme paketi.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7731,11 +7770,11 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>Client güncellemesini yüklemek için yeterli disk alanı yok.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>Yükleme paketi kayıp.</translation>
     </message>
   </context>
   <context>
@@ -7788,7 +7827,7 @@ to %1</source>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>Seçili bazı kameraların ayarlanması için şifre gereklidir.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -7870,13 +7909,13 @@ to %1</source>
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>Tüm cihazlar zaten ekli</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>%n cihazları ekleniyor. Bu pencereyi kapatabilir veya yeni bir arama yapabilirsiniz</numerusform>
+        <numerusform>%n cihazları ekleniyor. Bu pencereyi kapatabilir veya yeni bir arama yapabilirsiniz</numerusform>
       </translation>
     </message>
     <message>
@@ -7892,26 +7931,18 @@ to %1</source>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>Adres alanı boş bırakılamaz</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-    <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Devam etmek için lütfen %1 gözden geçirin ve kabul edin</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>Yazılımı kullanmak için son kullanıcı lisans sözleşmesini kabul etmelisiniz</translation>
     </message>
   </context>
   <context>
@@ -7946,39 +7977,39 @@ to %1</source>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Sunucu olayları</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Analitik olayları</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Herhangi bir cihaz sorunu</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Herhangi bir kamera sorunu</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Herhangi bir sunucu etkinliği</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Cihaz sorunları</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Kamera sorunları</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Herhangi bir etkinlik</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Herhangi bir analitik olayı</translation>
     </message>
     <message>
       <source>No events</source>
@@ -7993,11 +8024,11 @@ to %1</source>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>isim verilmemiş analitik motoru</translation>
     </message>
     <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>Hiçbir etkinlik olmadı</translation>
     </message>
   </context>
   <context>
@@ -8014,7 +8045,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>Lütfen parolayı girin.</translation>
     </message>
   </context>
   <context>
@@ -8163,7 +8194,7 @@ to %1</source>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>Uzun bir videoyu dışa aktarmak üzeresiniz. Çok fazla depolama alanı gerektirebilir ve çok zaman alabilir.</translation>
     </message>
   </context>
   <context>
@@ -8235,16 +8266,16 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n yeni</numerusform>
+        <numerusform>%n yeni</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>Toplan %n cihaz</numerusform>
+        <numerusform>Toplan %n cihaz</numerusform>
       </translation>
     </message>
   </context>
@@ -8289,7 +8320,7 @@ to %1</source>
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>Link Konumunu Kopyala</translation>
     </message>
   </context>
   <context>
@@ -8395,7 +8426,7 @@ to %1</source>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>silinen kamera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8410,27 +8441,27 @@ to %1</source>
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>Güncellemeleri Otomatik Kontrol Et</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Güncellemeleri denetle</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>Kontrol etmeye zorla</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>Otomatik Kontrol Etmeyi Devre Dışı Bırak</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>Bir Kez Kontrol Et</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>Otomatik Olarak Kontrol Et</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -8442,39 +8473,39 @@ to %1</source>
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>Bu sürüm zaten yüklü.</translation>
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation type="unfinished">Unable to check updates on the internet</translation>
+      <translation>İnternet üzerinden güncelleme kontrol edilemedi</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>Yapı bulunamadı</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>Seçilen dosyadan güncelleme yapılamadı</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>Geçersiz güncelleme bilgisi</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>Daha düşük versiyonlara geçiş mümkün değildir</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Güncelleme dosyası bulunamadı</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>Yükseltme paketi bozuldu</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>Bazı sunucular için güncelleme paketi eksik</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -8483,7 +8514,7 @@ to %1</source>
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>Güncelleme paketi bulunamadı</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -8514,10 +8545,6 @@ to %1</source>
       <translation>Güncellemeyi iptal et</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Güncelleme paketleri bazı sunuculara yüklenemedi</translation>
-    </message>
-    <message>
       <source>Please make sure they have enough free storage space and stable network connection.</source>
       <translation>Yeterli boş alan olduğundan ve ağ bağlantısının kararlı olduğundan emin olun.</translation>
     </message>
@@ -8527,11 +8554,11 @@ to %1</source>
     </message>
     <message>
       <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
+      <translation>Güncelleme tamamlandı ancak bazı sunucular güncellenemedi</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+      <translation>Nx Witness Client'ı güncellenen versiyonda yeniden başlatılacak.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -8539,7 +8566,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
+      <translation>Güncelleme bu sunuculara yüklenemedi:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -8547,15 +8574,15 @@ to %1</source>
     </message>
     <message>
       <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
+      <translation>Güncellemeler gönderiliyor...</translation>
     </message>
     <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>Yükle</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>Karşıya yükle &amp;&amp; Kur</translation>
     </message>
     <message>
       <source>Download</source>
@@ -8563,15 +8590,15 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>İndir &amp;&amp; Yükle</translation>
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>Başka Yapı Seçin</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
+      <translation>Başka Dosyaya Göz At...</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8579,11 +8606,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>Güncellemeler karşıya yükleniyor...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>Client paketi indiriliyor...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -8591,7 +8618,7 @@ to %1</source>
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>Client güncellemesi yükleniyor...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -8607,7 +8634,7 @@ to %1</source>
     </message>
     <message>
       <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <translation>Sistem güncellenecek</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8627,7 +8654,7 @@ to %1</source>
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
+      <translation>Mediaserverdan güncelleme</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
@@ -8635,18 +8662,18 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
+        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>Client için güncelleme paketi eksik</translation>
     </message>
     <message>
       <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
+      <translation>Güncellemeyi Bitir</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -8654,23 +8681,27 @@ to %1</source>
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
+      <translation>En son versiyon zaten yüklü</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
+      <translation>Bu versiyon zaten yüklü</translation>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
+      <translation>Güncelleme yapılacak çevrimiçi sunucu yok.</translation>
     </message>
     <message>
       <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+      <translation>Bazı sunucular güncelleme işlemini tamamlamadı. Yine de sonlandırılsın mı?</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>Güncellemeyi iptal et ve tüm indirilmiş verileri sil?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Güncelleme paketinin bazı bileşenleri indirilemedi</translation>
     </message>
   </context>
   <context>
@@ -8684,7 +8715,7 @@ to %1</source>
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>Herhangi bir ekran düzeniniz yok</translation>
     </message>
   </context>
   <context>
@@ -8696,6 +8727,26 @@ to %1</source>
     <message>
       <source>Acknowledge</source>
       <translation>Kabul edilen</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Genel olay</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Event</source>
+      <translation>Bilinmeyen Eklenti Olayı</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation>Aygıt Bağlantısı Kesildi</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation>Kamera Bağlantısı Kesildi</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation>G/Ç modülünün bağlantısı kesildi</translation>
     </message>
   </context>
   <context>
@@ -8716,10 +8767,6 @@ to %1</source>
       <translation>Seçilen kullanıcıların hiçbiri seçilen yerleşime erişemez. Eylem çalışmayacak.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>Yerel düzenler yalnızca sahiplerine gösterilebilir. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>Düzen seç...</translation>
     </message>
@@ -8733,7 +8780,46 @@ to %1</source>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>Seçilen kullanıcı rollerinden hiçbiri kullanıcı içermiyor. Eylem işe yaramayacak.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation>Sunucunun yanıt vermesi çok uzun sürüyor</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation>Güncelleme görevi yok</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation>Güncellemeyi indirmeye hazır</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation>Güncelleme indiriliyor</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation>Yeni sürümü başlatmak için hazır</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation>Güncelleme yükleniyor</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation>Yüklü</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation>Güncelleme indirme başarısız</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation>Güncelleme yüklenemedi</translation>
     </message>
   </context>
   <context>
@@ -8811,7 +8897,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>Hareket + Düşük-Çözünürlük</translation>
     </message>
   </context>
   <context>
@@ -8878,16 +8964,16 @@ to %1</source>
       <translation>Tüm kullanıcı haraket ve işlemlerini kaydet.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>dakika</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>saat</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation>Oturumlar belirtilen süreyi aşarsa kullanıcıların otomatik olarak oturumu kapatılır.</translation>
     </message>
   </context>
   <context>
@@ -8898,23 +8984,23 @@ to %1</source>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Yüklü</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Yükleniyor...</translation>
     </message>
     <message>
       <source>Downloaded</source>
       <translation>İndirildi</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation>Sunucunun yanıt vermesi bekleniyor...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>Geçerli Sürüm</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>Durum</translation>
@@ -8925,7 +9011,7 @@ to %1</source>
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Yükleme Dosyalarını Sakla</translation>
     </message>
     <message>
       <source>Client</source>
@@ -8933,7 +9019,11 @@ to %1</source>
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Bileşen</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation>Yüklü sürüm</translation>
     </message>
   </context>
   <context>
@@ -8951,7 +9041,7 @@ to %1</source>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>Sonuçları filtrelemek için videodan bir alan seçin</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -8978,11 +9068,11 @@ to %1</source>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Seçilen cihaz</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>Seçilen medya</translation>
     </message>
     <message>
       <source>none</source>
@@ -9001,9 +9091,9 @@ to %1</source>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>%n kullanıcıları için e-posta adresi ayarlanmadı</numerusform>
+        <numerusform>%n kullanıcıları için e-posta adresi ayarlanmadı</numerusform>
       </translation>
     </message>
     <message>
@@ -9022,14 +9112,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Ekran düzenine kamera eklemek için çift tıklayın ya da ctrl+tıklama yaparak yeni sekmede açın</numerusform>
+        <numerusform>Ekran düzenine kamera eklemek için çift tıklayın ya da ctrl+tıklama yaparak yeni sekmede açın</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Kullanılabilir arşiv yok</translation>
     </message>
   </context>
   <context>
@@ -9040,7 +9130,7 @@ to %1</source>
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Zaman Dilimi</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9048,42 +9138,42 @@ to %1</source>
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Sunucu Zamanı</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS Zamanı</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Zaman, ortak ve tüm sunucular arasında senkronize. Herhangi bir sunucudaki işletim sistemi zamanından farklı olabilir.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>İnternet üzerinden senkronize edildi</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Seçilen sunucular yerel zamanla senkronize edildi</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Senkronize değil. Her sunucu kendi yerel zamanını kullanıyor.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Sunucu yerel zamana eşit</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>İnternet bağlantısı yok. Zaman senkronize edilmiyor.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Zaman sunucusu çevrimdışı. Zaman senkronize edilemiyor.</translation>
     </message>
   </context>
   <context>
@@ -9109,7 +9199,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Sunucu tarafına yükleme oluşturulamadı: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9128,11 +9218,11 @@ to %1</source>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Hareket sadece video yükleme sırasında algılanıyor.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Ayarın etkinleştirilmesi veya devre dışı bırakılması arşiv için hiçbir şeyi değiştirmez.</translation>
     </message>
   </context>
   <context>
@@ -9219,7 +9309,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Birkaç yer imi sadece düzen olarak dışa aktarılabilir.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
@@ -9231,7 +9321,27 @@ to %1</source>
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Dışarı aktar başlatılıyor...</translation>
+    </message>
+    <message>
+      <source>Saving layout</source>
+      <translation>Ekran düzeni kaydetme</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation>Kaydetmeyi Durdur</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation>Kaydetme başarısız</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation>Kaydetme başlatılıyor...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation>Dosyaları dışarı aktarma işlemini hazırlıyorum. Lütfen birkaç saniye bekleyiniz.</translation>
     </message>
   </context>
   <context>
@@ -9268,7 +9378,7 @@ to %1</source>
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Yeniden çözünürlük oluştur</translation>
     </message>
   </context>
   <context>
@@ -9309,7 +9419,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::PluginEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Herhangi bir eklenti</translation>
     </message>
   </context>
   <context>
@@ -9440,7 +9550,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Ekran düzeni dolu</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9498,7 +9608,7 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Sanal Kameralar sunucular arasında taşınamaz</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -9510,7 +9620,7 @@ to %1</source>
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Tüm Desteklenenler</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9614,14 +9724,14 @@ to %1</source>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>%1 %n kameralarının şifreleri değiştirilemedi</numerusform>
+        <numerusform>%1 %n kameralarının şifreleri değiştirilemedi</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Bu yapı sadece test amaçlıdır.</translation>
     </message>
   </context>
   <context>
@@ -9640,7 +9750,7 @@ to %1</source>
     <message>
       <source>Switch by</source>
       <comment>Arrows will follow</comment>
-      <translation type="unfinished">Switch by</translation>
+      <translation>İle değiştir</translation>
     </message>
     <message>
       <source>Display for</source>
