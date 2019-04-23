@@ -70,11 +70,11 @@
                             }">
                     </p>
                     <p *ngIf="systemMergeable == ''" class="help-block-no-height mb-2 light-text" translate>
-                        You can only merge Systems in which you have owner permissions.
+                        You can only merge Systems where you are the owner.
                     </p>
                 </ng-template>
                 <div>
-                    <div class="bold-text" translate>Take System name and settings from</div>
+                    <div class="bold-text" translate>Take name and settings from</div>
                     <div>
                         <div class="radio-group">
                             <nx-radio name="firstSystem" [value]="system.id"
