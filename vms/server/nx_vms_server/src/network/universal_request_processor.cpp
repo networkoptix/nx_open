@@ -97,7 +97,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
             clientIp, d->request, &d->response, isProxy)).code != Qn::Auth_OK)
         {
             const auto resultReason = toString(result.code).toUtf8();
-            lastUnauthorizedData = authSession();
+            lastUnauthorizedData = authSession(result.access);
             nx::network::http::insertOrReplaceHeader(
                 &d->response.headers, {Qn::AUTH_RESULT_HEADER_NAME, resultReason});
 
