@@ -57,22 +57,47 @@ public:
             m_proxyChunk.deque = deque;
             if (originalIterator != static_cast<ChunksDeque::Base*>(deque)->end())
                 m_proxyChunk.originalChunk = &(*originalIterator);
+            else
+                m_proxyChunk.originalChunk = nullptr;
         }
 
         Iterator(const ChunksDeque* deque, std::deque<Chunk>::iterator originalIterator):
             Iterator(const_cast<ChunksDeque*>(deque), std::move(originalIterator))
         {}
 
+        Iterator(const Iterator& other):
+            Base(static_cast<const Base&>(other)),
+            m_deque(other.m_deque)
+        {
+            m_proxyChunk.deque = m_deque;
+            if (static_cast<const Base&>(other) != static_cast<ChunksDeque::Base*>(m_deque)->end())
+                m_proxyChunk.originalChunk = other.m_proxyChunk.originalChunk;
+            else
+                m_proxyChunk.originalChunk = nullptr;
+        }
+
+        Iterator& operator=(const Iterator& other)
+        {
+            static_cast<Base&>(*this) = static_cast<const Base&>(other);
+            m_deque = other.m_deque;
+            m_proxyChunk.deque = m_deque;
+            if (static_cast<const Base&>(other) != static_cast<ChunksDeque::Base*>(m_deque)->end())
+                m_proxyChunk.originalChunk = other.m_proxyChunk.originalChunk;
+            else
+                m_proxyChunk.originalChunk = nullptr;
+            return *this;
+        }
+
         ProxyChunk& operator*()
         {
-            m_proxyChunk = Base::operator*();
+            m_proxyChunk.originalChunk = &Base::operator*();
             m_proxyChunk.deque = m_deque;
             return m_proxyChunk;
         }
 
         const ProxyChunk& operator*() const
         {
-            m_proxyChunk = Base::operator*();
+            m_proxyChunk.originalChunk = &Base::operator*();
             m_proxyChunk.deque = m_deque;
             return m_proxyChunk;
         }
@@ -98,6 +123,14 @@ public:
         {
             return Iterator(it.m_deque, static_cast<const Base&>(it) + val);
         }
+
+        friend Iterator operator+(std::deque<Chunk>::size_type val, const Iterator& it)
+        {
+            return it + val;
+        }
+
+        friend Iterator operator-(const Iterator& it, std::deque<Chunk>::size_type val) = delete;
+        friend Iterator operator-(std::deque<Chunk>::size_type val, const Iterator& it) = delete;
 
         friend bool operator<(const Iterator& first, const Iterator& second)
         {
