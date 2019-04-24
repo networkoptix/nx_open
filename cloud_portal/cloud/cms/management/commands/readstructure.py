@@ -34,7 +34,7 @@ def create_new_cloudportals_for_each_customization(logger):
             logger.stdout.write(logger.style.SUCCESS("\tCouldnt find product name for {} using {}".
                                                      format(customization.name, product_name)))
         cloud = structure.find_or_add_product(product_name, customization)
-        cloud.customizations = [customization.id]
+        cloud.customizations.add(customization)
         cloud.save()
     logger.stdout.write(logger.style.SUCCESS("Done creating new cloud portals"))
 
@@ -220,7 +220,7 @@ class Command(BaseCommand):
             default_customization = Customization(name=settings.CUSTOMIZATION,
                                                   default_language=Language.by_code('en_US'))
             default_customization.save()
-            default_customization.languages = [Language.by_code('en_US')]
+            default_customization.languages.add(Language.by_code('en_US'))
             default_customization.save()
         structure.read_structure_json('cms/cms_structure.json')
         read_structure(product_type)

@@ -30,7 +30,7 @@ class Command(BaseCommand):
                 en_us = Language.objects.get(code="en_US")
                 customization = Customization(name=options['customization'], default_language=en_us)
                 customization.save()
-                customization.languages = [en_us]
+                customization.languages.add(en_us)
                 customization.save()
 
             if not Product.objects.filter(customizations__in=[customization],
