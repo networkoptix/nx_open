@@ -99,7 +99,12 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         }),
         DeviceDetectorModule.forRoot(),
         NgbModule.forRoot(),
-        RouterModule.forRoot([], { initialNavigation: true })
+        RouterModule.forRoot([], {
+            initialNavigation: true,
+            scrollPositionRestoration: 'enabled',
+            anchorScrolling          : 'enabled',
+            enableTracing            : false
+        })
     ],
     entryComponents: [
 

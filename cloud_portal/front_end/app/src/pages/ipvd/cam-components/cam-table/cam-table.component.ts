@@ -3,7 +3,7 @@ import {
     OnChanges, SimpleChanges,
     OnInit, ViewEncapsulation
 }                           from '@angular/core';
-import { NxPagerService }   from '../../../../services/pager.service';
+
 import { NxConfigService }  from '../../../../services/nx-config';
 import { TranslateService } from '@ngx-translate/core';
 import { NxUriService }     from '../../../../services/uri.service';
@@ -37,6 +37,9 @@ export class CamTableComponent implements OnChanges, OnInit {
     private lang;
     private debug: boolean;
 
+    currentPage: number;
+    pageSize: number;
+    totalItems: number;
     pager: any = {};
     pagedItems: any[];
     pagerMaxSize: number;
@@ -57,8 +60,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         removeNewLines  : true
     };
 
-    constructor(private pagerService: NxPagerService,
-                private translate: TranslateService,
+    constructor(private translate: TranslateService,
                 private uri: NxUriService,
                 config: NxConfigService) {
 
@@ -84,7 +86,10 @@ export class CamTableComponent implements OnChanges, OnInit {
             this.lang.ipvd.count
         ];
 
+        this.pagedItems = [];
         this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSize;
+        this.currentPage = 1;
+        this.pageSize = this.CONFIG.layout.tableLarge.rows;
     }
 
     toggleHeaderSort(param) {
@@ -168,7 +173,10 @@ export class CamTableComponent implements OnChanges, OnInit {
         }
 
         this._elements.sort(byParam);
-        this.setPage(1, keepURI);
+
+        if (!keepURI) {
+            this.setPage(1, keepURI);
+        }
 
         this.selectedHeader = this.cameraHeaders.find(x => {
             return x === this.lang.ipvd[param];
@@ -202,11 +210,16 @@ export class CamTableComponent implements OnChanges, OnInit {
     private sortElements(keepURI) {
         // If sort by popularity is set in CMS or default sorting 'Vendor-Model'
         const sortBy = (this.CONFIG.ipvd.sortSupportedDevicesByPopularity) ? 'count' : 'sortKey';
+        let pageNum;
         this.toggleSort(sortBy, keepURI);
 
         if (this.params && this.params.page) {
-            this.setPage(+this.params.page, true);
+            pageNum = +this.params.page;
+        } else {
+            pageNum = 1;
         }
+
+        this.setPage(pageNum, true);
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -217,6 +230,8 @@ export class CamTableComponent implements OnChanges, OnInit {
 
             this.sortElements(true /* keep uri params */);
             this.csvCameraData = this.getCsvData();
+
+            this.setPage(this.currentPage, true);
         }
 
         if (changes.activeCamera) {
@@ -225,7 +240,7 @@ export class CamTableComponent implements OnChanges, OnInit {
             }
         }
 
-        if (changes.params && changes.params.currentValue.page) {
+        if (changes.params) {
             this.debug = true;
 
             if (this.params.debug === undefined) {
@@ -265,15 +280,15 @@ export class CamTableComponent implements OnChanges, OnInit {
     }
 
     setPage(page: number, keep?: boolean) {
-        // get pager object from service
-        this.pager = this.pagerService.getPager(this._elements.length, page, this.CONFIG.layout.tableLarge.rows);
+        this.currentPage = page;
 
-        // get current page of items
-        this.pagedItems = this._elements.slice(this.pager.startIndex, this.pager.endIndex + 1);
+        const startIndex = (this.currentPage - 1) * this.pageSize;
+        const endIndex = startIndex + this.pageSize;
+        this.pagedItems = this._elements.slice(startIndex, endIndex);
 
         this.uri.updateURI('/ipvd', [
             {
-                key: 'page', value: this.pager.currentPage
+                key: 'page', value: (this.currentPage === 1) ? undefined : this.currentPage
             }
         ]);
 

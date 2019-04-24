@@ -5,13 +5,14 @@ import {
 }                                              from '@angular/core';
 import { CamerasService }                      from '../../services/cameras.service';
 import { IpvdSearchService }                   from './ipvd-search.service';
-import { NxModalMessageComponent }             from '../../dialogs/message/message.component';
-import { NxConfigService }                     from '../../services/nx-config';
-import { TranslateService }                    from '@ngx-translate/core';
-import { NxUriService }                        from '../../services/uri.service';
-import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
-import { NxUtilsService }                      from '../../services/utils.service';
-import { ActivatedRoute }                      from '@angular/router';
+import { NxModalMessageComponent }                                                          from '../../dialogs/message/message.component';
+import { NxConfigService }                                                                  from '../../services/nx-config';
+import { TranslateService }                                                                 from '@ngx-translate/core';
+import { NxUriService }                                                                     from '../../services/uri.service';
+import { BreakpointObserver, BreakpointState }                                              from '@angular/cdk/layout';
+import { NxUtilsService }                                                                   from '../../services/utils.service';
+import { ActivatedRoute, NavigationStart, Router, Event as NavigationEvent, NavigationEnd } from '@angular/router';
+import { filter }                                                                           from 'rxjs/operators';
 
 interface Params {
     [key: string]: any;
@@ -51,6 +52,7 @@ export class NxIpvdComponent implements OnInit {
     hasNoSearch: boolean;
     debug: any;
     uriPath: string;
+
 
     private setupDefaults() {
         this.allowedParameters = [
@@ -97,9 +99,46 @@ export class NxIpvdComponent implements OnInit {
                 private messageDialog: NxModalMessageComponent,
                 private uri: NxUriService,
                 private route: ActivatedRoute,
-                private breakpointObserver: BreakpointObserver) {
+                private breakpointObserver: BreakpointObserver,
+                router: Router) {
 
         this.setupDefaults();
+
+        router.events
+              .pipe(
+                  filter((event: NavigationEvent) => {
+                          return (event instanceof NavigationEnd);
+                      }
+                  )
+              ).subscribe(
+                (event: NavigationEnd) => {
+                    if (event.url.indexOf('?') < 0) {
+                        this.hasNoSearch = true;
+                        this.noResult = false;
+                        this.camerasTable = [];
+                        this.resetActiveCamera();
+                    } else {
+                        this.hasNoSearch = false;
+
+                        if (this.cameras) {
+                            if (this.filterEmpty()) {
+                                this.cameraSearchService
+                                    .ipvdSearch(this.cameras, this.filterModel)
+                                    .subscribe(cameras => {
+                                        this.activeCamera = undefined;
+
+                                        this.noResult = (cameras.length === 0);
+                                        if (cameras.length) {
+                                            this.camerasTable = this.preFilterCameraTable(cameras);
+                                            this.setActiveCamera();
+                                        } else {
+                                            this.camerasTable = [];
+                                        }
+                                    });
+                            }
+                        }
+                    }
+                });
     }
 
     ngOnInit() {

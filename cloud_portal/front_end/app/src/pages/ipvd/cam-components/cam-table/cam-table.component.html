@@ -46,10 +46,10 @@
     <div class="vertical-align ml-0 clearfix">
         <nav aria-label="Cameras table navigation" class="pagination-nav pt-3 pb-3">
             <ngb-pagination
-                    [collectionSize]="pager.totalItems"
+                    [collectionSize]="results"
                     [maxSize]="pagerMaxSize"
-                    [pageSize]="pager.pageSize"
-                    [page]="pager.currentPage"
+                    [pageSize]="pageSize"
+                    [page]="currentPage"
                     (pageChange)="setPage($event, true)"></ngb-pagination>
         </nav>
 
