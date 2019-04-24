@@ -145,6 +145,9 @@ QnLicense::QnLicense(const ec2::ApiDetailedLicenseData& value)
     params << QByteArray("EXPIRATION=").append(value.expiration);
     params << QByteArray("SIGNATURE2=").append(value.signature);
 
+    if (!value.orderType.isEmpty())
+        params << QByteArray("ORDERTYPE=").append(value.orderType);
+
     auto licenseBlock = params.join('\n');
     loadLicenseBlock(licenseBlock);
 }
@@ -337,7 +340,7 @@ Qn::LicenseType QnLicense::type() const
     if (xclass().toLower().toUtf8() == ::licenseTypeInfo[Qn::LC_VideoWall].className)
         return Qn::LC_VideoWall;
 
-    if (!expiration().isEmpty())
+    if (!expiration().isEmpty() && m_orderType != "saas")
         return Qn::LC_Trial;
 
     for (int i = 0; i < Qn::LC_Count; ++i) {
@@ -354,6 +357,8 @@ void QnLicense::parseLicenseBlock(
     QByteArray* const v2LicenseBlock )
 {
     int n = 0;
+    m_orderType.clear();
+
     for (QByteArray line: licenseBlock.split('\n'))
     {
         line = line.trimmed();
@@ -386,6 +391,8 @@ void QnLicense::parseLicenseBlock(
                 m_expiration = QString::fromUtf8(avalue);
             else if (aname == "SIGNATURE2" || aname == "SIGNATURE3" || aname == "SIGNATURE4")
                 m_signature2 = avalue;
+            else if (aname == "ORDERTYPE")
+                m_orderType = QString::fromUtf8(avalue);
         }
 
         // v1 license activation is 4 strings + signature
@@ -418,6 +425,11 @@ void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2Li
 
 LicenseTypeInfo QnLicense::licenseTypeInfo(Qn::LicenseType licenseType) {
     return ::licenseTypeInfo[licenseType];
+}
+
+QString QnLicense::orderType() const
+{
+    return m_orderType;
 }
 
 // -------------------------------------------------------------------------- //
