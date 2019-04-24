@@ -49,7 +49,7 @@ public:
     bool isEqualCaseInsensitive(const char* str, size_t strLength = (size_t)-1) const;
 
     const value_type& operator[](size_type index) const;
-    /** Constructs new QByteArray object by calling QByteArray::mid. */
+    /** Constructs \0-terminated QByteArray by calling QByteArray::mid. */
     operator QByteArray() const;
 
     /** Constructs QByteArray using QByteArray::fromRawData(), so returned buffer is usually NOT NULL-terminated! */
