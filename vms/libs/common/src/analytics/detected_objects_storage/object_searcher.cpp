@@ -293,12 +293,9 @@ void ObjectSearcher::filterTrack(std::vector<ObjectPosition>* const track)
         {
             if (!m_filter.timePeriod.isNull())
             {
-                if (microseconds(position.timestampUsec) >= m_filter.timePeriod.endTime() ||
-                    microseconds(position.timestampUsec + position.durationUsec) <
-                        m_filter.timePeriod.startTime())
-                {
+                const auto timestamp = microseconds(position.timestampUsec);
+                if (!m_filter.timePeriod.contains(duration_cast<milliseconds>(timestamp)))
                     return true;
-                }
             }
 
             // TODO: Filter box
