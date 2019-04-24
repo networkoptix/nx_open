@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.42",
+    "version": "1.0.1.43",
     "data": [
         {
             "keys": [
@@ -1998,6 +1998,15 @@
             "keys": ["Samsung*|PNF-9010*"],
             "forcedOnvifParams": {
                 "profiles": ["FisheyeView,MOBILE"]
+            }
+        },
+        {
+            "keys": ["Dahua|22204TNI"],
+            "_comment": "The camera returns the same URI for all videoencoders, so we switch them off.",
+            "forcedOnvifParams": 
+            {
+                "videoEncoders": ["000"],
+                "profiles": ["MediaProfile000"]
             }
         },
         {
