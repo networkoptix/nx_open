@@ -124,7 +124,7 @@ CREATE INDEX idx_event_for_streaming_cursor ON event(device_id, timestamp_usec_u
 static constexpr char kConvertTimestampToMillis[] =
 R"sql(
 
-UPDATE event SET timestamp_usec_utc = timestamp_usec_utc / 1000
+UPDATE event SET timestamp_usec_utc = timestamp_usec_utc / 1000;
 
 )sql";
 
@@ -137,7 +137,7 @@ UPDATE event SET
     box_top_left_x = round(box_top_left_x * %1),
     box_top_left_y = round(box_top_left_y * %1),
     box_bottom_right_x = round(box_bottom_right_x * %1),
-    box_bottom_right_y = round(box_bottom_right_y * %1)
+    box_bottom_right_y = round(box_bottom_right_y * %1);
 
 )sql";
 
@@ -169,7 +169,7 @@ GROUP BY device_id, timestamp_usec_utc/60000;
 static constexpr char kConvertDurationToMillis[] =
 R"sql(
 
-UPDATE event SET duration_usec = duration_usec / 1000
+UPDATE event SET duration_usec = duration_usec / 1000;
 
 )sql";
 
