@@ -1,6 +1,6 @@
 {
     "version" : "@release.version@.@buildNumber@",
-    "variantVersion": "14.04",
+    "variantVersion": "@variantVersion@",
     "platform" : "linux",
     "arch" : "arm",
     "modification" : "rpi",
