@@ -913,6 +913,7 @@
         this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
     };
     window.ShortCache.prototype.init = function (start, isPlaying) {
+        this.isReady = false; // use a flag to indicate initialization end
         this.liveMode = false;
         if (!start) {
             this.liveMode = true;
@@ -978,6 +979,7 @@
 
             if(makeRequest !== self.currentRequest){
                 console.error('Unexpected response in ShortCache', data);
+                self.isReady = undefined;
                 return;
             }
             self.updating = false;
@@ -1009,9 +1011,11 @@
             }
             
             self.setPlayingPosition(self.played);
+            self.isReady = true;
         },function(error){
             if(!makeRequest.abortReason){ // If the request was aborted - no handling is needed
                 console.error("Was not able to get records from server", error);
+                self.isReady = undefined;
             }
         });
     };
@@ -1140,7 +1144,7 @@
         });
     };
     window.ShortCache.prototype.isArchiveEmpty = function () {
-        return this.currentDetailization < 1;
+        return this.currentDetailization.length < 1;
     };
     
     window.ScaleManager = function (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs,
