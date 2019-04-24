@@ -267,6 +267,8 @@ bool SortedPeerUpdatesModel::lessThan(const QModelIndex& leftIndex, const QModel
 
     if (left->offline != right->offline)
     {
+        if (!left->offline)
+            return true;
         return left->state != nx::update::Status::Code::offline;
     }
 
