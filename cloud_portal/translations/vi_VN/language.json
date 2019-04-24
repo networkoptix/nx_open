@@ -2,9 +2,10 @@
   "language": "vi_VN",
   "language_name": "Tiếng Việt",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "Xác nhận",
     "cancelButton": "Hủy bỏ",
     "loginTitle": "Đăng nhập vào %PRODUCT_NAME%",
     "loginButton": "Đăng nhập",
@@ -37,8 +38,10 @@
     "pageNotFound": "Không tìm thấy trang"
   },
   "systemStatuses": {
-    "notActivated": "chưa kích hoạt",
     "activated": "đã kích hoạt",
+    "incompatible": "incompatible",
+    "merging": "merging",
+    "notActivated": "chưa kích hoạt",
     "online": "trực tuyến",
     "offline": "ngoại tuyến",
     "unavailable": "không khả dụng"
@@ -138,8 +141,14 @@
     "lostConnection": "Kết nối với {{systemName}} bị mất",
     "thisSystem": "hệ thống",
     "oldSafariNotSupported": "Không hỗ trợ các phiên bản cũ hơn Safari 10",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "tốt",
@@ -185,8 +194,10 @@
     "confirmUnshareAction": "Xoá",
     "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ %PRODUCT_NAME%",
     "successDeleted": "Tài khoản {{systemName}} đã xóa thành công từ hệ thống của bạn",
+    "failedMerge": "System merge failed",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "Các quyền đã bị xóa khỏi {{email}}"
+    "permissionsRemoved": "Các quyền đã bị xóa khỏi {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Tài khoản của bạn đã được lưu thành công",
@@ -323,5 +334,10 @@
       "stop listening": "dừng nghe",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "We'd recommend consulting with",
+    "b_support": "hỗ trợ",
+    "c_proceeding": "before proceeding."
   }
 }

@@ -2,9 +2,10 @@
   "language": "ja_JP",
   "language_name": "日本語",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "キャンセル",
     "loginTitle": "%PRODUCT_NAME% にログイン",
     "loginButton": "ログイン",
@@ -37,8 +38,10 @@
     "pageNotFound": "ページが見つかりません"
   },
   "systemStatuses": {
-    "notActivated": "アクティベートされていません",
     "activated": "アクティベート済",
+    "incompatible": "incompatible",
+    "merging": "統合中",
+    "notActivated": "アクティベートされていません",
     "online": "オンライン",
     "offline": "オフライン",
     "unavailable": "利用できません"
@@ -138,13 +141,19 @@
     "lostConnection": "{{systemName}} への接続が失われました",
     "thisSystem": "システム",
     "oldSafariNotSupported": "Safariのバージョン10以前はサポートされません",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "良い",
     "fair": "可",
-    "minLength": "短すぎ",
+    "minLength": "短すぎます",
     "minLengthMessage": "パスワードは8文字以上必要です",
     "required": "無効",
     "requiredMessage": "英数字とキーボードの記号のみを使用して、先頭と末尾の空白を避けます",
@@ -185,8 +194,10 @@
     "confirmUnshareAction": "削除",
     "successDisconnected": "システムが正常に %PRODUCT_NAME% から切断されました",
     "successDeleted": "システム {{systemName}} はあなたのアカウントから正常に削除されました",
-    "successMerge": "System merge completed",
-    "permissionsRemoved": "{{email}} からアクセス権限が削除されました"
+    "failedMerge": "System merge failed",
+    "successMerge": "システムが統合されました",
+    "permissionsRemoved": "{{email}} からアクセス権限が削除されました",
+    "unknownName": "システムの名前が不明です（クラウド統合が原因）"
   },
   "account": {
     "accountSavedSuccess": "あなたのアカウントは正常に保存されました",
@@ -323,5 +334,10 @@
       "stop listening": "聞くのをやめる",
       "help": "ヘルプ| 表示コマンド"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "相談を推奨",
+    "b_support": "サポート",
+    "c_proceeding": "続行する前に"
   }
 }

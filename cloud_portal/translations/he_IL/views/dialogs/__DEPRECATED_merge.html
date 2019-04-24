@@ -17,7 +17,7 @@
     <form ng-if="showMergeForm" name="mergeForm" novalidate>
         <div class="modal-body">
             <div class="form-group">
-                <>> מזג את המערכת הנוכחית עם </label>
+                <label for="system">מזג את המערכת הנוכחית עם</label>
                 <select class="form-control" name="targetSystem" id="system" ng-model="targetSystem"
                         ng-options="system as addStatus(system) for system in systems"></select>
             </div>

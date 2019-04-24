@@ -2,6 +2,7 @@
   "language": "pl_PL",
   "language_name": "Polski",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "OK",
@@ -37,8 +38,10 @@
     "pageNotFound": "Nie znaleziono strony"
   },
   "systemStatuses": {
-    "notActivated": "nieaktywny",
     "activated": "aktywny",
+    "incompatible": "incompatible",
+    "merging": "łączenie",
+    "notActivated": "nieaktywny",
     "online": "online",
     "offline": "offline",
     "unavailable": "niedostępny"
@@ -138,8 +141,14 @@
     "lostConnection": "Utracono połączenie z {{systemName}}",
     "thisSystem": "system",
     "oldSafariNotSupported": "Wersje Safari starsze niż 10 nie są obsługiwane",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "dobre",
@@ -185,8 +194,10 @@
     "confirmUnshareAction": "Usuń",
     "successDisconnected": "System został pomyślnie odłączony od %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} został pomyślnie usunięty z Twojego konta",
-    "successMerge": "System merge completed",
-    "permissionsRemoved": "Uprawnienia zostały usunięte z {{email}}"
+    "failedMerge": "System merge failed",
+    "successMerge": "Zakończono łączenie systemu",
+    "permissionsRemoved": "Uprawnienia zostały usunięte z {{email}}",
+    "unknownName": "Nieznana nazwa systemu (złączenie w chmurze)"
   },
   "account": {
     "accountSavedSuccess": "Twoje konto zostało pomyślnie zapisane",
@@ -323,5 +334,10 @@
       "stop listening": "przestań słuchać",
       "help": "pomoc | pokaż polecenia"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "Zalecamy skonsultowanie się z",
+    "b_support": "wsparcie",
+    "c_proceeding": "przed kontynuowaniem."
   }
 }

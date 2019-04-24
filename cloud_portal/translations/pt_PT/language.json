@@ -2,12 +2,13 @@
   "language": "pt_PT",
   "language_name": "Português",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "Cancelar",
-    "loginTitle": "Log in to %PRODUCT_NAME%",
-    "loginButton": "Log in",
+    "loginTitle": "Entrar em %PRODUCT_NAME%",
+    "loginButton": "Entrar",
     "logoutAuthorisedTitle": "Já tem sessão iniciada",
     "logoutAuthorisedContinueButton": "Continuar",
     "logoutAuthorisedLogoutButton": "Terminar sessão"
@@ -15,12 +16,12 @@
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
     "default": "%PRODUCT_NAME%",
-    "registerSuccess": "Welcome to",
+    "registerSuccess": "Bem-vindo a",
     "register": "Create account",
-    "changePassword": "Change password -",
+    "changePassword": "Alterar senha -",
     "account": "Definições da conta -",
     "systems": "Sistemas -",
-    "system": "System -",
+    "system": "Sistema -",
     "systemShare": "Partilha de Sistema -",
     "activate": "Activar conta -",
     "activateSent": "Activar conta -",
@@ -30,15 +31,17 @@
     "restorePasswordSuccess": "Senha guardada -",
     "restorePasswordCode": "Reset de Senha -",
     "view": "Visualizar câmaras - ",
-    "debug": "Debug",
-    "login": "Log in -",
+    "debug": "Depurar/Debug",
+    "login": "Entrar -",
     "download": "Baixar %VMS_NAME%",
     "downloadPlatform": "Baixar %VMS_NAME% para ",
     "pageNotFound": "Página não encontrada"
   },
   "systemStatuses": {
-    "notActivated": "não activado",
     "activated": "activado",
+    "incompatible": "incompatible",
+    "merging": "merging",
+    "notActivated": "não activado",
     "online": "online",
     "offline": "offline",
     "unavailable": "indisponível"
@@ -62,7 +65,7 @@
     },
     "Advanced Viewer": {
       "label": "Visualizador Avançado",
-      "description": "Pode visualizar vídeo ao vivo, pesquisar os arquivos, configurar câmaras, controlar PTZ etc"
+      "description": "Pode ver vídeos ao vivo, pesquisar os arquivos, configurar câmaras, controlar PTZ etc"
     },
     "Administrator": {
       "label": "Administrador",
@@ -138,17 +141,23 @@
     "lostConnection": "Conexão a {{systemName}} perdida",
     "thisSystem": "o sistema",
     "oldSafariNotSupported": "Versões do Safari anteriores à 10 não são suportadas",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
-    "good": "good",
-    "fair": "fair",
+    "good": "bom",
+    "fair": "justo",
     "minLength": "demasiado curta",
     "minLengthMessage": "A senha deve conter pelo menos 8 caracteres",
-    "required": "incorrect",
+    "required": "incorreta",
     "requiredMessage": "Use apenas letras latinas, números e símbolos do teclado, evite espaços à esquerda e à direita",
-    "weak": "weak",
+    "weak": "fraco",
     "weakMessage": "Use números, letras maiúsculas e minúsculas e caracteres especiais para tornar a sua senha mais forte",
     "strongMessage": "Senha forte!",
     "common": "demasiado comum",
@@ -175,24 +184,26 @@
     "confirmRenameTitle": "Nome do Sistema",
     "confirmRenameAction": "Gravar",
     "successRename": "Nome do sistema guardado",
-    "confirmDisconnectTitle": "Disconnect System from %PRODUCT_NAME%?",
-    "confirmDisconnectAction": "Disconnect",
+    "confirmDisconnectTitle": "Desligar o sistema do %PRODUCT_NAME%?",
+    "confirmDisconnectAction": "Desconectar",
     "confirmUnshareFromMe": "Está prestes a desconectar este Sistema da sua conta. Não poderá mais aceder a este Sistema. Tem certeza?",
     "confirmUnshareFromMeTitle": "Desconectar o Sistema?",
-    "confirmUnshareFromMeAction": "Disconnect",
+    "confirmUnshareFromMeAction": "Desconectar",
     "confirmUnshare": "Este utilizador não será capaz de aceder ao sistema. Tem certeza?",
     "confirmUnshareTitle": "Apagar utilizador?",
     "confirmUnshareAction": "Apagar",
     "successDisconnected": "O Sistema foi desconectado de %PRODUCT_NAME% com sucesso",
     "successDeleted": "O sistema {{systemName}} foi apagado com sucesso da sua conta",
+    "failedMerge": "System merge failed",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "As permissões foram removidas de {{email}}"
+    "permissionsRemoved": "As permissões foram removidas de {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "A sua conta foi gravada com sucesso",
     "activationLinkSent": "Link de activação enviado",
     "passwordChangedSuccess": "A sua conta foi gravada com sucesso",
-    "changePassword": "Change Password",
+    "changePassword": "Alterar senha",
     "newPasswordLabel": "Nova senha",
     "saveChanges": "Gravar"
   },
@@ -269,8 +280,8 @@
     "setNewPasswordLabel": "Nova senha"
   },
   "regActions": {
-    "passwordLabel": "Password",
-    "createAccount": "Create Account"
+    "passwordLabel": "Senha",
+    "createAccount": "Criar conta"
   },
   "header": {
     "allSystems": "Todos os sistemas",
@@ -323,5 +334,10 @@
       "stop listening": "parar de ouvir",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "We'd recommend consulting with",
+    "b_support": "suporte",
+    "c_proceeding": "before proceeding."
   }
 }

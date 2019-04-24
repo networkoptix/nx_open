@@ -2,9 +2,10 @@
   "language": "cs_CZ",
   "language_name": "Čeština",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "Zrušit",
     "loginTitle": "Přihlaste se k %PRODUCT_NAME%",
     "loginButton": "Přihlásit se",
@@ -37,8 +38,10 @@
     "pageNotFound": "Stránka nenalezna"
   },
   "systemStatuses": {
-    "notActivated": "neaktivováno",
     "activated": "aktivováno",
+    "incompatible": "incompatible",
+    "merging": "merging",
+    "notActivated": "neaktivováno",
     "online": "online",
     "offline": "offline",
     "unavailable": "nedostupný"
@@ -138,8 +141,14 @@
     "lostConnection": "Připojení k {{systemName}} se ztratilo",
     "thisSystem": "systém",
     "oldSafariNotSupported": "Verze Safari starší než 10 není podporována",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "dobré",
@@ -185,8 +194,10 @@
     "confirmUnshareAction": "Smazat",
     "successDisconnected": "Systém byl úspěšně odpojen od %PRODUCT_NAME%",
     "successDeleted": "Systém {{systemName}} byl úspěšně odstraněna z Vašeho účtu",
+    "failedMerge": "System merge failed",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "Oprávnění byla odstraněna z adresy {{email}}"
+    "permissionsRemoved": "Oprávnění byla odstraněna z adresy {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Váš účet byl úspěšně uložen",
@@ -323,5 +334,10 @@
       "stop listening": "zastavení poslech",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "We'd recommend consulting with",
+    "b_support": "podpora",
+    "c_proceeding": "before proceeding."
   }
 }

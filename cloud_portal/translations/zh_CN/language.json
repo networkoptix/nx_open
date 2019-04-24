@@ -2,6 +2,7 @@
   "language": "zh_CN",
   "language_name": "简体中文",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%",
   "dialogs": {
     "okButton": "确定",
@@ -37,8 +38,10 @@
     "pageNotFound": "找不到页面"
   },
   "systemStatuses": {
-    "notActivated": "未激活",
     "activated": "激活",
+    "incompatible": "incompatible",
+    "merging": "merging",
+    "notActivated": "未激活",
     "online": "在线",
     "offline": "离线",
     "unavailable": "不可用"
@@ -138,8 +141,14 @@
     "lostConnection": "连接到 {{systemName}} 失去了",
     "thisSystem": "系统",
     "oldSafariNotSupported": "不支持10岁以上的Safari版本",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "良好",
@@ -185,8 +194,10 @@
     "confirmUnshareAction": "删除",
     "successDisconnected": "系统成功地断开 %PRODUCT_NAME%",
     "successDeleted": "从您的帐户成功删除系统 {{systemName}}",
+    "failedMerge": "System merge failed",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "权限从 {{email}} 被刪除"
+    "permissionsRemoved": "权限从 {{email}} 被刪除",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "您的帐户已成功保存",
@@ -323,5 +334,10 @@
       "stop listening": "停止监听",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "We'd recommend consulting with",
+    "b_support": "技术支持",
+    "c_proceeding": "before proceeding."
   }
 }

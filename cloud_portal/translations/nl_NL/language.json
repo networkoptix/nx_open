@@ -2,6 +2,7 @@
   "language": "nl_NL",
   "language_name": "Nederlands",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Oké",
@@ -37,8 +38,10 @@
     "pageNotFound": "Pagina niet gevonden"
   },
   "systemStatuses": {
-    "notActivated": "niet geactiveerd",
     "activated": "geactiveerd",
+    "incompatible": "incompatible",
+    "merging": "merging",
+    "notActivated": "niet geactiveerd",
     "online": "online",
     "offline": "offline",
     "unavailable": "niet beschikbaar"
@@ -138,8 +141,14 @@
     "lostConnection": "Verbinding met {{systemName}} verloren",
     "thisSystem": "het systeem",
     "oldSafariNotSupported": "Versies van Safari ouder dan versie 10 worden niet ondersteund",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "goed",
@@ -185,8 +194,10 @@
     "confirmUnshareAction": "Verwijder",
     "successDisconnected": "Systeem is succesvol afgesloten van %PRODUCT_NAME%",
     "successDeleted": "Systeem {{systemName}} is succesvol verwijderd van uw account",
+    "failedMerge": "System merge failed",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}"
+    "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Uw account is succesvol opgeslagen",
@@ -323,5 +334,10 @@
       "stop listening": "stop met luisteren",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "We'd recommend consulting with",
+    "b_support": "ondersteuning",
+    "c_proceeding": "before proceeding."
   }
 }

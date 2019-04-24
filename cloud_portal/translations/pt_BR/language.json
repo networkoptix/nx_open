@@ -2,9 +2,10 @@
   "language": "pt_BR",
   "language_name": "Português (Brazil)",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "Cancelar",
     "loginTitle": "Logar em %PRODUCT_NAME%",
     "loginButton": "Entrar",
@@ -37,8 +38,10 @@
     "pageNotFound": "Página não encontrada"
   },
   "systemStatuses": {
-    "notActivated": "não ativado",
     "activated": "ativado",
+    "incompatible": "incompatible",
+    "merging": "merging",
+    "notActivated": "não ativado",
     "online": "online",
     "offline": "desligada",
     "unavailable": "indisponível"
@@ -62,7 +65,7 @@
     },
     "Advanced Viewer": {
       "label": "Visualizador Avançado",
-      "description": "Pode visualizar vídeo ao vivo, pesquisar os arquivos, configurar câmaras, controlar PTZ etc"
+      "description": "Pode ver vídeo ao vivo, navegar no arquivo, controle PTZ etc"
     },
     "Administrator": {
       "label": "Administrador",
@@ -138,20 +141,26 @@
     "lostConnection": "Conexão a {{systemName}} perdida",
     "thisSystem": "o sistema",
     "oldSafariNotSupported": "Versões do Safari anteriores à 10 não são suportadas",
-    "DUPLICATE_MEDIASERVER_FOUND": "Servidores duplicados foram encontrados em um dos sistemas.<br> Remova servidores antigos de cada sistema que você está tentando mesclar e tente novamente.",
-    "mergedSystemIsOffline": "Um dos sistemas que estão sendo mesclados está offline. Verifique se estão online e tente novamente."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
-    "good": "bom",
+    "good": "boa",
     "fair": "justo",
-    "minLength": "demasiado curta",
+    "minLength": "curto demais",
     "minLengthMessage": "A senha deve conter pelo menos 8 caracteres",
     "required": "incorreta",
     "requiredMessage": "Use apenas letras latinas, números e símbolos do teclado, evite espaços à esquerda e à direita",
     "weak": "fraca",
     "weakMessage": "Use números, letras maiúsculas e minúsculas e caracteres especiais para tornar a sua senha mais forte",
     "strongMessage": "Senha forte!",
-    "common": "demasiado comum",
+    "common": "muito comum",
     "commonMessage": "Esta senha está principais senhas mais populares no mundo",
     "missingMessage": "A senha é necessária"
   },
@@ -185,8 +194,10 @@
     "confirmUnshareAction": "Apagar",
     "successDisconnected": "O Sistema foi desconectado de %PRODUCT_NAME% com sucesso",
     "successDeleted": "O sistema {{systemName}} foi apagado com sucesso da sua conta",
+    "failedMerge": "System merge failed",
     "successMerge": "Mesclagem de sistema concluída",
-    "permissionsRemoved": "As permissões foram removidas de {{email}}"
+    "permissionsRemoved": "As permissões foram removidas de {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "A sua conta foi gravada com sucesso",
@@ -323,5 +334,10 @@
       "stop listening": "parar de ouvir",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "We'd recommend consulting with",
+    "b_support": "suporte",
+    "c_proceeding": "before proceeding."
   }
 }

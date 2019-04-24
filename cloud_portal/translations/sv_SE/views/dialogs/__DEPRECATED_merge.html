@@ -6,7 +6,7 @@
                     Du kan sammanfoga cloud system, där du är ägare.
                 </p>
                 <p class="help-block-no-height">
-                    Anslut system du vill slå samman med denna till %PRODUCT_NAME% eller slå samman lokalt med %VMS_NAME% klient.
+                    Anslut System du vill koppla med denna till %PRODUCT_NAME% eller koppla lokalt med %VMS_NAME% klient.
                 </p>
             </div>
         </div>
@@ -17,7 +17,7 @@
     <form ng-if="showMergeForm" name="mergeForm" novalidate>
         <div class="modal-body">
             <div class="form-group">
-                <label for="system"> Slå samman aktuellt system med </label>
+                <label for="system">Sammanfoga Nuvarande System med</label>
                 <select class="form-control" name="targetSystem" id="system" ng-model="targetSystem"
                         ng-options="system as addStatus(system) for system in systems"></select>
             </div>
@@ -26,7 +26,7 @@
             <p ng-if="systemMergeable =='cannotMerge'"
                class="help-block-no-height warning-label">System {{targetSystem.name}} är inkompatibelt. Kan inte slås samman med den nuvarande.</p>
             <p ng-if="systemMergeable == ''"
-               class="help-block-no-height">Du kan bara slå samman system där du har ägarbehörigheter.</p>
+               class="help-block-no-height">Du kan endast slå samman system där du har ägarbehörighet.</p>
             <div>
                 <div ng-class="{'text-muted': systemStatus != ''}">Tog systemnamn och inställningar från</div>
                 <div ng-init="$parent.masterSystemId=system.id">

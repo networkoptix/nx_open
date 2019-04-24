@@ -2,10 +2,11 @@
   "language": "tr_TR",
   "language_name": "Türk",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Tamam",
-    "cancelButton": "İptal",
+    "cancelButton": "Vazgeç",
     "loginTitle": "%PRODUCT_NAME% e giriş yapın",
     "loginButton": "Giriş yap",
     "logoutAuthorisedTitle": "Zaten giriş yapılmış",
@@ -37,8 +38,10 @@
     "pageNotFound": "Sayfa bulunamadı"
   },
   "systemStatuses": {
-    "notActivated": "aktif edilmemiş",
     "activated": "aktif edildi",
+    "incompatible": "incompatible",
+    "merging": "birleştirme",
+    "notActivated": "aktif edilmemiş",
     "online": "çevrimiçi",
     "offline": "çevrimdışı",
     "unavailable": "kullanılamaz"
@@ -62,7 +65,7 @@
     },
     "Advanced Viewer": {
       "label": "Gelişmiş Görüntüleyici",
-      "description": "Canlı vidyo izleyebilir, arşivi görüntüleyebilir, kameraları ayarlayabilir, PTZ'yi kontrol edebilir"
+      "description": "Canlı vidyo izleyebilir, arşive gözatabilir, kameraları ayarlayabilir, PTZ'yi kontrol edebilir vs"
     },
     "Administrator": {
       "label": "Yönetici",
@@ -138,12 +141,18 @@
     "lostConnection": "{{systemName}} ile bağlantı kayboldu",
     "thisSystem": "sistem",
     "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "iyi",
-    "fair": "idare Eder",
+    "fair": "idare eder",
     "minLength": "çok kısa",
     "minLengthMessage": "Şifre en az 8 karakter içermelidir",
     "required": "yanlış",
@@ -185,8 +194,10 @@
     "confirmUnshareAction": "Sil",
     "successDisconnected": "Sistem %PRODUCT_NAME%'den başarıyla çıkarıldı",
     "successDeleted": "{{systemName}} sistemi hesabınızdan başarıyla silindi",
-    "successMerge": "System merge completed",
-    "permissionsRemoved": "İzinler {{email}}'den kaldırıldı"
+    "failedMerge": "System merge failed",
+    "successMerge": "Sistem birleştirme tamamlandı",
+    "permissionsRemoved": "İzinler {{email}}'den kaldırıldı",
+    "unknownName": "Sistem için Bilinmeyen Ad (Bulut birleştirme yüzünden)"
   },
   "account": {
     "accountSavedSuccess": "Hesabınız başarıyla kaydedildi",
@@ -323,5 +334,10 @@
       "stop listening": "dinlemeyi durdur",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "Danışmanızı tavsiye ederiz",
+    "b_support": "destek",
+    "c_proceeding": "işlemden önce."
   }
 }

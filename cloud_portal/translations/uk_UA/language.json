@@ -2,9 +2,10 @@
   "language": "uk_UA",
   "language_name": "Українська",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ок",
+    "okButton": "ОК",
     "cancelButton": "Відміна",
     "loginTitle": "Увійдіть до %PRODUCT_NAME%",
     "loginButton": "Вхід",
@@ -37,8 +38,10 @@
     "pageNotFound": "Сторінку не знайдено"
   },
   "systemStatuses": {
-    "notActivated": "не активовано",
     "activated": "активовано",
+    "incompatible": "incompatible",
+    "merging": "злиття",
+    "notActivated": "не активовано",
     "online": "oнлайн",
     "offline": "поза мережею",
     "unavailable": "недоступний"
@@ -138,8 +141,14 @@
     "lostConnection": "Підключення до {{systemName}} втрачено",
     "thisSystem": "система",
     "oldSafariNotSupported": "Версії Safari старше 10 не підтримуються",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "хороший",
@@ -185,8 +194,10 @@
     "confirmUnshareAction": "Видалити",
     "successDisconnected": "Система успішно відключена від %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успішно видалена з вашого облікового запису",
-    "successMerge": "System merge completed",
-    "permissionsRemoved": "{{email}} був позбавлений повноважень"
+    "failedMerge": "System merge failed",
+    "successMerge": "Злиття системи завершено",
+    "permissionsRemoved": "{{email}} був позбавлений повноважень",
+    "unknownName": "Невідоме ім’я для системи (викликане злиттям хмари)"
   },
   "account": {
     "accountSavedSuccess": "Ваш обліковий запис успішно збережено",
@@ -323,5 +334,10 @@
       "stop listening": "припинити прослуховування",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "Ми рекомендуємо проконсультуватися з",
+    "b_support": "підтримка",
+    "c_proceeding": "перед тим, як продовжити."
   }
 }

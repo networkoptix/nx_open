@@ -117,7 +117,7 @@
     <h2>ログ設定</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">{{name}} ログ レベル</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">なし: ログを無効にします</option>

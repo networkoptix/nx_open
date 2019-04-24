@@ -2,9 +2,10 @@
   "language": "sv_SE",
   "language_name": "Svenska",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "Avbryt",
     "loginTitle": "Logga in på %PRODUCT_NAME%",
     "loginButton": "Logga in",
@@ -37,8 +38,10 @@
     "pageNotFound": "Det gick inte att hitta sidan"
   },
   "systemStatuses": {
-    "notActivated": "inte aktiverad",
     "activated": "aktiverad",
+    "incompatible": "incompatible",
+    "merging": "sammanslagning",
+    "notActivated": "inte aktiverad",
     "online": "uppkopplad",
     "offline": "frånkopplade",
     "unavailable": "inte tillgänglig"
@@ -138,20 +141,26 @@
     "lostConnection": "Anslutning till {{systemName}} förlorad",
     "thisSystem": "systemet",
     "oldSafariNotSupported": "Versioner av Safari äldre än 10 stöds inte",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
-    "good": "good",
-    "fair": "fair",
-    "minLength": "too short",
+    "good": "bra",
+    "fair": "skapligt",
+    "minLength": "för kort",
     "minLengthMessage": "Lösenordet måste innehålla minst 8 tecken",
-    "required": "incorrect",
+    "required": "felaktig",
     "requiredMessage": "Använd endast latinska bokstäver, siffror och tangentbordssymboler, undvik ledande och efterföljande mellanslag",
-    "weak": "weak",
+    "weak": "svagt",
     "weakMessage": "Använd siffror, stora bokstäver och specialtecken för att göra ditt lösenord starkare",
     "strongMessage": "Starkt lösenord!",
-    "common": "too common",
+    "common": "för vanligt",
     "commonMessage": "Detta lösenord är i topp populäraste lösenord i världen",
     "missingMessage": "Lösenord krävs"
   },
@@ -185,8 +194,10 @@
     "confirmUnshareAction": "Radera",
     "successDisconnected": "Systemet har kopplats bort från %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} har tagits bort från ditt konto",
-    "successMerge": "System merge completed",
-    "permissionsRemoved": "Rättigheterna togs bort från {{email}}"
+    "failedMerge": "System merge failed",
+    "successMerge": "Systemsammanslagning slutförd",
+    "permissionsRemoved": "Rättigheterna togs bort från {{email}}",
+    "unknownName": "Okänt namn för system (orsakad av molnsammanslagning)"
   },
   "account": {
     "accountSavedSuccess": "Ditt konto har sparats",
@@ -289,11 +300,11 @@
     "systemOffline": "System Offline",
     "systemHasNoCameras": "INGA KAMEROR",
     "cameraStates": {
-      "offline": "Frånkopplade",
+      "offline": "Offline",
       "error": "Fel",
       "unauthorized": "Autentisering krävs",
       "noData": "Data saknas",
-      "iosVideoTooLarge": "iOS stöder inte video större än fullHD (2MP: 1920x1080).",
+      "iosVideoTooLarge": "ios stöder inte video större än fullHD (2MP: 1920x1080).",
       "flashRequired": "Var god <a href='https://get.adobe.com/flashplayer/' target='_blank'>installera Adobe Flash</a> för att spela upp videor.",
       "flashOrWebmRequired": "Var god <a href='https://get.adobe.com/flashplayer/' target='_blank'>installera Adobe Flash</a> eller<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> för att spela video i Internet Explorer.",
       "noArmSupport": "Denna webbläsare eller enhet stöder inte videouppspelning från ARM-baserade servrar.",
@@ -323,5 +334,10 @@
       "stop listening": "sluta lyssna",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "Vi rekommenderar att vi konsulterar med",
+    "b_support": "support",
+    "c_proceeding": "innan fortsättning."
   }
 }

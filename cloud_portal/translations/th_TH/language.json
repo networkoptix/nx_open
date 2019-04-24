@@ -2,6 +2,7 @@
   "language": "th_TH",
   "language_name": "ภาษาไทย",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "ตกลง",
@@ -37,8 +38,10 @@
     "pageNotFound": "ไม่พบหน้านี้"
   },
   "systemStatuses": {
-    "notActivated": "ยังไม่ถูกเปิดใช้งาน",
     "activated": "เปิดใช้งาน",
+    "incompatible": "incompatible",
+    "merging": "การผสม",
+    "notActivated": "ยังไม่ถูกเปิดใช้งาน",
     "online": "ออนไลน์",
     "offline": "ออฟไลน์",
     "unavailable": "ไม่พร้อมใช้งาน"
@@ -138,8 +141,14 @@
     "lostConnection": "การเชื่อมต่อกับ {{systemName}} สูญหาย",
     "thisSystem": "ระบบ",
     "oldSafariNotSupported": "ไม่สนับสนุน Safari ที่เก่ากว่าเวอร์ชั่น 10",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "ดี",
@@ -185,8 +194,10 @@
     "confirmUnshareAction": "ลบ",
     "successDisconnected": "ระบบถูกตัดการเชื่อมต่อเรียบร้อยแล้วจาก %PRODUCT_NAME%",
     "successDeleted": "ระบบ {{systemName}} จะถูกลบออกจากบัญชีของคุณเรียบร้อยแล้ว",
-    "successMerge": "System merge completed",
-    "permissionsRemoved": "สิทธิ์ถูกนำออกจาก {{email}}"
+    "failedMerge": "System merge failed",
+    "successMerge": "ผสานระบบเสร็จสมบูรณ์",
+    "permissionsRemoved": "สิทธิ์ถูกนำออกจาก {{email}}",
+    "unknownName": "ชื่อที่ไม่รู้จักสำหรับระบบ (เกิดจากการผสานคลาวด์)"
   },
   "account": {
     "accountSavedSuccess": "บันทึกบัญชีของคุณเรียบร้อยแล้ว",
@@ -323,5 +334,10 @@
       "stop listening": "หยุดฟัง",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "เราขอแนะนำให้ปรึกษากับ",
+    "b_support": "ทีมช่วยเหลือ",
+    "c_proceeding": "ก่อนดำเนินการต่อ"
   }
 }

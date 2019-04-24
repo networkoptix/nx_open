@@ -2,9 +2,10 @@
   "language": "hu_HU",
   "language_name": "Magyar",
   "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "Mégse",
     "loginTitle": "Bejelentkezés ide: %PRODUCT_NAME%",
     "loginButton": "Bejelentkezés",
@@ -37,8 +38,10 @@
     "pageNotFound": "Az oldal nem található"
   },
   "systemStatuses": {
-    "notActivated": "nincs aktiválva",
     "activated": "aktiválva",
+    "incompatible": "incompatible",
+    "merging": "merging",
+    "notActivated": "nincs aktiválva",
     "online": "online",
     "offline": "offline",
     "unavailable": "nem elérhető"
@@ -138,8 +141,14 @@
     "lostConnection": "{{systemName}} kapcsolat megszakadt",
     "thisSystem": "a rendszer",
     "oldSafariNotSupported": "A 10-es verziónál régebbi Safari böngésző nem támogatott",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
+    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
+    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systems merge failed",
+    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "jó",
@@ -185,8 +194,10 @@
     "confirmUnshareAction": "Törlés",
     "successDisconnected": "Rendszer sikeresen bontotta %PRODUCT_NAME% kapcsolatát",
     "successDeleted": "{{systemName}} rendszer sikeresen törölve a fiókból",
+    "failedMerge": "System merge failed",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "{{email}} engedélyei vissavonva"
+    "permissionsRemoved": "{{email}} engedélyei vissavonva",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "A fiók mentése sikeres",
@@ -323,5 +334,10 @@
       "stop listening": "figyelés leállítása",
       "help": "súgó | parancsok megjelenítése"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "We'd recommend consulting with",
+    "b_support": "támogatás",
+    "c_proceeding": "before proceeding."
   }
 }

@@ -9,8 +9,8 @@
                 Vänligen stäng av enheten och installera en hårddisk.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                This device needs network connection to work.<br>
-                Please connect it to the local network or Internet
+                Denna enhet behöver nätverksanslutning för att fungera. <br>
+                Vänligen anslut den till det lokala nätverket eller Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Denna enhet har fel nätverkskonfiguration. <br>
@@ -88,7 +88,7 @@
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
                             <h3>Sammanfoga system</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Sammanfoga system</button></p>
                         </form>
                     </div>
 
@@ -121,11 +121,11 @@
 
 
                     <div>
-                        <h3>Traffic encryption</h3>
+                        <h3>Trafikkryptering</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encryption
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Kräv trafikkryptering
                                 </label>
                             </div>
                             <div class="checkbox">
@@ -134,7 +134,7 @@
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
                                            ng-model="trafficSettings.videoTrafficEncryptionForced"
                                            ng-checked="checkTrafficEncryption()">
-                                    Force Video Traffic Encryption
+                                    Tvinga videotrafikkryptering
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Spara</button>

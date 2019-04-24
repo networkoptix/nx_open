@@ -76,7 +76,7 @@
     "THIS LINK IS BROKEN TEXT": "ลิงค์นี้เสีย, <br> ระบบอาจถูกตัดการเชื่อมต่อจาก %PRODUCT_NAME%, <br> การเข้าถึงระบบนี้อาจถูกเพิกถอนหรือ <br> หรือคุณอาจจะเข้าสู่ระบบบัญชีอื่น",
     "PAGE NOT FOUND TEXT": "ไม่พบหน้านี้",
     "TAKE ME HOME TEXT": "ไปที่นั่นเลย",
-    "OPEN NX WITNESS BUTTON TEXT": "เปิด %VMS_NAME%",
+    "OPEN NX WITNESS BUTTON TEXT": "เปิด {{VMS_NAME}}",
     "PASSWORD TOO SHORT BADGE TEXT": "สั้นเกินไป",
     "PASSWORD TOO COMMON BADGE TEXT": "บ่อยเกินไป",
     "PASSWORD IS WEAK BADGE TEXT": "อ่อนแอ",
