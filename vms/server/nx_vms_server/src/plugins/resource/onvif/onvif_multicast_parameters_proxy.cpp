@@ -173,8 +173,17 @@ OnvifMulticastParametersProxy::OnvifMulticastParametersProxy(
 MulticastParameters OnvifMulticastParametersProxy::multicastParameters()
 {
     std::string token = m_resource->videoEncoderConfigurationToken(m_streamIndex);
-    if (!NX_ASSERT(!token.empty()))
+    if (m_streamIndex == nx::vms::api::StreamIndex::secondary)
+    {
+        // secondary stream may absent
         return MulticastParameters();
+    }
+    else
+    {
+        // primary stream may not absent
+        if (!NX_ASSERT(!token.empty()))
+            return MulticastParameters();
+    }
 
     if (m_resource->getMedia2Url().isEmpty())
         return getMulticastParametersViaMedia1(token, m_resource);
