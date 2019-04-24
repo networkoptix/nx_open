@@ -176,7 +176,8 @@ MulticastParameters OnvifMulticastParametersProxy::multicastParameters()
     if (m_streamIndex == nx::vms::api::StreamIndex::secondary)
     {
         // secondary stream may absent
-        return MulticastParameters();
+        if (token.empty())
+            return MulticastParameters();
     }
     else
     {
