@@ -46,9 +46,9 @@ ManualCameraAdditionRestHandler::~ManualCameraAdditionRestHandler()
 }
 
 nx::network::http::StatusCode::Value ManualCameraAdditionRestHandler::extractSearchStartParams(
-    nx::network::rest::JsonResult* const result,
+    nx::network::rest::JsonResult* result,
     const nx::network::rest::Params& params,
-    nx::utils::Url* const outUrl,
+    nx::utils::Url* outUrl,
     std::optional<std::pair<nx::network::HostAddress, nx::network::HostAddress>>* const outIpRange)
 {
     NX_ASSERT(outUrl->isEmpty());
@@ -322,7 +322,8 @@ nx::network::rest::Response ManualCameraAdditionRestHandler::executePost(
                 ManualCameraData camera;
                 camera.url = request.paramOrDefault("url" + QString::number(i));
                 camera.manufacturer = request.paramOrDefault("manufacturer" + QString::number(i));
-                if (camera.url.isEmpty() || camera.manufacturer.isEmpty()) {
+                if (camera.url.isEmpty() || camera.manufacturer.isEmpty())
+                {
                     skipped++;
                     continue;
                 }

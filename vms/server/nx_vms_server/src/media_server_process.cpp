@@ -1634,7 +1634,7 @@ void MediaServerProcess::registerRestHandlers(
      * intended to be analyzed by these rules.
      * <br/> Parameters should be passed as a JSON object in POST message body with content type
      * "application/json". Example:
-     * <pre>
+     * <pre><code>
      * {
      *     "timestamp": "2016-09-16T16:02:41Z",
      *     "caption": "CreditCardUsed",
@@ -1645,7 +1645,7 @@ void MediaServerProcess::registerRestHandlers(
      *         ]
      *     }
      * }
-     * </pre>
+     * </code></pre>
      * This example triggers a generic event informing the system that a
      * credit card has been used on September 16, 2016 at 16:03:41 UTC in a POS
      * terminal being watched by the two specified cameras.

@@ -38,11 +38,11 @@ nx::network::rest::Response DebugEventsRestHandler::executePost(
     const auto status = nx::utils::switch_(
         extractAction(request.path()),
         "networkIssue",
-        [&] { return testNetworkIssue(request.params(), result, request.owner); },
+            [&] { return testNetworkIssue(request.params(), result, request.owner); },
         "disconnected",
-        [&] { return testCameraDisconnected(request.params(), result, request.owner); },
+            [&] { return testCameraDisconnected(request.params(), result, request.owner); },
         nx::utils::default_,
-        [&] { return nx::network::http::StatusCode::notFound; });
+            [&] { return nx::network::http::StatusCode::notFound; });
 
 
     auto response = nx::network::rest::Response::result(result);

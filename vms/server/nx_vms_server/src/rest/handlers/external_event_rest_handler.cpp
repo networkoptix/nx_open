@@ -29,8 +29,8 @@ ExternalEventRestHandler::ExternalEventRestHandler(QnMediaServerModule* serverMo
 
 rest::Response ExternalEventRestHandler::executeGet(const rest::Request& request)
 {
-    // TODO: There should be system wide setting to enable this particular method when all GET
-    // modifications are disabled by default. This may be required for some 3rd party integrations.
+    // TODO: There should be system-wide setting to enable this particular method when all GET
+    // modifications are disabled by default. This may be required for some 3rd-party integrations.
     if (!rest::ini().allowModificationsViaGetMethod)
         return rest::Response::error(nx::network::rest::Result::Forbidden);
 

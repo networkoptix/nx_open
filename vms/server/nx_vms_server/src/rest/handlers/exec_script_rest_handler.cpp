@@ -8,7 +8,7 @@
 #include <nx/network/rest/nx_network_rest_ini.h>
 #include <nx/utils/file_system.h>
 
-static const QString kAllowedParamChars = lit("^[a-zA-Z0-9_ =\\-\\+\\.]*$");
+static const QString kAllowedParamChars("^[a-zA-Z0-9_ =\\-\\+\\.]*$");
 
 using namespace nx::network;
 
@@ -43,7 +43,7 @@ rest::Response ExecScript::executePost(const rest::Request& request)
 
     QStringList args;
     for (const auto& param: request.params().toList())
-        args << lit("%1=%2").arg(param.first).arg(param.second);
+        args << lm("%1=%2").args(param.first, param.second);
 
     QRegExp regExpr(kAllowedParamChars);
     for (const auto& arg: args)

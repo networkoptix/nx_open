@@ -49,7 +49,7 @@ nx::network::rest::Response DeviceAnalyticsSettingsHandler::executePost(
     if (const auto& error = checkCommonInputParameters(request))
         return *error;
 
-    const auto& settings = request.parseContentOrThrow<QJsonObject>();
+    const auto settings = request.parseContentOrThrow<QJsonObject>();
     auto analyticsManager = serverModule()->analyticsManager();
     if (!analyticsManager)
     {

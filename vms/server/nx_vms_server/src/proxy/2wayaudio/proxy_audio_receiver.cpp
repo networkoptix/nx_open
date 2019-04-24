@@ -180,7 +180,7 @@ void QnAudioProxyReceiver::run()
     if (!m_serverModule->audioStreamPool()->startStopStreamToResource(
             desktopDataProvider, params->resourceId, params->action, errString))
     {
-        NX_WARNING(this, "Cant start audio uploading to camera %1: %2",
+        NX_WARNING(this, "Unable to start audio uploading to camera %1: %2",
             params->resourceId, errString);
     }
 }

@@ -37,7 +37,7 @@ nx::network::rest::Response SetupLocalSystemRestHandler::executeGet(
 nx::network::rest::Response SetupLocalSystemRestHandler::executePost(
     const nx::network::rest::Request& request)
 {
-    auto data = request.parseContentOrThrow<SetupLocalSystemData>();
+    const auto data = request.parseContentOrThrow<SetupLocalSystemData>();
     nx::network::rest::JsonResult result;
     const auto status = execute(data, request.owner, result);
     auto response = nx::network::rest::Response::result(result);
