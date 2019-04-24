@@ -1,4 +1,4 @@
-FROM python:2.7-alpine3.7
+FROM python:3.7-alpine3.7
 
 COPY docker/merge_config.py /usr/local/bin/
 COPY docker/pip.conf /root/.config/pip/pip.conf
