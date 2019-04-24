@@ -67,7 +67,7 @@
         var line = lines[i]
         var level = findAny(line, LEVELS)
         if (level) {
-          records.push({level: LEVELS.indexOf(level), text: line})
+          records.push({level: LEVELS.indexOf(level), text: line.trim()})
         } else {
           records[records.length -1].text += '\n' + line
         }
