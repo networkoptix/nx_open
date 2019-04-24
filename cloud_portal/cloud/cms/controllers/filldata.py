@@ -54,12 +54,12 @@ def process_context_structure(product, context, content, language,
     def replace_in(adict, key, value):
         for dict_key in adict.keys():
             itm_type = type(adict[dict_key])
-            if itm_type not in [str, unicode, dict, list] or type(value) in [bool]:
+            if itm_type not in [str, dict, list] or type(value) in [bool]:
                 continue
 
             if itm_type is list:
                 for item in adict[dict_key]:
-                    if type(item) in [str, unicode]:
+                    if type(item) is str:
                         idx = adict[dict_key].index(item)
                         adict[dict_key][idx] = item.replace(key, value)
                     elif item in [dict, list]:
@@ -132,7 +132,7 @@ def process_context(product, context, language_code,
     context_template_text = context.template_for_language(language, default_language, skin)
 
     # check if the file is language JSON
-    if context.file_path.endswith(".json") and isinstance(context_template_text, unicode):
+    if context.file_path.endswith(".json") and isinstance(context_template_text, str):
         try:
             context_template_text = json.loads(context_template_text)
         except ValueError:

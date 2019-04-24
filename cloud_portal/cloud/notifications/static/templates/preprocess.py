@@ -35,13 +35,13 @@ container_html = container_html.replace('{{>style_css}}', css_content)
 for file in os.listdir("."):
     if file.endswith(".mustache.html"):
         template_name = file.replace('.mustache.html', '')
-        new_file = open('../' + template_name + '.mustache', 'w')
+        new_file = open('../' + template_name + '.mustache', 'wb')
         text = container_html.replace('{{>body}}', open(template_name + '.mustache.html').read())
         print >> new_file, htmlmin.minify(inline_css(text), remove_comments=True, remove_empty_space=True, remove_optional_attribute_quotes=False).encode('utf-8', 'replace')
 
     if file.endswith(".mustache.txt"):
         template_name = file.replace('.mustache.txt', '')
-        new_file = open('../' + template_name + '.txt.mustache', 'w')
+        new_file = open('../' + template_name + '.txt.mustache', 'wb')
         text = container_text.replace('{{>body}}', open(template_name + '.mustache.txt').read())
         print >> new_file, text
 

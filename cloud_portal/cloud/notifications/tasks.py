@@ -113,6 +113,6 @@ def test_task(x, y):
     print("x: %i\ty:%i" % (x, y))
     sleep(y * 60)
     print("total: %i" % (x * y))
-    with open('task.log', 'a+') as f:
+    with open('task.log', 'ab+') as f:
         f.write("Task Done: %i * %i = %i" % (x, x, x*y))
     return x * y
