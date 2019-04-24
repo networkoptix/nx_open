@@ -100,7 +100,6 @@ struct SomeData
     int i = 0;
     QString s;
 };
-
 #define SomeData_Fields (b)(i)(s)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((SomeData), (eq)(json), _Fields);
 
@@ -116,7 +115,6 @@ struct SomeBools
     bool c = true;
     bool d = true;
 };
-
 #define SomeBools_Fields (a)(b)(c)(d)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((SomeBools), (eq)(json), _Fields);
 

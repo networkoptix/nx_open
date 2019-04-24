@@ -17,7 +17,7 @@ BackupDbRestHandler::BackupDbRestHandler(QnMediaServerModule* serverModule):
 
 rest::Response BackupDbRestHandler::executeGet(const rest::Request& request)
 {
-    if (!rest::ini().allowGetModifications)
+    if (!rest::ini().allowModificationsViaGetMethod)
         return rest::Response::error(nx::network::rest::Result::Forbidden);
 
     return executePost(request);

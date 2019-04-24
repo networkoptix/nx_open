@@ -38,7 +38,7 @@ static rest::Response errorResponse(Qn::AuthResult code)
 
 rest::Response QnCookieLoginRestHandler::executePost(const rest::Request& request)
 {
-    QnCookieData cookieData = request.parseContentOrThrow<QnCookieData>();
+    const auto cookieData = request.parseContentOrThrow<QnCookieData>();
 
     const auto authenticator = QnUniversalTcpListener::authenticator(request.owner->owner());
     Qn::UserAccessData accessRights;

@@ -34,7 +34,7 @@ SetupCloudSystemRestHandler::SetupCloudSystemRestHandler(
 nx::network::rest::Response SetupCloudSystemRestHandler::executeGet(
     const nx::network::rest::Request& request)
 {
-    if (!nx::network::rest::ini().allowGetModifications)
+    if (!nx::network::rest::ini().allowModificationsViaGetMethod)
         return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
 
     return executePost(request);
@@ -43,7 +43,7 @@ nx::network::rest::Response SetupCloudSystemRestHandler::executeGet(
 nx::network::rest::Response SetupCloudSystemRestHandler::executePost(
     const nx::network::rest::Request& request)
 {
-    auto data = request.parseContentOrThrow<SetupCloudSystemData>();
+    const auto data = request.parseContentOrThrow<SetupCloudSystemData>();
     nx::network::rest::JsonResult result;
     const auto status = execute(data, request.owner, result);
     auto response = nx::network::rest::Response::result(result);

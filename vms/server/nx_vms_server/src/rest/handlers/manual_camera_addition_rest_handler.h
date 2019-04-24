@@ -42,9 +42,9 @@ private:
         nx::network::rest::JsonResult& result);
 
     nx::network::http::StatusCode::Value extractSearchStartParams(
-        nx::network::rest::JsonResult* const result,
+        nx::network::rest::JsonResult* result,
         const nx::network::rest::Params& params,
-        nx::utils::Url* const outUrl,
+        nx::utils::Url* outUrl,
         std::optional<std::pair<nx::network::HostAddress, nx::network::HostAddress>>* const outIpRange);
 
     /**

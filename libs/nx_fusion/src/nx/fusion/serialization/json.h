@@ -41,12 +41,12 @@ public:
     bool areSomeFieldsNotFound() const { return m_someFieldsNotFound; }
     void setSomeFieldsNotFound(bool value) { m_someFieldsNotFound = value; }
 
-    bool areStringConvesionsAllowed() const { return m_allowStringConvesions; }
-    void setAllowStringConvesions(bool value) { m_allowStringConvesions = value; }
+    bool areStringConvesionsAllowed() const { return m_allowStringConversions; }
+    void setAllowStringConvesions(bool value) { m_allowStringConversions = value; }
 
 private:
     bool m_someFieldsNotFound{false};
-    bool m_allowStringConvesions{false};
+    bool m_allowStringConversions{false};
 };
 
 class QnJsonSerializer:

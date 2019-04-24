@@ -24,7 +24,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((SetTimeData), (json), _Fields)
 nx::network::rest::Response SetTimeRestHandler::executeGet(
     const nx::network::rest::Request& request)
 {
-    if (!nx::network::rest::ini().allowGetModifications)
+    if (!nx::network::rest::ini().allowModificationsViaGetMethod)
         return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
 
     const SetTimeData data{request.paramOrDefault("datetime"), request.paramOrDefault("datetime")};

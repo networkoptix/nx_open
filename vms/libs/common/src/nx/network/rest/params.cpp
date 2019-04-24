@@ -29,15 +29,17 @@ Params Params::fromList(const QList<QPair<QString, QString>>& list)
 
 Params Params::fromJson(const QJsonObject& value)
 {
-    const auto jsonValue =
+    static const auto jsonValue =
         [](const QJsonValue& value) -> QString
     {
+        static const QString kTrue("true");
+        static const QString kFalse("false");
         switch (value.type())
         {
             case QJsonValue::Null:
                 return QString();
             case QJsonValue::Bool:
-                return value.toBool() ? QStringLiteral("true") : QStringLiteral("false");
+                return value.toBool() ? kTrue : kFalse;
             case QJsonValue::Double:
                 return QString::number(value.toDouble());
             case QJsonValue::Array:
