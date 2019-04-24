@@ -147,14 +147,14 @@ private:
         {
             relay.moduleInstance()->remoteRelayPeerPool().findRelayByDomain(systemId,
                 [this](std::string relayDomain)
-            {
-                std::lock_guard<std::mutex> lock(m_mutex);
-                if (!relayDomain.empty()
-                    && m_relayDomains.find(relayDomain) == m_relayDomains.end())
                 {
-                    m_relayDomains.emplace(relayDomain);
-                }
-            });
+                    std::lock_guard<std::mutex> lock(m_mutex);
+                    if (!relayDomain.empty()
+                        && m_relayDomains.find(relayDomain) == m_relayDomains.end())
+                    {
+                        m_relayDomains.emplace(relayDomain);
+                    }
+                });
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
@@ -237,19 +237,19 @@ void HardCodedRelayClusterClient::selectRelayInstanceForListeningPeer(
         [this, completionHandler = std::move(completionHandler)](
             nx::cloud::relay::api::ResultCode resultCode,
             std::vector<QUrl> relayUrls)
-    {
-        ASSERT_FALSE(relayUrls.empty());
-        relayUrls.pop_back(); //< Dropping relay 2 from the list, it is only for client.
+        {
+            ASSERT_FALSE(relayUrls.empty());
+            relayUrls.pop_back(); //< Dropping relay 2 from the list, it is only for client.
 
             m_testFixture->reportTrafficRelayUrlsForServer(relayUrls);
 
-        completionHandler(resultCode, std::move(relayUrls));
-    });
+            completionHandler(resultCode, std::move(relayUrls));
+        });
 }
 
 } // namespace
 
-TEST_F(MultipleRelays, mediator_connection_reports_multiple_traffic_relays)
+TEST_F(MultipleRelays, mediator_reports_multiple_traffic_relays)
 {
     // givenMultipleRelays();
     // givenServer();
@@ -258,7 +258,7 @@ TEST_F(MultipleRelays, mediator_connection_reports_multiple_traffic_relays)
     thenMultipleRelaysAreReportedToServer();
 }
 
-TEST_F(MultipleRelays, client_can_connect_to_server_on_multiple_reported_relays)
+TEST_F(MultipleRelays, client_connects_to_server_on_multiple_reported_relays)
 {
     // givenMultipleRelays();
     // givenServer();
