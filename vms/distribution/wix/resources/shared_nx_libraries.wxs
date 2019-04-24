@@ -10,6 +10,7 @@
                 Source="$(var.SourceDir)"
                 Directory="InstallDirRoot">
             <Component><File Name="nx_utils.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_vms_utils.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_network.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_kit.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="udt.dll" KeyPath="yes" DiskId="2"/></Component>
