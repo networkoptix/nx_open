@@ -112,6 +112,9 @@ export class NxIpvdComponent implements OnInit {
                   )
               ).subscribe(
                 (event: NavigationEnd) => {
+                    if (event.url.indexOf('/ipvd') < 0) {
+                        return;
+                    }
                     if (event.url.indexOf('?') < 0) {
                         this.hasNoSearch = true;
                         this.noResult = false;
