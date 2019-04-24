@@ -37,8 +37,6 @@ class MultipleRelays:
     public BasicTestFixture,
     public testing::Test
 {
-    friend class HardCodedRelayClusterClient;
-
     using base_type = BasicTestFixture;
 
 public:
@@ -52,6 +50,11 @@ public:
             nx::hpm::RelayClusterClientFactory::instance().setCustomFunc(
                 std::move(m_relayClusterClientFuncBak));
         }
+    }
+
+    void reportTrafficRelayUrlsForServer(const std::vector<QUrl>& trafficRelayUrls)
+    {
+        m_reportedRelayUrlsForServerPromise.set_value(trafficRelayUrls);
     }
 
 protected:
@@ -238,7 +241,7 @@ void HardCodedRelayClusterClient::selectRelayInstanceForListeningPeer(
         ASSERT_FALSE(relayUrls.empty());
         relayUrls.pop_back(); //< Dropping relay 2 from the list, it is only for client.
 
-        m_testFixture->m_reportedRelayUrlsForServerPromise.set_value(relayUrls);
+            m_testFixture->reportTrafficRelayUrlsForServer(relayUrls);
 
         completionHandler(resultCode, std::move(relayUrls));
     });
