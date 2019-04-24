@@ -11,6 +11,7 @@
 #include "analytics_events_storage_cursor.h"
 #include "config.h"
 #include "cursor.h"
+#include "cleaner.h"
 #include "object_searcher.h"
 #include "serializers.h"
 #include "time_period_fetcher.h"
@@ -238,9 +239,7 @@ void EventsStorage::markDataAsDeprecated(
     NX_VERBOSE(this, "Cleaning data of device %1 up to timestamp %2",
         deviceId, oldestDataToKeepTimestamp.count());
 
-    QnMutexLocker lock(&m_dbControllerMutex);
-    m_dbController->queryExecutor().executeUpdate(
-        std::bind(&EventsStorage::cleanupData, this, _1, deviceId, oldestDataToKeepTimestamp),
+    auto logCleanupResult =
         [this, deviceId, oldestDataToKeepTimestamp](sql::DBResult resultCode)
         {
             if (resultCode == sql::DBResult::ok)
@@ -253,7 +252,31 @@ void EventsStorage::markDataAsDeprecated(
                 NX_DEBUG(this, "Error (%1) while cleaning up data of device %2 up to timestamp %3",
                     toString(resultCode), deviceId, oldestDataToKeepTimestamp);
             }
-        });
+        };
+
+    QnMutexLocker lock(&m_dbControllerMutex);
+
+    if (kUseTrackAggregation)
+    {
+        auto cleaner = std::make_unique<Cleaner>(
+            m_deviceDao,
+            deviceId,
+            oldestDataToKeepTimestamp);
+
+        m_dbController->queryExecutor().executeUpdate(
+            [cleaner = std::move(cleaner)](nx::sql::QueryContext* queryContext)
+            {
+                cleaner->clean(queryContext);
+                return nx::sql::DBResult::ok;
+            },
+            logCleanupResult);
+    }
+    else
+    {
+        m_dbController->queryExecutor().executeUpdate(
+            std::bind(&EventsStorage::cleanupData, this, _1, deviceId, oldestDataToKeepTimestamp),
+            logCleanupResult);
+    }
 }
 
 void EventsStorage::flush(StoreCompletionHandler completionHandler)
