@@ -1752,17 +1752,14 @@ void MultiServerUpdatesWidget::setTargetState(
             case WidgetUpdateState::installingStalled:
                 break;
             case WidgetUpdateState::installing:
-                if (runCommands)
+                m_stateTracker->setPeersInstalling(targets, true);
+                if (runCommands && !targets.empty())
                 {
-                    if (!targets.empty())
-                    {
-                        m_stateTracker->setPeersInstalling(targets, true);
-                        QSet<QnUuid> servers = targets;
-                        servers.remove(m_stateTracker->getClientPeerId());
-                        if (!servers.empty())
-                            qnClientMessageProcessor->setHoldConnection(true);
-                        m_serverUpdateTool->requestInstallAction(servers);
-                    }
+                    QSet<QnUuid> servers = targets;
+                    servers.remove(m_stateTracker->getClientPeerId());
+                    if (!servers.empty())
+                        qnClientMessageProcessor->setHoldConnection(true);
+                    m_serverUpdateTool->requestInstallAction(servers);
                 }
 
                 m_installCheckTimer = std::make_unique<QTimer>(this);
@@ -1839,9 +1836,8 @@ bool MultiServerUpdatesWidget::isChecking() const
         || m_widgetState == WidgetUpdateState::initial;
 }
 
-void MultiServerUpdatesWidget::syncUpdateCheckToUi()
+bool MultiServerUpdatesWidget::hasLatestVersion() const
 {
-    const bool isChecking = this->isChecking();
     const bool hasEqualUpdateInfo = m_stateTracker->lowestInstalledVersion() >= m_updateInfo.getVersion();
     bool hasLatestVersion = false;
     if (m_updateInfo.isEmpty() || m_updateInfo.error == nx::update::InformationError::noNewVersion)
@@ -1859,9 +1855,20 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         && m_widgetState != WidgetUpdateState::initial
         && hasLatestVersion)
     {
-        NX_DEBUG(this) << "syncUpdateCheck() dropping hasLatestVersion flag";
         hasLatestVersion = false;
     }
+
+    if (isChecking())
+        hasLatestVersion = false;
+
+    return hasLatestVersion;
+}
+
+void MultiServerUpdatesWidget::syncUpdateCheckToUi()
+{
+    const bool isChecking = this->isChecking();
+
+    bool latestVersion = hasLatestVersion();
 
     ui->cancelProgressAction->setEnabled(m_widgetState != WidgetUpdateState::installing);
 
@@ -1875,24 +1882,21 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
     if (isChecking)
     {
         ui->versionStackedWidget->setCurrentWidget(ui->checkingPage);
-        ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
         ui->updateCheckMode->setVisible(false);
         ui->releaseDescriptionLabel->setText(QString());
         ui->errorLabel->setText(QString());
-        hasLatestVersion = false;
+        //hasLatestVersion = false;
     }
     else
     {
         ui->downloadButton->setVisible(m_haveValidUpdate);
-        if (hasLatestVersion)
+        if (latestVersion)
         {
             if (m_updateInfo.sourceType == UpdateSourceType::internet)
                 ui->latestVersionBannerLabel->setText(tr("The latest version is already installed"));
             else
                 ui->latestVersionBannerLabel->setText(tr("This version is already installed"));
-
             ui->versionStackedWidget->setCurrentWidget(ui->latestVersionPage);
-            ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
         }
         else
         {
@@ -1921,7 +1925,6 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
             }
 
             ui->versionStackedWidget->setCurrentWidget(ui->versionPage);
-            ui->updateStackedWidget->setCurrentWidget(ui->updateControlsPage);
         }
 
         bool browseUpdateVisible = false;
@@ -1934,7 +1937,7 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
                     browseUpdateVisible = true;
                     ui->browseUpdate->setText(tr("Browse for Another File..."));
                 }
-                else if (m_updateSourceMode == UpdateSourceType::internetSpecific && hasLatestVersion)
+                else if (m_updateSourceMode == UpdateSourceType::internetSpecific && latestVersion)
                 {
                     browseUpdateVisible = true;
                     ui->browseUpdate->setText(tr("Select Another Build"));
@@ -1957,14 +1960,14 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
             }
         }
         ui->browseUpdate->setVisible(browseUpdateVisible);
-        ui->latestVersionIconLabel->setVisible(hasLatestVersion);
+        ui->latestVersionIconLabel->setVisible(latestVersion);
         ui->updateCheckMode->setVisible(m_updateSourceMode == UpdateSourceType::internet);
         m_updatesModel->setUpdateTarget(m_updateInfo.getVersion());
     }
 
     ui->selectUpdateTypeButton->setText(toString(m_updateSourceMode));
 
-    const bool showButton = !isChecking && !hasLatestVersion
+    const bool showButton = !isChecking && !latestVersion
         && m_updateSourceMode != UpdateSourceType::file
         && (m_widgetState == WidgetUpdateState::ready
             || m_widgetState != WidgetUpdateState::initial)
@@ -2023,8 +2026,6 @@ void MultiServerUpdatesWidget::syncProgress()
     ui->actionProgess->setTextVisible(!caption.isEmpty());
     if (!caption.isEmpty())
         ui->actionProgess->setFormat(caption + "\t");
-
-    ui->updateStackedWidget->setCurrentWidget(ui->updateProgressPage);
 
     if (!m_rightPanelDownloadProgress.isNull())
     {
@@ -2099,15 +2100,17 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
         ui->titleStackedWidget->setCurrentWidget(selectedTitle);
     }
 
-    // Should we show progress for this UI state.
     if (isChecking())
         ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
     else if (stateHasProgress(m_widgetState))
-        syncProgress();
+        ui->updateStackedWidget->setCurrentWidget(ui->updateProgressPage);
     else if (m_widgetState == WidgetUpdateState::complete)
         ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
     else
         ui->updateStackedWidget->setCurrentWidget(ui->updateControlsPage);
+
+    if (stateHasProgress(m_widgetState))
+        syncProgress();
 
     auto notVeryOffline = m_stateTracker->offlineNotTooLong();
     if (m_widgetState == WidgetUpdateState::readyInstall && !notVeryOffline.empty())
