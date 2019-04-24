@@ -728,6 +728,9 @@ TEST_F(AnalyticsDb, storing_multiple_events_concurrently)
 
 TEST_F(AnalyticsDb, objects_best_shot_is_saved_and_reported)
 {
+    if (!kUseTrackAggregation)
+        return; // TODO: #ak Remove it after enabling kUseTrackAggregation in the repository.
+
     whenSaveObjectTrackContainingBestShot();
 
     thenAllEventsCanBeRead();
