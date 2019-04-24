@@ -39,11 +39,7 @@ struct BestShot
 
     bool initialized() const { return timestampUsec > 0; }
 
-    bool operator==(const BestShot& right) const
-    {
-        return timestampUsec == right.timestampUsec
-            && rect == right.rect;
-    }
+    bool operator==(const BestShot& right) const;
 };
 
 #define BestShot_analytics_storage_Fields \

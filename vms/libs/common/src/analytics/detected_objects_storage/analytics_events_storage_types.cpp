@@ -23,6 +23,12 @@ bool ObjectPosition::operator==(const ObjectPosition& right) const
         && attributes == right.attributes;
 }
 
+bool BestShot::operator==(const BestShot& right) const
+{
+    return timestampUsec == right.timestampUsec
+        && equalWithPrecision(rect, right.rect, kCoordinateDecimalDigits);
+}
+
 bool DetectedObject::operator==(const DetectedObject& right) const
 {
     return objectAppearanceId == right.objectAppearanceId
