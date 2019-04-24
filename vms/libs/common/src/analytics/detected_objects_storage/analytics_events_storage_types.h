@@ -32,6 +32,25 @@ struct ObjectPosition
     (deviceId)(timestampUsec)(durationUsec)(boundingBox)(attributes)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectPosition, (json)(ubjson));
 
+struct BestShot
+{
+    qint64 timestampUsec = 0;
+    QRectF rect;
+
+    bool initialized() const { return timestampUsec > 0; }
+
+    bool operator==(const BestShot& right) const
+    {
+        return timestampUsec == right.timestampUsec
+            && rect == right.rect;
+    }
+};
+
+#define BestShot_analytics_storage_Fields \
+    (timestampUsec)(rect)
+
+QN_FUSION_DECLARE_FUNCTIONS(BestShot, (json)(ubjson));
+
 struct DetectedObject
 {
     /** Device object has been detected on. */
@@ -43,12 +62,15 @@ struct DetectedObject
     qint64 firstAppearanceTimeUsec = 0;
     qint64 lastAppearanceTimeUsec = 0;
     std::vector<ObjectPosition> track;
+    BestShot bestShot;
 
     bool operator==(const DetectedObject& right) const;
 };
 
 #define DetectedObject_analytics_storage_Fields \
-    (objectAppearanceId)(objectTypeId)(attributes)(firstAppearanceTimeUsec)(lastAppearanceTimeUsec)(track)
+    (objectAppearanceId)(objectTypeId)(attributes)(firstAppearanceTimeUsec) \
+    (lastAppearanceTimeUsec)(track)(bestShot)
+
 QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------

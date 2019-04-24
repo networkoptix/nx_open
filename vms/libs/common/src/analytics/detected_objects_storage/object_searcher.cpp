@@ -161,7 +161,7 @@ void ObjectSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
     QString queryText = R"sql(
         WITH filtered_object AS
             (SELECT DISTINCT o.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
-                track_detail, attributes_id
+                track_detail, attributes_id, best_shot_timestamp_ms, best_shot_rect
             FROM %objectFilteredByText% o
                 %objectSearchFrom%
             WHERE %objectExpr%
@@ -170,7 +170,7 @@ void ObjectSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
             ORDER BY o.track_start_ms %objectOrderByTrackStart%
             %limitObjectCount%)
         SELECT o.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
-            track_detail, attrs.content AS content
+            track_detail, attrs.content AS content, best_shot_timestamp_ms, best_shot_rect
         FROM filtered_object o, unique_attributes attrs
         WHERE o.attributes_id = attrs.id
     )sql";
@@ -273,8 +273,18 @@ DetectedObject ObjectSearcher::loadObject(nx::sql::AbstractSqlQuery* query)
     detectedObject.lastAppearanceTimeUsec =
         query->value("track_end_ms").toLongLong() * kUsecInMs;
 
-    detectedObject.track = TrackSerializer::deserialized(
+    detectedObject.bestShot.timestampUsec =
+        query->value("best_shot_timestamp_ms").toLongLong() * kUsecInMs;
+    if (detectedObject.bestShot.initialized())
+    {
+        detectedObject.bestShot.rect =
+            TrackSerializer::deserialized<QRectF>(
+                query->value("best_shot_rect").toByteArray());
+    }
+
+    detectedObject.track = TrackSerializer::deserialized<decltype(detectedObject.track)>(
         query->value("track_detail").toByteArray());
+
     filterTrack(&detectedObject.track);
     if (!detectedObject.track.empty())
     {

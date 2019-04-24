@@ -30,11 +30,12 @@ bool DetectedObject::operator==(const DetectedObject& right) const
         //&& attributes == right.attributes
         && firstAppearanceTimeUsec == right.firstAppearanceTimeUsec
         && lastAppearanceTimeUsec == right.lastAppearanceTimeUsec
-        && track == right.track;
+        && track == right.track
+        && bestShot == right.bestShot;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ObjectPosition)(DetectedObject),
+    (BestShot)(DetectedObject)(ObjectPosition),
     (json)(ubjson),
     _analytics_storage_Fields)
 

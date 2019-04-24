@@ -31,6 +31,7 @@ DbController::DbController(
     {
         dbStructureUpdater().addUpdateScript(kSplitDataToObjectAndSearch);
         dbStructureUpdater().addUpdateScript(kObjectTrackStartTimeIndex);
+        dbStructureUpdater().addUpdateScript(kObjectBestShot);
     }
 }
 

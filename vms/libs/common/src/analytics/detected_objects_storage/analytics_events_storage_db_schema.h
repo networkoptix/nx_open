@@ -232,4 +232,14 @@ REINDEX idx_object_device_id_track_start_ms;
 
 )sql";
 
+//-------------------------------------------------------------------------------------------------
+// META-246.
+static constexpr char kObjectBestShot[] =
+R"sql(
+
+ALTER TABLE object ADD COLUMN best_shot_timestamp_ms INTEGER;
+ALTER TABLE object ADD COLUMN best_shot_rect BLOB;
+
+)sql";
+
 } // namespace nx::analytics::storage
