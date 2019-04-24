@@ -9,9 +9,9 @@ namespace nx::utils::test {
 static void expectVoice(const QString& animal, const QString& expectedVoice)
 {
     const auto voice = switch_(animal,
-        "cat", [](){ return "mew"; },
-        "dog", [](){ return "wof"; },
-        default_, [](){ return "unknown"; }
+        "cat", [] { return "mew"; },
+        "dog", [] { return "wof"; },
+        default_, [] { return "unknown"; }
     );
 
     ASSERT_EQ(expectedVoice, voice);
@@ -30,8 +30,8 @@ enum class Type { a, b };
 static void expectParsedType(const QString& value, Type expectedType = Type::a)
 {
     const auto parsedType = switch_(value,
-        "a", [](){ return Type::a; },
-        "b", [](){ return Type::b; }
+        "a", [] { return Type::a; },
+        "b", [] { return Type::b; }
     );
 
     ASSERT_EQ(expectedType, parsedType);
@@ -55,8 +55,8 @@ TEST(Switch, Action)
         [&value](const QString& command)
         {
             switch_(command,
-                "increment", [&](){ value++; },
-                "null", [&](){ value = 0; }
+                "increment", [&] { value++; },
+                "null", [&] { value = 0; }
             );
         };
 
