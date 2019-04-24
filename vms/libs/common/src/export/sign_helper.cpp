@@ -32,6 +32,8 @@ using namespace nx::utils;
 
 namespace {
 
+constexpr char kEndFileSignatureGuid[] = "29b5406f33174153aa5b3a63938507fe";
+
 static const int text_x_offs = 16;
 static const int text_y_offs = 16;
 char SIGN_TEXT_DELIMITER('\\');
@@ -814,4 +816,25 @@ void QnSignHelper::setHwIdStr(const QString& value)
 void QnSignHelper::setLicensedToStr(const QString& value)
 {
     m_licensedToStr = value;
+}
+
+QByteArray QnSignHelper::buildSignatureFileEnd(const QByteArray& signature)
+{
+    QByteArray result;
+    result.append(kEndFileSignatureGuid, sizeof(kEndFileSignatureGuid));
+    result.append(signature);
+    return result;
+}
+
+QByteArray QnSignHelper::loadSignatureFromFileEnd(const QString& filename)
+{
+    QFile file(filename);
+    if (!file.open(QFile::ReadOnly) || file.size() < kSignatureSize)
+        return QByteArray();
+
+    if (!file.seek(file.size() - kSignatureSize))
+        return QByteArray();
+
+    const auto data = file.read(kSignatureSize);
+    return data.mid(data.indexOf(kEndFileSignatureGuid) + sizeof(kEndFileSignatureGuid));
 }

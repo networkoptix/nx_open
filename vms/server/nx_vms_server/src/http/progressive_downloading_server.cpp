@@ -43,6 +43,7 @@
 #include <nx/metrics/metrics_storage.h>
 #include <nx/utils/scope_guard.h>
 #include <api/global_settings.h>
+#include <export/sign_helper.h>
 
 namespace {
 
@@ -124,7 +125,6 @@ public:
             m_dataOutput.reset( new CachedOutputStream(owner) );
             m_dataOutput->start();
         }
-
         setObjectName( "QnProgressiveDownloadingDataConsumer" );
     }
 
@@ -497,6 +497,16 @@ void QnProgressiveDownloadingConsumer::sendJsonResponse(const QString& errorStri
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat));
 }
 
+QByteArray QnProgressiveDownloadingConsumer::buildSignature()
+{
+    Q_D(QnProgressiveDownloadingConsumer);
+    QByteArray signature = QnSignHelper::getSignPattern(licensePool());
+    d->transcoder->updateSignatureHash((uint8_t*)signature.data(), signature.size());
+    signature.replace(QnSignHelper::getSignMagic(),
+        QnSignHelper::getSignFromDigest(d->transcoder->getSignatureHash()));
+    return QnSignHelper::buildSignatureFileEnd(signature);
+}
+
 void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
@@ -607,8 +617,10 @@ void QnProgressiveDownloadingConsumer::run()
             return;
         }
 
-        d->transcoder = std::make_unique<QnFfmpegTranscoder>(
-            DecoderConfig::fromResource(resource), commonModule()->metrics());
+        QnFfmpegTranscoder::Config config;
+        config.computeSignatureHash = true;
+        config.decoderConfig = DecoderConfig::fromResource(resource);
+        d->transcoder = std::make_unique<QnFfmpegTranscoder>(config, commonModule()->metrics());
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
         if (mediaRes)
@@ -866,13 +878,16 @@ void QnProgressiveDownloadingConsumer::run()
         while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
             readRequest(); // just reading socket to determine client connection is closed
 
-        NX_DEBUG(this, lit("Done with progressive download (url %1) connection from %2. Reason: %3").
-            arg(getDecodedUrl().toString()).arg(d->socket->getForeignAddress().toString()).
-            arg((!dataConsumer.isRunning() ? lit("Data consumer stopped") :
-                (!d->socket->isConnected() ? lit("Connection has been closed") :
-                 lit("Terminated")))));
+        NX_DEBUG(this, "Done with progressive download connection from %1. Reason: %2",
+            d->socket->getForeignAddress(),
+            !dataConsumer.isRunning() ? lit("Data consumer stopped") :
+                !d->socket->isConnected() ? lit("Connection has been closed") :
+                    lit("Terminated")
+        );
 
         dataConsumer.pleaseStop();
+
+        sendChunk(buildSignature());
 
         QnByteArray emptyChunk((unsigned)0,0);
         sendChunk(emptyChunk);

@@ -659,7 +659,8 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createRtpEncoder(
     else
         rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
-    QnUniversalRtpEncoder::Config config(DecoderConfig::fromResource(res));
+    QnUniversalRtpEncoder::Config config;
+    config.transcoderConfig.decoderConfig = DecoderConfig::fromResource(res);
     config.absoluteRtcpTimestamps = d->serverModule->settings().absoluteRtcpTimestamps();
     config.useRealTimeOptimization = d->serverModule->settings().ffmpegRealTimeOptimization();
     QString require = nx::network::http::getHeaderValue(d->request.headers, "Require");
