@@ -22,6 +22,8 @@ ObjectSearcher::ObjectSearcher(
     m_objectTypeDao(objectTypeDao),
     m_filter(std::move(filter))
 {
+    if (m_filter.maxObjectsToSelect == 0 || m_filter.maxObjectsToSelect > kMaxObjectLookupResultSet)
+        m_filter.maxObjectsToSelect = kMaxObjectLookupResultSet;
 }
 
 std::vector<DetectedObject> ObjectSearcher::lookup(nx::sql::QueryContext* queryContext)
