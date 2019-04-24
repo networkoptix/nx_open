@@ -11,15 +11,15 @@ class QnCommonModule;
 class QnUniversalRtpEncoder: public AbstractRtspEncoder
 {
 public:
-    struct Config: DecoderConfig
+    struct Config
     {
         Config() = default;
-        Config(const DecoderConfig& value): DecoderConfig(value) {}
 
         bool absoluteRtcpTimestamps = false;
         bool addOnvifHeaderExtension = false;
         bool useRealTimeOptimization = false;
         bool useMultipleSdpPayloadTypes = false;
+        QnFfmpegTranscoder::Config transcoderConfig;
     };
 
 public:

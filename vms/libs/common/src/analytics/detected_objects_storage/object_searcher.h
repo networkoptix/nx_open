@@ -60,7 +60,7 @@ public:
 private:
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
-    const Filter m_filter;
+    Filter m_filter;
 
     void prepareLookupQuery(nx::sql::AbstractSqlQuery* query);
     nx::sql::Filter prepareSqlFilterExpression();

@@ -11,22 +11,32 @@ Cursor::Cursor(
 
 common::metadata::ConstDetectionMetadataPacketPtr Cursor::next()
 {
-    // Always storing the next detected object in advance.
-    // I.e., the one that has track_start_time larger than the current track position.
-
-    while (!m_eof)
+    while (!m_eof || !m_currentObjects.empty())
     {
+        loadObjectsIfNecessary();
+
         auto [object, trackPositionIndex] = readNextTrackPosition();
         if (!object)
+            break;
+
+        if (!m_packet)
         {
-            loadNextObject();
+            m_packet = createMetaDataPacket(*object, trackPositionIndex);
             continue;
         }
 
-        return createMetaDataPacket(*object, trackPositionIndex);
+        if (m_packet && canAddToTheCurrentPacket(*object, trackPositionIndex))
+        {
+            addToCurrentPacket(*object, trackPositionIndex);
+            continue;
+        }
+
+        auto curPacket = std::exchange(m_packet, nullptr);
+        m_packet = createMetaDataPacket(*object, trackPositionIndex);
+        return curPacket;
     }
 
-    return nullptr;
+    return std::exchange(m_packet, nullptr);
 }
 
 void Cursor::close()
@@ -36,33 +46,29 @@ void Cursor::close()
 
 std::tuple<const DetectedObject*, std::size_t /*track position*/> Cursor::readNextTrackPosition()
 {
-    std::tuple<const DetectedObject*, std::size_t /*track position*/> result;
-
     // Selecting track position with minimal timestamp.
-    qint64 currentMinTimestamp = std::numeric_limits<qint64>::max();
-    int pos = -1;
-    for (auto it = m_currentObjects.begin(); it != m_currentObjects.end(); )
-    {
-        if (it->second == it->first.track.size())
-        {
-            it = m_currentObjects.erase(it);
-            continue;
-        }
+    auto it = findTrackPosition();
+    if (it == m_currentObjects.end())
+        return std::make_tuple(nullptr, 0);
 
-        if (it->first.track[it->second].timestampUsec < currentMinTimestamp)
-        {
-            currentMinTimestamp = it->first.track[it->second].timestampUsec;
-            result = std::make_tuple(&it->first, it->second);
-            pos = it - m_currentObjects.begin();
-        }
-
-        ++it;
-    }
-
-    if (pos >= 0)
-        ++m_currentObjects[pos].second;
-
+    const auto result = std::make_tuple(&it->first, it->second);
+    ++it->second;
     return result;
+}
+
+void Cursor::loadObjectsIfNecessary()
+{
+    if (m_eof)
+        return;
+
+    if (m_currentObjects.empty())
+        loadNextObject();
+
+    // Always storing the next detected object in advance.
+    // I.e., the one that has track_start_time larger than the current track position.
+
+    while (!m_eof && nextTrackPositionTimestamp() >= maxObjectTrackStartTimestamp())
+        loadNextObject();
 }
 
 void Cursor::loadNextObject()
@@ -77,7 +83,48 @@ void Cursor::loadNextObject()
     m_currentObjects.emplace_back(std::move(*object), 0);
 }
 
-common::metadata::ConstDetectionMetadataPacketPtr Cursor::createMetaDataPacket(
+qint64 Cursor::nextTrackPositionTimestamp()
+{
+    auto it = findTrackPosition();
+    return it->first.track[it->second].timestampUsec;
+}
+
+Cursor::Objects::iterator Cursor::findTrackPosition()
+{
+    // Selecting track position with minimal timestamp.
+    qint64 currentMinTimestamp = std::numeric_limits<qint64>::max();
+    int pos = -1;
+    for (auto it = m_currentObjects.begin(); it != m_currentObjects.end(); )
+    {
+        if (it->second == it->first.track.size())
+        {
+            it = m_currentObjects.erase(it);
+            continue;
+        }
+
+        if (it->first.track[it->second].timestampUsec < currentMinTimestamp)
+        {
+            currentMinTimestamp = it->first.track[it->second].timestampUsec;
+            pos = it - m_currentObjects.begin();
+        }
+
+        ++it;
+    }
+
+    return pos >= 0
+        ? m_currentObjects.begin() + pos
+        : m_currentObjects.end();
+}
+
+qint64 Cursor::maxObjectTrackStartTimestamp()
+{
+    qint64 result = std::numeric_limits<qint64>::min();
+    for (const auto& object: m_currentObjects)
+        result = std::max(result, object.first.firstAppearanceTimeUsec);
+    return result;
+}
+
+common::metadata::DetectionMetadataPacketPtr Cursor::createMetaDataPacket(
     const DetectedObject& object,
     int trackPositionIndex)
 {
@@ -100,6 +147,24 @@ nx::common::metadata::DetectedObject Cursor::toMetadataObject(
     result.boundingBox = object.track[trackPositionIndex].boundingBox;
     result.labels = object.attributes;
     return result;
+}
+
+bool Cursor::canAddToTheCurrentPacket(
+    const DetectedObject& object,
+    int trackPositionIndex) const
+{
+    return m_packet->deviceId == object.deviceId
+        && m_packet->timestampUsec == object.track[trackPositionIndex].timestampUsec;
+}
+
+void Cursor::addToCurrentPacket(
+    const DetectedObject& object,
+    int trackPositionIndex)
+{
+    m_packet->objects.push_back(toMetadataObject(object, trackPositionIndex));
+    m_packet->durationUsec = std::max(
+        m_packet->durationUsec,
+        object.track[trackPositionIndex].durationUsec);
 }
 
 } // namespace nx::analytics::storage

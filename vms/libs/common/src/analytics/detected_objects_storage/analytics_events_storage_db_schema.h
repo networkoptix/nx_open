@@ -222,4 +222,14 @@ CREATE TABLE object_search_to_object(
 
 )sql";
 
+//-------------------------------------------------------------------------------------------------
+// META-237.
+static constexpr char kObjectTrackStartTimeIndex[] =
+R"sql(
+
+CREATE INDEX idx_object_device_id_track_start_ms ON object(device_id, track_start_ms);
+REINDEX idx_object_device_id_track_start_ms;
+
+)sql";
+
 } // namespace nx::analytics::storage

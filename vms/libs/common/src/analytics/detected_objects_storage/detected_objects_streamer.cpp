@@ -149,6 +149,7 @@ void DetectedObjectsStreamer::createCursorAsync(
     filter.sortOrder = Qt::SortOrder::AscendingOrder;
     filter.timePeriod.setStartTime(startTimestamp);
     filter.timePeriod.setDuration(kMaxStreamingDuration);
+    filter.maxTrackSize = 0;
     m_storage->createLookupCursor(
         std::move(filter),
         [this, sharedGuard = m_asyncOperationGuard.sharedGuard(), handler = std::move(handler)](

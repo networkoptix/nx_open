@@ -28,7 +28,10 @@ DbController::DbController(
     dbStructureUpdater().addUpdateScript(kAddFullTimePeriods);
     dbStructureUpdater().addUpdateScript(kConvertDurationToMillis);
     if (kUseTrackAggregation)
+    {
         dbStructureUpdater().addUpdateScript(kSplitDataToObjectAndSearch);
+        dbStructureUpdater().addUpdateScript(kObjectTrackStartTimeIndex);
+    }
 }
 
 } // namespace nx::analytics::storage

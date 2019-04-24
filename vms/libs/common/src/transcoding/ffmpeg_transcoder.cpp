@@ -10,6 +10,7 @@ extern "C"
 #include <QtCore/QDebug>
 
 #include <nx/utils/log/log.h>
+#include <export/sign_helper.h>
 
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
@@ -66,10 +67,11 @@ AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
 
 static QAtomicInt QnFfmpegTranscoder_count = 0;
 
-QnFfmpegTranscoder::QnFfmpegTranscoder(const DecoderConfig& config, nx::metrics::Storage* metrics)
+QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metrics::Storage* metrics)
 :
     QnTranscoder(metrics),
     m_config(config),
+    m_signatureHash(EXPORT_SIGN_METHOD),
     m_videoEncoderCodecCtx(0),
     m_audioEncoderCodecCtx(0),
     m_videoBitrate(0),
@@ -80,6 +82,8 @@ QnFfmpegTranscoder::QnFfmpegTranscoder(const DecoderConfig& config, nx::metrics:
 {
     NX_DEBUG(this, lit("Created new ffmpeg transcoder. Total transcoder count %1").
         arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1));
+    m_signatureHash.reset();
+    m_signatureHash.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
 }
 
 QnFfmpegTranscoder::~QnFfmpegTranscoder()
@@ -178,7 +182,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             int videoHeight = video->height;
             if (!video || video->width < 1 || video->height < 1)
             {
-                QnFfmpegVideoDecoder decoder(m_config, video->compressionType, video, false);
+                QnFfmpegVideoDecoder decoder(m_config.decoderConfig, video->compressionType, video, false);
                 QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
                 decoder.decode(video, &decodedVideoFrame);
                 videoWidth = decoder.getWidth();
@@ -290,6 +294,25 @@ bool QnFfmpegTranscoder::addTag( const QString& name, const QString& value )
     return av_dict_set( &m_formatCtx->metadata, name.toUtf8().constData(), value.toUtf8().constData(), 0 ) >= 0;
 }
 
+
+int QnFfmpegTranscoder::muxPacket(const AVPacket* packet)
+{
+    int status = av_write_frame(m_formatCtx, (AVPacket*)packet);
+    if (status < 0)
+    {
+        NX_WARNING(this, "Muxing packet error: can't write AV packet, error: %1",
+            QnFfmpegHelper::getErrorStr(status));
+        return status;
+    }
+
+    if (m_config.computeSignatureHash)
+    {
+        QnSignHelper::updateDigest(
+            m_videoEncoderCodecCtx, m_signatureHash, packet->data, packet->size);
+    }
+    return 0;
+}
+
 int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
 {
     if (m_baseTime == AV_NOPTS_VALUE)
@@ -355,10 +378,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
         if (packet.size > 0)
         {
             m_lastPacketTimestamp.rtpTimestamp = packet.pts;
-            if (av_write_frame(m_formatCtx, &packet) < 0) {
-                qWarning() << QLatin1String("Transcoder error: can't write AV packet");
-                //return -1; // ignore error and continue
-            }
+            muxPacket(&packet);
         }
         doTranscoding = false;
     } while (transcoder && transcoder->existMoreData());
@@ -407,10 +427,8 @@ int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
             packet.dts = packet.pts;
 
             if (packet.size > 0)
-            {
-                if (av_write_frame(m_formatCtx, &packet) < 0)
-                    qWarning() << QLatin1String("QnFfmpegTranscoder::finalizeIntenal. Transcoder error: can't write AV packet");
-            }
+                muxPacket(&packet);
+
         } while (transcodedData);
     }
 
@@ -418,6 +436,16 @@ int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
     av_write_trailer(m_formatCtx);
     closeFfmpegContext();
     return 0;
+}
+
+void QnFfmpegTranscoder::updateSignatureHash(uint8_t* data, int size)
+{
+    QnSignHelper::updateDigest(nullptr, m_signatureHash, data, size);
+}
+
+QByteArray QnFfmpegTranscoder::getSignatureHash()
+{
+    return m_signatureHash.result();
 }
 
 AVCodecContext* QnFfmpegTranscoder::getVideoCodecContext() const

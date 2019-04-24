@@ -20,19 +20,36 @@ public:
     virtual void close() override;
 
 private:
+    using Objects =
+        std::vector<std::pair<DetectedObject, std::size_t /*current track position*/>>;
+
     std::unique_ptr<nx::sql::Cursor<DetectedObject>> m_sqlCursor;
     bool m_eof = false;
-    std::vector<std::pair<DetectedObject, std::size_t /*current track position*/>> m_currentObjects;
+    Objects m_currentObjects;
+    common::metadata::DetectionMetadataPacketPtr m_packet;
+
+    void loadObjectsIfNecessary();
+    void loadNextObject();
+
+    qint64 nextTrackPositionTimestamp();
+    Objects::iterator findTrackPosition();
+    qint64 maxObjectTrackStartTimestamp();
 
     std::tuple<const DetectedObject*, std::size_t /*track position*/> readNextTrackPosition();
 
-    void loadNextObject();
-
-    common::metadata::ConstDetectionMetadataPacketPtr createMetaDataPacket(
+    common::metadata::DetectionMetadataPacketPtr createMetaDataPacket(
         const DetectedObject& object,
         int trackPositionIndex);
 
     nx::common::metadata::DetectedObject toMetadataObject(
+        const DetectedObject& object,
+        int trackPositionIndex);
+
+    bool canAddToTheCurrentPacket(
+        const DetectedObject& object,
+        int trackPositionIndex) const;
+
+    void addToCurrentPacket(
         const DetectedObject& object,
         int trackPositionIndex);
 };
