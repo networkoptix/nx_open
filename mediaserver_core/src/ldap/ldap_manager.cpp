@@ -576,6 +576,7 @@ bool LdapSession::detectLdapVendor(LdapVendor &vendor)
     {
         PWCHAR *values = ldap_get_values(m_ld, e, QSTOCW(forestFunctionality));
         unsigned long nValues = ldap_count_values(values);
+        ldap_value_free(values);
         if (nValues > 0)
         {
             isActiveDirectory = true;
