@@ -5,6 +5,7 @@
 
 #include "nx/streaming/video_data_packet.h"
 #include <nx/streaming/config.h>
+#include <nx/utils/log/log.h>
 
 #include <licensing/license.h>
 #include <licensing/license_validator.h>
@@ -830,11 +831,24 @@ QByteArray QnSignHelper::loadSignatureFromFileEnd(const QString& filename)
 {
     QFile file(filename);
     if (!file.open(QFile::ReadOnly) || file.size() < kSignatureSize)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to open file [%1] to load signature", filename);
         return QByteArray();
+    }
 
     if (!file.seek(file.size() - kSignatureSize))
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to seek on file [%1] to load signature", filename);
         return QByteArray();
+    }
 
     const auto data = file.read(kSignatureSize);
-    return data.mid(data.indexOf(kEndFileSignatureGuid) + sizeof(kEndFileSignatureGuid));
+    int index = data.indexOf(kEndFileSignatureGuid);
+    if (index == -1)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Signature not found in file [%1]", filename);
+        return QByteArray();
+    }
+
+    return data.mid(index + sizeof(kEndFileSignatureGuid));
 }
