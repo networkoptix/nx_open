@@ -77,14 +77,16 @@
                     <div class="bold-text" translate>Take name and settings from</div>
                     <div>
                         <div class="radio-group">
-                            <nx-radio name="firstSystem" [value]="system.id"
+                            <nx-radio name="firstSystem" [value]="system"
                                       [label]="system.name || system.info && system.info.name"
-                                      compId="firstSystem" [(ngModel)]="masterId"></nx-radio>
+                                      compId="firstSystem" [(ngModel)]="primarySystem"
+                                      (ngModelChange)="setSecondarySystem()"></nx-radio>
                         </div>
                         <div class="radio-group">
-                            <nx-radio name="secondSystem" [value]="targetSystem.id"
+                            <nx-radio name="secondSystem" [value]="targetSystem"
                                       [label]="targetSystem.name || targetSystem.info && targetSystem.info.name"
-                                      compId="secondSystem" [(ngModel)]="masterId"></nx-radio>
+                                      compId="secondSystem" [(ngModel)]="primarySystem"
+                                      (ngModelChange)="setSecondarySystem()"></nx-radio>
                         </div>
                     </div>
                 </div>
@@ -113,8 +115,8 @@
         <div *ngIf="state == 'confirm'">
             <div class="modal-body">
                 <p class="mb-3" [innerHTML]="'mergeConfirmation' | translate: {
-                    system: system.info.name || system.name,
-                    targetSystem: targetSystem.info.name || targetSystem.name
+                    primarySystem: primarySystem.name || primarySystem.info && primarySystem.info.name,
+                    secondarySystem: secondarySystem.name || secondarySystem.info && secondarySystem.info.name
                 }">
                 </p>
                 <div class="form-group">

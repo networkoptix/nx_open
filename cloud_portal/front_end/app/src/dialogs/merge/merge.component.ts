@@ -19,12 +19,13 @@ export class MergeModalContent {
     checkMergeabilityProcess: any;
     config: any;
     lang: any;
-    masterId: string;
     mergingProcess: any;
     multipleSystems: boolean;
     outOfDate: boolean;
     password: string;
+    primarySystem: any;
     processedSystems: any;
+    secondarySystem: any;
     state: string;
     systemError: boolean;
     systemMergeable: string;
@@ -55,26 +56,18 @@ export class MergeModalContent {
     }
 
     ngOnInit() {
-        this.masterId = this.system.id;
+        this.primarySystem = this.system;
         this.multipleSystems = this.systems.length > 0;
         this.outOfDate = this.multipleSystems && !this.system.canMerge;
         this.processedSystems = this.makeSelectorList(this.systems);
         this.targetSystem = this.selectDefaultSystem();
+        this.secondarySystem = this.targetSystem;
         this.targetSystemDropdown = this.makeSelectorList([this.targetSystem])[0];
         this.systemMergeable = this.checkMergeability(this.targetSystem);
         this.systemError = !this.multipleSystems || this.outOfDate;
 
         this.mergingProcess = this.process.init(() => {
-            let masterSystemId;
-            let slaveSystemId;
-            if (this.masterId === this.system.id) {
-                masterSystemId = this.system.id;
-                slaveSystemId = this.targetSystem.id;
-            } else {
-                masterSystemId = this.targetSystem.id;
-                slaveSystemId = this.system.id;
-            }
-            return this.cloudApi.merge(masterSystemId, slaveSystemId, this.password);
+            return this.cloudApi.merge(this.primarySystem.id, this.secondarySystem.id, this.password);
         }, {
             errorCodes: {
                 mergedSystemIsOffline: () => {
@@ -96,7 +89,7 @@ export class MergeModalContent {
             this.systemsProvider.forceUpdateSystems();
             this.activeModal.close({
                 anotherSystemId: this.targetSystem.id,
-                role: this.masterId === this.system.id ?
+                role: this.primarySystem.id === this.system.id ?
                     this.configService.config.systemStatuses.master :
                     this.configService.config.systemStatuses.slave
             });
@@ -191,6 +184,10 @@ export class MergeModalContent {
             }
         }
         return {...this.systems[0]};
+    }
+
+    setSecondarySystem() {
+        this.secondarySystem = this.primarySystem.id === this.system.id ? this.targetSystem : this.system;
     }
 
     setTargetSystem(targetSystem) {
