@@ -14,7 +14,7 @@ class MulticastAddressRegistry: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 public:
-    MulticastAddressRegistry(QnCommonModule* parent = nullptr);
+    MulticastAddressRegistry(QObject* parent = nullptr);
 
     bool registerAddress(
         QnVirtualCameraResourcePtr resource,

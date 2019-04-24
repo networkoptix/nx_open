@@ -5,8 +5,9 @@
 namespace nx {
 namespace streaming {
 
-MulticastAddressRegistry::MulticastAddressRegistry(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+MulticastAddressRegistry::MulticastAddressRegistry(QObject* parent):
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
 }
 
