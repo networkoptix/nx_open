@@ -148,9 +148,8 @@ void ObjectSearcher::addTimePeriodToFilter(
     }
 }
 
+static constexpr char kObjectFilteredByTextExpr[] = "%objectFilteredByText%";
 static constexpr char kObjectExpr[] = "%objectExpr%";
-static constexpr char kFullTextFrom[] = "%fullTextFrom%";
-static constexpr char kFullTextExpr[] = "%fullTextExpr%";
 static constexpr char kObjectSearchFrom[] = "%objectSearchFrom%";
 static constexpr char kJoinObjectToObjectSearch[] = "%joinObjectToObjectSearch%";
 static constexpr char kBoundingBoxExpr[] = "%boundingBoxExpr%";
@@ -160,23 +159,25 @@ static constexpr char kLimitObjectCount[] = "%limitObjectCount%";
 void ObjectSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
 {
     QString queryText = R"sql(
-        SELECT DISTINCT o.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
+        WITH filtered_object AS
+            (SELECT DISTINCT o.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
+                track_detail, attributes_id
+            FROM %objectFilteredByText% o
+                %objectSearchFrom%
+            WHERE %objectExpr%
+                %joinObjectToObjectSearch% %boundingBoxExpr%
+                1 = 1
+            ORDER BY o.track_start_ms %objectOrderByTrackStart%
+            %limitObjectCount%)
+        SELECT o.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
             track_detail, attrs.content AS content
-        FROM object o, unique_attributes attrs
-            %fullTextFrom%
-            %objectSearchFrom%
-        WHERE %objectExpr%
-            %fullTextExpr%
-            %joinObjectToObjectSearch% %boundingBoxExpr%
-            o.attributes_id = attrs.id
-        ORDER BY track_start_ms %objectOrderByTrackStart%
-        %limitObjectCount%
+        FROM filtered_object o, unique_attributes attrs
+        WHERE o.attributes_id = attrs.id
     )sql";
 
     std::map<QString, QString> queryTextParams({
+        {kObjectFilteredByTextExpr, "object"},
         {kObjectExpr, ""},
-        {kFullTextFrom, ""},
-        {kFullTextExpr, ""},
         {kObjectSearchFrom, ""},
         {kJoinObjectToObjectSearch, ""},
         {kBoundingBoxExpr, ""},
@@ -196,9 +197,9 @@ void ObjectSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
 
     if (!m_filter.freeText.isEmpty())
     {
-        queryTextParams[kFullTextFrom] = ", attributes_text_index fts";
-        queryTextParams[kFullTextExpr] =
-            "fts.content MATCH :textQuery AND fts.docid = o.attributes_id AND ";
+        queryTextParams[kObjectFilteredByTextExpr] =
+            "(SELECT * FROM object WHERE attributes_id IN "
+                "(SELECT docid FROM attributes_text_index WHERE content MATCH :textQuery))";
     }
 
     nx::sql::Filter boundingBoxFilter;
