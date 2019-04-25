@@ -4790,7 +4790,7 @@ bool QnPlOnvifResource::fixMulticastParametersIfNeeded(
             : kDefaultSecondaryStreamMulticastAddress;
 
         NX_INFO(this, "Fixing multicast streaming address for stream %1: %2 -> %3",
-            streamIndex, defaultAddress);
+            streamIndex, (address ? *address : ""), defaultAddress);
 
         address = defaultAddress.toStdString();
         somethingIsFixed = true;
@@ -4815,7 +4815,7 @@ bool QnPlOnvifResource::fixMulticastParametersIfNeeded(
     if (!ttl || ttl <= 0)
     {
         NX_INFO(this, "Fixing multicast ttl for stream %1: %2 -> %3",
-            streamIndex, ttl ? *ttl : 0, kDefaultMulticastTtl);
+            streamIndex, (ttl ? *ttl : 0), kDefaultMulticastTtl);
 
         ttl = kDefaultMulticastTtl;
         somethingIsFixed = true;
