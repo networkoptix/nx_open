@@ -311,7 +311,7 @@ export class NxIpvdComponent implements OnInit {
                         this.activeCamera = undefined;
 
                         this.noResult = (cameras.length === 0);
-                        if (cameras.length) {
+                        if (!this.noResult) {
                             this.camerasTable = this.preFilterCameraTable(cameras);
                             this.setActiveCamera();
                         } else {
