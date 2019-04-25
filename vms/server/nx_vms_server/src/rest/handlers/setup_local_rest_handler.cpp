@@ -28,7 +28,7 @@ SetupLocalSystemRestHandler::SetupLocalSystemRestHandler(QnMediaServerModule* se
 nx::network::rest::Response SetupLocalSystemRestHandler::executeGet(
     const nx::network::rest::Request& request)
 {
-    if (!nx::network::rest::ini().allowGetModifications)
+    if (!nx::network::rest::ini().allowModificationsViaGetMethod)
         return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
 
     return executePost(request);
@@ -37,7 +37,7 @@ nx::network::rest::Response SetupLocalSystemRestHandler::executeGet(
 nx::network::rest::Response SetupLocalSystemRestHandler::executePost(
     const nx::network::rest::Request& request)
 {
-    auto data = request.parseContentOrThrow<SetupLocalSystemData>();
+    const auto data = request.parseContentOrThrow<SetupLocalSystemData>();
     nx::network::rest::JsonResult result;
     const auto status = execute(data, request.owner, result);
     auto response = nx::network::rest::Response::result(result);

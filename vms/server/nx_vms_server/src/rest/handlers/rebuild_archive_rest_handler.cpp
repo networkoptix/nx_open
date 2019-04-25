@@ -20,7 +20,7 @@ RebuildArchiveRestHandler::RebuildArchiveRestHandler(QnMediaServerModule* server
 nx::network::rest::Response RebuildArchiveRestHandler::executeGet(
     const nx::network::rest::Request& request)
 {
-    if (!nx::network::rest::ini().allowGetModifications && request.param("action"))
+    if (!nx::network::rest::ini().allowModificationsViaGetMethod && request.param("action"))
         return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
 
     return executePost(request);

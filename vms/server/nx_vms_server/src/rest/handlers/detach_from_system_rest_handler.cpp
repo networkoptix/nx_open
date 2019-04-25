@@ -34,7 +34,7 @@ DetachFromSystemRestHandler::DetachFromSystemRestHandler(
 nx::network::rest::Response DetachFromSystemRestHandler::executeGet(
     const nx::network::rest::Request& request)
 {
-    if (!nx::network::rest::ini().allowGetModifications)
+    if (!nx::network::rest::ini().allowModificationsViaGetMethod)
         return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
 
     return executePost(request);

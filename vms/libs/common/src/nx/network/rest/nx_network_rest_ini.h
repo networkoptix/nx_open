@@ -23,7 +23,7 @@ struct Ini: nx::kit::IniConfig
         "Enables POST and PUT methods to accept URL parameters as well as the message body.");
 
     // This must be disabled as soon as we can discontinue deprecated modifying GET methods.
-    NX_INI_FLAG(1, allowGetModifications,
+    NX_INI_FLAG(1, allowModificationsViaGetMethod,
         "Allows GET requests to modify server's state, e.g. 'GET /api/mergeSystems?... HTTP/1.1'\n"
         "will result in 'HTTP/1.1 403 Forbidden', so user is forced to use POST.");
 };

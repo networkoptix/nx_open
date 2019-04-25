@@ -200,7 +200,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(
     QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
-    if (!nx::network::rest::ini().allowGetModifications)
+    if (!nx::network::rest::ini().allowModificationsViaGetMethod)
     {
         switch (QnMultiserverBookmarksRestHandlerPrivate::getOperation(extractAction(path)))
         {

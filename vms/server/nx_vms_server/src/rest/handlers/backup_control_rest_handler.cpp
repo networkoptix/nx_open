@@ -23,7 +23,7 @@ nx::network::rest::Response BackupControlRestHandler::executeGet(
     // TODO: This branch should be deprecated.
     if (const auto action = request.param(kAction))
     {
-        if (!nx::network::rest::ini().allowGetModifications)
+        if (!nx::network::rest::ini().allowModificationsViaGetMethod)
             throw nx::network::rest::Exception(nx::network::rest::Result::Forbidden);
 
         execute(*action);

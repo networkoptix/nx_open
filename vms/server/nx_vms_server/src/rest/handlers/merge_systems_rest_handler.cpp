@@ -30,7 +30,7 @@ MergeSystemsRestHandler::MergeSystemsRestHandler(QnMediaServerModule* serverModu
 nx::network::rest::Response MergeSystemsRestHandler::executeGet(
     const nx::network::rest::Request& request)
 {
-    if (!nx::network::rest::ini().allowGetModifications)
+    if (!nx::network::rest::ini().allowModificationsViaGetMethod)
         return nx::network::rest::Response::error(nx::network::rest::Result::Forbidden);
 
     return executePost(request);
@@ -40,7 +40,7 @@ nx::network::rest::Response MergeSystemsRestHandler::executePost(
     const nx::network::rest::Request& request)
 {
     auto data = request.parseContentOrThrow<MergeSystemData>();
-    if (nx::network::rest::ini().allowGetModifications)
+    if (nx::network::rest::ini().allowModificationsViaGetMethod)
         data.mergeOneServer = request.paramOrDefault<bool>("oneServer", data.mergeOneServer);
 
     nx::network::rest::JsonResult result;
