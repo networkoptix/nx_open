@@ -206,13 +206,12 @@ void QnStorageDb::addRecord(
 }
 
 void QnStorageDb::replaceChunks(
-    const QString& cameraUniqueId,
-    QnServer::ChunksCatalog catalog,
-    const std::deque<nx::vms::server::Chunk>& chunks)
+    const QString& cameraUniqueId, QnServer::ChunksCatalog catalog,
+    const nx::vms::server::ChunksDeque& chunks)
 {
     deleteRecords(cameraUniqueId, catalog, -1);
     for (const auto &chunk : chunks)
-        addRecord(cameraUniqueId, catalog, chunk);
+        addRecord(cameraUniqueId, catalog, chunk.chunk());
 }
 
 bool QnStorageDb::open(const QString& fileName)

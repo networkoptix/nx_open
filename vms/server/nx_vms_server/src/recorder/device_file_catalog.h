@@ -138,10 +138,11 @@ public:
     static std::deque<nx::vms::server::Chunk> mergeChunks(
         const std::deque<nx::vms::server::Chunk>& chunks1,
         const std::deque<nx::vms::server::Chunk>& chunks2);
-    void addChunks(const std::deque<nx::vms::server::Chunk>& chunk);
+    void addChunks(const nx::vms::server::ChunksDeque& chunk);
 
-    template<typename It>
-    void assignChunksUnsafe(It begin, It end) { m_chunks.assign(begin, end); }
+    void assignChunksUnsafe(
+        std::deque<nx::vms::server::Chunk>::iterator begin,
+        std::deque<nx::vms::server::Chunk>::iterator end);
 
     bool fromCSVFile(const QString& fileName);
     QnServer::ChunksCatalog getRole() const;
@@ -163,7 +164,7 @@ private:
 
     nx::vms::server::Chunk chunkFromFile(const QnStorageResourcePtr &storage, const QString& fileName);
     QnTimePeriod timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName);
-    void replaceChunks(int storageIndex, const std::deque<nx::vms::server::Chunk>& newCatalog);
+    void replaceChunks(int storageIndex, const nx::vms::server::ChunksDeque &newCatalog);
     void removeChunks(int storageIndex);
     void removeRecord(int idx);
     int detectTimeZone(qint64 startTimeMs, const QString& fileName);

@@ -300,7 +300,7 @@ public:
         return chunk;
     }
 
-    std::pair<Catalog, std::deque<nx::vms::server::Chunk>> generateReplaceOperation(int size)
+    std::pair<Catalog, nx::vms::server::ChunksDeque> generateReplaceOperation(int size)
     {
         Catalog *catalog = &m_catalogs[nx::utils::random::number((size_t)0, m_catalogs.size() - 1)];
         for (auto& chunk: m_chunks)
@@ -312,7 +312,7 @@ public:
                 ((TestChunk&)chunk).isDeleted = true;
         }
 
-        std::deque<nx::vms::server::Chunk> ret;
+        nx::vms::server::ChunksDeque ret;
         for (int i = 0; i < size; ++i)
         {
             TestFileOperation fileOp = generateFileOperation(RecordType::FileOperationAdd);
@@ -717,9 +717,13 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
             QString::number(i),
             i % 2 ? QnServer::LowQualityCatalog : QnServer::HiQualityCatalog,
             QnServer::StoragePool::Normal));
-        std::deque<nx::vms::server::Chunk> chunks;
+        nx::vms::server::ChunksDeque chunks;
         for (size_t j = 0; j < kMaxChunks; ++j)
-            chunks.push_back(nx::vms::server::Chunk((j + 10) * j + 10, 0, nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION, 1, 0, 1, 1));
+        {
+            chunks.push_back(nx::vms::server::Chunk(
+                (j + 10) * j + 10, 0, nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION,
+                1, 0, 1, 1));
+        }
         catalog->addChunks(chunks);
 
         referenceCatalogs.push_back(catalog);
@@ -808,7 +812,7 @@ TEST_F(MediaDbTest, StorageDB)
             {
             case 0:
             {
-                std::pair<TestChunkManager::Catalog, std::deque<nx::vms::server::Chunk>> p;
+                std::pair<TestChunkManager::Catalog, nx::vms::server::ChunksDeque> p;
                 QnMutexLocker lk(&mutex);
                 p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
                 sdb->replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
@@ -875,12 +879,13 @@ TEST_F(MediaDbTest, StorageDB)
              ++chunkIt)
         {
             TestChunkManager::TestChunkCont::iterator tcmIt =
-                std::find_if(tcm.get().begin(), tcm.get().end(),
+                std::find_if(
+                    tcm.get().begin(), tcm.get().end(),
                     [catalogIt, chunkIt](const TestChunkManager::TestChunk &tc)
                     {
                         return tc.catalog->cameraUniqueId == (*catalogIt)->cameraUniqueId()
                             && tc.catalog->quality == (*catalogIt)->getCatalog()
-                            && !tc.isVisited && !tc.isDeleted && tc.chunk == *chunkIt;
+                            && !tc.isVisited && !tc.isDeleted && tc.chunk == (*chunkIt).chunk();
                     });
             bool tcmChunkFound = tcmIt != tcm.get().end();
             ASSERT_TRUE(tcmChunkFound);

@@ -78,8 +78,8 @@ qint64 DeviceFileCatalog::getSpaceByStorageIndex(int storageIndex) const
 
     for (const auto& chunk: m_chunks)
     {
-        if (chunk.storageIndex == storageIndex)
-            result += chunk.getFileSize();
+        if (chunk.chunk().storageIndex == storageIndex)
+            result += chunk.chunk().getFileSize();
     }
 
     return result;
@@ -176,19 +176,22 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResou
 
 void DeviceFileCatalog::removeChunks(int storageIndex)
 {
-    replaceChunks(storageIndex, std::deque<Chunk>());
+    replaceChunks(storageIndex, nx::vms::server::ChunksDeque());
 }
 
-void DeviceFileCatalog::replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog)
+void DeviceFileCatalog::replaceChunks(
+    int storageIndex, const nx::vms::server::ChunksDeque& newCatalog)
 {
     NX_ASSERT(std::is_sorted(newCatalog.begin(), newCatalog.end()));
 
     QnMutexLocker lock( &m_mutex );
 
-    std::deque<Chunk> filteredData;
+    nx::vms::server::ChunksDeque filteredData;
     filteredData.swap( m_chunks );
-    const auto filteredDataEndIter = std::remove_if( filteredData.begin(), filteredData.end(),
-        [storageIndex](const Chunk& chunk){ return chunk.storageIndex == storageIndex; } );
+    const auto filteredDataEndIter = std::remove_if(
+        filteredData.begin(), filteredData.end(),
+        [storageIndex](const auto& chunk){ return chunk.chunk().storageIndex == storageIndex; } );
+
     m_chunks.resize( filteredDataEndIter - filteredData.begin() + newCatalog.size() );
     std::merge( filteredData.begin(), filteredDataEndIter, newCatalog.begin(), newCatalog.end(), m_chunks.begin() );
 }
@@ -244,13 +247,13 @@ int64_t DeviceFileCatalog::occupiedSpace(int storageIndex) const
     return m_chunks.occupiedSpace(storageIndex);
 }
 
-void DeviceFileCatalog::addChunks(const std::deque<Chunk>& chunks)
+void DeviceFileCatalog::addChunks(const nx::vms::server::ChunksDeque& chunks)
 {
     NX_ASSERT(std::is_sorted(chunks.begin(), chunks.end()));
 
     QnMutexLocker lk( &m_mutex );
 
-    std::deque<Chunk> existChunks;
+    ChunksDeque existChunks;
     existChunks.swap( m_chunks );
     m_chunks.resize(existChunks.size() + chunks.size());
     auto itr = std::set_union(
@@ -594,10 +597,17 @@ Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64 durationMs) {
     return Chunk();
 }
 
+void DeviceFileCatalog::assignChunksUnsafe(
+    std::deque<nx::vms::server::Chunk>::iterator begin,
+    std::deque<nx::vms::server::Chunk>::iterator end)
+{
+    m_chunks.assign(begin, end);
+}
+
 qint64 DeviceFileCatalog::lastChunkStartTime() const
 {
     QnMutexLocker lock( &m_mutex );
-    return m_chunks.empty() ? 0 : m_chunks[m_chunks.size()-1].startTimeMs;
+    return m_chunks.empty() ? 0 : m_chunks[m_chunks.size()-1].chunk().startTimeMs;
 }
 
 qint64 DeviceFileCatalog::lastChunkStartTime(int storageIndex) const
@@ -802,7 +812,7 @@ qint64 DeviceFileCatalog::minTime() const
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks[0].startTimeMs;
+        return m_chunks[0].chunk().startTimeMs;
 }
 
 qint64 DeviceFileCatalog::maxTime() const
@@ -810,10 +820,10 @@ qint64 DeviceFileCatalog::maxTime() const
     QnMutexLocker lock( &m_mutex );
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
-    else if (m_chunks[m_chunks.size()-1].durationMs == -1)
+    else if (m_chunks[m_chunks.size()-1].chunk().durationMs == -1)
         return DATETIME_NOW;
     else
-        return m_chunks[m_chunks.size()-1].startTimeMs + qMax(0, m_chunks[m_chunks.size()-1].durationMs);
+        return m_chunks[m_chunks.size()-1].chunk().startTimeMs + qMax(0, m_chunks[m_chunks.size()-1].chunk().durationMs);
 }
 
 bool DeviceFileCatalog::containTime(qint64 timeMs, qint64 eps) const
@@ -853,14 +863,14 @@ bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const
     if (m_chunks.empty())
         return true;
     else
-        return m_chunks[m_chunks.size()-1].startTimeMs == startTimeMs;
+        return m_chunks[m_chunks.size()-1].chunk().startTimeMs == startTimeMs;
 }
 
 Chunk DeviceFileCatalog::chunkAt(int index) const
 {
     QnMutexLocker lock( &m_mutex );
     if (index >= 0 && (size_t)index < m_chunks.size() )
-        return m_chunks.at(index);
+        return m_chunks.at(index).chunk();
     else
         return Chunk();
 }
@@ -871,7 +881,7 @@ qint64 DeviceFileCatalog::firstTime() const
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks[0].startTimeMs;
+        return m_chunks[0].chunk().startTimeMs;
 }
 
 void DeviceFileCatalog::close()
@@ -958,15 +968,18 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
 
     qint64 averagingPeriodMs = bitrateAnalyzePeriodMs != 0 // bitrateAnalyzePeriodMs or all archive
         ? bitrateAnalyzePeriodMs
-        : qMax(1ll, qnSyncTime->currentMSecsSinceEpoch() - m_chunks.front().startTimeMs);
+        : qMax(1ll, qnSyncTime->currentMSecsSinceEpoch() - m_chunks.front().chunk().startTimeMs);
 
-    result.archiveDurationSecs = qMax(0ll, (qnSyncTime->currentMSecsSinceEpoch()
-        -  m_chunks.front().startTimeMs) / 1000);
+    result.archiveDurationSecs =
+        qMax(
+            0ll,
+            (qnSyncTime->currentMSecsSinceEpoch() -  m_chunks.front().chunk().startTimeMs) / 1000);
 
-    auto itrLeft = m_chunks.cbegin();
-    auto itrRight = m_chunks.cend();
+    auto itrLeft = m_chunks.begin();
+    auto itrRight = m_chunks.end();
 
-    qint64 averagingStartTime = bitrateAnalyzePeriodMs != 0 ? m_chunks.back().startTimeMs - bitrateAnalyzePeriodMs : 0;
+    qint64 averagingStartTime = bitrateAnalyzePeriodMs != 0
+        ? m_chunks.back().chunk().startTimeMs - bitrateAnalyzePeriodMs : 0;
 
     qint64 recordedMsForPeriod = 0;
     qint64 recordedBytesForPeriod = 0;
@@ -974,7 +987,7 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
     qint64 totalRecordedBytes = 0;
     for (auto itr = itrLeft; itr != itrRight; ++itr)
     {
-        const Chunk& chunk = *itr;
+        const auto& chunk = (*itr).chunk();
         auto storage = getMyStorageMan()->storageRoot(chunk.storageIndex);
         if (chunk.durationMs != Chunk::UnknownDuration)
         {

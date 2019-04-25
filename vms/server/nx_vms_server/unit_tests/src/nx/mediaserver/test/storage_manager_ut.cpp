@@ -13,7 +13,7 @@ namespace vms::server {
 namespace test {
 
 void addChunk(
-    std::deque<nx::vms::server::Chunk>& chunks,
+    nx::vms::server::ChunksDeque& chunks,
     qint64 startTimeMs,
     qint64 durationMs)
 {
@@ -30,7 +30,7 @@ class StorageManager:
 
 TEST_F(StorageManager, deleteRecordsToTime)
 {
-    std::deque<nx::vms::server::Chunk> chunks;
+    nx::vms::server::ChunksDeque chunks;
     addChunk(chunks, 5, 10);
     addChunk(chunks, 20, 5);
     addChunk(chunks, 100, 500);

@@ -1339,7 +1339,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     int filesizeFieldIdx = queryInfo.indexOf("filesize");
 
     DeviceFileCatalogPtr fileCatalog;
-    std::deque<nx::vms::server::Chunk> chunks;
+    nx::vms::server::ChunksDeque chunks;
     QnServer::ChunksCatalog prevCatalog = QnServer::ChunksCatalogCount; //should differ from all existing catalogs
     QByteArray prevId;
 
@@ -1906,15 +1906,15 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     QnMutexLocker lock1(&catalogHi->m_mutex);
     QnMutexLocker lock2(&catalogLow->m_mutex);
 
-    qint64 archiveStartTimeMs = qMin(catalogHi->m_chunks.front().startTimeMs,
-        catalogLow->m_chunks.front().startTimeMs);
+    qint64 archiveStartTimeMs = qMin(catalogHi->m_chunks.front().chunk().startTimeMs,
+        catalogLow->m_chunks.front().chunk().startTimeMs);
 
     qint64 averagingPeriodMs = bitrateAnalyzePeriodMs != 0
         ? bitrateAnalyzePeriodMs
         : qMax(1ll, qnSyncTime->currentMSecsSinceEpoch() - archiveStartTimeMs);
 
     const auto archiveEndTimeMs = qMax(
-        catalogLow->m_chunks.back().startTimeMs, catalogHi->m_chunks.back().startTimeMs);
+        catalogLow->m_chunks.back().chunk().startTimeMs, catalogHi->m_chunks.back().chunk().startTimeMs);
     qint64 averagingStartTime = bitrateAnalyzePeriodMs != 0
         ? archiveEndTimeMs - bitrateAnalyzePeriodMs
         : 0;
@@ -2864,7 +2864,7 @@ void QnStorageManager::replaceChunks(
     DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
     qint64 newArchiveFirstChunkStartTimeMs = newCatalog->m_chunks.empty()
         ? std::numeric_limits<qint64>::max()
-        : newCatalog->m_chunks.front().startTimeMs;
+        : newCatalog->m_chunks.front().chunk().startTimeMs;
     qint64 newArchiveBorder = qMin(rebuildPeriod.startTimeMs, newArchiveFirstChunkStartTimeMs);
     for (const auto& chunk : ownCatalog->m_chunks)
     {

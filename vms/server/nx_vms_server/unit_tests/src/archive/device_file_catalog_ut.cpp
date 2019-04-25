@@ -2,6 +2,7 @@
 
 #include <recorder/device_file_catalog.h>
 #include <recording/time_period_list.h>
+#include <recorder/chunks_deque.h>
 #include <media_server/media_server_module.h>
 
 namespace nx {
@@ -77,7 +78,7 @@ TEST(DeviceFileCatalog, mergeData)
         QString(), QnServer::HiQualityCatalog, QnServer::StoragePool::Normal);
     static const int kRecordsToTest = 1000;
 
-    std::deque<nx::vms::server::Chunk> chunks1;
+    nx::vms::server::ChunksDeque chunks1;
     catalog.addChunks(chunks1);
     ASSERT_EQ(0, catalog.size());
 
@@ -91,7 +92,7 @@ TEST(DeviceFileCatalog, mergeData)
     catalog.addChunks(chunks1);
     ASSERT_EQ(kRecordsToTest, catalog.size());
 
-    std::deque<nx::vms::server::Chunk> chunks2;
+    nx::vms::server::ChunksDeque chunks2;
     for (int i = 0; i < kRecordsToTest; ++i)
     {
         nx::vms::server::Chunk chunk;
@@ -103,7 +104,7 @@ TEST(DeviceFileCatalog, mergeData)
     catalog.addChunks(chunks2);
     ASSERT_EQ(kRecordsToTest * 2, catalog.size());
 
-    catalog.addChunks(std::deque<nx::vms::server::Chunk>());
+    catalog.addChunks(nx::vms::server::ChunksDeque());
     ASSERT_EQ(kRecordsToTest * 2, catalog.size());
 
     catalog.addChunks(chunks2);

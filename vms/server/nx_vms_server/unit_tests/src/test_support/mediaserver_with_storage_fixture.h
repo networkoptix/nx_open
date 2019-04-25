@@ -165,7 +165,7 @@ protected:
         const auto& serverChunks = serverCatalogIt.value()->getChunksUnsafe();
         ASSERT_EQ(generatedChunks.size(), serverChunks.size());
         for (int i = 0; i < serverChunks.size(); ++i)
-            ASSERT_EQ(generatedChunks[i].startTimeMs, serverChunks[i].startTimeMs);
+            ASSERT_EQ(generatedChunks[i].startTimeMs, serverChunks[i].chunk().startTimeMs);
     }
 };
 } // namespace nx::vms::server::test::test_support

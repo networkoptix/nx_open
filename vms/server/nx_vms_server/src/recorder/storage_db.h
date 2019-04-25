@@ -54,9 +54,8 @@ public:
 
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
-    void replaceChunks(const QString& cameraUniqueId,
-                       QnServer::ChunksCatalog catalog,
-                       const std::deque<nx::vms::server::Chunk>& chunks);
+    void replaceChunks(
+        const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const ChunksDeque &chunks);
 
 private:
     using VacuumCompletionHandler = nx::utils::MoveOnlyFunc<void(bool)>;
