@@ -1,0 +1,2 @@
+add_subdirectory(libmaxminddb)
+add_subdirectory(nx_maxminddb)
