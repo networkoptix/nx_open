@@ -28,7 +28,7 @@ angular.module('cloudApp')
                         setMergeStatus(mergeInfo);
                     } else{
                         if($scope.currentlyMerging) {
-                            dialogs.notify(L.system.successMerge, 'success', true);
+                            dialogs.notify(L.system.mergeSuccess, 'success', true);
                         }
                         $scope.currentlyMerging = false;
                     }
