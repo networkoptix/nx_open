@@ -20,5 +20,5 @@ if (UNIX)
     find_package(Threads)
     add_executable(mmdblookup bin/mmdblookup.c)
     target_link_libraries(mmdblookup maxminddb pthread)
-    add_definitions(-DPACKAGE_VERSION=\\"1.3.2\\") # not sure why this is necessary
+    add_definitions(-DPACKAGE_VERSION=\"1.3.2\") # not sure why this is necessary
 endif()

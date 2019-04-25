@@ -49,7 +49,7 @@ bool MaxmindDb::open(const std::string& dbPath)
 #ifdef _WIN32
     auto path = QString(dbPath.c_str()).toUtf8();
 #else
-    auto path = dpPath.c_str();
+    auto path = dbPath.c_str();
 #endif
 
     auto db = std::make_unique<Mmdb>();
