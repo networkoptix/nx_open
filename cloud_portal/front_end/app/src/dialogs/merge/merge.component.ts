@@ -111,15 +111,10 @@ export class MergeModalContent {
                     primaryState = this.primarySystem.info && this.primarySystem.info.stateOfHealth;
                 }
 
-                var secondaryState = this.secondarySystem.stateOfHealth;
-                if (secondaryState === undefined) {
-                    secondaryState = this.secondarySystem.info && this.secondarySystem.info.stateOfHealth;
-                }
-
+                // Assume the secondary system is the issue unless the primary system is not online
+                error.data.failedSystemName = error.data.secondarySystemName;
                 if (primaryState !== 'online') {
                     error.data.failedSystemName = error.data.primarySystemName;
-                } else if (secondaryState !== 'online') {
-                    error.data.failedSystemName = error.data.secondarySystemName;
                 }
                 this.activeModal.dismiss(error.data);
             }
