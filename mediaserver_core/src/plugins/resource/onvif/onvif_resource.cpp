@@ -99,6 +99,12 @@ static const int MAX_IO_PORTS_PER_DEVICE = 200;
 static const int DEFAULT_SOAP_TIMEOUT = 10;
 static const quint32 MAX_TIME_DRIFT_UPDATE_PERIOD_MS = 15 * 60 * 1000; // 15 minutes
 
+static const QString kDefaultPrimaryStreamMulticastAddress("239.0.0.10");
+static const QString kDefaultSecondaryStreamMulticastAddress("239.0.0.11");
+static const int kDefaultPrimaryStreamMulticastPort(2048);
+static const int kDefaultSecondaryStreamMulticastPort(2050);
+static const int kDefaultMulticastTtl(1);
+
 //Forth times greater than default = 320 x 240
 
 /* Some cameras declare invalid max resolution */
@@ -2776,6 +2782,59 @@ std::set<QString> QnPlOnvifResource::allowedInputSourceNames() const
     return result;
 }
 
+bool QnPlOnvifResource::fixMulticastParametersIfNeeded(
+    nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
+    Qn::StreamIndex streamIndex)
+{
+    if (!inOutMulticastParameters)
+    {
+        NX_ASSERT(false, "Multicast parameters must be non-null");
+        return false;
+    }   
+
+    bool somethingIsFixed = false;
+    auto& address = inOutMulticastParameters->address;
+    if (!address || !QHostAddress(QString::fromStdString(*address)).isMulticast())
+    {
+        const auto defaultAddress = streamIndex == Qn::StreamIndex::primary
+            ? kDefaultPrimaryStreamMulticastAddress
+            : kDefaultSecondaryStreamMulticastAddress;
+
+        NX_INFO(this, lm("Fixing multicast streaming address for stream %1: %2 -> %3")
+            .args(streamIndex, (address ? *address : ""), defaultAddress));
+
+        address = defaultAddress.toStdString();
+        somethingIsFixed = true;
+    }
+
+    auto& port = inOutMulticastParameters->port;
+    int portNumber = port ? *port : 0;
+    if (portNumber <= 1024 || portNumber > 65535)
+    {
+        const auto defaultPort = streamIndex == Qn::StreamIndex::primary
+            ? kDefaultPrimaryStreamMulticastPort
+            : kDefaultSecondaryStreamMulticastPort;
+
+        NX_INFO(this, lm("Fixing multicast port for stream %1: %2 -> %3").args(
+            streamIndex, portNumber, defaultPort));
+
+        port = defaultPort;
+        somethingIsFixed = true;
+    }
+
+    auto& ttl = inOutMulticastParameters->ttl;
+    if (!ttl || ttl <= 0)
+    {
+        NX_INFO(this, lm("Fixing multicast ttl for stream %1: %2 -> %3").args(
+            streamIndex, (ttl ? *ttl : 0), kDefaultMulticastTtl));
+
+        ttl = kDefaultMulticastTtl;
+        somethingIsFixed = true;
+    }
+
+    return somethingIsFixed;
+}
+
 bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values)
 {
     m_prevOnvifResultCode = CameraDiagnostics::NoErrorResult();
@@ -4261,6 +4320,37 @@ void QnPlOnvifResource::setAudioOutputConfigurationToken(const QString& value)
 {
     QnMutexLocker lock(&m_mutex);
     m_audioOutputConfigurationToken = value;
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::ensureMulticastIsEnabled(
+    Qn::StreamIndex streamIndex)
+{
+    auto& multicastParametersProvider = streamIndex == Qn::StreamIndex::primary
+        ? m_primaryMulticastParametersProvider
+        : m_secondaryMulticastParametersProvider;
+
+    auto multicastParameters = multicastParametersProvider.getMulticastParameters();
+    if (!fixMulticastParametersIfNeeded(&multicastParameters, streamIndex))
+    {
+        NX_VERBOSE(this, lm("Multicast parameters are ok for stream %1").args(streamIndex));
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    if (!multicastParametersProvider.setMulticastParameters(multicastParameters))
+    {
+        NX_DEBUG(this, lm("Unable to update multicast parameters for stream %1, parameters: %2")
+            .args(streamIndex, multicastParameters));
+
+        return CameraDiagnostics::RequestFailedResult("Updating multicast parameters",
+            lm("Unable to update multicast parameters for stream %1, parameters: %2")
+            .args(streamIndex, multicastParameters));
+    }
+
+    NX_VERBOSE(this,
+        lm("Multicast parameters has been successfully updated for stream %1, parameters %2")
+            .args(streamIndex, multicastParameters));
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudioByResourceData()

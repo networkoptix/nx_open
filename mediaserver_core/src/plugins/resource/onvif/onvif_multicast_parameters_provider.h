@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/mediaserver/resource/camera.h>
+#include <plugins/resource/onvif/onvif_multicast_parameters_proxy.h>
 
 class QnPlOnvifResource;
 
@@ -22,6 +23,10 @@ public:
     virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
 
     virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
+
+    MulticastParameters getMulticastParameters();
+
+    bool setMulticastParameters(MulticastParameters multicastParameters);
 
 private:
     QnPlOnvifResource* m_resource = nullptr;

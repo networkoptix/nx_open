@@ -906,6 +906,19 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     const static QLatin1String kWallpapersFolder("wallpapers");
 
+    inline QString toString(StreamIndex streamIndex)
+    {
+        switch (streamIndex)
+        {
+            case StreamIndex::primary:
+                return "primary";
+            case StreamIndex::secondary:
+                return "secondary";
+            default:
+                return "undefined";
+        }
+    }
+
 } // namespace Qn
 
 Q_DECLARE_METATYPE(Qn::StatusChangeReason)

@@ -327,6 +327,9 @@ public:
         const QnLiveStreamParams& streamParams);
 
     QString audioOutputConfigurationToken() const;
+
+    CameraDiagnostics::Result ensureMulticastIsEnabled(Qn::StreamIndex streamIndex);
+
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 
@@ -414,6 +417,10 @@ private:
 
     std::set<QString> notificationTopicsForMonitoring() const;
     std::set<QString> allowedInputSourceNames() const;
+
+    bool fixMulticastParametersIfNeeded(
+        nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
+        Qn::StreamIndex streamIndex);
 
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;

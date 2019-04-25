@@ -185,6 +185,19 @@ QSet<QString> OnvifMulticastParametersProvider::set(const QnCameraAdvancedParamV
     return {};
 }
 
+MulticastParameters OnvifMulticastParametersProvider::getMulticastParameters()
+{
+    OnvifMulticastParametersProxy proxy(m_resource, m_streamIndex);
+    return proxy.multicastParameters();
+}
+
+bool OnvifMulticastParametersProvider::setMulticastParameters(
+    MulticastParameters multicastParameters)
+{
+    OnvifMulticastParametersProxy proxy(m_resource, m_streamIndex);
+    return proxy.setMulticastParameters(std::move(multicastParameters));
+}
+
 } // namespace resource
 } // namespace server
 } // namespace vms
