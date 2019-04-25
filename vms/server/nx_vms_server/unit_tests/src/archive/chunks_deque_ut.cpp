@@ -10,20 +10,20 @@ class ChunksDeque: public ::testing::Test
 protected:
     void givenChunksDequeWithSomeChunks()
     {
-        addChunks(0, /*chunksCount*/30, /*storageCount*/3, m_deque, m_referenceDeque);
+        addChunks(0, kChunksToAddCount, kStorageCount, m_deque, m_referenceDeque);
         thenAllChunksShouldBeFound();
         thenCorrectArchiveOccupiedSpaceShouldBeReported();
     }
 
     void given2SortedDeques()
     {
-        addChunks(0, /*chunksCount*/30, /*storageCount*/3, m_deque, m_referenceDeque);
-        addChunks(10, /*chunksCount*/30, /*storageCount*/3, m_deque2, m_referenceDeque2);
+        addChunks(0, kChunksToAddCount, kStorageCount, m_deque, m_referenceDeque);
+        addChunks(10, kChunksToAddCount, kStorageCount, m_deque2, m_referenceDeque2);
     }
 
     void whenSomeChunksRemoved()
     {
-        removeChunks(10, 3);
+        removeChunks(10, kStorageCount);
     }
 
     void thenAllChunksShouldBeFound()
@@ -35,8 +35,7 @@ protected:
 
     void thenCorrectArchiveOccupiedSpaceShouldBeReported()
     {
-        ASSERT_EQ(referenceSpace(0), m_deque.occupiedSpace(0));
-        ASSERT_EQ(referenceSpace(1), m_deque.occupiedSpace(1));
+        assertSpace(m_deque, m_referenceDeque, 3);
     }
 
     void thenFindShouldReturnCorrectResult()
@@ -101,131 +100,50 @@ protected:
 
     void assertReverseIteratorsTraversal()
     {
-        auto rit1 = m_deque.rbegin();
-        auto rit2 = m_referenceDeque.rbegin();
-        for (; rit1 != m_deque.rend(); ++rit1)
-        {
-            ASSERT_EQ(rit2->startTimeMs, rit1->startTimeMs);
-            ASSERT_EQ(rit2->fileSize, rit1->getFileSize());
-            ASSERT_EQ(rit2->storageIndex, rit1->storageIndex);
-            ASSERT_EQ(rit2->startTimeMs, (*rit1).chunk().startTimeMs);
-            ASSERT_EQ(rit2->fileSize, (*rit1).chunk().getFileSize());
-            ASSERT_EQ(rit2->storageIndex, (*rit1).chunk().storageIndex);
-            ++rit2;
-        }
-
-        ASSERT_EQ(m_deque.rend(), rit1);
-        ASSERT_EQ(m_referenceDeque.rend(), rit2);
-
-        rit1 = m_deque.rbegin();
-        rit2 = m_referenceDeque.rbegin();
-        for (; rit1 != m_deque.rend(); rit1++)
-        {
-            ASSERT_EQ(rit2->startTimeMs, rit1->startTimeMs);
-            ASSERT_EQ(rit2->fileSize, rit1->getFileSize());
-            ASSERT_EQ(rit2->storageIndex, rit1->storageIndex);
-            ASSERT_EQ(rit2->startTimeMs, (*rit1).chunk().startTimeMs);
-            ASSERT_EQ(rit2->fileSize, (*rit1).chunk().getFileSize());
-            ASSERT_EQ(rit2->storageIndex, (*rit1).chunk().storageIndex);
-            rit2++;
-        }
-
-        ASSERT_EQ(m_deque.rend(), rit1);
-        ASSERT_EQ(m_referenceDeque.rend(), rit2);
+        assertIteratorTraversal(
+            [this]() { return m_deque.rbegin(); },
+            [this]() { return m_deque.rend(); },
+            [this]() { return m_referenceDeque.rbegin(); },
+            [this]() { return m_referenceDeque.rend(); });
     }
 
     void assertConstIteratorsTraversal()
     {
-        auto cit1 = m_deque.cbegin();
-        auto cit2 = m_referenceDeque.cbegin();
-        for (; cit1 != m_deque.cend(); ++cit1)
-        {
-            ASSERT_EQ(cit2->startTimeMs, cit1->startTimeMs);
-            ASSERT_EQ(cit2->fileSize, cit1->getFileSize());
-            ASSERT_EQ(cit2->storageIndex, cit1->storageIndex);
-            ASSERT_EQ(cit2->startTimeMs, (*cit1).chunk().startTimeMs);
-            ASSERT_EQ(cit2->fileSize, (*cit1).chunk().getFileSize());
-            ASSERT_EQ(cit2->storageIndex, (*cit1).chunk().storageIndex);
-            ++cit2;
-        }
+        assertIteratorTraversal(
+            [this]() { return m_deque.cbegin(); },
+            [this]() { return m_deque.cend(); },
+            [this]() { return m_referenceDeque.cbegin(); },
+            [this]() { return m_referenceDeque.cend(); });
+    }
 
-        ASSERT_EQ(m_deque.cend(), cit1);
-        ASSERT_EQ(m_referenceDeque.cend(), cit2);
-
-        cit1 = m_deque.cbegin();
-        cit2 = m_referenceDeque.cbegin();
-        for (; cit1 != m_deque.cend(); cit1++)
-        {
-            ASSERT_EQ(cit2->startTimeMs, cit1->startTimeMs);
-            ASSERT_EQ(cit2->fileSize, cit1->getFileSize());
-            ASSERT_EQ(cit2->storageIndex, cit1->storageIndex);
-            ASSERT_EQ(cit2->startTimeMs, (*cit1).chunk().startTimeMs);
-            ASSERT_EQ(cit2->fileSize, (*cit1).chunk().getFileSize());
-            ASSERT_EQ(cit2->storageIndex, (*cit1).chunk().storageIndex);
-            cit2++;
-        }
-
-        ASSERT_EQ(m_deque.cend(), cit1);
-        ASSERT_EQ(m_referenceDeque.cend(), cit2);
+    void assertForwardIteratorsTraversal()
+    {
+        assertIteratorTraversal(
+            [this]() { return m_deque.begin(); },
+            [this]() { return m_deque.end(); },
+            [this]() { return m_referenceDeque.begin(); },
+            [this]() { return m_referenceDeque.end(); });
     }
 
     void assertMergeWorksCorrectly()
     {
-        server::ChunksDeque result;
-        std::deque<ChunkCore> referenceResult;
-        std::merge(
-            m_deque.begin(), m_deque.end(), m_deque2.begin(), m_deque2.end(),
-            server::ChunksDequeBackInserter(result));
-        std::merge(
-            m_referenceDeque.begin(), m_referenceDeque.end(), m_referenceDeque2.begin(),
-            m_referenceDeque2.end(), std::back_inserter(referenceResult));
-        assertEquality(result, referenceResult);
-
-        const auto resultSize = result.size();
-        ASSERT_NE(0, resultSize);
-        result.clear();
-        referenceResult.clear();
-        result.resize(resultSize);
-        referenceResult.resize(resultSize);
-
-        std::merge(
-            m_deque.begin(), m_deque.end(), m_deque2.begin(), m_deque2.end(),
-            result.begin());
-        std::merge(
-            m_referenceDeque.begin(), m_referenceDeque.end(), m_referenceDeque2.begin(),
-            m_referenceDeque2.end(), referenceResult.begin());
-        assertEquality(result, referenceResult);
+        assertMergeOperationWorksCorrectly(
+            [](auto begin1, auto end1, auto begin2, auto end2, auto begin3)
+            {
+                return std::merge(begin1, end1, begin2, end2, begin3);
+            });
     }
 
-    void assertSetUnionCorrectly()
+    void assertSetUnionWorksCorrectly()
     {
-        server::ChunksDeque result;
-        std::deque<ChunkCore> referenceResult;
-        std::set_union(
-            m_deque.begin(), m_deque.end(), m_deque2.begin(), m_deque2.end(),
-            server::ChunksDequeBackInserter(result));
-        std::set_union(
-            m_referenceDeque.begin(), m_referenceDeque.end(), m_referenceDeque2.begin(),
-            m_referenceDeque2.end(),std::back_inserter(referenceResult));
-        assertEquality(result, referenceResult);
-
-        const auto resultSize = result.size();
-        ASSERT_NE(0, resultSize);
-        result.clear();
-        referenceResult.clear();
-        result.resize(resultSize);
-        referenceResult.resize(resultSize);
-
-        std::set_union(
-            m_deque.begin(), m_deque.end(), m_deque2.begin(), m_deque2.end(),
-            result.begin());
-        std::set_union(
-            m_referenceDeque.begin(), m_referenceDeque.end(), m_referenceDeque2.begin(),
-            m_referenceDeque2.end(), referenceResult.begin());
-        assertEquality(result, referenceResult);
+        assertMergeOperationWorksCorrectly(
+            [](auto begin1, auto end1, auto begin2, auto end2, auto begin3)
+            {
+                return std::set_union(begin1, end1, begin2, end2, begin3);
+            });
     }
 
-    void assertRemoveIfCorrectly()
+    void assertRemoveIfWorksCorrectly()
     {
         std::remove_if(
             m_deque.begin(), m_deque.end(),
@@ -240,6 +158,7 @@ protected:
                 return c.startTimeMs % 2 == 0;
             });
         assertEquality(m_deque, m_referenceDeque);
+        assertSpace(m_deque, m_referenceDeque, kStorageCount);
     }
 
 private:
@@ -265,6 +184,8 @@ private:
     server::ChunksDeque m_deque2;
     std::deque<ChunkCore> m_referenceDeque;
     std::deque<ChunkCore> m_referenceDeque2;
+    const int kStorageCount = 3;
+    const int kChunksToAddCount = 30;
 
     void addChunks(
         int64_t startTimeMs, int chunksCount, int storageCount, server::ChunksDeque& targetDeque,
@@ -293,6 +214,13 @@ private:
             }));
     }
 
+    void assertSpace(
+        server::ChunksDeque& chunksDeque, std::deque<ChunkCore>& referenceDeque, int storageCount)
+    {
+        for (int i = 0; i < storageCount; ++i)
+        ASSERT_EQ(referenceSpace(referenceDeque, i), chunksDeque.occupiedSpace(i));
+    }
+
     void removeChunks(int chunksCount, int storageCount)
     {
         for (int i = 0; i < storageCount; ++i)
@@ -315,26 +243,101 @@ private:
             deque.begin(), deque.end(),
             [startTimeMs, storageIndex](const auto& chunk)
             {
-                if constexpr (std::is_same_v<std::decay_t<decltype(chunk)>, server::ChunksDeque::ProxyChunk>)
-                    return chunk.chunk().startTimeMs == startTimeMs && chunk.chunk().storageIndex == storageIndex;
+                constexpr bool isProxyChunk =
+                    std::is_same_v<std::decay_t<decltype(chunk)>, server::ChunksDeque::ProxyChunk>;
+                if constexpr (isProxyChunk)
+                {
+                    return
+                        chunk.chunk().startTimeMs == startTimeMs
+                        && chunk.chunk().storageIndex == storageIndex;
+                }
                 else
+                {
                     return chunk.startTimeMs == startTimeMs && chunk.storageIndex == storageIndex;
+                }
             });
 
         if (it != deque.end())
             deque.erase(it);
     }
 
-    int referenceSpace(int storageIndex) const
+    int referenceSpace(std::deque<ChunkCore>& referenceDeque, int storageIndex) const
     {
         return std::accumulate(
-            m_referenceDeque.cbegin(), m_referenceDeque.cend(), 0,
+            referenceDeque.cbegin(), referenceDeque.cend(), 0,
             [storageIndex](int sum, const ChunkCore& chunk)
             {
                 if (chunk.storageIndex == storageIndex)
                     return sum + chunk.fileSize;
                 return sum;
             });
+    }
+
+    template<typename F>
+    void assertMergeOperationWorksCorrectly(F mergeAlgorithm)
+    {
+        server::ChunksDeque result;
+        std::deque<ChunkCore> referenceResult;
+        mergeAlgorithm(
+            m_deque.begin(), m_deque.end(), m_deque2.begin(), m_deque2.end(),
+            server::ChunksDequeBackInserter(result));
+        mergeAlgorithm(
+            m_referenceDeque.begin(), m_referenceDeque.end(), m_referenceDeque2.begin(),
+            m_referenceDeque2.end(),std::back_inserter(referenceResult));
+        assertEquality(result, referenceResult);
+        assertSpace(result, referenceResult, kStorageCount);
+
+        const auto resultSize = result.size();
+        ASSERT_NE(0, resultSize);
+        result.clear();
+        referenceResult.clear();
+        result.resize(resultSize);
+        referenceResult.resize(resultSize);
+
+        mergeAlgorithm(
+            m_deque.begin(), m_deque.end(), m_deque2.begin(), m_deque2.end(),
+            result.begin());
+        mergeAlgorithm(
+            m_referenceDeque.begin(), m_referenceDeque.end(), m_referenceDeque2.begin(),
+            m_referenceDeque2.end(), referenceResult.begin());
+        assertEquality(result, referenceResult);
+        assertSpace(result, referenceResult, kStorageCount);
+    }
+
+    void assertIteratorTraversal(
+        auto dequeBeginF, auto dequeEndF, auto referenceDequeBeginF, auto referenceDequeEndF)
+    {
+        auto it1 = dequeBeginF();
+        auto it2 = referenceDequeBeginF();
+        for (; it1 != dequeEndF(); ++it1)
+        {
+            ASSERT_EQ(it2->startTimeMs, it1->startTimeMs);
+            ASSERT_EQ(it2->fileSize, it1->getFileSize());
+            ASSERT_EQ(it2->storageIndex, it1->storageIndex);
+            ASSERT_EQ(it2->startTimeMs, (*it1).chunk().startTimeMs);
+            ASSERT_EQ(it2->fileSize, (*it1).chunk().getFileSize());
+            ASSERT_EQ(it2->storageIndex, (*it1).chunk().storageIndex);
+            ++it2;
+        }
+
+        ASSERT_EQ(dequeEndF(), it1);
+        ASSERT_EQ(referenceDequeEndF(), it2);
+
+        it1 = dequeBeginF();
+        it2 = referenceDequeBeginF();
+        for (; it1 != dequeEndF(); it1++)
+        {
+            ASSERT_EQ(it2->startTimeMs, it1->startTimeMs);
+            ASSERT_EQ(it2->fileSize, it1->getFileSize());
+            ASSERT_EQ(it2->storageIndex, it1->storageIndex);
+            ASSERT_EQ(it2->startTimeMs, (*it1).chunk().startTimeMs);
+            ASSERT_EQ(it2->fileSize, (*it1).chunk().getFileSize());
+            ASSERT_EQ(it2->storageIndex, (*it1).chunk().storageIndex);
+            it2++;
+        }
+
+        ASSERT_EQ(dequeEndF(), it1);
+        ASSERT_EQ(referenceDequeEndF(), it2);
     }
 };
 
@@ -376,6 +379,12 @@ TEST_F(ChunksDeque, reverseIterators)
     assertReverseIteratorsTraversal();
 }
 
+TEST_F(ChunksDeque, iterators)
+{
+    givenChunksDequeWithSomeChunks();
+    assertForwardIteratorsTraversal();
+}
+
 TEST_F(ChunksDeque, reverseAndSort)
 {
     givenChunksDequeWithSomeChunks();
@@ -394,13 +403,13 @@ TEST_F(ChunksDeque, merge)
 TEST_F(ChunksDeque, removeIf)
 {
     givenChunksDequeWithSomeChunks();
-    assertRemoveIfCorrectly();
+    assertRemoveIfWorksCorrectly();
 }
 
 TEST_F(ChunksDeque, setUnion)
 {
     given2SortedDeques();
-    assertSetUnionCorrectly();
+    assertSetUnionWorksCorrectly();
 }
 
 }
