@@ -250,7 +250,7 @@ LOCAL const char **get_options(
     }
 
     if (version) {
-        fprintf(stdout, "\n  %s version %s\n\n", program, MMDB_lib_version());
+        fprintf(stdout, "\n  %s version %s\n\n", program, VERSION);
         exit(0);
     }
 
