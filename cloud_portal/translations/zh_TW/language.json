@@ -141,14 +141,14 @@
     "lostConnection": "與 {{systemName}} 的連線斷開了",
     "thisSystem": "系統",
     "oldSafariNotSupported": "不支持10歲以上的Safari版本",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
-    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
-    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
+    "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/download\">latest build</a>.",
+    "FAIL": "System <strong>{{failedSystem}}</strong> is currently unreachable.<br>Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
   },
   "merging": {
     "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "好",
@@ -194,8 +194,9 @@
     "confirmUnshareAction": "刪除",
     "successDisconnected": "系統成功地斷開 %PRODUCT_NAME%",
     "successDeleted": "從您的帳號成功刪除系統 {{systemName}}",
-    "failedMerge": "System merge failed",
-    "successMerge": "System merge completed",
+    "mergeFailed": "System merge failed",
+    "mergeStart": "Systems have started merging",
+    "mergeSuccess": "System merge completed",
     "permissionsRemoved": "權限從 {{email}} 被移除",
     "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },

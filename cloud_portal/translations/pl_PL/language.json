@@ -39,7 +39,7 @@
   },
   "systemStatuses": {
     "activated": "aktywny",
-    "incompatible": "incompatible",
+    "incompatible": "niekompatybilny",
     "merging": "łączenie",
     "notActivated": "nieaktywny",
     "online": "online",
@@ -141,14 +141,14 @@
     "lostConnection": "Utracono połączenie z {{systemName}}",
     "thisSystem": "system",
     "oldSafariNotSupported": "Wersje Safari starsze niż 10 nie są obsługiwane",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
-    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
-    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
+    "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> jest w trybie offline.",
+    "INCOMPATIBLE": "Systemy mają różne wersje oprogramowania. Zaktualizuj oba z nich do <a href=\"/download\">najnowszej wersji</a>.",
+    "FAIL": "System <strong>{{failedSystem}}</strong> jest obecnie niedostępny.<br>Spróbuj ponownie za kilka minut lub skontaktuj się z <a href=\"%SUPPORT_LINK%\" target=\"_blank\">działem wsparcia technicznego</a>."
   },
   "merging": {
-    "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "mergeFailedTitle": "Łączenie systemów nie powiodło się",
+    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "dobre",
@@ -194,8 +194,9 @@
     "confirmUnshareAction": "Usuń",
     "successDisconnected": "System został pomyślnie odłączony od %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} został pomyślnie usunięty z Twojego konta",
-    "failedMerge": "System merge failed",
-    "successMerge": "Zakończono łączenie systemu",
+    "mergeFailed": "System merge failed",
+    "mergeStart": "Systems have started merging",
+    "mergeSuccess": "Zakończono łączenie systemu",
     "permissionsRemoved": "Uprawnienia zostały usunięte z {{email}}",
     "unknownName": "Nieznana nazwa systemu (złączenie w chmurze)"
   },

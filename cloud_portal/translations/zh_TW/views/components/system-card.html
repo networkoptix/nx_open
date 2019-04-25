@@ -4,7 +4,7 @@
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">重命名系統</button>
         </p>
-        <p ng-if="systems.length > 1 && canMerge || debugMode || betaMode">
+        <p ng-if="systems.length > 1 && system.canMerge || configCanMerge || debugMode || betaMode">
             <button class="btn btn-default"
                     ng-disabled="(currentlyMerging || !system.isOnline || !system.isAvailable) && !(debugMode || betaMode)"
                     ng-click="mergeSystems()">與其他系統合併</button>

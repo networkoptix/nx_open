@@ -39,7 +39,7 @@
   },
   "systemStatuses": {
     "activated": "activado",
-    "incompatible": "incompatible",
+    "incompatible": "incompatível",
     "merging": "merging",
     "notActivated": "não activado",
     "online": "online",
@@ -141,14 +141,14 @@
     "lostConnection": "Conexão a {{systemName}} perdida",
     "thisSystem": "o sistema",
     "oldSafariNotSupported": "Versões do Safari anteriores à 10 não são suportadas",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
-    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
-    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
+    "mergedSystemIsOffline": "O Sistema <strong>{{failedSystem}}</strong> está offline.",
+    "INCOMPATIBLE": "Os sistemas têm versões de software diferentes. Por favor, actualize os dois para o <a href=\"/download\">build mais recente</a>.",
+    "FAIL": "O sistema <strong>{{failedSystem}}</strong> está actualmente inacessível.<br> Tente novamente em alguns instantes ou entre em contato com o <a href=\"%SUPPORT_LINK%\" target=\"_blank\">suporte</a>."
   },
   "merging": {
-    "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "mergeFailedTitle": "Falha na fusão de Sistemas",
+    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "bom",
@@ -194,8 +194,9 @@
     "confirmUnshareAction": "Apagar",
     "successDisconnected": "O Sistema foi desconectado de %PRODUCT_NAME% com sucesso",
     "successDeleted": "O sistema {{systemName}} foi apagado com sucesso da sua conta",
-    "failedMerge": "System merge failed",
-    "successMerge": "System merge completed",
+    "mergeFailed": "System merge failed",
+    "mergeStart": "Systems have started merging",
+    "mergeSuccess": "System merge completed",
     "permissionsRemoved": "As permissões foram removidas de {{email}}",
     "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
@@ -336,8 +337,8 @@
     }
   },
   "recommendSupport": {
-    "a_recommend": "We'd recommend consulting with",
+    "a_recommend": "Recomendamos consultar com",
     "b_support": "suporte",
-    "c_proceeding": "before proceeding."
+    "c_proceeding": "antes de proceder."
   }
 }

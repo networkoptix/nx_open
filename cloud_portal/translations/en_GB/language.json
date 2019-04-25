@@ -141,14 +141,14 @@
     "lostConnection": "Connection to {{systemName}} lost",
     "thisSystem": "the system",
     "oldSafariNotSupported": "Versions of Safari older than 10 are not supported",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
-    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
-    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
+    "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/download\">latest build</a>.",
+    "FAIL": "System <strong>{{failedSystem}}</strong> is currently unreachable.<br>Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
   },
   "merging": {
     "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "good",
@@ -194,8 +194,9 @@
     "confirmUnshareAction": "Delete",
     "successDisconnected": "System is successfully disconnected from %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} is successfully deleted from your account",
-    "failedMerge": "System merge failed",
-    "successMerge": "System merge completed",
+    "mergeFailed": "System merge failed",
+    "mergeStart": "Systems have started merging",
+    "mergeSuccess": "System merge completed",
     "permissionsRemoved": "Permissions were removed from {{email}}",
     "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },

@@ -72,9 +72,9 @@
 	"Your browser is not supported": "เบราว์เซอร์ของคุณไม่สนับสนุนการทำงานของระบบ",
 	"connectToCloud": "Connect System you want to merge with this one to <strong>{{productName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.",
 	"latest build": "รุ่นล่าสุด",
-	"mergeConfirmation": "You are about to merge systems <strong>{{system}}</strong> and <strong>{{targetSystem}}</strong>. Settings and the name will be taken from the <strong>{{system}}</strong>.",
-	"primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current system. Update the current system to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.",
-	"secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current system. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
+	"mergeConfirmation": "You are about to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>. Settings and the name will be taken from the <strong>{{primarySystem}}</strong>.",
+	"primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current System. Update the current System to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.",
+	"secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current System. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
 	"servers in the merged System.": "เซิร์ฟเวอร์ในระบบที่ถูกผสาน",
 	"support": "ทีมช่วยเหลือ",
 	"systemUnavailable": "System {{targetSystem}} is currently unreachable. Try again in a few minutes or contact"

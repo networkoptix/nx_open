@@ -4,7 +4,7 @@
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Byt namn på systemet</button>
         </p>
-        <p ng-if="systems.length > 1 && canMerge || debugMode || betaMode">
+        <p ng-if="systems.length > 1 && system.canMerge || configCanMerge || debugMode || betaMode">
             <button class="btn btn-default"
                     ng-disabled="(currentlyMerging || !system.isOnline || !system.isAvailable) && !(debugMode || betaMode)"
                     ng-click="mergeSystems()">Sammanfoga med ett annat system</button>
@@ -39,11 +39,11 @@
         <br>
         <div ng-if="mergeTargetSystem.name" >
             <div><strong>{{mergeTargetSystem.name}}</strong>
-                is being merged to this system</div>
+                slås samman med detta system</div>
             <hr />
             <div class="merge-info-text light-text">Beroende på databasens storlek kan det ta upp till flera timmar</div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Avsluta systemsammanslagning</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
@@ -51,16 +51,16 @@
         </div>
         <br>
         <div ng-if="mergeTargetSystem.name">
-            <div>This system is being merged to
+            <div>Detta system slås samman till
                 <strong>{{mergeTargetSystem.name}}</strong></div>
             <hr />
             <div class="merge-info-text light-text">
                 <p>Beroende på databasens storlek kan det ta upp till flera timmar.</p>
                 <p>Innan sammanslagningen är klar kan du logga in på det här systemet och titta på video, men kan inte ändra några inställningar.</p>
-                <p>When merge is finished, all users and cameras from this system will become available
-                    in <strong>{{mergeTargetSystem.name}}</strong> System, and this system will be deleted.</p>
+                <p>När sammanslagning är klar kommer alla användare och kameror från detta system att bli tillgängliga
+                    i <strong>{{mergeTargetSystem.name}}</strong> System, och detta system kommer att raderas.</p>
             </div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Avsluta systemsammanslagning</div>
     </div>
 </div>

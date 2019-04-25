@@ -39,8 +39,8 @@
   },
   "systemStatuses": {
     "activated": "активирован",
-    "incompatible": "incompatible",
-    "merging": "merging",
+    "incompatible": "несовместима",
+    "merging": "объединяется",
     "notActivated": "не активирован",
     "online": "в сети",
     "offline": "не в сети",
@@ -141,14 +141,14 @@
     "lostConnection": "Подключение к {{systemName}} потеряно",
     "thisSystem": "система",
     "oldSafariNotSupported": "Версии Safari старше 10 не поддерживаются",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both systems – in the selected and in the current one. Remove offline and incompatible servers from each system and try again.",
-    "mergedSystemIsOffline": "System <strong>{{secondarySystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/downloads\">latest build</a>.",
-    "FAIL": "System <strong>{{secondarySystem}}</strong> is currently unreachable. Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
+    "mergedSystemIsOffline": "Система <strong>{{failedSystem}}</strong> не в сети.",
+    "INCOMPATIBLE": "Системы имеют разные версии программного обеспечения. Пожалуйста, обновите их на <a href=\"/download\">последнюю версию</a>.",
+    "FAIL": "Система <strong>{{failedSystem}}</strong> в настоящее время недоступна.<br>Повторите попытку через несколько минут или обратитесь в <a href=\"%SUPPORT_LINK%\" target=\"_blank\">поддержку</a>."
   },
   "merging": {
-    "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "mergeFailedTitle": "Объединение систем не удалось",
+    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "хорошее",
@@ -194,8 +194,9 @@
     "confirmUnshareAction": "Удалить",
     "successDisconnected": "Система успешно отключена от %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успешно удалена из вашей учетной записи",
-    "failedMerge": "System merge failed",
-    "successMerge": "Слияние системы завершено",
+    "mergeFailed": "System merge failed",
+    "mergeStart": "Systems have started merging",
+    "mergeSuccess": "Слияние системы завершено",
     "permissionsRemoved": "{{email}} был лишен полномочий",
     "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },

@@ -4,7 +4,7 @@
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Renommer système</button>
         </p>
-        <p ng-if="systems.length > 1 && canMerge || debugMode || betaMode">
+        <p ng-if="systems.length > 1 && system.canMerge || configCanMerge || debugMode || betaMode">
             <button class="btn btn-default"
                     ng-disabled="(currentlyMerging || !system.isOnline || !system.isAvailable) && !(debugMode || betaMode)"
                     ng-click="mergeSystems()">Fusionner avec un autre système</button>
@@ -38,11 +38,11 @@
         <br>
         <div ng-if="mergeTargetSystem.name" >
             <div><strong>{{mergeTargetSystem.name}}</strong>
-                is being merged to this system</div>
+                est en cours de fusion à ce système</div>
             <hr />
             <div class="merge-info-text light-text">Selon la taille de la base de données, cela peut prendre plusieurs heures</div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Terminer la fusion des systèmes</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
@@ -50,16 +50,16 @@
         </div>
         <br>
         <div ng-if="mergeTargetSystem.name">
-            <div>This system is being merged to
+            <div>Ce système est en cours de fusion avec
                 <strong>{{mergeTargetSystem.name}}</strong></div>
             <hr />
             <div class="merge-info-text light-text">
                 <p>Selon la taille de la base de données, cela peut prendre plusieurs heures.</p>
                 <p>Tant que la fusion n'est pas terminée, vous pouvez vous connecter à ce système et regarder le vidéo, mais vous ne pouvez modifier aucun paramètre.</p>
-                <p>When merge is finished, all users and cameras from this system will become available
-                    in <strong>{{mergeTargetSystem.name}}</strong> System, and this system will be deleted.</p>
+                <p>Lorsque la fusion sera terminée, tous les usagers et caméras de ce système seront disponible
+                dans le système "<strong>{{mergeTargetSystem.name}}</strong>", et ce système sera supprimé.</p>
             </div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Terminer la fusion des systèmes</div>
     </div>
 </div>
