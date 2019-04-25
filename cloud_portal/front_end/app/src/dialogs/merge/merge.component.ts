@@ -71,10 +71,10 @@ export class MergeModalContent {
         }, {
             errorCodes: {
                 mergedSystemIsOffline: () => {
-                    return this.language.system.failedMerge;
+                    return this.language.system.mergeFailed;
                 },
                 vmsRequestFailure: () => {
-                    return this.language.system.failedMerge;
+                    return this.language.system.mergeFailed;
                 },
                 wrongPassword: () => {
                     this.mergeForm.controls['mergePassword'].setErrors({'wrongPassword': true});
@@ -84,7 +84,7 @@ export class MergeModalContent {
                     this.wrongPassword = true;
                 },
             },
-            successMessage: this.language.system.successMerge
+            successMessage: this.language.system.mergeStart
         }).then(() => {
             this.systemsProvider.forceUpdateSystems();
             this.activeModal.close({

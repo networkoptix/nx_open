@@ -194,8 +194,9 @@
     "confirmUnshareAction": "Delete",
     "successDisconnected": "System is successfully disconnected from %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} is successfully deleted from your account",
-    "failedMerge": "System merge failed",
-    "successMerge":"System merge completed",
+    "mergeFailed": "System merge failed",
+    "mergeStart": "Systems have started merging",
+    "mergeSuccess":"System merge completed",
     "permissionsRemoved": "Permissions were removed from {{email}}",
     "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
