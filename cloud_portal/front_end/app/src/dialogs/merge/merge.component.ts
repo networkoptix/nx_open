@@ -206,13 +206,15 @@ export class MergeModalContent {
         return {...this.systems[0]};
     }
 
-    setSecondarySystem() {
+    setSystems() {
+        this.primarySystem = this.primarySystem.id === this.system.id ? this.system : this.targetSystem;
         this.secondarySystem = this.primarySystem.id === this.system.id ? this.targetSystem : this.system;
     }
 
     setTargetSystem(targetSystem) {
         this.systemMergeable = '';
         this.targetSystem = {... this.systems.find(system => system.id === targetSystem.id)};
+        this.setSystems();
     }
 
     updateState() {
