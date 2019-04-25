@@ -8,7 +8,7 @@ nx_add_target(libconnection_mediator LIBRARY NO_MOC
     PRIVATE_LIBS
         qtservice qtsinglecoreapplication
     PUBLIC_LIBS
-        cloud_db_client common nx_network nx_fusion nx_utils nx_clusterdb_map
+        cloud_db_client common nx_network nx_fusion nx_utils nx_clusterdb_map nx_maxminddb
 )
 
 set_target_properties(libconnection_mediator PROPERTIES PREFIX "")
