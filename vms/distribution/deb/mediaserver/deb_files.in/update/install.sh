@@ -7,36 +7,6 @@ TARGET_DEVICE="@targetDevice@"
 
 RELEASE_YEAR=$(lsb_release -a |grep "Release:" |awk {'print $2'} |awk -F  "." '/1/ {print $1}')
 
-is_rpi() {
-    if [[ $TARGET_DEVICE == "linux_arm32" ]]
-    then
-        grep '^Hardware.*:.*BCM2835[[:space:]]*$' /proc/cpuinfo &>/dev/null
-    else
-        false
-    fi
-}
-
-is_bananapi() {
-    if [[ $TARGET_DEVICE == "linux_arm32" ]]
-    then
-        grep '^Hardware.*:.*sun8i[[:space:]]*$' /proc/cpuinfo &>/dev/null
-    else
-        false
-    fi
-}
-
-hw_platform() {
-    if is_rpi
-    then
-        echo "raspberryPi"
-    elif is_bananapi
-    then
-        echo "bananaPi"
-    else
-        echo "unknown"
-    fi
-}
-
 installDeb()
 {
     local -r DEB="$1"
@@ -55,8 +25,19 @@ installDeb()
     fi
 }
 
+deleteObsoleteFiles()
+{
+    local -r DIR="/opt/$COMPANY_NAME"
+    rm "$DIR/version.txt" #< No longer present in 4.0.
+    rm "$DIR/build_info.txt" #< In 4.0 resides inside "mediaserver" dir.
+    rm "$DIR/specific_features.txt" #< In 4.0 resides inside "mediaserver" dir.
+    rm "$DIR/installation_info.json" #< Will be generated on first Server start.
+}
+
 update()
 {
+    deleteObsoleteFiles
+
     export DEBIAN_FRONTEND=noninteractive
     CIFSUTILS=$(dpkg -l |grep cifs-utils |grep ii |awk '{print $2}')
     if [ -z "$CIFSUTILS" ]
@@ -65,10 +46,9 @@ update()
     fi
     installDeb "$DISTRIB"
 
-    echo -e "{\n    \"hwPlatform\": \"$(hw_platform)\"\n}" \
-        >"/opt/$COMPANY_NAME/installation_info.json"
-
-    if is_rpi
+    # TODO: #alevenkov Consider moving this block to postinst to enable rpi camera after a clean
+    # installation (this script works only when upgrading). Note the reboot command.
+    if grep '^Hardware.*:.*BCM2835[[:space:]]*$' /proc/cpuinfo &>/dev/null
     then
         bash nx_rpi_cam_setup.sh
         reboot
