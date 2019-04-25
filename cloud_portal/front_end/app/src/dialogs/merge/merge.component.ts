@@ -95,7 +95,32 @@ export class MergeModalContent {
             });
         }, (error) => {
             if (error.data.resultCode !== 'wrongPassword') {
-                error.data.targetSystem = this.targetSystem;
+
+                error.data.primarySystemName = this.primarySystem.name;
+                if (error.data.primarySystemName === undefined) {
+                    error.data.primarySystemName = this.primarySystem.info && this.primarySystem.info.name;
+                }
+
+                error.data.secondarySystemName = this.secondarySystem.name;
+                if (error.data.secondarySystemName === undefined) {
+                    error.data.secondarySystemName = this.secondarySystem.info && this.secondarySystem.info.name;
+                }
+
+                var primaryState = this.primarySystem.stateOfHealth;
+                if (primaryState === undefined) {
+                    primaryState = this.primarySystem.info && this.primarySystem.info.stateOfHealth;
+                }
+
+                var secondaryState = this.secondarySystem.stateOfHealth;
+                if (secondaryState === undefined) {
+                    secondaryState = this.secondarySystem.info && this.secondarySystem.info.stateOfHealth;
+                }
+
+                if (primaryState !== 'online') {
+                    error.data.failedSystemName = error.data.primarySystemName;
+                } else if (secondaryState !== 'online') {
+                    error.data.failedSystemName = error.data.secondarySystemName;
+                }
                 this.activeModal.dismiss(error.data);
             }
         });

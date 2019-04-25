@@ -183,16 +183,18 @@ angular.module('cloudApp')
                         }
                     }, function(error) {
                         var commonErrorMsg = L.merging.commonText
-                            .replace('{{primarySystem}}', $scope.system.info.name)
-                            .replace('{{secondarySystem}}', error.targetSystem.name);
+                            .replace('{{primarySystem}}', error.primarySystemName)
+                            .replace('{{secondarySystem}}', error.secondarySystemName);
                         var dialogBody = '<p>' + commonErrorMsg + '</p>';
+                        error.errorText = "FAIL";
                         var responseError = L.errorCodes[error.errorText] || L.errorCodes[error.responseCode];
                         if (!responseError) {
-                            delete error.targetSystem;
-                            delete error.targetSystem;
+                            delete error.failedSystemName;
+                            delete error.primarySystemName;
+                            delete error.secondarySystemName;
                             responseError = L.errorCodes.unknownError + ':<br><pre>' + JSON.stringify(error, null, 2) + '</pre>';
                         } else {
-                            responseError = responseError.replace('{{secondarySystem}}', error.targetSystem.name);
+                            responseError = responseError.replace('{{failedSystem}}', error.failedSystemName);
                         }
                         dialogBody += '<p>' + responseError + '</p>';
                         dialogs.confirm(dialogBody, L.merging.mergeFailedTitle, L.dialogs.okButton, 'btn-primary', null);
