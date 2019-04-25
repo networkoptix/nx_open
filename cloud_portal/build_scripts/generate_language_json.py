@@ -65,18 +65,19 @@ def generate_languages_files(languages, template_filename):
         language_json_filename = os.path.join("../../../..", "translations", lang, 'language.json')
 
         print("Load: " + language_json_filename)
-        with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
-            data = json.load(file_descriptor)
-            data["language"] = lang
+        if os.path.exists(language_json_filename):
+            with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
+                data = json.load(file_descriptor)
+                data["language"] = lang
 
-            if data["language_name"] == 'LANGUAGE_NAME':
-                sys.stderr.write('ERROR: For BORIS to fix: language.json has wrong language_name. '
-                                 'File: ' + language_json_filename + '\n')
-                data["language_name"] = lang
-            merge(data, all_strings)
-        save_content("static/lang_" + lang + "/language.json", json.dumps(all_strings, ensure_ascii=False))
+                if data["language_name"] == 'LANGUAGE_NAME':
+                    sys.stderr.write('ERROR: For BORIS to fix: language.json has wrong language_name. '
+                                     'File: ' + language_json_filename + '\n')
+                    data["language_name"] = lang
+                merge(data, all_strings)
+            save_content("static/lang_" + lang + "/language.json", json.dumps(all_strings, ensure_ascii=False))
 
-        # Process i18n files
+            # Process i18n files
         i18n_json_filename = os.path.join("../../../..", "translations", lang, 'language_i18n.json')
         print("Load: " + i18n_json_filename)
 
