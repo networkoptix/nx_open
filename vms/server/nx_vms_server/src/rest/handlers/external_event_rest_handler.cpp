@@ -85,10 +85,10 @@ rest::Response ExternalEventRestHandler::executePost(const rest::Request& reques
             return request.paramOrDefault(name).replace('+', "%20");
         };
 
-    businessParams.resourceName = decoded("inputPortId");
-    businessParams.caption = decoded("source");
-    businessParams.description = decoded("caption");
-    businessParams.inputPortId = decoded("description");
+    businessParams.resourceName = decoded("source");
+    businessParams.caption = decoded("caption");
+    businessParams.description = decoded("description");
+    businessParams.inputPortId = decoded("inputPortId");
 
     if (const auto value = request.param("metadata"))
     {
