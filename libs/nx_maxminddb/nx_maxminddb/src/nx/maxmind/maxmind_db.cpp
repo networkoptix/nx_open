@@ -14,31 +14,6 @@ struct Mmdb: public MMDB_s
     }
 };
 
-void dump(MMDB_lookup_result_s& lookupResult, const std::string& ipAddress)
-{
-    MMDB_entry_data_list_s *entry_data_list = NULL;
-    int exit_code = 0;
-    if (lookupResult.found_entry)
-    {
-        int status = MMDB_get_entry_data_list(&lookupResult.entry, &entry_data_list);
-
-        if (MMDB_SUCCESS != status)
-        {
-            fprintf(stderr, "Got an error looking up the entry data - %s\n", MMDB_strerror(status));
-            return;
-        }
-
-        if (NULL != entry_data_list)
-        {
-            MMDB_dump_entry_data_list(stdout, entry_data_list, 2);
-        }
-    }
-    else
-    {
-        fprintf(stderr, "\n  No entry for this IP address (%s) was found\n\n", ipAddress.c_str());
-    }
-}
-
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
