@@ -4,6 +4,8 @@
 #include <memory>
 #include <optional>
 
+#include <QtCore/QString>
+
 #include <maxminddb.h>
 
 namespace nx::maxmind {
