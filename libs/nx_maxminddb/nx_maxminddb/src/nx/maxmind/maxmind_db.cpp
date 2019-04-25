@@ -57,7 +57,8 @@ bool MaxmindDb::open(const std::string& dbPath)
     int result = MMDB_open(path, MMDB_MODE_MMAP, db.get());
     if (result != MMDB_SUCCESS)
     {
-        NX_VERBOSE(this, "Failed to open maxmind db file: %1, error: %2", MMDB_strerror(result));
+        NX_VERBOSE(this, "Failed to open maxmind db file: %1, error: %2", 
+            path, MMDB_strerror(result));
         return false;
     }
 
