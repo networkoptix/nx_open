@@ -82,7 +82,13 @@ nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
 CameraDiagnostics::Result HikvisionResource::initializeCameraDriver()
 {
     tryToEnableIntegrationProtocols(getDeviceOnvifUrl(), getAuth());
-    return QnPlOnvifResource::initializeCameraDriver();
+    const auto result = QnPlOnvifResource::initializeCameraDriver();
+
+    // We don't support multicast streaming for Hikvision ISAPI cameras.
+    setCameraCapability(Qn::MulticastStreamCapability, false);
+    saveParams();
+    
+    return result;
 }
 
 QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
