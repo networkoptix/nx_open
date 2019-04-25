@@ -28,8 +28,9 @@ target_link_libraries(<your-lib> maxminddb)
 ## Updating to a newer version:
 1. Generate maxminddb_config.h 
     - using configure (on Linux) 
-    - building Visual Studio solution separately (on Windows)
+    - in the ```projects``` directory of the github repository (on Windows)
 2. In ```include``` directory replace:
     - ```maxminddb.h```
     - ```maxminddb_config.h``` from step 1.
 3. Replace all source files in ```src```
+4. In CmakeLists.txt, replace version number (Linux mmdblookup utility won't compile otherwise)

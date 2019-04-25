@@ -12,3 +12,13 @@ if (WIN32)
 endif()
 
 target_include_directories(maxminddb INTERFACE include)
+
+#--------------------------------------------------------------------------------------------------
+# mmdblookup executable (only works on Linux due to use of getopt.h)
+
+if (UNIX)
+    find_package(Threads)
+    add_executable(mmdblookup bin/mmdblookup.c)
+    target_link_libraries(mmdblookup maxminddb pthread)
+    add_definitions(-DPACKAGE_VERSION=\\"1.3.2\\") # not sure why this is necessary
+endif()
