@@ -186,7 +186,6 @@ angular.module('cloudApp')
                             .replace('{{primarySystem}}', error.primarySystemName)
                             .replace('{{secondarySystem}}', error.secondarySystemName);
                         var dialogBody = '<p>' + commonErrorMsg + '</p>';
-                        error.errorText = "FAIL";
                         var responseError = L.errorCodes[error.errorText] || L.errorCodes[error.responseCode];
                         if (!responseError) {
                             delete error.failedSystemName;
