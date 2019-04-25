@@ -1,4 +1,8 @@
-import django, json, base64, urllib, uuid
+import base64
+import django
+import json
+import urllib
+import uuid
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -76,7 +80,7 @@ def increment_rule(rule):
 def make_rule(rule_type, email, password, system_id, caption="", description="", source="", zapier_trigger=""):
     if rule_type == "Generic Event":
         action_params = json.dumps({"additionalResources": ["{00000000-0000-0000-0000-100000000000}",
-                                                "{00000000-0000-0000-0000-100000000001}"],
+                                                            "{00000000-0000-0000-0000-100000000001}"],
                                     "allUsers": False,
                                     "durationMs": 5000,
                                     "forced": True,
@@ -208,6 +212,7 @@ def get_systems(request):
 
     return api_success(zap_list)
 
+
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 @zapier_exceptions
@@ -236,7 +241,7 @@ def zapier_send_generic_event(request):
 @zapier_exceptions
 def nx_http_action(request):
     if 'caption' not in request.query_params or 'system_id' not in request.query_params:
-        return Response({ 'message': "Caption or System Id are missing from query parameters"}, status=400)
+        return Response({'message': "Caption or System Id are missing from query parameters"}, status=400)
     caption = request.query_params['caption']
     system_id = request.query_params['system_id']
     event = system_id + ' ' + caption

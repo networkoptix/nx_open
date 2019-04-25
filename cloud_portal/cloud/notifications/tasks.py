@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from celery import shared_task
 from .engines import email_engine
 
-from smtplib import SMTPException, SMTPConnectError, SMTPServerDisconnected
+from smtplib import SMTPException, SMTPServerDisconnected
 from ssl import SSLError
 from celery.exceptions import Ignore
 
@@ -23,12 +23,13 @@ class MaxResendException(Exception):
         return "Emails was not sent because it hit max retry limit!!!"
 
 
-def log_error(error, user_email, type, message, lang, customization, queue, attempt):
-    error_formatted = '\n{}:{}\nTarget Email: {}\nType: {}\nMessage:{}\nLanguage: {}\nCustomization: {}\nQueue: {}\nAttempt: {}\nCall Stack: {}'\
+def log_error(error, user_email, msg_type, message, lang, customization, queue, attempt):
+    error_formatted = '\n{}:{}\nTarget Email: {}\nType: {}\nMessage:{}\nLanguage: {}\nCustomization: {}\nQueue: {}\n' \
+                      'Attempt: {}\nCall Stack: {}'\
         .format(error.__class__.__name__,
                 error,
                 user_email,
-                type,
+                msg_type,
                 message,
                 lang,
                 customization,

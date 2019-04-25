@@ -1,7 +1,5 @@
 import os
 import yaml
-import os
-import sys
 
 
 def get_config(customization=None):

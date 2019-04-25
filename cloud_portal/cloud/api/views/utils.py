@@ -320,7 +320,7 @@ def get_ipvd(request):
         }
 
         # cache ipvd
-        cache.set("ipvd", ipvd, 60 * 60 * 24) # 24 hours
+        cache.set("ipvd", ipvd, 60 * 60 * 24)  # 24 hours
         # ---------------------
 
         return Response(ipvd)

@@ -2,13 +2,12 @@ import cssutils
 import logging
 import htmlmin
 from inlinestyler.utils import inline_css
-import yaml
 import os
 import shutil
-from os.path import join
 import re
 import inlinestyler
-assert inlinestyler.VERSION == (0, 2, 1), "Setup correct version of inlinestyler! Try 'pip install inlinestyler==0.2.1' and change requirements.txt accordingly"
+assert inlinestyler.VERSION == (0, 2, 1), "Setup correct version of inlinestyler! Try 'pip install " \
+                                          "inlinestyler==0.2.1' and change requirements.txt accordingly"
 
 cssutils.log.setLevel(logging.ERROR)
 
@@ -37,13 +36,14 @@ for file in os.listdir("."):
         template_name = file.replace('.mustache.html', '')
         new_file = open('../' + template_name + '.mustache', 'wb')
         text = container_html.replace('{{>body}}', open(template_name + '.mustache.html').read())
-        print >> new_file, htmlmin.minify(inline_css(text), remove_comments=True, remove_empty_space=True, remove_optional_attribute_quotes=False).encode('utf-8', 'replace')
+        print(htmlmin.minify(inline_css(text), remove_comments=True, remove_empty_space=True,
+                             remove_optional_attribute_quotes=False).encode('utf-8', 'replace'), file=new_file)
 
     if file.endswith(".mustache.txt"):
         template_name = file.replace('.mustache.txt', '')
         new_file = open('../' + template_name + '.txt.mustache', 'wb')
         text = container_text.replace('{{>body}}', open(template_name + '.mustache.txt').read())
-        print >> new_file, text
+        print(text, file=new_file)
 
 
 shutil.copyfile("notifications-language.json", "../notifications-language.json")

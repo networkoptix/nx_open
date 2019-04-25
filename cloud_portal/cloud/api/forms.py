@@ -57,8 +57,8 @@ class GroupAdminForm(forms.ModelForm):
         if self.instance.pk:
             # Populate the users field with the current Group users.
             self.fields['users'].initial = self.instance.user_set.all()
-            self.fields['products'].initial = UserGroupsToProductPermissions.objects.filter(group=self.instance).values_list(
-                'product', flat=True).distinct()
+            self.fields['products'].initial = UserGroupsToProductPermissions.objects.filter(group=self.instance)\
+                .values_list('product', flat=True).distinct()
 
     def save_m2m(self):
         # Add the users to the Group.
@@ -91,9 +91,11 @@ class UserInviteFrom(forms.Form):
         self.user = kwargs.pop('user', None)
         super(UserInviteFrom, self).__init__(*args, **kwargs)
         if self.user:
-            self.fields['customization'].choices = [(customization[0], customization[0]) for customization in self.user.customizations]
+            self.fields['customization'].choices = [(customization[0], customization[0])
+                                                    for customization in self.user.customizations]
 
-    def add_user(self, request):
+    @staticmethod
+    def add_user(request):
         email = request.POST['email']
         customization = request.POST['customization']
         message = request.POST['message']

@@ -27,7 +27,7 @@ def create_new_cloudportals_for_each_customization(logger):
             .exclude(version=None)
         if records_with_name.exists():
             product_name = records_with_name.latest('id').value
-            logger.stdout.write(logger.style.SUCCESS("\tProduct name for {} is {}".\
+            logger.stdout.write(logger.style.SUCCESS("\tProduct name for {} is {}".
                                                      format(customization.name, product_name)))
         else:
             product_name = "Nx Cloud"
@@ -63,7 +63,7 @@ def move_revisions_to_new_cloud_portals(logger):
 
     for cloud in new_clouds:
         logger.stdout.write(
-            logger.style.SUCCESS("\tMoving {} revisions to {}".\
+            logger.style.SUCCESS("\tMoving {} revisions to {}".
                                  format(cloud.customizations.first(), cloud.name)))
         customization_content_versions = original_content_versions.filter(
             customization=cloud.customizations.first())
@@ -126,7 +126,7 @@ def iterate_cms_files(skin_name, ignore_not_english):
 def find_or_add_context_by_file(file_path, product_type, has_language):
     if Context.objects.filter(file_path=file_path, product_type=product_type).exists():
         return Context.objects.get(file_path=file_path, product_type=product_type)
-    context = Context(name=file_path, file_path=file_path, product_type =product_type,
+    context = Context(name=file_path, file_path=file_path, product_type=product_type,
                       translatable=has_language, hidden=True, is_global=False)
     context.save()
     return context
@@ -199,7 +199,8 @@ def find_or_add_language(language_code):
 
 def read_languages(skin_name):
     languages_dir = os.path.join(SOURCE_DIR.replace("{{skin}}", skin_name), "static")
-    languages = [dir.replace('lang_','') for dir in os.listdir(languages_dir) if dir.startswith('lang_')]
+    languages = [directory.replace('lang_', '') for directory in os.listdir(languages_dir)
+                 if directory.startswith('lang_')]
     for language_code in languages:
         find_or_add_language(language_code)
 

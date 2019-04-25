@@ -12,6 +12,7 @@ IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns', 'jpg', 'jpeg')
 
 
 def image_meta(data, extension):
+    # noinspection PyBroadException
     try:
         with Image.open(io.BytesIO(data)) as img:
             width, height = img.size

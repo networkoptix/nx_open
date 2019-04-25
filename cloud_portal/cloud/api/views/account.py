@@ -21,6 +21,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions

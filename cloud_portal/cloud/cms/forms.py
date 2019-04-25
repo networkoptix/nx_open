@@ -76,7 +76,8 @@ class CustomContextForm(forms.Form):
                 ds_description += convert_meta_to_description(data_structure.meta_settings)
 
             if data_structure.type == DataStructure.DATA_TYPES.guid:
-                ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexadecimal characters (0-9, a-f, A-F)"
+                ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexadecimal " \
+                                  "characters (0-9, a-f, A-F)"
 
             ds_language = language
             if not data_structure.translatable:
@@ -209,7 +210,8 @@ class ProductForm(forms.ModelForm):
             cloud_customization = self.instance.customizations.first()
             used_customizations = [product.customizations.first().name
                                    for product in Product.objects.filter(product_type__type=cloud_portal)
-                                   if product.customizations.exists() and product.customizations.first() != cloud_customization]
+                                   if product.customizations.exists() and
+                                   product.customizations.first() != cloud_customization]
 
             # if the form doesnt have the customizations field create it
             if 'customizations' not in self.fields:

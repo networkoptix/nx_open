@@ -15,5 +15,5 @@ class Command(BaseCommand):
         cutoff_date = datetime.now() - timedelta(days=settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
         TaskResult.objects.filter(date_done__lt=cutoff_date).delete()
         Message.objects.filter(send_date__lt=cutoff_date).delete()
-        self.stdout.write(self.style.SUCCESS('Successfully deleted task results and messages older than {} days'\
+        self.stdout.write(self.style.SUCCESS('Successfully deleted task results and messages older than {} days'
                                              .format(settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)))

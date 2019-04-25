@@ -74,6 +74,7 @@ def process_context_structure(product, context, content, language,
     default_language = product.default_language
     location = product.product_root
     for datastructure in context.datastructure_set.order_by('order').all():
+        # noinspection PyBroadException
         try:
             if context_dict and datastructure.name in context_dict:
                 content_value = context_dict[datastructure.name]
@@ -109,8 +110,8 @@ def process_context_structure(product, context, content, language,
                 # print "Save file from DB: " + file_name, context, language, context.is_global
                 save_b64_to_file(content_value, file_name, image_storage)
         except Exception:
-            # if something happens here - instance will not start and it will close to impossible to fix
-            # so we ignore broken records while logging them - it will raise cloud alarm and we will go and fix the problem
+            # if something happens here - instance will not start and it will close to impossible to fix so we ignore
+            # broken records while logging them - it will raise cloud alarm and we will go and fix the problem
             logger.error("ERROR: Cannot process data structure {0} for product {1}".format(
                 datastructure.name, product.name))
             logger.error(traceback.format_exc())
@@ -140,11 +141,13 @@ def process_context(product, context, language_code,
 
     if not context_template_text:
         context_template_text = ''
+    # if context is global - process it
     content = process_context_structure(product, context, context_template_text,
-                                        language, version_id, preview, context.is_global)  # if context is global - process it
+                                        language, version_id, preview, context.is_global)
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
-            content = process_context_structure(product, global_context, content, None, version_id, preview, False, global_contexts_dict)
+            content = process_context_structure(product, global_context, content, None,
+                                                version_id, preview, False, global_contexts_dict)
 
     # If json -> dump it to string
     if type(content) == dict:
@@ -339,13 +342,13 @@ def fill_content(product,
     default_language_code = product.default_language.code
     languages_list = product.languages_list
     for context in changed_contexts:
-        #logger.info("Process context: " + context.name + " file:" + context.file_path)
+        # logger.info("Process context: " + context.name + " file:" + context.file_path)
         # now we need to check what languages were changes
         # if the default language is changed - we update all languages (lazy way)
         # otherwise - update only affected languages
         if incremental:
-            changed_languages = list(changed_records.filter(data_structure__context_id=context.id).\
-                values_list('language__code', flat=True).distinct())
+            changed_languages = list(changed_records.filter(data_structure__context_id=context.id).
+                                     values_list('language__code', flat=True).distinct())
 
             if default_language_code in changed_languages:
                 # if default language changes - it can affect all languages in the context
@@ -354,9 +357,11 @@ def fill_content(product,
         # update affected languages
         if context.translatable:
             for language_code in changed_languages:
-                save_context(product, context, context.file_path, language_code, preview, version_id, global_contexts, global_contexts_dict)
+                save_context(product, context, context.file_path, language_code,
+                             preview, version_id, global_contexts, global_contexts_dict)
         else:
-            save_context(product, context, context.file_path, None, preview, version_id, global_contexts, global_contexts_dict)
+            save_context(product, context, context.file_path, None,
+                         preview, version_id, global_contexts, global_contexts_dict)
 
     generate_languages_json(product.product_root, languages_list,  preview)
 

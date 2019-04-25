@@ -59,7 +59,8 @@ class AccountManager(models.Manager):
     def create_superuser(self, email, password, **extra_fields):
         return self._create_user(email, password, **extra_fields)
 
-    def register_cloud_invite_user(self, email, password, data):
+    @staticmethod
+    def register_cloud_invite_user(email, password, data):
         ip = data.pop("IP", "")
         first_name = data.pop("first_name")
         last_name = data.pop("last_name")
@@ -108,7 +109,9 @@ class Account(AbstractBaseUser, PermissionsMixin):
     activated_date = models.DateTimeField(null=True, blank=True)
     last_login = models.DateTimeField(null=True, blank=True)
     subscribe = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True, help_text="If false the account is disabled. <br> If user was invited to the cloud it will switch to true on its own when the user completes registration.")
+    is_active = models.BooleanField(default=True, help_text="If false the account is disabled. <br> If user was "
+                                                            "invited to the cloud it will switch to true on its own "
+                                                            "when the user completes registration.")
     is_staff = models.BooleanField(default=False, help_text="If true then the user can view cloud admin.")
     language = models.CharField(max_length=7, blank=True)
     customization = models.CharField(max_length=255, null=True)

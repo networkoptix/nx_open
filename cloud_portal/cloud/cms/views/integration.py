@@ -7,7 +7,7 @@ from api.helpers.exceptions import api_success, handle_exceptions
 
 from cms.controllers.filldata import process_context_structure
 from cms.models import Context, DataStructure, Product, ProductCustomizationReview, ProductType,\
-    UserGroupsToProductPermissions, get_cloud_portal_product
+    UserGroupsToProductPermissions
 
 CLOUD_PORTAL = ProductType.PRODUCT_TYPES.cloud_portal
 INTEGRATION = ProductType.PRODUCT_TYPES.integration
@@ -15,7 +15,7 @@ ACCEPTED = ProductCustomizationReview.REVIEW_STATES.accepted
 PENDING = ProductCustomizationReview.REVIEW_STATES.pending
 
 
-def make_integrations_json(integrations, contexts=[], show_pending=False):
+def make_integrations_json(integrations, contexts=None, show_pending=False):
     integrations_json = []
 
     if not contexts:

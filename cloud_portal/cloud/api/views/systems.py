@@ -9,6 +9,7 @@ from cloud import settings
 import hashlib
 import base64
 
+
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions

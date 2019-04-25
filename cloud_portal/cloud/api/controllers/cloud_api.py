@@ -250,9 +250,9 @@ class Account(object):
     @staticmethod
     @validate_response
     @lower_case_email
-    def create_temporary_credentials(email, password, type):
+    def create_temporary_credentials(email, password, credential_type):
         params = {
-            'type': type
+            'type': credential_type
         }
         request = CLOUD_DB_URL + '/account/createTemporaryCredentials'
         return post_wrapper(request, json=params, auth=HTTPDigestAuth(email, password))
@@ -264,7 +264,7 @@ class Account(object):
         params = {
             'email': user_email
         }
-        headers ={
+        headers = {
             'X-Forwarded-For': ip
         }
         request = CLOUD_DB_URL + '/account/resetPassword'

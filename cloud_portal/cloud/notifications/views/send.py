@@ -9,7 +9,8 @@ from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import redirect
 
-from api.helpers.exceptions import handle_exceptions, APIRequestException, APIServiceException, api_success, ErrorCodes, get_client_ip
+from api.helpers.exceptions import handle_exceptions, APIRequestException, APIServiceException,\
+    api_success, ErrorCodes, get_client_ip
 from api.models import Account
 from cms.models import Customization, Product, UserGroupsToProductPermissions, cloud_portal_customization_cache
 from notifications import notifications_api
@@ -42,7 +43,7 @@ def format_message(notification):
     return message
 
 
-def update_or_create_notification(data, customizations=[]):
+def update_or_create_notification(data, customizations=None):
     if not data['id']:
         notification = CloudNotification(subject=data['subject'], body=data['body'])
     else:
@@ -50,8 +51,9 @@ def update_or_create_notification(data, customizations=[]):
         notification.subject = data['subject']
         notification.body = data['body']
         notification.save()
-        customization_ids = Customization.objects.filter(name__in=customizations).all()
-        notification.customizations.set(customization_ids)
+        if customizations:
+            customization_ids = Customization.objects.filter(name__in=customizations).all()
+            notification.customizations.set(customization_ids)
     notification.save()
     return notification.id
 
@@ -72,7 +74,8 @@ def send_event(request):
             validation_error = True
             error_data['type'] = ['This field is required.']
 
-        if 'type' in request.data and request.data['type'] != 'ipvd_feedback_page' and request.data['type'] != 'ipvd_feedback_device' and 'productId' not in request.data:
+        if 'type' in request.data and request.data['type'] != 'ipvd_feedback_page' and \
+                request.data['type'] != 'ipvd_feedback_device' and 'productId' not in request.data:
             validation_error = True
             error_data['productId'] = ['This field is required.']
 
@@ -159,10 +162,10 @@ def send_notification(request):
                 request.data['message']['userFullName'] = user_account[0].get_full_name()
 
         notifications_api.send(request.data['user_email'],
-                 request.data['type'],
-                 request.data['message'],
-                 request.data['customization'],
-                 external_id)
+                               request.data['type'],
+                               request.data['message'],
+                               request.data['customization'],
+                               external_id)
     except ValidationError as error:
         error_data = error.detail if hasattr(error, 'detail') else None
         raise APIRequestException(error.message, ErrorCodes.wrong_parameters, error_data=error_data)

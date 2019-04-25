@@ -21,6 +21,8 @@ from django.contrib.admin import AdminSite
 
 class MyAdminSite(AdminSite):
     pass
+
+
 mysite = MyAdminSite()
 
 
@@ -226,7 +228,7 @@ def make_preview(request):
 def response_attachment(data, filename, content_type):
     response = HttpResponse(data, content_type=content_type)
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
-    response.set_cookie('filename', filename, max_age=10);
+    response.set_cookie('filename', filename, max_age=10)
     return response
 
 

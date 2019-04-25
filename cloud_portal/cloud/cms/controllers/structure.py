@@ -235,8 +235,8 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
 
                     context_template = context.contexttemplate_set.first()
                     # find a line in template which has structure.name in it
-                    template_line = next((line for line in context_template.template.split("\n") if structure.name in line),
-                                         None)
+                    template_line = next((line for line in context_template.template.split("\n")
+                                          if structure.name in line), None)
                     if not template_line:
                         log_messages.append(('warning', 'No line in template %s for data structure %s' %
                                              (name, structure.name)))

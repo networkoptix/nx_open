@@ -25,11 +25,12 @@ class LimitAdminEmailHandler(AdminEmailHandler):
             cache.set(self.COUNTER_CACHE_KEY + key_postfix, 1, self.PERIOD_LENGTH_IN_SECONDS)
         return cache.get(self.COUNTER_CACHE_KEY + key_postfix)
 
+    # noinspection PyBroadException
     def emit(self, record):
         try:
             counter = self.increment_counter(record)
         except Exception:
-            print (traceback.format_exc())
+            print(traceback.format_exc())
         else:
             if counter > self.MAX_EMAILS_IN_PERIOD:
                 return
@@ -43,7 +44,8 @@ class CatchExceptionMiddleware(object):
     def __call__(self, request):
         return self.get_response(request)
 
-    def process_exception(self, request, exception):
+    @staticmethod
+    def process_exception(request, exception):
         logging.info(request)
         logging.critical("{}: {}\nCall Stack:\n{}".format(exception.__class__.__name__,
                                                           exception.message,

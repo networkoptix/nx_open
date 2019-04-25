@@ -102,7 +102,7 @@ class CloudNotificationAdmin(admin.ModelAdmin):
             utc = pytz.utc.localize(obj.sent_date)
             converted_time = utc.astimezone(pytz.timezone(timezone))\
                                 .replace(tzinfo=None).strftime("%b. %d, %Y, %H:%M")
-            return format_html('<span title="{}">{}</span>'.format(timezone,converted_time))
+            return format_html('<span title="{}">{}</span>'.format(timezone, converted_time))
         return obj.sent_date
     convert_date.short_description = "Sent date"
     convert_date.allow_tags = True
@@ -112,7 +112,7 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         self.request = request
         if obj and obj.sent_date:
             return False
-        return super(CloudNotificationAdmin, self).has_delete_permission(request,obj=obj)
+        return super(CloudNotificationAdmin, self).has_delete_permission(request, obj=obj)
 
     def get_readonly_fields(self, request, obj=None):
         if obj and obj.sent_date:

@@ -16,3 +16,4 @@ def make_customization_visible_to_user(cloud_portal, user):
         can_view_group.user_set.add(user)
         can_view_group.permissions.add(can_view_permission)
         UserGroupsToProductPermissions(product=cloud_portal, group=can_view_group).save()
+        
