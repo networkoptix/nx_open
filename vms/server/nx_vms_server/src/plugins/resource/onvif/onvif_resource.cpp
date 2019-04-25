@@ -76,6 +76,12 @@ static const QString kMainH264Profile("Main");
 static const QString kExtendedH264Profile("Extended");
 static const QString kHighH264Profile("High");
 
+static const QString kDefaultPrimaryStreamMulticastAddress("239.0.0.10");
+static const QString kDefaultSecondaryStreamMulticastAddress("239.0.0.11");
+static const int kDefaultPrimaryStreamMulticastPort(2048);
+static const int kDefaultSecondaryStreamMulticastPort(2050);
+static const int kDefaultMulticastTtl(1);
+
 onvifXsd__H264Profile fromStringToH264Profile(const QString& str)
 {
     if (str == kMainH264Profile)
@@ -4768,6 +4774,56 @@ QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::findVideoEncoderC
     return *it;
 }
 
+bool QnPlOnvifResource::fixMulticastParametersIfNeeded(
+    nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
+    nx::vms::api::StreamIndex streamIndex)
+{
+    if (!NX_ASSERT(inOutMulticastParameters, "Multicast parameters must be non-null"))
+        return false;
+
+    bool somethingIsFixed = false;
+    auto& address = inOutMulticastParameters->address;
+    if (!address || !QHostAddress(QString::fromStdString(*address)).isMulticast())
+    {
+        const auto defaultAddress = streamIndex == nx::vms::api::StreamIndex::primary
+            ? kDefaultPrimaryStreamMulticastAddress
+            : kDefaultSecondaryStreamMulticastAddress;
+
+        NX_INFO(this, "Fixing multicast streaming address for stream %1: %2 -> %3",
+            streamIndex, defaultAddress);
+
+        address = defaultAddress.toStdString();
+        somethingIsFixed = true;
+    }
+
+    auto& port = inOutMulticastParameters->port;
+    int portNumber = port ? *port : 0;
+    if (portNumber <= 1024 || portNumber > 65535)
+    {
+        const auto defaultPort = streamIndex == nx::vms::api::StreamIndex::primary
+            ? kDefaultPrimaryStreamMulticastPort
+            : kDefaultSecondaryStreamMulticastPort;
+
+        NX_INFO(this, "Fixing multicast port for stream %1: %2 -> %3",
+            streamIndex, portNumber, defaultPort);
+
+        port = defaultPort;
+        somethingIsFixed = true;
+    }
+
+    auto& ttl = inOutMulticastParameters->ttl;
+    if (!ttl || ttl <= 0)
+    {
+        NX_INFO(this, "Fixing multicast ttl for stream %1: %2 -> %3",
+            streamIndex, ttl ? *ttl : 0, kDefaultMulticastTtl);
+
+        ttl = kDefaultMulticastTtl;
+        somethingIsFixed = true;
+    }
+
+    return somethingIsFixed;
+}
+
 void QnPlOnvifResource::updateVideoEncoder1(
     onvifXsd__VideoEncoderConfiguration& encoder,
     StreamIndex streamIndex,
@@ -5007,6 +5063,37 @@ SoapTimeouts QnPlOnvifResource::onvifTimeouts() const
         return SoapTimeouts::minivalValue();
     else
         return SoapTimeouts(serverModule()->settings().onvifTimeouts());
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::ensureMulticastIsEnabled(
+    nx::vms::api::StreamIndex streamIndex)
+{
+    auto& multicastParametersProvider = streamIndex == nx::vms::api::StreamIndex::primary
+        ? m_primaryMulticastParametersProvider
+        : m_secondaryMulticastParametersProvider;
+
+    auto multicastParameters = multicastParametersProvider.getMulticastParameters();
+    if (!fixMulticastParametersIfNeeded(&multicastParameters, streamIndex))
+    {
+        NX_VERBOSE(this, "Multicast parameters are ok for stream %1", streamIndex);
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    if (!multicastParametersProvider.setMulticastParameters(multicastParameters))
+    {
+        NX_DEBUG(this, "Unable to update multicast parameters for stream %1, parameters: %2",
+            streamIndex, multicastParameters);
+
+        return CameraDiagnostics::RequestFailedResult("Updating multicast parameters",
+            lm("Unable to update multicast parameters for stream %1, parameters: %2")
+                .args(streamIndex, multicastParameters));
+    }
+
+    NX_VERBOSE(this,
+        "Multicast parameters has been successfully updated for stream %1, parameters %2",
+        streamIndex, multicastParameters);
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 #endif //ENABLE_ONVIF
