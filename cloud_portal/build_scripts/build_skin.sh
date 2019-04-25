@@ -18,7 +18,7 @@ dir=../skins/$SKIN
     mkdir -p $TARGET_DIR/$SKIN
 
 
-    echo "------------------------------"
+    echo "------------------------------------------------------------"
     echo "Building front_end"
 
 
@@ -49,8 +49,10 @@ dir=../skins/$SKIN
     echo "Building front_end finished"
 
 
-    echo "------------------------------"
+    echo "------------------------------------------------------------"
+    echo
     echo "Building templates - for each language"
+    echo
 
     mkdir -p $TARGET_DIR/$SKIN/templates/
     cp -rf $dir/templates/* $TARGET_DIR/$SKIN/templates || true
@@ -79,11 +81,13 @@ dir=../skins/$SKIN
 
         echo "Clean sources"
         rm -rf $TARGET_DIR/$SKIN/templates/lang_$LANG/src
+        echo
     done
     echo "Templates success"
 
-    echo "------------------------------"
+    echo "------------------------------------------------------------"
     echo "Localization - portal"
+    echo
 
     for lang_dir in ../translations/*/
     do
@@ -113,6 +117,7 @@ dir=../skins/$SKIN
         pushd $TARGET_DIR/$SKIN
         python ../../../../build_scripts/generate_language_json.py $LANG
         popd
+        echo
 
     done
 

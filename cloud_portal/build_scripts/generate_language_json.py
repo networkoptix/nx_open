@@ -4,6 +4,8 @@ import errno
 import codecs
 import sys
 
+US_LANGUAGE_NAME = "English (US)"
+
 
 def make_dir(filename):
     dirname = os.path.dirname(filename)
@@ -59,6 +61,9 @@ def generate_languages_files(languages, template_filename):
     with codecs.open(template_filename, 'r', 'utf-8') as file_descriptor:
         template = json.load(file_descriptor)
 
+    with codecs.open('static/language_i18n.json', 'r', 'utf-8') as file_descriptor:
+        i18n_template = json.load(file_descriptor)
+
     for lang in languages:
         all_strings = {}
         merge(template, all_strings)
@@ -75,9 +80,15 @@ def generate_languages_files(languages, template_filename):
                                      'File: ' + language_json_filename + '\n')
                     data["language_name"] = lang
                 merge(data, all_strings)
-            save_content("static/lang_" + lang + "/language.json", json.dumps(all_strings, ensure_ascii=False))
+        elif lang != 'en_US':
+            sys.stderr.write('WARNING: ' + language_json_filename + ' don\'t exist.\n')
+        else:
+            all_strings['language_name'] = US_LANGUAGE_NAME
+        save_content("static/lang_" + lang + "/language.json", json.dumps(all_strings, indent=4, ensure_ascii=False))
 
-            # Process i18n files
+        # Process i18n files
+        i18n_strings = {}
+        merge(i18n_template, i18n_strings)
         i18n_json_filename = os.path.join("../../../..", "translations", lang, 'language_i18n.json')
         print("Load: " + i18n_json_filename)
 
@@ -94,10 +105,14 @@ def generate_languages_files(languages, template_filename):
 
                 if data["language_name"] != lang:
                     sys.stderr.write('ERROR: For BORIS to fix: language_i18n.json has wrong language_name. File: ' + i18n_json_filename + '\n')
-
-            save_content("static/lang_" + lang + "/language_i18n.json", json.dumps(data, ensure_ascii=False))
-        else:
+                merge(data, i18n_strings)
+        elif lang != 'en_US':
             sys.stderr.write('WARNING: ' + i18n_json_filename + ' don\'t exist.\n')
+        else:
+            i18n_strings["language"] = lang
+            i18n_strings["language_name"] = US_LANGUAGE_NAME
+
+        save_content("static/lang_" + lang + "/language_i18n.json", json.dumps(i18n_strings, indent=4, ensure_ascii=False))
 
 languages = sys.argv[1:]
 if not languages:
