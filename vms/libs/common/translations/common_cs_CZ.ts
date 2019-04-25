@@ -755,38 +755,38 @@
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
-      <translation type="unfinished">
-        <numerusform>%n %2 je použito z %1.</numerusform>
-        <numerusform>%n %2 je použito z %1.</numerusform>
-        <numerusform>%n %2 are used out of %1.</numerusform>
-        <numerusform>%n %2 are used out of %1.</numerusform>
+      <translation>
+        <numerusform>%n %2 jsou použity z %1.</numerusform>
+        <numerusform>%n %2 jsou použity z %1.</numerusform>
+        <numerusform>%n %2 jsou použity z %1.</numerusform>
+        <numerusform>%n %2 jsou použity z %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n %2 bude použito z %1.</numerusform>
-        <numerusform>%n %2 will be used out of %1.</numerusform>
-        <numerusform>%n %2 will be used out of %1.</numerusform>
-        <numerusform>%n %2 will be used out of %1.</numerusform>
+        <numerusform>%n %2 bude použito z %1.</numerusform>
+        <numerusform>%n %2 bude použito z %1.</numerusform>
+        <numerusform>%n %2 bude použito z %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Aktivovat %n dalších %1.</numerusform>
+        <numerusform>Aktivovat %n dalších %1.</numerusform>
+        <numerusform>Aktivovat %n dalších %1.</numerusform>
         <numerusform>Aktivovat %n další %1.</numerusform>
-        <numerusform>Activate %n more %1.</numerusform>
-        <numerusform>Activate %n more %1.</numerusform>
-        <numerusform>Activate %n more %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n další %1 bude použita.</numerusform>
-        <numerusform>%n more %1 will be used.</numerusform>
-        <numerusform>%n more %1 will be used.</numerusform>
-        <numerusform>%n more %1 will be used.</numerusform>
+        <numerusform>%n další %1 bude použita.</numerusform>
+        <numerusform>%n další %1 bude použita.</numerusform>
+        <numerusform>%n další %1 bude použita.</numerusform>
       </translation>
     </message>
   </context>
@@ -1202,11 +1202,11 @@
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Pohyb na kamerách</numerusform>
-        <numerusform>Motion on Cameras</numerusform>
-        <numerusform>Motion on Cameras</numerusform>
-        <numerusform>Motion on Cameras</numerusform>
+        <numerusform>Pohyb na kamerách</numerusform>
+        <numerusform>Pohyb na kamerách</numerusform>
+        <numerusform>Pohyb na kamerách</numerusform>
       </translation>
     </message>
     <message>
@@ -1243,56 +1243,56 @@
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Vstupní signál na zařízeních</numerusform>
-        <numerusform>Input Signal on Devices</numerusform>
-        <numerusform>Input Signal on Devices</numerusform>
-        <numerusform>Input Signal on Devices</numerusform>
+        <numerusform>Vstupní signál na zařízeních</numerusform>
+        <numerusform>Vstupní signál na zařízeních</numerusform>
+        <numerusform>Vstupní signál na zařízeních</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Vstupní signál na kamerách</numerusform>
-        <numerusform>Input Signal on Cameras</numerusform>
-        <numerusform>Input Signal on Cameras</numerusform>
-        <numerusform>Input Signal on Cameras</numerusform>
+        <numerusform>Vstupní signál na kamerách</numerusform>
+        <numerusform>Vstupní signál na kamerách</numerusform>
+        <numerusform>Vstupní signál na kamerách</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Zařízení byla odpojena</numerusform>
-        <numerusform>Devices Disconnected</numerusform>
-        <numerusform>Devices Disconnected</numerusform>
-        <numerusform>Devices Disconnected</numerusform>
+        <numerusform>Zařízení byla odpojena</numerusform>
+        <numerusform>Zařízení byla odpojena</numerusform>
+        <numerusform>Zařízení byla odpojena</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kamery byly odpojeny</numerusform>
-        <numerusform>Cameras Disconnected</numerusform>
-        <numerusform>Cameras Disconnected</numerusform>
-        <numerusform>Cameras Disconnected</numerusform>
+        <numerusform>Kamery byly odpojeny</numerusform>
+        <numerusform>Kamery byly odpojeny</numerusform>
+        <numerusform>Kamery byly odpojeny</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Konflikt IP adres zařízení</numerusform>
-        <numerusform>Devices IP Conflict</numerusform>
-        <numerusform>Devices IP Conflict</numerusform>
-        <numerusform>Devices IP Conflict</numerusform>
+      <translation>
+        <numerusform>Konflikt IP adres</numerusform>
+        <numerusform>Konflikt IP adres</numerusform>
+        <numerusform>Konflikt IP adres</numerusform>
+        <numerusform>Konflikt IP adres</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Konflikt IP adres kamer</numerusform>
-        <numerusform>Cameras IP Conflict</numerusform>
-        <numerusform>Cameras IP Conflict</numerusform>
-        <numerusform>Cameras IP Conflict</numerusform>
+        <numerusform>Konflikt IP adres kamer</numerusform>
+        <numerusform>Konflikt IP adres kamer</numerusform>
+        <numerusform>Konflikt IP adres kamer</numerusform>
       </translation>
     </message>
     <message>
@@ -1423,11 +1423,11 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n krát, první: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n krát, první: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n krát, první: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n krát, první: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1438,20 +1438,20 @@
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>První výskyt: %1 na %2 (celkem %n krát)</numerusform>
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+        <numerusform>První výskyt: %1 na %2 (celkem %n krát)</numerusform>
+        <numerusform>První výskyt: %1 na %2 (celkem %n krát)</numerusform>
+        <numerusform>První výskyt: %1 na %2 (celkem %n krát)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Během posledních %n sekund nebyla přijata žádná data.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+        <numerusform>Během posledních %n sekund nebyla přijata žádná data.</numerusform>
+        <numerusform>Během posledních %n sekund nebyla přijata žádná data.</numerusform>
+        <numerusform>Během posledních %n sekund nebyla přijata žádná data.</numerusform>
       </translation>
     </message>
     <message>
@@ -1581,11 +1581,11 @@
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n rolí</numerusform>
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
+        <numerusform>%n rolí</numerusform>
+        <numerusform>%n rolí</numerusform>
+        <numerusform>%n rolí</numerusform>
       </translation>
     </message>
     <message>

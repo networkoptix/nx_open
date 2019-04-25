@@ -774,15 +774,15 @@
     <name>VideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation type="unfinished">No motion data for this camera</translation>
+      <translation>Pro tuto kameru nejsou k dispozici žádná data o pohybu</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation type="unfinished">No motion found in the selected area</translation>
+      <translation>Ve vybrané oblasti nebyl nalezen žádný pohyb</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation type="unfinished">No motion found in the visible area</translation>
+      <translation>Ve viditelné oblasti nebyl nalezen žádný pohyb</translation>
     </message>
     <message>
       <source>No Archive</source>
@@ -797,7 +797,7 @@
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>Oblast</translation>
     </message>
     <message>
       <source>Change Quality</source>
@@ -809,15 +809,15 @@
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation type="unfinished">Tap and hold to select an area</translation>
+      <translation>Klepnutím a podržením vyberte oblast</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation type="unfinished">Enable motion search first to select an area</translation>
+      <translation>Chcete-li vybrat oblast, nejprve povolte vyhledávání pohybu</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
+      <translation>Neplatná oblast. Nakreslete prosím znovu.</translation>
     </message>
   </context>
   <context>

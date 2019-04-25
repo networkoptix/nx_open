@@ -5,11 +5,11 @@
     <name>DateTimeFormats</name>
     <message>
       <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
+      <translation>MM / DD</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -104,12 +104,12 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>ไม่สามารถรวมระบบเพราะมีเซิร์ฟเวอร์อย่างน้อยหนึ่งตัวที่มี ID เดียวกัน โปรดลบเซิร์ฟเวอร์นี้แล้วลองอีกครั้ง</translation>
     </message>
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+      <translation>ระบบคลาวด์มีเจ้าของแตกต่างกัน ไม่อนุญาตการรวม</translation>
     </message>
   </context>
   <context>
@@ -336,15 +336,15 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>ข้อผิดพลาดของปลั๊กอิน %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>ปลั๊กอินไม่พร้อมใช้งาน</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>ข้อผิดพลาดเซิร์ฟเวอร์ภายใน %1</translation>
     </message>
   </context>
   <context>
@@ -383,7 +383,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>ไม่สามารถจัดสรรบัฟเฟอร์ตัวอย่างรหัสข้อผิดพลาด</translation>
     </message>
   </context>
   <context>
@@ -586,12 +586,12 @@
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>ใบอนุญาตฟรี</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n ใบอนุญาตฟรี</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -660,8 +660,8 @@
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 ฟรีใบอนุญาต</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -738,11 +738,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>อนุญาตหนึ่งสิทธิ์ใช้งานเริ่มต้นต่อหนึ่งระบบ</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>คุณมีใบอนุญาตเริ่มต้นที่มีอยู่แล้ว</translation>
     </message>
   </context>
   <context>
@@ -804,38 +804,38 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n กล้อง</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n กล้อง</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n โมดูล I / O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n โมดูล I / O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n อุปกรณ์</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n อุปกรณ์</numerusform>
       </translation>
     </message>
   </context>
@@ -994,19 +994,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>ไฟล์ซิปเสียหาย</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>ไม่พบเป้าหมาย dir</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>ไม่สามารถเปิดไฟล์เพื่อเขียน</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>ไม่มีที่ว่างบนดิสก์</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1014,22 +1014,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>รายการของคุณถูกยกเลิก</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>ตัวแยกข้อมูลไม่ว่าง</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>ขนาดสตรีมที่เข้ารหัสไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>ส่วนหัวสตรีมที่เข้ารหัสเสียหาย</translation>
     </message>
   </context>
   <context>
@@ -1513,19 +1513,19 @@
     </message>
     <message>
       <source>Plugin Event</source>
-      <translation type="unfinished">Plugin Event</translation>
+      <translation>เหตุการณ์ปลั๊กอิน</translation>
     </message>
     <message>
       <source>Unknown plugin event</source>
-      <translation type="unfinished">Unknown plugin event</translation>
+      <translation>เหตุการณ์ปลั๊กอินที่ไม่รู้จัก</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>ล้มเหลวในการบังคับใช้เวลาของกล้องมันล่าช้ามากเกินไปเวลาของระบบจะถูกใช้</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>เวลาของกล้องกลับสู่ปกติ</translation>
     </message>
   </context>
   <context>

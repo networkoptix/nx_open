@@ -774,15 +774,15 @@
     <name>VideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation type="unfinished">No motion data for this camera</translation>
+      <translation>Nem tartozik mozgásérzékelési adat ehhez a kamerához</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation type="unfinished">No motion found in the selected area</translation>
+      <translation>Nem található mozgás a kiválasztott területen</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation type="unfinished">No motion found in the visible area</translation>
+      <translation>Nem található mozgás a látható területen</translation>
     </message>
     <message>
       <source>No Archive</source>
@@ -797,7 +797,7 @@
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>Terület</translation>
     </message>
     <message>
       <source>Change Quality</source>
@@ -809,15 +809,15 @@
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation type="unfinished">Tap and hold to select an area</translation>
+      <translation>Kattintson és tartsa nyomva egy terület kiválasztásához</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation type="unfinished">Enable motion search first to select an area</translation>
+      <translation>A terület kiválasztásához először engedélyezze a mozgáskeresést</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
+      <translation>Érvénytelen egyéni terület. Kérjük, rajzoljon egy megfelelőt.</translation>
     </message>
   </context>
   <context>

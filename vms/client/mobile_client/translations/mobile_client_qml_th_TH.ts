@@ -774,15 +774,15 @@
     <name>VideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation type="unfinished">No motion data for this camera</translation>
+      <translation>ไม่มีข้อมูลการเคลื่อนไหวสำหรับกล้องนี้</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation type="unfinished">No motion found in the selected area</translation>
+      <translation>ไม่พบการเคลื่อนไหวในพื้นที่ที่เลือก</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation type="unfinished">No motion found in the visible area</translation>
+      <translation>ไม่พบการเคลื่อนไหวในพื้นที่ที่มองเห็นได้</translation>
     </message>
     <message>
       <source>No Archive</source>
@@ -797,7 +797,7 @@
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>พื้นที่</translation>
     </message>
     <message>
       <source>Change Quality</source>
@@ -809,15 +809,15 @@
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation type="unfinished">Tap and hold to select an area</translation>
+      <translation>แตะ ค้างไว้เพื่อเลือกพื้นที่</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation type="unfinished">Enable motion search first to select an area</translation>
+      <translation>เปิดใช้งานการค้นหาการเคลื่อนไหวก่อนเพื่อเลือกพื้นที่</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
+      <translation>พื้นที่ที่กำหนดไม่ถูกต้อง โปรดวาดที่ถูกต้อง</translation>
     </message>
   </context>
   <context>
