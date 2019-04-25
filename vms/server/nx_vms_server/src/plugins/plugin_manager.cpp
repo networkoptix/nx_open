@@ -36,8 +36,11 @@ PluginManager::PluginManager(QObject* parent):
 
 PluginManager::~PluginManager()
 {
-    for (auto& qtPlugin: m_qtPlugins)
-        qtPlugin->unload();
+}
+
+void PluginManager::unloadPlugins()
+{
+    m_nxPlugins.clear();
 }
 
 /**

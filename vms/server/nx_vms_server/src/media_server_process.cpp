@@ -3664,15 +3664,17 @@ void MediaServerProcess::stopObjects()
 
     commonModule()->resourceDiscoveryManager()->stop();
     serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
+    serverModule()->pluginManager()->unloadPlugins();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
     m_serverResourceProcessor.reset();
 
+    serverModule()->resourcePool()->threadPool()->waitForDone();
+
     m_ec2ConnectionFactory->shutdown();
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
 
-    serverModule()->resourcePool()->threadPool()->waitForDone();
     commonModule()->resourcePool()->clear();
 
 
