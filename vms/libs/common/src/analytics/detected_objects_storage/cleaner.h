@@ -36,6 +36,11 @@ private:
     int cleanObjectSearch(nx::sql::QueryContext* queryContext);
     int cleanObjectSearchToObject(nx::sql::QueryContext* queryContext);
     int cleanObject(nx::sql::QueryContext* queryContext);
+
+    int executeObjectDataCleanUpQuery(
+        nx::sql::QueryContext* queryContext,
+        const char* queryText);
+
     int cleanAttributesTextIndex(nx::sql::QueryContext* queryContext);
 };
 
