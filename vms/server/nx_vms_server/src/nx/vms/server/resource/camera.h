@@ -59,9 +59,9 @@ public:
     static const float kMaxEps;
     inline static const QString kDefaultPrimaryStreamMulticastAddress{"239.0.0.10"};
     inline static const QString kDefaultSecondaryStreamMulticastAddress{"239.0.0.11"};
-    static const int kDefaultPrimaryStreamMulticastPort{2048};
-    static const int kDefaultSecondaryStreamMulticastPort{2050};
-    static const int kDefaultMulticastTtl{1};
+    static constexpr int kDefaultPrimaryStreamMulticastPort{2048};
+    static constexpr int kDefaultSecondaryStreamMulticastPort{2050};
+    static constexpr int kDefaultMulticastTtl{1};
 
 
     Camera(QnMediaServerModule* serverModule);
