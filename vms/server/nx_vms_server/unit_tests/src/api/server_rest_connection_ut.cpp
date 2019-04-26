@@ -2,7 +2,6 @@
 
 #include <api/server_rest_connection.h>
 #include <nx_vms_server_ini.h>
-#include <nx/utils/test_support/run_test.h>
 #include <test_support/mediaserver_launcher.h>
 
 namespace nx::test {
@@ -66,7 +65,7 @@ class FtServerRestConnection: public ::testing::Test
 public:
     static void SetUpTestCase()
     {
-        iniTweaks = std::make_unique<nx::utils::test::IniConfigTweaks>();
+        iniTweaks = std::make_unique<nx::kit::IniConfig::Tweaks>();
         iniTweaks->set(&ini().enableApiDebug, true);
 
         server = std::make_unique<MediaServerLauncher>();
@@ -89,7 +88,7 @@ public:
     }
 
 protected:
-    static std::unique_ptr<nx::utils::test::IniConfigTweaks> iniTweaks;
+    static std::unique_ptr<nx::kit::IniConfig::Tweaks> iniTweaks;
     static std::unique_ptr<MediaServerLauncher> server;
     static QnCommonModule* common;
 
@@ -97,7 +96,7 @@ protected:
     HandleKeeper handlerKeeper;
 };
 
-std::unique_ptr<nx::utils::test::IniConfigTweaks> FtServerRestConnection::iniTweaks;
+std::unique_ptr<nx::kit::IniConfig::Tweaks> FtServerRestConnection::iniTweaks;
 std::unique_ptr<MediaServerLauncher> FtServerRestConnection::server;
 QnCommonModule* FtServerRestConnection::common;
 

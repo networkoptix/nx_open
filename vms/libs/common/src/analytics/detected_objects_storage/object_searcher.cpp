@@ -58,7 +58,7 @@ void ObjectSearcher::addObjectFilterConditions(
     const Filter& filter,
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
-    const FieldNames& fieldNames,
+    const ObjectFields& fieldNames,
     nx::sql::Filter* sqlFilter)
 {
     if (!filter.deviceIds.empty())
@@ -82,11 +82,10 @@ void ObjectSearcher::addObjectFilterConditions(
 
     if (!filter.timePeriod.isNull())
     {
-        addTimePeriodToFilter(
+        addTimePeriodToFilter<std::chrono::milliseconds>(
             filter.timePeriod,
-            sqlFilter,
-            fieldNames.timeRangeStart,
-            fieldNames.timeRangeEnd);
+            fieldNames.timeRange,
+            sqlFilter);
     }
 }
 
@@ -119,72 +118,93 @@ void ObjectSearcher::addBoundingBoxToFilter(
     sqlFilter->addCondition(std::move(bottomRightYFilter));
 }
 
+template<typename FieldType>
 void ObjectSearcher::addTimePeriodToFilter(
     const QnTimePeriod& timePeriod,
-    nx::sql::Filter* sqlFilter,
-    const char* leftBoundaryFieldName,
-    const char* rightBoundaryFieldName,
-    std::optional<std::chrono::milliseconds> maxRecordedTimestamp)
+    const TimeRangeFields& timeRangeFields,
+    nx::sql::Filter* sqlFilter)
 {
     using namespace std::chrono;
 
     auto startTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
-        rightBoundaryFieldName,
+        timeRangeFields.timeRangeEnd,
         ":startTimeMs",
-        QnSql::serialized_field(duration_cast<milliseconds>(
+        QnSql::serialized_field(duration_cast<FieldType>(
             timePeriod.startTime()).count()));
     sqlFilter->addCondition(std::move(startTimeFilterField));
 
-    if (timePeriod.durationMs != QnTimePeriod::kInfiniteDuration &&
-        (!maxRecordedTimestamp ||
-            timePeriod.startTime() + timePeriod.duration() <= *maxRecordedTimestamp))
+    if (timePeriod.durationMs != QnTimePeriod::kInfiniteDuration)
     {
         auto endTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldLess>(
-            leftBoundaryFieldName,
+            timeRangeFields.timeRangeStart,
             ":endTimeMs",
-            QnSql::serialized_field(duration_cast<milliseconds>(
+            QnSql::serialized_field(duration_cast<FieldType>(
                 timePeriod.endTime()).count()));
         sqlFilter->addCondition(std::move(endTimeFilterField));
     }
 }
 
+template void ObjectSearcher::addTimePeriodToFilter<std::chrono::milliseconds>(
+    const QnTimePeriod& timePeriod,
+    const TimeRangeFields& timeRangeFields,
+    nx::sql::Filter* sqlFilter);
+
+template void ObjectSearcher::addTimePeriodToFilter<std::chrono::seconds>(
+    const QnTimePeriod& timePeriod,
+    const TimeRangeFields& timeRangeFields,
+    nx::sql::Filter* sqlFilter);
+
+static constexpr char kBoxFilteredTable[] = "%boxFilteredTable%";
+static constexpr char kFromBoxFilteredTable[] = "%fromBoxFilteredTable%";
+static constexpr char kJoinBoxFilteredTable[] = "%joinBoxFilteredTable%";
 static constexpr char kObjectFilteredByTextExpr[] = "%objectFilteredByText%";
 static constexpr char kObjectExpr[] = "%objectExpr%";
-static constexpr char kObjectSearchFrom[] = "%objectSearchFrom%";
-static constexpr char kJoinObjectToObjectSearch[] = "%joinObjectToObjectSearch%";
-static constexpr char kBoundingBoxExpr[] = "%boundingBoxExpr%";
-static constexpr char kObjectOrderByTrackStart[] = "%objectOrderByTrackStart%";
 static constexpr char kLimitObjectCount[] = "%limitObjectCount%";
+static constexpr char kObjectOrderByTrackStart[] = "%objectOrderByTrackStart%";
 
 void ObjectSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
 {
     QString queryText = R"sql(
-        WITH filtered_object AS
-            (SELECT DISTINCT o.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
-                track_detail, attributes_id
-            FROM %objectFilteredByText% o
-                %objectSearchFrom%
-            WHERE %objectExpr%
-                %joinObjectToObjectSearch% %boundingBoxExpr%
-                1 = 1
-            ORDER BY o.track_start_ms %objectOrderByTrackStart%
+        WITH
+          %boxFilteredTable%
+          filtered_object AS
+            (SELECT o.*
+            FROM
+               %fromBoxFilteredTable%
+               %objectFilteredByText%
+            WHERE
+              %joinBoxFilteredTable%
+              %objectExpr%
+              1 = 1
+            ORDER BY track_start_ms DESC
             %limitObjectCount%)
         SELECT o.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
-            track_detail, attrs.content AS content
+            track_detail, attrs.content AS content, best_shot_timestamp_ms, best_shot_rect
         FROM filtered_object o, unique_attributes attrs
         WHERE o.attributes_id = attrs.id
+        ORDER BY track_start_ms %objectOrderByTrackStart%
     )sql";
 
     std::map<QString, QString> queryTextParams({
-        {kObjectFilteredByTextExpr, "object"},
+        {kBoxFilteredTable, ""},
+        {kFromBoxFilteredTable, ""},
+        {kJoinBoxFilteredTable, ""},
+        {kObjectFilteredByTextExpr, "object o"},
         {kObjectExpr, ""},
-        {kObjectSearchFrom, ""},
-        {kJoinObjectToObjectSearch, ""},
-        {kBoundingBoxExpr, ""},
-        {kObjectOrderByTrackStart, "DESC"},
-        {kLimitObjectCount, ""}});
+        {kLimitObjectCount, ""},
+        {kObjectOrderByTrackStart, "DESC"}});
 
-    const auto sqlQueryFilter = prepareSqlFilterExpression();
+    nx::sql::Filter boxSubqueryFilter;
+    if (!m_filter.boundingBox.isEmpty())
+    {
+        QString queryText;
+        std::tie(queryText, boxSubqueryFilter) = prepareBoxFilterSubQuery();
+        queryTextParams[kBoxFilteredTable] = "box_filtered_ids AS (" + queryText + "),";
+        queryTextParams[kFromBoxFilteredTable] = "box_filtered_ids,";
+        queryTextParams[kJoinBoxFilteredTable] = "o.id = box_filtered_ids.object_id AND ";
+    }
+
+    const auto sqlQueryFilter = prepareFilterObjectSqlExpression();
     auto objectFilterSqlText = sqlQueryFilter.toString();
     if (!objectFilterSqlText.empty())
         queryTextParams[kObjectExpr] = (objectFilterSqlText + " AND ").c_str();
@@ -199,21 +219,7 @@ void ObjectSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
     {
         queryTextParams[kObjectFilteredByTextExpr] =
             "(SELECT * FROM object WHERE attributes_id IN "
-                "(SELECT docid FROM attributes_text_index WHERE content MATCH :textQuery))";
-    }
-
-    nx::sql::Filter boundingBoxFilter;
-    if (!m_filter.boundingBox.isEmpty())
-    {
-        queryTextParams[kObjectSearchFrom] =
-            ", object_search os, object_search_to_object os_to_o";
-        queryTextParams[kJoinObjectToObjectSearch] =
-            "os_to_o.object_id = o.id AND os_to_o.object_search_id = os.id AND ";
-
-        addBoundingBoxToFilter(
-            translate(m_filter.boundingBox, kSearchResolution),
-            &boundingBoxFilter);
-        queryTextParams[kBoundingBoxExpr] = (boundingBoxFilter.toString() + " AND ").c_str();
+                "(SELECT docid FROM attributes_text_index WHERE content MATCH :textQuery)) o";
     }
 
     queryTextParams[kObjectOrderByTrackStart] =
@@ -225,13 +231,49 @@ void ObjectSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
     query->prepare(queryText);
 
     sqlQueryFilter.bindFields(query);
+    boxSubqueryFilter.bindFields(query);
     if (!m_filter.freeText.isEmpty())
         query->bindValue(":textQuery", m_filter.freeText + "*");
-    if (!m_filter.boundingBox.isEmpty())
-        boundingBoxFilter.bindFields(query);
 }
 
-nx::sql::Filter ObjectSearcher::prepareSqlFilterExpression()
+std::tuple<QString /*query text*/, nx::sql::Filter> ObjectSearcher::prepareBoxFilterSubQuery()
+{
+    using namespace std::chrono;
+
+    nx::sql::Filter sqlFilter;
+    addBoundingBoxToFilter(
+        translate(m_filter.boundingBox, kSearchResolution),
+        &sqlFilter);
+
+    if (!m_filter.timePeriod.isEmpty())
+    {
+        // Making time period's right boundary inclusive to take into account
+        // "to seconds" conversion error.
+        auto localTimePeriod = m_filter.timePeriod;
+        if (!localTimePeriod.isInfinite())
+        {
+            localTimePeriod.setEndTime(
+                duration_cast<seconds>(localTimePeriod.endTime()) + seconds(1));
+        }
+
+        addTimePeriodToFilter<std::chrono::seconds>(
+            localTimePeriod,
+            {"timestamp_seconds_utc", "timestamp_seconds_utc"},
+            &sqlFilter);
+    }
+
+    QString queryText = lm(R"sql(
+        SELECT distinct os_to_o.object_id
+          FROM object_search_to_object os_to_o, object_search os
+          WHERE
+            %1 AND
+            os_to_o.object_search_id = os.id
+    )sql").args(sqlFilter.toString());
+
+    return std::make_tuple(std::move(queryText), std::move(sqlFilter));
+}
+
+nx::sql::Filter ObjectSearcher::prepareFilterObjectSqlExpression()
 {
     nx::sql::Filter sqlFilter;
 
@@ -239,7 +281,7 @@ nx::sql::Filter ObjectSearcher::prepareSqlFilterExpression()
         m_filter,
         m_deviceDao,
         m_objectTypeDao,
-        {"guid", "track_start_ms", "track_end_ms"},
+        {"guid", {"track_start_ms", "track_end_ms"}},
         &sqlFilter);
 
     return sqlFilter;
@@ -273,8 +315,18 @@ DetectedObject ObjectSearcher::loadObject(nx::sql::AbstractSqlQuery* query)
     detectedObject.lastAppearanceTimeUsec =
         query->value("track_end_ms").toLongLong() * kUsecInMs;
 
-    detectedObject.track = TrackSerializer::deserialized(
+    detectedObject.bestShot.timestampUsec =
+        query->value("best_shot_timestamp_ms").toLongLong() * kUsecInMs;
+    if (detectedObject.bestShot.initialized())
+    {
+        detectedObject.bestShot.rect =
+            TrackSerializer::deserialized<QRectF>(
+                query->value("best_shot_rect").toByteArray());
+    }
+
+    detectedObject.track = TrackSerializer::deserialized<decltype(detectedObject.track)>(
         query->value("track_detail").toByteArray());
+
     filterTrack(&detectedObject.track);
     if (!detectedObject.track.empty())
     {

@@ -303,7 +303,7 @@
                 <function>
                     <name>Cookie-based authentication</name>
                     <description>
-                        <b>This method should only be used in browser javascript applications.</b>
+                        <b>This method should only be used in browser javascript applications which share the origin with server (e.g. application and server are accessible by the single gateway).</b>
                         <br/>
                         Cookie authorization scheme allows to avoid standard login/password dialog in web-applications.<br/>
                         It provides you a way to replace it with your own dialog.<br/>
@@ -349,9 +349,9 @@
                 <function>
                     <name>URL-based authentication</name>
                     <description>
-                        <b>This method should only be used if other methods are not applicable, e.g. webm direct link.</b>
+                        <b>This method should only be used if other methods are not applicable, e.g. webm direct link or javascript application with different origin.</b>
                         <br/>
-                        Add the "auth" parameter to the URL query section of any GET request
+                        Add the "auth" parameter to the URL query section of any HTTP request:
                         <ul>
                             <li>Call <code>/api/getNonce</code> to get <i>realm</i> and <i>nonce</i> from the server (the current server time is used as a nonce value, and the nonce is valid for about 5 minutes)</li>
                             <li>Calculate the authentication hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>

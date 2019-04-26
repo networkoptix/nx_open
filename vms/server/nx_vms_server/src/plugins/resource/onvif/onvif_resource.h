@@ -377,6 +377,8 @@ public:
 
     SoapTimeouts onvifTimeouts() const;
 
+    CameraDiagnostics::Result ensureMulticastIsEnabled(nx::vms::api::StreamIndex streamIndex);
+
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 
@@ -483,6 +485,10 @@ private:
 
     VideoEncoderCapabilities findVideoEncoderCapabilities(
         SupportedVideoEncoding encoding, StreamIndex streamIndex);
+
+    bool fixMulticastParametersIfNeeded(
+        nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
+        nx::vms::api::StreamIndex streamIndex);
 
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;

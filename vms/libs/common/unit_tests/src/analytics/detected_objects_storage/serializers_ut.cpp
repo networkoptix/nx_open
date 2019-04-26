@@ -33,7 +33,7 @@ protected:
     void assertSerializeAndDeserializeAreSymmetric(
         const std::vector<ObjectPosition>& value)
     {
-        const auto result = storage::TrackSerializer::deserialized(
+        const auto result = storage::TrackSerializer::deserialized<std::vector<ObjectPosition>>(
             storage::TrackSerializer::serialized(value));
 
         ASSERT_EQ(value, result);
@@ -57,7 +57,8 @@ TEST_F(AnalyticsDbTrackSerializer, appended_serialization_results_can_be_deseria
         std::move(trackPart.begin(), trackPart.end(), std::back_inserter(track));
     }
 
-    const auto deserialized = storage::TrackSerializer::deserialized(serialized);
+    const auto deserialized =
+        storage::TrackSerializer::deserialized<decltype(track)>(serialized);
 
     ASSERT_EQ(track, deserialized);
 }

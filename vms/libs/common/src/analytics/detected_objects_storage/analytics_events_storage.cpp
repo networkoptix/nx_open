@@ -11,6 +11,7 @@
 #include "analytics_events_storage_cursor.h"
 #include "config.h"
 #include "cursor.h"
+#include "cleaner.h"
 #include "object_searcher.h"
 #include "serializers.h"
 #include "time_period_fetcher.h"
@@ -238,9 +239,7 @@ void EventsStorage::markDataAsDeprecated(
     NX_VERBOSE(this, "Cleaning data of device %1 up to timestamp %2",
         deviceId, oldestDataToKeepTimestamp.count());
 
-    QnMutexLocker lock(&m_dbControllerMutex);
-    m_dbController->queryExecutor().executeUpdate(
-        std::bind(&EventsStorage::cleanupData, this, _1, deviceId, oldestDataToKeepTimestamp),
+    auto logCleanupResult =
         [this, deviceId, oldestDataToKeepTimestamp](sql::DBResult resultCode)
         {
             if (resultCode == sql::DBResult::ok)
@@ -253,7 +252,31 @@ void EventsStorage::markDataAsDeprecated(
                 NX_DEBUG(this, "Error (%1) while cleaning up data of device %2 up to timestamp %3",
                     toString(resultCode), deviceId, oldestDataToKeepTimestamp);
             }
-        });
+        };
+
+    QnMutexLocker lock(&m_dbControllerMutex);
+
+    if (kUseTrackAggregation)
+    {
+        auto cleaner = std::make_unique<Cleaner>(
+            m_deviceDao,
+            deviceId,
+            oldestDataToKeepTimestamp);
+
+        m_dbController->queryExecutor().executeUpdate(
+            [cleaner = std::move(cleaner)](nx::sql::QueryContext* queryContext)
+            {
+                cleaner->clean(queryContext);
+                return nx::sql::DBResult::ok;
+            },
+            logCleanupResult);
+    }
+    else
+    {
+        m_dbController->queryExecutor().executeUpdate(
+            std::bind(&EventsStorage::cleanupData, this, _1, deviceId, oldestDataToKeepTimestamp),
+            logCleanupResult);
+    }
 }
 
 void EventsStorage::flush(StoreCompletionHandler completionHandler)
@@ -803,9 +826,13 @@ void EventsStorage::prepareSelectTimePeriodsUnfilteredQuery(
         auto localTimePeriod = timePeriod;
         if (localTimePeriod.durationMs == QnTimePeriod::kInfiniteDuration)
             localTimePeriod.setEndTime(m_maxRecordedTimestamp);
+        else if (localTimePeriod.endTime() > m_maxRecordedTimestamp)
+            localTimePeriod.durationMs = QnTimePeriod::kInfiniteDuration;
 
-        ObjectSearcher::addTimePeriodToFilter(
-            localTimePeriod, &sqlFilter, "period_end_ms", "period_start_ms", m_maxRecordedTimestamp);
+        ObjectSearcher::addTimePeriodToFilter<std::chrono::milliseconds>(
+            localTimePeriod,
+            {"period_end_ms", "period_start_ms"},
+            &sqlFilter);
     }
 
     std::string whereClause;

@@ -180,22 +180,38 @@ void AsyncClientWithHttpTunneling::cancelHandlers(
     post(
         [this, client, handler = std::move(handler)]() mutable
         {
-            QnMutexLocker lock(&m_mutex);
-
-            for (auto it = m_indicationHandlers.begin(); it != m_indicationHandlers.end(); )
-            {
-                if (it->second.client == client)
-                    it = m_indicationHandlers.erase(it);
-                else
-                    ++it;
-            }
-
-            m_reconnectHandlers.erase(client);
-
-            if (!m_stunClient)
-                return handler();
-            m_stunClient->cancelHandlers(client, std::move(handler));
+            cancelHandlersSync(client);
+            handler();
         });
+}
+
+void AsyncClientWithHttpTunneling::cancelHandlersSync(void* client)
+{
+    if (isInSelfAioThread())
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        for (auto it = m_indicationHandlers.begin(); it != m_indicationHandlers.end(); )
+        {
+            if (it->second.client == client)
+                it = m_indicationHandlers.erase(it);
+            else
+                ++it;
+        }
+
+        m_reconnectHandlers.erase(client);
+
+        if (!m_stunClient)
+            return;
+
+        m_stunClient->cancelHandlersSync(client);
+    }
+    else
+    {
+        std::promise<void> done;
+        cancelHandlers(client, [&done]() { done.set_value(); });
+        done.get_future().wait();
+    }
 }
 
 void AsyncClientWithHttpTunneling::setKeepAliveOptions(KeepAliveOptions options)

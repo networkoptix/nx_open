@@ -3,7 +3,7 @@
 #include <nx/sdk/interface.h>
 
 #include "i_object_metadata.h"
-#include "i_metadata_packet.h"
+#include "i_compound_metadata_packet.h"
 
 namespace nx {
 namespace sdk {
@@ -12,7 +12,7 @@ namespace analytics {
 /**
  * Metadata packet that contains data about objects detected on the scene.
  */
-class IObjectMetadataPacket: public Interface<IObjectMetadataPacket, IMetadataPacket>
+class IObjectMetadataPacket: public Interface<IObjectMetadataPacket, ICompoundMetadataPacket>
 {
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IObjectMetadataPacket"); }

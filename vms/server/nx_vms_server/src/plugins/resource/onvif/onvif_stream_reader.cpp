@@ -91,6 +91,20 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
     preStreamConfigureHook();
     executePreConfigurationRequests();
 
+    if (m_onvifRes->preferredRtpTransport() == nx::vms::api::RtpTransportType::multicast)
+    {
+        const auto result = m_onvifRes->ensureMulticastIsEnabled(toStreamIndex(getRole()));
+        if (!result)
+        {
+            NX_DEBUG(this,
+                "Device [%1] has incorrect multicast parameters "
+                "and the Server is unable to fix them",
+                m_onvifRes);
+
+            return result;
+        }
+    }
+
     QString streamUrl;
     CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(
         &streamUrl, isCameraControlRequired, params);

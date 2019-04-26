@@ -318,12 +318,11 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
     objectMetadata->setTypeId(detectedObject.objectTypeId.toStdString());
     objectMetadata->setTimestampUs(objectPosition.timestampUsec);
     const auto& boundingBox = objectPosition.boundingBox;
-    objectMetadata->setBoundingBox(
-        IObjectMetadata::Rect(
-            boundingBox.x(),
-            boundingBox.y(),
-            boundingBox.width(),
-            boundingBox.height()));
+    objectMetadata->setBoundingBox(Rect(
+        boundingBox.x(),
+        boundingBox.y(),
+        boundingBox.width(),
+        boundingBox.height()));
 
     for (const auto& attribute: detectedObject.attributes)
     {

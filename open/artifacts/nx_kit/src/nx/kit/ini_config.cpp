@@ -1,6 +1,7 @@
 #include "ini_config.h"
 
 #include <algorithm>
+#include <atomic>
 #include <cerrno>
 #include <climits>
 #include <cstdlib>
@@ -10,7 +11,6 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include <vector>
 #include <unordered_set>
 
 #if !defined(NX_INI_CONFIG_DEFAULT_OUTPUT)
@@ -409,6 +409,16 @@ public:
     {
     }
 
+    static bool& isEnabled()
+    {
+        #if defined(NX_INI_CONFIG_DISABLED)
+            static bool isEnabled = false;
+        #else
+            static bool isEnabled = true;
+        #endif
+        return isEnabled;
+    }
+
     /**
      * @param goingToSet Used to avoid calling determineIniFilesDir() if the getter was never
      *     called before the setter.
@@ -644,11 +654,13 @@ void IniConfig::Impl::reload()
 
 /*static*/ bool IniConfig::isEnabled()
 {
-    #if defined(NX_INI_CONFIG_DISABLED)
-        return false;
-    #else
-        return true;
-    #endif
+    return Impl::isEnabled();
+}
+
+
+/*static*/ void IniConfig::setEnabled(bool value)
+{
+    Impl::isEnabled() = value;
 }
 
 /*static*/ const char* IniConfig::iniFilesDir()
@@ -724,6 +736,27 @@ const char* IniConfig::iniFilePath() const
 void IniConfig::reload()
 {
     return d->reload();
+}
+
+static std::atomic<int> s_tweaksInstances(false);
+static bool s_tweaksIsEnabledBackup(false);
+
+IniConfig::Tweaks::Tweaks()
+{
+    if (++s_tweaksInstances != 0)
+    {
+        s_tweaksIsEnabledBackup = isEnabled();
+        setEnabled(false);
+    }
+}
+
+IniConfig::Tweaks::~Tweaks()
+{
+    for (const auto& guard: m_guards)
+        guard();
+
+    if (--s_tweaksInstances == 0)
+        setEnabled(s_tweaksIsEnabledBackup);
 }
 
 } // namespace kit

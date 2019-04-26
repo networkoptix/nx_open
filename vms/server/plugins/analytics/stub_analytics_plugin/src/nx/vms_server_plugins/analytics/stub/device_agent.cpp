@@ -298,8 +298,8 @@ static IObjectMetadata* makeObjectMetadata(
     objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
     objectMetadata->setTypeId(objectTypeId);
     objectMetadata->setId(objectId);
-    objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) offset,
-        (float) offset + 0.05F * (float) objectIndex, 0.25F, 0.25F));
+    objectMetadata->setBoundingBox(
+		Rect((float) offset, (float) offset + 0.05F * (float) objectIndex, 0.25F, 0.25F));
 
     if (generatePreviewAttributes)
     {
