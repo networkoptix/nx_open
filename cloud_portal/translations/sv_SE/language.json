@@ -141,14 +141,14 @@
     "lostConnection": "Anslutning till {{systemName}} förlorad",
     "thisSystem": "systemet",
     "oldSafariNotSupported": "Versioner av Safari äldre än 10 stöds inte",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
+    "DUPLICATE_MEDIASERVER_FOUND": "Några server listas som befintliga i båda systemen – i den valda och i den nuvarande.<br>ta bort offline och oförenliga servrar från varje System och försök igen.",
     "mergedSystemIsOffline": "Systemet <strong>{{failedSystem}}</strong> är offline.",
     "INCOMPATIBLE": "Systemen har olika mjukvaruversioner. Vänligen uppdatera dem båda till <a href=\"/download\">senaste version</a>.",
     "FAIL": "System <strong>{{failedSystem}}</strong> är för närvarande oåtkomligt.<br>Försök igen om några minuter eller kontakta <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
   },
   "merging": {
     "mergeFailedTitle": "Systemsammanslagning misslyckades",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "commonText": "Misslyckades med att slå samman system <strong>{{primarySystem}}</strong> och <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "bra",
@@ -194,8 +194,8 @@
     "confirmUnshareAction": "Radera",
     "successDisconnected": "Systemet har kopplats bort från %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} har tagits bort från ditt konto",
-    "mergeFailed": "System merge failed",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "Systemsammanslagning misslyckades",
+    "mergeStart": "System har börjat slås samman",
     "mergeSuccess": "Systemsammanslagning slutförd",
     "permissionsRemoved": "Rättigheterna togs bort från {{email}}",
     "unknownName": "Okänt namn för system (orsakad av molnsammanslagning)"

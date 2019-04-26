@@ -39,8 +39,8 @@
   },
   "systemStatuses": {
     "activated": "geactiveerd",
-    "incompatible": "incompatible",
-    "merging": "merging",
+    "incompatible": "incompatibel",
+    "merging": "samenvoegen",
     "notActivated": "niet geactiveerd",
     "online": "online",
     "offline": "offline",
@@ -141,14 +141,14 @@
     "lostConnection": "Verbinding met {{systemName}} verloren",
     "thisSystem": "het systeem",
     "oldSafariNotSupported": "Versies van Safari ouder dan versie 10 worden niet ondersteund",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
-    "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/download\">latest build</a>.",
-    "FAIL": "System <strong>{{failedSystem}}</strong> is currently unreachable.<br>Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "Sommige serverlijsten zoals aanwezig in beide systemen - in de geselecteerde en in de huidige.<br>Verwijder offline en incompatibele servers uit elk systeem en probeer het opnieuw.",
+    "mergedSystemIsOffline": "Systeem <strong>{{failedSystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systemen hebben verschillende softwareversies. Werk ze alstublieft bij naar de laatste <a href=\"/download\">build</a>.",
+    "FAIL": "Systeem <strong>{{failedSystem}}</strong> is momenteel niet bereikbaar.<br>Probeer het over een paar momenten opnieuw of neem contact op met <a href=\"%SUPPORT_LINK%\" target=\"_blank\">ondersteuning</a>."
   },
   "merging": {
-    "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "mergeFailedTitle": "Het samenvoegen van systemen is mislukt",
+    "commonText": "Kan systemen <strong>{{primarySystem}}</strong> en <strong>{{secondarySystem}}</strong>niet samenvoegen."
   },
   "passwordRequirements": {
     "good": "goed",
@@ -194,11 +194,11 @@
     "confirmUnshareAction": "Verwijder",
     "successDisconnected": "Systeem is succesvol afgesloten van %PRODUCT_NAME%",
     "successDeleted": "Systeem {{systemName}} is succesvol verwijderd van uw account",
-    "mergeFailed": "System merge failed",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "Het samenvoegen van systemen is mislukt",
+    "mergeStart": "Systemen zijn begonnen samen te voegen",
     "mergeSuccess": "System merge completed",
     "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Onbekende naam voor systeem (veroorzaakt door samenvoeging in de cloud)"
   },
   "account": {
     "accountSavedSuccess": "Uw account is succesvol opgeslagen",
@@ -337,8 +337,8 @@
     }
   },
   "recommendSupport": {
-    "a_recommend": "We'd recommend consulting with",
+    "a_recommend": "We raden aan om te overleggen met",
     "b_support": "ondersteuning",
-    "c_proceeding": "before proceeding."
+    "c_proceeding": ", alvorens verder te gaan."
   }
 }

@@ -39,11 +39,11 @@
         <br>
         <div ng-if="mergeTargetSystem.name" >
             <div><strong>{{mergeTargetSystem.name}}</strong>
-                is being merged to this system</div>
+            zal worden samengevoegd met dit systeem</div>
             <hr />
-            <div class="merge-info-text light-text">Afhankelijk van de grootte van de database kan dit enkele uren duren</div>
+            <div class="merge-info-text light-text">Depending of the size of the database it may take up to several hours</div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Samenvoegen van systemen aan het voltooien</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
@@ -51,16 +51,15 @@
         </div>
         <br>
         <div ng-if="mergeTargetSystem.name">
-            <div>This system is being merged to
+            <div>Dit systeem wordt samengevoegd met
                 <strong>{{mergeTargetSystem.name}}</strong></div>
             <hr />
             <div class="merge-info-text light-text">
-                <p>Afhankelijk van de grootte van de database kan dit enkele uren duren.</p>
-                <p>Tot het samenvoegen is voltooid, kunt u zich aanmelden bij dit systeem en video bekijken, maar kunt u geen instellingen wijzigen.</p>
-                <p>When merge is finished, all users and cameras from this system will become available
-                    in <strong>{{mergeTargetSystem.name}}</strong> System, and this system will be deleted.</p>
+                <p>Depending of the size of the database it may take up to several hours.</p>
+                <p>Until merge is finished you can log in to this system and watch video, but cannot change any settings.</p>
+                <p>Wanneer het samenvoegen is voltooid, worden alle gebruikers en camera's van dit systeem beschikbaar in systeem "<strong>{{mergeTargetSystem.name}}</strong>" en zal het huidige systeem worden verwijderd.</p>
             </div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Samenvoegen van systemen aan het voltooien</div>
     </div>
 </div>

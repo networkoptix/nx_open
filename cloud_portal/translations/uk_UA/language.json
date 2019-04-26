@@ -39,7 +39,7 @@
   },
   "systemStatuses": {
     "activated": "активовано",
-    "incompatible": "incompatible",
+    "incompatible": "несумісно",
     "merging": "злиття",
     "notActivated": "не активовано",
     "online": "oнлайн",
@@ -141,14 +141,14 @@
     "lostConnection": "Підключення до {{systemName}} втрачено",
     "thisSystem": "система",
     "oldSafariNotSupported": "Версії Safari старше 10 не підтримуються",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
-    "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/download\">latest build</a>.",
-    "FAIL": "System <strong>{{failedSystem}}</strong> is currently unreachable.<br>Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "Деякі списки серверів існують в обох системах - у вибраному і в поточному.<br>Видаліть з будь-якої системи сервер і спробуйте знову.",
+    "mergedSystemIsOffline": "Система<strong>{{failedSystem}}</strong>офлайн.",
+    "INCOMPATIBLE": "Системи мають різні версії програмного забезпечення. Будь ласка, поновіть їх до<a href=\"/download\">останньої збірки</a>.",
+    "FAIL": "Система<strong>{{failedSystem}}</strong>в даний час недоступна.<br>Повторіть спробу через кілька хвилин або зверніться до <a href=\"%SUPPORT_LINK%\" target=\"_blank\">підтримки</a>."
   },
   "merging": {
-    "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "mergeFailedTitle": "Злиття систем невдалося",
+    "commonText": "Не вдалося об’єднати системи <strong>{{primarySystem}}</strong> та <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "хороший",
@@ -194,8 +194,8 @@
     "confirmUnshareAction": "Видалити",
     "successDisconnected": "Система успішно відключена від %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успішно видалена з вашого облікового запису",
-    "mergeFailed": "System merge failed",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "Не вдалося об’єднати систему",
+    "mergeStart": "Злиття систем почалося",
     "mergeSuccess": "Злиття системи завершено",
     "permissionsRemoved": "{{email}} був позбавлений повноважень",
     "unknownName": "Невідоме ім’я для системи (викликане злиттям хмари)"

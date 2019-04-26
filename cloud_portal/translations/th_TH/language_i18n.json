@@ -57,7 +57,7 @@
 	"System {{targetSystem.name}} is offline and cannot be merged with the current one.": "System {{targetSystem.name}} is offline and cannot be merged with the current one.",
 	"Systems": "ระบบ",
 	"Systems of such size may work but will be unstable and have troubles with updates and synchronisation.": "ระบบที่มีขนาดดังกล่าวอาจทำงานได้ แต่จะไม่เสถียรและมีปัญหากับการอัปเดตและการซิงโครไนซ์",
-	"Take name and settings from": "Take name and settings from",
+	"Take the name and settings from": "Take the name and settings from",
 	"The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.": "ข้อมูลประจำตัวของผู้ใช้รายนี้จะเปิดเผย! คุณต้องสร้างบทบาท \"ผู้ใช้สาธารณะ\" ที่กำหนดเองโดยมีการเข้าถึงเฉพาะ\n            สำหรับกล้องที่เลือกเพื่อการใช้งานสาธารณะและกำหนดสิทธิ์การดูขั้นต่ำที่จำเป็นเท่านั้น นี้\n            \"ผู้ใช้ที่สาธารณะ\" ไม่ควรมีการเข้าถึงทั้งระบบใด ๆ",
 	"There will be more than": "จะมีมากกว่านั้น",
 	"Too many attempts. Try again in a minute.": "คุณพยายามเข้าระบบมากเกินไป กรุณารออีกสักพักแล้วเข้าใหม่",

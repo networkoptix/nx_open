@@ -57,7 +57,7 @@
 	"System {{targetSystem.name}} is offline and cannot be merged with the current one.": "System {{targetSystem.name}} is offline and cannot be merged with the current one.",
 	"Systems": "Sistemi",
 	"Systems of such size may work but will be unstable and have troubles with updates and synchronisation.": "Sistemi di tale dimensione potrebbero funzionare ma saranno instabili e avranno problemi con gli aggiornamenti e la sincronizzazione.",
-	"Take name and settings from": "Take name and settings from",
+	"Take the name and settings from": "Take the name and settings from",
 	"The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.": "Le credenziali di questo utente saranno esposte! È necessario creare un ruolo personalizzato \"Utente pubblico\" con accesso solo\n            alle telecamere selezionate per uso pubblico e assegnare solo le autorizzazioni di visualizzazione minime richieste. L'\n            \"utente pubblico\" non dovrebbe avere accesso a livello di sistema di alcun tipo.",
 	"There will be more than": "Ci saranno più di",
 	"Too many attempts. Try again in a minute.": "Troppi tentativi. Riprova tra un minuto.",

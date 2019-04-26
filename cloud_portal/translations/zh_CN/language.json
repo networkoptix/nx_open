@@ -39,7 +39,7 @@
   },
   "systemStatuses": {
     "activated": "激活",
-    "incompatible": "incompatible",
+    "incompatible": "不兼容",
     "merging": "merging",
     "notActivated": "未激活",
     "online": "在线",

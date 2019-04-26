@@ -57,7 +57,7 @@
 	"System {{targetSystem.name}} is offline and cannot be merged with the current one.": "System {{targetSystem.name}} is offline and cannot be merged with the current one.",
 	"Systems": "系统",
 	"Systems of such size may work but will be unstable and have troubles with updates and synchronisation.": "Systems of such size may work but will be unstable and have troubles with updates and synchronisation.",
-	"Take name and settings from": "Take name and settings from",
+	"Take the name and settings from": "Take the name and settings from",
 	"The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.": "此用户的验证凭据将被公开！您必须创建一个自定义的“公共用户”角色，该角色仅限共用摄像机的存取权限\n            ，并且只能被分配所需的最低查看权限。\n此\n            “公共用户”不应被交予任何的系统存取权限。",
 	"There will be more than": "There will be more than",
 	"Too many attempts. Try again in a minute.": "尝试次数过多，请稍后重试。",

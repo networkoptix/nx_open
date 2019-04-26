@@ -57,7 +57,7 @@
 	"System {{targetSystem.name}} is offline and cannot be merged with the current one.": "System {{targetSystem.name}} is offline and cannot be merged with the current one.",
 	"Systems": "시스템",
 	"Systems of such size may work but will be unstable and have troubles with updates and synchronisation.": "Systems of such size may work but will be unstable and have troubles with updates and synchronisation.",
-	"Take name and settings from": "Take name and settings from",
+	"Take the name and settings from": "Take the name and settings from",
 	"The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.": "이 사용자의 인증정보가 노출 될 것입니다! 지정한 공공 카메라들만 접근할 수 있는 사용자지정 공공사용자 역할계정을 만들고 보기만 할 수 있는 가장 촤소한의 권한을 주십시요. \n             이 \"공공 사용자\" 는 어떠한 시스템 기능을 액세스 하면 안됩니다.",
 	"There will be more than": "There will be more than",
 	"Too many attempts. Try again in a minute.": "시도 횟수가 너무 많습니다. 1 분 후에 다시 시도하십시오.",

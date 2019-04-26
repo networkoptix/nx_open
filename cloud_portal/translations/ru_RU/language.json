@@ -141,14 +141,14 @@
     "lostConnection": "Подключение к {{systemName}} потеряно",
     "thisSystem": "система",
     "oldSafariNotSupported": "Версии Safari старше 10 не поддерживаются",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
+    "DUPLICATE_MEDIASERVER_FOUND": "Некоторые серверы перечислены как существующие в обеих системах - как в выбранной, так и в текущей.<br>Удалите серверы, которые находятся не в сети, и несовместимые серверы из каждой системы и повторите попытку.",
     "mergedSystemIsOffline": "Система <strong>{{failedSystem}}</strong> не в сети.",
     "INCOMPATIBLE": "Системы имеют разные версии программного обеспечения. Пожалуйста, обновите их на <a href=\"/download\">последнюю версию</a>.",
     "FAIL": "Система <strong>{{failedSystem}}</strong> в настоящее время недоступна.<br>Повторите попытку через несколько минут или обратитесь в <a href=\"%SUPPORT_LINK%\" target=\"_blank\">поддержку</a>."
   },
   "merging": {
     "mergeFailedTitle": "Объединение систем не удалось",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "commonText": "Не удалось объединить системы <strong>{{primarySystem}}</strong> и <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "хорошее",
@@ -194,11 +194,11 @@
     "confirmUnshareAction": "Удалить",
     "successDisconnected": "Система успешно отключена от %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успешно удалена из вашей учетной записи",
-    "mergeFailed": "System merge failed",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "Объединение систем не удалось",
+    "mergeStart": "Объединение систем началось",
     "mergeSuccess": "Слияние системы завершено",
     "permissionsRemoved": "{{email}} был лишен полномочий",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Неизвестное имя для системы (вызвано облачным объединением систем)"
   },
   "account": {
     "accountSavedSuccess": "Ваша учетная запись успешно сохранена",
@@ -337,8 +337,8 @@
     }
   },
   "recommendSupport": {
-    "a_recommend": "We'd recommend consulting with",
+    "a_recommend": "Мы рекомендуем проконсультироваться с",
     "b_support": "техническая поддержка",
-    "c_proceeding": "before proceeding."
+    "c_proceeding": "прежде чем продолжить."
   }
 }

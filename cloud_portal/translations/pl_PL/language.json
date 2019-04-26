@@ -141,14 +141,14 @@
     "lostConnection": "Utracono połączenie z {{systemName}}",
     "thisSystem": "system",
     "oldSafariNotSupported": "Wersje Safari starsze niż 10 nie są obsługiwane",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
+    "DUPLICATE_MEDIASERVER_FOUND": "Niektóre serwery istnieją w obu systemach - w wybranym i w bieżącym. <br>Usuń z obu systemów serwery, które są rozłączone lub niekompatybilne i spróbuj ponownie.",
     "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> jest w trybie offline.",
     "INCOMPATIBLE": "Systemy mają różne wersje oprogramowania. Zaktualizuj oba z nich do <a href=\"/download\">najnowszej wersji</a>.",
     "FAIL": "System <strong>{{failedSystem}}</strong> jest obecnie niedostępny.<br>Spróbuj ponownie za kilka minut lub skontaktuj się z <a href=\"%SUPPORT_LINK%\" target=\"_blank\">działem wsparcia technicznego</a>."
   },
   "merging": {
     "mergeFailedTitle": "Łączenie systemów nie powiodło się",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "commonText": "Nie udało się złączyć systemów <strong>{{primarySystem}}</strong> i <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "dobre",
@@ -194,8 +194,8 @@
     "confirmUnshareAction": "Usuń",
     "successDisconnected": "System został pomyślnie odłączony od %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} został pomyślnie usunięty z Twojego konta",
-    "mergeFailed": "System merge failed",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "Łączenie systemu nie powiodło się",
+    "mergeStart": "Rozpoczęto złączanie systemów",
     "mergeSuccess": "Zakończono łączenie systemu",
     "permissionsRemoved": "Uprawnienia zostały usunięte z {{email}}",
     "unknownName": "Nieznana nazwa systemu (złączenie w chmurze)"
