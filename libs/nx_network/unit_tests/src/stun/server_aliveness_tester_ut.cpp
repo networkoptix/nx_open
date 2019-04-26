@@ -37,7 +37,6 @@ public:
         void* /*client*/,
         utils::MoveOnlyFunc<void()> /*handler*/) override
     {
-        m_cancelRequestCalls->push(0);
     }
 
     virtual void cancelHandlersSync(void* /*client*/) override
