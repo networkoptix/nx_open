@@ -11,11 +11,11 @@ class QnWorkbenchLayout;
 class QnWorkbenchLayoutAspectRatioWatcher : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
-    explicit QnWorkbenchLayoutAspectRatioWatcher(QObject *parent = 0);
+    explicit QnWorkbenchLayoutAspectRatioWatcher(QObject* parent = 0);
     ~QnWorkbenchLayoutAspectRatioWatcher();
 
 private slots:
-    void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
+    void at_renderWatcher_widgetChanged(QnResourceWidget* widget);
     void at_resourceWidget_aspectRatioChanged();
     void at_resourceWidget_destroyed();
     void at_workbench_currentLayoutChanged();
@@ -25,10 +25,11 @@ private slots:
 private:
     void watchCurrentLayout();
     void unwatchCurrentLayout();
+    void setAppropriateAspectRatio(QnResourceWidget* widget);
 
 private:
-    QnWorkbenchRenderWatcher *m_renderWatcher;
-    QnWorkbenchLayout *m_watchedLayout;
+    QnWorkbenchRenderWatcher* m_renderWatcher;
+    QnWorkbenchLayout* m_watchedLayout;
     QSet<QnResourceWidget*> m_watchedWidgets;
-    bool m_monitoring;
+    bool m_monitoring = true;
 };
