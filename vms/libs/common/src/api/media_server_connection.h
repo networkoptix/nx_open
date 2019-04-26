@@ -301,8 +301,6 @@ public:
     int deleteBookmarkAsync(const QnUuid& bookmarkId, QObject* target, const char* slot);
 
     int installUpdate(const QString& updateId, bool delayed, QObject* target, const char* slot);
-    int installUpdateUnauthenticated(
-        const QString& updateId, bool delayed, QObject* target, const char* slot);
     int uploadUpdateChunk(const QString& updateId,
         const QByteArray& data, qint64 offset, QObject* target, const char* slot);
 
@@ -335,6 +333,14 @@ protected:
     virtual bool isReady() const override;
 
     int sendAsyncGetRequestLogged(
+        int object,
+        const QnRequestParamList& params,
+        const char* replyTypeName,
+        QObject* target,
+        const char* slot,
+        std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+
+    int sendAsyncPostRequestLogged(
         int object,
         const QnRequestParamList& params,
         const char* replyTypeName,

@@ -32,17 +32,7 @@ static const QString kDeprecatedResIdParam = "res_id";
 static const std::chrono::seconds kMaxWaitTimeout(20);
 
 using StatusCode = nx::network::http::StatusCode::Value;
-using PostBody = QnCameraSettingsRestHandlerPostBody;
-
-struct QnCameraSettingsRestHandlerPostBody
-{
-    QString cameraId;
-    QMap<QString, QString> paramValues;
-};
-#define QnCameraSettingsRestHandlerPostBody_Fields (cameraId)(paramValues)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraSettingsRestHandlerPostBody, (json),
-    QnCameraSettingsRestHandlerPostBody_Fields);
+using PostBody = QnCameraAdvancedParamsPostBody;
 
 namespace {
 

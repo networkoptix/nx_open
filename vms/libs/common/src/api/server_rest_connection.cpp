@@ -116,9 +116,9 @@ rest::Handle ServerConnection::twoWayAudioCommand(const QString& sourceId,
 {
     QnRequestParamList params;
     params.insert(lit("clientId"), sourceId);
-    params.insert(lit("resourceId"),    cameraId.toString());
-    params.insert(lit("action"),        start ? lit("start") : lit("stop"));
-    return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
+    params.insert(lit("resourceId"), cameraId.toString());
+    params.insert(lit("action"), start ? lit("start") : lit("stop"));
+    return executePost(lit("/api/transmitAudio"), params, callback, targetThread);
 }
 
 rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
@@ -131,7 +131,7 @@ rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, co
     params.insert(lit("eventResourceId"), cameraId.toString());
     if (toggleState != nx::vms::api::EventState::undefined)
         params.insert(lit("state"), QnLexical::serialized(toggleState));
-    return executeGet(lit("/api/createEvent"), params, callback, targetThread);
+    return executePost(lit("/api/createEvent"), params, callback, targetThread);
 }
 
 Handle ServerConnection::createGenericEvent(
@@ -150,7 +150,7 @@ Handle ServerConnection::createGenericEvent(
     if (toggleState != nx::vms::api::EventState::undefined)
         params.insert("state", QnLexical::serialized(toggleState));
     params.insert("metadata", QString::fromUtf8(QJson::serialized(metadata)));
-    return executeGet("/api/createEvent", params, callback, targetThread);
+    return executePost("/api/createEvent", params, callback, targetThread);
 }
 
 QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
@@ -293,7 +293,7 @@ Handle ServerConnection::saveCloudSystemCredentials(
 
 Handle ServerConnection::startLiteClient(GetCallback callback, QThread* targetThread)
 {
-    return executeGet(
+    return executePost(
         "/api/startLiteClient", {{"startCamerasMode", "true"}},
         callback, targetThread);
 }
@@ -336,8 +336,6 @@ Handle ServerConnection::addFileDownload(
             {lit("md5"), QString::fromUtf8(md5)},
             {lit("url"), url.toString()},
             {lit("peerPolicy"), peerPolicy}},
-        QByteArray(),
-        QByteArray(),
         callback,
         targetThread);
 }
@@ -361,7 +359,7 @@ Handle ServerConnection::addCamera(
     parameters.insert("user", userName);
     parameters.insert("password", password);
 
-    return executeGet(lit("/api/manualCamera/add"), parameters, callback, thread);
+    return executePost(lit("/api/manualCamera/add"), parameters, callback, thread);
 }
 
 Handle ServerConnection::searchCameraStart(
@@ -379,7 +377,7 @@ Handle ServerConnection::searchCameraStart(
     if (port.has_value())
         parameters.insert("port", *port);
 
-    return executeGet("/api/manualCamera/search", parameters, callback, targetThread);
+    return executePost("/api/manualCamera/search", parameters, callback, targetThread);
 }
 
 Handle ServerConnection::searchCameraRangeStart(
@@ -400,7 +398,7 @@ Handle ServerConnection::searchCameraRangeStart(
     if (port.has_value())
         parameters.insert("port", *port);
 
-    return executeGet("/api/manualCamera/search", parameters, callback, targetThread);
+    return executePost("/api/manualCamera/search", parameters, callback, targetThread);
 }
 
 Handle ServerConnection::searchCameraStatus(
@@ -418,7 +416,7 @@ Handle ServerConnection::searchCameraStop(
     GetCallback callback,
     QThread* targetThread)
 {
-    return executeGet(lit("/api/manualCamera/stop"),
+    return executePost(lit("/api/manualCamera/stop"),
         QnRequestParamList{{lit("uuid"), processUuid.toString()}},
             callback, targetThread);
 }
@@ -618,7 +616,7 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
     params.insert(lit("metadata"), QString::fromUtf8(
         QJson::serialized(rule->eventParams().metadata)));
 
-    return executeGet(lit("/api/createEvent"), params, callback, targetThread);
+    return executePost(lit("/api/createEvent"), params, callback, targetThread);
 }
 
 Handle ServerConnection::mergeSystemAsync(
@@ -636,7 +634,7 @@ Handle ServerConnection::mergeSystemAsync(
         {"ignoreIncompatible", QnLexical::serialized(ignoreIncompatible)},
     };
 
-    return executeGet("/api/mergeSystems", std::move(params), callback, targetThread);
+    return executePost("/api/mergeSystems", std::move(params), callback, targetThread);
 }
 
 Handle ServerConnection::addWearableCamera(
@@ -693,8 +691,6 @@ Handle ServerConnection::lockWearableCamera(
             { lit("cameraId"), camera->getId().toSimpleString() },
             { lit("userId"), user->getId().toSimpleString() },
             { lit("ttl"), QString::number(ttl) } },
-        QByteArray(),
-        QByteArray(),
         callback,
         targetThread);
 }
@@ -714,8 +710,6 @@ Handle ServerConnection::extendWearableCameraLock(
             { lit("token"), token.toSimpleString() },
             { lit("userId"), user->getId().toSimpleString() },
             { lit("ttl"), QString::number(ttl) } },
-        QByteArray(),
-        QByteArray(),
         callback,
         targetThread);
 }
@@ -731,8 +725,6 @@ Handle ServerConnection::releaseWearableCameraLock(
         QnRequestParamList{
             { lit("cameraId"), camera->getId().toSimpleString() },
             { lit("token"), token.toSimpleString() } },
-        QByteArray(),
-        QByteArray(),
         callback,
         targetThread);
 }
@@ -752,8 +744,6 @@ Handle ServerConnection::consumeWearableCameraFile(
             { lit("token"), token.toSimpleString() },
             { lit("uploadId"), uploadId },
             { lit("startTime"), QString::number(startTimeMs) } },
-        QByteArray(),
-        QByteArray(),
         callback,
         targetThread);
 }
@@ -1115,6 +1105,19 @@ template <typename ResultType>
 Handle ServerConnection::executePost(
     const QString& path,
     const QnRequestParamList& params,
+    Callback<ResultType> callback,
+    QThread* targetThread)
+{
+    return executePost(
+        path, {},
+        nx::network::rest::kJsonContentType, QJson::serialized(params.toJson()),
+        std::move(callback), targetThread);
+}
+
+template <typename ResultType>
+Handle ServerConnection::executePost(
+    const QString& path,
+    const QnRequestParamList& params,
     const nx::network::http::StringType& contentType,
     const nx::network::http::StringType& messageBody,
     Callback<ResultType> callback,
@@ -1128,6 +1131,19 @@ Handle ServerConnection::executePost(
 
     trace(handle, path);
     return handle;
+}
+
+template <typename ResultType>
+Handle ServerConnection::executePut(
+    const QString& path,
+    const QnRequestParamList& params,
+    Callback<ResultType> callback,
+    QThread* targetThread)
+{
+    return executePut(
+        path, {},
+        nx::network::rest::kJsonContentType, QJson::serialized(params.toJson()),
+        std::move(callback), targetThread);
 }
 
 template <typename ResultType>
