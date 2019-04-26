@@ -207,14 +207,6 @@ private:
         const Filter& filter,
         QString* eventsFilteredByFreeTextSubQuery);
 
-    void addObjectTypeIdToFilter(
-        const std::vector<QString>& objectTypeIds,
-        nx::sql::Filter* sqlFilter);
-
-    void addBoundingBoxToFilter(
-        const QRect& boundingBox,
-        nx::sql::Filter* sqlFilter);
-
     void loadObjects(
         nx::sql::SqlQuery& selectEventsQuery,
         const Filter& filter,
