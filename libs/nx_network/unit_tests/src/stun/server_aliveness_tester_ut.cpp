@@ -40,6 +40,11 @@ public:
         m_cancelRequestCalls->push(0);
     }
 
+    virtual void cancelHandlersSync(void* /*client*/) override
+    {
+        m_cancelRequestCalls->push(0);
+    }
+
 private:
     nx::utils::SyncQueue<int /*dummy*/>* m_sendRequestCalls = nullptr;
     nx::utils::SyncQueue<int /*dummy*/>* m_cancelRequestCalls = nullptr;
