@@ -2,13 +2,13 @@
     "capabilities": "",
     "eventTypes": [
         {
-            "id": "nx.ssc.camera specify command",
+            "id": "nx.ssc.gasGunPickedUp",
             "name": "gas gun is picked up",
             "flags": "noFlags",
             "internalName": "camera specify command"
         },
         {
-            "id": "nx.ssc.reset command",
+            "id": "nx.ssc.gasGunHungDown",
             "name": "gas gun is hung down",
             "flags": "noFlags",
             "internalName": "reset command"
