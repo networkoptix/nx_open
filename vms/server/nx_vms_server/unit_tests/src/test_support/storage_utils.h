@@ -3,11 +3,26 @@
 #include <core/resource/resource_fwd.h>
 
 class MediaServerLauncher;
+class QnMediaServerModule;
 class QnArchiveStreamReader;
 
 namespace nx::vms::server::test::test_support {
 
-void addTestStorage(MediaServerLauncher* server, const QString& path);
+/**
+ * Adds a real storage which can be used for storing files, reindexing e.t.c.
+ */
+void addStorage(MediaServerLauncher* server, const QString& path);
+
+/**
+ * Adds a storage fixture. It will be seen by the storage manager but won't perform any real actions
+ * like reading, writing files.
+ */
+QnStorageResourcePtr addStorageFixture(
+    MediaServerLauncher* server, QnMediaServerModule* serverModule, const QString& url,
+    int64_t totalSpace, int64_t freeSpace, int64_t spaceLimit, bool isSystem, bool isOnline);
+
+void setNxOccupiedSpace(
+    MediaServerLauncher* server, const QnStorageResourcePtr& storage, int64_t nxOccupiedSpace);
 
 struct ChunkData
 {

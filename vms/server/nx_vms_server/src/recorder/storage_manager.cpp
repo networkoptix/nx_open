@@ -1066,22 +1066,6 @@ QMap<DeviceFileCatalogPtr, qint64> QnStorageManager::catalogsToScan(int storageI
     return result;
 }
 
-int64_t QnStorageManager::calculateNxOccupiedSpace(int storageIndex) const
-{
-    auto calculateNxOccupiedSpaceByQuality = [this](int storageIndex, QnServer::ChunksCatalog catalog)
-    {
-        int64_t result = 0;
-        for (auto it = m_devFileCatalog[catalog].cbegin(); it != m_devFileCatalog[catalog].cend(); ++it)
-            result += it.value()->getSpaceByStorageIndex(storageIndex);
-
-        return result;
-    };
-
-    QnMutexLocker lock(&m_mutexCatalog);
-    return calculateNxOccupiedSpaceByQuality(storageIndex, QnServer::HiQualityCatalog) +
-        calculateNxOccupiedSpaceByQuality(storageIndex, QnServer::LowQualityCatalog);
-}
-
 bool QnStorageManager::hasArchive(int storageIndex) const
 {
     for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
@@ -1104,7 +1088,7 @@ int64_t QnStorageManager::occupiedSpace(int storageIndex) const
     {
         QnMutexLocker lock(&m_mutexCatalog);
         for (auto it = m_devFileCatalog[i].cbegin(); it != m_devFileCatalog[i].cend(); ++it)
-            result += it.value()->occupiedSpace(storageIndex) > 0LL;
+            result += it.value()->occupiedSpace(storageIndex);
     }
 
     return result;

@@ -278,7 +278,6 @@ private:
     );
     void updateCameraHistory() const;
     static std::vector<QnUuid> getCamerasWithArchive(QnMediaServerModule* serverModule);
-    int64_t calculateNxOccupiedSpace(int storageIndex) const;
     bool hasArchive(int storageIndex) const;
     int64_t occupiedSpace(int storageIndex) const;
     QnStorageResourcePtr getStorageByIndex(int index) const;

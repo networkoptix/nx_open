@@ -185,7 +185,7 @@ private:
     int64_t m_timeGap = 0;
     utils::log::Buffer* m_logBuffer = nullptr;
 
-    void onArchiveIntegrityBreached(const QnStorageResourcePtr& storage)
+    void onArchiveIntegrityBreached(const QnStorageResourcePtr& /*storage*/)
     {
         NX_MUTEX_LOCKER lock(&m_archiveIntegrityMutex);
         m_archiveIntegritySignalReceived = true;

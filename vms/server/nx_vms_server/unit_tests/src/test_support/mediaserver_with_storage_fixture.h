@@ -49,7 +49,7 @@ protected:
             m_server->serverModule()->normalStorageManager(), &QnStorageManager::rebuildFinished,
             this, &MediaserverWithStorageFixture::onReindexFinished, Qt::DirectConnection);
 
-        test_support::addTestStorage(m_server.get(), m_storagePath);
+        test_support::addStorage(m_server.get(), m_storagePath);
     }
 
     void whenServerStopped()
