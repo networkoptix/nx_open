@@ -60,6 +60,11 @@ long long AttributesDao::insertOrFetchAttributes(
     return id;
 }
 
+void AttributesDao::clear()
+{
+    m_attributesCache.clear();
+}
+
 std::vector<common::metadata::Attribute> AttributesDao::deserialize(
     const QString& attributesStr)
 {

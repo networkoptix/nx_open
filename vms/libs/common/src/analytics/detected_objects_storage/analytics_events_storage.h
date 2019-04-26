@@ -250,6 +250,10 @@ private:
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 
+    void scheduleDataCleanup(
+        QnUuid deviceId,
+        std::chrono::milliseconds oldestDataToKeepTimestamp);
+
     nx::sql::DBResult cleanupData(
         nx::sql::QueryContext* queryContext,
         const QnUuid& deviceId,
@@ -261,6 +265,11 @@ private:
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void cleanupEventProperties(nx::sql::QueryContext* queryContext);
+
+    void logCleanupResult(
+        sql::DBResult resultCode,
+        const QnUuid& deviceId,
+        std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void logDataSaveResult(sql::DBResult resultCode);
 

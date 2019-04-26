@@ -7,20 +7,36 @@
 
 namespace nx::analytics::storage {
 
-class DeviceDao;
+class AttributesDao;
 
 class Cleaner
 {
 public:
+    enum class Result
+    {
+        done,
+        /** Some data has been cleaned up. But some data still remains. */
+        incomplete,
+    };
+
     Cleaner(
-        const DeviceDao& deviceDao,
-        const QnUuid& deviceId,
+        AttributesDao* attributesDao,
+        int deviceId,
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 
-    void clean(nx::sql::QueryContext* queryContext);
+    Result clean(nx::sql::QueryContext* queryContext);
 
 private:
-    const DeviceDao& m_deviceDao;
+    AttributesDao* m_attributesDao = nullptr;
+    const int m_deviceId;
+    const std::chrono::milliseconds m_oldestDataToKeepTimestamp;
+
+    /** All following functions return removed record count. */
+
+    int cleanObjectSearch(nx::sql::QueryContext* queryContext);
+    int cleanObjectSearchToObject(nx::sql::QueryContext* queryContext);
+    int cleanObject(nx::sql::QueryContext* queryContext);
+    int cleanAttributesTextIndex(nx::sql::QueryContext* queryContext);
 };
 
 } // namespace nx::analytics::storage
