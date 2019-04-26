@@ -608,6 +608,8 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
     if (watcher->hasMismatches())
         menu()->trigger(action::VersionMismatchMessageAction);
 
+    menu()->triggerIfPossible(action::ConfirmAnalyticsStorageAction);
+
     context()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();
 }
 
