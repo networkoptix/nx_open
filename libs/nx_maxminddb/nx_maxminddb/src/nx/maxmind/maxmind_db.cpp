@@ -1,7 +1,5 @@
 #include "maxmind_db.h"
 
-#include <nx/utils/log/log.h>
-
 namespace nx::maxmind {
 
 namespace {
@@ -42,44 +40,43 @@ bool MaxmindDb::open(const std::string& dbPath)
     return true;
 }
 
-std::string MaxmindDb::lookupCountry(const std::string& ipAddress, const std::string& language)
+std::optional<std::string> MaxmindDb::lookupCountry(
+    const std::string& ipAddress,
+    const std::string& language)
 {
     auto lookupResult = lookupIpAddress(ipAddress);
     if (!lookupResult)
         return {};
 
-    int mmdbError = MMDB_SUCCESS;
-    std::string value;
-    std::tie(mmdbError, value) =
-        detail::getStringValue(*lookupResult, "country", "names", language.c_str());
-
-    if (mmdbError != MMDB_SUCCESS)
-    {
-        NX_VERBOSE(this, "Error from MMDB_get_value: %1", MMDB_strerror(mmdbError));
-        return {};
-    }
-
-    return value;
+    return getString(__func__, *lookupResult, "country", "names", language.c_str());
 }
 
-std::string MaxmindDb::lookupContinent(const std::string& ipAddress, const std::string& language)
+std::optional<std::string> MaxmindDb::lookupContinent(
+    const std::string& ipAddress, 
+    const std::string& language)
+{
+    auto lookupResult = lookupIpAddress(ipAddress);
+    if (!lookupResult)
+        return std::nullopt;
+
+    return getString(__func__, *lookupResult, "continent", "names", language.c_str());
+}
+
+std::optional<Geopoint> MaxmindDb::lookupGeopoint(const std::string& ipAddress)
 {
     auto lookupResult = lookupIpAddress(ipAddress);
     if (!lookupResult)
         return {};
 
-    int mmdbError = MMDB_SUCCESS;
-    std::string value;
-    std::tie(mmdbError, value) =
-        detail::getStringValue(*lookupResult, "continent", "names", language.c_str());
+    auto lat = getDouble(__func__, *lookupResult, "location", "latitude");
+    if (!lat)
+        return std::nullopt;
 
-    if (mmdbError != MMDB_SUCCESS)
-    {
-        NX_VERBOSE(this, "Error from MMDB_get_value: %1", MMDB_strerror(mmdbError));
-        return {};
-    }
+    auto lon = getDouble(__func__, *lookupResult, "location", "longitude");
+    if (!lon)
+        return std::nullopt;
 
-    return value;
+    return Geopoint{*lat, *lon};
 }
 
 std::optional<MMDB_lookup_result_s> MaxmindDb::lookupIpAddress(const std::string& ipAddress)
@@ -103,7 +100,38 @@ std::optional<MMDB_lookup_result_s> MaxmindDb::lookupIpAddress(const std::string
         return std::nullopt;
     }
 
+    if (!lookupResult.found_entry)
+        return std::nullopt;
+
     return lookupResult;
+}
+
+bool MaxmindDb::validate(
+    const char* callingFunc,
+    int mmdbError,
+    const MMDB_entry_data_s& entryData,
+    uint32_t expectedMmdbDataType) const
+{
+    if (mmdbError != MMDB_SUCCESS)
+    {
+        NX_VERBOSE(this, "%1: error from MMDB_get_value: %2", 
+            callingFunc, MMDB_strerror(mmdbError));
+        return false;
+    }
+    
+    if (!entryData.has_data)
+        return false;
+
+    if (entryData.type != expectedMmdbDataType)
+    {
+        NX_VERBOSE(this, "%1: expected mmdb data type: %2, got %3",
+            callingFunc,
+            utils::dataTypeToString(expectedMmdbDataType),
+            utils::dataTypeToString(entryData.type));
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace nx::maxmind
