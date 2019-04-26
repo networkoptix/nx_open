@@ -95,23 +95,34 @@ export class MergeModalContent {
             });
         }, (error) => {
             if (error.data.resultCode !== 'wrongPassword') {
-
+                /* Get the names of the primary and secondary system.
+                   Next try to figure out which system caused the problem.
+                   If the primary system's stateOfHealth is not online set it as the failedSystem.
+                   Otherwise the secondary system is set as the failedSystem no matter what.
+                 */
+                // Set the name of the primary system.
                 error.data.primarySystemName = this.primarySystem.name;
+                // If name is undefined try looking in info for the name.
                 if (error.data.primarySystemName === undefined) {
                     error.data.primarySystemName = this.primarySystem.info && this.primarySystem.info.name;
                 }
 
+                // Set the name of the secondary system.
                 error.data.secondarySystemName = this.secondarySystem.name;
+
+                // If name is undefined try looking in info for the name.
                 if (error.data.secondarySystemName === undefined) {
                     error.data.secondarySystemName = this.secondarySystem.info && this.secondarySystem.info.name;
                 }
 
+                // Check the state of health
                 var primaryState = this.primarySystem.stateOfHealth;
+                // If stateOfHealth is undefined check in info for stateOfHealth.
                 if (primaryState === undefined) {
                     primaryState = this.primarySystem.info && this.primarySystem.info.stateOfHealth;
                 }
 
-                // Assume the secondary system is the issue unless the primary system is not online
+                // Assume the secondary system is the issue unless the primary system is not online.
                 error.data.failedSystemName = error.data.secondarySystemName;
                 if (primaryState !== 'online') {
                     error.data.failedSystemName = error.data.primarySystemName;
