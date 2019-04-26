@@ -14,6 +14,8 @@ static const QSize kSearchResolution(
     kTrackSearchResolutionX,
     kTrackSearchResolutionY);
 
+static constexpr bool kFilteredTimePeriodsQueryEnabled = false;
+
 TimePeriodFetcher::TimePeriodFetcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
@@ -40,7 +42,7 @@ nx::sql::DBResult TimePeriodFetcher::selectTimePeriods(
     localFilter.deviceIds.clear();
     localFilter.timePeriod.clear();
 
-    if (localFilter.empty())
+    if (!kFilteredTimePeriodsQueryEnabled || localFilter.empty())
     {
         prepareSelectTimePeriodsSimpleQuery(
             query.get(), filter.deviceIds, filter.timePeriod, options);
