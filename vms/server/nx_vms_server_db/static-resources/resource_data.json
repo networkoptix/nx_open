@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.49",
+    "version": "1.0.1.50",
     "data": [
         {
             "keys": [
@@ -2029,6 +2029,15 @@
             }
         },
         {
+            "keys": ["Dahua|22204TNI"],
+            "_comment": "The camera returns the same URI for all videoencoders, so we switch them off.",
+            "forcedOnvifParams": 
+            {
+                "videoEncoders": ["000"],
+                "profiles": ["MediaProfile000"]
+            }
+        },
+        {
             "keys": [
                 "*Grandeye*|EVO-05NxD"
             ],
@@ -3357,6 +3366,7 @@
             "_comment1": "Mapped for 2.623.0000000.1.R, Build Date 2018-06-27",
             "keys": [
                 "Dahua|DH-SD50225U*", "DH-SD50225U*|Dahua",
+                "Dahua|SD50225U*", "SD50225U*|Dahua",
                 "Dahua|DH-SD59225U*", "DH-SD59225U*|Dahua"
             ],
             "ptzMapper": {

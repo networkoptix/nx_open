@@ -1,0 +1,109 @@
+<!doctype html>
+<html><head>
+  <meta charset="utf-8">
+  <title>NX Log Viewer</title>
+  <style>
+    .ALWAYS { color: cyan; font-weight: bold; }
+    .ERROR { color: red; font-weight: bold; }
+    .WARNING { color: orange; font-weight: bold; }
+    .INFO { color: lightskyblue; font-weight: bold; }
+    .DEBUG { color: lightgreen; }
+    .VERBOSE { color: silver; }
+  </style>
+</head><body style="background-color: black; color: white; font-family: monospace">
+  <p>
+    <input type="file" id="file" style="width: 300pt;" multiple />
+    level <select id="level" style="width: 100pt;"></select>
+    OR contains <input type="text" id="filter" style="width: 300pt;" />
+  </p>
+  <pre id="output" style="width: 100%; height: 100%">
+    <p class="ERROR">Make sure javascript is enabled.</p>
+  </pre>
+  <script>
+    'use strict';
+    // This page does not use modern JS to support as many browsers as possible.
+    var LEVELS = ['ALWAYS', 'ERROR', 'WARNING', 'INFO', 'DEBUG', 'VERBOSE']
+
+    var contentRecords = [] //< Log recods: {level: int, text: string}.
+    var fileField = document.getElementById('file')
+    var levelField = document.getElementById('level')
+    var filterField = document.getElementById('filter')
+    var outputField = document.getElementById('output')
+
+    /** @returns Any of substrings if it's found in text, false otherwise. */
+    function findAny(text, substrings) {
+      for (var i = 0, length = substrings.length; i < length; ++i) {
+        var option = substrings[i]
+        if (!option || text.indexOf(option) != -1) {
+          return option || true
+        }
+      }
+      return false
+    }
+
+    /** Updates outputField with records from contentRecords according to filters. */
+    function updateOutput() {
+      var filters = filterField.value.split('|')
+      var level = levelField[levelField.selectedIndex].value
+      console.log(
+        'Use filters', filters, 'and level', LEVELS[level],
+        'for', contentRecords.length, 'record(s)')
+      var renderedLines = []
+      for (var i = 0, length = contentRecords.length; i < length; ++i) {
+        var record = contentRecords[i]
+        if (record.level <= level || (filters != '' && findAny(record.text, filters))) {
+          renderedLines.push(
+            '<span class="' + LEVELS[record.level] + '">' + record.text + '</span>')
+        }
+      }
+      console.log('Render', renderedLines.length, 'records(s)')
+      outputField.innerHTML = renderedLines.join('\n')
+    }
+
+    /** @returns Log records {level: int, text: string}, parsed from lines. */
+    function parseRecords(lines) {
+      var records = []
+      for (var i = 0, length = lines.length; i < length; ++i) {
+        var line = lines[i]
+        var level = findAny(line, LEVELS)
+        if (level) {
+          records.push({level: LEVELS.indexOf(level), text: line.trim()})
+        } else {
+          records[records.length -1].text += '\n' + line
+        }
+      }
+      return records
+    }
+
+    /** Loads files into contentRecords and updates outputField. */
+    function loadFiles(files) {
+      console.log('Load', files.length, 'file(s)')
+      contentRecords = []
+      outputField.innerHTML = '<p class="INFO">Loading...</p>'
+      for (var i = 0, f; f = files[i]; i++) {
+        var name = f.name
+        var reader = new FileReader()
+        reader.onload = function (event) {
+          var lines = event.target.result.split('\n')
+          console.log('File [', name, '] is loaded,', lines.length, 'line(s)')
+          contentRecords = contentRecords.concat(parseRecords(lines))
+          updateOutput()
+        }
+        reader.readAsText(f)
+      }
+    }
+
+    if (!FileReader) {
+      outputField.innerHTML =
+        '<div class="ERROR">This browser does not support FileReader :(</div>'
+    } else {
+      fileField.addEventListener('change', function (e) { loadFiles(e.target.files) })
+      for (var i = LEVELS.length - 1; i >= 0; --i) {
+        levelField.innerHTML += '<option value="' + i + '">' + LEVELS[i] + '</option>'
+      }
+      levelField.addEventListener('change', updateOutput)
+      filterField.addEventListener('change', updateOutput)
+      outputField.innerHTML = '<p class="INFO">Select log file to begin.</p>'
+    }
+  </script>
+</body></html>

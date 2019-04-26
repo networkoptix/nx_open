@@ -11,7 +11,6 @@ namespace event {
 class NetworkIssueEvent: public ReasonedEvent
 {
     using base_type = ReasonedEvent;
-
 public:
     struct MulticastAddressConflictParameters
     {
@@ -31,6 +30,8 @@ public:
     static bool decodePrimaryStream(const QString& encoded, const bool defaultValue);
     static QString encodePrimaryStream(bool isPrimary);
 };
+
+QN_FUSION_DECLARE_FUNCTIONS(NetworkIssueEvent::MulticastAddressConflictParameters, (json))
 
 QN_FUSION_DECLARE_FUNCTIONS(NetworkIssueEvent::MulticastAddressConflictParameters, (json))
 

@@ -26,6 +26,7 @@ copyBins()
     cp -r "bin/client" "$STAGE_BIN/"
     cp -r "$BUILD_DIR/bin/$LAUNCHER_VERSION_FILE" "$STAGE_BIN/"
     cp -r "bin/applauncher" "$STAGE_BIN/"
+    cp -r "$SOURCE_DIR/nx_log_viewer.html" "$STAGE_BIN/"
 }
 
 # [in] STAGE
