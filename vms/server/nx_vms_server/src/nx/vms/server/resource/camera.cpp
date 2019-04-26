@@ -19,6 +19,7 @@
 #include <media_server/media_server_module.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <plugins/utils/multisensor_data_provider.h>
+#include <nx/vms/server/resource/multicast_parameters.h>
 
 static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
 
@@ -752,6 +753,57 @@ QnTimePeriodList Camera::getDtsTimePeriods(
     Qt::SortOrder /*sortOrder*/)
 {
     return QnTimePeriodList();
+}
+
+/* static */
+bool Camera::fixMulticastParametersIfNeeded(
+    nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
+    nx::vms::api::StreamIndex streamIndex)
+{
+    if (!NX_ASSERT(inOutMulticastParameters, "Multicast parameters must be non-null"))
+        return false;
+
+    bool somethingIsFixed = false;
+    auto& address = inOutMulticastParameters->address;
+    if (!address || !QHostAddress(QString::fromStdString(*address)).isMulticast())
+    {
+        const auto defaultAddress = streamIndex == nx::vms::api::StreamIndex::primary
+            ? kDefaultPrimaryStreamMulticastAddress
+            : kDefaultSecondaryStreamMulticastAddress;
+
+        NX_DEBUG(NX_SCOPE_TAG, "Fixing multicast streaming address for stream %1: %2 -> %3",
+            streamIndex, (address ? *address : ""), defaultAddress);
+
+        address = defaultAddress.toStdString();
+        somethingIsFixed = true;
+    }
+
+    auto& port = inOutMulticastParameters->port;
+    int portNumber = port ? *port : 0;
+    if (portNumber <= 1024 || portNumber > 65535)
+    {
+        const auto defaultPort = streamIndex == nx::vms::api::StreamIndex::primary
+            ? kDefaultPrimaryStreamMulticastPort
+            : kDefaultSecondaryStreamMulticastPort;
+
+        NX_DEBUG(NX_SCOPE_TAG, "Fixing multicast port for stream %1: %2 -> %3",
+            streamIndex, portNumber, defaultPort);
+
+        port = defaultPort;
+        somethingIsFixed = true;
+    }
+
+    auto& ttl = inOutMulticastParameters->ttl;
+    if (!ttl || ttl <= 0)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Fixing multicast ttl for stream %1: %2 -> %3",
+            streamIndex, (ttl ? *ttl : 0), kDefaultMulticastTtl);
+
+        ttl = kDefaultMulticastTtl;
+        somethingIsFixed = true;
+    }
+
+    return somethingIsFixed;
 }
 
 } // namespace resource

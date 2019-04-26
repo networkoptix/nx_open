@@ -486,10 +486,6 @@ private:
     VideoEncoderCapabilities findVideoEncoderCapabilities(
         SupportedVideoEncoding encoding, StreamIndex streamIndex);
 
-    bool fixMulticastParametersIfNeeded(
-        nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
-        nx::vms::api::StreamIndex streamIndex);
-
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
 

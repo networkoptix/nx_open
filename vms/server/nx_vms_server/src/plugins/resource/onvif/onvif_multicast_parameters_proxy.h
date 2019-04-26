@@ -4,19 +4,12 @@
 #include <string>
 #include <QString>
 
+#include <nx/vms/server/resource/multicast_parameters.h>
+
 struct QnCameraAdvancedParams;
 class QnPlOnvifResource;
 
 namespace nx::vms::server::resource {
-
-struct MulticastParameters
-{
-    std::optional<std::string> address;
-    std::optional<int> port;
-    std::optional<int> ttl;
-
-    QString toString() const;
-};
 
 class OnvifMulticastParametersProxy
 {

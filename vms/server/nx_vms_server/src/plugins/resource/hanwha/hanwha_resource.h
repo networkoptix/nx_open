@@ -203,7 +203,8 @@ private:
 
     CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
     CameraDiagnostics::Result enableMulticast(
-        const HanwhaVideoProfile& profile, Qn::ConnectionRole role);
+        int profileNumber,
+        const nx::vms::server::resource::MulticastParameters& multicastParameters);
 
     void cleanUpOnProxiedDeviceChange();
 
