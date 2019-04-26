@@ -2801,7 +2801,7 @@ bool QnPlOnvifResource::fixMulticastParametersIfNeeded(
             : kDefaultSecondaryStreamMulticastAddress;
 
         NX_INFO(this, lm("Fixing multicast streaming address for stream %1: %2 -> %3")
-            .args(streamIndex, (address ? *address : ""), defaultAddress));
+            .args(Qn::toString(streamIndex), (address ? *address : ""), defaultAddress));
 
         address = defaultAddress.toStdString();
         somethingIsFixed = true;
@@ -2816,7 +2816,7 @@ bool QnPlOnvifResource::fixMulticastParametersIfNeeded(
             : kDefaultSecondaryStreamMulticastPort;
 
         NX_INFO(this, lm("Fixing multicast port for stream %1: %2 -> %3").args(
-            streamIndex, portNumber, defaultPort));
+            Qn::toString(streamIndex), portNumber, defaultPort));
 
         port = defaultPort;
         somethingIsFixed = true;
@@ -2826,7 +2826,7 @@ bool QnPlOnvifResource::fixMulticastParametersIfNeeded(
     if (!ttl || ttl <= 0)
     {
         NX_INFO(this, lm("Fixing multicast ttl for stream %1: %2 -> %3").args(
-            streamIndex, (ttl ? *ttl : 0), kDefaultMulticastTtl));
+            Qn::toString(streamIndex), (ttl ? *ttl : 0), kDefaultMulticastTtl));
 
         ttl = kDefaultMulticastTtl;
         somethingIsFixed = true;
@@ -4339,16 +4339,16 @@ CameraDiagnostics::Result QnPlOnvifResource::ensureMulticastIsEnabled(
     if (!multicastParametersProvider.setMulticastParameters(multicastParameters))
     {
         NX_DEBUG(this, lm("Unable to update multicast parameters for stream %1, parameters: %2")
-            .args(streamIndex, multicastParameters));
+            .args(Qn::toString(streamIndex), multicastParameters.toString()));
 
         return CameraDiagnostics::RequestFailedResult("Updating multicast parameters",
             lm("Unable to update multicast parameters for stream %1, parameters: %2")
-            .args(streamIndex, multicastParameters));
+                .args(Qn::toString(streamIndex), multicastParameters.toString()));
     }
 
     NX_VERBOSE(this,
         lm("Multicast parameters has been successfully updated for stream %1, parameters %2")
-            .args(streamIndex, multicastParameters));
+            .args(Qn::toString(streamIndex), multicastParameters.toString()));
 
     return CameraDiagnostics::NoErrorResult();
 }
