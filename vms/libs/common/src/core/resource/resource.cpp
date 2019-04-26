@@ -701,6 +701,8 @@ void QnResource::reinitAsync()
 {
     if (commonModule()->isNeedToStop() || hasFlags(Qn::foreigner))
         return;
+    if (resourcePool() == nullptr)
+        return;
 
     NX_DEBUG(this, "Reinitialization is requested");
     {
@@ -721,6 +723,9 @@ void QnResource::reinitAsync()
 
 void QnResource::initAsync(bool optional)
 {
+    if (resourcePool() == nullptr)
+        return;
+
     NX_VERBOSE(this, "Async init requested (optional: %1)", optional);
 
     qint64 t = getUsecTimer();
