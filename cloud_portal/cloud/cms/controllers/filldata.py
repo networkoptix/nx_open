@@ -9,6 +9,8 @@ import errno
 import traceback
 from io import StringIO
 
+from concurrent.futures import ThreadPoolExecutor
+
 from cloud.debug import timer
 
 import logging
@@ -341,29 +343,32 @@ def fill_content(product,
 
     default_language_code = product.default_language.code
     languages_list = product.languages_list
-    for context in changed_contexts:
-        # logger.info("Process context: " + context.name + " file:" + context.file_path)
-        # now we need to check what languages were changes
-        # if the default language is changed - we update all languages (lazy way)
-        # otherwise - update only affected languages
-        if incremental:
-            changed_languages = list(changed_records.filter(data_structure__context_id=context.id).
-                                     values_list('language__code', flat=True).distinct())
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        for context in changed_contexts:
+            # logger.info("Process context: " + context.name + " file:" + context.file_path)
+            if incremental:
+                changed_languages = list(changed_records.filter(data_structure__context_id=context.id).
+                                         values_list('language__code', flat=True).distinct())
 
-            if default_language_code in changed_languages:
-                # if default language changes - it can affect all languages in the context
-                changed_languages = languages_list
-
-        # update affected languages
-        if context.translatable:
-            for language_code in changed_languages:
-                save_context(product, context, context.file_path, language_code,
-                             preview, version_id, global_contexts, global_contexts_dict)
-        else:
-            save_context(product, context, context.file_path, None,
-                         preview, version_id, global_contexts, global_contexts_dict)
+                if default_language_code in changed_languages:
+                    # if default language changes - it can affect all languages in the context
+                    changed_languages = languages_list
+            executor.submit(thread_context, context, product, changed_languages, preview, version_id,
+                            global_contexts, global_contexts_dict)
 
     generate_languages_json(product.product_root, languages_list,  preview)
+
+
+def thread_context(context, product, changed_languages, preview, version_id, global_contexts, global_contexts_dict):
+    # update affected languages
+    if context.translatable:
+        with ThreadPoolExecutor(max_workers=25) as executor:
+            for language_code in changed_languages:
+                executor.submit(save_context, product, context, context.file_path, language_code, preview, version_id,
+                                global_contexts, global_contexts_dict)
+    else:
+        save_context(product, context, context.file_path, None,
+                     preview, version_id, global_contexts, global_contexts_dict)
 
 
 def zip_context(zip_file, product, context, language_code,
