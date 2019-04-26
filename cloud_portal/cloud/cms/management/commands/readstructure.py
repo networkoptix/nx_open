@@ -9,8 +9,8 @@ import json
 import codecs
 from cloud import settings
 from cloud.debug import timer
-from ...controllers import structure
-from ...models import *
+from cms.controllers import structure
+from cms.models import *
 from django.core.management.base import BaseCommand
 
 
@@ -142,7 +142,7 @@ def find_or_add_context_template(context, language_code, skin):
 
 def read_cms_strings(filename):
     pattern = re.compile(r'%\S+?%')
-    with open(filename, 'r', 'utf-8') as file:
+    with open(filename, 'r') as file:
         data = file.read()
         return data, set(re.findall(pattern, data))
 
