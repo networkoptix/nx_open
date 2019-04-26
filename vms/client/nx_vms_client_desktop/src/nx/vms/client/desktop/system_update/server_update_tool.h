@@ -209,11 +209,6 @@ public:
      */
     void uploadPackage(const nx::update::Package& package, const QDir& sourceDir);
 
-    /**
-     * Updates URL of the current mediaserver.
-     */
-    void setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId);
-
     TimePoint::duration getInstallDuration() const;
 
     /**

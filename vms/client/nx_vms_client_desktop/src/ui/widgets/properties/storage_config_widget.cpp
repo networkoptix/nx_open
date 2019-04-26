@@ -43,6 +43,7 @@
 #include <utils/common/synctime.h>
 #include <utils/math/color_transformations.h>
 
+#include <nx/analytics/utils.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
@@ -126,7 +127,7 @@ namespace
                 opt.state &= ~QStyle::State_Enabled;
 
             /* Set proper color for links: */
-            if (index.column() == QnStorageListModel::RemoveActionColumn && !opt.text.isEmpty())
+            if (index.column() == QnStorageListModel::ActionsColumn && !opt.text.isEmpty())
                 opt.palette.setColor(QPalette::Text, style::linkColor(opt.palette, hovered));
 
             /* Set warning color for inaccessible storages: */
@@ -240,8 +241,6 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     ui->backupSettingsButtonDuplicate->setText(ui->backupSettingsButton->text());
     connect(ui->backupSettingsButtonDuplicate, &QPushButton::clicked, ui->backupSettingsButton, &QPushButton::clicked);
-
-    setWarningStyle(ui->storagesWarningLabel);
 
     ui->progressBarBackup->setFormat(lit("%1\t%p%").arg(tr("Backup is in progress...")));
 
@@ -442,6 +441,9 @@ bool QnStorageConfigWidget::hasChanges() const
     if (hasStoragesChanges(m_model->storages()))
         return true;
 
+    if (m_model->metadataStorageId() != m_server->metadataStorageId())
+        return true;
+
     if (m_quality != qnGlobalSettings->backupQualities())
         return true;
 
@@ -491,7 +493,7 @@ void QnStorageConfigWidget::loadDataToUi()
     m_backupSchedule = m_server->getBackupSchedule();
     m_camerasToBackup = getCurrentSelectedCameras(resourcePool());
 
-    setWarningText(QString());
+    updateWarnings();
 
     updateRebuildInfo();
     updateBackupInfo();
@@ -545,14 +547,74 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
         record.isBackup = isBackup;
         m_model->updateStorage(record);
     }
-    else if (index.column() == QnStorageListModel::RemoveActionColumn)
+    else if (index.column() == QnStorageListModel::ActionsColumn)
     {
         if (m_model->canRemoveStorage(record))
+        {
+            // Network storage.
             m_model->removeStorage(record);
+        }
+        else
+        {
+            // Local storage, may be used to store analytics.
+            const bool analyticsEnabled = nx::analytics::hasActiveObjectEngines(
+                m_server->commonModule(), m_server->getId());
+
+            if (analyticsEnabled && record.id != m_model->metadataStorageId())
+            {
+                const auto storageId = record.id;
+                if (storageId == m_server->metadataStorageId())
+                {
+                    // The current storage has been chosen.
+                    m_model->setMetadataStorageId(storageId);
+                    updateWarnings();
+                }
+                else
+                {
+                    // Metadata storage has been changed, we need to do something with database.
+                    QnMessageBox msgBox(
+                        QnMessageBoxIcon::Question,
+                        tr("What to do with current analytics data?"),
+                        tr("Current analytics data will not be automatically moved to another location"
+                            " and will become unaccessible. You can keep it and manually move later,"
+                            " or delete permanently."
+                            "\n"
+                            "If you intended to move analytics data to another storage location,"
+                            " please contact support before proceeding."),
+                        QDialogButtonBox::StandardButtons(),
+                        QDialogButtonBox::NoButton,
+                        this);
+
+                    const auto deleteButton = msgBox.addButton(tr("Delete"),
+                        QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Warning);
+                    const auto keepButton = msgBox.addButton(tr("Keep"),
+                        QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
+                    const auto cancelButton = msgBox.addButton(tr("Cancel"),
+                        QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
+
+                    cancelButton->setFocus();
+
+                    msgBox.exec();
+
+                    if (msgBox.clickedButton() == deleteButton)
+                    {
+                        m_model->setMetadataStorageId(storageId,
+                            QnStorageListModel::DeleteExistingMetadata);
+                        updateWarnings();
+                    }
+
+                    if (msgBox.clickedButton() == keepButton)
+                    {
+                        m_model->setMetadataStorageId(storageId);
+                        updateWarnings();
+                    }
+                }
+            }
+        }
     }
     else if (index.column() == QnStorageListModel::CheckBoxColumn)
     {
-        setWarningText(calculateWarningMessage());
+        updateWarnings();
     }
 
     emit hasChangesChanged();
@@ -564,7 +626,10 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
         return;
 
     if (m_server)
+    {
         disconnect(m_server, &QnMediaServerResource::backupScheduleChanged, this, nullptr);
+        disconnect(m_server, &QnMediaServerResource::metadataStorageIdChanged, this, nullptr);
+    }
 
     m_server = server;
     m_model->setServer(server);
@@ -577,6 +642,14 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
             {
                 /* Current changes may be lost, it's OK. */
                 m_backupSchedule = m_server->getBackupSchedule();
+                emit hasChangesChanged();
+            });
+
+        m_model->setMetadataStorageId(m_server->metadataStorageId());
+        connect(m_server, &QnMediaServerResource::metadataStorageIdChanged, this,
+            [this]()
+            {
+                m_model->setMetadataStorageId(m_server->metadataStorageId());
                 emit hasChangesChanged();
             });
     }
@@ -678,13 +751,31 @@ void QnStorageConfigWidget::applyChanges()
     if (!storagesToRemove.empty())
         qnServerStorageManager->deleteStorages(storagesToRemove);
 
-    if (m_backupSchedule != m_server->getBackupSchedule())
+    if (m_model->metadataStorageId() != m_server->metadataStorageId())
     {
-        qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr& server)
-            { server->setBackupSchedule(m_backupSchedule); });
+        qnGlobalSettings->setMetadataStorageChangePolicy(
+            m_model->keepMetadata()
+                ? nx::vms::api::MetadataStorageChangePolicy::keep
+                : nx::vms::api::MetadataStorageChangePolicy::remove);
+        qnGlobalSettings->synchronizeNow();
+
+        qnResourcesChangesManager->saveServer(m_server,
+            [this](const QnMediaServerResourcePtr &server)
+            {
+                server->setMetadataStorageId(m_model->metadataStorageId());
+            });
     }
 
-    setWarningText(QString());
+    if (m_backupSchedule != m_server->getBackupSchedule())
+    {
+        qnResourcesChangesManager->saveServer(m_server,
+            [this](const QnMediaServerResourcePtr& server)
+            {
+                server->setBackupSchedule(m_backupSchedule);
+            });
+    }
+
+    updateWarnings();
     emit hasChangesChanged();
 }
 
@@ -936,15 +1027,30 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
     }
 }
 
-QString QnStorageConfigWidget::calculateWarningMessage() const
+void QnStorageConfigWidget::updateWarnings()
 {
+    bool analyticsIsOnSystemDrive = false;
+    bool analyticsIsOnDisabledStorage = false;
     bool hasDisabledStorage = false;
     bool hasUsbStorage = false;
+
+    const bool analyticsEnabled = nx::analytics::hasActiveObjectEngines(
+        m_server->commonModule(), m_server->getId());
+
     for (const auto& storageData: m_model->storages())
     {
         const auto storage = resourcePool()->getResourceById<QnStorageResource>(storageData.id);
         if (!storage || storage->getParentId() != m_server->getId())
             continue;
+
+        if (analyticsEnabled && storageData.id == m_model->metadataStorageId())
+        {
+            if (storage->statusFlag() & Qn::StorageStatus::system)
+                analyticsIsOnSystemDrive = true;
+
+            if (!storageData.isUsed)
+                analyticsIsOnDisabledStorage = true;
+        }
 
         // Storage was not modified.
         if (storageData.isUsed == storage->isUsedForWriting())
@@ -957,25 +1063,10 @@ QString QnStorageConfigWidget::calculateWarningMessage() const
             hasUsbStorage = true;
     }
 
-    QStringList errorMessages;
-    if (hasDisabledStorage)
-    {
-        errorMessages << tr("Recording to disabled storage will stop. "
-            "However, deleting outdated footage from it will continue.");
-    }
-    if (hasUsbStorage)
-        errorMessages << tr("Recording was enabled on the USB storage");
-
-    return errorMessages.join(L'\n');
-}
-
-void QnStorageConfigWidget::setWarningText(const QString& message)
-{
-    const bool wasHidden = ui->storagesWarningLabel->isHidden();
-    ui->storagesWarningLabel->setHidden(message.isEmpty());
-    ui->storagesWarningLabel->setText(message);
-    if (wasHidden != ui->storagesWarningLabel->isHidden())
-        ui->storagesGroupBox->layout()->activate();
+    ui->analyticsOnSystemDriveWarningLabel->setVisible(analyticsIsOnSystemDrive);
+    ui->analyticsOnDisabledStorageWarningLabel->setVisible(analyticsIsOnDisabledStorage);
+    ui->storagesWarningLabel->setVisible(hasDisabledStorage);
+    ui->usbWarningLabel->setVisible(hasUsbStorage);
 }
 
 void QnStorageConfigWidget::updateIntervalLabels()
