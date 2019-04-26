@@ -33,9 +33,25 @@ public:
 
     BusyIndicatorWidget* busyIndicator() const;
 
+    /**
+     * @returns:
+     *  - Take imageSize from imageProvider if it exists and not empty;
+     *  otherwise take minimumSize() if not empty; otherwise take kDefaultThumbnailSize=(1920, 1080).
+     *  - If autoScaleDown, scale it down respecting aspect ratio to fit into maximumSize() .
+     *
+     *  @note always returns non-empty rectangle.
+     */
     virtual QSize sizeHint() const override;
 
     virtual bool hasHeightForWidth() const override;
+
+    /**
+     * @returns:
+     *   - sizeHint().height() if autoScaleDown == false && autoScaleUp == false
+     *   - min(width / (sizeHint() aspect ratio), sizeHint().height()) if autoScaleDown == true && autoScaleUp == false
+     *   - max(width / (sizeHint() aspect ratio), sizeHint().height()) if autoScaleDown == false && autoScaleUp == true
+     *   - width / (sizeHint() aspect ratio) if autoScaleDown = true && autoScaleUp == true
+     */
     virtual int heightForWidth(int width) const override;
 
     QPalette::ColorRole borderRole() const;
@@ -85,13 +101,18 @@ private:
     void retranslateUi();
     void invalidateGeometry();
 
+    void updateSizeHint() const; //< Const because sizeHint() has to be const.
+    // Sets both sizeHint() and m_preview image based on current state.
+    void updateCache();
+
     void updateThumbnailStatus(Qn::ThumbnailStatus status);
-    void updateThumbnailImage(const QImage& image);
 
     bool cropRequired() const;
 
+    static QTransform getAdjustment(QRectF target, QRectF image);
+
 private:
-    mutable QSize m_cachedSizeHint;
+    mutable QSize m_cachedSizeHint; //< Mutable because sizeHint() has to be const.
     AutoscaledPlainText* const m_placeholder = nullptr;
     BusyIndicatorWidget* const m_indicator = nullptr;
     QPixmap m_preview;

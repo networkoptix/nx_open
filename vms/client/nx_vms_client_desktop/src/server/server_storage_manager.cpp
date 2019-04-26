@@ -33,7 +33,7 @@ namespace {
         storage->setWritable(spaceInfo.isWritable);
         storage->setSpaceLimit(spaceInfo.reservedSpace);
         storage->setStatus(spaceInfo.isOnline ? Qn::Online : Qn::Offline);
-
+        storage->setStatusFlag(spaceInfo.storageStatus);
     }
 }
 

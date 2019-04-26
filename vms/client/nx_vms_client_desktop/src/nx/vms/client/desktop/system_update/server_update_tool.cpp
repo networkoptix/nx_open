@@ -686,11 +686,6 @@ bool ServerUpdateTool::haveActiveUpdate() const
     return m_updateManifest.isValid();
 }
 
-void ServerUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId)
-{
-    m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
-}
-
 ServerUpdateTool::TimePoint::duration ServerUpdateTool::getInstallDuration() const
 {
     auto delta = qnSyncTime->currentMSecsSinceEpoch() - m_timeStartedInstall;
@@ -829,20 +824,6 @@ void ServerUpdateTool::requestInstallAction(
         if (auto handle = connection->updateActionInstall(servers, callback, thread()))
             m_requestingInstall.insert(handle);
     }
-
-    // We need to create manual connection to mediaserver to track version changes.
-    if (auto ec2connection = commonModule()->ec2Connection())
-    {
-        QnConnectionInfo connectionInfo = ec2connection->connectionInfo();
-        QnUuid serverId = QnUuid(connectionInfo.ecsGuid);
-        nx::utils::Url serverUrl = connectionInfo.ecUrl;
-        setServerUrl(serverUrl, serverId);
-    }
-    else
-    {
-        NX_ERROR(this, "requestInstallAction() - ec2Connection is not available. "
-            "I will have problems tracking server version during install process.");
-    }
 }
 
 void ServerUpdateTool::requestModuleInformation()
@@ -858,7 +839,20 @@ void ServerUpdateTool::requestModuleInformation()
         };
 
     // We expect that m_serverConnection is created in requestStartUpdate
-    NX_ASSERT(m_serverConnection);
+    if (!m_serverConnection)
+    {
+        if (auto ec2connection = commonModule()->ec2Connection())
+        {
+            QnConnectionInfo connectionInfo = ec2connection->connectionInfo();
+            QnUuid serverId = QnUuid(connectionInfo.ecsGuid);
+            nx::utils::Url serverUrl = connectionInfo.ecUrl;
+            m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
+        }
+        else {
+            NX_ERROR(this, "requestModuleInformation() - ec2Connection is not available. "
+                "I will have problems tracking server version during install process.");
+        }
+    }
     if (m_serverConnection)
         m_serverConnection->getModuleInformationAll(callback);
 }

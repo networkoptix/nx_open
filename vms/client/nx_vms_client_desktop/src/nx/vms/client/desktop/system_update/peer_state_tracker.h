@@ -110,7 +110,11 @@ public:
 
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
-    void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
+    /**
+     * Update internal data using response from mediaservers.
+     * It will return number if peers with changed data.
+     */
+    int setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
     void markStatusUnknown(const QSet<QnUuid>& targets);
     /**
      * Forcing update for mediaserver versions.
@@ -147,17 +151,26 @@ public:
     QSet<QnUuid> peersInState(StatusCode state) const;
     QSet<QnUuid> legacyServers() const;
     QSet<QnUuid> offlineServers() const;
+    QSet<QnUuid> offlineNotTooLong() const;
     QSet<QnUuid> peersInstalling() const;
     QSet<QnUuid> peersCompleteInstall() const;
     QSet<QnUuid> serversWithChangedProtocol() const;
     QSet<QnUuid> peersWithUnknownStatus() const;
 
     /**
+     * Process unknown or offline states. It will change item states.
+     */
+    void processUnknownStates();
+
+    /**
      * Processing for task sets. These functions are called every 1sec from
      * MultiServerUpdatesWidget.
+     * These functions should only affect task sets and do not change state for each item.
      */
     void processDownloadTaskSet();
     void processInstallTaskSet();
+
+    void skipFailedPeers();
 
     /**
      * Getters for task sets.
