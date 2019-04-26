@@ -47,7 +47,7 @@ int Cleaner::cleanObjectSearch(nx::sql::QueryContext* queryContext)
     )sql");
 
     query->addBindValue(m_deviceId);
-    query->addBindValue(m_oldestDataToKeepTimestamp.count());
+    query->addBindValue((long long) m_oldestDataToKeepTimestamp.count());
     query->addBindValue(kRecordsToRemoveAtATime);
 
     query->exec();
@@ -66,7 +66,7 @@ int Cleaner::cleanObjectSearchToObject(nx::sql::QueryContext* queryContext)
     )sql");
 
     query->addBindValue(m_deviceId);
-    query->addBindValue(m_oldestDataToKeepTimestamp.count());
+    query->addBindValue((long long) m_oldestDataToKeepTimestamp.count());
     query->addBindValue(kRecordsToRemoveAtATime);
 
     query->exec();
@@ -82,7 +82,7 @@ int Cleaner::cleanObject(nx::sql::QueryContext* queryContext)
     )sql");
 
     query->addBindValue(m_deviceId);
-    query->addBindValue(m_oldestDataToKeepTimestamp.count());
+    query->addBindValue((long long) m_oldestDataToKeepTimestamp.count());
     query->addBindValue(kRecordsToRemoveAtATime);
 
     query->exec();
