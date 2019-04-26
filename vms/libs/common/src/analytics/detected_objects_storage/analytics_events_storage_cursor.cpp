@@ -1,8 +1,6 @@
 #include "analytics_events_storage_cursor.h"
 
-namespace nx {
-namespace analytics {
-namespace storage {
+namespace nx::analytics::storage::deprecated {
 
 Cursor::Cursor(std::unique_ptr<nx::sql::Cursor<DetectedObject>> dbCursor):
     m_dbCursor(std::move(dbCursor))
@@ -83,6 +81,4 @@ nx::common::metadata::DetectedObject Cursor::toMetadataObject(
     return result;
 }
 
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::storage::deprecated

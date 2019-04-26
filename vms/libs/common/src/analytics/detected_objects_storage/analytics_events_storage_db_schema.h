@@ -209,8 +209,7 @@ CREATE TABLE object_search(
     box_top_left_x              INTEGER,
     box_top_left_y              INTEGER,
     box_bottom_right_x          INTEGER,
-    box_bottom_right_y          INTEGER,
-    object_id_list              BLOB
+    box_bottom_right_y          INTEGER
 );
 
 CREATE INDEX idx_object_search_box ON object_search(
@@ -220,6 +219,16 @@ CREATE TABLE object_search_to_object(
     object_search_id            INTEGER,
     object_id                   INTEGER
 );
+
+)sql";
+
+//-------------------------------------------------------------------------------------------------
+// META-237.
+static constexpr char kObjectTrackStartTimeIndex[] =
+R"sql(
+
+CREATE INDEX idx_object_device_id_track_start_ms ON object(device_id, track_start_ms);
+REINDEX idx_object_device_id_track_start_ms;
 
 )sql";
 

@@ -81,6 +81,7 @@ copyBuildLibs()
         libnx_network
         libnx_update
         libnx_utils
+        libnx_vms_utils
         libnx_sql
         libnx_vms_api
         libnx_sdk
@@ -123,7 +124,6 @@ copyBuildLibs()
             libnx_audio
             libnx_vms_client_core
             libnx_media
-            libnx_vms_utils
 
             # third-party
             ldpreloadhook

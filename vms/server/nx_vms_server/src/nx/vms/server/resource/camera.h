@@ -169,6 +169,8 @@ public:
     /** Override for IO modules. */
     virtual QnIOStateDataList ioPortStates() const;
 
+    void reopenStream(nx::vms::api::StreamIndex streamIndex);
+
     nx::streaming::rtp::TimeOffsetPtr getTimeOffset() { return m_timeOffset; }
 
     /*

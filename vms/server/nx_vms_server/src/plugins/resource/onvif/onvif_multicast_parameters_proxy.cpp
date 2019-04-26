@@ -173,8 +173,18 @@ OnvifMulticastParametersProxy::OnvifMulticastParametersProxy(
 MulticastParameters OnvifMulticastParametersProxy::multicastParameters()
 {
     std::string token = m_resource->videoEncoderConfigurationToken(m_streamIndex);
-    if (!NX_ASSERT(!token.empty()))
-        return MulticastParameters();
+    if (m_streamIndex == nx::vms::api::StreamIndex::secondary)
+    {
+        // secondary stream may absent
+        if (token.empty())
+            return MulticastParameters();
+    }
+    else
+    {
+        // primary stream may not absent
+        if (!NX_ASSERT(!token.empty()))
+            return MulticastParameters();
+    }
 
     if (m_resource->getMedia2Url().isEmpty())
         return getMulticastParametersViaMedia1(token, m_resource);
@@ -238,6 +248,10 @@ bool OnvifMulticastParametersProxy::setVideoEncoderMulticastParameters(
         NX_DEBUG(this, errorFormatString, "set", media2.soapErrorAsString());
         return false;
     }
+
+    NX_DEBUG(this, "Camera [%1], change multicast parameters, reopen stream: %2",
+        m_resource->getId(), m_streamIndex);
+    m_resource->reopenStream(m_streamIndex);
     return true;
 }
 

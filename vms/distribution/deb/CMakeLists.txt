@@ -1,4 +1,4 @@
-# Variables used by build_distribution.conf files and/or .deb contents.
+# Variables used by build_distribution.conf files and/or .zip/.deb contents.
 if(arch STREQUAL "x64")
     set(os.arch "amd64")
 elseif(arch STREQUAL "x86")
@@ -20,6 +20,12 @@ execute_process(
 
 if(NOT pandoc_result EQUAL 0)
     message(FATAL_ERROR "error: License generation failed (${pandoc_result})")
+endif()
+
+if(targetDevice STREQUAL "linux_arm32" OR targetDevice STREQUAL "linux_arm64")
+    set(variantVersion "") #< ARM distributions should be compatible with any linux flavor.
+else()
+    set(variantVersion "14.04")
 endif()
 
 # Read license.txt and properly format it to be included into deb templates file:

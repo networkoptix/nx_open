@@ -95,48 +95,14 @@ protected:
         const Filter& filter,
         const std::vector<common::metadata::DetectionMetadataPacketPtr>& expected)
     {
-        auto objects = toDetectedObjects(expected);
-        const auto filteredObjects =
-            filterObjectsAndApplySortOrder(filter, std::move(objects));
-        andLookupResultEquals(filteredObjects);
-    }
-
-    std::vector<nx::analytics::storage::DetectedObject> filterObjectsAndApplySortOrder(
-        const Filter& filter,
-        std::vector<nx::analytics::storage::DetectedObject> objects)
-    {
-        // First, sorting objects in descending order, because we always filtering the most recent objects
-        // and filter.sortOrder is applied AFTER fitering.
-        std::sort(
-            objects.begin(), objects.end(),
-            [&filter](const DetectedObject& left, const DetectedObject& right)
-            {
-                return left.track.front().timestampUsec > right.track.front().timestampUsec;
-            });
-
-        auto filteredObjects = filterObjects(objects, filter);
-
-        std::sort(
-            filteredObjects.begin(), filteredObjects.end(),
-            [&filter](const DetectedObject& left, const DetectedObject& right)
-            {
-                if (filter.sortOrder == Qt::AscendingOrder)
-                    return left.track.front().timestampUsec < right.track.front().timestampUsec;
-                else
-                    return left.track.front().timestampUsec > right.track.front().timestampUsec;
-            });
-
-        return filteredObjects;
+        andLookupResultEquals(calculateExpectedResult(filter, expected));
     }
 
     bool isLookupResultEquals(
         const Filter& filter,
         const std::vector<common::metadata::DetectionMetadataPacketPtr>& expected)
     {
-        auto objects = toDetectedObjects(expected);
-        const auto filteredObjects =
-            filterObjectsAndApplySortOrder(filter, std::move(objects));
-        return filteredObjects == m_prevLookupResult->objectsFound;
+        return calculateExpectedResult(filter, expected) == m_prevLookupResult->objectsFound;
     }
 
     void thenLookupSucceded()
@@ -314,7 +280,7 @@ protected:
         const int eventsPerDevice = 11;
 
         std::vector<common::metadata::DetectionMetadataPacketPtr> analyticsDataPackets;
-        for (const auto& deviceId : m_allowedDeviceIds)
+        for (const auto& deviceId: m_allowedDeviceIds)
         {
             for (int i = 0; i < eventsPerDevice; ++i)
             {
@@ -370,8 +336,9 @@ protected:
         if (m_analyticsDataPackets.empty())
             return;
 
-        m_analyticsDataPackets =
-            sortPacketsByTimestamp(m_analyticsDataPackets, Qt::SortOrder::AscendingOrder);
+        m_analyticsDataPackets = sortPacketsByTimestamp(
+            std::exchange(m_analyticsDataPackets, {}),
+            Qt::SortOrder::AscendingOrder);
 
         auto prevPacketIter = m_analyticsDataPackets.begin();
         for (auto it = std::next(prevPacketIter);
@@ -384,6 +351,7 @@ protected:
                 std::move(
                     (*it)->objects.begin(), (*it)->objects.end(),
                     std::back_inserter((*prevPacketIter)->objects));
+
                 (*prevPacketIter)->durationUsec =
                     std::max((*it)->durationUsec, (*prevPacketIter)->durationUsec);
                 it = m_analyticsDataPackets.erase(it);
@@ -425,6 +393,70 @@ private:
         std::promise<ResultCode> done;
         m_eventsStorage->flush([&done](ResultCode result) { done.set_value(result); });
         ASSERT_EQ(ResultCode::ok, done.get_future().get());
+    }
+
+    std::vector<nx::analytics::storage::DetectedObject> calculateExpectedResult(
+        const Filter& filter,
+        const std::vector<common::metadata::DetectionMetadataPacketPtr>& packets)
+    {
+        auto objects = toDetectedObjects(packets);
+        objects = filterObjectsAndApplySortOrder(filter, std::move(objects));
+
+        if (kUseTrackAggregation)
+        {
+            // NOTE: Object box is stored in the DB with limited precision.
+            // So, lowering precision to that in the DB.
+            objects = applyTrackBoxPrecision(std::move(objects));
+        }
+
+        return objects;
+    }
+
+    std::vector<nx::analytics::storage::DetectedObject> filterObjectsAndApplySortOrder(
+        const Filter& filter,
+        std::vector<nx::analytics::storage::DetectedObject> objects)
+    {
+        // First, sorting objects in descending order, because we always filtering the most recent objects
+        // and filter.sortOrder is applied AFTER fitering.
+        std::sort(
+            objects.begin(), objects.end(),
+            [&filter](const DetectedObject& left, const DetectedObject& right)
+            {
+                return left.track.front().timestampUsec > right.track.front().timestampUsec;
+            });
+
+        auto filteredObjects = filterObjects(objects, filter);
+
+        std::sort(
+            filteredObjects.begin(), filteredObjects.end(),
+            [&filter](const DetectedObject& left, const DetectedObject& right)
+            {
+                if (filter.sortOrder == Qt::AscendingOrder)
+                    return left.track.front().timestampUsec < right.track.front().timestampUsec;
+                else
+                    return left.track.front().timestampUsec > right.track.front().timestampUsec;
+            });
+
+        return filteredObjects;
+    }
+
+    std::vector<nx::analytics::storage::DetectedObject> applyTrackBoxPrecision(
+        std::vector<nx::analytics::storage::DetectedObject> objects)
+    {
+        static const QSize kResolution(kCoordinatesPrecision, kCoordinatesPrecision);
+
+        for (auto& object: objects)
+        {
+            for (auto& position: object.track)
+            {
+                position.boundingBox =
+                    translate(
+                        translate(position.boundingBox, kResolution),
+                        kResolution);
+            }
+        }
+
+        return objects;
     }
 
     bool satisfiesFilter(
@@ -765,25 +797,48 @@ protected:
 
     void givenRandomFilter()
     {
-        addRandomKnownDeviceIdToFilter();
+        const auto& randomPacket = nx::utils::random::choice(analyticsDataPackets());
+
+        m_filter.deviceIds.push_back(randomPacket->deviceId);
+        //addRandomKnownDeviceIdToFilter();
 
         if (nx::utils::random::number<bool>())
+        {
             addRandomNonEmptyTimePeriodToFilter();
+            if (!m_filter.timePeriod.contains(randomPacket->timestampUsec / kUsecInMs))
+            {
+                m_filter.timePeriod.addPeriod(
+                    QnTimePeriod(randomPacket->timestampUsec / kUsecInMs, 1));
+            }
+        }
 
         if (nx::utils::random::number<bool>())
-            addRandomObjectIdToFilter();
+            m_filter.objectAppearanceId = randomPacket->objects.front().objectId;
 
         if (nx::utils::random::number<bool>())
+        {
             addRandomObjectTypeIdToFilter();
+            if (!nx::utils::contains(m_filter.objectTypeId, randomPacket->objects.front().objectTypeId))
+                m_filter.objectTypeId.push_back(randomPacket->objects.front().objectTypeId);
+        }
 
         if (nx::utils::random::number<bool>())
             addMaxObjectsLimitToFilter();
 
         if (nx::utils::random::number<bool>())
+        {
             addRandomBoundingBoxToFilter();
+            if (!m_filter.boundingBox.intersects(randomPacket->objects.front().boundingBox))
+            {
+                m_filter.boundingBox =
+                    m_filter.boundingBox.united(randomPacket->objects.front().boundingBox);
+            }
+        }
 
         if (nx::utils::random::number<bool>())
+        {
             addRandomTextFoundInDataToFilter();
+        }
     }
 
     void givenRandomFilterWithMultipleDeviceIds()
@@ -1067,6 +1122,13 @@ class AnalyticsDbCursor:
 {
     using base_type = AnalyticsDbLookup;
 
+public:
+    AnalyticsDbCursor()
+    {
+        filter().sortOrder = Qt::AscendingOrder;
+        filter().maxTrackSize = 0;
+    }
+
 protected:
     void givenDetectedObjectsWithSameTimestamp()
     {
@@ -1081,6 +1143,35 @@ protected:
 
         saveAnalyticsDataPackets(std::move(newPackets));
         aggregateAnalyticsDataPacketsByTimestamp();
+    }
+
+    void givenObjectsWithInterleavedTracks()
+    {
+        constexpr int objectCount = 3;
+
+        auto newPackets = generateEventsByCriteria();
+
+        const auto deviceId = QnUuid::createUuid();
+        std::vector<QnUuid> objectIds(objectCount, QnUuid());
+        std::generate(objectIds.begin(), objectIds.end(), &QnUuid::createUuid);
+
+        for (auto& packet: newPackets)
+        {
+            packet->deviceId = deviceId;
+
+            while (packet->objects.size() < objectIds.size())
+                packet->objects.push_back(packet->objects.front());
+
+            for (std::size_t i = 0; i < packet->objects.size(); ++i)
+            {
+                packet->objects[i].objectId = objectIds[i];
+                packet->objects[i].objectTypeId = objectIds[i].toSimpleString();
+            }
+        }
+
+        saveAnalyticsDataPackets(std::move(newPackets));
+
+        filter().deviceIds = {deviceId};
     }
 
     void whenReadDataUsingCursor()
@@ -1108,14 +1199,30 @@ protected:
 
     void thenResultMatchesExpectations()
     {
-        assertEqual(
-            sortPacketsByTimestamp(
-                filterPackets(filter(), analyticsDataPackets()),
-                filter().sortOrder),
-            m_packetsRead);
+        auto expected = sortPacketsByTimestamp(
+            filterPackets(filter(), analyticsDataPackets()),
+            filter().sortOrder);
+
+        sortObjectsById(&expected);
+
+        // TODO: Currently, attribute change history is not preserved.
+        removeLabels(&expected);
+
+        std::vector<common::metadata::DetectionMetadataPacketPtr> actual;
+        std::transform(
+            m_packetsRead.begin(), m_packetsRead.end(),
+            std::back_inserter(actual),
+            [](const auto& constPacket)
+            {
+                return std::make_shared<common::metadata::DetectionMetadataPacket>(*constPacket);
+            });
+        sortObjectsById(&actual);
+        removeLabels(&actual);
+
+        assertEqual(expected, actual);
     }
 
-    void andObjectsWithSameTimestampAreDeiveredInSinglePacket()
+    void andObjectsWithSameTimestampAreDeliveredInSinglePacket()
     {
         // TODO
     }
@@ -1137,9 +1244,36 @@ private:
     {
         m_createdCursorsQueue.push(cursor);
     }
+
+    void sortObjectsById(
+        std::vector<common::metadata::DetectionMetadataPacketPtr>* packets)
+    {
+        for (auto& packet: *packets)
+        {
+            std::sort(
+                packet->objects.begin(), packet->objects.end(),
+                [](const auto& left, const auto& right) { return left.objectId < right.objectId; });
+        }
+    }
+
+    void removeLabels(
+        std::vector<common::metadata::DetectionMetadataPacketPtr>* packets)
+    {
+        for (auto& packet: *packets)
+        {
+            for (auto& object: packet->objects)
+                object.labels.clear();
+        }
+    }
 };
 
-TEST_F(AnalyticsDbCursor, cursor_provides_all_matched_data)
+TEST_F(AnalyticsDbCursor, reads_all_available_data)
+{
+    whenReadDataUsingCursor();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbCursor, reads_all_matched_data)
 {
     givenRandomFilter();
     setSortOrder(nx::utils::random::number<bool>() ? Qt::AscendingOrder : Qt::DescendingOrder);
@@ -1155,8 +1289,17 @@ TEST_F(AnalyticsDbCursor, aggregates_objects_with_same_timestamp)
     whenReadDataUsingCursor();
 
     thenResultMatchesExpectations();
-    andObjectsWithSameTimestampAreDeiveredInSinglePacket();
+    andObjectsWithSameTimestampAreDeliveredInSinglePacket();
 }
+
+TEST_F(AnalyticsDbCursor, interleaved_tracks_are_reported_interleaved)
+{
+    givenObjectsWithInterleavedTracks();
+    whenReadDataUsingCursor();
+    thenResultMatchesExpectations();
+}
+
+// TEST_F(AnalyticsDbCursor, attribute_change_history_is_preserved)
 
 //-------------------------------------------------------------------------------------------------
 // Time periods lookup.
@@ -1216,8 +1359,24 @@ protected:
 
     void andResultMatchesExpectations()
     {
-        const auto expected = expectedLookupResult();
-        ASSERT_EQ(expected, std::get<1>(m_prevLookupResult));
+        using namespace std::chrono;
+
+        auto expected = expectedLookupResult();
+        auto actualTimePeriods = std::get<1>(m_prevLookupResult);
+
+        if (kUseTrackAggregation &&
+            (!filter().boundingBox.isEmpty() || !filter().freeText.isEmpty() ||
+             !filter().objectAppearanceId.isNull() || !filter().objectTypeId.empty()))
+        {
+            // NOTE: For this type of filters supported precision is the following:
+            // start time - a second
+            // duration - kTrackAggregationPeriod.
+
+            roundTimePeriods(&expected);
+            roundTimePeriods(&actualTimePeriods);
+        }
+
+        ASSERT_EQ(expected, actualTimePeriods);
     }
 
 private:
@@ -1232,19 +1391,27 @@ private:
 
     QnTimePeriodList expectedLookupResult()
     {
-        auto timePeriods = filterTimePeriods(
+        return filterTimePeriods(
             filter(),
             toTimePeriods(
                 filterPackets(filter(), analyticsDataPackets()),
                 m_lookupOptions));
+    }
 
-        if (kUseTrackAggregation)
+    void roundTimePeriods(QnTimePeriodList* periods)
+    {
+        using namespace std::chrono;
+
+        *periods = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+            std::move(*periods), kTrackAggregationPeriod);
+
+        // Rounding to the aggregation period.
+        for (auto& timePeriod: *periods)
         {
-            timePeriods = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
-                timePeriods, kTrackAggregationPeriod);
+            timePeriod.setStartTime(duration_cast<seconds>(timePeriod.startTime()));
+            if (timePeriod.duration() < kTrackAggregationPeriod)
+                timePeriod.setDuration(kTrackAggregationPeriod);
         }
-
-        return timePeriods;
     }
 
     QnTimePeriodList filterTimePeriods(

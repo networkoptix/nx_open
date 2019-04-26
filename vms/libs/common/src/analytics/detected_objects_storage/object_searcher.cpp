@@ -4,6 +4,7 @@
 
 #include "attributes_dao.h"
 #include "config.h"
+#include "cursor.h"
 #include "serializers.h"
 
 namespace nx::analytics::storage {
@@ -14,23 +15,43 @@ static const QSize kSearchResolution(
 
 ObjectSearcher::ObjectSearcher(
     const DeviceDao& deviceDao,
-    const ObjectTypeDao& objectTypeDao)
+    const ObjectTypeDao& objectTypeDao,
+    Filter filter)
     :
     m_deviceDao(deviceDao),
-    m_objectTypeDao(objectTypeDao)
+    m_objectTypeDao(objectTypeDao),
+    m_filter(std::move(filter))
 {
+    if (m_filter.maxObjectsToSelect == 0 || m_filter.maxObjectsToSelect > kMaxObjectLookupResultSet)
+        m_filter.maxObjectsToSelect = kMaxObjectLookupResultSet;
 }
 
-std::vector<DetectedObject> ObjectSearcher::lookup(
-    nx::sql::QueryContext* queryContext,
-    const Filter& filter)
+std::vector<DetectedObject> ObjectSearcher::lookup(nx::sql::QueryContext* queryContext)
 {
     auto selectEventsQuery = queryContext->connection()->createQuery();
     selectEventsQuery->setForwardOnly(true);
-    prepareLookupQuery(filter, selectEventsQuery.get());
+    prepareLookupQuery(selectEventsQuery.get());
     selectEventsQuery->exec();
 
-    return loadObjects(selectEventsQuery.get(), filter);
+    return loadObjects(selectEventsQuery.get());
+}
+
+void ObjectSearcher::prepareCursorQuery(nx::sql::SqlQuery* query)
+{
+    prepareLookupQuery(query);
+}
+
+void ObjectSearcher::loadCurrentRecord(
+    nx::sql::SqlQuery* query,
+    DetectedObject* object)
+{
+    *object = loadObject(query);
+}
+
+std::unique_ptr<AbstractCursor> ObjectSearcher::createCursor(
+    std::unique_ptr<nx::sql::Cursor<DetectedObject>> sqlCursor)
+{
+    return std::make_unique<Cursor>(std::move(sqlCursor));
 }
 
 void ObjectSearcher::addObjectFilterConditions(
@@ -127,63 +148,62 @@ void ObjectSearcher::addTimePeriodToFilter(
     }
 }
 
+static constexpr char kObjectFilteredByTextExpr[] = "%objectFilteredByText%";
 static constexpr char kObjectExpr[] = "%objectExpr%";
-static constexpr char kFullTextFrom[] = "%fullTextFrom%";
-static constexpr char kFullTextExpr[] = "%fullTextExpr%";
 static constexpr char kObjectSearchFrom[] = "%objectSearchFrom%";
 static constexpr char kJoinObjectToObjectSearch[] = "%joinObjectToObjectSearch%";
 static constexpr char kBoundingBoxExpr[] = "%boundingBoxExpr%";
 static constexpr char kObjectOrderByTrackStart[] = "%objectOrderByTrackStart%";
 static constexpr char kLimitObjectCount[] = "%limitObjectCount%";
 
-void ObjectSearcher::prepareLookupQuery(
-    const Filter& filter,
-    nx::sql::AbstractSqlQuery* query)
+void ObjectSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
 {
     QString queryText = R"sql(
-        SELECT DISTINCT o.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
+        WITH filtered_object AS
+            (SELECT DISTINCT o.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
+                track_detail, attributes_id
+            FROM %objectFilteredByText% o
+                %objectSearchFrom%
+            WHERE %objectExpr%
+                %joinObjectToObjectSearch% %boundingBoxExpr%
+                1 = 1
+            ORDER BY o.track_start_ms %objectOrderByTrackStart%
+            %limitObjectCount%)
+        SELECT o.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
             track_detail, attrs.content AS content
-        FROM object o, unique_attributes attrs
-            %fullTextFrom%
-            %objectSearchFrom%
-        WHERE %objectExpr%
-            %fullTextExpr%
-            %joinObjectToObjectSearch% %boundingBoxExpr%
-            o.attributes_id = attrs.id
-        ORDER BY track_start_ms %objectOrderByTrackStart%
-        %limitObjectCount%
+        FROM filtered_object o, unique_attributes attrs
+        WHERE o.attributes_id = attrs.id
     )sql";
 
     std::map<QString, QString> queryTextParams({
+        {kObjectFilteredByTextExpr, "object"},
         {kObjectExpr, ""},
-        {kFullTextFrom, ""},
-        {kFullTextExpr, ""},
         {kObjectSearchFrom, ""},
         {kJoinObjectToObjectSearch, ""},
         {kBoundingBoxExpr, ""},
         {kObjectOrderByTrackStart, "DESC"},
         {kLimitObjectCount, ""}});
 
-    const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
+    const auto sqlQueryFilter = prepareSqlFilterExpression();
     auto objectFilterSqlText = sqlQueryFilter.toString();
     if (!objectFilterSqlText.empty())
         queryTextParams[kObjectExpr] = (objectFilterSqlText + " AND ").c_str();
 
-    if (filter.maxObjectsToSelect > 0)
+    if (m_filter.maxObjectsToSelect > 0)
     {
         queryTextParams[kLimitObjectCount] =
-            lm("LIMIT %1").args(filter.maxObjectsToSelect).toQString();
+            lm("LIMIT %1").args(m_filter.maxObjectsToSelect).toQString();
     }
 
-    if (!filter.freeText.isEmpty())
+    if (!m_filter.freeText.isEmpty())
     {
-        queryTextParams[kFullTextFrom] = ", attributes_text_index fts";
-        queryTextParams[kFullTextExpr] =
-            "fts.content MATCH :textQuery AND fts.docid = o.attributes_id AND ";
+        queryTextParams[kObjectFilteredByTextExpr] =
+            "(SELECT * FROM object WHERE attributes_id IN "
+                "(SELECT docid FROM attributes_text_index WHERE content MATCH :textQuery))";
     }
 
     nx::sql::Filter boundingBoxFilter;
-    if (!filter.boundingBox.isEmpty())
+    if (!m_filter.boundingBox.isEmpty())
     {
         queryTextParams[kObjectSearchFrom] =
             ", object_search os, object_search_to_object os_to_o";
@@ -191,13 +211,13 @@ void ObjectSearcher::prepareLookupQuery(
             "os_to_o.object_id = o.id AND os_to_o.object_search_id = os.id AND ";
 
         addBoundingBoxToFilter(
-            translate(filter.boundingBox, kSearchResolution),
+            translate(m_filter.boundingBox, kSearchResolution),
             &boundingBoxFilter);
         queryTextParams[kBoundingBoxExpr] = (boundingBoxFilter.toString() + " AND ").c_str();
     }
 
     queryTextParams[kObjectOrderByTrackStart] =
-        filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC";
+        m_filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC";
 
     for (const auto& [name, value]: queryTextParams)
         queryText.replace(name, value);
@@ -205,18 +225,18 @@ void ObjectSearcher::prepareLookupQuery(
     query->prepare(queryText);
 
     sqlQueryFilter.bindFields(query);
-    if (!filter.freeText.isEmpty())
-        query->bindValue(":textQuery", filter.freeText + "*");
-    if (!filter.boundingBox.isEmpty())
+    if (!m_filter.freeText.isEmpty())
+        query->bindValue(":textQuery", m_filter.freeText + "*");
+    if (!m_filter.boundingBox.isEmpty())
         boundingBoxFilter.bindFields(query);
 }
 
-nx::sql::Filter ObjectSearcher::prepareSqlFilterExpression(const Filter& filter)
+nx::sql::Filter ObjectSearcher::prepareSqlFilterExpression()
 {
     nx::sql::Filter sqlFilter;
 
     addObjectFilterConditions(
-        filter,
+        m_filter,
         m_deviceDao,
         m_objectTypeDao,
         {"guid", "track_start_ms", "track_end_ms"},
@@ -225,24 +245,20 @@ nx::sql::Filter ObjectSearcher::prepareSqlFilterExpression(const Filter& filter)
     return sqlFilter;
 }
 
-std::vector<DetectedObject> ObjectSearcher::loadObjects(
-    nx::sql::AbstractSqlQuery* query,
-    const Filter& filter)
+std::vector<DetectedObject> ObjectSearcher::loadObjects(nx::sql::AbstractSqlQuery* query)
 {
     std::vector<DetectedObject> objects;
 
     while (query->next())
     {
-        auto object = loadObject(query, filter);
+        auto object = loadObject(query);
         objects.push_back(std::move(object));
     }
 
     return objects;
 }
 
-DetectedObject ObjectSearcher::loadObject(
-    nx::sql::AbstractSqlQuery* query,
-    const Filter& filter)
+DetectedObject ObjectSearcher::loadObject(nx::sql::AbstractSqlQuery* query)
 {
     DetectedObject detectedObject;
 
@@ -259,7 +275,7 @@ DetectedObject ObjectSearcher::loadObject(
 
     detectedObject.track = TrackSerializer::deserialized(
         query->value("track_detail").toByteArray());
-    filterTrack(filter, &detectedObject.track);
+    filterTrack(&detectedObject.track);
     if (!detectedObject.track.empty())
     {
         for (auto& position: detectedObject.track)
@@ -269,22 +285,18 @@ DetectedObject ObjectSearcher::loadObject(
     return detectedObject;
 }
 
-void ObjectSearcher::filterTrack(
-    const Filter& filter,
-    std::vector<ObjectPosition>* const track)
+void ObjectSearcher::filterTrack(std::vector<ObjectPosition>* const track)
 {
     using namespace std::chrono;
 
     auto doesNotSatisfiesFilter =
-        [&filter](const ObjectPosition& position)
+        [this](const ObjectPosition& position)
         {
-            if (!filter.timePeriod.isNull())
+            if (!m_filter.timePeriod.isNull())
             {
-                if (microseconds(position.timestampUsec) >= filter.timePeriod.endTime() ||
-                    microseconds(position.timestampUsec + position.durationUsec) < filter.timePeriod.startTime())
-                {
+                const auto timestamp = microseconds(position.timestampUsec);
+                if (!m_filter.timePeriod.contains(duration_cast<milliseconds>(timestamp)))
                     return true;
-                }
             }
 
             // TODO: Filter box
@@ -300,8 +312,8 @@ void ObjectSearcher::filterTrack(
         track->begin(), track->end(),
         [](const auto& left, const auto& right) { return left.timestampUsec < right.timestampUsec; });
 
-    if (filter.maxTrackSize > 0 && (int) track->size() > filter.maxTrackSize)
-        track->erase(track->begin() + filter.maxTrackSize, track->end());
+    if (m_filter.maxTrackSize > 0 && (int) track->size() > m_filter.maxTrackSize)
+        track->erase(track->begin() + m_filter.maxTrackSize, track->end());
 }
 
 void ObjectSearcher::addObjectTypeIdToFilter(
