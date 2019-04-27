@@ -223,10 +223,10 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $scope.positionProvider.init(playingPosition, $scope.positionProvider.playing);
             
-            if(live){
-                playingPosition = window.timeManager.nowToDisplay();
+            if (live) {
+                playingPosition = window.timeManager.nowToServer();
             } else {
-                playingPosition = Math.round(playingPosition);
+                playingPosition = Math.round(window.timeManager.displayToServer(playingPosition));
             }
 
             // Fix here!
@@ -333,7 +333,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         $scope.switchPlaying = function(play){
-            if($scope.playerAPI) {
+            if($scope.playerAPI && $scope.playerAPI.video) {
                 if (play) {
                     $scope.playerAPI.play();
                 } else {
@@ -341,15 +341,16 @@ angular.module('nxCommon').controller('ViewCtrl',
                 }
                 if ($scope.positionProvider) {
                     $scope.positionProvider.playing = play;
-
-                    if(!play){
-                        $timeout(function(){
-                            $scope.positionProvider.liveMode = $scope.positionProvider.isArchiveEmpty(); // Do it async
-                        });
-                    }
                 }
             }
         };
+    
+        var self = $scope;
+        $scope.$watch('positionProvider.isReady', function (ready) {
+            if (ready && !self.positionProvider.playing) {
+                self.positionProvider.liveMode = self.positionProvider.isArchiveEmpty();
+            }
+        });
 
         $scope.switchPosition = function( val ){
 
