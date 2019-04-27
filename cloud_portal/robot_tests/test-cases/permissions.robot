@@ -346,6 +346,7 @@ Check share email for registered user
     ${INVITED TO SYSTEM EMAIL SUBJECT}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT}    {{message.system_name}}    ${AUTO TESTS}
     ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
     ${email text}    Get Email Body    ${email}
+    ${email text}    Decode Bytes To String    ${email text}    UTF-8
     Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
     ${links}    Get Links From Email    ${email}

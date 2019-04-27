@@ -17,7 +17,8 @@ Check Systems Text
     Log Out
     Log In    ${user}    ${password}
     Validate Log In
-    Wait Until Page Contains Element    ${AUTO TESTS USER}[text()='${TEST FIRST NAME} ${TEST LAST NAME}']
+    Wait Until Page Contains Element    ${AUTO TESTS USER}
+    Element Text Should Be    ${AUTO TESTS USER}    ${TEST FIRST NAME} ${TEST LAST NAME}
     Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
 
 Reset DB and Open New Browser On Failure
