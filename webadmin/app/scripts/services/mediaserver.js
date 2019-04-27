@@ -317,7 +317,7 @@ angular.module('webadminApp')
             },
             pingServer:function(url){
                 return $http.get(url + '/web/api/moduleInformation',{
-                    timeout: 3*1000
+                    timeout: 6*1000
                 });
             },
             getModuleInformation: function(reload) {

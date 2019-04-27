@@ -125,7 +125,7 @@ static void printInLogNetResources(const QnResourceList& resources)
         if (!netRes)
             continue;
 
-        NX_INFO(typeid(QnMServerResourceDiscoveryManager),
+        NX_DEBUG(typeid(QnMServerResourceDiscoveryManager),
             "%1 %2", netRes->getHostAddress(), netRes->getName());
     }
 }
@@ -342,8 +342,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     bool foundSmth = !resources.isEmpty();
     if (foundSmth)
     {
-        NX_INFO(this,
-            "After excluding existing resources we've got %1 new resources:", resources.size());
+        NX_DEBUG(this, "After excluding existing resources we've got %1 new resources:",
+            resources.size());
     }
 
     printInLogNetResources(resources);
@@ -358,7 +358,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
     if (resources.size())
     {
-        NX_INFO(this, "Final result: ");
+        NX_DEBUG(this, "Final result: ");
         printInLogNetResources(resources);
     }
     return true;
@@ -522,7 +522,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
                 }
                 else
                 {
-                    NX_INFO(this,
+                    NX_DEBUG(this,
                         "Mark resource %1 as offline"
                         " because it doesn't response to discovery any more.",
                         netResourceString(camRes));

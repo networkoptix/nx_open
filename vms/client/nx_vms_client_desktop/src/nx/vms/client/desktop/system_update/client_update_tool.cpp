@@ -297,6 +297,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         setState(State::downloading);
 
         const auto code = m_downloader->addFile(info);
+        NX_VERBOSE(this, "setUpdateTarget(%1) m_downloader->addFile code=%2", contents.info.version, code);
         m_updateFile = m_downloader->filePath(m_clientPackage.file);
 
         if (code == common::p2p::downloader::ResultCode::fileAlreadyExists
@@ -469,12 +470,11 @@ bool ClientUpdateTool::installUpdateAsync()
             using Result = applauncher::api::ResultType::Value;
             static const int kMaxTries = 5;
             QString absolutePath = QFileInfo(updateFile).absoluteFilePath();
-            QString message;
 
             for (int retries = 0; retries < kMaxTries; ++retries)
             {
                 Result result = applauncher::api::installZip(updateVersion, absolutePath);
-                bool repeat = false;
+                QString message = applauncherErrorToString(result);
 
                 switch (result)
                 {
@@ -484,16 +484,17 @@ bool ClientUpdateTool::installUpdateAsync()
                     case Result::invalidVersionFormat:
                     case Result::notEnoughSpace:
                     case Result::notFound:
-                    case Result::ioError:
+                    case Result::ok:
                         return result;
+                    case Result::connectError:
+                    case Result::ioError:
                     default:
-                        repeat = true;
-                        // Other variats can be fixed by retrying installation, do they?
+                        NX_VERBOSE(NX_SCOPE_TAG, "failed to run zip installation: %1", message);
+                        // Other variants can be fixed by retrying installation, do they?
                         break;
                 }
 
-                if (!repeat)
-                    break;
+                std::this_thread::sleep_for(std::chrono::seconds(1));
             }
 
             return Result::otherError;
@@ -572,7 +573,7 @@ bool ClientUpdateTool::restartClient(QString authString)
     static const int kMaxTries = 5;
     for (int i = 0; i < kMaxTries; ++i)
     {
-        QThread::msleep(100);
+        QThread::msleep(200);
         qApp->processEvents();
         if (applauncher::api::restartClient(m_updateVersion, authString) == Result::ok)
             return true;

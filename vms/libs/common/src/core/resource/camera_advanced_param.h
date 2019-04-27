@@ -112,6 +112,7 @@ struct QnCameraAdvancedParameter
         Enumeration,
         Button,
         String,
+        Text,
         Separator,
         SliderControl,
         PtrControl,

@@ -8,8 +8,7 @@
 #include <api/global_settings.h>
 #include <core/resource/media_server_resource.h>
 
-namespace rest {
-namespace handlers {
+namespace rest::handlers {
 
 nx::network::rest::Response SetPrimaryTimeServerRestHandler::executePost(
     const nx::network::rest::Request& request)
@@ -30,5 +29,4 @@ nx::network::rest::Response SetPrimaryTimeServerRestHandler::executePost(
     return nx::network::rest::Response::result(QnJsonRestResult());
 }
 
-} // namespace handlers
-} // namespace rest
+} // namespace rest::handlers

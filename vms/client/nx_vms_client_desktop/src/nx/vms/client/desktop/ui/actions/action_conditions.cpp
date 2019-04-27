@@ -1983,6 +1983,15 @@ ConditionWrapper canMakeShowreel()
         }, MatchMode::All);
 }
 
+ConditionWrapper isWorkbenchVisible()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* context)
+        {
+            return context->isWorkbenchVisible();
+        });
+}
+
 } // namespace condition
 
 

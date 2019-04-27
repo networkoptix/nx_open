@@ -12,7 +12,7 @@
 #include <nx/network/app_info.h>
 #include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
-namespace nx::vms::server::rest {
+namespace nx::vms::server {
 
 using namespace std::chrono;
 
@@ -31,4 +31,4 @@ nx::network::rest::Response GetTimeHandler::executeGet(const nx::network::rest::
     return nx::network::rest::Response::reply(reply);
 }
 
-} // namespace nx::vms::server::rest
+} // namespace nx::vms::server
