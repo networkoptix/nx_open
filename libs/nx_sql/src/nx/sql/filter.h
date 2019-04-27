@@ -29,22 +29,22 @@ class NX_SQL_API SqlFilterField:
 {
 public:
     SqlFilterField(
-        const char* name,
-        const char* placeHolderName,
+        const std::string& name,
+        const std::string& placeHolderName,
         QVariant value,
-        const char* comparisonOperator);
+        const std::string& comparisonOperator);
 
     virtual std::string toString() const override;
     virtual void bindFields(QSqlQuery* query) const override;
 
-    const char* name() const;
-    const char* placeHolderName() const;
+    const std::string& name() const;
+    const std::string& placeHolderName() const;
 
 private:
-    const char* m_name = nullptr;
-    const char* m_placeHolderName = nullptr;
+    std::string m_name;
+    std::string m_placeHolderName;
     QVariant m_value;
-    const char* m_comparisonOperator = nullptr;
+    std::string m_comparisonOperator;
 };
 
 class NX_SQL_API SqlFilterFieldEqual:
@@ -52,8 +52,8 @@ class NX_SQL_API SqlFilterFieldEqual:
 {
 public:
     SqlFilterFieldEqual(
-        const char* name,
-        const char* placeHolderName,
+        const std::string& name,
+        const std::string& placeHolderName,
         QVariant value);
 };
 
@@ -62,8 +62,8 @@ class NX_SQL_API SqlFilterFieldGreaterOrEqual:
 {
 public:
     SqlFilterFieldGreaterOrEqual(
-        const char* name,
-        const char* placeHolderName,
+        const std::string& name,
+        const std::string& placeHolderName,
         QVariant value);
 };
 
@@ -72,8 +72,8 @@ class NX_SQL_API SqlFilterFieldLess:
 {
 public:
     SqlFilterFieldLess(
-        const char* name,
-        const char* placeHolderName,
+        const std::string& name,
+        const std::string& placeHolderName,
         QVariant value);
 };
 
@@ -82,8 +82,8 @@ class NX_SQL_API SqlFilterFieldLessOrEqual:
 {
 public:
     SqlFilterFieldLessOrEqual(
-        const char* name,
-        const char* placeHolderName,
+        const std::string& name,
+        const std::string& placeHolderName,
         QVariant value);
 };
 
@@ -94,13 +94,13 @@ class NX_SQL_API SqlFilterFieldAnyOf:
 {
 public:
     SqlFilterFieldAnyOf(
-        const char* name,
-        const char* placeHolderName);
+        const std::string& name,
+        const std::string& placeHolderName);
 
     template<typename... Values>
     SqlFilterFieldAnyOf(
-        const char* name,
-        const char* placeHolderName,
+        const std::string& name,
+        const std::string& placeHolderName,
         Values... values)
         :
         SqlFilterFieldAnyOf(name, placeHolderName)
@@ -110,8 +110,8 @@ public:
 
     template<typename Value>
     SqlFilterFieldAnyOf(
-        const char* name,
-        const char* placeHolderName,
+        const std::string& name,
+        const std::string& placeHolderName,
         const std::vector<Value>& values)
         :
         SqlFilterFieldAnyOf(name, placeHolderName)
@@ -126,8 +126,8 @@ public:
     void addValue(const QVariant& value);
 
 private:
-    const char* m_name = nullptr;
-    const char* m_placeHolderName = nullptr;
+    std::string m_name;
+    std::string m_placeHolderName;
     std::vector<QVariant> m_values;
 };
 
@@ -160,7 +160,7 @@ private:
  */
 NX_SQL_API std::string joinFields(
     const InnerJoinFilterFields& fields,
-    const QString& separator);
+    const std::string& separator);
 
 NX_SQL_API void bindFields(QSqlQuery* query, const InnerJoinFilterFields& fields);
 
