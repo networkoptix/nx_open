@@ -11,7 +11,7 @@ ObjectTrackBestShotPacket::ObjectTrackBestShotPacket(
     :
     m_trackId(trackId),
     m_timestampUs(timestampUs),
-    m_boundingBox(m_boundingBox)
+    m_boundingBox(boundingBox)
 {
 }
 

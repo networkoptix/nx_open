@@ -743,6 +743,7 @@ static bool s_tweaksIsEnabledBackup(false);
 
 IniConfig::Tweaks::Tweaks()
 {
+    m_guards = new std::vector<std::function<void()>>();
     if (++s_tweaksInstances != 0)
     {
         s_tweaksIsEnabledBackup = isEnabled();
@@ -752,8 +753,9 @@ IniConfig::Tweaks::Tweaks()
 
 IniConfig::Tweaks::~Tweaks()
 {
-    for (const auto& guard: m_guards)
+    for (const auto& guard: *m_guards)
         guard();
+    delete m_guards;
 
     if (--s_tweaksInstances == 0)
         setEnabled(s_tweaksIsEnabledBackup);

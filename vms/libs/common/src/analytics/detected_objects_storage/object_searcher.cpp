@@ -95,25 +95,25 @@ void ObjectSearcher::addBoundingBoxToFilter(
 {
     auto topLeftXFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
         "box_top_left_x",
-        ":boxTopLeftX",
+        ":boxBottomRightX",
         QnSql::serialized_field(boundingBox.bottomRight().x()));
     sqlFilter->addCondition(std::move(topLeftXFilter));
 
     auto bottomRightXFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
         "box_bottom_right_x",
-        ":boxBottomRightX",
+        ":boxTopLeftX",
         QnSql::serialized_field(boundingBox.topLeft().x()));
     sqlFilter->addCondition(std::move(bottomRightXFilter));
 
     auto topLeftYFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
         "box_top_left_y",
-        ":boxTopLeftY",
+        ":boxBottomRightY",
         QnSql::serialized_field(boundingBox.bottomRight().y()));
     sqlFilter->addCondition(std::move(topLeftYFilter));
 
     auto bottomRightYFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
         "box_bottom_right_y",
-        ":boxBottomRightY",
+        ":boxTopLeftY",
         QnSql::serialized_field(boundingBox.topLeft().y()));
     sqlFilter->addCondition(std::move(bottomRightYFilter));
 }
@@ -128,7 +128,7 @@ void ObjectSearcher::addTimePeriodToFilter(
 
     auto startTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
         timeRangeFields.timeRangeEnd,
-        ":startTimeMs",
+        std::string(":start_") + timeRangeFields.timeRangeEnd,
         QnSql::serialized_field(duration_cast<FieldType>(
             timePeriod.startTime()).count()));
     sqlFilter->addCondition(std::move(startTimeFilterField));
@@ -137,7 +137,7 @@ void ObjectSearcher::addTimePeriodToFilter(
     {
         auto endTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldLess>(
             timeRangeFields.timeRangeStart,
-            ":endTimeMs",
+            std::string(":end_") + timeRangeFields.timeRangeStart,
             QnSql::serialized_field(duration_cast<FieldType>(
                 timePeriod.endTime()).count()));
         sqlFilter->addCondition(std::move(endTimeFilterField));

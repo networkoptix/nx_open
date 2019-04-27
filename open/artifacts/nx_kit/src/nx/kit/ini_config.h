@@ -127,12 +127,14 @@ public:
         {
             const auto oldValue = *field;
             T* mutableField = const_cast<T*>(field);
-            m_guards.push_back([=]() { *mutableField = oldValue; });
+            m_guards->push_back([=]() { *mutableField = oldValue; });
             *mutableField = newValue;
         }
 
     private:
-        std::vector<std::function<void()>> m_guards;
+        // Need pointer to vector here to prevent MSVC warning
+        // 'std::vector needs to have dll-interface to be used by clients of class 'X<T> warning'.
+        std::vector<std::function<void()>>* m_guards = nullptr;
     };
 
 protected:

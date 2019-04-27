@@ -737,6 +737,19 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
 
     const static QLatin1String kWallpapersFolder("wallpapers");
 
+    inline QString toString(nx::vms::api::StreamIndex streamIndex)
+    {
+        switch (streamIndex)
+        {
+            case nx::vms::api::StreamIndex::primary:
+                return "primary";
+            case nx::vms::api::StreamIndex::secondary:
+                return "secondary";
+            default:
+                return "undefined";
+        }
+    }
+
 } // namespace Qn
 
 using nx::vms::api::GlobalPermission;

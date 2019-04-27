@@ -207,14 +207,6 @@ private:
         const Filter& filter,
         QString* eventsFilteredByFreeTextSubQuery);
 
-    void addObjectTypeIdToFilter(
-        const std::vector<QString>& objectTypeIds,
-        nx::sql::Filter* sqlFilter);
-
-    void addBoundingBoxToFilter(
-        const QRect& boundingBox,
-        nx::sql::Filter* sqlFilter);
-
     void loadObjects(
         nx::sql::SqlQuery& selectEventsQuery,
         const Filter& filter,
@@ -258,6 +250,10 @@ private:
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 
+    void scheduleDataCleanup(
+        QnUuid deviceId,
+        std::chrono::milliseconds oldestDataToKeepTimestamp);
+
     nx::sql::DBResult cleanupData(
         nx::sql::QueryContext* queryContext,
         const QnUuid& deviceId,
@@ -269,6 +265,11 @@ private:
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void cleanupEventProperties(nx::sql::QueryContext* queryContext);
+
+    void logCleanupResult(
+        sql::DBResult resultCode,
+        const QnUuid& deviceId,
+        std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void logDataSaveResult(sql::DBResult resultCode);
 

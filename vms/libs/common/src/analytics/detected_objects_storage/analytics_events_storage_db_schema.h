@@ -197,11 +197,10 @@ CREATE TABLE object(
     attributes_id               INTEGER
 );
 
-CREATE INDEX idx_object_device_id ON object(device_id);
 CREATE INDEX idx_object_object_type_id ON object(object_type_id);
-CREATE INDEX idx_object_guid ON object(guid);
-CREATE INDEX idx_track_time_ms ON object(track_start_ms, track_end_ms);
 CREATE INDEX idx_object_attributes_id ON object(attributes_id);
+CREATE INDEX idx_object_device_id_track_start_ms ON object(
+    device_id, track_start_ms);
 
 CREATE TABLE object_search(
     id                          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -212,23 +211,17 @@ CREATE TABLE object_search(
     box_bottom_right_y          INTEGER
 );
 
-CREATE INDEX idx_object_search_box ON object_search(
-    box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y);
+CREATE INDEX idx_object_search_box_timestamp ON object_search(
+    box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y,
+    timestamp_seconds_utc);
 
 CREATE TABLE object_search_to_object(
     object_search_id            INTEGER,
     object_id                   INTEGER
 );
 
-)sql";
-
-//-------------------------------------------------------------------------------------------------
-// META-237.
-static constexpr char kObjectTrackStartTimeIndex[] =
-R"sql(
-
-CREATE INDEX idx_object_device_id_track_start_ms ON object(device_id, track_start_ms);
-REINDEX idx_object_device_id_track_start_ms;
+CREATE INDEX idx_object_search_to_object_full ON object_search_to_object(
+    object_search_id, object_id);
 
 )sql";
 

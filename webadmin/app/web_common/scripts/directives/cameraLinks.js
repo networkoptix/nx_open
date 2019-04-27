@@ -79,7 +79,11 @@ angular.module('nxCommon')
                 };
 
                 scope.$watch("player",function(){scope.transport = scope.player == 'webm' ? 'WEBM' : 'HLS'});
-
+    
+                scope.$watch("position", function () {
+                    scope.positionServer = window.timeManager.displayToLocal(scope.position);
+                });
+    
             }
         };
     }]);

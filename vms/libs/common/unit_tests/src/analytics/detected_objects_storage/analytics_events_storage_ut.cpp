@@ -1526,7 +1526,7 @@ TEST_F(AnalyticsDbTimePeriodsLookup, with_aggregation_period)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsDbTimePeriodsLookup, with_random_filter)
+TEST_F(AnalyticsDbTimePeriodsLookup, DISABLED_with_random_filter)
 {
     givenRandomFilter();
     whenLookupTimePeriods();
@@ -1665,19 +1665,19 @@ private:
     }
 };
 
-TEST_F(AnalyticsDbCleanup, DISABLED_removing_all_data)
+TEST_F(AnalyticsDbCleanup, removing_all_data)
 {
     whenRemoveEventsUpToLatestEventTimestamp();
     thenStorageIsEmpty();
 }
 
-TEST_F(AnalyticsDbCleanup, DISABLED_removing_data_up_to_a_random_available_timestamp)
+TEST_F(AnalyticsDbCleanup, removing_data_up_to_a_random_available_timestamp)
 {
     whenRemoveEventsUpToARandomAvailableTimestamp();
     thenDataIsExpected();
 }
 
-TEST_F(AnalyticsDbCleanup, DISABLED_removing_data_up_to_minimal_available_timestamp)
+TEST_F(AnalyticsDbCleanup, removing_data_up_to_minimal_available_timestamp)
 {
     whenRemoveEventsUpToEarlisestEventTimestamp();
     thenDataIsNotChanged();
