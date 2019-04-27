@@ -51,6 +51,7 @@ Yunhong Gu, last updated 08/01/2009
 #endif
 #include <cstdlib>
 #include "udt.h"
+#include "socket_addresss.h"
 
 
 #ifdef _WIN32
@@ -341,7 +342,7 @@ struct CIPAddress
 {
     static bool ipcmp(const sockaddr* addr1, const sockaddr* addr2);
     static void ntop(const sockaddr* addr, uint32_t ip[4], int ver = AF_INET);
-    static void pton(sockaddr* addr, const uint32_t ip[4], int ver = AF_INET);
+    static void pton(detail::SocketAddress* addr, const uint32_t ip[4], int ver = AF_INET);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
