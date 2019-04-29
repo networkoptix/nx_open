@@ -266,7 +266,7 @@ private:
                 owner->storageDbPool()->getStorageIndex(storage)), "nx occupied space", result.url);
 
             result.available = result.totalSpace - result.spaceLimit;
-            result.effective = result.nxOccupied + result.freeSpace;
+            result.effective = result.nxOccupied + result.freeSpace - result.spaceLimit;
             result.isSystem = storage->isSystem();
             result.storage = storage;
 
@@ -392,11 +392,11 @@ private:
         std::vector<SpaceInfo> result;
         for (const auto& info: infos)
         {
-            if (info.effective < info.spaceLimit)
+            if (info.effective < 0)
             {
                 NX_DEBUG(
                     typeid(WritableStorageManager),
-                    "Skipping storage (%1) because nxOccupiedSpace (%2) + freeSpace (%3) < spaceLimit (%4)",
+                    "Skipping storage (%1) because nxOccupiedSpace (%2) + freeSpace (%3) - spaceLimit (%4) < 0",
                     info.url, info.nxOccupied, info.freeSpace, info.spaceLimit);
                 continue;
             }

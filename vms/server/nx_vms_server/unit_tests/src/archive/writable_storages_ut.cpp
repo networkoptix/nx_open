@@ -2,6 +2,7 @@
 #include <test_support/mediaserver_launcher.h>
 #include <test_support/storage_utils.h>
 
+#include <map>
 #include <gtest/gtest.h>
 
 namespace nx::vms::server::test {
@@ -113,29 +114,52 @@ protected:
             /*isOnline*/true));
     }
 
-    void thenSmallerShouldntAppearOnTheWritableList()
+    void whenThreeStoragesAddedWithOneSystem4TimesSmaller()
     {
-        whenSomeTimeForInitializationHasPassed();
-        expectWritableStoragesSize(1);
-        ASSERT_FALSE(std::any_of(
-            m_writableStorages.cbegin(), m_writableStorages.cend(),
-            [this](const auto& storage)
+        std::array<int64_t, 3> totalSpaces =
+            {100*1024*1024*1024LL, 150*1024*1024*1024LL, 250*1024*1024*1024LL};
+        std::array<QString, 3> urls = {"url1", "url2", "url3"};
+        const int64_t spaceLimit = 1*1024*1024*1024LL;
+
+        for (size_t i = 0; i < totalSpaces.size(); ++i)
+        {
+            const auto newStorage = test_support::addStorageFixture(
+                m_server.get(), m_server->serverModule(), urls[i], totalSpaces[i],
+                totalSpaces[i], spaceLimit, /*isSystem*/i == 0, /*isOnline*/true);
+
+            if (i == 0)
+                m_smallStorage = newStorage;
+
+            m_urlToEffectiveSpace[urls[i]].value = totalSpaces[i] - spaceLimit;
+        }
+
+        const auto totalEffectiveSpace = std::accumulate(
+            m_urlToEffectiveSpace.cbegin(), m_urlToEffectiveSpace.cend(), 0LL,
+            [](int64_t a, const std::pair<QString, EffectiveSpace>& p)
             {
-                return storage == m_smallStorage;
-            }));
+                return a + p.second.value;
+            });
+
+        for (auto& p: m_urlToEffectiveSpace)
+            p.second.ratio = static_cast<double>(p.second.value) / totalEffectiveSpace;
     }
 
-
-private:
-    std::unique_ptr<MediaServerLauncher> m_server;
-    QnStorageResourceList m_addedStorages;
-    QnStorageResourceList m_writableStorages;
-    QnStorageResourcePtr m_smallStorage;
-
-    void getWritableStorages()
+    void whenThreeStoragesAddedWithOneSystem5TimesSmaller()
     {
-        m_writableStorages.append(
-            m_server->serverModule()->normalStorageManager()->getAllWritableStorages());
+        m_smallStorage = test_support::addStorageFixture(
+            m_server.get(), m_server->serverModule(), "url1", /*totalSpace*/100*1024*1024*1024LL,
+            /*freeSpace*/100*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/true,
+            /*isOnline*/true);
+
+        m_addedStorages.append(test_support::addStorageFixture(
+            m_server.get(), m_server->serverModule(), "url2", /*totalSpace*/260*1024*1024*1024LL,
+            /*freeSpace*/260*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/false,
+            /*isOnline*/true));
+
+        m_addedStorages.append(test_support::addStorageFixture(
+            m_server.get(), m_server->serverModule(), "url3", /*totalSpace*/260*1024*1024*1024LL,
+            /*freeSpace*/260*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/false,
+            /*isOnline*/true));
     }
 
     void expectWritableStoragesSize(int size)
@@ -145,6 +169,59 @@ private:
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             getWritableStorages();
         }
+    }
+
+    void thenSmallerShouldntAppearOnTheWritableList(int expectedNumberOfWritableStorages)
+    {
+        whenSomeTimeForInitializationHasPassed();
+        expectWritableStoragesSize(expectedNumberOfWritableStorages);
+        ASSERT_FALSE(std::any_of(
+            m_writableStorages.cbegin(), m_writableStorages.cend(),
+            [this](const auto& storage)
+            {
+                return storage == m_smallStorage;
+            }));
+    }
+
+    void whenOptimalStorageIsCalledForManyTimes()
+    {
+        for (int i = 0; i < kIterations; ++i)
+        {
+            const auto optimalStorage =
+                m_server->serverModule()->normalStorageManager()->getOptimalStorageRoot();
+            m_urlToSelectedCount[optimalStorage->getUrl()]++;
+        }
+    }
+
+    void thenTheyShouldBeSelectedProportionallyToTheirEffectiveSpaces()
+    {
+        for (const auto& p: m_urlToEffectiveSpace)
+        {
+            const double diff = std::abs<double>(
+                p.second.ratio - static_cast<double>(m_urlToSelectedCount[p.first]) / kIterations);
+            ASSERT_LE(diff, 0.1);
+        }
+    }
+
+private:
+    struct EffectiveSpace
+    {
+        int64_t value;
+        double ratio;
+    };
+
+    std::unique_ptr<MediaServerLauncher> m_server;
+    QnStorageResourceList m_addedStorages;
+    QnStorageResourceList m_writableStorages;
+    QnStorageResourcePtr m_smallStorage;
+    std::map<QString, EffectiveSpace> m_urlToEffectiveSpace;
+    std::map<QString, int> m_urlToSelectedCount;
+    const int kIterations = 100000;
+
+    void getWritableStorages()
+    {
+        m_writableStorages.append(
+            m_server->serverModule()->normalStorageManager()->getAllWritableStorages());
     }
 };
 
@@ -184,7 +261,26 @@ TEST_F(FtWritableStorageManager, noFreeSpace_butNxOccupiedSpaceIsEnough)
 TEST_F(FtWritableStorageManager, tenTimesSmallerStorage)
 {
     whenTwoStoragesWithEnoughFreeSpaceWith10TimesSpaceDifferenceAdded();
-    thenSmallerShouldntAppearOnTheWritableList();
+    thenSmallerShouldntAppearOnTheWritableList(/*expectedNumberOfWritableStorages*/1);
+}
+
+TEST_F(FtWritableStorageManager, systemStorage_5timesSmaller)
+{
+    whenThreeStoragesAddedWithOneSystem5TimesSmaller();
+    thenSmallerShouldntAppearOnTheWritableList(/*expectedNumberOfWritableStorages*/2);
+}
+
+TEST_F(FtWritableStorageManager, systemStorage_4timesSmaller)
+{
+    whenThreeStoragesAddedWithOneSystem4TimesSmaller();
+    expectWritableStoragesSize(3);
+}
+
+TEST_F(FtWritableStorageManager, optimalStorage)
+{
+    whenThreeStoragesAddedWithOneSystem4TimesSmaller();
+    whenOptimalStorageIsCalledForManyTimes();
+    thenTheyShouldBeSelectedProportionallyToTheirEffectiveSpaces();
 }
 
 } // namespace nx::vms::server::test
