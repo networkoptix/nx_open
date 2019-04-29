@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.43",
+    "version": "1.0.1.51",
     "data": [
         {
             "keys": [
@@ -844,7 +844,16 @@
                 "bosch|vip_x16_xf_e",
                 "private|dhi-nvr5216-4ks2",
                 "dh-nvr4208-8p-4k|private",
-                "dh-nvr608-32-4ks2|private"
+                "dh-nvr608-32-4ks2|private",
+                "general|nvr-p16/16p-4va",
+                "dahua|dh-xvr5116he",
+                "rvi-ipn16/2-pro-4k|general",
+                "sth795|cellinx-sth795",
+                "hq-thd1602k-poc|embedded net dvr",
+                "none|nvr302-08e-p8",
+                "uniview|nvr302-16e-p8",
+                "hangzhou hikvision digital technology co., ltd|hik%2fds-7816*",
+                "ltd8308t-ft|embedded_net_dvr"
             ],
             "analogEncoder": true
         },
