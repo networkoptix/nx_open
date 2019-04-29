@@ -4,14 +4,31 @@
 #include <memory>
 #include <optional>
 
-#include <QtCore/QString>
 #include <maxminddb.h>
 
 #include <nx/utils/log/log.h>
 
-#include "utils.h"
-
 namespace nx::maxmind {
+
+enum class ResultCode
+{
+    Ok,
+    NotFound,
+    IoError,
+    UnknownError
+};
+
+enum class Continent
+{
+    Unknown,
+    Africa,
+    Antarctica,
+    Asia,
+    Australia,
+    Europe,
+    NorthAmerica,
+    SouthAmerica
+};
 
 struct Geopoint
 {
@@ -24,6 +41,13 @@ struct Geopoint
     }
 };
 
+struct Location
+{
+    Continent continent;
+    std::string country;
+    std::optional<Geopoint> geopoint;
+};
+
 //-------------------------------------------------------------------------------------------------
 // MaxmindDb
 
@@ -32,67 +56,48 @@ class NX_MAXMINDDB_API MaxmindDb
 public:
     bool open(const std::string& dbPath);
 
-    std::optional<std::string> lookupCountry(
-        const std::string& ipAddress,
-        const std::string& language = "en");
-    std::optional<std::string> lookupContinent(
-        const std::string& ipAddress,
-        const std::string& language = "en");
-    std::optional<Geopoint> lookupGeopoint(const std::string& ipAddress);
+    std::pair<ResultCode, Location> lookup(const std::string& ipAddress);
 
 private:
-    std::optional<MMDB_lookup_result_s> lookupIpAddress(const std::string& ipAddress);
+    std::pair<ResultCode, MMDB_lookup_result_s> lookupIpAddress(const std::string& ipAddress);
 
-    template<typename ...ConstCharPtrs>
-    std::optional<std::string> getString(
-        const char * callingFunc,
-        MMDB_lookup_result_s& lookupResult,
-        ConstCharPtrs... strings);
+    std::pair<ResultCode, Geopoint> getGeopoint(MMDB_lookup_result_s& lookupResult);
 
-    template<typename ...ConstCharPtrs>
-    std::optional<double> getDouble(
-        const char* callingFunc, 
-        MMDB_lookup_result_s& lookupResult,
-        ConstCharPtrs... strings);
-    
-    bool validate(
-        const char* callingFunc,
+    ResultCode validate(
         int mmdbError,
         const MMDB_entry_data_s& entryData,
         uint32_t expectedMmdbDataType) const;
 
+    template<typename ...ConstCharPtrs>
+    std::pair<ResultCode, std::string> getString(
+        MMDB_lookup_result_s& lookupResult,
+        ConstCharPtrs... strings)
+    {
+        MMDB_entry_data_s entryData;
+        int mmdbResult = MMDB_get_value(&lookupResult.entry, &entryData, strings..., nullptr);
+        ResultCode resultCode = validate(mmdbResult, entryData, MMDB_DATA_TYPE_UTF8_STRING);
+        if (resultCode != ResultCode::Ok)
+            return {resultCode, {}};
+
+        return {resultCode, std::string(entryData.utf8_string, entryData.data_size)};
+    }
+
+    template<typename ...ConstCharPtrs>
+    std::pair<ResultCode, double> getDouble(
+        MMDB_lookup_result_s& lookupResult,
+        ConstCharPtrs... strings)
+    {
+        MMDB_entry_data_s entryData;
+        int mmdbResult = MMDB_get_value(&lookupResult.entry, &entryData, strings..., nullptr);
+        ResultCode resultCode = validate(mmdbResult, entryData, MMDB_DATA_TYPE_DOUBLE);
+        if (resultCode != ResultCode::Ok)
+            return {resultCode, 0};
+
+        return {resultCode, entryData.double_value};
+    }
+
 private:
     std::unique_ptr<MMDB_s> m_db;
 };
-
-//-------------------------------------------------------------------------------------------------
-
-template<typename ...ConstCharPtrs>
-std::optional<std::string> MaxmindDb::getString(
-    const char * callingFunc,
-    MMDB_lookup_result_s& lookupResult,
-    ConstCharPtrs... strings)
-{
-    MMDB_entry_data_s entryData;
-    int error = MMDB_get_value(&lookupResult.entry, &entryData, strings..., nullptr);
-    if (!validate(callingFunc, error, entryData, MMDB_DATA_TYPE_UTF8_STRING))
-        return std::nullopt;
-
-    return QString::fromUtf8(entryData.utf8_string, entryData.data_size).toStdString();
-}
-
-template<typename ...ConstCharPtrs>
-std::optional<double> MaxmindDb::getDouble(
-    const char* callingFunc, 
-    MMDB_lookup_result_s& lookupResult,
-    ConstCharPtrs... strings)
-{
-    MMDB_entry_data_s entryData;
-    int error = MMDB_get_value(&lookupResult.entry, &entryData, strings..., nullptr);
-    if (!validate(callingFunc, error, entryData, MMDB_DATA_TYPE_DOUBLE))
-        return std::nullopt;
-
-    return entryData.double_value;
-}
 
 } // namespace nx::maxind
