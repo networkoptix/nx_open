@@ -12,7 +12,9 @@ RUN set -ex \
     apk update \
     && apk add --no-cache bash tini gettext wget ca-certificates mariadb-client   \
         libcurl libjpeg-turbo libressl2.6-libcrypto libwebp libxml2 libxslt mariadb-client-libs musl openjpeg tiff yaml zlib \
-    && pip install -r /app/requirements.txt
+        gcc g++ libxslt-dev libxml2-dev jpeg-dev
+
+RUN ln -s /usr/include/locale.h /usr/include/xlocal.h && pip install -r /app/requirements.txt
 
 ENV CLOUD_PORTAL_BASE_CONF_DIR /app/app/static
 ENV C_FORCE_ROOT true
