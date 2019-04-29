@@ -82,7 +82,7 @@ QnLayoutResourcePtr QnLayoutResource::createFromResource(const QnResourcePtr& re
     {
         const auto ar = camera->aspectRatio();
         if (ar.isValid())
-            layout->setCellAspectRatio(ar.toFloat());
+            layout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(ar.toFloat()).toFloat());
     }
 
     QnLayoutItemData item;
