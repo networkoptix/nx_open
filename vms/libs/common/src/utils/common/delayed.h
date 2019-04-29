@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <chrono>
 
 class QObject;
 class QThread;
@@ -20,6 +21,13 @@ void executeDelayed(Callback callback, int delayMs = kDefaultDelay, QThread* tar
 /// Note: if delayed action is already executed, timer is invalid
 /// You have to delete timer to prevent callback to be executed
 QTimer* executeDelayedParented(Callback callback, int delayMs, QObject* parent);
+
+/// @brief Executes specified functor in the same thread using timer
+/// parented to specified <parent> after <delay> has expired
+/// @return Timer could be used for delayed action cancellation.
+/// Note: if delayed action is already executed, timer is invalid
+/// You have to delete timer to prevent callback to be executed
+QTimer* executeDelayedParented(Callback callback, std::chrono::milliseconds delay, QObject* parent);
 
 /**
  * Execute specified functor in the thread of the provided parent. If parent is destroyed, callback
