@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/sql/sql_cursor.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "abstract_cursor.h"
 #include "analytics_events_storage_types.h"
@@ -27,6 +28,7 @@ private:
     bool m_eof = false;
     Objects m_currentObjects;
     common::metadata::DetectionMetadataPacketPtr m_packet;
+    QnMutex m_mutex;
 
     void loadObjectsIfNecessary();
     void loadNextObject();
