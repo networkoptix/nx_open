@@ -198,7 +198,8 @@ bool QnTestCameraStreamReader::isStreamOpened() const
 void QnTestCameraStreamReader::pleaseStop()
 {
     CLServerPushStreamReader::pleaseStop();
-    closeStream();
+    QnMutexLocker lock(&m_socketMutex);
+    m_socket->shutdown();
 }
 
 #endif // #ifdef ENABLE_TEST_CAMERA
