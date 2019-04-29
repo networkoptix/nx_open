@@ -12,8 +12,10 @@
 
 
 .icon-positive {
-    font-size : 1.5rem;
-    color     : $dark9;
+    font-size      : 1.5rem;
+    color          : $dark9;
+    display        : flex;
+    justify-content: center;
 }
 
 .icon-negative {
