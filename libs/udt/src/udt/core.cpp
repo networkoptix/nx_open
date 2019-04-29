@@ -73,6 +73,7 @@ const int32_t CAckNo::m_iMaxAckSeqNo = 0x7FFFFFFF;
 const int32_t CMsgNo::m_iMsgNoTH = 0xFFFFFFF;
 const int32_t CMsgNo::m_iMaxMsgNo = 0x1FFFFFFF;
 
+
 /*
 static const int CTRL_HANDSHAKE = 0;            //000 - Handshake
 static const int CTRL_KEEP_ALIVE = 1;           //001 - Keep-alive
@@ -85,6 +86,8 @@ static const int CTRL_MSG_DROP = 7;             //111 - Msg drop request
 static const int CTRL_ACK_SPECIAL_ERROR = 8;    //1000 - acknowledge the peer side a special error
 static const int CTRL_RESERVED = 32767;         //0x7FFF - Resevered for future use
 
+// Mimimum recv flight flag size is 32 packets
+constexpr const int kMinRecvWindowSize = 32;
 */
 
 CUDT::CUDT()
@@ -139,7 +142,6 @@ CUDT::~CUDT()
     delete m_pRcvTimeWindow;
     delete m_pCCFactory;
     delete m_pCC;
-    delete m_pPeerAddr;
     delete m_pSNode;
 }
 
@@ -550,7 +552,7 @@ void CUDT::listen()
     m_bListening = true;
 }
 
-void CUDT::connect(const sockaddr* serv_addr)
+void CUDT::connect(const detail::SocketAddress& serv_addr)
 {
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
 
@@ -563,11 +565,11 @@ void CUDT::connect(const sockaddr* serv_addr)
     if (isConnecting() || m_bConnected)
         throw CUDTException(5, 2, 0);
 
+    if (serv_addr.family() != m_iIPversion)
+        throw CUDTException(5, 2, 0);
+
     // record peer/server address
-    delete m_pPeerAddr;
-    m_pPeerAddr = (AF_INET == m_iIPversion) ? (sockaddr*)new sockaddr_in : (sockaddr*)new sockaddr_in6;
-    memcpy(m_pPeerAddr, serv_addr, (AF_INET == m_iIPversion) ? sizeof(sockaddr_in) : sizeof(sockaddr_in6));
-    m_pPeerAddr->sa_family = m_iIPversion;
+    m_pPeerAddr = serv_addr;
 
     // register this socket in the rendezvous queue
     // RendezevousQueue is used to temporarily store incoming handshake, non-rendezvous connections also require this function
@@ -575,7 +577,7 @@ void CUDT::connect(const sockaddr* serv_addr)
     if (m_bRendezvous)
         ttl *= 10;
     ttl += CTimer::getTime();
-    rcvQueue().registerConnector(m_SocketId, shared_from_this(), m_iIPversion, serv_addr, ttl);
+    rcvQueue().registerConnector(m_SocketId, shared_from_this(), serv_addr, ttl);
 
     // This is my current configurations
     m_ConnReq.m_iVersion = m_iVersion;
@@ -584,7 +586,8 @@ void CUDT::connect(const sockaddr* serv_addr)
     m_ConnReq.m_iFlightFlagSize = (m_iRcvBufSize < m_iFlightFlagSize) ? m_iRcvBufSize : m_iFlightFlagSize;
     m_ConnReq.m_iReqType = (!m_bRendezvous) ? 1 : 0;
     m_ConnReq.m_iID = m_SocketId;
-    CIPAddress::ntop(serv_addr, m_ConnReq.m_piPeerIP, m_iIPversion);
+
+    serv_addr.copy(m_ConnReq.m_piPeerIP);
 
     // Random Initial Sequence Number
     srand((unsigned int)CTimer::getTime());
@@ -763,7 +766,7 @@ POST_CONNECT:
 
     CInfoBlock ib;
     ib.m_iIPversion = m_iIPversion;
-    CInfoBlock::convert(m_pPeerAddr, m_iIPversion, ib.m_piIP);
+    CInfoBlock::convert(m_pPeerAddr, ib.m_piIP);
     if (m_pCache->lookup(&ib) >= 0)
     {
         m_iRTT = ib.m_iRTT;
@@ -799,7 +802,7 @@ POST_CONNECT:
     return 0;
 }
 
-void CUDT::connect(const sockaddr* peer, CHandShake* hs)
+void CUDT::connect(const detail::SocketAddress& peer, CHandShake* hs)
 {
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
 
@@ -837,7 +840,7 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
 
     // get local IP address and send the peer its IP address (because UDP cannot get local IP address)
     memcpy(m_piSelfIP, hs->m_piPeerIP, 16);
-    CIPAddress::ntop(peer, hs->m_piPeerIP, m_iIPversion);
+    peer.copy(hs->m_piPeerIP);
 
     m_iPktSize = m_iMSS - 28;
     m_iPayloadSize = m_iPktSize - CPacket::m_iPktHdrSize;
@@ -859,8 +862,8 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     }
 
     CInfoBlock ib;
-    ib.m_iIPversion = m_iIPversion;
-    CInfoBlock::convert(peer, m_iIPversion, ib.m_piIP);
+    ib.m_iIPversion = peer.family();
+    CInfoBlock::convert(peer, ib.m_piIP);
     if (m_pCache->lookup(&ib) >= 0)
     {
         m_iRTT = ib.m_iRTT;
@@ -880,8 +883,7 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     m_ullInterval = (uint64_t)(m_pCC->m_dPktSndPeriod * m_ullCPUFrequency);
     m_dCongestionWindow = m_pCC->m_dCWndSize;
 
-    m_pPeerAddr = (AF_INET == m_iIPversion) ? (sockaddr*)new sockaddr_in : (sockaddr*)new sockaddr_in6;
-    memcpy(m_pPeerAddr, peer, (AF_INET == m_iIPversion) ? sizeof(sockaddr_in) : sizeof(sockaddr_in6));
+    m_pPeerAddr = peer;
 
     // And of course, it is connected.
     m_bConnected = true;
@@ -985,7 +987,7 @@ void CUDT::close()
         // Store current connection information.
         CInfoBlock ib;
         ib.m_iIPversion = m_iIPversion;
-        CInfoBlock::convert(m_pPeerAddr, m_iIPversion, ib.m_piIP);
+        CInfoBlock::convert(m_pPeerAddr, ib.m_piIP);
         ib.m_iRTT = m_iRTT;
         ib.m_iBandwidth = m_iBandwidth;
         m_pCache->update(&ib);
@@ -2482,7 +2484,7 @@ ServerSideConnectionAcceptor::ServerSideConnectionAcceptor(
 }
 
 int ServerSideConnectionAcceptor::processConnectionRequest(
-    sockaddr* addr,
+    const detail::SocketAddress& addr,
     CPacket& packet)
 {
     if (m_closing)
@@ -2497,7 +2499,10 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
     // SYN cookie
     char clienthost[NI_MAXHOST];
     char clientport[NI_MAXSERV];
-    getnameinfo(addr, (AF_INET == CUDT::m_iVersion) ? sizeof(sockaddr_in) : sizeof(sockaddr_in6), clienthost, sizeof(clienthost), clientport, sizeof(clientport), NI_NUMERICHOST | NI_NUMERICSERV);
+    getnameinfo(
+        addr.get(), addr.size(),
+        clienthost, sizeof(clienthost), clientport, sizeof(clientport),
+        NI_NUMERICHOST | NI_NUMERICSERV);
     int64_t timestamp = (CTimer::getTime() - m_StartTime) / 60000000; // secret changes every one minute
     stringstream cookiestr;
     cookiestr << clienthost << ":" << clientport << ":" << timestamp;
