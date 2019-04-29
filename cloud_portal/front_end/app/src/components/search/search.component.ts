@@ -232,10 +232,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             });
         }
 
-        if (this.localFilter.query !== '') {
-            this.numberFilters++;
-        }
-
         if (flag === 1 && this.localFilter.query === '') {
             this.filterSelected = tagsSelected || selectsSelected || multiSelectsSelected;
             return;
