@@ -179,7 +179,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
                 std::move(registrationOnMediatorRetryPolicy));
         cloudServerSocket->listen(0);
         m_multipleServerSocket->addSocket(std::move(cloudServerSocket));
-        m_cloudSocketIndex = m_multipleServerSocket->count() - 1;
+        m_cloudSocketIndex = (int) m_multipleServerSocket->count() - 1;
     }
     else
     {

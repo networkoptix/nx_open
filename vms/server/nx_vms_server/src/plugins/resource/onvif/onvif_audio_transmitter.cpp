@@ -119,7 +119,8 @@ bool OnvifAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
 {
     QByteArray sendBuffer;
     const static int kRtpTcpHeaderSize = 4;
-    sendBuffer.resize(audioData->dataSize() + nx::streaming::rtp::RtpHeader::kSize + kRtpTcpHeaderSize);
+    sendBuffer.resize((int) audioData->dataSize()
+        + nx::streaming::rtp::RtpHeader::kSize + kRtpTcpHeaderSize);
     char* rtpHeaderPtr = sendBuffer.data() + kRtpTcpHeaderSize;
 
     AVRational srcTimeBase = { 1, 1000000 };
@@ -131,7 +132,7 @@ bool OnvifAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
     nx::streaming::rtp::buildRtpHeader(
         rtpHeaderPtr,
         0, //< ssrc
-        audioData->dataSize(),
+        audioData->dataSize() > 0,
         timestamp,
         m_trackInfo.sdpMedia.payloadType,
         m_sequence++);

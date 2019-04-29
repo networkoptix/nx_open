@@ -764,7 +764,7 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 {
     QnMutexLocker lock( &m_mutex );
 
-    for (size_t i = 0; i < m_chunks.size();)
+    for (int i = 0; i < m_chunks.size();)
     {
         if (m_chunks[i].storageIndex == storageIndex)
         {

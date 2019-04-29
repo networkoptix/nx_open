@@ -270,7 +270,7 @@ int CLSimpleTFTPClient::form_ack(unsigned short blk, char* buff)
     return 4;
 }
 
-int CLSimpleTFTPClient::parseBlockSize(const char* const responseBuffer, std::size_t responseLength)
+int CLSimpleTFTPClient::parseBlockSize(const char* const responseBuffer, int responseLength)
 {
     if (!responseLength)
         return 0;
@@ -282,7 +282,7 @@ int CLSimpleTFTPClient::parseBlockSize(const char* const responseBuffer, std::si
     const char* kBlockSizeOption = "blksize";
     const auto kOptionAckCodeLen = 1;
     const auto kTerminatingBytes = 3;
-    const auto optionNameLength = std::strlen(kBlockSizeOption);
+    const auto optionNameLength = (int) std::strlen(kBlockSizeOption);
     const auto minimalLength = kTerminatingBytes
         + kOptionAckCodeLen
         + optionNameLength

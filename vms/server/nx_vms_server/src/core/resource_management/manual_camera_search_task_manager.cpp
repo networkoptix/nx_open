@@ -146,7 +146,7 @@ void QnManualSearchTaskManager::onSearchTaskDone(
 
                 if (taskInterruptProcessing && !results.isEmpty())
                 {
-                    m_remainingTaskCount -= m_searchTasksQueues[taskUrl].size();
+                    m_remainingTaskCount -= int(m_searchTasksQueues[taskUrl].size());
                     context.isInterrupted = true;
                 }
 
