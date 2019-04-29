@@ -6,13 +6,16 @@
     color       : $dark9;
     font-family : $font-family-medium;
     font-size   : rem(10px);
-    float       : right;
+    float       : left;
+    margin-left : 2px;
 }
 
 
 .icon-positive {
-    font-size : 1.5rem;
-    color     : $dark9;
+    font-size      : 1.5rem;
+    color          : $dark9;
+    display        : flex;
+    justify-content: center;
 }
 
 .icon-negative {
@@ -24,4 +27,5 @@
     font-size   : rem(13px);
     font-family : $font-family-medium;
     color       : $dark9;
+    margin-left : 2px;
 }

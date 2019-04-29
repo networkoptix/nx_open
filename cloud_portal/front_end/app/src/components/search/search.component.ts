@@ -232,10 +232,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             });
         }
 
-        if (this.localFilter.query !== '') {
-            this.numberFilters++;
-        }
-
         if (flag === 1 && this.localFilter.query === '') {
             this.filterSelected = tagsSelected || selectsSelected || multiSelectsSelected;
             return;
@@ -320,11 +316,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                     queryParams[select.id] = select.selected.join(',');
                 }
             });
-        }
-
-        // Reset page number after filter changed
-        if (this.params && !this.params.page) {
-            queryParams.page = (!this.numberFilters) ? undefined : 1;
         }
 
         this.uri.updateURI(this.uriPath, queryParams, true);

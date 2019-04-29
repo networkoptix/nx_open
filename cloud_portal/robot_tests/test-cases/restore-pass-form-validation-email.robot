@@ -63,7 +63,7 @@ Open Restore Password Dialog
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     ${link}    Get Email Link    ${email}    activate
-    Go To    ${link}[1]
+    Go To    ${link}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
 

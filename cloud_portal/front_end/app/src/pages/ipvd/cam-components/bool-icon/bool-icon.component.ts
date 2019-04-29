@@ -1,13 +1,15 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
 
 @Component({
     selector   : 'nx-bool-icon',
     templateUrl: './bool-icon.component.html',
-    styleUrls  : ['./bool-icon.component.scss']
+    styleUrls  : ['./bool-icon.component.scss'],
+    encapsulation: ViewEncapsulation.None,
 })
 export class BoolIconComponent implements OnInit {
     @Input() param: string;
     @Input() value: string;
+    @Input() align: string;
 
     public additional: string;
 
@@ -30,10 +32,11 @@ export class BoolIconComponent implements OnInit {
                 this.additional = '2-way';
             }
 
-            // maxResolution is not boolean - we need to overwrite '0x0'
+            // maxResolution and sndResolution are not boolean - we need to overwrite '0x0'
             if (this.value &&
                 changes.param &&
-                changes.param.currentValue === 'maxResolution') {
+                    (changes.param.currentValue === 'maxResolution' ||
+                     changes.param.currentValue === 'sndResolution')) {
 
                 this.value = null;
             }

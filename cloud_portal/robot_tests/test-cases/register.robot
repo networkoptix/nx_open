@@ -256,6 +256,7 @@ Check registration email links, colors, cloud name, and user name
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     ${email}    Wait For Email    recipient=${random email}    timeout=120    status=UNSEEN
     ${email text}    Get Email Body    ${email}
+    ${email text}    Decode Bytes To String    ${email text}    UTF-8
 
     Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
     Check Email User Names    ${email text}    ${TEST FIRST NAME}    ${TEST LAST NAME}

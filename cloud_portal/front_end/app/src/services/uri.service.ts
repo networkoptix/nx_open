@@ -41,7 +41,7 @@ export class NxUriService {
         this.router.navigate([navigateTo], {
             queryParams,
             relativeTo         : this.route,
-            replaceUrl         : true,
+            replaceUrl         : false,
             queryParamsHandling: 'merge',
             // do not trigger navigation
             // skipLocationChange : true

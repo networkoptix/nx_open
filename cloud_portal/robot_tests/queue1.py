@@ -1,7 +1,7 @@
 import datetime
 import time
 import functools
-from Queue import Queue
+import queue
 from threading import Thread
 from os import system, path
 from get_names import get_threaded_names
@@ -24,12 +24,10 @@ TEST_LIST = get_threaded_names("Threaded")
 SERIAL_LIST = list(set((test[0] for test in get_threaded_names("Unthreaded"))))
 
 
-q = Queue(maxsize=0)
-NUM_THREADS = 12
+q = queue.Queue(maxsize=0)
+NUM_THREADS = 16
 
 # actually runs the commands in the queue
-
-
 def do_stuff(q):
     while True:
         system(q.get())
@@ -41,7 +39,7 @@ def timer(func):
         start_time = datetime.datetime.now()
         func(*args, **kwargs)
         run_time = datetime.datetime.now() - start_time
-        print run_time
+        print (run_time)
     return wrapper_timer
 
 @timer

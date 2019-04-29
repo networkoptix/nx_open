@@ -356,23 +356,23 @@
                         
                         if ($scope.positionProvider) {
                             $scope.positionProvider.playing = play;
-                            
-                            if (!play) {
-                                $timeout(function () {
-                                    $scope.positionProvider.liveMode = $scope.positionProvider.isArchiveEmpty(); // Do it async
-                                });
-                            }
                         }
                     }
                 };
                 
+                var self = $scope;
+                $scope.$watch('positionProvider.isReady', function (ready) {
+                    if (ready && !self.positionProvider.playing) {
+                        self.positionProvider.liveMode = self.positionProvider.isArchiveEmpty();
+                    }
+                });
+                
                 $scope.switchPosition = function (val) {
-                    
                     //var playing = $scope.positionProvider.checkPlayingDate(val);
                     
                     //if(playing === false) {
                     $scope.crashCount = 0;
-                    updateVideoSource(val);//We have nothing more to do with it.
+                    updateVideoSource(val);// We have nothing more to do with it.
                     /*}else{
                         $scope.playerAPI.seekTime(playing); // Jump to buffered video
                     }*/
