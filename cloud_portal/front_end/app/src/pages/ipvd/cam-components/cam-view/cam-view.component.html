@@ -24,11 +24,21 @@
             <div class="active-camera-info">
                 <div class="row">
                     <div class="col-7" translate>Resolution(max)</div>
-                    <div class="col-5">{{ activeCamera.maxResolution }}</div>
+                    <div class="col-5">
+                        <nx-bool-icon
+                                param="maxResolution"
+                                [value]="activeCamera.maxResolution">
+                        </nx-bool-icon>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-7" translate>FPS(max)</div>
-                    <div class="col-5">{{ activeCamera.maxFps }}</div>
+                    <div class="col-5">
+                        <nx-bool-icon
+                                param="maxFps"
+                                [value]="activeCamera.maxFps">
+                        </nx-bool-icon>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-7" translate>Codec</div>
@@ -38,6 +48,7 @@
                     <div class="col-7" translate>Audio</div>
                     <div class="col-5">
                         <nx-bool-icon
+                                param="isAudioSupported"
                                 [value]="activeCamera.isAudioSupported">
                         </nx-bool-icon>
                     </div>
@@ -46,6 +57,7 @@
                     <div class="col-7" translate>2-Way Audio</div>
                     <div class="col-5">
                         <nx-bool-icon
+                                param="isTwAudioSupported"
                                 [value]="activeCamera.isTwAudioSupported">
                         </nx-bool-icon>
                     </div>
@@ -54,6 +66,7 @@
                     <div class="col-7" translate>PTZ</div>
                     <div class="col-5">
                         <nx-bool-icon
+                                param="isPtzSupported"
                                 [value]="activeCamera.isPtzSupported">
                         </nx-bool-icon>
                     </div>
@@ -62,6 +75,7 @@
                     <div class="col-7" translate>Advanced PTZ</div>
                     <div class="col-5">
                         <nx-bool-icon
+                                param="isAptzSupported"
                                 [value]="activeCamera.isAptzSupported">
                         </nx-bool-icon>
                     </div>
@@ -70,6 +84,7 @@
                     <div class="col-7" translate>Motion Detection</div>
                     <div class="col-5">
                         <nx-bool-icon
+                                param="isMdSupported"
                                 [value]="activeCamera.isMdSupported">
                         </nx-bool-icon>
                     </div>
@@ -78,6 +93,7 @@
                     <div class="col-7" translate>Fisheye</div>
                     <div class="col-5">
                         <nx-bool-icon
+                                param="</nx-bool-icon>"
                                 [value]="activeCamera.isFisheye">
                         </nx-bool-icon>
                     </div>
@@ -86,6 +102,7 @@
                     <div class="col-7" translate>I/O</div>
                     <div class="col-5">
                         <nx-bool-icon
+                                param="isIoSupported"
                                 [value]="activeCamera.isIoSupported">
                         </nx-bool-icon>
                     </div>
@@ -94,18 +111,25 @@
                     <div class="col-7" translate>Dual Streaming</div>
                     <div class="col-5">
                         <nx-bool-icon
+                                param="isDualStreamingSupported"
                                 [value]="activeCamera.isDualStreamingSupported">
                         </nx-bool-icon>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-7" translate>Secondary Stream</div>
-                    <div class="col-5">{{ activeCamera.sndResolution }}</div>
+                    <div class="col-5">
+                        <nx-bool-icon
+                                param="sndResolution"
+                                [value]="activeCamera.sndResolution">
+                        </nx-bool-icon>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-7" translate>Multi Sensor</div>
                     <div class="col-5">
                         <nx-bool-icon
+                                param="isMultiSensor"
                                 [value]="activeCamera.isMultiSensor">
                         </nx-bool-icon>
                     </div>

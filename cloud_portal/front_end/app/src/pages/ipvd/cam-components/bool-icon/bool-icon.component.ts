@@ -30,10 +30,11 @@ export class BoolIconComponent implements OnInit {
                 this.additional = '2-way';
             }
 
-            // maxResolution is not boolean - we need to overwrite '0x0'
+            // maxResolution and sndResolution are not boolean - we need to overwrite '0x0'
             if (this.value &&
                 changes.param &&
-                changes.param.currentValue === 'maxResolution') {
+                    (changes.param.currentValue === 'maxResolution' ||
+                     changes.param.currentValue === 'sndResolution')) {
 
                 this.value = null;
             }
