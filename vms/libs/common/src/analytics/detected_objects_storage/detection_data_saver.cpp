@@ -94,8 +94,9 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
     auto query = queryContext->connection()->createQuery();
     query->prepare(R"sql(
         INSERT INTO object (device_id, object_type_id, guid,
-            track_start_ms, track_end_ms, track_detail, attributes_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+            track_start_ms, track_end_ms, track_detail, attributes_id,
+            best_shot_timestamp_ms, best_shot_rect)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     )sql");
 
     for (const auto& object: m_objectsToInsert)
@@ -114,6 +115,12 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         query->bindValue(4, trackMaxTimestamp / kUsecInMs);
         query->bindValue(5, TrackSerializer::serialized(object.track));
         query->bindValue(6, attributesId);
+        query->bindValue(7, object.bestShot.initialized()
+            ? object.bestShot.timestampUsec / kUsecInMs
+            : 0);
+        query->bindValue(8, object.bestShot.initialized()
+            ? TrackSerializer::serialized(object.bestShot.rect)
+            : QByteArray());
 
         query->exec();
 

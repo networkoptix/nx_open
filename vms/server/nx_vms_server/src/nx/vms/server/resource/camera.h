@@ -12,6 +12,8 @@
 typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 class QnAbstractPtzController;
 
+namespace nx::vms::server::resource { struct MulticastParameters; }
+
 namespace nx {
 namespace vms::server {
 namespace resource {
@@ -55,6 +57,12 @@ class Camera:
     using base_type = QnVirtualCameraResource;
 public:
     static const float kMaxEps;
+    inline static const QString kDefaultPrimaryStreamMulticastAddress{"239.0.0.10"};
+    inline static const QString kDefaultSecondaryStreamMulticastAddress{"239.0.0.11"};
+    static constexpr int kDefaultPrimaryStreamMulticastPort{2048};
+    static constexpr int kDefaultSecondaryStreamMulticastPort{2050};
+    static constexpr int kDefaultMulticastTtl{1};
+
 
     Camera(QnMediaServerModule* serverModule);
     virtual ~Camera() override;
@@ -192,6 +200,10 @@ public:
     void setRole(Role role) { m_role = role; }
     Role getRole() const { return m_role; }
 
+    bool fixMulticastParametersIfNeeded(
+        nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
+        nx::vms::api::StreamIndex streamIndex);
+
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(
@@ -248,7 +260,7 @@ protected:
 
 private:
     using StreamCapabilityAdvancedParameterProviders = std::map<
-        nx::vms::api::StreamIndex, 
+        nx::vms::api::StreamIndex,
         std::unique_ptr<StreamCapabilityAdvancedParametersProvider>>;
 
     int m_channelNumber; // video/audio source number

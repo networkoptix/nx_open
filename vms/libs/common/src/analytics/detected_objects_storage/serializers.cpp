@@ -10,26 +10,11 @@ namespace nx::analytics::storage {
 
 static const QSize kResolution(kCoordinatesPrecision, kCoordinatesPrecision);
 
-QByteArray TrackSerializer::serialized(const std::vector<ObjectPosition>& track)
+void TrackSerializer::serialize(
+    const std::vector<ObjectPosition>& track,
+    QByteArray* buf)
 {
-    QByteArray buf;
-    serializeTrackSequence(track, &buf);
-    return buf;
-}
-
-std::vector<ObjectPosition> TrackSerializer::deserialized(
-    const QByteArray& serializedData)
-{
-    QnByteArrayConstRef buf(serializedData);
-
-    std::vector<ObjectPosition> track;
-
-    // TODO: #ak Return sorted track IF each track sequence is sorted.
-
-    while (!buf.isEmpty())
-        deserializeTrackSequence(&buf, &track);
-
-    return track;
+    serializeTrackSequence(track, buf);
 }
 
 void TrackSerializer::serializeTrackSequence(
@@ -68,6 +53,14 @@ void TrackSerializer::serialize(const QRect& rect, QByteArray* buf)
     nx::utils::compact_int::serialize(rect.y(), buf);
     nx::utils::compact_int::serialize(rect.width(), buf);
     nx::utils::compact_int::serialize(rect.height(), buf);
+}
+
+void TrackSerializer::deserialize(
+    QnByteArrayConstRef* buf,
+    std::vector<ObjectPosition>* track)
+{
+    while (!buf->isEmpty())
+        deserializeTrackSequence(buf, track);
 }
 
 void TrackSerializer::deserializeTrackSequence(
@@ -121,6 +114,22 @@ void TrackSerializer::deserialize(QnByteArrayConstRef* buf, QRect* rect)
     nx::utils::compact_int::deserialize(buf, &value);
     rect->setHeight(value);
 }
+
+void TrackSerializer::serialize(const QRectF& rect, QByteArray* buf)
+{
+    serialize(
+        translate(rect, kResolution),
+        buf);
+}
+
+void TrackSerializer::deserialize(QnByteArrayConstRef* buf, QRectF* rect)
+{
+    QRect translated;
+    deserialize(buf, &translated);
+    *rect = translate(translated, kResolution);
+}
+
+//-------------------------------------------------------------------------------------------------
 
 QRect translate(const QRectF& box, const QSize& resolution)
 {

@@ -30,7 +30,7 @@ DbController::DbController(
     if (kUseTrackAggregation)
     {
         dbStructureUpdater().addUpdateScript(kSplitDataToObjectAndSearch);
-        dbStructureUpdater().addUpdateScript(kObjectTrackStartTimeIndex);
+        dbStructureUpdater().addUpdateScript(kObjectBestShot);
     }
 }
 

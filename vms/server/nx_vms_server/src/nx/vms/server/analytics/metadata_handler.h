@@ -18,6 +18,7 @@
 
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
+#include <nx/sdk/analytics/i_object_track_best_shot_packet.h>
 
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/vms/server/server_module_aware.h>
@@ -65,6 +66,10 @@ private:
 
     void handleObjectMetadataPacket(
         const nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket>& objectMetadataPacket);
+
+    void handleObjectTrackBestShotPacket(
+        const nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket>&
+            objectTrackBestShotPacket);
 
     void handleEventMetadata(
         const nx::sdk::Ptr<const nx::sdk::analytics::IEventMetadata>& eventMetadata,

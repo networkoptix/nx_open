@@ -11,6 +11,7 @@
 #include "analytics_events_storage_cursor.h"
 #include "config.h"
 #include "cursor.h"
+#include "cleaner.h"
 #include "object_searcher.h"
 #include "serializers.h"
 #include "time_period_fetcher.h"
@@ -239,21 +240,20 @@ void EventsStorage::markDataAsDeprecated(
         deviceId, oldestDataToKeepTimestamp.count());
 
     QnMutexLocker lock(&m_dbControllerMutex);
-    m_dbController->queryExecutor().executeUpdate(
-        std::bind(&EventsStorage::cleanupData, this, _1, deviceId, oldestDataToKeepTimestamp),
-        [this, deviceId, oldestDataToKeepTimestamp](sql::DBResult resultCode)
-        {
-            if (resultCode == sql::DBResult::ok)
+
+    if (kUseTrackAggregation)
+    {
+        scheduleDataCleanup(deviceId, oldestDataToKeepTimestamp);
+    }
+    else
+    {
+        m_dbController->queryExecutor().executeUpdate(
+            std::bind(&EventsStorage::cleanupData, this, _1, deviceId, oldestDataToKeepTimestamp),
+            [this, deviceId, oldestDataToKeepTimestamp](nx::sql::DBResult result)
             {
-                NX_VERBOSE(this, "Cleaned data of device %1 up to timestamp %2",
-                    deviceId, oldestDataToKeepTimestamp);
-            }
-            else
-            {
-                NX_DEBUG(this, "Error (%1) while cleaning up data of device %2 up to timestamp %3",
-                    toString(resultCode), deviceId, oldestDataToKeepTimestamp);
-            }
-        });
+                logCleanupResult(result, deviceId, oldestDataToKeepTimestamp);
+            });
+    }
 }
 
 void EventsStorage::flush(StoreCompletionHandler completionHandler)
@@ -803,9 +803,13 @@ void EventsStorage::prepareSelectTimePeriodsUnfilteredQuery(
         auto localTimePeriod = timePeriod;
         if (localTimePeriod.durationMs == QnTimePeriod::kInfiniteDuration)
             localTimePeriod.setEndTime(m_maxRecordedTimestamp);
+        else if (localTimePeriod.endTime() > m_maxRecordedTimestamp)
+            localTimePeriod.durationMs = QnTimePeriod::kInfiniteDuration;
 
-        ObjectSearcher::addTimePeriodToFilter(
-            localTimePeriod, &sqlFilter, "period_end_ms", "period_start_ms", m_maxRecordedTimestamp);
+        ObjectSearcher::addTimePeriodToFilter<std::chrono::milliseconds>(
+            localTimePeriod,
+            {"period_end_ms", "period_start_ms"},
+            &sqlFilter);
     }
 
     std::string whereClause;
@@ -888,6 +892,32 @@ void EventsStorage::loadTimePeriods(
         *result, std::max<milliseconds>(options.detailLevel, kMinTimePeriodAggregationPeriod));
 }
 
+void EventsStorage::scheduleDataCleanup(
+    QnUuid deviceId,
+    std::chrono::milliseconds oldestDataToKeepTimestamp)
+{
+    m_dbController->queryExecutor().executeUpdate(
+        [this, deviceId, oldestDataToKeepTimestamp](nx::sql::QueryContext* queryContext)
+        {
+            Cleaner cleaner(
+                &m_attributesDao,
+                m_deviceDao.deviceIdFromGuid(deviceId),
+                oldestDataToKeepTimestamp);
+
+            if (cleaner.clean(queryContext) == Cleaner::Result::incomplete)
+            {
+                NX_VERBOSE(this, "Could not clean all data in one run. Scheduling another one");
+                scheduleDataCleanup(deviceId, oldestDataToKeepTimestamp);
+            }
+
+            return nx::sql::DBResult::ok;
+        },
+        [this, deviceId, oldestDataToKeepTimestamp](nx::sql::DBResult result)
+        {
+            logCleanupResult(result, deviceId, oldestDataToKeepTimestamp);
+        });
+}
+
 nx::sql::DBResult EventsStorage::cleanupData(
     nx::sql::QueryContext* queryContext,
     const QnUuid& deviceId,
@@ -942,6 +972,23 @@ void EventsStorage::cleanupEventProperties(
     query.exec();
 #endif
 }
+
+void EventsStorage::logCleanupResult(
+    sql::DBResult resultCode,
+    const QnUuid& deviceId,
+    std::chrono::milliseconds oldestDataToKeepTimestamp)
+{
+    if (resultCode == sql::DBResult::ok)
+    {
+        NX_VERBOSE(this, "Cleaned data of device %1 up to timestamp %2",
+            deviceId, oldestDataToKeepTimestamp);
+    }
+    else
+    {
+        NX_DEBUG(this, "Error (%1) while cleaning up data of device %2 up to timestamp %3",
+            toString(resultCode), deviceId, oldestDataToKeepTimestamp);
+    }
+};
 
 void EventsStorage::logDataSaveResult(sql::DBResult resultCode)
 {

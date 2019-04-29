@@ -218,33 +218,35 @@ QnTimePeriodList QnMotionArchive::matchPeriod(
         QVector<IndexRecord> index;
         IndexHeader indexHeader;
         fillFileNames(timePointMs, &motionFile, 0);
-        if (!motionFile.open(QFile::ReadOnly) || !loadIndexFile(index, indexHeader, timePointMs))
-            return rez;
-
-        QVector<IndexRecord>::iterator startItr = index.begin();
-        QVector<IndexRecord>::iterator endItr = index.end();
-
-        if (msStartTime > minTime)
+        bool isFileExists = motionFile.open(QFile::ReadOnly)
+            && loadIndexFile(index, indexHeader, timePointMs);
+        if (isFileExists)
         {
-            startItr =
-                std::lower_bound(index.begin(), index.end(), msStartTime - indexHeader.startTime);
-        }
-        if (maxTime <= msEndTime)
-            endItr = std::upper_bound(startItr, index.end(), msEndTime - indexHeader.startTime);
+            QVector<IndexRecord>::iterator startItr = index.begin();
+            QVector<IndexRecord>::iterator endItr = index.end();
 
-        if (descendingOrder)
-        {
-            loadDataFromIndexDesc(motionFile, indexHeader, index, startItr, endItr, detailLevel, limit,
-                buffer, mask, maskStart, maskEnd, rez);
-        }
-        else
-        {
-            loadDataFromIndex(motionFile, indexHeader, index, startItr, endItr, detailLevel, limit,
-                buffer, mask, maskStart, maskEnd, rez);
-        }
+            if (msStartTime > minTime)
+            {
+                startItr =
+                    std::lower_bound(index.begin(), index.end(), msStartTime - indexHeader.startTime);
+            }
+            if (maxTime <= msEndTime)
+                endItr = std::upper_bound(startItr, index.end(), msEndTime - indexHeader.startTime);
 
-        if (limit && rez.size() == limit)
-            break;
+            if (descendingOrder)
+            {
+                loadDataFromIndexDesc(motionFile, indexHeader, index, startItr, endItr, detailLevel, limit,
+                    buffer, mask, maskStart, maskEnd, rez);
+            }
+            else
+            {
+                loadDataFromIndex(motionFile, indexHeader, index, startItr, endItr, detailLevel, limit,
+                    buffer, mask, maskStart, maskEnd, rez);
+            }
+
+            if (limit && rez.size() == limit)
+                break;
+        }
 
         if (descendingOrder)
             msEndTime = minTime - 1;

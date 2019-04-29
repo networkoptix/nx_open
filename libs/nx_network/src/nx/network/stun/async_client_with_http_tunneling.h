@@ -66,6 +66,8 @@ public:
         void* client,
         utils::MoveOnlyFunc<void()> handler) override;
 
+    virtual void cancelHandlersSync(void* client) override;
+
     virtual void setKeepAliveOptions(KeepAliveOptions options) override;
 
     void setTunnelValidatorFactory(http::tunneling::TunnelValidatorFactoryFunc func);

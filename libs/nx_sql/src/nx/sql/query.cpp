@@ -95,6 +95,11 @@ QVariant SqlQuery::lastInsertId() const
     return m_sqlQuery.lastInsertId();
 }
 
+int SqlQuery::numRowsAffected() const
+{
+    return m_sqlQuery.numRowsAffected();
+}
+
 QSqlQuery& SqlQuery::impl()
 {
     return m_sqlQuery;

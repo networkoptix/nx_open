@@ -10,3 +10,4 @@ Config.productName = 'EZ Pro';
 Config.cloud.productName = 'EZ Pro Cloud';
 Config.defaultLanguage = 'zh_TW';
 Config.supportedLanguages = ['zh_CN', 'zh_TW'];
+Config.developersFeedbackForm = false;

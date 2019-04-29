@@ -14,6 +14,8 @@ static const QSize kSearchResolution(
     kTrackSearchResolutionX,
     kTrackSearchResolutionY);
 
+static constexpr bool kFilteredTimePeriodsQueryEnabled = false;
+
 TimePeriodFetcher::TimePeriodFetcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
@@ -40,7 +42,7 @@ nx::sql::DBResult TimePeriodFetcher::selectTimePeriods(
     localFilter.deviceIds.clear();
     localFilter.timePeriod.clear();
 
-    if (localFilter.empty())
+    if (!kFilteredTimePeriodsQueryEnabled || localFilter.empty())
     {
         prepareSelectTimePeriodsSimpleQuery(
             query.get(), filter.deviceIds, filter.timePeriod, options);
@@ -78,9 +80,13 @@ void TimePeriodFetcher::prepareSelectTimePeriodsSimpleQuery(
         auto localTimePeriod = timePeriod;
         if (localTimePeriod.durationMs == QnTimePeriod::kInfiniteDuration)
             localTimePeriod.setEndTime(m_maxRecordedTimestamp);
+        else if (localTimePeriod.endTime() > m_maxRecordedTimestamp)
+            localTimePeriod.durationMs = QnTimePeriod::kInfiniteDuration;
 
-        ObjectSearcher::addTimePeriodToFilter(
-            localTimePeriod, &sqlFilter, "period_end_ms", "period_start_ms", m_maxRecordedTimestamp);
+        ObjectSearcher::addTimePeriodToFilter<std::chrono::milliseconds>(
+            localTimePeriod,
+            {"period_end_ms", "period_start_ms"},
+            &sqlFilter);
     }
 
     std::string whereClause;
@@ -142,7 +148,7 @@ void TimePeriodFetcher::prepareSelectTimePeriodsFilteredQuery(
         filter,
         m_deviceDao,
         m_objectTypeDao,
-        {"guid", "track_start_ms", "track_end_ms"},
+        {"guid", {"track_start_ms", "track_end_ms"}},
         &objectFilter);
 
     auto objectFilterSqlText = objectFilter.toString();

@@ -247,6 +247,7 @@ copyBins()
             echo "Copying (binary) $(basename "$FILE")"
             cp -r "$FILE" "$STAGE_MEDIASERVER_BIN/"
         done
+        cp -r "$SOURCE_DIR/nx_log_viewer.html" "$STAGE_MEDIASERVER_BIN/"
     done
 
     if [ "$BOX" = "bpi" ]

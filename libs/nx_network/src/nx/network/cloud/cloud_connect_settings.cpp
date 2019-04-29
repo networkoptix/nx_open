@@ -4,7 +4,7 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-constexpr std::chrono::milliseconds 
+constexpr std::chrono::milliseconds
     CloudConnectSettings::kDefaltDelayBeforeSendingConnectToMediatorOverTcp;
 
 CloudConnectSettings::CloudConnectSettings(const CloudConnectSettings& right):
@@ -12,7 +12,6 @@ CloudConnectSettings::CloudConnectSettings(const CloudConnectSettings& right):
     isUdpHpEnabled(right.isUdpHpEnabled),
     isCloudProxyEnabled(right.isCloudProxyEnabled),
     isDirectTcpConnectEnabled(right.isDirectTcpConnectEnabled),
-    useHttpConnectToListenOnRelay(right.useHttpConnectToListenOnRelay),
     delayBeforeSendingConnectToMediatorOverTcp(right.delayBeforeSendingConnectToMediatorOverTcp),
     m_originatingHostAddressReplacement(right.originatingHostAddressReplacement())
 {
@@ -27,8 +26,7 @@ CloudConnectSettings& CloudConnectSettings::operator=(const CloudConnectSettings
     isUdpHpEnabled = right.isUdpHpEnabled;
     isCloudProxyEnabled = right.isCloudProxyEnabled;
     isDirectTcpConnectEnabled = right.isDirectTcpConnectEnabled;
-    useHttpConnectToListenOnRelay = right.useHttpConnectToListenOnRelay;
-    delayBeforeSendingConnectToMediatorOverTcp = 
+    delayBeforeSendingConnectToMediatorOverTcp =
         right.delayBeforeSendingConnectToMediatorOverTcp;
 
     auto val = right.originatingHostAddressReplacement();

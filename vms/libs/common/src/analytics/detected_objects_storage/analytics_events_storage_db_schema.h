@@ -124,7 +124,7 @@ CREATE INDEX idx_event_for_streaming_cursor ON event(device_id, timestamp_usec_u
 static constexpr char kConvertTimestampToMillis[] =
 R"sql(
 
-UPDATE event SET timestamp_usec_utc = timestamp_usec_utc / 1000
+UPDATE event SET timestamp_usec_utc = timestamp_usec_utc / 1000;
 
 )sql";
 
@@ -137,7 +137,7 @@ UPDATE event SET
     box_top_left_x = round(box_top_left_x * %1),
     box_top_left_y = round(box_top_left_y * %1),
     box_bottom_right_x = round(box_bottom_right_x * %1),
-    box_bottom_right_y = round(box_bottom_right_y * %1)
+    box_bottom_right_y = round(box_bottom_right_y * %1);
 
 )sql";
 
@@ -169,7 +169,7 @@ GROUP BY device_id, timestamp_usec_utc/60000;
 static constexpr char kConvertDurationToMillis[] =
 R"sql(
 
-UPDATE event SET duration_usec = duration_usec / 1000
+UPDATE event SET duration_usec = duration_usec / 1000;
 
 )sql";
 
@@ -197,11 +197,10 @@ CREATE TABLE object(
     attributes_id               INTEGER
 );
 
-CREATE INDEX idx_object_device_id ON object(device_id);
 CREATE INDEX idx_object_object_type_id ON object(object_type_id);
-CREATE INDEX idx_object_guid ON object(guid);
-CREATE INDEX idx_track_time_ms ON object(track_start_ms, track_end_ms);
 CREATE INDEX idx_object_attributes_id ON object(attributes_id);
+CREATE INDEX idx_object_device_id_track_start_ms ON object(
+    device_id, track_start_ms);
 
 CREATE TABLE object_search(
     id                          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -212,23 +211,27 @@ CREATE TABLE object_search(
     box_bottom_right_y          INTEGER
 );
 
-CREATE INDEX idx_object_search_box ON object_search(
-    box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y);
+CREATE INDEX idx_object_search_box_timestamp ON object_search(
+    box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y,
+    timestamp_seconds_utc);
 
 CREATE TABLE object_search_to_object(
     object_search_id            INTEGER,
     object_id                   INTEGER
 );
 
+CREATE INDEX idx_object_search_to_object_full ON object_search_to_object(
+    object_search_id, object_id);
+
 )sql";
 
 //-------------------------------------------------------------------------------------------------
-// META-237.
-static constexpr char kObjectTrackStartTimeIndex[] =
+// META-246.
+static constexpr char kObjectBestShot[] =
 R"sql(
 
-CREATE INDEX idx_object_device_id_track_start_ms ON object(device_id, track_start_ms);
-REINDEX idx_object_device_id_track_start_ms;
+ALTER TABLE object ADD COLUMN best_shot_timestamp_ms INTEGER;
+ALTER TABLE object ADD COLUMN best_shot_rect BLOB;
 
 )sql";
 

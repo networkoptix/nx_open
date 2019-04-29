@@ -28,17 +28,15 @@ using namespace nx::sdk::analytics;
 using namespace nx::vms::api::analytics;
 
 MetadataHandler::MetadataHandler(
-    QnMediaServerModule* serverModule,
-    QnVirtualCameraResourcePtr device,
-    QnUuid engineId)
-    :
+    QnMediaServerModule* serverModule, QnVirtualCameraResourcePtr device, QnUuid engineId):
     ServerModuleAware(serverModule),
-    m_resource(device),
-    m_engineId(engineId),
+    m_resource(device), m_engineId(engineId),
     m_metadataLogger("outgoing_metadata_", m_resource->getId(), m_engineId)
 {
-    connect(this, &MetadataHandler::sdkEventTriggered,
-        serverModule->eventConnector(), &event::EventConnector::at_analyticsSdkEvent,
+    connect(this,
+        &MetadataHandler::sdkEventTriggered,
+        serverModule->eventConnector(),
+        &event::EventConnector::at_analyticsSdkEvent,
         Qt::QueuedConnection);
 }
 
@@ -75,11 +73,18 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
         handled = true;
     }
 
+    if (const auto objectTrackBestShotPacket =
+            queryInterfacePtr<IObjectTrackBestShotPacket>(metadataPacket))
+    {
+        handleObjectTrackBestShotPacket(objectTrackBestShotPacket);
+        handled = true;
+    }
+
     if (!handled)
     {
-        NX_VERBOSE(this) << "WARNING: Received unsupported metadata packet with timestampUs "
-            << metadataPacket->timestampUs() << ", durationUs " << metadataPacket->durationUs()
-            << "; ignoring";
+        NX_VERBOSE(this,
+            "WARNING: Received unsupported metadata packet with timestampUs %1; ignoring",
+            metadataPacket->timestampUs());
     }
 }
 
@@ -117,8 +122,11 @@ void MetadataHandler::handleObjectMetadataPacket(
         const auto box = item->boundingBox();
         object.boundingBox = QRectF(box.x, box.y, box.width, box.height);
 
-        NX_VERBOSE(this) << __func__ << lm("(): x %1, y %2, width %3, height %4, typeId %5, id %6")
-            .args(box.x, box.y, box.width, box.height, object.objectTypeId, object.objectId);
+        NX_VERBOSE(this)
+            << __func__
+            << lm("(): x %1, y %2, width %3, height %4, typeId %5, id %6")
+                   .args(
+                       box.x, box.y, box.width, box.height, object.objectTypeId, object.objectId);
 
         for (int i = 0; i < item->attributeCount(); ++i)
         {
@@ -152,9 +160,37 @@ void MetadataHandler::handleObjectMetadataPacket(
         m_metadataLogger.pushObjectMetadata(data);
 }
 
+void MetadataHandler::handleObjectTrackBestShotPacket(
+    const nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket>& objectTrackBestShotPacket)
+{
+    nx::common::metadata::DetectionMetadataPacket bestShotPacket;
+    bestShotPacket.timestampUsec = objectTrackBestShotPacket->timestampUs();
+    if (bestShotPacket.timestampUsec <= 0)
+    {
+        NX_WARNING(
+            this, "Invalid ObjectTrackBestShotPacket timestamp: %1", bestShotPacket.timestampUsec);
+    }
+
+    bestShotPacket.durationUsec = 0;
+    bestShotPacket.deviceId = m_resource->getId();
+
+    nx::common::metadata::DetectedObject bestShot;
+    bestShot.objectId =
+        nx::vms_server_plugins::utils::fromSdkUuidToQnUuid(objectTrackBestShotPacket->trackId());
+    bestShot.bestShot = true;
+    const auto box = objectTrackBestShotPacket->boundingBox();
+    bestShot.boundingBox = QRectF(box.x, box.y, box.width, box.height);
+
+    bestShotPacket.objects.push_back(std::move(bestShot));
+
+    if (m_metadataSink)
+        m_metadataSink->putData(nx::common::metadata::toMetadataPacket(bestShotPacket));
+
+	// TODO: #dmishin pass best shots to the metadata logger.
+}
+
 void MetadataHandler::handleEventMetadata(
-    const Ptr<const IEventMetadata>& eventMetadata,
-    qint64 timestampUsec)
+    const Ptr<const IEventMetadata>& eventMetadata, qint64 timestampUsec)
 {
     auto eventState = nx::vms::api::EventState::undefined;
 
@@ -170,9 +206,8 @@ void MetadataHandler::handleEventMetadata(
 
     if (descriptor->flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
     {
-        eventState = eventMetadata->isActive()
-            ? nx::vms::api::EventState::active
-            : nx::vms::api::EventState::inactive;
+        eventState = eventMetadata->isActive() ? nx::vms::api::EventState::active
+                                               : nx::vms::api::EventState::inactive;
 
         const bool isDuplicate = eventState == nx::vms::api::EventState::inactive
             && lastEventState(eventTypeId) == nx::vms::api::EventState::inactive;
@@ -186,8 +221,7 @@ void MetadataHandler::handleEventMetadata(
 
     setLastEventState(eventTypeId, eventState);
 
-    auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
-        m_resource,
+    auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(m_resource,
         m_engineId,
         eventTypeId,
         eventState,
