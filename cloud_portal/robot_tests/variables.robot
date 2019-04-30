@@ -159,6 +159,18 @@ ${AVAILABLE SYSTEMS LIST}             //a[@href='/systems']
 ${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
 ${SYSTEM SEARCH X BUTTON}             //a[@ng-click="search.value=''"]
 
+#Merge
+${MERGE BUTTON SYSTEM}                //button[@ng-click="mergeSystems()"]
+${MERGE DIALOG}                       //nx-modal-merge-content
+${MERGE SYSTEM DROPDOWN}              ${MERGE DIALOG}//button[@id="genericSelect"]
+${MERGE X BUTTON}                     ${MERGE DIALOG}//button[@class="close"]
+${MERGE OK BUTTON}                    ${MERGE DIALOG}//button[@class="btn btn-primary" and contains(text(),"${OK TEXT}"]
+${MERGE CANCEL BUTTON}                ${MERGE DIALOG}//button[@class="btn btn-default"]
+${MERGE BUTTON MODAL}                 ${MERGE DIALOG}//button[@class="btn btn-primary" and contains(text(),"${MERGE SYSTEMS TEXT}"]
+${MERGE PASSWORD INPUT}               ${MERGE DIALOG}//imput=[@id="mergePassword"]
+
+
+
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
 ${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[text()='${CANCEL BUTTON TEXT}']

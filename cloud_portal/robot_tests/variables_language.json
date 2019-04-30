@@ -102,5 +102,8 @@
     "PASSWORD INCORRECT BADGE TEXT"        :    "incorrect",
 
     "IPVD TITLE TEXT"                      :    "Supported IP Video Devices",
-    "IPVD ADVANCED SEARCH BUTTON TEXT"     :    "Avanced Search"
+    "IPVD ADVANCED SEARCH BUTTON TEXT"     :    "Avanced Search",
+
+    "OK TEXT"                              :    "OK",
+    "MERGE SYSTEMS TEXT"                   :    "Merge Systems"
 }
