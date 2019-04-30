@@ -760,6 +760,12 @@ bool Camera::fixMulticastParametersIfNeeded(
     nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
     nx::vms::api::StreamIndex streamIndex)
 {
+    static const QString kDefaultPrimaryStreamMulticastAddress{"239.0.0.10"};
+    static const QString kDefaultSecondaryStreamMulticastAddress{"239.0.0.11"};
+    static constexpr int kDefaultPrimaryStreamMulticastPort{2048};
+    static constexpr int kDefaultSecondaryStreamMulticastPort{2050};
+    static constexpr int kDefaultMulticastTtl{ 1 };
+
     if (!NX_ASSERT(inOutMulticastParameters, "Multicast parameters must be non-null"))
         return false;
 
