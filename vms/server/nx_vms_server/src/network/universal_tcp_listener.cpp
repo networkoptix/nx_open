@@ -124,8 +124,8 @@ void QnUniversalTcpListener::destroyServerSocket(
         NX_ASSERT(m_serverSocket.get() == serverSocket);
         std::swap(m_serverSocket, serverSocketToDestroy);
     }
-
-    serverSocketToDestroy->pleaseStopSync();
+    if (serverSocketToDestroy)
+        serverSocketToDestroy->pleaseStopSync();
     serverSocketToDestroy.reset();
 }
 
