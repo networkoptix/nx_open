@@ -6,6 +6,7 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out, user_lo
 from django.dispatch import receiver
 
 from api.models import *
+from api.controllers.cloud_api import Account as Clouddb_Account
 from api.helpers.exceptions import APILogicException, ErrorCodes, APINotAuthorisedException
 
 
@@ -23,7 +24,7 @@ class AccountBackend(ModelBackend):
     def authenticate(self, request=None, username=None, password=None):
         try:
             ip = get_ip(request)
-            user = Account.get(username, password, ip)  # first - check cloud_db
+            user = Clouddb_Account.get(username, password, ip)  # first - check cloud_db
         except APINotAuthorisedException as exception:
             if request and exception.error_code == ErrorCodes.account_blocked:
                 request.session['account_blocked'] = True
