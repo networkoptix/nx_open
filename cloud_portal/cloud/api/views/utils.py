@@ -311,7 +311,7 @@ def get_ipvd(request):
         num_cameras = len(set(camera_names))
         # ---------------------
 
-        vendors = vendors_dict.values()
+        vendors = list(vendors_dict.values())
 
         ipvd = {
             "cameras": cameras,
