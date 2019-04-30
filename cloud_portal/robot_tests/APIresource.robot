@@ -3,11 +3,13 @@ Resource          resource.robot
 Library           RequestsLibrary
 
 *** variables ***
+${default name}    API made system
+${customization}    default
 
 *** Keywords ***
 Bind System
     [Arguments]    ${auth}    ${cloud url}
-    &{data}=    Create Dictionary   name=kyle-VirtualBox    customization=default
+    &{data}=    Create Dictionary   name=${default name}    customization=${customization}
     Create Digest Session    bind session    ${cloud url}    auth=${auth}
     ${resp}=    Post Request    bind session    /cdb/system/bind    json=${data}
     Should Be Equal As Strings    ${resp.status_code}    200
