@@ -108,7 +108,7 @@ void GetPostTunnelServer<ApplicationData...>::registerRequestHandlers(
         path,
         [this](auto&&... args)
         {
-            processTunnelInitiationRequest(std::forward<decltype(args)>(args)...);
+            this->processTunnelInitiationRequest(std::forward<decltype(args)>(args)...);
         });
 }
 
