@@ -4,6 +4,7 @@
 
 #include <test_support/utils.h>
 #include <common/static_common_module.h>
+#include <iostream>
 
 namespace {
 
@@ -62,6 +63,6 @@ int main(int argc, char** argv)
             return nx::utils::test::DeinitFunctions();
         });
     if (parser->isSet("help"))
-        parser->showHelp();
+        std::cout << parser->helpText().toUtf8();
     return result;
 }

@@ -275,8 +275,8 @@ QnMediaServerModule::QnMediaServerModule(
     m_archiveIntegrityWatcher = store(new nx::vms::server::ServerArchiveIntegrityWatcher(this));
     m_updateManager = store(new nx::vms::server::ServerUpdateManager(this));
     m_serverUpdateTool = store(new QnServerUpdateTool(this));
-    auto dataDir = settings().dataDir();
-    m_motionHelper = store(new QnMotionHelper(settings().dataDir(), this));
+    auto dataDir = closeDirPath(settings().dataDir());
+    m_motionHelper = store(new QnMotionHelper(dataDir + QString("record_catalog"), this));
 
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
 
