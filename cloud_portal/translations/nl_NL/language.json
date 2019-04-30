@@ -196,7 +196,7 @@
     "successDeleted": "Systeem {{systemName}} is succesvol verwijderd van uw account",
     "mergeFailed": "Het samenvoegen van systemen is mislukt",
     "mergeStart": "Systemen zijn begonnen samen te voegen",
-    "mergeSuccess": "System merge completed",
+    "mergeSuccess": "Systeem samenvoegen voltooid",
     "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}",
     "unknownName": "Onbekende naam voor systeem (veroorzaakt door samenvoeging in de cloud)"
   },

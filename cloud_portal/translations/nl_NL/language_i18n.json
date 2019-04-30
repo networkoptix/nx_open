@@ -57,7 +57,7 @@
 	"System {{targetSystem.name}} is offline and cannot be merged with the current one.": "Systeem {{targetSystem.name}} is offline en kan niet worden samengevoegd met het huidige exemplaar.",
 	"Systems": "Systemen",
 	"Systems of such size may work but will be unstable and have troubles with updates and synchronisation.": "Systemen van dergelijke omvang kunnen werken, maar zullen onstabiel zijn en problemen hebben met updates en synchronisatie.",
-	"Take the name and settings from": "Take the name and settings from",
+	"Take the name and settings from": "Gebruik de systeemnaam en instellingen over van",
 	"The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.": "De inloggegevens van deze gebruiker worden zichtbaar! U moet een aangepaste rol \"Openbare Gebruiker\" maken met alleen toegang voor de camera's die zijn geselecteerd voor openbaar gebruik en waaraan alleen de minimaal vereiste weergaverechten zijn toegewezen. Deze \"Openbare Gebruiker\" mag geen systeembrede toegang hebben.",
 	"There will be more than": "Er zal meer zijn dan",
 	"Too many attempts. Try again in a minute.": "Te veel pogingen. Probeer het later opnieuw.",

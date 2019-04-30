@@ -37,12 +37,11 @@
         </div>
         <br>
         <div ng-if="mergeTargetSystem.name" >
-            <div><strong>{{mergeTargetSystem.name}}</strong>
-                is being merged to this system</div>
+            <div><strong>{{mergeTargetSystem.name}}</strong> è stato unito a questo sistema</div>
             <hr />
             <div class="merge-info-text light-text">A seconda della dimensione del database può richiedere fino a diverse ore</div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Termine unione sistemi</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
@@ -50,16 +49,15 @@
         </div>
         <br>
         <div ng-if="mergeTargetSystem.name">
-            <div>This system is being merged to
-                <strong>{{mergeTargetSystem.name}}</strong></div>
+            <div>Questo sistema viene unito a <strong>{{mergeTargetSystem.name}}</strong></div>
             <hr />
             <div class="merge-info-text light-text">
                 <p>A seconda delle dimensioni del database possono essere necessarie diverse ore.</p>
                 <p>Finché l'unione non è terminata, puoi accedere a questo sistema e guardare le immagini, ma non puoi modificare alcuna impostazione.</p>
-                <p>When merge is finished, all users and cameras from this system will become available
-                    in <strong>{{mergeTargetSystem.name}}</strong> System, and this system will be deleted.</p>
+                <p>Una volta completata l'unione, tutti gli utenti e le telecamere di questo sistema diventeranno disponibili
+                nel sistema "<strong>{{mergeTargetSystem.name}}</strong> "e questo sistema sarà cancellato.</p>
             </div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Termine unione sistemi</div>
     </div>
 </div>

@@ -141,14 +141,14 @@
     "lostConnection": "Connexion à {{systemName}} perdu",
     "thisSystem": "le système",
     "oldSafariNotSupported": "Les versions de Safari antérieures à 10 ne sont pas supportées",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
-    "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/download\">latest build</a>.",
-    "FAIL": "System <strong>{{failedSystem}}</strong> is currently unreachable.<br>Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "Certaines listes serveurs existent dans les deux systèmes - dans le système sélectionné et dans le système actuel. <br>Supprimez les serveurs hors ligne et incompatibles de chaque système, puis réessayez.",
+    "mergedSystemIsOffline": "Système <strong>{{failedSystem}}</strong> hors ligne.",
+    "INCOMPATIBLE": "Les systèmes ont des versions de logiciel différentes. Veuillez mettre à jour les deux versions vers <a href=\"/download\">la dernière version</a>.",
+    "FAIL": "Le système <strong>{{failedSystem}}</strong> est actuellement inaccessible. <br>Essayez à nouveau dans quelques instants ou contactez <a href=\"%SUPPORT_LINK%\" target=\"_blank\"> support</a>."
   },
   "merging": {
     "mergeFailedTitle": "Fusion des systèmes a échoué",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "commonText": "Échec de la fusion des systèmes <strong>{{primarySystem}}</strong> et <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "bon",
@@ -194,8 +194,8 @@
     "confirmUnshareAction": "Supprimer",
     "successDisconnected": "Système correctement déconnecté de %PRODUCT_NAME%",
     "successDeleted": "Système {{systemName}} a correctement été supprimé de votre compte",
-    "mergeFailed": "System merge failed",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "Fusion système a échoué",
+    "mergeStart": "Les systèmes ont commencé à fusionner",
     "mergeSuccess": "Fusion du système terminée",
     "permissionsRemoved": "Autorisations retirées de {{email}}",
     "unknownName": "Nom inconnu pour le système (causé par la fusion nuage)"

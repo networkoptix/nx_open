@@ -57,7 +57,7 @@
 	"System {{targetSystem.name}} is offline and cannot be merged with the current one.": "Sistem {{targetSystem.name}} çevrimdışı ve güncel sistemle birleştirilemez.",
 	"Systems": "Sistemler",
 	"Systems of such size may work but will be unstable and have troubles with updates and synchronisation.": "Bu büyüklükteki sistemler belki çalışabilir ancak kararsız olabilir ve güncelleme senkroniyle ile ilgili sorunlar yaşayabilir.",
-	"Take the name and settings from": "Take the name and settings from",
+	"Take the name and settings from": "Sistem adını ve ayarlarını al",
 	"The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.": "Bu kullanıcının kimlik bilgileri açıkta kalacak! Genel kullanım için seçilen kameralara yalnızca\n            erişimi olan ve yalnızca gerekli minimum görüntüleme izinleri atanan özel bir \"Genel Kullanıcı\" rolü oluşturmanız gerekir. Bu\n            \"Genel Kullanıcı\", sistem genelinde herhangi bir türde erişime sahip olmamalıdır.",
 	"There will be more than": "Daha fazla olacak",
 	"Too many attempts. Try again in a minute.": "Çok fazla deneme yapıldı. Bir dakika sonra tekrar deneyiniz.",

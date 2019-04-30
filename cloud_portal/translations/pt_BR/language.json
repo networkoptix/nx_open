@@ -40,7 +40,7 @@
   "systemStatuses": {
     "activated": "ativado",
     "incompatible": "incompatível",
-    "merging": "merging",
+    "merging": "mesclagem",
     "notActivated": "não ativado",
     "online": "online",
     "offline": "desligada",
@@ -141,14 +141,14 @@
     "lostConnection": "Conexão a {{systemName}} perdida",
     "thisSystem": "o sistema",
     "oldSafariNotSupported": "Versões do Safari anteriores à 10 não são suportadas",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
+    "DUPLICATE_MEDIASERVER_FOUND": "Um dos servidores está listado como existente em ambos os sistemas – no selecionado e no atual.<br>Remova os servidores que estejam offline e incompatíveis de cada sistema e tente novamente.",
     "mergedSystemIsOffline": "O Sistema <strong>{{failedSystem}}</strong> está offline.",
     "INCOMPATIBLE": "Os sistemas têm versões de software diferentes. Por favor, actualize os dois para o <a href=\"/download\">build mais recente</a>.",
     "FAIL": "O sistema <strong>{{failedSystem}}</strong> está actualmente inacessível.<br> Tente novamente em alguns instantes ou entre em contato com o <a href=\"%SUPPORT_LINK%\" target=\"_blank\">suporte</a>."
   },
   "merging": {
     "mergeFailedTitle": "Falha na fusão de Sistemas",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "commonText": "Falha na fusão dos sistemas <strong>{{primarySystem}}</strong> e <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "boa",
@@ -194,7 +194,7 @@
     "confirmUnshareAction": "Apagar",
     "successDisconnected": "O Sistema foi desconectado de %PRODUCT_NAME% com sucesso",
     "successDeleted": "O sistema {{systemName}} foi apagado com sucesso da sua conta",
-    "mergeFailed": "System merge failed",
+    "mergeFailed": "Falha na fusão de Sistemas",
     "mergeStart": "Systems have started merging",
     "mergeSuccess": "Mesclagem de sistema concluída",
     "permissionsRemoved": "As permissões foram removidas de {{email}}",
