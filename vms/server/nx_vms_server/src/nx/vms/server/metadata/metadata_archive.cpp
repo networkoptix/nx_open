@@ -8,7 +8,6 @@ namespace nx::vms::server::metadata {
 
 static const char kVersion = 1;
 static const int kRecordsPerIteration = 1024;
-static const int kGridDataSize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128;
 
 MetadataArchive::MetadataArchive(
     const QString& filePrefix,
@@ -374,14 +373,31 @@ void MetadataArchive::loadDataFromIndexDesc(
     }
 }
 
-QnTimePeriodList MetadataArchive::matchPeriod(
+QnTimePeriodList MetadataArchive::matchPeriod(const Filter& filter)
+#if 0
     const QRegion& region,
     qint64 msStartTime,
     qint64 msEndTime,
     int detailLevel,
     int limit,
-    Qt::SortOrder sortOrder)
+    Qt::SortOrder sortOrder
+#endif
+
 {
+    qint64 msStartTime = filter.startTime.count();
+    qint64 msEndTime = filter.endTime.count();
+
+    QRegion region;
+    for (const auto& normilizedRect: filter.region)
+    {
+        region += QRect(
+            normilizedRect.x() * Qn::kMotionGridWidth,
+            normilizedRect.y() * Qn::kMotionGridHeight,
+            normilizedRect.width() * Qn::kMotionGridWidth,
+            normilizedRect.height() * Qn::kMotionGridHeight);
+    }
+
+
     if (minTime() != (qint64)AV_NOPTS_VALUE)
         msStartTime = qMax(minTime(), msStartTime);
     msEndTime = qMin(msEndTime, m_maxMetadataTime.load());
@@ -401,7 +417,7 @@ QnTimePeriodList MetadataArchive::matchPeriod(
 
     QnTimePeriodList rez;
     QFile metadataFile, indexFile;
-    const bool descendingOrder = sortOrder == Qt::SortOrder::DescendingOrder;
+    const bool descendingOrder = filter.sortOrder == Qt::SortOrder::DescendingOrder;
 
     while (msStartTime < msEndTime)
     {
@@ -429,16 +445,16 @@ QnTimePeriodList MetadataArchive::matchPeriod(
 
             if (descendingOrder)
             {
-                loadDataFromIndexDesc(metadataFile, indexHeader, index, startItr, endItr, detailLevel, limit,
+                loadDataFromIndexDesc(metadataFile, indexHeader, index, startItr, endItr, filter.detailLevel.count(), filter.limit,
                     buffer, mask, maskStart, maskEnd, rez);
             }
             else
             {
-                loadDataFromIndex(metadataFile, indexHeader, index, startItr, endItr, detailLevel, limit,
+                loadDataFromIndex(metadataFile, indexHeader, index, startItr, endItr, filter.detailLevel.count(), filter.limit,
                     buffer, mask, maskStart, maskEnd, rez);
             }
 
-            if (limit && rez.size() == limit)
+            if (filter.limit > 0 && rez.size() == filter.limit)
                 break;
         }
 

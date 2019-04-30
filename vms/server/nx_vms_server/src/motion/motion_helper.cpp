@@ -12,7 +12,7 @@
 // ------------------------ QnMotionHelper ------------------------
 
 QnMotionHelper::QnMotionHelper(const QString& dataDir, QObject* parent):
-    MetadataHelper(m_dataDir, parent)
+    MetadataHelper(dataDir, parent)
 {
 }
 

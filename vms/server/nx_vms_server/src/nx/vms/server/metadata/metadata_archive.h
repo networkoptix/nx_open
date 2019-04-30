@@ -46,14 +46,20 @@ public:
     qint64 maxTime() const;
     int aggregationIntervalSeconds() const;
 
-    QnTimePeriodList matchPeriod(
-        const QRegion& region,
-        qint64 startTime,
-        qint64 endTime,
-        int detailLevel,
-        int limit,
-        Qt::SortOrder sortOrder);
+    struct Filter
+    {
+        QList<QRectF> region;
+        std::chrono::milliseconds startTime{ 0 };
+        std::chrono::milliseconds endTime{ 0 };
+        std::chrono::milliseconds detailLevel = std::chrono::milliseconds::zero();
+        int limit = -1;
+        Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder;
+    };
+
+    QnTimePeriodList matchPeriod(const Filter& filter);
 protected:
+    static const int kGridDataSize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128;
+
     QString getFilePrefix(const QDate& datetime) const;
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate) const;
     void fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile) const;
