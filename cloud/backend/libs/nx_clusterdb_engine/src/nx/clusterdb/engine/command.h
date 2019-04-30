@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <nx/fusion/model_functions_fwd.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/uuid.h>
 
 #include <nx/vms/api/data/timestamp.h>
@@ -55,7 +55,7 @@ QN_FUSION_DECLARE_FUNCTIONS(
 class NX_DATA_SYNC_ENGINE_API CommandHeader
 {
 public:
-    using PersistentInfo = PersistentInfo;
+    using PersistentInfo = engine::PersistentInfo;
 
     CommandHeader() = default;
     CommandHeader(int value, QnUuid peerId);
