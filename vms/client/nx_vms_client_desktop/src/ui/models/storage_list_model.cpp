@@ -260,8 +260,9 @@ QVariant QnStorageListModel::mouseCursorData(const QModelIndex& index) const
         return QVariant();
 
     if (index.column() == ActionsColumn)
-        if (!index.data(Qt::DisplayRole).toString().isEmpty())
-            return QVariant::fromValue<int>(Qt::PointingHandCursor);
+        if (!index.data(Qt::DisplayRole).toString().isEmpty()
+            && m_storages.at(index.row()).id != m_metadataStorageId)
+                return QVariant::fromValue<int>(Qt::PointingHandCursor);
 
     return QVariant();
 }
@@ -457,6 +458,9 @@ bool QnStorageListModel::canRemoveStorage(const QnStorageModelInfo& data) const
         return false;
 
     if (isStoragePoolInRebuild(data))
+        return false;
+
+    if (data.id == m_metadataStorageId)
         return false;
 
     return data.isExternal || !data.isOnline;
