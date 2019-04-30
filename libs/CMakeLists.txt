@@ -3,7 +3,10 @@ add_subdirectory(nx_sql)
 add_subdirectory(nx_fusion)
 add_subdirectory(nx_network)
 add_subdirectory(udt)
-add_subdirectory(nx_maxminddb)
+
+if (withClouds)
+    add_subdirectory(nx_maxminddb)
+endif()
 
 #if(((LINUX AND arch STREQUAL "x64") OR (WINDOWS AND arch STREQUAL "x64")) AND withClouds)
 if(arch STREQUAL "x64" AND withClouds)

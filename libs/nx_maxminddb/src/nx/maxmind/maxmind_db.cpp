@@ -1,19 +1,18 @@
 #include "maxmind_db.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx::maxmind {
 
 namespace {
 
 ResultCode toResultCode(int mmdbError)
 {
-    // Maxmind has no "not found" error. it is provided by a boolean in its structures,
-    // so it must be checked seperately.
     switch (mmdbError)
     {
         case MMDB_SUCCESS:
             return ResultCode::Ok;
         case MMDB_INVALID_LOOKUP_PATH_ERROR:
-            return ResultCode::NotFound;
         case MMDB_FILE_OPEN_ERROR:
         case MMDB_CORRUPT_SEARCH_TREE_ERROR:
         case MMDB_INVALID_METADATA_ERROR:

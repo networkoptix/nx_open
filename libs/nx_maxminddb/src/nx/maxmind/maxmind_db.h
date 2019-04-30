@@ -6,8 +6,6 @@
 
 #include <maxminddb.h>
 
-#include <nx/utils/log/log.h>
-
 namespace nx::maxmind {
 
 enum class ResultCode
