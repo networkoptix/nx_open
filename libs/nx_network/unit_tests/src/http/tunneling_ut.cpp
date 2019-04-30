@@ -37,7 +37,7 @@ class HttpTunneling:
 public:
     HttpTunneling():
         m_tunnelingServer(
-            std::bind(&HttpTunneling::saveServerTunnel, this, std::placeholders::_1),
+            [this](auto&&... args) { saveServerTunnel(std::forward<decltype(args)>(args)...); },
             this)
     {
         m_clientFactoryBak = detail::ClientFactory::instance().setCustomFunc(

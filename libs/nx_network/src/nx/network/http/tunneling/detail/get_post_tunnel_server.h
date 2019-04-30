@@ -99,8 +99,6 @@ void GetPostTunnelServer<ApplicationData...>::registerRequestHandlers(
     const std::string& basePath,
     server::rest::MessageDispatcher* messageDispatcher)
 {
-    using namespace std::placeholders;
-
     const auto path = this->requestPath().empty()
         ? url::joinPath(basePath, kGetPostTunnelPath)
         : this->requestPath();
@@ -108,7 +106,10 @@ void GetPostTunnelServer<ApplicationData...>::registerRequestHandlers(
     messageDispatcher->registerRequestProcessorFunc(
         nx::network::http::Method::get,
         path,
-        std::bind(&GetPostTunnelServer::processTunnelInitiationRequest, this, _1, _2));
+        [this](auto&&... args)
+        {
+            processTunnelInitiationRequest(std::forward<decltype(args)>(args)...);
+        });
 }
 
 template<typename ...ApplicationData>
@@ -173,8 +174,6 @@ void GetPostTunnelServer<ApplicationData...>::openUpTunnel(
     const std::string& requestPath,
     ApplicationData... requestData)
 {
-    using namespace std::placeholders;
-
     auto httpPipe = std::make_unique<network::http::AsyncMessagePipeline>(
         connection->takeSocket());
     httpPipe->setOnConnectionClosed(
@@ -194,7 +193,10 @@ void GetPostTunnelServer<ApplicationData...>::openUpTunnel(
             std::make_tuple(std::move(requestData)...)});
 
     insertionResult.first->second.connection->setMessageHandler(
-        std::bind(&GetPostTunnelServer::onMessage, this, httpPipePtr, _1));
+        [this, httpPipePtr](auto&&... args)
+        {
+            onMessage(httpPipePtr, std::forward<decltype(args)>(args)...);
+        });
     insertionResult.first->second.connection->startReadingConnection();
 }
 
