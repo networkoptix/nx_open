@@ -37,7 +37,7 @@ class HttpTunneling:
 public:
     HttpTunneling():
         m_tunnelingServer(
-            std::bind(&HttpTunneling::saveServerTunnel, this, std::placeholders::_1),
+            [this](auto&&... args) { saveServerTunnel(std::forward<decltype(args)>(args)...); },
             this)
     {
         m_clientFactoryBak = detail::ClientFactory::instance().setCustomFunc(
@@ -181,12 +181,12 @@ protected:
     }
 
 private:
+    nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverTunnels;
     Server<> m_tunnelingServer;
+    nx::utils::SyncQueue<OpenTunnelResult> m_clientTunnels;
     std::unique_ptr<Client> m_tunnelingClient;
     detail::ClientFactory m_localFactory;
     detail::ClientFactory::Function m_clientFactoryBak;
-    nx::utils::SyncQueue<OpenTunnelResult> m_clientTunnels;
-    nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverTunnels;
     std::unique_ptr<TestHttpServer> m_httpServer;
     http::HttpHeaders m_customHeaders;
     http::Request m_lastOpenTunnelRequestReceivedByServer;

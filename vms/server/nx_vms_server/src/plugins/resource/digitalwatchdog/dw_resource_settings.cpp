@@ -123,7 +123,7 @@ QString QnWin4NetCameraProxy::fromInnerValue(const QnCameraAdvancedParameter& pa
     const QString& value) const
 {
     bool ok = true;
-    std::size_t idx = value.toUInt(&ok);
+    int idx = value.toUInt(&ok);
 
     if (!ok)
         return QString();

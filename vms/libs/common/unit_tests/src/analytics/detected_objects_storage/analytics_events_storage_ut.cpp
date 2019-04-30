@@ -1310,7 +1310,8 @@ TEST_F(AnalyticsDbCursor, reads_all_available_data)
 TEST_F(AnalyticsDbCursor, reads_all_matched_data)
 {
     givenRandomFilter();
-    setSortOrder(nx::utils::random::number<bool>() ? Qt::AscendingOrder : Qt::DescendingOrder);
+    // NOTE: Currently, the cursor is forward only.
+    setSortOrder(Qt::AscendingOrder);
 
     whenReadDataUsingCursor();
     thenResultMatchesExpectations();

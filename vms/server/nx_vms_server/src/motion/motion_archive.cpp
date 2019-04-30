@@ -202,7 +202,7 @@ QnTimePeriodList QnMotionArchive::matchPeriod(
     simd128i mask[Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128];
     int maskStart, maskEnd;
 
-    NX_ASSERT(!useSSE2() || ((unsigned long)mask) % 16 == 0);
+    NX_ASSERT(!useSSE2() || ((std::ptrdiff_t)mask) % 16 == 0);
     QnMetaDataV1::createMask(region, (char*)mask, &maskStart, &maskEnd);
 
     QnTimePeriodList rez;

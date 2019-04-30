@@ -124,8 +124,8 @@ void QnUniversalTcpListener::destroyServerSocket(
         NX_ASSERT(m_serverSocket.get() == serverSocket);
         std::swap(m_serverSocket, serverSocketToDestroy);
     }
-
-    serverSocketToDestroy->pleaseStopSync();
+    if (serverSocketToDestroy)
+        serverSocketToDestroy->pleaseStopSync();
     serverSocketToDestroy.reset();
 }
 
@@ -179,7 +179,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
                 std::move(registrationOnMediatorRetryPolicy));
         cloudServerSocket->listen(0);
         m_multipleServerSocket->addSocket(std::move(cloudServerSocket));
-        m_cloudSocketIndex = m_multipleServerSocket->count() - 1;
+        m_cloudSocketIndex = (int) m_multipleServerSocket->count() - 1;
     }
     else
     {

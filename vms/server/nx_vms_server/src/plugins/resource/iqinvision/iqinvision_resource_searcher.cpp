@@ -9,6 +9,7 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <nx/network/socket_common.h>
 
 #if !defined(Q_OS_WIN)
     #include <arpa/inet.h>
@@ -257,8 +258,8 @@ void QnPlIqResourceSearcher::processNativePacket(
         return;
 
     QnPlIqResourcePtr resource (new QnPlIqResource(m_serverModule));
-    in_addr* peerAddr = (in_addr*) (responseData.data() + 32);
-    QHostAddress peerAddress(QLatin1String(inet_ntoa(*peerAddr)));
+    const in_addr* peerAddr = (in_addr*) (responseData.data() + 32);
+    nx::network::HostAddress peerAddress(*peerAddr);
     resource->setTypeId(rt);
     resource->setName(nameStr);
     resource->setModel(nameStr);
