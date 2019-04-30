@@ -3,7 +3,8 @@ import json
 import errno
 import codecs
 import sys
-from shutil import copyfile
+
+US_LANGUAGE_NAME = "English (US)"
 
 
 def make_dir(filename):
@@ -60,31 +61,58 @@ def generate_languages_files(languages, template_filename):
     with codecs.open(template_filename, 'r', 'utf-8') as file_descriptor:
         template = json.load(file_descriptor)
 
+    with codecs.open('static/language_i18n.json', 'r', 'utf-8') as file_descriptor:
+        i18n_template = json.load(file_descriptor)
+
     for lang in languages:
         all_strings = {}
         merge(template, all_strings)
         language_json_filename = os.path.join("../../../..", "translations", lang, 'language.json')
 
         print("Load: " + language_json_filename)
-        with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
-            data = json.load(file_descriptor)
-            data["language"] = lang
+        if os.path.exists(language_json_filename):
+            with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
+                data = json.load(file_descriptor)
+                data["language"] = lang
 
-            if data["language_name"] == 'LANGUAGE_NAME':
-                sys.stderr.write('ERROR: For BORIS to fix: language.json has wrong language_name. '
-                                 'File: ' + language_json_filename + '\n')
-                data["language_name"] = lang
-            merge(data, all_strings)
-        save_content("static/lang_" + lang + "/language.json", json.dumps(all_strings, ensure_ascii=False))
+                if data["language_name"] == 'LANGUAGE_NAME':
+                    sys.stderr.write('ERROR: For BORIS to fix: language.json has wrong language_name. '
+                                     'File: ' + language_json_filename + '\n')
+                    data["language_name"] = lang
+                merge(data, all_strings)
+        elif lang != 'en_US':
+            sys.stderr.write('WARNING: ' + language_json_filename + ' don\'t exist.\n')
+        else:
+            all_strings['language_name'] = US_LANGUAGE_NAME
+        save_content("static/lang_" + lang + "/language.json", json.dumps(all_strings, indent=4, ensure_ascii=False))
 
         # Process i18n files
+        i18n_strings = {}
+        merge(i18n_template, i18n_strings)
         i18n_json_filename = os.path.join("../../../..", "translations", lang, 'language_i18n.json')
         print("Load: " + i18n_json_filename)
 
         if os.path.exists(i18n_json_filename):
-            copyfile(i18n_json_filename, "static/lang_" + lang + "/language_i18n.json")
+            with codecs.open(i18n_json_filename, 'r', 'utf-8') as file_descriptor:
+                data = json.load(file_descriptor)
+                data["language"] = lang
+
+                if "language_name" in data:
+                    if data["language_name"] == 'LANGUAGE_NAME':
+                        data["language_name"] = lang
+                else:
+                    data["language_name"] = lang
+
+                if data["language_name"] != lang:
+                    sys.stderr.write('ERROR: For BORIS to fix: language_i18n.json has wrong language_name. File: ' + i18n_json_filename + '\n')
+                merge(data, i18n_strings)
+        elif lang != 'en_US':
+            sys.stderr.write('WARNING: ' + i18n_json_filename + ' don\'t exist.\n')
         else:
-            sys.stderr.write('ERROR: For BORIS to fix -> ' + i18n_json_filename + ' don\'t exist.\n')
+            i18n_strings["language"] = lang
+            i18n_strings["language_name"] = US_LANGUAGE_NAME
+
+        save_content("static/lang_" + lang + "/language_i18n.json", json.dumps(i18n_strings, indent=4, ensure_ascii=False))
 
 languages = sys.argv[1:]
 if not languages:
