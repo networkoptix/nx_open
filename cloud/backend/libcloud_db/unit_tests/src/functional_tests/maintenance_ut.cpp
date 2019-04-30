@@ -31,7 +31,7 @@ protected:
     }
 
 private:
-    ::ec2::ApiTransactionDataList m_transactionLog;
+    nx::clusterdb::engine::CommandDataList m_transactionLog;
     api::ResultCode m_prevRequestResult = api::ResultCode::ok;
 };
 
