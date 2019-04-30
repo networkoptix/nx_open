@@ -328,18 +328,19 @@ private:
         const std::vector<dao::TransactionLogRecord>& allTransactions,
         const TransactionDataType& transactionData)
     {
-        for (const auto& logRecord : allTransactions)
+        for (const auto& logRecord: allTransactions)
         {
             const auto serializedTransactionFromLog =
                 logRecord.serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION);
 
-            Command<vms::api::UserData> transaction(peerId());
+            Command<vms::api::UserData> command;
+            command.peerID = peerId();
             QnUbjsonReader<QByteArray> ubjsonStream(&serializedTransactionFromLog);
-            const bool isDeserialized = QnUbjson::deserialize(&ubjsonStream, &transaction);
+            const bool isDeserialized = QnUbjson::deserialize(&ubjsonStream, &command);
             NX_GTEST_ASSERT_TRUE(isDeserialized);
 
-            if (transaction.params == transactionData)
-                return transaction;
+            if (command.params == transactionData)
+                return command;
         }
 
         return boost::none;
@@ -375,10 +376,8 @@ private:
     Command<vms::api::UserData> prepareFromOtherPeerWithTimestampDiff(
         int timestampDiff)
     {
-        Command<vms::api::UserData> transaction(m_otherPeerId);
-        transaction.command = ::ec2::ApiCommand::saveUser;
+        Command<vms::api::UserData> transaction(::ec2::ApiCommand::saveUser, m_otherPeerId);
         transaction.persistentInfo.dbID = m_otherPeerDbId;
-        transaction.transactionType = ::ec2::TransactionType::Cloud;
         transaction.persistentInfo.sequence = m_otherPeerSequence++;
         transaction.persistentInfo.timestamp =
             m_initialTransaction

@@ -6,6 +6,7 @@
 #include <nx/utils/uuid.h>
 
 #include <nx/clusterdb/engine/transaction_log_cache.h>
+#include <nx/cloud/db/ec2/vms_command_descriptor.h>
 
 namespace nx::clusterdb::engine {
 namespace test {
@@ -136,10 +137,9 @@ protected:
 
     CommandHeader prepareTransaction(TranId tranId)
     {
-        auto transactionHeader = CommandHeader(QnUuid(m_peerId));
-        transactionHeader.peerID = QnUuid(m_peerId);
-        transactionHeader.command = ::ec2::ApiCommand::saveCamera;
-        transactionHeader.transactionType = ::ec2::TransactionType::Cloud;
+        CommandHeader transactionHeader(
+            nx::cloud::db::ec2::command::SaveUser::code,
+            QnUuid(m_peerId));
         transactionHeader.persistentInfo.sequence =
             m_cache.generateTransactionSequence(
                 vms::api::PersistentIdData(QnUuid(m_peerId), m_dbId));

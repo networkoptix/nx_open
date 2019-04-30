@@ -120,8 +120,6 @@ CommandHeader CommandLog::prepareLocalTransactionHeader(
     const std::string& systemId,
     int commandCode)
 {
-    CommandHeader header;
-
     int transactionSequence = 0;
     vms::api::Timestamp transactionTimestamp;
     std::tie(transactionSequence, transactionTimestamp) =
@@ -129,9 +127,7 @@ CommandHeader CommandLog::prepareLocalTransactionHeader(
 
     // Generating transaction.
     // Filling transaction header.
-    header.command = static_cast<::ec2::ApiCommand::Value>(commandCode);
-    header.peerID = m_peerId;
-    header.transactionType = ::ec2::TransactionType::Cloud;
+    CommandHeader header(commandCode, m_peerId);
     header.persistentInfo.dbID = QnUuid::fromArbitraryData(systemId);
     header.persistentInfo.sequence = transactionSequence;
     header.persistentInfo.timestamp = transactionTimestamp;
