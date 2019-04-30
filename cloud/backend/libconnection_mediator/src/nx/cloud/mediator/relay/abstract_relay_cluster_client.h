@@ -1,8 +1,6 @@
 #pragma once
 
-#include <string>
-
-#include <QtCore/QUrl>
+#include <nx/utils/url.h>
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/utils/move_only_func.h>
@@ -11,10 +9,10 @@ namespace nx {
 namespace hpm {
 
 using RelayInstanceSelectCompletionHandler =
-nx::utils::MoveOnlyFunc<void(cloud::relay::api::ResultCode, std::vector<QUrl>)>;
+    nx::utils::MoveOnlyFunc<void(cloud::relay::api::ResultCode, std::vector<nx::utils::Url>)>;
 
 using RelayInstanceSearchCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(cloud::relay::api::ResultCode, QUrl /*relayInstanceUrl*/)>;
+    nx::utils::MoveOnlyFunc<void(cloud::relay::api::ResultCode, nx::utils::Url /*relayInstanceUrl*/) > ;
 
 /**
  * Every method is thread-safe.

@@ -151,12 +151,12 @@ private:
 
     void finishConnect();
 
-    void onRelayInstanceSearchCompletion(std::optional<QUrl> relayInstanceUrl);
+    void onRelayInstanceSearchCompletion(std::optional<nx::utils::Url> relayInstanceUrl);
 
     api::ConnectResponse prepareConnectResponse(
         const api::ConnectionAckRequest& connectionAckRequest,
         std::list<network::SocketAddress> tcpEndpoints,
-        std::optional<QUrl> relayInstanceUrl);
+        std::optional<nx::utils::Url> relayInstanceUrl);
 
     void sendConnectResponse(
         api::ResultCode resultCode,

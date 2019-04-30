@@ -181,7 +181,7 @@ void UDPHolePunchingConnectionInitiationFsm::processTcpConnectRequest(
     findRelayInstance(
         [this, connectResponseSender = std::move(connectResponseSender)](
             nx::cloud::relay::api::ResultCode resultCode,
-            QUrl relayInstanceUrl)
+            nx::utils::Url relayInstanceUrl)
         {
             auto connectResponse = prepareConnectResponse(
                 api::ConnectionAckRequest(),
@@ -386,7 +386,7 @@ void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
     auto completionHander =
         [this](
             nx::cloud::relay::api::ResultCode resultCode,
-            QUrl relayInstanceUrl)
+            nx::utils::Url relayInstanceUrl)
         {
             onRelayInstanceSearchCompletion(
                 resultCode == nx::cloud::relay::api::ResultCode::ok
@@ -416,7 +416,7 @@ void UDPHolePunchingConnectionInitiationFsm::findRelayInstance(
             nx::utils::swapAndCall(
                 *sharedHandler,
                 nx::cloud::relay::api::ResultCode::timedOut,
-                QUrl());
+                nx::utils::Url());
         },
         m_relayClusterClient,
         m_serverPeerHostName.toStdString());
@@ -447,7 +447,7 @@ void UDPHolePunchingConnectionInitiationFsm::finishConnect()
 }
 
 void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
-    std::optional<QUrl> relayInstanceUrl)
+    std::optional<nx::utils::Url> relayInstanceUrl)
 {
     if (relayInstanceUrl)
     {
@@ -475,7 +475,7 @@ void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
 api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectResponse(
     const api::ConnectionAckRequest& connectionAckRequest,
     std::list<network::SocketAddress> tcpEndpoints,
-    std::optional<QUrl> relayInstanceUrl)
+    std::optional <nx::utils::Url> relayInstanceUrl)
 {
     api::ConnectResponse connectResponse;
     connectResponse.params = m_settings.connectionParameters();

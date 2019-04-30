@@ -347,7 +347,7 @@ public:
                 nx::utils::swapAndCall(
                     m_selectRelayInstanceForListeningPeerHandler,
                     cloud::relay::api::ResultCode::ok,
-                    std::vector<QUrl>({QUrl("http://some-relay-instance.com")}));
+                    std::vector<nx::utils::Url>({"http://some-relay-instance.com"}));
             });
     }
 

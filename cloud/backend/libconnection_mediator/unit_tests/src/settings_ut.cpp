@@ -130,9 +130,9 @@ TEST_F(Settings, nat_traversal_method_delay)
 
 TEST_F(Settings, traffic_relay_urls)
 {
-    const std::vector<QUrl> relayUrls{
-        QUrl("http://nxvms.com/relay"),
-        QUrl("http://nxvms.com/relay2")};
+    const std::vector<nx::utils::Url> relayUrls{
+        {"http://nxvms.com/relay"},
+        {"http://nxvms.com/relay2"}};
 
     QString urls;
     for (const auto& url : relayUrls)

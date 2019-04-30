@@ -47,7 +47,7 @@ public:
             nx::utils::swapAndCall(
                 m_pendingRequestHandler,
                 cloud::relay::api::ResultCode::networkError,
-                QUrl());
+                nx::utils::Url());
         }
     }
 

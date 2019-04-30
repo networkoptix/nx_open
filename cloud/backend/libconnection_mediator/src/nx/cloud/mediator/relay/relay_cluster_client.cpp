@@ -39,7 +39,7 @@ void RelayClusterClient::findRelayInstancePeerIsListeningOn(
     m_aioThreadBinder.post(
         [this, completionHandler = std::move(completionHandler)]()
         {
-            QUrl relayInstanceUrl;
+            nx::utils::Url relayInstanceUrl;
             if (!m_settings.trafficRelay().urls.empty())
                 relayInstanceUrl = m_settings.trafficRelay().urls.front();
 
