@@ -115,6 +115,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False, help_text="If true then the user can view cloud admin.")
     language = models.CharField(max_length=7, blank=True)
     customization = models.CharField(max_length=255, null=True)
+    password = None
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['registeredDate', 'createdDate']
