@@ -202,6 +202,8 @@ class ProductType(models.Model):
 
 class Product(models.Model):
     class Meta:
+        verbose_name = 'asset'
+        verbose_name_plural = 'assets'
         # The can_access_product gives users the ability to see the product in product lists.
         # In combination with other permission it allows them to edit the product and send reviews for their product
         permissions = (
@@ -520,8 +522,8 @@ class ContentVersion(models.Model):
 
 class ProductCustomizationReview(models.Model):
     class Meta:
-        verbose_name = 'product review'
-        verbose_name_plural = 'product reviews'
+        verbose_name = 'review'
+        verbose_name_plural = 'reviews'
         permissions = (
             ("publish_version", "Can publish content to production"),
             ("force_update", "Can forcibly update content"),
