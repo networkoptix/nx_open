@@ -9,15 +9,6 @@
 
 namespace nx::test {
 
-template <typename Types>
-class TypesCompatibility:
-    public ::testing::Test
-{
-public:
-    using One = typename Types::One;
-    using Two = typename Types::Two;
-
-protected:
     struct Json
     {
         template<typename... Args>
@@ -48,6 +39,15 @@ protected:
         }
     };
 
+template <typename Types>
+class TypesCompatibility:
+    public ::testing::Test
+{
+public:
+    using One = typename Types::One;
+    using Two = typename Types::Two;
+
+protected:
     std::tuple<One, Two> generate()
     {
         One one;
@@ -72,7 +72,7 @@ private:
     void assertCanBeRestoredFrom(const From& from, const To& to)
     {
         auto serialized = Format::serialized(from);
-        auto deserialized = Format::deserialized<To>(serialized);
+        auto deserialized = Format::template deserialized<To>(serialized);
 
         ASSERT_EQ(to, deserialized);
     }
@@ -82,14 +82,14 @@ TYPED_TEST_CASE_P(TypesCompatibility);
 
 TYPED_TEST_P(TypesCompatibility, ubjson_compatible)
 {
-    assertOneCanBeRestoredFromAnother<Ubjson, One, Two>();
-    assertOneCanBeRestoredFromAnother<Ubjson, Two, One>();
+    this->template assertOneCanBeRestoredFromAnother<Ubjson, typename TypeParam::One, typename TypeParam::Two>();
+    this->template assertOneCanBeRestoredFromAnother<Ubjson, typename TypeParam::Two, typename TypeParam::One>();
 }
 
 TYPED_TEST_P(TypesCompatibility, DISABLED_json_compatible)
 {
-    assertOneCanBeRestoredFromAnother<Json, One, Two>();
-    assertOneCanBeRestoredFromAnother<Json, Two, One>();
+    this->template assertOneCanBeRestoredFromAnother<Json, typename TypeParam::One, typename TypeParam::Two>();
+    this->template assertOneCanBeRestoredFromAnother<Json, typename TypeParam::Two, typename TypeParam::One>();
 }
 
 REGISTER_TYPED_TEST_CASE_P(TypesCompatibility,
