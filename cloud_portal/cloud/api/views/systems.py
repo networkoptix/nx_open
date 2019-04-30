@@ -48,7 +48,7 @@ def sharing(request, system_id):
 
 def md5(data):
     m = hashlib.md5()
-    m.update(data)
+    m.update(data.encode('utf-8'))
     return m.hexdigest()
 
 

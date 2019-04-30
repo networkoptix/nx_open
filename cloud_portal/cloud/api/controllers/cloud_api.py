@@ -180,7 +180,7 @@ class Account(object):
     @lower_case_email
     def encode_password(email, password):
         realm = settings.CLOUD_CONNECT['password_realm']
-        password_string = ':'.join((email, realm, password))
+        password_string = ':'.join((email, realm, password)).encode('utf-8')
         password_ha1 = md5(password_string).hexdigest()
         password_ha1_sha256 = sha256(password_string).hexdigest()
         return password_ha1, password_ha1_sha256

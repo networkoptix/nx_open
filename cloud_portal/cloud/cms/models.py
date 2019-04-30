@@ -397,10 +397,11 @@ class DataStructure(models.Model):
         content_value = ""
         if not product:
             return self.default
-        content_record = DataRecord.objects.filter(product=product, data_structure=self).order_by('version_id')
+        content_record = DataRecord.objects.filter(product=product, data_structure=self)
         if not draft:
             content_record = content_record.\
-                exclude(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.rejected)
+                exclude(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.rejected).\
+                order_by('version_id')
 
         # try to get translated content
         if self.translatable:

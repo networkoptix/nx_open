@@ -113,7 +113,7 @@ class CustomContextForm(forms.Form):
             elif data_structure.type in [DataStructure.DATA_TYPES.file,
                                          DataStructure.DATA_TYPES.external_file,
                                          DataStructure.DATA_TYPES.external_image]:
-                if not record_value and not DataStructure.DATA_TYPES.external_file:
+                if not record_value and not data_structure.optional:
                     record_value = data_structure.default
                 self.fields[data_structure.name] = forms.FileField(label=ds_label,
                                                                    help_text=ds_description,

@@ -16,7 +16,7 @@ class LimitAdminEmailHandler(AdminEmailHandler):
     COUNTER_CACHE_KEY = "email_admins_counter_"
 
     def increment_counter(self, record):
-        key_postfix = record.message[:self.KEY_LENGTH]
+        key_postfix = record.message[:self.KEY_LENGTH].encode('utf-8')
         key_postfix = md5.update(key_postfix).hexdigest()
         from django.core.cache import cache
         try:
@@ -48,7 +48,7 @@ class CatchExceptionMiddleware(object):
     def process_exception(request, exception):
         logging.info(request)
         logging.critical("{}: {}\nCall Stack:\n{}".format(exception.__class__.__name__,
-                                                          exception.message,
+                                                          exception,
                                                           traceback.format_exc().replace("Traceback", "")))
         if not settings.DEBUG:
             return HttpResponse("Error with request", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
