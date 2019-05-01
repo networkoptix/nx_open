@@ -1,15 +1,11 @@
 set(libmaxminddb_source_dir ${CMAKE_SOURCE_DIR}/artifacts/libmaxminddb)
 
-message("libmaxminddb CMakeLists.txt")
-
 include_directories(${libmaxminddb_source_dir}/include)
-message("include dirs: ${libmaxminddb_source_dir}/include")
 
 file(GLOB libmaxminddb_sources
     ${libmaxminddb_source_dir}/include/*.h
     ${libmaxminddb_source_dir}/src/*.h
     ${libmaxminddb_source_dir}/src/*.c)
-message ("sources: ${libmaxminddb_sources}")
 
 # The library parses doubles differently depending on endianness, using its own macro
 # MMDB_LITTLE_ENDIAN
@@ -21,11 +17,10 @@ endif()
 
 set(library_type SHARED)
 if (WINDOWS)
-# STATIC on windows because source code does not export symbols, causing failed dll linkage
+# STATIC on windows because source code does not export symbols, causing failed linkage
 	set(library_type STATIC)
 endif()
 
-# Library is STATIC because source code does not export symbols, causing linking against a windows dll to fail
 add_library(maxminddb ${library_type} ${libmaxminddb_sources})
 
 if (WIN32)
@@ -33,7 +28,6 @@ if (WIN32)
 endif()
 
 target_include_directories(maxminddb INTERFACE ${libmaxminddb_source_dir}/include)
-message("target_include_directories: ${libmaxminddb_source_dir}/include")
 
 #--------------------------------------------------------------------------------------------------
 # mmdblookup executable (only works on Linux due to use of getopt.h)
