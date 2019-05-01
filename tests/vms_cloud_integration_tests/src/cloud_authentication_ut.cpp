@@ -311,9 +311,9 @@ protected:
             m_cloudNode.moduleInstance()->protocolVersionRange(),
             &m_cloudNode.moduleInstance()->synchronizationEngine().transactionLog(),
             m_cloudNode.moduleInstance()->synchronizationEngine().outgoingCommandFilter(),
-            url,
             cloudSystem().id,
-            "nodeId");
+            "nodeId",
+            url);
 
         m_connector->connect(
             [this](auto&&... args)
