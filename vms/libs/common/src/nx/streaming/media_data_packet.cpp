@@ -358,11 +358,11 @@ void QnMetaDataV1::addMotion(const QRectF& data)
         data.x() * Qn::kMotionGridWidth, data.y() * Qn::kMotionGridHeight,
         data.width() * Qn::kMotionGridWidth, data.height() * Qn::kMotionGridHeight);
 
-#if 0
-    int shift = x * Qn::kMotionGridHeight + y;
-    quint8* b = (quint8*)m_data.data() + shift / 8;
-    *b |= (128 >> (shift & 7));
-#endif
+    for (int x = rect.left(); x <= rect.right(); ++x)
+    {
+        for (int y = rect.top(); y <= rect.bottom(); ++y)
+            setMotionAt(x, y);
+    }
 }
 
 bool QnMetaDataV1::isMotionAt(int x, int y, char* mask)
