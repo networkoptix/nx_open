@@ -84,7 +84,9 @@
 
                             return checkLoginState()
                                     .then(() => {
-                                        logoutAuthorised();
+                                        if (result.data.email !== $rootScope.session.loginState) {
+                                            logoutAuthorised();
+                                        }
                                     })
                                     .catch(() => {
                                         if (result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
@@ -144,7 +146,7 @@
                 get().then(() => {
                     // logoutAuthorisedLogoutButton
                     NxDialogsService
-                        .confirm(languageService.lang.dialogs.logoutAuthorisedText, languageService.lang.dialogs.logoutAuthorisedTitle,
+                        .confirm('', languageService.lang.dialogs.logoutAuthorisedTitle,
                             languageService.lang.dialogs.logoutAuthorisedContinueButton, 'btn-primary',
                             languageService.lang.dialogs.logoutAuthorisedLogoutButton
                         )

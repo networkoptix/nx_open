@@ -22,12 +22,13 @@ export class MergeModalContent {
     checkMergeabilityProcess: any;
     config: any;
     lang: any;
-    masterId: string;
     mergingProcess: any;
     multipleSystems: boolean;
     outOfDate: boolean;
     password: string;
+    primarySystem: any;
     processedSystems: any;
+    secondarySystem: any;
     state: string;
     systemError: boolean;
     systemMergeable: string;
@@ -58,33 +59,25 @@ export class MergeModalContent {
     }
 
     ngOnInit() {
-        this.masterId = this.system.id;
+        this.primarySystem = this.system;
         this.multipleSystems = this.systems.length > 0;
         this.outOfDate = this.multipleSystems && !this.system.canMerge;
         this.processedSystems = this.makeSelectorList(this.systems);
         this.targetSystem = this.selectDefaultSystem();
+        this.secondarySystem = this.targetSystem;
         this.targetSystemDropdown = this.makeSelectorList([this.targetSystem])[0];
         this.systemMergeable = this.checkMergeability(this.targetSystem);
         this.systemError = !this.multipleSystems || this.outOfDate;
 
         this.mergingProcess = this.process.init(() => {
-            let masterSystemId;
-            let slaveSystemId;
-            if (this.masterId === this.system.id) {
-                masterSystemId = this.system.id;
-                slaveSystemId = this.targetSystem.id;
-            } else {
-                masterSystemId = this.targetSystem.id;
-                slaveSystemId = this.system.id;
-            }
-            return this.cloudApi.merge(masterSystemId, slaveSystemId, this.password);
+            return this.cloudApi.merge(this.primarySystem.id, this.secondarySystem.id, this.password);
         }, {
             errorCodes: {
                 mergedSystemIsOffline: () => {
-                    return this.language.system.failedMerge;
+                    return this.language.system.mergeFailed;
                 },
                 vmsRequestFailure: () => {
-                    return this.language.system.failedMerge;
+                    return this.language.system.mergeFailed;
                 },
                 wrongPassword: () => {
                     this.mergeForm.controls['mergePassword'].setErrors({ 'wrongPassword': true });
@@ -94,18 +87,49 @@ export class MergeModalContent {
                     this.wrongPassword = true;
                 },
             },
-            successMessage: this.language.system.successMerge
+            successMessage: this.language.system.mergeStart
         }).then(() => {
             this.systemsProvider.forceUpdateSystems();
             this.activeModal.close({
                 anotherSystemId: this.targetSystem.id,
-                role: this.masterId === this.system.id ?
+                role: this.primarySystem.id === this.system.id ?
                     this.configService.config.systemStatuses.master :
                     this.configService.config.systemStatuses.slave
             });
         }, (error) => {
             if (error.data.resultCode !== 'wrongPassword') {
-                error.data.targetSystem = this.targetSystem;
+                /* Get the names of the primary and secondary system.
+                   Next try to figure out which system caused the problem.
+                   If the primary system's stateOfHealth is not online set it as the failedSystem.
+                   Otherwise the secondary system is set as the failedSystem no matter what.
+                 */
+                // Set the name of the primary system.
+                error.data.primarySystemName = this.primarySystem.name;
+                // If name is undefined try looking in info for the name.
+                if (error.data.primarySystemName === undefined) {
+                    error.data.primarySystemName = this.primarySystem.info && this.primarySystem.info.name;
+                }
+
+                // Set the name of the secondary system.
+                error.data.secondarySystemName = this.secondarySystem.name;
+
+                // If name is undefined try looking in info for the name.
+                if (error.data.secondarySystemName === undefined) {
+                    error.data.secondarySystemName = this.secondarySystem.info && this.secondarySystem.info.name;
+                }
+
+                // Check the state of health
+                var primaryState = this.primarySystem.stateOfHealth;
+                // If stateOfHealth is undefined check in info for stateOfHealth.
+                if (primaryState === undefined) {
+                    primaryState = this.primarySystem.info && this.primarySystem.info.stateOfHealth;
+                }
+
+                // Assume the secondary system is the issue unless the primary system is not online.
+                error.data.failedSystemName = error.data.secondarySystemName;
+                if (primaryState !== 'online') {
+                    error.data.failedSystemName = error.data.primarySystemName;
+                }
                 this.activeModal.dismiss(error.data);
             }
         });
@@ -196,9 +220,15 @@ export class MergeModalContent {
         return {...this.systems[0]};
     }
 
+    setSystems() {
+        this.primarySystem = this.primarySystem.id === this.system.id ? this.system : this.targetSystem;
+        this.secondarySystem = this.primarySystem.id === this.system.id ? this.targetSystem : this.system;
+    }
+
     setTargetSystem(targetSystem) {
         this.systemMergeable = '';
         this.targetSystem = {... this.systems.find(system => system.id === targetSystem.id)};
+        this.setSystems();
     }
 
     updateState() {

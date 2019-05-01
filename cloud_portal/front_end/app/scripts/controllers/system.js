@@ -10,14 +10,13 @@ angular.module('cloudApp')
             $scope.currentlyMerging = false;
             $scope.debugMode = Config.allowDebugMode;
             $scope.betaMode = Config.allowBetaMode;
-            $scope.canMerge = Config.cloudMerge || false;
+            $scope.configCanMerge = Config.cloudMerge || false;
 
             authorizationCheckService.requireLogin().then(function (account) {
                 $scope.account = account;
                 $scope.system = system(systemId, account.email);
                 $scope.gettingSystem.run();
-
-                $scope.canMerge = $scope.system.canMerge || $scope.canMerge;
+                $scope.systems = systemsProvider.systems;
 
                 $scope.$watch('system.info.name', function (value) {
                     page.title(value ? value + ' -' : '');
@@ -29,7 +28,7 @@ angular.module('cloudApp')
                         setMergeStatus(mergeInfo);
                     } else{
                         if($scope.currentlyMerging) {
-                            dialogs.notify(L.system.successMerge, 'success', true);
+                            dialogs.notify(L.system.mergeSuccess, 'success', true);
                         }
                         $scope.currentlyMerging = false;
                     }
@@ -122,14 +121,6 @@ angular.module('cloudApp')
                 $location.path('/systems/' + systemId, false);
             }
 
-            function reloadSystems() {
-                systemsProvider
-                    .forceUpdateSystems()
-                    .then(function () {
-                        $location.path('/systems');
-                    });
-            }
-
             function updateAndGoToSystems() {
                 $scope.userDisconnectSystem = true;
                 systemsProvider
@@ -184,7 +175,7 @@ angular.module('cloudApp')
             };
 
             $scope.mergeSystems = function () {
-                var systems = $scope.systemsProvider.getMySystems($scope.account.email, $scope.system.id);
+                var systems = systemsProvider.getMySystems($scope.account.email, $scope.system.id);
                 return dialogs
                     .merge($scope.system, systems, $scope.account)
                     .then(function (mergeInfo) {
@@ -193,16 +184,17 @@ angular.module('cloudApp')
                         }
                     }, function(error) {
                         var commonErrorMsg = L.merging.commonText
-                            .replace('{{primarySystem}}', $scope.system.info.name)
-                            .replace('{{secondarySystem}}', error.targetSystem.name);
+                            .replace('{{primarySystem}}', error.primarySystemName)
+                            .replace('{{secondarySystem}}', error.secondarySystemName);
                         var dialogBody = '<p>' + commonErrorMsg + '</p>';
                         var responseError = L.errorCodes[error.errorText] || L.errorCodes[error.responseCode];
                         if (!responseError) {
-                            delete error.targetSystem;
-                            delete error.targetSystem;
+                            delete error.failedSystemName;
+                            delete error.primarySystemName;
+                            delete error.secondarySystemName;
                             responseError = L.errorCodes.unknownError + ':<br><pre>' + JSON.stringify(error, null, 2) + '</pre>';
                         } else {
-                            responseError = responseError.replace('{{secondarySystem}}', error.targetSystem.name);
+                            responseError = responseError.replace('{{failedSystem}}', error.failedSystemName);
                         }
                         dialogBody += '<p>' + responseError + '</p>';
                         dialogs.confirm(dialogBody, L.merging.mergeFailedTitle, L.dialogs.okButton, 'btn-primary', null);

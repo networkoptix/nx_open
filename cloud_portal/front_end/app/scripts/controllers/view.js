@@ -45,18 +45,13 @@
                 }
                 
                 function systemError(){
-                    dialogs.notify(LANG.errorCodes.lostConnection.replace('{{systemName}}',
-                        $scope.currentSystem.name || LANG.errorCodes.thisSystem), 'warning');
-    
-                    if ($scope.isInIframe) {
-                        $location.path(CONFIG.viewsDir + '404.html');
-                    } else {
-                        $location.path('/systems');
-                    }
+                    $scope.unreachable = true;
                 }
+                
                 authorizationCheckService
                     .requireLogin()
                     .then(function (account) {
+                        $scope.unreachable = false;
                         $scope.currentSystem = system($routeParams.systemId, account.email);
                         var systemInfoRequest = $scope.currentSystem.getInfo();
                         var systemAuthRequest = $scope.currentSystem.updateSystemAuth();

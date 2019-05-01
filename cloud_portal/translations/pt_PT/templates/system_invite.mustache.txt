@@ -1,4 +1,4 @@
-Welcome to %PRODUCT_NAME%
+Bem-vindo a %PRODUCT_NAME%
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) is inviting you to join %PRODUCT_NAME% and shared the system {{message.system_name}} with you.
