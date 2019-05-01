@@ -253,7 +253,7 @@
       "sdk": {
         "label": "SDK",
         "shortLabel": "SDK",
-        "supported": "Universal"
+        "supported": "C++ cross platform SDK"
       }
     },
     "platforms": {
