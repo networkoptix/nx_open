@@ -37,6 +37,7 @@ $header-collapsing-width-1: 1px;
         align-items: center;
         height : $header-height;
         line-height: $line-height;
+        margin-top: -1px;
     }
 
     .navbar-brand{
