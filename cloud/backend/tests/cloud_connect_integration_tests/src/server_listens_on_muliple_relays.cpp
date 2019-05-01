@@ -52,7 +52,7 @@ public:
         }
     }
 
-    void reportTrafficRelayUrlsForServer(const std::vector<QUrl>& trafficRelayUrls)
+    void reportTrafficRelayUrlsForServer(const std::vector<nx::utils::Url>& trafficRelayUrls)
     {
         m_reportedRelayUrlsForServerPromise.set_value(trafficRelayUrls);
     }
@@ -73,8 +73,8 @@ protected:
                 -> std::unique_ptr<nx::hpm::AbstractRelayClusterClient>
             {
                 m_expectedRelayUrlsForServer = {
-                    relayUrl(0).toQUrl(),
-                    relayUrl(1).toQUrl()
+                    relayUrl(0),
+                    relayUrl(1)
                 };
 
                 return std::make_unique<HardCodedRelayClusterClient>(
@@ -133,7 +133,7 @@ private:
                 std::lock_guard<std::mutex> lock(m_mutex);
                 for (const auto& expectedUrl : m_expectedRelayUrlsForServer)
                 {
-                    QString domainAndPort = expectedUrl.adjusted(QUrl::RemoveScheme).toString();
+                    QString domainAndPort = expectedUrl.toQUrl().adjusted(QUrl::RemoveScheme).toString();
                     if (domainAndPort.startsWith("//"))
                         domainAndPort = domainAndPort.mid(2);
 
@@ -159,7 +159,7 @@ private:
         }
     }
 
-    void waitForClientToConnectToRelayDirectly(const QUrl& relayUrl)
+    void waitForClientToConnectToRelayDirectly(const nx::utils::Url& relayUrl)
     {
         using namespace nx::cloud::relay;
 
@@ -187,8 +187,8 @@ private:
             if (resultCode == api::ResultCode::ok)
             {
                 // Verify that there was no redirect
-                ASSERT_EQ(relayUrl.toString().toStdString(), std::get<1>(result).actualRelayUrl);
-                if (relayUrl.toString().toStdString() == std::get<1>(result).actualRelayUrl)
+                ASSERT_EQ(relayUrl.toStdString(), std::get<1>(result).actualRelayUrl);
+                if (relayUrl.toStdString() == std::get<1>(result).actualRelayUrl)
                     break;
             }
 
@@ -209,9 +209,9 @@ private:
     nx::utils::MoveOnlyFunc< nx::hpm::RelayClusterClientFactoryFunction>
         m_relayClusterClientFuncBak;
 
-    std::vector<QUrl> m_expectedRelayUrlsForServer;
-    std::promise<std::vector<QUrl>> m_reportedRelayUrlsForServerPromise;
-    std::vector<QUrl> m_reportedRelayUrlsForServer;
+    std::vector<nx::utils::Url> m_expectedRelayUrlsForServer;
+    std::promise<std::vector<nx::utils::Url>> m_reportedRelayUrlsForServerPromise;
+    std::vector<nx::utils::Url> m_reportedRelayUrlsForServer;
 
     std::mutex m_mutex;
     std::set<std::string> m_relayDomains;
@@ -236,7 +236,7 @@ void HardCodedRelayClusterClient::selectRelayInstanceForListeningPeer(
         peerId,
         [this, completionHandler = std::move(completionHandler)](
             nx::cloud::relay::api::ResultCode resultCode,
-            std::vector<QUrl> relayUrls)
+            std::vector<nx::utils::Url> relayUrls)
         {
             ASSERT_FALSE(relayUrls.empty());
             relayUrls.pop_back(); //< Dropping relay 2 from the list, it is only for client.
