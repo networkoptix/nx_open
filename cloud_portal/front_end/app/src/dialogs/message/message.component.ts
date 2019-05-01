@@ -49,9 +49,14 @@ export class MessageModalContent {
             this.messageType = this.language.messageType.unknown;
         }
 
-        if (this.messageType.indexOf('_feedback_') > -1) {
-            this.placeholder = this.lang.messageDialogPlaceholders.feedback;
+        switch (this.messageType) {
+            case this.config.messageType.ipvd_page :
+                this.placeholder = this.lang.messageDialogPlaceholders.feedback;
+                break;
+            default :
+                this.placeholder = '';
         }
+
         this.title = this.language.lang.messageType[this.messageType].replace('{{product}}', this.product);
 
         this.sendMessage = this.process.init(() => {
