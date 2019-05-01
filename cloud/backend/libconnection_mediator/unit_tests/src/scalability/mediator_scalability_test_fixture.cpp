@@ -24,12 +24,6 @@ std::optional<nx::hpm::api::SystemCredentials> MediatorScalabilityTestFixture::g
 
 void MediatorScalabilityTestFixture::SetUp()
 {
-    RelayClusterClientFactory::instance().setCustomFunc(
-        [this](const conf::Settings& settings)
-    {
-        return std::make_unique <OnlineRelaysClusterClient>(settings);
-    });
-
     ASSERT_TRUE(m_discoveryServer.bindAndListen());
     m_mediatorCluster = std::make_unique<MediatorCluster>(m_discoveryServer.url());
 }
@@ -38,8 +32,7 @@ void MediatorScalabilityTestFixture::addMediator()
 {
     auto& mediator = m_mediatorCluster->addMediator({
         "-https/listenOn", "127.0.0.1",
-        "-http/connectionInactivityTimeout", "10m",
-        "-geoIp/dbPath", "C:/develop/GeoLite2-City.mmdb"});
+        "-http/connectionInactivityTimeout", "10m"});
 
     ASSERT_TRUE(mediator.startAndWaitUntilStarted());
 }
