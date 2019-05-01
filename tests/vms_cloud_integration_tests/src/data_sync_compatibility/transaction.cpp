@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/clusterdb/engine/command.h>
+#include <nx/clusterdb/engine/command_data.h>
 #include <nx/fusion/model_functions.h>
 #include <transaction/transaction.h>
 
@@ -69,12 +70,12 @@ protected:
 
 private:
     template<typename Format, typename From, typename To>
-    void assertCanBeRestoredFrom(const From& from, const To& to)
+    void assertCanBeRestoredFrom(const From& from, const To& expected)
     {
-        auto serialized = Format::serialized(from);
-        auto deserialized = Format::template deserialized<To>(serialized);
+        const auto actual = Format::template deserialized<To>(
+            Format::serialized(from));
 
-        ASSERT_EQ(to, deserialized);
+        ASSERT_EQ(expected, actual);
     }
 };
 
@@ -82,14 +83,20 @@ TYPED_TEST_CASE_P(TypesCompatibility);
 
 TYPED_TEST_P(TypesCompatibility, ubjson_compatible)
 {
-    this->template assertOneCanBeRestoredFromAnother<Ubjson, typename TypeParam::One, typename TypeParam::Two>();
-    this->template assertOneCanBeRestoredFromAnother<Ubjson, typename TypeParam::Two, typename TypeParam::One>();
+    this->template assertOneCanBeRestoredFromAnother<
+        Ubjson, typename TypeParam::One, typename TypeParam::Two>();
+    
+    this->template assertOneCanBeRestoredFromAnother<
+        Ubjson, typename TypeParam::Two, typename TypeParam::One>();
 }
 
 TYPED_TEST_P(TypesCompatibility, DISABLED_json_compatible)
 {
-    this->template assertOneCanBeRestoredFromAnother<Json, typename TypeParam::One, typename TypeParam::Two>();
-    this->template assertOneCanBeRestoredFromAnother<Json, typename TypeParam::Two, typename TypeParam::One>();
+    this->template assertOneCanBeRestoredFromAnother<
+        Json, typename TypeParam::One, typename TypeParam::Two>();
+    
+    this->template assertOneCanBeRestoredFromAnother<
+        Json, typename TypeParam::Two, typename TypeParam::One>();
 }
 
 REGISTER_TYPED_TEST_CASE_P(TypesCompatibility,
@@ -125,7 +132,9 @@ struct DataSyncTransactionTypes
         }
     };
 
-    static void copy(Two* dest, const One& src)
+    static void copy(
+        nx::clusterdb::engine::CommandHeader* dest,
+        const ::ec2::QnAbstractTransaction& src)
     {
         dest->command = (int) src.command;
         dest->peerID = src.peerID;
@@ -141,5 +150,25 @@ INSTANTIATE_TYPED_TEST_CASE_P(
     Transaction,
     TypesCompatibility,
     DataSyncTransactionTypes);
+
+//-------------------------------------------------------------------------------------------------
+
+struct DataSyncTransactionDataTypes
+{
+    using One = ::ec2::ApiTransactionData;
+    using Two = nx::clusterdb::engine::CommandData;
+
+    static void copy(Two* dest, const One& src)
+    {
+        dest->dataSize = src.dataSize;
+        DataSyncTransactionTypes::copy(&dest->tran, src.tran);
+        dest->tranGuid = src.tranGuid;
+    }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    TransactionData,
+    TypesCompatibility,
+    DataSyncTransactionDataTypes);
 
 } // namespace nx::test
