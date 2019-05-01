@@ -9,10 +9,10 @@ namespace nx {
 namespace hpm {
 
 using RelayInstanceSelectCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(cloud::relay::api::ResultCode, std::vector<nx::utils::Url>)>;
+    nx::utils::MoveOnlyFunc<void(cloud::relay::api::ResultCode, std::vector<nx::utils::Url> /*relayInstanceUrls*/)>;
 
 using RelayInstanceSearchCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(cloud::relay::api::ResultCode, nx::utils::Url /*relayInstanceUrl*/) > ;
+    nx::utils::MoveOnlyFunc<void(cloud::relay::api::ResultCode, nx::utils::Url /*relayInstanceUrl*/)> ;
 
 /**
  * Every method is thread-safe.
