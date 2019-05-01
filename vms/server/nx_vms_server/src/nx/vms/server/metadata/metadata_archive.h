@@ -48,22 +48,22 @@ public:
 
     struct Filter
     {
-        QList<QRectF> region;
-        std::chrono::milliseconds startTime{ 0 };
-        std::chrono::milliseconds endTime{ 0 };
+        QRegion region;
+        std::chrono::milliseconds startTime{0};
+        std::chrono::milliseconds endTime{0};
         std::chrono::milliseconds detailLevel = std::chrono::milliseconds::zero();
         int limit = -1;
         Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder;
     };
 
-    QnTimePeriodList matchPeriod(const Filter& filter);
 protected:
     static const int kGridDataSize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128;
 
+    QnTimePeriodList matchPeriodInternal(const Filter& filter);
     QString getFilePrefix(const QDate& datetime) const;
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate) const;
     void fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile) const;
-    bool saveToArchiveInternal(QnConstMetaDataV1Ptr data);
+    bool saveToArchiveInternal(const QnAbstractCompressedMetadataPtr& data);
     QString getChannelPrefix() const;
 
     void loadRecordedRange();
@@ -73,30 +73,29 @@ protected:
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, qint64 msTime) const;
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, QFile& indexFile) const;
 protected:
-    virtual bool matchAdditionData(const quint8* data, int size) { return true;  }
+    virtual bool matchAdditionData(const Filter& filter, const quint8* data, int size) { return true; }
 private:
     int getSizeForTime(qint64 timeMs, bool reloadIndex);
 
     void loadDataFromIndex(
+        const Filter& filter,
         QFile& motionFile,
         const IndexHeader& indexHeader,
         const QVector<IndexRecord>& index,
         QVector<IndexRecord>::iterator startItr,
         QVector<IndexRecord>::iterator endItr,
-        int detailLevel,
-        int limit,
         quint8* buffer,
         simd128i* mask,
         int maskStart,
         int maskEnd,
         QnTimePeriodList& rez);
-    void loadDataFromIndexDesc(QFile& motionFile,
+    void loadDataFromIndexDesc(
+        const Filter& filter,
+        QFile& motionFile,
         const IndexHeader& indexHeader,
         const QVector<IndexRecord>& index,
         QVector<IndexRecord>::iterator startItr,
         QVector<IndexRecord>::iterator endItr,
-        int detailLevel,
-        int limit,
         quint8* buffer,
         simd128i* mask,
         int maskStart,

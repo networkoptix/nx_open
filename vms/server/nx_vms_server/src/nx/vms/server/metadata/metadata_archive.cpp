@@ -79,7 +79,7 @@ void MetadataArchive::fillFileNames(qint64 datetimeMs, QFile* metadataFile, QFil
         indexFile->setFileName(fileName + QString("%1_detailed_index").arg(m_filePrefix) + getChannelPrefix() + ".bin");
 }
 
-bool MetadataArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
+bool MetadataArchive::saveToArchiveInternal(const QnAbstractCompressedMetadataPtr& data)
 {
     QnMutexLocker lock(&m_writeMutex);
 
@@ -247,13 +247,12 @@ int MetadataArchive::getSizeForTime(qint64 timeMs, bool reloadIndex)
 }
 
 void MetadataArchive::loadDataFromIndex(
+    const Filter& filter,
     QFile& metadataFile,
     const IndexHeader& indexHeader,
     const QVector<IndexRecord>& index,
     QVector<IndexRecord>::iterator startItr,
     QVector<IndexRecord>::iterator endItr,
-    int detailLevel,
-    int limit,
     quint8* buffer,
     simd128i* mask,
     int maskStart,
@@ -277,7 +276,7 @@ void MetadataArchive::loadDataFromIndex(
         while (i < endItr && curData < dataEnd)
         {
             if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd)
-                && matchAdditionData(curData + kGridDataSize, recordSize() - kGridDataSize))
+                && matchAdditionData(filter, curData + kGridDataSize, recordSize() - kGridDataSize))
             {
                 qint64 fullStartTime = i->start + indexHeader.startTime;
 
@@ -288,13 +287,13 @@ void MetadataArchive::loadDataFromIndex(
                 else
                 {
                     QnTimePeriod& last = rez.back();
-                    if (fullStartTime <= last.startTimeMs + last.durationMs + detailLevel)
+                    if (fullStartTime <= last.startTimeMs + last.durationMs + filter.detailLevel.count())
                     {
                         last.durationMs = qMax(last.durationMs, i->duration + fullStartTime - last.startTimeMs);
                     }
                     else
                     {
-                        if (rez.size() == limit)
+                        if (rez.size() == filter.limit)
                             return;
                         rez.push_back(QnTimePeriod(fullStartTime, i->duration));
                     }
@@ -308,13 +307,12 @@ void MetadataArchive::loadDataFromIndex(
 }
 
 void MetadataArchive::loadDataFromIndexDesc(
+    const Filter& filter,
     QFile& metadataFile,
     const IndexHeader& indexHeader,
     const QVector<IndexRecord>& index,
     QVector<IndexRecord>::iterator startItr,
     QVector<IndexRecord>::iterator endItr,
-    int detailLevel,
-    int limit,
     quint8* buffer,
     simd128i* mask,
     int maskStart,
@@ -341,7 +339,7 @@ void MetadataArchive::loadDataFromIndexDesc(
         while (i >= startItr && curData < dataEnd)
         {
             if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd)
-                && matchAdditionData(curData + kGridDataSize, recordSize() - kGridDataSize))
+                && matchAdditionData(filter, curData + kGridDataSize, recordSize() - kGridDataSize))
             {
                 qint64 fullStartTimeMs = i->start + indexHeader.startTime;
 
@@ -352,7 +350,7 @@ void MetadataArchive::loadDataFromIndexDesc(
                 else
                 {
                     QnTimePeriod& last = rez.back();
-                    if (fullStartTimeMs + i->duration + detailLevel >= last.startTimeMs)
+                    if (fullStartTimeMs + i->duration + filter.detailLevel.count() >= last.startTimeMs)
                     {
                         const auto endTimeMs = last.endTimeMs();
                         last.startTimeMs = qMin(last.startTimeMs, fullStartTimeMs);
@@ -360,7 +358,7 @@ void MetadataArchive::loadDataFromIndexDesc(
                     }
                     else
                     {
-                        if (rez.size() == limit)
+                        if (rez.size() == filter.limit)
                             return;
                         rez.push_back(QnTimePeriod(fullStartTimeMs, i->duration));
                     }
@@ -373,30 +371,10 @@ void MetadataArchive::loadDataFromIndexDesc(
     }
 }
 
-QnTimePeriodList MetadataArchive::matchPeriod(const Filter& filter)
-#if 0
-    const QRegion& region,
-    qint64 msStartTime,
-    qint64 msEndTime,
-    int detailLevel,
-    int limit,
-    Qt::SortOrder sortOrder
-#endif
-
+QnTimePeriodList MetadataArchive::matchPeriodInternal(const Filter& filter)
 {
     qint64 msStartTime = filter.startTime.count();
     qint64 msEndTime = filter.endTime.count();
-
-    QRegion region;
-    for (const auto& normilizedRect: filter.region)
-    {
-        region += QRect(
-            normilizedRect.x() * Qn::kMotionGridWidth,
-            normilizedRect.y() * Qn::kMotionGridHeight,
-            normilizedRect.width() * Qn::kMotionGridWidth,
-            normilizedRect.height() * Qn::kMotionGridHeight);
-    }
-
 
     if (minTime() != (qint64)AV_NOPTS_VALUE)
         msStartTime = qMax(minTime(), msStartTime);
@@ -413,7 +391,7 @@ QnTimePeriodList MetadataArchive::matchPeriod(const Filter& filter)
     int maskStart, maskEnd;
 
     NX_ASSERT(!useSSE2() || ((std::ptrdiff_t)mask) % 16 == 0);
-    QnMetaDataV1::createMask(region, (char*)mask, &maskStart, &maskEnd);
+    QnMetaDataV1::createMask(filter.region, (char*)mask, &maskStart, &maskEnd);
 
     QnTimePeriodList rez;
     QFile metadataFile, indexFile;
@@ -445,12 +423,12 @@ QnTimePeriodList MetadataArchive::matchPeriod(const Filter& filter)
 
             if (descendingOrder)
             {
-                loadDataFromIndexDesc(metadataFile, indexHeader, index, startItr, endItr, filter.detailLevel.count(), filter.limit,
+                loadDataFromIndexDesc(filter, metadataFile, indexHeader, index, startItr, endItr,
                     buffer, mask, maskStart, maskEnd, rez);
             }
             else
             {
-                loadDataFromIndex(metadataFile, indexHeader, index, startItr, endItr, filter.detailLevel.count(), filter.limit,
+                loadDataFromIndex(filter, metadataFile, indexHeader, index, startItr, endItr,
                     buffer, mask, maskStart, maskEnd, rez);
             }
 

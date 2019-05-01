@@ -99,12 +99,14 @@ QnTimePeriodList QnMotionHelper::matchImage(const QnChunksRequestData& request)
                 if (archive)
                 {
                     timePeriods.push_back(archive->matchPeriod(
-                        motionRegions[i],
-                        request.startTimeMs,
-                        request.endTimeMs,
-                        request.detailLevel.count(),
-                        request.limit,
-                        request.sortOrder));
+                        {
+                            motionRegions[i],
+                            std::chrono::milliseconds(request.startTimeMs),
+                            std::chrono::milliseconds(request.endTimeMs),
+                            request.detailLevel,
+                            request.limit,
+                            request.sortOrder
+                        }));
                 }
             }
         }

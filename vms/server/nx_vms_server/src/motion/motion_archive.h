@@ -8,8 +8,6 @@
 #include <motion/motion_detection.h>
 #include <nx/vms/server/metadata/metadata_archive.h>
 
-static const int kMotionDataRecordSize = Qn::kMotionGridWidth*Qn::kMotionGridHeight/8;
-
 class QnMotionArchive;
 
 class QnMotionArchiveConnection: public QnAbstractMotionArchiveConnection
@@ -17,7 +15,6 @@ class QnMotionArchiveConnection: public QnAbstractMotionArchiveConnection
 public:
     QnAbstractCompressedMetadataPtr getMotionData(qint64 timeUsec);
     virtual ~QnMotionArchiveConnection();
-
 private:
     QnMotionArchiveConnection(QnMotionArchive* owner);
 
@@ -45,13 +42,14 @@ typedef std::shared_ptr<QnMotionArchiveConnection> QnMotionArchiveConnectionPtr;
 class QnMotionArchive: public nx::vms::server::metadata::MetadataArchive
 {
     Q_OBJECT
+    using base_type = nx::vms::server::metadata::MetadataArchive;
 public:
     QnMotionArchive(const QString& dataDir, const QString& uniqueId, int channel);
     virtual ~QnMotionArchive();
     QnMotionArchiveConnectionPtr createConnection();
 
     bool saveToArchive(QnConstMetaDataV1Ptr data);
-
+    QnTimePeriodList matchPeriod(const Filter& filter);
 private:
     friend class QnMotionArchiveConnection;
 private:

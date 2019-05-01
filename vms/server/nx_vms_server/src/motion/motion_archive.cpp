@@ -114,7 +114,7 @@ QnMotionArchive::QnMotionArchive(
     :
     MetadataArchive(
         "motion",
-        kMotionDataRecordSize,
+        QnMetaDataV1::kMotionDataBufferSize,
         kAggregationIntervalSeconds,
         dataDir,
         uniqueId,
@@ -170,3 +170,7 @@ bool QnMotionArchive::saveToArchive(QnConstMetaDataV1Ptr data)
     return rez;
 }
 
+QnTimePeriodList QnMotionArchive::matchPeriod(const Filter& filter)
+{
+    return base_type::matchPeriodInternal(filter);
+}
