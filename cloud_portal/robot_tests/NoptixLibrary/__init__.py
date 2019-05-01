@@ -1,22 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import imaplib
-import re
-from platform import system
+import docker
 import email.header
-from email.parser import HeaderParser
+import imaplib
 import os.path
+import re
 import time
+from email.parser import HeaderParser
+from platform import system
+from random import *
 from requests import head
+from robot.libraries.BuiltIn import BuiltIn
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-
 from selenium.common.exceptions import NoSuchElementException
 from SeleniumLibrary.utils import (is_falsy, is_truthy, secs_to_timestr,
                                    timestr_to_secs, SELENIUM_VERSION)
-from random import *
-from robot.libraries.BuiltIn import BuiltIn
 
 
 class NoptixLibrary(object):
