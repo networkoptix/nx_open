@@ -33,6 +33,12 @@ MediatorCluster::MediatorCluster(const nx::utils::Url& discoveryServiceUrl):
 {
 }
 
+void MediatorCluster::stop()
+{
+    for (auto& mediator : m_mediators)
+        mediator->stop();
+}
+
 MediatorFunctionalTest& MediatorCluster::addMediator(int flags, const QString& testDir)
 {
     m_mediators.emplace_back(std::make_unique<MediatorFunctionalTest>(flags, testDir));

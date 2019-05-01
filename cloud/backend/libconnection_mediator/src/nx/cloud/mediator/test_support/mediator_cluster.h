@@ -12,7 +12,12 @@ namespace nx::hpm::test {
 class MediatorCluster
 {
 public:
-    MediatorCluster(const nx::utils::Url& url);
+    MediatorCluster(const nx::utils::Url& discoveryServiceUrl);
+
+    /**
+     * Stops all mediators.
+     */
+    void stop();
 
     /**
      * Adds a mediator to the cluster with necessary arguments for cluster operation.
