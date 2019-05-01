@@ -20,9 +20,9 @@ using ConnectorFactoryFunc = std::unique_ptr<AbstractTransactionTransportConnect
     const ProtocolVersionRange& protocolVersionRange,
     CommandLog* commandLog,
     const OutgoingCommandFilter& outgoingCommandFilter,
-    const nx::utils::Url& nodeUrl,
-    const std::string& systemId,
-    const std::string& nodeId);
+    const std::string& clusterId,
+    const std::string& nodeId,
+    const nx::utils::Url& nodeUrl);
 
 class NX_DATA_SYNC_ENGINE_API ConnectorFactory:
     public nx::utils::BasicFactory<ConnectorFactoryFunc>
@@ -39,9 +39,9 @@ private:
         const ProtocolVersionRange& protocolVersionRange,
         CommandLog* commandLog,
         const OutgoingCommandFilter& outgoingCommandFilter,
-        const nx::utils::Url& nodeUrl,
-        const std::string& systemId,
-        const std::string& nodeId);
+        const std::string& clusterId,
+        const std::string& nodeId,
+        const nx::utils::Url& nodeUrl);
 };
 
 } // namespace nx::clusterdb::engine::transport

@@ -15,17 +15,17 @@ public:
             [](const ProtocolVersionRange& protocolVersionRange,
                 CommandLog* commandLog,
                 const OutgoingCommandFilter& outgoingCommandFilter,
-                const nx::utils::Url& nodeUrl,
-                const std::string& systemId,
-                const std::string& nodeId)
+                const std::string& clusterId,
+                const std::string& nodeId,
+                const nx::utils::Url& nodeUrl)
             {
                 return std::make_unique<p2p::websocket::Connector>(
                     protocolVersionRange,
                     commandLog,
                     outgoingCommandFilter,
-                    nodeUrl,
-                    systemId,
-                    nodeId);
+                    clusterId,
+                    nodeId,
+                    nodeUrl);
             });
     }
 };

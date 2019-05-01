@@ -20,13 +20,13 @@ std::unique_ptr<AbstractTransactionTransportConnector> ConnectorFactory::default
     const ProtocolVersionRange& protocolVersionRange,
     CommandLog* commandLog,
     const OutgoingCommandFilter& outgoingCommandFilter,
-    const nx::utils::Url& nodeUrl,
-    const std::string& systemId,
-    const std::string& nodeId)
+    const std::string& clusterId,
+    const std::string& nodeId,
+    const nx::utils::Url& nodeUrl)
 {
 #if 0
     return std::make_unique<HttpTunnelTransportConnector>(
-        systemId,
+        clusterId,
         connectionId,
         syncApiTargetUrl);
 #else
@@ -34,9 +34,9 @@ std::unique_ptr<AbstractTransactionTransportConnector> ConnectorFactory::default
         protocolVersionRange,
         commandLog,
         outgoingCommandFilter,
-        nodeUrl,
-        systemId,
-        nodeId);
+        clusterId,
+        nodeId,
+        nodeUrl);
 #endif
 }
 

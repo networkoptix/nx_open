@@ -20,15 +20,15 @@ Connector::Connector(
     const ProtocolVersionRange& protocolVersionRange,
     CommandLog* commandLog,
     const OutgoingCommandFilter& commandFilter,
-    const nx::utils::Url& remoteNodeUrl,
-    const std::string& systemId,
-    const std::string& nodeId)
+    const std::string& clusterId,
+    const std::string& nodeId,
+    const nx::utils::Url& remoteNodeUrl)
     :
     m_protocolVersionRange(protocolVersionRange),
     m_commandLog(commandLog),
     m_commandFilter(commandFilter),
     m_remoteNodeUrl(nx::network::url::Builder(remoteNodeUrl).appendPath(kCommandPath)),
-    m_systemId(systemId)
+    m_clusterId(clusterId)
 {
     m_localPeer.id = QnUuid::fromStringSafe(nodeId.c_str());
     m_localPeer.instanceId = m_localPeer.id;
@@ -103,7 +103,7 @@ void Connector::handlePipelineStart(SystemError::ErrorCode resultCode)
     auto connection = std::make_unique<websocket::Connection>(
         m_protocolVersionRange,
         m_commandLog,
-        m_systemId,
+        m_clusterId,
         m_commandFilter,
         m_connectionId,
         std::exchange(m_commandPipeline, nullptr),

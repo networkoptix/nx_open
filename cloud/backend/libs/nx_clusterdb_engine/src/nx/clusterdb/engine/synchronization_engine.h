@@ -17,9 +17,6 @@
 #include "statistics/provider.h"
 #include "transaction_log.h"
 #include "discovery_manager.h"
-#include "transport/common_http/acceptor.h"
-#include "transport/p2p_http/acceptor.h"
-#include "transport/p2p_websocket/acceptor.h"
 #include "transport/transport_manager.h"
 
 namespace nx::clusterdb::engine {
@@ -91,9 +88,7 @@ private:
     ConnectionManager m_connectionManager;
     transport::TransportManager m_transportManager;
     Connector m_connector;
-    transport::CommonHttpAcceptor m_httpTransportAcceptor;
-    transport::p2p::websocket::Acceptor m_webSocketAcceptor;
-    transport::p2p::http::Acceptor m_p2pHttpAcceptor;
+    std::vector<std::unique_ptr<transport::AbstractAcceptor>> m_transportAcceptors;
     statistics::Provider m_statisticsProvider;
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;
     nx::utils::Counter m_startedAsyncCallsCounter;
