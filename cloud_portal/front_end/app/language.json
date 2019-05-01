@@ -245,6 +245,7 @@
     },
     "systemOffline"       : "System Offline",
     "systemHasNoCameras"  : "NO CAMERAS",
+    "systemUnreachable"   : "SYSTEM IS UNREACHABLE",
     "cameraStates"        : {
       "offline"            : "Offline",
       "error"              : "Error",
