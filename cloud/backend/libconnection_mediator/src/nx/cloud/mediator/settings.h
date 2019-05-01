@@ -14,6 +14,7 @@
 #include <nx/utils/deprecated_settings.h>
 #include <nx/utils/std/optional.h>
 #include <nx/clusterdb/map/settings.h>
+#include <nx/cloud/discovery/settings.h>
 
 #include "discovery/discovery_settings.h"
 
@@ -67,7 +68,14 @@ struct Statistics
 
 struct TrafficRelay
 {
-    std::vector<QUrl>urls;
+    std::vector<nx::utils::Url> urls;
+    std::string clusterId;
+    nx::cloud::discovery::Settings discovery;
+};
+
+struct GeoIp
+{
+    std::string dbPath;
 };
 
 struct ListeningPeer
@@ -126,6 +134,7 @@ public:
     const nx::sql::ConnectionOptions& dbConnectionOptions() const;
     const Statistics& statistics() const;
     const TrafficRelay& trafficRelay() const;
+    const GeoIp& geoIp() const;
     const nx::cloud::discovery::conf::Discovery& discovery() const;
     const ListeningPeer& listeningPeer() const;
     const Server& server() const;
@@ -142,6 +151,7 @@ private:
     nx::sql::ConnectionOptions m_dbConnectionOptions;
     Statistics m_statistics;
     TrafficRelay m_trafficRelay;
+    GeoIp m_geoIp;
     nx::cloud::discovery::conf::Discovery m_discovery;
     ListeningPeer m_listeningPeer;
     Server m_server;
@@ -157,6 +167,7 @@ private:
 
     void loadConnectionParameters();
     void loadTrafficRelay();
+    void loadGeoIp();
     void loadListeningPeer();
     void loadHttp();
     void loadHttps();
