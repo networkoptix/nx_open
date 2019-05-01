@@ -7,4 +7,6 @@ struct QnTraytoolAppInfo
 
     /** Client registry key. */
     static QString clientName();
+
+    static QString mediaServerRegistryKey();
 };

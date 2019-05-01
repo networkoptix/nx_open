@@ -216,10 +216,10 @@ void RubberBandInstrument::installedNotify() {
 void RubberBandInstrument::aboutToBeUninstalledNotify() {
     base_type::aboutToBeUninstalledNotify();
 
-    if (scene() != NULL)
-        disconnect(scene(), NULL, this, NULL);
+    if (scene())
+        scene()->disconnect(this);
 
-    if(rubberBand() != NULL)
+    if (rubberBand())
         delete rubberBand();
 }
 

@@ -86,6 +86,13 @@ public:
             m_animated = true;
             progressHidden = true;
         }
+        else if (data->offline && data->state != StatusCode::offline)
+        {
+            m_left->setText(tr("Waiting for server to respond..."));
+            leftHidden = false;
+            m_animated = true;
+            progressHidden = true;
+        }
         else
         {
             switch (data->state)

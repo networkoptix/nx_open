@@ -1,0 +1,5 @@
+[General]
+secureAppserverConnection=1 #< default: false
+minStorageSpace=1000000000 #< default: 100M
+resourceInitThreadsCount=8 #< default: 32
+logLevel=ALWAYS #< default: ""

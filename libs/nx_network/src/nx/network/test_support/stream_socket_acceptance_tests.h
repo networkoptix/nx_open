@@ -1152,6 +1152,11 @@ protected:
         m_clientSocketThread.join();
     }
 
+    void thenPollableIsStillValid()
+    {
+        ASSERT_NE(nullptr, m_connection->pollable());
+    }
+
     //---------------------------------------------------------------------------------------------
 
     void whenSendDataConcurrentlyThroughConnectedSockets()
@@ -1730,6 +1735,16 @@ TYPED_TEST_P(StreamSocketAcceptance, shutdown_interrupts_recv)
     this->thenConnectionOperationIsInterrupted();
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, pollable_is_valid_after_shutdown)
+{
+    this->givenSilentServer();
+    this->givenConnectedSocket();
+    
+    this->whenInvokeShutdown();
+
+    this->thenPollableIsStillValid();
+}
+
 //-------------------------------------------------------------------------------------------------
 // Accepting side tests.
 
@@ -1879,6 +1894,7 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_shutdown_interrupts_connect,
     DISABLED_shutdown_interrupts_send,
     shutdown_interrupts_recv,
+    pollable_is_valid_after_shutdown,
 
     //---------------------------------------------------------------------------------------------
     // Accepting side tests.

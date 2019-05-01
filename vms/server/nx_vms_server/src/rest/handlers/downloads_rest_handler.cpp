@@ -343,11 +343,11 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
     else if (!url.isValid())
         return makeInvalidParameterError("url", QnRestResult::InvalidParameter);
 
-    bool ok = false;
-    const qint64 chunkSize = params.value("chunkSize").toLongLong(&ok);
-    if (!ok)
+    const QString chunkSizeString = params.value("chunkSize");
+    if (chunkSizeString.isEmpty())
         return makeInvalidParameterError("chunkSize", QnRestResult::MissingParameter);
-    if (chunkSize > kMaxChunkSize)
+    const qint64 chunkSize = chunkSizeString.toLongLong();
+    if (chunkSize <= 0 || chunkSize > kMaxChunkSize)
         return makeInvalidParameterError("chunkSize", QnRestResult::InvalidParameter);
 
     const auto fileInfo = downloader->fileInformation(fileName);
@@ -382,8 +382,11 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
 
     const auto status = httpClient.response()->statusLine.statusCode;
 
-    if (status != nx::network::http::StatusCode::ok && status != nx::network::http::StatusCode::partialContent)
+    if (status != nx::network::http::StatusCode::ok
+        && status != nx::network::http::StatusCode::partialContent)
+    {
         return status;
+    }
 
     result.clear();
     while (!httpClient.eof())

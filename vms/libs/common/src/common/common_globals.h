@@ -180,6 +180,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
+    nx::vms::api::StreamIndex toStreamIndex(ConnectionRole role);
+
     // TODO: #GDM split to server-only and client-only flags as they are always local
     enum ResourceFlag
     {
@@ -734,6 +736,19 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
     const T &_id(const T &value) { return value; }
 
     const static QLatin1String kWallpapersFolder("wallpapers");
+
+    inline QString toString(nx::vms::api::StreamIndex streamIndex)
+    {
+        switch (streamIndex)
+        {
+            case nx::vms::api::StreamIndex::primary:
+                return "primary";
+            case nx::vms::api::StreamIndex::secondary:
+                return "secondary";
+            default:
+                return "undefined";
+        }
+    }
 
 } // namespace Qn
 

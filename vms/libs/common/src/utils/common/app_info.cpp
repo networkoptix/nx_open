@@ -73,11 +73,6 @@ bool QnAppInfo::isArm()
     return nx::utils::AppInfo::isArm();
 }
 
-bool QnAppInfo::isBpi()
-{
-    return nx::utils::AppInfo::isBpi();
-}
-
 bool QnAppInfo::isNx1()
 {
     return nx::utils::AppInfo::isNx1();

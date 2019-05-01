@@ -77,8 +77,6 @@ Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
             nx::utils::random::number<float>(0, 1));
     }
 
-    // TODO: requiredAttributes;
-
     if (nx::utils::random::number<bool>())
     {
         filter.freeText = attributeDictionary
@@ -91,6 +89,28 @@ Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
         : Qt::SortOrder::DescendingOrder;
 
     return filter;
+}
+
+static std::vector<common::metadata::Attribute> getUniqueAttributes(
+    std::vector<common::metadata::Attribute> attributes)
+{
+    std::vector<common::metadata::Attribute> result;
+    std::map<QString /*name*/, std::size_t /*position*/> uniqueAttributes;
+
+    for (std::size_t i = 0; i < attributes.size(); ++i)
+    {
+        if (uniqueAttributes.count(attributes.at(i).name) == 0)
+        {
+            result.push_back(attributes.at(i));
+            uniqueAttributes[attributes.at(i).name] = result.size() - 1;
+        }
+        else
+        {
+            result[uniqueAttributes[attributes.at(i).name]].value = attributes.at(i).value;
+        }
+    }
+
+    return result;
 }
 
 common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
@@ -110,15 +130,7 @@ common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
         common::metadata::DetectedObject detectedObject;
         detectedObject.objectTypeId = QnUuid::createUuid().toString();
         detectedObject.objectId = QnUuid::createUuid();
-        detectedObject.boundingBox.setTopLeft(QPointF(
-            nx::utils::random::number<float>(0, 1),
-            nx::utils::random::number<float>(0, 1)));
-        detectedObject.boundingBox.setWidth(nx::utils::random::number<float>(
-            0,
-            1 - detectedObject.boundingBox.topLeft().x()));
-        detectedObject.boundingBox.setHeight(nx::utils::random::number<float>(
-            0,
-            1 - detectedObject.boundingBox.topLeft().y()));
+        detectedObject.boundingBox = generateRandomRectf();
         detectedObject.labels.resize(nx::utils::random::number<int>(
             minAttributeCount, maxAttributeCount));
         for (auto& attribute: detectedObject.labels)
@@ -129,10 +141,25 @@ common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
                     QString::fromUtf8(nx::utils::random::generateName(7)),
                     QString::fromUtf8(nx::utils::random::generateName(7))};
         }
+
+        detectedObject.labels = getUniqueAttributes(
+            std::exchange(detectedObject.labels, {}));
+
         packet->objects.push_back(std::move(detectedObject));
     }
 
     return packet;
+}
+
+QRectF generateRandomRectf()
+{
+    QRectF rect;
+    rect.setTopLeft(QPointF(
+        nx::utils::random::number<float>(0, 1),
+        nx::utils::random::number<float>(0, 1)));
+    rect.setWidth(nx::utils::random::number<float>(0, 1 - rect.topLeft().x()));
+    rect.setHeight(nx::utils::random::number<float>(0, 1 - rect.topLeft().y()));
+    return rect;
 }
 
 } // namespace test

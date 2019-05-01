@@ -42,9 +42,9 @@ void ActiAudioTransmitter::prepare()
 
 bool ActiAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
 {
-    std::size_t totalBytesAvailable = audioData->dataSize() + m_buffer.size();
-    std::size_t bufferOffset = 0;
-    
+    int totalBytesAvailable = int(audioData->dataSize()) + m_buffer.size();
+    int bufferOffset = 0;
+
     bool result = false;
 
     while (totalBytesAvailable >= kSingleChunkLength)
@@ -103,8 +103,8 @@ void ActiAudioTransmitter::prepareHttpClient(const nx::network::http::AsyncHttpC
     httpClient->setDisablePrecalculatedAuthorization(false);
 
     // There is a bug in ACTi authorization for SEND_AUDIO request:
-    // if we don't add authorization info to the first request all subsequent 
-    // requests will fail with "401 Unauthorized", so we have to add authorization 
+    // if we don't add authorization info to the first request all subsequent
+    // requests will fail with "401 Unauthorized", so we have to add authorization
     // to the first request.
     httpClient->setAuthType(nx::network::http::AuthType::authBasic);
 }

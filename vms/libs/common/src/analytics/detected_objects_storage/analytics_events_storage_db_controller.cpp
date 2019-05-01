@@ -4,6 +4,7 @@
 
 #include "analytics_events_storage_db_schema.h"
 #include "analytics_events_storage_types.h"
+#include "config.h"
 
 namespace nx::analytics::storage {
 
@@ -25,8 +26,12 @@ DbController::DbController(
     dbStructureUpdater().addUpdateScript(kConvertTimestampToMillis);
     dbStructureUpdater().addUpdateScript(lm(kPackCoordinates).args(kCoordinatesPrecision).toUtf8());
     dbStructureUpdater().addUpdateScript(kAddFullTimePeriods);
+    dbStructureUpdater().addUpdateScript(kConvertDurationToMillis);
     if (kUseTrackAggregation)
+    {
         dbStructureUpdater().addUpdateScript(kSplitDataToObjectAndSearch);
+        dbStructureUpdater().addUpdateScript(kObjectBestShot);
+    }
 }
 
 } // namespace nx::analytics::storage

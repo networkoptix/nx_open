@@ -6,6 +6,7 @@
 
 namespace nx::vms::api::analytics {
 
+// TODO: Move this class to server-only library; eliminate its usages in the Client.
 /**
  * The JSON-serializable data structure that is given by each Analytics Engine's DeviceAgent to the
  * Server after the DeviceAgent has been created by the Engine.

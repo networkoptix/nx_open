@@ -1,16 +1,25 @@
 #include "analytics_events_storage_cursor.h"
 
-namespace nx {
-namespace analytics {
-namespace storage {
+namespace nx::analytics::storage::deprecated {
 
 Cursor::Cursor(std::unique_ptr<nx::sql::Cursor<DetectedObject>> dbCursor):
     m_dbCursor(std::move(dbCursor))
 {
 }
 
+void Cursor::close()
+{
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    m_closed = true;
+    m_dbCursor.reset();
+}
+
 common::metadata::ConstDetectionMetadataPacketPtr Cursor::next()
 {
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    if (m_closed)
+        return nullptr;
+
     common::metadata::DetectionMetadataPacketPtr resultPacket;
     m_nextPacket.swap(resultPacket);
 
@@ -72,6 +81,4 @@ nx::common::metadata::DetectedObject Cursor::toMetadataObject(
     return result;
 }
 
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::storage::deprecated

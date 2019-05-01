@@ -10,21 +10,18 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/detected_objects_storage/config.h>
+#include <analytics/detected_objects_storage/serializers.h>
 #include <test_support/analytics/storage/analytics_storage_types.h>
 
-namespace nx {
-namespace analytics {
-namespace storage {
-namespace test {
+namespace nx::analytics::storage::test {
 
-static const auto kUsecInMs = 1000;
-
-class AnalyticsEventsStorage:
+class AnalyticsDb:
     public nx::utils::test::TestWithTemporaryDirectory,
     public ::testing::Test
 {
 public:
-    AnalyticsEventsStorage():
+    AnalyticsDb():
         nx::utils::test::TestWithTemporaryDirectory("analytics_events_storage", QString()),
         m_allowedTimeRange(
             std::chrono::system_clock::from_time_t(0),
@@ -48,7 +45,7 @@ protected:
     {
         m_analyticsDataPackets.push_back(generateRandomPacket(1));
         whenIssueSavePacket(m_analyticsDataPackets[0]);
-        thenSaveSucceeded();
+        flushData();
     }
 
     void whenSaveMultipleEventsConcurrently()
@@ -60,15 +57,26 @@ protected:
             whenIssueSavePacket(m_analyticsDataPackets.back());
         }
 
-        for (int i = 0; i < packetCount; ++i)
-            thenSaveSucceeded();
+        flushData();
+    }
+
+    void whenSaveObjectTrackContainingBestShot()
+    {
+        std::vector<nx::common::metadata::DetectionMetadataPacketPtr> packets;
+
+        packets.push_back(generateRandomPacket(1));
+        packets.push_back(std::make_shared<nx::common::metadata::DetectionMetadataPacket>(
+            *packets.back()));
+
+        packets.back()->timestampUsec += 1000000;
+        packets.back()->objects.front().bestShot = true;
+
+        saveAnalyticsDataPackets(std::move(packets));
     }
 
     void whenIssueSavePacket(common::metadata::ConstDetectionMetadataPacketPtr packet)
     {
-        m_eventsStorage->save(
-            packet,
-            [this](ResultCode resultCode) { m_savePacketResultQueue.push(resultCode); });
+        m_eventsStorage->save(packet);
     }
 
     void whenRestartStorage()
@@ -83,15 +91,10 @@ protected:
             filter,
             [this](
                 ResultCode resultCode,
-                std::vector<DetectedObject> eventsFound)
+                std::vector<DetectedObject> objectsFound)
             {
-                m_lookupResultQueue.push(LookupResult{resultCode, std::move(eventsFound)});
+                m_lookupResultQueue.push(LookupResult{resultCode, std::move(objectsFound)});
             });
-    }
-
-    void thenSaveSucceeded()
-    {
-        ASSERT_EQ(ResultCode::ok, m_savePacketResultQueue.pop());
     }
 
     void thenAllEventsCanBeRead()
@@ -106,48 +109,14 @@ protected:
         const Filter& filter,
         const std::vector<common::metadata::DetectionMetadataPacketPtr>& expected)
     {
-        auto objects = toDetectedObjects(expected);
-        const auto filteredObjects =
-            filterObjectsAndApplySortOrder(filter, std::move(objects));
-        andLookupResultEquals(filteredObjects);
-    }
-
-    std::vector<nx::analytics::storage::DetectedObject> filterObjectsAndApplySortOrder(
-        const Filter& filter,
-        std::vector<nx::analytics::storage::DetectedObject> objects)
-    {
-        // First, sorting objects in descending order, because we always filtering the most recent objects
-        // and filter.sortOrder is applied AFTER fitering.
-        std::sort(
-            objects.begin(), objects.end(),
-            [&filter](const DetectedObject& left, const DetectedObject& right)
-            {
-                return left.track.front().timestampUsec > right.track.front().timestampUsec;
-            });
-
-        auto filteredObjects = filterObjects(objects, filter);
-
-        std::sort(
-            filteredObjects.begin(), filteredObjects.end(),
-            [&filter](const DetectedObject& left, const DetectedObject& right)
-            {
-                if (filter.sortOrder == Qt::AscendingOrder)
-                    return left.track.front().timestampUsec < right.track.front().timestampUsec;
-                else
-                    return left.track.front().timestampUsec > right.track.front().timestampUsec;
-            });
-
-        return filteredObjects;
+        andLookupResultEquals(calculateExpectedResult(filter, expected));
     }
 
     bool isLookupResultEquals(
         const Filter& filter,
         const std::vector<common::metadata::DetectionMetadataPacketPtr>& expected)
     {
-        auto objects = toDetectedObjects(expected);
-        const auto filteredObjects =
-            filterObjectsAndApplySortOrder(filter, std::move(objects));
-        return filteredObjects == m_prevLookupResult->eventsFound;
+        return calculateExpectedResult(filter, expected) == m_prevLookupResult->objectsFound;
     }
 
     void thenLookupSucceded()
@@ -159,84 +128,20 @@ protected:
     void andLookupResultEquals(
         const std::vector<DetectedObject>& expected)
     {
-        ASSERT_EQ(expected, m_prevLookupResult->eventsFound);
+        ASSERT_EQ(expected, m_prevLookupResult->objectsFound);
     }
 
     std::vector<DetectedObject> toDetectedObjects(
         const std::vector<common::metadata::DetectionMetadataPacketPtr>& analyticsDataPackets) const
     {
-        std::vector<DetectedObject> result;
-        for (const auto& packet: analyticsDataPackets)
-        {
-            for (const auto& object: packet->objects)
-            {
-                DetectedObject detectedObject;
-                detectedObject.objectAppearanceId = object.objectId;
-                detectedObject.objectTypeId = object.objectTypeId;
-                detectedObject.attributes = object.labels;
-                detectedObject.track.push_back(ObjectPosition());
-                ObjectPosition& objectPosition = detectedObject.track.back();
-                objectPosition.boundingBox = object.boundingBox;
-                objectPosition.timestampUsec = packet->timestampUsec;
-                objectPosition.durationUsec = packet->durationUsec;
-                objectPosition.deviceId = packet->deviceId;
+        std::vector<DetectedObject> objects;
 
-                result.push_back(std::move(detectedObject));
-            }
-        }
+        convertPacketsToObjects(analyticsDataPackets, &objects);
+        groupObjects(&objects);
+        if (kUseTrackAggregation)
+            removeDuplicateAttributes(&objects);
 
-        // Groupping object track.
-        std::sort(
-            result.begin(), result.end(),
-            [](const DetectedObject& left, const DetectedObject& right)
-            {
-                return left.objectAppearanceId < right.objectAppearanceId;
-            });
-
-        for (auto it = result.begin(); it != result.end();)
-        {
-            auto nextIter = std::next(it);
-            if (nextIter == result.end())
-                break;
-
-            if (it->objectAppearanceId == nextIter->objectAppearanceId)
-            {
-                // Merging.
-                it->firstAppearanceTimeUsec =
-                    std::min(it->firstAppearanceTimeUsec, nextIter->firstAppearanceTimeUsec);
-                it->lastAppearanceTimeUsec =
-                    std::max(it->lastAppearanceTimeUsec, nextIter->lastAppearanceTimeUsec);
-                std::move(
-                    nextIter->track.begin(), nextIter->track.end(),
-                    std::back_inserter(it->track));
-                std::move(
-                    nextIter->attributes.begin(), nextIter->attributes.end(),
-                    std::back_inserter(it->attributes));
-                result.erase(nextIter);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-
-        for (auto& detectedObject: result)
-        {
-            std::sort(
-                detectedObject.track.begin(), detectedObject.track.end(),
-                [](const ObjectPosition& left, const ObjectPosition& right)
-                    { return left.timestampUsec < right.timestampUsec; });
-
-            if (!detectedObject.track.empty())
-            {
-                detectedObject.firstAppearanceTimeUsec =
-                    detectedObject.track.begin()->timestampUsec;
-                detectedObject.lastAppearanceTimeUsec =
-                    detectedObject.track.rbegin()->timestampUsec;
-            }
-        }
-
-        return result;
+        return objects;
     }
 
     std::vector<DetectedObject> filterObjects(
@@ -389,7 +294,7 @@ protected:
         const int eventsPerDevice = 11;
 
         std::vector<common::metadata::DetectionMetadataPacketPtr> analyticsDataPackets;
-        for (const auto& deviceId : m_allowedDeviceIds)
+        for (const auto& deviceId: m_allowedDeviceIds)
         {
             for (int i = 0; i < eventsPerDevice; ++i)
             {
@@ -427,8 +332,7 @@ protected:
         std::for_each(analyticsDataPackets.begin(), analyticsDataPackets.end(),
             [this](const auto& packet) { whenIssueSavePacket(packet); });
 
-        std::for_each(analyticsDataPackets.begin(), analyticsDataPackets.end(),
-            [this](const auto&) { thenSaveSucceeded(); });
+        flushData();
     }
 
     EventsStorage& eventsStorage()
@@ -446,8 +350,9 @@ protected:
         if (m_analyticsDataPackets.empty())
             return;
 
-        m_analyticsDataPackets =
-            sortPacketsByTimestamp(m_analyticsDataPackets, Qt::SortOrder::AscendingOrder);
+        m_analyticsDataPackets = sortPacketsByTimestamp(
+            std::exchange(m_analyticsDataPackets, {}),
+            Qt::SortOrder::AscendingOrder);
 
         auto prevPacketIter = m_analyticsDataPackets.begin();
         for (auto it = std::next(prevPacketIter);
@@ -460,6 +365,7 @@ protected:
                 std::move(
                     (*it)->objects.begin(), (*it)->objects.end(),
                     std::back_inserter((*prevPacketIter)->objects));
+
                 (*prevPacketIter)->durationUsec =
                     std::max((*it)->durationUsec, (*prevPacketIter)->durationUsec);
                 it = m_analyticsDataPackets.erase(it);
@@ -476,13 +382,12 @@ private:
     struct LookupResult
     {
         ResultCode resultCode;
-        std::vector<DetectedObject> eventsFound;
+        std::vector<DetectedObject> objectsFound;
     };
 
     std::unique_ptr<EventsStorage> m_eventsStorage;
     Settings m_settings;
     std::vector<common::metadata::DetectionMetadataPacketPtr> m_analyticsDataPackets;
-    nx::utils::SyncQueue<ResultCode> m_savePacketResultQueue;
     nx::utils::SyncQueue<LookupResult> m_lookupResultQueue;
     boost::optional<LookupResult> m_prevLookupResult;
 
@@ -493,8 +398,79 @@ private:
 
     bool initializeStorage()
     {
-        m_eventsStorage = std::make_unique<EventsStorage>(m_settings);
-        return m_eventsStorage->initialize();
+        m_eventsStorage = std::make_unique<EventsStorage>();
+        return m_eventsStorage->initialize(m_settings);
+    }
+
+    void flushData()
+    {
+        std::promise<ResultCode> done;
+        m_eventsStorage->flush([&done](ResultCode result) { done.set_value(result); });
+        ASSERT_EQ(ResultCode::ok, done.get_future().get());
+    }
+
+    std::vector<nx::analytics::storage::DetectedObject> calculateExpectedResult(
+        const Filter& filter,
+        const std::vector<common::metadata::DetectionMetadataPacketPtr>& packets)
+    {
+        auto objects = toDetectedObjects(packets);
+        objects = filterObjectsAndApplySortOrder(filter, std::move(objects));
+
+        if (kUseTrackAggregation)
+        {
+            // NOTE: Object box is stored in the DB with limited precision.
+            // So, lowering precision to that in the DB.
+            objects = applyTrackBoxPrecision(std::move(objects));
+        }
+
+        return objects;
+    }
+
+    std::vector<nx::analytics::storage::DetectedObject> filterObjectsAndApplySortOrder(
+        const Filter& filter,
+        std::vector<nx::analytics::storage::DetectedObject> objects)
+    {
+        // First, sorting objects in descending order, because we always filtering the most recent objects
+        // and filter.sortOrder is applied AFTER fitering.
+        std::sort(
+            objects.begin(), objects.end(),
+            [&filter](const DetectedObject& left, const DetectedObject& right)
+            {
+                return left.track.front().timestampUsec > right.track.front().timestampUsec;
+            });
+
+        auto filteredObjects = filterObjects(objects, filter);
+
+        std::sort(
+            filteredObjects.begin(), filteredObjects.end(),
+            [&filter](const DetectedObject& left, const DetectedObject& right)
+            {
+                if (filter.sortOrder == Qt::AscendingOrder)
+                    return left.track.front().timestampUsec < right.track.front().timestampUsec;
+                else
+                    return left.track.front().timestampUsec > right.track.front().timestampUsec;
+            });
+
+        return filteredObjects;
+    }
+
+    std::vector<nx::analytics::storage::DetectedObject> applyTrackBoxPrecision(
+        std::vector<nx::analytics::storage::DetectedObject> objects)
+    {
+        static const QSize kResolution(kCoordinatesPrecision, kCoordinatesPrecision);
+
+        for (auto& object: objects)
+        {
+            for (auto& position: object.track)
+            {
+                position.boundingBox =
+                    translate(
+                        translate(position.boundingBox, kResolution),
+                        kResolution);
+            }
+        }
+
+        return objects;
     }
 
     bool satisfiesFilter(
@@ -527,10 +503,23 @@ private:
         if (!satisfiesCommonConditions(filter, data))
             return false;
 
-        if (!filter.boundingBox.isNull() && !filter.boundingBox.intersects(data.boundingBox))
-            return false;
+        if (filter.boundingBox.isNull())
+            return true;
 
-        return true;
+        if (kUseTrackAggregation)
+        {
+            const auto filterBoundingBox = translate(
+                filter.boundingBox,
+                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+            const auto dataBoundingBox = translate(
+                data.boundingBox,
+                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+            return filterBoundingBox.intersects(dataBoundingBox);
+        }
+        else
+        {
+            return filter.boundingBox.intersects(data.boundingBox);
+        }
     }
 
     bool satisfiesFilter(
@@ -620,9 +609,110 @@ private:
 
         return true;
     }
+
+    static void convertPacketsToObjects(
+        const std::vector<common::metadata::DetectionMetadataPacketPtr>& analyticsDataPackets,
+        std::vector<DetectedObject>* objects)
+    {
+        for (const auto& packet: analyticsDataPackets)
+        {
+            for (const auto& object: packet->objects)
+            {
+                DetectedObject detectedObject;
+                detectedObject.objectAppearanceId = object.objectId;
+                detectedObject.objectTypeId = object.objectTypeId;
+                detectedObject.attributes = object.labels;
+                detectedObject.track.push_back(ObjectPosition());
+                ObjectPosition& objectPosition = detectedObject.track.back();
+                objectPosition.boundingBox = object.boundingBox;
+                objectPosition.timestampUsec = packet->timestampUsec;
+                objectPosition.durationUsec = packet->durationUsec;
+                objectPosition.deviceId = packet->deviceId;
+
+                if (object.bestShot)
+                {
+                    detectedObject.bestShot.timestampUsec = packet->timestampUsec;
+                    detectedObject.bestShot.rect = object.boundingBox;
+                }
+
+                objects->push_back(std::move(detectedObject));
+            }
+        }
+    }
+
+    static void groupObjects(std::vector<DetectedObject>* objects)
+    {
+        std::sort(
+            objects->begin(), objects->end(),
+            [](const DetectedObject& left, const DetectedObject& right)
+            {
+                return left.objectAppearanceId < right.objectAppearanceId;
+            });
+
+        for (auto it = objects->begin(); it != objects->end();)
+        {
+            auto nextIter = std::next(it);
+            if (nextIter == objects->end())
+                break;
+
+            if (it->objectAppearanceId == nextIter->objectAppearanceId)
+            {
+                // Merging.
+                it->firstAppearanceTimeUsec =
+                    std::min(it->firstAppearanceTimeUsec, nextIter->firstAppearanceTimeUsec);
+                it->lastAppearanceTimeUsec =
+                    std::max(it->lastAppearanceTimeUsec, nextIter->lastAppearanceTimeUsec);
+                std::move(
+                    nextIter->track.begin(), nextIter->track.end(),
+                    std::back_inserter(it->track));
+                std::move(
+                    nextIter->attributes.begin(), nextIter->attributes.end(),
+                    std::back_inserter(it->attributes));
+
+                if (nextIter->bestShot.initialized())
+                    it->bestShot = nextIter->bestShot;
+
+                objects->erase(nextIter);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+
+        for (auto& detectedObject: *objects)
+        {
+            std::sort(
+                detectedObject.track.begin(), detectedObject.track.end(),
+                [](const ObjectPosition& left, const ObjectPosition& right)
+                { return left.timestampUsec < right.timestampUsec; });
+
+            if (!detectedObject.track.empty())
+            {
+                detectedObject.firstAppearanceTimeUsec =
+                    detectedObject.track.begin()->timestampUsec;
+                detectedObject.lastAppearanceTimeUsec =
+                    detectedObject.track.rbegin()->timestampUsec;
+            }
+        }
+    }
+
+    static void removeDuplicateAttributes(std::vector<DetectedObject>* objects)
+    {
+        for (auto& detectedObject: *objects)
+        {
+            std::map<QString, QString> uniqueAttributes;
+            for (const auto& attribute: detectedObject.attributes)
+                uniqueAttributes[attribute.name] = attribute.value;
+            detectedObject.attributes.clear();
+
+            for (const auto& [name, value]: uniqueAttributes)
+                detectedObject.attributes.push_back({name, value});
+        }
+    }
 };
 
-TEST_F(AnalyticsEventsStorage, event_saved_can_be_read_later)
+TEST_F(AnalyticsDb, event_saved_can_be_read_later)
 {
     whenSaveEvent();
     whenRestartStorage();
@@ -630,19 +720,29 @@ TEST_F(AnalyticsEventsStorage, event_saved_can_be_read_later)
     thenAllEventsCanBeRead();
 }
 
-TEST_F(AnalyticsEventsStorage, storing_multiple_events_concurrently)
+TEST_F(AnalyticsDb, storing_multiple_events_concurrently)
 {
     whenSaveMultipleEventsConcurrently();
+    thenAllEventsCanBeRead();
+}
+
+TEST_F(AnalyticsDb, objects_best_shot_is_saved_and_reported)
+{
+    if (!kUseTrackAggregation)
+        return; // TODO: #ak Remove it after enabling kUseTrackAggregation in the repository.
+
+    whenSaveObjectTrackContainingBestShot();
+
     thenAllEventsCanBeRead();
 }
 
 //-------------------------------------------------------------------------------------------------
 // Basic Lookup condition.
 
-class AnalyticsEventsStorageLookup:
-    public AnalyticsEventsStorage
+class AnalyticsDbLookup:
+    public AnalyticsDb
 {
-    using base_type = AnalyticsEventsStorage;
+    using base_type = AnalyticsDb;
 
 protected:
     virtual void SetUp() override
@@ -731,25 +831,48 @@ protected:
 
     void givenRandomFilter()
     {
-        addRandomKnownDeviceIdToFilter();
+        const auto& randomPacket = nx::utils::random::choice(analyticsDataPackets());
+
+        m_filter.deviceIds.push_back(randomPacket->deviceId);
+        //addRandomKnownDeviceIdToFilter();
 
         if (nx::utils::random::number<bool>())
+        {
             addRandomNonEmptyTimePeriodToFilter();
+            if (!m_filter.timePeriod.contains(randomPacket->timestampUsec / kUsecInMs))
+            {
+                m_filter.timePeriod.addPeriod(
+                    QnTimePeriod(randomPacket->timestampUsec / kUsecInMs, 1));
+            }
+        }
 
         if (nx::utils::random::number<bool>())
-            addRandomObjectIdToFilter();
+            m_filter.objectAppearanceId = randomPacket->objects.front().objectId;
 
         if (nx::utils::random::number<bool>())
+        {
             addRandomObjectTypeIdToFilter();
+            if (!nx::utils::contains(m_filter.objectTypeId, randomPacket->objects.front().objectTypeId))
+                m_filter.objectTypeId.push_back(randomPacket->objects.front().objectTypeId);
+        }
 
         if (nx::utils::random::number<bool>())
             addMaxObjectsLimitToFilter();
 
         if (nx::utils::random::number<bool>())
+        {
             addRandomBoundingBoxToFilter();
+            if (!m_filter.boundingBox.intersects(randomPacket->objects.front().boundingBox))
+            {
+                m_filter.boundingBox =
+                    m_filter.boundingBox.united(randomPacket->objects.front().boundingBox);
+            }
+        }
 
         if (nx::utils::random::number<bool>())
+        {
             addRandomTextFoundInDataToFilter();
+        }
     }
 
     void givenRandomFilterWithMultipleDeviceIds()
@@ -768,6 +891,7 @@ protected:
         using namespace std::chrono;
 
         m_specificObjectAppearanceId = QnUuid::createUuid();
+        const auto deviceId = QnUuid::createUuid();
         auto analyticsDataPackets = generateEventsByCriteria();
 
         qint64 objectTrackStartTime = std::numeric_limits<qint64>::max();
@@ -778,6 +902,7 @@ protected:
             objectTrackStartTime = std::min(objectTrackStartTime, packet->timestampUsec);
             objectTrackEndTime =
                 std::max(objectTrackEndTime, packet->timestampUsec + packet->durationUsec);
+            packet->deviceId = deviceId;
 
             for (auto& object: packet->objects)
             {
@@ -913,51 +1038,51 @@ private:
     }
 };
 
-TEST_F(AnalyticsEventsStorageLookup, empty_filter_matches_all_events)
+TEST_F(AnalyticsDbLookup, empty_filter_matches_all_events)
 {
     whenLookupByEmptyFilter();
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, lookup_by_deviceId)
+TEST_F(AnalyticsDbLookup, lookup_by_deviceId)
 {
     whenLookupByRandomKnownDeviceId();
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, lookup_by_non_empty_time_period)
+TEST_F(AnalyticsDbLookup, lookup_by_non_empty_time_period)
 {
     whenLookupByRandomNonEmptyTimePeriod();
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, lookup_by_empty_time_period)
+TEST_F(AnalyticsDbLookup, lookup_by_empty_time_period)
 {
     whenLookupByEmptyTimePeriod();
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, full_track_timestamps)
+TEST_F(AnalyticsDbLookup, filtering_part_of_track_by_time_period)
 {
     givenObjectWithLongTrack();
     whenLookupByRandomNonEmptyTimePeriodCoveringPartOfTrack();
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, max_objects_limit)
+TEST_F(AnalyticsDbLookup, max_objects_limit)
 {
     whenLookupWithMaxObjectsLimit();
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, max_track_length_limit)
+TEST_F(AnalyticsDbLookup, max_track_length_limit)
 {
     givenObjectWithLongTrack();
     whenLookupWithMaxTrackLengthLimit();
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, sort_lookup_result_by_timestamp_ascending)
+TEST_F(AnalyticsDbLookup, sort_lookup_result_by_timestamp_ascending)
 {
     givenRandomFilter();
     setSortOrder(Qt::SortOrder::AscendingOrder);
@@ -967,7 +1092,7 @@ TEST_F(AnalyticsEventsStorageLookup, sort_lookup_result_by_timestamp_ascending)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, sort_lookup_result_by_timestamp_descending)
+TEST_F(AnalyticsDbLookup, sort_lookup_result_by_timestamp_descending)
 {
     givenRandomFilter();
     setSortOrder(Qt::SortOrder::DescendingOrder);
@@ -977,35 +1102,33 @@ TEST_F(AnalyticsEventsStorageLookup, sort_lookup_result_by_timestamp_descending)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, full_text_search)
+TEST_F(AnalyticsDbLookup, full_text_search)
 {
     whenLookupByRandomTextFoundInData();
     thenResultMatchesExpectations();
 }
 
-// TEST_F(AnalyticsEventsStorage, lookup_by_attribute_value)
-
-TEST_F(AnalyticsEventsStorageLookup, lookup_by_bounding_box)
+TEST_F(AnalyticsDbLookup, lookup_by_bounding_box)
 {
     whenLookupByRandomBoundingBox();
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, lookup_by_objectId)
+TEST_F(AnalyticsDbLookup, lookup_by_objectId)
 {
     whenLookupByRandomObjectId();
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, lookup_by_objectTypeId)
+TEST_F(AnalyticsDbLookup, lookup_by_objectTypeId)
 {
     whenLookupByRandomObjectTypeId();
     thenResultMatchesExpectations();
 }
 
-// TEST_F(AnalyticsEventsStorageLookup, lookup_by_multiple_objectTypeId)
+// TEST_F(AnalyticsDbLookup, lookup_by_multiple_objectTypeId)
 
-TEST_F(AnalyticsEventsStorageLookup, lookup_stress_test)
+TEST_F(AnalyticsDbLookup, lookup_stress_test)
 {
     givenRandomFilter();
     setSortOrder(
@@ -1018,7 +1141,7 @@ TEST_F(AnalyticsEventsStorageLookup, lookup_stress_test)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, quering_data_from_multiple_cameras)
+TEST_F(AnalyticsDbLookup, quering_data_from_multiple_cameras)
 {
     givenRandomFilterWithMultipleDeviceIds();
     whenLookupObjects();
@@ -1028,10 +1151,17 @@ TEST_F(AnalyticsEventsStorageLookup, quering_data_from_multiple_cameras)
 //-------------------------------------------------------------------------------------------------
 // Cursor.
 
-class AnalyticsEventsStorageCursor:
-    public AnalyticsEventsStorageLookup
+class AnalyticsDbCursor:
+    public AnalyticsDbLookup
 {
-    using base_type = AnalyticsEventsStorageLookup;
+    using base_type = AnalyticsDbLookup;
+
+public:
+    AnalyticsDbCursor()
+    {
+        filter().sortOrder = Qt::AscendingOrder;
+        filter().maxTrackSize = 0;
+    }
 
 protected:
     void givenDetectedObjectsWithSameTimestamp()
@@ -1049,6 +1179,35 @@ protected:
         aggregateAnalyticsDataPacketsByTimestamp();
     }
 
+    void givenObjectsWithInterleavedTracks()
+    {
+        constexpr int objectCount = 3;
+
+        auto newPackets = generateEventsByCriteria();
+
+        const auto deviceId = QnUuid::createUuid();
+        std::vector<QnUuid> objectIds(objectCount, QnUuid());
+        std::generate(objectIds.begin(), objectIds.end(), &QnUuid::createUuid);
+
+        for (auto& packet: newPackets)
+        {
+            packet->deviceId = deviceId;
+
+            while (packet->objects.size() < objectIds.size())
+                packet->objects.push_back(packet->objects.front());
+
+            for (std::size_t i = 0; i < packet->objects.size(); ++i)
+            {
+                packet->objects[i].objectId = objectIds[i];
+                packet->objects[i].objectTypeId = objectIds[i].toSimpleString();
+            }
+        }
+
+        saveAnalyticsDataPackets(std::move(newPackets));
+
+        filter().deviceIds = {deviceId};
+    }
+
     void whenReadDataUsingCursor()
     {
         whenCreateCursor();
@@ -1063,7 +1222,7 @@ protected:
 
         eventsStorage().createLookupCursor(
             filter(),
-            std::bind(&AnalyticsEventsStorageCursor::saveCursor, this, _1, _2));
+            std::bind(&AnalyticsDbCursor::saveCursor, this, _1, _2));
     }
 
     void thenCursorIsCreated()
@@ -1074,22 +1233,38 @@ protected:
 
     void thenResultMatchesExpectations()
     {
-        assertEqual(
-            sortPacketsByTimestamp(
-                filterPackets(filter(), analyticsDataPackets()),
-                filter().sortOrder),
-            m_packetsRead);
+        auto expected = sortPacketsByTimestamp(
+            filterPackets(filter(), analyticsDataPackets()),
+            filter().sortOrder);
+
+        sortObjectsById(&expected);
+
+        // TODO: Currently, attribute change history is not preserved.
+        removeLabels(&expected);
+
+        std::vector<common::metadata::DetectionMetadataPacketPtr> actual;
+        std::transform(
+            m_packetsRead.begin(), m_packetsRead.end(),
+            std::back_inserter(actual),
+            [](const auto& constPacket)
+            {
+                return std::make_shared<common::metadata::DetectionMetadataPacket>(*constPacket);
+            });
+        sortObjectsById(&actual);
+        removeLabels(&actual);
+
+        assertEqual(expected, actual);
     }
 
-    void andObjectsWithSameTimestampAreDeiveredInSinglePacket()
+    void andObjectsWithSameTimestampAreDeliveredInSinglePacket()
     {
         // TODO
     }
 
 private:
     std::vector<common::metadata::ConstDetectionMetadataPacketPtr> m_packetsRead;
-    nx::utils::SyncQueue<std::unique_ptr<AbstractCursor>> m_createdCursorsQueue;
-    std::unique_ptr<AbstractCursor> m_cursor;
+    nx::utils::SyncQueue<std::shared_ptr<AbstractCursor>> m_createdCursorsQueue;
+    std::shared_ptr<AbstractCursor> m_cursor;
 
     void readAllDataFromCursor()
     {
@@ -1099,38 +1274,75 @@ private:
 
     void saveCursor(
         ResultCode /*resultCode*/,
-        std::unique_ptr<AbstractCursor> cursor)
+        std::shared_ptr<AbstractCursor> cursor)
     {
-        m_createdCursorsQueue.push(std::move(cursor));
+        m_createdCursorsQueue.push(cursor);
+    }
+
+    void sortObjectsById(
+        std::vector<common::metadata::DetectionMetadataPacketPtr>* packets)
+    {
+        for (auto& packet: *packets)
+        {
+            std::sort(
+                packet->objects.begin(), packet->objects.end(),
+                [](const auto& left, const auto& right) { return left.objectId < right.objectId; });
+        }
+    }
+
+    void removeLabels(
+        std::vector<common::metadata::DetectionMetadataPacketPtr>* packets)
+    {
+        for (auto& packet: *packets)
+        {
+            for (auto& object: packet->objects)
+                object.labels.clear();
+        }
     }
 };
 
-TEST_F(AnalyticsEventsStorageCursor, cursor_provides_all_matched_data)
+TEST_F(AnalyticsDbCursor, reads_all_available_data)
+{
+    whenReadDataUsingCursor();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbCursor, reads_all_matched_data)
 {
     givenRandomFilter();
-    setSortOrder(nx::utils::random::number<bool>() ? Qt::AscendingOrder : Qt::DescendingOrder);
+    // NOTE: Currently, the cursor is forward only.
+    setSortOrder(Qt::AscendingOrder);
 
     whenReadDataUsingCursor();
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageCursor, aggregates_objects_with_same_timestamp)
+TEST_F(AnalyticsDbCursor, aggregates_objects_with_same_timestamp)
 {
     givenDetectedObjectsWithSameTimestamp();
 
     whenReadDataUsingCursor();
 
     thenResultMatchesExpectations();
-    andObjectsWithSameTimestampAreDeiveredInSinglePacket();
+    andObjectsWithSameTimestampAreDeliveredInSinglePacket();
 }
+
+TEST_F(AnalyticsDbCursor, interleaved_tracks_are_reported_interleaved)
+{
+    givenObjectsWithInterleavedTracks();
+    whenReadDataUsingCursor();
+    thenResultMatchesExpectations();
+}
+
+// TEST_F(AnalyticsDbCursor, attribute_change_history_is_preserved)
 
 //-------------------------------------------------------------------------------------------------
 // Time periods lookup.
 
-class AnalyticsEventsStorageTimePeriodsLookup:
-    public AnalyticsEventsStorageLookup
+class AnalyticsDbTimePeriodsLookup:
+    public AnalyticsDbLookup
 {
-    using base_type = AnalyticsEventsStorageLookup;
+    using base_type = AnalyticsDbLookup;
 
 protected:
     void givenAggregationPeriodEqualToTheWholeArchivePeriod()
@@ -1182,8 +1394,24 @@ protected:
 
     void andResultMatchesExpectations()
     {
-        const auto expected = expectedLookupResult();
-        ASSERT_EQ(expected, std::get<1>(m_prevLookupResult));
+        using namespace std::chrono;
+
+        auto expected = expectedLookupResult();
+        auto actualTimePeriods = std::get<1>(m_prevLookupResult);
+
+        if (kUseTrackAggregation &&
+            (!filter().boundingBox.isEmpty() || !filter().freeText.isEmpty() ||
+             !filter().objectAppearanceId.isNull() || !filter().objectTypeId.empty()))
+        {
+            // NOTE: For this type of filters supported precision is the following:
+            // start time - a second
+            // duration - kTrackAggregationPeriod.
+
+            roundTimePeriods(&expected);
+            roundTimePeriods(&actualTimePeriods);
+        }
+
+        ASSERT_EQ(expected, actualTimePeriods);
     }
 
 private:
@@ -1203,6 +1431,22 @@ private:
             toTimePeriods(
                 filterPackets(filter(), analyticsDataPackets()),
                 m_lookupOptions));
+    }
+
+    void roundTimePeriods(QnTimePeriodList* periods)
+    {
+        using namespace std::chrono;
+
+        *periods = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+            std::move(*periods), kTrackAggregationPeriod);
+
+        // Rounding to the aggregation period.
+        for (auto& timePeriod: *periods)
+        {
+            timePeriod.setStartTime(duration_cast<seconds>(timePeriod.startTime()));
+            if (timePeriod.duration() < kTrackAggregationPeriod)
+                timePeriod.setDuration(kTrackAggregationPeriod);
+        }
     }
 
     QnTimePeriodList filterTimePeriods(
@@ -1254,13 +1498,13 @@ private:
     }
 };
 
-TEST_F(AnalyticsEventsStorageTimePeriodsLookup, selecting_all_periods)
+TEST_F(AnalyticsDbTimePeriodsLookup, selecting_all_periods)
 {
     whenLookupTimePeriods();
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageTimePeriodsLookup, selecting_all_periods_aggregated_to_one)
+TEST_F(AnalyticsDbTimePeriodsLookup, selecting_all_periods_aggregated_to_one)
 {
     givenAggregationPeriodEqualToTheWholeArchivePeriod();
     whenLookupTimePeriods();
@@ -1268,7 +1512,7 @@ TEST_F(AnalyticsEventsStorageTimePeriodsLookup, selecting_all_periods_aggregated
 }
 
 TEST_F(
-    AnalyticsEventsStorageTimePeriodsLookup,
+    AnalyticsDbTimePeriodsLookup,
     selecting_periods_with_timestamp_filter_only)
 {
     givenFilterWithTimePeriod();
@@ -1276,14 +1520,14 @@ TEST_F(
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageTimePeriodsLookup, with_aggregation_period)
+TEST_F(AnalyticsDbTimePeriodsLookup, with_aggregation_period)
 {
     givenRandomLookupOptions();
     whenLookupTimePeriods();
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageTimePeriodsLookup, with_random_filter)
+TEST_F(AnalyticsDbTimePeriodsLookup, DISABLED_with_random_filter)
 {
     givenRandomFilter();
     whenLookupTimePeriods();
@@ -1298,10 +1542,10 @@ TEST_F(AnalyticsEventsStorageTimePeriodsLookup, with_random_filter)
 /**
  * Initial condition for every test: there is some random data in the DB.
  */
-class AnalyticsEventsStorageCleanup:
-    public AnalyticsEventsStorage
+class AnalyticsDbCleanup:
+    public AnalyticsDb
 {
-    using base_type = AnalyticsEventsStorage;
+    using base_type = AnalyticsDb;
 
 protected:
     void whenRemoveEventsUpToLatestEventTimestamp()
@@ -1422,25 +1666,22 @@ private:
     }
 };
 
-TEST_F(AnalyticsEventsStorageCleanup, removing_all_data)
+TEST_F(AnalyticsDbCleanup, removing_all_data)
 {
     whenRemoveEventsUpToLatestEventTimestamp();
     thenStorageIsEmpty();
 }
 
-TEST_F(AnalyticsEventsStorageCleanup, removing_data_up_to_a_random_available_timestamp)
+TEST_F(AnalyticsDbCleanup, removing_data_up_to_a_random_available_timestamp)
 {
     whenRemoveEventsUpToARandomAvailableTimestamp();
     thenDataIsExpected();
 }
 
-TEST_F(AnalyticsEventsStorageCleanup, removing_data_up_to_minimal_available_timestamp)
+TEST_F(AnalyticsDbCleanup, removing_data_up_to_minimal_available_timestamp)
 {
     whenRemoveEventsUpToEarlisestEventTimestamp();
     thenDataIsNotChanged();
 }
 
-} // namespace test
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::storage::test

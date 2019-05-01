@@ -124,7 +124,7 @@ CREATE INDEX idx_event_for_streaming_cursor ON event(device_id, timestamp_usec_u
 static constexpr char kConvertTimestampToMillis[] =
 R"sql(
 
-UPDATE event SET timestamp_usec_utc = timestamp_usec_utc / 1000
+UPDATE event SET timestamp_usec_utc = timestamp_usec_utc / 1000;
 
 )sql";
 
@@ -137,7 +137,7 @@ UPDATE event SET
     box_top_left_x = round(box_top_left_x * %1),
     box_top_left_y = round(box_top_left_y * %1),
     box_bottom_right_x = round(box_bottom_right_x * %1),
-    box_bottom_right_y = round(box_bottom_right_y * %1)
+    box_bottom_right_y = round(box_bottom_right_y * %1);
 
 )sql";
 
@@ -163,16 +163,27 @@ GROUP BY device_id, timestamp_usec_utc/60000;
 )sql";
 
 //-------------------------------------------------------------------------------------------------
+// META-223
+// NOTE: Not renaming duration_usec since renaming a field is complicated and the next scheme update
+// just drops the 'event' table.
+static constexpr char kConvertDurationToMillis[] =
+R"sql(
+
+UPDATE event SET duration_usec = duration_usec / 1000;
+
+)sql";
+
+//-------------------------------------------------------------------------------------------------
 // META-225
 // TODO: Add indexes.
 static constexpr char kSplitDataToObjectAndSearch[] =
 R"sql(
 
-DROP INDEX idx_event_timestamp;
-DROP INDEX idx_event_object_id;
-DROP INDEX idx_event_device_guid;
-DROP INDEX idx_event_for_streaming_cursor;
-DROP INDEX event_attributes_id;
+DROP INDEX IF EXISTS idx_event_timestamp;
+DROP INDEX IF EXISTS idx_event_object_id;
+DROP INDEX IF EXISTS idx_event_device_id;
+DROP INDEX IF EXISTS idx_event_for_streaming_cursor;
+DROP INDEX IF EXISTS event_attributes_id;
 DROP TABLE event;
 
 CREATE TABLE object(
@@ -180,10 +191,16 @@ CREATE TABLE object(
     device_id                   INTEGER,
     object_type_id              INTEGER,
     guid                        BLOB,
-    track_start_timestamp_ms    INTEGER,
+    track_start_ms              INTEGER,
+    track_end_ms                INTEGER,
     track_detail                BLOB,
     attributes_id               INTEGER
 );
+
+CREATE INDEX idx_object_object_type_id ON object(object_type_id);
+CREATE INDEX idx_object_attributes_id ON object(attributes_id);
+CREATE INDEX idx_object_device_id_track_start_ms ON object(
+    device_id, track_start_ms);
 
 CREATE TABLE object_search(
     id                          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -191,14 +208,30 @@ CREATE TABLE object_search(
     box_top_left_x              INTEGER,
     box_top_left_y              INTEGER,
     box_bottom_right_x          INTEGER,
-    box_bottom_right_y          INTEGER,
-    object_id_list              BLOB
+    box_bottom_right_y          INTEGER
 );
 
-CREATE TABLE unique_attributes_to_object_search(
-    attributes_id               INTEGER,
-    object_search_id            INTEGER
+CREATE INDEX idx_object_search_box_timestamp ON object_search(
+    box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y,
+    timestamp_seconds_utc);
+
+CREATE TABLE object_search_to_object(
+    object_search_id            INTEGER,
+    object_id                   INTEGER
 );
+
+CREATE INDEX idx_object_search_to_object_full ON object_search_to_object(
+    object_search_id, object_id);
+
+)sql";
+
+//-------------------------------------------------------------------------------------------------
+// META-246.
+static constexpr char kObjectBestShot[] =
+R"sql(
+
+ALTER TABLE object ADD COLUMN best_shot_timestamp_ms INTEGER;
+ALTER TABLE object ADD COLUMN best_shot_rect BLOB;
 
 )sql";
 

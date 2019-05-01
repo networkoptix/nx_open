@@ -974,7 +974,7 @@ bool QnServerStreamRecorder::mediaHasBuiltinContext(const QnConstAbstractMediaDa
                 else if (codecId == AV_CODEC_ID_HEVC)
                 {
                     hevc::NalUnitHeader header;
-                    header.decode(nalu.first, nalu.second);
+                    header.decode(nalu.first, (int) nalu.second);
                     if (hevc::isParameterSet(header.unitType))
                         return true;
                 }

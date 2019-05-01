@@ -4,19 +4,14 @@
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
-class QLabel;
-class QnServerSettingsWidget;
-class QnStorageAnalyticsWidget;
-class QnStorageConfigWidget;
+#include <nx/utils/impl_ptr.h>
 
-namespace Ui {
-    class ServerSettingsDialog;
-}
+namespace Ui { class ServerSettingsDialog; }
 
-class QnServerSettingsDialog: public QnSessionAwareTabbedDialog {
+class QnServerSettingsDialog: public QnSessionAwareTabbedDialog
+{
     Q_OBJECT
-
-    typedef QnSessionAwareTabbedDialog base_type;
+    using base_type = QnSessionAwareTabbedDialog;
 
 public:
     enum DialogPage
@@ -24,15 +19,16 @@ public:
         SettingsPage,
         StatisticsPage,
         StorageManagmentPage,
+        PluginsPage,
 
         PageCount
     };
 
-    QnServerSettingsDialog(QWidget *parent = NULL);
-    virtual ~QnServerSettingsDialog();
+    QnServerSettingsDialog(QWidget* parent = nullptr);
+    virtual ~QnServerSettingsDialog() override;
 
     QnMediaServerResourcePtr server() const;
-    void setServer(const QnMediaServerResourcePtr &server);
+    void setServer(const QnMediaServerResourcePtr& server);
 
 protected:
     virtual void retranslateUi() override;
@@ -42,19 +38,12 @@ protected:
 
 private:
     void updateWebPageLink();
-
     void setupShowWebServerLink();
 
 private:
-    Q_DISABLE_COPY(QnServerSettingsDialog)
-
-    QScopedPointer<Ui::ServerSettingsDialog> ui;
-    QnMediaServerResourcePtr m_server;
-
-    QnServerSettingsWidget* const m_generalPage;
-    QnStorageAnalyticsWidget* const m_statisticsPage;
-    QnStorageConfigWidget* const m_storagesPage;
-    QLabel* const m_webPageLink;
+    struct Private;
+    nx::utils::ImplPtr<Ui::ServerSettingsDialog> ui;
+    nx::utils::ImplPtr<Private> d;
 };
 
 Q_DECLARE_METATYPE(QnServerSettingsDialog::DialogPage)

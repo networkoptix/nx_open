@@ -7,21 +7,11 @@
 
 #include <analytics/common/object_detection_metadata.h>
 
+#include "abstract_cursor.h"
 #include "analytics_events_storage_types.h"
 
-namespace nx {
-namespace analytics {
-namespace storage {
+namespace nx::analytics::storage::deprecated {
 
-class AbstractCursor
-{
-public:
-    virtual ~AbstractCursor() = default;
-
-    virtual common::metadata::ConstDetectionMetadataPacketPtr next() = 0;
-};
-
-//-------------------------------------------------------------------------------------------------
 class Cursor:
     public AbstractCursor
 {
@@ -30,18 +20,22 @@ public:
 
     virtual common::metadata::ConstDetectionMetadataPacketPtr next() override;
 
+    virtual void close() override;
+
 private:
     std::unique_ptr<nx::sql::Cursor<DetectedObject>> m_dbCursor;
     common::metadata::DetectionMetadataPacketPtr m_nextPacket;
+    bool m_closed { false };
+    std::mutex m_mutex;
 
     common::metadata::DetectionMetadataPacketPtr toDetectionMetadataPacket(
         DetectedObject detectedObject);
+
     void addToPacket(
         DetectedObject detectedObject,
         common::metadata::DetectionMetadataPacket* packet);
+
     nx::common::metadata::DetectedObject toMetadataObject(DetectedObject detectedObject);
 };
 
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::storage::deprecated

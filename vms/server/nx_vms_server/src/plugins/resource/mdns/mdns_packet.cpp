@@ -30,7 +30,7 @@ void QnMdnsPacket::toDatagram(QByteArray& datagram)
 bool QnMdnsPacket::fromDatagram(const QByteArray& message)
 {
     const auto bufferStart = message.constData();
-    const auto bufferSize = (size_t)message.size();
+    const auto bufferSize = message.size();
 
     const size_t kHeaderLength =
         sizeof(decltype(transactionId)) +
@@ -53,7 +53,7 @@ bool QnMdnsPacket::fromDatagram(const QByteArray& message)
         >> authorityRRCount
         >> additionalRRCount;
 
-    size_t currentOffset = kHeaderLength;
+    int currentOffset = kHeaderLength;
     for (int i = 0; i < questionCount; i++)
     {
         Query query;
@@ -66,7 +66,7 @@ bool QnMdnsPacket::fromDatagram(const QByteArray& message)
 
         currentOffset += nameLength;
 
-        size_t sizeOfTypeAndClass =
+        int sizeOfTypeAndClass =
             sizeof(query.queryType) +
             sizeof(query.queryClass);
 
@@ -87,12 +87,12 @@ bool QnMdnsPacket::fromDatagram(const QByteArray& message)
         queries.push_back(query);
     }
 
-    size_t recordCount =
+    int recordCount =
         answerRRCount +
         authorityRRCount +
         additionalRRCount;
 
-    for (size_t i = 0; i < recordCount; i++)
+    for (int i = 0; i < recordCount; i++)
     {
         ResourceRecord record;
 
@@ -102,7 +102,7 @@ bool QnMdnsPacket::fromDatagram(const QByteArray& message)
             return false;
 
         currentOffset += nameLength;
-        size_t fixedSizeFieldSize =
+        int fixedSizeFieldSize =
             sizeof(record.recordType) +
             sizeof(record.recordClass) +
             sizeof(record.ttl) +
@@ -261,7 +261,7 @@ void QnMdnsSrvData::decode(const QByteArray& raw)
         sizeof(decltype(weight)) +
         sizeof(decltype(port));
 
-    auto targetLength = raw.size() -
+    int targetLength = raw.size() -
         sizeof(decltype(priority)) -
         sizeof(decltype(weight)) -
         sizeof(decltype(port));

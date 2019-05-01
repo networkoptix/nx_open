@@ -2,15 +2,6 @@
 
 namespace nx::analytics::storage {
 
-void ObjectTypeDao::addObjectTypeToDictionary(
-    long long id, const QString& name)
-{
-    QnMutexLocker locker(&m_mutex);
-
-    m_objectTypeToId.emplace(name, id);
-    m_idToObjectType.emplace(id, name);
-}
-
 long long ObjectTypeDao::objectTypeIdFromName(const QString& name) const
 {
     QnMutexLocker locker(&m_mutex);
@@ -55,6 +46,15 @@ void ObjectTypeDao::loadObjectTypeDictionary(nx::sql::QueryContext* queryContext
     query->exec();
     while (query->next())
         addObjectTypeToDictionary(query->value(0).toLongLong(), query->value(1).toString());
+}
+
+void ObjectTypeDao::addObjectTypeToDictionary(
+    long long id, const QString& name)
+{
+    QnMutexLocker locker(&m_mutex);
+
+    m_objectTypeToId.emplace(name, id);
+    m_idToObjectType.emplace(id, name);
 }
 
 } // namespace nx::analytics::storage

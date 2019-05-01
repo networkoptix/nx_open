@@ -9,7 +9,8 @@ PartitionsInformationProvider::PartitionsInformationProvider(RootFileSystem* roo
    m_rootFs(rootFs)
 {
     m_fileName = lit("/proc/mounts");
-    if (nx::utils::AppInfo::isRaspberryPi())
+    // TODO: Fix this condition: /dev/root can be in Linux with any architecture.
+    if (nx::utils::AppInfo::isArm())
     {
         // On Rapberry Pi 2+ "/proc/mounts" contains unexisting "/dev/root" on "/", while mount
         // reports a valid mounted device.

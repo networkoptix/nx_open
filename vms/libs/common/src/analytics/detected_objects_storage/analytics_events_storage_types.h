@@ -15,23 +15,6 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
-/**
- * Enables META-225.
- */
-static constexpr bool kUseTrackAggregation = false;
-
-// Using 14 bits for coordinates. That allows using only 2 bytes when compressing the value.
-static constexpr int kCoordinatesBits = 14;
-static constexpr int kCoordinatesPrecision = (1 << kCoordinatesBits) - 1;
-static constexpr int kCoordinateDecimalDigits = nx::common::metadata::kCoordinateDecimalDigits;
-// NOTE: If the assertion fails, all constants here must be modified and analytics DB data migrated.
-static_assert(kCoordinateDecimalDigits == 4);
-
-/**
- * Time periods shorter than this value are always aggregated.
- */
-static constexpr auto kMinTimePeriodAggregationPeriod = std::chrono::seconds(3);
-
 struct ObjectPosition
 {
     /** Device object has been detected on. */
@@ -49,6 +32,21 @@ struct ObjectPosition
     (deviceId)(timestampUsec)(durationUsec)(boundingBox)(attributes)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectPosition, (json)(ubjson));
 
+struct BestShot
+{
+    qint64 timestampUsec = 0;
+    QRectF rect;
+
+    bool initialized() const { return timestampUsec > 0; }
+
+    bool operator==(const BestShot& right) const;
+};
+
+#define BestShot_analytics_storage_Fields \
+    (timestampUsec)(rect)
+
+QN_FUSION_DECLARE_FUNCTIONS(BestShot, (json)(ubjson));
+
 struct DetectedObject
 {
     /** Device object has been detected on. */
@@ -60,17 +58,16 @@ struct DetectedObject
     qint64 firstAppearanceTimeUsec = 0;
     qint64 lastAppearanceTimeUsec = 0;
     std::vector<ObjectPosition> track;
+    BestShot bestShot;
 
     bool operator==(const DetectedObject& right) const;
 };
 
 #define DetectedObject_analytics_storage_Fields \
-    (objectAppearanceId)(objectTypeId)(attributes)(firstAppearanceTimeUsec)(lastAppearanceTimeUsec)(track)
+    (objectAppearanceId)(objectTypeId)(attributes)(firstAppearanceTimeUsec) \
+    (lastAppearanceTimeUsec)(track)(bestShot)
+
 QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
-
-QByteArray serializeTrack(const std::vector<ObjectPosition>& track);
-
-std::vector<ObjectPosition> deserializeTrack(const QByteArray& serializedData);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -87,7 +84,7 @@ struct Filter
      * Coordinates are in range [0;1].
      */
     QRectF boundingBox;
-    std::vector<common::metadata::Attribute> requiredAttributes;
+
     /**
      * Set of words separated by spaces, commas, etc...
      * Search is done across all attributes (names and values).
@@ -119,7 +116,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
 QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
-    (deviceIds)(objectTypeId)(objectAppearanceId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
+    (deviceIds)(objectTypeId)(objectAppearanceId)(timePeriod)(boundingBox)(freeText)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------

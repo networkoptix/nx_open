@@ -8,6 +8,8 @@
 #include <common/common_globals.h>
 #include <utils/math/math.h>
 
+#include "config.h"
+
 namespace nx {
 namespace analytics {
 namespace storage {
@@ -21,6 +23,12 @@ bool ObjectPosition::operator==(const ObjectPosition& right) const
         && attributes == right.attributes;
 }
 
+bool BestShot::operator==(const BestShot& right) const
+{
+    return timestampUsec == right.timestampUsec
+        && equalWithPrecision(rect, right.rect, kCoordinateDecimalDigits);
+}
+
 bool DetectedObject::operator==(const DetectedObject& right) const
 {
     return objectAppearanceId == right.objectAppearanceId
@@ -28,26 +36,14 @@ bool DetectedObject::operator==(const DetectedObject& right) const
         //&& attributes == right.attributes
         && firstAppearanceTimeUsec == right.firstAppearanceTimeUsec
         && lastAppearanceTimeUsec == right.lastAppearanceTimeUsec
-        && track == right.track;
+        && track == right.track
+        && bestShot == right.bestShot;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ObjectPosition)(DetectedObject),
+    (BestShot)(DetectedObject)(ObjectPosition),
     (json)(ubjson),
     _analytics_storage_Fields)
-
-QByteArray serializeTrack(const std::vector<ObjectPosition>& /*track*/)
-{
-    NX_ASSERT(false);
-    // TODO
-    return QByteArray();
-}
-
-std::vector<ObjectPosition> deserializeTrack(const QByteArray& /*serializedData*/)
-{
-    // TODO
-    return {};
-}
 
 //-------------------------------------------------------------------------------------------------
 
@@ -81,7 +77,6 @@ bool Filter::operator==(const Filter& right) const
         && objectAppearanceId == right.objectAppearanceId
         && timePeriod == right.timePeriod
         && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
-        && isSameItems(requiredAttributes, right.requiredAttributes)
         && freeText == right.freeText
         && sortOrder == right.sortOrder;
 }
@@ -112,8 +107,6 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
         params->insert(lit("x2"), QString::number(filter.boundingBox.bottomRight().x()));
         params->insert(lit("y2"), QString::number(filter.boundingBox.bottomRight().y()));
     }
-
-    // TODO: requiredAttributes
 
     if (!filter.freeText.isEmpty())
     {
@@ -167,8 +160,6 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
             params.value(lit("x2")).toDouble(),
             params.value(lit("y2")).toDouble()));
     }
-
-    // TODO: requiredAttributes.
 
     if (params.contains(lit("freeText")))
     {

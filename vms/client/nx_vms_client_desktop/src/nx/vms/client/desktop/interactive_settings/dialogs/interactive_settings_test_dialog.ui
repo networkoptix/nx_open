@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>881</width>
-    <height>535</height>
+    <width>883</width>
+    <height>542</height>
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
@@ -52,7 +52,7 @@
        <item row="0" column="0" rowspan="2">
         <widget class="QPlainTextEdit" name="manifestTextEdit">
          <property name="plainText">
-          <string>{
+          <string notr="true">{
     &quot;items&quot;: [
         {
             &quot;type&quot;: &quot;TextField&quot;,

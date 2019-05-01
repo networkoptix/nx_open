@@ -29,6 +29,8 @@ enum class EventReason
     networkNoResponseFromDevice = 19,
     networkBadCameraTime = 20,
     networkCameraTimeBackToNormal = 21,
+    networkMulticastAddressConflict = 22,
+    networkMulticastAddressIsInvalid = 23,
 
     // Server Failure event
     serverTerminated = 4,
@@ -39,6 +41,8 @@ enum class EventReason
     storageTooSlow = 7,
     storageFull = 8,
     systemStorageFull = 9,
+    metadataStorageOffline = 1010,
+    metadataStorageFull = 1011,
 
     // License Issue event
     licenseRemoved = 10,
@@ -53,7 +57,7 @@ enum class EventReason
     backupDone = 17,
     backupCancelled = 18,
 
-    // last number is 19, see networkNoResponseFromDevice
+    // last number is 23, see networkMulticastAddressIsInvalid
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 
