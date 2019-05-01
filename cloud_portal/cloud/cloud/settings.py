@@ -197,14 +197,6 @@ if LOCAL_ENVIRONMENT:
     # Or go through file history in source control to find the last time it was here
     # (changeset 49115a0427b3 or 4923e6b2575d)
 
-    # CACHES["global"] = {
-    #     'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-    #     'LOCATION': 'portal_cache',
-    # }
-    CACHES["global"] = {
-        'LOCATION': 'redis://localhost:6379/1',
-    }
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 

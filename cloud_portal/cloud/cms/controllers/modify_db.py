@@ -38,7 +38,7 @@ def update_draft_state(review_id, target_state, user):
 def notify_version_ready(product, version_id, exclude_user):
     perm = Permission.objects.filter(codename='publish_version')
     users = Account.objects.\
-        filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).\
+        filter(Q(groups__permissions__in=perm) | Q(user_permissions__in=perm)).\
         filter(subscribe=True, customization__in=product.customizations.all()).\
         exclude(pk=exclude_user.pk).\
         distinct()
@@ -416,7 +416,7 @@ def check_meta_settings(data_structure, new_file):
 
 # End of file upload helpers
 def upload_file(data_structure, new_file):
-    encoded_file = base64.b64encode(new_file.read())
+    encoded_file = base64.b64encode(new_file.read()).decode('utf8')
     if new_file.size >= settings.CMS_MAX_FILE_SIZE:
         return None, [(data_structure.name, 'Its size was {0:.2f}MB but must be less than {1:.2f} MB'.
                        format(new_file.size/BYTES_TO_MEGABYTES, settings.CMS_MAX_FILE_SIZE/BYTES_TO_MEGABYTES))]
