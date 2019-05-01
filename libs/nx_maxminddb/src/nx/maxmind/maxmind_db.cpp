@@ -11,7 +11,7 @@ ResultCode toResultCode(int mmdbError)
     switch (mmdbError)
     {
         case MMDB_SUCCESS:
-            return ResultCode::Ok;
+            return ResultCode::ok;
         case MMDB_INVALID_LOOKUP_PATH_ERROR:
         case MMDB_FILE_OPEN_ERROR:
         case MMDB_CORRUPT_SEARCH_TREE_ERROR:
@@ -19,29 +19,29 @@ ResultCode toResultCode(int mmdbError)
         case MMDB_IO_ERROR:
         case MMDB_OUT_OF_MEMORY_ERROR:
         case MMDB_UNKNOWN_DATABASE_FORMAT_ERROR:
-            return ResultCode::IoError;
+            return ResultCode::ioError;
         default:
-            return ResultCode::UnknownError;
+            return ResultCode::unknownError;
     }
 }
 
-Continent toContinent(std::string str)
+std::optional<Continent> toContinent(const std::string& continent)
 {
-    if (str == "Africa")
-        return Continent::Africa;
-    if (str == "Antarctica")
-        return Continent::Antarctica;
-    if (str == "Asia")
-        return Continent::Asia;
-    if (str == "Australia")
-        return Continent::Australia;
-    if (str == "Europe")
-        return Continent::Europe;
-    if (str == "North America")
-        return Continent::NorthAmerica;
-    if (str == "South America")
-        return Continent::SouthAmerica;
-    return Continent::Unknown;
+    if (continent == "Africa")
+        return Continent::africa;
+    if (continent == "Antarctica")
+        return Continent::antarctica;
+    if (continent == "Asia")
+        return Continent::asia;
+    if (continent == "Australia")
+        return Continent::australia;
+    if (continent == "Europe")
+        return Continent::europe;
+    if (continent == "North America")
+        return Continent::northAmerica;
+    if (continent == "South America")
+        return Continent::southAmerica;
+    return std::nullopt;
 }
 
 const char* dataTypeToString(int mmdbDataType)
@@ -128,25 +128,29 @@ std::pair<ResultCode, Location> MaxmindDb::lookup(const std::string& ipAddress)
     ResultCode resultCode;
     MMDB_lookup_result_s lookupResult;
     std::tie(resultCode, lookupResult) = lookupIpAddress(ipAddress);
-    if (resultCode != ResultCode::Ok)
+    if (resultCode != ResultCode::ok)
         return {resultCode, {}};
 
     Location location;
     std::string str;
     std::tie(resultCode, str) = getString(lookupResult, kContinent, kNames, kLanguage);
-    if (resultCode != ResultCode::Ok)
-        return {resultCode, location};
-    location.continent = toContinent(str);
+    if (resultCode != ResultCode::ok)
+        return {resultCode, Location{}};
+    auto continent = toContinent(str);
+    if (!continent)
+        return {ResultCode::notFound, Location{}};
+    location.continent = *continent;
 
+    // Not every ip has an associated country, for example: "2.16.126.1", which contains
+    // continent and location (geopoint).
+    // if not found, it should not be an error
     std::tie(resultCode, location.country) = getString(lookupResult, kCountry, kNames, kLanguage);
-    if (resultCode != ResultCode::Ok)
-        return {resultCode, location};
 
     // Geopoint exists only in Geolite2-City mmdb, so if it is not found, it should not be
     // an error.
     Geopoint geopoint;
     std::tie(resultCode, geopoint) = getGeopoint(lookupResult);
-    if (resultCode == ResultCode::Ok)
+    if (resultCode == ResultCode::ok)
         location.geopoint = std::move(geopoint);
 
     return {resultCode, location};
@@ -155,7 +159,7 @@ std::pair<ResultCode, Location> MaxmindDb::lookup(const std::string& ipAddress)
 std::pair<ResultCode, MMDB_lookup_result_s> MaxmindDb::lookupIpAddress(const std::string& ipAddress)
 {
     if (!m_db)
-        return {ResultCode::IoError, {}};
+        return {ResultCode::ioError, {}};
 
     int gaiError = 0;
     int mmdbError = MMDB_SUCCESS;
@@ -164,7 +168,7 @@ std::pair<ResultCode, MMDB_lookup_result_s> MaxmindDb::lookupIpAddress(const std
     if (gaiError != 0)
     {
         NX_VERBOSE(this, "Error from getaddrinfo: %1", gai_strerror(gaiError));
-        return {ResultCode::IoError, {}};
+        return {ResultCode::ioError, {}};
     }
 
     if (mmdbError != MMDB_SUCCESS)
@@ -174,9 +178,9 @@ std::pair<ResultCode, MMDB_lookup_result_s> MaxmindDb::lookupIpAddress(const std
     }
 
     if (!lookupResult.found_entry)
-        return {ResultCode::NotFound, {}};
+        return {ResultCode::notFound, {}};
 
-    return {ResultCode::Ok, lookupResult};
+    return {ResultCode::ok, lookupResult};
 }
 
 std::pair<ResultCode, Geopoint> MaxmindDb::getGeopoint(MMDB_lookup_result_s& lookupResult)
@@ -185,11 +189,11 @@ std::pair<ResultCode, Geopoint> MaxmindDb::getGeopoint(MMDB_lookup_result_s& loo
     Geopoint geopoint;
 
     std::tie(resultCode, geopoint.latitude) = getDouble(lookupResult, kLocation, kLatitude);
-    if (resultCode != ResultCode::Ok)
+    if (resultCode != ResultCode::ok)
         return {resultCode, geopoint};
 
     std::tie(resultCode, geopoint.longitude)= getDouble(lookupResult, kLocation, kLongitude);
-    if (resultCode != ResultCode::Ok)
+    if (resultCode != ResultCode::ok)
         return {resultCode, geopoint};
 
     return {resultCode, geopoint};
@@ -207,17 +211,17 @@ ResultCode MaxmindDb::validate(
     }
 
     if (!entryData.has_data)
-        return ResultCode::NotFound;
+        return ResultCode::notFound;
 
     if (entryData.type != expectedMmdbDataType)
     {
         NX_VERBOSE(this, "Type mismatch error, expected mmdb data type: %1, got %2",
             dataTypeToString(expectedMmdbDataType),
             dataTypeToString(entryData.type));
-        return ResultCode::UnknownError;
+        return ResultCode::unknownError;
     }
 
-    return ResultCode::Ok;
+    return ResultCode::ok;
 }
 
 } // namespace nx::maxmind

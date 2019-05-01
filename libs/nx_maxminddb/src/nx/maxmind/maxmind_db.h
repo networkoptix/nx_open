@@ -10,22 +10,21 @@ namespace nx::maxmind {
 
 enum class ResultCode
 {
-    Ok,
-    NotFound,
-    IoError,
-    UnknownError
+    ok,
+    notFound,
+    ioError,
+    unknownError
 };
 
 enum class Continent
 {
-    Unknown,
-    Africa,
-    Antarctica,
-    Asia,
-    Australia,
-    Europe,
-    NorthAmerica,
-    SouthAmerica
+    africa,
+    antarctica,
+    asia,
+    australia,
+    europe,
+    northAmerica,
+    southAmerica
 };
 
 struct Geopoint
@@ -74,7 +73,7 @@ private:
         MMDB_entry_data_s entryData;
         int mmdbResult = MMDB_get_value(&lookupResult.entry, &entryData, strings..., nullptr);
         ResultCode resultCode = validate(mmdbResult, entryData, MMDB_DATA_TYPE_UTF8_STRING);
-        if (resultCode != ResultCode::Ok)
+        if (resultCode != ResultCode::ok)
             return {resultCode, {}};
 
         return {resultCode, std::string(entryData.utf8_string, entryData.data_size)};
@@ -88,7 +87,7 @@ private:
         MMDB_entry_data_s entryData;
         int mmdbResult = MMDB_get_value(&lookupResult.entry, &entryData, strings..., nullptr);
         ResultCode resultCode = validate(mmdbResult, entryData, MMDB_DATA_TYPE_DOUBLE);
-        if (resultCode != ResultCode::Ok)
+        if (resultCode != ResultCode::ok)
             return {resultCode, 0};
 
         return {resultCode, entryData.double_value};
