@@ -2,6 +2,7 @@
 
 #include <nx/network/rest/handler.h>
 #include <nx/network/rest/nx_network_rest_ini.h>
+#include <nx/kit/ini_config.h>
 #include <nx/utils/test_support/run_test.h>
 
 namespace nx::network::rest::test {
@@ -88,7 +89,7 @@ public:
         return request;
     }
 
-    nx::utils::test::IniConfigTweaks iniTweaks;
+    nx::kit::IniConfig::Tweaks iniTweaks;
 
 private:
     std::vector<std::unique_ptr<http::Request>> m_requests;

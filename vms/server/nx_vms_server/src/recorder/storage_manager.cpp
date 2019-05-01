@@ -1837,13 +1837,13 @@ void QnStorageManager::checkSystemStorageSpace()
 
 void QnStorageManager::checkMetadataStorageSpace()
 {
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+    auto server = serverModule()->resourcePool()->getResourceById<QnMediaServerResource>(
         serverModule()->commonModule()->moduleGUID());
     if (!server)
         return;
 
     bool hasAnalyticsEngine = false;
-    auto cameras = resourcePool()->getAllCameras(server);
+    auto cameras = serverModule()->resourcePool()->getAllCameras(server);
     for (const auto& camera: cameras)
     {
         QSet<QnUuid> objectEngines;
