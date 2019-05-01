@@ -4,11 +4,12 @@ services:
     image: mediaserver
     ports:
       - "7001:7001"
-    network_mode: "host"
+    network_mode: "bridge"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - ./video:/dock2
+      - ./video:/dokk
       - ./data/:/opt/networkoptix/mediaserver/var
+      - ~/develop/devtools/util/:/scripts
     tmpfs:
       - /run
       - /run/lock

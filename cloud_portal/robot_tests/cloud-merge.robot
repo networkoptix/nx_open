@@ -1,5 +1,6 @@
 *** Settings ***
-Resource          ../resource.robot
+Resource          resource.robot
+Resource          APIresource.robot
 Test Setup        Restart
 #Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
@@ -22,7 +23,13 @@ Restart
     Validate Log Out
 
 Create system and attach to cloud
-    [arguments]
+    ${image}    Build Image
+    ${cont}    Run Container    ${image}
+    ${auth}=    Create List    ${EMAIL OWNER}    ${password}
+    ${default auth}=    Create List    admin    admin
+    &{bind json}=    bind system    ${auth}    https://cloud-test.hdw.mx
+    &{Setup Cloud System json}=    Setup Cloud System    ${default auth}    https://localhost:7001    ${bind json["authKey"]}    ${bind json["name"]}    ${bind json["id"]}    ${bind json["ownerAccountEmail"]}
+    Stop Container    ${cont}
 
 *** Test Cases ***
 Only one system connected to Cloud Account
