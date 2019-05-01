@@ -120,7 +120,7 @@
                 let self = this;
                 this.get().then(function () {
                     // logoutAuthorisedLogoutButton
-                    dialogs.confirm(null /*L.dialogs.logoutAuthorisedText*/,
+                    dialogs.confirm('',
                         lang.dialogs.logoutAuthorisedTitle,
                         lang.dialogs.logoutAuthorisedContinueButton,
                         null,
