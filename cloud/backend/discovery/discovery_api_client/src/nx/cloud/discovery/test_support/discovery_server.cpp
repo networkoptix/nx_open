@@ -80,7 +80,7 @@ void DiscoveryServer::serveRegisterNode(
     if (!ok)
         return completionHandler(nx::network::http::StatusCode::badRequest);
 
-    Node node = updateNode(getClusterId(requestContext), nodeInfo);
+    Node node = updateNode(std::move(requestContext), nodeInfo);
 
     nx::network::http::RequestResult result(nx::network::http::StatusCode::created);
     result.dataSource =
@@ -114,13 +114,18 @@ bool DiscoveryServer::haveClusterId(const std::string& clusterId) const
     return m_onlineNodes.find(clusterId) != m_onlineNodes.end();
 }
 
-Node DiscoveryServer::updateNode(const std::string& clusterId, const NodeInfo& nodeInfo)
+Node DiscoveryServer::updateNode(
+    nx::network::http::RequestContext requestContext,
+    const NodeInfo& nodeInfo)
 {
     QnMutexLocker lock(&m_mutex);
-    Node& node = m_onlineNodes[clusterId][nodeInfo.nodeId];
+    Node& node = m_onlineNodes[getClusterId(requestContext)][nodeInfo.nodeId];
 
     if (node.nodeId.empty())
         node.nodeId = nodeInfo.nodeId;
+
+    if (node.publicIpAddress.empty())
+        node.publicIpAddress = requestContext.connection->clientEndpoint().address.toStdString();
 
     node.urls = nodeInfo.urls;
 

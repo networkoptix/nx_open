@@ -37,7 +37,7 @@ private:
 
     bool haveClusterId(const std::string& clusterId) const;
 
-    Node updateNode(const std::string& clusterId, const NodeInfo& nodeInfo);
+    Node updateNode(nx::network::http::RequestContext requestContext, const NodeInfo& nodeInfo);
 
     std::vector<Node> updateOnlineNodes(const std::string& clusterId);
 
