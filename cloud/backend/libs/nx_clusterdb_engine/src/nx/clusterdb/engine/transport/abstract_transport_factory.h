@@ -28,6 +28,8 @@ class AbstractFactory
 public:
     virtual ~AbstractFactory() = default;
 
+    virtual std::string key() const = 0;
+
     virtual std::unique_ptr<AbstractTransactionTransportConnector> createConnector(
         const ProtocolVersionRange& protocolVersionRange,
         CommandLog* commandLog,

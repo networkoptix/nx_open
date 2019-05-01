@@ -5,6 +5,11 @@
 
 namespace nx::clusterdb::engine::transport::p2p::http {
 
+std::string Factory::key() const
+{
+    return kKey;
+}
+
 std::unique_ptr<AbstractTransactionTransportConnector> Factory::createConnector(
     const ProtocolVersionRange& protocolVersionRange,
     CommandLog* commandLog,

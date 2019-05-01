@@ -3,7 +3,6 @@
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/url/url_builder.h>
 
-#include "connector_factory.h"
 #include "http_tunnel/factory.h"
 #include "../http/http_paths.h"
 
@@ -49,17 +48,29 @@ std::vector<std::unique_ptr<AbstractAcceptor>> TransportManager::createAllAccept
     return result;
 }
 
+bool TransportManager::setConnectorTypeKey(const std::string& key)
+{
+    auto it = std::find_if(
+        m_transportFactories.begin(), m_transportFactories.end(),
+        [key](auto& factory) { return factory->key() == key; });
+    
+    if (it == m_transportFactories.end())
+        return false;
+
+    m_connectorFactory = it->get();
+    return true;
+}
+
 std::unique_ptr<AbstractTransactionTransportConnector> TransportManager::createConnector(
     const std::string& clusterId,
     const std::string& /*connectionId*/,
     const nx::utils::Url& targetUrl)
 {
-    using namespace nx::network;
+    auto connectorFactory = m_connectorFactory
+        ? m_connectorFactory
+        : m_transportFactories.front().get();
 
-    // TODO: #ak Get rid of ConnectorFactory.
-    // Use connector type based on externally-set priorities.
-
-    return ConnectorFactory::instance().create(
+    return connectorFactory->createConnector(
         m_protocolVersionRange,
         m_commandLog,
         m_outgoingCommandFilter,

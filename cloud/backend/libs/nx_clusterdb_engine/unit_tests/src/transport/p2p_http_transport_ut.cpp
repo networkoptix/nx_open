@@ -1,5 +1,5 @@
-#include <nx/clusterdb/engine/transport/connector_factory.h>
 #include <nx/clusterdb/engine/transport/p2p_http/connector.h>
+#include <nx/clusterdb/engine/transport/p2p_http/factory.h>
 
 #include "connection_acceptance_tests.h"
 #include "../node_synchronization_tests.h"
@@ -9,25 +9,7 @@ namespace nx::clusterdb::engine::transport::test {
 class P2pHttpTransportInstaller
 {
 public:
-    static ConnectorFactory::Function configureFactory(ConnectorFactory* factory)
-    {
-        return factory->setCustomFunc(
-            [](const ProtocolVersionRange& protocolVersionRange,
-                CommandLog* commandLog,
-                const OutgoingCommandFilter& outgoingCommandFilter,
-                const std::string& clusterId,
-                const std::string& nodeId,
-                const nx::utils::Url& nodeUrl)
-            {
-                return std::make_unique<p2p::http::Connector>(
-                    protocolVersionRange,
-                    commandLog,
-                    outgoingCommandFilter,
-                    clusterId,
-                    nodeId,
-                    nodeUrl);
-            });
-    }
+    static constexpr auto kConnectorTypeKey = p2p::http::Factory::kKey;
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(

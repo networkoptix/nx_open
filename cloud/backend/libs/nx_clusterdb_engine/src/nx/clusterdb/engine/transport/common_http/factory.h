@@ -8,6 +8,10 @@ class Factory:
     public AbstractFactory
 {
 public:
+    static constexpr char kKey[] = "common_http";
+
+    virtual std::string key() const override;
+
     virtual std::unique_ptr<AbstractTransactionTransportConnector> createConnector(
         const ProtocolVersionRange& protocolVersionRange,
         CommandLog* commandLog,

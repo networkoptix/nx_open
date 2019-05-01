@@ -5,6 +5,11 @@
 
 namespace nx::clusterdb::engine::transport::http_tunnel {
 
+std::string Factory::key() const
+{
+    return kKey;
+}
+
 std::unique_ptr<AbstractTransactionTransportConnector> Factory::createConnector(
     const ProtocolVersionRange& /*protocolVersionRange*/,
     CommandLog* /*commandLog*/,

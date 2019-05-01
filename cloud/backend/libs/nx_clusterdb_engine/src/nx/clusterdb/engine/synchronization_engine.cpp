@@ -55,6 +55,7 @@ SynchronizationEngine::SynchronizationEngine(
     m_httpServer(m_peerId),
     m_discoveryManager(settings.discovery, this)
 {
+    // NOTE: First type registered is used to construct connector by default.
     m_transportManager.registerTransport(std::make_unique<transport::common_http::Factory>());
     m_transportManager.registerTransport(std::make_unique<transport::p2p::websocket::Factory>());
     m_transportManager.registerTransport(std::make_unique<transport::p2p::http::Factory>());
