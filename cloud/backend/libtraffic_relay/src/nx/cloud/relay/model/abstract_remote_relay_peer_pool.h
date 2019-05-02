@@ -42,10 +42,9 @@ public:
     virtual void setPublicUrl(const nx::utils::Url& publicUrl) = 0;
 
     virtual void registerHttpApi(
-        nx::network::http::server::rest::MessageDispatcher* /*messageDispatcher*/)
-    {
-        //TODO get rid of me when cassandra is no longer used along with this interface.
-    }
+        nx::network::http::server::rest::MessageDispatcher* /*messageDispatcher*/) = 0;
+
+    virtual void pleaseStopSync() = 0;
 
 };
 
