@@ -43,9 +43,9 @@ public:
 private:
     const conf::Settings& m_settings;
     model::ClientSessionPool m_clientSessionPool;
-    relaying::ListeningPeerPool m_listeningPeerPool;
     std::unique_ptr<model::AbstractRemoteRelayPeerPool> m_remoteRelayPeerPool;
     model::RemoteRelayPeerPoolAioWrapper m_remoteRelayPeerPoolAioWrapper;
+    relaying::ListeningPeerPool m_listeningPeerPool;
     model::AliasManager m_aliasManager;
     std::vector<nx::utils::SubscriptionId> m_listeningPeerPoolSubscriptions;
 
