@@ -16,7 +16,7 @@ ARG mediaserver_deb
 
 RUN ["/bin/bash", "-c", ": ${mediaserver_deb:?Missing source deb file. You should set --build-arg mediaserver_deb=path_to_mediaserver.deb!}"]
 
-RUN apt-get update && apt-get install -y dbus systemd && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y dbus systemd lsb-release && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN find /etc/systemd -name '*.timer' | xargs rm -v
 
@@ -30,7 +30,7 @@ ENTRYPOINT ["/sbin/init", "--log-target=journal"]
 # This is strange workaround for systemd stdout problem. Not sure what is going on, actually.
 CMD []
 
-RUN mkdir /debs
+RUN mkdir -p /debs
 
 COPY "${mediaserver_deb}" /debs/
 

@@ -19,8 +19,6 @@ bool CommandLogCache::isShouldBeIgnored(
     const CommandHeader& commandHeader,
     const QByteArray& hash) const
 {
-    using namespace ::ec2;
-
     QnMutexLocker lock(&m_mutex);
 
     vms::api::PersistentIdData key(commandHeader.peerID, commandHeader.persistentInfo.dbID);

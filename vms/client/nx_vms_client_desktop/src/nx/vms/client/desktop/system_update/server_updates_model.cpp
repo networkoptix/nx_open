@@ -64,7 +64,7 @@ QVariant ServerUpdatesModel::headerData(int section, Qt::Orientation orientation
             case NameColumn:
                 return tr("Component");
             case VersionColumn:
-                return tr("Current Version");
+                return tr("Installed Version");
             case ProgressColumn:
                 return tr("Status");
             case StatusMessageColumn:

@@ -12,7 +12,7 @@
 #include <nx/network/app_info.h>
 #include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
-namespace nx::vms::server::rest {
+namespace nx::vms::server {
 
 nx::network::rest::Response DeprecatedTimeRestHandler::executeGet(
     const nx::network::rest::Request& request)
@@ -34,4 +34,4 @@ nx::network::rest::Response DeprecatedTimeRestHandler::executeGet(
     return nx::network::rest::Response::reply(reply);
 }
 
-} // namespace nx::vms::server::rest
+} // namespace nx::vms::server

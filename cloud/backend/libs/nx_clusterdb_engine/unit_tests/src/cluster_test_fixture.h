@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <memory>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -51,9 +52,14 @@ class ClusterTestFixture:
 public:
     ClusterTestFixture();
 
+    /**
+     * Propagated to every peer to select connector type to use.
+     */
+    void setConnectorTypeKey(const std::string& key);
+
     std::string clusterId() const;
 
-    Peer& addPeer(bool startAndWaitUntilStarted = true);
+    Peer& addPeer(std::vector<std::pair<const char*, const char*>> args = {});
     Peer& peer(int index);
     const Peer& peer(int index) const;
     int peerCount() const;
@@ -62,6 +68,7 @@ public:
     bool peersAreSynchronized(std::vector<int> ids) const;
 
 private:
+    std::string m_connectorTypeKey;
     const std::string m_clusterId;
     std::vector<std::unique_ptr<Peer>> m_peers;
     std::atomic<int> m_peerCounter{0};

@@ -4,9 +4,14 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_message.h>
 
+#include <transaction/transaction_transport_header.h>
+
 #include "../command.h"
 
 namespace nx::clusterdb::engine {
+
+// TODO: #ak Remove this type.
+using VmsTransportHeader = ::ec2::QnTransactionTransportHeader;
 
 class CommandTransportHeader
 {

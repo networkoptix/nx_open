@@ -8,6 +8,9 @@
 #include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 
+#include <nx/vms/api/data/peer_data.h>
+#include <nx/vms/api/data/tran_state_data.h>
+
 #include "command.h"
 #include "transaction_timestamp_calculator.h"
 

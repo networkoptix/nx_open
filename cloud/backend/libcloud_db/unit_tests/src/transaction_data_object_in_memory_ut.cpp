@@ -5,6 +5,7 @@
 #include <nx/clusterdb/engine/dao/memory/transaction_data_object_in_memory.h>
 #include <nx/cloud/db/controller.h>
 #include <nx/cloud/db/ec2/data_conversion.h>
+#include <nx/cloud/db/ec2/vms_command_descriptor.h>
 #include <nx/cloud/db/test_support/base_persistent_data_test.h>
 #include <nx/cloud/db/test_support/business_data_generator.h>
 
@@ -27,7 +28,7 @@ public:
         m_systemId(QnUuid::createUuid().toSimpleByteArray().toStdString()),
         m_peerSequence(0),
         m_transactionDataObject(kMaxSupportedProtocolVersion),
-        m_lastAddedTransaction(m_peerGuid),
+        m_lastAddedTransaction(ec2::command::SaveUser::code, m_peerGuid),
         m_dbConnectionHolder(dbConnectionOptions())
     {
         init();
@@ -114,7 +115,9 @@ private:
     template<typename TransactionDataType>
     void saveTransaction(const clusterdb::engine::Command<TransactionDataType>& transaction)
     {
-        const auto tranHash = ::ec2::transactionHash(transaction.command, transaction.params).toSimpleByteArray();
+        const auto tranHash = ::ec2::transactionHash(
+            (::ec2::ApiCommand::Value) transaction.command,
+            transaction.params).toSimpleByteArray();
         const auto ubjsonSerializedTransaction = QnUbjson::serialized(transaction);
         clusterdb::engine::dao::TransactionData transactionData{
             m_systemId,
@@ -130,10 +133,10 @@ private:
 
     clusterdb::engine::Command<nx::vms::api::UserData> generateTransaction()
     {
-        clusterdb::engine::Command<nx::vms::api::UserData> transaction(m_peerGuid);
-        transaction.command = ::ec2::ApiCommand::saveUser;
+        clusterdb::engine::Command<nx::vms::api::UserData> transaction(
+            ec2::command::SaveUser::code,
+            m_peerGuid);
         transaction.persistentInfo.dbID = m_peerDbId;
-        transaction.transactionType = ::ec2::TransactionType::Cloud;
         transaction.persistentInfo.sequence = m_peerSequence++;
         transaction.params = m_transactionData;
 

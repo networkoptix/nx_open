@@ -1,19 +1,24 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 #include <nx/vms/server/server_module_aware.h>
 
-class QnExternalEventRestHandler:
-    public QnJsonRestHandler, public /*mixin*/ nx::vms::server::ServerModuleAware
+namespace nx::vms::server {
+
+class ExternalEventRestHandler:
+    public nx::network::rest::Handler,
+    public /*mixin*/ ServerModuleAware
 {
-    Q_OBJECT
-
 public:
-    QnExternalEventRestHandler(QnMediaServerModule* serverModule);
+    ExternalEventRestHandler(QnMediaServerModule* serverModule);
 
-    QnExternalEventRestHandler();
+protected:
+    virtual nx::network::rest::Response executeGet(
+        const nx::network::rest::Request& request) override;
 
-    virtual int executeGet(const QString& path, const QnRequestParams& params,
-        QnJsonRestResult& result, const QnRestConnectionProcessor* owner) override;
+    virtual nx::network::rest::Response executePost(
+        const nx::network::rest::Request& request) override;
 };
+
+} // namespace nx::vms::server

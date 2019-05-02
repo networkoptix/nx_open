@@ -5,14 +5,14 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
-namespace nx::vms::server::rest {
+namespace nx::vms::server {
 
-QnExecuteEventActionRestHandler::QnExecuteEventActionRestHandler(QnMediaServerModule* serverModule):
+ExecuteEventActionRestHandler::ExecuteEventActionRestHandler(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule)
 {
 }
 
-nx::network::rest::Response QnExecuteEventActionRestHandler::executePost(
+nx::network::rest::Response ExecuteEventActionRestHandler::executePost(
     const nx::network::rest::Request& request)
 {
     if (!request.content)
@@ -39,4 +39,4 @@ nx::network::rest::Response QnExecuteEventActionRestHandler::executePost(
     return nx::network::rest::Response(nx::network::http::StatusCode::ok);
 }
 
-} //namespace nx::vms::server::rest
+} //namespace nx::vms::server

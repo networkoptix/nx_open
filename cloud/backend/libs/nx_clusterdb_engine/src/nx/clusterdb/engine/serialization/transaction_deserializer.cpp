@@ -43,7 +43,8 @@ std::unique_ptr<DeserializableCommandData>
         int commandFormatVersion,
         QByteArray serializedCommand)
 {
-    CommandHeader commandHeader(moduleGuid);
+    CommandHeader commandHeader;
+    commandHeader.peerID = moduleGuid;
 
     auto dataSource = std::make_unique<TransactionUbjsonDataSource>(
         std::move(serializedCommand));
@@ -64,7 +65,9 @@ std::unique_ptr<DeserializableCommandData> TransactionDeserializer::deserializeJ
     const QnUuid& moduleGuid,
     QByteArray serializedCommand)
 {
-    CommandHeader commandHeader(moduleGuid);
+    CommandHeader commandHeader;
+    commandHeader.peerID = moduleGuid;
+    
     QJsonObject tranObject;
     // TODO: #ak put tranObject to some cache for later use
     if (!QJson::deserialize(serializedCommand, &tranObject))

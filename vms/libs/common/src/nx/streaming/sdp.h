@@ -41,6 +41,7 @@ struct Sdp
         RtpMap rtpmap;
         Fmtp fmtp;
         QStringList sdpAttributes;
+        QHostAddress connectionAddress;
     };
 
     /**
@@ -51,7 +52,6 @@ struct Sdp
      */
     void parse(const QString& sdp);
 
-    QHostAddress serverAddress;
     QString controlUrl;
     std::vector<Media> media;
 };

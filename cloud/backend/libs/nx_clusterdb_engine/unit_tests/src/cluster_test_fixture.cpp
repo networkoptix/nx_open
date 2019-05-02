@@ -142,12 +142,18 @@ ClusterTestFixture::ClusterTestFixture():
 {
 }
 
+void ClusterTestFixture::setConnectorTypeKey(const std::string& key)
+{
+    m_connectorTypeKey = key;
+}
+
 std::string ClusterTestFixture::clusterId() const
 {
     return m_clusterId;
 }
 
-Peer& ClusterTestFixture::addPeer(bool startAndWaitUntilStarted)
+Peer& ClusterTestFixture::addPeer(
+    std::vector<std::pair<const char*, const char*>> args)
 {
     const auto dbFileArg = lm("--db/name=%1/db_%2.sqlite")
         .args(testDataDir(), ++m_peerCounter).toStdString();
@@ -155,10 +161,18 @@ Peer& ClusterTestFixture::addPeer(bool startAndWaitUntilStarted)
     auto peer = std::make_unique<Peer>();
     peer->process().addArg(dbFileArg.c_str());
     peer->process().addArg("-p2pDb/clusterId", m_clusterId.c_str());
+    for (const auto& arg: args)
+        peer->process().addArg(arg.first, arg.second);
 
-    if (startAndWaitUntilStarted)
+    [this, &peer]() { ASSERT_TRUE(peer->process().startAndWaitUntilStarted()); }();
+
+    if (!m_connectorTypeKey.empty())
     {
-        [this, &peer]() { ASSERT_TRUE(peer->process().startAndWaitUntilStarted()); }();
+        [this, &peer]()
+        {
+            ASSERT_TRUE(peer->process().moduleInstance()->synchronizationEngine()
+                .transportManager().setConnectorTypeKey(m_connectorTypeKey));
+        }();
     }
 
     m_peers.push_back(std::move(peer));

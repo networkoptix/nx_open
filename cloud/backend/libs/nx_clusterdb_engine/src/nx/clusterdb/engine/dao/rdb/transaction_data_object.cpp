@@ -35,9 +35,9 @@ nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
     {
         const auto str = saveTranQuery.lastError().text();
 
-        NX_WARNING(this, lm("systemId %1. Error saving transaction %2 (%3, hash %4) to log. %5")
-            .args(tran.systemId, ::ec2::ApiCommand::toString(tran.header.command),
-                tran.header, tran.hash, saveTranQuery.lastError().text()));
+        NX_WARNING(this, "systemId %1. Error saving transaction %2 (%3, hash %4) to log. %5",
+            tran.systemId, tran.header.command, toString(tran.header), tran.hash,
+            saveTranQuery.lastError().text());
         return nx::sql::DBResult::ioError;
     }
 

@@ -15,6 +15,11 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
+/**
+ * Enables META-225.
+ */
+static constexpr bool kUseTrackAggregation = false;
+
 // Using 14 bits for coordinates. That allows using only 2 bytes when compressing the value.
 static constexpr int kCoordinatesBits = 14;
 static constexpr int kCoordinatesPrecision = (1 << kCoordinatesBits) - 1;
@@ -46,6 +51,8 @@ QN_FUSION_DECLARE_FUNCTIONS(ObjectPosition, (json)(ubjson));
 
 struct DetectedObject
 {
+    /** Device object has been detected on. */
+    QnUuid deviceId;
     QnUuid objectAppearanceId;
     QString objectTypeId;
     /** Persistent object attributes. E.g., license plate number. */
@@ -60,6 +67,10 @@ struct DetectedObject
 #define DetectedObject_analytics_storage_Fields \
     (objectAppearanceId)(objectTypeId)(attributes)(firstAppearanceTimeUsec)(lastAppearanceTimeUsec)(track)
 QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
+
+QByteArray serializeTrack(const std::vector<ObjectPosition>& track);
+
+std::vector<ObjectPosition> deserializeTrack(const QByteArray& serializedData);
 
 //-------------------------------------------------------------------------------------------------
 

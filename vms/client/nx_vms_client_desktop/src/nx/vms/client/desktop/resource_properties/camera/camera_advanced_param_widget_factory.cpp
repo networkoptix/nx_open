@@ -7,6 +7,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
@@ -23,6 +24,7 @@
 #include <nx/vms/client/desktop/common/widgets/lens_ptz_control.h>
 #include <nx/vms/client/desktop/common/widgets/button_slider.h>
 #include <nx/vms/client/desktop/common/widgets/hover_button.h>
+#include <utils/common/scoped_value_rollback.h>
 
 namespace nx::vms::client::desktop {
 
@@ -266,41 +268,58 @@ public:
     virtual void setValue(const QString &newValue) override	{ Q_UNUSED(newValue); }
 };
 
-class QnStringCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
+template<typename TextControl>
+class QnTextControlCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
 {
-public:
-    QnStringCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
-        AbstractCameraAdvancedParamWidget(parameter, parent),
-        m_lineEdit(new QLineEdit(this))
+    static QString getText(QLineEdit* control)
     {
-        m_lineEdit->setToolTip(parameter.description);
-        setReadOnly(m_lineEdit, parameter.readOnly);
-
-        m_layout->insertWidget(0, m_lineEdit, 1);
-
-        connect(m_lineEdit, &QLineEdit::textEdited, this, [this] {
-            emit valueChanged(m_id, value());
-        });
+        return control->text();
     }
 
-    virtual QString value() const override	{
-        return m_lineEdit->text();
+    static QString getText(QTextEdit* control)
+    {
+        return control->toPlainText();
     }
 
-    virtual void setValue(const QString &newValue) override	{
-        m_lineEdit->setText(newValue);
+public:
+    QnTextControlCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
+        AbstractCameraAdvancedParamWidget(parameter, parent),
+        m_textControl(new TextControl(this))
+    {
+        m_textControl->setToolTip(parameter.description);
+        setReadOnly(m_textControl, parameter.readOnly);
+
+        m_layout->insertWidget(0, m_textControl, 1);
+
+        connect(m_textControl, &TextControl::textChanged, this,
+            [this]()
+            {
+                if (!m_updateInProgress)
+                    emit valueChanged(m_id, value());
+            });
+    }
+
+    virtual QString value() const override
+    {
+        return getText(m_textControl);
+    }
+
+    virtual void setValue(const QString &newValue) override
+    {
+        const QnScopedValueRollback rollback(&m_updateInProgress, true);
+        m_textControl->setText(newValue);
     }
 
     virtual QSize sizeHint() const override
     {
         // TODO: #GDM Looks like dirty hack. Investigation is required. #low #future
-        return QSize(9999, m_lineEdit->sizeHint().height());
+        return QSize(9999, m_textControl->sizeHint().height());
     }
 
 private:
-    QLineEdit* m_lineEdit;
+    TextControl* m_textControl = nullptr;
+    bool m_updateInProgress = false;
 };
-
 
 // Wrapper for a vertical slider.
 class QnVSliderCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
@@ -514,7 +533,11 @@ AbstractCameraAdvancedParamWidget* QnCameraAdvancedParamWidgetFactory::createWid
 
         // LineEdit.
         case QnCameraAdvancedParameter::DataType::String:
-            return new QnStringCameraAdvancedParamWidget(parameter, parent);
+            return new QnTextControlCameraAdvancedParamWidget<QLineEdit>(parameter, parent);
+
+        // TextEdit
+        case QnCameraAdvancedParameter::DataType::Text:
+            return new QnTextControlCameraAdvancedParamWidget<QTextEdit>(parameter, parent);
 
         // Separator.
         case QnCameraAdvancedParameter::DataType::Separator:

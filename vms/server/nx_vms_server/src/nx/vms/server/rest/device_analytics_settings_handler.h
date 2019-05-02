@@ -7,7 +7,7 @@
 
 namespace nx::vms::server::analytics { class Manager; }
 
-namespace nx::vms::server::rest {
+namespace nx::vms::server {
 
 class DeviceAnalyticsSettingsHandler: public nx::network::rest::Handler, public ServerModuleAware
 {
@@ -28,4 +28,4 @@ private:
         const QString& deviceId) const;
 };
 
-} // namespace nx::vms::server::rest
+} // namespace nx::vms::server

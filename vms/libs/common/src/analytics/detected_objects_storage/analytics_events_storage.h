@@ -1,7 +1,6 @@
 #pragma once
 
 #include <chrono>
-#include <deque>
 #include <map>
 #include <vector>
 
@@ -23,9 +22,13 @@
 #include "analytics_events_storage_settings.h"
 #include "analytics_events_storage_types.h"
 
-namespace nx {
-namespace analytics {
-namespace storage {
+#include "attributes_dao.h"
+#include "device_dao.h"
+#include "object_cache.h"
+#include "object_track_aggregator.h"
+#include "object_type_dao.h"
+
+namespace nx::analytics::storage {
 
 using StoreCompletionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/)>;
@@ -149,12 +152,6 @@ public:
         std::chrono::milliseconds oldestDataToKeepTimestamp) override;
 
 private:
-    struct AttributesCacheEntry
-    {
-        QByteArray md5;
-        long long id = -1;
-    };
-
     using DeviceIdToCurrentTimePeriod = std::map<long long, detail::TimePeriod>;
     using IdToTimePeriod = std::map<long long, DeviceIdToCurrentTimePeriod::iterator>;
 
@@ -162,27 +159,18 @@ private:
     DbController m_dbController;
     std::chrono::milliseconds m_maxRecordedTimestamp = std::chrono::milliseconds::zero();
     mutable QnMutex m_mutex;
-    std::map<QnUuid, long long> m_deviceGuidToId;
-    std::map<long long, QnUuid> m_idToDeviceGuid;
-    std::map<QString, long long> m_objectTypeToId;
-    std::map<long long, QString> m_idToObjectType;
-    std::deque<AttributesCacheEntry> m_attributesCache;
     DeviceIdToCurrentTimePeriod m_deviceIdToCurrentTimePeriod;
     IdToTimePeriod m_idToTimePeriod;
+    AttributesDao m_attributesDao;
+    ObjectTypeDao m_objectTypeDao;
+    DeviceDao m_deviceDao;
+
+    ObjectCache m_objectCache;
+    ObjectTrackAggregator m_trackAggregator;
 
     bool readMaximumEventTimestamp();
 
     bool loadDictionaries();
-    void loadDeviceDictionary(nx::sql::QueryContext* queryContext);
-    void loadObjectTypeDictionary(nx::sql::QueryContext* queryContext);
-
-    void addDeviceToDictionary(long long id, const QnUuid& deviceGuid);
-    long long deviceIdFromGuid(const QnUuid& deviceGuid) const;
-    QnUuid deviceGuidFromId(long long id) const;
-
-    void addObjectTypeToDictionary(long long id, const QString& name);
-    long long objectTypeIdFromName(const QString& name) const;
-    QString objectTypeFromId(long long id) const;
 
     nx::sql::DBResult savePacket(
         nx::sql::QueryContext*,
@@ -203,22 +191,6 @@ private:
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject);
-
-    void updateDeviceDictionaryIfNeeded(
-        nx::sql::QueryContext* queryContext,
-        const common::metadata::DetectionMetadataPacket& packet);
-
-    void updateObjectTypeDictionaryIfNeeded(
-        nx::sql::QueryContext* queryContext,
-        const common::metadata::DetectedObject& detectedObject);
-
-    /**
-     * Inserts attributes or returns id or existing attributes.
-     * @return attributesId
-     */
-    long long insertAttributes(
-        nx::sql::QueryContext* queryContext,
-        const std::vector<common::metadata::Attribute>& eventAttributes);
 
     /**
      * @return Id of the current time period.
@@ -321,9 +293,6 @@ private:
 
     void cleanupEventProperties(nx::sql::QueryContext* queryContext);
 
-    void addToAttributesCache(long long id, const QByteArray& content);
-    long long findAttributesIdInCache(const QByteArray& content);
-
     static int packCoordinate(double);
     static double unpackCoordinate(int);
 };
@@ -347,6 +316,4 @@ private:
     std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction(const Settings&);
 };
 
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::storage

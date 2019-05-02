@@ -171,7 +171,7 @@ protected:
 
     void thenFinishUpdateShouldSucceed()
     {
-        NX_TEST_API_POST(m_peers[0].get(), "/ec2/finishUpdate", "");
+        NX_TEST_API_POST(m_peers[0].get(), "/ec2/finishUpdate", QString());
 
         QnRestResult result;
         NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &result);
@@ -299,8 +299,9 @@ private:
             }
         }
 
-        NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
+        NX_TEST_API_POST(m_peers[0].get(), path, QString(), nullptr,
             network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
+
         QnRestResult installResponse;
         QJson::deserialize(responseBuffer, &installResponse);
         ASSERT_EQ(expectedRestResult, installResponse.error);
@@ -314,7 +315,7 @@ private:
             path += "?ignorePendingPeers";
 
         QByteArray responseBuffer;
-        NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
+        NX_TEST_API_POST(m_peers[0].get(), path, QString(), nullptr,
             network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
 
         QnRestResult installResponse;

@@ -3,7 +3,13 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update \
         && apt-get install -y --no-install-recommends git \
-        && go get -u github.com/vigasin/config_helper
+        && mkdir -p /go/src/github.com/vigasin \
+        && cd /go/src/github.com/vigasin \
+        && git clone https://github.com/vigasin/config_helper \
+        && cd config_helper \
+        && git checkout -q 6e9864c13236909e5d933942c8b98351df265d5b \
+        && go get gopkg.in/yaml.v2 github.com/go-ini/ini \
+        && go install
 
 FROM ubuntu:18.04
 

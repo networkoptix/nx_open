@@ -209,26 +209,31 @@ void initialize(Manager* manager, Action* root)
     factory(NotificationsTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
         .shortcut(lit("N"))
+        .condition(condition::isWorkbenchVisible())
         .text(ContextMenu::tr("Switch to Notifications tab"));
 
     factory(MotionTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
         .shortcut(lit("M"))
+        .condition(condition::isWorkbenchVisible())
         .text(ContextMenu::tr("Switch to Motion tab"));
 
     factory(BookmarksTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
         .shortcut(lit("B"))
+        .condition(condition::isWorkbenchVisible())
         .text(ContextMenu::tr("Switch to Bookmarks tab"));
 
     factory(EventsTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
         .shortcut(lit("E"))
+        .condition(condition::isWorkbenchVisible())
         .text(ContextMenu::tr("Switch to Events tab"));
 
     factory(ObjectsTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
         .shortcut(lit("O"))
+        .condition(condition::isWorkbenchVisible())
         .text(ContextMenu::tr("Switch to Objects tab"));
 
     /* Context menu actions. */

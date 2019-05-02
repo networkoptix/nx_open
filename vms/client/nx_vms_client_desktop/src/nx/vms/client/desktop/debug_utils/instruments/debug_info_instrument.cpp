@@ -4,7 +4,7 @@
 
 #include <client/client_runtime_settings.h>
 
-#include <utils/memory/circular_buffer.h>
+#include <boost/circular_buffer.hpp>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/log/log.h>
 
@@ -39,7 +39,7 @@ struct DebugInfoInstrument::Private
 
     QString fps = "----";
     qint64 frameTimeMs = 0;
-    nx::utils::circular_buffer<qint64> frameTimePoints{
+    boost::circular_buffer<qint64> frameTimePoints{
         static_cast<std::size_t>(ini().storeFrameTimePoints)};
     QString handles;
 
@@ -84,7 +84,10 @@ DebugInfoInstrument::~DebugInfoInstrument()
 
 std::vector<qint64> DebugInfoInstrument::getFrameTimePoints()
 {
-    return d->frameTimePoints.get_vector();
+    std::vector<qint64> timePoints;
+    timePoints.reserve(d->frameTimePoints.size());
+    timePoints.insert(timePoints.begin(), d->frameTimePoints.begin(), d->frameTimePoints.end());
+    return timePoints;
 }
 
 void DebugInfoInstrument::enabledNotify()
