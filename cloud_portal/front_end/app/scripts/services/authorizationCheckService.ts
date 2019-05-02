@@ -84,6 +84,8 @@
 
                             return checkLoginState()
                                     .then(() => {
+                                        // If the user that logged in matches the current session there's no need to show
+                                        // the logout dialog.
                                         if (result.data.email !== $rootScope.session.loginState) {
                                             logoutAuthorised();
                                         }
