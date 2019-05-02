@@ -40,7 +40,7 @@ EventsStorage::~EventsStorage()
 
 bool EventsStorage::initialize(const Settings& settings)
 {
-    NX_DEBUG(this, "Openning analytics event storage from [%1]",
+    NX_DEBUG(this, "Opening analytics event storage from [%1]",
         settings.dbConnectionOptions.dbName);
     QnMutexLocker lock(&m_dbControllerMutex);
     {
@@ -56,7 +56,7 @@ bool EventsStorage::initialize(const Settings& settings)
     m_closingDbController = false;
     
     auto dbConnectionOptions = settings.dbConnectionOptions;
-    dbConnectionOptions.dbName = settings.path + "/events.sqlite";
+    dbConnectionOptions.dbName = settings.path + "/" + dbConnectionOptions.dbName;
     m_dbController = std::make_shared<DbController>(dbConnectionOptions);
     if (!m_dbController->initialize()
         || !readMaximumEventTimestamp()

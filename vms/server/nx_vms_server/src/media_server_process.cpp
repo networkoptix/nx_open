@@ -4095,8 +4095,10 @@ QString MediaServerProcess::getMetadataDatabaseName() const
 
 bool MediaServerProcess::initializeAnalyticsEvents()
 {
+    const auto dbFilePath = getMetadataDatabaseName();
     auto settings = this->serverModule()->analyticEventsStorageSettings();
-    settings.dbConnectionOptions.dbName = getMetadataDatabaseName();
+    settings.path = QFileInfo(dbFilePath).absoluteDir().path();
+    settings.dbConnectionOptions.dbName = QFileInfo(dbFilePath).fileName();
 
     if (!this->serverModule()->analyticsEventsStorage()->initialize(settings))
     {
