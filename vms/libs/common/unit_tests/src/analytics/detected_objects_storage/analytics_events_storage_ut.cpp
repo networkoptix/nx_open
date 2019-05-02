@@ -507,19 +507,22 @@ private:
             return true;
 
         if (kUseTrackAggregation)
-        {
-            const auto filterBoundingBox = translate(
-                filter.boundingBox,
-                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
-            const auto dataBoundingBox = translate(
-                data.boundingBox,
-                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
-            return filterBoundingBox.intersects(dataBoundingBox);
-        }
+            return rectsIntersectToPrecision(filter.boundingBox, data.boundingBox);
         else
-        {
             return filter.boundingBox.intersects(data.boundingBox);
-        }
+    }
+
+    bool rectsIntersectToPrecision(const QRectF& one, const QRectF& two)
+    {
+        const auto translatedOne = translate(
+            one,
+            QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+
+        const auto translatedTwo = translate(
+            two,
+            QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+
+        return translatedOne.intersects(translatedTwo);
     }
 
     bool satisfiesFilter(
@@ -539,7 +542,7 @@ private:
         {
             bool intersects = false;
             for (const auto& object: data.objects)
-                intersects |= filter.boundingBox.intersects(object.boundingBox);
+                intersects |= rectsIntersectToPrecision(filter.boundingBox, object.boundingBox);
             if (!intersects)
                 return false;
         }
@@ -800,8 +803,11 @@ protected:
 
     void addMaxObjectsLimitToFilter()
     {
-        m_filter.maxObjectsToSelect = (int) filterObjects(
-            toDetectedObjects(analyticsDataPackets()), m_filter).size() / 2;
+        const auto filteredObjectCount = filterObjects(
+            toDetectedObjects(analyticsDataPackets()), m_filter).size();
+
+        if (filteredObjectCount > 0)
+            m_filter.maxObjectsToSelect = nx::utils::random::number<int>(0, filteredObjectCount + 1);
     }
 
     void addMaxTrackLengthLimitToFilter()
@@ -834,7 +840,6 @@ protected:
         const auto& randomPacket = nx::utils::random::choice(analyticsDataPackets());
 
         m_filter.deviceIds.push_back(randomPacket->deviceId);
-        //addRandomKnownDeviceIdToFilter();
 
         if (nx::utils::random::number<bool>())
         {
@@ -1233,8 +1238,16 @@ protected:
 
     void thenResultMatchesExpectations()
     {
+        auto filteredPackets = filterPackets(filter(), analyticsDataPackets());
+        filteredPackets = sortPacketsByTimestamp(
+            std::move(filteredPackets),
+            Qt::SortOrder::DescendingOrder);
+
+        if (filter().maxObjectsToSelect > 0 && (int)filteredPackets.size() > filter().maxObjectsToSelect)
+            filteredPackets.erase(filteredPackets.begin() + filter().maxObjectsToSelect, filteredPackets.end());
+
         auto expected = sortPacketsByTimestamp(
-            filterPackets(filter(), analyticsDataPackets()),
+            std::move(filteredPackets),
             filter().sortOrder);
 
         sortObjectsById(&expected);
