@@ -67,6 +67,8 @@ public:
      */
     std::vector<ObjectUpdate> getObjectsToUpdate(bool flush = false);
 
+    std::optional<DetectedObject> getObjectById(const QnUuid& objectGuid) const;
+
     /**
      * MUST be invoked after inserting object to the DB.
      */

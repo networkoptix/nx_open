@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtGui/QRegion>
+
 #include <nx/sql/query_context.h>
 
 #include "analytics_events_storage_types.h"
@@ -11,6 +13,7 @@ namespace nx::analytics::storage {
 class AttributesDao;
 class DeviceDao;
 class ObjectTypeDao;
+class AnalyticsArchiveDirectory;
 
 class DetectionDataSaver
 {
@@ -19,7 +22,8 @@ public:
         AttributesDao* attributesDao,
         DeviceDao* deviceDao,
         ObjectTypeDao* objectTypeDao,
-        ObjectCache* objectCache);
+        ObjectCache* objectCache,
+        AnalyticsArchiveDirectory* analyticsArchive);
 
     DetectionDataSaver(const DetectionDataSaver&) = delete;
     DetectionDataSaver& operator=(const DetectionDataSaver&) = delete;
@@ -39,10 +43,30 @@ public:
     void save(nx::sql::QueryContext* queryContext);
 
 private:
+    struct AnalArchiveItem
+    {
+        QnUuid deviceId;
+        int objectType = -1;
+        std::chrono::milliseconds timestamp = std::chrono::milliseconds::zero();
+        /**
+         * This region is given with object search grid resolution.
+         */
+        QRegion region;
+        long long combinedAttributesId = -1;
+    };
+
+    struct ObjectDbAttributes
+    {
+        QnUuid deviceId;
+        int objectTypeId = -1;
+        long long attributesDbId = -1;
+    };
+
     AttributesDao* m_attributesDao = nullptr;
     DeviceDao* m_deviceDao = nullptr;
     ObjectTypeDao* m_objectTypeDao = nullptr;
     ObjectCache* m_objectCache = nullptr;
+    AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
 
     std::vector<DetectedObject> m_objectsToInsert;
     std::vector<ObjectUpdate> m_objectsToUpdate;
@@ -60,7 +84,13 @@ private:
 
     void saveObjectSearchData(nx::sql::QueryContext* queryContext);
 
-    std::vector<long long> toDbIds(const std::set<QnUuid>& objectIds);
+    void saveToAnalyticsArchive(nx::sql::QueryContext* queryContext);
+    std::vector<AnalArchiveItem> prepareArchiveData(nx::sql::QueryContext* queryContext);
+    ObjectDbAttributes getObjectDbDataById(const QnUuid& objectId);
+    
+    long long combineAttributes(
+        nx::sql::QueryContext* queryContext,
+        const std::vector<long long>& attributesIds);
 };
 
 } // namespace nx::analytics::storage

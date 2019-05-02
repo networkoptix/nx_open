@@ -27,8 +27,7 @@ public:
             std::chrono::system_clock::from_time_t(0),
             std::chrono::system_clock::from_time_t(0))
     {
-        m_settings.dbConnectionOptions.dbName =
-            nx::utils::test::TestWithTemporaryDirectory::testDataDir() + "/events.sqlite";
+        m_settings.path = nx::utils::test::TestWithTemporaryDirectory::testDataDir();
         m_settings.dbConnectionOptions.driverType = nx::sql::RdbmsDriverType::sqlite;
         m_settings.dbConnectionOptions.maxConnectionCount = 17;
 

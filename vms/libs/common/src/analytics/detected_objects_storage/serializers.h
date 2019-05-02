@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <vector>
 
 #include <QtCore/QRectF>
@@ -83,5 +84,18 @@ QRect translate(const QRectF& box, const QSize& resolution);
  * Translates rect coordinates from [0; resolution.width()] and [0; resolution.height()] to [0; 1].
  */
 QRectF translate(const QRect& box, const QSize& resolution);
+
+template<template<typename...> class Container, typename... Args>
+Container<QRectF> translate(
+    const Container<QRect, Args...>& rects,
+    const QSize& resolution)
+{
+    Container<QRectF> result;
+    std::transform(
+        rects.begin(), rects.end(),
+        std::back_inserter(result),
+        [&resolution](const QRect& rect) { return translate(rect, resolution); });
+    return result;
+}
 
 } // namespace nx::analytics::storage
