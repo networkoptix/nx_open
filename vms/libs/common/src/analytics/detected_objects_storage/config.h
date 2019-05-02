@@ -10,7 +10,7 @@ namespace nx::analytics::storage {
 static constexpr bool kUseTrackAggregation = true;
 
 /** Enabled META-254. */
-static constexpr bool kSaveTimePeriodsToFile = true;
+static constexpr bool kSaveTimePeriodsToFile = false;
 
 // Using 14 bits for coordinates. That allows using only 2 bytes when compressing the value.
 static constexpr int kCoordinatesBits = 14;
