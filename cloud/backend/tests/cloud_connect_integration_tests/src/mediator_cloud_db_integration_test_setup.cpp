@@ -15,6 +15,11 @@ MediatorCloudDbIntegrationTestSetup::MediatorCloudDbIntegrationTestSetup()
         hpm::MediatorFunctionalTest::noFlags);
 }
 
+MediatorCloudDbIntegrationTestSetup::~MediatorCloudDbIntegrationTestSetup()
+{
+    m_mediator->stop();
+}
+
 bool MediatorCloudDbIntegrationTestSetup::startCdb()
 {
     return m_cdbLauncher->startAndWaitUntilStarted();

@@ -31,11 +31,7 @@ Model::Model(const conf::Settings& settings):
 
 Model::~Model()
 {
-    for (const auto& subscriptionId: m_listeningPeerPoolSubscriptions)
-    {
-        m_listeningPeerPool.peerConnectedSubscription()
-            .removeSubscription(subscriptionId);
-    }
+    stop();
 }
 
 bool Model::doMandatoryInitialization()
@@ -45,6 +41,16 @@ bool Model::doMandatoryInitialization()
     // implementation clear (free of DB needed/not needed checks).
 
     return m_remoteRelayPeerPool->connectToDb();
+}
+
+void Model::stop()
+{
+    m_remoteRelayPeerPool->pleaseStopSync();
+    for (const auto& subscriptionId : m_listeningPeerPoolSubscriptions)
+    {
+        m_listeningPeerPool.peerConnectedSubscription()
+            .removeSubscription(subscriptionId);
+    }
 }
 
 model::ClientSessionPool& Model::clientSessionPool()

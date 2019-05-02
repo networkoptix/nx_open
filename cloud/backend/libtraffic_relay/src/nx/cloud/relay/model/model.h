@@ -24,6 +24,7 @@ public:
     ~Model();
 
     bool doMandatoryInitialization();
+    void stop();
 
     model::ClientSessionPool& clientSessionPool();
     const model::ClientSessionPool& clientSessionPool() const;
