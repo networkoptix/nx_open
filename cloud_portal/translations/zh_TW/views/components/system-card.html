@@ -38,12 +38,11 @@
         </div>
         <br>
         <div ng-if="mergeTargetSystem.name" >
-            <div><strong>{{mergeTargetSystem.name}}</strong>
-                is being merged to this system</div>
+            <div><strong>{{mergeTargetSystem.name}}</strong> 正被合併到此系統中</div>
             <hr />
             <div class="merge-info-text light-text">根據資料庫的大小, 可能會花上數小時</div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">完成系統合併</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
@@ -51,16 +50,15 @@
         </div>
         <br>
         <div ng-if="mergeTargetSystem.name">
-            <div>This system is being merged to
-                <strong>{{mergeTargetSystem.name}}</strong></div>
+            <div>此系統正被合併到 <strong>{{mergeTargetSystem.name}}</strong></div>
             <hr />
             <div class="merge-info-text light-text">
                 <p>根據錄影資料的大小, 可能會花費數小時</p>
                 <p>在合併完成前, 您可以登入到此系統並觀看影片, 但不能更改任何設定。</p>
-                <p>When merge is finished, all users and cameras from this system will become available
-                    in <strong>{{mergeTargetSystem.name}}</strong> System, and this system will be deleted.</p>
+                <p>合併完成後, 此系統中的所有用戶和攝影機都將可用於
+                <strong>{{mergeTargetSystem.name}}</strong>, 同時此系統將被刪除</p>
             </div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">完成系統合併</div>
     </div>
 </div>

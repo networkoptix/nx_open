@@ -39,8 +39,8 @@
   },
   "systemStatuses": {
     "activated": "활성화 됨",
-    "incompatible": "incompatible",
-    "merging": "merging",
+    "incompatible": "호환 되지 않음",
+    "merging": "합치기",
     "notActivated": "활성화되지 않음",
     "online": "온라인",
     "offline": "오프라인",
@@ -141,14 +141,14 @@
     "lostConnection": "{{systemName}} 연결이 끊어졌습니다.",
     "thisSystem": "시스템",
     "oldSafariNotSupported": "10 이전의 Safari 버전은 지원되지 않습니다.",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
-    "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/download\">latest build</a>.",
-    "FAIL": "System <strong>{{failedSystem}}</strong> is currently unreachable.<br>Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "일부 서버 목록은 두 시스템 모두에 존재하는 것으로 - 선택된 서버와 현재 서버의 목록에 있습니다.<br>각 시스템에서 오프라인 및 호환되지 않는 서버를 제거하고 다시 시도하십시오.",
+    "mergedSystemIsOffline": "시스템 <strong>{{failedSystem}}</strong> 가 오프라인입니다.",
+    "INCOMPATIBLE": "시스템들는 다른 소프트웨어 버전이 입니다. 둘다 <a href=\"/download\">최신 빌드</a> 로 업데이트 하십시요.",
+    "FAIL": "시스템 <strong>{{failedSystem}}</strong>에 현재 연결할 수 없습니다.<br> 조금 있다 다시 시도 하거나 <a href=\"%SUPPORT_LINK%\" target=\"_blank\">지원</a> 에 문의하십시요."
   },
   "merging": {
-    "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "mergeFailedTitle": "시스템 머지 실패",
+    "commonText": "시스템 <strong>{{primarySystem}}</strong> 및 <strong>{{secondarySystem}}</strong>를 머지 하는데 실패 했습니다."
   },
   "passwordRequirements": {
     "good": "좋음",
@@ -194,11 +194,11 @@
     "confirmUnshareAction": "삭제",
     "successDisconnected": "시스템이 성공적으로 %PRODUCT_NAME%에서 분리 되었습니다.",
     "successDeleted": "시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
-    "mergeFailed": "System merge failed",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "시스템 머지에 실패했습니다.",
+    "mergeStart": "시스템이 머지를 시작했습니다.",
     "mergeSuccess": "System merge completed",
     "permissionsRemoved": "권한이 {{email}} 에서 제거 되었습니다.",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "시스템의 알 수없는 이름 (클라우드 머지로 인해 발생)"
   },
   "account": {
     "accountSavedSuccess": "계정이 성공적으로 저장되었습니다.",
@@ -249,6 +249,11 @@
         "label": "ARM",
         "shortLabel": "ARM",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      },
+      "sdk": {
+        "label": "SDK",
+        "shortLabel": "SDK",
+        "supported": "C++ cross platform SDK"
       }
     },
     "platforms": {
@@ -337,8 +342,8 @@
     }
   },
   "recommendSupport": {
-    "a_recommend": "We'd recommend consulting with",
+    "a_recommend": "와 상담 하는 것을 제안 합니다.",
     "b_support": "지원",
-    "c_proceeding": "before proceeding."
+    "c_proceeding": "계속하기 전에."
   }
 }

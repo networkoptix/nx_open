@@ -70,12 +70,12 @@
 	"You can merge only those cloud Systems, where you have the \"Owner\" permissions.": "Yalnızca \"Sahip\" izinlerine sahip olduğunuz bulut Sistemlerini birleştirebilirsiniz.",
 	"You can only merge Systems where you are the owner.": "Yalnızca sahip olduğunuz Sistemleri birleştirebilirsiniz.",
 	"Your browser is not supported": "Tarayıcınız desteklenmiyor",
-	"connectToCloud": "Connect System you want to merge with this one to <strong>{{productName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.",
+	"connectToCloud": "Birleştirmek istediğiniz <strong>{{productName}}</strong> sistemine bağlanın veya yerel sistemi {{vmsName}}</strong> kullanarak birleştirin.",
 	"latest build": "son yapı",
-	"mergeConfirmation": "You are about to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>. Settings and the name will be taken from the <strong>{{primarySystem}}</strong>.",
-	"primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current System. Update the current System to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.",
-	"secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current System. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
+	"mergeConfirmation": "<strong>{{primarySystem}}</strong> sistemi ile <strong>{{secondarySystem}}</strong> sistemini birleştirmek üzeresiniz. İsim ve ayarlar <strong>{{primarySystem}}</strong> sisteminden alınacaktır.",
+	"primaryCannotMerge": "{{targetSystem}} sistemi daha yeni bir yazılım versiyonuna sahip. Sistemi <a href=\"/download\" target=\"_blank\" translate> versiyonuna </a> güncelleyin.",
+	"secondaryCannotMerge": "{{targetSystem}} sisteminin yazılım versiyonu eski. Birleştirme işlemi için {{targetSystem}} sistemini en son <a href=\"/download\" target=\"_blank\" translate> versiyona güncelleyin.",
 	"servers in the merged System.": "birleştirilmiş sistemdeki sunucular.",
 	"support": "destek",
-	"systemUnavailable": "System {{targetSystem}} is currently unreachable. Try again in a few minutes or contact"
+	"systemUnavailable": "{{targetSystem}} sistemi erişilebilir değil. Birkaç dakika sonra tekrar deneyin"
 }

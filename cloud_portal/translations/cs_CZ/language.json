@@ -39,8 +39,8 @@
   },
   "systemStatuses": {
     "activated": "aktivováno",
-    "incompatible": "incompatible",
-    "merging": "merging",
+    "incompatible": "Nekompatibilní",
+    "merging": "#merging",
     "notActivated": "neaktivováno",
     "online": "online",
     "offline": "offline",
@@ -65,7 +65,7 @@
     },
     "Advanced Viewer": {
       "label": "Pokročilý prohlížeč",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Lze sledovat živé video, procházet archiv, ovládat PTZ atd"
     },
     "Administrator": {
       "label": "Administrátor",
@@ -141,26 +141,26 @@
     "lostConnection": "Připojení k {{systemName}} se ztratilo",
     "thisSystem": "systém",
     "oldSafariNotSupported": "Verze Safari starší než 10 není podporována",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
-    "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/download\">latest build</a>.",
-    "FAIL": "System <strong>{{failedSystem}}</strong> is currently unreachable.<br>Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "Některé serverové seznamy se mohou zobrazovat jako existující v obou systémech - ve vybraném i v aktuálním.<br>Ze systému odeberte offline a nekompatibilní servery a opakujte akci.",
+    "mergedSystemIsOffline": "Systém <strong>{{failedSystem}}</strong> je offline.",
+    "INCOMPATIBLE": "Systémy mají různé verze softwaru. Prosím aktualizujte oba na <a href=\"/download\">nejnovější verzi</a>.",
+    "FAIL": "Systém <strong>{{failedSystem}}</strong> je momentálně nedostupný.<br>zkuste to znovu za okamžik nebo se obraťte na podporu <a href=\"%SUPPORT_LINK%\" target=\"_blank\"></a>."
   },
   "merging": {
-    "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "mergeFailedTitle": "Spojení systémů selhalo",
+    "commonText": "Nelze sloučit systémy <strong>{{primarySystem}}</strong> a <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "dobré",
     "fair": "dostatečné",
-    "minLength": "too short",
+    "minLength": "příliš krátké",
     "minLengthMessage": "Heslo musí obsahovat nejméně 8 znaků",
     "required": "nesprávné",
     "requiredMessage": "Používejte pouze latinskou abecedu, číslice a symboly na klávesnici, vyhněte se použití mezery na počátku a konci",
     "weak": "slabé",
     "weakMessage": "Aby bylo vaše heslo silnější, použijte čísla, velká a malá písmena a speciální znaky",
     "strongMessage": "Silné heslo!",
-    "common": "too common",
+    "common": "příliš časté",
     "commonMessage": "Toto heslo je v seznamu nejoblíbenějších heslech na světě",
     "missingMessage": "Heslo je vyžadováno"
   },
@@ -194,11 +194,11 @@
     "confirmUnshareAction": "Smazat",
     "successDisconnected": "Systém byl úspěšně odpojen od %PRODUCT_NAME%",
     "successDeleted": "Systém {{systemName}} byl úspěšně odstraněna z Vašeho účtu",
-    "mergeFailed": "System merge failed",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "Spojení systémů selhalo",
+    "mergeStart": "Systémy se spojují",
     "mergeSuccess": "System merge completed",
     "permissionsRemoved": "Oprávnění byla odstraněna z adresy {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Neznámý název systému (problém s cloudovým spojením)"
   },
   "account": {
     "accountSavedSuccess": "Váš účet byl úspěšně uložen",
@@ -249,6 +249,11 @@
         "label": "ARM",
         "shortLabel": "ARM",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      },
+      "sdk": {
+        "label": "SDK",
+        "shortLabel": "SDK",
+        "supported": "C++ cross platform SDK"
       }
     },
     "platforms": {
@@ -299,7 +304,7 @@
       "copyActiveText": "zkopírováno do schránky"
     },
     "systemOffline": "Systém je offline",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "ŽÁDNÉ KAMERY",
     "cameraStates": {
       "offline": "Offline",
       "error": "Chyba",
@@ -337,8 +342,8 @@
     }
   },
   "recommendSupport": {
-    "a_recommend": "We'd recommend consulting with",
+    "a_recommend": "Doporučujeme konzultaci s",
     "b_support": "podpora",
-    "c_proceeding": "before proceeding."
+    "c_proceeding": "než budete pokračovat."
   }
 }

@@ -38,11 +38,11 @@
         <br>
         <div ng-if="mergeTargetSystem.name" >
             <div><strong>{{mergeTargetSystem.name}}</strong>
-                is being merged to this system</div>
+            se sloučí s tímto systémem</div>
             <hr />
             <div class="merge-info-text light-text">V závislosti na velikosti databáze může operace trvat až několik hodin</div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Dokončování sloučení systémů</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
@@ -50,16 +50,16 @@
         </div>
         <br>
         <div ng-if="mergeTargetSystem.name">
-            <div>This system is being merged to
-                <strong>{{mergeTargetSystem.name}}</strong></div>
+            <div>Tento systém se sloučí s
+            <strong>{{mergeTargetSystem.name}}</strong></div>
             <hr />
             <div class="merge-info-text light-text">
                 <p>V závislosti na velikosti databáze může operace trvat až několik hodin.</p>
                 <p>Dokud nebude sloučení dokončeno, můžete se k tomuto systému přihlásit a sledovat živé video, ale nemůžete měnit žádné nastavení.</p>
-                <p>When merge is finished, all users and cameras from this system will become available
-                    in <strong>{{mergeTargetSystem.name}}</strong> System, and this system will be deleted.</p>
+                <p>Po dokončení slučování budou všichni uživatelé a kamery z tohoto systému k dispozici
+                    v <strong>{{mergeTargetSystem.name}}</strong> Systém bude vymazán.</p>
             </div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Dokončování sloučení systémů</div>
     </div>
 </div>

@@ -40,7 +40,7 @@
   "systemStatuses": {
     "activated": "激活",
     "incompatible": "不兼容",
-    "merging": "merging",
+    "merging": "合并中",
     "notActivated": "未激活",
     "online": "在线",
     "offline": "离线",
@@ -141,14 +141,14 @@
     "lostConnection": "连接到 {{systemName}} 失去了",
     "thisSystem": "系统",
     "oldSafariNotSupported": "不支持10岁以上的Safari版本",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
-    "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/download\">latest build</a>.",
-    "FAIL": "System <strong>{{failedSystem}}</strong> is currently unreachable.<br>Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "某些服务器列表并存于选定的和当前的两个系统中 。 <br>请从各系统中删除并断线不相容的服务器，然后重连一次。",
+    "mergedSystemIsOffline": "系统 <strong>{{failedSystem}}</strong> 处于离线状态。",
+    "INCOMPATIBLE": "系统有不同的软件版本。请将它们更新到 <a href=\"/download\">最新版本</a>。",
+    "FAIL": "系统 <strong>{{failedSystem}}</strong> 目前无法连上。<br>请稍后再试一次, 或联系 <a href=\"%SUPPORT_LINK%\" target=\"_blank\">支持</a>。"
   },
   "merging": {
-    "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "mergeFailedTitle": "系统合并失败",
+    "commonText": "无法合并系统 <strong>{{primarySystem}}</strong> 和 <strong>{{secondarySystem}}</strong>。"
   },
   "passwordRequirements": {
     "good": "良好",
@@ -194,11 +194,11 @@
     "confirmUnshareAction": "删除",
     "successDisconnected": "系统成功地断开 %PRODUCT_NAME%",
     "successDeleted": "从您的帐户成功删除系统 {{systemName}}",
-    "mergeFailed": "System merge failed",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "系统合并失败",
+    "mergeStart": "系统开始合并中",
     "mergeSuccess": "System merge completed",
     "permissionsRemoved": "权限从 {{email}} 被刪除",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "未知的系统名称（由云合并引起）"
   },
   "account": {
     "accountSavedSuccess": "您的帐户已成功保存",
@@ -249,6 +249,11 @@
         "label": "ARM",
         "shortLabel": "ARM",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      },
+      "sdk": {
+        "label": "SDK",
+        "shortLabel": "SDK",
+        "supported": "C++ cross platform SDK"
       }
     },
     "platforms": {
@@ -337,8 +342,8 @@
     }
   },
   "recommendSupport": {
-    "a_recommend": "We'd recommend consulting with",
+    "a_recommend": "建议您进行咨询",
     "b_support": "技术支持",
-    "c_proceeding": "before proceeding."
+    "c_proceeding": "在继续执行之前："
   }
 }

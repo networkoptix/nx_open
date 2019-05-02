@@ -39,7 +39,7 @@
   },
   "systemStatuses": {
     "activated": "เปิดใช้งาน",
-    "incompatible": "incompatible",
+    "incompatible": "เข้ากันไม่ได้",
     "merging": "การผสม",
     "notActivated": "ยังไม่ถูกเปิดใช้งาน",
     "online": "ออนไลน์",
@@ -249,6 +249,11 @@
         "label": "ARM",
         "shortLabel": "ARM",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      },
+      "sdk": {
+        "label": "SDK",
+        "shortLabel": "SDK",
+        "supported": "C++ cross platform SDK"
       }
     },
     "platforms": {
