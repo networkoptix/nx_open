@@ -271,6 +271,8 @@ public:
     void addMotion(const quint8* data, qint64 timestamp);
     void addMotion(QnMetaDataV1Ptr data);
     void addMotion(QnConstMetaDataV1Ptr data);
+
+    static QRect rectFromNormalizedRect(const QRectF& rectF);
     void addMotion(const QRectF& data);
 
     // Removes part of motion info by motion mask.

@@ -352,17 +352,31 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 #endif
 }
 
-void QnMetaDataV1::addMotion(const QRectF& data)
+QRect QnMetaDataV1::rectFromNormalizedRect(const QRectF& rectF)
 {
-    QRect rect(
-        data.x() * Qn::kMotionGridWidth, data.y() * Qn::kMotionGridHeight,
-        data.width() * Qn::kMotionGridWidth, data.height() * Qn::kMotionGridHeight);
+    const auto x1 = rectF.left() * Qn::kMotionGridWidth;
+    const auto y1 = rectF.top() * Qn::kMotionGridHeight;
+    const auto x2 = rectF.right() * Qn::kMotionGridWidth;
+    const auto y2 = rectF.bottom() * Qn::kMotionGridHeight;
+    
+    const int x = x1 + 0.5;
+    const int y = y1 + 0.5;
 
-    for (int x = rect.left(); x <= rect.right(); ++x)
-    {
-        for (int y = rect.top(); y <= rect.bottom(); ++y)
-            setMotionAt(x, y);
-    }
+    return QRect(x, y, x2 - x + 0.5, y2 - y + 0.5);
+}
+
+void QnMetaDataV1::addMotion(const QRectF& rectF)
+{
+    const QRect rect = rectFromNormalizedRect(rectF);
+
+    const quint32 maskL = (1LL << (32 - rect.top())) - 1;
+    const quint32 maskR = ~((1 << (31 - rect.bottom())) - 1);
+    const quint32 mask = qToBigEndian(maskL & maskR);
+
+    quint32* data = ((quint32*)m_data.data()) + rect.left();
+    const quint32* dataEnd = data + rect.width();
+    while (data < dataEnd)
+        *data++ |= mask;
 }
 
 bool QnMetaDataV1::isMotionAt(int x, int y, char* mask)
