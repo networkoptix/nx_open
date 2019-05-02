@@ -39,18 +39,25 @@ struct Apply<0>
 
 //-------------------------------------------------------------------------------------------------
 
-template<size_t N>
-struct TupleForEach
+template<typename Tuple, std::size_t index, typename Func>
+static inline void tuple_for_each(const Tuple& tuple, Func func)
 {
-    template<typename Tuple, typename Func>
-    static inline void for_each(const Tuple& tuple, Func func)
-    {
-        func(std::get<N-1>(tuple));
+    func(std::get<index>(tuple));
 
-        if constexpr (N > 1)
-            TupleForEach<N - 1>::for_each(tuple, func);
-    }
-};
+    if constexpr (std::tuple_size<Tuple>::value > index + 1)
+        tuple_for_each<Tuple, index + 1>(tuple, func);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+template<typename Func, typename FirstArg, typename... Args>
+inline void apply_each(Func&& func, FirstArg&& firstArg, Args&& ... args)
+{
+    func(std::forward<FirstArg>(firstArg));
+
+    if constexpr (sizeof...(args) > 0)
+        apply_each(std::forward<Func>(func), std::forward<Args>(args)...);
+}
 
 } // namespace detail
 
@@ -65,11 +72,24 @@ decltype(detail::Apply<
         ::apply(::std::forward<F>(f), ::std::forward<T>(t));
 }
 
+/**
+ * NOTE: Tuple elements are interated forward.
+ */
 template<typename Tuple, typename Func>
 inline void tuple_for_each(const Tuple& tuple, Func func)
 {
-    detail::TupleForEach<::std::tuple_size<typename ::std::decay<Tuple>::type>::value>
-        ::for_each(tuple, func);
+    detail::tuple_for_each<Tuple, 0>(tuple, func);
+}
+
+/**
+ * Invokes func with each argument of Args pack separately.
+ * NOTE: Args packs elements are interated forward.
+ */
+template<typename Func, typename... Args>
+inline void apply_each(Func&& func, Args&&... args)
+{
+    if constexpr(sizeof...(args) > 0)
+        detail::apply_each(std::forward<Func>(func), std::forward<Args>(args)...);
 }
 
 /**
