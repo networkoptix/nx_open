@@ -56,6 +56,7 @@ public:
         Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder;
     };
 
+    static constexpr quint32 kMinimalDurationMs = 125;
 protected:
     static const int kGridDataSize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128;
 
@@ -102,7 +103,6 @@ private:
         int maskEnd,
         QnTimePeriodList& rez);
 private:
-    static constexpr quint32 kMinimalDurationMs = 125;
 
     QString m_filePrefix;
     int m_recordSize = 0;

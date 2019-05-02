@@ -63,6 +63,6 @@ int main(int argc, char** argv)
             return nx::utils::test::DeinitFunctions();
         });
     if (parser->isSet("help"))
-        std::cout << parser->helpText().toUtf8();
+        parser->showHelp();
     return result;
 }
