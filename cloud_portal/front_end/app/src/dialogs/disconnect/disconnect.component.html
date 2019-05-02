@@ -21,10 +21,10 @@
                    name="password" type="password"
                    required nxFocusMe>
             <div *ngIf="password.invalid && password.touched && !wrongPassword">
-                <label class="input-error" translate>Password is required</label>
+                <div class="input-error" translate>Password is required</div>
             </div>
             <div *ngIf="password.invalid && wrongPassword">
-                <label class="input-error" translate>Wrong password</label>
+                <div class="input-error" translate>Wrong password</div>
             </div>
         </div>
     </div>
