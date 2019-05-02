@@ -155,6 +155,7 @@ TEST_F(MotionArchive, addMotion)
     };
 
     checkMotion(QRectF(0, 0, 0.25, 0.25*1.5));
+    checkMotion(QRectF(1/40.0, 0, 0.25, 0.25*1.5));
     checkMotion(QRectF(0.5, 0.5, 0.25, 0.25));
     checkMotion(QRectF(0, 0, 1.0, 1.0));
     checkMotion(QRectF(0, 0, 0, 0));

@@ -372,11 +372,19 @@ void QnMetaDataV1::addMotion(const QRectF& rectF)
     const quint32 maskL = (1LL << (32 - rect.top())) - 1;
     const quint32 maskR = ~((1 << (31 - rect.bottom())) - 1);
     const quint32 mask = qToBigEndian(maskL & maskR);
+    const quint64 mask64 = (quint64(mask) << 32) + mask;
 
     quint32* data = ((quint32*)m_data.data()) + rect.left();
     const quint32* dataEnd = data + rect.width();
-    while (data < dataEnd)
+    const quint64* dataEnd64 = (quint64*) (std::ptrdiff_t(dataEnd) & ~std::ptrdiff_t(7));
+    if (std::ptrdiff_t(data) % 8)
         *data++ |= mask;
+    quint64* data64 = (quint64*) data;
+    while (data64 < dataEnd64)
+        *data64++ |= mask64;
+    data = (quint32*) data64;
+    if (data < dataEnd)
+        *data |= mask;
 }
 
 bool QnMetaDataV1::isMotionAt(int x, int y, char* mask)
