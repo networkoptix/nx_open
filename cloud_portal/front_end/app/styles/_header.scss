@@ -31,13 +31,16 @@ $header-collapsing-width-1: 1px;
         background-color: #fff;
         padding: 0;
     }
+    
+    .app-header-right {
+        margin-top : -1px;
+    }
 
     .navbar-nav {
         flex-direction: row;
         align-items: center;
         height : $header-height;
         line-height: $line-height;
-        margin-top: -1px;
     }
 
     .navbar-brand{

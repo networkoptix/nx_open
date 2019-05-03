@@ -98,7 +98,11 @@ header {
         border           : none;
         border-radius    : 2px;
         width            : 100%;
-        padding          : 4px 0 0;
+        padding          : 4px 0 8px !important;
+    
+        @include media-breakpoint-up(md) {
+            padding-bottom : 4px !important;
+        }
         
         &--list {
             max-height      : $dropdown-list-height;

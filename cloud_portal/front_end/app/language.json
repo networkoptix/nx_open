@@ -164,6 +164,7 @@
   "passwordRequirements": {
     "good": "good",
     "fair": "fair",
+    "fairMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
     "minLength": "too short",
     "minLengthMessage": "Password must contain at least 8 characters",
     "required": "incorrect",

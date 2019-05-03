@@ -1,22 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import imaplib
-import re
-from platform import system
+import docker
 import email.header
-from email.parser import HeaderParser
+import imaplib
 import os.path
+import re
 import time
+from email.parser import HeaderParser
+from platform import system
+from random import *
 from requests import head
+from robot.libraries.BuiltIn import BuiltIn
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-
 from selenium.common.exceptions import NoSuchElementException
 from SeleniumLibrary.utils import (is_falsy, is_truthy, secs_to_timestr,
                                    timestr_to_secs, SELENIUM_VERSION)
-from random import *
-from robot.libraries.BuiltIn import BuiltIn
 
 
 class NoptixLibrary(object):
@@ -177,3 +178,22 @@ class NoptixLibrary(object):
         pat = '(<a class="btn" href="{})(.[^>]*)(target=_blank)'.format(url)
         if re.search(pat, body) == None:
             raise Exception("Button target was not 'blank'.")
+
+    def build_image(self):
+        client = docker.from_env()
+        return client.images.build(path="/home/kyle/develop/nx_vms/cloud_portal/robot_tests/Docker", 
+                            tag="mediaserver", 
+                            buildargs={"mediaserver_deb":"nxwitness-server-4.0.0.28389-linux64-beta-test.deb"})
+
+    def run_container(self, image):
+        tmp = {'/run':'', '/run/lock':''}
+        vol = {'/sys/fs/cgroup':'/sys/fs/cgroup', '/home/kyle/develop/nx_vms/cloud_portal/robot_tests/video':'/dokk', '/home/kyle/develop/nx_vms/cloud_portal/robot_tests/data/':'/opt/networkoptix/mediaserver/var'}
+        prt = {'7001':'7001'}
+        client = docker.from_env()
+        cont = client.containers.run(image, detach=True, tmpfs=tmp, volumes=vol, ports=prt, network_mode="bridge", name="mediaserver")
+        return cont
+
+    def stop_container(self, cont):
+        cont.stop()
+        client = docker.from_env()
+        client.containers.prune()

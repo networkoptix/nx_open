@@ -145,7 +145,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     @property
     def customizations(self):
         if self.is_superuser:
-            return Customization.objects.all().values_list('name')
+            return list(Customization.objects.all().values_list('name', flat=True))
         cloud_portal_ids = UserGroupsToProductPermissions.objects.\
             filter(group__in=self.groups.all(), product__product_type__type=ProductType.PRODUCT_TYPES.cloud_portal).\
             values_list('product__id', flat=True)

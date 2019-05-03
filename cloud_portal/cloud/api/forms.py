@@ -91,8 +91,7 @@ class UserInviteFrom(forms.Form):
         self.user = kwargs.pop('user', None)
         super(UserInviteFrom, self).__init__(*args, **kwargs)
         if self.user:
-            self.fields['customization'].choices = [(customization[0], customization[0])
-                                                    for customization in self.user.customizations]
+            self.fields['customization'].choices = [(customization, customization) for customization in self.user.customizations]
 
     @staticmethod
     def add_user(request):

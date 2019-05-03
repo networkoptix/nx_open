@@ -220,10 +220,22 @@ class ProductForm(forms.ModelForm):
             self.initial['customizations'] = self.instance.customizations.all()
 
     def clean_customizations(self):
-        data = self.cleaned_data['customizations']
-        if self.instance.product_type and self.instance.product_type.single_customization and len(data) > 1:
-            raise ValueError('Too many customizations selected')
-        return data
+        customizations = self.cleaned_data['customizations']
+        customizations_len = len(customizations)
+        product_type = ProductType.objects.get(id=self.data['product_type'])
+
+        if product_type and product_type.single_customization:
+            if customizations_len > 1:
+                raise ValidationError("Too many customizations selected for product type.")
+
+            if customizations_len > 0 and product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+                customization_portal_id = get_cloud_portal_product(customizations[0])
+                product_id = self.instance and self.instance.id
+
+                if customization_portal_id and product_id and product_id != customization_portal_id or \
+                        not product_id and customization_portal_id:
+                    raise ValidationError("Customization is already used for a cloud portal product.")
+        return customizations
 
 
 class CustomizationForm(forms.ModelForm):
