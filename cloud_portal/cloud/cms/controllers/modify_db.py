@@ -38,8 +38,8 @@ def update_draft_state(review_id, target_state, user):
 def notify_version_ready(product, version_id, exclude_user):
     perm = Permission.objects.filter(codename='publish_version')
     users = Account.objects.\
-        filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).\
-        filter(subscribe=True, customization__in=product.customizations.all()).\
+        filter(Q(groups__permissions__in=perm) | Q(user_permissions__in=perm)).\
+        filter(subscribe=True, customization__in=product.customizations.values_list('name', flat=True)).\
         exclude(pk=exclude_user.pk).\
         distinct()
 
