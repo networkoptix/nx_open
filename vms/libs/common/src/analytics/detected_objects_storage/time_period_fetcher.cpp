@@ -14,17 +14,17 @@ static const QSize kSearchResolution(
     kTrackSearchResolutionX,
     kTrackSearchResolutionY);
 
-static constexpr bool kFilteredTimePeriodsQueryEnabled = false;
-
 TimePeriodFetcher::TimePeriodFetcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
     const TimePeriodDao& timePeriodDao,
+    AnalyticsArchiveDirectory* analyticsArchive,
     std::chrono::milliseconds maxRecordedTimestamp)
     :
     m_deviceDao(deviceDao),
     m_objectTypeDao(objectTypeDao),
     m_timePeriodDao(timePeriodDao),
+    m_analyticsArchive(analyticsArchive),
     m_maxRecordedTimestamp(maxRecordedTimestamp)
 {
 }
@@ -35,27 +35,65 @@ nx::sql::DBResult TimePeriodFetcher::selectTimePeriods(
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
-    auto query = queryContext->connection()->createQuery();
-    query->setForwardOnly(true);
-
     Filter localFilter = filter;
     localFilter.deviceIds.clear();
     localFilter.timePeriod.clear();
 
-    if (!kFilteredTimePeriodsQueryEnabled || localFilter.empty())
+    if (!filter.objectAppearanceId.isNull())
     {
-        prepareSelectTimePeriodsSimpleQuery(
-            query.get(), filter.deviceIds, filter.timePeriod, options);
+        *result = selectTimePeriodsByObject(queryContext, filter, options);
+    }
+    else if (!m_analyticsArchive || localFilter.empty())
+    {
+        *result = selectFullTimePeriods(
+            queryContext, filter.deviceIds, filter.timePeriod, options);
     }
     else
     {
-        prepareSelectTimePeriodsFilteredQuery(query.get(), filter, options);
+        *result = selectTimePeriodsFiltered(queryContext, filter, options);
     }
 
-    query->exec();
-    loadTimePeriods(query.get(), filter.timePeriod, options, result);
-
     return nx::sql::DBResult::ok;
+}
+
+QnTimePeriodList TimePeriodFetcher::selectFullTimePeriods(
+    nx::sql::QueryContext* queryContext,
+    const std::vector<QnUuid>& deviceIds,
+    const QnTimePeriod& timePeriod,
+    const TimePeriodsLookupOptions& options)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->setForwardOnly(true);
+    prepareSelectTimePeriodsSimpleQuery(
+        query.get(), deviceIds, timePeriod, options);
+    query->exec();
+
+    return loadTimePeriods(query.get(), timePeriod, options);
+}
+
+QnTimePeriodList TimePeriodFetcher::selectTimePeriodsByObject(
+    nx::sql::QueryContext* queryContext,
+    const Filter& filter,
+    const TimePeriodsLookupOptions& options)
+{
+    using namespace std::chrono;
+
+    ObjectSearcher objectSearcher(m_deviceDao, m_objectTypeDao, filter);
+    const auto objects = objectSearcher.lookup(queryContext);
+
+    QnTimePeriodList result;
+    for (const auto& object: objects)
+    {
+        for (const auto& position: object.track)
+        {
+            result += QnTimePeriod(
+                duration_cast<milliseconds>(microseconds(position.timestampUsec)),
+                duration_cast<milliseconds>(microseconds(position.durationUsec)));
+        }
+    }
+
+    return QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+        result, options.detailLevel);
 }
 
 void TimePeriodFetcher::prepareSelectTimePeriodsSimpleQuery(
@@ -103,6 +141,67 @@ void TimePeriodFetcher::prepareSelectTimePeriodsSimpleQuery(
     sqlFilter.bindFields(query);
 }
 
+QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
+    nx::sql::QueryContext* queryContext,
+    const Filter& filter,
+    const TimePeriodsLookupOptions& options)
+{
+    AnalyticsArchive::Filter archiveFilter = prepareArchiveFilter(filter, options);
+
+    if (!filter.freeText.isEmpty())
+        archiveFilter.allAttributesHash = lookupCombinedAttributes(queryContext, filter.freeText);
+
+    return m_analyticsArchive->matchPeriods(filter.deviceIds, archiveFilter);
+}
+
+AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
+    const Filter& filter,
+    const TimePeriodsLookupOptions& options)
+{
+    AnalyticsArchive::Filter archiveFilter;
+
+    if (!filter.boundingBox.isEmpty())
+        archiveFilter.region.push_back(filter.boundingBox);
+
+    if (!filter.objectTypeId.empty())
+    {
+        std::transform(
+            filter.objectTypeId.begin(), filter.objectTypeId.end(),
+            std::inserter(archiveFilter.objectTypes, archiveFilter.objectTypes.begin()),
+            [this](const auto& objectTypeName) { return m_objectTypeDao.objectTypeIdFromName(objectTypeName); });
+    }
+
+    archiveFilter.timePeriod = filter.timePeriod;
+    archiveFilter.sortOrder = filter.sortOrder;
+    if (filter.maxObjectsToSelect > 0)
+        archiveFilter.limit = filter.maxObjectsToSelect;
+
+    return archiveFilter;
+}
+
+std::set<int> TimePeriodFetcher::lookupCombinedAttributes(
+    nx::sql::QueryContext* queryContext,
+    const QString& text)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(R"sql(
+        SELECT distinct combination_id
+        FROM combined_attributes
+        WHERE attributes_id IN
+	        (SELECT docid FROM attributes_text_index WHERE content MATCH ?)
+    )sql");
+
+    query->addBindValue(text);
+    query->exec();
+
+    std::set<int> attributesIds;
+    while (query->next())
+        attributesIds.insert(query->value(0).toInt());
+
+    return attributesIds;
+}
+
+#if 0
 static constexpr char kFromObject[] = "%fromObject%";
 static constexpr char kObjectExpr[] = "%objectExpr%";
 static constexpr char kFullTextFrom[] = "%fullTextFrom%";
@@ -113,7 +212,7 @@ static constexpr char kBoundingBoxExpr[] = "%boundingBoxExpr%";
 void TimePeriodFetcher::prepareSelectTimePeriodsFilteredQuery(
     nx::sql::AbstractSqlQuery* query,
     const Filter& filter,
-    const TimePeriodsLookupOptions& /*options*/)
+    const TimePeriodsLookupOptions& options)
 {
     using namespace std::chrono;
 
@@ -189,14 +288,16 @@ void TimePeriodFetcher::prepareSelectTimePeriodsFilteredQuery(
     if (!filter.boundingBox.isEmpty())
         boundingBoxFilter.bindFields(query);
 }
+#endif
 
-void TimePeriodFetcher::loadTimePeriods(
+QnTimePeriodList TimePeriodFetcher::loadTimePeriods(
     nx::sql::AbstractSqlQuery* query,
     const QnTimePeriod& timePeriodFilter,
-    const TimePeriodsLookupOptions& options,
-    QnTimePeriodList* result)
+    const TimePeriodsLookupOptions& options)
 {
     using namespace std::chrono;
+
+    QnTimePeriodList result;
 
     while (query->next())
     {
@@ -225,14 +326,14 @@ void TimePeriodFetcher::loadTimePeriods(
             }
         }
 
-        if (!result->empty() && result->back() == timePeriod)
+        if (!result.empty() && result.back() == timePeriod)
             continue;
 
-        result->push_back(timePeriod);
+        result.push_back(timePeriod);
     }
 
-    *result = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
-        *result, std::max<milliseconds>(options.detailLevel, kMinTimePeriodAggregationPeriod));
+    return QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+        result, std::max<milliseconds>(options.detailLevel, kMinTimePeriodAggregationPeriod));
 }
 
 } // namespace nx::analytics::storage

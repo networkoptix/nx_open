@@ -21,7 +21,23 @@ bool AnalyticsArchiveDirectory::saveToArchive(
     return archive->saveToArchive(timestamp, region, objectType, allAttributesHash);
 }
 
-QnTimePeriodList AnalyticsArchiveDirectory::matchPeriod(
+QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(
+    const std::vector<QnUuid>& deviceIds,
+    const Filter& filter)
+{
+    // TODO: #ak If there are more than one device given we can apply map/reduce to speed things up.
+    
+    QnTimePeriodList allTimePeriods;
+    for (const auto& deviceId: deviceIds)
+    {
+        auto timePeriods = matchPeriods(deviceId, filter);
+        allTimePeriods = QnTimePeriodList::mergeTimePeriods({allTimePeriods, timePeriods});
+    }
+
+    return allTimePeriods;
+}
+
+QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(
     const QnUuid& deviceId,
     const Filter& filter)
 {

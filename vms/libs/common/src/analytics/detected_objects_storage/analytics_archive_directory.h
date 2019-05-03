@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "analytics_archive.h"
 
 namespace nx::analytics::storage {
@@ -19,7 +21,11 @@ public:
         int objectType,
         long long allAttributesHash);
 
-    QnTimePeriodList matchPeriod(
+    QnTimePeriodList matchPeriods(
+        const std::vector<QnUuid>& deviceIds,
+        const Filter& filter);
+
+    QnTimePeriodList matchPeriods(
         const QnUuid& deviceId,
         const Filter& filter);
 

@@ -43,19 +43,19 @@ protected:
 
     void whenSaveEvent()
     {
-        m_analyticsDataPackets.push_back(generateRandomPacket(1));
+        generateRandomPackets(1);
         whenIssueSavePacket(m_analyticsDataPackets[0]);
         flushData();
     }
 
     void whenSaveMultipleEventsConcurrently()
     {
-        const int packetCount = 101;
-        for (int i = 0; i < packetCount; ++i)
-        {
-            m_analyticsDataPackets.push_back(generateRandomPacket(1));
-            whenIssueSavePacket(m_analyticsDataPackets.back());
-        }
+        constexpr int packetCount = 101;
+
+        generateRandomPackets(packetCount);
+
+        for (const auto& packet: m_analyticsDataPackets)
+            whenIssueSavePacket(packet);
 
         flushData();
     }
@@ -319,6 +319,13 @@ protected:
                 analyticsDataPackets.push_back(generateRandomPacket(1));
         }
 
+        std::sort(
+            analyticsDataPackets.begin(), analyticsDataPackets.end(),
+            [](const auto& left, const auto& right)
+            {
+                return left->timestampUsec < right->timestampUsec;
+            });
+
         return analyticsDataPackets;
     }
 
@@ -400,6 +407,19 @@ private:
     {
         m_eventsStorage = std::make_unique<EventsStorage>();
         return m_eventsStorage->initialize(m_settings);
+    }
+
+    void generateRandomPackets(int count)
+    {
+        for (int i = 0; i < count; ++i)
+            m_analyticsDataPackets.push_back(generateRandomPacket(1));
+
+        std::sort(
+            m_analyticsDataPackets.begin(), m_analyticsDataPackets.end(),
+            [](const auto& left, const auto& right)
+            {
+                return left->timestampUsec < right->timestampUsec;
+            });
     }
 
     void flushData()

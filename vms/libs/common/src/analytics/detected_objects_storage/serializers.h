@@ -85,16 +85,26 @@ QRect translate(const QRectF& box, const QSize& resolution);
  */
 QRectF translate(const QRect& box, const QSize& resolution);
 
-template<template<typename...> class Container, typename... Args>
-Container<QRectF> translate(
-    const Container<QRect, Args...>& rects,
+template<typename Rect>
+struct OtherRect {};
+
+template<>
+struct OtherRect<QRect> { using type = QRectF; };
+
+template<>
+struct OtherRect<QRectF> { using type = QRect; };
+
+
+template<template<typename...> class Container, typename Rect, typename... Args>
+Container<typename OtherRect<Rect>::type> translate(
+    const Container<Rect, Args...>& rects,
     const QSize& resolution)
 {
-    Container<QRectF> result;
+    Container<typename OtherRect<Rect>::type> result;
     std::transform(
         rects.begin(), rects.end(),
         std::back_inserter(result),
-        [&resolution](const QRect& rect) { return translate(rect, resolution); });
+        [&resolution](const Rect& rect) { return translate(rect, resolution); });
     return result;
 }
 

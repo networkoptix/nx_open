@@ -19,8 +19,7 @@ public:
     struct Filter
     {
         std::vector<QRectF> region;
-        std::chrono::milliseconds startTime;
-        std::chrono::milliseconds endTime;
+        QnTimePeriod timePeriod;
         std::chrono::milliseconds detailLevel = std::chrono::milliseconds::zero();
         Qt::SortOrder sortOrder = Qt::AscendingOrder;
         int limit = -1;
@@ -40,8 +39,22 @@ public:
     QnTimePeriodList matchPeriod(const Filter& filter);
 
 private:
+    struct Item
+    {
+        std::chrono::milliseconds timestamp = std::chrono::milliseconds::zero();
+        QRect rect;
+        int objectType = -1;
+        long long allAttributesId = -1;
+    };
+
     const QString m_dataDir;
     const QnUuid m_resourceId;
+    std::vector<Item> m_items;
+
+    bool satisfiesFilter(
+        const Item& item,
+        const Filter& filter,
+        const std::vector<QRect>& regionFilter);
 };
 
 } // namespace nx::analytics::storage
