@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
+Suite Setup       Open browser and set user language to current
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
-Suite Setup       Open browser and set user language to current
 Suite Teardown    Clean up
 
 *** Variables ***
