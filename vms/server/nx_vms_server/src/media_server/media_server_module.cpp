@@ -90,6 +90,8 @@
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include "server_connector.h"
 #include "resource_status_watcher.h"
+#include <core/resource/media_server_resource.h>
+#include <nx/network/url/url_builder.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -696,4 +698,16 @@ nx::vms::server::network::MulticastAddressRegistry*
 QnStoragePluginFactory* QnMediaServerModule::storagePluginFactory() const
 {
     return m_commonModule->storagePluginFactory();
+}
+
+QString QnMediaServerModule::metadataDatabaseDir() const
+{
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+    if (!server)
+        return QString();
+    auto storageResource = resourcePool()->getResourceById<QnStorageResource>(
+        server->metadataStorageId());
+    const auto pathBase = storageResource ? storageResource->getPath()
+        : nx::network::url::normalizePath(settings().dataDir());
+    return closeDirPath(pathBase);
 }

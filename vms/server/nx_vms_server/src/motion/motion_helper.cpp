@@ -57,28 +57,11 @@ QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(const QnResourcePt
 
 QnTimePeriodList QnMotionHelper::matchImage(const QnChunksRequestData& request)
 {
-    const auto motionRegionList = request.filter.trimmed().isEmpty()
-        ? QList<QRegion>()
-        : QJson::deserialized<QList<QRegion>>(request.filter.toUtf8());
-
-    const auto wholeFrameRegionList =
-        [](int channelCount)
-        {
-            static const QRegion kWholeFrame(
-                QRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight));
-
-            QList<QRegion> result;
-            result.reserve(channelCount);
-            std::fill_n(std::back_inserter(result), channelCount, kWholeFrame);
-            return result;
-        };
-
     std::vector<QnTimePeriodList> timePeriods;
     for (const auto& res: request.resList)
     {
-        const auto motionRegions = motionRegionList.isEmpty()
-            ? wholeFrameRegionList(res->getVideoLayout()->channelCount())
-            : motionRegionList;
+        const auto motionRegions = regionsFromFilter(
+            request.filter, res->getVideoLayout()->channelCount());
 
         if (res->isDtsBased())
         {
@@ -112,32 +95,4 @@ QnTimePeriodList QnMotionHelper::matchImage(const QnChunksRequestData& request)
         }
     }
     return QnTimePeriodList::mergeTimePeriods(timePeriods, request.limit, request.sortOrder);
-}
-
-void cleanupMotionDir(const QString& _dirName)
-{
-    QString dirName = QDir::toNativeSeparators(_dirName);
-    if (dirName.endsWith(QDir::separator()))
-        dirName.chop(1);
-
-    QDir dir(dirName);
-    QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-    for(const QFileInfo& fi: list)
-        QFile::remove(fi.absoluteFilePath());
-    for(int i = 0; i < 3; ++i)
-    {
-        QDir dir (dirName);
-        if (!dir.rmdir(dirName))
-            break;
-        dirName = dirName.left(dirName.lastIndexOf(QDir::separator()));
-    }
-}
-
-void QnMotionHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QString& cameraUniqueId) const
-{
-    QList<QDate> existsData = recordedMonth(cameraUniqueId);
-    for(const QDate& date: existsData) {
-        if (!monthList.contains(date))
-            cleanupMotionDir(getDirByDateTime(date, cameraUniqueId));
-    }
 }

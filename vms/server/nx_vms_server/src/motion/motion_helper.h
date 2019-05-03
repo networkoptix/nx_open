@@ -28,8 +28,6 @@ public:
 
     QnMotionArchive* getArchive(const QnResourcePtr& res, int channel);
 
-    void deleteUnusedFiles(const QList<QDate>& chunks, const QString& cameraUniqueId) const;
-
     QnMotionHelper();
 private:
 

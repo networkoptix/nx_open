@@ -12,8 +12,10 @@ public:
     QString getDirByDateTime(const QDate& date, const QString& cameraUniqueId) const;
     QString getBaseDir() const;
     QList<QDate> recordedMonth(const QString& cameraUniqueId) const;
+    void deleteUnusedFiles(const QList<QDate>& monthList, const QString& cameraUniqueId) const;
 protected:
     QString getBaseDir(const QString& cameraUniqueId) const;
+    QList<QRegion> regionsFromFilter(const QString& filter, int channelCount) const;
 protected:
     const QString m_dataDir;
 };

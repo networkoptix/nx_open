@@ -13,6 +13,7 @@
 #include "motion/motion_helper.h"
 #include "recorder/storage_manager.h"
 #include "media_server/media_server_module.h"
+#include <nx/vms/server/metadata/analytics_helper.h>
 
 static const auto kAllArchive = QList<QnServer::ChunksCatalog>()
     << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog;
@@ -39,7 +40,9 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
 
         case Qn::AnalyticsContent:
         {
-            const auto analiticsPeriods = loadAnalyticsTimePeriods(request);
+            nx::vms::server::metadata::AnalyticsHelper helper(serverModule()->metadataDatabaseDir());
+            const auto analiticsPeriods = helper.matchImage(request);
+            //const auto analiticsPeriods = loadAnalyticsTimePeriods(request);
             return QnTimePeriodList::intersection(analiticsPeriods, archivePeriods);
         }
 
