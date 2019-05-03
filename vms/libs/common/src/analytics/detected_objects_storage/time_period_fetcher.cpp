@@ -175,6 +175,7 @@ AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
     archiveFilter.sortOrder = filter.sortOrder;
     if (filter.maxObjectsToSelect > 0)
         archiveFilter.limit = filter.maxObjectsToSelect;
+    archiveFilter.detailLevel = options.detailLevel;
 
     return archiveFilter;
 }
