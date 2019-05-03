@@ -289,8 +289,8 @@ def publish_latest_version(product, review_id, user):
 
 def integration_has_required_data(product):
     errors = []
-    for datastructure in DataStructure.objects.filter(context__product_type__product=product):
-        if not datastructure.optional and not datastructure.datarecord_set.exists():
+    for datastructure in DataStructure.objects.filter(context__product_type=product.product_type):
+        if not datastructure.optional and not datastructure.datarecord_set.filter(product=product).exists():
             ds_name = datastructure.label if datastructure.label else datastructure.name
             errors.append((ds_name,
                            "This field cannot be blank. Go to the {} page and fill in {}.".
