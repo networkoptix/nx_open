@@ -39,16 +39,17 @@ def notify_version_ready(product, version_id, exclude_user):
     perm = Permission.objects.filter(codename='publish_version')
     users = Account.objects.\
         filter(Q(groups__permissions__in=perm) | Q(user_permissions__in=perm)).\
-        filter(subscribe=True, customization__in=product.customizations.values_list('name', flat=True)).\
-        exclude(pk=exclude_user.pk).\
-        distinct()
+        filter(subscribe=True).exclude(pk=exclude_user.pk).distinct()
 
     product_name = product.name
+    product_customizations_set = set(product.customizations.values_list('name', flat=True))
 
     for user in users:
-        send(user.email, "review_version",
-             {'id': version_id, 'product': product_name},
-             user.customization)
+        # If the user has a customization in common with product send them a notification
+        if set(user.customizations) & product_customizations_set:
+            send(user.email, "review_version",
+                 {'id': version_id, 'product': product_name},
+                 user.customization)
 
 
 def save_unrevisioned_records(product, context, language, data_structures,
