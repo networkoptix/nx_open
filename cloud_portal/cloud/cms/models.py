@@ -52,10 +52,10 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
         if footer_items:
             for context in Context.objects.filter(is_global=True):
                 footer_items = process_context_structure(product, context, footer_items,
-                                                         None, product.version_id(), False, True)
+                                                         None, product.version_id, False, True)
 
         data = {
-            'version_id': product.version_id(),
+            'version_id': product.version_id,
             'languages': customization.languages_list,
             'default_language': customization.default_language.code,
             'email': {
@@ -266,7 +266,7 @@ class Product(models.Model):
         global_contexts = self.product_type.context_set.filter(is_global=True)
         data_structure = DataStructure.objects.filter(name=record_name, context__in=global_contexts).last()
 
-        return data_structure.find_actual_value(product=self, version_id=self.version_id()) if data_structure else None
+        return data_structure.find_actual_value(product=self, version_id=self.version_id) if data_structure else None
 
     def save(self, *args, **kwargs):
         need_update = False
@@ -513,7 +513,7 @@ class ContentVersion(models.Model):
         if not self.accepted_by:
             return 'in review'
 
-        version_id = self.product.version_id()
+        version_id = self.product.version_id
 
         if version_id > self.id:
             return 'old'

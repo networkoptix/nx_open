@@ -29,7 +29,7 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
 
         for integration in integrations:
             integration_dict = {}
-            current_version = integration.version_id()
+            current_version = integration.version_id
             if show_pending:
                 current_version = ProductCustomizationReview.objects.filter(version__product=integration,
                                                                             state=PENDING).latest('id').version.id
