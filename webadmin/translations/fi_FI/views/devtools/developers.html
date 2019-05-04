@@ -1,0 +1,75 @@
+<div class="container">
+    <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
+    <div ng-if="developersFeedbackForm">
+        <h2>Kehitystyökalut</h2>
+        <p>
+            Onko sinulla ajatusta siitä, miten voimme parantaa kehittäjätyökaluja tai haluatko aloittaa keskustelun aiheesta?
+        </p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Anna palautetta</a></p>
+    </div>
+
+    <div>
+        <h3>Generic Events -generaattori</h3>
+        <p>
+            Generic Event on tapa lähettää tapahtumia kolmannen osapuolen järjestelmistä järjestelmään,
+            jonka avulla voidaan käynnistää System-toimintoja Events & Rule-enginessä.
+            Generic Event Generator on työkalu, joka auttaa luomaan HTTP-geneerisiä tapahtumia.
+        </p>
+        <p><a href="#/developers/events">Generic Events -generaattori</a></p>
+    </div>
+    <div>
+        <h3>Palvelin API</h3>
+        <p>
+            Palvelin-sovellusliittymä tarjoaa vakiomuotoisen API-kutsun kolmannen osapuolen järjestelmille. Se antaa kehittäjille
+            pääsyn lähes kaikkiin järjestelmän normaalin client-sovelluksen ominaisuuksiin: tehdä kyselyitä / hallita järjestelmän resursseja (palvelimet,
+            kamerat, käyttäjät, oikeudet), viedä videokuvaa tai tallennettua videota järjestelmästä, luoda tapahtumia, luoda sääntöjä,
+            hallita PTZ-kameroita ja paljon muuta.
+        </p>
+        <p>
+            <<a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation with tools for testing API calls<br>
+            <a href="#/developers/changelog">API Changelog</a>
+            - list of breaking changes in API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a><br>
+            <a href="#/developers/serverDocumentation">Server Settings Documentation</a>
+        </p>
+
+    </div>
+    <div>
+        <h3>Kameran tiedot -paneeli</h3>
+        <p>
+            Näyttää ylimääräisiä Web-ylläpitäjän tietoja kameroista Web Admin-käyttöliittymässä:
+        </p>
+        <ul>
+            <li>Kameran tunnus</li>
+            <li>Linkit kaikkiin saatavilla oleviin videostreameihin</li>
+            <li>Suora videon vienti selaimen kautta</li>
+        </ul>
+        <p>
+            Avataksensi Kameran tiedot-paneelin - siirry Web-Admin käyttöliittymään, valitse <a href="#/view"> Näytä </a>,
+            valitse kamera, paina asetus-kuvaketta (rattaan-kuva) ja valitse sitten "Kameran tiedot"
+        </p>
+        <p><a href="#/view/?cameraLinks">kameran tiedot -paneeli</a></p>
+    </div>
+    <div>
+        <h3>Video Source Integration SDK</h3>
+        <p>
+            Video Source Integration SDK tarjoaa mahdollisuuden integroida käytännöllisesti katsoen kaikki live- tai tallennetut videolähteet
+            (IP-kamerat, NVR: t, DVR: t jne.) Järjestelmään. SDK mahdollistaa keinoja löytää
+            näyttää, analysoida tallennettua videota. Se mahdollistaa myös laitteen I / O-porttien ja liiketunnistuksen
+            tietojen integroinnin.
+        </p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >hae SDK</a></p>
+    </div>
+
+    <div>
+        <h3>Storage SDK</h3>
+        <p>
+            Storage SDK tarjoaa mahdollisuuden integroida tallennustilan järjestelmään. Sen avulla kehittäjät voivat
+            lukea tai kirjoittaa mihinkä tahansa tallennuspaikkaan: paikallinen, kauko-, ja jopa pilvi yksi. Tallennuksen
+            laajennuksen luominen vaatii standarditoimintojen, kuten: I / O-virran, jos tiedosto on olemassa, poistaminen, tiedostojen luettelo
+            kansiosta, jne. Säilytys SDK sisältää myös esimerkin FTP-palvelimen käyttämisestä tallennuspaikkana.
+        </p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >hae SDK</a></p>
+    </div>
+</div>

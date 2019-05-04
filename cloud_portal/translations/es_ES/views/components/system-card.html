@@ -39,11 +39,11 @@
         <br>
         <div ng-if="mergeTargetSystem.name" >
             <div><strong>{{mergeTargetSystem.name}}</strong>
-                is being merged to this system</div>
+                se está fusionando a este sistema</div>
             <hr />
             <div class="merge-info-text light-text">Dependiendo del tamaño de la base de datos, puede tomar varias horas</div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Acabando la fusión de sistemas</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
@@ -51,16 +51,15 @@
         </div>
         <br>
         <div ng-if="mergeTargetSystem.name">
-            <div>This system is being merged to
-                <strong>{{mergeTargetSystem.name}}</strong></div>
+            <div>Este sistema se está fusionando a <strong>{{mergeTargetSystem.name}}</strong></div>
             <hr />
             <div class="merge-info-text light-text">
                 <p>Dependiendo del tamaño de la base de datos, puede tomar varias horas.</p>
                 <p>Hasta que finalice la fusión, puede iniciar sesión en este sistema y ver el video, pero no puede cambiar ninguna configuración.</p>
-                <p>When merge is finished, all users and cameras from this system will become available
-                    in <strong>{{mergeTargetSystem.name}}</strong> System, and this system will be deleted.</p>
+                <p>Cuando finalice la fusión, todos los usuarios y cámaras de este sistema estarán disponibles
+                en Sistema "<strong>{{mergeTargetSystem.name}}</strong> ", y este sistema será eliminado.</p>
             </div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Acabando la fusión de sistemas</div>
     </div>
 </div>

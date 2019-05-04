@@ -1,0 +1,16 @@
+<div class="container">
+    <div class="col-xs-12" ng-repeat="(key, link) in config.helpLinks">
+        <h3>{{link.title}}</h3>
+        <p ng-if="link.description">
+            {{link.description}}
+        </p>
+
+        <a ng-if="link.url" ng-href="{{link.url}}" target="{{link.target=='new'?'_blank':'_top'}}">{{link.button||link.title}}</a>
+
+        <a ng-repeat="(key1, url) in link.urls"
+           class="btn btn-default"
+           ng-href="{{url.url}}"
+           ng-class="url.class"
+           target="{{link.target=='new'?'_blank':'_top'}}">{{url.button}}</a>
+    </div>
+</div>

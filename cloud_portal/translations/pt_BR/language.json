@@ -40,7 +40,7 @@
   "systemStatuses": {
     "activated": "ativado",
     "incompatible": "incompatível",
-    "merging": "mesclagem",
+    "merging": "mesclando",
     "notActivated": "não ativado",
     "online": "online",
     "offline": "desligada",
@@ -141,14 +141,14 @@
     "lostConnection": "Conexão a {{systemName}} perdida",
     "thisSystem": "o sistema",
     "oldSafariNotSupported": "Versões do Safari anteriores à 10 não são suportadas",
-    "DUPLICATE_MEDIASERVER_FOUND": "Um dos servidores está listado como existente em ambos os sistemas – no selecionado e no atual.<br>Remova os servidores que estejam offline e incompatíveis de cada sistema e tente novamente.",
-    "mergedSystemIsOffline": "O Sistema <strong>{{failedSystem}}</strong> está offline.",
-    "INCOMPATIBLE": "Os sistemas têm versões de software diferentes. Por favor, actualize os dois para o <a href=\"/download\">build mais recente</a>.",
-    "FAIL": "O sistema <strong>{{failedSystem}}</strong> está actualmente inacessível.<br> Tente novamente em alguns instantes ou entre em contato com o <a href=\"%SUPPORT_LINK%\" target=\"_blank\">suporte</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "Algumas listas de servidores como existentes em ambos os sistemas - no selecionado e no atual.<br>Remova os servidores offline e incompatíveis de cada sistema e tente novamente.",
+    "mergedSystemIsOffline": "O sistema <strong>{{failedSystem}}</strong> está offline.",
+    "INCOMPATIBLE": "Os sistemas têm diferentes versões de software. Por favor, atualize os dois para o <a href=\"/download\">mais recente build</a>.",
+    "FAIL": "O sistema <strong>{{failedSystem}}</strong> está atualmente inacessível.<br>Tente novamente em alguns instantes ou entre em contato com o suporte <a href=\"%SUPPORT_LINK%\" target=\"_blank\"></a>."
   },
   "merging": {
     "mergeFailedTitle": "Falha na fusão de Sistemas",
-    "commonText": "Falha na fusão dos sistemas <strong>{{primarySystem}}</strong> e <strong>{{secondarySystem}}</strong>."
+    "commonText": "Falha ao mesclar Sistemas <strong>{{primarySystem}}</strong> e <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "boa",
@@ -194,11 +194,11 @@
     "confirmUnshareAction": "Apagar",
     "successDisconnected": "O Sistema foi desconectado de %PRODUCT_NAME% com sucesso",
     "successDeleted": "O sistema {{systemName}} foi apagado com sucesso da sua conta",
-    "mergeFailed": "Falha na fusão de Sistemas",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "Falha na mesclagem do sistema",
+    "mergeStart": "Sistemas começaram a se fundir",
     "mergeSuccess": "Mesclagem de sistema concluída",
     "permissionsRemoved": "As permissões foram removidas de {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Nome desconhecido para o sistema (Causado pela mescla de nuvem)"
   },
   "account": {
     "accountSavedSuccess": "A sua conta foi gravada com sucesso",
@@ -253,7 +253,7 @@
       "sdk": {
         "label": "SDK",
         "shortLabel": "SDK",
-        "supported": "C++ cross platform SDK"
+        "supported": "C++ cruzar plataforma SDK"
       }
     },
     "platforms": {
@@ -342,8 +342,8 @@
     }
   },
   "recommendSupport": {
-    "a_recommend": "Recomendamos consultar com",
+    "a_recommend": "Recomendamos consulta com",
     "b_support": "suporte",
-    "c_proceeding": "antes de proceder."
+    "c_proceeding": "antes de prosseguir."
   }
 }
