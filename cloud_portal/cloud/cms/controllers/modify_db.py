@@ -35,7 +35,7 @@ def update_draft_state(review_id, target_state, user):
     return None
 
 
-def notify_version_ready(product, version_id, exclude_user):
+def notify_version_ready(product, version, exclude_user):
     perm = Permission.objects.filter(codename='publish_version')
     users = Account.objects.\
         filter(Q(groups__permissions__in=perm) | Q(user_permissions__in=perm)).\
@@ -46,9 +46,16 @@ def notify_version_ready(product, version_id, exclude_user):
 
     for user in users:
         # If the user has a customization in common with product send them a notification
-        if set(user.customizations) & product_customizations_set:
+        intersection_user_customizations_to_products = set(user.customizations) & product_customizations_set
+        if intersection_user_customizations_to_products:
+            # There should never be two customizations with the same name but this is a safety check
+            review_id = version.productcustomizationreview_set.\
+                filter(customization__name=intersection_user_customizations_to_products.pop()).first().id
             send(user.email, "review_version",
-                 {'id': version_id, 'product': product_name},
+                 {
+                     'id': review_id,
+                     'product': product_name
+                 },
                  user.customization)
 
 
@@ -324,7 +331,7 @@ def send_version_for_review(product, user):
 
     update_records_to_version(product, Context.objects.filter(product_type=product.product_type), version)
 
-    notify_version_ready(product, version.id, user)
+    notify_version_ready(product, version, user)
     return []
 
 
