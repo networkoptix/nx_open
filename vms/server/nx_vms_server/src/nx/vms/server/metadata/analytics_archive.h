@@ -9,6 +9,8 @@ namespace nx::vms::server::metadata {
     {
         int objectType = 0;
         int attributesHash = 0;
+        int reserved1 = 0;
+        int reserved2 = 0;
     };
 #pragma pack(pop)
 
