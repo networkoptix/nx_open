@@ -52,7 +52,7 @@ Response Handler::executeRequest(
         return Response::error(error.descriptor);
     }
 
-    if (response.content && response.content->type == kJsonContentType
+    if (response.content && response.content->type.value == http::header::ContentType::kJson.value
         && request.isExtraFormattingRequired())
     {
         response.content->body = nx::utils::formatJsonString(response.content->body);

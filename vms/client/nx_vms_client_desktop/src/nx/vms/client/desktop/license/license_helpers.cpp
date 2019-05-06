@@ -201,11 +201,10 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
     for (const auto& license: licenses)
         request.licenses.append({::toString(license->key()), license->hardwareId()});
 
-    static const QByteArray kJsonContentType(
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
-
     m_httpClient->doPost(
-        QnLicenseServer::kDeactivateUrl, kJsonContentType, QJson::serialized(request));
+        QnLicenseServer::kDeactivateUrl,
+        nx::network::http::header::ContentType::kJson,
+        QJson::serialized(request));
 }
 
 }

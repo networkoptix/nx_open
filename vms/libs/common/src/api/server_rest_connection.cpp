@@ -45,7 +45,6 @@ namespace {
 
 static const size_t ResponseReadTimeoutMs = 15 * 1000;
 static const size_t TcpConnectTimeoutMs = 5 * 1000;
-static const nx::network::http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 
 void trace(const QString& serverId, int handle, const QString& message)
 {
@@ -216,7 +215,7 @@ Handle ServerConnection::sendStatisticsAsync(
     nx::network::http::ClientPool::Request request = prepareRequest(
         nx::network::http::Method::post,
         prepareUrl(path, statisticsData.toParams()),
-        kJsonContentType,
+        nx::network::http::header::ContentType::kJson,
         data);
     nx::network::http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     nx::network::http::insertOrReplaceHeader(&request.headers, header);
@@ -660,7 +659,7 @@ Handle ServerConnection::prepareWearableUploads(
     return executePost(
         lit("/api/wearableCamera/prepare"),
         QnRequestParamList{ { lit("cameraId"), camera->getId().toSimpleString() } },
-        kJsonContentType,
+        nx::network::http::header::ContentType::kJson,
         QJson::serialized(data),
         callback,
         targetThread);
@@ -1110,7 +1109,7 @@ Handle ServerConnection::executePost(
 {
     return executePost(
         path, {},
-        nx::network::rest::kJsonContentType, QJson::serialized(params.toJson()),
+        nx::network::http::header::ContentType::kJson, QJson::serialized(params.toJson()),
         std::move(callback), targetThread);
 }
 
@@ -1142,7 +1141,7 @@ Handle ServerConnection::executePut(
 {
     return executePut(
         path, {},
-        nx::network::rest::kJsonContentType, QJson::serialized(params.toJson()),
+        nx::network::http::header::ContentType::kJson, QJson::serialized(params.toJson()),
         std::move(callback), targetThread);
 }
 
