@@ -734,6 +734,49 @@
     "single_customization": false,
     "contexts": [
       {
+        "name": "Integrations filter",
+        "is_global": true,
+        "description": "Customizing integrations tag filters",
+        "hidden": true,
+        "translatable": false,
+        "values": [
+          {
+            "label": "Tag Items",
+            "name": "%INTEGRATION_FILTER_ITEMS%",
+            "value": [
+              {
+                "name": "Access Control",
+                "enabled": false
+              },
+              {
+                "name": "Connector",
+                "enabled": false
+              },
+              {
+                "name": "Data Analytics",
+                "enabled": false
+              },
+              {
+                "name": "Drone",
+                "enabled": false
+              },
+              {
+                "name": "Health Monitor",
+                "enabled": false
+              },
+              {
+                "name": "Storage",
+                "enabled": false
+              }
+            ],
+            "description": "Defines the tags in the search for integrations",
+            "advanced": true,
+            "optional": false,
+            "type": "array"
+          }
+        ]
+      },
+      {
         "name": "Information",
         "translatable": false,
         "values": [

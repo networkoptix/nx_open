@@ -79,7 +79,7 @@ export class NxIntegrationsComponent implements OnInit {
             });
         });
 
-        // Ecsure model change will be trigger
+        // Ensure model change will be trigger
         this.filterModel = { ...this.filterModel };
     }
 

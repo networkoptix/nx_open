@@ -29,6 +29,7 @@ def get_settings_from_cache():
         'companyLink': customization_cache['company_link'],
         'feedbackEnabled': customization_cache['feedback_enabled'],
         'footerItems': customization_cache['footer_items'],
+        'integrationFilterItems': customization_cache['integration_filter_items'],
         'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
         'publicDownloads': customization_cache['public_downloads'],
         'publicReleases': customization_cache['public_releases'],
