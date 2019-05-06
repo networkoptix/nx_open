@@ -101,16 +101,20 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     }
 
     writeValue(value: any): void {
+        this.localFilter.query = this.params.search || '';
+
         // Avoid localFilter update if filter in not initialized (page refresh)
-        if (value && (value.tags.length || value.selects.length || value.multiselects.length)) {
+        if (value &&
+            ((value.tags && value.tags.length) ||
+             (value.selects && value.selects.length) ||
+             (value.multiselects && value.multiselects.length))) {
+
             this.localFilter = value;
             this.advSearch = (this.localFilter.selects && this.localFilter.selects.length) ||
                     (this.localFilter.multiselects && this.localFilter.multiselects.length) ||
                     (this.localFilter.tags && this.localFilter.tags.length);
 
             // Update model with query params
-            this.localFilter.query = this.params.search || '';
-
             if (this.localFilter.tags.length) {
                 if (this.params.tags) {
                     this.params.tags

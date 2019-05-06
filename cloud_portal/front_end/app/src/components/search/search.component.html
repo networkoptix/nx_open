@@ -46,7 +46,8 @@
             </div>
         </div>
 
-        <div class="row col-12 m-0 p-0" [hidden]="!showAdvancedOptions">
+        <div class="row col-12 m-0 p-0"
+             [hidden]="!showAdvancedOptions" *ngIf="localFilter.tags">
             <div class="row col-12 col-lg-9 col-xxl-6 mt-3 m-0 p-0"
                  *ngIf="localFilter.selects && localFilter.selects.length || localFilter.multiselects && localFilter.multiselects.length">
 
