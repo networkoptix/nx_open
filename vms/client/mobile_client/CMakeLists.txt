@@ -21,7 +21,6 @@ if(IOS)
     endif()
 
     set(ios_sources
-        src/nx/mobile_client/settings/settings_migration_ios.mm
         src/ui/window_utils_ios.mm
         src/utils/app_delegate.mm
     )

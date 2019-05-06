@@ -34,7 +34,7 @@ class QnContext: public QObject, public QnConnectionContextAware
     Q_PROPERTY(QnMobileAppInfo* applicationInfo MEMBER m_appInfo CONSTANT)
     Q_PROPERTY(QnCloudStatusWatcher* cloudStatusWatcher READ cloudStatusWatcher CONSTANT)
     Q_PROPERTY(QnMobileClientUiController* uiController READ uiController CONSTANT)
-    Q_PROPERTY(nx::vms::client::core::UserWatcher* userWatcher READ userWatcher CONSTANT)
+    Q_PROPERTY(nx::vms::client::core::UserWatcher* currentUserWatcher READ currentUserWatcher CONSTANT)
     Q_PROPERTY(nx::vms::client::core::TwoWayAudioController* twoWayAudioController
         READ twoWayAudioController CONSTANT)
     Q_PROPERTY(QnCloudUrlHelper* cloudUrlHelper MEMBER m_cloudUrlHelper CONSTANT)
@@ -64,7 +64,7 @@ public:
     QnCloudStatusWatcher* cloudStatusWatcher() const;
     QnConnectionManager* connectionManager() const;
 
-    nx::vms::client::core::UserWatcher* userWatcher() const;
+    nx::vms::client::core::UserWatcher* currentUserWatcher() const;
     nx::vms::client::core::TwoWayAudioController* twoWayAudioController() const;
     nx::vms::client::core::OperationManager* operationManager() const;
     QmlSettingsAdaptor* settings() const;

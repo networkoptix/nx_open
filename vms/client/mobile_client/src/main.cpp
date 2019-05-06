@@ -43,7 +43,7 @@
 #include <utils/intent_listener_android.h>
 #include <handlers/lite_client_handler.h>
 
-#include <nx/media/ios_device_info.h>
+#include <nx/utils/ios_device_info.h>
 #include <gl_context_synchronizer.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/std/cpp14.h>
@@ -78,6 +78,7 @@ bool forceSoftwareDecoding()
 {
     if (nx::utils::AppInfo::isIos())
     {
+        using IosDeviceInformation = nx::utils::IosDeviceInformation;
         using Type = IosDeviceInformation::Type;
         using Version = IosDeviceInformation::Version;
 

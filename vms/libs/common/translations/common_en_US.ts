@@ -106,6 +106,11 @@
         <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Cloud systems have different owners. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -1054,11 +1059,11 @@
     <name>nx::utils::CryptedFileStream</name>
     <message>
         <source>Wrong crypted stream size.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Damaged crypted stream header.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

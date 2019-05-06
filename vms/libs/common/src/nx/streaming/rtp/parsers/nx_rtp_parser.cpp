@@ -232,7 +232,6 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             {
                 m_nextDataPacket->opaque = cseq;
                 m_nextDataPacket->flags = static_cast<QnAbstractMediaData::MediaFlags>(flags);
-                m_nextDataPacket->flags |= QnAbstractMediaData::MediaFlags_GotFromRemotePeer;
 
                 if (context)
                     m_nextDataPacket->compressionType = context->getCodecId();
