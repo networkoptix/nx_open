@@ -1,11 +1,16 @@
 #pragma once
 
+#include <chrono>
 #include <deque>
+#include <utils/media/frame_info.h>
 
+#include <QtCore/QMap>
+#include <QtCore/QSet>
+#include <QtCore/QObject>
 #include <QtGui/QImage>
 
+#include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/media/frame_info.h>
 
 namespace nx::vms::client::desktop {
 
