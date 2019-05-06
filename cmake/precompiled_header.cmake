@@ -93,22 +93,19 @@ endfunction()
 
 function(_add_gcc_clang_precompiled_header target input)
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        set(pch_dir "${CMAKE_CURRENT_BINARY_DIR}/${target}.pch")
+        set(pch_file "${CMAKE_CURRENT_BINARY_DIR}/${target}.pch")
     else()
-        set(pch_dir "${CMAKE_CURRENT_BINARY_DIR}/${target}.gch")
+        set(pch_file "${CMAKE_CURRENT_BINARY_DIR}/${target}.gch")
     endif()
-    set(pch_file "${pch_dir}/c++")
 
-    set(parameters_file "${pch_dir}_${CMAKE_CXX_COMPILER_VERSION}.parameters")
+    set(parameters_file "${pch_file}_${CMAKE_CXX_COMPILER_VERSION}.parameters")
     _generate_pch_parameters(${target} ${parameters_file})
     _get_cxx_standard(${target} cxx_standard)
-
-    file(MAKE_DIRECTORY "${pch_dir}")
 
     set(depfile_args)
     set(depfile_cmd_args)
     if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
-        set(depfile "${pch_dir}.d")
+        set(depfile "${pch_file}.d")
         file(RELATIVE_PATH pch_file_relative "${CMAKE_BINARY_DIR}" "${pch_file}")
 
         set(depfile_args DEPFILE "${depfile}")
@@ -123,17 +120,12 @@ function(_add_gcc_clang_precompiled_header target input)
         DEPENDS "${input}" "${parameters_file}"
         IMPLICIT_DEPENDS CXX "${input}"
         ${depfile_args}
-        COMMENT "Precompiling ${pch_dir}")
+        COMMENT "Precompiling ${pch_file}")
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        set(pch_flags "-Xclang -include-pch -Xclang \"${pch_file}\" -Winvalid-pch")
-    else()
-        set(pch_flags "-include \"${CMAKE_CURRENT_BINARY_DIR}/${target}\" -Winvalid-pch")
+        set(pch_flags "-Xclang -include-pch -Xclang \"${pch_file}\"")
     endif()
-
-    # This is not necessary, but it helps Clang based static analyzers (like on in Qt Creator)
-    # parse sources correctly.
-    string(APPEND pch_flags " -include ${input}")
+    string(APPEND pch_flags " -Winvalid-pch")
 
     get_target_property(sources ${target} SOURCES)
     foreach(source ${sources})
