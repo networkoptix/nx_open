@@ -180,7 +180,7 @@ class Account(object):
     @lower_case_email
     def encode_password(email, password):
         realm = settings.CLOUD_CONNECT['password_realm']
-        password_string = ':'.join((email, realm, password))
+        password_string = ':'.join((email, realm, password)).encode('utf-8')
         password_ha1 = md5(password_string).hexdigest()
         password_ha1_sha256 = sha256(password_string).hexdigest()
         return password_ha1, password_ha1_sha256
@@ -250,9 +250,9 @@ class Account(object):
     @staticmethod
     @validate_response
     @lower_case_email
-    def create_temporary_credentials(email, password, type):
+    def create_temporary_credentials(email, password, credential_type):
         params = {
-            'type': type
+            'type': credential_type
         }
         request = CLOUD_DB_URL + '/account/createTemporaryCredentials'
         return post_wrapper(request, json=params, auth=HTTPDigestAuth(email, password))
@@ -264,7 +264,7 @@ class Account(object):
         params = {
             'email': user_email
         }
-        headers ={
+        headers = {
             'X-Forwarded-For': ip
         }
         request = CLOUD_DB_URL + '/account/resetPassword'

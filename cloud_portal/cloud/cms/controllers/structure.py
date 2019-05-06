@@ -27,7 +27,7 @@ def find_or_add_product(name, customization, product_type_name='cloud_portal'):
         product = Product(name=name)
         product.product_type = product_type
         product.save()
-        product.customizations = [customization]
+        product.customizations.add(customization)
         product.save()
     return product
 
@@ -146,7 +146,7 @@ def update_from_object(cms_structure):
                     file_path = os.path.join('static', '_source', 'blue', name)
                     file_path = file_path.replace("{{language}}", 'en_US')
                     try:
-                        with open(file_path, 'r') as file:
+                        with open(file_path, 'rb') as file:
                             value = base64.b64encode(file.read())
                     except IOError:
                         pass
@@ -235,8 +235,8 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
 
                     context_template = context.contexttemplate_set.first()
                     # find a line in template which has structure.name in it
-                    template_line = next((line for line in context_template.template.split("\n") if structure.name in line),
-                                         None)
+                    template_line = next((line for line in context_template.template.split("\n")
+                                          if structure.name in line), None)
                     if not template_line:
                         log_messages.append(('warning', 'No line in template %s for data structure %s' %
                                              (name, structure.name)))

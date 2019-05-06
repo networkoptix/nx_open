@@ -104,7 +104,7 @@ class APIException(Exception):
         if error_code is None:
             error_code = status_code
 
-        if isinstance(error_code, basestring):
+        if isinstance(error_code, str):
             try:
                 error_code = ErrorCodes(error_code)
             except ValueError:
@@ -128,7 +128,7 @@ class APIException(Exception):
             }, status=self.status_code)
 
     def log_level(self):
-        if isinstance(self.error_code, basestring):
+        if isinstance(self.error_code, str):
             return logging.ERROR
         return self.error_code.log_level()
 
@@ -215,7 +215,8 @@ def validate_mediaserver_response(func):
         if response.status_code in errors:
             if response_data:
                 validate_error(response_data)
-                raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'], error_data=response_data)
+                raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'],
+                                                   error_data=response_data)
             else:
                 raise errors[response.status_code](response.text, error_code=ErrorCodes.unknown_error)
 
@@ -266,7 +267,8 @@ def validate_response(func):
         if 'resultCode' in response_data and response_data['resultCode'] != ErrorCodes.ok.value:
             validate_error(response_data)
             if response_data['resultCode'] in logic_errors:
-                raise logic_errors[response_data['resultCode']](response_data['errorText'], error_code=response_data['resultCode'])
+                raise logic_errors[response_data['resultCode']](response_data['errorText'],
+                                                                error_code=response_data['resultCode'])
             raise APILogicException(response_data['errorText'], response_data['resultCode'])
 
         # everything is OK - return server's response

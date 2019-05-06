@@ -89,7 +89,7 @@ def language(request):
         request.session['language'] = lang
 
         # Save account value
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             request.user.language = lang
             request.user.save()
 
@@ -311,7 +311,7 @@ def get_ipvd(request):
         num_cameras = len(set(camera_names))
         # ---------------------
 
-        vendors = vendors_dict.values()
+        vendors = list(vendors_dict.values())
 
         ipvd = {
             "cameras": cameras,
@@ -320,7 +320,7 @@ def get_ipvd(request):
         }
 
         # cache ipvd
-        cache.set("ipvd", ipvd, 60 * 60 * 24) # 24 hours
+        cache.set("ipvd", ipvd, 60 * 60 * 24)  # 24 hours
         # ---------------------
 
         return Response(ipvd)

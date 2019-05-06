@@ -186,7 +186,8 @@ class ProductAdmin(CMSAdmin):
 
         return render(request, 'cms/page_list_view.html', context)
 
-    def change_page(self, request, context_id=None, product_id=None):
+    @staticmethod
+    def change_page(request, context_id=None, product_id=None):
         context = {'errors': []}
         if request.method == "POST" and 'product_id' in request.POST:
             context['preview_link'], context['errors'] = page_editor(request)
@@ -226,7 +227,8 @@ class ProductAdmin(CMSAdmin):
     edit_product_button.short_description = 'Edit page'
     edit_product_button.allow_tags = True
 
-    def customizations_list(self, obj):
+    @staticmethod
+    def customizations_list(obj):
         return ", ".join(obj.customizations.values_list('name', flat=True))
 
 
@@ -376,7 +378,8 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
             return request.user == obj.version.product.created_by
         return False
 
-    def product(self, obj):
+    @staticmethod
+    def product(obj):
         return obj.version.product
 
     def save_model(self, request, obj, form, change):

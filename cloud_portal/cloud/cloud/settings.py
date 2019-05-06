@@ -17,9 +17,6 @@ import json
 import sys
 from util.config import get_config
 
-reload(sys)
-sys.setdefaultencoding("utf-8")
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCAL_ENVIRONMENT = 'runserver' in sys.argv
 conf = get_config()
@@ -86,7 +83,6 @@ MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -198,12 +194,8 @@ if LOCAL_ENVIRONMENT:
     # BROKER_URL = 'sqs://...'
     # This setting is removed because every developer needs personal AWS credentials
     # Ask Ivan V to provide you with config and credentials files for AWS and save them to ~/.aws/ directory
-    # Or go through file history in source control to find the last time it was here (changeset 49115a0427b3 or 4923e6b2575d)
-
-    CACHES["global"] = {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'portal_cache',
-    }
+    # Or go through file history in source control to find the last time it was here
+    # (changeset 49115a0427b3 or 4923e6b2575d)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -296,7 +288,7 @@ LOGGING = {
 
 STATIC_URL = '/static/'
 MEDIA_ROOT = BASE_DIR + '/static/integrations/'
-MEDIA_URL = '/static/integrations/'
+MEDIA_URL = '/integrations/'
 # #End of s3 config
 
 
@@ -344,8 +336,8 @@ if not BROKER_URL:
     BROKER_URL = 'sqs://'
 
 BROKER_TRANSPORT_OPTIONS = {
-    'queue_name_prefix' : conf['queue_name'] + '-',
-    'region' : 'us-east-1'
+    'queue_name_prefix': conf['queue_name'] + '-',
+    'region': 'us-east-1'
 }
 
 RESULT_PERSISTENT = True
@@ -425,7 +417,7 @@ if os.path.isfile(common_list_file):
     with open(common_list_file) as data_file:
         PASSWORD_REQUIREMENTS['common_passwords'] = json.load(data_file)
 else:
-    print >> sys.stderr, "Warning: Can't read from {}".format(common_list_file)
+    print("Warning: Can't read from {}".format(common_list_file), file=sys.stderr)
 
 
 NOTIFICATIONS_CONFIG = {
@@ -444,11 +436,11 @@ NOTIFICATIONS_CONFIG = {
     'review_version': {
         'engine': 'email'
     },
-    'cloud_notification':{
+    'cloud_notification': {
         'engine': 'email',
         'queue': 'broadcast-notifications'
     },
-    'cloud_invite':{
+    'cloud_invite': {
         'engine': 'email'
     },
     'ipvd_feedback_page': {

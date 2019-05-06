@@ -126,7 +126,8 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
                                                  self.get_prepopulated_fields(request))
         return render(request, 'api/invite_form.html', context)
 
-    def user_groups(self, obj):
+    @staticmethod
+    def user_groups(obj):
         return [group.name for group in obj.groups.all()]
 
 

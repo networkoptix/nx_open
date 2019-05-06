@@ -68,7 +68,7 @@ class Message(models.Model):
     message = JSONField()
     created_date = models.DateTimeField(auto_now_add=True)
     send_date = models.DateTimeField(null=True, blank=True)
-    event = models.ForeignKey(Event, null=True)
+    event = models.ForeignKey(Event, null=True, on_delete=models.CASCADE)
 
     REQUIRED_FIELDS = ['user_email', 'type', 'message']
 
@@ -116,7 +116,7 @@ class CloudNotification(models.Model):
     sent_date = models.DateTimeField(null=True, blank=True)
     sent_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,
-        related_name='accepted_%(class)s')
+        related_name='accepted_%(class)s', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.subject
