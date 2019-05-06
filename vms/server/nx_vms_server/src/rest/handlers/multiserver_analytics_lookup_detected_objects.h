@@ -2,7 +2,7 @@
 
 #include <QtCore/QString>
 
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/detected_objects_storage/abstract_storage.h>
 #include <rest/server/fusion_rest_handler.h>
 
 class QnCommonModule;

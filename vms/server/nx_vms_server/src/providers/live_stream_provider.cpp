@@ -25,7 +25,7 @@
 #include <utils/media/hevc_sps.h>
 #include <camera/video_camera.h>
 #include <nx_vms_server_ini.h>
-#include <analytics/detected_objects_storage/analytics_events_receptor.h>
+#include <nx/vms/server/analytics/detected_objects_storage/analytics_events_receptor.h>
 #include <media_server/media_server_module.h>
 #include <nx/vms/server/analytics/manager.h>
 #include <nx/fusion/model_functions.h>

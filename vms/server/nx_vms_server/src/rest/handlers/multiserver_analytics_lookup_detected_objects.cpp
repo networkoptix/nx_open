@@ -2,6 +2,7 @@
 
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>

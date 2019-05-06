@@ -121,6 +121,10 @@ QN_FUSION_DECLARE_FUNCTIONS(Filter, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------
 
+using LookupResult = std::vector<DetectedObject>;
+
+//-------------------------------------------------------------------------------------------------
+
 struct TimePeriodsLookupOptions
 {
     /**

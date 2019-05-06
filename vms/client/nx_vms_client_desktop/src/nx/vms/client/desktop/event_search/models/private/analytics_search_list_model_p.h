@@ -14,7 +14,7 @@
 #include <QtCore/QSharedPointer>
 
 #include <api/server_rest_connection_fwd.h>
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/detected_objects_storage/abstract_storage.h>
 #include <core/resource/resource_fwd.h>
 
 #include <nx/vms/client/desktop/camera/camera_fwd.h>

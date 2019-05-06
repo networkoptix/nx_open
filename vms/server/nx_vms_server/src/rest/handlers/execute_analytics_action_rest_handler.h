@@ -8,7 +8,7 @@
 #include <nx/vms/server/sdk_support/loggers.h>
 
 #include <api/model/analytics_actions.h>
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/detected_objects_storage/abstract_storage.h>
 #include <transcoding/filters/abstract_image_filter.h>
 
 #include <nx/vms/api/analytics/descriptors.h>

@@ -5,7 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/detected_objects_storage/abstract_storage.h>
 #include <api/helpers/chunks_request_data.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>

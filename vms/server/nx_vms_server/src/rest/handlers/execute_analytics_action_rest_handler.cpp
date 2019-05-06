@@ -21,7 +21,7 @@
 #include <nx/analytics/action_type_descriptor_manager.h>
 
 #include <camera/get_image_helper.h>
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/detected_objects_storage/abstract_storage.h>
 
 #include <plugins/settings.h>
 

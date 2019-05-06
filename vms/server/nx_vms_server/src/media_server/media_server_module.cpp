@@ -63,7 +63,7 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <nx/vms/server/analytics/detected_objects_storage/analytics_events_storage.h>
 
 #include "wearable_lock_manager.h"
 #include "wearable_upload_manager.h"

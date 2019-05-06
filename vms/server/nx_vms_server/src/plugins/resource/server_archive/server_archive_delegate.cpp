@@ -3,7 +3,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include <analytics/detected_objects_storage/detected_objects_streamer.h>
+#include <nx/vms/server/analytics/detected_objects_storage/detected_objects_streamer.h>
 #include <server/server_globals.h>
 
 #include "nx/streaming/video_data_packet.h"
