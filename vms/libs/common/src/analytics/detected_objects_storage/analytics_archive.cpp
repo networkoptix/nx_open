@@ -24,7 +24,7 @@ bool AnalyticsArchive::saveToArchive(
     int objectType,
     long long allAttributesId)
 {
-    const auto translatedRegion = translate<>(
+    const auto translatedRegion = restore<>(
         region,
         QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
 
@@ -47,8 +47,6 @@ QnTimePeriodList AnalyticsArchive::matchPeriod(const Filter& filter)
     const auto translatedRegion = translate<>(
         filter.region,
         QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
-
-    std::cout<<"Total items: " << m_items.size() << std::endl; 
 
     for (const auto& item: m_items)
     {

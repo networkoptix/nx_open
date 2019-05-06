@@ -138,16 +138,32 @@ QRect translate(const QRectF& box, const QSize& resolution)
             box.x() * resolution.width(),
             box.y() * resolution.height()),
         QPoint(
-            round(box.bottomRight().x() * resolution.width()),
-            round(box.bottomRight().y() * resolution.height()))
+            lround(box.bottomRight().x() * resolution.width()),
+            lround(box.bottomRight().y() * resolution.height()))
+    );
+}
+
+QRect restore(const QRectF& box, const QSize& resolution)
+{
+    return QRect(
+        QPoint(
+            lround(box.x() * resolution.width()),
+            lround(box.y() * resolution.height())),
+        QPoint(
+            lround(box.bottomRight().x() * resolution.width()),
+            lround(box.bottomRight().y() * resolution.height()))
     );
 }
 
 QRectF translate(const QRect& box, const QSize& resolution)
 {
     return QRectF(
-        box.x() / (double) resolution.width(), box.y() / (double) resolution.height(),
-        box.width() / (double) resolution.width(), box.height() / (double) resolution.height());
+        QPointF(
+            box.x() / (double) resolution.width(),
+            box.y() / (double) resolution.height()),
+        QPointF(
+            box.bottomRight().x() / (double) resolution.width(),
+            box.bottomRight().y() / (double) resolution.height()));
 }
 
 } // namespace nx::analytics::storage

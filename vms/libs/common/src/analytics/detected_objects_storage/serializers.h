@@ -81,6 +81,17 @@ private:
 QRect translate(const QRectF& box, const QSize& resolution);
 
 /**
+ * Used to restore QRect translated to QRectF.
+ * The difference from translate is that translate always makes sure the resulting QRect contains
+ * the original QRectF.
+ * So, because of a float operation precision error, translate(tanslate(...)) can return rect larger
+ * than the original one.
+ * This method tends to restore the original values by rounding float operation result
+ * (but not floor/ceil).
+ */
+QRect restore(const QRectF& box, const QSize& resolution);
+
+/**
  * Translates rect coordinates from [0; resolution.width()] and [0; resolution.height()] to [0; 1].
  */
 QRectF translate(const QRect& box, const QSize& resolution);
@@ -94,7 +105,6 @@ struct OtherRect<QRect> { using type = QRectF; };
 template<>
 struct OtherRect<QRectF> { using type = QRect; };
 
-
 template<template<typename...> class Container, typename Rect, typename... Args>
 Container<typename OtherRect<Rect>::type> translate(
     const Container<Rect, Args...>& rects,
@@ -105,6 +115,19 @@ Container<typename OtherRect<Rect>::type> translate(
         rects.begin(), rects.end(),
         std::back_inserter(result),
         [&resolution](const Rect& rect) { return translate(rect, resolution); });
+    return result;
+}
+
+template<template<typename...> class Container, typename Rect, typename... Args>
+Container<typename OtherRect<Rect>::type> restore(
+    const Container<Rect, Args...>& rects,
+    const QSize& resolution)
+{
+    Container<typename OtherRect<Rect>::type> result;
+    std::transform(
+        rects.begin(), rects.end(),
+        std::back_inserter(result),
+        [&resolution](const Rect& rect) { return restore(rect, resolution); });
     return result;
 }
 

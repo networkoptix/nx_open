@@ -1444,7 +1444,20 @@ protected:
             roundTimePeriods(&actualTimePeriods);
         }
 
-        ASSERT_EQ(expected, actualTimePeriods);
+        assertTimePeriodsMatchUpToAggregationPeriod(expected, actualTimePeriods);
+    }
+
+    void assertTimePeriodsMatchUpToAggregationPeriod(
+        const QnTimePeriodList& left, const QnTimePeriodList& right)
+    {
+        ASSERT_EQ(left.size(), right.size());
+
+        for (std::size_t i = 0; i < left.size(); ++i)
+        {
+            ASSERT_LT(
+                std::chrono::abs(left[i].startTime() - right[i].startTime()),
+                kTrackAggregationPeriod);
+        }
     }
 
 private:
@@ -1560,7 +1573,7 @@ TEST_F(AnalyticsDbTimePeriodsLookup, with_aggregation_period)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsDbTimePeriodsLookup, DISABLED_with_random_filter)
+TEST_F(AnalyticsDbTimePeriodsLookup, with_random_filter)
 {
     givenRandomFilter();
     whenLookupTimePeriods();
