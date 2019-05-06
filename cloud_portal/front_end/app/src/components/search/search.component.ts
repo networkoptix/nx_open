@@ -101,7 +101,8 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     }
 
     writeValue(value: any): void {
-        if (value) {
+        // Avoid localFilter update if filter in not initialized (page refresh)
+        if (value && (value.tags.length || value.selects.length || value.multiselects.length)) {
             this.localFilter = value;
             this.advSearch = (this.localFilter.selects && this.localFilter.selects.length) ||
                     (this.localFilter.multiselects && this.localFilter.multiselects.length) ||
