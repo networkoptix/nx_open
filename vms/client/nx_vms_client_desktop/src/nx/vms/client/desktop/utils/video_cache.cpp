@@ -46,14 +46,16 @@ QImage VideoCache::image(
     QnMutexLocker lock(&m_mutex);
     if (outImageTimestamp)
         *outImageTimestamp = kNoTimestamp;
-    const auto& queue = m_cache.value(resourceId);
-    auto itr = std::lower_bound(queue.begin(), queue.end(),
+    const auto queueItr = m_cache.find(resourceId);
+    if (queueItr == m_cache.end())
+        return QImage();
+    auto itr = std::lower_bound(queueItr->begin(), queueItr->end(),
         timestamp,
         [](const CLVideoDecoderOutputPtr& left, const std::chrono::microseconds& right)
         {
             return left->pkt_dts < right.count();
         });
-    if (itr == queue.end())
+    if (itr == queueItr->end())
         return QImage();
     if (outImageTimestamp)
         *outImageTimestamp = std::chrono::microseconds((*itr)->pkt_dts);
