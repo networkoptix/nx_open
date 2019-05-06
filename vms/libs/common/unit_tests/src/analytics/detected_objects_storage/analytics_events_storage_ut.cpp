@@ -1452,7 +1452,7 @@ protected:
     {
         ASSERT_EQ(left.size(), right.size());
 
-        for (std::size_t i = 0; i < left.size(); ++i)
+        for (int i = 0; i < left.size(); ++i)
         {
             ASSERT_LT(
                 std::chrono::abs(left[i].startTime() - right[i].startTime()),
