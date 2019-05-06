@@ -56,15 +56,18 @@ export class NxVendorListComponent implements OnInit, OnChanges {
         this.filters = [
             {
                 label: this.lang.cameraFilters.highRes,
-                select: {id: 'maxResolution'}
+                select: {id: 'resolution', value: '8mp'},
+                multiselect: { id: 'hardwareTypes', value: 'camera' }
             },
             {
                 label: this.lang.cameraFilters.aptz,
-                tagId: 'isAptzSupported'
+                tagId: 'isAptzSupported',
+                multiselect: { id: 'hardwareTypes', value: 'camera' }
             },
             {
                 label: this.lang.cameraFilters.ptz,
-                tagId: 'isPtzSupported'
+                tagId: 'isPtzSupported',
+                multiselect: { id: 'hardwareTypes', value: 'camera' }
             },
             {
                 label: this.lang.cameraFilters.audio,
@@ -73,7 +76,8 @@ export class NxVendorListComponent implements OnInit, OnChanges {
             },
             {
                 label: this.lang.cameraFilters.H265,
-                tagId: 'isH265'
+                tagId: 'isH265',
+                multiselect: { id: 'hardwareTypes', value: 'camera' }
             },
             {
                 label: this.lang.cameraFilters.encoder,
@@ -89,7 +93,8 @@ export class NxVendorListComponent implements OnInit, OnChanges {
             },
             {
                 label: this.lang.cameraFilters.fisheye,
-                tagId: 'isFisheye'
+                tagId: 'isFisheye',
+                multiselect: { id: 'hardwareTypes', value: 'camera' }
             },
             {
                 label: this.lang.cameraFilters.IO,
@@ -162,31 +167,33 @@ export class NxVendorListComponent implements OnInit, OnChanges {
 
         const queryParams: Params = {};
 
-        if (filter.select && filter.select.id === 'maxResolution') {
+        if (filter.select) {
             this.filter.selects.find((select) => {
-                if (select.id === 'resolution') {
-                    select.selected = select.items[select.items.length - 1];
+                if (select.id === filter.select.id) {
+                    select.selected = select.items.find(item => {
+                        return item.name === filter.select.value;
+                    });
                     queryParams.resolution = select.selected.name;
                 }
             });
-        } else {
-            if (filter.tagId) {
-                queryParams.tags = filter.tagId;
-                this.filter.tags.find(tag => {
-                    if (tag.id === filter.tagId) {
-                        tag.value = true;
-                    }
-                });
-            }
+        }
 
-            if (filter.multiselect) {
-                this.filter.multiselects.find((select) => {
-                    if (select.id === filter.multiselect.id) {
-                        select.selected.push(select.items.find(item => item.id === filter.multiselect.value).id);
-                        queryParams.hardwareTypes = select.selected;
-                    }
-                });
-            }
+        if (filter.tagId) {
+            queryParams.tags = filter.tagId;
+            this.filter.tags.find(tag => {
+                if (tag.id === filter.tagId) {
+                    tag.value = true;
+                }
+            });
+        }
+
+        if (filter.multiselect) {
+            this.filter.multiselects.find((select) => {
+                if (select.id === filter.multiselect.id) {
+                    select.selected.push(select.items.find(item => item.id === filter.multiselect.value).id);
+                    queryParams.hardwareTypes = select.selected;
+                }
+            });
         }
 
         this.uri.updateURI('/ipvd', queryParams, true);
