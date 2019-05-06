@@ -39,8 +39,8 @@
   },
   "systemStatuses": {
     "activated": "הופעל",
-    "incompatible": "incompatible",
-    "merging": "merging",
+    "incompatible": "אינו תואם",
+    "merging": "מיזוג",
     "notActivated": "לא הופעל",
     "online": "מקוון",
     "offline": "לא מקוון",
@@ -141,14 +141,14 @@
     "lostConnection": "החיבור ל- {{systemName}} אבד",
     "thisSystem": "המערכת",
     "oldSafariNotSupported": "גרסאות של Safari מתחת ל 10 אינן נתמכות",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
-    "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/download\">latest build</a>.",
-    "FAIL": "System <strong>{{failedSystem}}</strong> is currently unreachable.<br>Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "מספר שרתים רשומים כקיימים במערכת - הן שנבחרו והן במערכת הנוכחית.<br>הסר שרתים לא מקוונים ובלתי תואמים מכל המערכות ונסה שוב.",
+    "mergedSystemIsOffline": "מערכת <strong>{{failedSystem}}</strong> לא מקוונת.",
+    "INCOMPATIBLE": "למערכות יש גרסאות תוכנה שונות. אנא עדכן את שניהם ל <a href=\"/download\">לגרסא האחרונה</a>.",
+    "FAIL": "המערכת <strong>{{failedSystem}}</strong> אינה זמינה כעת.<br>נסה שוב בעוד מספר דקות או צור קשר עם <a href=\"%SUPPORT_LINK%\" target=\"_blank\">תמיכה</a>."
   },
   "merging": {
-    "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "mergeFailedTitle": "מיזוג המערכות נכשל",
+    "commonText": "מיזוג מערכות נכשל<strong>{{primarySystem}}</strong> ו - <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "טוב",
@@ -194,11 +194,11 @@
     "confirmUnshareAction": "מחק",
     "successDisconnected": "המערכת מנותקת בהצלחה מ- %PRODUCT_NAME%",
     "successDeleted": "המערכת {{systemName}} נמחקה בהצלחה מהחשבון שלך",
-    "mergeFailed": "System merge failed",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "מיזוג המערכת נכשל",
+    "mergeStart": "מיזוג מערכות החל",
     "mergeSuccess": "מיזוג המערכת הושלם",
     "permissionsRemoved": "ההרשאות הוסרו מ- {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "שם לא ידוע עבור מערכת (נגרמה על ידי מיזוג ענן)"
   },
   "account": {
     "accountSavedSuccess": "החשבון שלך נשמר בהצלחה",
@@ -253,7 +253,7 @@
       "sdk": {
         "label": "SDK",
         "shortLabel": "SDK",
-        "supported": "C++ cross platform SDK"
+        "supported": "C + + פלטפורמת SDK"
       }
     },
     "platforms": {
@@ -342,8 +342,8 @@
     }
   },
   "recommendSupport": {
-    "a_recommend": "We'd recommend consulting with",
+    "a_recommend": "אנו ממליצים להתייעץ עם",
     "b_support": "תמיכה",
-    "c_proceeding": "before proceeding."
+    "c_proceeding": "לפני המשך עיבוד."
   }
 }

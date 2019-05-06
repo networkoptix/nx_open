@@ -37,12 +37,11 @@
         </div>
         <br>
         <div ng-if="mergeTargetSystem.name" >
-            <div><strong>{{mergeTargetSystem.name}}</strong>
-                is being merged to this system</div>
+            <div><strong>{{mergeTargetSystem.name}}</strong> מוזגה למערכת זו</div>
             <hr />
             <div class="merge-info-text light-text">בהתאם לגודל של מסד הנתונים זה עלול לקחת עד כמה שעות</div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">מיזוג מערכות הושלם</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
@@ -50,16 +49,15 @@
         </div>
         <br>
         <div ng-if="mergeTargetSystem.name">
-            <div>This system is being merged to
-                <strong>{{mergeTargetSystem.name}}</strong></div>
+            <div>מערכת זו מוזגה עם- <strong>{{mergeTargetSystem.name}}</strong></div>
             <hr />
             <div class="merge-info-text light-text">
                 <p>בהתאם לגודל של מסד הנתונים זה עלול לקחת עד כמה שעות.</p>
                 <p>עד לסיום המיזוג אתה יכול להיכנס למערכת זו ולצפות בוידאו, אבל לא יכול לשנות הגדרות.</p>
-                <p>When merge is finished, all users and cameras from this system will become available
-                    in <strong>{{mergeTargetSystem.name}}</strong> System, and this system will be deleted.</p>
+                <p>כאשר המיזוג יסתיים, כל המשתמשים והמצלמות ממערכת זו יהפכו לזמינים
+                במערכת "<strong>{{mergeTargetSystem.name}}</strong> ", ומערכת זו תימחק.</p>
             </div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">מיזוג מערכות הושלם</div>
     </div>
 </div>
