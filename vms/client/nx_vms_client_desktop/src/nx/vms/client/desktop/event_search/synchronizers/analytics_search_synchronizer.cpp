@@ -1,5 +1,6 @@
 #include "analytics_search_synchronizer.h"
 
+#include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_item_index.h>
 
@@ -12,8 +13,10 @@
 #include <ui/workbench/workbench_navigator.h>
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/analytics/analytics_objects_visualization_manager.h>
+#include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
+#include <nx/vms/client/desktop/utils/video_cache.h>
 
 namespace nx::vms::client::desktop {
 
@@ -66,6 +69,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         [this]()
         {
             updateAreaSelection();
+            updateCachedDevices();
             updateTimelineDisplay();
             updateAllMediaResourceWidgetsAnalyticsMode();
         });
@@ -84,8 +88,12 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
             }
         });
 
-    connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::cameraSetChanged,
-        this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
+    connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::cameraSetChanged, this,
+        [this]()
+        {
+            updateCachedDevices();
+            updateTimelineDisplay();
+        });
 
     connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::textFilterChanged,
         this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
@@ -182,6 +190,24 @@ void AnalyticsSearchSynchronizer::updateAreaSelection()
     mediaWidget->setAreaSelectionType(m_analyticsSearchWidget->areaSelectionEnabled()
         ? QnMediaResourceWidget::AreaType::analytics
         : QnMediaResourceWidget::AreaType::none);
+}
+
+void AnalyticsSearchSynchronizer::updateCachedDevices()
+{
+    if (!ini().cacheLiveVideoForRightPanelPreviews)
+        return;
+
+    if (auto cache = qnClientModule->videoCache())
+    {
+        QnUuidSet cachedDevices;
+        if (active())
+        {
+            for (const auto& camera: m_analyticsSearchWidget->cameras())
+                cachedDevices.insert(camera->getId());
+        }
+
+        cache->setCachedDevices(intptr_t(this), cachedDevices);
+    }
 }
 
 void AnalyticsSearchSynchronizer::updateTimelineDisplay()

@@ -24,6 +24,7 @@ private:
 
     void updateAreaSelection();
     void updateTimelineDisplay();
+    void updateCachedDevices();
     void updateMediaResourceWidgetAnalyticsMode(QnMediaResourceWidget* widget);
     void updateAllMediaResourceWidgetsAnalyticsMode();
 

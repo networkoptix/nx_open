@@ -1,5 +1,7 @@
 #include "video_cache.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx::vms::client::desktop {
 
 const std::chrono::microseconds VideoCache::kNoTimestamp(-1);
@@ -57,19 +59,33 @@ QImage VideoCache::image(
     QnMutexLocker lock(&m_mutex);
     if (outImageTimestamp)
         *outImageTimestamp = kNoTimestamp;
+
     const auto queueItr = m_cache.find(resourceId);
-    if (queueItr == m_cache.end())
+    if (queueItr == m_cache.end() || queueItr->empty())
         return QImage();
+
+    const auto logRange =
+        [this](qint64 value, qint64 minimum, qint64 maximum)
+        {
+            NX_VERBOSE(this, "Cached from %1 to %2, requested %3 - %4", minimum, maximum, value,
+                ((value < minimum) ? "TOO OLD" : ((value > maximum) ? "TOO NEW" : "CACHED")));
+        };
+
+    logRange(timestamp.count(), queueItr->front()->pkt_dts, queueItr->back()->pkt_dts);
+
     auto itr = std::lower_bound(queueItr->begin(), queueItr->end(),
         timestamp,
         [](const CLVideoDecoderOutputPtr& left, const std::chrono::microseconds& right)
         {
             return left->pkt_dts < right.count();
         });
+
     if (itr == queueItr->end())
         return QImage();
+
     if (outImageTimestamp)
         *outImageTimestamp = std::chrono::microseconds((*itr)->pkt_dts);
+
     return (*itr)->toImage();
 }
 
