@@ -9,9 +9,8 @@ from rdep import Rdep
 class RdepSyncher:
     def __init__(self, rdep_repo_root):
         self.versions = {}
-        self.locations = {}
         self.rdep_target = None
-        self.use_local = False
+        self.prefer_debug_packages = False
 
         self.rdep = Rdep(rdep_repo_root)
         self.rdep.fast_check = True
@@ -20,29 +19,34 @@ class RdepSyncher:
         self._exported_paths = {}
         self._synched_package_dirs = []
 
-    def sync(self, package, path_variable=None, optional=False):
+    def sync(self, package, path_variable=None, optional=False, use_local=False):
         target, pack = posixpath.split(package)
 
         self.rdep.targets = [target] if target else [self.rdep_target]
 
         version = self.versions.get(pack)
-        path = self.locations.get(pack)
 
         full_package_name = pack + "-" + version if version else pack
 
-        if not path:
-            sync_func = self.rdep.locate_package if self.use_local else self.rdep.sync_package
+        sync_func = self.rdep.locate_package if use_local else self.rdep.sync_package
 
-            if not sync_func(full_package_name):
-                if not optional:
-                    print("error: Cannot sync package {}".format(package), file=sys.stderr)
-                    exit(1)
+        package_found = False
+        if self.prefer_debug_packages:
+            if sync_func(full_package_name + "-debug"):
+                package_found = True
+                full_package_name += "-debug"
 
-                return False
+        if not package_found:
+            package_found = sync_func(full_package_name)
 
-            path = self.rdep.locate_package(full_package_name)
+        if not package_found:
+            if not optional:
+                print("error: Cannot sync package {}".format(package), file=sys.stderr)
+                exit(1)
 
-        path = path.replace("\\", "/")
+            return False
+
+        path = self.rdep.locate_package(full_package_name).replace("\\", "/")
 
         self._synched_package_dirs.append(path)
         if path_variable:
