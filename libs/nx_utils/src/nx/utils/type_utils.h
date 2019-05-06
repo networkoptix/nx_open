@@ -37,18 +37,14 @@ struct Apply<0>
     }
 };
 
-//-------------------------------------------------------------------------------------------------
-
-template<typename Tuple, std::size_t index, typename Func>
-static inline void tuple_for_each(const Tuple& tuple, Func func)
+template<std::size_t index, typename Func, typename... TupleArgs>
+static inline void tuple_for_each(const std::tuple<TupleArgs...>& tuple, Func func)
 {
     func(std::get<index>(tuple));
 
-    if constexpr (std::tuple_size<Tuple>::value > index + 1)
-        tuple_for_each<Tuple, index + 1>(tuple, func);
+    if constexpr (std::tuple_size<std::tuple<TupleArgs...>>::value > index + 1)
+        tuple_for_each<index + 1>(tuple, func);
 }
-
-//-------------------------------------------------------------------------------------------------
 
 template<typename Func, typename FirstArg, typename... Args>
 inline void apply_each(Func&& func, FirstArg&& firstArg, Args&& ... args)
@@ -60,6 +56,8 @@ inline void apply_each(Func&& func, FirstArg&& firstArg, Args&& ... args)
 }
 
 } // namespace detail
+
+//-------------------------------------------------------------------------------------------------
 
 /** Calls f passing it members of tuple t as arguments. */
 template<typename F, typename T>
@@ -75,10 +73,10 @@ decltype(detail::Apply<
 /**
  * NOTE: Tuple elements are interated forward.
  */
-template<typename Tuple, typename Func>
-inline void tuple_for_each(const Tuple& tuple, Func func)
+template<typename Func, typename... TupleArgs>
+inline void tuple_for_each(const std::tuple<TupleArgs...>& tuple, Func func)
 {
-    detail::tuple_for_each<Tuple, 0>(tuple, func);
+    detail::tuple_for_each<0>(tuple, func);
 }
 
 /**
