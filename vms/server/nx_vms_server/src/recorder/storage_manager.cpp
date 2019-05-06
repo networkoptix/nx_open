@@ -7,7 +7,6 @@
 #include <utils/fs/file.h>
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/random.h>
 
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <core/resource_management/resource_pool.h>
@@ -41,6 +40,7 @@
 #include "motion/motion_helper.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
+#include "writable_storages_helper.h"
 #include "nx/fusion/serialization/lexical_enum.h"
 
 #include <memory>
@@ -194,271 +194,6 @@ static void remove(const QnStorageResourcePtr &storage)
 } // namespace empty_dirs
 
 } // namespace
-
-class WritableStorageManager
-{
-public:
-    WritableStorageManager(QnStorageManager* owner): m_owner(owner)
-    {
-    }
-
-    QnStorageResourceList list(
-        const QnStorageResourceList& additional = QnStorageResourceList()) const
-    {
-        auto candidates = online(additional);
-        const auto resultStorages = SpaceInfo::toStorageList(resultInfos(candidates));
-        adjustFlags(SpaceInfo::toStorageList(candidates), resultStorages);
-        return resultStorages;
-    }
-
-    QnStorageResourcePtr optimalStorageForRecording() const
-    {
-        int64_t totalEffectiveSpace = 0LL;
-        const auto infos = resultInfos(online());
-        NX_DEBUG(this, "Optimal storage selection: candidates number: %1", infos.size());
-        for (const auto& info: infos)
-        {
-            NX_DEBUG(this, "Optimal storage selection: candidate: %1", info);
-            totalEffectiveSpace += info.effective;
-        }
-
-        const double selectionPoint = nx::utils::random::number<double>(0, 1);
-        NX_DEBUG(
-            this, "Optimal storage selection: total effective space: %1, selection point: %2",
-            totalEffectiveSpace, selectionPoint);
-
-        double runningSum = 0.0;
-        for (const auto& info: infos)
-        {
-            runningSum += static_cast<double>(info.effective) / totalEffectiveSpace;
-            NX_DEBUG(this, "Optimal storage selection: running sum: %1", runningSum);
-            if (selectionPoint < runningSum)
-            {
-                NX_DEBUG(this, "Optimal storage selection: final result: %1", info.url);
-                return info.storage;
-            }
-        }
-
-        return QnStorageResourcePtr();
-    }
-
-private:
-    struct SpaceInfo
-    {
-        int64_t totalSpace = -1LL;
-        int64_t freeSpace = -1LL;
-        int64_t spaceLimit = -1LL;
-        int64_t nxOccupied = -1LL;
-        int64_t available = -1LL;
-        int64_t effective = -1LL;
-        std::string url;
-        bool isSystem = false;
-        QnStorageResourcePtr storage;
-
-        static SpaceInfo from(const QnStorageResourcePtr& storage, QnStorageManager* owner)
-        {
-            SpaceInfo result;
-            result.url = nx::utils::url::hidePassword(storage->getUrl()).toStdString();
-            result.totalSpace = getOrThrow(storage->getTotalSpace(), "total space", result.url);
-            result.freeSpace = getOrThrow(storage->getFreeSpace(), "free space", result.url);
-            result.spaceLimit = getOrThrow(storage->getSpaceLimit(), "space limit", result.url);
-            result.nxOccupied = getOrThrow(owner->occupiedSpace(
-                owner->storageDbPool()->getStorageIndex(storage)), "nx occupied space", result.url);
-
-            result.available = result.totalSpace - result.spaceLimit;
-            result.effective = result.nxOccupied + result.freeSpace - result.spaceLimit;
-            result.isSystem = storage->isSystem();
-            result.storage = storage;
-
-            return result;
-        }
-
-        static QnStorageResourceList toStorageList(const std::vector<SpaceInfo>& infos)
-        {
-            QnStorageResourceList result;
-            std::transform(
-                infos.cbegin(), infos.cend(), std::back_inserter(result),
-                [](const auto& info) { return info.storage; });
-            return result;
-        }
-
-        std::string toString() const
-        {
-            std::stringstream ss;
-            ss
-                << "SpaceInfo { totalSpace: " << totalSpace << ", "
-                << "freeSpace: " << freeSpace << ", "
-                << "spaceLimit: " << spaceLimit << ", "
-                << "nxOccupied: " << nxOccupied << ", "
-                << "available: " << available << ", "
-                << "effective: " << effective << ", "
-                << "url: " << url << ", "
-                << "isSystem: " << isSystem << " }";
-
-            return ss.str();
-        }
-
-    private:
-        static int64_t getOrThrow(
-            int64_t value, const std::string& description, const std::string& url)
-        {
-            if (value < 0)
-            {
-                std::stringstream ss;
-                ss << "Failed to get " << description << " for the storage " << url;
-                throw std::runtime_error(ss.str());
-            }
-
-            return value;
-        }
-    };
-
-    QnStorageManager* m_owner;
-
-    std::vector<SpaceInfo> resultInfos(const std::vector<SpaceInfo>& candidates) const
-    {
-        auto result = filterOutSpaceless(candidates);
-        result = filterOutSmall(result);
-        return filterOutSmallSystem(result);
-    }
-
-    std::vector<SpaceInfo> online(
-        const QnStorageResourceList& additional = QnStorageResourceList()) const
-    {
-        std::vector<SpaceInfo> result;
-        auto candidates = m_owner->getAllStorages().values() + additional;
-        candidates = unique(candidates);
-        for (const auto& storage: candidates)
-        {
-            if (!storage->isOnline())
-            {
-                NX_DEBUG(
-                    this, "Storage %1 is offline", nx::utils::url::hidePassword(storage->getUrl()));
-                continue;
-            }
-
-            try
-            {
-                result.push_back(SpaceInfo::from(storage, m_owner));
-            }
-            catch(const std::exception& e)
-            {
-                NX_WARNING(this, e.what());
-                continue;
-            }
-        }
-
-        return result;
-    }
-
-    static QnStorageResourceList unique(const QnStorageResourceList& candidates)
-    {
-        auto result = candidates;
-        std::sort(
-            result.begin(), result.end(),
-            [](const auto& storage1, const auto& storage2)
-            {
-                return storage1->getUrl() < storage2->getUrl();
-            });
-
-        auto last = std::unique(
-            result.begin(), result.end(),
-            [](const auto& storage1, const auto& storage2)
-            {
-                return storage1->getUrl() == storage2->getUrl();
-            });
-
-        result.erase(last, result.end());
-        NX_ASSERT(candidates.size() == result.size());
-        if (candidates.size() != result.size())
-        {
-            QString diffString;
-            for (const auto& storage: candidates)
-            {
-                if (!result.contains(storage))
-                {
-                    diffString +=
-                        QString("(%1) ").arg(nx::utils::url::hidePassword(storage->getUrl()));
-                }
-            }
-            NX_WARNING(typeid(WritableStorageManager), "Found duplicate storages: %1", diffString);
-        }
-
-        return result;
-    }
-
-    static std::vector<SpaceInfo> filterOutSpaceless(const std::vector<SpaceInfo>& infos)
-    {
-        std::vector<SpaceInfo> result;
-        for (const auto& info: infos)
-        {
-            if (info.effective < 0)
-            {
-                NX_DEBUG(
-                    typeid(WritableStorageManager),
-                    "Skipping storage (%1) because nxOccupiedSpace (%2) + freeSpace (%3) - spaceLimit (%4) < 0",
-                    info.url, info.nxOccupied, info.freeSpace, info.spaceLimit);
-                continue;
-            }
-            result.push_back(info);
-        }
-
-        return result;
-    }
-
-    static std::vector<SpaceInfo> filterOutSmall(const std::vector<SpaceInfo>& infos)
-    {
-        const auto maxIt = std::max_element(
-            infos.cbegin(), infos.cend(),
-            [](const auto& info1, const auto& info2) { return info1.available - info2.available; });
-
-        if (maxIt == infos.cend())
-            return infos;
-
-        const auto maxSpaceTreshold = maxIt->available / QnStorageManager::kBigStorageTreshold;
-        std::vector<SpaceInfo> result;
-        std::copy_if(
-            infos.cbegin(), infos.cend(), std::back_inserter(result),
-            [maxSpaceTreshold](const auto& info) { return info.available >= maxSpaceTreshold; });
-
-        return result;
-    }
-
-    static std::vector<SpaceInfo> filterOutSmallSystem(const std::vector<SpaceInfo>& infos)
-    {
-        int64_t totalNonSystemSpaceAvailable = 0;
-        for (const auto& info: infos)
-        {
-            if (!info.isSystem)
-                totalNonSystemSpaceAvailable += info.available;
-        }
-
-        std::vector<SpaceInfo> result;
-        std::copy_if(
-            infos.cbegin(), infos.cend(), std::back_inserter(result),
-            [totalNonSystemSpaceAvailable](const auto& info)
-            {
-                if (!info.isSystem)
-                    return true;
-
-                return totalNonSystemSpaceAvailable <= info.available * 5;
-            });
-
-        return result;
-    }
-
-    static void adjustFlags(
-        const QnStorageResourceList& candidates, const QnStorageResourceList& result)
-    {
-        for (const auto& storage: candidates)
-        {
-            if (result.contains(storage))
-                storage->setStatusFlag(storage->statusFlag() & ~Qn::StorageStatus::tooSmall);
-            else
-                storage->setStatusFlag(storage->statusFlag() | Qn::StorageStatus::tooSmall);
-        }
-    }
-};
 
 class ArchiveScanPosition: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
@@ -1043,7 +778,6 @@ QnStorageManager::QnStorageManager(
         : QString("StorageIndexer");
     m_archiveIndexer.reset(new ArchiveIndexer(this, storageIndexerThreadName));
     m_archiveIndexer->start();
-    m_writableStorageManager.reset(new WritableStorageManager(this));
 
     m_clearMotionTimer.restart();
     m_clearBookmarksTimer.restart();
@@ -2620,7 +2354,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getClearableStorages() const
 QnStorageResourceList QnStorageManager::getAllWritableStorages(
     const QnStorageResourceList& additional) const
 {
-    return m_writableStorageManager->list(additional);
+    return nx::vms::server::WritableStoragesHelper(this).list(m_storageRoots.values() + additional);
 }
 
 void QnStorageManager::testStoragesDone()
@@ -2801,10 +2535,16 @@ QnStorageResourcePtr QnStorageManager::getStorageByIndex(int index) const
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot()
 {
-    return m_writableStorageManager->optimalStorageForRecording();
+    return nx::vms::server::WritableStoragesHelper(this).optimalStorageForRecording(
+        m_storageRoots.values());
 }
 
-QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, const QnNetworkResourcePtr &camera, const QString& prefix, const QnStorageResourcePtr& storage)
+QString QnStorageManager::getFileName(
+    const qint64& dateTime,
+    qint16 timeZone,
+    const QnNetworkResourcePtr &camera,
+    const QString& prefix,
+    const QnStorageResourcePtr& storage)
 {
     if (!storage) {
         if (m_storageWarnTimer.elapsed() > 5000) {
@@ -2919,6 +2659,11 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
         storageIndex = storageDbPool()->getStorageIndex(ret);
     }
     return ret;
+}
+
+bool QnStorageManager::canStorageBeUsedByVms(const QnStorageResourcePtr& storage)
+{
+    return storage->getTotalSpace() > storage->getSpaceLimit();
 }
 
 QnStorageResourcePtr QnStorageManager::getStorageByUrlExact(const QString& storageUrl)

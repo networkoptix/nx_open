@@ -7,7 +7,7 @@
 
 namespace nx::vms::server::test {
 
-class FtWritableStorageManager: public ::testing::Test
+class FtWritableStoragesHelper: public ::testing::Test
 {
 protected:
     virtual void SetUp() override
@@ -21,7 +21,7 @@ protected:
         test_support::addStorageFixture(
             m_server.get(), m_server->serverModule(), "url1", /*totalSpace*/100*1024*1024*1024LL,
             /*freeSpace*/100*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/false,
-            /*isOnline*/false);
+            /*isOnline*/false, /*isUsedForWriting*/true);
     }
 
     void whenSomeTimeForInitializationHasPassed()
@@ -40,7 +40,7 @@ protected:
         m_addedStorages.append(test_support::addStorageFixture(
             m_server.get(), m_server->serverModule(), "url1", /*totalSpace*/100*1024*1024*1024LL,
             /*freeSpace*/100*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/false,
-            /*isOnline*/true));
+            /*isOnline*/true, /*isUsedForWriting*/true));
     }
 
     void thenWritableStoragesListShouldContainIt()
@@ -76,7 +76,7 @@ protected:
         m_addedStorages.append(test_support::addStorageFixture(
             m_server.get(), m_server->serverModule(), "url1", /*totalSpace*/100*1024*1024*1024LL,
             /*freeSpace*/0.9*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/false,
-            /*isOnline*/true));
+            /*isOnline*/true, /*isUsedForWriting*/true));
     }
 
     void whenOneOnlineStorageWithNotEnoughFreeSpaceAndNxOccupiedSpaceAdded()
@@ -84,7 +84,7 @@ protected:
         const auto storageFixture = test_support::addStorageFixture(
             m_server.get(), m_server->serverModule(), "url1", /*totalSpace*/100*1024*1024*1024LL,
             /*freeSpace*/0.4*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/false,
-            /*isOnline*/true);
+            /*isOnline*/true, /*isUsedForWriting*/true);
         m_addedStorages.append(storageFixture);
         test_support::setNxOccupiedSpace(
             m_server.get(), storageFixture, /*nxOccupiedSpace*/0.5*1024*1024*1024LL);
@@ -95,7 +95,7 @@ protected:
         const auto storageFixture = test_support::addStorageFixture(
             m_server.get(), m_server->serverModule(), "url1", /*totalSpace*/100*1024*1024*1024LL,
             /*freeSpace*/0.1*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/false,
-            /*isOnline*/true);
+            /*isOnline*/true, /*isUsedForWriting*/true);
         m_addedStorages.append(storageFixture);
         test_support::setNxOccupiedSpace(
             m_server.get(), storageFixture, /*nxOccupiedSpace*/1.2*1024*1024*1024LL);
@@ -106,12 +106,12 @@ protected:
         m_smallStorage = test_support::addStorageFixture(
             m_server.get(), m_server->serverModule(), "url1", /*totalSpace*/100*1024*1024*1024LL,
             /*freeSpace*/100*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/false,
-            /*isOnline*/true);
+            /*isOnline*/true, /*isUsedForWriting*/true);
 
         m_addedStorages.append(test_support::addStorageFixture(
             m_server.get(), m_server->serverModule(), "url2", /*totalSpace*/1500*1024*1024*1024LL,
             /*freeSpace*/1500*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/false,
-            /*isOnline*/true));
+            /*isOnline*/true, /*isUsedForWriting*/true));
     }
 
     void whenThreeStoragesAddedWithOneSystem4TimesSmaller()
@@ -125,7 +125,8 @@ protected:
         {
             const auto newStorage = test_support::addStorageFixture(
                 m_server.get(), m_server->serverModule(), urls[i], totalSpaces[i],
-                totalSpaces[i], spaceLimit, /*isSystem*/i == 0, /*isOnline*/true);
+                totalSpaces[i], spaceLimit, /*isSystem*/i == 0, /*isOnline*/true,
+                /*isUsedForWriting*/true);
 
             if (i == 0)
                 m_smallStorage = newStorage;
@@ -144,22 +145,51 @@ protected:
             p.second.ratio = static_cast<double>(p.second.value) / totalEffectiveSpace;
     }
 
+    void whenThreeStoragesAddedWithOneUnused()
+    {
+        std::array<int64_t, 3> totalSpaces =
+            {100*1024*1024*1024LL, 100*1024*1024*1024LL, 100*1024*1024*1024LL};
+        std::array<QString, 3> urls = {"url1", "url2", "url3"};
+        const int64_t spaceLimit = 1*1024*1024*1024LL;
+
+        for (size_t i = 0; i < totalSpaces.size(); ++i)
+        {
+            test_support::addStorageFixture(
+                m_server.get(), m_server->serverModule(), urls[i], totalSpaces[i],
+                totalSpaces[i], spaceLimit, /*isSystem*/false, /*isOnline*/true,
+                /*isUsedForWriting*/i != 0);
+
+            if (i != 0)
+                m_urlToEffectiveSpace[urls[i]].value = totalSpaces[i] - spaceLimit;
+        }
+
+        const auto totalEffectiveSpace = std::accumulate(
+            m_urlToEffectiveSpace.cbegin(), m_urlToEffectiveSpace.cend(), 0LL,
+            [](int64_t a, const std::pair<QString, EffectiveSpace>& p)
+            {
+                return a + p.second.value;
+            });
+
+        for (auto& p: m_urlToEffectiveSpace)
+            p.second.ratio = static_cast<double>(p.second.value) / totalEffectiveSpace;
+    }
+
     void whenThreeStoragesAddedWithOneSystem5TimesSmaller()
     {
         m_smallStorage = test_support::addStorageFixture(
             m_server.get(), m_server->serverModule(), "url1", /*totalSpace*/100*1024*1024*1024LL,
             /*freeSpace*/100*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/true,
-            /*isOnline*/true);
+            /*isOnline*/true, /*isUsedForWriting*/true);
 
         m_addedStorages.append(test_support::addStorageFixture(
             m_server.get(), m_server->serverModule(), "url2", /*totalSpace*/260*1024*1024*1024LL,
             /*freeSpace*/260*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/false,
-            /*isOnline*/true));
+            /*isOnline*/true, /*isUsedForWriting*/true));
 
         m_addedStorages.append(test_support::addStorageFixture(
             m_server.get(), m_server->serverModule(), "url3", /*totalSpace*/260*1024*1024*1024LL,
             /*freeSpace*/260*1024*1024*1024LL, /*spaceLimit*/1*1024*1024*1024LL, /*isSystem*/false,
-            /*isOnline*/true));
+            /*isOnline*/true, /*isUsedForWriting*/true));
     }
 
     void expectWritableStoragesSize(int size)
@@ -189,6 +219,7 @@ protected:
         {
             const auto optimalStorage =
                 m_server->serverModule()->normalStorageManager()->getOptimalStorageRoot();
+            ASSERT_TRUE(optimalStorage);
             m_urlToSelectedCount[optimalStorage->getUrl()]++;
         }
     }
@@ -225,7 +256,7 @@ private:
     }
 };
 
-TEST_F(FtWritableStorageManager, noOfflineStorages)
+TEST_F(FtWritableStoragesHelper, noOfflineStorages)
 {
     whenSomeOfflineStoragesAdded();
     whenSomeTimeForInitializationHasPassed();
@@ -233,52 +264,59 @@ TEST_F(FtWritableStorageManager, noOfflineStorages)
 }
 
 
-TEST_F(FtWritableStorageManager, oneOnlineStorage)
+TEST_F(FtWritableStoragesHelper, oneOnlineStorage)
 {
     whenOneOnlineStorageAdded();
     thenWritableStoragesListShouldContainIt();
 }
 
-TEST_F(FtWritableStorageManager, spaceLessStorages_noFreeSpace)
+TEST_F(FtWritableStoragesHelper, spaceLessStorages_noFreeSpace)
 {
     whenOneOnlineStorageWithNotEnoughFreeSpaceAdded();
     whenSomeTimeForInitializationHasPassed();
     thenWritableStoragesListShouldBeEmpty();
 }
 
-TEST_F(FtWritableStorageManager, spaceLessStorages_noNxOccupiedSpace)
+TEST_F(FtWritableStoragesHelper, spaceLessStorages_noNxOccupiedSpace)
 {
     whenOneOnlineStorageWithNotEnoughFreeSpaceAndNxOccupiedSpaceAdded();
     thenWritableStoragesListShouldBeEmpty();
 }
 
-TEST_F(FtWritableStorageManager, noFreeSpace_butNxOccupiedSpaceIsEnough)
+TEST_F(FtWritableStoragesHelper, noFreeSpace_butNxOccupiedSpaceIsEnough)
 {
     whenOneOnlineStorageWithNotEnoughFreeSpaceButWithEnoughNxOccupiedSpaceAdded();
     thenWritableStoragesListShouldContainIt();
 }
 
-TEST_F(FtWritableStorageManager, tenTimesSmallerStorage)
+TEST_F(FtWritableStoragesHelper, tenTimesSmallerStorage)
 {
     whenTwoStoragesWithEnoughFreeSpaceWith10TimesSpaceDifferenceAdded();
     thenSmallerShouldntAppearOnTheWritableList(/*expectedNumberOfWritableStorages*/1);
 }
 
-TEST_F(FtWritableStorageManager, systemStorage_5timesSmaller)
+TEST_F(FtWritableStoragesHelper, systemStorage_5timesSmaller)
 {
     whenThreeStoragesAddedWithOneSystem5TimesSmaller();
     thenSmallerShouldntAppearOnTheWritableList(/*expectedNumberOfWritableStorages*/2);
 }
 
-TEST_F(FtWritableStorageManager, systemStorage_4timesSmaller)
+TEST_F(FtWritableStoragesHelper, systemStorage_4timesSmaller)
 {
     whenThreeStoragesAddedWithOneSystem4TimesSmaller();
     expectWritableStoragesSize(3);
 }
 
-TEST_F(FtWritableStorageManager, optimalStorage)
+TEST_F(FtWritableStoragesHelper, optimalStorage)
 {
     whenThreeStoragesAddedWithOneSystem4TimesSmaller();
+    whenOptimalStorageIsCalledForManyTimes();
+    thenTheyShouldBeSelectedProportionallyToTheirEffectiveSpaces();
+}
+
+TEST_F(FtWritableStoragesHelper, optimalStorage_noUnusedStorages)
+{
+    whenThreeStoragesAddedWithOneUnused();
     whenOptimalStorageIsCalledForManyTimes();
     thenTheyShouldBeSelectedProportionallyToTheirEffectiveSpaces();
 }

@@ -48,7 +48,6 @@ extern "C" {
 
 } // extern "C"
 
-class WritableStorageManager;
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
@@ -58,6 +57,7 @@ class QnUuid;
 class QnScheduleSync;
 
 namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
+namespace nx::vms::server { class WritableStoragesHelper; }
 
 class QnStorageManager: public QObject, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
@@ -192,6 +192,8 @@ public:
         QnMediaServerModule* serverModule,
         const QnStorageResourcePtr& storage);
 
+    static bool canStorageBeUsedByVms(const QnStorageResourcePtr& storage);
+
 signals:
     void storagesAvailable();
     void noStoragesAvailable();
@@ -323,13 +325,12 @@ private:
 
     QnStorageScanData m_archiveRebuildInfo;
 
-    friend class WritableStorageManager;
+    friend class nx::vms::server::WritableStoragesHelper;
     friend class RebuildAsyncTask;
     friend class AuxiliaryTask;
     friend class ArchiveIndexer;
 
     std::unique_ptr<ArchiveIndexer> m_archiveIndexer;
-    std::unique_ptr<WritableStorageManager> m_writableStorageManager;
 
     bool m_initInProgress;
     QMap<QString, QSet<int>> m_oldStorageIndexes;

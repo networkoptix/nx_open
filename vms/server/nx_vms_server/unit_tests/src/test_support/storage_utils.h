@@ -19,7 +19,8 @@ void addStorage(MediaServerLauncher* server, const QString& path);
  */
 QnStorageResourcePtr addStorageFixture(
     MediaServerLauncher* server, QnMediaServerModule* serverModule, const QString& url,
-    int64_t totalSpace, int64_t freeSpace, int64_t spaceLimit, bool isSystem, bool isOnline);
+    int64_t totalSpace, int64_t freeSpace, int64_t spaceLimit, bool isSystem, bool isOnline,
+    bool isUsedForWriting);
 
 void setNxOccupiedSpace(
     MediaServerLauncher* server, const QnStorageResourcePtr& storage, int64_t nxOccupiedSpace);

@@ -110,12 +110,13 @@ class StorageFixtureResource: public QnStorageResource
 public:
     StorageFixtureResource(
         QnMediaServerModule* serverModule, const QString& url, int64_t totalSpace,
-        int64_t freeSpace, int64_t spaceLimit, bool isSystem, bool isOnline)
+        int64_t freeSpace, int64_t spaceLimit, bool isSystem, bool isOnline, bool isUsedForWriting)
         :
         QnStorageResource(serverModule->commonModule()), m_url(url), m_totalSpace(totalSpace),
         m_freeSpace(freeSpace), m_isSystem(isSystem), m_isOnline(isOnline)
     {
         setSpaceLimit(spaceLimit);
+        setUsedForWriting(isUsedForWriting);
         setId(QnUuid::createUuid());
     }
 
@@ -219,10 +220,11 @@ private:
 
 QnStorageResourcePtr addStorageFixture(
     MediaServerLauncher* server, QnMediaServerModule* serverModule, const QString& url,
-    int64_t totalSpace, int64_t freeSpace, int64_t spaceLimit, bool isSystem, bool isOnline)
+    int64_t totalSpace, int64_t freeSpace, int64_t spaceLimit, bool isSystem, bool isOnline,
+    bool isUsedForWriting)
 {
     auto storage = QnStorageResourcePtr(new StorageFixtureResource(
-        serverModule, url, totalSpace, freeSpace, spaceLimit, isSystem, isOnline));
+        serverModule, url, totalSpace, freeSpace, spaceLimit, isSystem, isOnline, isUsedForWriting));
     server->serverModule()->normalStorageManager()->addStorage(storage);
     return storage;
 }

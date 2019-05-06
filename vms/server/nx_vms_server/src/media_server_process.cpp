@@ -429,20 +429,6 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 }
 
-void calculateSpaceLimitOrLoadFromConfig(
-    QnCommonModule* commonModule,
-    const QnFileStorageResourcePtr& fileStorage)
-{
-    const BeforeRestoreDbData& beforeRestoreData = commonModule->beforeRestoreDbData();
-    if (!beforeRestoreData.isEmpty() && beforeRestoreData.hasInfoForStorage(fileStorage->getUrl()))
-    {
-        fileStorage->setSpaceLimit(beforeRestoreData.getSpaceLimitForStorage(fileStorage->getUrl()));
-        return;
-    }
-
-    fileStorage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
-}
-
 #ifdef Q_OS_WIN
 static int freeGB(QString drive)
 {
@@ -482,7 +468,9 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, const QString& path)
 {
     NX_VERBOSE(kLogTag, lm("Attempting to create storage %1").arg(path));
-    QnStorageResourcePtr storage(serverModule()->storagePluginFactory()->createStorage(commonModule(), "ufile"));
+    QnStorageResourcePtr storage(serverModule()->storagePluginFactory()->createStorage(
+        commonModule(),
+        "ufile"));
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
@@ -500,14 +488,13 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
 
     if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
     {
-        const qint64 totalSpace = fileStorage->calculateAndSetTotalSpaceWithoutInit();
-        calculateSpaceLimitOrLoadFromConfig(commonModule(), fileStorage);
-
-        if (totalSpace < fileStorage->getSpaceLimit())
+        if (!QnStorageManager::canStorageBeUsedByVms(fileStorage))
         {
-            NX_DEBUG(kLogTag, lm(
+            NX_DEBUG(
+                kLogTag,
                 "Storage with this path %1 total space is unknown or totalSpace < spaceLimit. "
-                "Total space: %2, Space limit: %3").args(path, totalSpace, storage->getSpaceLimit()));
+                "Total space: %2, Space limit: %3",
+                path, fileStorage->getTotalSpace(), storage->getSpaceLimit());
             return QnStorageResourcePtr();
         }
     }
@@ -3901,23 +3888,52 @@ void MediaServerProcess::doMigrationFrom_2_4()
     }
 }
 
+static QnStorageResource* initSpaceLimitAndTotalSpace(
+    QnStorageResource* storage,
+    QnCommonModule* commonModule)
+{
+    if (!storage)
+        return storage;
+
+    auto fileStorage = dynamic_cast<QnFileStorageResource*>(storage);
+    if (storage->getTotalSpace() <= 0 && fileStorage)
+        fileStorage->calculateAndSetTotalSpaceWithoutInit();
+
+    const auto& beforeRestoreData = commonModule->beforeRestoreDbData();
+    if (!beforeRestoreData.isEmpty() && beforeRestoreData.hasInfoForStorage(storage->getUrl()))
+    {
+        storage->setSpaceLimit(beforeRestoreData.getSpaceLimitForStorage(storage->getUrl()));
+        return storage;
+    }
+
+    if (fileStorage)
+        fileStorage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
+    else
+        storage->setSpaceLimit(QnStorageResource::kThirdPartyStorageLimit);
+
+    return storage;
+}
+
 void MediaServerProcess::loadPlugins()
 {
     auto storagePlugins = serverModule()->storagePluginFactory();
     auto pluginManager = serverModule()->pluginManager();
     for (nx_spl::StorageFactory* const storagePlugin:
-    pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+        pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
         auto settings = &serverModule()->settings();
         storagePlugins->registerStoragePlugin(
             storagePlugin->storageType(),
-            std::bind(
-                &QnThirdPartyStorageResource::instance,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                storagePlugin,
-                settings
-            ),
+            [&settings, storagePlugin](QnCommonModule* commonModule, const QString& path)
+            {
+                return initSpaceLimitAndTotalSpace(
+                    QnThirdPartyStorageResource::instance(
+                        commonModule,
+                        path,
+                        storagePlugin,
+                        settings),
+                    commonModule);
+            },
             false);
     }
 
@@ -3925,7 +3941,11 @@ void MediaServerProcess::loadPlugins()
         "file",
         [this](QnCommonModule*, const QString& path)
         {
-            return QnFileStorageResource::instance(this->serverModule(), path);
+            return initSpaceLimitAndTotalSpace(
+                QnFileStorageResource::instance(
+                    this->serverModule(),
+                    path),
+                commonModule());
         }, /*isDefaultProtocol*/ true);
 
     storagePlugins->registerStoragePlugin(
@@ -3936,7 +3956,11 @@ void MediaServerProcess::loadPlugins()
         "smb",
         [this](QnCommonModule*, const QString& path)
         {
-            return QnFileStorageResource::instance(this->serverModule(), path);
+            return initSpaceLimitAndTotalSpace(
+                QnFileStorageResource::instance(
+                    this->serverModule(),
+                    path),
+                commonModule());
         }, /*isDefaultProtocol*/ false);
 }
 
