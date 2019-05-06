@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QHash>
+
 namespace nx {
 namespace core {
 namespace access {

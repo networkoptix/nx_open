@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/ssl/ssl_stream_socket.h>

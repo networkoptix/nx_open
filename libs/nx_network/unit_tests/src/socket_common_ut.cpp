@@ -6,6 +6,8 @@ typedef ULONG in_addr_t;
 
 #include <gtest/gtest.h>
 
+#include <QtCore/QUrl>
+
 #include <nx/network/socket_common.h>
 
 namespace nx {

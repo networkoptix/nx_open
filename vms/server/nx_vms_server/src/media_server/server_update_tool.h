@@ -5,6 +5,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QMap>
 #include <QtCore/QSet>
+#include <QtCore/QDir>
 
 #include <common/common_module_aware.h>
 
