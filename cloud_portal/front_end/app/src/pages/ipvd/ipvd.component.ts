@@ -40,8 +40,6 @@ export class NxIpvdComponent implements OnInit {
     showAll: boolean;
     hardwareTypes: any[];
     resolutions: any;
-    filter: any;
-    emptyFilter: any;
     camerasTable: any;
     allowedParameters: string[];
     filterModel: any;
@@ -77,7 +75,6 @@ export class NxIpvdComponent implements OnInit {
         this.showAll = false;
         this.toggleCamview = false;
 
-        this.filter = {};
         this.filterModel = {
             query: ''
         };
@@ -115,32 +112,9 @@ export class NxIpvdComponent implements OnInit {
                     if (event.url.indexOf('/ipvd') < 0) {
                         return;
                     }
-                    if (event.url.indexOf('?') < 0) {
-                        this.hasNoSearch = true;
-                        this.noResult = false;
-                        this.camerasTable = [];
-                        this.resetActiveCamera();
-                    } else {
-                        this.hasNoSearch = false;
 
-                        if (this.cameras) {
-                            if (this.filterEmpty()) {
-                                this.cameraSearchService
-                                    .ipvdSearch(this.cameras, this.filterModel)
-                                    .subscribe(cameras => {
-                                        this.activeCamera = undefined;
+                    this.filterModel = {... this.filterModel}; // force search component update
 
-                                        this.noResult = (cameras.length === 0);
-                                        if (!this.noResult) {
-                                            this.camerasTable = this.preFilterCameraTable(cameras);
-                                            this.setActiveCamera();
-                                        } else {
-                                            this.camerasTable = [];
-                                        }
-                                    });
-                            }
-                        }
-                    }
                 });
     }
 
@@ -220,7 +194,6 @@ export class NxIpvdComponent implements OnInit {
     }
 
     activate() {
-        this.resetFilters();
         this.cameraService
             .getIPVD()
             .subscribe(data => {
@@ -259,10 +232,6 @@ export class NxIpvdComponent implements OnInit {
                 // Trigger model change for search component
                 this.filterModel = { ...this.filterModel };
             });
-    }
-
-    resetFilters() {
-        this.filter = { ...this.emptyFilter };
     }
 
     // restrict the parameters to be passed and viewed for to cam-table (based on allowedParameters)

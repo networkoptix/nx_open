@@ -1,7 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
-Test Teardown     Restart
 Suite Setup       Open Browser and go to URL    ${url}
+Test Teardown     Restart
 Suite Teardown    Close All Browsers
 
 *** Variables ***

@@ -108,47 +108,50 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                     (this.localFilter.tags && this.localFilter.tags.length);
 
             // Update model with query params
-            Object.keys(this.params).forEach((key) => {
-                if (key === 'search' && this.params.search !== '') {
-                    this.localFilter.query = this.params.search;
-                    return;
-                }
+            this.localFilter.query = this.params.search || '';
 
-                if (key === 'tags' && this.localFilter.tags.length) {
-                    this.params[key]
-                            .split(',')
-                            .forEach((tagName) => {
-                                this.localFilter.tags.find((tag) => {
-                                    if (tag.id === tagName) {
-                                        tag.value = true;
-                                    }
-                                });
+            if (this.localFilter.tags.length) {
+                if (this.params.tags) {
+                    this.params.tags
+                        .split(',')
+                        .forEach((tagName) => {
+                            this.localFilter.tags.find((tag) => {
+                                if (tag.id === tagName) {
+                                    tag.value = true;
+                                }
                             });
-                    return;
-                }
-
-                if (this.localFilter.selects && this.localFilter.selects.length) {
-                    this.localFilter
-                        .selects
-                        .find((select) => {
-                            if (select.id === key) {
-                                select.selected = select.items.find((item) => item.name === this.params[key]);
-                            }
                         });
+                } else {
+                    this.localFilter.tags.forEach(tag => tag.value = false);
                 }
+            }
 
-                if (this.localFilter.multiselects && this.localFilter.multiselects.length) {
-                    this.localFilter
-                        .multiselects
-                        .find((select) => {
-                            if (select.id === key) {
-                                select.selected = isArray(this.params[key]) ? this.params[key] : this.params[key].split(',');
-                            }
-                        });
-                }
-            });
+            if (this.localFilter.selects && this.localFilter.selects.length) {
+                this.localFilter
+                    .selects
+                    .find((select) => {
+                        if (this.params[select.id]) {
+                            select.selected = select.items.find((item) => item.name === this.params[select.id]);
+                        } else {
+                            select.selected = { value: '0', name: 'All' };
+                        }
+                    });
+            }
+
+            if (this.localFilter.multiselects && this.localFilter.multiselects.length) {
+                this.localFilter
+                    .multiselects
+                    .find((select) => {
+                        if (this.params[select.id]) {
+                            select.selected = isArray(this.params[select.id]) ? this.params[select.id] : this.params[select.id].split(',');
+                        } else {
+                            select.selected = [];
+                        }
+                    });
+            }
         }
 
+        this.onChangeCallback({ ...this.localFilter });
         this.numberOfOptionsSelected();
     }
 
@@ -244,7 +247,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         this.filterSelected = this.numberFilters + str;
     }
 
-    resetFilters() {
+    clearFilters() {
         this.localFilter.query = '';
 
         if (this.localFilter.tags) {
@@ -264,7 +267,10 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                 filter.selected = [];
             });
         }
+    }
 
+    resetFilters() {
+        this.clearFilters();
         this.numberFilters = 0;
         this.filterSelected = '';
         this.uri.resetURI(this.uriPath);
