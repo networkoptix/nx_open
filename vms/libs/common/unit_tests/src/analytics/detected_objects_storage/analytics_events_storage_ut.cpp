@@ -27,8 +27,8 @@ public:
             std::chrono::system_clock::from_time_t(0),
             std::chrono::system_clock::from_time_t(0))
     {
-        m_settings.dbConnectionOptions.dbName =
-            nx::utils::test::TestWithTemporaryDirectory::testDataDir() + "/events.sqlite";
+        m_settings.path = nx::utils::test::TestWithTemporaryDirectory::testDataDir();
+        m_settings.dbConnectionOptions.dbName = "objects.sqlite";
         m_settings.dbConnectionOptions.driverType = nx::sql::RdbmsDriverType::sqlite;
         m_settings.dbConnectionOptions.maxConnectionCount = 17;
 
@@ -43,19 +43,19 @@ protected:
 
     void whenSaveEvent()
     {
-        m_analyticsDataPackets.push_back(generateRandomPacket(1));
+        generateRandomPackets(1);
         whenIssueSavePacket(m_analyticsDataPackets[0]);
         flushData();
     }
 
     void whenSaveMultipleEventsConcurrently()
     {
-        const int packetCount = 101;
-        for (int i = 0; i < packetCount; ++i)
-        {
-            m_analyticsDataPackets.push_back(generateRandomPacket(1));
-            whenIssueSavePacket(m_analyticsDataPackets.back());
-        }
+        constexpr int packetCount = 101;
+
+        generateRandomPackets(packetCount);
+
+        for (const auto& packet: m_analyticsDataPackets)
+            whenIssueSavePacket(packet);
 
         flushData();
     }
@@ -319,6 +319,13 @@ protected:
                 analyticsDataPackets.push_back(generateRandomPacket(1));
         }
 
+        std::sort(
+            analyticsDataPackets.begin(), analyticsDataPackets.end(),
+            [](const auto& left, const auto& right)
+            {
+                return left->timestampUsec < right->timestampUsec;
+            });
+
         return analyticsDataPackets;
     }
 
@@ -400,6 +407,19 @@ private:
     {
         m_eventsStorage = std::make_unique<EventsStorage>();
         return m_eventsStorage->initialize(m_settings);
+    }
+
+    void generateRandomPackets(int count)
+    {
+        for (int i = 0; i < count; ++i)
+            m_analyticsDataPackets.push_back(generateRandomPacket(1));
+
+        std::sort(
+            m_analyticsDataPackets.begin(), m_analyticsDataPackets.end(),
+            [](const auto& left, const auto& right)
+            {
+                return left->timestampUsec < right->timestampUsec;
+            });
     }
 
     void flushData()
@@ -507,19 +527,22 @@ private:
             return true;
 
         if (kUseTrackAggregation)
-        {
-            const auto filterBoundingBox = translate(
-                filter.boundingBox,
-                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
-            const auto dataBoundingBox = translate(
-                data.boundingBox,
-                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
-            return filterBoundingBox.intersects(dataBoundingBox);
-        }
+            return rectsIntersectToPrecision(filter.boundingBox, data.boundingBox);
         else
-        {
             return filter.boundingBox.intersects(data.boundingBox);
-        }
+    }
+
+    bool rectsIntersectToPrecision(const QRectF& one, const QRectF& two)
+    {
+        const auto translatedOne = translate(
+            one,
+            QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+
+        const auto translatedTwo = translate(
+            two,
+            QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+
+        return translatedOne.intersects(translatedTwo);
     }
 
     bool satisfiesFilter(
@@ -539,7 +562,7 @@ private:
         {
             bool intersects = false;
             for (const auto& object: data.objects)
-                intersects |= filter.boundingBox.intersects(object.boundingBox);
+                intersects |= rectsIntersectToPrecision(filter.boundingBox, object.boundingBox);
             if (!intersects)
                 return false;
         }
@@ -800,8 +823,11 @@ protected:
 
     void addMaxObjectsLimitToFilter()
     {
-        m_filter.maxObjectsToSelect = (int) filterObjects(
-            toDetectedObjects(analyticsDataPackets()), m_filter).size() / 2;
+        const auto filteredObjectCount = filterObjects(
+            toDetectedObjects(analyticsDataPackets()), m_filter).size();
+
+        if (filteredObjectCount > 0)
+            m_filter.maxObjectsToSelect = nx::utils::random::number<int>(0, filteredObjectCount + 1);
     }
 
     void addMaxTrackLengthLimitToFilter()
@@ -834,7 +860,6 @@ protected:
         const auto& randomPacket = nx::utils::random::choice(analyticsDataPackets());
 
         m_filter.deviceIds.push_back(randomPacket->deviceId);
-        //addRandomKnownDeviceIdToFilter();
 
         if (nx::utils::random::number<bool>())
         {
@@ -1233,8 +1258,16 @@ protected:
 
     void thenResultMatchesExpectations()
     {
+        auto filteredPackets = filterPackets(filter(), analyticsDataPackets());
+        filteredPackets = sortPacketsByTimestamp(
+            std::move(filteredPackets),
+            Qt::SortOrder::DescendingOrder);
+
+        if (filter().maxObjectsToSelect > 0 && (int)filteredPackets.size() > filter().maxObjectsToSelect)
+            filteredPackets.erase(filteredPackets.begin() + filter().maxObjectsToSelect, filteredPackets.end());
+
         auto expected = sortPacketsByTimestamp(
-            filterPackets(filter(), analyticsDataPackets()),
+            std::move(filteredPackets),
             filter().sortOrder);
 
         sortObjectsById(&expected);
@@ -1411,7 +1444,20 @@ protected:
             roundTimePeriods(&actualTimePeriods);
         }
 
-        ASSERT_EQ(expected, actualTimePeriods);
+        assertTimePeriodsMatchUpToAggregationPeriod(expected, actualTimePeriods);
+    }
+
+    void assertTimePeriodsMatchUpToAggregationPeriod(
+        const QnTimePeriodList& left, const QnTimePeriodList& right)
+    {
+        ASSERT_EQ(left.size(), right.size());
+
+        for (int i = 0; i < left.size(); ++i)
+        {
+            ASSERT_LT(
+                std::chrono::abs(left[i].startTime() - right[i].startTime()),
+                kTrackAggregationPeriod);
+        }
     }
 
 private:
@@ -1504,6 +1550,15 @@ TEST_F(AnalyticsDbTimePeriodsLookup, selecting_all_periods)
     thenResultMatchesExpectations();
 }
 
+TEST_F(AnalyticsDbTimePeriodsLookup, selecting_all_periods_by_device)
+{
+    givenEmptyFilter();
+    addRandomKnownDeviceIdToFilter();
+    
+    whenLookupTimePeriods();
+    thenResultMatchesExpectations();
+}
+
 TEST_F(AnalyticsDbTimePeriodsLookup, selecting_all_periods_aggregated_to_one)
 {
     givenAggregationPeriodEqualToTheWholeArchivePeriod();
@@ -1527,7 +1582,7 @@ TEST_F(AnalyticsDbTimePeriodsLookup, with_aggregation_period)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsDbTimePeriodsLookup, DISABLED_with_random_filter)
+TEST_F(AnalyticsDbTimePeriodsLookup, with_random_filter)
 {
     givenRandomFilter();
     whenLookupTimePeriods();

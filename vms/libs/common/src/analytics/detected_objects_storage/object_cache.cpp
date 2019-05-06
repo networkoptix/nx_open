@@ -108,6 +108,16 @@ std::vector<ObjectUpdate> ObjectCache::getObjectsToUpdate(bool flush)
     return result;
 }
 
+std::optional<DetectedObject> ObjectCache::getObjectById(const QnUuid& objectGuid) const
+{
+    QnMutexLocker lock(&m_mutex);
+
+    if (auto it = m_objectsById.find(objectGuid); it != m_objectsById.end())
+        return it->second.object;
+
+    return std::nullopt;
+}
+
 void ObjectCache::setObjectIdInDb(const QnUuid& objectId, long long dbId)
 {
     QnMutexLocker lock(&m_mutex);

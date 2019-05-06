@@ -22,6 +22,7 @@
 #include "analytics_events_storage_settings.h"
 #include "analytics_events_storage_types.h"
 
+#include "analytics_archive_directory.h"
 #include "attributes_dao.h"
 #include "device_dao.h"
 #include "detection_data_saver.h"
@@ -160,6 +161,7 @@ private:
     ObjectTypeDao m_objectTypeDao;
     DeviceDao m_deviceDao;
     TimePeriodDao m_timePeriodDao;
+    std::unique_ptr<AnalyticsArchiveDirectory> m_analyticsArchiveDirectory;
 
     ObjectCache m_objectCache;
     ObjectTrackAggregator m_trackAggregator;

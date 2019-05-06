@@ -36,7 +36,7 @@ public:
         m_asyncCaller.pleaseStopSync();
     }
 
-    virtual bool initialize(const Settings& settings) override
+    virtual bool initialize(const Settings& /*settings*/) override
     {
         return true;
     }

@@ -235,4 +235,19 @@ ALTER TABLE object ADD COLUMN best_shot_rect BLOB;
 
 )sql";
 
+//-------------------------------------------------------------------------------------------------
+// META-254.
+static constexpr char kCombinedAttributes[] =
+R"sql(
+
+CREATE TABLE combined_attributes(
+    combination_id      INTEGER,
+    attributes_id       INTEGER
+);
+
+CREATE INDEX idx_combined_attributes_full ON combined_attributes(
+    attributes_id, combination_id);
+
+)sql";
+
 } // namespace nx::analytics::storage

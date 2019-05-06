@@ -40,7 +40,7 @@ EventsStorage::~EventsStorage()
 
 bool EventsStorage::initialize(const Settings& settings)
 {
-    NX_DEBUG(this, "Openning analytics event storage from [%1]",
+    NX_DEBUG(this, "Opening analytics event storage from [%1]",
         settings.dbConnectionOptions.dbName);
     QnMutexLocker lock(&m_dbControllerMutex);
     {
@@ -50,13 +50,28 @@ bool EventsStorage::initialize(const Settings& settings)
             cursor->close();
         m_openedCursors.clear();
     }
+    m_analyticsArchiveDirectory.reset();
     m_dbController.reset();
 
     m_closingDbController = false;
-    m_dbController = std::make_shared<DbController>(settings.dbConnectionOptions);
-    return m_dbController->initialize()
-        && readMaximumEventTimestamp()
-        && loadDictionaries();
+    
+    auto dbConnectionOptions = settings.dbConnectionOptions;
+    dbConnectionOptions.dbName = settings.path + "/" + dbConnectionOptions.dbName;
+    m_dbController = std::make_shared<DbController>(dbConnectionOptions);
+    if (!m_dbController->initialize()
+        || !readMaximumEventTimestamp()
+        || !loadDictionaries())
+    {
+        return false;
+    }
+
+    if (kSaveTimePeriodsToFile)
+    {
+        m_analyticsArchiveDirectory = std::make_unique<AnalyticsArchiveDirectory>(
+            settings.path + "/archive/");
+    }
+
+    return true;
 }
 
 void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packet)
@@ -212,6 +227,7 @@ void EventsStorage::lookupTimePeriods(
                     m_deviceDao,
                     m_objectTypeDao,
                     m_timePeriodDao,
+                    m_analyticsArchiveDirectory.get(),
                     m_maxRecordedTimestamp);
                 return timePeriodFetcher.selectTimePeriods(
                     queryContext, filter, options, result.get());
@@ -432,7 +448,8 @@ DetectionDataSaver EventsStorage::takeDataToSave(
         &m_attributesDao,
         &m_deviceDao,
         &m_objectTypeDao,
-        &m_objectCache);
+        &m_objectCache,
+        m_analyticsArchiveDirectory.get());
 
     detectionDataSaver.load(&m_trackAggregator, flushData);
 
