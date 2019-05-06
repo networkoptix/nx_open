@@ -57,12 +57,6 @@ class Camera:
     using base_type = QnVirtualCameraResource;
 public:
     static const float kMaxEps;
-    inline static const QString kDefaultPrimaryStreamMulticastAddress{"239.0.0.10"};
-    inline static const QString kDefaultSecondaryStreamMulticastAddress{"239.0.0.11"};
-    static constexpr int kDefaultPrimaryStreamMulticastPort{2048};
-    static constexpr int kDefaultSecondaryStreamMulticastPort{2050};
-    static constexpr int kDefaultMulticastTtl{1};
-
 
     Camera(QnMediaServerModule* serverModule);
     virtual ~Camera() override;

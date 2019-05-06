@@ -41,7 +41,9 @@ common::metadata::ConstDetectionMetadataPacketPtr Cursor::next()
 
 void Cursor::close()
 {
-    // TODO
+    QnMutexLocker lock(&m_mutex);
+    m_sqlCursor.reset();
+    m_eof = true;
 }
 
 std::tuple<const DetectedObject*, std::size_t /*track position*/> Cursor::readNextTrackPosition()
@@ -58,21 +60,24 @@ std::tuple<const DetectedObject*, std::size_t /*track position*/> Cursor::readNe
 
 void Cursor::loadObjectsIfNecessary()
 {
-    if (m_eof)
-        return;
-
-    if (m_currentObjects.empty())
-        loadNextObject();
-
     // Always storing the next detected object in advance.
     // I.e., the one that has track_start_time larger than the current track position.
 
-    while (!m_eof && nextTrackPositionTimestamp() >= maxObjectTrackStartTimestamp())
+    while (!m_eof &&
+        (m_currentObjects.empty() ||
+            nextTrackPositionTimestamp() >= maxObjectTrackStartTimestamp()))
+    {
         loadNextObject();
+    }
 }
 
 void Cursor::loadNextObject()
 {
+    QnMutexLocker lock(&m_mutex);
+
+    if (m_eof)
+        return;
+
     auto object = m_sqlCursor->next();
     if (!object)
     {

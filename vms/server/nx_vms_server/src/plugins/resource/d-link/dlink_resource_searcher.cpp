@@ -86,7 +86,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             continue;
 
         // Sending broadcast.
-        constexpr qint16 kPort = 62976;
+        constexpr qint16 kPort = qint16(62976);
         for (int r = 0; r < CL_BROAD_CAST_RETRY; ++r)
         {
             sock->sendTo(barequest.data(), barequest.size(), nx::network::BROADCAST_ADDRESS, kPort);
