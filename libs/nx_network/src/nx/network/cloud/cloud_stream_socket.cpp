@@ -37,7 +37,7 @@ aio::AbstractAioThread* CloudStreamSocket::getAioThread() const
 
 void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    BaseType::bindToAioThread(aioThread);
+    base_type::bindToAioThread(aioThread);
 
     m_aioThreadBinder.bindToAioThread(aioThread);
     if (m_socketDelegate)
@@ -125,6 +125,11 @@ AbstractSocket::SOCKET_HANDLE CloudStreamSocket::handle() const
 
     SystemError::setLastErrorCode(SystemError::notSupported);
     return -1;
+}
+
+nx::network::Pollable* CloudStreamSocket::pollable()
+{
+    return m_socketDelegate ? m_socketDelegate->pollable() : nullptr;
 }
 
 bool CloudStreamSocket::connect(

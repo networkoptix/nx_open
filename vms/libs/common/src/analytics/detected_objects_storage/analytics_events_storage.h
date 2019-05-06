@@ -17,7 +17,7 @@
 #include <analytics/common/object_detection_metadata.h>
 #include <recording/time_period_list.h>
 
-#include "analytics_events_storage_cursor.h"
+#include "abstract_cursor.h"
 #include "analytics_events_storage_db_controller.h"
 #include "analytics_events_storage_settings.h"
 #include "analytics_events_storage_types.h"
@@ -46,7 +46,7 @@ using TimePeriodsLookupCompletionHandler =
 using CreateCursorCompletionHandler =
     nx::utils::MoveOnlyFunc<void(
         ResultCode /*resultCode*/,
-        std::unique_ptr<AbstractCursor> /*cursor*/)>;
+        std::shared_ptr<AbstractCursor> /*cursor*/)>;
 
 /**
  * NOTE: Every method of this class is asynchronous if other not specified.
@@ -61,7 +61,7 @@ public:
     /**
      * Initializes internal database. MUST be called just after object instantiation.
      */
-    virtual bool initialize() = 0;
+    virtual bool initialize(const Settings& settings) = 0;
 
     /**
      * Packet is saved asynchronously.
@@ -76,6 +76,11 @@ public:
     virtual void createLookupCursor(
         Filter filter,
         CreateCursorCompletionHandler completionHandler) = 0;
+
+    /**
+     * Close created cursor.
+     */
+    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& cursor) = 0;
 
     /**
      * Selects all objects with non-empty track that satisfy to the filter.
@@ -115,16 +120,18 @@ class EventsStorage:
     public AbstractEventsStorage
 {
 public:
-    EventsStorage(const Settings& settings);
+    EventsStorage();
     virtual ~EventsStorage();
 
-    virtual bool initialize() override;
+    virtual bool initialize(const Settings& settings) override;
 
     virtual void save(common::metadata::ConstDetectionMetadataPacketPtr packet) override;
 
     virtual void createLookupCursor(
         Filter filter,
         CreateCursorCompletionHandler completionHandler) override;
+
+    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& cursor) override;
 
     virtual void lookup(
         Filter filter,
@@ -142,8 +149,11 @@ public:
     virtual void flush(StoreCompletionHandler completionHandler) override;
 
 private:
-    const Settings& m_settings;
-    DbController m_dbController;
+    std::shared_ptr<DbController> m_dbController;
+    std::list<std::shared_ptr<AbstractCursor>> m_openedCursors;
+    QnMutex m_dbControllerMutex;
+    QnMutex m_cursorsMutex;
+    std::atomic<bool> m_closingDbController {false};
     std::chrono::milliseconds m_maxRecordedTimestamp = std::chrono::milliseconds::zero();
     mutable QnMutex m_mutex;
     AttributesDao m_attributesDao;
@@ -197,14 +207,6 @@ private:
         const Filter& filter,
         QString* eventsFilteredByFreeTextSubQuery);
 
-    void addObjectTypeIdToFilter(
-        const std::vector<QString>& objectTypeIds,
-        nx::sql::Filter* sqlFilter);
-
-    void addBoundingBoxToFilter(
-        const QRectF& boundingBox,
-        nx::sql::Filter* sqlFilter);
-
     void loadObjects(
         nx::sql::SqlQuery& selectEventsQuery,
         const Filter& filter,
@@ -219,6 +221,11 @@ private:
     void queryTrackInfo(
         nx::sql::QueryContext* queryContext,
         std::vector<DetectedObject>* result);
+
+    void reportCreateCursorCompletion(
+        sql::DBResult resultCode,
+        QnUuid dbCursorId,
+        CreateCursorCompletionHandler completionHandler);
 
     nx::sql::DBResult selectTimePeriods(
         nx::sql::QueryContext* queryContext,
@@ -243,6 +250,10 @@ private:
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 
+    void scheduleDataCleanup(
+        QnUuid deviceId,
+        std::chrono::milliseconds oldestDataToKeepTimestamp);
+
     nx::sql::DBResult cleanupData(
         nx::sql::QueryContext* queryContext,
         const QnUuid& deviceId,
@@ -255,16 +266,21 @@ private:
 
     void cleanupEventProperties(nx::sql::QueryContext* queryContext);
 
+    void logCleanupResult(
+        sql::DBResult resultCode,
+        const QnUuid& deviceId,
+        std::chrono::milliseconds oldestDataToKeepTimestamp);
+
     void logDataSaveResult(sql::DBResult resultCode);
 
-    static int packCoordinate(double);
-    static double unpackCoordinate(int);
+    static QRect packRect(const QRectF& rectf);
+    static QRectF unpackRect(const QRect& rect);
 };
 
 //-------------------------------------------------------------------------------------------------
 
 using EventsStorageFactoryFunction =
-    std::unique_ptr<AbstractEventsStorage>(const Settings&);
+    std::unique_ptr<AbstractEventsStorage>();
 
 class EventsStorageFactory:
     public nx::utils::BasicFactory<EventsStorageFactoryFunction>
@@ -277,7 +293,7 @@ public:
     static EventsStorageFactory& instance();
 
 private:
-    std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction(const Settings&);
+    std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction();
 };
 
 } // namespace nx::analytics::storage

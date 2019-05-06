@@ -94,8 +94,9 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
     auto query = queryContext->connection()->createQuery();
     query->prepare(R"sql(
         INSERT INTO object (device_id, object_type_id, guid,
-            track_start_ms, track_end_ms, track_detail, attributes_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+            track_start_ms, track_end_ms, track_detail, attributes_id,
+            best_shot_timestamp_ms, best_shot_rect)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     )sql");
 
     for (const auto& object: m_objectsToInsert)
@@ -114,11 +115,18 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         query->bindValue(4, trackMaxTimestamp / kUsecInMs);
         query->bindValue(5, TrackSerializer::serialized(object.track));
         query->bindValue(6, attributesId);
+        query->bindValue(7, object.bestShot.initialized()
+            ? object.bestShot.timestampUsec / kUsecInMs
+            : 0);
+        query->bindValue(8, object.bestShot.initialized()
+            ? TrackSerializer::serialized(object.bestShot.rect)
+            : QByteArray());
 
         query->exec();
 
         const auto objectDbId = query->lastInsertId().toLongLong();
         m_objectGuidToId[object.objectAppearanceId] = objectDbId;
+        m_objectCache->setObjectIdInDb(object.objectAppearanceId, objectDbId);
 
         m_objectCache->saveObjectGuidToAttributesId(
             object.objectAppearanceId, attributesId);
@@ -148,7 +156,7 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
     auto updateObjectQuery = queryContext->connection()->createQuery();
     updateObjectQuery->prepare(R"sql(
         UPDATE object
-        SET track_detail = track_detail || ?,
+        SET track_detail = CAST(track_detail || CAST(? AS BLOB) AS BLOB),
             attributes_id = ?,
             track_start_ms = min(track_start_ms, ?),
             track_end_ms = max(track_end_ms, ?)
@@ -167,7 +175,9 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         updateObjectQuery->bindValue(1, newAttributesId);
         updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
         updateObjectQuery->bindValue(3, trackMaxTimestamp / kUsecInMs);
-        updateObjectQuery->bindValue(4, objectUpdate.dbId);
+        updateObjectQuery->bindValue(4, objectUpdate.dbId != -1
+            ? objectUpdate.dbId
+            : m_objectCache->dbIdFromObjectId(objectUpdate.objectId));
         updateObjectQuery->exec();
 
         m_objectCache->saveObjectGuidToAttributesId(objectUpdate.objectId, newAttributesId);
@@ -181,14 +191,13 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
     auto insertObjectSearchCell = queryContext->connection()->createQuery();
     insertObjectSearchCell->prepare(R"sql(
         INSERT INTO object_search(timestamp_seconds_utc,
-            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y,
-            object_id_list)
-        VALUES (?, ?, ?, ?, ?, ?)
+            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
+        VALUES (?, ?, ?, ?, ?)
     )sql");
 
     auto insertObjectSearchToAttributesBinding = queryContext->connection()->createQuery();
     insertObjectSearchToAttributesBinding->prepare(R"sql(
-        INSERT OR IGNORE INTO unique_attributes_to_object_search(attributes_id, object_search_id)
+        INSERT OR IGNORE INTO object_search_to_object(object_search_id, object_id)
         VALUES (?, ?)
     )sql");
 
@@ -202,18 +211,15 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
         insertObjectSearchCell->bindValue(3, objectSearchGridCell.boundingBox.bottomRight().x());
         insertObjectSearchCell->bindValue(4, objectSearchGridCell.boundingBox.bottomRight().y());
 
-        insertObjectSearchCell->bindValue(5,
-            compact_int::serialized(toDbIds(objectSearchGridCell.objectIds)));
-
         insertObjectSearchCell->exec();
         const auto objectSearchCellId = insertObjectSearchCell->lastInsertId().toLongLong();
 
         for (const auto& objectId: objectSearchGridCell.objectIds)
         {
-            const auto attributesId = m_objectCache->getAttributesIdByObjectGuid(objectId);
+            const auto objectDbId = m_objectCache->dbIdFromObjectId(objectId);
 
-            insertObjectSearchToAttributesBinding->bindValue(0, attributesId);
-            insertObjectSearchToAttributesBinding->bindValue(1, objectSearchCellId);
+            insertObjectSearchToAttributesBinding->bindValue(0, objectSearchCellId);
+            insertObjectSearchToAttributesBinding->bindValue(1, objectDbId);
             insertObjectSearchToAttributesBinding->exec();
         }
     }

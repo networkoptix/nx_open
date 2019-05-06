@@ -3721,6 +3721,8 @@ int QnNxStyle::styleHint(
             return QDialogButtonBox::KdeLayout;
         case SH_ScrollBar_ContextMenu:
             return 0;
+        case SH_LineEdit_PasswordCharacter:
+            return 0x25cf;
         default:
             break;
     }

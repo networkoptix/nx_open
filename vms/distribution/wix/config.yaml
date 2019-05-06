@@ -19,7 +19,7 @@ client_qml_dir: '${client_qml_dir}'
 nxtool_qml_dir: '${nxtool_qml_dir}'
 help_directory: '${help_directory}'
 festival_vox_directory: '${festival_vox_directory}'
-fonts_directory: '${fonts_directory}'
+fonts_directory: '${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/fonts'
 client_update_files_directory: '${client_update_files_directory}'
 server_update_files_directory: '${server_update_files_directory}'
 

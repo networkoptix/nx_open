@@ -3174,6 +3174,14 @@ to %1</source>
       <source>Folder already added</source>
       <translation>資料夾已新增</translation>
     </message>
+    <message>
+      <source>None</source>
+      <translation>無</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
+    </message>
   </context>
   <context>
     <name>QnGeneralSystemAdministrationWidget</name>
@@ -5821,14 +5829,6 @@ to %1</source>
   <context>
     <name>QnSystemSettingsWidget</name>
     <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>啟用裝置與伺服器自動搜尋</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>啟用攝影機與伺服器自動搜尋</translation>
-    </message>
-    <message>
       <source>Allow System to optimize device settings</source>
       <translation>允許系統優化裝置設定</translation>
     </message>
@@ -5843,6 +5843,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>不包含任何個人資訊, 並且完全匿名</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -6987,6 +7003,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7189,6 +7216,14 @@ to %1</source>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>顯示</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7337,10 +7372,6 @@ to %1</source>
       <translation>原生</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>伺服器不更動任何攝影機串流設定, 將直接使用攝影機所提供之串流並保留串流原始設定 </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>有助於修正一些攝影機的圖像質量問題; 但對於其他攝影機會導致明顯增加的位元速率。</translation>
     </message>
@@ -7363,6 +7394,14 @@ to %1</source>
       <translation>
         <numerusform>此ID已被以下 %n 支攝影機使用:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>UDP Multicast</source>
+      <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>伺服器不更動任何攝影機串流設定, 將直接使用攝影機所提供之串流並保留串流原始設定。</translation>
     </message>
   </context>
   <context>
@@ -7791,14 +7830,6 @@ to %1</source>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
       <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
@@ -8404,10 +8435,6 @@ to %1</source>
       <translation>取消更新</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>更新套件無法下載至所有伺服器</translation>
-    </message>
-    <message>
       <source>Please make sure they have enough free storage space and stable network connection.</source>
       <translation>請確認磁碟剩餘空間足夠並保持網路連線穩定</translation>
     </message>
@@ -8561,6 +8588,10 @@ to %1</source>
       <source>Cancel update and delete all downloaded data?</source>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8585,6 +8616,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>確認</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>通用事件</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Event</source>
+      <translation type="unfinished">Unknown Plugin Event</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8604,10 +8655,6 @@ to %1</source>
       <translation>所有使用者對所選佈局均不具有存取權限。佈局操作將無法正常執行。</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>本地佈局僅對其所有者顯示。 </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>選擇佈局</translation>
     </message>
@@ -8622,6 +8669,45 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
     </message>
   </context>
   <context>
@@ -8765,16 +8851,16 @@ to %1</source>
       <translation>追蹤和記錄所有使用者操作</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>分</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>小時</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
     </message>
   </context>
   <context>
@@ -8795,13 +8881,13 @@ to %1</source>
       <source>Downloaded</source>
       <translation>已下載</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>目前版本</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>狀態</translation>
@@ -8821,6 +8907,10 @@ to %1</source>
     <message>
       <source>Component</source>
       <translation type="unfinished">Component</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
     </message>
   </context>
   <context>
@@ -9114,6 +9204,26 @@ to %1</source>
     <message>
       <source>Starting export...</source>
       <translation type="unfinished">Starting export...</translation>
+    </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
     </message>
   </context>
   <context>

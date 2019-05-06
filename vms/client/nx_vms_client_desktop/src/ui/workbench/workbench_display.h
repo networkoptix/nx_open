@@ -327,6 +327,8 @@ signals:
     void resourceAdded(const QnResourcePtr &resource);
     void resourceAboutToBeRemoved(const QnResourcePtr &resource);
 
+    void layoutAccessChanged();
+
 protected:
     WidgetAnimator *animator(QnResourceWidget *widget);
 

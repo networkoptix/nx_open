@@ -154,10 +154,5 @@ void MSSettings::loadAnalyticEventsStorageSettings()
     m_roSettings->beginGroup("analyticEventsStorage");
     m_analyticEventsStorage.dbConnectionOptions.maxConnectionCount = 20; //< TODO: #ak
     m_analyticEventsStorage.load(settings);
-    if (m_analyticEventsStorage.dbConnectionOptions.dbName.isEmpty())
-    {
-        m_analyticEventsStorage.dbConnectionOptions.dbName =
-            nx::network::url::normalizePath(m_settings.dataDir() + "/object_detection.sqlite");
-    }
     m_roSettings->endGroup();
 }

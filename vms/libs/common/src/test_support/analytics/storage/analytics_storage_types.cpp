@@ -91,6 +91,28 @@ Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
     return filter;
 }
 
+static std::vector<common::metadata::Attribute> getUniqueAttributes(
+    std::vector<common::metadata::Attribute> attributes)
+{
+    std::vector<common::metadata::Attribute> result;
+    std::map<QString /*name*/, std::size_t /*position*/> uniqueAttributes;
+
+    for (std::size_t i = 0; i < attributes.size(); ++i)
+    {
+        if (uniqueAttributes.count(attributes.at(i).name) == 0)
+        {
+            result.push_back(attributes.at(i));
+            uniqueAttributes[attributes.at(i).name] = result.size() - 1;
+        }
+        else
+        {
+            result[uniqueAttributes[attributes.at(i).name]].value = attributes.at(i).value;
+        }
+    }
+
+    return result;
+}
+
 common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
     int eventCount,
     const AttributeDictionary* attributeDictionary)
@@ -119,6 +141,10 @@ common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
                     QString::fromUtf8(nx::utils::random::generateName(7)),
                     QString::fromUtf8(nx::utils::random::generateName(7))};
         }
+
+        detectedObject.labels = getUniqueAttributes(
+            std::exchange(detectedObject.labels, {}));
+
         packet->objects.push_back(std::move(detectedObject));
     }
 

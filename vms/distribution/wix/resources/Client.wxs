@@ -108,6 +108,7 @@
                 Directory="InstallDirRoot"
                 Source="$(var.CMAKE_BINARY_DIR)">
             <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
+            <Component><File Name="nx_log_viewer.html" KeyPath="yes"/></Component>
         </ComponentGroup>
 
         <!-- These libraries are used in TrayTool and not in MediaServer, so they are here. -->

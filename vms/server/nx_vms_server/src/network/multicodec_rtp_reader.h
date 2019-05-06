@@ -20,6 +20,8 @@
 #include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <nx/streaming/rtp/camera_time_helper.h>
 
+#include <nx/vms/server/network/multicast_address_registry.h>
+
 namespace nx::streaming::rtp  { class StreamParser; }
 
 class QnMulticodecRtpReader:
@@ -131,9 +133,9 @@ private:
         TrackInfo& track,
         int rtpChannel);
 
-    CameraDiagnostics::Result registerMulticastAddress(
+    CameraDiagnostics::Result registerMulticastAddressesIfNeeded();
+    CameraDiagnostics::Result registerAddressIfNeeded(
         const QnRtspIoDevice::AddressInfo& addressInfo);
-    void unregisterMulticastAddresses();
 
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
@@ -176,7 +178,8 @@ private:
 
     static nx::utils::Mutex s_defaultTransportMutex;
     static nx::vms::api::RtpTransportType s_defaultTransportToUse;
-    std::set<nx::network::SocketAddress> m_registeredMulticastAddresses;
+    std::set<nx::vms::server::network::MulticastAddressRegistry::RegisteredAddressHolderPtr>
+        m_registeredMulticastAddresses;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

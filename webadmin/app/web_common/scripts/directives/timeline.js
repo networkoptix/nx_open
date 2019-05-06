@@ -220,6 +220,8 @@ angular.module('nxCommon')
                     } else {
                         if (!scope.emptyArchive) {
                             jumpToPosition(scope.positionProvider.playedPosition);
+                        } else {
+                            goToLive(true);
                         }
                         scope.playHandler(true);
                     }

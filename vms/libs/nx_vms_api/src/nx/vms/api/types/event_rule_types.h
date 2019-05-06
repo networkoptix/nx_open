@@ -41,6 +41,8 @@ enum class EventReason
     storageTooSlow = 7,
     storageFull = 8,
     systemStorageFull = 9,
+    metadataStorageOffline = 1010,
+    metadataStorageFull = 1011,
 
     // License Issue event
     licenseRemoved = 10,

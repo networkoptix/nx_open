@@ -7,9 +7,10 @@
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
-#include "utils/common/app_info.h"
+#include <nx/utils/app_info.h>
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
+#include <nx/vms/utils/installation_info.h>
 
 class IfconfigReply
 {
@@ -288,20 +289,23 @@ void QnIfConfigRestHandler::afterExecute(const QString& /*path*/,
     if (!m_modified)
         return;
 
-#ifndef Q_OS_WIN
-    if(QnAppInfo::isBpi() || QnAppInfo::isNx1())
+    if (nx::utils::AppInfo::isNx1()
+        || nx::vms::utils::installationInfo().hwPlatform ==
+            nx::vms::api::HwPlatform::bananaPi)
     {
-        //network restart on nx1 sometimes fails, so rebooting
-        if( system("/sbin/reboot") != 0 )
+        // Network restart on Nx1 sometimes fails, so rebooting.
+        if (system("/sbin/reboot") != 0)
             qWarning() << "Failed to reboot";
     }
-    else
+    else if (nx::utils::AppInfo::isLinux())
     {
+        // TODO: Fix: doesn't work in Ubuntu 18.04.
         if (system("/etc/init.d/networking restart") != 0)
             qWarning() << "Failed to restart networking service";
-        for(const auto& value: currentSettings)
+        for (const auto& value: currentSettings)
+        {
             if (system(lit("ifconfig %1 up").arg(value.name).toLatin1().data()) != 0)
                 qWarning() << "Failed to restart network interface " << value.name;
+        }
     }
-#endif
 }

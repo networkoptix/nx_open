@@ -1,5 +1,7 @@
 #include "camera.h"
 
+#include <camera/camera_pool.h>
+#include <camera/video_camera.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -18,6 +20,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <plugins/utils/multisensor_data_provider.h>
 #include <nx/vms/server/ptz/server_ptz_controller_pool.h>
+#include <nx/vms/server/resource/multicast_parameters.h>
 
 static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
 
@@ -465,6 +468,25 @@ void Camera::stopInputPortStatesMonitoring()
 {
 }
 
+void Camera::reopenStream(nx::vms::api::StreamIndex streamIndex)
+{
+    auto camera = serverModule()->videoCameraPool()->getVideoCamera(toSharedPointer(this));
+    if (!camera)
+        return;
+
+    QnLiveStreamProviderPtr reader;
+    if (streamIndex == nx::vms::api::StreamIndex::primary)
+        reader = camera->getPrimaryReader();
+    else if (streamIndex == nx::vms::api::StreamIndex::secondary)
+        reader = camera->getSecondaryReader();
+
+    if (reader && reader->isRunning())
+    {
+        NX_DEBUG(this, "Camera [%1], reopen reader: %2", getId(), streamIndex);
+        reader->pleaseReopenStream();
+    }
+}
+
 CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
 {
     m_streamCapabilityAdvancedProviders.clear();
@@ -758,6 +780,63 @@ QnTimePeriodList Camera::getDtsTimePeriods(
     Qt::SortOrder /*sortOrder*/)
 {
     return QnTimePeriodList();
+}
+
+/* static */
+bool Camera::fixMulticastParametersIfNeeded(
+    nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
+    nx::vms::api::StreamIndex streamIndex)
+{
+    static const QString kDefaultPrimaryStreamMulticastAddress{"239.0.0.10"};
+    static const QString kDefaultSecondaryStreamMulticastAddress{"239.0.0.11"};
+    static constexpr int kDefaultPrimaryStreamMulticastPort{2048};
+    static constexpr int kDefaultSecondaryStreamMulticastPort{2050};
+    static constexpr int kDefaultMulticastTtl{ 1 };
+
+    if (!NX_ASSERT(inOutMulticastParameters, "Multicast parameters must be non-null"))
+        return false;
+
+    bool somethingIsFixed = false;
+    auto& address = inOutMulticastParameters->address;
+    if (!address || !QHostAddress(QString::fromStdString(*address)).isMulticast())
+    {
+        const auto defaultAddress = streamIndex == nx::vms::api::StreamIndex::primary
+            ? kDefaultPrimaryStreamMulticastAddress
+            : kDefaultSecondaryStreamMulticastAddress;
+
+        NX_DEBUG(NX_SCOPE_TAG, "Fixing multicast streaming address for stream %1: %2 -> %3",
+            streamIndex, (address ? *address : ""), defaultAddress);
+
+        address = defaultAddress.toStdString();
+        somethingIsFixed = true;
+    }
+
+    auto& port = inOutMulticastParameters->port;
+    int portNumber = port ? *port : 0;
+    if (portNumber <= 1024 || portNumber > 65535)
+    {
+        const auto defaultPort = streamIndex == nx::vms::api::StreamIndex::primary
+            ? kDefaultPrimaryStreamMulticastPort
+            : kDefaultSecondaryStreamMulticastPort;
+
+        NX_DEBUG(NX_SCOPE_TAG, "Fixing multicast port for stream %1: %2 -> %3",
+            streamIndex, portNumber, defaultPort);
+
+        port = defaultPort;
+        somethingIsFixed = true;
+    }
+
+    auto& ttl = inOutMulticastParameters->ttl;
+    if (!ttl || ttl <= 0)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Fixing multicast ttl for stream %1: %2 -> %3",
+            streamIndex, (ttl ? *ttl : 0), kDefaultMulticastTtl);
+
+        ttl = kDefaultMulticastTtl;
+        somethingIsFixed = true;
+    }
+
+    return somethingIsFixed;
 }
 
 } // namespace resource

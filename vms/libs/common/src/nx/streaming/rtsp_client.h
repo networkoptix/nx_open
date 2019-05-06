@@ -159,14 +159,6 @@ public:
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
     CameraDiagnostics::Result open(const nx::utils::Url& url, qint64 startTime = AV_NOPTS_VALUE);
 
-    /**
-     * TODO: #dmishin the two methods below are hacks to make multicodec RTP reader work properly
-     * with multicast streams. We need to refactor it.
-     */
-    bool playPhase1(); //< Sends SETUP if needed.
-
-    bool playPhase2(qint64 positionStart, qint64 positionEnd, double scale); //< Sends actual PLAY.
-
     /*
     * Start playing RTSP sessopn.
     * @param positionStart start position at mksec
@@ -189,6 +181,8 @@ public:
 
     const nx::streaming::Sdp& getSdp() const;
 
+    void setKeepAliveTimeout(std::chrono::milliseconds keepAliveTimeout);
+
     bool sendKeepAliveIfNeeded();
 
     void setTransport(nx::vms::api::RtpTransportType transport);
@@ -199,7 +193,7 @@ public:
     /* Actual session RTP transport. If user set 'automatic', it can be 'tcp' or 'udp',
      * otherwise it should be equal to result of getTransport().
      */
-    nx::vms::api::RtpTransportType getActualTransport() const { return m_prefferedTransport; }
+    nx::vms::api::RtpTransportType getActualTransport() const { return m_actualTransport; }
 
     const std::vector<SDPTrackInfo>& getTrackInfo() const;
     QString getTrackCodec(int rtpChannelNum);
@@ -211,6 +205,7 @@ public:
     float getScale() const;
     void setScale(float value);
 
+    bool sendSetup();
     bool sendPlay(qint64 startPos, qint64 endPos, double scale);
     bool sendPause();
     bool sendSetParameter(const QByteArray& paramName, const QByteArray& paramValue);
@@ -285,8 +280,8 @@ private:
     nx::network::http::Request createDescribeRequest();
     bool sendDescribe();
     bool sendOptions();
-    bool sendSetup();
     bool sendKeepAlive();
+    bool sendSetupIfNotPlaying();
 
     bool readTextResponce(QByteArray &responce);
     void addAuth( nx::network::http::Request* const request );
@@ -325,7 +320,7 @@ private:
     nx::network::rtsp::StatusCodeValue m_responseCode;
     bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;
-    unsigned int m_TimeOut;
+    std::chrono::milliseconds m_keepAliveTimeOut{0};
     bool m_playNowMode = false;
     // end of initialized fields
 
@@ -346,7 +341,7 @@ private:
     QAuthenticator m_auth;
     boost::optional<nx::network::SocketAddress> m_proxyAddress;
     QString m_contentBase;
-    nx::vms::api::RtpTransportType m_prefferedTransport;
+    nx::vms::api::RtpTransportType m_actualTransport;
 
     static QByteArray m_guid; // client guid. used in proprietary extension
     static QnMutex m_guidMutex;

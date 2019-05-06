@@ -3,18 +3,29 @@
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
 #include <nx/sql/query_context.h>
+#include <nx/sql/sql_cursor.h>
 
+#include "abstract_cursor.h"
 #include "analytics_events_storage_types.h"
 #include "device_dao.h"
 #include "object_type_dao.h"
 
 namespace nx::analytics::storage {
 
-struct FieldNames
+struct TimeRangeFields
 {
-    const char* objectId;
     const char* timeRangeStart;
     const char* timeRangeEnd;
+
+    TimeRangeFields() = delete;
+};
+
+struct ObjectFields
+{
+    const char* objectId;
+    TimeRangeFields timeRange;
+
+    ObjectFields() = delete;
 };
 
 class ObjectSearcher
@@ -22,46 +33,55 @@ class ObjectSearcher
 public:
     ObjectSearcher(
         const DeviceDao& deviceDao,
-        const ObjectTypeDao& objectTypeDao);
+        const ObjectTypeDao& objectTypeDao,
+        Filter filter);
 
     /**
      * Throws on failure.
      */
-    std::vector<DetectedObject> lookup(
-        nx::sql::QueryContext* queryContext,
-        const Filter& filter);
+    std::vector<DetectedObject> lookup(nx::sql::QueryContext* queryContext);
+
+    void prepareCursorQuery(nx::sql::SqlQuery* query);
+
+    void loadCurrentRecord(nx::sql::SqlQuery*, DetectedObject*);
+
+    static std::unique_ptr<AbstractCursor> createCursor(
+        std::unique_ptr<nx::sql::Cursor<DetectedObject>> sqlCursor);
 
     static void addObjectFilterConditions(
         const Filter& filter,
         const DeviceDao& deviceDao,
         const ObjectTypeDao& objectTypeDao,
-        const FieldNames& fieldNames,
+        const ObjectFields& fieldNames,
         nx::sql::Filter* sqlFilter);
 
+    static void addBoundingBoxToFilter(
+        const QRect& boundingBox,
+        nx::sql::Filter* sqlFilter);
+
+    /**
+     * @param FieldType. One of std::chrono::duration types.
+     */
+    template<typename FieldType>
     static void addTimePeriodToFilter(
         const QnTimePeriod& timePeriod,
-        nx::sql::Filter* sqlFilter,
-        const char* leftBoundaryFieldName,
-        const char* rightBoundaryFieldName,
-        std::optional<std::chrono::milliseconds> maxRecordedTimestamp = std::nullopt);
+        const TimeRangeFields& timeRangeFields,
+        nx::sql::Filter* sqlFilter);
 
 private:
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
+    Filter m_filter;
 
-    void prepareLookupQuery(
-        const Filter& filter,
-        nx::sql::AbstractSqlQuery* query);
+    void prepareLookupQuery(nx::sql::AbstractSqlQuery* query);
 
-    nx::sql::Filter prepareSqlFilterExpression(const Filter& filter);
+    std::tuple<QString /*query text*/, nx::sql::Filter> prepareBoxFilterSubQuery();
 
-    std::vector<DetectedObject> loadObjects(
-        nx::sql::AbstractSqlQuery* query,
-        const Filter& filter);
+    nx::sql::Filter prepareFilterObjectSqlExpression();
 
-    DetectedObject loadObject(
-        nx::sql::AbstractSqlQuery* query,
-        const Filter& filter);
+    std::vector<DetectedObject> loadObjects(nx::sql::AbstractSqlQuery* query);
+    DetectedObject loadObject(nx::sql::AbstractSqlQuery* query);
+    void filterTrack(std::vector<ObjectPosition>* const track);
 
     static void addObjectTypeIdToFilter(
         const std::vector<QString>& objectTypes,

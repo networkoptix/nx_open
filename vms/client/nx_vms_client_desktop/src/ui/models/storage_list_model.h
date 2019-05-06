@@ -32,10 +32,16 @@ public:
         TypeColumn,
         StoragePoolColumn,
         TotalSpaceColumn,
-        RemoveActionColumn,
+        ActionsColumn,
         CheckBoxColumn,
 
         ColumnCount
+    };
+
+    enum MetadataAction
+    {
+        KeepExistingMetadata,
+        DeleteExistingMetadata
     };
 
     QnStorageListModel(QObject* parent = nullptr);
@@ -48,6 +54,11 @@ public:
 
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr& server);
+
+    QnUuid metadataStorageId() const;
+    void setMetadataStorageId(const QnUuid &id, MetadataAction action = KeepExistingMetadata);
+
+    bool keepMetadata() const;
 
     QnStorageModelInfo storage(const QModelIndex& index) const;
     QnStorageModelInfoList storages() const;
@@ -95,6 +106,8 @@ private:
     QnStorageModelInfoList m_storages;
     QSet<QnUuid> m_checkedStorages;
     std::array<QnStorageScanData, static_cast<int>(QnServerStoragesPool::Count)> m_rebuildStatus;
+    QnUuid m_metadataStorageId;
+    bool m_keepMetadata;
 
     bool m_readOnly;
     QBrush m_linkBrush;

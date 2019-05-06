@@ -4,6 +4,8 @@
 
 #include <core/resource/resource.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx {
 namespace vms {
 namespace event {

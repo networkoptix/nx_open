@@ -227,8 +227,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_context.reset(new UniquePtrContext());
 
     m_analyticsEventsStorage =
-        nx::analytics::storage::EventsStorageFactory::instance()
-            .create(m_settings->analyticEventsStorage());
+        nx::analytics::storage::EventsStorageFactory::instance().create();
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
@@ -252,13 +251,11 @@ QnMediaServerModule::QnMediaServerModule(
         isRootToolEnabled,
         qApp->applicationFilePath());
 
-    #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-        if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
-        {
-            m_settings->mutableSettings()->setBootedFromSdCard(
-                Nx1::isBootedFromSD(m_rootFileSystem.get()));
-        }
-    #endif
+    if (QnAppInfo::isNx1())
+    {
+        m_settings->mutableSettings()->setBootedFromSdCard(
+            Nx1::isBootedFromSD(m_rootFileSystem.get()));
+    }
 
     m_fileDeletor = store(new QnFileDeletor(this));
 
@@ -321,10 +318,7 @@ QnMediaServerModule::QnMediaServerModule(
 void QnMediaServerModule::initializeP2PDownloader()
 {
     m_p2pDownloader = store(new nx::vms::common::p2p::downloader::Downloader(
-        downloadsDirectory(),
-        commonModule(),
-        nullptr,
-        this));
+        downloadsDirectory(), commonModule(), {}, this));
 }
 
 QDir QnMediaServerModule::downloadsDirectory() const

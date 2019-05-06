@@ -109,7 +109,7 @@
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+      <translation>Systemy w chmurze mają różnych właścicieli. Złączenie nie jest możliwe.</translation>
     </message>
   </context>
   <context>
@@ -1659,7 +1659,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>Wystąpiło wiele zdarzeń %1</translation>
     </message>
   </context>
   <context>

@@ -285,7 +285,7 @@ inline bool equalWithPrecision(const QSizeF& one, const QSizeF& two, int precisi
 
 inline bool equalWithPrecision(const QRectF& one, const QRectF& two, int precision) {
     return equalWithPrecision(one.topLeft(), two.topLeft(), precision)
-        && equalWithPrecision(one.size(), two.size(), precision);
+        && equalWithPrecision(one.bottomRight(), two.bottomRight(), precision);
 }
 
 #endif // QN_MATH_H

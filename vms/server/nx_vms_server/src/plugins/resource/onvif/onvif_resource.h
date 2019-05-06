@@ -270,9 +270,6 @@ public:
     void setVideoSourceToken(std::string token);
 
     std::string videoEncoderConfigurationToken(nx::vms::api::StreamIndex streamIndex) const;
-    void setVideoEncoderConfigurationToken(
-        nx::vms::api::StreamIndex streamIndex,
-        std::string token);
 
     std::string audioSourceConfigurationToken() const;
     void setAudioSourceConfigurationToken(std::string token);
@@ -379,6 +376,8 @@ public:
         const QnLiveStreamParams& streamParams);
 
     SoapTimeouts onvifTimeouts() const;
+
+    CameraDiagnostics::Result ensureMulticastIsEnabled(nx::vms::api::StreamIndex streamIndex);
 
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
@@ -604,8 +603,6 @@ private:
     std::string m_audioOutputConfigurationToken;
     std::string m_ptzConfigurationToken;
     std::string m_ptzProfileToken;
-
-    std::map<nx::vms::api::StreamIndex, std::string> m_videoEncoderConfigurationTokens;
 
     QString m_imagingUrl;
     QString m_ptzUrl;

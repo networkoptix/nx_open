@@ -126,7 +126,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidChunk)
     nx::utils::promise<bool> readyPromise;
     auto readyFuture = readyPromise.get_future();
 
-    peerManager->downloadChunk(peer, fileInformation.name, 2,
+    peerManager->downloadChunk(peer, fileInformation.name, nx::utils::Url(), 2, 0,
         [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
         {
             readyPromise.set_value(success && !data.isEmpty());
@@ -175,7 +175,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     auto downloadFuture = downloadPromise.get_future();
     QByteArray chunkData;
 
-    peerManager->downloadChunk(peer, fileName, 0,
+    peerManager->downloadChunk(peer, fileName, nx::utils::Url(), 0, 0,
         [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
         {
             chunkData = data;
@@ -212,13 +212,14 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, internetFile)
 
     const auto peerId = peerManager->addPeer();
     peerManager->setHasInternetConnection(peerId);
+    peerManager->setIndirectInternetRequestsAllowed(true);
 
     nx::utils::promise<bool> downloadPromise;
     auto downloadFuture = downloadPromise.get_future();
     QByteArray chunkData;
 
-    peerManager->downloadChunkFromInternet(peerId, fileName, url, 0, 1,
-    [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
+    peerManager->downloadChunk(peerId, fileName, url, 0, 1,
+        [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
         {
             chunkData = data;
             downloadPromise.set_value(success);
@@ -236,7 +237,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, calculateDistances)
     QString groupD("D");
 
     ProxyTestPeerManager testPeerManager(peerManager.data());
-    const auto& peerA = testPeerManager.selfId();
+    const auto& peerA = QnUuid();
     peerManager->setPeerGroups(peerA, { groupA });
     const auto& peerA2 = peerManager->addPeer();
     peerManager->setPeerGroups(peerA2, { groupA });

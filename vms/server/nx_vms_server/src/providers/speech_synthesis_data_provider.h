@@ -48,5 +48,5 @@ private:
     QString m_text;
     QnConstMediaContextPtr m_ctx;
     QByteArray m_rawBuffer;
-    size_t m_curPos;
+    int m_curPos;
 };

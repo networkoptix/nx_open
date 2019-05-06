@@ -1,14 +1,17 @@
 #include "filter.h"
 
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+
 #include <nx/utils/log/log_message.h>
 
 namespace nx::sql {
 
 SqlFilterField::SqlFilterField(
-    const char* name,
-    const char* placeHolderName,
+    const std::string& name,
+    const std::string& placeHolderName,
     QVariant value,
-    const char* comparisonOperator)
+    const std::string& comparisonOperator)
     :
     m_name(name),
     m_placeHolderName(placeHolderName),
@@ -27,15 +30,15 @@ std::string SqlFilterField::toString() const
 
 void SqlFilterField::bindFields(QSqlQuery* query) const
 {
-    query->bindValue(QLatin1String(m_placeHolderName), m_value);
+    query->bindValue(m_placeHolderName.c_str(), m_value);
 }
 
-const char* SqlFilterField::name() const
+const std::string& SqlFilterField::name() const
 {
     return m_name;
 }
 
-const char* SqlFilterField::placeHolderName() const
+const std::string& SqlFilterField::placeHolderName() const
 {
     return m_placeHolderName;
 }
@@ -43,8 +46,8 @@ const char* SqlFilterField::placeHolderName() const
 //-------------------------------------------------------------------------------------------------
 
 SqlFilterFieldEqual::SqlFilterFieldEqual(
-    const char* name,
-    const char* placeHolderName,
+    const std::string& name,
+    const std::string& placeHolderName,
     QVariant value)
     :
     SqlFilterField(name, placeHolderName, std::move(value), "=")
@@ -52,8 +55,8 @@ SqlFilterFieldEqual::SqlFilterFieldEqual(
 }
 
 SqlFilterFieldGreaterOrEqual::SqlFilterFieldGreaterOrEqual(
-    const char* name,
-    const char* placeHolderName,
+    const std::string& name,
+    const std::string& placeHolderName,
     QVariant value)
     :
     SqlFilterField(name, placeHolderName, std::move(value), ">=")
@@ -61,8 +64,8 @@ SqlFilterFieldGreaterOrEqual::SqlFilterFieldGreaterOrEqual(
 }
 
 SqlFilterFieldLess::SqlFilterFieldLess(
-    const char* name,
-    const char* placeHolderName,
+    const std::string& name,
+    const std::string& placeHolderName,
     QVariant value)
     :
     SqlFilterField(name, placeHolderName, std::move(value), "<")
@@ -70,8 +73,8 @@ SqlFilterFieldLess::SqlFilterFieldLess(
 }
 
 SqlFilterFieldLessOrEqual::SqlFilterFieldLessOrEqual(
-    const char* name,
-    const char* placeHolderName,
+    const std::string& name,
+    const std::string& placeHolderName,
     QVariant value)
     :
     SqlFilterField(name, placeHolderName, std::move(value), "<=")
@@ -81,8 +84,8 @@ SqlFilterFieldLessOrEqual::SqlFilterFieldLessOrEqual(
 //-------------------------------------------------------------------------------------------------
 
 SqlFilterFieldAnyOf::SqlFilterFieldAnyOf(
-    const char* name,
-    const char* placeHolderName)
+    const std::string& name,
+    const std::string& placeHolderName)
     :
     m_name(name),
     m_placeHolderName(placeHolderName)
@@ -149,15 +152,16 @@ void Filter::bindFields(AbstractSqlQuery* query) const
 
 std::string joinFields(
     const InnerJoinFilterFields& fields,
-    const QString& separator)
+    const std::string& separator)
 {
-    QStringList result;
+    std::vector<std::string> result;
+    result.reserve(fields.size());
     for (const auto& field: fields)
-    {
-        result.push_back(QLatin1String(field.name()) + '=' +
-            QLatin1String(field.placeHolderName()));
-    }
-    return result.join(separator).toStdString();
+        result.push_back(field.name() + '=' + field.placeHolderName());
+
+    return boost::join(
+        boost::make_iterator_range(result.begin(), result.end()),
+        separator);
 }
 
 void bindFields(QSqlQuery* query, const InnerJoinFilterFields& fields)

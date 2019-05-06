@@ -279,6 +279,7 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     const auto objectTypeDescriptors = objectTypeDescriptorManager.descriptors();
     const auto engineDescriptors = engineDescriptorManager.descriptors();
     m_objectTypeMenu->clear();
+    m_defaultAction = addMenuAction(m_objectTypeMenu, tr("Any type"), {});
 
     const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
     QSet<QnUuid> enabledEngines;
@@ -287,6 +288,8 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
 
     if (!objectTypeDescriptors.empty())
     {
+        m_objectTypeMenu->addSeparator();
+
         QHash<QnUuid, EngineInfo> engineById;
         for (const auto& [engineId, engineDescriptor]: engineDescriptors)
         {
@@ -342,9 +345,6 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
             }
         }
     }
-
-    m_objectTypeMenu->addSeparator();
-    m_defaultAction = addMenuAction(m_objectTypeMenu, tr("Any type"), {});
 
     if (!currentSelectionStillAvailable)
         m_model->setSelectedObjectType({});

@@ -188,6 +188,12 @@ void ObjectCache::updateObject(
             m_maxObjectLifetime);
     }
 
+    if (detectedObject.bestShot)
+    {
+        objectContext.object.bestShot.timestampUsec = packet.timestampUsec;
+        objectContext.object.bestShot.rect = detectedObject.boundingBox;
+    }
+
     objectContext.object.lastAppearanceTimeUsec = packet.timestampUsec;
 
     addNewAttributes(detectedObject.labels, &objectContext);

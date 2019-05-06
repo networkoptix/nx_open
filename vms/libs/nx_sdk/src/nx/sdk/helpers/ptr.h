@@ -99,15 +99,6 @@ public:
 
     operator bool() const { return m_ptr != nullptr; }
 
-    template<class OtherRefCountable>
-    Ptr<OtherRefCountable> dynamicCast() const
-    {
-        auto ptr = dynamic_cast<OtherRefCountable*>(m_ptr);
-        if (ptr)
-            m_ptr->addRef();
-        return Ptr<OtherRefCountable>(ptr);
-    }
-
 private:
     void addRef()
     {
@@ -181,24 +172,29 @@ static Ptr<RefCountable> makePtr(Args&&... args)
 
 /**
  * Calls queryInterface() and returns a smart pointer to its result, possibly null.
+ * @param refCountable Can be null, then null will be returned.
  */
 template</*explicit*/ class Interface, /*deduced*/ class RefCountablePtr>
 static Ptr<Interface> queryInterfacePtr(RefCountablePtr refCountable)
 {
-    return Ptr<Interface>(
-        static_cast<Interface*>(refCountable->queryInterface(Interface::interfaceId())));
+    return refCountable
+        ? Ptr<Interface>(
+            static_cast<Interface*>(refCountable->queryInterface(Interface::interfaceId())))
+        : nullptr;
 }
 
 /**
  * Calls queryInterface() from old SDK and returns a smart pointer to its result, possibly null.
+ * @param refCountable Can be null, then null will be returned.
  */
 template</*explicit*/ class Interface, /*deduced*/ class RefCountablePtr,
     /*deduced*/ typename InterfaceId>
 static Ptr<Interface> queryInterfacePtr(
     RefCountablePtr refCountable, const InterfaceId& interfaceId)
 {
-    return Ptr<Interface>(
-        static_cast<Interface*>(refCountable->queryInterface(interfaceId)));
+    return refCountable
+        ? Ptr<Interface>(static_cast<Interface*>(refCountable->queryInterface(interfaceId)))
+        : nullptr;
 }
 
 /**

@@ -9,7 +9,7 @@
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
 
-static const size_t kDefaultDataChunkSize = 2048;
+static const int kDefaultDataChunkSize = 2048;
 
 /*static*/ bool QnSpeechSynthesisDataProvider::isEnabled()
 {
@@ -69,7 +69,7 @@ QnConstMediaContextPtr QnSpeechSynthesisDataProvider::initializeAudioContext(
 
 QnAbstractMediaDataPtr QnSpeechSynthesisDataProvider::getNextData()
 {
-    if ((int) m_curPos >= m_rawBuffer.size())
+    if (m_curPos >= m_rawBuffer.size())
         return QnAbstractMediaDataPtr();
 
     QnWritableCompressedAudioDataPtr packet(
@@ -78,7 +78,7 @@ QnAbstractMediaDataPtr QnSpeechSynthesisDataProvider::getNextData()
             kDefaultDataChunkSize,
             m_ctx));
 
-    const size_t bytesRest = m_rawBuffer.size() - m_curPos;
+    const int bytesRest = m_rawBuffer.size() - m_curPos;
     packet->m_data.write(
         m_rawBuffer.constData() + m_curPos,
         (bytesRest < kDefaultDataChunkSize) ? bytesRest : kDefaultDataChunkSize);

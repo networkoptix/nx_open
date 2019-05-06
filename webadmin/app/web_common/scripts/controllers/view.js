@@ -223,10 +223,10 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $scope.positionProvider.init(playingPosition, $scope.positionProvider.playing);
             
-            if(live){
-                playingPosition = window.timeManager.nowToDisplay();
+            if (live) {
+                playingPosition = window.timeManager.nowToServer();
             } else {
-                playingPosition = Math.round(playingPosition);
+                playingPosition = Math.round(window.timeManager.displayToServer(playingPosition));
             }
 
             // Fix here!
@@ -341,15 +341,16 @@ angular.module('nxCommon').controller('ViewCtrl',
                 }
                 if ($scope.positionProvider) {
                     $scope.positionProvider.playing = play;
-
-                    if(!play){
-                        $timeout(function(){
-                            $scope.positionProvider.liveMode = $scope.positionProvider.isArchiveEmpty(); // Do it async
-                        });
-                    }
                 }
             }
         };
+    
+        var self = $scope;
+        $scope.$watch('positionProvider.isReady', function (ready) {
+            if (ready && !self.positionProvider.playing) {
+                self.positionProvider.liveMode = self.positionProvider.isArchiveEmpty();
+            }
+        });
 
         $scope.switchPosition = function( val ){
 
@@ -502,9 +503,13 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
         }
     
-        $scope.$watch('camerasProvider.cameras', function () {
+        $scope.$watch('camerasProvider.cameras', function() {
             if (!$scope.activeCamera && Object.keys($scope.camerasProvider.cameras).length !== 0) {
-                $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
+                if ($scope.storage.cameraId) {
+                    $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+                } else {
+                    $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
+                }
             }
         }, true);
         

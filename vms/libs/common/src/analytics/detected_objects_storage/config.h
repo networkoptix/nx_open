@@ -9,7 +9,7 @@ namespace nx::analytics::storage {
 /**
  * Enables META-225.
  */
-static constexpr bool kUseTrackAggregation = false;
+static constexpr bool kUseTrackAggregation = true;
 
 // Using 14 bits for coordinates. That allows using only 2 bytes when compressing the value.
 static constexpr int kCoordinatesBits = 14;
@@ -35,5 +35,10 @@ static constexpr int kMaxFilterEventsResultSize =
 static constexpr auto kMinTimePeriodAggregationPeriod = std::chrono::seconds(3);
 
 static constexpr int kUsecInMs = 1000;
+
+static constexpr auto kTrackAggregationPeriod = std::chrono::seconds(5);
+static constexpr auto kMaxCachedObjectLifeTime = std::chrono::minutes(1);
+static constexpr auto kTrackSearchResolutionX = 44;
+static constexpr auto kTrackSearchResolutionY = 32;
 
 } // namespace nx::analytics::storage

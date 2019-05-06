@@ -83,4 +83,9 @@ std::set<EventTypeId> supportedEventTypeIdsFromManifest(
 std::set<EventTypeId> supportedObjectTypeIdsFromManifest(
     const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
+/*
+ * Return true if at least one analytics engine with objects detection is activated for server.
+ */
+bool hasActiveObjectEngines(QnCommonModule* commonModule, const QnUuid& serverId);
+
 } // namespace nx::analytics

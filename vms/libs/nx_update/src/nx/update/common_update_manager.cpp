@@ -170,21 +170,6 @@ bool CommonUpdateManager::canDownloadFile(
     auto fileInformation = downloader()->fileInformation(package.file);
     const auto peerId = commonModule()->moduleGUID();
 
-    const double requiredSpace = package.size * 2 * 1.2;
-    const int64_t deviceFreeSpace = freeSpace(installer()->dataDirectoryPath());
-    if (deviceFreeSpace < requiredSpace)
-    {
-        NX_WARNING(
-            this,
-            "Can't start downloading an update package because lack of free space on disk. " \
-            "Required: %1 Mb, free Space: %2 Mb",
-            static_cast<double>(requiredSpace) / (1024 * 1024),
-            static_cast<double>(deviceFreeSpace) / (1024 * 1024));
-        *outUpdateStatus = nx::update::Status(
-            peerId, update::Status::Code::error, "Not enough free space for keeping update files");
-        return false;
-    }
-
     switch (m_downloaderFailDetail)
     {
         case DownloaderFailDetail::noError:
@@ -243,6 +228,21 @@ bool CommonUpdateManager::canDownloadFile(
                 "Update file is corrupted");
             return true;
         }
+    }
+
+    const double requiredSpace = package.size * 2 * 1.2;
+    const int64_t deviceFreeSpace = freeSpace(installer()->dataDirectoryPath());
+    if (deviceFreeSpace < requiredSpace)
+    {
+        NX_WARNING(
+            this,
+            "Can't start downloading an update package because lack of free space on disk. " \
+            "Required: %1 Mb, free Space: %2 Mb",
+            static_cast<double>(requiredSpace) / (1024 * 1024),
+            static_cast<double>(deviceFreeSpace) / (1024 * 1024));
+        *outUpdateStatus = nx::update::Status(
+            peerId, update::Status::Code::error, "Not enough free space for keeping update files");
+        return false;
     }
 
     return true;
