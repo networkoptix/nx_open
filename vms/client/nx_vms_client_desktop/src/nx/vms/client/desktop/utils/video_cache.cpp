@@ -24,6 +24,17 @@ std::chrono::microseconds VideoCache::cacheSize() const
     return m_cacheSize;
 }
 
+void VideoCache::setCachedDevices(intptr_t consumerId, const QSet<QnUuid>& value)
+{
+    m_cachedDevices[consumerId] = value;
+    QSet<QnUuid> totalCachedDevices;
+
+    for (const auto& subset: m_cachedDevices)
+        totalCachedDevices += subset;
+
+    setCachedDevices(totalCachedDevices);
+}
+
 void VideoCache::setCachedDevices(const QSet<QnUuid>& value)
 {
     QnMutexLocker lock(&m_mutex);
