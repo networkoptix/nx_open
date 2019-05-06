@@ -1,6 +1,7 @@
 #include "time_period_fetcher.h"
 
 #include <nx/sql/query.h>
+#include <nx/utils/elapsed_timer.h>
 
 #include "config.h"
 #include "device_dao.h"
@@ -146,12 +147,23 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
     const Filter& filter,
     const TimePeriodsLookupOptions& options)
 {
+    NX_DEBUG(this, "Selecting time periods by filter ", filter);
+
     AnalyticsArchive::Filter archiveFilter = prepareArchiveFilter(filter, options);
 
+    nx::utils::ElapsedTimer timer;
+    
     if (!filter.freeText.isEmpty())
+    {
+        timer.restart();
         archiveFilter.allAttributesHash = lookupCombinedAttributes(queryContext, filter.freeText);
+        NX_DEBUG(this, "Text '%1' lookup completed in %2", filter.freeText, timer.elapsed());
+    }
 
-    return m_analyticsArchive->matchPeriods(filter.deviceIds, archiveFilter);
+    timer.restart();
+    const auto timePeriods = m_analyticsArchive->matchPeriods(filter.deviceIds, archiveFilter);
+    NX_DEBUG(this, "Time periods lookup completed in %1", timer.elapsed());
+    return timePeriods;
 }
 
 AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
