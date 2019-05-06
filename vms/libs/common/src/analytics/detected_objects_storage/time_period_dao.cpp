@@ -51,7 +51,7 @@ long long TimePeriodDao::insertOrUpdateTimePeriod(
 
     const auto packetTimestamp = duration_cast<milliseconds>(microseconds(packet.timestampUsec));
     const auto packetDuration = duration_cast<milliseconds>(microseconds(packet.durationUsec));
-    const auto deviceId = m_deviceDao->deviceIdFromGuid(packet.deviceId);
+    const auto deviceId = m_deviceDao->insertOrFetch(queryContext, packet.deviceId);
 
     auto currentPeriod = insertOrFetchCurrentTimePeriod(
         queryContext, deviceId, packetTimestamp, packetDuration);

@@ -1550,6 +1550,15 @@ TEST_F(AnalyticsDbTimePeriodsLookup, selecting_all_periods)
     thenResultMatchesExpectations();
 }
 
+TEST_F(AnalyticsDbTimePeriodsLookup, selecting_all_periods_by_device)
+{
+    givenEmptyFilter();
+    addRandomKnownDeviceIdToFilter();
+    
+    whenLookupTimePeriods();
+    thenResultMatchesExpectations();
+}
+
 TEST_F(AnalyticsDbTimePeriodsLookup, selecting_all_periods_aggregated_to_one)
 {
     givenAggregationPeriodEqualToTheWholeArchivePeriod();
