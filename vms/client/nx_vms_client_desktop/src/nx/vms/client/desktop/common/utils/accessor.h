@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
+#include <QtCore/QSharedPointer>
 
 namespace nx::vms::client::desktop {
 

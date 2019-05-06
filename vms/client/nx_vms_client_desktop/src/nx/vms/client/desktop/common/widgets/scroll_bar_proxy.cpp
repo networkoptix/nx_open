@@ -3,6 +3,8 @@
 #include <QtCore/QEvent>
 #include <QtWidgets/QAbstractScrollArea>
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::vms::client::desktop {
 
 ScrollBarProxy::ScrollBarProxy(QWidget* parent):

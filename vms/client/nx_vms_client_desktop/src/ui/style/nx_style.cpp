@@ -40,6 +40,7 @@
 #include <QtWidgets/private/qabstractitemview_p.h>
 
 #include <ui/common/indents.h>
+#include <ui/dialogs/common/dialog.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/workaround/hidpi_workarounds.h>

@@ -7,6 +7,7 @@
 
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
 
 QnWorkbenchResourcesChangesWatcher::QnWorkbenchResourcesChangesWatcher(QObject* parent):

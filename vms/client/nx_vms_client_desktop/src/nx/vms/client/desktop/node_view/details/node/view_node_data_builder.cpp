@@ -1,5 +1,7 @@
 #include "view_node_data_builder.h"
 
+#include <QtGui/QIcon>
+
 #include "view_node_constants.h"
 
 namespace nx::vms::client::desktop {

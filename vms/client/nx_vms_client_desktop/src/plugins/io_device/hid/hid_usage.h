@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QtGlobal>
+
 namespace nx {
 namespace client {
 namespace plugins {

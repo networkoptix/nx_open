@@ -1,8 +1,10 @@
 #pragma once
 
+#include <deque>
+
 #include <QtGui/QImage>
 
-#include <deque>
+#include <nx/utils/thread/mutex.h>
 #include <utils/media/frame_info.h>
 
 namespace nx::vms::client::desktop {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtWidgets/QWidget>
+
 class QWidget;
 
 namespace nx::vms::client::desktop {

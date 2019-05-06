@@ -357,7 +357,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TimePeriodContentCount
     };
 
-using StreamQuality = nx::vms::api::StreamQuality;
+    using StreamQuality = nx::vms::api::StreamQuality;
 
     enum class BitrateControl {
         undefined,

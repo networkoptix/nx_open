@@ -1,5 +1,8 @@
 #pragma once
 
+#include <QtGui/QIcon>
+#include <QtCore/QVector>
+
 class QnIcon: public QIcon
 {
 public:

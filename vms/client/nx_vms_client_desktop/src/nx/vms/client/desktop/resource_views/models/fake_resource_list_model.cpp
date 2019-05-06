@@ -1,6 +1,7 @@
 #include "fake_resource_list_model.h"
 
 #include <QtGui/QFontMetrics>
+#include <QtGui/QPalette>
 
 #include <utils/math/math.h>
 
@@ -22,6 +23,7 @@ FakeResourceListModel::FakeResourceListModel(
     const FakeResourceList& fakeResources,
     QObject* parent)
     :
+    base_type(parent),
     m_resources(fakeResources)
 {
 }

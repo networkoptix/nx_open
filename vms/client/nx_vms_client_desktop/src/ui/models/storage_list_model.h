@@ -3,6 +3,7 @@
 #include <array>
 
 #include <QtCore/QSortFilterProxyModel>
+#include <QtGui/QBrush>
 
 #include <api/model/storage_space_reply.h>
 #include <api/model/rebuild_archive_reply.h>

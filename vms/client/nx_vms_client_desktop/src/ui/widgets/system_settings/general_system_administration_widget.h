@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
@@ -9,6 +10,8 @@
 #include <ui_general_system_administration_widget.h>
 
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
+
+class QPushButton;
 
 class QnGeneralSystemAdministrationWidget:
     public QnAbstractPreferencesWidget,

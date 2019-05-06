@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <nx/utils/data_structures/map_helper.h>
 
 #include <nx/analytics/replacement_merge_executor.h>

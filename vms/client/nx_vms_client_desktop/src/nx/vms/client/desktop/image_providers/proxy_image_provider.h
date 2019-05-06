@@ -4,6 +4,7 @@
 
 #include "image_provider.h"
 
+#include <client/client_globals.h>
 #include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {

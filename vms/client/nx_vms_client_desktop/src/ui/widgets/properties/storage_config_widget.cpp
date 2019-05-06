@@ -1,6 +1,7 @@
 #include "storage_config_widget.h"
 #include "ui_storage_config_widget.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
 #include <boost/range/algorithm/count_if.hpp>
 
 #include <QtGui/QKeyEvent>

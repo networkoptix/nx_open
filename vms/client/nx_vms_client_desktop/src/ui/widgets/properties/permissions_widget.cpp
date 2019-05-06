@@ -2,6 +2,7 @@
 #include "ui_permissions_widget.h"
 
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QCheckBox>
 
 #include <core/resource_access/global_permissions_manager.h>
 

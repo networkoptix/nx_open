@@ -1,5 +1,4 @@
-#ifndef QNTIMELINECHUNKPAINTER_H
-#define QNTIMELINECHUNKPAINTER_H
+#pragma once
 
 #include <array>
 #include <QtQuick/QSGGeometry>
@@ -7,6 +6,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <recording/time_period.h>
+#include <common/common_globals.h>
 
 class QnTimelineChunkPainter {
 public:
@@ -54,5 +54,3 @@ private:
     std::array<qint64, Qn::TimePeriodContentCount + 1> m_weights;
     std::array<QColor, Qn::TimePeriodContentCount + 1> m_color;
 };
-
-#endif // QNTIMELINECHUNKPAINTER_H

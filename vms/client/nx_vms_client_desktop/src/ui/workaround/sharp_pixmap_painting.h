@@ -1,5 +1,9 @@
 #pragma once
 
+#include <functional>
+
+#include <QtGui/QTransform>
+
 QTransform sharpTransform(const QTransform &transform, bool *corrected = nullptr);
 
 /**

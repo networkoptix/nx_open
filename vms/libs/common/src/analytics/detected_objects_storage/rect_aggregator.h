@@ -5,6 +5,8 @@
 #include <QtCore/QRect>
 #include <QtGui/QRegion>
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::analytics::storage {
 
 /**

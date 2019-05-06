@@ -2,6 +2,7 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
+#include <common/common_globals.h>
 #include <client_core/connection_context_aware.h>
 #include <nx/utils/uuid.h>
 
@@ -22,7 +23,7 @@ class QnCameraListModel: public QSortFilterProxyModel, public QnConnectionContex
 
 public:
     QnCameraListModel(QObject* parent = nullptr);
-    ~QnCameraListModel();
+    virtual ~QnCameraListModel() override;
 
     virtual QHash<int, QByteArray> roleNames() const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;

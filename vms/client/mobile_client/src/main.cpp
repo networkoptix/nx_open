@@ -1,6 +1,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QDir>
 #include <QtGui/QFont>
+#include <QtGui/QDesktopServices>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
 #include <QtQml/QQmlFileSelector>
