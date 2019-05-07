@@ -1,5 +1,7 @@
 #pragma once
 
+#include <deque>
+
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/move_only_func.h>
 
