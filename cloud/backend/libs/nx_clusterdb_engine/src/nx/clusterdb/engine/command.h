@@ -95,7 +95,7 @@ public:
 
     Command() = default;
 
-    Command(CommandHeader header):
+    explicit Command(CommandHeader header):
         base_type(std::move(header))
     {
     }

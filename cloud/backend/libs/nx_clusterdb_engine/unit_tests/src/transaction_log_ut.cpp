@@ -1,44 +1,63 @@
+#include <optional>
+
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/detail/query_execution_thread.h>
+#include <nx/sql/db_instance_controller.h>
+#include <nx/sql/test_support/test_with_db_helper.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
-#include <nx/sql/async_sql_query_executor.h>
-#include <nx/sql/detail/query_execution_thread.h>
-#include <nx/sql/test_support/test_with_db_helper.h>
-
-#include <nx_ec/ec_proto_version.h>
 
 #include <nx/clusterdb/engine/dao/memory/transaction_data_object_in_memory.h>
 #include <nx/clusterdb/engine/dao/rdb/structure_updater.h>
 #include <nx/clusterdb/engine/outgoing_transaction_dispatcher.h>
 #include <nx/clusterdb/engine/transaction_log.h>
 
-#include <nx/cloud/db/controller.h>
-#include <nx/cloud/db/data/account_data.h>
-#include <nx/cloud/db/data/system_data.h>
-#include <nx/cloud/db/ec2/data_conversion.h>
-#include <nx/cloud/db/ec2/vms_command_descriptor.h>
-#include <nx/cloud/db/test_support/business_data_generator.h>
-#include <nx/cloud/db/test_support/base_persistent_data_test.h>
-
+#include "customer_db/data.h"
 #include "test_outgoing_transaction_dispatcher.h"
 
 namespace nx::clusterdb::engine::test {
 
+class BaseDbTest:
+    public nx::sql::test::TestWithDbHelper
+{
+public:
+    BaseDbTest():
+        nx::sql::test::TestWithDbHelper("clusterdb_engine_ut", ""),
+        m_dbController(dbConnectionOptions())
+    {
+    }
+
+    void initializeDatabase()
+    {
+        ASSERT_TRUE(m_dbController.initialize());
+    }
+
+    nx::sql::AsyncSqlQueryExecutor& queryExecutor()
+    {
+        return m_dbController.queryExecutor();
+    }
+
+private:
+    nx::sql::InstanceController m_dbController;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+static constexpr int kCurrentProtoVersion = 1;
+
 class CommandLog:
-    public nx::cloud::db::test::BasePersistentDataTest,
+    public BaseDbTest,
     public ::testing::Test
 {
 public:
     CommandLog(dao::DataObjectType dataObjectType):
-        BasePersistentDataTest(DbInitializationType::delayed),
-        m_protocolVersionRange(
-            nx::cloud::db::kMinSupportedProtocolVersion,
-            nx::cloud::db::kMaxSupportedProtocolVersion),
+        m_protocolVersionRange(kCurrentProtoVersion, kCurrentProtoVersion),
         m_peerId(QnUuid::createUuid())
     {
         dbConnectionOptions().maxConnectionCount = 100;
@@ -56,32 +75,18 @@ public:
     ~CommandLog()
     {
         clusterdb::engine::dao::TransactionDataObjectFactory::instance()
-            .setCustomFunc(std::move(m_factoryFuncBak));
-    }
-
-    void givenRandomSystem()
-    {
-        using namespace std::placeholders;
-
-        constexpr int accountCount = 10;
-
-        // Creating accounts.
-        for (int i = 0; i < accountCount; ++i)
-            insertRandomAccount();
-        insertRandomSystem(getAccount(0));
-
-        // Initializing system's transaction log.
-        const std::string systemId = getSystem(0).id.c_str();
-        const auto dbResult = executeUpdateQuerySync(
-            std::bind(&clusterdb::engine::CommandLog::updateTimestampHiForSystem,
-                m_commandLog.get(), _1, systemId, getSystem(0).systemSequence));
-        ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
+            .setCustomFunc(std::exchange(m_factoryFuncBak, {}));
     }
 
 protected:
-    const std::unique_ptr<clusterdb::engine::CommandLog>& commandLog()
+    clusterdb::engine::CommandLog& commandLog()
     {
-        return m_commandLog;
+        return *m_commandLog;
+    }
+
+    const clusterdb::engine::CommandLog& commandLog() const
+    {
+        return *m_commandLog;
     }
 
     const QnUuid& peerId() const
@@ -105,6 +110,15 @@ protected:
         return m_protocolVersionRange;
     }
 
+    Customer generateRandomCustomer()
+    {
+        Customer customer;
+        customer.id = QnUuid::createUuid().toSimpleString().toStdString();
+        customer.fullName = QnUuid::createUuid().toSimpleString().toStdString();
+        customer.address = QnUuid::createUuid().toSimpleString().toStdString();
+        return customer;
+    }
+
 private:
     TestOutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
     ProtocolVersionRange m_protocolVersionRange;
@@ -117,7 +131,7 @@ private:
         m_commandLog = std::make_unique<clusterdb::engine::CommandLog>(
             m_peerId,
             m_protocolVersionRange,
-            &persistentDbManager()->queryExecutor(),
+            &queryExecutor(),
             &m_outgoingTransactionDispatcher);
     }
 };
@@ -128,7 +142,7 @@ class CommandLogSameTransaction:
 public:
     CommandLogSameTransaction():
         CommandLog(dao::DataObjectType::rdbms),
-        m_systemId(nx::cloud::db::test::BusinessDataGenerator::generateRandomSystemId()),
+        m_clusterId(QnUuid::createUuid().toSimpleString().toStdString()),
         m_otherPeerId(QnUuid::createUuid()),
         m_otherPeerDbId(QnUuid::createUuid()),
         m_otherPeerSequence(1),
@@ -171,26 +185,25 @@ protected:
     void whenGenerateTransactionLocally()
     {
         auto queryContext = getQueryContext();
-        auto transaction = commandLog()->prepareLocalTransaction(
+        auto command = commandLog().prepareLocalTransaction(
             queryContext.get(),
-            m_systemId.c_str(),
-            ::ec2::ApiCommand::saveUser,
-            m_transactionData);
-        if (!m_initialTransaction)
-            m_initialTransaction = transaction;
+            m_clusterId.c_str(),
+            command::SaveCustomer::code,
+            m_commandData);
+        if (!m_initialCommand)
+            m_initialCommand = command;
 
-        const auto transactionHash =
-            nx::cloud::db::ec2::command::SaveUser::hash(transaction.params);
-        auto transactionSerializer = std::make_unique<
-            UbjsonSerializedTransaction<nx::cloud::db::ec2::command::SaveUser>>(
-                std::move(transaction),
+        const auto commandHash = command::SaveCustomer::hash(command.params);
+        auto commandSerializer = std::make_unique<
+            UbjsonSerializedTransaction<command::SaveCustomer>>(
+                std::move(command),
                 protocolVersionRange().currentVersion());
 
-        commandLog()->saveLocalTransaction(
+        commandLog().saveLocalTransaction(
             queryContext.get(),
-            m_systemId.c_str(),
-            transactionHash,
-            std::move(transactionSerializer));
+            m_clusterId.c_str(),
+            commandHash,
+            std::move(commandSerializer));
     }
 
     void assertTransactionIsPresent()
@@ -198,8 +211,8 @@ protected:
         const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
         ASSERT_EQ(1U, allTransactions.size());
 
-        boost::optional<Command<vms::api::UserData>> transaction =
-            findTransaction(allTransactions, m_transactionData);
+        std::optional<Command<command::SaveCustomer::Data>> transaction =
+            findTransaction(allTransactions, m_commandData);
         ASSERT_TRUE(static_cast<bool>(transaction));
     }
 
@@ -211,7 +224,7 @@ protected:
     void assertTransactionIsReplaced()
     {
         const auto finalTransaction = getTransactionFromLog();
-        ASSERT_NE(*m_initialTransaction, finalTransaction);
+        ASSERT_NE(*m_initialCommand, finalTransaction);
     }
 
     void assertTransactionAuthorIsLocalPeer()
@@ -234,7 +247,7 @@ protected:
     void assertTransactionIsNotReplaced()
     {
         const auto finalTransaction = getTransactionFromLog();
-        ASSERT_EQ(*m_initialTransaction, finalTransaction);
+        ASSERT_EQ(*m_initialCommand, finalTransaction);
     }
 
     void whenAddTransactionLocallyWithGreaterSequence()
@@ -245,53 +258,50 @@ protected:
     void whenReceiveOwnOldTransactionWithLesserSequence()
     {
         auto queryContext = getQueryContext();
-        auto transaction = commandLog()->prepareLocalTransaction(
+        auto transaction = commandLog().prepareLocalTransaction(
             queryContext.get(),
-            m_systemId.c_str(),
-            ::ec2::ApiCommand::saveUser,
-            m_transactionData);
+            m_clusterId.c_str(),
+            command::SaveCustomer::code,
+            m_commandData);
         transaction.persistentInfo.sequence -= 2;
-        if (!m_initialTransaction)
-            m_initialTransaction = transaction;
+        if (!m_initialCommand)
+            m_initialCommand = transaction;
 
-        const auto resultCode = commandLog()->checkIfNeededAndSaveToLog
-            <nx::cloud::db::ec2::command::SaveUser>(
+        const auto resultCode = commandLog().checkIfNeededAndSaveToLog
+            <command::SaveCustomer>(
                 queryContext.get(),
-                m_systemId.c_str(),
-                clusterdb::engine::SerializableCommand<nx::cloud::db::ec2::command::SaveUser>(
+                m_clusterId.c_str(),
+                clusterdb::engine::SerializableCommand<command::SaveCustomer>(
                     std::move(transaction)));
         ASSERT_EQ(nx::sql::DBResult::cancelled, resultCode);
     }
 
     void assertMaxTimestampSequenceIsUsed()
     {
-        const auto timestamp = commandLog()->generateTransactionTimestamp(m_systemId.c_str());
+        const auto timestamp = commandLog().generateTransactionTimestamp(m_clusterId.c_str());
         ASSERT_EQ(m_lastUsedSequence, timestamp.sequence);
     }
 
 private:
-    const std::string m_systemId;
+    const std::string m_clusterId;
     const QnUuid m_otherPeerId;
     const QnUuid m_otherPeerDbId;
     int m_otherPeerSequence;
-    vms::api::UserData m_transactionData;
+    command::SaveCustomer::Data m_commandData;
     std::shared_ptr<nx::sql::QueryContext> m_activeQuery;
     nx::sql::DbConnectionHolder m_dbConnectionHolder;
-    boost::optional<Command<vms::api::UserData>> m_initialTransaction;
+    std::optional<Command<command::SaveCustomer::Data>> m_initialCommand;
     std::uint64_t m_lastUsedSequence = 0;
 
     void init()
     {
-        const auto sharing =
-            nx::cloud::db::test::BusinessDataGenerator::generateRandomSharing(
-                nx::cloud::db::test::BusinessDataGenerator::generateRandomAccount(),
-                m_systemId);
-        nx::cloud::db::ec2::convert(sharing, &m_transactionData);
+        m_commandData = generateRandomCustomer();
+
         ASSERT_TRUE(m_dbConnectionHolder.open());
 
         // Moving local peer sequence.
         // TODO: #ak Do it by generating commands and get rid of shiftLocalTransactionSequence method.
-        commandLog()->shiftLocalTransactionSequence(m_systemId.c_str(), 100);
+        commandLog().shiftLocalTransactionSequence(m_clusterId.c_str(), 100);
     }
 
     std::shared_ptr<nx::sql::QueryContext> getQueryContext()
@@ -304,36 +314,35 @@ private:
 
     std::shared_ptr<nx::sql::QueryContext> createNewTran()
     {
+        auto dbConnection = m_dbConnectionHolder.dbConnection();
+        auto transaction = std::make_unique<nx::sql::Transaction>(dbConnection);
+        NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, transaction->begin());
+        auto transactionPtr = transaction.get();
+
         auto deleter =
-            [](nx::sql::QueryContext* queryContext)
+            [transaction = std::move(transaction)](nx::sql::QueryContext* queryContext)
             {
                 if (queryContext->transaction()->isActive())
-                {
                     ASSERT_EQ(nx::sql::DBResult::ok, queryContext->transaction()->commit());
-                }
-                delete queryContext->transaction();
                 delete queryContext;
             };
 
-        auto dbConnection = m_dbConnectionHolder.dbConnection();
-        nx::sql::Transaction* transaction = new nx::sql::Transaction(dbConnection);
-        NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, transaction->begin());
         return std::shared_ptr<nx::sql::QueryContext>(
-            new nx::sql::QueryContext(dbConnection, transaction),
-            deleter);
+            new nx::sql::QueryContext(dbConnection, transactionPtr),
+            std::move(deleter));
     }
 
     template<typename TransactionDataType>
-    boost::optional<Command<TransactionDataType>> findTransaction(
+    std::optional<Command<TransactionDataType>> findTransaction(
         const std::vector<dao::TransactionLogRecord>& allTransactions,
         const TransactionDataType& transactionData)
     {
         for (const auto& logRecord: allTransactions)
         {
             const auto serializedTransactionFromLog =
-                logRecord.serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION);
+                logRecord.serializer->serialize(Qn::UbjsonFormat, kCurrentProtoVersion);
 
-            Command<vms::api::UserData> command;
+            Command<TransactionDataType> command;
             command.peerID = peerId();
             QnUbjsonReader<QByteArray> ubjsonStream(&serializedTransactionFromLog);
             const bool isDeserialized = QnUbjson::deserialize(&ubjsonStream, &command);
@@ -343,7 +352,7 @@ private:
                 return command;
         }
 
-        return boost::none;
+        return std::nullopt;
     }
 
     std::vector<dao::TransactionLogRecord> readAllTransactions()
@@ -359,8 +368,8 @@ private:
                 transactionsReadPromise.set_value(std::move(serializedTransactions));
             };
 
-        commandLog()->readTransactions(
-            m_systemId.c_str(),
+        commandLog().readTransactions(
+            m_clusterId.c_str(),
             ReadCommandsFilter::kEmptyFilter,
             completionHandler);
 
@@ -373,48 +382,48 @@ private:
             prepareFromOtherPeerWithTimestampDiff(timestampDiff));
     }
 
-    Command<vms::api::UserData> prepareFromOtherPeerWithTimestampDiff(
+    Command<command::SaveCustomer::Data> prepareFromOtherPeerWithTimestampDiff(
         int timestampDiff)
     {
-        Command<vms::api::UserData> transaction(::ec2::ApiCommand::saveUser, m_otherPeerId);
+        Command<command::SaveCustomer::Data> transaction(
+            command::SaveCustomer::code, m_otherPeerId);
         transaction.persistentInfo.dbID = m_otherPeerDbId;
         transaction.persistentInfo.sequence = m_otherPeerSequence++;
         transaction.persistentInfo.timestamp =
-            m_initialTransaction
-            ? m_initialTransaction->persistentInfo.timestamp + timestampDiff
-            : commandLog()->generateTransactionTimestamp(m_systemId.c_str()) + timestampDiff;
-        transaction.params = m_transactionData;
+            m_initialCommand
+            ? m_initialCommand->persistentInfo.timestamp + timestampDiff
+            : commandLog().generateTransactionTimestamp(m_clusterId.c_str()) + timestampDiff;
+        transaction.params = m_commandData;
 
-        if (!m_initialTransaction)
-            m_initialTransaction = transaction;
+        if (!m_initialCommand)
+            m_initialCommand = transaction;
 
         return transaction;
     }
 
-    void saveTransaction(Command<vms::api::UserData> transaction)
+    void saveTransaction(Command<command::SaveCustomer::Data> command)
     {
         auto queryContext = getQueryContext();
-        const auto dbResult = commandLog()->checkIfNeededAndSaveToLog
-            <nx::cloud::db::ec2::command::SaveUser>(
-                queryContext.get(),
-                m_systemId.c_str(),
-                clusterdb::engine::UbjsonSerializedTransaction<nx::cloud::db::ec2::command::SaveUser>(
-                    std::move(transaction),
-                    nx_ec::EC2_PROTO_VERSION));
+        const auto dbResult = commandLog().checkIfNeededAndSaveToLog<command::SaveCustomer>(
+            queryContext.get(),
+            m_clusterId.c_str(),
+            clusterdb::engine::UbjsonSerializedTransaction<command::SaveCustomer>(
+                std::move(command),
+                kCurrentProtoVersion));
         ASSERT_TRUE(dbResult == nx::sql::DBResult::ok || dbResult == nx::sql::DBResult::cancelled)
             << "Got " << toString(dbResult);
     }
 
-    Command<vms::api::UserData> getTransactionFromLog()
+    Command<command::SaveCustomer::Data> getTransactionFromLog()
     {
         const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
         NX_GTEST_ASSERT_EQ(1U, allTransactions.size());
 
-        boost::optional<Command<vms::api::UserData>> transaction =
-            findTransaction(allTransactions, m_transactionData);
-        NX_GTEST_ASSERT_TRUE(static_cast<bool>(transaction));
+        std::optional<Command<command::SaveCustomer::Data>> command =
+            findTransaction(allTransactions, m_commandData);
+        NX_GTEST_ASSERT_TRUE(static_cast<bool>(command));
 
-        return *transaction;
+        return *command;
     }
 };
 
@@ -499,13 +508,13 @@ public:
     };
 
     TestTransactionController(
-        const std::unique_ptr<clusterdb::engine::CommandLog>& commandLog,
-        const nx::cloud::db::api::SystemData& system,
-        const nx::cloud::db::api::AccountData& accountToShareWith)
+        clusterdb::engine::CommandLog* commandLog,
+        const std::string& clusterId,
+        const command::SaveCustomer::Data& customer)
         :
         m_commandLog(commandLog),
-        m_system(system),
-        m_accountToShareWith(accountToShareWith),
+        m_clusterId(clusterId),
+        m_customer(customer),
         m_completedState(State::init),
         m_desiredState(State::init)
     {
@@ -521,7 +530,7 @@ public:
         m_completedState = State::startedTransaction;
         m_desiredState = State::startedTransaction;
         m_commandLog->startDbTransaction(
-            m_system.id.c_str(),
+            m_clusterId,
             [this](auto&&... args) { return doSomeDataModifications(std::move(args)...); },
             [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
                 nx::sql::DBResult /*dbResult*/)
@@ -540,20 +549,17 @@ public:
     }
 
 private:
-    const std::unique_ptr<clusterdb::engine::CommandLog>& m_commandLog;
-    const nx::cloud::db::api::SystemData m_system;
-    const nx::cloud::db::api::AccountData m_accountToShareWith;
+    clusterdb::engine::CommandLog* m_commandLog = nullptr;
+    const std::string m_clusterId;
+    const command::SaveCustomer::Data m_customer;
     State m_completedState;
     State m_desiredState;
-    nx::cloud::db::api::SystemSharingEx m_sharing;
     QnMutex m_mutex;
     QnWaitCondition m_cond;
     nx::utils::Counter m_startedAsyncCallsCounter;
 
     nx::sql::DBResult doSomeDataModifications(nx::sql::QueryContext* queryContext)
     {
-        prepareData();
-
         for (;;)
         {
             {
@@ -569,7 +575,6 @@ private:
             switch (thingToDo)
             {
                 case State::modifiedBusinessData:
-                    modifyBusinessData();
                     setCompletedState(State::modifiedBusinessData);
                     break;
 
@@ -600,36 +605,16 @@ private:
         m_cond.wakeAll();
     }
 
-    void prepareData()
-    {
-        m_sharing.systemId = m_system.id;
-        m_sharing.accountId = m_accountToShareWith.id;
-        m_sharing.accountEmail = m_accountToShareWith.email;
-        m_sharing.accessRole = nx::cloud::db::api::SystemAccessRole::advancedViewer;
-        m_sharing.vmsUserId =
-            guidFromArbitraryData(m_sharing.accountEmail).toSimpleString().toStdString();
-    }
-
-    void modifyBusinessData()
-    {
-        // It does not matter for transaction log whether we save application data or not.
-        // TODO #ak But, it is still better to mockup data access object here.
-        //NX_GTEST_ASSERT_EQ(
-        //    nx::sql::DBResult::ok,
-        //    systemSharingController().insertOrReplaceSharing(queryContext, sharing));
-    }
-
     void addTransactionToLog(nx::sql::QueryContext* queryContext)
     {
-        vms::api::UserData userData;
-        nx::cloud::db::ec2::convert(m_sharing, &userData);
-        userData.isCloud = true;
-        userData.fullName = QString::fromStdString(m_accountToShareWith.fullName);
+        auto customer = m_customer;
+        customer.fullName = QnUuid::createUuid().toSimpleString().toStdString();
+
         auto dbResult = m_commandLog->generateTransactionAndSaveToLog
-            <nx::cloud::db::ec2::command::SaveUser>(
+            <command::SaveCustomer>(
                 queryContext,
-                m_sharing.systemId.c_str(),
-                std::move(userData));
+                m_clusterId,
+                std::move(customer));
         ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
     }
 
@@ -660,9 +645,10 @@ class CommandLogOverlappingTransactions:
 {
 public:
     CommandLogOverlappingTransactions():
-        CommandLog(dao::DataObjectType::ram)
+        CommandLog(dao::DataObjectType::ram),
+        m_clusterId(QnUuid::createUuid().toSimpleString().toStdString())
     {
-        persistentDbManager()->queryExecutor().setConcurrentModificationQueryLimit(0 /*no limit*/);
+        queryExecutor().setConcurrentModificationQueryLimit(0 /*no limit*/);
     }
 
 protected:
@@ -673,11 +659,28 @@ protected:
         vms::api::TranState readedUpTo;
     };
 
+    void givenRandomSystem()
+    {
+        using namespace std::placeholders;
+
+        constexpr int customerCount = 10;
+
+        for (int i = 0; i < customerCount; ++i)
+            m_customers.push_back(generateRandomCustomer());
+
+        // Initializing transaction log.
+        ASSERT_NO_THROW(queryExecutor().executeUpdateQuerySync(
+            [this](auto queryContext)
+            {
+                return commandLog().updateTimestampHiForSystem(queryContext, m_clusterId, 0);
+            }));
+    }
+
     void whenAddOverlappingTransactions()
     {
         constexpr std::size_t transactionCount = 5;
 
-        persistentDbManager()->queryExecutor().reserveConnections(transactionCount);
+        queryExecutor().reserveConnections(transactionCount);
 
         auto dbTransactions = startDbTransactions(transactionCount);
         for (std::size_t i = 0; i < dbTransactions.size(); ++i)
@@ -711,16 +714,14 @@ protected:
         for (int i = 0; i < transactionToAddCount; ++i)
         {
             ++m_scheduledCommandCount;
-            commandLog()->startDbTransaction(
-                getSystem(0).id,
-                [this, i](auto&&... args) { return shareSystemToRandomUser(std::move(args)..., i); },
+            commandLog().startDbTransaction(
+                m_clusterId,
+                [this, i](auto&&... args) { return insertRandomCustomer(std::move(args)..., i); },
                 [this](
                     nx::sql::DBResult dbResult)
                 {
                     if (dbResult != nx::sql::DBResult::cancelled)
-                    {
                         ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
-                    }
 
                     m_commandResults.push(dbResult);
                 });
@@ -735,8 +736,8 @@ protected:
 
     void whenReadCommandLog()
     {
-        commandLog()->readTransactions(
-            getSystem(0).id,
+        commandLog().readTransactions(
+            m_clusterId,
             ReadCommandsFilter(),
             [this](auto&&... args) { saveReadResult(std::move(args)...); });
     }
@@ -767,13 +768,13 @@ protected:
 
     std::unique_ptr<TestTransactionController> startDbTransaction()
     {
-        const auto& accountToShareWith =
-            accounts().at(nx::utils::random::number<std::size_t>(1, accounts().size() - 1));
+        auto customer = nx::utils::random::choice(m_customers);
+        customer.fullName = QnUuid::createUuid().toSimpleString().toStdString();
 
         auto tranController = std::make_unique<TestTransactionController>(
-            commandLog(),
-            getSystem(0),
-            accountToShareWith);
+            &commandLog(),
+            m_clusterId,
+            std::move(customer));
         tranController->startDbTransaction();
         return tranController;
     }
@@ -792,35 +793,19 @@ private:
     nx::utils::SyncQueue<nx::sql::DBResult> m_commandResults;
     nx::utils::SyncQueue<ReadResult> m_readResults;
     ReadResult m_prevReadResult;
+    std::string m_clusterId;
+    std::vector<command::SaveCustomer::Data> m_customers;
 
-    nx::sql::DBResult shareSystemToRandomUser(
+    nx::sql::DBResult insertRandomCustomer(
         nx::sql::QueryContext* queryContext,
         int originalTransactionIndex)
     {
-        nx::cloud::db::api::SystemSharingEx sharing;
-        sharing.systemId = getSystem(0).id;
-        const auto& accountToShareWith =
-            accounts().at(nx::utils::random::number<std::size_t>(1, accounts().size() - 1));
-        sharing.accountId = accountToShareWith.id;
-        sharing.accountEmail = accountToShareWith.email;
-        sharing.accessRole = nx::cloud::db::api::SystemAccessRole::advancedViewer;
-        sharing.vmsUserId = QnUuid::createUuid().toSimpleString().toStdString();
+        auto customer = generateRandomCustomer();
 
-        // It does not matter for transaction log whether we save application data or not.
-        // TODO #ak But, it is still better to mockup data access object here.
-        //NX_GTEST_ASSERT_EQ(
-        //    nx::sql::DBResult::ok,
-        //    systemSharingController().insertOrReplaceSharing(queryContext, sharing));
-
-        vms::api::UserData userData;
-        nx::cloud::db::ec2::convert(sharing, &userData);
-        userData.isCloud = true;
-        userData.fullName = QString::fromStdString(accountToShareWith.fullName);
-        auto dbResult = commandLog()->generateTransactionAndSaveToLog
-            <nx::cloud::db::ec2::command::SaveUser>(
-                queryContext,
-                sharing.systemId.c_str(),
-                std::move(userData));
+        auto dbResult = commandLog().generateTransactionAndSaveToLog<command::SaveCustomer>(
+            queryContext,
+            m_clusterId,
+            std::move(customer));
         NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
 
         // Making sure transactions are completed in the order

@@ -6,10 +6,10 @@
 #include <nx/utils/uuid.h>
 
 #include <nx/clusterdb/engine/transaction_log_cache.h>
-#include <nx/cloud/db/ec2/vms_command_descriptor.h>
 
-namespace nx::clusterdb::engine {
-namespace test {
+#include "customer_db/data.h"
+
+namespace nx::clusterdb::engine::test {
 
 class CommandLogCache:
     public ::testing::Test
@@ -138,7 +138,7 @@ protected:
     CommandHeader prepareTransaction(TranId tranId)
     {
         CommandHeader transactionHeader(
-            nx::cloud::db::ec2::command::SaveUser::code,
+            command::SaveCustomer::code,
             QnUuid(m_peerId));
         transactionHeader.persistentInfo.sequence =
             m_cache.generateTransactionSequence(
@@ -267,5 +267,4 @@ TEST_F(CommandLogCache, timestamp_is_not_decreasing)
     ASSERT_GT(timestampAfter, timestampBefore);
 }
 
-} // namespace test
-} // namespace nx::clusterdb::engine
+} // namespace nx::clusterdb::engine::test
