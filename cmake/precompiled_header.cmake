@@ -48,10 +48,6 @@ function(_generate_pch_parameters target parameters_file)
     file(GENERATE
         OUTPUT "${parameters_file}"
         CONTENT "${flags}${include_directories}${framework_directories}${definitions}\n"
-        # Some generator expressions cause CMake to generate a file for every combination of
-        # values. $<COMPILE_LANGUAGE:CXX> is one of them. Condition ensures we write the file
-        # only for the required value: when the compile language is not CXX.
-        CONDITION $<NOT:$<COMPILE_LANGUAGE:CXX>>
     )
 endfunction()
 
@@ -133,25 +129,14 @@ function(_add_gcc_clang_precompiled_header target input)
 
     set(pch_flags -Winvalid-pch)
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        list(APPEND pch_flags "SHELL:-Xclang -include-pch" "SHELL:-Xclang ${pch_file}")
+        list(APPEND pch_flags -Xclang -include-pch -Xclang ${pch_file})
     else()
         list(APPEND pch_flags -include ${CMAKE_CURRENT_BINARY_DIR}/${target})
     endif()
 
-    # PCH flags should be added on target level (not source file level) to guarantee that PCH
-    # inclusion goes before any other "-include" flags. This is the requirement of some compilers.
-    # E.g. GCC will ignore PCH if it find any other "-include" flag before PCH incusion.
-    target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${pch_flags}>)
-
-    get_target_property(all_sources ${target} SOURCES)
-    set(sources)
-    foreach(file ${all_sources})
-        if(file MATCHES "\\.\(cpp|cxx|cc\)$")
-            list(APPEND sources ${file})
-        endif()
-    endforeach()
-
+    nx_get_target_cpp_sources(${target} sources)
     set_property(SOURCE ${sources} APPEND PROPERTY OBJECT_DEPENDS ${input} ${pch_file})
+    set_property(SOURCE ${sources} APPEND PROPERTY COMPILE_OPTIONS ${pch_flags})
 endfunction()
 
 function(add_precompiled_header target input)
