@@ -47,6 +47,15 @@
                 display : inline-block;
                 white-space: normal;
     
+                .caption {
+                    line-height : 1rem;
+                    align-items : flex-end;
+    
+                    .nav-arrow {
+                        height: 18px;
+                    }
+                }
+    
                 &:nth-child(1) {
                     padding-left : .75rem;
                     width : 175px;
@@ -78,6 +87,7 @@
                     .caption {
                         div:first-of-type {
                             width : 65px;
+                            line-height: 1rem;
                         }
                         
                         .sort-dir {
@@ -92,6 +102,7 @@
                     .caption {
                         div:first-of-type {
                             width : 26px;
+                            line-height : 1rem;
                         }
         
                         .sort-dir {

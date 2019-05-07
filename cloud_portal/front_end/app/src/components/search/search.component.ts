@@ -154,9 +154,11 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                         }
                     });
             }
+
+            this.onChangeCallback({ ...this.localFilter });
         }
 
-        this.onChangeCallback({ ...this.localFilter });
+
         this.numberOfOptionsSelected();
     }
 

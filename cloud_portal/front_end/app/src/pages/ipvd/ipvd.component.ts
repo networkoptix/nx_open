@@ -251,20 +251,26 @@ export class NxIpvdComponent implements OnInit {
     }
 
     filterEmpty() {
-        // query
-        const tags = this.filterModel.tags.find(tag => tag.value === true);
+        let tags = false;
+        if (this.filterModel.tags) {
+            tags = this.filterModel.tags.find(tag => tag.value === true);
+        }
 
         let multiselect = false;
-        this.filterModel.multiselects.forEach(select => {
-            multiselect = multiselect || (select.selected.length > 0);
-        });
+        if (this.filterModel.multiselects) {
+            this.filterModel.multiselects.forEach(select => {
+                multiselect = multiselect || (select.selected.length > 0);
+            });
+        }
 
         let singleselect = false;
-        this.filterModel.selects.forEach(select => {
-            singleselect = singleselect || (select.selected.value > 0); // 0 is default choice
-        });
+        if (this.filterModel.selects) {
+            this.filterModel.selects.forEach(select => {
+                singleselect = singleselect || (select.selected.value > 0); // 0 is default choice
+            });
+        }
 
-        return !!tags || multiselect || singleselect || this.filterModel.query !== '';
+        return tags || multiselect || singleselect || this.filterModel.query !== '';
     }
 
     searchVendor() {

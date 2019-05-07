@@ -52,10 +52,10 @@
     
     thead {
       background-color : $additional_light1;
+      border-bottom    : 1px solid $light3;
       
       th {
-        padding          : .5rem .25rem .5rem .5rem;
-        border-bottom    : 1px solid $light3;
+        padding          : .5rem 0;
         color            : $dark9;
         font-family      : $font-family-medium;
         font-weight      : 500 !important;
@@ -63,6 +63,11 @@
         text-transform   : none;
         overflow-wrap    : break-word;
         cursor           : pointer;
+        border           : none;
+        
+        &:first-of-type {
+          padding-left : .5rem;
+        }
     
         &.table-title {
           font-family : $font-family-regular;
@@ -76,6 +81,7 @@
     
         .caption {
           position : relative;
+          height   : 2rem;
       
           .sort-dir {
             //top: 0;
@@ -98,14 +104,17 @@
     }
     
     tbody {
+      padding : .5rem 0;
+      display : table-cell;
+      
       tr {
-        height : 1.625rem; // 26px
+        height : rem(26px);
         
         &:hover {
-          td {
+          //td {
             color      : $dark9;
-            background : transparentize($brand_core, 0.8);
-          }
+            background : transparentize($brand_core, 0.9);
+          //}
         }
         
         &.selected, &:active, &:focus {
@@ -117,11 +126,16 @@
         }
         
         td {
-          padding      : .5rem .25rem .5rem .5rem;
+          padding      : 0;
           font-family  : $font-family-regular;
           font-size    : $font-size-base;
           color        : $dark9;
-          line-height  : 1rem;
+          line-height  : rem(26px);
+          border       : none;
+          
+          &:first-of-type {
+            padding-left : .25rem;
+          }
         }
       }
     }
@@ -150,7 +164,6 @@
 
   .pagination-nav {
     display: inline-flex;
-    background-color: $light2;
 
     /*** overwrite bootstrap pagination style ***/
     .pagination {
