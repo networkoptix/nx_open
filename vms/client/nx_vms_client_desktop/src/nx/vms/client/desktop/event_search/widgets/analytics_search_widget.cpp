@@ -394,9 +394,6 @@ void AnalyticsSearchWidget::Private::setAreaSelectionEnabled(bool value)
 
 void AnalyticsSearchWidget::Private::updateAreaButtonAppearance()
 {
-    if (!m_areaSelectionEnabled)
-        return;
-
     m_areaSelectionButton->setState(m_model->filterRect().isValid()
         ? SelectableTextButton::State::unselected
         : SelectableTextButton::State::deactivated);
