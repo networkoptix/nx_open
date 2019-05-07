@@ -141,6 +141,11 @@ MediatorConnectorCluster::Context& MediatorConnectorCluster::context(int index)
     return *m_mediators[index];
 }
 
+nx::hpm::test::MediatorCluster& MediatorConnectorCluster::cluster()
+{
+    return m_cluster;
+}
+
 const nx::hpm::test::MediatorCluster& MediatorConnectorCluster::cluster() const
 {
     return m_cluster;
@@ -159,6 +164,8 @@ BasicTestFixture::BasicTestFixture(
     m_disconnectedPeerTimeout(disconnectedPeerTimeout)
 {
     NX_ASSERT(m_discoveryServer.bindAndListen());
+    m_discoveryServiceUrl = m_discoveryServer.url().toStdString();
+
     m_mediatorCluster = std::make_unique<MediatorConnectorCluster>(m_discoveryServer.url());
     m_relays =
         std::make_unique<nx::cloud::relay::test::TrafficRelayCluster>(m_discoveryServer.url());
@@ -224,6 +231,11 @@ void BasicTestFixture::SetUp()
     startMediator();
 
     startCloudModulesXmlProvider();
+}
+
+nx::cloud::discovery::test::DiscoveryServer& BasicTestFixture::discoveryServer()
+{
+    return m_discoveryServer;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -430,6 +442,11 @@ nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
     }
 
     return nx::utils::Url();
+}
+
+std::string nx::network::cloud::test::BasicTestFixture::relayClusterId() const
+{
+    return m_relays->clusterId();
 }
 
 //-------------------------------------------------------------------------------------------------
