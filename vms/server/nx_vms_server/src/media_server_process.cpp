@@ -1089,8 +1089,6 @@ void MediaServerProcess::stopSync()
 {
     qWarning() << "Stopping server";
 
-    const int kStopTimeoutMs = 100 * 1000;
-
     {
         QnMutexLocker lock( &m_stopMutex );
         if (m_stopping)
@@ -1102,11 +1100,9 @@ void MediaServerProcess::stopSync()
     pleaseStop();
     quit();
 
-    if (!wait(kStopTimeoutMs))
-    {
-        terminate();
-        wait();
-    }
+    const std::chrono::seconds kStopTimeout(100);
+    if (!wait(kStopTimeout))
+        NX_CRITICAL(false, lm("Server was unable to stop within %1").arg(kStopTimeout));
 
     qApp->quit();
 }
