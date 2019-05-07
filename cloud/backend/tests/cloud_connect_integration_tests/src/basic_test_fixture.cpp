@@ -169,6 +169,7 @@ BasicTestFixture::BasicTestFixture(
     m_mediatorCluster = std::make_unique<MediatorConnectorCluster>(m_discoveryServer.url());
     m_relays =
         std::make_unique<nx::cloud::relay::test::TrafficRelayCluster>(m_discoveryServer.url());
+
     addMediator();
 }
 
@@ -245,7 +246,13 @@ void BasicTestFixture::addMediator()
 {
     auto& mediatorContext = m_mediatorCluster->addContext({
             "-stun/addrToListenList", "127.0.0.1:0",
-            "-http/addrToListenList", "127.0.0.1:0"
+            "-http/addrToListenList", "127.0.0.1:0",
+            "-trafficRelay/clusterId", m_relays->clusterId().c_str(),
+            "-trafficRelay/discovery/enabled", "true",
+            "-trafficRelay/discovery/discoveryServiceUrl", m_discoveryServiceUrl.c_str(),
+            "-trafficRelay/discovery/roundTripPadding", "1ms",
+            "-trafficRelay/discovery/registrationErrorDelay", "1ms",
+            "-trafficRelay/discovery/onlineNodesRequestDelay", "1ms"
         },
         nx::hpm::MediatorInstance::allFlags &
             ~nx::hpm::MediatorInstance::initializeConnectivity,
