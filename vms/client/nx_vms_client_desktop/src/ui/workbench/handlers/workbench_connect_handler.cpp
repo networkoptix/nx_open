@@ -1,6 +1,8 @@
 
 #include "workbench_connect_handler.h"
 
+#include <QtCore/QTimer>
+
 #include <QtNetwork/QHostInfo>
 
 #include <QtWidgets/QAction>
@@ -215,6 +217,36 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
         &QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed);
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
         &QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived);
+
+    // The initialResourcesReceived signal may never be emitted if there are the server has issues.
+    // Avoid infinite UI loading state by introducing timeout after which the connections is dropped
+    // and the error message is shown.
+    const auto connectTimeout = ini().connectTimeoutMs;
+    if (connectTimeout > 0)
+    {
+        auto connectTimeoutTimer = new QTimer(this);
+        connectTimeoutTimer->setSingleShot(true);
+        connectTimeoutTimer->setInterval(connectTimeout);
+        connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened,
+            connectTimeoutTimer, qOverload<>(&QTimer::start));
+        connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
+            connectTimeoutTimer, &QTimer::stop);
+        connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived,
+            connectTimeoutTimer, &QTimer::stop);
+        connect(connectTimeoutTimer, &QTimer::timeout, this,
+            [this]
+            {
+                disconnectFromServer(DisconnectFlag::Force);
+
+                // Just display the error message.
+                const QnConnectionInfo emptyConnectionInfo;
+                QnConnectionDiagnosticsHelper::validateConnection(
+                    emptyConnectionInfo,
+                    ec2::ErrorCode::serverError,
+                    mainWindowWidget(),
+                    commonModule()->engineVersion());
+            });
+    }
 
     auto userWatcher = context()->instance<QnWorkbenchUserWatcher>();
     connect(userWatcher, &QnWorkbenchUserWatcher::userChanged, this,

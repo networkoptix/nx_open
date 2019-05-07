@@ -145,6 +145,9 @@ struct Ini: nx::kit::IniConfig
         "Whether mouse hover toggles crop mode on Right Panel tiles and tooltips.");
     NX_INI_FLAG(0, pluginInformationInServerSettings,
         "Show information about installed plugin libraries in Server Settings.");
+    NX_INI_INT(0, connectTimeoutMs,
+        "Timeout (in milliseconds) for waiting initial resources message from the server.\n"
+        "If exceeded then connections is dropped to avoid infinite UI loading state. 0 means disabled.");
 };
 
 inline Ini& ini()
