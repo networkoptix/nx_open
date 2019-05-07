@@ -1,5 +1,5 @@
 *** Settings ***
-Resource          resource.robot
+Resource          ../resource.robot
 Suite Setup       Open Browser and go to URL    ${url}
 Test Teardown     Run Keyword If Test Failed    Restart
 Test Template     Test Submit Message
