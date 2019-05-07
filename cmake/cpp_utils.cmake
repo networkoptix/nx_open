@@ -11,6 +11,8 @@ function(nx_get_target_cpp_sources target variable)
 endfunction()
 
 function(nx_force_include target)
+    # TODO: #dklychkov Fix windowss build and remove this line.
+    return()
     # target_compile_options cannot be used! Now source file property is the only right way to do
     # this. This is because of precompiled headers. GCC require its inclusion to be before any
     # other `-include` flags. To guarantee this, we must call this function after PCH activation
