@@ -95,34 +95,36 @@ Node toNode(const QVariantMap& map, const Node& defaultValue, bool* ok = nullptr
         *ok = false;
 
     Node node;
-
     QVariantMap::const_iterator it;
 
-#define findAndCheck(strValue) \
-do{\
-    it = map.find(strValue); \
-    if (it == map.end()) \
-        return defaultValue; \
-} while(0)
+    const auto find =
+        [&map, &it](const char* value)
+        {
+            it = map.find(value);
+            return it != map.end();
+        };
 
-    findAndCheck(kNodeId);
+    if (!find(kNodeId))
+        return defaultValue;
     node.nodeId = it->toString().toStdString();
 
-    findAndCheck(kPublicIpAddress);
+    if (!find(kPublicIpAddress))
+        return defaultValue;
     node.publicIpAddress = it->toString().toStdString();
 
-    findAndCheck(kUrls);
-    if (!it->canConvert(QVariant::StringList))
+    if (!find(kUrls) || !it->canConvert(QVariant::StringList))
         return defaultValue;
     node.urls = toVector(it->toStringList());
 
-    findAndCheck(kExpirationTime);
+    if (!find(kExpirationTime))
+        return defaultValue;
     QDateTime dt = nx::network::http::parseDate(it->toByteArray());
     if (!dt.isValid())
         return defaultValue;
     node.expirationTime = toTimePoint(dt);
 
-    findAndCheck(kInfoJson);
+    if (!find(kInfoJson))
+        return defaultValue;
     node.infoJson = it->toString().toStdString();
 
     if (ok)
