@@ -24,6 +24,8 @@ void printHelp()
     std::cout << "\n";
     nx::cctu::printTestRelayOptions(&std::cout);
     std::cout << "\n";
+    nx::cctu::RelayLoadTest::printOptions(&std::cout);
+    std::cout << "\n";
     nx::cctu::printConnectOptions(&std::cout);
     std::cout << "\n";
     nx::cctu::printHttpClientOptions(&std::cout);
