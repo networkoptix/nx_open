@@ -7,8 +7,8 @@
 #include <recording/time_period_list.h>
 
 #include "abstract_cursor.h"
-#include "analytics_events_storage_settings.h"
-#include "analytics_events_storage_types.h"
+#include "analytics_db_settings.h"
+#include "analytics_db_types.h"
 
 namespace nx::analytics::db {
 

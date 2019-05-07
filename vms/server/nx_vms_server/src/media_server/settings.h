@@ -5,7 +5,7 @@
 
 #include <QtCore/QSettings>
 
-#include <analytics/db/analytics_events_storage_settings.h>
+#include <analytics/db/analytics_db_settings.h>
 #include <nx/vms/server/settings.h>
 
 class QnMediaServerModule;

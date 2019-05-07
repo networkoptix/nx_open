@@ -1,4 +1,4 @@
-#include "analytics_events_storage_settings.h"
+#include "analytics_db_settings.h"
 
 #include <nx/utils/deprecated_settings.h>
 

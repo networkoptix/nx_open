@@ -1,4 +1,4 @@
-#include "analytics_events_storage_types.h"
+#include "analytics_db_types.h"
 
 #include <cmath>
 #include <sstream>

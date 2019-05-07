@@ -16,7 +16,7 @@
 
 #include <analytics/db/abstract_storage.h>
 
-#include "analytics_events_storage_db_controller.h"
+#include "analytics_db_controller.h"
 #include "analytics_archive_directory.h"
 #include "attributes_dao.h"
 #include "device_dao.h"

@@ -5,7 +5,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/vms/server/analytics/db/analytics_events_storage.h>
+#include <nx/vms/server/analytics/db/analytics_db.h>
 #include <api/mediaserver_client.h>
 #include <test_support/mediaserver_launcher.h>
 

@@ -5,7 +5,7 @@
 
 #include <recording/time_period_list.h>
 
-#include <analytics/db/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 
 #include "analytics_archive_directory.h"
 

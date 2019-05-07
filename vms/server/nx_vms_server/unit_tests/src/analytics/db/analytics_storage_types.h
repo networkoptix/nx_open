@@ -1,6 +1,6 @@
 #pragma once
 
-#include <analytics/db/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 
 namespace nx::analytics::db::test {
 

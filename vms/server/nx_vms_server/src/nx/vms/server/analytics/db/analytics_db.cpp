@@ -1,4 +1,4 @@
-#include "analytics_events_storage.h"
+#include "analytics_db.h"
 
 #include <cmath>
 
@@ -10,7 +10,7 @@
 
 #include <analytics/db/config.h>
 
-#include "analytics_events_storage_cursor.h"
+#include "analytics_db_cursor.h"
 #include "cursor.h"
 #include "cleaner.h"
 #include "object_searcher.h"

@@ -11,7 +11,7 @@
 
 #include <analytics/db/config.h>
 
-#include <nx/vms/server/analytics/db/analytics_events_storage.h>
+#include <nx/vms/server/analytics/db/analytics_db.h>
 #include <nx/vms/server/analytics/db/serializers.h>
 
 #include "analytics_storage_types.h"
@@ -24,7 +24,7 @@ class AnalyticsDb:
 {
 public:
     AnalyticsDb():
-        nx::utils::test::TestWithTemporaryDirectory("analytics_events_storage", QString()),
+        nx::utils::test::TestWithTemporaryDirectory("analytics_db", QString()),
         m_allowedTimeRange(
             std::chrono::system_clock::from_time_t(0),
             std::chrono::system_clock::from_time_t(0))

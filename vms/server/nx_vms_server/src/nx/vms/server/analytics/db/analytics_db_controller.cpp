@@ -1,11 +1,11 @@
-#include "analytics_events_storage_db_controller.h"
+#include "analytics_db_controller.h"
 
 #include <nx/utils/log/log_message.h>
 
-#include <analytics/db/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 #include <analytics/db/config.h>
 
-#include "analytics_events_storage_db_schema.h"
+#include "analytics_db_db_schema.h"
 
 namespace nx::analytics::db {
 

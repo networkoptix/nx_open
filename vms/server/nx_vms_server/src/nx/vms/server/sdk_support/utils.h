@@ -27,7 +27,7 @@
 
 #include <nx/vms/server/sdk_support/loggers.h>
 
-#include <analytics/db/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_plugin_event.h>

@@ -23,7 +23,7 @@
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/module_information.h>
 
-#include <analytics/db/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 #include <nx_ec/ec_api.h>
 #include <rest/server/json_rest_result.h>
 

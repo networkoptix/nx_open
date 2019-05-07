@@ -6,7 +6,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
 
-#include <analytics/db/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 #include <camera/data/time_period_camera_data.h>
 #include <camera/loaders/camera_data_loader_fwd.h>
 #include <common/common_globals.h>

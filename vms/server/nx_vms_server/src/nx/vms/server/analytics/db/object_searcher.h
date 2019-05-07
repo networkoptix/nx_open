@@ -6,7 +6,7 @@
 #include <nx/sql/sql_cursor.h>
 
 #include <analytics/db/abstract_cursor.h>
-#include <analytics/db/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 
 #include "device_dao.h"
 #include "object_type_dao.h"

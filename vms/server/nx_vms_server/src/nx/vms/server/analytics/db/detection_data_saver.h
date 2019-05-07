@@ -4,7 +4,7 @@
 
 #include <nx/sql/query_context.h>
 
-#include <analytics/db/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 
 #include "object_cache.h"
 #include "object_track_aggregator.h"

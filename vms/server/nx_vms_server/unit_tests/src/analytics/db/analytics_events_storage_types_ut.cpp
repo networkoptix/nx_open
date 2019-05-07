@@ -2,7 +2,7 @@
 
 #include <nx/utils/random.h>
 
-#include <analytics/db/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 
 #include "analytics_storage_types.h"
 

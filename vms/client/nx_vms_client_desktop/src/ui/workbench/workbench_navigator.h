@@ -9,7 +9,7 @@
 
 #include <nx/utils/uuid.h>
 
-#include <analytics/db/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>

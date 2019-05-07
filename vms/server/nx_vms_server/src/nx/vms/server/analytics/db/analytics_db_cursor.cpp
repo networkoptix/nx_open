@@ -1,4 +1,4 @@
-#include "analytics_events_storage_cursor.h"
+#include "analytics_db_cursor.h"
 
 namespace nx::analytics::db::deprecated {
 
