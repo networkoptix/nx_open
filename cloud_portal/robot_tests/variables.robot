@@ -3,6 +3,7 @@ Variables    getvars.py
 
 *** Variables ***
 ${ALERT}                              //span[@ng-if='!message.compileContent']
+${ALERT TEXT}                         //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']
 ${ALERT CLOSE}                        //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']/../preceding-sibling::button[@ng-click='!message.dismissOnClick && dismiss()']
 
 ${BROWSER}                            Chrome
@@ -246,6 +247,21 @@ ${IPVD PREVIOUS BUTTON}              //ipvd//a/span[contains(text(),"«")]
 ${IPVD NEXT BUTTON}                  //ipvd//a/span[contains(text(),"»")]
 ${IPVD LAST PAGE BUTTON}             //ipvd//ul/[@class="pagination"]/li[@class="page-item disabled"]/following-sibling::li/a
 ${IPVD CLOSE DETAILS BUTTON}         //ipvd//header//span[@class="glyphicon close-icon detailsClose"]
+#IPVD Feedback
+${SUBMIT A REQUEST}     //ipvd//a[contains(text(),'submit a request')]
+${SEND DEVICE FEEDBACK}     //ipvd//a[contains(text(),'Send feedback about this device')]
+${IPVD FEEDBACK}                     //nx-modal-message-content//form[@name='messageForm']
+${IPVD FEEDBACK TITLE}               ${IPVD FEEDBACK}//h1
+${IPVD FEEDBACK YOUR NAME}           ${IPVD FEEDBACK}//form[@name='feedbackForm']//input[@id='user_name']
+${IPVD FEEDBACK EMAIL}               ${IPVD FEEDBACK}//form[@name='feedbackForm']//input[@id='user_email']
+${IPVD FEEDBACK MESSAGE}             ${IPVD FEEDBACK}//form[@name='feedbackForm']//textarea[@id='message']
+${IPVD FEEDBACK CONTACT ME}          ${IPVD FEEDBACK}//form[@name='feedbackForm']//input[@type='checkbox' and @id='contact']
+${IPVD FEEDBACK AGREE}               ${IPVD FEEDBACK}//form[@name='feedbackForm']//input[@type='checkbox' and @id='agree']
+${IPVD FEEDBACK PRIVACY POLICY}      ${IPVD FEEDBACK}//form[@name='feedbackForm']//a[text()='Privacy Policy']
+${IPVD FEEDBACK SEND BUTTON}         ${IPVD FEEDBACK}//button[text()='Send']
+${IPVD FEEDBACK CANCEL BUTTON}       ${IPVD FEEDBACK}//button[text()='Cancel']
+${IPVD FEEDBACK CLOSE BUTTON}        ${IPVD FEEDBACK}//button[@class='close']
+${IPVD FEEDBACK MESSAGE SENT}        //span[@ng-bind-html="message.content" and text()='Message has been sent.']
 
 #Footer
 ${FOOTER ABOUT LINK}                 //footer//a[contains(text(),"${ABOUT} ${PRODUCT_NAME}")]
@@ -265,6 +281,8 @@ ${UBUNTU TAB}                         //a[@ng-click="select()"]//span[text()="Ub
 ${MAC OS TAB}                         //a[@ng-click="select()"]//span[text()="Mac OS"]/../..
 
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b
+
+${PRIVACY POLICY HEADER}              //h1[contains(text(),'Personal data and privacy policy')]
 
 #Password badges
 ${PASSWORD BADGE}                     //span[contains(@class,"badge")]
