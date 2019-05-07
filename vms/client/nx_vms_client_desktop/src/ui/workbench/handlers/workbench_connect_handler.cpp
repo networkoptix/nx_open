@@ -218,9 +218,8 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
         &QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived);
 
-    // The initialResourcesReceived signal may never be emitted if there are the server has issues.
-    // Avoid infinite UI loading state by introducing timeout after which the connections is dropped
-    // and the error message is shown.
+    // The initialResourcesReceived signal may be never emitted if the server has issues.
+    // Avoid infinite "UI loading" state by forcibly dropping the connections after a timeout.
     const auto connectTimeout = ini().connectTimeoutMs;
     if (connectTimeout > 0)
     {
