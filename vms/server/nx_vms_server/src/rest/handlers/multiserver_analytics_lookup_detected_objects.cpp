@@ -2,6 +2,7 @@
 
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
@@ -16,7 +17,7 @@ static const char* kFormatParamName = "format";
 
 QnMultiserverAnalyticsLookupDetectedObjects::QnMultiserverAnalyticsLookupDetectedObjects(
     QnCommonModule* commonModule,
-    nx::analytics::storage::AbstractEventsStorage* eventStorage)
+    nx::analytics::db::AbstractEventsStorage* eventStorage)
     :
     m_commonModule(commonModule),
     m_eventStorage(eventStorage)
@@ -30,7 +31,7 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executeGet(
     QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
-    using namespace nx::analytics::storage;
+    using namespace nx::analytics::db;
 
     Filter filter;
     Qn::SerializationFormat outputFormat = Qn::JsonFormat;
@@ -50,7 +51,7 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executePost(
     QByteArray& resultContentType,
     const QnRestConnectionProcessor* /*owner*/)
 {
-    using namespace nx::analytics::storage;
+    using namespace nx::analytics::db;
 
     Filter filter;
     Qn::SerializationFormat outputFormat = Qn::JsonFormat;
@@ -63,7 +64,7 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executePost(
 
 bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
     const QnRequestParamList& params,
-    nx::analytics::storage::Filter* filter,
+    nx::analytics::db::Filter* filter,
     Qn::SerializationFormat* outputFormat)
 {
     if (!deserializeOutputFormat(params, outputFormat))
@@ -103,7 +104,7 @@ bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
     const QnRequestParamList& params,
     const QByteArray& body,
     const QByteArray& srcBodyContentType,
-    nx::analytics::storage::Filter* filter,
+    nx::analytics::db::Filter* filter,
     Qn::SerializationFormat* outputFormat)
 {
     if (!deserializeOutputFormat(params, outputFormat))
@@ -115,12 +116,12 @@ bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
     {
         case Qn::JsonFormat:
             *filter = QJson::deserialized(
-                body, nx::analytics::storage::Filter(), &isParsingSucceded);
+                body, nx::analytics::db::Filter(), &isParsingSucceded);
             return isParsingSucceded;
 
         case Qn::UbjsonFormat:
             *filter = QnUbjson::deserialized(
-                body, nx::analytics::storage::Filter(), &isParsingSucceded);
+                body, nx::analytics::db::Filter(), &isParsingSucceded);
             return isParsingSucceded;
 
         default:
@@ -129,13 +130,13 @@ bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
 }
 
 nx::network::http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects::execute(
-    const nx::analytics::storage::Filter& filter,
+    const nx::analytics::db::Filter& filter,
     bool isLocal,
     Qn::SerializationFormat outputFormat,
     QByteArray* body,
     QByteArray* contentType)
 {
-    using namespace nx::analytics::storage;
+    using namespace nx::analytics::db;
 
     nx::utils::ElapsedTimer queryTimer;
     queryTimer.restart();
@@ -193,13 +194,13 @@ nx::network::http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects
 
 nx::network::http::StatusCode::Value
     QnMultiserverAnalyticsLookupDetectedObjects::lookupOnEveryOtherServer(
-        const nx::analytics::storage::Filter& filter,
-        std::vector<nx::analytics::storage::LookupResult>* lookupResults)
+        const nx::analytics::db::Filter& filter,
+        std::vector<nx::analytics::db::LookupResult>* lookupResults)
 {
     QnResourcePool* resourcePool = m_commonModule->resourcePool();
 
     nx::utils::SyncQueue<
-        std::tuple<bool /*hasSucceded*/, nx::analytics::storage::LookupResult>
+        std::tuple<bool /*hasSucceded*/, nx::analytics::db::LookupResult>
     > requestResultQueue;
 
     std::vector<std::unique_ptr<rest::ServerConnection>> serverConnections;
@@ -219,7 +220,7 @@ nx::network::http::StatusCode::Value
             [&requestResultQueue](
                 bool hasSucceded,
                 rest::Handle,
-                nx::analytics::storage::LookupResult lookupResult)
+                nx::analytics::db::LookupResult lookupResult)
             {
                 requestResultQueue.push(
                     std::make_tuple(hasSucceded, std::move(lookupResult)));
@@ -239,12 +240,12 @@ nx::network::http::StatusCode::Value
     return nx::network::http::StatusCode::ok;
 }
 
-nx::analytics::storage::LookupResult
+nx::analytics::db::LookupResult
     QnMultiserverAnalyticsLookupDetectedObjects::mergeResults(
-        std::vector<nx::analytics::storage::LookupResult> lookupResults,
+        std::vector<nx::analytics::db::LookupResult> lookupResults,
         Qt::SortOrder resultSortOrder)
 {
-    using namespace nx::analytics::storage;
+    using namespace nx::analytics::db;
 
     if (lookupResults.size() == 1)
         return std::move(lookupResults.front());

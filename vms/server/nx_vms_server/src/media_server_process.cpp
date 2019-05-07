@@ -32,7 +32,7 @@
 #include <QtNetwork/QNetworkInterface>
 
 #include <api/global_settings.h>
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <nx/vms/server/analytics/db/analytics_db.h>
 
 #include <appserver/processor.h>
 

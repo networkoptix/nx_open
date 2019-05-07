@@ -200,7 +200,7 @@ void AnalyticsSearchSynchronizer::updateTimelineDisplay()
         return;
     }
 
-    analytics::storage::Filter filter;
+    analytics::db::Filter filter;
     filter.deviceIds = {camera->getId()};
     filter.boundingBox = m_analyticsSearchWidget->filterRect();
     filter.freeText = m_analyticsSearchWidget->textFilter();

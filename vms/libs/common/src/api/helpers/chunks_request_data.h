@@ -6,7 +6,7 @@
 
 #include <QUrlQuery>
 
-#include <analytics/detected_objects_storage/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
 #include <common/common_globals.h>
@@ -54,7 +54,7 @@ struct QnChunksRequestData
     GroupBy groupBy = GroupBy::serverId;
     Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder;
 
-    boost::optional<nx::analytics::storage::Filter> analyticsStorageFilter;
+    boost::optional<nx::analytics::db::Filter> analyticsStorageFilter;
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnChunksRequestData::GroupBy, (lexical))

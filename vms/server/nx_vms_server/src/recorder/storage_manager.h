@@ -74,7 +74,7 @@ public:
 
     QnStorageManager(
         QnMediaServerModule* serverModule,
-        nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
+        nx::analytics::db::AbstractEventsStorage* analyticsEventsStorage,
         QnServer::StoragePool kind,
         const char* threadName = nullptr);
     virtual ~QnStorageManager();
@@ -292,7 +292,7 @@ private:
     Qn::StorageStatuses storageStatusInternal(const QnStorageResourcePtr& storage);
 
 private:
-    nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;
+    nx::analytics::db::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;
     StorageMap                  m_storageRoots;
     FileCatalogMap              m_devFileCatalog[QnServer::ChunksCatalogCount];

@@ -5,7 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/db/abstract_storage.h>
 #include <api/helpers/chunks_request_data.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
@@ -56,7 +56,7 @@ QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
     const QnChunksRequestData& request) const
 {
     using namespace std::chrono;
-    using namespace nx::analytics::storage;
+    using namespace nx::analytics::db;
 
     if (request.resList.empty())
         return QnTimePeriodList();

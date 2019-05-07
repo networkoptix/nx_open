@@ -8,7 +8,7 @@
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
 
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/db/abstract_storage.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/resource.h>
@@ -597,7 +597,7 @@ private:
 
 QnStorageManager::QnStorageManager(
     QnMediaServerModule* serverModule,
-    nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
+    nx::analytics::db::AbstractEventsStorage* analyticsEventsStorage,
     QnServer::StoragePool role,
     const char* threadName)
 :
