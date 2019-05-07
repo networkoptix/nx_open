@@ -1,14 +1,14 @@
 *** Settings ***
-Resource          ../resource.robot
-Test Setup        Restart
-Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
+Resource          resource.robot
 Suite Setup       Open Browser and go to URL    ${url}
-Suite Teardown    Close All Browsers
-Force Tags        Threaded File
+Test Teardown     Run Keyword If Test Failed    Restart
+Test Template     Test Submit Message
+Suite Teardown    Close Browser
+Force Tags        form    Threaded File
 
 *** Variables ***
-${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
+${password}    ${BASE PASSWORD}
 
 *** Keywords ***
 Check advaced search filters text

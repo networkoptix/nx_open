@@ -168,7 +168,7 @@ clicking 'X' closes rename dialog without rename
     Wait Until Page Does Not Contain Element    ${BACKDROP}
     Verify In System    Auto Tests
 
-clicking save with no input in rename dialoge throws error
+clicking save with no input in rename dialog throws error
     [tags]    C41880    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
