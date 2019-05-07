@@ -45,7 +45,7 @@ int RelayLoadTest::run(const nx::utils::ArgumentParser& args)
         servers.push_back(std::make_unique<TestHttpServerOnProxy>(serverSettings));
     }
 
-    std::cout << "Started as " << servers.size() << " servers "
+    std::cout << "Started " << servers.size() << " server(s) "
         << "on relay " << settings.relayUrl << std::endl;
 
     waitForExitCommand();
