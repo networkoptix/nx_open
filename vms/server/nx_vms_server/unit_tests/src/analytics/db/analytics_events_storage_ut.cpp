@@ -1584,7 +1584,7 @@ TEST_F(AnalyticsDbTimePeriodsLookup, with_aggregation_period)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsDbTimePeriodsLookup, with_random_filter)
+TEST_F(AnalyticsDbTimePeriodsLookup, DISABLED_with_random_filter)
 {
     givenRandomFilter();
     whenLookupTimePeriods();
