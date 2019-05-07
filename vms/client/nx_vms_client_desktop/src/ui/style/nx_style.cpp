@@ -8,7 +8,6 @@
 
 #include <QtCore/QtMath>
 #include <QtGui/QPainter>
-#include <QtGui/QScreen>
 #include <QtGui/QWindow>
 #include <QtGui/private/qfont_p.h>
 #include <QtWidgets/QApplication>
