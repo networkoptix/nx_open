@@ -256,7 +256,7 @@ const TrafficRelay& Settings::trafficRelay() const
     return m_trafficRelay;
 }
 
-const GeoIp& Settings::geoIp() const
+const nx::geo_ip::Settings& Settings::geoIp() const
 {
     return m_geoIp;
 }
@@ -490,6 +490,7 @@ void Settings::loadTrafficRelay()
 
     m_trafficRelay.clusterId = settings().value(
         group + traffic_relay::kClusterId).toString().toStdString();
+
     m_trafficRelay.discovery.load(settings(), (group + "discovery").toStdString());
 }
 

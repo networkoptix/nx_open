@@ -1,8 +1,10 @@
-#include "maxmind_db.h"
+#include "resolver_impl.h"
 
 #include <nx/utils/log/log.h>
 
-namespace nx::maxmind {
+#include "nx/geo_ip/settings.h"
+
+namespace nx::geo_ip::detail {
 
 namespace {
 
@@ -85,9 +87,9 @@ const char* dataTypeToString(int mmdbDataType)
     }
 }
 
-struct Mmdb: public MMDB_s
+struct MmdbHelper: public MMDB_s
 {
-    ~Mmdb()
+    ~MmdbHelper()
     {
         MMDB_close(this);
     }
@@ -103,27 +105,30 @@ static constexpr char kLongitude[] = "longitude";
 
 } // namespace
 
-//-------------------------------------------------------------------------------------------------
-// MaxmindDb
 
-bool MaxmindDb::open(const std::string& dbPath)
+ResolverImpl::ResolverImpl(const Settings& settings):
+    m_settings(settings)
 {
-    auto db = std::make_unique<Mmdb>();
+}
 
-    int result = MMDB_open(dbPath.c_str(), MMDB_MODE_MMAP, db.get());
+ResultCode ResolverImpl::initialize()
+{
+    auto db = std::make_unique<MmdbHelper>();
+
+    int result = MMDB_open(m_settings.dbPath.c_str(), MMDB_MODE_MMAP, db.get());
     if (result != MMDB_SUCCESS)
     {
         NX_VERBOSE(this, "Failed to open maxmind db file: %1, error: %2",
-            dbPath, MMDB_strerror(result));
-        false;
+            m_settings.dbPath, MMDB_strerror(result));
+        return ResultCode::ioError;
     }
 
     m_db = std::move(db);
 
-    return true;
+    return ResultCode::ok;
 }
 
-std::pair<ResultCode, Location> MaxmindDb::lookup(const std::string& ipAddress)
+Result ResolverImpl::resolve(const std::string& ipAddress)
 {
     ResultCode resultCode;
     MMDB_lookup_result_s lookupResult;
@@ -136,13 +141,23 @@ std::pair<ResultCode, Location> MaxmindDb::lookup(const std::string& ipAddress)
     std::tie(resultCode, str) = getString(lookupResult, kContinent, kNames, kLanguage);
     if (resultCode != ResultCode::ok)
         return {resultCode, Location{}};
-    auto continent = toContinent(str);
+
+    std::optional<Continent> continent;
+    if (!str.empty())
+    {
+        continent = toContinent(str);
+        NX_ASSERT(continent.has_value());
+    }
+
     if (!continent)
+    {
+        NX_VERBOSE(this, "Failed to resolve continent string: %1 to a Continent enum", str);
         return {ResultCode::notFound, Location{}};
+    }
     location.continent = *continent;
 
     // Not every ip has an associated country, for example: "2.16.126.1", which contains
-    // continent and location (geopoint).
+    // continent and location (geopoint), but no country.
     // if not found, it should not be an error
     std::tie(resultCode, location.country) = getString(lookupResult, kCountry, kNames, kLanguage);
 
@@ -156,7 +171,7 @@ std::pair<ResultCode, Location> MaxmindDb::lookup(const std::string& ipAddress)
     return {resultCode, location};
 }
 
-std::pair<ResultCode, MMDB_lookup_result_s> MaxmindDb::lookupIpAddress(const std::string& ipAddress)
+std::pair<ResultCode, MMDB_lookup_result_s> ResolverImpl::lookupIpAddress(const std::string& ipAddress)
 {
     if (!m_db)
         return {ResultCode::ioError, {}};
@@ -183,7 +198,7 @@ std::pair<ResultCode, MMDB_lookup_result_s> MaxmindDb::lookupIpAddress(const std
     return {ResultCode::ok, lookupResult};
 }
 
-std::pair<ResultCode, Geopoint> MaxmindDb::getGeopoint(MMDB_lookup_result_s& lookupResult)
+std::pair<ResultCode, Geopoint> ResolverImpl::getGeopoint(MMDB_lookup_result_s& lookupResult)
 {
     ResultCode resultCode;
     Geopoint geopoint;
@@ -192,14 +207,14 @@ std::pair<ResultCode, Geopoint> MaxmindDb::getGeopoint(MMDB_lookup_result_s& loo
     if (resultCode != ResultCode::ok)
         return {resultCode, geopoint};
 
-    std::tie(resultCode, geopoint.longitude)= getDouble(lookupResult, kLocation, kLongitude);
+    std::tie(resultCode, geopoint.longitude) = getDouble(lookupResult, kLocation, kLongitude);
     if (resultCode != ResultCode::ok)
         return {resultCode, geopoint};
 
     return {resultCode, geopoint};
 }
 
-ResultCode MaxmindDb::validate(
+ResultCode ResolverImpl::validate(
     int mmdbError,
     const MMDB_entry_data_s& entryData,
     uint32_t expectedMmdbDataType) const
@@ -224,4 +239,5 @@ ResultCode MaxmindDb::validate(
     return ResultCode::ok;
 }
 
-} // namespace nx::maxmind
+
+} // namespace nx::geo_ip::detail

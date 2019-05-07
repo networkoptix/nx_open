@@ -179,6 +179,7 @@ void UDPHolePunchingConnectionInitiationFsm::processTcpConnectRequest(
     updateSessionStatistics(requestSourceDescriptor, request);
 
     findRelayInstance(
+        requestSourceDescriptor,
         [this, connectResponseSender = std::move(connectResponseSender)](
             nx::cloud::relay::api::ResultCode resultCode,
             nx::utils::Url relayInstanceUrl)
@@ -294,7 +295,7 @@ void UDPHolePunchingConnectionInitiationFsm::noConnectionAckOnTime()
 
     m_timer.pleaseStopSync();
 
-    if (initiateCloudConnect(api::ConnectionAckRequest()))
+    if (initiateCloudConnect(RequestSourceDescriptor{}, api::ConnectionAckRequest{}))
     {
         NX_VERBOSE(this, "Proceeding without connection ack from listening peer");
         return;
@@ -345,7 +346,7 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
     }
 
     m_serverPeerConnectionMethods = request.connectionMethods;
-    if (!initiateCloudConnect(std::move(request)))
+    if (!initiateCloudConnect(requestSourceDescriptor, std::move(request)))
         return completionHandler(api::ResultCode::noSuitableConnectionMethod);
 
     // Saving completion handler so that client and server receive
@@ -354,6 +355,7 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
 }
 
 bool UDPHolePunchingConnectionInitiationFsm::initiateCloudConnect(
+    const RequestSourceDescriptor& requestSourceDescriptor,
     api::ConnectionAckRequest connectionAck)
 {
     decltype(connectionAck.forwardedTcpEndpointList) tcpEndpoints;
@@ -375,11 +377,12 @@ bool UDPHolePunchingConnectionInitiationFsm::initiateCloudConnect(
         std::move(tcpEndpoints),
         std::nullopt);
 
-    initiateRelayInstanceSearch();
+    initiateRelayInstanceSearch(requestSourceDescriptor);
     return true;
 }
 
-void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
+void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch(
+    const RequestSourceDescriptor& requestSourceDescriptor)
 {
     m_state = State::resolvingServersRelayInstance;
 
@@ -394,10 +397,11 @@ void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
                     : std::nullopt);
         };
 
-    findRelayInstance(std::move(completionHander));
+    findRelayInstance(requestSourceDescriptor, std::move(completionHander));
 }
 
 void UDPHolePunchingConnectionInitiationFsm::findRelayInstance(
+    const RequestSourceDescriptor& requestSourceDescriptor,
     RelayInstanceSearchCompletionHandler handler)
 {
     auto sharedHandler =
@@ -419,7 +423,8 @@ void UDPHolePunchingConnectionInitiationFsm::findRelayInstance(
                 nx::utils::Url());
         },
         m_relayClusterClient,
-        m_serverPeerHostName.toStdString());
+        m_serverPeerHostName.toStdString(),
+        requestSourceDescriptor.sourceAddress);
 }
 
 void UDPHolePunchingConnectionInitiationFsm::finishConnect()

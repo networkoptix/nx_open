@@ -24,10 +24,12 @@ public:
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& peerId,
+        const nx::network::SocketAddress& serverEndpoint,
         RelayInstanceSelectCompletionHandler completionHandler) = 0;
 
     virtual void findRelayInstancePeerIsListeningOn(
         const std::string& peerId,
+        const nx::network::SocketAddress& clientEndpoint,
         RelayInstanceSearchCompletionHandler completionHandler) = 0;
 };
 

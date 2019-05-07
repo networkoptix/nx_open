@@ -2,58 +2,26 @@
 
 #include <string>
 #include <memory>
-#include <optional>
 
 #include <maxminddb.h>
 
-namespace nx::maxmind {
+#include "nx/geo_ip/types.h"
 
-enum class ResultCode
-{
-    ok,
-    notFound,
-    ioError,
-    unknownError
-};
+namespace nx::geo_ip{
 
-enum class Continent
-{
-    africa,
-    antarctica,
-    asia,
-    australia,
-    europe,
-    northAmerica,
-    southAmerica
-};
+class Settings;
 
-struct Geopoint
-{
-    double latitude = 0;
-    double longitude = 0;
+namespace detail {
 
-    std::string toString() const
-    {
-        return "{ lat: " + std::to_string(latitude) + ", lon: " + std::to_string(longitude) + " }";
-    }
-};
-
-struct Location
-{
-    Continent continent;
-    std::string country;
-    std::optional<Geopoint> geopoint;
-};
-
-//-------------------------------------------------------------------------------------------------
-// MaxmindDb
-
-class NX_MAXMINDDB_API MaxmindDb
+class ResolverImpl
 {
 public:
-    bool open(const std::string& dbPath);
+    ResolverImpl(const Settings& settings);
+    virtual ~ResolverImpl() = default;
 
-    std::pair<ResultCode, Location> lookup(const std::string& ipAddress);
+    ResultCode initialize();
+
+    Result resolve(const std::string& ipAddress);
 
 private:
     std::pair<ResultCode, MMDB_lookup_result_s> lookupIpAddress(const std::string& ipAddress);
@@ -94,7 +62,9 @@ private:
     }
 
 private:
+    const Settings& m_settings;
     std::unique_ptr<MMDB_s> m_db;
 };
 
-} // namespace nx::maxind
+} // namespace detail
+} // namespace nx::geo_ip

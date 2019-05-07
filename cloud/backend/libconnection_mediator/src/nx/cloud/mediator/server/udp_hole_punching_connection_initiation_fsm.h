@@ -142,11 +142,15 @@ private:
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 
-    bool initiateCloudConnect(api::ConnectionAckRequest connectionAck);
+    bool initiateCloudConnect(
+        const RequestSourceDescriptor& requestSourceDescriptor,
+        api::ConnectionAckRequest connectionAck);
 
-    void initiateRelayInstanceSearch();
+    void initiateRelayInstanceSearch(
+        const RequestSourceDescriptor& requestSourceDescriptor);
 
     void findRelayInstance(
+        const RequestSourceDescriptor& requestSourceDescriptor,
         RelayInstanceSearchCompletionHandler handler);
 
     void finishConnect();

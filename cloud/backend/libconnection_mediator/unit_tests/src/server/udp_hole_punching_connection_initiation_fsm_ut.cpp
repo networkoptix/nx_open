@@ -28,6 +28,7 @@ class TestRelayClusterClient:
 public:
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& /*peerId*/,
+        const nx::network::SocketAddress& /*serverEndpoint*/,
         RelayInstanceSelectCompletionHandler /*completionHandler*/)
     {
         // Unused.
@@ -35,6 +36,7 @@ public:
 
     virtual void findRelayInstancePeerIsListeningOn(
         const std::string& /*peerId*/,
+        const nx::network::SocketAddress& /*clientEndpoint*/,
         RelayInstanceSearchCompletionHandler completionHandler)
     {
         m_pendingRequestHandler = std::move(completionHandler);

@@ -1,10 +1,8 @@
 #include "abstract_relay_cluster_client.h"
-#include <nx/network/aio/basic_pollable.h>
 
 #include <nx/cloud/discovery/discovery_api_client.h>
-#include <nx/network/dns_resolver.h>
-
-#include "nx/cloud/mediator/geo_ip/abstract_geo_ip_resolver.h"
+#include <nx/geo_ip/abstract_resolver.h>
+#include <nx/network/aio/basic_pollable.h>
 
 namespace nx::hpm {
 
@@ -19,28 +17,28 @@ public:
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& peerId,
+        const nx::network::SocketAddress& serverEndpoint,
         RelayInstanceSelectCompletionHandler completionHandler) override;
 
     virtual void findRelayInstancePeerIsListeningOn(
         const std::string& peerId,
+        const nx::network::SocketAddress& clientEndpoint,
         RelayInstanceSearchCompletionHandler completionHandler) override;
 
 private:
     void onRelayDiscovered(nx::cloud::discovery::Node node);
     void onRelayLost(nx::cloud::discovery::Node node);
 
-    std::vector<nx::utils::Url> findOnlineRelaysBy(geo_ip::Continent continent);
-
-    void resolvePeerIdToContinent(
-        const std::string& peerId,
-        nx::utils::MoveOnlyFunc<void(geo_ip::ResultCode, geo_ip::Continent)> handler);
+    std::vector<nx::utils::Url> findOnlineRelaysBy(nx::geo_ip::Continent continent);
 
 private:
-    std::unique_ptr<geo_ip::AbstractGeoIpResolver> m_geoIpResolver;
+    std::unique_ptr<nx::geo_ip::AbstractResolver> m_geoIpResolver;
     nx::cloud::discovery::DiscoveryClient m_trafficRelayDiscoveryClient;
 
     QnMutex m_mutex;
-    std::multimap<geo_ip::Continent, nx::cloud::discovery::Node> m_onlineRelayLocations;
+    std::multimap<nx::geo_ip::Continent, nx::cloud::discovery::Node> m_onlineRelayLocations;
+
+    nx::network::aio::BasicPollable m_aioThreadBinder;
 };
 
 } // namespace nx::hpm

@@ -2,16 +2,15 @@
 
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/url/url_parse_helper.h>
 
 #include "nx/cloud/mediator/settings.h"
-#include "nx/cloud/mediator/geo_ip/geo_ip_resolver_factory.h"
+#include "nx/cloud/mediator/geo_ip/resolver_factory.h"
 
 namespace nx::hpm {
 
-using namespace nx::cloud;
-
 OnlineRelaysClusterClient::OnlineRelaysClusterClient(const conf::Settings& settings):
-    m_geoIpResolver(geo_ip::GeoIpResolverFactory::instance().create(settings)),
+    m_geoIpResolver(geo_ip::ResolverFactory::instance().create(settings)),
     m_trafficRelayDiscoveryClient(
         settings.trafficRelay().discovery,
         settings.trafficRelay().clusterId,
@@ -31,71 +30,98 @@ OnlineRelaysClusterClient::OnlineRelaysClusterClient(const conf::Settings& setti
 OnlineRelaysClusterClient::~OnlineRelaysClusterClient()
 {
     m_trafficRelayDiscoveryClient.pleaseStopSync();
-    nx::network::SocketGlobals::addressResolver().cancel(this);
+    m_aioThreadBinder.pleaseStopSync();
 }
 
 void OnlineRelaysClusterClient::selectRelayInstanceForListeningPeer(
     const std::string& peerId,
+    const nx::network::SocketAddress& serverEndpoint,
     RelayInstanceSelectCompletionHandler completionHandler)
 {
-    resolvePeerIdToContinent(
-        peerId,
-        [this, peerId, completionHandler = std::move(completionHandler)](
-            geo_ip::ResultCode resultCode, geo_ip::Continent continent)
+    using namespace nx::cloud::relay::api;
+
+    m_aioThreadBinder.post(
+        [this, peerId, serverEndpoint, completionHandler = std::move(completionHandler)]()
+    {
+        auto[resultCode, location] = m_geoIpResolver->resolve(serverEndpoint);
+        if (resultCode != nx::geo_ip::ResultCode::ok)
         {
-            if (resultCode != geo_ip::ResultCode::ok)
-            {
-                return completionHandler(
-                    relay::api::ResultCode::notFound,
-                    std::vector<nx::utils::Url>());
-            }
+            NX_WARNING(this, "Error resolving peerId: %1 with server address: %1 to a continent",
+                peerId, serverEndpoint);
 
-            auto relayUrls = findOnlineRelaysBy(continent);
+            return completionHandler(ResultCode::notFound, std::vector<nx::utils::Url>());
+        }
 
-            return completionHandler(
-                !relayUrls.empty()
-                    ? relay::api::ResultCode::ok
-                    : relay::api::ResultCode::notFound,
-                std::move(relayUrls));
-        });
+        auto relayUrls = findOnlineRelaysBy(location.continent);
+        if (relayUrls.empty())
+        {
+            NX_WARNING(this, "There were no online relays found for continent: %1",
+                nx::geo_ip::toString(location.continent));
+
+            return completionHandler(ResultCode::notFound, std::vector<nx::utils::Url>());
+        }
+
+        NX_VERBOSE(this,
+            "Resolved peerId: %1 with server endpoint: %2 to continent: %3 and found relay urls: %4",
+                peerId, serverEndpoint, nx::geo_ip::toString(location.continent),
+                containerString(relayUrls));
+
+        return completionHandler(ResultCode::ok, std::move(relayUrls));
+    });
 }
 
 void OnlineRelaysClusterClient::findRelayInstancePeerIsListeningOn(
      const std::string& peerId,
+     const nx::network::SocketAddress& clientEndpoint,
      RelayInstanceSearchCompletionHandler completionHandler)
 {
-    selectRelayInstanceForListeningPeer(
-        peerId,
-        [this, peerId, completionHandler = std::move(completionHandler)](
-            relay::api::ResultCode resultCode,
-            std::vector<nx::utils::Url> relayUrls)
+    using namespace nx::cloud::relay::api;
+
+    m_aioThreadBinder.post(
+        [this, peerId, clientEndpoint, completionHandler = std::move(completionHandler)]()
+    {
+        auto[resultCode, location] =
+            m_geoIpResolver->resolve(clientEndpoint);
+
+        if (resultCode != nx::geo_ip::ResultCode::ok)
         {
-            if (resultCode != relay::api::ResultCode::ok || relayUrls.empty())
-                return completionHandler(resultCode, nx::utils::Url());
-
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution dis(0, (int)relayUrls.size() - 1);
-
-            return completionHandler(resultCode, relayUrls[dis(gen)]);
+            NX_WARNING(this, "Error resolving peerId: %1with client address: %2 to a continent",
+                peerId, clientEndpoint);
+            return completionHandler(ResultCode::notFound, nx::utils::Url());
         }
-    );
+
+        auto relayUrls = findOnlineRelaysBy(location.continent);
+        if (relayUrls.empty())
+        {
+            NX_WARNING(this, "There were no online relays found for continent: %1",
+                nx::geo_ip::toString(location.continent));
+            return completionHandler(ResultCode::notFound, nx::utils::Url());
+        }
+
+        std::random_device rd;  //Will be used to obtain a seed for the random number engine
+        std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+        std::uniform_int_distribution<> dis(0, (int)relayUrls.size() - 1);
+
+        return completionHandler(cloud::relay::api::ResultCode::ok, relayUrls[dis(gen)]);
+    });
 }
 
 void OnlineRelaysClusterClient::onRelayDiscovered(nx::cloud::discovery::Node trafficRelayNode)
 {
-    auto [resultCode, continent] = m_geoIpResolver->resolve(trafficRelayNode.publicIpAddress);
-    if (resultCode != geo_ip::ResultCode::ok)
+    auto [resultCode, location] = m_geoIpResolver->resolve(trafficRelayNode.publicIpAddress);
+    if (resultCode != nx::geo_ip::ResultCode::ok)
     {
-        NX_WARNING(this, "Failed to resolve traffic relay: %1 to a known continent.",
-            trafficRelayNode);
+        NX_WARNING(this, "Failed to resolve traffic relay: %1 to a known continent using"
+            " public ip address: %2",
+            trafficRelayNode, trafficRelayNode.publicIpAddress);
         return;
     }
+
     NX_VERBOSE(this, "Traffic relay: %1 discovered and resolved to continent: %2",
-        trafficRelayNode, geo_ip::toString(continent));
+        trafficRelayNode, nx::geo_ip::toString(location.continent));
 
     QnMutexLocker lock(&m_mutex);
-    m_onlineRelayLocations.emplace(continent, trafficRelayNode);
+    m_onlineRelayLocations.emplace(location.continent, trafficRelayNode);
 }
 
 void OnlineRelaysClusterClient::onRelayLost(nx::cloud::discovery::Node trafficRelayNode)
@@ -114,7 +140,7 @@ void OnlineRelaysClusterClient::onRelayLost(nx::cloud::discovery::Node trafficRe
 }
 
 std::vector<nx::utils::Url> OnlineRelaysClusterClient::findOnlineRelaysBy(
-    geo_ip::Continent continent)
+    nx::geo_ip::Continent continent)
 {
     QnMutexLocker lock(&m_mutex);
     std::vector<nx::utils::Url> relayUrls;
@@ -135,52 +161,5 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findOnlineRelaysBy(
 
     return relayUrls;
 }
-
-void OnlineRelaysClusterClient::resolvePeerIdToContinent(
-    const std::string& peerId,
-    nx::utils::MoveOnlyFunc<void(geo_ip::ResultCode, geo_ip::Continent)> handler)
-{
-    nx::network::SocketGlobals::addressResolver().resolveAsync(
-        peerId,
-        [this, peerId, handler = std::move(handler)](
-            SystemError::ErrorCode errorCode,
-            std::deque<network::AddressEntry> entries) mutable
-        {
-            if (errorCode != SystemError::noError)
-            {
-                NX_VERBOSE(this, "System error: %1 occured while resolving ip address of peer: %2",
-                    SystemError::toString(errorCode), peerId);
-                return handler(geo_ip::ResultCode::unknownError, geo_ip::Continent{});
-            }
-
-            if (entries.empty())
-            {
-                NX_VERBOSE(this, "No Ip address resolved for peer: %1", peerId);
-                return handler(geo_ip::ResultCode::unknownError, geo_ip::Continent{});
-            }
-
-            std::string ipAddress = entries.front().toEndpoint().address.toStdString();
-
-            NX_VERBOSE(this, "Resolved peerId: %1 to ip address: %2", peerId, ipAddress);
-
-            auto [resultCode, continent] = m_geoIpResolver->resolve(ipAddress);
-            if (resultCode != geo_ip::ResultCode::ok)
-            {
-                NX_VERBOSE(this, "Failed to resolve peerId: %1 with ip address:%2 to a continent",
-                    peerId, ipAddress);
-            }
-            else
-            {
-                NX_VERBOSE(this, "peerId: %1 resolved to continent: %2",
-                    peerId, geo_ip::toString(continent));
-            }
-
-            return handler(resultCode, continent);
-        },
-        network::NatTraversalSupport::disabled,
-        AF_INET,
-        this);
-}
-
 
 } // namespace nx::hpm

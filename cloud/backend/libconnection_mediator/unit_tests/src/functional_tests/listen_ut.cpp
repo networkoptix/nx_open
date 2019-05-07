@@ -317,6 +317,7 @@ public:
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& /*peerId*/,
+        const nx::network::SocketAddress& /*serverEndpoint*/,
         RelayInstanceSelectCompletionHandler completionHandler) override
     {
         post(
@@ -330,6 +331,7 @@ public:
 
     virtual void findRelayInstancePeerIsListeningOn(
         const std::string& /*peerId*/,
+        const nx::network::SocketAddress& /*clientEndpoint*/,
         RelayInstanceSearchCompletionHandler /*completionHandler*/) override
     {
     }

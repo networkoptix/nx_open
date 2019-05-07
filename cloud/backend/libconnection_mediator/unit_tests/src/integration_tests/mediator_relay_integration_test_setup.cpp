@@ -21,6 +21,7 @@ public:
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& /*peerId*/,
+        const nx::network::SocketAddress& /*serverEndpoint*/,
         RelayInstanceSelectCompletionHandler completionHandler) override
     {
         m_aioThreadBinder.post(
@@ -34,6 +35,7 @@ public:
 
     virtual void findRelayInstancePeerIsListeningOn(
         const std::string& /*peerId*/,
+        const nx::network::SocketAddress& /*clientEndpoint*/,
         RelayInstanceSearchCompletionHandler completionHandler) override
     {
         m_aioThreadBinder.post(

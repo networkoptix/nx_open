@@ -1,10 +1,10 @@
 #pragma once
 
-#include "abstract_geo_ip_resolver.h"
+#include "types.h"
 
-namespace nx::hpm::geo_ip {
+namespace nx::geo_ip {
 
-const char* toString(Continent continent)
+const char * toString(Continent continent)
 {
     switch (continent)
     {
@@ -21,8 +21,8 @@ const char* toString(Continent continent)
         case Continent::southAmerica:
             return "South America";
         default:
-            return "unknown";
+            return "unknown"; //< Should never get here, Continent is an enum class.
     }
 }
 
-} // namespace nx::hpm::geo_ip
+} // namespace nx::geo_ip
