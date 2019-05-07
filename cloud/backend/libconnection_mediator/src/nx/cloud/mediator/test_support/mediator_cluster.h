@@ -13,6 +13,7 @@ class MediatorCluster
 {
 public:
     MediatorCluster(const nx::utils::Url& discoveryServiceUrl);
+    ~MediatorCluster();
 
     /**
      * Stops all mediators.

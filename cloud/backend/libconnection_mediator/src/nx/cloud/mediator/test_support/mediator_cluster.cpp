@@ -33,6 +33,17 @@ MediatorCluster::MediatorCluster(const nx::utils::Url& discoveryServiceUrl):
 {
 }
 
+MediatorCluster::~MediatorCluster()
+{
+    stop();
+    // Mediators need to be destroyed in the opposite order they were added to preserve
+    // the order or restoration of AbstractCloudDataProvider's factory function, used
+    // internally by MediatorFunctionalTest
+    for (auto rit = m_mediators.rbegin(); rit != m_mediators.rend(); ++rit)
+        rit->reset();
+    m_mediators.clear();
+}
+
 void MediatorCluster::stop()
 {
     for (auto& mediator : m_mediators)
