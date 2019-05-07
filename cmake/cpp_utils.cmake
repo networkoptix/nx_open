@@ -11,8 +11,11 @@ function(nx_get_target_cpp_sources target variable)
 endfunction()
 
 function(nx_force_include target)
-    # TODO: #dklychkov Fix windowss build and remove this line.
-    return()
+    if(CMAKE_GENERATOR MATCHES "Visual Studio" AND enablePrecompiledHeaders)
+        # TODO: #dklychkov Fix windowss build in this case and remove this.
+        return()
+    endif()
+
     # target_compile_options cannot be used! Now source file property is the only right way to do
     # this. This is because of precompiled headers. GCC require its inclusion to be before any
     # other `-include` flags. To guarantee this, we must call this function after PCH activation
@@ -22,7 +25,7 @@ function(nx_force_include target)
 
     foreach(file ${ARGN})
         if(MSVC)
-            set(flags /FI ${file})
+            set(flags /FI${file})
         else()
             set(flags -include ${file})
         endif()
