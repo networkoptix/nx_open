@@ -34,43 +34,29 @@ namespace hpm {
 
 static constexpr size_t kMaxBindRetryCount = 10;
 
-MediatorFunctionalTest::MediatorFunctionalTest(int flags, const QString& testDir):
-    utils::test::TestWithTemporaryDirectory("hpm", testDir),
+MediatorInstance::MediatorInstance(int flags, const QString& dataDir):
     m_testFlags(flags)
 {
-    if (m_testFlags & initializeSocketGlobals)
-        nx::network::SocketGlobals::cloud().reinitialize();
-
     addArg("/path/to/bin");
     addArg("-e");
     addArg("-stun/addrToListenList", "127.0.0.1:0");
     addArg("-stun/udpAddrToListenList", "127.0.0.1:0");
     addArg("-http/addrToListenList", "127.0.0.1:0");
     addArg("-log/logLevel", "DEBUG2");
-    addArg("-general/dataDir", testDataDir().toLatin1().constData());
-
-    if (m_testFlags & MediatorTestFlags::useTestCloudDataProvider)
-        registerCloudDataProvider(&m_cloudDataProvider);
+    addArg("-general/dataDir", dataDir.toLatin1().constData());
 }
 
-MediatorFunctionalTest::~MediatorFunctionalTest()
+MediatorInstance::~MediatorInstance()
 {
     stop();
-
-    if (m_factoryFuncToRestore)
-    {
-        AbstractCloudDataProviderFactory::setFactoryFunc(
-            std::move(*m_factoryFuncToRestore));
-        m_factoryFuncToRestore.reset();
-    }
 }
 
-void MediatorFunctionalTest::setUseProxy(bool value)
+void MediatorInstance::setUseProxy(bool value)
 {
     m_useProxy = value;
 }
 
-bool MediatorFunctionalTest::waitUntilStarted()
+bool MediatorInstance::waitUntilStarted()
 {
     ++m_startCount;
 
@@ -112,27 +98,27 @@ bool MediatorFunctionalTest::waitUntilStarted()
     return true;
 }
 
-network::SocketAddress MediatorFunctionalTest::stunUdpEndpoint() const
+network::SocketAddress MediatorInstance::stunUdpEndpoint() const
 {
     return m_stunUdpEndpoint ? *m_stunUdpEndpoint : network::SocketAddress();
 }
 
-network::SocketAddress MediatorFunctionalTest::stunTcpEndpoint() const
+network::SocketAddress MediatorInstance::stunTcpEndpoint() const
 {
     return m_stunTcpEndpoint;
 }
 
-network::SocketAddress MediatorFunctionalTest::httpEndpoint() const
+network::SocketAddress MediatorInstance::httpEndpoint() const
 {
     return m_httpEndpoint;
 }
 
-network::SocketAddress MediatorFunctionalTest::httpsEndpoint() const
+network::SocketAddress MediatorInstance::httpsEndpoint() const
 {
     return m_httpsEndpoint;
 }
 
-nx::utils::Url MediatorFunctionalTest::httpUrl() const
+nx::utils::Url MediatorInstance::httpUrl() const
 {
     return nx::network::url::Builder()
         .setScheme(network::http::kUrlSchemeName)
@@ -141,44 +127,18 @@ nx::utils::Url MediatorFunctionalTest::httpUrl() const
 }
 
 std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>
-    MediatorFunctionalTest::clientConnection()
+    MediatorInstance::clientConnection()
 {
     return network::SocketGlobals::cloud().mediatorConnector().clientConnection();
 }
 
 std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection>
-    MediatorFunctionalTest::systemConnection()
+    MediatorInstance::systemConnection()
 {
     return network::SocketGlobals::cloud().mediatorConnector().systemConnection();
 }
 
-void MediatorFunctionalTest::registerCloudDataProvider(
-    AbstractCloudDataProvider* cloudDataProvider)
-{
-    auto oldFactoryFunc =
-        AbstractCloudDataProviderFactory::setFactoryFunc(
-            [cloudDataProvider](auto&&...)
-            {
-                return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
-            });
-
-    if (!m_factoryFuncToRestore)
-        m_factoryFuncToRestore = std::move(oldFactoryFunc);
-}
-
-AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
-{
-    AbstractCloudDataProvider::System system(
-        QnUuid::createUuid().toSimpleString().toUtf8(),
-        nx::utils::generateRandomName(16),
-        true);
-    m_cloudDataProvider.addSystem(
-        system.id,
-        system);
-    return system;
-}
-
-std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
+std::unique_ptr<MediaServerEmulator> MediatorInstance::addServer(
     const AbstractCloudDataProvider::System& system,
     nx::String name,
     ServerTweak::Value tweak)
@@ -206,7 +166,7 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
     return server;
 }
 
-std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
+std::unique_ptr<MediaServerEmulator> MediatorInstance::addRandomServer(
     const AbstractCloudDataProvider::System& system,
     boost::optional<QnUuid> serverId,
     ServerTweak::Value tweak)
@@ -221,7 +181,7 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
 }
 
 std::vector<std::unique_ptr<MediaServerEmulator>>
-    MediatorFunctionalTest::addRandomServers(
+    MediatorInstance::addRandomServers(
         const AbstractCloudDataProvider::System& system,
         size_t count, ServerTweak::Value tweak)
 {
@@ -239,7 +199,7 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
 }
 
 std::tuple<api::ResultCode, api::ListeningPeers>
-    MediatorFunctionalTest::getListeningPeers() const
+    MediatorInstance::getListeningPeers() const
 {
     api::Client mediatorClient(
         nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
@@ -247,7 +207,7 @@ std::tuple<api::ResultCode, api::ListeningPeers>
     return mediatorClient.getListeningPeers();
 }
 
-void MediatorFunctionalTest::beforeModuleCreation()
+void MediatorInstance::beforeModuleCreation()
 {
     if (m_stunUdpEndpoint)
     {
@@ -256,12 +216,12 @@ void MediatorFunctionalTest::beforeModuleCreation()
     }
 }
 
-void MediatorFunctionalTest::afterModuleDestruction()
+void MediatorInstance::afterModuleDestruction()
 {
     //clearArgs();
 }
 
-bool MediatorFunctionalTest::startProxy()
+bool MediatorInstance::startProxy()
 {
     if (!m_tcpPortsAllocated)
     {
@@ -278,7 +238,7 @@ bool MediatorFunctionalTest::startProxy()
     return true;
 }
 
-bool MediatorFunctionalTest::allocateTcpPorts()
+bool MediatorInstance::allocateTcpPorts()
 {
     auto proxyToInitialize = {&m_httpProxy, &m_stunProxy};
 
@@ -302,6 +262,56 @@ bool MediatorFunctionalTest::allocateTcpPorts()
 
     return true;
 }
+
+MediatorFunctionalTest::MediatorFunctionalTest(int flags, const QString& testDir):
+    utils::test::TestWithTemporaryDirectory("hpm", testDir),
+    MediatorInstance(flags, testDir.isEmpty() ? testDataDir() : testDir)
+{
+    if (flags & initializeSocketGlobals)
+        nx::network::SocketGlobals::cloud().reinitialize();
+
+    if (flags & MediatorTestFlags::useTestCloudDataProvider)
+        registerCloudDataProvider(&m_cloudDataProvider);
+}
+
+MediatorFunctionalTest::~MediatorFunctionalTest()
+{
+    stop();
+
+    if (m_factoryFuncToRestore)
+    {
+        AbstractCloudDataProviderFactory::setFactoryFunc(
+            std::move(*m_factoryFuncToRestore));
+        m_factoryFuncToRestore.reset();
+    }
+}
+
+AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
+{
+    AbstractCloudDataProvider::System system(
+        QnUuid::createUuid().toSimpleString().toUtf8(),
+        nx::utils::generateRandomName(16),
+        true);
+    m_cloudDataProvider.addSystem(
+        system.id,
+        system);
+    return system;
+}
+
+void MediatorFunctionalTest::registerCloudDataProvider(
+    AbstractCloudDataProvider* cloudDataProvider)
+{
+    auto oldFactoryFunc =
+        AbstractCloudDataProviderFactory::setFactoryFunc(
+            [cloudDataProvider](auto&&...)
+    {
+        return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
+    });
+
+    if (!m_factoryFuncToRestore)
+        m_factoryFuncToRestore = std::move(oldFactoryFunc);
+}
+
 
 } // namespace hpm
 } // namespace nx

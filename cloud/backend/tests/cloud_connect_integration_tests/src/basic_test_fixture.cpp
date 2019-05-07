@@ -107,7 +107,7 @@ void MemoryRemoteRelayPeerPool::removePeer(
 
 
 MediatorConnectorCluster::Context::Context(
-    nx::hpm::MediatorFunctionalTest& mediator,
+    nx::hpm::MediatorInstance& mediator,
     const QString& cloudHost)
     :
     mediator(mediator),
@@ -235,9 +235,9 @@ void BasicTestFixture::addMediator()
             "-stun/addrToListenList", "127.0.0.1:0",
             "-http/addrToListenList", "127.0.0.1:0"
         },
-        nx::hpm::MediatorFunctionalTest::allFlags &
-            ~nx::hpm::MediatorFunctionalTest::initializeConnectivity,
-        testDataDir() + "/mediator");
+        nx::hpm::MediatorInstance::allFlags &
+            ~nx::hpm::MediatorInstance::initializeConnectivity,
+        testDataDir() + QString("/mediator_%1").arg(mediatorCluster().size()));
     mediatorContext.mediator.setUseProxy(true);
 }
 
@@ -290,7 +290,7 @@ const nx::hpm::test::MediatorCluster& BasicTestFixture::mediatorCluster() const
     return m_mediatorCluster->cluster();
 }
 
-nx::hpm::MediatorFunctionalTest& BasicTestFixture::mediator(int index)
+nx::hpm::MediatorInstance& BasicTestFixture::mediator(int index)
 {
     return m_mediatorCluster->context(index).mediator;
 }
@@ -437,7 +437,7 @@ nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
 
 void BasicTestFixture::startServer(int mediatorIndex)
 {
-    auto cloudSystemCredentials = mediator(mediatorIndex).addRandomSystem();
+    auto cloudSystemCredentials = m_mediatorCluster->cluster().addRandomSystem();
 
     m_cloudSystemCredentials.systemId = cloudSystemCredentials.id;
     m_cloudSystemCredentials.serverId = QnUuid::createUuid().toSimpleByteArray();

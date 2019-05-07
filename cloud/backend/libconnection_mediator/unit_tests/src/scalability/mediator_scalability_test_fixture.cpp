@@ -54,7 +54,7 @@ void MediatorScalabilityTestFixture::givenSynchronizedClusterWithListeningServer
 
 void MediatorScalabilityTestFixture::whenAddServer()
 {
-    m_system = m_mediatorCluster->mediator(0).addRandomSystem();
+    m_system = m_mediatorCluster->addRandomSystem();
     m_mediaServer = m_mediatorCluster->mediator(0).addRandomServer(m_system);
     m_mediaServerFullName = m_mediaServer->fullName().toStdString();
 

@@ -77,11 +77,11 @@ class MediatorConnectorCluster
 public:
     struct Context
     {
-        nx::hpm::MediatorFunctionalTest& mediator;
+        nx::hpm::MediatorInstance& mediator;
         nx::hpm::api::MediatorConnector connector;
 
         Context(
-            nx::hpm::MediatorFunctionalTest& mediator,
+            nx::hpm::MediatorInstance& mediator,
             const QString& cloudHost);
 
         Context(const Context&) = delete;
@@ -97,6 +97,7 @@ public:
 
     Context& context(int index);
 
+    nx::hpm::test::MediatorCluster& cluster();
     const nx::hpm::test::MediatorCluster& cluster() const;
 
 private:
@@ -144,7 +145,7 @@ protected:
     void startMediator(int index = 0);
     void restartMediator(int index = 0);
     const nx::hpm::test::MediatorCluster& mediatorCluster() const;
-    nx::hpm::MediatorFunctionalTest& mediator(int index = 0);
+    nx::hpm::MediatorInstance& mediator(int index = 0);
     MediatorConnectorCluster::Context& mediatorContext(int index = 0);
     void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
     void configureProxyBeforeMediator();
