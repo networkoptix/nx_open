@@ -45,8 +45,14 @@ function(_generate_pch_parameters target parameters_file)
     set(definitions
         "$<$<BOOL:${definitions}>:-D$<JOIN:${definitions},\n-D>\n>")
 
-    file(GENERATE OUTPUT "${parameters_file}" CONTENT
-        "${flags}${include_directories}${framework_directories}${definitions}\n")
+    file(GENERATE
+        OUTPUT "${parameters_file}"
+        CONTENT "${flags}${include_directories}${framework_directories}${definitions}\n"
+        # Some generator expressions cause CMake to generate a file for every combination of
+        # values. $<COMPILE_LANGUAGE:CXX> is one of them. Condition ensures we write the file
+        # only for the required value: when the compile language is not CXX.
+        CONDITION $<NOT:$<COMPILE_LANGUAGE:CXX>>
+    )
 endfunction()
 
 function(_get_cxx_standard target STANDARD_VAR)
@@ -93,19 +99,22 @@ endfunction()
 
 function(_add_gcc_clang_precompiled_header target input)
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        set(pch_file "${CMAKE_CURRENT_BINARY_DIR}/${target}.pch")
+        set(pch_dir "${CMAKE_CURRENT_BINARY_DIR}/${target}.pch")
     else()
-        set(pch_file "${CMAKE_CURRENT_BINARY_DIR}/${target}.gch")
+        set(pch_dir "${CMAKE_CURRENT_BINARY_DIR}/${target}.gch")
     endif()
+    set(pch_file "${pch_dir}/c++")
 
-    set(parameters_file "${pch_file}_${CMAKE_CXX_COMPILER_VERSION}.parameters")
+    set(parameters_file "${pch_dir}_${CMAKE_CXX_COMPILER_VERSION}.parameters")
     _generate_pch_parameters(${target} ${parameters_file})
     _get_cxx_standard(${target} cxx_standard)
+
+    file(MAKE_DIRECTORY "${pch_dir}")
 
     set(depfile_args)
     set(depfile_cmd_args)
     if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
-        set(depfile "${pch_file}.d")
+        set(depfile "${pch_dir}.d")
         file(RELATIVE_PATH pch_file_relative "${CMAKE_BINARY_DIR}" "${pch_file}")
 
         set(depfile_args DEPFILE "${depfile}")
@@ -120,36 +129,29 @@ function(_add_gcc_clang_precompiled_header target input)
         DEPENDS "${input}" "${parameters_file}"
         IMPLICIT_DEPENDS CXX "${input}"
         ${depfile_args}
-        COMMENT "Precompiling ${pch_file}")
+        COMMENT "Precompiling ${pch_dir}")
 
+    set(pch_flags -Winvalid-pch)
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        set(pch_flags "-Xclang -include-pch -Xclang \"${pch_file}\"")
+        list(APPEND pch_flags "SHELL:-Xclang -include-pch" "SHELL:-Xclang ${pch_file}")
+    else()
+        list(APPEND pch_flags -include ${CMAKE_CURRENT_BINARY_DIR}/${target})
     endif()
-    string(APPEND pch_flags " -Winvalid-pch")
 
-    get_target_property(sources ${target} SOURCES)
-    foreach(source ${sources})
-        if(NOT source MATCHES "\\.\(cpp|cxx|cc\)$")
-            continue()
+    # PCH flags should be added on target level (not source file level) to guarantee that PCH
+    # inclusion goes before any other "-include" flags. This is the requirement of some compilers.
+    # E.g. GCC will ignore PCH if it find any other "-include" flag before PCH incusion.
+    target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${pch_flags}>)
+
+    get_target_property(all_sources ${target} SOURCES)
+    set(sources)
+    foreach(file ${all_sources})
+        if(file MATCHES "\\.\(cpp|cxx|cc\)$")
+            list(APPEND sources ${file})
         endif()
-
-        get_source_file_property(flags "${source}" COMPILE_FLAGS)
-        if(NOT flags)
-            set(flags)
-        endif()
-        string(APPEND flags " ${pch_flags}")
-
-        get_source_file_property(depends "${source}" OBJECT_DEPENDS)
-        if(NOT depends)
-            set(depends)
-        endif()
-        list(APPEND depends "${input}" "${pch_file}")
-
-        set_source_files_properties("${source}"
-            PROPERTIES
-                COMPILE_FLAGS "${flags}"
-                OBJECT_DEPENDS "${depends}")
     endforeach()
+
+    set_property(SOURCE ${sources} APPEND PROPERTY OBJECT_DEPENDS ${input} ${pch_file})
 endfunction()
 
 function(add_precompiled_header target input)
