@@ -48,6 +48,7 @@ footer {
         font-size : $font-size-sm;
         padding   : 15px 10px;
         color     : $light12;
+        text-decoration: none;
         
         &:hover, &:focus {
             box-shadow       : none;
