@@ -27,7 +27,7 @@
 
 #include <nx/vms/server/sdk_support/loggers.h>
 
-#include <analytics/detected_objects_storage/analytics_events_storage_types.h>
+#include <analytics/db/analytics_events_storage_types.h>
 
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_plugin_event.h>
@@ -220,11 +220,11 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
 nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level);
 
 nx::sdk::Ptr<nx::sdk::analytics::ITimestampedObjectMetadata> createTimestampedObjectMetadata(
-    const nx::analytics::storage::DetectedObject& detectedObject,
-    const nx::analytics::storage::ObjectPosition& objectPosition);
+    const nx::analytics::db::DetectedObject& detectedObject,
+    const nx::analytics::db::ObjectPosition& objectPosition);
 
 nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::ITimestampedObjectMetadata>> createObjectTrack(
-    const nx::analytics::storage::DetectedObject& detectedObject);
+    const nx::analytics::db::DetectedObject& detectedObject);
 
 nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> createUncompressedVideoFrame(
     const CLVideoDecoderOutputPtr& frame,

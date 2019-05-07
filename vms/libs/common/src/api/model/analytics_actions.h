@@ -6,7 +6,7 @@
 
 #include <utils/common/request_param.h>
 
-#include <analytics/detected_objects_storage/analytics_events_storage_types.h>
+#include <analytics/db/analytics_events_storage_types.h>
 
 struct AnalyticsActionResult
 {

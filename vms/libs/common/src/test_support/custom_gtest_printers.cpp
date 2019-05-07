@@ -2,9 +2,7 @@
 
 #include <nx/fusion/serialization/lexical.h>
 
-namespace nx {
-namespace analytics {
-namespace storage {
+namespace nx::analytics::db {
 
 void PrintTo(ResultCode value, ::std::ostream* os)
 {
@@ -16,6 +14,4 @@ void PrintTo(const std::vector<DetectedObject>& value, ::std::ostream* os)
     *os << "[" << value.size() << "]";
 }
 
-} // namespace storage
-} // namespace analytics
-} // namespace nx
+} // namespace nx::analytics::db

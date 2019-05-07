@@ -3,7 +3,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include <nx/vms/server/analytics/detected_objects_storage/detected_objects_streamer.h>
+#include <nx/vms/server/analytics/db/detected_objects_streamer.h>
 #include <server/server_globals.h>
 
 #include "nx/streaming/video_data_packet.h"
@@ -472,7 +472,7 @@ QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getAnalyticsConnec
 {
     QnMutexLocker lock(&m_mutex);
 
-    return std::make_shared<nx::analytics::storage::DetectedObjectsStreamer>(
+    return std::make_shared<nx::analytics::db::DetectedObjectsStreamer>(
         m_mediaServerModule->analyticsEventsStorage(),
         m_resource->getId());
 }

@@ -2,7 +2,7 @@
 
 #include <QtCore/QString>
 
-#include <analytics/detected_objects_storage/abstract_storage.h>
+#include <analytics/db/abstract_storage.h>
 #include <rest/server/fusion_rest_handler.h>
 
 class QnCommonModule;
@@ -14,7 +14,7 @@ class QnMultiserverAnalyticsLookupDetectedObjects:
 public:
     QnMultiserverAnalyticsLookupDetectedObjects(
         QnCommonModule* commonModule,
-        nx::analytics::storage::AbstractEventsStorage* eventStorage);
+        nx::analytics::db::AbstractEventsStorage* eventStorage);
 
     virtual int executeGet(
         const QString& path,
@@ -34,11 +34,11 @@ public:
 
 private:
     QnCommonModule* m_commonModule = nullptr;
-    nx::analytics::storage::AbstractEventsStorage* m_eventStorage = nullptr;
+    nx::analytics::db::AbstractEventsStorage* m_eventStorage = nullptr;
 
     bool deserializeRequest(
         const QnRequestParamList& params,
-        nx::analytics::storage::Filter* filter,
+        nx::analytics::db::Filter* filter,
         Qn::SerializationFormat* outputFormat);
 
     bool deserializeOutputFormat(
@@ -49,22 +49,22 @@ private:
         const QnRequestParamList& params,
         const QByteArray& body,
         const QByteArray& srcBodyContentType,
-        nx::analytics::storage::Filter* filter,
+        nx::analytics::db::Filter* filter,
         Qn::SerializationFormat* outputFormat);
 
     nx::network::http::StatusCode::Value execute(
-        const nx::analytics::storage::Filter& filter,
+        const nx::analytics::db::Filter& filter,
         bool isLocal,
         Qn::SerializationFormat outputFormat,
         QByteArray* body,
         QByteArray* contentType);
 
     nx::network::http::StatusCode::Value lookupOnEveryOtherServer(
-        const nx::analytics::storage::Filter& filter,
-        std::vector<nx::analytics::storage::LookupResult>* lookupResults);
+        const nx::analytics::db::Filter& filter,
+        std::vector<nx::analytics::db::LookupResult>* lookupResults);
 
-    nx::analytics::storage::LookupResult mergeResults(
-        std::vector<nx::analytics::storage::LookupResult> lookupResults,
+    nx::analytics::db::LookupResult mergeResults(
+        std::vector<nx::analytics::db::LookupResult> lookupResults,
         Qt::SortOrder resultSortOrder);
 
     template<typename T>

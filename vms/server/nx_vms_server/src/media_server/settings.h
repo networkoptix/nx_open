@@ -5,7 +5,7 @@
 
 #include <QtCore/QSettings>
 
-#include <analytics/detected_objects_storage/analytics_events_storage_settings.h>
+#include <analytics/db/analytics_events_storage_settings.h>
 #include <nx/vms/server/settings.h>
 
 class QnMediaServerModule;
@@ -32,7 +32,7 @@ public:
     void syncRoSettings() const;
     void close();
 
-    nx::analytics::storage::Settings analyticEventsStorage() const;
+    nx::analytics::db::Settings analyticEventsStorage() const;
 
     static QString defaultConfigDirectory();
 
@@ -51,5 +51,5 @@ private:
     nx::vms::server::Settings m_settings;
     std::unique_ptr<QSettings> m_rwSettings;
     std::shared_ptr<QSettings> m_roSettings;
-    nx::analytics::storage::Settings m_analyticEventsStorage;
+    nx::analytics::db::Settings m_analyticEventsStorage;
 };

@@ -63,7 +63,7 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
-#include <nx/vms/server/analytics/detected_objects_storage/analytics_events_storage.h>
+#include <nx/vms/server/analytics/db/analytics_events_storage.h>
 
 #include "wearable_lock_manager.h"
 #include "wearable_upload_manager.h"
@@ -227,7 +227,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_context.reset(new UniquePtrContext());
 
     m_analyticsEventsStorage =
-        nx::analytics::storage::EventsStorageFactory::instance().create();
+        nx::analytics::db::EventsStorageFactory::instance().create();
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
@@ -496,7 +496,7 @@ AbstractArchiveIntegrityWatcher* QnMediaServerModule::archiveIntegrityWatcher() 
     return m_archiveIntegrityWatcher;
 }
 
-nx::analytics::storage::AbstractEventsStorage* QnMediaServerModule::analyticsEventsStorage() const
+nx::analytics::db::AbstractEventsStorage* QnMediaServerModule::analyticsEventsStorage() const
 {
     return m_analyticsEventsStorage.get();
 }
