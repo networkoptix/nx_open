@@ -70,21 +70,11 @@ export class NxIntegrationsComponent implements OnInit {
     }
 
     setTags() {
-        Object.keys(this.CONFIG.integrationFilterItems).forEach((key) => {
-            // if (this.CONFIG.integrationFilterItems) {
-            //     this.CONFIG.integrationFilterItems.forEach(item => {
-                    this.filterModel.tags.push(key);
-                // });
-            // }
+        this.CONFIG.integrationFilterItems.forEach(item => {
+            if (item.enabled) {
+                    this.filterModel.tags.push({ id: item.name, label: item.name, value: false });
+            }
         });
-        // this.allElements.forEach((integration) => {
-        //     integration.information.type.forEach((type) => {
-        //         const found = this.filterModel.tags.some((tag) => tag.id === type);
-        //         if (!found) {
-        //             this.filterModel.tags.push({ id: type, label: type, value: false });
-        //         }
-        //     });
-        // });
 
         // Ensure model change will be trigger
         this.filterModel = { ...this.filterModel };
