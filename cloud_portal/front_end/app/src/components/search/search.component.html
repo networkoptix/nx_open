@@ -47,7 +47,7 @@
 
         <div class="row col-12 m-0 p-0"
              [hidden]="!showAdvancedOptions" *ngIf="localFilter.tags">
-            <div class="drop-container row col-12 col-lg-9 col-xxl-6 mt-3 m-0 p-0"
+            <div class="drop-container row col-12 mt-3 m-0 p-0"
                  *ngIf="localFilter.selects && localFilter.selects.length || localFilter.multiselects && localFilter.multiselects.length">
 
                 <div class="drop col-12 col-md-4 mt-3 mt-md-0" *ngFor="let select of localFilter.selects">
@@ -72,7 +72,7 @@
                 </div>
             </div>
 
-            <div class="col-xxl-6 mb-2 m-0 p-0"
+            <div class="mb-2 m-0 p-0"
                  [ngClass]="{'mt-2' : layout != 'full', 'mt-3 mb-2': layout == 'full'}"
                  [hidden]="!showAdvancedOptions && localFilter.tags && localFilter.tags.length">
 

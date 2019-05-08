@@ -199,6 +199,7 @@ button, .btn {
     max-width : none;
     cursor    : default !important;
     font-family : $font-family-regular;
+    font-size : rem(13px);
     
     .close-button {
         position        : absolute;

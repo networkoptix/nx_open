@@ -37,12 +37,14 @@
     @include badge-selected($light16, $light17, $light18);
     cursor : default !important;
     font-family : $font-family-regular;
+    font-size : rem(13px);
 }
 
 .badge-brand-selected {
     @include badge-selected($brand_core, $brand_d1, $brand_d2);
     cursor : default !important;
     font-family : $font-family-regular;
+    font-size : rem(13px);
 }
 
 $theme-colors : (
