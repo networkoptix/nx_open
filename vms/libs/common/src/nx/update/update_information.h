@@ -109,14 +109,14 @@ public:
     QnUuid serverId;
     Code code = Code::idle;
     QString message;
-    double progress = 0.0;
+    int progress = 0;
 
     Status() = default;
     Status(
         const QnUuid& serverId,
         Code code,
         const QString& message = QString(),
-        double progress = 0.0)
+        int progress = 0)
         :
         serverId(serverId),
         code(code),
