@@ -57,7 +57,7 @@ class ProductFilter(SimpleListFilter):
     def lookups(self, request, model_admin):
         products = Product.objects.all()
         if not request.user.is_superuser:
-            products = products.filter(customizations__name__in=request.user.customizations)
+            products = products.filter(customizations__name__in=request.user.customizations).distinct()
         # TODO: Get list of available products for non context managers
         if not UserGroupsToProductPermissions.\
                 check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
