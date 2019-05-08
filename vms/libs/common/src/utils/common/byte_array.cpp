@@ -253,8 +253,6 @@ QnByteArray& QnByteArray::operator=( QnByteArray&& right )
 
 bool QnByteArray::reallocate(unsigned int capacity)
 {
-    NX_ASSERT(capacity > 0);
-
     if (capacity < m_size)
     {
         qWarning("QnByteArray::reallocate(): Unable to decrease capacity. "
@@ -269,14 +267,16 @@ bool QnByteArray::reallocate(unsigned int capacity)
         capacity + QN_BYTE_ARRAY_PADDING,
         m_alignment,
         std::bind( &QnAbstractAllocator::alloc, m_allocator, _1 ) );
-    if(!data)
+    if (!data)
         return false;
 #ifdef CALC_QnByteArray_ALLOCATION
     QnByteArray_bytesAllocated.fetchAndAddOrdered( capacity + QN_BYTE_ARRAY_PADDING );
 #endif
 
-    memcpy(data, m_data, m_size);
-    if( m_ownBuffer )
+    if (m_data && m_size)
+        memcpy(data, m_data, m_size);
+
+    if (m_ownBuffer && m_data)
     {
         nx::kit::utils::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
 #ifdef CALC_QnByteArray_ALLOCATION
