@@ -324,7 +324,9 @@ private:
             [transaction = std::move(transaction)](nx::sql::QueryContext* queryContext)
             {
                 if (queryContext->transaction()->isActive())
+                {
                     ASSERT_EQ(nx::sql::DBResult::ok, queryContext->transaction()->commit());
+                }
                 delete queryContext;
             };
 
@@ -718,11 +720,12 @@ protected:
             commandLog().startDbTransaction(
                 m_clusterId,
                 [this, i](auto&&... args) { return insertRandomCustomer(std::move(args)..., i); },
-                [this](
-                    nx::sql::DBResult dbResult)
+                [this](nx::sql::DBResult dbResult)
                 {
                     if (dbResult != nx::sql::DBResult::cancelled)
+                    {
                         ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
+                    }
 
                     m_commandResults.push(dbResult);
                 });
