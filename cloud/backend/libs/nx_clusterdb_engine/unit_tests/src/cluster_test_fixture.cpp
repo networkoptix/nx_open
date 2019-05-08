@@ -184,7 +184,7 @@ Peer& ClusterTestFixture::addPeer(
     for (const auto& arg: args)
         peer->process().addArg(arg.first, arg.second);
 
-    [this, &peer]() { ASSERT_TRUE(peer->process().startAndWaitUntilStarted()); }();
+    [&peer]() { ASSERT_TRUE(peer->process().startAndWaitUntilStarted()); }();
 
     if (!m_connectorTypeKey.empty())
     {
