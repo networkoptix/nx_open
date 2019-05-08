@@ -24,6 +24,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
@@ -110,8 +111,10 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
     setPlaceholderPixmap(qnSkin->pixmap("events/placeholders/analytics.png"));
     selectCameras(AbstractSearchWidget::Cameras::layout);
 
-    connect(model(), &AbstractSearchListModel::isOnlineChanged,
-        this, &AnalyticsSearchWidget::updateAllowance);
+    connect(model(), &AbstractSearchListModel::isOnlineChanged, this,
+        &AnalyticsSearchWidget::updateAllowance);
+    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
+        &AnalyticsSearchWidget::updateAllowance);
 }
 
 AnalyticsSearchWidget::~AnalyticsSearchWidget()
@@ -152,7 +155,10 @@ QString AnalyticsSearchWidget::itemCounterText(int count) const
 
 bool AnalyticsSearchWidget::calculateAllowance() const
 {
-    if (!model()->isOnline())
+    const bool hasPermissions = model()->isOnline()
+        && accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
+
+    if (!hasPermissions)
         return false;
 
     const nx::analytics::ObjectTypeDescriptorManager manager(commonModule());
@@ -273,6 +279,7 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     const auto objectTypeDescriptors = objectTypeDescriptorManager.descriptors();
     const auto engineDescriptors = engineDescriptorManager.descriptors();
     m_objectTypeMenu->clear();
+    m_defaultAction = addMenuAction(m_objectTypeMenu, tr("Any type"), {});
 
     const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
     QSet<QnUuid> enabledEngines;
@@ -281,6 +288,8 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
 
     if (!objectTypeDescriptors.empty())
     {
+        m_objectTypeMenu->addSeparator();
+
         QHash<QnUuid, EngineInfo> engineById;
         for (const auto& [engineId, engineDescriptor]: engineDescriptors)
         {
@@ -336,9 +345,6 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
             }
         }
     }
-
-    m_objectTypeMenu->addSeparator();
-    m_defaultAction = addMenuAction(m_objectTypeMenu, tr("Any type"), {});
 
     if (!currentSelectionStillAvailable)
         m_model->setSelectedObjectType({});

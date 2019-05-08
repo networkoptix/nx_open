@@ -18,6 +18,7 @@ public:
     QString name;
 
     QnServerBackupSchedule backupSchedule;
+    QnUuid metadataStorageId;
 
     QnMediaServerUserAttributes();
     void assign(
@@ -25,12 +26,8 @@ public:
         QSet<QByteArray>                    *const modifiedFields
     );
 };
-#define QnMediaServerUserAttributes_Fields  \
-    (serverId)                              \
-    (maxCameras)                            \
-    (isRedundancyEnabled)                   \
-    (name)                                  \
-    (backupSchedule)                     \
+#define QnMediaServerUserAttributes_Fields \
+    (serverId)(maxCameras)(isRedundancyEnabled)(name)(backupSchedule)(metadataStorageId)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnMediaServerUserAttributes, (eq))
 

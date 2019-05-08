@@ -30,6 +30,8 @@ public:
 
     virtual common::metadata::ConstDetectionMetadataPacketPtr next() override;
 
+    virtual void close() override;
+
     const Filter& filter() const;
 
     nx::utils::SyncQueue<common::metadata::ConstDetectionMetadataPacketPtr>& packetsProvidedQueue();
@@ -62,14 +64,12 @@ public:
         m_asyncCaller.pleaseStopSync();
     }
 
-    virtual bool initialize() override
+    virtual bool initialize(const Settings& /*settings*/) override
     {
         return true;
     }
 
-    virtual void save(
-        common::metadata::ConstDetectionMetadataPacketPtr packet,
-        StoreCompletionHandler completionHandler) override
+    virtual void save(common::metadata::ConstDetectionMetadataPacketPtr packet) override
     {
         auto it = std::upper_bound(
             m_detectionPackets.begin(),
@@ -82,8 +82,6 @@ public:
             });
 
         m_detectionPackets.insert(it, std::move(packet));
-
-        completionHandler(ResultCode::ok);
     }
 
     virtual void createLookupCursor(
@@ -98,6 +96,8 @@ public:
                 completionHandler(ResultCode::ok, std::move(cursor));
             });
     }
+
+    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& /*cursor*/) override {}
 
     virtual void lookup(
         Filter /*filter*/,
@@ -117,6 +117,11 @@ public:
     virtual void markDataAsDeprecated(
         QnUuid /*deviceId*/,
         std::chrono::milliseconds /*oldestNeededDataTimestamp*/) override
+    {
+        FAIL();
+    }
+
+    virtual void flush(StoreCompletionHandler /*completionHandler*/) override
     {
         FAIL();
     }
@@ -190,6 +195,10 @@ common::metadata::ConstDetectionMetadataPacketPtr Cursor::next()
     auto resultPacket = m_eventsStorageStub->m_detectionPackets[m_nextPacketPosition++];
     m_packetsProvidedQueue.push(resultPacket);
     return resultPacket;
+}
+
+void Cursor::close()
+{
 }
 
 const Filter& Cursor::filter() const

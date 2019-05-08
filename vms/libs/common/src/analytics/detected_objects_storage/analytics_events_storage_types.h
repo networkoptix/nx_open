@@ -34,6 +34,8 @@ QN_FUSION_DECLARE_FUNCTIONS(ObjectPosition, (json)(ubjson));
 
 struct DetectedObject
 {
+    /** Device object has been detected on. */
+    QnUuid deviceId;
     QnUuid objectAppearanceId;
     QString objectTypeId;
     /** Persistent object attributes. E.g., license plate number. */
@@ -64,7 +66,7 @@ struct Filter
      * Coordinates are in range [0;1].
      */
     QRectF boundingBox;
-    std::vector<common::metadata::Attribute> requiredAttributes;
+
     /**
      * Set of words separated by spaces, commas, etc...
      * Search is done across all attributes (names and values).
@@ -83,6 +85,8 @@ struct Filter
      */
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
+    bool empty() const;
+
     bool operator==(const Filter& right) const;
     bool operator!=(const Filter& right) const;
 };
@@ -94,7 +98,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
 QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
-    (deviceIds)(objectTypeId)(objectAppearanceId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
+    (deviceIds)(objectTypeId)(objectAppearanceId)(timePeriod)(boundingBox)(freeText)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------

@@ -26,15 +26,17 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
-#include <nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
 #include "server_update_tool.h"
 #include "server_updates_model.h"
+
+using namespace nx::vms::common::p2p::downloader;
 
 namespace {
 
@@ -77,11 +79,7 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
         m_stateTracker.get(), &PeerStateTracker::setVersionInformation);
     m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
 
-    vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
-    m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
-    m_peerManager->setParent(this);
-
-    m_downloader.reset(new Downloader(m_outputDir, commonModule(), this));
+    m_downloader.reset(new Downloader(m_outputDir, commonModule()));
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ServerUpdateTool::atDownloaderStatusChanged);
 
@@ -104,7 +102,6 @@ ServerUpdateTool::~ServerUpdateTool()
     saveInternalState();
     m_downloader->disconnect(this);
     m_serverConnection.reset();
-    m_peerManager.reset();
     NX_VERBOSE(this) << "~ServerUpdateTool() done";
 }
 
@@ -324,7 +321,7 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
 QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
 {
     QnMediaServerResourceList result;
-    auto items = m_stateTracker->getAllItems();
+    auto items = m_stateTracker->allItems();
     for (const auto& record: items)
     {
         auto server = m_stateTracker->getServer(record);
@@ -355,6 +352,7 @@ QDir ServerUpdateTool::getDownloadDir() const
 void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
 {
     NX_ASSERT(m_downloader);
+
     // TODO: Stop previous manual downloads
     m_manualPackages = contents.manualPackages;
 
@@ -376,7 +374,7 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
         switch (code)
         {
             case Code::ok:
-                NX_VERBOSE(this) << "startManualDownloads() - downloading client package"
+                NX_VERBOSE(this) << "startManualDownloads() - downloading package"
                     << info.name << " from url=" << package.url;
                 m_activeDownloads.insert(std::make_pair(package.file, 0));
                 break;
@@ -392,7 +390,7 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
             // Some sort of an error here.
             {
                 QString error = vms::common::p2p::downloader::toString(code);
-                NX_VERBOSE(this) << "requestStartUpdate() - failed to add client package "
+                NX_VERBOSE(this) << "requestStartUpdate() - failed start downloading package"
                     << info.name << error;
                 m_failedDownloads.insert(file);
                 break;
@@ -604,8 +602,13 @@ bool ServerUpdateTool::verifyUpdateManifest(
     bool checkClient) const
 {
     NX_ASSERT(m_stateTracker);
-    std::map<QnUuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->getActiveServers();
-    return verifyUpdateContents(commonModule(), contents, activeServers, clientVersions, checkClient);
+    std::map<QnUuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->activeServers();
+
+    ClientVerificationData clientData;
+    clientData.fillDefault();
+    clientData.clientId = checkClient ? m_stateTracker->getClientPeerId() : QnUuid();
+    clientData.installedVersions = clientVersions;
+    return verifyUpdateContents(commonModule(), contents, activeServers, clientData);
 }
 
 void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
@@ -683,25 +686,9 @@ bool ServerUpdateTool::haveActiveUpdate() const
     return m_updateManifest.isValid();
 }
 
-nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
-{
-    UpdateContents contents;
-    contents.sourceType = nx::update::UpdateSourceType::mediaservers;
-    contents.source = "mediaservers";
-    contents.info = m_updateManifest;
-    QString errorMessage;
-
-    nx::update::findPackage(
-        *commonModule(), m_updateManifest, &contents.clientPackage, &errorMessage);
-    // TODO: Should move this to Widget somehow.
-    verifyUpdateManifest(contents, {});
-    return contents;
-}
-
 void ServerUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId)
 {
     m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
-    m_peerManager->setServerUrl(serverUrl, serverId);
 }
 
 ServerUpdateTool::TimePoint::duration ServerUpdateTool::getInstallDuration() const
@@ -710,11 +697,27 @@ ServerUpdateTool::TimePoint::duration ServerUpdateTool::getInstallDuration() con
     return std::chrono::milliseconds(delta);
 }
 
-void ServerUpdateTool::requestStopAction()
+bool ServerUpdateTool::requestStopAction()
 {
-    m_updateManifest = nx::update::Information();
+    if (m_requestingStop)
+    {
+        NX_WARNING(this, "requestStopAction() - previous request is not complete");
+        return false;
+    }
+
     if (auto connection = getServerConnection(commonModule()->currentServer()))
-        connection->updateActionStop({});
+    {
+        NX_INFO(this, "requestStopAction() - sending request");
+        connection->updateActionStop(nx::utils::guarded(this,
+            [this](bool success, rest::Handle /*handle*/)
+            {
+                // This will be called in outer
+                NX_VERBOSE(this, "requestStopAction() - success=%1", success);
+                m_updateManifest = nx::update::Information();
+                m_requestingStop = false;
+                emit cancelUpdateComplete(success);
+            }), thread());
+    }
 
     if (!m_activeRequests.empty())
     {
@@ -726,14 +729,35 @@ void ServerUpdateTool::requestStopAction()
         m_downloader->deleteFile(file.first);
     m_activeDownloads.clear();
     m_stateTracker->clearState();
+    return true;
 }
 
-void ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
+bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
 {
-    NX_WARNING(this, "requestFinishUpdate(%1)", skipActivePeers);
+    if (m_requestingFinish)
+    {
+        NX_WARNING(this, "requestFinishUpdate(%1) - previous request is not complete",
+            skipActivePeers);
+        return false;
+    }
+
+    m_requestingFinish = true;
     if (auto connection = getServerConnection(commonModule()->currentServer()))
-        connection->updateActionFinish(skipActivePeers, {});
-    m_stateTracker->clearState();
+    {
+        NX_VERBOSE(this, "requestFinishUpdate(%1) - sending request", skipActivePeers);
+        connection->updateActionFinish(skipActivePeers, nx::utils::guarded(this,
+            [this, skipActivePeers](bool success, rest::Handle /*handle*/)
+            {
+                NX_VERBOSE(this, "requestFinishUpdate(%1) - got response", skipActivePeers);
+                m_requestingFinish = false;
+                emit finishUpdateComplete(success);
+            }), thread());
+        m_stateTracker->clearState();
+        return true;
+    }
+
+    NX_VERBOSE(this, "requestFinishUpdate(%1) - no connection to the server", skipActivePeers);
+    return false;
 }
 
 void ServerUpdateTool::requestStartUpdate(
@@ -771,13 +795,23 @@ void ServerUpdateTool::requestStartUpdate(
 void ServerUpdateTool::requestInstallAction(
     const QSet<QnUuid>& targets)
 {
+    // Filtering out only 'server' components.
+    QSet<QnUuid> servers;
+    for (const auto& id: targets)
+    {
+        auto item = m_stateTracker->findItemById(id);
+        if (item->component == UpdateItem::Component::server)
+            servers.insert(id);
+    }
+
     if (!m_activeRequests.empty())
         m_skippedRequests.unite(m_activeRequests);
-    NX_VERBOSE(this) << "requestInstallAction() for" << targets;
+
+    NX_VERBOSE(this) << "requestInstallAction() for" << servers;
     m_remoteUpdateStatus = {};
 
     m_timeStartedInstall = qnSyncTime->currentMSecsSinceEpoch();
-    m_serversAreInstalling.clear();
+    m_serversAreInstalling = servers;
 
     auto callback = [tool = QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
         {
@@ -792,26 +826,41 @@ void ServerUpdateTool::requestInstallAction(
 
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        if (auto handle = connection->updateActionInstall(targets, callback, thread()))
+        if (auto handle = connection->updateActionInstall(servers, callback, thread()))
             m_requestingInstall.insert(handle);
+    }
+
+    // We need to create manual connection to mediaserver to track version changes.
+    if (auto ec2connection = commonModule()->ec2Connection())
+    {
+        QnConnectionInfo connectionInfo = ec2connection->connectionInfo();
+        QnUuid serverId = QnUuid(connectionInfo.ecsGuid);
+        nx::utils::Url serverUrl = connectionInfo.ecUrl;
+        setServerUrl(serverUrl, serverId);
+    }
+    else
+    {
+        NX_ERROR(this, "requestInstallAction() - ec2Connection is not available. "
+            "I will have problems tracking server version during install process.");
     }
 }
 
 void ServerUpdateTool::requestModuleInformation()
 {
-    if (auto connection = getServerConnection(commonModule()->currentServer()))
-    {
-        auto callback =
-            [tool = QPointer(this)](
-                bool success, rest::Handle /*handle*/,
-                const QList<nx::vms::api::ModuleInformation>& response)
-            {
-                if (success && tool)
-                    emit tool->moduleInformationReceived(response);
-            };
-        if (auto handle = connection->getModuleInformation(callback, thread()))
-            m_requestingInstall.insert(handle);
-    }
+    //NX_VERBOSE(this, "requestModuleInformation()");
+    auto callback =
+        [tool = QPointer(this), connection = m_serverConnection](
+            bool success, rest::Handle /*handle*/,
+            const rest::RestResultWithData<QList<nx::vms::api::ModuleInformation>>& response)
+        {
+            if (success && tool)
+                emit tool->moduleInformationReceived(response.data);
+        };
+
+    // We expect that m_serverConnection is created in requestStartUpdate
+    NX_ASSERT(m_serverConnection);
+    if (m_serverConnection)
+        m_serverConnection->getModuleInformationAll(callback);
 }
 
 void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
@@ -859,9 +908,9 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
             {
                 if (response.error != QnRestResult::NoError)
                 {
-                    NX_DEBUG(this,
-                        "requestRemoteUpdateStateAsync: An error in response to the /ec2/updateStatus request: %1",
-                        response.errorString);
+                    NX_VERBOSE(this,
+                        "requestRemoteUpdateStateAsync: An error in response to the /ec2/updateStatus request: code=%1, err=%2",
+                        response.error, response.errorString);
                 }
 
                 if (tool)
@@ -876,7 +925,7 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
 
         // Requesting remote update info.
         handle = connection->getUpdateInfo(
-            [this, tool = QPointer<ServerUpdateTool>(this)](
+            [tool = QPointer<ServerUpdateTool>(this)](
                 bool success, rest::Handle handle, rest::UpdateInformationData response)
             {
                 if (!tool)
@@ -885,6 +934,8 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                 tool->m_activeRequests.remove(handle);
                 if (success && response.error == QnRestResult::NoError)
                 {
+                    if (tool->m_skippedRequests.contains((handle)))
+                        return;
                     tool->m_updateManifest = response.data;
                     tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
                 }
@@ -948,12 +999,6 @@ std::shared_ptr<PeerStateTracker> ServerUpdateTool::getStateTracker()
 QSet<QnUuid> ServerUpdateTool::getServersInstalling() const
 {
     return m_serversAreInstalling;
-}
-
-ServerUpdateTool::PeerManagerPtr ServerUpdateTool::createPeerManager(
-    FileInformation::PeerSelectionPolicy /*peerPolicy*/, const QList<QnUuid>& /*additionalPeers*/)
-{
-    return m_peerManager.get();
 }
 
 const nx::update::Package* ServerUpdateTool::findPackageForFile(const QString& fileName) const
@@ -1040,7 +1085,7 @@ void ServerUpdateTool::atDownloadFailed(const QString& fileName)
     }
 }
 
-QString getServerUrl(QnCommonModule* commonModule, QString path)
+nx::utils::Url getServerUrl(QnCommonModule* commonModule, QString path)
 {
     if (const auto connection = commonModule->ec2Connection())
     {
@@ -1049,24 +1094,30 @@ QString getServerUrl(QnCommonModule* commonModule, QString path)
         url.setPath(path);
         bool hasSsl = commonModule->moduleInformation().sslAllowed;
         url.setScheme(nx::network::http::urlSheme(hasSsl));
-        return url.toString(QUrl::RemoveUserInfo);
+        return url;
     }
     return "";
 }
 
 QString ServerUpdateTool::getUpdateStateUrl() const
 {
-    return getServerUrl(commonModule(), "/ec2/updateStatus");
+    const auto url = getServerUrl(commonModule(), "/ec2/updateStatus");
+    return url.toString(QUrl::RemoveUserInfo);
 }
 
 QString ServerUpdateTool::getUpdateInformationUrl() const
 {
-    return getServerUrl(commonModule(), "/ec2/updateInformation");
+    const auto url = getServerUrl(commonModule(), "/ec2/updateInformation");
+    return url.toString(QUrl::RemoveUserInfo);
 }
 
 QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 {
-    return getServerUrl(commonModule(), "/ec2/updateInfomation?version=installed");
+    auto url = getServerUrl(commonModule(), "/ec2/updateInfomation");
+    QUrlQuery query;
+    query.addQueryItem("version", "latest");
+    url.setQuery(query);
+    return url.toString(QUrl::RemoveUserInfo);
 }
 
 std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkLatestUpdate(
@@ -1191,11 +1242,6 @@ QUrl generateUpdatePackageUrl(
     {
         const auto& server = resourcePool->getResourceById<QnMediaServerResource>(id);
         if (!server)
-            continue;
-
-        bool incompatible = (server->getStatus() == Qn::Incompatible);
-
-        if (server->getStatus() != Qn::Online && !incompatible)
             continue;
 
         if (!server->getSystemInfo().isValid())

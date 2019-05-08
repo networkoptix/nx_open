@@ -16,7 +16,7 @@
 namespace {
 
 using namespace std::chrono;
-using nx::vms::common::p2p::downloader::Worker;
+using namespace nx::vms::common::p2p::downloader;
 
 constexpr int kDefaultPeersPerOperation = 5;
 constexpr int kSubsequentChunksToDownload = 5;
@@ -97,36 +97,29 @@ QList<QnUuid> takeRandomPeers(QList<QnUuid>& peers, int count)
 
 } // namespace
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
+namespace nx::vms::common::p2p::downloader {
 
 Worker::Worker(
     const QString& fileName,
     Storage* storage,
-    AbstractPeerManager* peerManager)
+    const QList<AbstractPeerManager*>& peerManagers,
+    const QnUuid& selfId)
     :
+    m_selfId(selfId),
     m_storage(storage),
-    m_peerManager(peerManager),
+    m_peerManagers(peerManagers),
     m_fileName(fileName),
     m_peersPerOperation(kDefaultPeersPerOperation)
 {
-    updateLogTag();
+    m_logTag = nx::utils::log::Tag(QStringLiteral("%1 [%2]").arg(::toString(this), m_fileName));
 
     NX_ASSERT(storage);
     if (!storage)
         return;
 
-    NX_ASSERT(peerManager);
-    if (!peerManager)
-        return;
+    NX_ASSERT(!peerManagers.isEmpty());
 
-    if (!peerManager->parent())
-        peerManager->setParent(this);
-
-    NX_VERBOSE(m_logTag, "Created. Self GUID: %1", peerManager->selfId());
+    NX_VERBOSE(m_logTag, "Created.");
 }
 
 Worker::~Worker()
@@ -197,6 +190,12 @@ bool Worker::haveChunksToDownloadUnsafe()
     if (!fileInfo.isValid())
         return false;
 
+    for (const PeerInformation& peer: m_peerInfoByPeer)
+    {
+        if (peer.isInternet)
+            return true;
+    }
+
     const int chunksCount = fileInfo.downloadedChunks.size();
     if (m_availableChunks.size() != chunksCount)
         return false;
@@ -207,12 +206,6 @@ bool Worker::haveChunksToDownloadUnsafe()
             return true;
     }
     return false;
-}
-
-void Worker::setPreferredPeers(const QList<QnUuid>& preferredPeers)
-{
-    for (const auto& peerId: preferredPeers)
-        m_peerInfoById[peerId].rank = kMaxAutoRank;
 }
 
 void Worker::setState(State state)
@@ -313,14 +306,7 @@ void Worker::doWork()
                     requestChecksums();
                     break;
                 case FileInformation::Status::downloading:
-                    if (m_usingInternet)
-                    {
-                        if (hasNotDownloadingChunks())
-                            downloadNextChunk();
-                        else
-                            setShouldWaitForAsyncOperationCompletion();
-                    }
-                    else if (haveChunksToDownloadUnsafe())
+                    if (haveChunksToDownloadUnsafe())
                     {
                         if (m_subsequentChunksToDownload == 0 && needToFindBetterPeers())
                         {
@@ -330,7 +316,9 @@ void Worker::doWork()
                                 setShouldWaitForAsyncOperationCompletion();
                         }
                         else
+                        {
                             downloadNextChunk();
+                        }
                     }
                     else if (m_downloadingChunks.count(true) == 0)
                     {
@@ -380,78 +368,40 @@ void Worker::requestFileInformationInternal()
 
     NX_VERBOSE(m_logTag, "Trying to get %1.", requestSubjectString(m_state));
 
-    const auto peers = selectPeersForOperation();
+    const QList<Peer>& peers = selectPeersForOperation(AbstractPeerManager::FileInfo);
     if (peers.isEmpty())
     {
         revivePeersWithMinimalRank();
-
-        if (m_state == State::requestingAvailableChunks
-            && !selectPeersForInternetDownload().isEmpty())
-        {
-            setState(State::foundAvailableChunks);
-            return setShouldWait(false);
-        }
-
-        return setShouldWait(true);
+        setShouldWait(true);
+        return;
     }
 
     for (const auto& peer: peers)
     {
-        QString peerName = m_peerManager->peerString(peer);
         NX_VERBOSE(m_logTag, "Requesting %1 from server %2.",
-            requestSubjectString(m_state), peerName);
+            requestSubjectString(m_state), peer);
 
-        const auto handle = m_peerManager->requestFileInfo(peer, m_fileName, nx::utils::guarded(this,
-            [this](bool success, rest::Handle handle, const FileInformation& fileInfo)
-            {
-                handleFileInformationReply(success, handle, fileInfo);
-            }));
+        const rest::Handle handle = peer.manager->requestFileInfo(
+            peer.id,
+            m_fileName,
+            nx::utils::guarded(this,
+                [this, peer](bool success, rest::Handle handle, const FileInformation& fileInfo)
+                {
+                    handleFileInformationReply(
+                        success, RequestHandle{peer.manager, handle}, fileInfo);
+                }));
+
         if (handle > 0)
-            m_contextByHandle[handle] = RequestContext(peer, State::requestingFileInformation);
+        {
+            m_contextByHandle[RequestHandle{peer.manager, handle}] =
+                RequestContext(peer, State::requestingFileInformation);
+        }
     }
 
     if (m_contextByHandle.isEmpty())
         setShouldWait(true);
     else
         setShouldWaitForAsyncOperationCompletion();
-}
-
-void Worker::setShouldWaitForAsyncOperationCompletion()
-{
-    NX_VERBOSE(m_logTag, "setShouldWaitForAsyncOperationCompletion()");
-    m_shouldWait = true;
-}
-
-void Worker::setShouldWait(bool value)
-{
-    if (value)
-    {
-        NX_VERBOSE(m_logTag, "setShouldWait(): Start waiting.");
-
-        m_shouldWait = true;
-        if (!m_stepDelayTimer.hasPendingTasks())
-        {
-            NX_VERBOSE(m_logTag, "setShouldWait(): Starting a timer.");
-
-            m_stepDelayTimer.addTimer(
-                [this](utils::TimerId /*timerId*/)
-                {
-                    NX_VERBOSE(m_logTag, "setShouldWait(): Waking by a timer...");
-
-                    NX_MUTEX_LOCKER lock(&m_mutex);
-                    m_shouldWait = false;
-                    m_waitCondition.wakeOne();
-                },
-                std::chrono::milliseconds(delayMs()));
-        }
-    }
-    else if (!value)
-    {
-        NX_VERBOSE(m_logTag, "setShouldWait(): Waking...");
-
-        m_shouldWait = false;
-        m_waitCondition.wakeOne();
-    }
 }
 
 qint64 Worker::delayMs() const
@@ -472,18 +422,17 @@ void Worker::requestAvailableChunks()
 }
 
 void Worker::handleFileInformationReply(
-    bool success, rest::Handle handle, const FileInformation& fileInfo)
+    bool success, RequestHandle handle, const FileInformation& fileInfo)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    auto requestContext = m_contextByHandle.take(handle);
+    RequestContext requestContext = m_contextByHandle.take(handle);
 
     NX_VERBOSE(m_logTag, "handleFileInformationReply(): Got %3 reply from %1: %2",
-        m_peerManager->peerString(requestContext.peerId),
+        requestContext.peer,
         statusString(success),
         requestSubjectString(m_state));
 
-    NX_ASSERT(!requestContext.peerId.isNull());
     NX_ASSERT(requestContext.type == State::requestingFileInformation);
 
     auto exitGuard = nx::utils::makeScopeGuard(
@@ -492,36 +441,31 @@ void Worker::handleFileInformationReply(
             if (!m_contextByHandle.isEmpty())
                 return setShouldWaitForAsyncOperationCompletion();
 
-            if (m_state == State::requestingFileInformation
-                || m_state == State::requestingAvailableChunks)
-            {
-                if (isFileReadyForInternetDownload()
-                    && !selectPeersForInternetDownload().isEmpty())
-                {
-
-                    setState(State::foundAvailableChunks);
-                    setShouldWait(false);
-                    return;
-                }
-
-                setShouldWait(true);
-                return;
-            }
-
-            setShouldWait(false);
+            setShouldWait(m_state == State::requestingFileInformation
+                || m_state == State::requestingAvailableChunks);
     });
 
-    auto& peerInfo = m_peerInfoById[requestContext.peerId];
+    auto& peerInfo = m_peerInfoByPeer[requestContext.peer];
 
-    if (!success || !fileInfo.isValid())
+    if (!success)
     {
-        decreasePeerRank(requestContext.peerId);
+        decreasePeerRank(requestContext.peer);
         return;
     }
 
-    if (m_state == State::requestingFileInformation
-        && fileInfo.size >= 0 && !fileInfo.md5.isEmpty() && fileInfo.chunkSize > 0)
+    peerInfo.isInternet = fileInfo.downloadedChunks.isEmpty();
+
+    if (m_state == State::requestingFileInformation)
     {
+        if (fileInfo.size < 0 || fileInfo.md5.isEmpty() || fileInfo.chunkSize <= 0)
+        {
+            if (!peerInfo.isInternet)
+            {
+                decreasePeerRank(requestContext.peer);
+                return;
+            }
+        }
+
         auto resultCode = m_storage->setChunkSize(fileInfo.name, fileInfo.chunkSize);
         if (resultCode != ResultCode::ok)
         {
@@ -551,14 +495,9 @@ void Worker::handleFileInformationReply(
     }
 
     peerInfo.downloadedChunks = fileInfo.downloadedChunks;
-    if (m_availableChunks.count(true) < fileInfo.downloadedChunks.size()
-        && !addAvailableChunksInfo(fileInfo.downloadedChunks))
-    {
-        decreasePeerRank(requestContext.peerId);
-        return;
-    }
+    addAvailableChunksInfo(fileInfo.downloadedChunks);
 
-    increasePeerRank(requestContext.peerId);
+    increasePeerRank(requestContext.peer);
     if (m_state == State::requestingAvailableChunks)
         setState(State::foundAvailableChunks);
 }
@@ -576,7 +515,7 @@ void Worker::requestChecksums()
     m_subsequentChunksToDownload = 0;
     setState(State::requestingChecksums);
 
-    const auto peers = selectPeersForOperation();
+    const auto peers = selectPeersForOperation(AbstractPeerManager::Checksums);
     if (peers.isEmpty())
     {
         NX_VERBOSE(m_logTag, "requestChecksums(): No peers selected. Exiting.");
@@ -588,17 +527,22 @@ void Worker::requestChecksums()
     for (const auto& peer: peers)
     {
         NX_VERBOSE(m_logTag, "requestChecksums(): Requesting %1 from server %2.",
-            requestSubjectString(State::requestingChecksums),
-            m_peerManager->peerString(peer));
+            requestSubjectString(State::requestingChecksums), peer);
 
-        const auto handle = m_peerManager->requestChecksums(peer, m_fileName, nx::utils::guarded(this,
-            [this](
-                bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
-            {
-                handleChecksumsReply(success, handle, checksums);
-            }));
+        const auto handle = peer.manager->requestChecksums(
+            peer.id,
+            m_fileName,
+            nx::utils::guarded(this,
+                [this, peer](
+                    bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
+                {
+                    handleChecksumsReply(success, RequestHandle{peer.manager, handle}, checksums);
+                }));
         if (handle > 0)
-            m_contextByHandle[handle] = RequestContext(peer, State::requestingChecksums);
+        {
+            m_contextByHandle[RequestHandle{peer.manager, handle}] =
+                RequestContext(peer, State::requestingChecksums);
+        }
     }
 
     if (m_contextByHandle.isEmpty())
@@ -608,7 +552,7 @@ void Worker::requestChecksums()
 }
 
 void Worker::handleChecksumsReply(
-    bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
+    bool success, RequestHandle handle, const QVector<QByteArray>& checksums)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -616,22 +560,17 @@ void Worker::handleChecksumsReply(
 
     NX_VERBOSE(m_logTag, "handleChecksumsReply(): Got %1 from %2: %3",
         requestSubjectString(State::requestingChecksums),
-        m_peerManager->peerString(requestContext.peerId),
+        requestContext.peer,
         statusString(success));
 
-    NX_ASSERT(!requestContext.peerId.isNull());
+    NX_ASSERT(!requestContext.peer.isNull());
     NX_ASSERT(requestContext.type == State::requestingChecksums);
 
     auto exitGuard = nx::utils::makeScopeGuard(
         [this, &success]()
         {
             if (success)
-            {
                 cancelRequestsByType(State::requestingChecksums);
-                setShouldWait(true);
-                return;
-            }
-
             setShouldWait(false);
         });
 
@@ -645,7 +584,7 @@ void Worker::handleChecksumsReply(
     {
         NX_VERBOSE(m_logTag, "handleChecksumsReply(): Got invalid reply. Exiting.");
         success = false;
-        decreasePeerRank(requestContext.peerId);
+        decreasePeerRank(requestContext.peer);
         return;
     }
 
@@ -694,23 +633,14 @@ void Worker::downloadNextChunk()
 
     const auto& fileInfo = fileInformation();
 
-    QList<QnUuid> peers;
-
-    if (m_usingInternet && m_subsequentChunksToDownload > 0)
+    QList<Peer> peers = peersForChunk(chunkIndex);
+    if (!NX_ASSERT(!peers.isEmpty()))
     {
-        peers = selectPeersForInternetDownload();
-    }
-    else
-    {
-        peers = peersForChunk(chunkIndex);
-        if (peers.isEmpty() && fileInfo.url.isValid())
-        {
-            m_usingInternet = true;
-            peers = selectPeersForInternetDownload();
-        }
+        NX_VERBOSE(m_logTag, "downloadNextChunk(): The selected chunk is not available.");
+        return setShouldWait(false);
     }
 
-    peers = selectPeersForOperation(1, peers, !m_usingInternet);
+    peers = selectPeersForOperation(AbstractPeerManager::DownloadChunk, 1, peers);
     if (peers.isEmpty())
     {
         NX_VERBOSE(m_logTag, "downloadNextChunk(): No peers are selected for download. Waiting.");
@@ -718,74 +648,48 @@ void Worker::downloadNextChunk()
         return setShouldWait(true);
     }
 
-    NX_ASSERT(peers.size() == 1);
-
-    const auto& peerId = peers.first();
+    const auto& peer = peers.first();
 
     NX_VERBOSE(m_logTag, "downloadNextChunk(): Selected peer %1, rank: %2, distance: %3",
-        m_peerManager->peerString(peerId),
-        m_peerInfoById[peerId].rank,
-        m_peerManager->distanceTo(peerId));
+        peer,
+        m_peerInfoByPeer[peer].rank,
+        peer.manager->distanceTo(peer.id));
 
     auto handleReply = nx::utils::guarded(this,
-        [this, chunkIndex](
+        [this, peer, chunkIndex](
             bool result,
             rest::Handle handle,
             const QByteArray& data)
         {
-            handleDownloadChunkReply(result, handle, chunkIndex, data);
+            handleDownloadChunkReply(
+                result, RequestHandle{peer.manager, handle}, chunkIndex, data);
         });
 
     if (m_subsequentChunksToDownload == 0)
-    {
-        if (m_usingInternet && peerId != m_peerManager->selfId())
-            m_subsequentChunksToDownload = 1;
-        else
-            m_subsequentChunksToDownload = kSubsequentChunksToDownload;
-    }
+        m_subsequentChunksToDownload = kSubsequentChunksToDownload;
 
     m_downloadingChunks.setBit(chunkIndex, true);
 
-    rest::Handle handle;
-
-    if (m_usingInternet)
-    {
-        NX_VERBOSE(m_logTag,
-            "downloadNextChunk(): Requesting chunk %1 from the Internet via %2...",
-            chunkIndex,
-            m_peerManager->peerString(peerId));
-        handle = m_peerManager->downloadChunkFromInternet(
-            peerId,
-            fileInfo.name,
-            fileInfo.url,
-            chunkIndex,
-            (int) fileInfo.chunkSize,
-            handleReply);
-    }
-    else
-    {
-        NX_VERBOSE(m_logTag, "downloadNextChunk(): Requesting chunk %1 from %2...",
-            chunkIndex, m_peerManager->peerString(peerId));
-        handle = m_peerManager->downloadChunk(peerId, m_fileName, chunkIndex, handleReply);
-    }
+    NX_VERBOSE(m_logTag, "downloadNextChunk(): Requesting chunk %1 from %2...", chunkIndex, peer);
+    const rest::Handle handle = peer.manager->downloadChunk(
+        peer.id, m_fileName, fileInfo.url, chunkIndex, (int) fileInfo.chunkSize, handleReply);
 
     if (handle <= 0)
     {
         NX_VERBOSE(m_logTag, "downloadNextChunk(): Cannot send request for chunk %1 to %2...",
-            chunkIndex, m_peerManager->peerString(peerId));
+            chunkIndex, peer);
     }
     else
     {
-        NX_VERBOSE(m_logTag,
-            "downloadNextChunk(): Issued download request. Handle: %1, peerId: %2",
-            handle,
-            peerId);
-        m_contextByHandle[handle] = RequestContext(peerId, State::downloadingChunks);
+        NX_VERBOSE(m_logTag, "downloadNextChunk(): Issued download request. Handle: %1, peer: %2",
+            handle, peer);
+        m_contextByHandle[RequestHandle{peer.manager, handle}] =
+            RequestContext(peer, State::downloadingChunks);
     }
 }
 
 void Worker::handleDownloadChunkReply(
-    bool success, rest::Handle handle, int chunkIndex, const QByteArray& data)
+    bool success, RequestHandle handle, int chunkIndex, const QByteArray& data)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -797,7 +701,6 @@ void Worker::handleDownloadChunkReply(
         chunkIndex,
         success);
 
-    NX_ASSERT(!requestContext.peerId.isNull());
     NX_ASSERT(requestContext.type == State::downloadingChunks);
 
     auto exitGuard = nx::utils::makeScopeGuard(
@@ -820,19 +723,16 @@ void Worker::handleDownloadChunkReply(
     }
 
     NX_VERBOSE(m_logTag, "handleDownloadChunkReply(): Got chunk %1 from %2: %3",
-        chunkIndex,
-        m_peerManager->peerString(requestContext.peerId),
-        statusString(success));
+        chunkIndex, requestContext.peer, statusString(success));
 
     if (!success)
     {
-        decreasePeerRank(requestContext.peerId);
+        decreasePeerRank(requestContext.peer);
         return;
     }
 
-    m_subsequentChunksToDownload = std::max(0, m_subsequentChunksToDownload - 1);
-    if (m_subsequentChunksToDownload == 0)
-        m_usingInternet = false;
+    if (m_subsequentChunksToDownload > 0)
+        --m_subsequentChunksToDownload;
 
     const auto resultCode = m_storage->writeFileChunk(m_fileName, chunkIndex, data);
     if (resultCode != ResultCode::ok)
@@ -849,18 +749,28 @@ void Worker::cancelRequests()
 {
     NX_DEBUG(m_logTag, "Cancelling all requests...");
 
-    for (auto it = m_contextByHandle.begin(); it != m_contextByHandle.end(); ++it)
-        m_peerManager->cancelRequest(QnUuid(), it.key());
+    for (auto it = m_contextByHandle.begin(); it != m_contextByHandle.end(); /* no increment */)
+    {
+        it->peer.manager->cancelRequest(QnUuid(), it.key().handle);
+        it = m_contextByHandle.erase(it);
+    }
 }
 
 void Worker::cancelRequestsByType(State type)
 {
     NX_DEBUG(m_logTag, "Cancelling requests of type %1...", type);
 
-    for (auto it = m_contextByHandle.begin(); it != m_contextByHandle.end(); ++it)
+    for (auto it = m_contextByHandle.begin(); it != m_contextByHandle.end(); /* no increment */)
     {
         if (it->type == type)
-            m_peerManager->cancelRequest(QnUuid(), it.key());
+        {
+            it->peer.manager->cancelRequest(QnUuid(), it.key().handle);
+            it = m_contextByHandle.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
     }
 }
 
@@ -871,17 +781,6 @@ void Worker::finish(State state)
     m_mutex.unlock();
     emit finished(m_fileName);
     m_mutex.lock();
-}
-
-void Worker::updateLogTag()
-{
-    auto tag = QStringLiteral(" [%1]").arg(m_fileName);
-    if (m_printSelfPeerInLogs)
-        tag.prepend(QString("Worker [%1]").arg(m_peerManager->peerString(m_peerManager->selfId())));
-    else
-        tag.prepend(::toString(this));
-
-    m_logTag = nx::utils::log::Tag(tag);
 }
 
 bool Worker::addAvailableChunksInfo(const QBitArray& chunks)
@@ -907,17 +806,58 @@ bool Worker::addAvailableChunksInfo(const QBitArray& chunks)
     return newChunksAvailable;
 }
 
-QList<QnUuid> Worker::peersForChunk(int chunkIndex) const
+QList<Worker::Peer> Worker::peersForChunk(int chunkIndex) const
 {
-    QList<QnUuid> result;
+    QList<Peer> result;
 
-    for (auto it = m_peerInfoById.begin(); it != m_peerInfoById.end(); ++it)
+    for (auto it = m_peerInfoByPeer.begin(); it != m_peerInfoByPeer.end(); ++it)
     {
-        if (it->downloadedChunks.size() > chunkIndex && it->downloadedChunks[chunkIndex])
+        if (it->isInternet
+            || (it->downloadedChunks.size() > chunkIndex && it->downloadedChunks[chunkIndex]))
+        {
             result.append(it.key());
+        }
     }
 
     return result;
+}
+
+void Worker::setShouldWaitForAsyncOperationCompletion()
+{
+    NX_VERBOSE(m_logTag, "setShouldWaitForAsyncOperationCompletion()");
+    m_shouldWait = true;
+}
+
+void Worker::setShouldWait(bool value)
+{
+    if (value)
+    {
+        NX_VERBOSE(m_logTag, "setShouldWait(): Start waiting.");
+
+        m_shouldWait = true;
+        if (!m_stepDelayTimer.hasPendingTasks())
+        {
+            NX_VERBOSE(m_logTag, "setShouldWait(): Starting a timer.");
+
+            m_stepDelayTimer.addTimer(
+                [this](utils::TimerId /*timerId*/)
+                {
+                    NX_VERBOSE(m_logTag, "setShouldWait(): Waking by a timer...");
+
+                    NX_MUTEX_LOCKER lock(&m_mutex);
+                    m_shouldWait = false;
+                    m_waitCondition.wakeOne();
+                },
+                std::chrono::milliseconds(delayMs()));
+        }
+    }
+    else if (!value)
+    {
+        NX_VERBOSE(m_logTag, "setShouldWait(): Waking...");
+
+        m_shouldWait = false;
+        m_waitCondition.wakeOne();
+    }
 }
 
 FileInformation Worker::fileInformation() const
@@ -931,53 +871,65 @@ FileInformation Worker::fileInformation() const
     return fileInfo;
 }
 
-QList<QnUuid> Worker::peersWithInternetConnection() const
+QList<Worker::Peer> Worker::selectPeersForOperation(
+    AbstractPeerManager::Capability capability, int count, const QList<Peer>& allowedPeers) const
 {
-    QList<QnUuid> result;
+    QList<Peer> result;
 
-    for (const auto& peerId: m_peerManager->getAllPeers())
+    if (count <= 0)
+        count = m_peersPerOperation;
+
+    const auto getAllowedPeerIds =
+        [&allowedPeers](AbstractPeerManager* peerManager)
+        {
+            QList<QnUuid> result;
+            for (const Peer& peer: allowedPeers)
+            {
+                if (peer.manager == peerManager)
+                    result.append(peer.id);
+            }
+            return result;
+        };
+
+    for (AbstractPeerManager* peerManager: m_peerManagers)
     {
-        if (m_peerManager->hasInternetConnection(peerId))
-            result.append(peerId);
+        if (!peerManager->capabilities.testFlag(capability))
+            continue;
+
+        QList<QnUuid> peers = allowedPeers.isEmpty()
+            ? peerManager->peers()
+            : getAllowedPeerIds(peerManager);
+
+        if (peers.isEmpty())
+            continue;
+
+        peers = selectPeersForOperation(peerManager, count - result.size(), peers);
+        for (const auto& peerId: peers)
+            result.append(Peer{peerId, peerManager});
+
+        if (result.size() >= count)
+            break;
     }
+
+    if (result.isEmpty())
+        NX_VERBOSE(m_logTag, "No peers selected.");
 
     return result;
 }
 
 QList<QnUuid> Worker::selectPeersForOperation(
-    int count, QList<QnUuid> peers, bool skipPeersWithMinimalRank) const
+    AbstractPeerManager* peerManager, int count, QList<QnUuid> peers) const
 {
     QList<QnUuid> result;
 
-    auto exitLogGuard = nx::utils::makeScopeGuard(
-        [this, &result]
-        {
-            if (result.isEmpty())
-                NX_VERBOSE(m_logTag, "No peers selected.");
-        });
-
     if (peers.isEmpty())
-        peers = m_peerManager->peers();
+        peers = peerManager->peers();
 
     if (count <= 0)
         count = m_peersPerOperation;
 
     if (peers.size() <= count)
-    {
-        if (skipPeersWithMinimalRank)
-        {
-            for (const auto& peer: peers)
-            {
-                if (m_peerInfoById[peer].rank > kMinAutoRank)
-                    result.append(peer);
-            }
-        }
-        else
-        {
-            result = peers;
-        }
-        return result;
-    }
+        result = peers;
 
     struct ScoredPeer
     {
@@ -992,9 +944,10 @@ QList<QnUuid> Worker::selectPeersForOperation(
     for (auto it = peers.begin(); it != peers.end(); /* no increment */)
     {
         const QnUuid& peerId = *it;
+        Peer peer{peerId, peerManager};
 
-        const int rank = m_peerInfoById.value(peerId).rank;
-        if (skipPeersWithMinimalRank && rank <= kMinAutoRank)
+        const int rank = m_peerInfoByPeer.value(peer).rank;
+        if (rank <= kMinAutoRank)
         {
             it = peers.erase(it);
             continue;
@@ -1002,7 +955,7 @@ QList<QnUuid> Worker::selectPeersForOperation(
 
         ++it;
 
-        const int distance = m_peerManager->distanceTo(peerId);
+        const int distance = peerManager->distanceTo(peerId);
 
         const int score = std::max(0, kBigDistance - distance) * 2 + rank;
         if (score == 0)
@@ -1055,11 +1008,9 @@ QList<QnUuid> Worker::selectPeersForOperation(
         previousScore = currentScore;
     }
 
-    const auto selfId = m_peerManager->selfId();
-
     // Take (3) highest-score peers.
     std::sort(highestScorePeers.begin(), highestScorePeers.end());
-    result = takeClosestPeerIds(highestScorePeers, highestScorePeersNeeded, selfId);
+    result = takeClosestPeerIds(highestScorePeers, highestScorePeersNeeded, m_selfId);
 
     if (result.size() == count)
         return result;
@@ -1070,7 +1021,7 @@ QList<QnUuid> Worker::selectPeersForOperation(
     std::sort(peers.begin(), peers.end());
 
     // Take (1) one closest-guid peer.
-    result += takeClosestPeerIds(peers, 1, selfId);
+    result += takeClosestPeerIds(peers, 1, m_selfId);
     --additionalPeers;
 
     // Take (2) random peers.
@@ -1083,7 +1034,7 @@ QList<QnUuid> Worker::selectPeersForOperation(
 void Worker::revivePeersWithMinimalRank()
 {
     NX_DEBUG(m_logTag, "revivePeersWithMinimalRank()");
-    for (auto& peerInfo: m_peerInfoById)
+    for (auto& peerInfo: m_peerInfoByPeer)
     {
         if (peerInfo.rank <= kMinAutoRank)
             ++peerInfo.rank;
@@ -1130,73 +1081,19 @@ int Worker::selectNextChunk() const
     return firstMetNotDownloadedChunk;
 }
 
-bool Worker::isInternetAvailable(const QList<QnUuid>& peers) const
-{
-    if (!peers.isEmpty())
-    {
-        for (const auto& peerId: peers)
-        {
-            if (m_peerManager->hasInternetConnection(peerId))
-                return true;
-        }
-    }
-    else
-    {
-        if (m_peerManager->hasInternetConnection(m_peerManager->selfId()))
-            return true;
-
-        for (const auto& peerId: m_peerManager->getAllPeers())
-        {
-            if (m_peerManager->hasInternetConnection(peerId))
-                return true;
-        }
-    }
-
-    return false;
-}
-
-bool Worker::isFileReadyForInternetDownload() const
-{
-    const auto& fileInfo = fileInformation();
-    return fileInfo.size > 0
-        && !fileInfo.md5.isEmpty()
-        && fileInfo.chunkSize > 0
-        && fileInfo.url.isValid()
-        && !m_availableChunks.isEmpty();
-}
-
-QList<QnUuid> Worker::selectPeersForInternetDownload() const
-{
-    if (m_peerManager->hasInternetConnection(m_peerManager->selfId())
-        || m_peerManager->hasAccessToTheUrl(fileInformation().url.toString()))
-    {
-        return {m_peerManager->selfId()};
-    }
-
-    const auto& peers = peersWithInternetConnection();
-
-    const auto& currentPeersWithInternet = peers.toSet() & m_peerManager->peers().toSet();
-
-    if (!currentPeersWithInternet.isEmpty())
-        return currentPeersWithInternet.toList();
-
-    return peers;
-}
-
 bool Worker::needToFindBetterPeers() const
 {
-    if (m_peerManager->peers().size() < m_peersPerOperation * 2)
-        return false;
-
-    auto closestPeers = m_peerManager->peers();
-    std::sort(closestPeers.begin(), closestPeers.end());
-    closestPeers = takeClosestPeerIds(
-        closestPeers, m_peersPerOperation, m_peerManager->selfId());
-
-    for (const auto& peerId: closestPeers)
+    for (AbstractPeerManager* peerManager: m_peerManagers)
     {
-        if (m_peerInfoById[peerId].rank < kMaxAutoRank - 1)
-            return true;
+        QList<QnUuid> closestPeers = peerManager->peers();
+        std::sort(closestPeers.begin(), closestPeers.end());
+        closestPeers = takeClosestPeerIds(closestPeers, m_peersPerOperation, m_selfId);
+
+        for (const auto& peerId: closestPeers)
+        {
+            if (m_peerInfoByPeer[Peer{peerId, peerManager}].rank < kMaxAutoRank - 1)
+                return true;
+        }
     }
 
     return false;
@@ -1218,26 +1115,18 @@ void Worker::waitBeforeNextIteration(QnMutexLockerBase* lock)
     NX_VERBOSE(m_logTag, "Finished waiting for the next iteration.");
 }
 
-void Worker::increasePeerRank(const QnUuid& peerId, int value)
+void Worker::increasePeerRank(const Peer& peer, int value)
 {
-    auto& peerInfo = m_peerInfoById[peerId];
+    auto& peerInfo = m_peerInfoByPeer[peer];
     peerInfo.increaseRank(value);
-    NX_VERBOSE(m_logTag, "Increasing rank of %1: %2",
-        m_peerManager->peerString(peerId), peerInfo.rank);
+    NX_VERBOSE(m_logTag, "Increasing rank of %1: %2", peer, peerInfo.rank);
 }
 
-void Worker::decreasePeerRank(const QnUuid& peerId, int value)
+void Worker::decreasePeerRank(const Peer& peer, int value)
 {
-    auto& peerInfo = m_peerInfoById[peerId];
+    auto& peerInfo = m_peerInfoByPeer[peer];
     peerInfo.decreaseRank(value);
-    NX_VERBOSE(m_logTag, "Decreasing rank of %1: %2",
-        m_peerManager->peerString(peerId), peerInfo.rank);
-}
-
-void Worker::setPrintSelfPeerInLogs()
-{
-    m_printSelfPeerInLogs = true;
-    updateLogTag();
+    NX_VERBOSE(m_logTag, "Decreasing rank of %1: %2", peer, peerInfo.rank);
 }
 
 qint64 Worker::defaultStepDelay()
@@ -1245,9 +1134,9 @@ qint64 Worker::defaultStepDelay()
     return kDefaultStepDelayMs.count();
 }
 
-AbstractPeerManager* Worker::peerManager() const
+QList<AbstractPeerManager*> Worker::peerManagers() const
 {
-    return m_peerManager;
+    return m_peerManagers;
 }
 
 void Worker::PeerInformation::increaseRank(int value)
@@ -1262,8 +1151,4 @@ void Worker::PeerInformation::decreaseRank(int value)
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Worker, State)
 
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::common::p2p::downloader

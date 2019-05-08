@@ -1,5 +1,7 @@
 #include "camera.h"
 
+#include <camera/camera_pool.h>
+#include <camera/video_camera.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -35,7 +37,11 @@ Camera::Camera(QnMediaServerModule* serverModule):
     m_lastInitTime.invalidate();
 
     connect(this, &Camera::groupIdChanged, [this]() { reinitAsync(); });
-    connect(this, &QnResource::initializedChanged, [this]() { fixInputPortMonitoring(); });
+    connect(this, &QnResource::initializedChanged, [this]()
+    {
+        QnMutexLocker lk(&m_initMutex);
+        fixInputPortMonitoring();
+    });
 
     const auto updateIoCache =
         [this](const QnResourcePtr&, const QString& id, bool value, qint64 timestamp)
@@ -379,6 +385,9 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
 
 CameraDiagnostics::Result Camera::initInternal()
 {
+    // This property is for debug purpose only.
+    setProperty("driverClass", toString(typeid(*this)));
+
     auto resData = resourceData();
     auto timeoutSec = resData.value<int>(ResourceDataKey::kUnauthorizedTimeoutSec);
     auto credentials = getAuth();
@@ -399,11 +408,10 @@ CameraDiagnostics::Result Camera::initInternal()
         ResourceDataKey::kMediaTraits,
         nx::media::CameraTraits());
 
-    setCameraCapability(Qn::CameraTimeCapability, true);
-
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
+    NX_VERBOSE(this, "Initialising camera driver");
     const auto driverResult = initializeCameraDriver();
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;
@@ -442,6 +450,25 @@ void Camera::startInputPortStatesMonitoring()
 
 void Camera::stopInputPortStatesMonitoring()
 {
+}
+
+void Camera::reopenStream(nx::vms::api::StreamIndex streamIndex)
+{
+    auto camera = serverModule()->videoCameraPool()->getVideoCamera(toSharedPointer(this));
+    if (!camera)
+        return;
+
+    QnLiveStreamProviderPtr reader;
+    if (streamIndex == nx::vms::api::StreamIndex::primary)
+        reader = camera->getPrimaryReader();
+    else if (streamIndex == nx::vms::api::StreamIndex::secondary)
+        reader = camera->getSecondaryReader();
+
+    if (reader && reader->isRunning())
+    {
+        NX_DEBUG(this, "Camera [%1], reopen reader: %2", getId(), streamIndex);
+        reader->pleaseReopenStream();
+    }
 }
 
 CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()

@@ -88,19 +88,6 @@ onvifXsd__H264Profile fromStringToH264Profile(const QString& str)
         return onvifXsd__H264Profile::Baseline;
 };
 
-void updateTimer(nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
-    nx::utils::MoveOnlyFunc<void(nx::utils::TimerId)> function)
-{
-    if (*timerId != 0)
-    {
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(*timerId);
-        *timerId = 0;
-    }
-
-    *timerId = nx::utils::TimerManager::instance()->addTimer(
-        std::move(function), timeout);
-}
-
 /* Some cameras declare invalid max resolution */
 struct StrictResolution
 {
@@ -148,6 +135,27 @@ QString QnOnvifServiceUrls::getUrl(OnvifWebService onvifWebService) const
 
 //-------------------------------------------------------------------------------------------------
 // QnPlOnvifResource::VideoEncoderCapabilities
+
+void QnPlOnvifResource::updateTimer(
+    nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
+    nx::utils::MoveOnlyFunc<void(nx::utils::TimerId)> function)
+{
+    if (*timerId != 0)
+    {
+        // Can be called from IO thread. Non blocking call should be used here.
+        nx::utils::TimerManager::instance()->deleteTimer(*timerId);
+        *timerId = 0;
+    }
+
+    *timerId = nx::utils::TimerManager::instance()->addTimer(
+        [operationGuard = m_asyncConnectGuard.sharedGuard(),
+        function = std::move(function)](nx::utils::TimerId timerId) mutable
+        {
+            if (const auto lock = operationGuard->lock())
+                function(timerId);
+        },
+        timeout);
+}
 
 QnPlOnvifResource::VideoEncoderCapabilities::VideoEncoderCapabilities(
     std::string videoEncoderToken,
@@ -423,6 +431,8 @@ QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
     m_inputPortCount(0),
     m_videoLayout(nullptr),
     m_advancedParametersProvider(this),
+    m_primaryMulticastParametersProvider(this, StreamIndex::primary),
+    m_secondaryMulticastParametersProvider(this, StreamIndex::secondary),
     m_onvifRecieveTimeout(DEFAULT_SOAP_TIMEOUT),
     m_onvifSendTimeout(DEFAULT_SOAP_TIMEOUT)
 {
@@ -461,6 +471,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
     }
 
     stopInputPortStatesMonitoring();
+    m_asyncConnectGuard->terminate();
 
     QnMutexLocker lock(&m_physicalParamsMutex);
     m_imagingParamsProxy.reset();
@@ -706,11 +717,11 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
         onvifTimeouts(),
         getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
     _onvifDevice__GetCapabilitiesResponse capabilitiesResponse;
+
     /*
      Warning! The capabilitiesResponse lifetime must be not more then deviceSoapWrapper lifetime,
      because DeviceSoapWrapper destructor destroys internals of _onvifDevice__GetCapabilitiesResponse.
     */
-
     auto result = initOnvifCapabilitiesAndUrls(deviceSoapWrapper, &capabilitiesResponse); //< step 1
     if (!checkResultAndSetStatus(result))
         return result;
@@ -746,7 +757,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
         if (!checkResultAndSetStatus(result))
             return result;
     }
-
+    setCameraCapability(Qn::CameraTimeCapability, true);
     saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
@@ -764,6 +775,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
         return result;
 
     fillFullUrlInfo(*outCapabilitiesResponse);
+    detectCapabilities(*outCapabilitiesResponse);
 
     if (getMediaUrl().isEmpty())
         return CameraDiagnostics::CameraInvalidParams("ONVIF media URL is not filled by camera");
@@ -1125,20 +1137,21 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
 */
 
 /*static*/ const char* QnPlOnvifResource::attributeTextByName(
-    const soap_dom_element* element, const char* attributeName)
+    const soap_dom_element& element, const char* attributeName)
 {
     NX_ASSERT(attributeName);
-    // soap_dom_element methods have no const specifiers, so we are compelled to use const_cast
-    soap_dom_attribute_iterator it = const_cast<soap_dom_element*>(element)->att_find(attributeName);
-    const char* const text = (it != soap_dom_attribute_iterator())
-        ? (it->text ? it->text : "")
-        : "";
-    NX_ASSERT(text);
-    return text;
+    const soap_dom_attribute* att = element.atts;
+    while (att)
+    {
+        if (att->name && std::strcmp(att->name, attributeName) == 0)
+            return att->text;
+        att = att->next;
+    }
+    return nullptr;
 }
 
 /*static*/ QnPlOnvifResource::onvifSimpleItem  QnPlOnvifResource::parseSimpleItem(
-    const soap_dom_element* element)
+    const soap_dom_element& element)
 {
     // if an element is a simple item, it has the only subelement
     // with attributes "Name" and "Value"
@@ -1148,46 +1161,53 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
 }
 
 /*static*/ QnPlOnvifResource::onvifSimpleItem  QnPlOnvifResource::parseChildSimpleItem(
-    const soap_dom_element* element)
+    const soap_dom_element& element)
 {
-    if (element->elts)
-        return parseSimpleItem(element->elts);
+    if (element.elts)
+        return parseSimpleItem(*element.elts);
     else
         return onvifSimpleItem();
 }
 
 /*static*/ std::vector<QnPlOnvifResource::onvifSimpleItem> QnPlOnvifResource::parseChildSimpleItems(
-    const soap_dom_element* element)
+    const soap_dom_element& element)
 {
     // if an element contains a simple item, it has the only subelement
     // with attributes "Name" and "Value"
     std::vector<onvifSimpleItem> result;
-    for (soap_dom_element* subElement = element->elts; subElement; subElement = subElement->next)
+    const soap_dom_element* subElement = element.elts;
+    while (subElement)
     {
-
-        result.emplace_back(parseSimpleItem(subElement));
+        result.emplace_back(parseSimpleItem(*subElement));
+        subElement = subElement->next;
     }
     return result;
 }
 
 /*static*/ void QnPlOnvifResource::parseSourceAndData(
-    const soap_dom_element* element,
-    std::vector<QnPlOnvifResource::onvifSimpleItem>* source,
-    QnPlOnvifResource::onvifSimpleItem* data)
+    const soap_dom_element& element,
+    std::vector<QnPlOnvifResource::onvifSimpleItem>* outSource,
+    QnPlOnvifResource::onvifSimpleItem* outData)
 {
+    NX_ASSERT(outSource);
+    NX_ASSERT(outData);
+
     static const QByteArray kSource = "Source";
     static const QByteArray kData = "Data";
-    for (soap_dom_element* elt = element->elts; elt; elt = elt->next)
+
+    const soap_dom_element* elt = element.elts;
+    while (elt)
     {
-        if (!elt->name)
-            continue;
-        const QByteArray name = QByteArray::fromRawData(elt->name, (int)strlen(elt->name));
-        QByteArray pureName = name.split(':').back();
-        soap_dom_element* subElement = elt->elts;
-        if (pureName == kSource)
-            *source = parseChildSimpleItems(elt);
-        else if (pureName == kData)
-            *data = parseChildSimpleItem(elt);
+        if (elt->name)
+        {
+            const QByteArray name = QByteArray::fromRawData(elt->name, (int)strlen(elt->name));
+            QByteArray pureName = name.split(':').back();
+            if (pureName == kSource)
+                *outSource = parseChildSimpleItems(*elt);
+            else if (pureName == kData)
+                *outData = parseChildSimpleItem(*elt);
+        }
+        elt = elt->next;
     }
 }
 
@@ -1253,7 +1273,7 @@ void QnPlOnvifResource::handleOneNotification(
     /*
         TODO: #szaitsev: This function should be completely rewritten in 4.1.
         In does not correspond onvif specification.
-        ONVIF Core Specification – Ver. 18.12 (or later), paragraph 9.
+        ONVIF Core Specification Ver. 18.12 (or later), paragraph 9.
     */
     const auto now = qnSyncTime->currentUSecsSinceEpoch();
     if (m_clearInputsTimeoutUSec > 0)
@@ -1310,7 +1330,7 @@ void QnPlOnvifResource::handleOneNotification(
 
     std::vector<onvifSimpleItem> source;
     onvifSimpleItem data;
-    parseSourceAndData(&notification.Message.__any, &source, &data);
+    parseSourceAndData(notification.Message.__any, &source, &data);
 
     if (source.empty())
     {
@@ -1693,6 +1713,23 @@ void QnPlOnvifResource::setVideoSourceToken(std::string token)
 {
     QnMutexLocker lock(&m_mutex);
     m_videoSourceToken = std::move(token);
+}
+
+std::string QnPlOnvifResource::videoEncoderConfigurationToken(
+    nx::vms::api::StreamIndex streamIndex) const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (streamIndex == nx::vms::api::StreamIndex::primary
+        && !m_primaryStreamCapabilitiesList.empty())
+    {
+        return m_primaryStreamCapabilitiesList[0].videoEncoderToken;
+    }
+    if (streamIndex == nx::vms::api::StreamIndex::secondary
+        && !m_secondaryStreamCapabilitiesList.empty())
+    {
+        return m_secondaryStreamCapabilitiesList[0].videoEncoderToken;
+    }
+    return std::string();
 }
 
 std::string QnPlOnvifResource::audioSourceConfigurationToken() const
@@ -3092,7 +3129,15 @@ bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMa
 std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
     QnPlOnvifResource::advancedParametersProviders()
 {
-    return {&m_advancedParametersProvider};
+    std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*> providers {
+        &m_advancedParametersProvider };
+
+    if (hasCameraCapabilities(Qn::MulticastStreamCapability))
+    {
+        providers.emplace_back(&m_primaryMulticastParametersProvider);
+        providers.emplace_back(&m_secondaryMulticastParametersProvider);
+    }
+    return providers;
 }
 
 QnCameraAdvancedParamValueMap QnPlOnvifResource::getApiParameters(const QSet<QString>& ids)
@@ -3726,8 +3771,9 @@ bool QnPlOnvifResource::createPullPointSubscription()
 
     if (response.SubscriptionReference.Address)
     {
+        const auto resData = resourceData();
         const bool updatePort =
-            OnvifIniConfig::instance().doUpdatePortInSubscriptionAddress;
+            resData.value<bool>(ResourceDataKey::kDoUpdatePortInSubscriptionAddress, true);
         m_onvifNotificationSubscriptionReference =
             fromOnvifDiscoveredUrl(response.SubscriptionReference.Address, updatePort);
     }
@@ -4549,6 +4595,26 @@ void QnPlOnvifResource::fillFullUrlInfo(const _onvifDevice__GetCapabilitiesRespo
     {
         setDeviceIOUrl(getDeviceOnvifUrl());
     }
+}
+
+void QnPlOnvifResource::detectCapabilities(const _onvifDevice__GetCapabilitiesResponse& response)
+{
+    bool multicastIsSupported = false;
+    const QnResourceData resData = resourceData();
+    if (resData.contains(ResourceDataKey::kMulticastIsSupported))
+    {
+        multicastIsSupported = resData.value<bool>(ResourceDataKey::kMulticastIsSupported);
+    }
+    else
+    {
+        multicastIsSupported = response.Capabilities
+            && response.Capabilities->Media
+            && response.Capabilities->Media->StreamingCapabilities
+            && response.Capabilities->Media->StreamingCapabilities->RTPMulticast
+            && *response.Capabilities->Media->StreamingCapabilities->RTPMulticast;
+    }
+
+    setCameraCapability(Qn::MulticastStreamCapability, multicastIsSupported);
 }
 
 /**

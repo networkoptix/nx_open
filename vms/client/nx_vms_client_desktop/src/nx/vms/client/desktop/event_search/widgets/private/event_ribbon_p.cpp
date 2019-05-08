@@ -36,6 +36,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/utils/app_info.h>
 
 namespace nx::vms::client::desktop {
 
@@ -1225,7 +1226,11 @@ void EventRibbon::Private::doUpdateView()
 
     if (!m_animations.empty())
     {
-        qApp->processEvents();
+        // Sometimes in Mac OS animation has running state but never starts actually.
+        // Looks like processEvents() calls gives a chance to start animations actually.
+        if (nx::utils::AppInfo::isMacOsX())
+            qApp->processEvents();
+
         qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest));
     }
 }

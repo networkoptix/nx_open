@@ -153,16 +153,21 @@ ScopedEventTypeIds EventTypeDescriptorManager::compatibleEventTypeIds(
     ScopedEventTypeIds result;
     for (const auto& engine: compatibleEngines)
     {
-        const auto eventTypeDescriptors = engine->analyticsEventTypeDescriptors();
-        for (const auto& [eventTypeId, eventTypeDescriptor]: eventTypeDescriptors)
+        if (engine->isDeviceDependent())
         {
-            for (const auto& scope: eventTypeDescriptor.scopes)
-                result[scope.engineId][scope.groupId].insert(eventTypeId);
+            auto supported = supportedEventTypeIds(device);
+            MapHelper::merge(&result, supported, mergeEventTypeIds);
+        }
+        else
+        {
+            const auto eventTypeDescriptors = engine->analyticsEventTypeDescriptors();
+            for (const auto& [eventTypeId, eventTypeDescriptor]: eventTypeDescriptors)
+            {
+                for (const auto& scope: eventTypeDescriptor.scopes)
+                    result[scope.engineId][scope.groupId].insert(eventTypeId);
+            }
         }
     }
-
-    auto supported = supportedEventTypeIds(device);
-    MapHelper::merge(&result, supported, mergeEventTypeIds);
 
     return result;
 }

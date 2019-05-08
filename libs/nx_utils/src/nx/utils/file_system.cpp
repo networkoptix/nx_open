@@ -334,8 +334,8 @@ bool reserveSpace(QFile& file, qint64 size)
     #if defined(Q_OS_WIN)
         return _chsize_s(file.handle(), size) == 0;
     #elif defined(Q_OS_MAC)
-        fstore_t store = {F_ALLOCATECONTIG | F_ALLOCATEALL, F_PEOFPOSMODE, 0, size, 0};
-        return fcntl(file.handle(), F_PREALLOCATE | F_ALLOCATEALL, &store) == 0;
+        fstore_t store = {F_ALLOCATEALL, F_PEOFPOSMODE, 0, size, 0};
+        return fcntl(file.handle(), F_PREALLOCATE, &store) == 0;
     #else
         return posix_fallocate(file.handle(), 0, size) == 0;
     #endif

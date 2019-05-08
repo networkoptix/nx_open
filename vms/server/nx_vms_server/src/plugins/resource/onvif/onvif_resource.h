@@ -31,6 +31,8 @@
 #include <nx/streaming/media_data_packet.h>
 #include <onvif/soapStub.h>
 
+#include <plugins/resource/onvif/onvif_multicast_parameters_provider.h>
+
 #include "soap_wrapper.h"
 #include "video_encoder_config_options.h"
 
@@ -93,11 +95,7 @@ struct QnOnvifServiceUrls
 
 struct OnvifIniConfig: public nx::kit::IniConfig
 {
-    OnvifIniConfig(): IniConfig("server_onvif.ini") {}
-
-    NX_INI_FLAG(1, doUpdatePortInSubscriptionAddress,
-        "Used in ONVIF event notification subscription.\n"
-        "Value 0 (false) may be used for debugging port forwarded devices.");
+    OnvifIniConfig(): IniConfig("vms_server_onvif.ini") {}
 
     static OnvifIniConfig& instance()
     {
@@ -270,6 +268,8 @@ public:
 
     std::string videoSourceToken() const;
     void setVideoSourceToken(std::string token);
+
+    std::string videoEncoderConfigurationToken(nx::vms::api::StreamIndex streamIndex) const;
 
     std::string audioSourceConfigurationToken() const;
     void setAudioSourceConfigurationToken(std::string token);
@@ -544,16 +544,21 @@ private:
         std::string name;
         std::string value;
         onvifSimpleItem() = default;
-        onvifSimpleItem(const char* name, const char* value): name(name), value(value) {}
+        onvifSimpleItem(const char* name, const char* value):
+            name(name ? name : ""), value(value ? value : "")
+        {
+        }
     };
 
     // TODO: The following static functions should be moved to a separate class in 4.1.
-    static const char* attributeTextByName(const soap_dom_element* element, const char* attributeName);
-    static onvifSimpleItem parseSimpleItem(const soap_dom_element* element);
-    static onvifSimpleItem parseChildSimpleItem(const soap_dom_element* element);
-    static std::vector<onvifSimpleItem> parseChildSimpleItems(const soap_dom_element* element);
-    static void parseSourceAndData(const soap_dom_element* element,
-        std::vector<onvifSimpleItem>* source, onvifSimpleItem* data);
+    static const char* attributeTextByName(const soap_dom_element& element, const char* attributeName);
+    static onvifSimpleItem parseSimpleItem(const soap_dom_element& element);
+
+    static onvifSimpleItem parseChildSimpleItem(const soap_dom_element& element);
+    static std::vector<onvifSimpleItem> parseChildSimpleItems(const soap_dom_element& element);
+    static void parseSourceAndData(const soap_dom_element& element,
+        std::vector<onvifSimpleItem>* outSource, onvifSimpleItem* outData);
+
     static QString parseEventTopic(const char* text);
     static QDateTime parseDateTime(const soap_dom_attribute* att, QTimeZone timeZone);
     static std::string makeItemNameList(const std::vector<onvifSimpleItem>& items);
@@ -665,6 +670,7 @@ private:
         _onvifDevice__GetCapabilitiesResponse* response);
     CameraDiagnostics::Result fetchOnvifMedia2Url(QString* url);
     void fillFullUrlInfo(const _onvifDevice__GetCapabilitiesResponse& response);
+    void detectCapabilities(const _onvifDevice__GetCapabilitiesResponse& response);
     bool getVideoEncoderTokens(BaseSoapWrapper& soapWrapper,
         const std::vector<onvifXsd__VideoEncoderConfiguration*>& configurations,
         QStringList* tokenList);
@@ -709,7 +715,9 @@ protected:
         const QString& text = QString());
 
     QString makeFailMessage(const QString& text) const;
-
+    void updateTimer(
+        nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
+        nx::utils::MoveOnlyFunc<void(nx::utils::TimerId)> function);
 private:
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;
@@ -718,9 +726,11 @@ private:
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
     mutable QnConstResourceVideoLayoutPtr m_videoLayout;
     mutable QnOnvifServiceUrls m_serviceUrls;
-
+    nx::utils::AsyncOperationGuard m_asyncConnectGuard;
 protected:
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
+    nx::vms::server::resource::OnvifMulticastParametersProvider m_primaryMulticastParametersProvider;
+    nx::vms::server::resource::OnvifMulticastParametersProvider m_secondaryMulticastParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
 };

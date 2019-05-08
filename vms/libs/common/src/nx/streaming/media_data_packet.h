@@ -107,8 +107,6 @@ public:
         MediaFlags_PlayUnsync           = 0x08000,
         // Ignore packet at all.
         MediaFlags_Skip                 = 0x10000,
-        // Packet has been delivered via network.
-        MediaFlags_GotFromRemotePeer    = 0x20000,
     };
 
     Q_DECLARE_FLAGS(MediaFlags, MediaFlag)

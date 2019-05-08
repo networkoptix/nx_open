@@ -47,6 +47,12 @@ QSet<QnUuid> getServersLinkedToCloud(QnCommonModule* commonModule, const QSet<Qn
     return result;
 }
 
+void ClientVerificationData::fillDefault()
+{
+    systemInfo = QnAppInfo::currentSystemInformation();
+    currentVersion = nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion());
+}
+
 bool checkCloudHost(QnCommonModule* commonModule, nx::utils::SoftwareVersion targetVersion, QString cloudUrl, const QSet<QnUuid>& peers)
 {
     NX_ASSERT(commonModule);
@@ -146,8 +152,7 @@ QString UpdateStrings::getReportForUnsupportedServer(const nx::vms::api::SystemI
 
 bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateContents& contents,
     std::map<QnUuid, QnMediaServerResourcePtr> activeServers,
-    const std::set<nx::utils::SoftwareVersion>& clientVersions,
-    bool checkClient)
+    const ClientVerificationData& clientData)
 {
     nx::update::Information& info = contents.info;
     if (contents.error != nx::update::InformationError::noError)
@@ -170,7 +175,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     contents.missingUpdate.clear();
 
     // Check if some packages from manifest do not exist.
-    if (contents.sourceType == nx::update::UpdateSourceType::file && !contents.packagesGenerted)
+    if (contents.sourceType == nx::update::UpdateSourceType::file && !contents.packagesGenerated)
     {
         contents.filesToUpload.clear();
         QString uploadDestination = QString("updates/%1/").arg(contents.info.version);
@@ -194,7 +199,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 }
             }
         }
-        contents.packagesGenerted = true;
+        contents.packagesGenerated = true;
         contents.info.packages = checked;
     }
 
@@ -210,36 +215,9 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         contents.eulaPath = contents.info.eulaLink;
     }
 
-    QString errorMessage;
     // Update is allowed if either target version has the same cloud host or
     // there are no servers linked to the cloud in the system.
-    QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
-    bool alreadyInstalled = true;
-
-    QString clientVersionRaw = nx::utils::AppInfo::applicationVersion();
-    if (nx::utils::SoftwareVersion(clientVersionRaw) != contents.getVersion())
-        alreadyInstalled = false;
-
-    if (checkClient)
-    {
-        auto systemInfo = QnAppInfo::currentSystemInformation();
-        if (auto packagePtr = nx::update::findPackage(kClientComponent, systemInfo, contents.info))
-        {
-            contents.clientPackage = *packagePtr;
-        }
-        else
-        {
-            NX_ERROR(typeid(UpdateContents))
-                << "verifyUpdateManifest(" << contents.info.version
-                << ") error while trying to find client package:" << errorMessage;
-        }
-    }
-
-    QSet<QnUuid> allServers;
-
-    // We store here a set of packages that should be downloaded manually by the client.
-    // We will convert it to a list of values later.
-    QSet<nx::update::Package*> manualPackages;
+    //QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
 
     for (const auto& package: info.packages)
     {
@@ -257,6 +235,53 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         auto& record = cache[info];
         record.append(package);
     }
+
+    // We will try to set it to false when we check servers and clients
+    bool alreadyInstalled = true;
+
+    if (!clientData.clientId.isNull())
+    {
+        if (clientData.currentVersion != contents.getVersion())
+            alreadyInstalled = false;
+
+        auto it = contents.clientPackageCache.find(clientData.systemInfo);
+        if (it == contents.clientPackageCache.end())
+        {
+            NX_ERROR(typeid(UpdateContents)) << "verifyUpdateManifest("
+                << contents.info.version << ") client arch"
+                << clientData.systemInfo.arch
+                << "platform" << clientData.systemInfo.platform
+                << "variant" << clientData.systemInfo.modification
+                << "is missing its update package";
+            contents.missingUpdate.insert(clientData.clientId);
+        }
+        else
+        {
+            auto& packageVariants = it->second;
+
+            auto package = findPackageForOsVariant(
+                packageVariants, nx::update::kComponentClient, clientData.systemInfo.version);
+
+            if (!package)
+            {
+                NX_ERROR(typeid(UpdateContents))
+                    << "verifyUpdateManifest(" << contents.info.version
+                    << ") current client OS version is unsupported";
+                QString message = UpdateStrings::getReportForUnsupportedServer(clientData.systemInfo);
+                contents.unsuportedSystemsReport.insert(clientData.clientId, message);
+            }
+            else
+            {
+                contents.clientPackage = *package;
+            }
+        }
+    }
+
+    QSet<QnUuid> allServers;
+
+    // We store here a set of packages that should be downloaded manually by the client.
+    // We will convert it to a list of values later.
+    QSet<nx::update::Package*> manualPackages;
 
     QSet<QnUuid> serversWithNewerVersion;
 
@@ -280,6 +305,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 << server->getId()
                 << "arch" << serverInfo.arch
                 << "platform" << serverInfo.platform
+                << "variant" << serverInfo.modification
                 << "is missing its update package";
             contents.missingUpdate.insert(server->getId());
             continue;
@@ -297,7 +323,6 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 << "osversion =" << serverInfo.version;
             QString message = UpdateStrings::getReportForUnsupportedServer(serverInfo);
             contents.unsuportedSystemsReport.insert(server->getId(), message);
-            package = findPackageForOsVariant(it->second, nx::update::kComponentServer, serverInfo.version);
         }
 
         nx::utils::SoftwareVersion serverVersion = server->getVersion();
@@ -337,7 +362,11 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         contents.ignorePeers = serversWithNewerVersion;
 
     contents.alreadyInstalled = alreadyInstalled;
-    contents.cloudIsCompatible = checkCloudHost(commonModule, targetVersion, contents.info.cloudHost, allServers);
+    if (commonModule)
+    {
+        contents.cloudIsCompatible = checkCloudHost(
+            commonModule, targetVersion, contents.info.cloudHost, allServers);
+    }
 
     for (auto id: contents.unsuportedSystemsReport.keys())
         contents.missingUpdate.remove(id);
@@ -345,17 +374,16 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     if (!contents.missingUpdate.empty() || !contents.unsuportedSystemsReport.empty())
     {
         NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
-            << contents.info.version << ") - detected missing server packages.";
+            << contents.info.version << ") - detected missing packages.";
         contents.error = nx::update::InformationError::missingPackageError;
     }
 
-    if (checkClient && !contents.clientPackage.isValid())
+    if (!clientData.clientId.isNull()
+        && (contents.missingUpdate.contains(clientData.clientId) || !contents.clientPackage.isValid()))
     {
-        QString clientVersion = nx::utils::AppInfo::applicationVersion();
-        if (targetVersion > nx::utils::SoftwareVersion(clientVersion)
-            && !clientVersions.count(targetVersion))
+        if (targetVersion > clientData.currentVersion
+            && !clientData.installedVersions.count(targetVersion))
         {
-            contents.missingClientPackage = true;
             NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
                 << contents.info.version << ") - we should install client package, but there are no such.";
             contents.error = nx::update::InformationError::missingPackageError;
@@ -365,6 +393,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
             NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
                 << contents.info.version << ") - there are no client package, but applauncher has it. That's ok.";
         }
+        contents.missingUpdate.insert(clientData.clientId);
     }
 
     if (!contents.invalidVersion.empty())

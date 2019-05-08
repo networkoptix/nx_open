@@ -43,13 +43,26 @@ update::Status CommonUpdateManager::start()
     update::Status updateStatus;
 
     bool shouldDownload = statusAppropriateForDownload(&package, &updateStatus);
+    NX_DEBUG(
+        this,
+        lm("Start update: ShouldDownload: %1, package valid: %2")
+            .args(shouldDownload, package.isValid()));
     if (shouldDownload || !package.isValid())
     {
         m_downloaderFailDetail = DownloaderFailDetail::noError;
         for (const auto& file : downloader()->files())
         {
+            NX_DEBUG(
+                this,
+                lm("Start update: existing file: %1").args(file));
             if (file.contains("updates/"))
+            {
+
+                NX_DEBUG(
+                    this,
+                    lm("Start update: removing file: %1").args(file));
                 downloader()->deleteFile(file);
+            }
         }
         installer()->stopSync();
     }
@@ -83,7 +96,13 @@ update::Status CommonUpdateManager::start()
         fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::all;
     }
 
-    switch (downloader()->addFile(fileInformation))
+    const auto addFileResult = downloader()->addFile(fileInformation);
+    NX_DEBUG(
+        this,
+        lm("Downloader::addFile (%1) called. Result is: %2")
+            .args(fileInformation.name, addFileResult));
+
+    switch (addFileResult)
     {
     case downloader::ResultCode::ok:
         return update::Status(
@@ -106,6 +125,7 @@ update::Status CommonUpdateManager::start()
         return update::Status(peerId, update::Status::Code::error, "Not enough free space");
     default:
         NX_ASSERT(false, "Unexpected Downloader::addFile() result");
+        m_downloaderFailDetail = DownloaderFailDetail::internalError;
         return update::Status(peerId, update::Status::Code::error, "Unknown error");
     }
 
@@ -145,10 +165,9 @@ void CommonUpdateManager::startUpdate(const QByteArray& content)
 }
 
 bool CommonUpdateManager::canDownloadFile(
-    const QString& fileName,
-    update::Status* outUpdateStatus)
+    const nx::update::Package& package, update::Status* outUpdateStatus)
 {
-    auto fileInformation = downloader()->fileInformation(fileName);
+    auto fileInformation = downloader()->fileInformation(package.file);
     const auto peerId = commonModule()->moduleGUID();
 
     switch (m_downloaderFailDetail)
@@ -211,6 +230,21 @@ bool CommonUpdateManager::canDownloadFile(
         }
     }
 
+    const double requiredSpace = package.size * 2 * 1.2;
+    const int64_t deviceFreeSpace = freeSpace(installer()->dataDirectoryPath());
+    if (deviceFreeSpace < requiredSpace)
+    {
+        NX_WARNING(
+            this,
+            "Can't start downloading an update package because lack of free space on disk. " \
+            "Required: %1 Mb, free Space: %2 Mb",
+            static_cast<double>(requiredSpace) / (1024 * 1024),
+            static_cast<double>(deviceFreeSpace) / (1024 * 1024));
+        *outUpdateStatus = nx::update::Status(
+            peerId, update::Status::Code::error, "Not enough free space for keeping update files");
+        return false;
+    }
+
     return true;
 }
 
@@ -247,7 +281,43 @@ bool CommonUpdateManager::installerState(update::Status* outUpdateStatus, const 
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "No enough free space on device");
+            "Not enough free space on device");
+        return true;
+    case CommonUpdateInstaller::State::brokenZip:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            "Zip archive is broken");
+        return true;
+    case CommonUpdateInstaller::State::wrongDir:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            "Wrong directory");
+        return true;
+    case CommonUpdateInstaller::State::cantOpenFile:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            "Can't open file");
+        return true;
+    case CommonUpdateInstaller::State::otherError:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            "Other error");
+        return true;
+    case CommonUpdateInstaller::State::stopped:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            "Installer was unexpectedly stopped");
+        return true;
+    case CommonUpdateInstaller::State::busy:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            "Installer is busy");
         return true;
     case CommonUpdateInstaller::State::unknownError:
         *outUpdateStatus = update::Status(
@@ -270,7 +340,12 @@ update::FindPackageResult CommonUpdateManager::findPackage(
     update::Package* outPackage,
     QString* outMessage) const
 {
-    return update::findPackage(*commonModule(), outPackage, outMessage);
+    const auto result = update::findPackage(*commonModule(), outPackage, outMessage);
+    NX_DEBUG(
+        this,
+        lm("Find package called. Result: %1, message: %2")
+            .args((int) result, outMessage == nullptr ? "" : *outMessage));
+    return result;
 }
 
 bool CommonUpdateManager::deserializedUpdateInformation(update::Information* outUpdateInformation,
@@ -347,14 +422,13 @@ bool CommonUpdateManager::updateLastInstallationRequestTime()
 }
 
 bool CommonUpdateManager::statusAppropriateForDownload(
-    nx::update::Package* outPackage,
-    update::Status* outStatus)
+    nx::update::Package* outPackage, update::Status* outStatus)
 {
     QString message;
     switch (findPackage(outPackage, &message))
     {
         case update::FindPackageResult::ok:
-            return canDownloadFile(outPackage->file, outStatus);
+            return canDownloadFile(*outPackage, outStatus);
         case update::FindPackageResult::otherError:
             *outStatus = update::Status(
                 commonModule()->moduleGUID(),

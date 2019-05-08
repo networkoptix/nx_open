@@ -1,5 +1,8 @@
 #!/bin/bash
 
+COMPANY_NAME="@deb.customization.company.name@"
+TARGET_DEVICE="@targetDevice@"
+
 VMS_DIR=$(dirname $(dirname "${BASH_SOURCE[0]}"))
 
 EXE="$VMS_DIR/bin/mediaserver-bin"
@@ -8,6 +11,29 @@ ARGS="-e"
 source "$VMS_DIR/build_info.txt"
 FULL_VERSION="$version-$changeSet-$customization"
 [ ! -z "$beta" ] && FULL_VERSION+="-beta"
+
+detect_HW_PLATFORM()
+{
+    HW_PLATFORM="unknown"
+    if [[ $TARGET_DEVICE == "linux_arm32" ]]
+    then
+        if grep '^Hardware.*:.*BCM2835[[:space:]]*$' /proc/cpuinfo &>/dev/null
+        then
+            HW_PLATFORM="raspberryPi"
+        elif grep '^Hardware.*:.*sun8i[[:space:]]*$' /proc/cpuinfo &>/dev/null
+        then
+            HW_PLATFORM="bananaPi"
+        fi
+    fi
+}
+
+# TODO: Consider generating installation_info.json in Client-only distributions as well.
+INSTALLATION_INFO_JSON="/opt/$COMPANY_NAME/installation_info.json"
+if [[ ! -f $INSTALLATION_INFO_JSON ]]
+then
+    detect_HW_PLATFORM
+    echo -e "{\n    \"hwPlatform\": \"$HW_PLATFORM\"\n}" >"$INSTALLATION_INFO_JSON"
+fi
 
 # Switch off rp_filter for all interfaces to allow
 # discover/install cameras with invalid ip addresses

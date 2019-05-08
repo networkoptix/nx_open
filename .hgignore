@@ -26,3 +26,5 @@ subinclude:webadmin/.hgignore
 # Build folders in the repository root.
 re:^build/
 re:^build-.*/
+
+.git

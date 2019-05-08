@@ -8,7 +8,6 @@
 #include <ui/style/helper.h>
 #include <nx/vms/client/desktop/common/widgets/text_edit_label.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
-#include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -165,4 +164,14 @@ void QnGraphicsToolTipWidget::pointTo(const QPointF& pos)
     m_pointTo = pos;
     base_type::pointTo(pos);
     updateTailPos();
+}
+
+AsyncImageWidget::CropMode QnGraphicsToolTipWidget::cropMode() const
+{
+    return m_previewWidget->cropMode();
+}
+
+void QnGraphicsToolTipWidget::setCropMode(AsyncImageWidget::CropMode value)
+{
+    m_previewWidget->setCropMode(value);
 }

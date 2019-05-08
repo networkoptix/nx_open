@@ -10,6 +10,7 @@
 #include <common/common_module.h>
 
 #include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/screen_recording/video_recorder_settings.h>
@@ -23,7 +24,7 @@ const int kMsecsPerMinute = 60 * 1000;
 
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(
     QnVideoRecorderSettings* settings,
-    QWidget *parent)
+    QWidget* parent)
     :
     base_type(parent),
     ui(new Ui::GeneralPreferencesWidget),
@@ -42,11 +43,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(
 
     ui->idleTimeoutWidget->setEnabled(false);
 
-    for (const auto& deviceName: QnVideoRecorderSettings::availableDeviceNames(QAudio::AudioInput))
-    {
-        ui->primaryAudioDeviceComboBox->addItem(deviceName);
-        ui->secondaryAudioDeviceComboBox->addItem(deviceName);
-    }
+    initAudioDevices();
 
     connect(ui->addMediaFolderButton, &QPushButton::clicked, this,
         &QnGeneralPreferencesWidget::at_addMediaFolderButton_clicked);
@@ -88,13 +85,13 @@ void QnGeneralPreferencesWidget::applyChanges()
     bool recorderSettingsChanged = false;
     if (m_recorderSettings->primaryAudioDeviceName() != primaryAudioDeviceName())
     {
-        m_recorderSettings->setPrimaryAudioDeviceByName(primaryAudioDeviceName());
+        m_recorderSettings->setPrimaryAudioDeviceName(primaryAudioDeviceName());
         recorderSettingsChanged = true;
     }
 
     if (m_recorderSettings->secondaryAudioDeviceName() != secondaryAudioDeviceName())
     {
-        m_recorderSettings->setSecondaryAudioDeviceByName(secondaryAudioDeviceName());
+        m_recorderSettings->setSecondaryAudioDeviceName(secondaryAudioDeviceName());
         recorderSettingsChanged = true;
     }
 
@@ -111,8 +108,8 @@ void QnGeneralPreferencesWidget::loadDataToUi()
     allMediaFolders << qnSettings->extraMediaFolders();
     setMediaFolders(allMediaFolders);
     setUserIdleTimeoutMs(qnSettings->userIdleTimeoutMSecs());
-    setPrimaryAudioDeviceName(m_recorderSettings->primaryAudioDevice().fullName());
-    setSecondaryAudioDeviceName(m_recorderSettings->secondaryAudioDevice().fullName());
+    setPrimaryAudioDeviceName(m_recorderSettings->primaryAudioDeviceName());
+    setSecondaryAudioDeviceName(m_recorderSettings->secondaryAudioDeviceName());
     setAutoStart(qnSettings->autoStart());
 }
 
@@ -233,48 +230,72 @@ void QnGeneralPreferencesWidget::setAutoStart(bool value)
     ui->autoStartCheckBox->setChecked(value);
 }
 
-QString QnGeneralPreferencesWidget::primaryAudioDeviceName() const
+void QnGeneralPreferencesWidget::initAudioDevices()
 {
-    return ui->primaryAudioDeviceComboBox->currentText();
+    ui->primaryAudioDeviceComboBox->clear();
+    ui->secondaryAudioDeviceComboBox->clear();
+
+    QString defaultPrimaryDeviceName = m_recorderSettings->defaultPrimaryAudioDevice().fullName();
+    if (defaultPrimaryDeviceName.isEmpty())
+        defaultPrimaryDeviceName = tr("None");
+    ui->primaryAudioDeviceComboBox->addItem(tr("Auto (%1)").arg(defaultPrimaryDeviceName));
+    ui->primaryAudioDeviceComboBox->addItem(tr("None"), QnAudioRecorderSettings::kNoDevice);
+
+    QString defaultSecondaryDeviceName =
+        m_recorderSettings->defaultSecondaryAudioDevice().fullName();
+    if (defaultSecondaryDeviceName.isEmpty())
+        defaultSecondaryDeviceName = tr("None");
+    ui->secondaryAudioDeviceComboBox->addItem(tr("Auto (%1)").arg(defaultSecondaryDeviceName));
+    ui->secondaryAudioDeviceComboBox->addItem(tr("None"), QnAudioRecorderSettings::kNoDevice);
+
+    for (const auto& deviceName: m_recorderSettings->availableDevices())
+    {
+        const QString& name = deviceName.fullName();
+        ui->primaryAudioDeviceComboBox->addItem(name, name);
+        ui->secondaryAudioDeviceComboBox->addItem(name, name);
+    }
 }
 
-void QnGeneralPreferencesWidget::setPrimaryAudioDeviceName(const QString &name)
+QString QnGeneralPreferencesWidget::primaryAudioDeviceName() const
 {
-    if (name.isEmpty())
-    {
-        ui->primaryAudioDeviceComboBox->setCurrentIndex(0);
-        return;
-    }
+    return ui->primaryAudioDeviceComboBox->currentData().toString();
+}
 
-    for (int i = 1; i < ui->primaryAudioDeviceComboBox->count(); i++)
+void QnGeneralPreferencesWidget::setPrimaryAudioDeviceName(const QString& name)
+{
+    if (!name.isEmpty())
     {
-        if (ui->primaryAudioDeviceComboBox->itemText(i).startsWith(name))
+        for (int i = 0; i < ui->primaryAudioDeviceComboBox->count(); ++i)
         {
-            ui->primaryAudioDeviceComboBox->setCurrentIndex(i);
-            return;
+            if (ui->primaryAudioDeviceComboBox->itemData(i).toString() == name)
+            {
+                ui->primaryAudioDeviceComboBox->setCurrentIndex(i);
+                return;
+            }
         }
     }
+
+    ui->primaryAudioDeviceComboBox->setCurrentIndex(0);
 }
 
 QString QnGeneralPreferencesWidget::secondaryAudioDeviceName() const
 {
-    return ui->secondaryAudioDeviceComboBox->currentText();
+    return ui->primaryAudioDeviceComboBox->currentData().toString();
 }
 
 void QnGeneralPreferencesWidget::setSecondaryAudioDeviceName(const QString &name)
 {
-    if (name.isEmpty())
+    if (!name.isEmpty())
     {
-        ui->secondaryAudioDeviceComboBox->setCurrentIndex(0);
-        return;
-    }
-
-    for (int i = 1; i < ui->secondaryAudioDeviceComboBox->count(); i++)
-    {
-        if (ui->secondaryAudioDeviceComboBox->itemText(i).startsWith(name))
+        for (int i = 0; i < ui->secondaryAudioDeviceComboBox->count(); i++)
         {
-            ui->secondaryAudioDeviceComboBox->setCurrentIndex(i);
-            return;
+            if (ui->secondaryAudioDeviceComboBox->itemData(i).toString() == name)
+            {
+                ui->secondaryAudioDeviceComboBox->setCurrentIndex(i);
+                return;
+            }
         }
     }
+
+    ui->secondaryAudioDeviceComboBox->setCurrentIndex(0);
 }

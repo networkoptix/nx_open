@@ -134,15 +134,14 @@ void DeviceAdditionDialog::initializeControls()
 
     ui->addressEdit->setPlaceholderText(tr("IP / Hostname / RTSP link / UDP link"));
     ui->addressEdit->setExternalControls(ui->addressLabel, ui->addressHint);
-    ui->addressEdit->setHintColor(QPalette().color(QPalette::WindowText));
+    ui->addressEdit->setUseWarningStyleForControl(false);
     ui->addressHint->setVisible(false);
-    ui->explanationLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
-    ui->explanationLabel->setToolTip(tr("Examples:")
-        + lit("\n192.168.1.15\n"
-              "www.example.com:8080\n"
-              "http://example.com:7090/image.jpg\n"
-              "rtsp://example.com:554/video\n"
-              "udp://239.250.5.5:1234"));
+    ui->addressLabel->addHintLine(tr("Examples:"));
+    ui->addressLabel->addHintLine(lit("192.168.1.15"));
+    ui->addressLabel->addHintLine(lit("www.example.com:8080"));
+    ui->addressLabel->addHintLine(lit("http://example.com:7090/image.jpg"));
+    ui->addressLabel->addHintLine(lit("rtsp://example.com:554/video"));
+    ui->addressLabel->addHintLine(lit("udp://239.250.5.5:1234"));
 
     ui->widget->setFixedWidth(ui->addressLabelLayout->minimumSize().width());
     installEventHandler(ui->serverChoosePanel, QEvent::PaletteChange, ui->serverChoosePanel,

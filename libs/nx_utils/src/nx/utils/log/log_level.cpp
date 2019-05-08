@@ -10,15 +10,6 @@ namespace nx {
 namespace utils {
 namespace log {
 
-namespace {
-
-QRegularExpression makeExactMatchPattern(const Tag& tag)
-{
-    return QRegularExpression("^" + tag.toString() + "$");
-}
-
-} // namespace
-
 Level levelFromString(const QString& levelString)
 {
     const auto level = levelString.toLower();
@@ -131,21 +122,35 @@ bool Tag::operator!=(const Tag& rhs) const
 //-------------------------------------------------------------------------------------------------
 // Filter
 
-Filter::Filter(const QRegularExpression& source):
-    m_filter(source),
-    m_valid(m_filter.isValid())
-{
-    if (m_valid)
-        m_filter.optimize();
-}
-
 Filter::Filter(const QString& source):
-    Filter(QRegularExpression(source, QRegularExpression::CaseInsensitiveOption))
+    m_pattern(source)
 {
+    // Trying to parse pattern as a regular expression.
+    static const QString kRegularExpressionPattern("re:");
+    if (m_pattern.startsWith(kRegularExpressionPattern))
+    {
+        try
+        {
+            const QString pattern(m_pattern.mid(kRegularExpressionPattern.length()));
+            std::regex re(pattern.toStdString(),
+                std::regex_constants::ECMAScript | std::regex_constants::icase);
+            m_regex = re;
+            m_valid = true;
+        }
+        catch (std::regex_error&)
+        {
+            // Syntax error in the regular expression.
+            m_valid = false;
+        }
+    }
+    else
+    {
+        m_valid = !m_pattern.isEmpty();
+    }
 }
 
 Filter::Filter(const Tag& tag):
-    Filter(makeExactMatchPattern(tag))
+    Filter(tag.toString())
 {
 }
 
@@ -159,25 +164,15 @@ bool Filter::accepts(const Tag& tag) const
     if (!isValid())
         return false;
 
-    if (ini().disableRegexInLogFilter)
-    {
-        const auto pattern = m_filter.pattern();
-        if (pattern.length() < 2)
-            return false;
+    if (m_regex)
+        return std::regex_search(tag.toString().toStdString(), *m_regex);
 
-        const auto prefix = (pattern[0] == '^' && pattern[pattern.length() - 1] == '$')
-            ? pattern.midRef(1, pattern.length() - 2)
-            : QStringRef(&pattern);
-
-        return tag.toString().startsWith(prefix);
-    }
-
-    return m_filter.match(tag.toString()).hasMatch();
+    return tag.toString().startsWith(m_pattern);
 }
 
 QString Filter::toString() const
 {
-    return m_filter.pattern();
+    return m_pattern;
 }
 
 bool Filter::operator<(const Filter& rhs) const

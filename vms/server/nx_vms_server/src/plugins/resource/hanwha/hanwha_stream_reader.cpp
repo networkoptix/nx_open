@@ -8,12 +8,13 @@
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 #include "hanwha_chunk_loader.h"
-#include "hanwha_ini_config.h"
+#include "vms_server_hanwha_ini.h"
 
 #include <utils/common/sleep.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
+#include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
 namespace vms::server {
@@ -22,9 +23,39 @@ namespace plugins {
 namespace {
 
 static const QString kLive4NvrProfileName = lit("Live4NVR");
+static const QString kTooManyConnectionsMessagePattern("maximum");
 static const int kHanwhaDefaultPrimaryStreamProfile = 2;
 static const std::chrono::milliseconds kNvrSocketReadTimeout(500);
 static const std::chrono::milliseconds kTimeoutToExtrapolateTime(1000 * 5);
+
+static const QString kHanwhaTcp("TCP");
+static const QString kHanwhaUdp("UDP");
+
+QString toHanwhaStreamingType(nx::vms::api::RtpTransportType rtpTransport)
+{
+    using namespace nx::vms::api;
+    if (rtpTransport == nx::vms::api::RtpTransportType::multicast)
+        return kHanwhaRtpMulticast;
+
+    return kHanwhaRtpUnicast;
+}
+
+QString toHanwhaTransportProtocol(nx::vms::api::RtpTransportType rtpTransport)
+{
+    using namespace nx::vms::api;
+    switch (rtpTransport)
+    {
+        case RtpTransportType::automatic:
+        case RtpTransportType::tcp:
+            return kHanwhaTcp;
+        case RtpTransportType::udp:
+        case RtpTransportType::multicast:
+            return kHanwhaUdp;
+        default:
+            NX_ASSERT(false, "Invalid RTP transport");
+            return kHanwhaTcp;
+    }
+}
 
 } // namespace
 
@@ -69,6 +100,21 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
         // if it added to the end of URL only.
         streamUrlString.append(lit("/session=%1").arg(m_sessionContext->sessionId));
     }
+    else
+    {
+        // If multicast transport used, ensure that camera configured accordingly.
+        const auto rtpTransportString =
+            m_hanwhaResource->getProperty(QnMediaResource::rtpTransportKey());
+        const auto transport = QnLexical::deserialized<nx::vms::api::RtpTransportType>(
+            rtpTransportString,
+            nx::vms::api::RtpTransportType::automatic);
+        if (transport == nx::vms::api::RtpTransportType::multicast)
+        {
+            auto result = m_hanwhaResource->ensureMulticastEnabled(getRole());
+            if (!result)
+                return result;
+        }
+    }
 
     const auto role = getRole();
     m_rtpReader.setRole(role);
@@ -90,7 +136,11 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     const auto openResult = m_rtpReader.openStream();
     NX_DEBUG(this, lm("Open RTSP %1 for device %2").args(
         streamUrlString, m_resource->getUniqueId()));
-
+    if (!openResult &&
+        openResult.toString(resourcePool()).toLower().contains(kTooManyConnectionsMessagePattern))
+    {
+        return CameraDiagnostics::TooManyOpenedConnectionsResult();
+    }
     return openResult;
 }
 
@@ -173,13 +223,16 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
         return CameraDiagnostics::NoErrorResult();
     }
 
+    const nx::vms::api::RtpTransportType preferredRtpTransport =
+        m_hanwhaResource->preferredRtpTransport();
+
     using ParameterMap = std::map<QString, QString>;
     ParameterMap params =
     {
         {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
         {kHanwhaStreamingModeProperty, kHanwhaFullMode},
-        {kHanwhaStreamingTypeProperty, kHanwhaRtpUnicast},
-        {kHanwhaTransportProtocolProperty, rtpTransport()},
+        {kHanwhaStreamingTypeProperty, toHanwhaStreamingType(preferredRtpTransport)},
+        {kHanwhaTransportProtocolProperty, toHanwhaTransportProtocol(preferredRtpTransport)},
         {kHanwhaRtspOverHttpProperty, kHanwhaFalse}
     };
 

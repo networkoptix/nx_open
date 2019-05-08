@@ -163,6 +163,7 @@ public:
     bool clearSpaceForFile(const QString& path, qint64 size);
     bool canAddChunk(qint64 timeMs, qint64 size);
     void checkSystemStorageSpace();
+    void checkMetadataStorageSpace();
 
     bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays, qint64 targetFreeSpace);
     void clearMaxDaysData();

@@ -9,12 +9,12 @@ StreamingChunk::SequentialReadingContext::SequentialReadingContext(StreamingChun
     m_currentOffset(0),
     m_chunk(chunk)
 {
-    m_chunk->m_readers.insert(this);
+    m_chunk->addReader(this);
 }
 
 StreamingChunk::SequentialReadingContext::~SequentialReadingContext()
 {
-    m_chunk->m_readers.erase(this);
+    m_chunk->removeReader(this);
 }
 
 StreamingChunk::StreamingChunk(
@@ -31,6 +31,18 @@ StreamingChunk::StreamingChunk(
 const StreamingChunkCacheKey& StreamingChunk::params() const
 {
     return m_params;
+}
+
+void StreamingChunk::addReader(SequentialReadingContext* reader)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_readers.insert(reader);
+}
+
+void StreamingChunk::removeReader(SequentialReadingContext* reader)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_readers.erase(reader);
 }
 
 QString StreamingChunk::mimeType() const

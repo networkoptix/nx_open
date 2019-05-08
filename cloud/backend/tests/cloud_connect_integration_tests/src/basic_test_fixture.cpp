@@ -19,11 +19,11 @@ namespace network {
 namespace cloud {
 namespace test {
 
-class TrtafficBlocker:
+class TrafficBlocker:
     public nx::utils::bstream::AbstractOutputConverter
 {
 public:
-    TrtafficBlocker(
+    TrafficBlocker(
         int connectionNumber,
         std::atomic<int>* blockedConnectionNumber)
         :
@@ -100,10 +100,12 @@ BasicTestFixture::BasicTestFixture(
     int relayCount,
     std::optional<std::chrono::seconds> disconnectedPeerTimeout)
     :
+    base_type("cloud_connect_integration"),
     m_staticMsgBody("Hello, hren!"),
     m_mediator(
         nx::hpm::MediatorFunctionalTest::allFlags &
-            ~nx::hpm::MediatorFunctionalTest::initializeConnectivity),
+            ~nx::hpm::MediatorFunctionalTest::initializeConnectivity,
+        testDataDir() + "/mediator"),
     m_unfinishedRequestsLeft(0),
     m_relayCount(relayCount),
     m_disconnectedPeerTimeout(disconnectedPeerTimeout)
@@ -227,7 +229,7 @@ void BasicTestFixture::configureProxyBeforeMediator()
     m_proxyBeforeMediator->proxy.setDownStreamConverterFactory(
         [proxyContext = m_proxyBeforeMediator.get()]()
         {
-            return std::make_unique<TrtafficBlocker>(
+            return std::make_unique<TrafficBlocker>(
                 ++proxyContext->lastConnectionNumber,
                 &proxyContext->blockedConnectionNumber);
         });
@@ -296,7 +298,7 @@ void BasicTestFixture::startRelay(int index)
     std::string endpointString = "127.0.0.1:0";
     newRelay->addArg("-http/listenOn", endpointString.c_str());
 
-    std::string dataDirString = std::string("relay_") + std::to_string(index);
+    const auto dataDirString = lm("%1/relay_%2").args(testDataDir(), index).toStdString();
     newRelay->addArg("-dataDir", dataDirString.c_str());
 
     for (const auto& argument : m_relayStartupArguments)

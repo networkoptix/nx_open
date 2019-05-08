@@ -22,14 +22,24 @@ CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 
 WITH_ROOT_TOOL='@withRootTool@'
 
-systemctl stop $COMPANY_NAME-mediaserver.service || true
+service $COMPANY_NAME-mediaserver stop || true
 
 if [[ $WITH_ROOT_TOOL == 'true' ]]
 then
-    systemctl stop $COMPANY_NAME-root-tool.service || true
+    service $COMPANY_NAME-root-tool stop || true
 fi
 
-if [[ $1 == 'remove' ]]
+if is_systemd_used
+then
+    systemctl disable $COMPANY_NAME-mediaserver
+
+    if [[ $WITH_ROOT_TOOL == 'true' ]]
+    then
+        systemctl disable $COMPANY_NAME-root-tool
+    fi
+fi
+
+if [ "$1" = "remove" ]
 then
     REMOVE="Remove the Database"
     KEEP="Keep current version"
@@ -42,39 +52,6 @@ then
     db_input high @deb.customization.company.name@-mediaserver/removeDatabase || true
     db_go || true
     db_get @deb.customization.company.name@-mediaserver/removeDatabase
-
-    if [ "$RET" = "$KEEP" -a "$2" = "in-favour" ]
-    then
-        # Here we check cloud instances conflict prior to upgrade. Pre-installation script has a
-        # similar check which is required for updates from old versions which do not have this
-        # check.
-
-        echo "Checking $CLOUD_NAME compatibility..." >&2
-
-        NEW_CLOUD_GROUP_SUFFIX=$(echo "$3" | sed "s/$COMPANY_NAME-mediaserver//")
-        IS_CONNECTED_TO_CLOUD=$($CFG_HELPER isConnectedToCloud)
-
-        if [ "$IS_CONNECTED_TO_CLOUD" = "yes" \
-            -a "$CLOUD_GROUP_SUFFIX" != "$NEW_CLOUD_GROUP_SUFFIX" ]
-        then
-            echo >&2
-            echo "You are going to install a package for another cloud instance." >&2
-            echo "Please unlink the system from $CLOUD_NAME first."
-            echo "Exiting..." >&2
-            echo >&2
-            exit 1
-        fi
-    fi
-
-    if is_systemd_used
-    then
-        systemctl disable $COMPANY_NAME-mediaserver.service
-
-        if [[ $WITH_ROOT_TOOL == 'true' ]]
-        then
-            systemctl disable $COMPANY_NAME-root-tool.service
-        fi
-    fi
 
     $CFG_HELPER sysIdTime -d
 

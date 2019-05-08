@@ -209,8 +209,7 @@ struct UpdateContents
 
     /** Information for the clent update. */
     nx::update::Package clientPackage;
-    /** Flag shows that we need update package for client, but it is missing. */
-    bool missingClientPackage = false;
+
     nx::update::Information info;
     nx::update::InformationError error = nx::update::InformationError::noError;
     /**
@@ -220,7 +219,7 @@ struct UpdateContents
     QList<Package> manualPackages;
     bool cloudIsCompatible = true;
 
-    bool packagesGenerted = false;
+    bool packagesGenerated = false;
     /** We have already installed this version. Widget will show appropriate status.*/
     bool alreadyInstalled = false;
 

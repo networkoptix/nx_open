@@ -233,12 +233,12 @@ void LensPtzControl::onButtonClicked(ButtonType button, bool state)
 
 void LensPtzControl::onRotationButtonCounterClockWise(bool pressed)
 {
-    m_buttonState.rotation += pressed ? kRotationIncrement : -kRotationIncrement;
+    m_buttonState.rotation -= (pressed ? kRotationIncrement : -kRotationIncrement);
 }
 
 void LensPtzControl::onRotationButtonClockWise(bool pressed)
 {
-    m_buttonState.rotation -= pressed ? kRotationIncrement : -kRotationIncrement;
+    m_buttonState.rotation += (pressed ? kRotationIncrement : -kRotationIncrement);
 }
 
 QSize LensPtzControl::sizeHint() const
@@ -531,7 +531,15 @@ void LensPtzControl::drawButton(QPainter* painter, const Button& button) const
     const QPixmap& pixmap = (button.isClicked != button.isHovered) ? button.hover : button.normal;
 
     if (!pixmap.isNull())
-        painter->drawPixmap(button.rect, pixmap);
+    {
+        const auto iconRect = QStyle::alignedRect(
+            Qt::LeftToRight,
+            Qt::AlignCenter,
+            pixmap.size() / pixmap.devicePixelRatio(),
+            button.rect);
+        NX_ASSERT(button.rect == iconRect, "We will have hover problems in this case");
+        painter->drawPixmap(iconRect, pixmap);
+    }
 }
 
 QPointF LensPtzControl::screenToLocal(const QPointF& pos) const

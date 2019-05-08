@@ -22,6 +22,7 @@ public:
     virtual void setForwardOnly(bool val) = 0;
     virtual void prepare(const QString& query) = 0;
 
+    virtual void addBindValue(const QVariant& value) noexcept = 0;
     virtual void bindValue(const QString& placeholder, const QVariant& value) noexcept = 0;
     virtual void bindValue(int pos, const QVariant& value) noexcept = 0;
     virtual void bindValue(const std::string& placeholder, const std::string& value) noexcept = 0;
@@ -33,6 +34,7 @@ public:
     virtual QVariant value(int index) const = 0;
     virtual QVariant value(const QString& name) const = 0;
     virtual QSqlRecord record() = 0;
+    virtual QVariant lastInsertId() const = 0;
 
     // TODO: #ak Remove these methods.
     // For now they are required for compatibility with QnSql::*.
@@ -54,6 +56,7 @@ public:
     virtual void setForwardOnly(bool val) override;
     virtual void prepare(const QString& query) override;
 
+    virtual void addBindValue(const QVariant& value) noexcept override;
     virtual void bindValue(const QString& placeholder, const QVariant& value) noexcept override;
     virtual void bindValue(int pos, const QVariant& value) noexcept override;
     virtual void bindValue(const std::string& placeholder, const std::string& value) noexcept override;
@@ -65,6 +68,7 @@ public:
     virtual QVariant value(int index) const override;
     virtual QVariant value(const QString& name) const override;
     virtual QSqlRecord record() override;
+    virtual QVariant lastInsertId() const override;
 
     virtual QSqlQuery& impl() override;
     virtual const QSqlQuery& impl() const override;

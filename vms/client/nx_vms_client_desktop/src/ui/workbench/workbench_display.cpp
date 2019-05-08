@@ -102,6 +102,7 @@
 
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
+#include <nx/vms/client/desktop/debug_utils/instruments/debug_info_instrument.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
@@ -250,6 +251,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_focusListenerInstrument = new FocusListenerInstrument(this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_selectionOverlayHackInstrument = new SelectionOverlayHackInstrument(this);
+    m_debugInfoInstrument = new DebugInfoInstrument(this);
 
     m_instrumentManager->installInstrument(new StopInstrument(Instrument::Viewport, paintEventTypes, this));
     m_instrumentManager->installInstrument(m_afterPaintInstrument);
@@ -263,6 +265,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_instrumentManager->installInstrument(m_widgetActivityInstrument);
     m_instrumentManager->installInstrument(m_selectionOverlayHackInstrument);
     m_instrumentManager->installInstrument(new ToolTipInstrument(this));
+    m_instrumentManager->installInstrument(m_debugInfoInstrument, InstallationMode::InstallBefore,
+        paintForwardingInstrument());
 
     connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)), this, SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(synchronizeRaisedGeometry()));
@@ -402,6 +406,11 @@ SignalingInstrument* QnWorkbenchDisplay::beforePaintInstrument() const
 SignalingInstrument* QnWorkbenchDisplay::afterPaintInstrument() const
 {
     return m_afterPaintInstrument;
+}
+
+DebugInfoInstrument* QnWorkbenchDisplay::debugInfoInstrument() const
+{
+    return m_debugInfoInstrument;
 }
 
 QGraphicsScene* QnWorkbenchDisplay::scene() const
@@ -1217,8 +1226,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             if (!mediaWidget->isZoomWindow())
                 qnClientModule->radassController()->registerConsumer(mediaWidget->display()->camDisplay());
 
-            integrations::registerWidget(mediaWidget);
         }
+
+        integrations::registerWidget(mediaWidget);
     }
 
     return true;
@@ -2159,6 +2169,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
     connect(layout, SIGNAL(zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)), this, SLOT(at_layout_zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)));
     connect(layout, SIGNAL(zoomLinkRemoved(QnWorkbenchItem *, QnWorkbenchItem *)), this, SLOT(at_layout_zoomLinkRemoved(QnWorkbenchItem *, QnWorkbenchItem *)));
     connect(layout, SIGNAL(boundingRectChanged(QRect, QRect)), this, SLOT(at_layout_boundingRectChanged(QRect, QRect)));
+
+    connect(layout, &QnWorkbenchLayout::lockedChanged, this, &QnWorkbenchDisplay::layoutAccessChanged);
+
     if (const auto& layoutResource = layout->resource())
     {
         connect(layout->resource(), &QnLayoutResource::backgroundImageChanged, this,

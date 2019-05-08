@@ -2,7 +2,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
-#include <plugins/plugins_ini.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
@@ -201,12 +201,12 @@ void DeviceAnalyticsContext::putFrame(
         if (!gotPixelFormat)
             continue;
 
-        if (const auto& dataPacket = frameConverter.getDataPacket(pixelFormat))
+        if (const auto dataPacket = frameConverter.getDataPacket(pixelFormat))
         {
             if (binding->canAcceptData()
                 && NX_ASSERT(dataPacket->timestampUs() >= 0))
             {
-                binding->putData(std::make_shared<DataPacketAdapter>(dataPacket));
+                binding->putData(std::make_shared<DataPacketAdapter>(dataPacket.get()));
             }
             else
             {

@@ -8,5 +8,5 @@ platformModification=@modification@
 changeSet=@changeSet@
 beta=@beta_bool@
 brand=@product.name.short@
-protoVersion=@nxec.ec2ProtoVersion@
+protoVersion=@vmsProtocolVersion@
 metaVersion=@metaVersion@

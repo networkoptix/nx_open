@@ -180,20 +180,15 @@ bool setDateTime(qint64 millisecondsSinceEpoch)
             return false;
         }
 
-        if (AppInfo::isBpi() || AppInfo::isNx1())
+        // On NX1, we have to execute "hwclock -w" to save the time, and this command sometimes
+        // failes, hence several attempts.
+        for (int i = 0; i < 3; ++i)
         {
-            // On NX1, we have to execute "hwclock -w" to save the time, and this command sometimes
-            // failes, hence several attempts.
-            for (int i = 0; i < 3; ++i)
-            {
-                if (QProcess::execute("hwclock -w") == 0)
-                    return true;
-            }
-            NX_ERROR(typeid(TimeFunctionTag), lm("setDateTime(): \"hwclock -w\" fails"));
-            return false;
+            if (QProcess::execute("hwclock -w") == 0)
+                return true;
         }
-
-        return true;
+        NX_ERROR(typeid(TimeFunctionTag), lm("setDateTime(): \"hwclock -w\" fails"));
+        return false;
     #else
         nx::utils::unused(millisecondsSinceEpoch);
         NX_ERROR(typeid(TimeFunctionTag), lm("setDateTime(): unsupported platform"));

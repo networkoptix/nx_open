@@ -24,6 +24,8 @@ common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
     int eventCount,
     const AttributeDictionary* attributeDictionary = nullptr);
 
+QRectF generateRandomRectf();
+
 } // namespace test
 } // namespace storage
 } // namespace analytics

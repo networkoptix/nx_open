@@ -198,7 +198,6 @@ namespace QnXmlTag {
     const QString parameterGroup = lit("group");
 
     const QString dependenciesRoot          = lit("dependencies");
-    const QString dependenciesShow          = lit("dependencies-ranges");
     const QString dependenciesRanges        = lit("dependencies-ranges");
     const QString dependenciesTrigger       = lit("dependencies-trigger");
 

@@ -119,15 +119,13 @@
         "upnpPortMappingEnabled": "מיפוי יציאת UPNP מאופשר",
         "useTextEmailFormat": "לשלוח הודעות דואר אלקטרוני טקסט רגיל",
         "useWindowsEmailLineFeed": "השתמש במעבר שורה של חלונות בהודעות דוא\"ל",
-        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
-        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
-        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
         "trafficEncryptionForced": "Force traffic encryption",
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
         "watermarkSettings": "Watermark settings",
         "maxWebMTranscoders": "כמות מקסימלית של חיבורי WEBM עבור השרת. Chrome פותח 2 חיבורים בו-זמנית, ולאחר מכן סוגר את הראשון. לכן, מומלץ להגדיר ערך> = 2 לפרמטר זה.",
-        "maxEventLogRecords": "המספר המרבי של רשומות יומן האירועים שיש לשמור במסד הנתונים. הכמות האמיתית של רשומות שלא נמחקו עשויה להיות גבוהה בעד 20% מהערך שצוין."
+        "maxEventLogRecords": "המספר המרבי של רשומות יומן האירועים שיש לשמור במסד הנתונים. הכמות האמיתית של רשומות שלא נמחקו עשויה להיות גבוהה בעד 20% מהערך שצוין.",
+        "forceLiveCacheForPrimaryStream": "Whether to cache some frames for the primary stream. Values: \"yes\" - always enabled (may use a lot of RAM), \"no\" - always disabled except when required by the playback (e.g. HLS), \"auto\" - similar to \"no\", but turned on when improves the user experience (e.g. when some Analytics plugin is working on the camera)."
     },
     "info": {
         "tabs": {

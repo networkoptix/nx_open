@@ -8,6 +8,8 @@
 #include <common/common_globals.h>
 #include <utils/math/math.h>
 
+#include "config.h"
+
 namespace nx {
 namespace analytics {
 namespace storage {
@@ -17,7 +19,7 @@ bool ObjectPosition::operator==(const ObjectPosition& right) const
     return deviceId == right.deviceId
         && timestampUsec == right.timestampUsec
         && durationUsec == right.durationUsec
-        && equalWithPrecision(boundingBox, right.boundingBox, 6)
+        && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && attributes == right.attributes;
 }
 
@@ -38,13 +40,17 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 //-------------------------------------------------------------------------------------------------
 
+bool Filter::empty() const
+{
+    return *this == Filter();
+}
+
 bool Filter::operator==(const Filter& right) const
 {
     return objectTypeId == right.objectTypeId
         && objectAppearanceId == right.objectAppearanceId
         && timePeriod == right.timePeriod
-        && equalWithPrecision(boundingBox, right.boundingBox, 6)
-        && requiredAttributes == right.requiredAttributes
+        && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && freeText == right.freeText
         && sortOrder == right.sortOrder;
 }
@@ -75,8 +81,6 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
         params->insert(lit("x2"), QString::number(filter.boundingBox.bottomRight().x()));
         params->insert(lit("y2"), QString::number(filter.boundingBox.bottomRight().y()));
     }
-
-    // TODO: requiredAttributes
 
     if (!filter.freeText.isEmpty())
     {
@@ -131,8 +135,6 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
             params.value(lit("y2")).toDouble()));
     }
 
-    // TODO: requiredAttributes.
-
     if (params.contains(lit("freeText")))
     {
         filter->freeText = QUrl::fromPercentEncoding(
@@ -174,7 +176,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 
     os << "maxObjectsToSelect " << filter.maxObjectsToSelect << "; ";
     os << "maxTrackSize " << filter.maxTrackSize << "; ";
-    os << "sortOrder " << 
+    os << "sortOrder " <<
         (filter.sortOrder == Qt::SortOrder::DescendingOrder ? "DESC" : "ASC");
 
     return os;

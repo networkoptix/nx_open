@@ -20,11 +20,8 @@
 #include <nx/vms/client/desktop/utils/upload_state.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 
 #include "update_contents.h"
-
-namespace nx::vms::common::p2p::downloader { class SingleConnectionPeerManager; }
 
 namespace nx::vms::client::desktop {
 
@@ -45,22 +42,19 @@ struct UpdateItem;
  */
 class ServerUpdateTool:
     public Connective<QObject>,
-    public QnConnectionContextAware,
-    public nx::vms::common::p2p::downloader::AbstractPeerManagerFactory
+    public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
     using UpdateContents = nx::update::UpdateContents;
     using Downloader = vms::common::p2p::downloader::Downloader;
     using FileInformation = vms::common::p2p::downloader::FileInformation;
-    using SingleConnectionPeerManager = nx::vms::common::p2p::downloader::SingleConnectionPeerManager;
-    using PeerManagerPtr = nx::vms::common::p2p::downloader::AbstractPeerManager*;
     using Clock = std::chrono::steady_clock;
     using TimePoint = std::chrono::time_point<Clock>;
 
 public:
     ServerUpdateTool(QObject* parent = nullptr);
-    ~ServerUpdateTool();
+    virtual ~ServerUpdateTool() override;
 
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
@@ -94,14 +88,14 @@ public:
      * Asks mediaservers to stop the update process.
      * Client expects all mediaservers to return to nx::update::Status::Code::idle state.
      */
-    void requestStopAction();
+    bool requestStopAction();
 
     /**
      * Asks mediaservers to finish update process.
      * @param skipActivePeers - will force update completion even if there are
      *     some servers installing.
      */
-    void requestFinishUpdate(bool skipActivePeers);
+    bool requestFinishUpdate(bool skipActivePeers);
 
     /**
      * Asks mediaservers to start installation process.
@@ -185,9 +179,6 @@ public:
 
     OfflineUpdateState getUploaderState() const;
 
-    // Get information about current update from mediaservers.
-    UpdateContents getRemoteUpdateContents() const;
-
     bool haveActiveUpdate() const;
 
     /** Get authentication string for current connection to mediaserver. */
@@ -202,10 +193,6 @@ public:
     QString getUpdateStateUrl() const;
     QString getUpdateInformationUrl() const;
     QString getInstalledUpdateInfomationUrl() const;
-
-    virtual PeerManagerPtr createPeerManager(
-        FileInformation::PeerSelectionPolicy peerPolicy,
-        const QList<QnUuid>& additionalPeers) override;
 
     /** Starts downloading the packages for the servers without internet. */
     void startManualDownloads(const UpdateContents& contents);
@@ -239,6 +226,11 @@ signals:
     void packageDownloaded(const nx::update::Package& package);
     void packageDownloadFailed(const nx::update::Package& package, const QString& error);
     void moduleInformationReceived(const QList<nx::vms::api::ModuleInformation>& moduleInformation);
+
+    /** Called when /ec2/cancelUpdate request is complete. */
+    void cancelUpdateComplete(bool success);
+    /** Called when /ec2/finishUpdate request is complete. */
+    void finishUpdateComplete(bool success);
 
 private:
     void atUpdateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
@@ -305,6 +297,8 @@ private:
 
     QSet<rest::Handle> m_activeRequests;
     QSet<rest::Handle> m_skippedRequests;
+    std::atomic_bool m_requestingStop = false;
+    std::atomic_bool m_requestingFinish = false;
 
     std::shared_ptr<PeerStateTracker> m_stateTracker;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
@@ -316,8 +310,6 @@ private:
 
     /** We use this downloader when client downloads updates for server without internet. */
     std::unique_ptr<Downloader> m_downloader;
-    /** Special peer manager to be used in the downloader. */
-    std::unique_ptr<vms::common::p2p::downloader::SingleConnectionPeerManager> m_peerManager;
     /** List of packages to be downloaded and uploaded by the client. */
     QList<nx::update::Package> m_manualPackages;
     /** Direct connection to the mediaserver. */

@@ -11,7 +11,7 @@
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_common.h"
-#include "hanwha_ini_config.h"
+#include "vms_server_hanwha_ini.h"
 
 #include <media_server/media_server_module.h>
 #include <nx/vms/server/resource/shared_context_pool.h>
@@ -166,7 +166,7 @@ void HanwhaResourceSearcher::updateSocketList()
     {
         auto socket = nx::network::SocketFactory::createDatagramSocket();
         if (socket->setReuseAddrFlag(true) &&
-            socket->bind(network::BROADCAST_ADDRESS, kSunApiProbeSrcPort))
+            socket->bind(nx::network::BROADCAST_ADDRESS, kSunApiProbeSrcPort))
         {
             m_sunapiReceiveSocket = std::move(socket);
         }
@@ -263,7 +263,7 @@ void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceLi
 }
 
 bool HanwhaResourceSearcher::readSunApiResponseFromSocket(
-    network::AbstractDatagramSocket* socket,
+    nx::network::AbstractDatagramSocket* socket,
     QnResourceList* resultResourceList)
 {
     NX_ASSERT(socket);

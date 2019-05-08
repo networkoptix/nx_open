@@ -53,6 +53,10 @@
 #include "common/common_globals.h"
 #include <media_server/media_server_module.h>
 #include <media_server_process_aux.h>
+#include <nx/sql/database.h>
+#include <core/resource/media_server_resource.h>
+#include <nx/utils/std/algorithm.h>
+#include <nx/analytics/utils.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -69,6 +73,7 @@ const qint64 kMinSystemStorageFreeSpace = 500 * 1000 * 1000LL;
 #else
 const qint64 kMinSystemStorageFreeSpace = 5000 * 1000 * 1000LL;
 #endif
+const qint64 kMinMetadataStorageFreeSpace = 1024 * 1024;
 
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
@@ -866,7 +871,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
             return;
     }
 
-    QSqlDatabase sqlDb = QSqlDatabase::addDatabase(
+    QSqlDatabase sqlDb = nx::sql::Database::addDatabase(
         lit("QSQLITE"),
         QString("QnStorageManager_%1").arg(fileName));
 
@@ -952,7 +957,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     auto connectionName = sqlDb.connectionName();
     sqlDb.close();
     sqlDb = QSqlDatabase();
-    QSqlDatabase::removeDatabase(connectionName);
+    nx::sql::Database::removeDatabase(connectionName);
 
     QString depracatedFileName = fileName + lit("_deprecated");
     if (!QFile::remove(depracatedFileName))
@@ -1750,6 +1755,47 @@ void QnStorageManager::checkSystemStorageSpace()
     }
 }
 
+void QnStorageManager::checkMetadataStorageSpace()
+{
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+        serverModule()->commonModule()->moduleGUID());
+    if (!server)
+        return;
+
+    bool hasAnalyticsEngine = false;
+    auto cameras = resourcePool()->getAllCameras(server);
+    for (const auto& camera: cameras)
+    {
+        QSet<QnUuid> objectEngines;
+        for (const auto& objectType: camera->supportedObjectTypes())
+        {
+            if (!objectType.second.empty())
+                objectEngines.insert(objectType.first);
+        }
+        auto usedObjectEngines = camera->enabledAnalyticsEngines().intersect(objectEngines);
+        if (!usedObjectEngines.empty())
+        {
+            hasAnalyticsEngine = true;
+        }
+    }
+    if (!nx::analytics::hasActiveObjectEngines(
+        serverModule()->commonModule(),
+        serverModule()->commonModule()->moduleGUID()))
+    {
+        return; //< No active analytics engine.
+    }
+
+    for (const auto& storage: getAllStorages())
+    {
+        if (storage->getId() != server->metadataStorageId())
+            continue;
+        if (storage->getStatus() != Qn::Online)
+            emit storageFailure(storage, nx::vms::api::EventReason::metadataStorageOffline);
+        else if (storage->getFreeSpace()< kMinMetadataStorageFreeSpace)
+            emit storageFailure(storage, nx::vms::api::EventReason::metadataStorageFull);
+    }
+}
+
 void QnStorageManager::clearSpace(bool forced)
 {
     QnMutexLocker lk(&m_clearSpaceMutex);
@@ -2451,7 +2497,7 @@ void QnStorageManager::testStoragesDone()
 
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
 {
-    NX_VERBOSE(this, "Changing storage [%1] status to [%2]...", fileStorage, status);
+    NX_VERBOSE(this, "Changing storage [%1] status to [%2]", fileStorage, status);
 
     //QnMutexLocker lock( &m_mutexStorages );
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
@@ -2539,7 +2585,12 @@ void QnStorageManager::startAuxTimerTasks()
 
     static const std::chrono::minutes kCheckSystemStorageSpace(1);
     m_auxTasksTimerManager.addNonStopTimer(
-        [this](nx::utils::TimerId) { checkSystemStorageSpace(); },
+        [this](nx::utils::TimerId)
+        {
+            checkSystemStorageSpace();
+            if (m_role == QnServer::StoragePool::Normal)
+                checkMetadataStorageSpace();
+        },
         kCheckSystemStorageSpace,
         kCheckSystemStorageSpace);
 

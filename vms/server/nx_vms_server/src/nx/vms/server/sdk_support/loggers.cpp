@@ -1,6 +1,6 @@
 #include "loggers.h"
 
-#include <plugins/plugins_ini.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 #include <core/resource/camera_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>

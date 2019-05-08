@@ -149,6 +149,7 @@ public:
 
     void setAuthenticationEnabled(bool value);
     void registerUserCredentials(const nx::String& userName, const nx::String& password);
+    void registerUserCredentials(const Credentials& credentials);
 
     nx::network::http::HttpStreamSocketServer& server() { return *m_httpServer; }
     const nx::network::http::HttpStreamSocketServer& server() const { return *m_httpServer; }

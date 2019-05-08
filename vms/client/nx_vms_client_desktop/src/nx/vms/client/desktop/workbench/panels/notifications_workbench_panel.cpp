@@ -35,6 +35,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_pane_settings.h>
 
+#include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_panel.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
@@ -464,6 +465,10 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     toolTip->updateTailPos();
     toolTip->pointTo(tooltipPos);
 
+    toolTip->setCropMode(ini().rightPanelHoverPreviewCrop
+        ? AsyncImageWidget::CropMode::notHovered
+        : AsyncImageWidget::CropMode::never);
+
     // TODO: #vkutin Refactor tooltip clicks, now it looks hackish.
     connect(toolTip.data(), &QnNotificationToolTipWidget::thumbnailClicked, tile,
         [tile]() { emit tile->clicked(Qt::LeftButton, QApplication::keyboardModifiers()); });
@@ -499,9 +504,9 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
                 return;
 
             auto animator = opacityAnimator(toolTip, kToolTipFadeSpeedFactor);
-            animator->animateTo(0.0);
             connect(animator, &VariantAnimator::finished,
                 toolTip.data(), &QObject::deleteLater);
+            animator->animateTo(0.0);
         });
 
     m_eventPanelHoverProcessor->forceHoverEnter();

@@ -48,6 +48,7 @@ struct QnCameraAdvancedParameterCondition
         present, //< Watched parameter is present in parameter list
         notPresent,
         valueChanged,
+        contains,
         unknown
     };
 
@@ -111,6 +112,7 @@ struct QnCameraAdvancedParameter
         Enumeration,
         Button,
         String,
+        Text,
         Separator,
         SliderControl,
         PtrControl,

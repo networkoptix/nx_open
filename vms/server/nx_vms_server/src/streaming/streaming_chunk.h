@@ -111,6 +111,9 @@ public:
     /** Disables check on internal buffer size. */
     void disableInternalBufferLimit();
 
+    void addReader(SequentialReadingContext* chunk);
+    void removeReader(SequentialReadingContext* chunk);
+
 private:
     enum class State
     {

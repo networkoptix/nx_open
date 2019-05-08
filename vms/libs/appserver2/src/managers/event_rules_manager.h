@@ -29,10 +29,6 @@ public:
     virtual int broadcastEventAction(
         const nx::vms::api::EventActionData& actionData,
         impl::SimpleHandlerPtr handler) override;
-    virtual int sendEventAction(
-        const nx::vms::api::EventActionData& actionData,
-        const QnUuid& dstPeer,
-        impl::SimpleHandlerPtr handler) override;
     virtual int resetBusinessRules(impl::SimpleHandlerPtr handler) override;
 
 private:
@@ -113,23 +109,6 @@ int EventRulesManager<T>::broadcastEventAction(
     {
         handler->done(reqID, errorCode);
     });
-    return reqID;
-}
-
-template<class T>
-int EventRulesManager<T>::sendEventAction(
-    const nx::vms::api::EventActionData& actionData,
-    const QnUuid& dstPeer,
-    impl::SimpleHandlerPtr handler)
-{
-    const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-        ApiCommand::execAction,
-        actionData,
-        [handler, reqID](ec2::ErrorCode errorCode)
-        {
-            handler->done(reqID, errorCode);
-        });
     return reqID;
 }
 

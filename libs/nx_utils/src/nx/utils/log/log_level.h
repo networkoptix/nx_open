@@ -2,8 +2,7 @@
 
 #include <map>
 #include <set>
-
-#include <QtCore/QRegularExpression>
+#include <regex>
 
 #include <nx/utils/log/to_string.h>
 
@@ -74,12 +73,8 @@ class NX_UTILS_API Filter
 {
 public:
     /**
-     * Create filter using the provided regular expression.
-     */
-    explicit Filter(const QRegularExpression& source);
-
-    /**
-     * Create filter using the provided string as a regular expression pattern.
+     * Create filter using the provided string. If the starts from the `re:` substring, it is parsed
+     * as a regular expression. Otherwise, `startsWith` logic is applied.
      */
     explicit Filter(const QString& source);
 
@@ -97,7 +92,8 @@ public:
     bool operator!=(const Filter& rhs) const;
 
 private:
-    QRegularExpression m_filter;
+    QString m_pattern;
+    std::optional<std::regex> m_regex;
     bool m_valid = true;
 };
 

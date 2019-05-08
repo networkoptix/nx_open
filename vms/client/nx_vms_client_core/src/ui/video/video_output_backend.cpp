@@ -66,8 +66,9 @@ QnVideoOutputBackend::QnVideoOutputBackend(QnVideoOutput* videoOutput):
     d->videoNodeFactories.append(&d->i420Factory);
     d->videoNodeFactories.append(&d->rgbFactory);
     d->videoNodeFactories.append(&d->textureFactory);
-    if (QnAppInfo::isBpi())
-        d->videoNodeFactories.append(&d->bpiFactory);
+    
+    // Commented out hardware video decoder support for BananaPi (Allwinner) - used by Lite Client.
+    //d->videoNodeFactories.append(&d->bpiFactory);
 }
 
 QnVideoOutputBackend::~QnVideoOutputBackend()

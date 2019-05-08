@@ -8,8 +8,8 @@
 
 namespace nx::sql::test {
 
-BasicFixture::BasicFixture():
-    nx::utils::test::TestWithTemporaryDirectory("utils_ut", "")
+BasicFixture::BasicFixture(const std::string& testModuleName):
+    nx::utils::test::TestWithTemporaryDirectory(testModuleName.c_str(), "")
 {
     init();
 }

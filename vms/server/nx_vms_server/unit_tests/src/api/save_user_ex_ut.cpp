@@ -22,6 +22,7 @@ protected:
     vms::api::UserDataEx regularUser2;
     vms::api::UserDataEx newAdminUser;
     vms::api::UserDataEx defaultAdmin;
+    vms::api::UserDataEx cloudUser;
 
     virtual void SetUp() override
     {
@@ -58,6 +59,7 @@ protected:
         auto testUserIt = std::find_if(m_userDataList.cbegin(), m_userDataList.cend(),
             [&expectedUser](const auto& userData) { return userData.name == expectedUser.name; });
         ASSERT_NE(testUserIt, m_userDataList.cend());
+        ASSERT_FALSE(testUserIt->realm.isEmpty());
     }
 
     void thenSavedUserShouldBeAuthorizedByServer(const vms::api::UserDataEx& accessUser)
@@ -111,6 +113,9 @@ private:
 
         defaultAdmin.name = "admin";
         defaultAdmin.password = "admin";
+
+        cloudUser.name = "test@networkoptix.com";
+        cloudUser.email = cloudUser.name;
     }
 };
 
@@ -191,6 +196,12 @@ TEST_F(SaveUserEx, shouldBePossibleToChangeUserPassword)
     whenChangePasswordRequestIssued(regularUser1, &regularUser1, "new_password",
         http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
+}
+
+TEST_F(SaveUserEx, cloudUserShouldHaveRealm)
+{
+    whenSaveUserRequestIssued(defaultAdmin, cloudUser, http::StatusCode::ok);
+    thenUserShouldAppearInTheGetUsersResponse(cloudUser);
 }
 
 } // namespace nx::test

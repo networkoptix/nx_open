@@ -55,6 +55,7 @@ CameraDiagnostics::Result QnFlirEIPResource::initializeCameraDriver()
     initializeIO();
 
     fetchAndSetAdvancedParameters();
+    setCameraCapability(Qn::CameraTimeCapability, true);
     saveProperties();
 
     return CameraDiagnostics::NoErrorResult();

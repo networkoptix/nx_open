@@ -488,6 +488,16 @@ void MainWindow::setWelcomeScreenVisible(bool visible)
     updateWidgetsVisibility();
 }
 
+bool MainWindow::isWorkbenchVisible() const
+{
+    return m_view->isVisibleTo(this);
+}
+
+bool MainWindow::isWelcomeScreenVisible() const
+{
+    return m_welcomeScreenVisible;
+}
+
 void MainWindow::setMaximized(bool maximized) {
     if(maximized == isMaximized())
         return;

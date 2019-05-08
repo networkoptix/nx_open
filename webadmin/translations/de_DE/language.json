@@ -119,15 +119,13 @@
         "upnpPortMappingEnabled": "UPNP-Port-Mapping aktiviert",
         "useTextEmailFormat": "Nur-Text-Emails senden",
         "useWindowsEmailLineFeed": "Windows-Zeilenumbruch in Emails verwenden",
-        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Timeout für den Inhalt einer Chunk-Message",
-        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunkantwort-Timeout",
-        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Alternative PTZ-Steuerung auf der Kachel anzeigen",
         "trafficEncryptionForced": "Trafficverschlüsselung erzwingen",
         "videoTrafficEncryptionForced": "Videotrafficverschlüsselung erzwingen",
         "updateStatus": "Update-Status",
         "watermarkSettings": "Wasserzeicheneinstellungen",
         "maxWebMTranscoders": "Maximale Anzahl von WEBM-Verbindungen für den Server. Chrome öffnet 2 Verbindungen auf einmal und schließt dann die erste. Es wird daher empfohlen, den Wert >=2 auf diesen Parameter zu setzen.",
-        "maxEventLogRecords": "Maximale Ereignisprotokollaufzeichnungen, die in der Datenbank gespeichert werden sollen. Die tatsächliche Anzahl der nicht gelöschten Datensätze kann bis zu 20% höher sein als der angegebene Wert."
+        "maxEventLogRecords": "Maximale Ereignisprotokollaufzeichnungen, die in der Datenbank gespeichert werden sollen. Die tatsächliche Anzahl der nicht gelöschten Datensätze kann bis zu 20% höher sein als der angegebene Wert.",
+        "forceLiveCacheForPrimaryStream": "Gibt an, ob einige Frames für den primären Stream zwischengespeichert werden sollen. Werte: \"Ja\" - immer aktiviert (verwendet möglicherweise viel RAM), \"Nein\" - immer deaktiviert, außer wenn dies für die Wiedergabe erforderlich ist (z. B. HLS), \"Auto\" - ähnlich wie \"Nein\", wird aber eingeschaltet, wenn die Benutzerfreundlichkeit verbessert wird (z.B. wenn einige Analytics-Plugins an der Kamera arbeiten)."
     },
     "info": {
         "tabs": {

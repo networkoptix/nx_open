@@ -11,7 +11,7 @@
 
 #include "camera/gl_renderer.h"
 #include "camera/cam_display.h"
-#include "camera/sync_dialog_display.h"
+#include "camera/sign_dialog_display.h"
 
 #include "ui/workaround/gl_native_painting.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"

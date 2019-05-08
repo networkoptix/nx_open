@@ -105,7 +105,7 @@ EngineManifest Engine::fetchSupportedEvents(const IDeviceInfo* deviceInfo)
 
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result.eventTypes),
-        [](const nx::axis::SupportedEventType& eventType) {return EventType(eventType); });
+        [](const nx::axis::SupportedEventType& eventType) { return EventType(eventType); });
 
     // Being uncommented, the next code line allows to get the list of supported events in the same
     // json format that is used in "static-resources/manifest.json". All you need is to stop on a

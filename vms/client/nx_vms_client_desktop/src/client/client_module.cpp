@@ -29,6 +29,7 @@
 #include <client_core/client_core_module.h>
 
 #include <nx/vms/client/desktop/settings/migration.h>
+#include <nx/vms/client/desktop/director/director.h>
 #include <client/client_app_info.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -105,6 +106,7 @@
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_manager.h>
+#include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
@@ -445,8 +447,9 @@ void QnClientModule::initSingletons()
 
     initializeStatisticsManager(commonModule);
 
-    /* Long runnables depend on QnCameraHistoryPool and other singletons. */
-    commonModule->store(new QnLongRunnablePool());
+    // Long runnables depend on QnCameraHistoryPool and other singletons.
+    // The pool is set to relaxed mode and can be destroyed with some QnLongRunnables dangling.
+    QnLongRunnablePool::instance()->setRelaxedChecking(true);
 
     commonModule->store(new QnCloudConnectionProvider());
     m_cloudStatusWatcher = commonModule->store(
@@ -458,6 +461,8 @@ void QnClientModule::initSingletons()
 
     m_uploadManager = new UploadManager(commonModule);
     m_wearableManager = new WearableManager(commonModule);
+
+    m_videoCache = new VideoCache(commonModule);
 
     commonModule->store(m_uploadManager);
     commonModule->store(m_wearableManager);
@@ -661,7 +666,11 @@ void QnClientModule::initSkin()
             QDir(QApplication::applicationDirPath()).absoluteFilePath(
                 nx::utils::AppInfo::isMacOsX() ? "../Resources/fonts" : "fonts"));
 
-        QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
+        if (qnRuntime->isVideoWallMode())
+            QApplication::setWindowIcon(qnSkin->icon(":/videowall.ico"));
+        else
+            QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
+
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }
 
@@ -687,20 +696,17 @@ void QnClientModule::initLocalResources()
     resourceProcessor->moveToThread(resourceDiscoveryManager);
     resourceDiscoveryManager->setResourceProcessor(resourceProcessor);
 
-    if (!m_startupParameters.skipMediaFolderScan)
-    {
-        auto localFilesSearcher = commonModule->store(new QnResourceDirectoryBrowser());
-
-        localFilesSearcher->setLocal(true);
-        QStringList dirs;
-        dirs << qnSettings->mediaFolder();
-        dirs << qnSettings->extraMediaFolders();
-        localFilesSearcher->setPathCheckList(dirs);
-        resourceDiscoveryManager->addDeviceServer(localFilesSearcher);
-    }
     resourceDiscoveryManager->setReady(true);
     commonModule->store(new QnSystemsWeightsManager());
     commonModule->store(new QnLocalResourceStatusWatcher());
+    if (!m_startupParameters.skipMediaFolderScan)
+    {
+        auto localFilesSearcher = commonModule->store(new ResourceDirectoryBrowser());
+        QStringList paths;
+        paths.append(qnSettings->mediaFolder());
+        paths.append(qnSettings->extraMediaFolders());
+        localFilesSearcher->setLocalResourcesDirectories(paths);
+    }
 }
 
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
@@ -736,6 +742,11 @@ UploadManager* QnClientModule::uploadManager() const
 WearableManager* QnClientModule::wearableManager() const
 {
     return m_wearableManager;
+}
+
+VideoCache* QnClientModule::videoCache() const
+{
+    return m_videoCache;
 }
 
 void QnClientModule::initLocalInfo()

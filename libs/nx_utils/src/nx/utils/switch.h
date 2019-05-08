@@ -19,9 +19,9 @@ auto switch_(const Value&, const Default&, const Action& defaultAction)
  * # Usage example 1:
  * ```
  *  const std::string line = nx::utils::switch_(count,
- *      0, []() { return "none"; },
- *      1, []() { return "single"; },
- *      nx::utils::default_, []() { return "many"; }
+ *      0, []{ return "none"; },
+ *      1, []{ return "single"; },
+ *      nx::utils::default_, []{ return "many"; }
  *  );
  * ```
  * Equivalent of:
@@ -45,8 +45,8 @@ auto switch_(const Value&, const Default&, const Action& defaultAction)
  * # Usage example 2:
  * ```
  *  nx::utils::switch_(data.command(),
- *      "help", []() { printHelp(); },
- *      "save", [&]() { save(data.argument()); },
+ *      "help", []{ printHelp(); },
+ *      "save", [&]{ save(data.argument()); },
  *  );
  * ```
  * Equivalent of:

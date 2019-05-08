@@ -64,7 +64,7 @@ QVariant ServerUpdatesModel::headerData(int section, Qt::Orientation orientation
             case NameColumn:
                 return tr("Component");
             case VersionColumn:
-                return tr("Current Version");
+                return tr("Installed Version");
             case ProgressColumn:
                 return tr("Status");
             case StatusMessageColumn:
@@ -126,7 +126,8 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
             {
                 case NameColumn:
                     if (item->component == UpdateItem::Component::server)
-                        return QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
+                        return QnResourceDisplayInfo(server).toString(
+                            Qn::ResourceInfoLevel::RI_NameOnly);
                     else
                         return QString(tr("Client"));
                 case VersionColumn:
@@ -147,6 +148,9 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
     {
         switch (role)
         {
+            case Qn::ResourceRole:
+                return QVariant::fromValue<QnResourcePtr>(server);
+
             case Qt::DecorationRole:
                 if (column == NameColumn)
                     return qnResIconCache->icon(server);

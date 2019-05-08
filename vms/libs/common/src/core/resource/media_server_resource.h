@@ -128,12 +128,15 @@ public:
     virtual QnUuid getOriginalGuid() const { return getId();  }
 
     /**
-     * Analytics engines (ids), which are actually running on the server.
+     * @return Ids of Analytics Engines which are actually running on the server.
      */
-    QSet<QnUuid> activeAnalyticsEngines() const;
+    QSet<QnUuid> activeAnalyticsEngineIds() const;
+
+    QnUuid metadataStorageId() const;
+    void setMetadataStorageId(const QnUuid& value);
 
     static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
-
+    QnMediaServerUserAttributesPtr userAttributes() const;
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
@@ -151,6 +154,7 @@ signals:
     void backupScheduleChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr& resource);
     void primaryAddressChanged(const QnResourcePtr& resource);
+    void metadataStorageIdChanged(const QnResourcePtr& resource);
 private:
     nx::network::SocketAddress m_primaryAddress;
     QnMediaServerConnectionPtr m_apiConnection; // deprecated

@@ -81,6 +81,7 @@ copyBuildLibs()
         libnx_network
         libnx_update
         libnx_utils
+        libnx_vms_utils
         libnx_sql
         libnx_vms_api
         libnx_sdk
@@ -123,7 +124,6 @@ copyBuildLibs()
             libnx_audio
             libnx_vms_client_core
             libnx_media
-            libnx_vms_utils
 
             # third-party
             ldpreloadhook
@@ -473,16 +473,6 @@ copyAdditionalSysrootFilesIfNeeded()
             echo "Copying (sysroot) $LIB"
             cp -r "$SYSROOT_LIB_DIR/$LIB"* "$STAGE_LIB/"
         done
-    elif [ "$BOX" = "bananapi" ]
-    then
-        echo "Copying (sysroot) libglib required for bananapi on Debian 8 \"Jessie\""
-        cp -r "$SYSROOT_LIB_DIR/libglib"* "$STAGE_LIB/"
-        echo "Copying (sysroot) hdparm required for bananapi on Debian 8 \"Jessie\""
-        cp -r "$SYSROOT_SBIN_DIR/hdparm" "$STAGE_VMS/mediaserver/bin/"
-    elif [ "$BOX" = "rpi" ]
-    then
-        echo "Copying (sysroot) hdparm"
-        cp -r "$SYSROOT_SBIN_DIR/hdparm" "$STAGE_VMS/mediaserver/bin/"
     fi
 }
 

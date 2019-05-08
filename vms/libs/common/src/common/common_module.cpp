@@ -37,6 +37,7 @@
 #include <network/router.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/app_info.h>
+#include <nx/vms/utils/installation_info.h>
 
 #include <nx/network/app_info.h>
 #include <nx/network/socket_global.h>
@@ -49,6 +50,7 @@
 #include <api/http_client_pool.h>
 #include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <nx/fusion/serialization/lexical_enum.h>
 
 #include <core/resource/storage_plugin_factory.h>
 
@@ -196,6 +198,7 @@ QnCommonModule::QnCommonModule(bool clientMode,
 
     m_moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
     m_moduleInformation.systemInformation = QnAppInfo::currentSystemInformation();
+    m_moduleInformation.hwPlatform = nx::vms::utils::installationInfo().hwPlatform;
     m_moduleInformation.brand = QnAppInfo::productNameShort();
     m_moduleInformation.customization = QnAppInfo::customizationName();
     m_moduleInformation.version = nx::utils::SoftwareVersion(QnAppInfo::applicationVersion());

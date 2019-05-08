@@ -25,7 +25,11 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
     #endif
 
     NX_INI_STRING(kDefaultMutexImplementation, mutexImplementation,
-        "Mutex implementation: qt, std, debug or analyze.");
+        "Mutex implementation:\n"
+        "qt - fastest, default for release;\n"
+        "std - average speed, useful for valgrind;\n"
+        "debug - average speed, provides more info for debugger, default for debug;\n"
+        "analyze - very slow, analyses mutexes for deadlocks.");
 
     NX_INI_FLAG(kDefaultAssertCrash, assertCrash,
         "Crash application on assertion failure.");
@@ -41,9 +45,6 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
 
     NX_INI_INT(kLogLevelReducerWindowSizeS, logLevelReducerWindowSizeS,
         "Replace error and warning logs with debugs within this time.");
-
-    NX_INI_FLAG(1, disableRegexInLogFilter,
-        "Helps to avoid crashes due to Qt regexes instability.");
 };
 
 NX_UTILS_API Ini& ini();

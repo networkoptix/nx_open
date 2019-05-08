@@ -17,6 +17,14 @@ namespace nx {
 namespace vms {
 namespace api {
 
+enum class HwPlatform
+{
+    unknown = 0,
+    raspberryPi,
+    bananaPi
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::vms::api::HwPlatform)
+
 struct NX_VMS_API ModuleInformation: Data
 {
     QString type;
@@ -38,6 +46,7 @@ struct NX_VMS_API ModuleInformation: Data
     QString cloudPortalUrl;
     QString cloudHost;
     QnUuid localSystemId;
+    HwPlatform hwPlatform;
 
     void fixRuntimeId();
     QString cloudId() const;
@@ -74,7 +83,8 @@ struct NX_VMS_API ModuleInformationWithAddresses: ModuleInformation
     (cloudSystemId) \
     (cloudHost) \
     (brand) \
-    (localSystemId)
+    (localSystemId) \
+    (hwPlatform)
 
 #define ModuleInformationWithAddresses_Fields \
     ModuleInformation_Fields \
@@ -86,3 +96,5 @@ struct NX_VMS_API ModuleInformationWithAddresses: ModuleInformation
 
 Q_DECLARE_METATYPE(nx::vms::api::ModuleInformation)
 Q_DECLARE_METATYPE(nx::vms::api::ModuleInformationWithAddresses)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::HwPlatform, (lexical), NX_VMS_API)

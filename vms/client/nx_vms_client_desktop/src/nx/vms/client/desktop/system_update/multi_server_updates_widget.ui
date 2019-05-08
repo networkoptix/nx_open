@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1339</width>
+    <width>862</width>
     <height>592</height>
    </rect>
   </property>
@@ -54,7 +54,7 @@
    <item>
     <widget class="nx::vms::client::desktop::Panel" name="controlsPanel" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -204,9 +204,9 @@
          <number>0</number>
         </property>
         <widget class="QWidget" name="versionPage">
-         <layout class="QVBoxLayout" name="verticalLayout_5">
+         <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,1,0,0">
           <property name="spacing">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -249,7 +249,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="releaseNotesLabel">
+           <widget class="QLabel" name="releaseNotesUrl">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -262,16 +262,28 @@
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
             </property>
+            <property name="margin">
+             <number>0</number>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QWidget" name="releaseDescriptionHolder" native="true">
+            <property name="styleSheet">
+             <string notr="true">#releaseDescriptionHolder { border-width: 1px;
+border-color: red;
+border-style: solid;
+}</string>
+            </property>
             <layout class="QVBoxLayout" name="verticalLayout_3">
+             <property name="spacing">
+              <number>0</number>
+             </property>
              <property name="leftMargin">
               <number>0</number>
              </property>
              <property name="topMargin">
-              <number>8</number>
+              <number>0</number>
              </property>
              <property name="rightMargin">
               <number>0</number>
@@ -282,7 +294,7 @@
              <item>
               <widget class="QLabel" name="releaseDescriptionLabel">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -430,7 +442,7 @@
       <item>
        <widget class="QStackedWidget" name="updateStackedWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="updateControlsPage">
          <layout class="QHBoxLayout" name="horizontalLayout_12">

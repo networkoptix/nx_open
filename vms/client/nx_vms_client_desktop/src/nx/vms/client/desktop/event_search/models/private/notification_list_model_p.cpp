@@ -4,6 +4,7 @@
 #include <client/client_settings.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <ui/common/notification_levels.h>
 #include <ui/help/business_help.h>
@@ -105,8 +106,17 @@ NotificationListModel::Private::Private(NotificationListModel* q):
                 const auto extraData = Private::extraData(event);
                 m_uuidHashes[extraData.first][extraData.second].remove(event.id);
                 m_players.remove(event.id);
+
+                for (auto it = m_itemsByLoadingSound.begin(); it != m_itemsByLoadingSound.end(); ++it)
+                {
+                    if (it.value() == event.id)
+                    {
+                        m_itemsByLoadingSound.erase(it);
+                        break;
+                    }
+                }
             }
-    });
+        });
 
     connect(context()->instance<ServerNotificationCache>(),
         &ServerNotificationCache::fileDownloaded, this,
@@ -138,14 +148,14 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     const auto& params = action->getRuntimeParams();
     const auto ruleId = action->getRuleId();
 
-    auto title = m_helper->eventAtResource(params, qnSettings->extraInfoInTree());
-    const microseconds timestamp(params.eventTimestampUsec);
-
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
     auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     const auto server = resource.dynamicCast<QnMediaServerResource>();
     const bool hasViewPermission = resource && accessController()->hasPermissions(resource,
         Qn::ViewContentPermission);
+
+    auto title = caption(params, camera);
+    const microseconds timestamp(params.eventTimestampUsec);
 
     auto alarmCameras =
         resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->getResources());
@@ -205,12 +215,14 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     EventData eventData;
     eventData.id = actionHasId ? actionId : QnUuid::createUuid();
     eventData.title = title;
+    eventData.description = description(params);
     eventData.toolTip = tooltip.join(lit("<br>"));
     eventData.helpId = QnBusiness::eventHelpId(params.eventType);
     eventData.level = QnNotificationLevel::valueOf(action);
     eventData.timestamp = timestamp;
     eventData.removable = true;
     eventData.extraData = qVariantFromValue(ExtraData(action->getRuleId(), resource));
+    eventData.source = resource;
 
     if (action->actionType() == ActionType::playSoundAction)
     {
@@ -409,6 +421,59 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
 
     connect(eventData.extraAction.data(), &QAction::triggered,
         [this, actionHandler]() { executeDelayedParented(actionHandler, 0, this); });
+}
+
+QString NotificationListModel::Private::caption(const nx::vms::event::EventParameters& parameters,
+    const QnVirtualCameraResourcePtr& camera) const
+{
+    // TODO: #vkutin Include event end condition, if applicable. Include aggregation.
+
+    switch (parameters.eventType)
+    {
+        case EventType::softwareTriggerEvent:
+            return lit("%1 <b>%2</b>").arg(
+                m_helper->eventName(parameters.eventType),
+                m_helper->getSoftwareTriggerName(parameters));
+
+        case EventType::userDefinedEvent:
+            return parameters.caption.isEmpty()
+                ? tr("Generic Event")
+                : parameters.caption;
+
+        case EventType::pluginEvent:
+            return parameters.caption.isEmpty()
+                ? tr("Unknown Plugin Event")
+                : parameters.caption;
+
+        case EventType::analyticsSdkEvent:
+            return parameters.caption.isEmpty()
+                ? m_helper->getAnalyticsSdkEventName(parameters)
+                : parameters.caption;
+
+        case EventType::cameraDisconnectEvent:
+            return QnDeviceDependentStrings::getNameFromSet(resourcePool(),
+                QnCameraDeviceStringSet(
+                    tr("Device was disconnected"),
+                    tr("Camera was disconnected"),
+                    tr("I/O Module was disconnected")), camera);
+        default:
+            return m_helper->eventName(parameters.eventType);
+    }
+}
+
+QString NotificationListModel::Private::description(
+    const nx::vms::event::EventParameters& parameters) const
+{
+    switch (parameters.eventType)
+    {
+        case EventType::userDefinedEvent:
+        case EventType::pluginEvent:
+        case EventType::analyticsSdkEvent:
+            return parameters.description;
+
+        default:
+            return QString();
+    }
 }
 
 QPixmap NotificationListModel::Private::pixmapForAction(

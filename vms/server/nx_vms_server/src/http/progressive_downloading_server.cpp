@@ -44,12 +44,55 @@
 #include <nx/utils/scope_guard.h>
 #include <api/global_settings.h>
 
+namespace {
+
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
+static const unsigned int DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP = 1;
+
+AVCodecID getPrefferedVideoCodec(const QByteArray& streamingFormat)
+{
+    if (streamingFormat == "webm")
+        return AV_CODEC_ID_VP8;
+    if (streamingFormat == "mpjpeg")
+        return AV_CODEC_ID_MJPEG;
+
+    return AV_CODEC_ID_MPEG4;
+}
+
+bool isCodecCompatibleWithFormat(AVCodecID codec, const QByteArray& streamingFormat)
+{
+    if (streamingFormat == "webm")
+        return AV_CODEC_ID_VP8 == codec;
+    if (streamingFormat == "mpjpeg")
+        return AV_CODEC_ID_MJPEG == codec;
+
+    if (streamingFormat == "mpegts"|| streamingFormat == "mp4" || streamingFormat == "ismv")
+        return codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_H265 || codec == AV_CODEC_ID_MPEG4;
+
+    return false;
+}
+
+const std::optional<CameraMediaStreamInfo> findCompatibleStream(
+    const std::vector<CameraMediaStreamInfo>& streams,
+    const QByteArray& streamingFormat,
+    const QString& requestedResolution)
+{
+    for (const auto& streamInfo: streams)
+    {
+        if (!streamInfo.transcodingRequired &&
+            isCodecCompatibleWithFormat((AVCodecID)streamInfo.codec, streamingFormat) &&
+            (requestedResolution.isEmpty() || requestedResolution == streamInfo.resolution))
+        {
+            return streamInfo;
+        }
+    }
+    return std::nullopt;
+}
+
+}
 
 // -------------------------- QnProgressiveDownloadingDataConsumer ---------------------
-
-static const unsigned int DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP = 1;
 
 class QnProgressiveDownloadingDataConsumer: public QnAbstractDataConsumer
 {
@@ -340,24 +383,13 @@ class QnProgressiveDownloadingConsumerPrivate: public QnTCPConnectionProcessorPr
 public:
     QnMediaServerModule* serverModule = nullptr;
     std::unique_ptr<QnFfmpegTranscoder> transcoder;
-    QByteArray streamingFormat;
-    AVCodecID videoCodec;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     //saving address and port in case socket will not make it to the destructor
     QString foreignAddress;
-    unsigned short foreignPort;
-    bool terminated;
-    quint64 killTimerID;
+    unsigned short foreignPort = 0;
+    bool terminated = false;
+    quint64 killTimerID = 0;
     QnMutex mutex;
-
-    QnProgressiveDownloadingConsumerPrivate()
-    :
-        videoCodec( AV_CODEC_ID_NONE ),
-        foreignPort( 0 ),
-        terminated( false ),
-        killTimerID( 0 )
-    {
-    }
 };
 
 static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
@@ -379,10 +411,6 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
 
     d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
     d->socket->setSendTimeout(CONNECTION_TIMEOUT);
-
-    d->streamingFormat = "webm";
-    d->videoCodec = AV_CODEC_ID_VP8;
-
     d->foreignAddress = d->socket->getForeignAddress().address.toString();
     d->foreignPort = d->socket->getForeignAddress().port;
 
@@ -424,7 +452,7 @@ QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& strea
 {
     if (streamingFormat == "webm")
         return "video/webm";
-    else if (streamingFormat == "mpegts")
+    else if (streamingFormat == "mpegts" || streamingFormat == "ts")
         return "video/mp2t";
     else if (streamingFormat == "mp4")
         return "video/mp4";
@@ -440,28 +468,6 @@ QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& strea
         return "multipart/x-mixed-replace;boundary=--ffserver";
     else
         return QByteArray();
-}
-
-void QnProgressiveDownloadingConsumer::updateCodecByFormat(const QByteArray& streamingFormat)
-{
-    Q_D(QnProgressiveDownloadingConsumer);
-
-    if (streamingFormat == "webm")
-        d->videoCodec = AV_CODEC_ID_VP8;
-    else if (streamingFormat == "mpegts")
-        d->videoCodec = AV_CODEC_ID_MPEG2VIDEO;
-    else if (streamingFormat == "mp4")
-        d->videoCodec = AV_CODEC_ID_MPEG4;
-    else if (streamingFormat == "3gp")
-        d->videoCodec = AV_CODEC_ID_MPEG4;
-    else if (streamingFormat == "rtp")
-        d->videoCodec = AV_CODEC_ID_MPEG4;
-    else if (streamingFormat == "mpjpeg")
-        d->videoCodec = AV_CODEC_ID_MJPEG;
-    else if (streamingFormat == "flv")
-        d->videoCodec = AV_CODEC_ID_H264;  //TODO #ak need to use "copy"
-    else if (streamingFormat == "f4v")
-        d->videoCodec = AV_CODEC_ID_H264;  //TODO #ak need to use "copy"
 }
 
 void QnProgressiveDownloadingConsumer::sendMediaEventErrorResponse(
@@ -533,21 +539,27 @@ void QnProgressiveDownloadingConsumer::run()
 
         d->response.messageBody.clear();
 
+        NX_DEBUG(this, "Start export data by url: [%1]", getDecodedUrl());
+
         //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'. So, unique ID cannot contain '.', but VMAX resource does contain
         const QString& requestedResourcePath = QnFile::fileName(getDecodedUrl().path());
         const int nameFormatSepPos = requestedResourcePath.lastIndexOf( QLatin1Char('.') );
         const QString& resId = requestedResourcePath.mid(0, nameFormatSepPos);
-        d->streamingFormat = nameFormatSepPos == -1 ? QByteArray() : requestedResourcePath.mid( nameFormatSepPos+1 ).toLatin1();
-        QByteArray mimeType = getMimeType(d->streamingFormat);
+        QByteArray streamingFormat = nameFormatSepPos == -1 ? QByteArray()
+            : requestedResourcePath.mid( nameFormatSepPos+1 ).toLatin1();
+        QByteArray mimeType = getMimeType(streamingFormat);
         if (mimeType.isEmpty())
         {
             d->response.messageBody = QByteArray("Unsupported streaming format ") + mimeType;
             sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
             return;
         }
-        updateCodecByFormat(d->streamingFormat);
 
-        const QUrlQuery decodedUrlQuery( getDecodedUrl().toQUrl() );
+        // If user request 'mp4' format use smooth streaming format to make mp4 streamable.
+        if (streamingFormat == "mp4")
+            streamingFormat = "ismv";
+
+        const QUrlQuery decodedUrlQuery(getDecodedUrl().toQUrl());
 
         QSize videoSize(640,480);
         QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLatin1().toLower();
@@ -615,52 +627,57 @@ void QnProgressiveDownloadingConsumer::run()
             d->transcoder->setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
         }
 
-        boost::optional<CameraMediaStreams> mediaStreams;
-        if (const auto physicalResource = resource.dynamicCast<QnVirtualCameraResource>())
-            mediaStreams = physicalResource->mediaStreams();
-
-        QnServer::ChunksCatalog qualityToUse = QnServer::HiQualityCatalog;
-        QnTranscoder::TranscodeMethod transcodeMethod =
-            d->videoCodec == AV_CODEC_ID_H264
-                ? QnTranscoder::TM_DirectStreamCopy
-                : QnTranscoder::TM_FfmpegTranscode;
-        if (static_cast<bool>(mediaStreams) &&
-            transcodeMethod == QnTranscoder::TM_FfmpegTranscode)
+        const auto physicalResource = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!physicalResource)
         {
-            const auto requestedResolutionStr = lit("%1x%2").arg(videoSize.width()).arg(videoSize.height());
-            for (const auto& streamInfo: mediaStreams->streams)
-            {
-                if (!streamInfo.transcodingRequired
-                    && streamInfo.codec == d->videoCodec
-                    && (resolutionStr.isEmpty() ||
-                        requestedResolutionStr == streamInfo.resolution))
-                {
-                    qualityToUse = streamInfo.getEncoderIndex() == nx::vms::api::StreamIndex::primary
-                        ? QnServer::HiQualityCatalog
-                        : QnServer::LowQualityCatalog;
-                    transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
-                }
-            }
+            d->response.messageBody = QByteArray("Transcoding error. Bad resource");
+            NX_ERROR(this, d->response.messageBody);
+            sendResponse(nx::network::http::StatusCode::internalServerError, "plain/text");
+            return;
+        }
+        const auto requestedResolutionStr = resolutionStr.isEmpty() ?
+            "" :
+            QString("%1x%2").arg(videoSize.width()).arg(videoSize.height());
+
+        AVCodecID videoCodec;
+        QnTranscoder::TranscodeMethod transcodeMethod;
+        QnServer::ChunksCatalog qualityToUse;
+        auto streamInfo = findCompatibleStream(
+            physicalResource->mediaStreams().streams, streamingFormat, requestedResolutionStr);
+        if (streamInfo)
+        {
+            qualityToUse = streamInfo->getEncoderIndex() == nx::vms::api::StreamIndex::primary
+                ? QnServer::HiQualityCatalog
+                : QnServer::LowQualityCatalog;
+            transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
+            videoCodec = (AVCodecID)streamInfo->codec;
+        }
+        else
+        {
+            qualityToUse = QnServer::HiQualityCatalog;
+            transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
+            videoCodec = getPrefferedVideoCodec(streamingFormat);
+            NX_DEBUG(this,
+                "Compatible video stream not found, transcoding will used, codec id[%1]",
+                videoCodec);
         }
 
         if (d->transcoder->setVideoCodec(
-                d->videoCodec,
+                videoCodec,
                 transcodeMethod,
                 quality,
                 videoSize,
                 -1) != 0 )
         {
-            QByteArray msg;
-            msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder->getLastErrorMessage().toLatin1();
-            qWarning() << msg;
-            d->response.messageBody = msg;
+            d->response.messageBody = QByteArray("Transcoding error. Can not setup video codec:") +
+                d->transcoder->getLastErrorMessage().toLatin1();
+            NX_ERROR(this, d->response.messageBody);
             sendResponse(nx::network::http::StatusCode::internalServerError, "plain/text");
             return;
         }
 
-
         //taking max send queue size from url
-        bool dropLateFrames = d->streamingFormat == "mpjpeg";
+        bool dropLateFrames = streamingFormat == "mpjpeg";
         unsigned int maxFramesToCacheBeforeDrop = DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP;
         if( decodedUrlQuery.hasQueryItem(DROP_LATE_FRAMES_PARAM_NAME) )
         {
@@ -824,10 +841,11 @@ void QnProgressiveDownloadingConsumer::run()
             return;
         }
 
-        if (d->transcoder->setContainer(d->streamingFormat) != 0)
+        if (d->transcoder->setContainer(streamingFormat) != 0)
         {
             QByteArray msg;
-            msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder->getLastErrorMessage().toLatin1();
+            msg = QByteArray("Transcoding error. Can not setup output format:") +
+                d->transcoder->getLastErrorMessage().toLatin1();
             sendJsonResponse(msg);
             return;
         }
@@ -876,19 +894,6 @@ void QnProgressiveDownloadingConsumer::onTimer( const quint64& /*timerID*/ )
     d->terminated = true;
     d->killTimerID = 0;
     pleaseStop();
-}
-
-int QnProgressiveDownloadingConsumer::getVideoStreamResolution() const
-{
-    Q_D(const QnProgressiveDownloadingConsumer);
-    if (d->streamingFormat == "webm")
-        return 1000;
-    else if (d->streamingFormat == "mpegts")
-        return 90000;
-    else if (d->streamingFormat == "mp4")
-        return 90000;
-    else
-        return 60;
 }
 
 QnFfmpegTranscoder* QnProgressiveDownloadingConsumer::getTranscoder()

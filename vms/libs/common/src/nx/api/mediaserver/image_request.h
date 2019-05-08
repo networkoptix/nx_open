@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QSize>
+#include <QtCore/QRectF>
 
 #include <core/resource/resource_fwd.h>
 
@@ -72,6 +73,9 @@ struct ImageRequest
     RoundMethod roundMethod = RoundMethod::iFrameAfter;
 
     AspectRatio aspectRatio = AspectRatio::auto_;
+
+    /** Crop image. Values in range [0..1] */
+    QRectF crop;
 };
 
 struct ResourceImageRequest: ImageRequest

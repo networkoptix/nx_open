@@ -4,8 +4,11 @@
 
 #include <client/client_runtime_settings.h>
 
+#include <boost/circular_buffer.hpp>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/log/log.h>
+
+#include <nx/vms/client/desktop/ini.h>
 
 #if defined(Q_OS_WIN)
     #include "windows.h"
@@ -30,10 +33,14 @@ struct DebugInfoInstrument::Private
     QElapsedTimer fpsTimer;
     QElapsedTimer handlesTimer;
     QElapsedTimer logTimer;
+    QElapsedTimer totalTimer;
 
     int frameCount = 0;
+
     QString fps = "----";
     qint64 frameTimeMs = 0;
+    boost::circular_buffer<qint64> frameTimePoints{
+        static_cast<std::size_t>(ini().storeFrameTimePoints)};
     QString handles;
 
     void updateHandles()
@@ -67,11 +74,20 @@ DebugInfoInstrument::DebugInfoInstrument(QObject* parent):
     Instrument(Viewport, makeSet(QEvent::Paint), parent),
     d(new Private())
 {
+    d->totalTimer.start();
 }
 
 DebugInfoInstrument::~DebugInfoInstrument()
 {
     ensureUninstalled();
+}
+
+std::vector<qint64> DebugInfoInstrument::getFrameTimePoints()
+{
+    std::vector<qint64> timePoints;
+    timePoints.reserve(d->frameTimePoints.size());
+    timePoints.insert(timePoints.begin(), d->frameTimePoints.begin(), d->frameTimePoints.end());
+    return timePoints;
 }
 
 void DebugInfoInstrument::enabledNotify()
@@ -96,6 +112,7 @@ bool DebugInfoInstrument::paintEvent(QWidget* /*viewport*/, QPaintEvent* /*event
         return false;
 
     ++d->frameCount;
+    d->frameTimePoints.push_back(d->totalTimer.elapsed());
 
     bool changed = false;
     if (d->fpsTimer.hasExpired(d->updateIntervalMs))

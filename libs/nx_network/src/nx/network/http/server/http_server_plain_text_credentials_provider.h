@@ -5,6 +5,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "http_server_base_authentication_manager.h"
+#include "../auth_tools.h"
 
 namespace nx {
 namespace network {
@@ -19,11 +20,11 @@ public:
         const nx::String& userName,
         LookupResultHandler completionHandler) override;
 
-    void addCredentials(const nx::String& userName, const nx::String& password);
+    void addCredentials(const Credentials& credentials);
 
 private:
-    /** map<username, password>. */
-    std::map<nx::String, nx::String> m_credentials;
+    /** map<username, credentials>. */
+    std::map<nx::String, Credentials> m_credentials;
     mutable QnMutex m_mutex;
 };
 
