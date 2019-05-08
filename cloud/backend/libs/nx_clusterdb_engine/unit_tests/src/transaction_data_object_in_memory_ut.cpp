@@ -1,34 +1,31 @@
 #include <gtest/gtest.h>
 
+#include <nx/sql/db_connection_holder.h>
+#include <nx/sql/test_support/test_with_db_helper.h>
 #include <nx/utils/test_support/utils.h>
 
 #include <nx/clusterdb/engine/dao/memory/command_data_object_in_memory.h>
-#include <nx/cloud/db/controller.h>
-#include <nx/cloud/db/ec2/data_conversion.h>
-#include <nx/cloud/db/ec2/vms_command_descriptor.h>
-#include <nx/cloud/db/test_support/base_persistent_data_test.h>
-#include <nx/cloud/db/test_support/business_data_generator.h>
 
 #include <transaction/transaction_descriptor.h>
 
-namespace nx::cloud::db {
-namespace ec2 {
-namespace dao {
-namespace memory {
-namespace test {
+#include "customer_db/data.h"
+
+namespace nx::clusterdb::engine::dao::memory::test {
+
+static constexpr int kProtoVersion = 1;
 
 class TransactionDataObjectInMemory:
     public ::testing::Test,
-    public nx::cloud::db::test::BasePersistentDataTest
+    public nx::sql::test::TestWithDbHelper
 {
 public:
     TransactionDataObjectInMemory():
+        nx::sql::test::TestWithDbHelper("clusterdb_engine_ut", ""),
         m_peerGuid(QnUuid::createUuid()),
         m_peerDbId(QnUuid::createUuid()),
         m_systemId(QnUuid::createUuid().toSimpleByteArray().toStdString()),
-        m_peerSequence(0),
-        m_transactionDataObject(kMaxSupportedProtocolVersion),
-        m_lastAddedTransaction(ec2::command::SaveUser::code, m_peerGuid),
+        m_transactionDataObject(kProtoVersion),
+        m_lastAddedCommand(engine::test::command::SaveCustomer::code, m_peerGuid),
         m_dbConnectionHolder(dbConnectionOptions())
     {
         init();
@@ -41,7 +38,7 @@ protected:
         {
             const auto transaction = generateTransaction();
             saveTransaction(transaction);
-            m_lastAddedTransaction = transaction;
+            m_lastAddedCommand = transaction;
         }
     }
 
@@ -57,18 +54,19 @@ protected:
             else
                 transaction.persistentInfo.sequence = sequence;
             saveTransaction(transaction);
-            m_lastAddedTransaction = transaction;
+            m_lastAddedCommand = transaction;
         }
     }
 
     void verifyThatOnlyLastOneIsPresent()
     {
-        const std::vector<clusterdb::engine::dao::TransactionLogRecord> transactions = readAllTransaction();
+        const std::vector<clusterdb::engine::dao::TransactionLogRecord>
+            transactions = readAllTransaction();
 
         ASSERT_EQ(1U, transactions.size());
         ASSERT_EQ(
-            QnUbjson::serialized(m_lastAddedTransaction),
-            transactions[0].serializer->serialize(Qn::UbjsonFormat, kMaxSupportedProtocolVersion));
+            QnUbjson::serialized(m_lastAddedCommand),
+            transactions[0].serializer->serialize(Qn::UbjsonFormat, kProtoVersion));
     }
 
     void verifyThatDataObjectIsEmpty()
@@ -96,32 +94,30 @@ private:
     const QnUuid m_peerGuid;
     const QnUuid m_peerDbId;
     const std::string m_systemId;
-    std::int64_t m_peerSequence;
+    std::int64_t m_peerSequence = 0;
     clusterdb::engine::dao::memory::TransactionDataObject m_transactionDataObject;
-    nx::vms::api::UserData m_transactionData;
-    clusterdb::engine::Command<nx::vms::api::UserData> m_lastAddedTransaction;
+    engine::test::command::SaveCustomer::Data m_commandData;
+    clusterdb::engine::Command<engine::test::command::SaveCustomer::Data> m_lastAddedCommand;
     nx::sql::DbConnectionHolder m_dbConnectionHolder;
     std::shared_ptr<nx::sql::QueryContext> m_currentTran;
 
     void init()
     {
-        const auto sharing =
-            nx::cloud::db::test::BusinessDataGenerator::generateRandomSharing(
-                nx::cloud::db::test::BusinessDataGenerator::generateRandomAccount(),
-                m_systemId);
-        ec2::convert(sharing, &m_transactionData);
+        engine::test::Customer customer;
+        customer.id = QnUuid::createUuid().toSimpleString().toStdString();
+        customer.fullName = QnUuid::createUuid().toSimpleString().toStdString();
+        customer.address = QnUuid::createUuid().toSimpleString().toStdString();
     }
 
-    template<typename TransactionDataType>
-    void saveTransaction(const clusterdb::engine::Command<TransactionDataType>& transaction)
+    template<typename CommandDataType>
+    void saveTransaction(const clusterdb::engine::Command<CommandDataType>& command)
     {
-        const auto tranHash = ::ec2::transactionHash(
-            (::ec2::ApiCommand::Value) transaction.command,
-            transaction.params).toSimpleByteArray();
-        const auto ubjsonSerializedTransaction = QnUbjson::serialized(transaction);
+        const auto tranHash =
+            engine::test::command::SaveCustomer::hash(command.params);
+        const auto ubjsonSerializedTransaction = QnUbjson::serialized(command);
         clusterdb::engine::dao::TransactionData transactionData{
             m_systemId,
-            transaction,
+            command,
             tranHash,
             ubjsonSerializedTransaction};
 
@@ -131,16 +127,16 @@ private:
         ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
     }
 
-    clusterdb::engine::Command<nx::vms::api::UserData> generateTransaction()
+    clusterdb::engine::Command<engine::test::command::SaveCustomer::Data> generateTransaction()
     {
-        clusterdb::engine::Command<nx::vms::api::UserData> transaction(
-            ec2::command::SaveUser::code,
+        clusterdb::engine::Command<engine::test::command::SaveCustomer::Data> command(
+            engine::test::command::SaveCustomer::code,
             m_peerGuid);
-        transaction.persistentInfo.dbID = m_peerDbId;
-        transaction.persistentInfo.sequence = m_peerSequence++;
-        transaction.params = m_transactionData;
+        command.persistentInfo.dbID = m_peerDbId;
+        command.persistentInfo.sequence = m_peerSequence++;
+        command.params = m_commandData;
 
-        return transaction;
+        return command;
     }
 
     std::vector<clusterdb::engine::dao::TransactionLogRecord> readAllTransaction()
@@ -179,8 +175,4 @@ TEST_F(TransactionDataObjectInMemory, DISABLED_tran_rollback)
     verifyThatDataObjectIsEmpty();
 }
 
-} // namespace test
-} // namespace memory
-} // namespace dao
-} // namespace ec2
-} // namespace nx::cloud::db
+} // namespace nx::clusterdb::engine::dao::memory::test
