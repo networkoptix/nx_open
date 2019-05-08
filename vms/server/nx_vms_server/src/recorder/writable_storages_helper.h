@@ -13,6 +13,7 @@ public:
     WritableStoragesHelper(const QnStorageManager* owner);
     QnStorageResourceList list(const QnStorageResourceList& storages) const;
     QnStorageResourcePtr optimalStorageForRecording(const QnStorageResourceList& storages) const;
+    static QnStorageResourceList filterOutSmall(const QnStorageResourceList& storages);
 
 private:
     struct SpaceInfo
@@ -37,7 +38,7 @@ private:
     const QnStorageManager* m_owner;
 
     std::vector<SpaceInfo> resultInfos(const std::vector<SpaceInfo>& candidates) const;
-    std::vector<SpaceInfo> online(const QnStorageResourceList& storages) const;
+    static std::vector<SpaceInfo> online(const std::vector<SpaceInfo>& infos);
     static QnStorageResourceList unique(const QnStorageResourceList& candidates);
     static std::vector<SpaceInfo> filterOutSpaceless(const std::vector<SpaceInfo>& infos);
     static std::vector<SpaceInfo> filterOutSmall(const std::vector<SpaceInfo>& infos);
@@ -45,6 +46,8 @@ private:
     static std::vector<SpaceInfo> filterOutUnused(const std::vector<SpaceInfo>& infos);
     static void adjustFlags(
         const QnStorageResourceList& candidates, const QnStorageResourceList& result);
+    static std::vector<SpaceInfo> toInfos(
+        const QnStorageResourceList& storages, const QnStorageManager *owner);
 };
 
 } // namespace nx::vms::server

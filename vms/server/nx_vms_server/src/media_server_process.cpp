@@ -103,6 +103,7 @@
 #include <recorder/file_deletor.h>
 #include <recorder/storage_manager.h>
 #include <recorder/schedule_sync.h>
+#include <recorder/writable_storages_helper.h>
 
 #include <nx/vms/server/rest/exec_event_action_rest_handler.h>
 #include <rest/handlers/acti_event_rest_handler.h>
@@ -531,7 +532,6 @@ QnStorageResourceList MediaServerProcess::createStorages(const QnMediaServerReso
     QnStorageResourceList storages;
     QStringList availablePaths;
     //bool isBigStorageExist = false;
-    qint64 bigStorageThreshold = 0;
 
     availablePaths = listRecordFolders();
 
@@ -550,29 +550,10 @@ QnStorageResourceList MediaServerProcess::createStorages(const QnMediaServerReso
         if (!storage)
             continue;
 
-        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
-        bigStorageThreshold = qMax(bigStorageThreshold, available);
         storages.append(storage);
-        NX_DEBUG(kLogTag, lm("Creating new storage: %1").arg(folderPath));
-    }
-    bigStorageThreshold /= QnStorageManager::kBigStorageTreshold;
-
-    for (int i = 0; i < storages.size(); ++i) {
-        QnStorageResourcePtr storage = storages[i].dynamicCast<QnStorageResource>();
-        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
-        if (available < bigStorageThreshold)
-            storage->setUsedForWriting(false);
+        NX_DEBUG(kLogTag, lm("Creating a new storage: %1").arg(folderPath));
     }
 
-    QString logMessage = "Storage new candidates:\n";
-    for (const auto& storage : storages)
-    {
-        logMessage.append(
-            lm("\t\turl: %1, totalSpace: %2, spaceLimit: %3")
-                .args(storage->getUrl(), storage->getTotalSpace(), storage->getSpaceLimit()));
-    }
-
-    NX_DEBUG(kLogTag, logMessage);
     return storages;
 }
 
@@ -633,6 +614,16 @@ QnStorageResourceList MediaServerProcess::updateStorages(QnMediaServerResourcePt
 
     NX_DEBUG(kLogTag, logMesssage);
     return result.values();
+}
+
+static void markUnusedIfNeeded(const QnStorageResourceList& storages)
+{
+    const auto filtered = WritableStoragesHelper::filterOutSmall(storages);
+    for (const auto& storage: storages)
+    {
+        if (!filtered.contains(storage))
+            storage->setUsedForWriting(false);
+    }
 }
 
 void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProcessor)
@@ -722,6 +713,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
         modifiedStorages.append(updateStorages(m_mediaServer));
+        markUnusedIfNeeded(modifiedStorages);
         saveStorages(ec2Connection, modifiedStorages);
         for(const QnStorageResourcePtr &storage: modifiedStorages)
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);

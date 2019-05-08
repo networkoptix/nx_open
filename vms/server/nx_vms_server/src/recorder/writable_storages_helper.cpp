@@ -79,17 +79,43 @@ WritableStoragesHelper::WritableStoragesHelper(const QnStorageManager* owner): m
 
 QnStorageResourceList WritableStoragesHelper::list(const QnStorageResourceList& storages) const
 {
-    auto candidates = online(storages);
+    auto candidates = online(toInfos(storages, m_owner));
     const auto resultStorages = SpaceInfo::toStorageList(resultInfos(candidates));
     adjustFlags(SpaceInfo::toStorageList(candidates), resultStorages);
     return resultStorages;
+}
+
+std::vector<WritableStoragesHelper::SpaceInfo> WritableStoragesHelper::toInfos(
+    const QnStorageResourceList& storages, const QnStorageManager* owner)
+{
+    std::vector<SpaceInfo> result;
+    const auto candidates = unique(storages);
+    for (const auto& storage: candidates)
+    {
+        try
+        {
+            result.push_back(SpaceInfo::from(storage, owner));
+        }
+        catch(const std::exception& e)
+        {
+            NX_WARNING(typeid(WritableStoragesHelper), e.what());
+            continue;
+        }
+    }
+
+    return result;
+}
+
+QnStorageResourceList WritableStoragesHelper::filterOutSmall(const QnStorageResourceList& storages)
+{
+    return SpaceInfo::toStorageList(filterOutSmallSystem(filterOutSmall(toInfos(storages, nullptr))));
 }
 
 QnStorageResourcePtr WritableStoragesHelper::optimalStorageForRecording(
     const QnStorageResourceList& storages) const
 {
     int64_t totalEffectiveSpace = 0LL;
-    const auto infos = filterOutUnused(resultInfos(online(storages)));
+    const auto infos = filterOutUnused(resultInfos(online(toInfos(storages, m_owner))));
     NX_DEBUG(this, "Optimal storage selection: candidates number: %1", infos.size());
     for (const auto& info: infos)
     {
@@ -126,30 +152,12 @@ std::vector<WritableStoragesHelper::SpaceInfo> WritableStoragesHelper::resultInf
 }
 
 std::vector<WritableStoragesHelper::SpaceInfo> WritableStoragesHelper::online(
-    const QnStorageResourceList& storages) const
+    const std::vector<SpaceInfo>& infos)
 {
     std::vector<SpaceInfo> result;
-    const auto candidates = unique(storages);
-    for (const auto& storage: candidates)
-    {
-        if (!storage->isOnline())
-        {
-            NX_DEBUG(
-                this, "Storage %1 is offline", nx::utils::url::hidePassword(storage->getUrl()));
-            continue;
-        }
-
-        try
-        {
-            result.push_back(SpaceInfo::from(storage, m_owner));
-        }
-        catch(const std::exception& e)
-        {
-            NX_WARNING(this, e.what());
-            continue;
-        }
-    }
-
+    std::copy_if(
+        infos.cbegin(), infos.cend(), std::back_inserter(result),
+        [](const auto& info) { return info.storage->isOnline(); });
     return result;
 }
 
