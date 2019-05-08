@@ -6,6 +6,7 @@ from django.db import migrations
 def remove_permissions(apps, schema_editor):
     codenames_to_remove = ['can_access_product',
                            'can_view_customization',
+                           'can_view_pending',
                            'add_usergroupstocustomizationpermissions',
                            'change_usergroupstocustomizationpermissions',
                            'delete_usergroupstocustomizationpermissions',
