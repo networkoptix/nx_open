@@ -78,17 +78,37 @@ void Peer::disconnectFrom(const Peer& other)
 
 Customer Peer::addRandomData()
 {
+    std::promise<std::tuple<ResultCode, Customer>> done;
+    addRandomDataAsync(
+        [&done](ResultCode resultCode, Customer customer)
+        {
+            done.set_value(std::make_tuple(resultCode, std::move(customer)));
+        });
+
+    auto [resultCode, customer] = done.get_future().get();
+
+    if (resultCode != ResultCode::ok)
+        throw std::runtime_error(toString(resultCode));
+
+    return customer;
+}
+
+void Peer::addRandomDataAsync(
+    nx::utils::MoveOnlyFunc<void(ResultCode, Customer)> completionHandler)
+{
     Customer customer;
     customer.id = QnUuid::createUuid().toSimpleByteArray().toStdString();
     customer.fullName = nx::utils::generateRandomName(7).toStdString();
     customer.address = nx::utils::generateRandomName(7).toStdString();
 
-    const auto resultCode =
-        process().moduleInstance()->customerManager().saveCustomer(customer);
-    if (resultCode != ResultCode::ok)
-        throw std::runtime_error(toString(resultCode));
-
-    return customer;
+    process().moduleInstance()->customerManager().saveCustomer(
+        customer,
+        [customer, handler = std::move(completionHandler)](ResultCode resultCode)
+        {
+            if (resultCode != ResultCode::ok)
+                std::cout << "Failed! " << (int)resultCode << std::endl;
+            handler(resultCode, customer);
+        });
 }
 
 bool Peer::hasData(const std::vector<Customer>& expected)
