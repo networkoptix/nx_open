@@ -37,7 +37,7 @@ std::optional<Continent> toContinent(const std::string& continent)
         return Continent::antarctica;
     if (continent == "Asia")
         return Continent::asia;
-    if (continent == "Australia")
+    if (continent == "Australia" || continent == "Oceania")
         return Continent::australia;
     if (continent == "Europe")
         return Continent::europe;
@@ -168,8 +168,6 @@ public:
         // if not found, it should not be an error
         std::tie(resultCode, location.country) = getString(lookupResult, kCountry, kNames, kLanguage);
 
-        // Geopoint exists only in Geolite2-City mmdb, so if it is not found, it should not be
-        // an error.
         Geopoint geopoint;
         std::tie(resultCode, geopoint) = getGeopoint(lookupResult);
         if (resultCode == ResultCode::ok)
