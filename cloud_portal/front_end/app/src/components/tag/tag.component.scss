@@ -60,7 +60,7 @@ $theme-colors : (
     }
     .badge-#{$color}-selected {
         color: $light1;
-        @include badge-selected($value, darken($value, 10%), darken($value, 15%))
+        @include badge-selected($value, darken($value, 10%), darken($value, 15%));
         font-family : $font-family-regular;
     }
 }
