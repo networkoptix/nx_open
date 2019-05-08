@@ -347,14 +347,17 @@ void QnWorkbenchConnectHandler::setupConnectTimeoutTimer(int timeoutMs)
                     return;
             }
         });
+
     connect(connectTimeoutTimer, &QTimer::timeout, this,
         [this]
         {
             disconnectFromServer(DisconnectFlag::Force);
             // Just display the error message.
             QnConnectionDiagnosticsHelper::validateConnection(
-                {}, ec2::ErrorCode::serverError,
-                mainWindowWidget(), commonModule()->engineVersion());
+                {},
+                ec2::ErrorCode::serverError,
+                mainWindowWidget(),
+                commonModule()->engineVersion());
         });
 }
 
