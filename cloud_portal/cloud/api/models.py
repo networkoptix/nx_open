@@ -154,7 +154,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
         for cloud_id in cloud_portal_ids:
             product = Product.objects.get(id=cloud_id)
-            if UserGroupsToProductPermissions.check_permission(self, product, 'cms.can_view_customization'):
+            if UserGroupsToProductPermissions.check_permission(self, product, 'cms.access_customization'):
                 customizations.append(product.customizations.first().name)
 
         return list(set(customizations))

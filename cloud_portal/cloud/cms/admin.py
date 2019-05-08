@@ -61,7 +61,9 @@ class ProductFilter(SimpleListFilter):
         # TODO: Get list of available products for non context managers
         if not UserGroupsToProductPermissions.\
                 check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
-            products = products.filter(created_by=request.user)
+            products = [product for product in products
+                        if UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.access_product')
+                        or product.created_by == request.user]
 
         return [(p.id, p.__str__()) for p in products]
 
@@ -146,9 +148,8 @@ class ProductAdmin(CMSAdmin):
             viewable_products = [product.id for product in queryset
                                  if UserGroupsToProductPermissions.check_permission(request.user,
                                                                                     product,
-                                                                                    'cms.can_access_product')
-                                 or product.created_by == request.user]
-            queryset = Product.objects.filter(id__in=viewable_products)
+                                                                                    'cms.access_product')]
+            queryset = Product.objects.filter(Q(id__in=viewable_products) | Q(created_by=request.user))
         return queryset
 
     def get_urls(self):
@@ -350,7 +351,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         review = self.get_queryset(request).get(id=object_id)
         if not UserGroupsToProductPermissions.check_customization_permission(request.user,
                                                                              review.customization.name,
-                                                                             'cms.can_view_customization'):
+                                                                             'cms.access_customization'):
             review.notes = review.anon_notes(review.notes)
         return review
 
@@ -362,7 +363,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
 
         if not UserGroupsToProductPermissions.\
                 check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
-            qs = qs.filter(Q(version__product__created_by=request.user))
+            qs = qs.filter(Q(version__product__created_by=request.user) | Q(version__created_by=request.user))
         return qs
 
     def get_readonly_fields(self, request, obj=None):

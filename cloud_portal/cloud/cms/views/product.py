@@ -197,8 +197,8 @@ def review(request):
         message = "\n{}: {}\n".format(request.user.email, request.POST['addedNote'])
         product_review.notes += message
         product_review.save()
-        if 'can_view_customization' in request.POST:
-            make_customization_visible_to_user(get_cloud_portal_product(settings.CUSTOMIZATION),
+        if 'access_customization' in request.POST:
+            make_customization_visible_to_user(get_cloud_portal_product(product_review.customization),
                                                product_review.version.created_by)
     elif any(action in request.POST for action in ['publish', 'force_update']):
         raise PermissionDenied

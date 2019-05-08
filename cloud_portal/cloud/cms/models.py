@@ -135,7 +135,7 @@ class Customization(models.Model):
         # Used to allow a user to see the customization in list of customizations
         # Cloud portal(s) are now a product so customization is not necessary for giving access anymore
         permissions = (
-            ('can_view_customization', 'Can view customization'),
+            ('access_customization', 'Can access customization'),
         )
     name = models.CharField(max_length=255, unique=True)
     default_language = models.ForeignKey(
@@ -210,7 +210,7 @@ class Product(models.Model):
         # The can_access_product gives users the ability to see the product in product lists.
         # In combination with other permission it allows them to edit the product and send reviews for their product
         permissions = (
-            ('can_access_product', 'Can access product'),
+            ('access_product', 'Can access product'),
         )
     name = models.CharField(max_length=255)
     created_by = models.ForeignKey(
