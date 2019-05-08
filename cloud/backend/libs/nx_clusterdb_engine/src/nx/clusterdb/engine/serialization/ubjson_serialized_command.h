@@ -3,7 +3,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/ubjson_reader.h>
 
-#include "serializable_transaction.h"
+#include "serializable_command.h"
 
 namespace nx::clusterdb::engine {
 

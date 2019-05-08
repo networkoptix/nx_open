@@ -20,10 +20,10 @@
 #include <nx/vms/api/data/peer_data.h>
 
 #include "compatible_ec2_protocol_version.h"
-#include "serialization/transaction_serializer.h"
-#include "transaction_processor.h"
-#include "transport/transaction_transport_header.h"
-#include "transport/abstract_transaction_transport.h"
+#include "serialization/command_serializer.h"
+#include "command_processor.h"
+#include "transport/command_transport_header.h"
+#include "transport/abstract_command_transport.h"
 
 namespace nx {
 namespace network {

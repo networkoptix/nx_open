@@ -3,7 +3,7 @@
 #include <nx/p2p/p2p_serialization.h>
 #include <transaction/connection_guard.h>
 
-#include "../../transaction_log.h"
+#include "../../command_log.h"
 
 namespace nx::clusterdb::engine::transport::p2p::websocket {
 

@@ -1,9 +1,9 @@
-#include "transaction_log_reader.h"
+#include "command_log_reader.h"
 
 #include <nx/utils/log/log.h>
 
 #include "outgoing_command_filter.h"
-#include "transaction_log.h"
+#include "command_log.h"
 
 namespace nx::clusterdb::engine {
 

@@ -9,8 +9,8 @@
 #include <nx/sql/db_instance_controller.h>
 
 #include <nx/clusterdb/engine/command_data.h>
-#include <nx/clusterdb/engine/serialization/transaction_serializer.h>
-#include <nx/clusterdb/engine/transaction_log.h>
+#include <nx/clusterdb/engine/serialization/command_serializer.h>
+#include <nx/clusterdb/engine/command_log.h>
 
 #include "../data/statistics_data.h"
 #include "../data/system_data.h"

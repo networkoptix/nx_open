@@ -1,4 +1,4 @@
-#include "test_outgoing_transaction_dispatcher.h"
+#include "test_outgoing_command_dispatcher.h"
 
 #include <thread>
 

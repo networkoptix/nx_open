@@ -1,4 +1,4 @@
-#include "transaction_deserializer.h"
+#include "command_deserializer.h"
 
 #include <nx/fusion/model_functions.h>
 

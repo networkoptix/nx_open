@@ -13,13 +13,13 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
 
-#include <nx/clusterdb/engine/dao/memory/transaction_data_object_in_memory.h>
+#include <nx/clusterdb/engine/dao/memory/command_data_object_in_memory.h>
 #include <nx/clusterdb/engine/dao/rdb/structure_updater.h>
-#include <nx/clusterdb/engine/outgoing_transaction_dispatcher.h>
-#include <nx/clusterdb/engine/transaction_log.h>
+#include <nx/clusterdb/engine/outgoing_command_dispatcher.h>
+#include <nx/clusterdb/engine/command_log.h>
 
 #include "customer_db/data.h"
-#include "test_outgoing_transaction_dispatcher.h"
+#include "test_outgoing_command_dispatcher.h"
 
 namespace nx::clusterdb::engine::test {
 

@@ -8,9 +8,9 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/log/log.h>
 
-#include "serialization/transaction_deserializer.h"
-#include "transaction_log.h"
-#include "transport/transaction_transport_header.h"
+#include "serialization/command_deserializer.h"
+#include "command_log.h"
+#include "transport/command_transport_header.h"
 
 namespace nx::clusterdb::engine {
 

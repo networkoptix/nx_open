@@ -6,9 +6,9 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/thread.h>
 
-#include <nx/clusterdb/engine/outgoing_transaction_sorter.h>
+#include <nx/clusterdb/engine/outgoing_command_sorter.h>
 
-#include "test_outgoing_transaction_dispatcher.h"
+#include "test_outgoing_command_dispatcher.h"
 
 namespace nx::clusterdb::engine {
 namespace test {

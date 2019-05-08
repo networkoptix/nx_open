@@ -11,7 +11,7 @@
 #include <nx/vms/api/data/tran_state_data.h>
 #include <transaction/transaction_transport_base.h>
 
-#include "../abstract_transaction_transport.h"
+#include "../abstract_command_transport.h"
 #include "../../compatible_ec2_protocol_version.h"
 
 namespace ec2 {

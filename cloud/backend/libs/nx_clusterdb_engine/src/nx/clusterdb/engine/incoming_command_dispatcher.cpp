@@ -1,4 +1,4 @@
-#include "incoming_transaction_dispatcher.h"
+#include "incoming_command_dispatcher.h"
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
@@ -6,7 +6,7 @@
 #include <nx/utils/log/log.h>
 
 #include "command_descriptor.h"
-#include "serialization/transaction_deserializer.h"
+#include "serialization/command_deserializer.h"
 
 namespace nx::clusterdb::engine {
 

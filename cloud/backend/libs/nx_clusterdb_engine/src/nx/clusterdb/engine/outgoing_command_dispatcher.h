@@ -5,9 +5,9 @@
 #include <nx/utils/subscription.h>
 
 #include "outgoing_command_filter.h"
-#include "serialization/serializable_transaction.h"
-#include "serialization/transaction_serializer.h"
-#include "transport/transaction_transport_header.h"
+#include "serialization/serializable_command.h"
+#include "serialization/command_serializer.h"
+#include "transport/command_transport_header.h"
 
 namespace nx::clusterdb::engine {
 

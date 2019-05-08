@@ -2,7 +2,7 @@
 
 #include <future>
 
-#include <nx/clusterdb/engine/transaction_log.h>
+#include <nx/clusterdb/engine/command_log.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>

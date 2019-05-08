@@ -6,7 +6,7 @@
 
 #include <nx/utils/url.h>
 
-#include "abstract_transaction_transport_connector.h"
+#include "abstract_command_transport_connector.h"
 #include "abstract_transport_factory.h"
 #include "../compatible_ec2_protocol_version.h"
 

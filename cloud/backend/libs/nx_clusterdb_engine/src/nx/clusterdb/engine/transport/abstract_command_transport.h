@@ -7,10 +7,10 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/subscription.h>
 
-#include "transaction_transport_header.h"
+#include "command_transport_header.h"
 #include "connect_request_attributes.h"
-#include "../serialization/serializable_transaction.h"
-#include "../serialization/transaction_deserializer.h"
+#include "../serialization/serializable_command.h"
+#include "../serialization/command_deserializer.h"
 
 namespace nx::clusterdb::engine::transport {
 

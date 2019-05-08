@@ -1,11 +1,11 @@
-#include "outgoing_transaction_sorter.h"
+#include "outgoing_command_sorter.h"
 
 #include <set>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "outgoing_transaction_dispatcher.h"
+#include "outgoing_command_dispatcher.h"
 
 namespace nx::clusterdb::engine {
 

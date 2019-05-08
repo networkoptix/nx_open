@@ -1,4 +1,4 @@
-#include "transaction_data_object_in_memory.h"
+#include "command_data_object_in_memory.h"
 
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>

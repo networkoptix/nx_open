@@ -11,7 +11,7 @@
 #include <nx/utils/subscription.h>
 #include <nx/utils/url.h>
 
-#include "transport/abstract_transaction_transport_connector.h"
+#include "transport/abstract_command_transport_connector.h"
 
 namespace nx::clusterdb::engine {
 

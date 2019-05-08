@@ -1,6 +1,6 @@
 #pragma once
 
-#include "transaction_serializer.h"
+#include "command_serializer.h"
 #include "../command.h"
 
 namespace nx::clusterdb::engine {

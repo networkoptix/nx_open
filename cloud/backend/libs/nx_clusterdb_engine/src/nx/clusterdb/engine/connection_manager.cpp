@@ -9,8 +9,8 @@
 
 #include "command_descriptor.h"
 #include "compatible_ec2_protocol_version.h"
-#include "incoming_transaction_dispatcher.h"
-#include "outgoing_transaction_dispatcher.h"
+#include "incoming_command_dispatcher.h"
+#include "outgoing_command_dispatcher.h"
 #include "p2p_sync_settings.h"
 
 namespace nx::clusterdb::engine {

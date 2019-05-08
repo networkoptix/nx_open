@@ -12,7 +12,7 @@
 #include <nx/vms/api/data/tran_state_data.h>
 
 #include "command.h"
-#include "transaction_timestamp_calculator.h"
+#include "command_timestamp_calculator.h"
 
 namespace nx::clusterdb::engine {
 

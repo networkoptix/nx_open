@@ -10,7 +10,7 @@
 #include <nx/sql/types.h>
 #include <nx/sql/query_context.h>
 
-#include "../serialization/ubjson_serialized_transaction.h"
+#include "../serialization/ubjson_serialized_command.h"
 
 namespace nx::clusterdb::engine::dao {
 

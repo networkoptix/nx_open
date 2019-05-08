@@ -17,15 +17,15 @@
 
 #include "compatible_ec2_protocol_version.h"
 #include "command.h"
-#include "dao/abstract_transaction_data_object.h"
-#include "outgoing_transaction_dispatcher.h"
-#include "outgoing_transaction_sorter.h"
+#include "dao/abstract_command_data_object.h"
+#include "outgoing_command_dispatcher.h"
+#include "outgoing_command_sorter.h"
 #include "p2p_sync_settings.h"
 #include "result_code.h"
-#include "serialization/transaction_serializer.h"
-#include "serialization/ubjson_serialized_transaction.h"
-#include "transaction_log_cache.h"
-#include "transport/transaction_transport_header.h"
+#include "serialization/command_serializer.h"
+#include "serialization/ubjson_serialized_command.h"
+#include "command_log_cache.h"
+#include "transport/command_transport_header.h"
 
 namespace nx::clusterdb::engine {
 

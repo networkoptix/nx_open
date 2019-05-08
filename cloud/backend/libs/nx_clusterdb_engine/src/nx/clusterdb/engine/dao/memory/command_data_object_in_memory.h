@@ -12,7 +12,7 @@
 #include <nx/sql/types.h>
 #include <nx/sql/query_context.h>
 
-#include "../abstract_transaction_data_object.h"
+#include "../abstract_command_data_object.h"
 
 namespace nx::clusterdb::engine::dao::memory {
 

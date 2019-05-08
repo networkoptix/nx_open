@@ -4,8 +4,8 @@
 
 #include <nx/fusion/serialization/ubjson_reader.h>
 
-#include "serializable_transaction.h"
-#include "ubjson_serialized_transaction.h"
+#include "serializable_command.h"
+#include "ubjson_serialized_command.h"
 #include "../command.h"
 
 namespace nx::clusterdb::engine {

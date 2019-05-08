@@ -1,4 +1,4 @@
-#include "outgoing_transaction_dispatcher.h"
+#include "outgoing_command_dispatcher.h"
 
 namespace nx::clusterdb::engine {
 

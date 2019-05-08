@@ -6,7 +6,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/tran_state_data.h>
 
-#include "transaction_log.h"
+#include "command_log.h"
 
 namespace nx::clusterdb::engine {
 

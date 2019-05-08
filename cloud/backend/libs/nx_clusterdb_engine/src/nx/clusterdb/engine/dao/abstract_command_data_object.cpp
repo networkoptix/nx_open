@@ -1,9 +1,9 @@
-#include "abstract_transaction_data_object.h"
+#include "abstract_command_data_object.h"
 
 #include <nx/utils/std/cpp14.h>
 
-#include "rdb/transaction_data_object.h"
-#include "memory/transaction_data_object_in_memory.h"
+#include "rdb/command_data_object.h"
+#include "memory/command_data_object_in_memory.h"
 
 namespace nx::clusterdb::engine::dao {
 

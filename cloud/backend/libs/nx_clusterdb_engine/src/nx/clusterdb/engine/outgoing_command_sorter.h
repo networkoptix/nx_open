@@ -8,8 +8,8 @@
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/thread/mutex.h>
 
-#include "serialization/serializable_transaction.h"
-#include "transaction_log_cache.h"
+#include "serialization/serializable_command.h"
+#include "command_log_cache.h"
 
 namespace nx::clusterdb::engine {
 

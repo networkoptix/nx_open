@@ -2,7 +2,7 @@
 
 #include <nx/utils/test_support/utils.h>
 
-#include <nx/clusterdb/engine/dao/memory/transaction_data_object_in_memory.h>
+#include <nx/clusterdb/engine/dao/memory/command_data_object_in_memory.h>
 #include <nx/cloud/db/controller.h>
 #include <nx/cloud/db/ec2/data_conversion.h>
 #include <nx/cloud/db/ec2/vms_command_descriptor.h>

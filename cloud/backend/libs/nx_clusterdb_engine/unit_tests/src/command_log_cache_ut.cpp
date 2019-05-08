@@ -5,7 +5,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/uuid.h>
 
-#include <nx/clusterdb/engine/transaction_log_cache.h>
+#include <nx/clusterdb/engine/command_log_cache.h>
 
 #include "customer_db/data.h"
 
