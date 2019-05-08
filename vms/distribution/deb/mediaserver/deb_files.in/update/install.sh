@@ -1,11 +1,32 @@
 #!/bin/bash
 
-DISTRIB="@server_distribution_name@.deb"
+SERVER_DEB_FILE="@server_distribution_name@.deb"
 COMPANY_NAME="@deb.customization.company.name@"
 WITH_ROOT_TOOL="@withRootTool@"
-TARGET_DEVICE="@targetDevice@"
 
-RELEASE_YEAR=$(lsb_release -a |grep "Release:" |awk {'print $2'} |awk -F  "." '/1/ {print $1}')
+osBasename() {
+    local -r NAME=$(cat /etc/os-release |grep -e '^ID=' |sed 's/^ID=\(.*\)$/\1/')
+
+    local -rA BASENAMES=(
+        [debian]=debian
+        [ubuntu]=ubuntu
+        [raspbian]=debian
+    )
+
+    echo ${BASENAMES[$NAME]}
+}
+
+osVersion() {
+    local -r VERSION=$(cat /etc/os-release |grep -e '^VERSION_ID=' |sed 's/^VERSION_ID="\(.*\)"/\1/')
+
+    echo $VERSION
+}
+
+osMajorVersion() {
+    local -r VERSION=$(osVersion)
+
+    echo ${VERSION%%.*}
+}
 
 installDeb()
 {
@@ -28,10 +49,26 @@ installDeb()
 deleteObsoleteFiles()
 {
     local -r DIR="/opt/$COMPANY_NAME"
-    rm "$DIR/version.txt" #< No longer present in 4.0.
-    rm "$DIR/build_info.txt" #< In 4.0 resides inside "mediaserver" dir.
-    rm "$DIR/specific_features.txt" #< In 4.0 resides inside "mediaserver" dir.
-    rm "$DIR/installation_info.json" #< Will be generated on first Server start.
+    rm "$DIR/version.txt" &>/dev/null #< No longer present in 4.0.
+    rm "$DIR/build_info.txt" &>/dev/null #< In 4.0 resides inside "mediaserver" dir.
+    rm "$DIR/specific_features.txt" &>/dev/null #< In 4.0 resides inside "mediaserver" dir.
+    rm "$DIR/installation_info.json" &>/dev/null #< Will be generated on first Server start.
+}
+
+ensureDependencyInstalled()
+{
+    local -r OS_DIRNAME=$(osBasename)$(osMajorVersion)
+
+    while (( $# > 0 ))
+    do
+        local NAME=$1;shift
+
+        [[ $(dpkg -l |grep -e "${NAME}\s" |grep -e '^.i' |awk '{print $2}') ]] && continue
+
+        [[ -d "dependencies/${OS_DIRNAME}/${NAME}" ]] || continue
+
+        installDeb "dependencies/${OS_DIRNAME}/${NAME}"/*.deb
+    done
 }
 
 update()
@@ -39,12 +76,9 @@ update()
     deleteObsoleteFiles
 
     export DEBIAN_FRONTEND=noninteractive
-    CIFSUTILS=$(dpkg -l |grep cifs-utils |grep ii |awk '{print $2}')
-    if [ -z "$CIFSUTILS" ]
-    then
-        [ -d "ubuntu${RELEASE_YEAR}" ] && installDeb ubuntu${RELEASE_YEAR}/cifs-utils/*.deb
-    fi
-    installDeb "$DISTRIB"
+
+    ensureDependencyInstalled cifs-utils
+    installDeb "$SERVER_DEB_FILE"
 
     # TODO: #alevenkov Consider moving this block to postinst to enable rpi camera after a clean
     # installation (this script works only when upgrading). Note the reboot command.
@@ -56,7 +90,7 @@ update()
     fi
 }
 
-if [ "$1" != "" ]
+if [ -n "$1" ]
 then
     update >>$1 2>&1
 else
