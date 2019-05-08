@@ -240,7 +240,7 @@ bool ClusterTestFixture::peersAreSynchronized(std::vector<int> ids) const
             [&commandLogs, &commandLogRead](
                 nx::clusterdb::engine::ResultCode /*resultCode*/,
                 std::vector<nx::clusterdb::engine::dao::TransactionLogRecord> serializedTransactions,
-                nx::vms::api::TranState /*readedUpTo*/)
+                NodeState /*readedUpTo*/)
             {
                 commandLogs.push_back(std::move(serializedTransactions));
                 commandLogRead.set_value();

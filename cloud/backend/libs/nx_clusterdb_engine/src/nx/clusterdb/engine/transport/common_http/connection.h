@@ -8,7 +8,6 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
 
-#include <nx/vms/api/data/tran_state_data.h>
 #include <transaction/transaction_transport_base.h>
 
 #include "../abstract_command_transport.h"

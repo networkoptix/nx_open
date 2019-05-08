@@ -118,7 +118,7 @@ protected:
     void assertCacheStateIsValid()
     {
         const auto newSequence = m_cache.generateTransactionSequence(
-            vms::api::PersistentIdData(QnUuid(m_peerId), m_dbId));
+            NodeStateKey{QnUuid(m_peerId), m_dbId});
         if (!m_transactionSequenceGenerated.empty())
         {
             ASSERT_GT(newSequence, *m_transactionSequenceGenerated.begin());
@@ -137,27 +137,19 @@ protected:
 
     CommandHeader prepareTransaction(TranId tranId)
     {
-        CommandHeader transactionHeader(
-            command::SaveCustomer::code,
-            QnUuid(m_peerId));
-        transactionHeader.persistentInfo.sequence =
-            m_cache.generateTransactionSequence(
-                vms::api::PersistentIdData(QnUuid(m_peerId), m_dbId));
-        transactionHeader.persistentInfo.dbID = m_dbId;
-        transactionHeader.persistentInfo.timestamp =
+        CommandHeader commandHeader(command::SaveCustomer::code, QnUuid(m_peerId));
+        commandHeader.persistentInfo.sequence =
+            m_cache.generateTransactionSequence(NodeStateKey{QnUuid(m_peerId), m_dbId});
+        commandHeader.persistentInfo.dbID = m_dbId;
+        commandHeader.persistentInfo.timestamp =
             m_cache.generateTransactionTimestamp(tranId);
-        return transactionHeader;
+        return commandHeader;
     }
 
 private:
     struct CacheState
     {
-        std::uint64_t timestampSequence;
-
-        CacheState():
-            timestampSequence(0)
-        {
-        }
+        std::uint64_t timestampSequence = 0;
     };
 
     engine::CommandLogCache m_cache;
@@ -179,19 +171,19 @@ private:
 
     void generateTransaction(TranId tranId)
     {
-        auto transactionHeader = prepareTransaction(tranId);
-        saveTransactionToCache(tranId, transactionHeader);
+        auto commandHeader = prepareTransaction(tranId);
+        saveTransactionToCache(tranId, commandHeader);
     }
 
     void saveTransactionToCache(
         TranId tranId,
-        CommandHeader transactionHeader)
+        CommandHeader commandHeader)
     {
         m_cache.insertOrReplaceTransaction(
             tranId,
-            transactionHeader,
+            commandHeader,
             (m_peerId + m_systemId).c_str());
-        m_transactionSequenceGenerated.insert(transactionHeader.persistentInfo.sequence);
+        m_transactionSequenceGenerated.insert(commandHeader.persistentInfo.sequence);
     }
 
     void assertEqual(const CacheState& cacheState, const engine::CommandLogCache& cache)

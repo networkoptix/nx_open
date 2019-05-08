@@ -8,17 +8,15 @@
 #include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <nx/vms/api/data/peer_data.h>
-#include <nx/vms/api/data/tran_state_data.h>
-
 #include "command.h"
 #include "command_timestamp_calculator.h"
+#include "node_state.h"
 
 namespace nx::clusterdb::engine {
 
 struct UpdateHistoryData
 {
-    vms::api::PersistentIdData updatedBy;
+    NodeStateKey updatedBy;
     vms::api::Timestamp timestamp;
 };
 
@@ -39,7 +37,7 @@ public:
     {
         /** map<transaction hash, peer which updated transaction> */
         std::map<nx::Buffer, UpdateHistoryData> transactionHashToUpdateAuthor;
-        vms::api::TranState transactionState;
+        NodeState nodeState;
         std::optional<std::uint64_t> timestampSequence;
     };
 
@@ -53,7 +51,7 @@ public:
         const QByteArray& hash) const;
 
     void restoreTransaction(
-        vms::api::PersistentIdData tranStateKey,
+        NodeStateKey tranStateKey,
         int sequence,
         const nx::Buffer& tranHash,
         const vms::api::Timestamp& timestamp);
@@ -74,17 +72,17 @@ public:
      */
     const VmsDataState* state(TranId tranId) const;
     vms::api::Timestamp generateTransactionTimestamp(TranId tranId);
-    int generateTransactionSequence(const vms::api::PersistentIdData& tranStateKey);
-    int lastTransactionSequence(const vms::api::PersistentIdData& tranStateKey);
+    int generateTransactionSequence(const NodeStateKey& tranStateKey);
+    int lastTransactionSequence(const NodeStateKey& tranStateKey);
 
     /**
      * Makes sure the sequence is not less than value.
      */
-    void shiftTransactionSequenceTo(const vms::api::PersistentIdData& tranStateKey, int value);
+    void shiftTransactionSequenceTo(const NodeStateKey& tranStateKey, int value);
 
-    void shiftTransactionSequence(const vms::api::PersistentIdData& tranStateKey, int delta);
+    void shiftTransactionSequence(const NodeStateKey& tranStateKey, int delta);
 
-    vms::api::TranState committedTransactionState() const;
+    NodeState committedTransactionState() const;
     std::uint64_t committedTimestampSequence() const;
 
     int activeTransactionCount() const;

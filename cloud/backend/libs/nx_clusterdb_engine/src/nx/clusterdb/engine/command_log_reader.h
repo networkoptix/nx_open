@@ -4,7 +4,6 @@
 #include <nx/network/buffer.h>
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/api/data/tran_state_data.h>
 
 #include "command_log.h"
 
@@ -36,7 +35,7 @@ public:
         TransactionsReadHandler completionHandler);
 
     // TODO: #ak following method MUST be asynchronous
-    vms::api::TranState getCurrentState() const;
+    NodeState getCurrentState() const;
     std::string systemId() const;
 
 private:
@@ -45,17 +44,14 @@ private:
     const Qn::SerializationFormat m_dataFormat;
     const OutgoingCommandFilter& m_outgoingCommandFilter;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
-    bool m_terminated;
+    bool m_terminated = false;
     QnMutex m_mutex;
 
     void onTransactionsRead(
         ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransactions,
-        vms::api::TranState readedUpTo,
+        NodeState readedUpTo,
         TransactionsReadHandler completionHandler);
 };
-
-// TODO: #ak Move this function somewhere.
-std::string stateToString(const vms::api::TranState& tranState);
 
 } // namespace nx::clusterdb::engine

@@ -133,11 +133,9 @@ void GenericTransport::sendTransaction(
                     m_commonTransportHeaderOfRemoteTransaction));
 
             //cannot send transaction right now: updating local transaction sequence
-            const vms::api::PersistentIdData tranStateKey(
-                transactionSerializer->header().peerID,
-                transactionSerializer->header().persistentInfo.dbID);
-            m_tranStateToSynchronizeTo.values[tranStateKey] = std::max(
-                m_tranStateToSynchronizeTo.values[tranStateKey],
+            const auto nodeStateKey = NodeStateKey::build(transactionSerializer->header());
+            m_tranStateToSynchronizeTo.nodeSequence[nodeStateKey] = std::max<long long>(
+                m_tranStateToSynchronizeTo.sequence(nodeStateKey),
                 transactionSerializer->header().persistentInfo.sequence);
             //transaction will be sent later
         });
@@ -154,7 +152,7 @@ void GenericTransport::start()
     // Sending tranSyncRequest.
     auto requestTran = command::make<command::TranSyncRequest>(
         m_localPeer.id);
-    requestTran.params.persistentState = m_transactionLogReader->getCurrentState();
+    requestTran.params.persistentState = toVmsTranState(m_transactionLogReader->getCurrentState());
 
     CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
     transportHeader.vmsTransportHeader.processedPeers << m_remotePeer.id;
@@ -259,7 +257,7 @@ void GenericTransport::processHandshakeCommand(
 {
     m_tranStateToSynchronizeTo =
         m_outgoingCommandFilter.filter(m_transactionLogReader->getCurrentState());
-    m_remotePeerTranState = std::move(data.params.persistentState);
+    m_remotePeerTranState = toNodeState(data.params.persistentState);
 
     //sending sync response
     auto tranSyncResponse = command::make<command::TranSyncResponse>(
@@ -294,7 +292,7 @@ void GenericTransport::processHandshakeCommand(
 void GenericTransport::onTransactionsReadFromLog(
     ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
-    vms::api::TranState readedUpTo)
+    NodeState readedUpTo)
 {
     // TODO: handle api::ResultCode::tryLater result code
 
@@ -324,10 +322,8 @@ void GenericTransport::onTransactionsReadFromLog(
     if (resultCode == ResultCode::partialContent ||
         m_tranStateToSynchronizeTo.containsDataMissingIn(m_remotePeerTranState))
     {
-        NX_DEBUG(this,
-            lm("systemId %1. Synchronize to (%2), already synchronized to (%3)")
-            .args(m_systemId, stateToString(m_tranStateToSynchronizeTo),
-                stateToString(m_remotePeerTranState)));
+        NX_DEBUG(this, "systemId %1. Synchronize to (%2), already synchronized to (%3)",
+            m_systemId, m_tranStateToSynchronizeTo, m_remotePeerTranState);
 
         // Asserting that something new has been read.
         NX_ASSERT(!m_prevReadResult || readedUpTo.containsDataMissingIn(*m_prevReadResult));
@@ -346,9 +342,8 @@ void GenericTransport::onTransactionsReadFromLog(
     }
     else
     {
-        NX_DEBUG(this, lm("systemId %1. "
-            "Done initial synchronization to (%2)")
-                .args(m_systemId, stateToString(m_remotePeerTranState)));
+        NX_DEBUG(this, "systemId %1. Done initial synchronization to (%2)",
+            m_systemId, m_remotePeerTranState);
     }
 
     // Sending transactions to remote peer is allowed now.
@@ -374,9 +369,8 @@ void GenericTransport::sendTransactions(
 
 void GenericTransport::enableOutputChannel()
 {
-    NX_DEBUG(this,
-        lm("systemId %1. Enabled output channel to the peer %2")
-            .args(m_systemId, m_commonTransportHeaderOfRemoteTransaction));
+    NX_DEBUG(this, "systemId %1. Enabled output channel to the peer %2",
+        m_systemId, m_commonTransportHeaderOfRemoteTransaction);
 
     m_canSendCommands = true;
 
@@ -396,6 +390,25 @@ void GenericTransport::enableOutputChannel()
             std::move(transportHeader),
             makeSerializer<command::TranSyncDone>(std::move(tranSyncDone)));
     }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+nx::vms::api::TranState toVmsTranState(const NodeState& nodeState)
+{
+    nx::vms::api::TranState tranState;
+    for (const auto& [node, sequence]: nodeState.nodeSequence)
+        tranState.values[nx::vms::api::PersistentIdData(node.nodeId, node.dbId)] = sequence;
+    return tranState;
+}
+
+NodeState toNodeState(const nx::vms::api::TranState& tranState)
+{
+    NodeState nodeState;
+    for (auto it = tranState.values.begin(); it != tranState.values.end(); ++it)
+        nodeState.nodeSequence[NodeStateKey{it.key().id, it.key().persistentId}] = it.value();
+
+    return nodeState;
 }
 
 } // namespace nx::clusterdb::engine::transport

@@ -7,7 +7,6 @@
 
 #include <nx/p2p/p2p_connection_base.h>
 #include <nx/p2p/connection_context.h>
-#include <nx/vms/api/data/tran_state_data.h>
 
 #include "../abstract_command_transport.h"
 #include "../../compatible_ec2_protocol_version.h"
@@ -64,7 +63,7 @@ private:
     void onTransactionsReadFromLog(
         ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransactions,
-        vms::api::TranState readedUpTo);
+        NodeState readedUpTo);
 
     void readTransactions();
 
@@ -78,7 +77,7 @@ private:
 
     bool m_sendHandshakeDone = false;
     bool m_tranLogRequestInProgress = false;
-    std::optional<vms::api::TranState> m_remoteSubscription; //< remote -> local subscription
+    std::optional<NodeState> m_remoteSubscription; //< remote -> local subscription
     const std::string m_systemId;
     std::string m_connectionGuid;
 };

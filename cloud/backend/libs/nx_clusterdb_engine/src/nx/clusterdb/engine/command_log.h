@@ -18,6 +18,7 @@
 #include "compatible_ec2_protocol_version.h"
 #include "command.h"
 #include "dao/abstract_command_data_object.h"
+#include "node_state.h"
 #include "outgoing_command_dispatcher.h"
 #include "outgoing_command_sorter.h"
 #include "p2p_sync_settings.h"
@@ -33,8 +34,8 @@ class AbstractOutgoingCommandDispatcher;
 
 struct NX_DATA_SYNC_ENGINE_API ReadCommandsFilter
 {
-    std::optional<vms::api::TranState> from;
-    std::optional<vms::api::TranState> to;
+    std::optional<NodeState> from;
+    std::optional<NodeState> to;
     int maxTransactionsToReturn = 0;
     /** List of command source peers. If empty, then command source is not restricted. */
     std::vector<QnUuid> sources;
@@ -57,7 +58,7 @@ public:
     using TransactionsReadHandler = nx::utils::MoveOnlyFunc<void(
         ResultCode /*resultCode*/,
         std::vector<dao::TransactionLogRecord> /*serializedTransactions*/,
-        vms::api::TranState /*readedUpTo*/)>;
+        NodeState /*readedUpTo*/)>;
 
     using OnTransactionReceivedHandler = nx::utils::MoveOnlyFunc<
         nx::sql::DBResult(
@@ -214,7 +215,7 @@ public:
         const std::string& systemId,
         int commandCode);
 
-    vms::api::TranState getTransactionState(const std::string& systemId) const;
+    NodeState getTransactionState(const std::string& systemId) const;
 
     /**
      * Asynchronously reads requested transactions from Db.
@@ -277,7 +278,7 @@ private:
         ResultCode resultCode;
         std::vector<dao::TransactionLogRecord> transactions;
         /** (Read start state) + (readed transactions). */
-        vms::api::TranState state;
+        NodeState state;
     };
 
     const SynchronizationSettings m_settings;

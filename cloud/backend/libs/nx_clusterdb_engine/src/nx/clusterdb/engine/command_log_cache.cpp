@@ -5,8 +5,6 @@
 
 namespace nx::clusterdb::engine {
 
-using VmsDataState = CommandLogCache::VmsDataState;
-
 CommandLogCache::CommandLogCache():
     m_tranIdSequence(0)
 {
@@ -21,9 +19,9 @@ bool CommandLogCache::isShouldBeIgnored(
 {
     QnMutexLocker lock(&m_mutex);
 
-    vms::api::PersistentIdData key(commandHeader.peerID, commandHeader.persistentInfo.dbID);
+    const auto key = NodeStateKey::build(commandHeader);
     NX_ASSERT(commandHeader.persistentInfo.sequence != 0);
-    const auto currentSequence = m_committedData.transactionState.values.value(key);
+    const auto currentSequence = m_committedData.nodeState.sequence(key);
     if (currentSequence >= commandHeader.persistentInfo.sequence)
     {
         NX_DEBUG(this, lm("systemId %1. Ignoring transaction (%2, hash %3) "
@@ -53,7 +51,7 @@ bool CommandLogCache::isShouldBeIgnored(
 }
 
 void CommandLogCache::restoreTransaction(
-    vms::api::PersistentIdData tranStateKey,
+    NodeStateKey tranStateKey,
     int sequence,
     const nx::Buffer& tranHash,
     const vms::api::Timestamp& timestamp)
@@ -70,11 +68,11 @@ void CommandLogCache::restoreTransaction(
         m_committedData.timestampSequence = timestamp.sequence;
     }
 
-    qint32& persistentSequence = m_committedData.transactionState.values[tranStateKey];
+    auto& persistentSequence = m_committedData.nodeState.nodeSequence[tranStateKey];
     if (persistentSequence < sequence)
         persistentSequence = sequence;
     m_committedData.transactionHashToUpdateAuthor[tranHash] =
-        UpdateHistoryData{ tranStateKey, timestamp };
+        UpdateHistoryData{tranStateKey, timestamp};
 
     if (timestamp > m_maxTimestamp)
     {
@@ -106,13 +104,13 @@ void CommandLogCache::commit(TranId tranId)
     for (const auto& elem: tranContext.data.transactionHashToUpdateAuthor)
         m_committedData.transactionHashToUpdateAuthor[elem.first] = elem.second;
 
-    for (auto it = tranContext.data.transactionState.values.cbegin();
-         it != tranContext.data.transactionState.values.cend();
+    for (auto it = tranContext.data.nodeState.nodeSequence.cbegin();
+         it != tranContext.data.nodeState.nodeSequence.cend();
          ++it)
     {
-        auto& currentSequence = m_committedData.transactionState.values[it.key()];
-        if (currentSequence < it.value())
-            currentSequence = it.value();
+        auto& currentSequence = m_committedData.nodeState.nodeSequence[it->first];
+        if (currentSequence < it->second)
+            currentSequence = it->second;
     }
 
     if (tranContext.data.timestampSequence)
@@ -153,20 +151,18 @@ void CommandLogCache::insertOrReplaceTransaction(
 
     m_timestampCalculator.shiftTimestampIfNeeded(transaction.persistentInfo.timestamp);
 
-    const vms::api::PersistentIdData tranKey(
-        transaction.peerID,
-        transaction.persistentInfo.dbID);
+    const auto tranKey = NodeStateKey::build(transaction);
 
     tranContext.data.timestampSequence = transaction.persistentInfo.timestamp.sequence;
     tranContext.data.transactionHashToUpdateAuthor[transactionHash] =
         UpdateHistoryData{
             tranKey,
             transaction.persistentInfo.timestamp};
-    tranContext.data.transactionState.values[tranKey] =
+    tranContext.data.nodeState.nodeSequence[tranKey] =
         transaction.persistentInfo.sequence;
 }
 
-const VmsDataState* CommandLogCache::state(TranId tranId) const
+const CommandLogCache::VmsDataState* CommandLogCache::state(TranId tranId) const
 {
     const auto tranContext = findTranContext(tranId);
     return tranContext ? &tranContext->data : nullptr;
@@ -183,52 +179,51 @@ vms::api::Timestamp CommandLogCache::generateTransactionTimestamp(TranId tranId)
 }
 
 int CommandLogCache::generateTransactionSequence(
-    const vms::api::PersistentIdData& tranStateKey)
+    const NodeStateKey& tranStateKey)
 {
     QnMutexLocker lock(&m_mutex);
-    int& currentSequence = m_rawData.transactionState.values[tranStateKey];
+    auto& currentSequence = m_rawData.nodeState.nodeSequence[tranStateKey];
     ++currentSequence;
     return currentSequence;
 }
 
 int CommandLogCache::lastTransactionSequence(
-    const vms::api::PersistentIdData& tranStateKey)
+    const NodeStateKey& tranStateKey)
 {
     QnMutexLocker lock(&m_mutex);
-    auto it = m_rawData.transactionState.values.find(tranStateKey);
-    return it == m_rawData.transactionState.values.end() ? 0 : it.value();
+    return m_rawData.nodeState.sequence(tranStateKey);
 }
 
 void CommandLogCache::shiftTransactionSequenceTo(
-    const vms::api::PersistentIdData& tranStateKey,
+    const NodeStateKey& tranStateKey,
     int value)
 {
     QnMutexLocker lock(&m_mutex);
 
-    int& currentSequence = m_rawData.transactionState.values[tranStateKey];
-    currentSequence = std::max(currentSequence, value);
+    auto& currentSequence = m_rawData.nodeState.nodeSequence[tranStateKey];
+    currentSequence = std::max<long long>(currentSequence, value);
 
-    m_committedData.transactionState.values[tranStateKey] = currentSequence;
+    m_committedData.nodeState.nodeSequence[tranStateKey] = currentSequence;
 }
 
 void CommandLogCache::shiftTransactionSequence(
-    const vms::api::PersistentIdData& tranStateKey,
+    const NodeStateKey& tranStateKey,
     int delta)
 {
     // TODO: #ak Get rid of this method.
 
     QnMutexLocker lock(&m_mutex);
 
-    int& currentSequence = m_committedData.transactionState.values[tranStateKey];
+    auto& currentSequence = m_committedData.nodeState.nodeSequence[tranStateKey];
     currentSequence += delta;
 
     m_rawData = m_committedData;
 }
 
-vms::api::TranState CommandLogCache::committedTransactionState() const
+NodeState CommandLogCache::committedTransactionState() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_committedData.transactionState;
+    return m_committedData.nodeState;
 }
 
 std::uint64_t CommandLogCache::committedTimestampSequence() const

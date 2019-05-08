@@ -23,15 +23,15 @@ bool OutgoingCommandFilter::satisfies(const CommandHeader& commandHeader) const
     return true;
 }
 
-vms::api::TranState OutgoingCommandFilter::filter(const vms::api::TranState& value) const
+NodeState OutgoingCommandFilter::filter(const NodeState& value) const
 {
-    vms::api::TranState result;
-    for (auto it = value.values.begin(); it != value.values.end(); ++it)
+    NodeState result;
+    for (const auto& [node, sequence]: value.nodeSequence)
     {
-        if (m_configuration.sendOnlyOwnCommands && it.key().id != m_selfPeerId)
+        if (m_configuration.sendOnlyOwnCommands && node.nodeId != m_selfPeerId)
             continue;
 
-        result.values.insert(it.key(), it.value());
+        result.nodeSequence[node] = sequence;
     }
 
     return result;

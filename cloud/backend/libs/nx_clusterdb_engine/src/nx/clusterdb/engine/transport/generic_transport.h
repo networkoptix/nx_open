@@ -72,12 +72,12 @@ private:
     /**
      * Transaction state, we need to synchronize remote side to, before we can mark it write sync.
      */
-    vms::api::TranState m_tranStateToSynchronizeTo;
+    NodeState m_tranStateToSynchronizeTo;
     /**
      * Transaction state of remote peer. Transactions before this state have been sent to the peer.
      */
-    vms::api::TranState m_remotePeerTranState;
-    std::optional<vms::api::TranState> m_prevReadResult;
+    NodeState m_remotePeerTranState;
+    std::optional<NodeState> m_prevReadResult;
     bool m_haveToSendSyncDone = false;
     std::unique_ptr<CommandLogReader> m_transactionLogReader;
     CommandTransportHeader m_commonTransportHeaderOfRemoteTransaction;
@@ -105,11 +105,14 @@ private:
     void onTransactionsReadFromLog(
         ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransaction,
-        vms::api::TranState readedUpTo);
+        NodeState readedUpTo);
 
     void sendTransactions(std::vector<dao::TransactionLogRecord> serializedTransactions);
 
     void enableOutputChannel();
 };
+
+nx::vms::api::TranState toVmsTranState(const NodeState& nodeState);
+NodeState toNodeState(const nx::vms::api::TranState& tranState);
 
 } // namespace nx::clusterdb::engine::transport

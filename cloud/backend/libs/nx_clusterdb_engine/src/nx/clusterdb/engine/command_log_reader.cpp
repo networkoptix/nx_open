@@ -16,8 +16,7 @@ CommandLogReader::CommandLogReader(
     m_commandLog(commandLog),
     m_systemId(systemId),
     m_dataFormat(dataFormat),
-    m_outgoingCommandFilter(outgoingCommandFilter),
-    m_terminated(false)
+    m_outgoingCommandFilter(outgoingCommandFilter)
 {
 }
 
@@ -41,8 +40,8 @@ void CommandLogReader::readTransactions(
 {
     NX_DEBUG(this,
         lm("systemId %1. Reading commands from (%2) to (%3)")
-        .args(m_systemId, readFilter.from ? stateToString(*readFilter.from) : "none",
-            readFilter.to ? stateToString(*readFilter.to) : "none"));
+        .args(m_systemId, readFilter.from ? readFilter.from->toString() : "none",
+            readFilter.to ? readFilter.to->toString() : "none"));
 
     ReadCommandsFilter effectiveReadFilter = readFilter;
     m_outgoingCommandFilter.updateReadFilter(&effectiveReadFilter);
@@ -55,7 +54,7 @@ void CommandLogReader::readTransactions(
             completionHandler = std::move(completionHandler)](
                 ResultCode resultCode,
                 std::vector<dao::TransactionLogRecord> serializedTransactions,
-                vms::api::TranState readedUpTo) mutable
+                NodeState readedUpTo) mutable
         {
             const auto locker = sharedGuard->lock();
             if (!locker)
@@ -82,7 +81,7 @@ void CommandLogReader::readTransactions(
 void CommandLogReader::onTransactionsRead(
     ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
-    vms::api::TranState readedUpTo,
+    NodeState readedUpTo,
     TransactionsReadHandler completionHandler)
 {
     NX_ASSERT(m_dataFormat == Qn::UbjsonFormat);
@@ -94,7 +93,7 @@ void CommandLogReader::onTransactionsRead(
         std::move(readedUpTo));
 }
 
-vms::api::TranState CommandLogReader::getCurrentState() const
+NodeState CommandLogReader::getCurrentState() const
 {
     return m_commandLog->getTransactionState(m_systemId);
 }
@@ -102,25 +101,6 @@ vms::api::TranState CommandLogReader::getCurrentState() const
 std::string CommandLogReader::systemId() const
 {
     return m_systemId;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-std::string stateToString(const vms::api::TranState& tranState)
-{
-    std::string str;
-    for (auto it = tranState.values.begin(); it != tranState.values.end(); ++it)
-    {
-        if (!str.empty())
-            str += ", ";
-
-        str += "{" + it.key().id.toSimpleString().toStdString() + ", " +
-            it.key().persistentId.toSimpleString().toStdString() + "}";
-        str += ": ";
-        str += std::to_string(it.value());
-    }
-
-    return str;
 }
 
 } // namespace nx::clusterdb::engine

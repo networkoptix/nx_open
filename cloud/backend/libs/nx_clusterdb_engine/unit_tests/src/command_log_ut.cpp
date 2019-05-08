@@ -361,7 +361,7 @@ private:
             [&transactionsReadPromise](
                 ResultCode resultCode,
                 std::vector<dao::TransactionLogRecord> serializedTransactions,
-                nx::vms::api::TranState /*readedUpTo*/)
+                NodeState /*readedUpTo*/)
             {
                 ASSERT_EQ(ResultCode::ok, resultCode);
                 transactionsReadPromise.set_value(std::move(serializedTransactions));
@@ -655,7 +655,7 @@ protected:
     {
         ResultCode resultCode;
         std::vector<dao::TransactionLogRecord> serializedTransactions;
-        vms::api::TranState readedUpTo;
+        NodeState readedUpTo;
     };
 
     void givenRandomSystem()
@@ -739,7 +739,7 @@ protected:
         commandLog().readTransactions(
             m_clusterId,
             ReadCommandsFilter(),
-            [this](auto&&... args) { saveReadResult(std::move(args)...); });
+            [this](auto&&... args) { saveReadResult(std::forward<decltype(args)>(args)...); });
     }
 
     void thenReadSucceeded()
@@ -752,7 +752,7 @@ protected:
     void andReportedReadPositionCorrespondsToCommandsRead()
     {
         ASSERT_EQ(
-            m_prevReadResult.readedUpTo.values.begin().value(),
+            m_prevReadResult.readedUpTo.nodeSequence.begin()->second,
             m_prevReadResult.serializedTransactions.size());
     }
 
@@ -839,7 +839,7 @@ private:
     void saveReadResult(
         ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransactions,
-        vms::api::TranState readedUpTo)
+        NodeState readedUpTo)
     {
         m_readResults.push({
             resultCode,

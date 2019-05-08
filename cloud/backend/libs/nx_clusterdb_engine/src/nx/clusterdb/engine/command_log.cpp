@@ -138,7 +138,7 @@ CommandHeader CommandLog::prepareLocalTransactionHeader(
     return header;
 }
 
-vms::api::TranState CommandLog::getTransactionState(
+NodeState CommandLog::getTransactionState(
     const std::string& systemId) const
 {
     QnMutexLocker lock(&m_mutex);
@@ -155,18 +155,6 @@ void CommandLog::readTransactions(
 {
     using namespace std::placeholders;
 
-    if (!filter.from)
-        filter.from = vms::api::TranState{};
-
-    if (!filter.to)
-    {
-        vms::api::PersistentIdData maxTranStateKey;
-        maxTranStateKey.id = QnUuid::fromStringSafe(lit("{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}"));
-        vms::api::TranState maxTranState;
-        maxTranState.values.insert(std::move(maxTranStateKey), std::numeric_limits<qint32>::max());
-        filter.to = std::move(maxTranState);
-    }
-
     auto outputData = std::make_unique<TransactionReadResult>();
     auto outputDataPtr = outputData.get();
     m_dbManager->executeSelect(
@@ -174,8 +162,8 @@ void CommandLog::readTransactions(
             &CommandLog::fetchTransactions, this,
             _1, systemId, filter, outputDataPtr),
         [completionHandler = std::move(completionHandler), outputData = std::move(outputData),
-         lock = m_startedAsyncCallsCounter.getScopedIncrement()](
-            nx::sql::DBResult dbResult)
+            lock = m_startedAsyncCallsCounter.getScopedIncrement()](
+                nx::sql::DBResult dbResult)
         {
             completionHandler(
                 dbResult == nx::sql::DBResult::ok
@@ -211,7 +199,7 @@ void CommandLog::shiftLocalTransactionSequence(
 {
     QnMutexLocker lock(&m_mutex);
     return getTransactionLogContext(lock, systemId)->cache.shiftTransactionSequence(
-        vms::api::PersistentIdData(m_peerId, QnUuid::fromArbitraryData(systemId)),
+        NodeStateKey{m_peerId, QnUuid::fromArbitraryData(systemId)},
         delta);
 }
 
@@ -292,9 +280,9 @@ void CommandLog::fetchTransactionState(nx::sql::QueryContext* queryContext)
         timestamp.sequence = selectTransactionStateQuery.value("timestamp_hi").toLongLong();
         timestamp.ticks = selectTransactionStateQuery.value("timestamp").toLongLong();
 
-        vms::api::PersistentIdData tranStateKey(
+        NodeStateKey tranStateKey{
             QnUuid::fromStringSafe(peerGuid),
-            QnUuid::fromStringSafe(dbGuid));
+            QnUuid::fromStringSafe(dbGuid)};
 
         QnMutexLocker lock(&m_mutex);
         TransactionLogContext* vmsTranLog = getTransactionLogContext(lock, systemId);
@@ -327,11 +315,11 @@ void CommandLog::restoreTransactionSequence(nx::sql::QueryContext* queryContext)
 
     for (const auto& systemIdAndSequence: currentPeerSequenceBySystemId)
     {
-        vms::api::PersistentIdData peerKey(
-            m_peerId, QnUuid::fromArbitraryData(systemIdAndSequence.first));
+        NodeStateKey nodeKey{
+            m_peerId, QnUuid::fromArbitraryData(systemIdAndSequence.first)};
 
         auto vmsTranLog = getTransactionLogContext(lock, systemIdAndSequence.first);
-        vmsTranLog->cache.shiftTransactionSequenceTo(peerKey, systemIdAndSequence.second);
+        vmsTranLog->cache.shiftTransactionSequenceTo(nodeKey, systemIdAndSequence.second);
     }
 }
 
@@ -343,8 +331,7 @@ nx::sql::DBResult CommandLog::fetchTransactions(
 {
     // TODO: Taking into account maxTransactionsToReturn
 
-    //QMap<QnTranStateKey, qint32> values
-    vms::api::TranState currentState;
+    NodeState currentState;
     {
         // Merging "from" with local state.
         QnMutexLocker lock(&m_mutex);
@@ -357,27 +344,29 @@ nx::sql::DBResult CommandLog::fetchTransactions(
 
     outputData->state = {};
 
-    for (auto it = currentState.values.begin();
-         it != currentState.values.end();
+    for (auto it = currentState.nodeSequence.begin();
+         it != currentState.nodeSequence.end();
          ++it)
     {
-        if (!filter.sources.empty() && !nx::utils::contains(filter.sources, it.key().id))
+        if (!filter.sources.empty() && !nx::utils::contains(filter.sources, it->first.nodeId))
             continue;
 
-        const auto minSequence = filter.from->values.value(it.key());
-        const auto maxSequence = filter.to->values.value(it.key(), it.value());
+        const auto minSequence =
+            filter.from ? filter.from->sequence(it->first) : 0;
+        const auto maxSequence =
+            filter.to ? filter.to->sequence(it->first, it->second) : it->second;
         const auto dbResult = m_transactionDataObject->fetchTransactionsOfAPeerQuery(
             queryContext,
             systemId,
-            it.key().id.toSimpleString(),
-            it.key().persistentId.toSimpleString(),
+            it->first.nodeId.toSimpleString(),
+            it->first.dbId.toSimpleString(),
             minSequence,
             maxSequence,
             &outputData->transactions);
         if (dbResult != nx::sql::DBResult::ok)
             return dbResult;
 
-        outputData->state.values[it.key()] = maxSequence;
+        outputData->state.nodeSequence[it->first] = maxSequence;
     }
 
     outputData->resultCode = ResultCode::ok;
@@ -438,7 +427,7 @@ int CommandLog::generateNewTransactionSequence(
     const std::string& systemId)
 {
     return getTransactionLogContext(lock, systemId)->cache.generateTransactionSequence(
-        vms::api::PersistentIdData(m_peerId, QnUuid::fromArbitraryData(systemId)));
+        NodeStateKey{m_peerId, QnUuid::fromArbitraryData(systemId)});
 }
 
 vms::api::Timestamp CommandLog::generateNewTransactionTimestamp(
@@ -558,7 +547,7 @@ nx::sql::DBResult CommandLog::saveActualSequence(
     {
         QnMutexLocker lock(&m_mutex);
         sequence = getTransactionLogContext(lock, systemId)->cache.lastTransactionSequence(
-            vms::api::PersistentIdData(m_peerId, QnUuid::fromArbitraryData(systemId)));
+            NodeStateKey{m_peerId, QnUuid::fromArbitraryData(systemId)});
     }
 
     m_transactionDataObject->saveRecentTransactionSequence(
