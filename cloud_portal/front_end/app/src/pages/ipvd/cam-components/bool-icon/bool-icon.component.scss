@@ -11,6 +11,7 @@
 
 
 .icon-positive {
+    line-height     : 1rem;
     font-size       : 1.5rem;
     display         : flex;
     justify-content : center;
@@ -19,6 +20,7 @@
 }
 
 .icon-negative {
+    line-height     : 1rem;
     font-size       : 1.5rem;
     color           : $light10;
     display         : flex;
@@ -28,6 +30,7 @@
 }
 
 .icon-unknown {
+    line-height     : 1rem;
     font-size       : rem(13px);
     font-family     : $font-family-medium;
     display         : flex;

@@ -144,10 +144,12 @@
             
             td {
                 display : inline-block;
+                vertical-align : middle;
+                padding : 5px 0;
     
                 &:nth-child(n+1) > div {
-                    text-overflow : ellipsis;
-                    overflow      : hidden;
+                    white-space : normal;
+                    line-height : 1rem;
                 }
     
                 &:nth-child(1) {

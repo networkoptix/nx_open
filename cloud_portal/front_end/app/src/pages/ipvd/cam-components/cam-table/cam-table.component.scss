@@ -111,10 +111,8 @@
         height : rem(26px);
         
         &:hover {
-          //td {
-            color      : $dark9;
-            background : transparentize($brand_core, 0.9);
-          //}
+          color      : $dark9;
+          background : transparentize($brand_core, 0.9);
         }
         
         &.selected, &:active, &:focus {
