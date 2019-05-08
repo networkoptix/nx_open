@@ -37,7 +37,7 @@ std::optional<Continent> toContinent(const std::string& continent)
         return Continent::antarctica;
     if (continent == "Asia")
         return Continent::asia;
-    if (continent == "Australia" || continent == "Oceania")
+    if (continent == "Oceania" || continent == "Australia")
         return Continent::australia;
     if (continent == "Europe")
         return Continent::europe;
