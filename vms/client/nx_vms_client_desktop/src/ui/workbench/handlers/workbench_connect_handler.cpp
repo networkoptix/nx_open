@@ -222,7 +222,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     // Avoid infinite UI "Loading..." state by forcibly dropping the connections after a timeout.
     const auto connectTimeout = ini().connectTimeoutMs;
     if (connectTimeout > 0)
-        setupConnectTimeoutTimer(connectTimeout);
+        setupConnectTimeoutTimer(std::chrono::milliseconds(connectTimeout));
 
     auto userWatcher = context()->instance<QnWorkbenchUserWatcher>();
     connect(userWatcher, &QnWorkbenchUserWatcher::userChanged, this,
@@ -322,12 +322,12 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     //m_clientUpdateTool.reset(new nx::vms::client::desktop::ClientUpdateTool(this));
 }
 
-void QnWorkbenchConnectHandler::setupConnectTimeoutTimer(int timeoutMs)
+void QnWorkbenchConnectHandler::setupConnectTimeoutTimer(std::chrono::milliseconds timeout)
 {
     auto connectTimeoutTimer = new QTimer(this);
 
     connectTimeoutTimer->setSingleShot(true);
-    connectTimeoutTimer->setInterval(timeoutMs);
+    connectTimeoutTimer->setInterval(timeout);
 
     connect(this, &QnWorkbenchConnectHandler::stateChanged, this,
         [connectTimeoutTimer](LogicalState logicalValue, PhysicalState /*physicalValue*/)
