@@ -92,13 +92,24 @@
         }
     }
     
-    .drop {
-        &:last-of-type {
-            @include media-breakpoint-up(lg) {
-                padding-right : 0 !important;
+    .drop-container {
+        @include media-breakpoint-up(lg) {
+            max-width: 715px; // overwrite Bootstrap's column width in percentage
+        }
+        
+        .drop {
+            
+            padding : 0 1rem 0 0;
+            @include media-breakpoint-down(sm) {
+                padding-right : 0;
             }
-            @include media-breakpoint-up(xxl) {
-                padding-right : 1rem !important;
+        
+            &:last-of-type {
+                padding-right : 0;
+                
+                @include media-breakpoint-up(xxl) {
+                    padding-right : 1rem;
+                }
             }
         }
     }

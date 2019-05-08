@@ -50,6 +50,7 @@ export class NxIpvdComponent implements OnInit {
     hasNoSearch: boolean;
     debug: any;
     uriPath: string;
+    breakpoint: string;
 
 
     private setupDefaults() {
@@ -60,6 +61,7 @@ export class NxIpvdComponent implements OnInit {
             'isFisheye', 'isMdSupported', 'isIoSupported', 'count', 'resolutionArea'
         ];
 
+        this.breakpoint = '(max-width: 767px)';
         this.placeholder = '';
         this.data = undefined;
         this.resolution = '0';
@@ -133,8 +135,9 @@ export class NxIpvdComponent implements OnInit {
 
         this.activate();
 
+
         this.breakpointObserver
-            .observe(['(max-width: 991px)'])
+            .observe([this.breakpoint])
             .subscribe((state: BreakpointState) => {
                 this.mobileDetailMode = (state.matches && this.activeCamera);
             });
@@ -334,7 +337,7 @@ export class NxIpvdComponent implements OnInit {
         this.activeCamera = { ...selectedCamera };
         this.showAll = false;
 
-        if (this.breakpointObserver.isMatched('(max-width: 991px)')) {
+        if (this.breakpointObserver.isMatched(this.breakpoint)) {
             this.mobileDetailMode = true;
         }
 
