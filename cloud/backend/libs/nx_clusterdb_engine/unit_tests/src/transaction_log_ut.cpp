@@ -129,6 +129,7 @@ private:
     void initializeTransactionLog()
     {
         m_commandLog = std::make_unique<clusterdb::engine::CommandLog>(
+            SynchronizationSettings(),
             m_peerId,
             m_protocolVersionRange,
             &queryExecutor(),

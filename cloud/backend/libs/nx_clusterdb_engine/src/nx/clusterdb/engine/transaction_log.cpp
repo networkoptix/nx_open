@@ -15,11 +15,13 @@ const ReadCommandsFilter ReadCommandsFilter::kEmptyFilter = {
     {}};
 
 CommandLog::CommandLog(
+    const SynchronizationSettings& settings,
     const QnUuid& peerId,
     const ProtocolVersionRange& supportedProtocolRange,
     nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
     AbstractOutgoingCommandDispatcher* const outgoingTransactionDispatcher)
     :
+    m_settings(settings),
     m_peerId(peerId),
     m_supportedProtocolRange(supportedProtocolRange),
     m_dbManager(dbManager),
@@ -60,7 +62,8 @@ void CommandLog::startDbTransaction(
             onDbUpdateCompleted = std::move(onDbUpdateCompleted)](nx::sql::DBResult dbResult)
         {
             onDbUpdateCompleted(dbResult);
-        });
+        },
+        m_settings.groupCommandsUnderDbTransaction ? "commands_group" : "");
 }
 
 nx::sql::DBResult CommandLog::updateTimestampHiForSystem(
