@@ -122,8 +122,7 @@ protected:
     void whenReindexRequestIssued()
     {
         using namespace nx::test;
-        QnJsonRestResult result;
-        NX_TEST_API_GET(m_server.get(), "/api/rebuildArchive?action=start", &result);
+        NX_TEST_API_POST(m_server.get(), "/api/rebuildArchive", jsonParams({{"action", "start"}}));
     }
 
 protected:

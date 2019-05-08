@@ -179,7 +179,7 @@ void QnRestConnectionProcessor::run()
         if (nx::network::http::getHeaderValue(d->request.headers, "Accept-Encoding")
                 .toLower().contains("gzip")
             && response.statusCode == nx::network::http::StatusCode::ok
-            && !response.content->type.contains("image"))
+            && !response.content->type.value.contains("image"))
         {
             contentEncoding = "gzip";
             d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(
@@ -207,7 +207,7 @@ void QnRestConnectionProcessor::run()
 
     sendResponse(
         response.statusCode,
-        response.content ? response.content->type : QByteArray(),
+        response.content ? response.content->type.toString() : QByteArray(),
         contentEncoding,
         /*multipartBoundary*/ QByteArray(),
         /*displayDebug*/ false,

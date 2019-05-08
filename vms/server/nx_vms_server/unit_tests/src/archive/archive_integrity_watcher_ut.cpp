@@ -24,14 +24,14 @@ protected:
     {
         test_support::MediaserverWithStorageFixture::SetUp();
         m_server->addSetting("appserverPassword", "admin");
-        test_support::createTestLogger({"ServerArchiveIntegrityWatcher"}, &m_logBuffer);
+        test_support::createTestLogger({ utils::log::Filter(typeid(ServerArchiveIntegrityWatcher)) }, &m_logBuffer);
     }
 
     virtual void TearDown() override
     {
         m_archiveReader->stop();
         m_archiveReader->removeDataProcessor(this);
-        utils::log::removeLoggers({ utils::log::Filter(QString("ServerArchiveIntegrityWatcher")) });
+        utils::log::removeLoggers({ utils::log::Filter(typeid(ServerArchiveIntegrityWatcher)) });
         nx::utils::log::lockConfiguration();
     }
 

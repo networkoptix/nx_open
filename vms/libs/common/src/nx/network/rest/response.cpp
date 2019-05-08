@@ -24,7 +24,9 @@ Response Response::result(const JsonResult& jsonResult)
 {
     Response response;
     response.statusCode = Result::toHttpStatus(jsonResult.error);
-    response.content = Content{kJsonContentType, QJson::serialized(jsonResult)};
+    response.content = Content{
+        http::header::ContentType::kJson,
+        QJson::serialized(jsonResult)};
     return response;
 }
 
@@ -32,7 +34,10 @@ Response Response::result(const UbjsonResult& ubjsonResult)
 {
     Response response;
     response.statusCode = Result::toHttpStatus(ubjsonResult.error);
-    response.content = Content{kUbjsonContentType, QnUbjson::serialized(ubjsonResult)};
+    response.content = Content{
+        http::header::ContentType::kUbjson,
+        QnUbjson::serialized(ubjsonResult)};
+
     return response;
 }
 

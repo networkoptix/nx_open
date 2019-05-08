@@ -776,13 +776,20 @@ struct NX_NETWORK_API ContentType
 
     static const ContentType kPlain;
     static const ContentType kHtml;
+    static const ContentType kXml;
+    static const ContentType kForm;
     static const ContentType kJson;
+    static const ContentType kUbjson;
+    static const ContentType kBinary;
 
     StringType value;
     StringType charset;
 
     ContentType(const StringType& headerValue = kPlain.toString());
     StringType toString() const;
+
+    bool operator==(const ContentType& rhs) const;
+    operator StringType() const { return toString(); }
 };
 
 } // namespace header

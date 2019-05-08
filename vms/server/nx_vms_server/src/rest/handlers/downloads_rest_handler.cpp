@@ -16,8 +16,6 @@ using nx::vms::common::p2p::downloader::ResultCode;
 
 namespace {
 
-static const QByteArray kJsonContentType("application/json");
-static const QByteArray kOctetStreamContentType("application/octet-stream");
 static const int kDownloadRequestTimeoutMs = 10 * 60 * 1000;
 static const int kMaxChunkSize = 10 * 1024 * 1024;
 
@@ -331,7 +329,7 @@ int Helper::handleDownloadChunk(const QString& fileName, int chunkIndex)
         return makeDownloaderError(errorCode);
 
     result = data;
-    resultContentType = kOctetStreamContentType;
+    resultContentType = nx::network::http::header::ContentType::kBinary;
     return nx::network::http::StatusCode::ok;
 }
 
@@ -363,7 +361,7 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
         if (errorCode == ResultCode::ok)
         {
             result = data;
-            resultContentType = kOctetStreamContentType;
+            resultContentType = nx::network::http::header::ContentType::kBinary;
             return nx::network::http::StatusCode::ok;
         }
     }
@@ -398,7 +396,7 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
         return nx::network::http::StatusCode::internalServerError;
     }
 
-    resultContentType = kOctetStreamContentType;
+    resultContentType = nx::network::http::header::ContentType::kBinary;
 
     if (useDownloader)
         downloader->writeFileChunk(fileName, chunkIndex, result);
@@ -412,13 +410,13 @@ int Helper::handleUploadChunk(
     const QByteArray& body,
     const QByteArray& contentType)
 {
-    if (contentType != kOctetStreamContentType)
+    if (contentType != nx::network::http::header::ContentType::kBinary)
     {
         return makeError(
             nx::network::http::StatusCode::badRequest,
             QnRestResult::CantProcessRequest,
-            lit("Only %1 Content-Type is supported.").arg(
-                QLatin1String(kOctetStreamContentType)));
+            lm("Only %1 Content-Type is supported.").arg(
+                nx::network::http::header::ContentType::kBinary));
     }
 
     const auto errorCode = downloader->writeFileChunk(fileName, chunkIndex, body);

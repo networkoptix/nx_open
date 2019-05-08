@@ -596,11 +596,31 @@ private:
     template <typename ResultType> Handle executePost(
         const QString& path,
         const QnRequestParamList& params,
+        Callback<ResultType> callback,
+        QThread* targetThread);
+
+    /**
+     * This overload thould only be used if API requires custum message body so paramiters can only
+     * be passed by URL.
+     */
+    template <typename ResultType> Handle executePost(
+        const QString& path,
+        const QnRequestParamList& params,
         const nx::network::http::StringType& contentType,
         const nx::network::http::StringType& messageBody,
         Callback<ResultType> callback,
         QThread* targetThread);
 
+    template <typename ResultType> Handle executePut(
+        const QString& path,
+        const QnRequestParamList& params,
+        Callback<ResultType> callback,
+        QThread* targetThread);
+
+    /**
+     * This overload thould only be used if API requires custum message body so paramiters can only
+     * be passed by URL.
+     */
     template <typename ResultType> Handle executePut(
         const QString& path,
         const QnRequestParamList& params,

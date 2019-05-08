@@ -13,11 +13,6 @@
 
 namespace nx::network::rest {
 
-// TODO: Should probably be moved somewhere into nx::network::http.
-static const http::StringType kFormContentType("application/x-www-form-urlencoded");
-static const http::StringType kJsonContentType("application/json");
-static const http::StringType kUbjsonContentType("application/ubjson");
-
 class Params: public QMultiMap<QString, QString>
 {
 public:
@@ -43,7 +38,7 @@ public:
 
 struct Content
 {
-    http::StringType type;
+    http::header::ContentType type;
     http::StringType body;
 
     std::optional<QJsonValue> parse() const;
