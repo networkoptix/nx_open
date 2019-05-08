@@ -147,7 +147,7 @@ struct Ini: nx::kit::IniConfig
         "Show information about installed plugin libraries in Server Settings.");
     NX_INI_INT(0, connectTimeoutMs,
         "Timeout (in milliseconds) for waiting initial resources message from the server.\n"
-        "If exceeded then connections is dropped to avoid infinite UI loading state. 0 means disabled.");
+        "If exceeded then connections is dropped to avoid infinite UI \"Loading...\" state. 0 means disabled.");
 };
 
 inline Ini& ini()

@@ -142,6 +142,9 @@ private:
 
     void showPreloader();
 
+    /** Limit the time UI spends in "Loading..." state. */
+    void setupConnectTimeoutTimer(int timeoutMs);
+
 private:
     struct
     {

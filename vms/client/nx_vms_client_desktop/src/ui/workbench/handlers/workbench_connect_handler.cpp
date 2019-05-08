@@ -219,33 +219,10 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
         &QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived);
 
     // The initialResourcesReceived signal may never be emitted if the server has issues.
-    // Avoid infinite "UI loading" state by forcibly dropping the connections after a timeout.
+    // Avoid infinite UI "Loading..." state by forcibly dropping the connections after a timeout.
     const auto connectTimeout = ini().connectTimeoutMs;
     if (connectTimeout > 0)
-    {
-        auto connectTimeoutTimer = new QTimer(this);
-        connectTimeoutTimer->setSingleShot(true);
-        connectTimeoutTimer->setInterval(connectTimeout);
-        connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened,
-            connectTimeoutTimer, qOverload<>(&QTimer::start));
-        connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
-            connectTimeoutTimer, &QTimer::stop);
-        connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived,
-            connectTimeoutTimer, &QTimer::stop);
-        connect(connectTimeoutTimer, &QTimer::timeout, this,
-            [this]
-            {
-                disconnectFromServer(DisconnectFlag::Force);
-
-                // Just display the error message.
-                const QnConnectionInfo emptyConnectionInfo;
-                QnConnectionDiagnosticsHelper::validateConnection(
-                    emptyConnectionInfo,
-                    ec2::ErrorCode::serverError,
-                    mainWindowWidget(),
-                    commonModule()->engineVersion());
-            });
-    }
+        setupConnectTimeoutTimer(connectTimeout);
 
     auto userWatcher = context()->instance<QnWorkbenchUserWatcher>();
     connect(userWatcher, &QnWorkbenchUserWatcher::userChanged, this,
@@ -343,6 +320,42 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
         [resourceModeAction]() { resourceModeAction->setChecked(true); });
 
     //m_clientUpdateTool.reset(new nx::vms::client::desktop::ClientUpdateTool(this));
+}
+
+void QnWorkbenchConnectHandler::setupConnectTimeoutTimer(int timeoutMs)
+{
+    auto connectTimeoutTimer = new QTimer(this);
+
+    connectTimeoutTimer->setSingleShot(true);
+    connectTimeoutTimer->setInterval(timeoutMs);
+
+    connect(this, &QnWorkbenchConnectHandler::stateChanged, this,
+        [connectTimeoutTimer](LogicalState logicalValue, PhysicalState /*physicalValue*/)
+        {
+            switch (logicalValue)
+            {
+                case LogicalState::connected:
+                case LogicalState::disconnected:
+                    connectTimeoutTimer->stop();
+                    return;
+                case LogicalState::connecting:
+                case LogicalState::connecting_to_target:
+                    if (!connectTimeoutTimer->isActive())
+                        connectTimeoutTimer->start();
+                    return;
+                default:
+                    return;
+            }
+        });
+    connect(connectTimeoutTimer, &QTimer::timeout, this,
+        [this]
+        {
+            disconnectFromServer(DisconnectFlag::Force);
+            // Just display the error message.
+            QnConnectionDiagnosticsHelper::validateConnection(
+                {}, ec2::ErrorCode::serverError,
+                mainWindowWidget(), commonModule()->engineVersion());
+        });
 }
 
 QnWorkbenchConnectHandler::~QnWorkbenchConnectHandler()
