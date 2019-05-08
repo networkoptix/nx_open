@@ -131,7 +131,7 @@ def page_editor(request):
     context_id = request.POST['context_id']
     language_code = request.POST['language'] if 'language' in request.POST else None
 
-    if not request.user.has_perm('cms.edit_content'):
+    if not UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.edit_content'):
         raise PermissionDenied
 
     preview_link, context_errors, product_errors = context_editor_action(request, product, context_id, language_code)

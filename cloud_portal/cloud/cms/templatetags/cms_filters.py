@@ -64,7 +64,14 @@ def get_review_state(state):
 
 
 @register.simple_tag
-def has_permission(user, permission, customization=settings.CUSTOMIZATION):
+def has_permission(user, product, permission=None):
+    return UserGroupsToProductPermissions.check_permission(user, product, permission)
+
+
+@register.simple_tag
+def has_customization_permission(user, customization, permission):
+    if not customization:
+        customization = settings.CUSTOMIZATION
     return UserGroupsToProductPermissions.check_customization_permission(user, customization, permission)
 
 
