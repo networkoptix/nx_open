@@ -108,17 +108,17 @@ public:
 
     enum class ErrorCode
     {
-        noError,
-        unknownError,
-        internalError,
-        internalDownloaderError,
-        downloadFailed,
+        updatePackageNotFound,
         noFreeSpaceToDownload,
         noFreeSpaceToExtract,
+        downloadFailed,
+        invalidUpdateContents,
         corruptedArchive,
         extractionError,
-        invalidUpdateContents,
-        updatePackageNotFound,
+        internalDownloaderError,
+        internalError,
+        unknownError,
+        noError,
     };
     Q_ENUM(ErrorCode)
 
