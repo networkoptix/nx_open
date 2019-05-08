@@ -26,6 +26,9 @@ Resolver::~Resolver()
 
 ResultCode Resolver::initialize()
 {
+    if (m_impl)
+        return ResultCode::ok;
+
     try
     {
         detail::ResolverImpl * impl = new detail::ResolverImpl(m_settings);
