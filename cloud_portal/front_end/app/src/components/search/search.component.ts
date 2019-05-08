@@ -101,8 +101,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     }
 
     writeValue(value: any): void {
-        this.localFilter.query = this.params.search || '';
-
         // Avoid localFilter update if filter in not initialized (page refresh)
         if (value &&
             ((value.tags && value.tags.length) ||
@@ -115,6 +113,8 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                     (this.localFilter.tags && this.localFilter.tags.length);
 
             // Update model with query params
+            this.localFilter.query = this.params.search || '';
+
             if (this.localFilter.tags.length) {
                 if (this.params.tags) {
                     this.params.tags
@@ -190,9 +190,9 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         this.filterSelected = '';
 
         let flag = 0;
-        let tagsSelected;
-        let selectsSelected;
-        let multiSelectsSelected;
+        let tagsSelected = '';
+        let selectsSelected = '';
+        let multiSelectsSelected = '';
 
         if (this.localFilter.tags) {
             this.localFilter.tags.forEach((filter) => {
@@ -242,16 +242,15 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             });
         }
 
-        if (flag === 1 && this.localFilter.query === '') {
+        if (flag === 1) {
             this.filterSelected = tagsSelected || selectsSelected || multiSelectsSelected;
-            return;
+        } else {
+            const str = (this.numberFilters === 1) ?
+                    ' ' + this.lang.search['filter applied'] :
+                    ' ' + this.lang.search['filters applied'];
+
+            this.filterSelected = this.numberFilters + str;
         }
-
-        const str = (this.numberFilters === 1) ?
-                ' ' + this.lang.search['filter applied'] :
-                ' ' + this.lang.search['filters applied'];
-
-        this.filterSelected = this.numberFilters + str;
     }
 
     clearFilters() {
