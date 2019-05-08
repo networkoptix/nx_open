@@ -2740,6 +2740,10 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
     if (analyticsEnabled && !isAnalyticsSupported())
         return;
 
+    NX_VERBOSE(this, "Setting analytics frames %1 for %2",
+        analyticsEnabled ? "enabled" : "disabled",
+        this);
+
     if (auto reader = display()->archiveReader())
     {
         StreamDataFilters filter = reader->streamDataFilter();
