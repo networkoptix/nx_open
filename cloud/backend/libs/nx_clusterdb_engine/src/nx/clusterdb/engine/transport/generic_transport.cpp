@@ -8,7 +8,7 @@
 namespace nx::clusterdb::engine::transport {
 
 /** Holding in queue not more then this transaction count. */
-static constexpr int kMaxTransactionsPerIteration = 17;
+static constexpr int kMaxTransactionsPerIteration = 117;
 
 GenericTransport::GenericTransport(
     const ProtocolVersionRange& protocolVersionRange,

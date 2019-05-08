@@ -9,7 +9,7 @@
 
 namespace nx::clusterdb::engine::transport::p2p::websocket {
 
-static constexpr int kMaxTransactionsPerIteration = 17;
+static constexpr int kMaxTransactionsPerIteration = 117;
 
 Connection::Connection(
     const ProtocolVersionRange& protocolVersionRange,
