@@ -254,8 +254,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     }
 
     clearFilters() {
-        this.localFilter.query = '';
-
         if (this.localFilter.tags) {
             this.localFilter.tags.forEach((filter) => {
                 filter.value = false;
@@ -279,7 +277,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         this.clearFilters();
         this.numberFilters = 0;
         this.filterSelected = '';
-        this.uri.resetURI(this.uriPath);
+        this.setRouteParams();
         this.onChangeCallback({...this.localFilter});
 
         return false;
