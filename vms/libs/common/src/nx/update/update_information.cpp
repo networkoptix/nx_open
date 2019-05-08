@@ -36,6 +36,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Package, (ubjson)(json)(datastream)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Information, (ubjson)(json)(datastream)(eq), Information_Fields)
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, Code)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, ErrorCode)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Status, (ubjson)(json), UpdateStatus_Fields)
 
 nx::utils::SoftwareVersion UpdateContents::getVersion() const

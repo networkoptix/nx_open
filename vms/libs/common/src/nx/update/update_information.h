@@ -106,8 +106,25 @@ public:
     };
     Q_ENUM(Code)
 
+    enum class ErrorCode
+    {
+        noError,
+        unknownError,
+        internalError,
+        internalDownloaderError,
+        downloadFailed,
+        noFreeSpaceToDownload,
+        noFreeSpaceToExtract,
+        corruptedArchive,
+        extractionError,
+        invalidUpdateContents,
+        updatePackageNotFound,
+    };
+    Q_ENUM(ErrorCode)
+
     QnUuid serverId;
     Code code = Code::idle;
+    ErrorCode errorCode = ErrorCode::noError;
     QString message;
     int progress = 0;
 
@@ -115,20 +132,21 @@ public:
     Status(
         const QnUuid& serverId,
         Code code,
-        const QString& message = QString(),
+        ErrorCode errorCode = ErrorCode::noError,
         int progress = 0)
         :
         serverId(serverId),
         code(code),
-        message(message),
+        errorCode(errorCode),
         progress(progress)
     {}
 };
 
-#define UpdateStatus_Fields (serverId)(code)(progress)(message)
+#define UpdateStatus_Fields (serverId)(code)(errorCode)(progress)(message)
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Status::Code)
-QN_FUSION_DECLARE_FUNCTIONS(Status::Code, (lexical))
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Status::ErrorCode)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Status::Code)(Status::ErrorCode), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS(Status, (ubjson)(json))
 
 /**

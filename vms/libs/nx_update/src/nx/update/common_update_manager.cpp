@@ -43,24 +43,17 @@ update::Status CommonUpdateManager::start()
     update::Status updateStatus;
 
     bool shouldDownload = statusAppropriateForDownload(&package, &updateStatus);
-    NX_DEBUG(
-        this,
-        lm("Start update: ShouldDownload: %1, package valid: %2")
-            .args(shouldDownload, package.isValid()));
+    NX_DEBUG(this, "Start update: ShouldDownload: %1, package valid: %2",
+        shouldDownload, package.isValid());
     if (shouldDownload || !package.isValid())
     {
         m_downloaderFailDetail = DownloaderFailDetail::noError;
         for (const auto& file : downloader()->files())
         {
-            NX_DEBUG(
-                this,
-                lm("Start update: existing file: %1").args(file));
+            NX_DEBUG(this, "Start update: existing file: %1", file);
             if (file.contains("updates/"))
             {
-
-                NX_DEBUG(
-                    this,
-                    lm("Start update: removing file: %1").args(file));
+                NX_DEBUG(this, "Start update: removing file: %1", file);
                 downloader()->deleteFile(file);
             }
         }
@@ -97,39 +90,38 @@ update::Status CommonUpdateManager::start()
     }
 
     const auto addFileResult = downloader()->addFile(fileInformation);
-    NX_DEBUG(
-        this,
-        lm("Downloader::addFile (%1) called. Result is: %2")
-            .args(fileInformation.name, addFileResult));
+    NX_DEBUG(this, "Downloader::addFile (%1) called. Result is: %2",
+        fileInformation.name, addFileResult);
 
     switch (addFileResult)
     {
-    case downloader::ResultCode::ok:
-        return update::Status(
-            peerId,
-            update::Status::Code::downloading,
-            "Started downloading update file");
-    case downloader::ResultCode::fileDoesNotExist:
-    case downloader::ResultCode::ioError:
-    case downloader::ResultCode::invalidChecksum:
-    case downloader::ResultCode::invalidFileSize:
-    case downloader::ResultCode::invalidChunkIndex:
-    case downloader::ResultCode::invalidChunkSize:
-        m_downloaderFailDetail = DownloaderFailDetail::internalError;
-        return update::Status(
-            peerId,
-            update::Status::Code::error,
-            "Downloader experienced internal error");
-    case downloader::ResultCode::noFreeSpace:
-        m_downloaderFailDetail = DownloaderFailDetail::noFreeSpace;
-        return update::Status(peerId, update::Status::Code::error, "Not enough free space");
-    default:
-        NX_ASSERT(false, "Unexpected Downloader::addFile() result");
-        m_downloaderFailDetail = DownloaderFailDetail::internalError;
-        return update::Status(peerId, update::Status::Code::error, "Unknown error");
+        case downloader::ResultCode::ok:
+            return update::Status(peerId, update::Status::Code::downloading);
+        case downloader::ResultCode::fileDoesNotExist:
+        case downloader::ResultCode::ioError:
+        case downloader::ResultCode::invalidChecksum:
+        case downloader::ResultCode::invalidFileSize:
+        case downloader::ResultCode::invalidChunkIndex:
+        case downloader::ResultCode::invalidChunkSize:
+            m_downloaderFailDetail = DownloaderFailDetail::internalError;
+            return update::Status(
+                peerId,
+                update::Status::Code::error,
+                update::Status::ErrorCode::internalDownloaderError);
+        case downloader::ResultCode::noFreeSpace:
+            m_downloaderFailDetail = DownloaderFailDetail::noFreeSpace;
+            return update::Status(
+                peerId,
+                update::Status::Code::error,
+                update::Status::ErrorCode::noFreeSpaceToDownload);
+        default:
+            NX_ASSERT(false, "Unexpected Downloader::addFile() result");
+            m_downloaderFailDetail = DownloaderFailDetail::internalError;
+                return update::Status(
+                    peerId,
+                    update::Status::Code::error,
+                    update::Status::ErrorCode::unknownError);
     }
-
-    return update::Status();
 }
 
 update::Status CommonUpdateManager::status()
@@ -178,19 +170,19 @@ bool CommonUpdateManager::canDownloadFile(
             *outUpdateStatus = update::Status(
                 peerId,
                 update::Status::Code::error,
-                "The downloader experienced internal error");
+                update::Status::ErrorCode::internalDownloaderError);
             return true;
         case DownloaderFailDetail::downloadFailed:
             *outUpdateStatus = update::Status(
                 peerId,
                 update::Status::Code::error,
-                "The downloader failed to get update files");
+                update::Status::ErrorCode::downloadFailed);
             return true;
         case DownloaderFailDetail::noFreeSpace:
             *outUpdateStatus = update::Status(
                 peerId,
                 update::Status::Code::error,
-                "Not enough free space for keeping update files");
+                update::Status::ErrorCode::noFreeSpaceToDownload);
             return true;
     }
 
@@ -202,14 +194,14 @@ bool CommonUpdateManager::canDownloadFile(
             *outUpdateStatus = update::Status(
                 peerId,
                 update::Status::Code::downloading,
-                QString("Downloading file %1").arg(fileInformation.name),
+                update::Status::ErrorCode::noError,
                 fileInformation.calculateDownloadProgress());
             return false;
         case FileInformation::Status::uploading:
             *outUpdateStatus = update::Status(
                 peerId,
                 update::Status::Code::downloading,
-                QString("Uploading file %1").arg(fileInformation.name),
+                update::Status::ErrorCode::noError,
                 fileInformation.calculateDownloadProgress());
             return false;
         case FileInformation::Status::downloaded:
@@ -219,13 +211,13 @@ bool CommonUpdateManager::canDownloadFile(
             *outUpdateStatus = update::Status(
                 peerId,
                 update::Status::Code::error,
-                "Unexpected error");
+                update::Status::ErrorCode::unknownError);
             return true;
         case FileInformation::Status::corrupted:
             *outUpdateStatus = update::Status(
                 peerId,
                 update::Status::Code::error,
-                "Update file is corrupted");
+                update::Status::ErrorCode::corruptedArchive);
             return true;
         }
     }
@@ -241,7 +233,7 @@ bool CommonUpdateManager::canDownloadFile(
             static_cast<double>(requiredSpace) / (1024 * 1024),
             static_cast<double>(deviceFreeSpace) / (1024 * 1024));
         *outUpdateStatus = nx::update::Status(
-            peerId, update::Status::Code::error, "Not enough free space for keeping update files");
+            peerId, update::Status::Code::error, update::Status::ErrorCode::noFreeSpaceToDownload);
         return false;
     }
 
@@ -255,81 +247,79 @@ bool CommonUpdateManager::installerState(update::Status* outUpdateStatus, const 
     case CommonUpdateInstaller::State::ok:
         *outUpdateStatus = update::Status(
             peerId,
-            update::Status::Code::readyToInstall,
-            "Update is ready for installation");
+            update::Status::Code::readyToInstall);
         return false;
     case CommonUpdateInstaller::State::inProgress:
     case CommonUpdateInstaller::State::idle:
         *outUpdateStatus = update::Status(
             peerId,
-            update::Status::Code::preparing,
-            "Update file is being validated");
+            update::Status::Code::preparing);
         return false;
     case CommonUpdateInstaller::State::cleanTemporaryFilesError:
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "Failed to clean up temporary files");
-        return true;
-    case CommonUpdateInstaller::State::corruptedArchive:
-        *outUpdateStatus = update::Status(
-            peerId,
-            update::Status::Code::error,
-            "Update archive is corrupted");
+            update::Status::ErrorCode::internalError);
         return true;
     case CommonUpdateInstaller::State::noFreeSpace:
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "Not enough free space on device");
+            update::Status::ErrorCode::noFreeSpaceToExtract);
         return true;
     case CommonUpdateInstaller::State::brokenZip:
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "Zip archive is broken");
+            update::Status::ErrorCode::corruptedArchive);
         return true;
     case CommonUpdateInstaller::State::wrongDir:
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "Wrong directory");
+            update::Status::ErrorCode::extractionError);
+        outUpdateStatus->message = "Wrong directory";
         return true;
     case CommonUpdateInstaller::State::cantOpenFile:
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "Can't open file");
+            update::Status::ErrorCode::extractionError);
+        outUpdateStatus->message = "Can't open file";
         return true;
     case CommonUpdateInstaller::State::otherError:
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "Other error");
+            update::Status::ErrorCode::extractionError);
+        outUpdateStatus->message = "Other error";
         return true;
     case CommonUpdateInstaller::State::stopped:
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "Installer was unexpectedly stopped");
+            update::Status::ErrorCode::extractionError);
+        outUpdateStatus->message = "Installer was unexpectedly stopped";
         return true;
     case CommonUpdateInstaller::State::busy:
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "Installer is busy");
+            update::Status::ErrorCode::extractionError);
+            outUpdateStatus->message = "Installer is busy";
         return true;
     case CommonUpdateInstaller::State::unknownError:
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "Internal installer error");
+            update::Status::ErrorCode::extractionError);
+            outUpdateStatus->message = "Internal installer error";
         return true;
     case CommonUpdateInstaller::State::updateContentsError:
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "Invalid update archive contents");
+            update::Status::ErrorCode::invalidUpdateContents);
         return true;
     }
 
@@ -341,10 +331,8 @@ update::FindPackageResult CommonUpdateManager::findPackage(
     QString* outMessage) const
 {
     const auto result = update::findPackage(*commonModule(), outPackage, outMessage);
-    NX_DEBUG(
-        this,
-        lm("Find package called. Result: %1, message: %2")
-            .args((int) result, outMessage == nullptr ? "" : *outMessage));
+    NX_DEBUG(this, "Find package called. Result: %1, message: %2",
+        (int) result, outMessage == nullptr ? "" : *outMessage);
     return result;
 }
 
@@ -356,7 +344,7 @@ bool CommonUpdateManager::deserializedUpdateInformation(update::Information* out
 
     if (deserializeResult != nx::update::FindPackageResult::ok)
     {
-        NX_DEBUG(this, lm("%1: Failed to deserialize").args(caller));
+        NX_DEBUG(this, "%1: Failed to deserialize", caller);
         return false;
     }
 
@@ -433,25 +421,25 @@ bool CommonUpdateManager::statusAppropriateForDownload(
             *outStatus = update::Status(
                 commonModule()->moduleGUID(),
                 update::Status::Code::error,
-                message.isEmpty() ? "Failed to find a suitable update package" : message);
+                update::Status::ErrorCode::updatePackageNotFound);
+                outStatus->message =
+                    message.isEmpty() ? "Failed to find a suitable update package" : message;
             return false;
         case update::FindPackageResult::noInfo:
             *outStatus = update::Status(
                 commonModule()->moduleGUID(),
-                update::Status::Code::idle,
-                message.isEmpty() ? "No update information found" : message);
+                update::Status::Code::idle);
+                outStatus->message = message.isEmpty() ? "No update information found" : message;
             return false;
         case update::FindPackageResult::latestUpdateInstalled:
             *outStatus = update::Status(
                 commonModule()->moduleGUID(),
-                update::Status::Code::latestUpdateInstalled,
-                message);
+                update::Status::Code::latestUpdateInstalled);
             return false;
         case update::FindPackageResult::notParticipant:
             *outStatus = update::Status(
-            commonModule()->moduleGUID(),
-                update::Status::Code::idle,
-                message);
+                commonModule()->moduleGUID(),
+                update::Status::Code::idle);
             return false;
     }
 
