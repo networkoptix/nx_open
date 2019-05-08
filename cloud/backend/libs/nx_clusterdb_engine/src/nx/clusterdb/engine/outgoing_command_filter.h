@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/vms/api/data/tran_state_data.h>
+
 #include "command.h"
 
 namespace nx::clusterdb::engine {

@@ -29,9 +29,9 @@ public:
         const ProtocolVersionRange& protocolVersionRange,
         CommandLog* commandLog,
         const OutgoingCommandFilter& filter,
-        const nx::utils::Url& remoteNodeUrl,
-        const std::string& systemId,
-        const std::string& nodeId);
+        const std::string& clusterId,
+        const std::string& nodeId,
+        const nx::utils::Url& remoteNodeUrl);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
@@ -45,7 +45,7 @@ private:
     CommandLog* m_commandLog = nullptr;
     const OutgoingCommandFilter& m_commandFilter;
     nx::utils::Url m_remoteNodeUrl;
-    const std::string m_systemId;
+    const std::string m_clusterId;
     int m_stage2TryCount = 0;
 
     std::unique_ptr<network::http::AsyncClient> m_connectionUpgradeClient;

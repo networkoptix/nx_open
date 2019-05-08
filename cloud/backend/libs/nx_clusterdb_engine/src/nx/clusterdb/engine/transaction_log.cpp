@@ -15,11 +15,13 @@ const ReadCommandsFilter ReadCommandsFilter::kEmptyFilter = {
     {}};
 
 CommandLog::CommandLog(
+    const SynchronizationSettings& settings,
     const QnUuid& peerId,
     const ProtocolVersionRange& supportedProtocolRange,
     nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
     AbstractOutgoingCommandDispatcher* const outgoingTransactionDispatcher)
     :
+    m_settings(settings),
     m_peerId(peerId),
     m_supportedProtocolRange(supportedProtocolRange),
     m_dbManager(dbManager),
@@ -60,7 +62,8 @@ void CommandLog::startDbTransaction(
             onDbUpdateCompleted = std::move(onDbUpdateCompleted)](nx::sql::DBResult dbResult)
         {
             onDbUpdateCompleted(dbResult);
-        });
+        },
+        m_settings.groupCommandsUnderDbTransaction ? "commands_group" : "");
 }
 
 nx::sql::DBResult CommandLog::updateTimestampHiForSystem(
@@ -120,8 +123,6 @@ CommandHeader CommandLog::prepareLocalTransactionHeader(
     const std::string& systemId,
     int commandCode)
 {
-    CommandHeader header;
-
     int transactionSequence = 0;
     vms::api::Timestamp transactionTimestamp;
     std::tie(transactionSequence, transactionTimestamp) =
@@ -129,9 +130,7 @@ CommandHeader CommandLog::prepareLocalTransactionHeader(
 
     // Generating transaction.
     // Filling transaction header.
-    header.command = static_cast<::ec2::ApiCommand::Value>(commandCode);
-    header.peerID = m_peerId;
-    header.transactionType = ::ec2::TransactionType::Cloud;
+    CommandHeader header(commandCode, m_peerId);
     header.persistentInfo.dbID = QnUuid::fromArbitraryData(systemId);
     header.persistentInfo.sequence = transactionSequence;
     header.persistentInfo.timestamp = transactionTimestamp;

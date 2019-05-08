@@ -41,9 +41,9 @@ class TestTransaction:
 {
 public:
     TestTransaction(const QnUuid& peerId, CommandLogCache::TranId tranId):
-        m_header(peerId),
         m_tranId(tranId)
     {
+        m_header.peerID = peerId;
     }
 
     virtual nx::Buffer serialize(
@@ -212,7 +212,7 @@ protected:
         m_testOutgoingTransactionDispatcher.clear();
         for (const auto& transaction: m_transactionsGenerated)
         {
-            ASSERT_TRUE(transaction.unique());
+            ASSERT_EQ(1, transaction.use_count());
         }
     }
 

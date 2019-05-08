@@ -17,7 +17,7 @@ public:
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& peerId,
-        RelayInstanceSearchCompletionHandler completionHandler) override;
+        RelayInstanceSelectCompletionHandler completionHandler) override;
 
     virtual void findRelayInstancePeerIsListeningOn(
         const std::string& peerId,

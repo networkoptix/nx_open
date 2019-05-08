@@ -7,8 +7,9 @@
 
 #include <nx/clusterdb/engine/transaction_log_cache.h>
 
-namespace nx::clusterdb::engine {
-namespace test {
+#include "customer_db/data.h"
+
+namespace nx::clusterdb::engine::test {
 
 class CommandLogCache:
     public ::testing::Test
@@ -136,10 +137,9 @@ protected:
 
     CommandHeader prepareTransaction(TranId tranId)
     {
-        auto transactionHeader = CommandHeader(QnUuid(m_peerId));
-        transactionHeader.peerID = QnUuid(m_peerId);
-        transactionHeader.command = ::ec2::ApiCommand::saveCamera;
-        transactionHeader.transactionType = ::ec2::TransactionType::Cloud;
+        CommandHeader transactionHeader(
+            command::SaveCustomer::code,
+            QnUuid(m_peerId));
         transactionHeader.persistentInfo.sequence =
             m_cache.generateTransactionSequence(
                 vms::api::PersistentIdData(QnUuid(m_peerId), m_dbId));
@@ -267,5 +267,4 @@ TEST_F(CommandLogCache, timestamp_is_not_decreasing)
     ASSERT_GT(timestampAfter, timestampBefore);
 }
 
-} // namespace test
-} // namespace nx::clusterdb::engine
+} // namespace nx::clusterdb::engine::test

@@ -13,7 +13,7 @@ public:
 protected:
     void whenTryToConnectToServerOnDifferentMediator()
     {
-        auto& mediator = m_mediatorCluster.mediator(1);
+        auto& mediator = m_mediatorCluster->mediator(1);
 
         m_udpClient =
             std::make_unique<api::MediatorClientUdpConnection>(mediator.stunUdpEndpoint());
@@ -39,8 +39,8 @@ protected:
     void andConnectionToDifferentMediatorIsEstablished()
     {
         ASSERT_EQ(
-            m_mediatorCluster.mediator(0).stunUdpEndpoint(),
-            m_connectionHeader.locationEndpoint);
+            m_mediatorCluster->mediator(0).stunUdpEndpoint().toString(),
+            m_connectionHeader.locationEndpoint.toString());
     }
 
 private:

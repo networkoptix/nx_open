@@ -4,9 +4,7 @@
 
 #include <nx/network/cloud/mediator/api/mediator_api_client.h>
 #include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
-#include <nx/cloud/discovery/test_support/discovery_server.h>
-
-#include "mediator_cluster.h"
+#include <nx/cloud/mediator/test_support/mediator_cluster.h>
 
 namespace nx::hpm::test {
 
@@ -15,7 +13,6 @@ class MediatorScalabilityTestFixture:
     public api::AbstractCloudSystemCredentialsProvider
 {
 protected:
-    static constexpr char kClusterId[] = "mediator_test_cluster";
     static constexpr int kMaxMediators = 2;
 
 public:
@@ -44,7 +41,7 @@ protected:
 
 protected:
     nx::cloud::discovery::test::DiscoveryServer m_discoveryServer;
-    MediatorCluster m_mediatorCluster;
+    std::unique_ptr<MediatorCluster> m_mediatorCluster;
 
     AbstractCloudDataProvider::System m_system;
     std::unique_ptr<MediaServerEmulator> m_mediaServer;

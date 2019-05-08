@@ -8,6 +8,7 @@
 #include <nx/utils/counter.h>
 #include <nx/sql/db_instance_controller.h>
 
+#include <nx/clusterdb/engine/command_data.h>
 #include <nx/clusterdb/engine/serialization/transaction_serializer.h>
 #include <nx/clusterdb/engine/transaction_log.h>
 
@@ -41,7 +42,7 @@ public:
         data::SystemId systemId,
         std::function<void(
             api::Result,
-            ::ec2::ApiTransactionDataList)> completionHandler);
+            nx::clusterdb::engine::CommandDataList)> completionHandler);
 
     void getStatistics(
         const AuthorizationInfo& authzInfo,
@@ -62,7 +63,7 @@ private:
         vms::api::TranState readedUpTo,
         std::function<void(
             api::Result,
-            ::ec2::ApiTransactionDataList)> completionHandler);
+            nx::clusterdb::engine::CommandDataList)> completionHandler);
 };
 
 } // namespace nx::cloud::db

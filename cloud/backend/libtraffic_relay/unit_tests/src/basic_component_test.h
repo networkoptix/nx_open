@@ -6,7 +6,7 @@
 #include <nx/sql/test_support/test_with_db_helper.h>
 #include <nx/cloud/discovery/test_support/discovery_server.h>
 
-#include <nx/cloud/relay/relay_service.h>
+#include <nx/cloud/relay/test_support/traffic_relay_cluster.h>
 
 #include "remote_relay_peer_pool.h"
 
@@ -15,15 +15,7 @@ namespace cloud {
 namespace relay {
 namespace test {
 
-class Relay:
-    public utils::test::ModuleLauncher<relay::RelayService>
-{
-public:
-    Relay();
-    ~Relay();
-
-    nx::utils::Url basicUrl() const;
-};
+using Relay = TrafficRelay;
 
 //-------------------------------------------------------------------------------------------------
 
@@ -58,8 +50,8 @@ public:
 private:
     nx::cloud::discovery::test::DiscoveryServer m_discoveryServer;
     bool m_serverListening = false;
+    std::unique_ptr<TrafficRelayCluster> m_relayCluster;
     ListeningPeerPool m_listeningPeerPool;
-    std::vector<std::unique_ptr<Relay>> m_relays;
     std::optional<model::RemoteRelayPeerPoolFactory::Function> m_factoryFunctionBak;
 };
 

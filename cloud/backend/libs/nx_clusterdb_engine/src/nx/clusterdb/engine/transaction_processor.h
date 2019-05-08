@@ -244,7 +244,9 @@ private:
                 lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
                 .args(CommandDescriptor::name, transactionContext.transportHeader.systemId,
                     transactionContext.transportHeader.endpoint));
-            return dbResultCode;
+            // Command cancellation is not a DB-level error, but a logical one.
+            // So, providing nx::sql::DBResult::ok. Otherwise, the connection will be broken.
+            return nx::sql::DBResult::ok;
         }
         else if (dbResultCode != nx::sql::DBResult::ok)
         {

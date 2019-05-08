@@ -12,6 +12,8 @@ namespace nx {
 namespace hpm {
 namespace test {
 
+namespace detail { class RelayClusterClientStub; }
+
 class MediatorRelayIntegrationTestSetup:
     public MediatorFunctionalTest,
     public api::AbstractCloudSystemCredentialsProvider
@@ -23,6 +25,7 @@ public:
 protected:
     virtual void SetUp() override;
 
+    void addTrafficRelayUrl(const QString& url);
     void issueListenRequest();
     void givenListeningServer();
     void issueConnectRequest();
@@ -30,7 +33,12 @@ protected:
     std::optional<nx::String> reportedTrafficRelayUrl();
 
 private:
-    const QUrl m_relayUrl;
+    void assertUrlsEquality(
+        const std::vector<QUrl>& expected,
+        const std::vector<nx::String>& test);
+
+private:
+    std::vector<QUrl> m_relayUrls;
     api::ResultCode m_lastRequestResult = api::ResultCode::ok;
     boost::optional<api::ListenResponse> m_listenResponse;
     boost::optional<api::ConnectResponse> m_connectResponse;
@@ -40,6 +48,7 @@ private:
     api::SystemCredentials m_systemCredentials;
     std::unique_ptr<MediaServerEmulator> m_mediaServerEmulator;
     RelayClusterClientFactory::Function m_factoryFuncBak;
+    detail::RelayClusterClientStub* m_relayClusterClientStub = nullptr;
 
     virtual std::optional<api::SystemCredentials> getSystemCredentials() const override;
 

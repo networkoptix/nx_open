@@ -20,6 +20,7 @@
 #include "dao/abstract_transaction_data_object.h"
 #include "outgoing_transaction_dispatcher.h"
 #include "outgoing_transaction_sorter.h"
+#include "p2p_sync_settings.h"
 #include "result_code.h"
 #include "serialization/transaction_serializer.h"
 #include "serialization/ubjson_serialized_transaction.h"
@@ -69,6 +70,7 @@ public:
      * @throw std::runtime_error In case of failure to pre-fill data cache.
      */
     CommandLog(
+        const SynchronizationSettings& settings,
         const QnUuid& peerId,
         const ProtocolVersionRange& supportedProtocolRange,
         nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
@@ -278,6 +280,7 @@ private:
         vms::api::TranState state;
     };
 
+    const SynchronizationSettings m_settings;
     const QnUuid m_peerId;
     const ProtocolVersionRange m_supportedProtocolRange;
     nx::sql::AbstractAsyncSqlQueryExecutor* m_dbManager = nullptr;

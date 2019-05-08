@@ -1,5 +1,8 @@
 #pragma once
 
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/ubjson_reader.h>
+
 #include "serializable_transaction.h"
 
 namespace nx::clusterdb::engine {

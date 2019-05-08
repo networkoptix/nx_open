@@ -20,28 +20,14 @@ std::optional<nx::hpm::api::SystemCredentials> MediatorScalabilityTestFixture::g
 void MediatorScalabilityTestFixture::SetUp()
 {
     ASSERT_TRUE(m_discoveryServer.bindAndListen());
+    m_mediatorCluster = std::make_unique<MediatorCluster>(m_discoveryServer.url());
 }
 
 void MediatorScalabilityTestFixture::addMediator()
 {
-    std::string nodeId = lm("mediator_%1").arg(m_mediatorCluster.size()).toStdString();
-    std::string discoveryServiceUrl = m_discoveryServer.url().toStdString();
-    std::string maxMediatorCount = std::to_string(kMaxMediators);
-
-    auto& mediator = m_mediatorCluster.addMediator({
+    auto& mediator = m_mediatorCluster->addMediator({
         "-https/listenOn", "127.0.0.1",
-        "-http/connectionInactivityTimeout", "10m",
-        "-server/name", "127.0.0.1",
-        "-listeningPeerDb/connectionRetryDelay", "100ms",
-        "-listeningPeerDb/cluster/discovery/enabled", "true",
-        "-listeningPeerDb/cluster/discovery/discoveryServiceUrl", discoveryServiceUrl.c_str(),
-        "-listeningPeerDb/cluster/discovery/roundTripPadding", "1ms",
-        "-listeningPeerDb/cluster/discovery/registrationErrorDelay", "10ms",
-        "-listeningPeerDb/cluster/discovery/onlineNodesRequestDelay", "10ms",
-        "-listeningPeerDb/cluster/nodeConnectRetryTimeout", "100ms",
-        "-listeningPeerDb/cluster/clusterId", kClusterId,
-        "-listeningPeerDb/cluster/nodeId", nodeId.c_str(),
-        "-listeningPeerDb/cluster/maxConcurrentConnectionsFromSystem", maxMediatorCount.c_str()});
+        "-http/connectionInactivityTimeout", "10m"});
 
     ASSERT_TRUE(mediator.startAndWaitUntilStarted());
 }
@@ -63,8 +49,8 @@ void MediatorScalabilityTestFixture::givenSynchronizedClusterWithListeningServer
 
 void MediatorScalabilityTestFixture::whenAddServer()
 {
-    m_system = m_mediatorCluster.mediator(0).addRandomSystem();
-    m_mediaServer = m_mediatorCluster.mediator(0).addRandomServer(m_system);
+    m_system = m_mediatorCluster->mediator(0).addRandomSystem();
+    m_mediaServer = m_mediatorCluster->mediator(0).addRandomServer(m_system);
     m_mediaServerFullName = m_mediaServer->fullName().toStdString();
 
     auto resultCodeAndResponse = m_mediaServer->listen();
@@ -78,13 +64,13 @@ void MediatorScalabilityTestFixture::whenMediaServerGoesOffline()
 
 void MediatorScalabilityTestFixture::thenServerInfoIsSynchronized()
 {
-    while (!m_mediatorCluster.peerInformationSynchronizedInCluster(m_mediaServerFullName))
+    while (!m_mediatorCluster->peerInformationSynchronizedInCluster(m_mediaServerFullName))
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
 
 void MediatorScalabilityTestFixture::thenServerInfoIsDroppedFromCluster()
 {
-    while (!m_mediatorCluster.peerInformationIsAbsentFromCluster(m_mediaServerFullName))
+    while (!m_mediatorCluster->peerInformationIsAbsentFromCluster(m_mediaServerFullName))
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
 

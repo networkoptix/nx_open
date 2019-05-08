@@ -2,8 +2,6 @@
 
 #include <type_traits>
 
-#include <nx/clusterdb/engine/transport/connector_factory.h>
-
 #include <nx/utils/random.h>
 
 #include "cluster_test_fixture.h"
@@ -18,14 +16,7 @@ class Synchronization:
 public:
     Synchronization()
     {
-        m_factoryFunctionBak =
-            ConnectorTypeInstaller::configureFactory(&transport::ConnectorFactory::instance());
-    }
-
-    ~Synchronization()
-    {
-        transport::ConnectorFactory::instance().setCustomFunc(
-            std::exchange(m_factoryFunctionBak, nullptr));
+        setConnectorTypeKey(ConnectorTypeInstaller::kConnectorTypeKey);
     }
 
 protected:
@@ -127,9 +118,6 @@ protected:
         for (int peerId: peerIds)
             this->peer(peerId).process().stop();
     }
-
-private:
-    transport::ConnectorFactory::Function m_factoryFunctionBak;
 };
 
 TYPED_TEST_CASE_P(Synchronization);
