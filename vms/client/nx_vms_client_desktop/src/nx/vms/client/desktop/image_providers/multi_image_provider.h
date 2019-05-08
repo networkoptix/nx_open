@@ -1,9 +1,12 @@
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtGui/QImage>
-#include "image_provider.h"
 #include <memory>
+
+#include <QtCore/QObject>
+#include <QtCore/QMap>
+#include <QtGui/QImage>
+
+#include "image_provider.h"
 
 namespace nx::vms::client::desktop {
 
@@ -15,8 +18,11 @@ class MultiImageProvider: public ImageProvider
 public:
     typedef std::vector<std::unique_ptr<ImageProvider>> Providers;
 
-    MultiImageProvider(Providers providers, Qt::Orientation orientation, int spacing,
-        QObject *parent = 0);
+    MultiImageProvider(
+        Providers providers,
+        Qt::Orientation orientation,
+        int spacing,
+        QObject* parent = nullptr);
     virtual ~MultiImageProvider() override = default;
 
     virtual QImage image() const override;

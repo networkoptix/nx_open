@@ -1,5 +1,6 @@
 #include "graphics_scroll_area.h"
 
+#include <QtGui/QFontMetrics>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 

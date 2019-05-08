@@ -1,5 +1,6 @@
 #include "analytics_search_synchronizer.h"
 
+#include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_item_index.h>
 
@@ -12,8 +13,10 @@
 #include <ui/workbench/workbench_navigator.h>
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/analytics/analytics_objects_visualization_manager.h>
+#include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
+#include <nx/vms/client/desktop/utils/video_cache.h>
 
 namespace nx::vms::client::desktop {
 
@@ -39,14 +42,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     NX_CRITICAL(m_objectsVisualizationManager);
 
     connect(this, &AbstractSearchSynchronizer::mediaWidgetAboutToBeChanged, this,
-        [this](QnMediaResourceWidget* mediaWidget)
-        {
-            if (!mediaWidget)
-                return;
-
-            QObject::disconnect(m_activeMediaWidgetConnection);
-            mediaWidget->unsetAreaSelectionType(QnMediaResourceWidget::AreaType::analytics);
-        });
+        [this]() { QObject::disconnect(m_activeMediaWidgetConnection); });
 
     connect(this, &AbstractSearchSynchronizer::mediaWidgetChanged, this,
         [this](QnMediaResourceWidget* mediaWidget)
@@ -66,6 +62,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         [this]()
         {
             updateAreaSelection();
+            updateCachedDevices();
             updateTimelineDisplay();
             updateAllMediaResourceWidgetsAnalyticsMode();
         });
@@ -74,18 +71,14 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         this, &AnalyticsSearchSynchronizer::updateAreaSelection);
 
     connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::areaSelectionRequested, this,
+        [this]() { setAreaSelectionActive(true); });
+
+    connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::cameraSetChanged, this,
         [this]()
         {
-            const auto mediaWidget = this->mediaWidget();
-            if (mediaWidget && active())
-            {
-                mediaWidget->setAreaSelectionEnabled(
-                    QnMediaResourceWidget::AreaType::analytics, true);
-            }
+            updateCachedDevices();
+            updateTimelineDisplay();
         });
-
-    connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::cameraSetChanged,
-        this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
 
     connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::textFilterChanged,
         this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
@@ -166,22 +159,30 @@ bool AnalyticsSearchSynchronizer::calculateMediaResourceWidgetAnalyticsEnabled(
 void AnalyticsSearchSynchronizer::updateAreaSelection()
 {
     const auto mediaWidget = this->mediaWidget();
-    if (!mediaWidget || !m_analyticsSearchWidget)
+    if (!mediaWidget || !m_analyticsSearchWidget || !active())
         return;
-
-    if (!active())
-    {
-        mediaWidget->unsetAreaSelectionType(QnMediaResourceWidget::AreaType::analytics);
-        return;
-    }
 
     m_analyticsSearchWidget->setFilterRect(m_analyticsSearchWidget->areaSelectionEnabled()
         ? mediaWidget->analyticsFilterRect()
         : QRectF());
+}
 
-    mediaWidget->setAreaSelectionType(m_analyticsSearchWidget->areaSelectionEnabled()
-        ? QnMediaResourceWidget::AreaType::analytics
-        : QnMediaResourceWidget::AreaType::none);
+void AnalyticsSearchSynchronizer::updateCachedDevices()
+{
+    if (!ini().cacheLiveVideoForRightPanelPreviews)
+        return;
+
+    if (auto cache = qnClientModule->videoCache())
+    {
+        QnUuidSet cachedDevices;
+        if (active())
+        {
+            for (const auto& camera: m_analyticsSearchWidget->cameras())
+                cachedDevices.insert(camera->getId());
+        }
+
+        cache->setCachedDevices(intptr_t(this), cachedDevices);
+    }
 }
 
 void AnalyticsSearchSynchronizer::updateTimelineDisplay()
@@ -212,6 +213,17 @@ void AnalyticsSearchSynchronizer::updateMediaResourceWidgetAnalyticsMode(
     QnMediaResourceWidget* widget)
 {
     widget->setAnalyticsEnabled(calculateMediaResourceWidgetAnalyticsEnabled(widget));
+
+    if (active())
+    {
+        widget->setAreaSelectionType(QnMediaResourceWidget::AreaType::analytics);
+        widget->setAreaSelectionEnabled(m_areaSelectionActive);
+    }
+    else
+    {
+        widget->setAreaSelectionEnabled(QnMediaResourceWidget::AreaType::analytics, false);
+        widget->unsetAreaSelectionType(QnMediaResourceWidget::AreaType::analytics);
+    }
 }
 
 void AnalyticsSearchSynchronizer::updateAllMediaResourceWidgetsAnalyticsMode()
@@ -228,7 +240,16 @@ void AnalyticsSearchSynchronizer::handleWidgetAnalyticsFilterRectChanged()
     updateAreaSelection();
 
     // Stop selection after selecting once.
-    mediaWidget()->setAreaSelectionEnabled(QnMediaResourceWidget::AreaType::analytics, false);
+    setAreaSelectionActive(false);
+}
+
+void AnalyticsSearchSynchronizer::setAreaSelectionActive(bool value)
+{
+    if (m_areaSelectionActive == value)
+        return;
+
+    m_areaSelectionActive = value;
+    updateAllMediaResourceWidgetsAnalyticsMode();
 }
 
 } // namespace nx::vms::client::desktop

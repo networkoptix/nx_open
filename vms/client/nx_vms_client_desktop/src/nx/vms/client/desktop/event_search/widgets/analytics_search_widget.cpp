@@ -25,6 +25,7 @@
 #include <core/resource_management/resource_changes_listener.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/dialogs/common/message_box.h>
 
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
@@ -393,9 +394,6 @@ void AnalyticsSearchWidget::Private::setAreaSelectionEnabled(bool value)
 
 void AnalyticsSearchWidget::Private::updateAreaButtonAppearance()
 {
-    if (!m_areaSelectionEnabled)
-        return;
-
     m_areaSelectionButton->setState(m_model->filterRect().isValid()
         ? SelectableTextButton::State::unselected
         : SelectableTextButton::State::deactivated);

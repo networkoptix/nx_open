@@ -4,6 +4,7 @@
 #include <string>
 #include <QString>
 
+#include <nx/vms/api/types_fwd.h>
 #include <nx/vms/server/resource/multicast_parameters.h>
 
 struct QnCameraAdvancedParams;

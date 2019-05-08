@@ -1,6 +1,6 @@
 #include "selection_item.h"
 
-#include <cassert>
+#include <cmath>
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyle>
@@ -15,10 +15,9 @@ using nx::vms::client::core::Geometry;
 // SelectionItem
 // -------------------------------------------------------------------------- //
 SelectionItem::SelectionItem(QGraphicsItem *parent):
-    base_type(parent),
-    m_viewport(NULL)
+    base_type(parent)
 {
-    setAcceptedMouseButtons(0);
+    setAcceptedMouseButtons(Qt::NoButton);
 
     /* Initialize colors with some sensible defaults. Calculations are taken from XP style. */
     QPalette palette = QApplication::style()->standardPalette();

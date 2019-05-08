@@ -2,6 +2,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/widgets/transitioner_widget.h>
 
 namespace nx::vms::client::desktop {

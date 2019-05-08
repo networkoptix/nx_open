@@ -6,6 +6,8 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QPointer>
 
+#include <QtGui/QImage>
+
 #include <QtQuick/QSGSimpleMaterialShader>
 
 #include <nx/client/core/motion/motion_grid.h>

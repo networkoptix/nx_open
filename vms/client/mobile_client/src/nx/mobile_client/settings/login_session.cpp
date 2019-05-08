@@ -10,25 +10,25 @@ QnLoginSession::QnLoginSession():
 QVariantMap QnLoginSession::toVariant() const
 {
     QVariantMap variant;
-    variant[lit("sessionId")] = id.toString();
-    variant[lit("systemName")] = systemName;
-    variant[lit("address")] = url.host();
-    variant[lit("port")] = url.port();
-    variant[lit("user")] = url.userName();
-    variant[lit("password")] = url.password();
+    variant[QStringLiteral("sessionId")] = id.toString();
+    variant[QStringLiteral("systemName")] = systemName;
+    variant[QStringLiteral("address")] = url.host();
+    variant[QStringLiteral("port")] = url.port();
+    variant[QStringLiteral("user")] = url.userName();
+    variant[QStringLiteral("password")] = url.password();
     return variant;
 }
 
 QnLoginSession QnLoginSession::fromVariant(const QVariantMap& variant)
 {
     QnLoginSession session;
-    session.id = QnUuid::fromStringSafe(variant[lit("sessionId")].toString());
-    session.systemName = variant[lit("systemName")].toString();
+    session.id = QnUuid::fromStringSafe(variant[QStringLiteral("sessionId")].toString());
+    session.systemName = variant[QStringLiteral("systemName")].toString();
     session.url = nx::network::url::Builder()
-        .setScheme(lit("http"))
-        .setHost(variant[lit("address")].toString())
-        .setPort(variant.value(lit("port"), -1).toInt())
-        .setUserName(variant[lit("user")].toString())
-        .setPassword(variant[lit("password")].toString());
+        .setScheme(QStringLiteral("http"))
+        .setHost(variant[QStringLiteral("address")].toString())
+        .setPort(variant.value(QStringLiteral("port"), -1).toInt())
+        .setUserName(variant[QStringLiteral("user")].toString())
+        .setPassword(variant[QStringLiteral("password")].toString());
     return session;
 }

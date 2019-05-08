@@ -140,11 +140,15 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(1024, rightPanelMaxThumbnailWidth,
         "Maximum image width, in pixels, that Right Panel can request from a server.");
     NX_INI_INT(0, backgroupdUpdateCheckPeriodOverrideSec,
-        "Period to check for new updates, in seconds. Set to zero to use the built-in value.");
+        "Period to check for new updates, in seconds. Set to zero to use built-in value.");
     NX_INI_FLAG(1, rightPanelHoverPreviewCrop,
         "Whether mouse hover toggles crop mode on Right Panel tiles and tooltips.");
     NX_INI_FLAG(0, pluginInformationInServerSettings,
         "Show information about installed plugin libraries in Server Settings.");
+    NX_INI_FLAG(0, cacheLiveVideoForRightPanelPreviews,
+        "Cache live video to obtain right panel previews without querying the server.");
+    NX_INI_INT(0, globalLiveVideoCacheLength,
+        "Global live video cache length, in seconds. Set to zero to use built-in value.");
 };
 
 inline Ini& ini()

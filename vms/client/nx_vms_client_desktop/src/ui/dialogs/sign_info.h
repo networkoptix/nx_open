@@ -1,16 +1,19 @@
-#ifndef __SIGN_INGO_H__
-#define __SIGN_INGO_H__
+#pragma once
 
 #include <QtWidgets/QLabel>
 #include <QtCore/QTimer>
+
+#include <nx/utils/thread/mutex.h>
+
 #include "export/sign_helper.h"
 
 // TODO: #GDM #3.1 not a dialog, a label! move to widgets!
 class QnSignInfo: public QLabel
 {
     Q_OBJECT
+
 public:
-    QnSignInfo(QWidget* parent = 0);
+    QnSignInfo(QWidget* parent = nullptr);
 
     void setImageSize(int width, int height);
     void setDrawDetailTextMode(bool value); // draw detail text instead of match info
@@ -32,5 +35,3 @@ private:
     QTimer m_timer;
     bool m_DrawDetailText;
 };
-
-#endif // __SIGN_INGO_H__

@@ -1,10 +1,12 @@
-#ifndef __MULTICAST_HTTP_SERVER_H__
-#define __MULTICAST_HTTP_SERVER_H__
+#pragma once
+
+#include <memory>
+
+#include <nx/network/http/http_async_client.h>
+#include <nx/utils/uuid.h>
 
 #include "core/multicast/multicast_http_fwd.h"
 #include "core/multicast/multicast_http_transport.h"
-#include <memory>
-#include <nx/network/http/http_async_client.h>
 
 class QThread;
 class QnTcpListener;
@@ -30,6 +32,3 @@ namespace QnMulticast
         QnTcpListener* m_tcpListener;
     };
 }
-
-
-#endif // __MULTICAST_HTTP_SERVER_H__

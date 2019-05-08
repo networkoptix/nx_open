@@ -2,6 +2,8 @@
 
 #include <QtQuick/QQuickItem>
 
+#include <nx/utils/log/assert.h>
+
 #include "../redux/server_settings_dialog_store.h"
 
 namespace nx::vms::client::desktop {

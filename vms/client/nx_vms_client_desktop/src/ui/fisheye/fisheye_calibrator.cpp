@@ -1,7 +1,10 @@
 #include "fisheye_calibrator.h"
 
 extern "C" {
+
 #include <libavutil/imgutils.h>
+#include <libswscale/swscale.h>
+
 } // extern "C"
 
 struct Distance

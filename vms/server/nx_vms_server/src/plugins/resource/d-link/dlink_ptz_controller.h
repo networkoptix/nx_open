@@ -4,7 +4,10 @@
 #ifdef ENABLE_ONVIF
 
 #include <QtCore/QScopedPointer>
+
 #include <core/ptz/basic_ptz_controller.h>
+
+#include <nx/utils/thread/mutex.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 
 class QnPlOnvifResource;

@@ -8,6 +8,8 @@
 #include <ui/widgets/business/abstract_business_params_widget.h>
 #include <nx/utils/uuid.h>
 
+class QPushButton;
+
 namespace nx { namespace vms { namespace event {
 class QnBusinessStringsHelper;
 }}} // namespace nx::vms::event

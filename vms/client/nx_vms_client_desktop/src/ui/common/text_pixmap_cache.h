@@ -1,11 +1,9 @@
-#ifndef QN_TEXT_PIXMAP_CACHE_H
-#define QN_TEXT_PIXMAP_CACHE_H
+#pragma once
 
 #include <QtCore/QObject>
+#include <QtGui/QPixmap>
 
-class QPixmap;
 class QFont;
-class QColor;
 
 class QnTextPixmapCachePrivate;
 
@@ -58,5 +56,3 @@ struct QnTextPixmap
     {
     }
 };
-
-#endif // QN_TEXT_PIXMAP_CACHE_H

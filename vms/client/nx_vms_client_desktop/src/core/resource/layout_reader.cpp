@@ -14,6 +14,8 @@
 
 #include <client_core/client_core_module.h>
 
+#include <client/client_globals.h>
+
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 

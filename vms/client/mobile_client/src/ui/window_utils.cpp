@@ -3,6 +3,8 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QWindow>
 
+#include <nx/utils/log/log.h>
+
 QWindow *getMainWindow()
 {
     QWindowList windows = qApp->topLevelWindows();
@@ -51,7 +53,7 @@ QWindow *getMainWindow()
 
     void makeShortVibration()
     {
-        qWarning() << "short vibration ";
+        NX_WARNING(NX_SCOPE_TAG, "Short vibration...");
     }
 
 #endif // !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)

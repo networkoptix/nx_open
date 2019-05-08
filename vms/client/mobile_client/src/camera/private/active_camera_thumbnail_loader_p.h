@@ -2,6 +2,7 @@
 
 #include <QtCore/QThread>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QMutex>
 
 #include "../active_camera_thumbnail_loader.h"
 

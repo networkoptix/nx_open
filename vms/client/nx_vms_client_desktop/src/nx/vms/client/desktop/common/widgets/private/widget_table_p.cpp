@@ -8,6 +8,7 @@
 
 #include <utils/common/event_processors.h>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/delegates/widget_table_delegate.h>
 
 namespace nx::vms::client::desktop {

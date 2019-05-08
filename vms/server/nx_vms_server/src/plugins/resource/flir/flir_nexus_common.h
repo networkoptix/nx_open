@@ -1,5 +1,9 @@
 #pragma once
 
+#include <chrono>
+
+#include <QtCore/QString>
+
 namespace nx {
 namespace plugins {
 namespace flir {
@@ -7,12 +11,12 @@ namespace nexus {
 
 const quint16 kDefaultNexusPort = 8090;
 
-const QString kAlarmPrefix = lit("$ALARM");
-const QString kThgSpotPrefix = lit("$THGSPOT");
-const QString kThgAreaPrefix = lit("$THGAREA");
-const QString kMdAreaPrefix = lit("$MD");
-const QString kDigitalInputPrefix = lit("$DI");
-const QString kDigitalOutputPrefix = lit("$DO");
+const QString kAlarmPrefix = "$ALARM";
+const QString kThgSpotPrefix = "$THGSPOT";
+const QString kThgAreaPrefix = "$THGAREA";
+const QString kMdAreaPrefix = "$MD";
+const QString kDigitalInputPrefix = "$DI";
+const QString kDigitalOutputPrefix = "$DO";
 
 const int kMdDeviceType = 12;
 const int kIODeviceType = 28;
@@ -20,37 +24,37 @@ const int kThgObjectDeviceType = 5;
 const int kThgSpotDeviceType = 53;
 const int kThgAreaDeviceType = 54;
 
-const QString kCommandPrefix = lit("Nexus.cgi");
-const QString kControlPrefix = lit("NexusWS.cgi");
-const QString kSubscriptionPrefix = lit("NexusWS_Status.cgi");
-const QString kServerWhoAmICommand = lit("SERVERWhoAmI");
-const QString kRequestControlCommand = lit("SERVERRemoteControlRequest");
-const QString kRequestControlAsyncCommand = lit("SERVERRemoteControlRequestAsync");
-const QString kReleaseControlCommand = lit("SERVERRemoteControlRelease");
-const QString kSetOutputPortStateCommand = lit("IOSENSOROutputStateSet");
+const QString kCommandPrefix = "Nexus.cgi";
+const QString kControlPrefix = "NexusWS.cgi";
+const QString kSubscriptionPrefix = "NexusWS_Status.cgi";
+const QString kServerWhoAmICommand = "SERVERWhoAmI";
+const QString kRequestControlCommand = "SERVERRemoteControlRequest";
+const QString kRequestControlAsyncCommand = "SERVERRemoteControlRequestAsync";
+const QString kReleaseControlCommand = "SERVERRemoteControlRelease";
+const QString kSetOutputPortStateCommand = "IOSENSOROutputStateSet";
 
-const QString kSessionParamName = lit("session");
-const QString kSubscriptionNumParamName = lit("numSubscriptions");
-const QString kNotificationFormatParamName = lit("NotificationFormat");
-const QString kSubscriptionParamNamePrefix = lit("subscription");
+const QString kSessionParamName = "session";
+const QString kSubscriptionNumParamName = "numSubscriptions";
+const QString kNotificationFormatParamName = "NotificationFormat";
+const QString kSubscriptionParamNamePrefix = "subscription";
 
-const QString kJsonNotificationFormat = lit("JSON");
-const QString kStringNotificationFormat = lit("String");
+const QString kJsonNotificationFormat = "JSON";
+const QString kStringNotificationFormat = "String";
 
 const int kNoError = 0;
 const int kAnyDevice = -1;
 
-const QString kAlarmSubscription = lit("ALARM");
-const QString kThgSpotSubscription = lit("THGSPOT");
-const QString kThgAreaSubscription = lit("THGAREA");
-const QString kIOSubscription = lit("IO");
+const QString kAlarmSubscription = "ALARM";
+const QString kThgSpotSubscription = "THGSPOT";
+const QString kThgAreaSubscription = "THGAREA";
+const QString kIOSubscription = "IO";
 
 const QString kDateTimeFormat("yyyyMMddhhmmsszzz");
 
-const QString kSessionIdParamName = lit("Id");
+const QString kSessionIdParamName = "Id";
 
-const QString kDiscoveryPrefix = lit("$NEXUS");
-const QString kOldDiscoveryPrefix = lit("$LUVEO");
+const QString kDiscoveryPrefix = "$NEXUS";
+const QString kOldDiscoveryPrefix = "$LUVEO";
 const int kDiscoveryMessageFieldsNumber = 13;
 
 struct Notification final
@@ -65,17 +69,17 @@ struct Subscription final
     Subscription(const QString& subscriptionTypeString):
         subscriptionType(subscriptionTypeString)
     {
-    };
+    }
 
     QString toString() const
     {
-        return lit("\"%1,%2,%3,%4,%5\"")
+        return QStringLiteral("\"%1,%2,%3,%4,%5\"")
             .arg(subscriptionType)
             .arg(deviceId)
             .arg(minDeliveryInterval.count())
             .arg(maxDeliveryInterval.count())
             .arg(onChange);
-    };
+    }
 
     QString subscriptionType;
     int deviceId = kAnyDevice;

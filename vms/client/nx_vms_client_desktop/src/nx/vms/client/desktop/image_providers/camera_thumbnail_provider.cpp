@@ -1,11 +1,8 @@
 #include "camera_thumbnail_provider.h"
 
 #include <api/server_rest_connection.h>
-
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
-
+#include <client/client_module.h>
 #include <common/common_module.h>
-
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 
@@ -13,8 +10,19 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/vms/client/desktop/utils/video_cache.h>
 
 namespace nx::vms::client::desktop {
+
+using namespace std::chrono;
+
+namespace {
+
+// Allowed timestamp error when pre-looking an existing frame in the global VideoCache.
+static constexpr microseconds kAllowedTimeDeviation = 35ms;
+
+} // namespace
 
 CameraThumbnailProvider::CameraThumbnailProvider(
     const nx::api::CameraImageRequest& request,
@@ -40,14 +48,16 @@ CameraThumbnailProvider::CameraThumbnailProvider(
         {
             if (!data.isEmpty())
             {
-                NX_VERBOSE(this) << "CameraThumbnailProvider::imageDataLoadedInternal(" << m_request.camera->getName() << ") - got response with data";
+                NX_VERBOSE(this, "imageDataLoadedInternal(%1) - got response with data",
+                    m_request.camera->getName());
                 const auto imageFormat = QnLexical::serialized(m_request.imageFormat).toUtf8();
                 m_image.loadFromData(data, imageFormat);
             }
             else if (nextStatus != Qn::ThumbnailStatus::NoData)
             {
                 // We should not be here
-                NX_VERBOSE(this) << "CameraThumbnailProvider::imageDataLoadedInternal(" << m_request.camera->getName() << ") - empty data but status not NoData!";
+                NX_VERBOSE(this, "imageDataLoadedInternal(%1) - empty data but status not NoData!",
+                    m_request.camera->getName());
             }
 
             m_timestampUs = timestampUs;
@@ -89,17 +99,49 @@ void CameraThumbnailProvider::doLoadAsync()
     if (m_status == Qn::ThumbnailStatus::Loading)
         return;
 
+    if (!m_request.camera)
+    {
+        setStatus(Qn::ThumbnailStatus::NoData);
+        return;
+    }
+
     setStatus(Qn::ThumbnailStatus::Loading);
+
+    auto cache = qnClientModule->videoCache();
+
+    if (cache && !nx::api::CameraImageRequest::isSpecialTimeValue(m_request.usecSinceEpoch))
+    {
+        std::chrono::microseconds requiredTime(m_request.usecSinceEpoch);
+        std::chrono::microseconds actualTime{};
+
+        const auto image = cache->image(m_request.camera->getId(), requiredTime, &actualTime);
+        if (!image.isNull() && abs(requiredTime - actualTime) < kAllowedTimeDeviation)
+        {
+            NX_VERBOSE(this, "doLoadAsync(%1) - got image from the cache, error is %2 us",
+                m_request.camera->getName(), requiredTime - actualTime);
+
+            m_image = image;
+            m_timestampUs = actualTime.count();
+
+            emit imageChanged(m_image);
+            emit sizeHintChanged(sizeHint());
+
+            setStatus(Qn::ThumbnailStatus::Loaded);
+            return;
+        }
+    }
 
     if (!commonModule()->currentServer())
     {
-        NX_VERBOSE(this) << "CameraThumbnailProvider::doLoadAsync(" << m_request.camera->getName() << ") - no server is available. Returning early";
+        NX_VERBOSE(this, "doLoadAsync(%1) - no server is available. Returning early",
+            m_request.camera->getName());
         emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData, 0);
         return;
     }
 
     QPointer<CameraThumbnailProvider> guard(this);
-    NX_VERBOSE(this) << "CameraThumbnailProvider::doLoadAsync(" << m_request.camera->getName() << ") - sending request to the server";
+    NX_VERBOSE(this, "doLoadAsync(%1) - sending request to the server",
+        m_request.camera->getName());
 
     const auto callback = nx::utils::guarded(this,
         [this](

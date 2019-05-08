@@ -3,6 +3,7 @@
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QDialogButtonBox>
 
 #include <common/common_module.h>
 

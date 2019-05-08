@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include <nx/utils/log/assert.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/math/arithmetic.h>
 

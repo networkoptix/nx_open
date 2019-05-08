@@ -1,5 +1,7 @@
 #include "notification_counter_label.h"
 
+#include <QtCore/QVariant>
+
 #include <ui/style/helper.h>
 
 namespace nx::vms::client::desktop {

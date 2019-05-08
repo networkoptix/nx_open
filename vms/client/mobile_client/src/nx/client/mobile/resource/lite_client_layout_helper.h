@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QPoint>
+
 #include <nx/client/core/resource/layout_accessor.h>
 #include <utils/common/id.h>
 

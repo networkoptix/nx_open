@@ -125,6 +125,7 @@ protected slots:
     void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 
 private:
+    void recalculateGlobalPermissions();
     void recalculateAllPermissions();
 
     void setPermissionsInternal(const QnResourcePtr& resource, Qn::Permissions permissions);
