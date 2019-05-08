@@ -36,7 +36,7 @@ struct Package
 };
 
 #define Package_Fields (component)(arch)(platform)(variant)(variantVersion)(file)(url)(size)(md5)
-QN_FUSION_DECLARE_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(Package, (ubjson)(json)(eq))
 
 struct Information
 {
@@ -65,7 +65,7 @@ struct Information
 #define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl) \
     (description)(packages)(participants)(lastInstallationRequestTime)(eula)
 
-QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(Information, (ubjson)(json)(eq))
 
 enum class InformationError
 {
@@ -129,7 +129,7 @@ public:
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Status::Code)
 QN_FUSION_DECLARE_FUNCTIONS(Status::Code, (lexical))
-QN_FUSION_DECLARE_FUNCTIONS(Status, (xml)(csv_record)(ubjson)(json))
+QN_FUSION_DECLARE_FUNCTIONS(Status, (ubjson)(json))
 
 /**
  * Source type for update information.

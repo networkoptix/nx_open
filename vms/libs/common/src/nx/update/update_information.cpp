@@ -32,11 +32,11 @@ QString toString(InformationError error)
     return result;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Package, (xml)(csv_record)(ubjson)(json)(datastream)(eq), Package_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Information, (xml)(csv_record)(ubjson)(json)(datastream)(eq), Information_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Package, (ubjson)(json)(datastream)(eq), Package_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Information, (ubjson)(json)(datastream)(eq), Information_Fields)
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, Code)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Status, (xml)(csv_record)(ubjson)(json), UpdateStatus_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Status, (ubjson)(json), UpdateStatus_Fields)
 
 nx::utils::SoftwareVersion UpdateContents::getVersion() const
 {
