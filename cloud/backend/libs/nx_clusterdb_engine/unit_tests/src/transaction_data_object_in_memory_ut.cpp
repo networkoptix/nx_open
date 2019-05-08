@@ -6,8 +6,6 @@
 
 #include <nx/clusterdb/engine/dao/memory/command_data_object_in_memory.h>
 
-#include <transaction/transaction_descriptor.h>
-
 #include "customer_db/data.h"
 
 namespace nx::clusterdb::engine::dao::memory::test {
