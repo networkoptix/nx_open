@@ -316,23 +316,19 @@ private:
     std::shared_ptr<nx::sql::QueryContext> createNewTran()
     {
         auto dbConnection = m_dbConnectionHolder.dbConnection();
-        auto transaction = std::make_unique<nx::sql::Transaction>(dbConnection);
+        auto transaction = std::make_shared<nx::sql::Transaction>(dbConnection);
         NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, transaction->begin());
-        auto transactionPtr = transaction.get();
 
-        auto deleter =
-            [transaction = std::move(transaction)](nx::sql::QueryContext* queryContext)
+        return std::shared_ptr<nx::sql::QueryContext>(
+            new nx::sql::QueryContext(dbConnection, transaction.get()),
+            [transaction](nx::sql::QueryContext* queryContext)
             {
                 if (queryContext->transaction()->isActive())
                 {
                     ASSERT_EQ(nx::sql::DBResult::ok, queryContext->transaction()->commit());
                 }
                 delete queryContext;
-            };
-
-        return std::shared_ptr<nx::sql::QueryContext>(
-            new nx::sql::QueryContext(dbConnection, transactionPtr),
-            std::move(deleter));
+            });
     }
 
     template<typename TransactionDataType>
@@ -535,7 +531,7 @@ public:
         m_commandLog->startDbTransaction(
             m_clusterId,
             [this](auto&&... args) { return doSomeDataModifications(std::move(args)...); },
-            [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
+            [locker = m_startedAsyncCallsCounter.getScopedIncrement()](
                 nx::sql::DBResult /*dbResult*/)
             {
             });
