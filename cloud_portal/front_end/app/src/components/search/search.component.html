@@ -3,7 +3,7 @@
     <div class="row m-0">
         <div class="col-12 p-0">
             <div class="d-block d-md-inline-flex flex-md-row w-100">
-                <div class="search-group">
+                <div class="search-group" [ngClass]="{'mr-3' : layout == 'full'}">
                     <span class="glyphicon glyphicon-search icon-search"></span>
                     <input [(ngModel)]="localFilter.query"
                            [ngModelOptions]="{debounceTime : config.search.debounceTime}"
@@ -20,19 +20,18 @@
                         <span class="glyphicon-close"></span>
                     </button>
                 </div>
-                <div class="float-left btn btn-big btn-tag-selected ml-md-3 mt-3 mt-md-0 mr-1 mr-md-0"
+                <div class="float-left btn btn-big btn-tag-selected mt-3 mt-md-0 mr-1"
                         *ngIf="numberFilters != 0 && layout == 'full'">
 
-                    <span class="ml-2 mr-3">
+                    <span class="ml-1 mr-1">
                         {{filterSelected}}
                     </span>
-
                     <span class="close-button" (click)="resetFilters()">
                         <span class="glyphicon tag-close-icon"></span>
                     </span>
                 </div>
 
-                <div class="btn btn-arrow btn-big btn-tag float-left ml-md-3 mt-3 mt-md-0"
+                <div class="btn btn-arrow btn-big btn-tag float-left mt-3 mt-md-0"
                         [ngClass]="{'selected' : showAdvancedOptions}"
                         (click)="toggleOptions()"
                         *ngIf="layout == 'full'">
@@ -41,7 +40,7 @@
                         <span></span>
                         <span></span>
                     </div>
-                    <span translate>Advanced search</span>
+                    <span class="ml-1 mr-1" translate>Advanced search</span>
                 </div>
             </div>
         </div>
