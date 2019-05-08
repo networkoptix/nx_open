@@ -215,7 +215,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                     if (this.numberFilters > 1) {
                         selectsSelected = this.numberFilters + ' ' + this.lang.search['filters applied'];
                     } else {
-                        selectsSelected = select.label + ' - ' + select.selected.name;
+                        selectsSelected = select.label + ' &ndash; ' + select.selected.name;
                     }
                     flag++;
                 }
@@ -232,7 +232,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
 
                     if (select.selected.length === 1) {
                         const label = select.singular || select.label;
-                        multiSelectsSelected = label + ' - ' + select.items.find(item => {
+                        multiSelectsSelected = label + ' &ndash; ' + select.items.find(item => {
                             return (item.label.name || item.id) === select.selected[0];
                         }).label;
                     } else {

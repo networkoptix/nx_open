@@ -201,6 +201,11 @@ button, .btn {
     font-family : $font-family-regular;
     font-size : rem(13px);
     
+    & > span {
+        margin  : 0;
+        padding : 0 1px; // flex messes up caption width
+    }
+    
     .close-button {
         position        : absolute;
         right           : 0;
@@ -247,6 +252,7 @@ button, .btn {
     
     & > span {
         margin : 0;
+        padding : 0 1px; // flex messes up caption width
     }
     
     &.selected {

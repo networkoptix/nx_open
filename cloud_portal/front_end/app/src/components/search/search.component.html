@@ -23,9 +23,7 @@
                 <div class="float-left btn btn-big btn-tag-selected mt-3 mt-md-0 mr-1"
                         *ngIf="numberFilters != 0 && layout == 'full'">
 
-                    <span class="ml-1 mr-1">
-                        {{filterSelected}}
-                    </span>
+                    <span [innerHTML]="filterSelected"></span>
                     <span class="close-button" (click)="resetFilters()">
                         <span class="glyphicon tag-close-icon"></span>
                     </span>
@@ -40,7 +38,7 @@
                         <span></span>
                         <span></span>
                     </div>
-                    <span class="ml-1 mr-1" translate>Advanced search</span>
+                    <span translate>Advanced search</span>
                 </div>
             </div>
         </div>
