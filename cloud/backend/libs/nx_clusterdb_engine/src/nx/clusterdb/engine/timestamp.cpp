@@ -25,7 +25,7 @@ bool Timestamp::operator==(const Timestamp& right) const
 
 bool Timestamp::operator>(std::chrono::milliseconds right) const
 {
-    return sequence > 0 ? true : ticks > right.count();
+    return sequence > 0 ? true : static_cast<std::int64_t>(ticks) > right.count();
 }
 
 Timestamp& Timestamp::operator-=(std::chrono::milliseconds right)

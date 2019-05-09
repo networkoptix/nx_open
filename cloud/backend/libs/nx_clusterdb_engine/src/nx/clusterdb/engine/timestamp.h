@@ -16,20 +16,20 @@ public:
      * This is some sequence introduced to give transactions generated after
      * unbinding from cloud / binding to cloud higher priority.
      */
-    std::uint64_t sequence = 0;
+    quint64 sequence = 0;
 
     /** This is a regular transaction timestamp. Close to millis since epoch. */
-    std::uint64_t ticks = 0;
+    quint64 ticks = 0;
 
     Timestamp() = default;
 
-    Timestamp(std::uint64_t sequence, std::uint64_t ticks):
+    Timestamp(quint64 sequence, quint64 ticks):
         sequence(sequence),
         ticks(ticks)
     {
     }
 
-    Timestamp(std::uint64_t sequence, std::chrono::milliseconds ticks):
+    Timestamp(quint64 sequence, std::chrono::milliseconds ticks):
         sequence(sequence),
         ticks(ticks.count())
     {
