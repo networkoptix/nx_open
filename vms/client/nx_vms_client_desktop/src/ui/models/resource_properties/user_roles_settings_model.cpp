@@ -1,5 +1,10 @@
 #include "user_roles_settings_model.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+#include <boost/algorithm/cxx11/all_of.hpp>
+
+#include <QtGui/QBrush>
+
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>

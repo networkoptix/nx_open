@@ -446,7 +446,9 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     if (const int port = ini().clientWebServerPort; port > 0 && port < 65536)
     {
         context()->instance<nx::vmx::client::desktop::DirectorWebserver>()->setPort(port);
-        context()->instance<nx::vmx::client::desktop::DirectorWebserver>()->start();
+        bool started = context()->instance<nx::vmx::client::desktop::DirectorWebserver>()->start();
+        if (!started)
+            NX_ERROR(this, QString("Cannot start client webserver - port %1 already occupied?").arg(port));
     }
 }
 

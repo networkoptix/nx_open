@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QRect>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>

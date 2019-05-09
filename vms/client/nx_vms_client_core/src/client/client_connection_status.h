@@ -1,5 +1,8 @@
 #pragma once
 
+#include <QtCore/QObject>
+#include <QtCore/QMap>
+
 enum class QnConnectionState
 {
     Disconnected,
@@ -31,9 +34,6 @@ public:
 
 signals:
     void stateChanged(QnConnectionState value);
-
-private:
-    void warn(const QString &message) const;
 
 private:
     QnConnectionState m_state;

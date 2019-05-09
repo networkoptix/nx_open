@@ -5,6 +5,8 @@
 #include <QtGui/QDragMoveEvent>
 #include <QtWidgets/QScrollBar>
 
+#include <nx/utils/scope_guard.h>
+
 #include <ui/help/help_topic_accessor.h>
 #include <utils/common/variant.h>
 

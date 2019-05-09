@@ -1,7 +1,11 @@
 #pragma once
 
+#include <functional>
+
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
+#include <QtCore/QRect>
+
 #include <nx/utils/app_info.h>
 #include <nx/vms/client/desktop/utils/dialog_utils.h>
 
@@ -18,10 +22,16 @@ public:
 };
 
 /** Helper class to show target non-modal dialog as soon as top-level modal dialog is closed. */
-class QnDelayedShowHelper: public QObject, public QnShowDialogHelper {
+class QnDelayedShowHelper: public QObject, public QnShowDialogHelper
+{
     Q_OBJECT
+
 public:
-    QnDelayedShowHelper(QWidget* targetWidget, const QRect &targetGeometry, int sourceCount, QObject *parent = NULL);
+    QnDelayedShowHelper(
+        QWidget* targetWidget,
+        const QRect& targetGeometry,
+        int sourceCount,
+        QObject* parent = nullptr);
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 

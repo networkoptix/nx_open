@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 

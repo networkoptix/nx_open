@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QSortFilterProxyModel>
+#include <QtCore/QSet>
 
 #include <utils/common/ldap_fwd.h>
 

@@ -1,6 +1,7 @@
 #include "layout_background_image_provider.h"
 
 #include <core/resource/layout_resource.h>
+#include <client/client_globals.h>
 
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>

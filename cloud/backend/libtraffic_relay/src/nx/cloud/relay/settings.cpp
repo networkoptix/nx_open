@@ -78,7 +78,7 @@ static constexpr std::chrono::seconds kDefaultDelayBeforeRetryingInitialConnect 
 
 //-------------------------------------------------------------------------------------------------
 
-static const QString kModuleName = lit("traffic_relay");
+static const QString kModuleName = "traffic_relay";
 
 Http::Http():
     tcpBacklogSize(kDefaultHttpTcpBacklogSize),

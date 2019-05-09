@@ -13,6 +13,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
+class QTimer;
 class QnUuid;
 class QnBookmarkMergeHelper;
 class QnBookmarkQueriesCache;

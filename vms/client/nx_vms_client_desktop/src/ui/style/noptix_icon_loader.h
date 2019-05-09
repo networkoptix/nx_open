@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QSet>
 #include <QtGui/QIcon>
 
 #include <ui/style/icon.h>

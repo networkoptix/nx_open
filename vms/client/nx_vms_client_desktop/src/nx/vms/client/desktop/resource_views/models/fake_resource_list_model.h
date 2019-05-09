@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QAbstractListModel>
+#include <QtGui/QIcon>
 
 #include <nx/utils/uuid.h>
 
@@ -19,7 +20,7 @@ using FakeResourceList = QList<FakeResourceDescription>;
 class FakeResourceListModel: public QAbstractListModel
 {
     Q_OBJECT
-    using base_type = QAbstractItemModel;
+    using base_type = QAbstractListModel;
 
 public:
     enum Columns

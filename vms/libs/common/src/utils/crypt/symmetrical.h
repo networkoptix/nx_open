@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include <QtCore/QByteArray>
 
 namespace nx::utils {

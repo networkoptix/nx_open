@@ -3,6 +3,8 @@
 #include <QtWidgets/QTabBar>
 #include <QtWidgets/QTabWidget>
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::vms::client::desktop {
 
 GenericTabbedDialog::GenericTabbedDialog(QWidget* parent, Qt::WindowFlags windowFlags) :
