@@ -4,6 +4,7 @@
 
 {% block extrahead %}
     {{ block.super }}
+    <script>window.$ = django.jQuery;</script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 {% endblock %}
 {% block content %}
@@ -183,7 +184,7 @@
         </div>
     </form>
     <script>
-        $(function() {
+        (function() {
             // When a preview tag is clicked make a post request instead of a get request
             var previews = $('.preview');
             var csrf = $('input[name=csrfmiddlewaretoken]')[0];
@@ -221,7 +222,7 @@
                 noteButton.attr('class', button.attr('class'));
             })
 
-        });
+        })();
     </script>
     {% endwith %}
 {% endblock %}
