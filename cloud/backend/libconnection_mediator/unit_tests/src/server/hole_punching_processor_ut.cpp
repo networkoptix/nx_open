@@ -417,7 +417,8 @@ protected:
         m_relayUrl = "http://relay.host/relay/path?relay.query";
         std::array<const char*, 2U> args{
             "-trafficRelay/url",
-            m_relayUrl.constData()};
+            m_relayUrl.constData(),
+        };
 
         m_settings.load(args.size(), args.data());
     }

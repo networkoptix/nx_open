@@ -2,7 +2,7 @@
 
 #include <future>
 
-#include <nx/clusterdb/engine/transaction_log.h>
+#include <nx/clusterdb/engine/command_log.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
@@ -78,17 +78,37 @@ void Peer::disconnectFrom(const Peer& other)
 
 Customer Peer::addRandomData()
 {
+    std::promise<std::tuple<ResultCode, Customer>> done;
+    addRandomDataAsync(
+        [&done](ResultCode resultCode, Customer customer)
+        {
+            done.set_value(std::make_tuple(resultCode, std::move(customer)));
+        });
+
+    auto [resultCode, customer] = done.get_future().get();
+
+    if (resultCode != ResultCode::ok)
+        throw std::runtime_error(toString(resultCode));
+
+    return customer;
+}
+
+void Peer::addRandomDataAsync(
+    nx::utils::MoveOnlyFunc<void(ResultCode, Customer)> completionHandler)
+{
     Customer customer;
     customer.id = QnUuid::createUuid().toSimpleByteArray().toStdString();
     customer.fullName = nx::utils::generateRandomName(7).toStdString();
     customer.address = nx::utils::generateRandomName(7).toStdString();
 
-    const auto resultCode =
-        process().moduleInstance()->customerManager().saveCustomer(customer);
-    if (resultCode != ResultCode::ok)
-        throw std::runtime_error(toString(resultCode));
-
-    return customer;
+    process().moduleInstance()->customerManager().saveCustomer(
+        customer,
+        [customer, handler = std::move(completionHandler)](ResultCode resultCode)
+        {
+            if (resultCode != ResultCode::ok)
+                std::cout << "Failed! " << (int)resultCode << std::endl;
+            handler(resultCode, customer);
+        });
 }
 
 bool Peer::hasData(const std::vector<Customer>& expected)
@@ -142,12 +162,18 @@ ClusterTestFixture::ClusterTestFixture():
 {
 }
 
+void ClusterTestFixture::setConnectorTypeKey(const std::string& key)
+{
+    m_connectorTypeKey = key;
+}
+
 std::string ClusterTestFixture::clusterId() const
 {
     return m_clusterId;
 }
 
-Peer& ClusterTestFixture::addPeer(bool startAndWaitUntilStarted)
+Peer& ClusterTestFixture::addPeer(
+    std::vector<std::pair<const char*, const char*>> args)
 {
     const auto dbFileArg = lm("--db/name=%1/db_%2.sqlite")
         .args(testDataDir(), ++m_peerCounter).toStdString();
@@ -155,10 +181,18 @@ Peer& ClusterTestFixture::addPeer(bool startAndWaitUntilStarted)
     auto peer = std::make_unique<Peer>();
     peer->process().addArg(dbFileArg.c_str());
     peer->process().addArg("-p2pDb/clusterId", m_clusterId.c_str());
+    for (const auto& arg: args)
+        peer->process().addArg(arg.first, arg.second);
 
-    if (startAndWaitUntilStarted)
+    [&peer]() { ASSERT_TRUE(peer->process().startAndWaitUntilStarted()); }();
+
+    if (!m_connectorTypeKey.empty())
     {
-        [this, &peer]() { ASSERT_TRUE(peer->process().startAndWaitUntilStarted()); }();
+        [this, &peer]()
+        {
+            ASSERT_TRUE(peer->process().moduleInstance()->synchronizationEngine()
+                .transportManager().setConnectorTypeKey(m_connectorTypeKey));
+        }();
     }
 
     m_peers.push_back(std::move(peer));
@@ -206,7 +240,7 @@ bool ClusterTestFixture::peersAreSynchronized(std::vector<int> ids) const
             [&commandLogs, &commandLogRead](
                 nx::clusterdb::engine::ResultCode /*resultCode*/,
                 std::vector<nx::clusterdb::engine::dao::TransactionLogRecord> serializedTransactions,
-                nx::vms::api::TranState /*readedUpTo*/)
+                NodeState /*readedUpTo*/)
             {
                 commandLogs.push_back(std::move(serializedTransactions));
                 commandLogRead.set_value();

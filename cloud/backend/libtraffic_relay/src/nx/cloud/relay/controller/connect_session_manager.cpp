@@ -2,7 +2,6 @@
 
 #include "connect_session_manager.h"
 
-#include <nx/casssandra/async_cassandra_connection.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/aio/async_channel_adapter.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>

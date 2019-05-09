@@ -29,7 +29,7 @@ public:
 
     nx::network::SocketAddress httpEndpoint() const
     {
-        nx::utils::Url url = m_test.relay(0).basicUrl();
+        nx::utils::Url url = m_test.relay(0).httpUrl();
         return nx::network::SocketAddress(url.host() + ":" + QString::number(url.port()));
     }
 

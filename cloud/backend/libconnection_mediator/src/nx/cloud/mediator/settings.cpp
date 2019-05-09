@@ -464,7 +464,9 @@ void Settings::loadConnectionParameters()
 
 void Settings::loadTrafficRelay()
 {
-    m_trafficRelay.url = settings().value(kTrafficRelayUrl).toString();
+    auto urls = settings().value(kTrafficRelayUrl).toString().split(',', QString::SkipEmptyParts);
+    std::transform(urls.begin(), urls.end(), std::back_inserter(m_trafficRelay.urls),
+        [](const QString& url) { return url.trimmed(); });
 }
 
 void Settings::loadListeningPeer()

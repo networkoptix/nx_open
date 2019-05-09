@@ -19,18 +19,18 @@
 namespace nx::clusterdb::engine::transport::p2p::websocket {
 
 Acceptor::Acceptor(
-    const QnUuid& moduleGuid,
+    const QnUuid& nodeId,
     const ProtocolVersionRange& protocolVersionRange,
-    CommandLog* transactionLog,
+    CommandLog* commandLog,
     ConnectionManager* connectionManager,
     const OutgoingCommandFilter& outgoingCommandFilter)
     :
     m_protocolVersionRange(protocolVersionRange),
-    m_commandLog(transactionLog),
+    m_commandLog(commandLog),
     m_connectionManager(connectionManager),
     m_outgoingCommandFilter(outgoingCommandFilter),
     m_localPeerData(
-        moduleGuid,
+        nodeId,
         QnUuid::createUuid(),
         vms::api::PeerType::cloudServer,
         Qn::UbjsonFormat)

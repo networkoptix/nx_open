@@ -105,7 +105,7 @@ void CustomerManager::getCustomers(
             *customers = m_customerDao->fetchCustomers(queryContext);
             return nx::sql::DBResult::ok;
         },
-        [this, customers, handler = std::move(handler)](
+        [customers, handler = std::move(handler)](
             nx::sql::DBResult dbResult)
         {
             handler(

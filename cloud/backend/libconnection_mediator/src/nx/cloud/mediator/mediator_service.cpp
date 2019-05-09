@@ -77,8 +77,6 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 {
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
-    nx::utils::TimerManager timerManager;
-
     NX_INFO(this, lm("Initializating controller"));
 
     Controller controller(settings);

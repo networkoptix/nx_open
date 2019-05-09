@@ -19,6 +19,9 @@ static constexpr int kMaxConcurrentConnectionsFromSystemDefault = 2;
 static constexpr char kNodeConnectRetryTimeout[] = "nodeConnectRetryTimeout";
 static constexpr std::chrono::seconds kDefaultNodeConnectRetryTimeout = std::chrono::seconds(7);
 
+static constexpr char kGroupCommandsUnderDbTransaction[] = "groupCommandsUnderDbTransaction";
+static constexpr bool kDefaultGroupCommandsUnderDbTransaction = false;
+
 } // namespace
 
 SynchronizationSettings::SynchronizationSettings():
@@ -60,6 +63,10 @@ void SynchronizationSettings::load(const QnSettings& settings, std::string group
         kDefaultNodeConnectRetryTimeout);
 
     discovery.load(settings, groupName.empty() ? "discovery" : groupName + "/discovery");
+
+    groupCommandsUnderDbTransaction = settings.value(
+        lm(settingsTemplate).args(groupName, kGroupCommandsUnderDbTransaction),
+        kDefaultGroupCommandsUnderDbTransaction ? "true" : "false").toString() == "true";
 }
 
 } // namespace nx::clusterdb::engine

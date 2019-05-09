@@ -13,7 +13,6 @@
 #include <nx/utils/sync_call.h>
 
 #include <nx/clusterdb/engine/service/service.h>
-#include <nx/clusterdb/engine/transport/connector_factory.h>
 #include <nx/clusterdb/engine/transport/p2p_websocket/connector.h>
 
 #include <nx_ec/ec_proto_version.h>
@@ -311,9 +310,9 @@ protected:
             m_cloudNode.moduleInstance()->protocolVersionRange(),
             &m_cloudNode.moduleInstance()->synchronizationEngine().transactionLog(),
             m_cloudNode.moduleInstance()->synchronizationEngine().outgoingCommandFilter(),
-            url,
             cloudSystem().id,
-            "nodeId");
+            "nodeId",
+            url);
 
         m_connector->connect(
             [this](auto&&... args)
