@@ -75,7 +75,8 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'company_link': product.read_global_value("%COMPANY_LINK%"),
                 'feedback_enabled': product.read_global_value("%FEEDBACK_ENABLED%"),
                 'footer_items': footer_items,
-                'integration_filter_items': product.read_global_value('%INTEGRATION_FILTER_ITEMS%'),
+                'integration_filter_items': product.read_global_value("%INTEGRATION_FILTER_ITEMS%"),
+                'integration_store_enabled': product.read_global_value("%INTEGRATION_STORE_ENABLED%"),
                 'public_downloads': product.read_global_value("%PUBLIC_DOWNLOADS%"),
                 'public_releases': product.read_global_value("%PUBLIC_RELEASE_HISTORY%"),
                 'sort_supported_devices_by_popularity': product.read_global_value(

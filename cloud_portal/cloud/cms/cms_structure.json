@@ -494,6 +494,15 @@
             "value": "true",
             "optional": true,
             "advanced": true
+          },
+          {
+            "label": "Enable integration store",
+            "name": "%INTEGRATION_STORE_ENABLED%",
+            "description": "Lets the desktop client know if the integration store is enabled.",
+            "type": "check_box",
+            "value": "false",
+            "optional": true,
+            "advanced": true
           }
         ]
       },
