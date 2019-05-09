@@ -340,9 +340,6 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
 
         extra_context['DataStructureTypes'] = DataStructure.DATA_TYPES
 
-        if request.user == version.product.created_by:
-            extra_context['customization_reviews'] = version.productcustomizationreview_set.all()
-
         return super(ProductCustomizationReviewAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
         )
