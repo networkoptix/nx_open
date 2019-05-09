@@ -314,10 +314,10 @@ admin.site.register(ContentVersion, ContentVersionAdmin)
 
 
 class ProductCustomizationReviewAdmin(CMSAdmin):
-    list_display = ('product', 'version', 'customization', 'reviewed_by', 'reviewed_date', 'state')
+    list_display = ('product', 'version', 'customization', 'reviewed_by', 'reviewed_date', 'state', 'current_version')
     readonly_fields = ('customization', 'version', 'reviewed_date', 'reviewed_by', 'notes',)
 
-    list_filter = ('version__product__product_type', ProductFilter, CustomizationFilter)
+    list_filter = ('version__product__product_type', 'state', ProductFilter, CustomizationFilter)
 
     change_form_template = 'cms/product_customization_review_change_form.html'
     fieldsets = (
@@ -388,6 +388,12 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
 
     def response_change(self, request, obj):
         return redirect(reverse('admin:cms_productcustomizationreview_change', args=(obj.id,)))
+
+    def current_version(self, obj):
+        return obj.version.product.version_id(obj.customization.name) == obj.version.id
+
+    current_version.short_description = "Current Published Version"
+    current_version.boolean = True
 
 
 admin.site.register(ProductCustomizationReview, ProductCustomizationReviewAdmin)
