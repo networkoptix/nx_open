@@ -26,7 +26,7 @@ bool CommandLogCache::isShouldBeIgnored(
     {
         NX_DEBUG(this, lm("systemId %1. Ignoring transaction (%2, hash %3) "
             "because of persistent sequence: %4 <= %5")
-            .args(systemId, engine::toString(commandHeader), hash,
+            .args(systemId, commandHeader, hash,
                 commandHeader.persistentInfo.sequence, currentSequence));
         return true;    //< Transaction should be ignored.
     }
@@ -42,7 +42,7 @@ bool CommandLogCache::isShouldBeIgnored(
     if (rez)
     {
         NX_DEBUG(this, lm("systemId %1. Ignoring transaction (%2 hash %3) "
-            "because of timestamp: %4 <= %5").args(systemId, engine::toString(commandHeader), hash,
+            "because of timestamp: %4 <= %5").args(systemId, commandHeader, hash,
                 commandHeader.persistentInfo.timestamp, lastTime));
         return true;    //< Transaction should be ignored.
     }
@@ -54,7 +54,7 @@ void CommandLogCache::restoreTransaction(
     NodeStateKey tranStateKey,
     int sequence,
     const nx::Buffer& tranHash,
-    const vms::api::Timestamp& timestamp)
+    const Timestamp& timestamp)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -168,10 +168,10 @@ const CommandLogCache::VmsDataState* CommandLogCache::state(TranId tranId) const
     return tranContext ? &tranContext->data : nullptr;
 }
 
-vms::api::Timestamp CommandLogCache::generateTransactionTimestamp(TranId tranId)
+Timestamp CommandLogCache::generateTransactionTimestamp(TranId tranId)
 {
     QnMutexLocker lock(&m_mutex);
-    vms::api::Timestamp timestamp = m_timestampCalculator.calculateNextTimeStamp();
+    Timestamp timestamp = m_timestampCalculator.calculateNextTimeStamp();
     timestamp.sequence = std::max<decltype(timestamp.sequence)>(
         timestamp.sequence,
         timestampSequence(lock, tranId)); //< Increased timestamp sequence can still be not commited.

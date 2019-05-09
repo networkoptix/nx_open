@@ -33,7 +33,7 @@ void IncomingCommandDispatcher::dispatchTransaction(
     std::unique_ptr<DeserializableCommandData> commandData,
     CommandProcessedHandler completionHandler)
 {
-    NX_VERBOSE(this, "Dispatching command %1", engine::toString(commandData->header()));
+    NX_VERBOSE(this, "Dispatching command %1", commandData->header());
 
     m_watchTransactionSubscription.notify(
         transportHeader,
@@ -47,8 +47,7 @@ void IncomingCommandDispatcher::dispatchTransaction(
 
     if (it == m_commandProcessors.end() || it->second->markedForRemoval)
     {
-        NX_VERBOSE(this, "Received unsupported transaction %1",
-            engine::toString(commandData->header()));
+        NX_VERBOSE(this, "Received unsupported transaction %1", commandData->header());
         // No handler registered for transaction type.
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]

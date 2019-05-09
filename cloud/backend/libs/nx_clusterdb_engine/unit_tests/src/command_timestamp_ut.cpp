@@ -1,53 +1,57 @@
+#include <limits>
+
 #include <gtest/gtest.h>
 
-#include <nx/vms/api/data/timestamp.h>
+#include <nx/clusterdb/engine/timestamp.h>
 
-using nx::vms::api::Timestamp;
+namespace nx::clusterdb::engine::test {
 
-TEST(TransactionTimestamp, addNegative)
+TEST(Timestamp, addNegative)
 {
     Timestamp ts;
     ts.sequence = 0;
     ts.ticks = 10;
 
-    ts += -1;
+    ts += std::chrono::milliseconds(-1);
 
     ASSERT_EQ(0U, ts.sequence);
     ASSERT_EQ(9U, ts.ticks);
 }
 
-TEST(TransactionTimestamp, addNegativeOverflow)
+TEST(Timestamp, addNegativeOverflow)
 {
     Timestamp ts;
     ts.sequence = 1;
     ts.ticks = 1;
 
-    ts += -3;
+    ts += std::chrono::milliseconds(-3);
 
     ASSERT_EQ(0U, ts.sequence);
     ASSERT_EQ(std::numeric_limits<std::uint64_t>::max() - 1, ts.ticks);
 }
 
-TEST(TransactionTimestamp, subtractPositive)
+TEST(Timestamp, subtractPositive)
 {
     Timestamp ts;
     ts.sequence = 0;
     ts.ticks = 10;
 
-    ts -= 1;
+    ts -= std::chrono::milliseconds(1);
 
     ASSERT_EQ(0U, ts.sequence);
     ASSERT_EQ(9U, ts.ticks);
 }
 
-TEST(TransactionTimestamp, subtractPositiveOverflow)
+TEST(Timestamp, subtractPositiveOverflow)
 {
     Timestamp ts;
     ts.sequence = 1;
     ts.ticks = 1;
 
-    ts -= 3;
+    ts -= std::chrono::milliseconds(3);
 
     ASSERT_EQ(0U, ts.sequence);
     ASSERT_EQ(std::numeric_limits<std::uint64_t>::max() - 1, ts.ticks);
 }
+
+} // namespace nx::clusterdb::engine::test

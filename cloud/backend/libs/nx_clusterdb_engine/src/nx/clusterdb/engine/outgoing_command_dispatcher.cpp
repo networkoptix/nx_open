@@ -15,8 +15,7 @@ void OutgoingCommandDispatcher::dispatchTransaction(
 {
     if (!m_filter.satisfies(transactionSerializer->header()))
     {
-        NX_VERBOSE(this, "Ignoring command %1",
-            engine::toString(transactionSerializer->header()));
+        NX_VERBOSE(this, "Ignoring command %1", transactionSerializer->header());
         return;
     }
 

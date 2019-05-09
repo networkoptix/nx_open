@@ -95,10 +95,8 @@ nx::sql::DBResult CommandLog::saveLocalTransaction(
     vmsTransactionLogData = getTransactionLogContext(lock, systemId);
     lock.unlock();
 
-    NX_DEBUG(
-        this,
-        lm("systemId %1. Generated new command %2 (hash %3)")
-        .args(systemId, toString(transactionSerializer->header()), transactionHash));
+    NX_DEBUG(this, "systemId %1. Generated new command %2 (hash %3)",
+        systemId, transactionSerializer->header(), transactionHash);
 
     // Saving transaction to the log.
     const auto result = saveToDb(
@@ -124,7 +122,7 @@ CommandHeader CommandLog::prepareLocalTransactionHeader(
     int commandCode)
 {
     int transactionSequence = 0;
-    vms::api::Timestamp transactionTimestamp;
+    Timestamp transactionTimestamp;
     std::tie(transactionSequence, transactionTimestamp) =
         generateNewTransactionAttributes(queryContext, systemId);
 
@@ -182,7 +180,7 @@ void CommandLog::markSystemForDeletion(const std::string& systemId)
     m_systemsMarkedForDeletion.push_back(systemId);
 }
 
-vms::api::Timestamp CommandLog::generateTransactionTimestamp(
+Timestamp CommandLog::generateTransactionTimestamp(
     const std::string& systemId)
 {
     QnMutexLocker lock(&m_mutex);
@@ -276,7 +274,7 @@ void CommandLog::fetchTransactionState(nx::sql::QueryContext* queryContext)
         const auto dbGuid = selectTransactionStateQuery.value("db_guid").toString().toStdString();
         const int sequence = selectTransactionStateQuery.value("sequence").toInt();
         const nx::Buffer tranHash = selectTransactionStateQuery.value("tran_hash").toString().toLatin1();
-        vms::api::Timestamp timestamp;
+        Timestamp timestamp;
         timestamp.sequence = selectTransactionStateQuery.value("timestamp_hi").toLongLong();
         timestamp.ticks = selectTransactionStateQuery.value("timestamp").toLongLong();
 
@@ -400,8 +398,8 @@ nx::sql::DBResult CommandLog::saveToDb(
         Qn::SerializationFormat::UbjsonFormat,
         m_supportedProtocolRange.currentVersion());
 
-    NX_DEBUG(this, lm("systemId %1. Saving command %2 (hash %3) to log")
-        .args(systemId, toString(commandHeader), commandHash));
+    NX_DEBUG(this, "systemId %1. Saving command %2 (hash %3) to log",
+        systemId, commandHeader, commandHash);
 
     auto dbResult = m_transactionDataObject->insertOrReplaceTransaction(
         queryContext,
@@ -430,7 +428,7 @@ int CommandLog::generateNewTransactionSequence(
         NodeStateKey{m_peerId, QnUuid::fromArbitraryData(systemId)});
 }
 
-vms::api::Timestamp CommandLog::generateNewTransactionTimestamp(
+Timestamp CommandLog::generateNewTransactionTimestamp(
     const QnMutexLockerBase& lock,
     CommandLogCache::TranId cacheTranId,
     const std::string& systemId)
@@ -508,7 +506,7 @@ CommandLog::TransactionLogContext* CommandLog::getTransactionLogContext(
     return insertionPair.first->second.get();
 }
 
-std::tuple<int, vms::api::Timestamp> CommandLog::generateNewTransactionAttributes(
+std::tuple</*command sequence*/ int, Timestamp> CommandLog::generateNewTransactionAttributes(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId)
 {

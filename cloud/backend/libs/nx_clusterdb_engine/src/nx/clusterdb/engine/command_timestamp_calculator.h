@@ -3,14 +3,12 @@
 #include <chrono>
 #include <functional>
 
-#include <QtCore/QElapsedTimer>
-
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/api/data/timestamp.h>
+
+#include "timestamp.h"
 
 namespace nx::clusterdb::engine {
-
-using Timestamp = nx::vms::api::Timestamp;
 
 class CommandTimestampCalculator
 {
@@ -29,9 +27,9 @@ public:
 
 private:
     std::function<std::chrono::milliseconds()> m_currentTimeSinceEpochFunc;
-    quint64 m_baseTime;
+    std::chrono::milliseconds m_baseTime = std::chrono::milliseconds::zero();
     Timestamp m_lastTimestamp;
-    QElapsedTimer m_relativeTimer;
+    nx::utils::ElapsedTimer m_relativeTimer;
     mutable QnMutex m_timeMutex;
 };
 

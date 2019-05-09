@@ -104,23 +104,21 @@ public:
     nx::sql::DBResult checkIfNeededAndSaveToLog(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        const SerializableCommand<CommandDescriptor>& transaction)
+        const SerializableCommand<CommandDescriptor>& command)
     {
-        const auto transactionHash = CommandDescriptor::hash(transaction.get().params);
+        const auto transactionHash = CommandDescriptor::hash(command.get().params);
 
-        // Checking whether transaction should be saved or not.
+        // Checking whether command should be saved or not.
         if (isShouldBeIgnored(
                 queryContext,
                 systemId,
-                transaction.get(),
+            command.get(),
                 transactionHash))
         {
-            NX_DEBUG(this,
-                lm("systemId %1. Command (%2, hash %3) is skipped")
-                    .args(systemId, engine::toString(transaction.header()),
-                        CommandDescriptor::hash(transaction.get().params)));
+            NX_DEBUG(this, "systemId %1. Command (%2, hash %3) is skipped",
+                systemId, command.header(), CommandDescriptor::hash(command.get().params));
 
-            // Returning nx::sql::DBResult::cancelled if transaction should be skipped.
+            // Returning nx::sql::DBResult::cancelled if command should be skipped.
             return nx::sql::DBResult::cancelled;
         }
 
@@ -128,20 +126,20 @@ public:
             queryContext,
             systemId,
             transactionHash,
-            transaction);
+            command);
         if (resultCode != nx::sql::DBResult::ok)
             return resultCode;
 
         resultCode = invokeExternalProcessor<CommandDescriptor>(
             queryContext,
             systemId,
-            transaction);
+            command);
         if (resultCode != nx::sql::DBResult::ok)
             return resultCode;
 
-        // TODO: #ak Get rid of transaction.clone().
+        // TODO: #ak Get rid of command.clone().
         queryContext->transaction()->addOnSuccessfulCommitHandler(
-            [this, systemId, commandSerializer = transaction.clone()]() mutable
+            [this, systemId, commandSerializer = command.clone()]() mutable
             {
                 m_outgoingTransactionDispatcher->dispatchTransaction(
                     systemId,
@@ -234,7 +232,7 @@ public:
 
     void markSystemForDeletion(const std::string& systemId);
 
-    vms::api::Timestamp generateTransactionTimestamp(const std::string& systemId);
+    Timestamp generateTransactionTimestamp(const std::string& systemId);
 
     void shiftLocalTransactionSequence(
         const std::string& systemId,
@@ -341,7 +339,7 @@ private:
         nx::sql::QueryContext* connection,
         const std::string& systemId);
 
-    vms::api::Timestamp generateNewTransactionTimestamp(
+    Timestamp generateNewTransactionTimestamp(
         const QnMutexLockerBase& lock,
         CommandLogCache::TranId cacheTranId,
         const std::string& systemId);
@@ -360,7 +358,7 @@ private:
         const QnMutexLockerBase& lock,
         const std::string& systemId);
 
-    std::tuple<int, vms::api::Timestamp> generateNewTransactionAttributes(
+    std::tuple</*command sequence*/ int, Timestamp> generateNewTransactionAttributes(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId);
 

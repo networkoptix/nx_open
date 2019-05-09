@@ -174,7 +174,8 @@ protected:
     {
         for (int i = 0; i < 3; ++i)
         {
-            auto tran = prepareFromOtherPeerWithTimestampDiff(1);
+            auto tran = prepareFromOtherPeerWithTimestampDiff(
+                std::chrono::milliseconds(1));
             tran.persistentInfo.timestamp.sequence = std::max<std::uint64_t>(
                 m_lastUsedSequence + 1,
                 tran.persistentInfo.timestamp.sequence + 1);
@@ -219,7 +220,8 @@ protected:
 
     void whenReceiveTransactionFromOtherPeerWithGreaterTimestamp()
     {
-        addTransactionFromOtherPeerWithTimestampDiff(1);
+        addTransactionFromOtherPeerWithTimestampDiff(
+            std::chrono::milliseconds(1));
     }
 
     void assertTransactionIsReplaced()
@@ -242,7 +244,8 @@ protected:
 
     void whenReceiveTransactionFromOtherPeerWithLesserTimestamp()
     {
-        addTransactionFromOtherPeerWithTimestampDiff(-1);
+        addTransactionFromOtherPeerWithTimestampDiff(
+            std::chrono::milliseconds(-1));
     }
 
     void assertTransactionIsNotReplaced()
@@ -375,14 +378,15 @@ private:
         return transactionsReadPromise.get_future().get();
     }
 
-    void addTransactionFromOtherPeerWithTimestampDiff(int timestampDiff)
+    void addTransactionFromOtherPeerWithTimestampDiff(
+        std::chrono::milliseconds timestampDiff)
     {
         saveTransaction(
             prepareFromOtherPeerWithTimestampDiff(timestampDiff));
     }
 
     Command<command::SaveCustomer::Data> prepareFromOtherPeerWithTimestampDiff(
-        int timestampDiff)
+        std::chrono::milliseconds timestampDiff)
     {
         Command<command::SaveCustomer::Data> transaction(
             command::SaveCustomer::code, m_otherPeerId);

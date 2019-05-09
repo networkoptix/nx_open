@@ -147,14 +147,13 @@ void Connection::reportCommandReceived(
         std::move(commandBuffer));
     if (!commandData)
     {
-        NX_DEBUG(this, lm("Failed to deserialize command from %1")
-            .args(remotePeerEndpoint()));
+        NX_DEBUG(this, "Failed to deserialize command from %1", remotePeerEndpoint());
         setState(State::Error);
         return;
     }
 
     NX_VERBOSE(this, "systemId %1. Received command (%2)",
-        m_transactionLogReader->systemId(), toString(commandData->header()));
+        m_transactionLogReader->systemId(), commandData->header());
 
     m_gotTransactionEventHandler(
         std::move(commandData),

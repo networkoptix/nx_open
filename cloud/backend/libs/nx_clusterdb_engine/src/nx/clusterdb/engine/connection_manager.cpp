@@ -65,8 +65,8 @@ void ConnectionManager::dispatchTransaction(
     const std::string& systemId,
     std::shared_ptr<const SerializableAbstractCommand> transactionSerializer)
 {
-    NX_VERBOSE(this, lm("systemId %1. Dispatching command %2")
-        .args(systemId, toString(transactionSerializer->header())));
+    NX_VERBOSE(this, "systemId %1. Dispatching command %2",
+        systemId, transactionSerializer->header());
 
     // Generating transport header.
     CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());

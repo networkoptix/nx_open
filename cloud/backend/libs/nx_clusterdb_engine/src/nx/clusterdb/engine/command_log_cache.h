@@ -11,13 +11,14 @@
 #include "command.h"
 #include "command_timestamp_calculator.h"
 #include "node_state.h"
+#include "timestamp.h"
 
 namespace nx::clusterdb::engine {
 
 struct UpdateHistoryData
 {
     NodeStateKey updatedBy;
-    vms::api::Timestamp timestamp;
+    Timestamp timestamp;
 };
 
 /**
@@ -54,7 +55,7 @@ public:
         NodeStateKey tranStateKey,
         int sequence,
         const nx::Buffer& tranHash,
-        const vms::api::Timestamp& timestamp);
+        const Timestamp& timestamp);
 
     TranId beginTran();
     void commit(TranId tranId);
@@ -71,7 +72,7 @@ public:
      * @return nullptr if tranId is unknown.
      */
     const VmsDataState* state(TranId tranId) const;
-    vms::api::Timestamp generateTransactionTimestamp(TranId tranId);
+    Timestamp generateTransactionTimestamp(TranId tranId);
     int generateTransactionSequence(const NodeStateKey& tranStateKey);
     int lastTransactionSequence(const NodeStateKey& tranStateKey);
 
@@ -93,7 +94,7 @@ private:
         VmsDataState data;
     };
 
-    vms::api::Timestamp m_maxTimestamp;
+    Timestamp m_maxTimestamp;
     std::map<TranId, TranContext> m_tranIdToContext;
     mutable QnMutex m_mutex;
     TranId m_tranIdSequence;

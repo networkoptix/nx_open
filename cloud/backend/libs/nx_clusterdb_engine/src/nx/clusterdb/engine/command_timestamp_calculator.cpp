@@ -2,33 +2,34 @@
 
 namespace nx::clusterdb::engine {
 
-constexpr const int kTimeShiftDelta = 1000;
+static constexpr std::chrono::seconds kTimeShiftDelta{1};
 
 CommandTimestampCalculator::CommandTimestampCalculator(
     std::function<std::chrono::milliseconds()> currentTimeSinceEpochFunc)
     :
-    m_currentTimeSinceEpochFunc(std::move(currentTimeSinceEpochFunc)),
-    m_baseTime(0)
+    m_currentTimeSinceEpochFunc(std::move(currentTimeSinceEpochFunc))
 {
     if (!m_currentTimeSinceEpochFunc)
+    {
         m_currentTimeSinceEpochFunc =
             []()
             {
                 return std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::steady_clock::now().time_since_epoch());
             };
+    }
 }
 
 void CommandTimestampCalculator::init(Timestamp initialValue)
 {
     m_lastTimestamp = initialValue;
-    m_baseTime = m_lastTimestamp.ticks;
+    m_baseTime = std::chrono::milliseconds(m_lastTimestamp.ticks);
     m_relativeTimer.restart();
 }
 
 Timestamp CommandTimestampCalculator::calculateNextTimeStamp()
 {
-    const qint64 absoluteTime = m_currentTimeSinceEpochFunc().count();
+    const auto absoluteTime = m_currentTimeSinceEpochFunc();
 
     Timestamp newTime = Timestamp(m_lastTimestamp.sequence, absoluteTime);
 
@@ -41,13 +42,14 @@ Timestamp CommandTimestampCalculator::calculateNextTimeStamp()
     }
     else
     {
-        newTime.ticks = m_baseTime + m_relativeTimer.elapsed();
+        newTime.ticks = (m_baseTime + m_relativeTimer.elapsed()).count();
         if (newTime > m_lastTimestamp)
         {
-            if (newTime > m_lastTimestamp + kTimeShiftDelta && newTime > absoluteTime + kTimeShiftDelta)
+            if (newTime > m_lastTimestamp + kTimeShiftDelta && 
+                newTime > absoluteTime + kTimeShiftDelta)
             {
                 newTime -= kTimeShiftDelta; // try to reach absolute time
-                m_baseTime = newTime.ticks;
+                m_baseTime = std::chrono::milliseconds(newTime.ticks);
                 m_relativeTimer.restart();
             }
             m_lastTimestamp = newTime;
@@ -55,7 +57,7 @@ Timestamp CommandTimestampCalculator::calculateNextTimeStamp()
         else
         {
             m_lastTimestamp++;
-            m_baseTime = m_lastTimestamp.ticks;
+            m_baseTime = std::chrono::milliseconds(m_lastTimestamp.ticks);
             m_relativeTimer.restart();
         }
     }
@@ -64,8 +66,8 @@ Timestamp CommandTimestampCalculator::calculateNextTimeStamp()
 
 void CommandTimestampCalculator::reset()
 {
-    m_baseTime = m_currentTimeSinceEpochFunc().count();
-    m_lastTimestamp = Timestamp::fromInteger(m_baseTime);
+    m_baseTime = m_currentTimeSinceEpochFunc();
+    m_lastTimestamp = Timestamp(0, m_baseTime);
     m_relativeTimer.restart();
 }
 

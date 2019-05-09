@@ -111,8 +111,7 @@ void GenericTransport::sendTransaction(
             {
                 NX_VERBOSE(this,
                     "Not sending command %1 to %2 since remote peer must have it",
-                    engine::toString(transactionSerializer->header()),
-                    m_commonTransportHeaderOfRemoteTransaction);
+                    transactionSerializer->header(), m_commonTransportHeaderOfRemoteTransaction);
                 return;
             }
 
@@ -120,17 +119,15 @@ void GenericTransport::sendTransaction(
                 || m_canSendCommands)
             {
                 NX_VERBOSE(this, "Sending command %1 to %2",
-                    engine::toString(transactionSerializer->header()),
-                    m_commonTransportHeaderOfRemoteTransaction);
+                    transactionSerializer->header(), m_commonTransportHeaderOfRemoteTransaction);
                 m_commandPipeline->sendTransaction(
                     std::move(transportHeader),
                     transactionSerializer);
                 return;
             }
 
-            NX_DEBUG(this, lm("Postponing sending command %1 to %2")
-                .args(engine::toString(transactionSerializer->header()),
-                    m_commonTransportHeaderOfRemoteTransaction));
+            NX_DEBUG(this, "Postponing sending command %1 to %2",
+                transactionSerializer->header(), m_commonTransportHeaderOfRemoteTransaction);
 
             //cannot send transaction right now: updating local transaction sequence
             const auto nodeStateKey = NodeStateKey::build(transactionSerializer->header());
@@ -143,15 +140,13 @@ void GenericTransport::sendTransaction(
 
 void GenericTransport::start()
 {
-    NX_DEBUG(this,
-        lm("Starting outgoing transaction channel to %1")
-            .arg(m_commonTransportHeaderOfRemoteTransaction));
+    NX_DEBUG(this, "Starting outgoing transaction channel to %1",
+        m_commonTransportHeaderOfRemoteTransaction);
 
     m_commandPipeline->start();
 
     // Sending tranSyncRequest.
-    auto requestTran = command::make<command::TranSyncRequest>(
-        m_localPeer.id);
+    auto requestTran = command::make<command::TranSyncRequest>(m_localPeer.id);
     requestTran.params.persistentState = toVmsTranState(m_transactionLogReader->getCurrentState());
 
     CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
@@ -201,9 +196,7 @@ void GenericTransport::processCommandData(
     }
 
     NX_VERBOSE(this, "Received command %1 from (%2, %3)",
-        engine::toString(commandData->header()),
-        transportHeader.systemId,
-        transportHeader.endpoint.toString());
+        commandData->header(), transportHeader.systemId, transportHeader.endpoint.toString());
 
     if (m_remotePeer.persistentId.isNull() &&
         !commandData->header().persistentInfo.dbID.isNull())
