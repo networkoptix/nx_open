@@ -38,6 +38,13 @@ static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 class QnRtspIoDevice
 {
 public:
+    struct AddressInfo
+    {
+        nx::vms::api::RtpTransportType transport{ nx::vms::api::RtpTransportType::automatic };
+        nx::network::SocketAddress address;
+    };
+
+public:
     explicit QnRtspIoDevice(
         QnRtspClient* owner,
         nx::vms::api::RtpTransportType rtpTransport,
@@ -63,7 +70,12 @@ public:
 
 
     void bindToMulticastAddress(const QHostAddress& address, const QString& interfaceAddress);
+
+    AddressInfo mediaAddressInfo() const;
+    AddressInfo rtcpAddressInfo() const;
+
 private:
+    AddressInfo addressInfo(int port) const;
     void processRtcpData();
     void updateSockets();
 
@@ -83,6 +95,16 @@ private:
     bool m_forceRtcpReports = false;
     QHostAddress m_multicastAddress;
 };
+
+inline bool operator<(
+    const QnRtspIoDevice::AddressInfo& lhs,
+    const QnRtspIoDevice::AddressInfo& rhs)
+{
+    if (lhs.transport != rhs.transport)
+        return lhs.transport < rhs.transport;
+
+    return lhs.address < rhs.address;
+}
 
 class QnRtspClient
 {
@@ -159,6 +181,8 @@ public:
 
     const nx::streaming::Sdp& getSdp() const;
 
+    void setKeepAliveTimeout(std::chrono::milliseconds keepAliveTimeout);
+
     bool sendKeepAliveIfNeeded();
 
     void setTransport(nx::vms::api::RtpTransportType transport);
@@ -169,7 +193,7 @@ public:
     /* Actual session RTP transport. If user set 'automatic', it can be 'tcp' or 'udp',
      * otherwise it should be equal to result of getTransport().
      */
-    nx::vms::api::RtpTransportType getActualTransport() const { return m_prefferedTransport; }
+    nx::vms::api::RtpTransportType getActualTransport() const { return m_actualTransport; }
 
     const std::vector<SDPTrackInfo>& getTrackInfo() const;
     QString getTrackCodec(int rtpChannelNum);
@@ -181,6 +205,7 @@ public:
     float getScale() const;
     void setScale(float value);
 
+    bool sendSetup();
     bool sendPlay(qint64 startPos, qint64 endPos, double scale);
     bool sendPause();
     bool sendSetParameter(const QByteArray& paramName, const QByteArray& paramValue);
@@ -255,8 +280,8 @@ private:
     nx::network::http::Request createDescribeRequest();
     bool sendDescribe();
     bool sendOptions();
-    bool sendSetup();
     bool sendKeepAlive();
+    bool sendSetupIfNotPlaying();
 
     bool readTextResponce(QByteArray &responce);
     void addAuth( nx::network::http::Request* const request );
@@ -295,7 +320,7 @@ private:
     nx::network::rtsp::StatusCodeValue m_responseCode;
     bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;
-    unsigned int m_TimeOut;
+    std::chrono::milliseconds m_keepAliveTimeOut{0};
     bool m_playNowMode = false;
     // end of initialized fields
 
@@ -316,7 +341,7 @@ private:
     QAuthenticator m_auth;
     boost::optional<nx::network::SocketAddress> m_proxyAddress;
     QString m_contentBase;
-    nx::vms::api::RtpTransportType m_prefferedTransport;
+    nx::vms::api::RtpTransportType m_actualTransport;
 
     static QByteArray m_guid; // client guid. used in proprietary extension
     static QnMutex m_guidMutex;

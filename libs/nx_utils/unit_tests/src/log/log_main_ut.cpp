@@ -9,7 +9,6 @@
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/utils/test_support/run_test.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/unused.h>
 
@@ -81,7 +80,7 @@ public:
 
     Buffer* buffer = nullptr;
     const Level initialLevel;
-    nx::utils::test::IniConfigTweaks iniTweaks;
+    nx::kit::IniConfig::Tweaks iniTweaks;
 };
 
 TEST_F(LogMainTest, ExplicitTag)

@@ -692,6 +692,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         "auto",
         this);
 
+    m_metadataStorageChangePolicyAdaptor = new QnLexicalResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>(
+        kMetadataStorageChangePolicyName,
+        nx::vms::api::MetadataStorageChangePolicy::keep,
+        this);
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -912,8 +917,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_maxWebMTranscoders
         << m_maxEventLogRecordsAdaptor
         << m_forceLiveCacheForPrimaryStreamAdaptor
+        << m_metadataStorageChangePolicyAdaptor
     ;
-
 
     return result;
 }
@@ -1738,4 +1743,14 @@ const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings()
 bool QnGlobalSettings::isGlobalSetting(const nx::vms::api::ResourceParamWithRefData& param)
 {
     return QnUserResource::kAdminGuid == param.resourceId;
+}
+
+nx::vms::api::MetadataStorageChangePolicy QnGlobalSettings::metadataStorageChangePolicy() const
+{
+    return m_metadataStorageChangePolicyAdaptor->value();
+}
+
+void QnGlobalSettings::setMetadataStorageChangePolicy(nx::vms::api::MetadataStorageChangePolicy value)
+{
+    m_metadataStorageChangePolicyAdaptor->setValue(value);
 }

@@ -93,23 +93,6 @@ inline int runTest(
         gtestRunFlags);
 }
 
-// TODO: Move to nx_kit?
-class IniConfigTweaks
-{
-public:
-    template<typename T>
-    void set(const T* iniField, T newValue)
-    {
-        const auto oldValue = *iniField;
-        T* mutableField = const_cast<T*>(iniField);
-        m_iniGuards.push_back(makeSharedGuard([=]() { *mutableField = oldValue; }));
-        *mutableField = newValue;
-    }
-
-private:
-    std::vector<SharedGuardPtr> m_iniGuards;
-};
-
 } // namespace test
 } // namespace utils
 } // namespace nx

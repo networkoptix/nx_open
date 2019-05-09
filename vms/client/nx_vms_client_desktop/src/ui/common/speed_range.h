@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QtGlobal>
+
 struct QnSpeedRange
 {
     qreal forward; //< maximum forward speed (>= 0)

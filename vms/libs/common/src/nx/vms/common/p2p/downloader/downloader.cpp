@@ -8,10 +8,12 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 #include <utils/common/delayed.h>
+#include <common/common_module.h>
 
 #include "private/storage.h"
 #include "private/worker.h"
 #include "private/resource_pool_peer_manager.h"
+#include "private/internet_only_peer_manager.h"
 
 namespace nx::vms::common::p2p::downloader {
 
@@ -30,8 +32,7 @@ public:
     QnMutex mutex;
     QScopedPointer<Storage> storage;
     QHash<QString, std::shared_ptr<Worker>> workers;
-    AbstractPeerManagerFactory* peerManagerFactory = nullptr;
-    std::unique_ptr<AbstractPeerManagerFactory> peerManagerFactoryOwner;
+    QList<AbstractPeerManager*> peerManagers;
     bool downloadsStarted = false;
 };
 
@@ -62,11 +63,11 @@ void Downloader::Private::startDownload(const QString& fileName)
         return;
 
     const auto fi = storage->fileInformation(fileName);
-    auto peerManager = peerManagerFactory->createPeerManager(fi.peerPolicy, fi.additionalPeers);
     auto worker = std::make_shared<Worker>(
         fileName,
         storage.data(),
-        peerManager);
+        peerManagers,
+        q->commonModule()->moduleGUID());
     workers[fileName] = worker;
 
     connect(worker.get(), &Worker::finished, this,
@@ -106,7 +107,7 @@ void Downloader::Private::stopDownload(const QString& fileName, bool emitSignals
 Downloader::Downloader(
     const QDir& downloadsDirectory,
     QnCommonModule* commonModule,
-    AbstractPeerManagerFactory* peerManagerFactory,
+    const QList<AbstractPeerManager*>& peerManagers,
     QObject* parent)
     :
     QObject(parent),
@@ -133,21 +134,19 @@ Downloader::Downloader(
         &Downloader::fileInformationChanged);
     connect(d->storage.data(), &Storage::fileStatusChanged, this, &Downloader::fileStatusChanged);
 
-    d->peerManagerFactory = peerManagerFactory;
-
-    // Creating the default factory.
-    if (!d->peerManagerFactory)
+    d->peerManagers = peerManagers;
+    if (peerManagers.isEmpty())
     {
-        auto factory = std::make_unique<ResourcePoolPeerManagerFactory>(commonModule);
-        d->peerManagerFactory = factory.get();
-        d->peerManagerFactoryOwner = std::move(factory);
+        d->peerManagers.append(new ResourcePoolPeerManager(commonModule));
+        d->peerManagers.append(new InternetOnlyPeerManager());
+        d->peerManagers.append(new ResourcePoolProxyPeerManager(commonModule));
     }
 }
 
 Downloader::~Downloader()
 {
-    for (auto& worker: d->workers)
-        worker->stop();
+    d->workers.clear();
+    qDeleteAll(d->peerManagers);
 }
 
 QStringList Downloader::files() const
@@ -240,73 +239,6 @@ void Downloader::stopDownloads()
 void Downloader::findExistingDownloads()
 {
     d->storage->findDownloads(true);
-}
-
-void Downloader::validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,
-    std::function<void(bool)> callback)
-{
-    auto httpClient = createHttpClient();
-    httpClient->doHead(url,
-        [httpClient, url, callback, expectedSize, onlyConnectionCheck](
-            const network::http::AsyncHttpClientPtr& asyncClient) mutable
-        {
-            const auto& response = asyncClient->response();
-            const bool hasResponse = response != nullptr;
-
-            if (asyncClient->failed()
-                || !hasResponse
-                || response->statusLine.statusCode != network::http::StatusCode::ok)
-            {
-                NX_WARNING(NX_SCOPE_TAG,
-                    "validateAsync(): Validate %1 http request failed. "
-                       "Http client failed: %2, has response: %3, status code: %4",
-                    url,
-                    asyncClient->failed(),
-                    hasResponse,
-                    response ? response->statusLine.statusCode : -1);
-
-                return callback(false);
-            }
-
-            if (onlyConnectionCheck)
-            {
-                NX_VERBOSE(NX_SCOPE_TAG,
-                    "validateAsync(): %1. Success (only connection check)", url);
-                return callback(true);
-            }
-
-            auto& responseHeaders = asyncClient->response()->headers;
-            auto contentLengthItr = responseHeaders.find("Content-Length");
-            const bool hasHeader = contentLengthItr != responseHeaders.cend();
-
-            if (!hasHeader || contentLengthItr->second.toInt() != expectedSize)
-            {
-                NX_WARNING(NX_SCOPE_TAG,
-                    "validateAsync(): %1. Content-Length: %2, fileInformation.size: %3",
-                    url,
-                    hasHeader ? contentLengthItr->second.toInt() : -1,
-                    expectedSize);
-
-                return callback(false);
-            }
-
-            NX_VERBOSE(NX_SCOPE_TAG, "validateAsync(): %1. Success", url);
-            callback(true);
-        });
-}
-
-bool Downloader::validate(const QString& url, bool onlyConnectionCheck, int expectedSize)
-{
-    nx::utils::promise<bool> readyPromise;
-    auto readyFuture = readyPromise.get_future();
-
-    validateAsync(url, onlyConnectionCheck, expectedSize,
-        [&readyPromise](bool success) mutable
-        {
-            readyPromise.set_value(success);
-        });
-
-    return readyFuture.get();
 }
 
 } // namespace nx::vms::common::p2p::downloader

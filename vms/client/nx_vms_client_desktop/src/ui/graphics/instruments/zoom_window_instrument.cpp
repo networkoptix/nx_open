@@ -190,9 +190,9 @@ QPointF targetDirectionPoint(const QRectF& to, Direction direction)
 class ZoomOverlayWidget;
 
 
-// -------------------------------------------------------------------------- //
-// ZoomWindowWidget
-// -------------------------------------------------------------------------- //
+/**
+ * This is a rectangle you can drag and scale across MediaResourceWidget.
+ */
 class ZoomWindowWidget: public Instrumented<QnClickableWidget>, public ConstrainedGeometrically
 {
     using base_type = Instrumented<QnClickableWidget>;
@@ -343,10 +343,10 @@ private:
     int m_frameWidth;
 };
 
-
-// -------------------------------------------------------------------------- //
-// ZoomOverlayWidget
-// -------------------------------------------------------------------------- //
+/**
+ * Container for several instances of ZoomWindowWidget.
+ * ZoomWindowInstrument prefers working with this class, instead of dealing with each zoom window.
+ */
 class ZoomOverlayWidget: public GraphicsWidget
 {
     using base_type = GraphicsWidget;
@@ -583,6 +583,8 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject* parent):
         &ZoomWindowInstrument::at_display_zoomLinkAboutToBeRemoved);
     connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
         &ZoomWindowInstrument::at_display_widgetChanged);
+    connect(display(), &QnWorkbenchDisplay::layoutAccessChanged, this,
+        &ZoomWindowInstrument::at_layoutAccessChanged);
 }
 
 ZoomWindowInstrument::~ZoomWindowInstrument()
@@ -1117,6 +1119,16 @@ void ZoomWindowInstrument::at_display_widgetChanged(Qn::ItemRole role)
 
     if (m_zoomedWidget)
         updateOverlayMode(m_zoomedWidget.data());
+}
+
+void ZoomWindowInstrument::at_layoutAccessChanged()
+{
+    qDebug() << "ZoomWindowInstrument::at_layoutAccessChanged()";
+    for (auto widgetRaw: m_dataByWidget.keys())
+    {
+        if (auto widget = dynamic_cast<QnMediaResourceWidget*>(widgetRaw))
+            updateOverlayMode(widget);
+    }
 }
 
 void ZoomWindowInstrument::at_display_zoomLinkAdded(

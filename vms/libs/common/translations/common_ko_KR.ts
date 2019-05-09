@@ -1010,7 +1010,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>알 수 없는 오류.</translation>
+      <translation>알수없는 오류</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>

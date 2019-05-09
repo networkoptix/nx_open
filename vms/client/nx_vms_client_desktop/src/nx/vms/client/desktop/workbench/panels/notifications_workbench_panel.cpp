@@ -504,9 +504,9 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
                 return;
 
             auto animator = opacityAnimator(toolTip, kToolTipFadeSpeedFactor);
-            animator->animateTo(0.0);
             connect(animator, &VariantAnimator::finished,
                 toolTip.data(), &QObject::deleteLater);
+            animator->animateTo(0.0);
         });
 
     m_eventPanelHoverProcessor->forceHoverEnter();

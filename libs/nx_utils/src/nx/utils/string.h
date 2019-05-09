@@ -110,8 +110,14 @@ enum GroupToken
     doubleQuotes = 1,
     squareBraces = 2,
     roundBraces = 4,
+    singleQuotes = 8,
 };
 
+/**
+ * Splits src string to substring using separator.
+ * Separators inside group tokens (inside double quotes by default) are ignored.
+ * @param groupTokens Bitset of group tokens.
+ */
 NX_UTILS_API std::vector<QnByteArrayConstRef> splitQuotedString(
     const QnByteArrayConstRef& src,
     char separator=',',

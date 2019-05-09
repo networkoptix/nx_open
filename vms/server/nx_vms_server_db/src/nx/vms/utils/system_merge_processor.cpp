@@ -602,7 +602,8 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     if (m_dbBackupEnabled)
     {
         QnJsonRestResult backupDBRestResult;
-        if (!executeRequest(remoteUrl, getKey, backupDBRestResult, lit("/api/backupDatabase")))
+        if (!executeRequest(
+            remoteUrl, getKey, backupDBRestResult, "/api/backupDatabase", /*post*/ true))
         {
             setMergeError(&result, MergeStatus::configurationFailed);
             return result;
@@ -814,7 +815,8 @@ bool SystemMergeProcessor::executeRequest(
     const nx::utils::Url& remoteUrl,
     const QString& getKey,
     ResultDataType& result,
-    const QString& path)
+    const QString& path,
+    bool post)
 {
     nx::network::http::HttpClient client;
     client.setResponseReadTimeout(kRequestTimeout);
@@ -824,7 +826,8 @@ bool SystemMergeProcessor::executeRequest(
     nx::utils::Url requestUrl(remoteUrl);
     requestUrl.setPath(path);
     addAuthToRequest(requestUrl, getKey);
-    if (!client.doGet(requestUrl) || !isResponseOK(client))
+
+    if (!(post ? client.doPost(requestUrl) : client.doGet(requestUrl)) || !isResponseOK(client))
     {
         auto status = getClientResponse(client);
         NX_DEBUG(this, lit("applyRemoteSettings. Failed to invoke %1: %2")

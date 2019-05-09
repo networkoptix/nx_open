@@ -18,6 +18,7 @@ static const QString kCameraIdParam = "cameraId";
 static const QString kTimeParam = "time";
 static const QString kIgnoreExternalArchive = "ignoreExternalArchive";
 static const QString kRotateParam = "rotate";
+static const QString kCropParam = "crop";
 static const QString kHeightParam = "height";
 static const QString kDeprecatedWidthParam = "widht";
 static const QString kWidthParam = "width";
@@ -55,6 +56,7 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
     }
 
     request.rotation = QnLexical::deserialized<int>(params.value(kRotateParam), request.rotation);
+    request.crop = QnLexical::deserialized<QRectF>(params.value(kCropParam), request.crop);
     auto& size = request.size;
     size.setHeight(QnLexical::deserialized<int>(params.value(kHeightParam),
         size.height()));
@@ -86,6 +88,8 @@ QnRequestParamList QnThumbnailRequestData::toParams() const
     if (request.ignoreExternalArchive)
         result.insert(kIgnoreExternalArchive, "");
     result.insert(kRotateParam, QnLexical::serialized(request.rotation));
+    if (!request.crop.isNull())
+        result.insert(kCropParam, QnLexical::serialized(request.crop));
     result.insert(kHeightParam, QnLexical::serialized(request.size.height()));
     result.insert(kWidthParam, QnLexical::serialized(request.size.width()));
     result.insert(kImageFormatParam, QnLexical::serialized(request.imageFormat));

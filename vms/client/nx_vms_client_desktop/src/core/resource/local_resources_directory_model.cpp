@@ -1,5 +1,6 @@
 #include "local_resources_directory_model.h"
 
+#include <QtCore/QSet>
 #include <QtCore/QDir>
 
 using namespace std::literals::chrono_literals;

@@ -2152,6 +2152,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
     connect(layout, SIGNAL(zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)), this, SLOT(at_layout_zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)));
     connect(layout, SIGNAL(zoomLinkRemoved(QnWorkbenchItem *, QnWorkbenchItem *)), this, SLOT(at_layout_zoomLinkRemoved(QnWorkbenchItem *, QnWorkbenchItem *)));
     connect(layout, SIGNAL(boundingRectChanged(QRect, QRect)), this, SLOT(at_layout_boundingRectChanged(QRect, QRect)));
+
+    connect(layout, &QnWorkbenchLayout::lockedChanged, this, &QnWorkbenchDisplay::layoutAccessChanged);
+
     if (const auto& layoutResource = layout->resource())
     {
         connect(layout->resource(), &QnLayoutResource::backgroundImageChanged, this,

@@ -9,6 +9,7 @@
 
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
+#include <nx/sdk/analytics/helpers/pixel_format.h>
 
 #include "engine.h"
 
@@ -46,13 +47,22 @@ private:
     virtual Engine* engine() const override { return engineCasted<Engine>(); }
 
     nx::sdk::analytics::IMetadataPacket* cookSomeEvents();
-    nx::sdk::analytics::IMetadataPacket* cookSomeObjects();
+    std::vector<nx::sdk::analytics::IMetadataPacket*> cookSomeObjects();
 
     int64_t usSinceEpoch() const;
 
     void processVideoFrame(const nx::sdk::analytics::IDataPacket* videoFrame, const char* func);
 
     bool checkVideoFrame(const nx::sdk::analytics::IUncompressedVideoFrame* frame) const;
+
+    bool checkVideoFramePlane(
+        const nx::sdk::analytics::IUncompressedVideoFrame* frame,
+        const nx::sdk::analytics::PixelFormatDescriptor* pixelFormatDescriptor,
+        int plane) const;
+
+    void dumpSomeFrameBytes(
+        const nx::sdk::analytics::IUncompressedVideoFrame* frame,
+        int plane) const;
 
     nx::sdk::Error startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);

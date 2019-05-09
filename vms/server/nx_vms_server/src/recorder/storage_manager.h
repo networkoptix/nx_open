@@ -74,7 +74,7 @@ public:
 
     QnStorageManager(
         QnMediaServerModule* serverModule,
-        nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
+        nx::analytics::db::AbstractEventsStorage* analyticsEventsStorage,
         QnServer::StoragePool kind,
         const char* threadName = nullptr);
     virtual ~QnStorageManager();
@@ -162,6 +162,7 @@ public:
     bool clearSpaceForFile(const QString& path, qint64 size);
     bool canAddChunk(qint64 timeMs, qint64 size);
     void checkSystemStorageSpace();
+    void checkMetadataStorageSpace();
 
     bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays, qint64 targetFreeSpace);
     void clearMaxDaysData();
@@ -304,7 +305,7 @@ private:
         nx::caminfo::ArchiveCameraDataList* outArchiveCameras) const;
 
 private:
-    nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;
+    nx::analytics::db::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;
     StorageMap                  m_storageRoots;
     FileCatalogMap              m_devFileCatalog[QnServer::ChunksCatalogCount];

@@ -128,6 +128,12 @@ Q_DECLARE_FLAGS(StreamDataFilters, StreamDataFilter)
 Q_DECLARE_OPERATORS_FOR_FLAGS(StreamDataFilters)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamDataFilter)
 
+enum class MetadataStorageChangePolicy
+{
+    keep,
+    remove,
+    move,
+};
 
 } // namespace api
 } // namespace vms
@@ -141,3 +147,4 @@ NX_VMS_API_DECLARE_TYPE(ServerFlag)
 NX_VMS_API_DECLARE_TYPE(ServerFlags)
 NX_VMS_API_DECLARE_TYPE(StreamDataFilter)
 NX_VMS_API_DECLARE_TYPE(StreamDataFilters)
+NX_VMS_API_DECLARE_TYPE(MetadataStorageChangePolicy)

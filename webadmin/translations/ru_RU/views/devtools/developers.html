@@ -11,34 +11,34 @@
     <div>
         <h3>Генератор произвольных событий</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party Systems to a System,
+            A Generic Event is a method of sending events from 3rd party systems to a System
             which can be used to trigger System actions in the Events & Rules engine.
-            Генератор произвольных событий - инструмент, который выполняет вызовы произвольных событий HTTP.
+            The Generic Event Generator is a tool which helps developers and integrators build
+            and test HTTP Generic Event calls.
         </p>
         <p><a href="#/developers/events">Генератор произвольных событий</a></p>
     </div>
     <div>
         <h3>API сервера</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party Systems. It gives developers the ability to
-            access almost every System feature available in the regular client: query/manage System resources (servers,
-            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
-            control PTZ cameras, and more.
+            A REST API that gives developers the ability to access almost every system feature available in the regular
+            client: query/manage system resources (servers, cameras, users, permissions), pull live or recorded video
+            out of System, generate events, create rules, control PTZ cameras, and more.
         </p>
         <p>
-            <a href="#/developers/api"><b>Инструмент тестирования API (новый)</b></a>
-            - интерактивная документация с инструментами для тестирования вызовов API<br>
-            <a href="#/developers/changelog">API-журнал изменений</a>
-             - список изменений в API, могущих затронуть текущий функционал<br>
-            <a id="api-doc" href="api.xml" target="_blank">Документация API</a><br>
-            <a href="#/developers/serverDocumentation">Документация по настройкам сервера</a>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation and tools for testing API calls<br>
+            <a href="#/developers/changelog">API Changelog</a>
+            - a list of breaking changes in API since the last release<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+            - a full list of available Server API calls
         </p>
 
     </div>
     <div>
         <h3>Панель сведений о камере</h3>
         <p>
-            Отображает дополнительную информацию по камерам, полезную для разработчиков, в интерфейсе Web Admin:
+            Displays additional developer-friendly information for individual cameras in the Web Admin Interface’s View tab:
         </p>
         <ul>
             <li>Идентификатор камеры</li>
@@ -51,9 +51,12 @@
         <p><a href="#/view/?cameraLinks">открыть панель сведений о камере</a></p>
     </div>
     <div>
-        <h3>SDK для интеграции источников видео</h3>
+        <h3>Video Source SDK</h3>
         <p>
-            SDK предоставляет возможность интеграции практически любого источника живого или записанного видео (IP-камер, NVR, цифровых видеорегистраторов, и т. д.) в систему. SDK позволяет создавать методы для обнаружения, отображения, анализа и записи видео. Также возможно интегрировать порты устройств ввода-вывода и данные обнаружения движения.
+            The Video Source SDK provides the ability to integrate almost any live or recorded video source (IP Cameras,
+            NVRs, DVRs, etc) into System and makes it possible to create methods for discovering, displaying, analyzing
+            and recording video. It also allows integrating I/O ports and devices, as well as pulling motion detection
+            information from 3rd party devices.
         </p>
         <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >получить пакет SDK</a></p>
     </div>
@@ -61,7 +64,10 @@
     <div>
         <h3>SDK для интеграции хранилищ</h3>
         <p>
-            SDK хранения данных предоставляет возможность интеграции потенциальных хранилищ в систему. Это позволяет разработчикам выполнять операции чтения/записи в любое место хранения: местное, удаленное и даже облачное. Создание плагина хранения данных требует реализации стандартных функций таких как: потоковый ввод-вывод, проверка существования файла, удаление файла, получения списка файлов в папке и др. SDK также содержит пример использования FTP-сервера в качестве хранилища.
+            The Storage SDK allows developers to read from or write to any storage location: local, remote, and even
+            cloud one. Creating a storage plugin requires implementing standard functions such as: I/O stream, if file
+            exist, delete file, list of files in the folder, etc. The Storage SDK contains an example for using an FTP
+            server as a storage location.
         </p>
         <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >получить пакет SDK</a></p>
     </div>

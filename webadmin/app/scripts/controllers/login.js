@@ -26,33 +26,48 @@ angular.module('webadminApp')
             },20);
             return false;
         }
+    
+        function touchForm(form) {
+            for (let ctrl in form) {
+                if (ctrl.indexOf('$') === -1) {
+                    form[ctrl].$setTouched(true);
+                    form[ctrl].$setDirty(true);
+                }
+            }
+        }
 
-        $scope.login = function () {
+        $scope.login = function (form) {
+            touchForm(form);
+            
             if ($scope.loginForm.$valid) {
                 var login = $scope.user.username.toLowerCase();
                 var password = $scope.user.password;
                 $scope.authorizing = true;
-                mediaserver.login(login,password).then(reload,function(error){
-                    $scope.authorizing = false;
-                    if(error.authResult !== '') {
-                        switch (error.authResult) {
-                            case 'Auth_WrongPassword':
-                                dialogs.alert(L.login.incorrectPassword);
-                                break;
-                            case 'Auth_LockedOut':
-                            default:
-                                dialogs.alert(L.login.authLockout);
-                        }
-                    } else {
-                        if(error.errorString.toLowerCase().indexOf('wrong') > -1) {
-                            dialogs.alert(L.login.incorrectPassword);
+                
+                mediaserver
+                    .login(login, password)
+                    .then(reload, function(error) {
+                        $scope.authorizing = false;
+                        if (error.authResult !== '') {
+                            switch (error.authResult) {
+                                case 'Auth_WrongLogin':
+                                case 'Auth_WrongPassword':
+                                    dialogs.alert(L.login.incorrectPassword);
+                                    break;
+                                case 'Auth_LockedOut':
+                                default:
+                                    dialogs.alert(L.login.authLockout);
+                            }
                         } else {
-                            dialogs.alert(L.login.authLockout);
+                            if(error.errorString.toLowerCase().indexOf('wrong') > -1) {
+                                dialogs.alert(L.login.incorrectPassword);
+                            } else {
+                                dialogs.alert(L.login.authLockout);
+                            }
                         }
-                    }
-                }).then(function(){
-                    nativeClient.updateCredentials(login,password,false,false);
-                });
+                    }).then(function(){
+                        nativeClient.updateCredentials(login, password, false, false);
+                    });
             }
         };
     }]);

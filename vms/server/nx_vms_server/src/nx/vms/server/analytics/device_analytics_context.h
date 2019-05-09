@@ -4,8 +4,9 @@
 
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/server/resource/resource_fwd.h>
 
+#include <nx/utils/thread/mutex.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/analytics/abstract_video_data_receptor.h>
 #include <nx/sdk/analytics/i_device_agent.h>

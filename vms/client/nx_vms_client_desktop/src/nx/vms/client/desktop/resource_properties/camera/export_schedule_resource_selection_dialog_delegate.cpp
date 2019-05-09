@@ -1,6 +1,7 @@
 #include "export_schedule_resource_selection_dialog_delegate.h"
 
 #include <QtWidgets/QLayout>
+#include <QtWidgets/QCheckBox>
 
 #include <ui/style/custom_style.h>
 #include <utils/license_usage_helper.h>

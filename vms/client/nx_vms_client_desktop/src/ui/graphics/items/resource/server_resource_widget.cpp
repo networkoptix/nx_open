@@ -650,8 +650,10 @@ void QnServerResourceWidget::updateLegend() {
                 int mask = data.bar->visibleButtons();
                 QList<LegendButtonWidget*> buttons;
 
-                for (int i = 1; i <= mask; i*=2) {
-                    LegendButtonWidget* button = dynamic_cast<LegendButtonWidget*>(data.bar->button(i));
+                for (int i = 1; i <= mask && i > 0; i*=2)
+                {
+                    LegendButtonWidget* button = dynamic_cast<LegendButtonWidget*>(
+                        data.bar->button(i));
                     if (!button)
                         continue;
                     buttons << button;

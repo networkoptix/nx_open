@@ -21,7 +21,6 @@ public:
     bool isUdpHpEnabled = true;
     bool isCloudProxyEnabled = true;
     bool isDirectTcpConnectEnabled = true;
-    bool useHttpConnectToListenOnRelay = false;
     std::chrono::milliseconds delayBeforeSendingConnectToMediatorOverTcp =
         kDefaltDelayBeforeSendingConnectToMediatorOverTcp;
 

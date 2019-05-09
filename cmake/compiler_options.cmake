@@ -209,7 +209,7 @@ if(qml_debug)
 endif()
 
 set(strip_binaries ON)
-if(targetDevice MATCHES "bpi|bananapi|rpi|edge1"
+if(targetDevice MATCHES "bpi|linux_arm32|edge1"
     OR targetDevice STREQUAL "linux-x64"
     OR targetDevice STREQUAL "linux-x86"
     OR (targetDevice STREQUAL "" AND platform STREQUAL "linux")

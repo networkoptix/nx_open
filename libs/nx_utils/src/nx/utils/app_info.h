@@ -29,8 +29,6 @@ public:
     static bool isWin64();
     static bool isWin32();
 
-    static bool isBpi();
-    static bool isRaspberryPi();
     static bool isNx1();
     static bool isAndroid();
     static bool isIos();

@@ -332,7 +332,7 @@ NameHelper::NameHelper()
 
         normalizedName = normalizedName.replace(normalizedManufacturer, QString());
 
-        camerasNames.insert(normalizedName);
+        m_camerasNames.insert(normalizedName);
     }
 }
 
@@ -353,8 +353,8 @@ bool NameHelper::isSupported(const QString& cameraName) const
 
     QString normalizedCameraName = cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString());
     do {
-        QSet<QString>::ConstIterator it = camerasNames.constFind(normalizedCameraName);
-        if (it != camerasNames.constEnd())
+        std::set<QString>::const_iterator it = m_camerasNames.find(normalizedCameraName);
+        if (it != m_camerasNames.cend())
             return true;
         normalizedCameraName.chop(1);
     } while (normalizedCameraName.length() >= 4);

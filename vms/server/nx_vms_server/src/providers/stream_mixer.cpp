@@ -346,7 +346,7 @@ int QnStreamMixer::channelCount(QnAbstractMediaData::DataType dataType) const
             mappedChannels = std::move(temp);
         }
     }
-    return mappedChannels.size();
+    return (int) mappedChannels.size();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

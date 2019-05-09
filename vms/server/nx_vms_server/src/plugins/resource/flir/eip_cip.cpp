@@ -1,5 +1,7 @@
 #include "eip_cip.h"
 
+#include <QtCore/QDataStream>
+
 QByteArray MessageRouterRequest::encode(const MessageRouterRequest& request)
 {
     QByteArray encoded;
@@ -46,7 +48,7 @@ MessageRouterResponse MessageRouterResponse::decode(const QByteArray& buf)
         response.additionalStatus.append(tmp.get(), response.sizeOfAdditionalStatus);
     }
 
-    size_t sizeOfData = buf.size()
+    int sizeOfData = buf.size()
         - sizeof(response.serviceCode)
         - sizeof(response.reserved)
         - sizeof(response.generalStatus)

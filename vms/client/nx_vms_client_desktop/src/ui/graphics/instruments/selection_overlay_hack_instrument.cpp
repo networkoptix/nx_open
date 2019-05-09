@@ -15,8 +15,8 @@ void SelectionOverlayHackInstrument::installedNotify() {
 }
 
 void SelectionOverlayHackInstrument::aboutToBeUninstalledNotify() {
-    if(scene() != NULL)
-        disconnect(scene(), NULL, this, NULL);
+    if (scene())
+        scene()->disconnect(this);
 
     m_singleSelectedWidget.clear();
 }

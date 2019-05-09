@@ -80,10 +80,14 @@ protected:
 
     void whenStartAlivenessTester()
     {
-        m_alivenessTester = std::make_unique<AlivenessTester>(
-            m_keepAliveOptions,
-            &m_serverIsAlive,
-            &m_probesSent);
+        if (!m_alivenessTester)
+        {
+            m_alivenessTester = std::make_unique<AlivenessTester>(
+                m_keepAliveOptions,
+                &m_serverIsAlive,
+                &m_probesSent);
+        }
+
         m_alivenessTester->start([this]() { m_failures.push(0); });
     }
 

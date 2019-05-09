@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <QtCore/QAbstractItemModel>
+#include <QtGui/QBrush>
 
 #include <utils/common/id.h>
 

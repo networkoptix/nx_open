@@ -425,7 +425,8 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
 
     //launching transcoding:
     //creating transcoder
-    auto config = DecoderConfig::fromResource(mediaResource);
+    QnFfmpegTranscoder::Config config;
+    config.decoderConfig = DecoderConfig::fromResource(mediaResource);
     std::unique_ptr<QnTranscoder> transcoder(new QnFfmpegTranscoder(config, mediaResource->commonModule()->metrics()));
     if (transcoder->setContainer(transcodeParams.containerFormat()) != 0)
     {

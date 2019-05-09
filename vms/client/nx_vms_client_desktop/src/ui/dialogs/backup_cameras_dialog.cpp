@@ -1,5 +1,10 @@
 #include "backup_cameras_dialog.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+#include <boost/algorithm/cxx11/all_of.hpp>
+
+#include <QtCore/QCryptographicHash>
+
 #include <api/model/backup_status_reply.h>
 
 #include <core/resource_management/resource_pool.h>

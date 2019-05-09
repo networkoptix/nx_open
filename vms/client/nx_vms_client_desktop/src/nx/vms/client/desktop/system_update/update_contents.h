@@ -25,15 +25,6 @@ public:
 };
 
 /**
- * Tries to find update package for the specified server.
- * @param server
- * @param updateInfo
- * @return pointer to package found, or nullptr.
- */
-const nx::update::Package* findPackageForServer(
-    QnMediaServerResourcePtr server, const nx::update::Information& updateInfo);
-
-/**
  * Checks if cloud host is compatible with our system
  * @param commonModule
  * @param targetVersion - target version of system update.
@@ -47,6 +38,19 @@ bool checkCloudHost(
     QString cloudUrl,
     const QSet<QnUuid>& peers);
 
+struct ClientVerificationData
+{
+    api::SystemInformation systemInfo;
+    std::set<nx::utils::SoftwareVersion> installedVersions;
+    /** Current client version, */
+    nx::utils::SoftwareVersion currentVersion;
+    /** Peer id for a client. Verification will ignore client if clientId is null. */
+    QnUuid clientId;
+
+    /** Fills in systemInfo and currentVersion. */
+    void fillDefault();
+};
+
 /**
  * Run verification for update contents.
  * It checks whether there are all necessary packages and they are compatible with current system.
@@ -55,14 +59,13 @@ bool checkCloudHost(
  * @param commonModule - everybody needs commonModule.
  * @param contents - update contents. Result is stored inside its fields.
  * @param servers - servers to be used for update verification.
- * @param clientVersions - a set of installed client versions.
- * @param clientId - peer id for a client. Verification will ignore client if clientId is null.
- * @returns true if everything is ok.
+ * @param clientData - contains additional client data necessary for verification.
+ * @returns true if everything is ok. Detailed error can be found inside 'contents'.
  */
-bool verifyUpdateContents(
+NX_VMS_CLIENT_DESKTOP_API bool verifyUpdateContents(
     QnCommonModule* commonModule,
     nx::update::UpdateContents& contents,
     std::map<QnUuid, QnMediaServerResourcePtr> servers,
-    const std::set<nx::utils::SoftwareVersion>& clientVersions = {}, QnUuid clientId = QnUuid());
+    const ClientVerificationData& clientData);
 
 } // namespace nx::vms::client::desktop

@@ -413,9 +413,9 @@ public:
         m_rotationCcw = new nx::vms::client::desktop::HoverButton(kIconCcw, kIconCcwHovered, this);
         m_rotationLabel = new QLabel();
         m_rotationLabel->setText(rotationText(0));
-        ptzrInfoContainer->addWidget(m_rotationCw);
-        ptzrInfoContainer->addWidget(m_rotationLabel);
         ptzrInfoContainer->addWidget(m_rotationCcw);
+        ptzrInfoContainer->addWidget(m_rotationLabel);
+        ptzrInfoContainer->addWidget(m_rotationCw);
         ptzrContainer->addLayout(ptzrInfoContainer);
         ptzrContainer->setAlignment(ptzrInfoContainer, Qt::AlignCenter);
 

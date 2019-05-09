@@ -240,6 +240,11 @@ RandomlyFailingHttpServer::RandomlyFailingHttpServer(
 {
 }
 
+RandomlyFailingHttpServer::~RandomlyFailingHttpServer()
+{
+    pleaseStopSync();
+}
+
 void RandomlyFailingHttpServer::setResponseBuffer(const QByteArray& buf)
 {
     m_responseBuffer = buf;
