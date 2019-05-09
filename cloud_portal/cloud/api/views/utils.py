@@ -29,6 +29,8 @@ def get_settings_from_cache():
         'companyLink': customization_cache['company_link'],
         'feedbackEnabled': customization_cache['feedback_enabled'],
         'footerItems': customization_cache['footer_items'],
+        'integrationFilterItems': customization_cache['integration_filter_items'],
+        'integrationStoreEnabled': customization_cache['integration_store_enabled'],
         'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
         'publicDownloads': customization_cache['public_downloads'],
         'publicReleases': customization_cache['public_releases'],
@@ -331,3 +333,9 @@ def get_ipvd(request):
         # --------------------
 
         return Response({'IPVD cache cleared'})
+
+
+@api_view(['GET'])
+@handle_exceptions
+def is_integration_store_enabled(request):
+    return Response(get_settings_from_cache()['integrationStoreEnabled'])

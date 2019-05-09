@@ -62,8 +62,7 @@ class GroupAdminForm(forms.ModelForm):
 
     def save_m2m(self):
         # Add the users to the Group.
-        self.instance.user_set = self.cleaned_data['users']
-        self.instance.products_set = self.cleaned_data['products']
+        self.instance.user_set.set(self.cleaned_data['users'])
 
         for product in self.cleaned_data['products']:
             if not UserGroupsToProductPermissions.objects.filter(group=self.instance, product=product).exists():

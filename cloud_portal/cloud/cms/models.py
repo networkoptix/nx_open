@@ -75,6 +75,8 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'company_link': product.read_global_value("%COMPANY_LINK%"),
                 'feedback_enabled': product.read_global_value("%FEEDBACK_ENABLED%"),
                 'footer_items': footer_items,
+                'integration_filter_items': product.read_global_value("%INTEGRATION_FILTER_ITEMS%"),
+                'integration_store_enabled': product.read_global_value("%INTEGRATION_STORE_ENABLED%"),
                 'public_downloads': product.read_global_value("%PUBLIC_DOWNLOADS%"),
                 'public_releases': product.read_global_value("%PUBLIC_RELEASE_HISTORY%"),
                 'sort_supported_devices_by_popularity': product.read_global_value(
@@ -134,7 +136,7 @@ class Customization(models.Model):
         # Used to allow a user to see the customization in list of customizations
         # Cloud portal(s) are now a product so customization is not necessary for giving access anymore
         permissions = (
-            ('can_view_customization', 'Can view customization'),
+            ('access_customization', 'Can access customization'),
         )
     name = models.CharField(max_length=255, unique=True)
     default_language = models.ForeignKey(
@@ -209,7 +211,7 @@ class Product(models.Model):
         # The can_access_product gives users the ability to see the product in product lists.
         # In combination with other permission it allows them to edit the product and send reviews for their product
         permissions = (
-            ('can_access_product', 'Can access product'),
+            ('access_product', 'Can access product'),
         )
     name = models.CharField(max_length=255)
     created_by = models.ForeignKey(
@@ -250,9 +252,6 @@ class Product(models.Model):
 
     @property
     def version_id(self):
-        # I need this for local dev until cloud-portal gets updated to 18.4
-        # versions = ContentVersion.objects.filter(product=self)
-        # return versions.latest('accepted_date').id if versions.exists() else 0
         accepted_review = ProductCustomizationReview.objects. \
             filter(customization__name=settings.CUSTOMIZATION,
                    state=ProductCustomizationReview.REVIEW_STATES.accepted,

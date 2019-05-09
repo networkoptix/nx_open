@@ -89,8 +89,8 @@
         </div>
     </div>
     {% endfor %}
-
-    {% if perms.cms.edit_content %}
+    {% has_permission user product 'cms.edit_content' as can_edit_content %}
+    {% if can_edit_content %}
         <div class="submit-row">
             {% if preview_link %}
                 <button class='btn btn-sm btn-default pull-left' onClick="openPreview();return false;">Open Preview</button>

@@ -2,8 +2,8 @@
 
     <div class="row m-0">
         <div class="col-12 p-0">
-            <div class="d-block d-lg-inline-flex flex-lg-row w-100">
-                <div class="search-group">
+            <div class="d-block d-md-inline-flex flex-md-row w-100">
+                <div class="search-group" [ngClass]="{'mr-3' : layout == 'full'}">
                     <span class="glyphicon glyphicon-search icon-search"></span>
                     <input [(ngModel)]="localFilter.query"
                            [ngModelOptions]="{debounceTime : config.search.debounceTime}"
@@ -20,19 +20,16 @@
                         <span class="glyphicon-close"></span>
                     </button>
                 </div>
-                <div class="float-left btn btn-big btn-tag-selected ml-lg-3 mt-3 mt-lg-0 mr-1 mr-lg-0"
+                <div class="float-left btn btn-big btn-tag-selected mt-3 mt-md-0 mr-1"
                         *ngIf="numberFilters != 0 && layout == 'full'">
 
-                    <span class="ml-2 mr-3">
-                        {{filterSelected}}
-                    </span>
-
+                    <span [innerHTML]="filterSelected"></span>
                     <span class="close-button" (click)="resetFilters()">
                         <span class="glyphicon tag-close-icon"></span>
                     </span>
                 </div>
 
-                <div class="btn btn-arrow btn-big btn-tag float-left ml-lg-3 mt-3 mt-lg-0"
+                <div class="btn btn-arrow btn-big btn-tag float-left mt-3 mt-md-0"
                         [ngClass]="{'selected' : showAdvancedOptions}"
                         (click)="toggleOptions()"
                         *ngIf="layout == 'full'">
@@ -41,16 +38,17 @@
                         <span></span>
                         <span></span>
                     </div>
-                    <span translate>Advanced search</span>
+                    <span translate>Advanced Search</span>
                 </div>
             </div>
         </div>
 
-        <div class="row col-12 m-0 p-0" [hidden]="!showAdvancedOptions">
-            <div class="row col-12 col-lg-9 col-xxl-6 mt-3 m-0 p-0"
+        <div class="row col-12 m-0 p-0"
+             [hidden]="!showAdvancedOptions" *ngIf="localFilter.tags">
+            <div class="drop-container row col-12 mt-3 m-0 p-0"
                  *ngIf="localFilter.selects && localFilter.selects.length || localFilter.multiselects && localFilter.multiselects.length">
 
-                <div class="drop col-12 col-lg-4 mt-3 mt-lg-0 pl-0 pr-0 pr-lg-3" *ngFor="let select of localFilter.selects">
+                <div class="drop col-12 col-md-4 mt-3 mt-md-0" *ngFor="let select of localFilter.selects">
                     <label style="text-transform: capitalize">{{ select.label }}</label>
                     <nx-select [name]="select.label"
                                [items]="select.items"
@@ -61,7 +59,7 @@
                     </nx-select>
                 </div>
 
-                <div class="drop col-12 col-lg-4 mt-3 mt-lg-0 pl-0 pr-0 pr-lg-3" *ngFor="let multiselect of localFilter.multiselects">
+                <div class="drop col-12 col-md-4 mt-3 mt-md-0" *ngFor="let multiselect of localFilter.multiselects">
                     <label style="text-transform: capitalize">{{ multiselect.label }}</label>
                     <nx-multi-select [name]="multiselect.label"
                                      [items]="multiselect.items"
@@ -72,7 +70,7 @@
                 </div>
             </div>
 
-            <div class="col-xxl-6 mb-2 m-0 p-0"
+            <div class="mb-2 m-0 p-0"
                  [ngClass]="{'mt-2' : layout != 'full', 'mt-3 mb-2': layout == 'full'}"
                  [hidden]="!showAdvancedOptions && localFilter.tags && localFilter.tags.length">
 

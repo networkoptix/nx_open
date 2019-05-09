@@ -31,9 +31,7 @@
                     <td *ngFor="let p of showParametersFor(item)" class="text-left"
                         [ngClass]="{'debug' : debug}">
 
-                        <div *ngIf="!isBoolean(item[p]) && item[p] !== 0 && item[p] !== '0x0'; else icon">
-                            {{ item[p] }}
-                        </div>
+                        <div *ngIf="!isBoolean(item[p]) && item[p] !== 0 && item[p] !== '0x0'; else icon">{{item[p]}}</div>
                         <ng-template #icon>
                             <nx-bool-icon [param]="p" [value]="item[p]"></nx-bool-icon>
                         </ng-template>

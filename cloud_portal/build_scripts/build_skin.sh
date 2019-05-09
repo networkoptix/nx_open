@@ -97,22 +97,22 @@ dir=../skins/$SKIN
 
         echo "$TARGET_DIR/$SKIN/static/lang_$LANG/views/"
 
-        mkdir -p $TARGET_DIR/$SKIN/static/lang_$LANG/views/
+        mkdir -p $TARGET_DIR/$SKIN/static/lang_$LANG/views
 
         echo "Copy default views - with default language"
-        cp -rf $TARGET_DIR/$SKIN/static/views/* $TARGET_DIR/$SKIN/static/lang_$LANG/views/
+        cp -rf $TARGET_DIR/$SKIN/static/views $TARGET_DIR/$SKIN/static/lang_$LANG
 
         echo "Overwrite them with localized sources"
-        cp -rf $lang_dir/views/* $TARGET_DIR/$SKIN/static/lang_$LANG/views/ || true
+        cp -rf $lang_dir/views $TARGET_DIR/$SKIN/static/lang_$LANG || true
 
 
-        mkdir -p $TARGET_DIR/$SKIN/static/lang_$LANG/web_common/
+        mkdir -p $TARGET_DIR/$SKIN/static/lang_$LANG/web_common
 
         echo "Copy web_common default views - with default language"
-        cp -rf $TARGET_DIR/$SKIN/static/web_common/* $TARGET_DIR/$SKIN/static/lang_$LANG/web_common/
+        cp -rf $TARGET_DIR/$SKIN/static/web_common/views $TARGET_DIR/$SKIN/static/lang_$LANG/web_common
 
         echo "Overwrite them with localized sources"
-        cp -rf $lang_dir/web_common/views/* $TARGET_DIR/$SKIN/static/lang_$LANG/web_common/ || true
+        cp -rf $lang_dir/web_common/views $TARGET_DIR/$SKIN/static/lang_$LANG/web_common || true
 
         echo "Generate language.json"
         pushd $TARGET_DIR/$SKIN
@@ -126,7 +126,7 @@ dir=../skins/$SKIN
     python ../../../../build_scripts/generate_all_languages_json.py
     popd
 
-    rm -rf $TARGET_DIR/$SKIN/static/views
+    rm -rf $TARGET_DIR/$SKIN/static/{views,web_common/views}
     echo "Localization success"
 
 echo "$SKIN Done"

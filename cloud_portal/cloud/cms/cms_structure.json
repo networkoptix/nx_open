@@ -494,6 +494,15 @@
             "value": "true",
             "optional": true,
             "advanced": true
+          },
+          {
+            "label": "Enable integration store",
+            "name": "%INTEGRATION_STORE_ENABLED%",
+            "description": "Lets the desktop client know if the integration store is enabled.",
+            "type": "check_box",
+            "value": "false",
+            "optional": true,
+            "advanced": true
           }
         ]
       },
@@ -724,6 +733,49 @@
             "optional": false,
             "type": "array"
           }
+        ]
+      },
+      {
+        "name": "Integrations page",
+        "is_global": true,
+        "description": "Customizing integrations page",
+        "hidden": true,
+        "translatable": false,
+        "values": [
+            {
+                "label": "Tag Items",
+                "name": "%INTEGRATION_FILTER_ITEMS%",
+                "value": [
+                    {
+                        "name": "Access Control",
+                        "enabled": false
+                    },
+                    {
+                        "name": "Connector",
+                        "enabled": false
+                    },
+                    {
+                        "name": "Data Analytics",
+                        "enabled": false
+                    },
+                    {
+                        "name": "Drone",
+                        "enabled": false
+                    },
+                    {
+                        "name": "Health Monitor",
+                        "enabled": false
+                    },
+                    {
+                        "name": "Storage",
+                        "enabled": false
+                    }
+                ],
+                "description": "Defines the tags in the search for integrations",
+                "advanced": true,
+                "optional": false,
+                "type": "array"
+            }
         ]
       }
     ]

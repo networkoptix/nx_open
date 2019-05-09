@@ -4,6 +4,7 @@
 
 {% block extrahead %}
     {{ block.super }}
+    <script>window.$ = django.jQuery;</script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 {% endblock %}
 {% block content %}
@@ -34,13 +35,13 @@
                     <tbody>
                     {% for review in customization_reviews %}
                         {% get_review_state review.state as state %}
-                        {% has_permission user 'cms.can_view_customization' review.customization.name as can_view_customization %}
+                        {% has_customization_permission user review.customization.name 'cms.access_customization' as access_customization %}
                         <tr>
                             <td> {{ review.customization }}</td>
                             <td><span class="label {% if state == 'Rejected' %} label-danger {% elif state == "Accepted" %} label-success {% else %} label-default{% endif %}">{{ state }}</span></td>
                             <td> {{ review.reviewed_by }}</td>
                             <td> {{ review.reviewed_date }}</td>
-                            {% if can_view_customization %}
+                            {% if access_customization %}
                             <td> {{ review.notes | linebreaks }}</td>
                             {% else %}
                             <td> {{ review.notes | anon_notes | linebreaks }} </td>
@@ -167,9 +168,9 @@
                                 <div id="add">
                                     <textarea id="id_add" rows="5" style="width:100%" name="addedNote" type="text" required></textarea>
                                 </div>
-                                <label for="can_view_customization">Can View Customization (If selected the user will be able to see this customization)</label>
+                                <label for="access_customization">Can View Customization (If selected the user will be able to see this customization)</label>
                                 <div>
-                                    <input id="can_view_customization" name="can_view_customization" type="checkbox">
+                                    <input id="access_customization" name="access_customization" type="checkbox">
                                 </div>
                             </div>
                         </div>
@@ -183,7 +184,7 @@
         </div>
     </form>
     <script>
-        $(function() {
+        (function() {
             // When a preview tag is clicked make a post request instead of a get request
             var previews = $('.preview');
             var csrf = $('input[name=csrfmiddlewaretoken]')[0];
@@ -221,7 +222,7 @@
                 noteButton.attr('class', button.attr('class'));
             })
 
-        });
+        })();
     </script>
     {% endwith %}
 {% endblock %}

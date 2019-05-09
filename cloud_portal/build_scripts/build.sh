@@ -87,9 +87,9 @@ done
 
 cp ../cloud/cloud/cloud_portal.yaml $TARGET_DIR/_source
 
-BAN_LIST="nx witness|nx witness client|nx platform|nxvms|nx cloud"
+BAN_LIST="nx\ |nxvms"
 echo "Checking files for mentions of nx with the following patterns: ${BAN_LIST}"
-branding=$(grep -iE "$BAN_LIST" --exclude=fonts -rl ${TARGET_DIR}/_source) || true
+branding=$(grep -Ei "$BAN_LIST" -rl --exclude-dir=fonts --exclude={\*.{swf,png,gif},{commonPasswordsList,downloads}.json} ${TARGET_DIR}/_source) || true
 if [[ -z ${branding} ]]
 then
     echo "No mentions were found"

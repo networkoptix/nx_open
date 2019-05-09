@@ -50,6 +50,7 @@ export class NxIpvdComponent implements OnInit {
     hasNoSearch: boolean;
     debug: any;
     uriPath: string;
+    breakpoint: string;
 
 
     private setupDefaults() {
@@ -60,6 +61,7 @@ export class NxIpvdComponent implements OnInit {
             'isFisheye', 'isMdSupported', 'isIoSupported', 'count', 'resolutionArea'
         ];
 
+        this.breakpoint = '(max-width: 767px)';
         this.placeholder = '';
         this.data = undefined;
         this.resolution = '0';
@@ -133,8 +135,9 @@ export class NxIpvdComponent implements OnInit {
 
         this.activate();
 
+
         this.breakpointObserver
-            .observe(['(max-width: 991px)'])
+            .observe([this.breakpoint])
             .subscribe((state: BreakpointState) => {
                 this.mobileDetailMode = (state.matches && this.activeCamera);
             });
@@ -251,20 +254,26 @@ export class NxIpvdComponent implements OnInit {
     }
 
     filterEmpty() {
-        // query
-        const tags = this.filterModel.tags.find(tag => tag.value === true);
+        let tags = false;
+        if (this.filterModel.tags) {
+            tags = this.filterModel.tags.find(tag => tag.value === true);
+        }
 
         let multiselect = false;
-        this.filterModel.multiselects.forEach(select => {
-            multiselect = multiselect || (select.selected.length > 0);
-        });
+        if (this.filterModel.multiselects) {
+            this.filterModel.multiselects.forEach(select => {
+                multiselect = multiselect || (select.selected.length > 0);
+            });
+        }
 
         let singleselect = false;
-        this.filterModel.selects.forEach(select => {
-            singleselect = singleselect || (select.selected.value > 0); // 0 is default choice
-        });
+        if (this.filterModel.selects) {
+            this.filterModel.selects.forEach(select => {
+                singleselect = singleselect || (select.selected.value > 0); // 0 is default choice
+            });
+        }
 
-        return !!tags || multiselect || singleselect || this.filterModel.query !== '';
+        return tags || multiselect || singleselect || this.filterModel.query !== '';
     }
 
     searchVendor() {
@@ -328,7 +337,7 @@ export class NxIpvdComponent implements OnInit {
         this.activeCamera = { ...selectedCamera };
         this.showAll = false;
 
-        if (this.breakpointObserver.isMatched('(max-width: 991px)')) {
+        if (this.breakpointObserver.isMatched(this.breakpoint)) {
             this.mobileDetailMode = true;
         }
 

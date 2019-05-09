@@ -19,6 +19,7 @@
     overflow      : hidden;
     line-height   : 1rem;
     justify-content: center;
+    text-decoration: none;
 
     &:hover,
     &:active,
@@ -193,10 +194,17 @@ button, .btn {
 
 .btn-tag-selected {
     @include badge-selected($light16, $light17, $light18);
-    padding   : 0 40px 0 16px !important;
+    padding   : 0 40px 0 12px !important;
     position  : relative;
     max-width : none;
     cursor    : default !important;
+    font-family : $font-family-regular;
+    font-size : rem(13px);
+    
+    & > span {
+        margin  : 0;
+        padding : 0 1px; // flex messes up caption width
+    }
     
     .close-button {
         position        : absolute;
@@ -222,15 +230,15 @@ button, .btn {
 
 .btn.btn-arrow {
     position      : relative;
-    padding-left  : 2rem !important;
-    padding-right : 1rem !important;
+    padding-left  : 40px !important;
+    padding-right : 12px !important;
     max-width     : none;
     
     .nav-arrow {
         height : 20px;
         float  : left;
         right  : auto;
-        left   : 5px;
+        left   : 8px;
         bottom : 10px;
         
         span {
@@ -244,6 +252,7 @@ button, .btn {
     
     & > span {
         margin : 0;
+        padding : 0 1px; // flex messes up caption width
     }
     
     &.selected {

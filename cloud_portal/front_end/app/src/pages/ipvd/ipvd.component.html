@@ -14,8 +14,8 @@
     <div class="row pl-3 pr-3 m-0 d-flex"
          *ngIf="camerasTable.length">
 
-        <div class="order-1 order-lg-0 m-0 p-0"
-             [ngClass]="{'toggle': toggleCamview, 'pr-2' : toggleCamview, 'col-12': !toggleCamview, 'col-lg-8 col-xl-9' : toggleCamview}"
+        <div class="order-1 order-md-0 m-0 p-0"
+             [ngClass]="{'toggle': toggleCamview, 'pr-2' : toggleCamview, 'col-12': !toggleCamview, 'col-md-7 col-xl-9' : toggleCamview}"
              [style.display]="mobileDetailMode ? 'none' : 'block'">
 
             <nx-cam-table
@@ -36,7 +36,7 @@
             </button>
         </div>
 
-        <div class="order-0 order-lg-1 pb-3 pl-0 pl-lg-2 pr-0 col-12 col-lg-4 col-xl-3"
+        <div class="order-0 order-md-1 pb-3 pl-0 pl-lg-2 pr-0 col-12 col-md-5 col-xl-3"
              *ngIf="activeCamera">
 
             <nx-block id="cam-view">
@@ -49,10 +49,9 @@
         </div>
     </div>
 
-    <div class="col ml-2 mb-3 text-placeholder d-flex align-items-center"
-         *ngIf="noResult"
-         translate>
-        Nothing Found
+    <div class="row pl-3 pr-3 m-0 mb-3 text-placeholder d-flex align-items-center"
+         *ngIf="noResult">
+        <span translate>Nothing Found</span>
     </div>
 
     <div class="row pl-3 pr-3 m-0"

@@ -19,6 +19,7 @@
 
 .badge,
 .badge-brand {
+    font-family : $font-family-regular;
     color : $light16;
     background-color: $light4;
     line-height: 1rem;
@@ -35,11 +36,15 @@
 .badge-selected {
     @include badge-selected($light16, $light17, $light18);
     cursor : default !important;
+    font-family : $font-family-regular;
+    font-size : rem(13px);
 }
 
 .badge-brand-selected {
     @include badge-selected($brand_core, $brand_d1, $brand_d2);
     cursor : default !important;
+    font-family : $font-family-regular;
+    font-size : rem(13px);
 }
 
 $theme-colors : (
@@ -53,9 +58,11 @@ $theme-colors : (
     .badge-#{$color} {
         @extend .badge;
         padding: 0 12px !important;
+        font-family : $font-family-regular;
     }
     .badge-#{$color}-selected {
         color: $light1;
-        @include badge-selected($value, darken($value, 10%), darken($value, 15%))
+        @include badge-selected($value, darken($value, 10%), darken($value, 15%));
+        font-family : $font-family-regular;
     }
 }

@@ -101,7 +101,12 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     }
 
     writeValue(value: any): void {
-        if (value) {
+        // Avoid localFilter update if filter in not initialized (page refresh)
+        if (value &&
+            ((value.tags && value.tags.length) ||
+             (value.selects && value.selects.length) ||
+             (value.multiselects && value.multiselects.length))) {
+
             this.localFilter = value;
             this.advSearch = (this.localFilter.selects && this.localFilter.selects.length) ||
                     (this.localFilter.multiselects && this.localFilter.multiselects.length) ||
@@ -149,9 +154,11 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                         }
                     });
             }
+
+            this.onChangeCallback({ ...this.localFilter });
         }
 
-        this.onChangeCallback({ ...this.localFilter });
+
         this.numberOfOptionsSelected();
     }
 
@@ -183,9 +190,9 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         this.filterSelected = '';
 
         let flag = 0;
-        let tagsSelected;
-        let selectsSelected;
-        let multiSelectsSelected;
+        let tagsSelected = '';
+        let selectsSelected = '';
+        let multiSelectsSelected = '';
 
         if (this.localFilter.tags) {
             this.localFilter.tags.forEach((filter) => {
@@ -208,7 +215,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                     if (this.numberFilters > 1) {
                         selectsSelected = this.numberFilters + ' ' + this.lang.search['filters applied'];
                     } else {
-                        selectsSelected = select.label + ' - ' + select.selected.name;
+                        selectsSelected = select.label + ' &ndash; ' + select.selected.name;
                     }
                     flag++;
                 }
@@ -225,7 +232,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
 
                     if (select.selected.length === 1) {
                         const label = select.singular || select.label;
-                        multiSelectsSelected = label + ' - ' + select.items.find(item => {
+                        multiSelectsSelected = label + ' &ndash; ' + select.items.find(item => {
                             return (item.label.name || item.id) === select.selected[0];
                         }).label;
                     } else {
@@ -235,21 +242,18 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             });
         }
 
-        if (flag === 1 && this.localFilter.query === '') {
+        if (flag === 1) {
             this.filterSelected = tagsSelected || selectsSelected || multiSelectsSelected;
-            return;
+        } else {
+            const str = (this.numberFilters === 1) ?
+                    ' ' + this.lang.search['filter applied'] :
+                    ' ' + this.lang.search['filters applied'];
+
+            this.filterSelected = this.numberFilters + str;
         }
-
-        const str = (this.numberFilters === 1) ?
-                ' ' + this.lang.search['filter applied'] :
-                ' ' + this.lang.search['filters applied'];
-
-        this.filterSelected = this.numberFilters + str;
     }
 
     clearFilters() {
-        this.localFilter.query = '';
-
         if (this.localFilter.tags) {
             this.localFilter.tags.forEach((filter) => {
                 filter.value = false;
@@ -273,7 +277,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         this.clearFilters();
         this.numberFilters = 0;
         this.filterSelected = '';
-        this.uri.resetURI(this.uriPath);
+        this.setRouteParams();
         this.onChangeCallback({...this.localFilter});
 
         return false;

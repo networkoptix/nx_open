@@ -14,7 +14,7 @@
                 You can merge only those cloud Systems, where you have the "Owner" permissions.
             </p>
             <p class="help-block-no-height"
-               [innerHTML]="'connectToCloud' | translate: {
+               [innerHTML]="'dialogs.merge.connectToCloud' | translate: {
                     productName: language.productName,
                     vmsName: language.vmsName
                }">
@@ -52,7 +52,7 @@
                 </div>
                 <ng-template #notChecking>
                     <p *ngIf="systemMergeable == 'unavailable'" class="help-block-no-height warning-label mb-2">
-                        <span [translate]="'systemUnavailable'" [translateParams]="{ targetSystem: targetSystem.name }"></span>
+                        <span [translate]="'dialogs.merge.systemUnavailable'" [translateParams]="{ targetSystem: targetSystem.name }"></span>
                         <span>&nbsp;<a [href]="config.supportLink" target="_blank" translate>support</a>.</span>
                     </p>
                     <p *ngIf="systemMergeable == 'offline'" translate
@@ -60,12 +60,12 @@
                         System {{targetSystem.name}} is offline and cannot be merged with the current one.
                     </p>
                     <p *ngIf="systemMergeable == 'secondaryCannotMerge'" class="help-block-no-height warning-label mb-2"
-                       [innerHTML]="'secondaryCannotMerge' | translate: {
+                       [innerHTML]="'dialogs.merge.secondaryCannotMerge' | translate: {
                             targetSystem: targetSystem.name || targetSystem.info.name
                        }">
                     </p>
                     <p *ngIf="systemMergeable == 'primaryCannotMerge'" class="help-block-no-height warning-label mb-2"
-                       [innerHTML]="'primaryCannotMerge' | translate: {
+                       [innerHTML]="'dialogs.merge.primaryCannotMerge' | translate: {
                             targetSystem: targetSystem.name || targetSystem.info.name
                             }">
                     </p>
@@ -114,7 +114,7 @@
         </div>
         <div *ngIf="state == 'confirm'">
             <div class="modal-body">
-                <p class="mb-3" [innerHTML]="'mergeConfirmation' | translate: {
+                <p class="mb-3" [innerHTML]="'dialogs.merge.mergeConfirmation' | translate: {
                     primarySystem: primarySystem.name || primarySystem.info && primarySystem.info.name,
                     secondarySystem: secondarySystem.name || secondarySystem.info && secondarySystem.info.name
                 }">

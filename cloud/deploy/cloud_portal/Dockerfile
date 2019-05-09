@@ -12,6 +12,7 @@ RUN set -ex \
     apk update \
     && apk add --no-cache bash tini gettext wget ca-certificates mariadb-client   \
         libcurl libjpeg-turbo libressl2.6-libcrypto libwebp libxml2 libxslt mariadb-client-libs musl openjpeg tiff yaml zlib \
+        g++ \
     && pip install -r /app/requirements.txt
 
 ENV CLOUD_PORTAL_BASE_CONF_DIR /app/app/static
