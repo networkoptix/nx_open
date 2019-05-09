@@ -1,85 +1,34 @@
 *** Settings ***
-Resource          resource.robot
-Suite Setup       Open Browser and go to URL    ${url}
+Resource          ipvd_resource.robot
+Suite Setup       Open Browser and go to URL    ${url}/ipvd
 Test Setup        Restart
 Test Teardown     Close Browser    #Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Teardown    Close All Browsers
 Force Tags        Threaded File
 
 *** Variables ***
-${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 
 *** Keywords ***
-Advaced search filters text
-    [Arguments]    ${fiters}
-    Return From Keyword    //ipvd/span[contains(text(),"${filters}"]
 
-Validate on ipvd page
-    Wait Until Elements Are Visible    ${IPVD TITLE}    ${IPVD SEARCH BAR}    ${IPVD ADVANCED SEARCH BUTTON}
-    ...                                ${IPVD MANFUACTURERS PANE}    ${IPVD DEVICES PANE}
-
-Open New Browser On Failure
-    Close Browser
-    Open Browser and go to URL    ${url}/ipvd
-
-Restart
-    Register Keyword To Run On Failure    NONE
-    ${status}    Run Keyword And Return Status    Validate Log In
-    Register Keyword To Run On Failure    Failure Tasks
-    Run Keyword If    ${status}    Log Out
-    Go To    ${url}
-
-Validate Request Form Initial State
-    Wait Until Element Is Visible    ${IPVD FEEDBACK}
-
-    ${result}    Get Checkbox Value    ${IPVD FEEDBACK CONTACT ME}
-    Should Be True    ${result}
-
-    ${result}    Get Checkbox Value    ${IPVD FEEDBACK AGREE}
-    Should Not Be True    ${result}
-
-Validate Privacy Policy
-    @{windowsBefore}    Get Window Handles
-    Element Should Be Visible    ${IPVD FEEDBACK PRIVACY POLICY}
-    ${url}    Get Element Attribute    ${IPVD FEEDBACK PRIVACY POLICY}    href
-    Should Contain    ${url}    /content/privacy
-    Click Element    ${IPVD FEEDBACK PRIVACY POLICY}
-    @{windowsAfter}    Get Window Handles
-    ${numWindowsBefore}    Get Length    ${windowsBefore}
-    ${numWindowsAfter}    Get Length    ${windowsAfter}
-    Should Be True    ${numWindowsAfter} > 1
-    Should Be True    ${numWindowsAfter} == ${numWindowsBefore}+1
-    ${indexLast}=   Evaluate    ${numWindowsAfter}-1
-    Select Window    @{windowsAfter}[${indexLast}]
-    Location Should Be    ${url}
-    Wait Until Element Is Visible    ${PRIVACY POLICY HEADER}
-    Close Window
-    Select Window    @{windowsAfter}[0]
 
 *** Test Cases ***
 IPVD page loads without login
-    Go To    ${url}/ipvd
-    #need to add in the disclaimer at the bottom
-    Validate on ipvd page
+    IPVD page
 
 IPVD page loads while logged in
-    Log In    ${EMAIL OWNER}    ${password}
+    Log In    ${EMAIL OWNER}    ${BASE PASSWORD}
     Validate Log In
-    Go To    ${url}/ipvd
-    Validate on ipvd page
+    IPVD page
 
 #Submit request can be closed by 'X', cancel, and escape
 #Submit request cannot be close by clicking outside the form
 #Submit request correctly sends request
+
 Text search correctly finds manufacturers
-    Go To    ${url}/ipvd
-    Validate on ipvd page
-    Click Element    ${IPVD SEARCH BAR}
-    Element Should Be Focused    ${IPVD SEARCH BAR}
-    Input Text    ${IPVD SEARCH BAR}    hanwha
-    Wait Until Element Is Visible    ${IPVD FIRST TABLE ITEM}
-    Element Text Should Be    ${IPVD FIRST TABLE ITEM}/td[1]/div     Hanwha Techwin (Samsung)
+    IPVD page
+    IPVD Text Search    hanwha
+    Element Text Should Be    ${IPVD TABLE FIRST ITEM}/td[1]/div     Hanwha Techwin (Samsung)
 
 
 #Text search correctly finds models
@@ -106,9 +55,32 @@ Text search correctly finds manufacturers
 
 IPVD Request Form Basic Validations
     [tags]    C48969
-    Go To    ${url}/ipvd
+    IPVD page
     Wait Until Element Is Visible    ${SUBMIT A REQUEST}
     Click Element    ${SUBMIT A REQUEST}
+    Wait Until Element Is Visible    ${IPVD FEEDBACK}
+    Validate Request Form Initial State
+    Validate Privacy Policy
+    Click Button    ${IPVD FEEDBACK SEND BUTTON}
+    #Name, email, message, and agreeing to privacy policy fields turn red
+    Validate Input Field State    ${IPVD FEEDBACK YOUR NAME}/../..    False
+    Validate Input Field State    ${IPVD FEEDBACK EMAIL}/../..    False
+    Validate Input Field State    ${IPVD FEEDBACK MESSAGE}/../..    False
+    Validate Input Field State    ${IPVD FEEDBACK AGREE}/../..    False
+    Click Button    ${IPVD FEEDBACK CANCEL BUTTON}
+    Click Element    ${SUBMIT A REQUEST}
+    Wait Until Element Is Visible    ${IPVD FEEDBACK}
+    Click Button    ${IPVD FEEDBACK CLOSE BUTTON}
+
+IPVD Feedback Form Basic Validations
+    [tags]    C54182
+    #IPVD page    Login=True
+    #Wait Until Element Is Not Visible    ${LOG IN MODAL}
+    IPVD page with Log In
+    IPVD Text Search    Axis
+    IPVD Select Device From Table Randomly
+    Wait Until Element Is Visible    ${SEND DEVICE FEEDBACK}
+    Click Element    ${SEND DEVICE FEEDBACK}
     Wait Until Element Is Visible    ${IPVD FEEDBACK}
     Validate Request Form Initial State
     Validate Privacy Policy

@@ -12,13 +12,15 @@ Variables         getIds.py    ${ENV}
 ${directory}    ${SCREENSHOTDIRECTORY}
 ${variables_file}    variables-env.robot
 ${options}    true
-@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox    --log-level=3
+${headless}    true
+@{chrome_arguments}    --disable-gpu    --no-sandbox    --log-level=3    --start-maximized
+@{chrome_arguments_headless}    --disable-infobars    --headless    --disable-gpu    --no-sandbox    --log-level=3
 ${speed}    0
 
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    run keyword if    "${options}"=="false"    Regular Open Browser
+    Run Keyword If    "${options}"=="false" or "${headless}"=="false"    Regular Open Browser
     ...          ELSE    Open Browser With Options
     Set Selenium Speed    ${speed}
     Set Selenium Timeout    20
@@ -27,15 +29,15 @@ Open Browser and go to URL
 
 Regular Open Browser
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
-    Open Browser    ${ENV}    ${BROWSER}
-    #Set Window Size    1920    1080
+    ${chrome_options}=    Set Chrome Options
+    Create Webdriver    Chrome    chrome_options=${chrome_options}
     Maximize Browser Window
+    Go To    ${ENV}
 
 Open Browser With Options
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
-    ${chrome_options}=    Set Chrome Options
+    ${chrome_options}=    Set Chrome Options Headless
     Create Webdriver    Chrome    chrome_options=${chrome_options}
-    #Set Window Size    1920    1080
     Maximize Browser Window
     Go to    ${ENV}
 
@@ -43,6 +45,13 @@ Set Chrome Options
     [Documentation]    Set Chrome options for headless mode
     ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
     : FOR    ${option}    IN    @{chrome_arguments}
+    \    Call Method    ${options}    add_argument    ${option}
+    [Return]    ${options}
+
+Set Chrome Options Headless
+    [Documentation]    Set Chrome options for headless mode
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+    : FOR    ${option}    IN    @{chrome_arguments_headless}
     \    Call Method    ${options}    add_argument    ${option}
     [Return]    ${options}
 
