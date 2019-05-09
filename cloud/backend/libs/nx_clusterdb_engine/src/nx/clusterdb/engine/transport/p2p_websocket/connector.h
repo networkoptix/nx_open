@@ -7,7 +7,7 @@
 #include <nx/p2p/transport/p2p_websocket_transport.h>
 #include <nx/vms/api/data/peer_data.h>
 
-#include "../abstract_transaction_transport_connector.h"
+#include "../abstract_command_transport_connector.h"
 
 namespace nx::clusterdb::engine {
 

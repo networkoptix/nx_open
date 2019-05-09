@@ -6,11 +6,11 @@
 
 #include <nx/network/connection_server/fixed_size_message_pipeline.h>
 
-#include "abstract_transaction_transport.h"
-#include "transaction_transport_header.h"
+#include "abstract_command_transport.h"
+#include "command_transport_header.h"
 #include "../compatible_ec2_protocol_version.h"
-#include "../transaction_processor.h"
-#include "../transaction_log_reader.h"
+#include "../command_processor.h"
+#include "../command_log_reader.h"
 
 namespace nx::clusterdb::engine { class CommandLog; }
 
@@ -72,12 +72,12 @@ private:
     /**
      * Transaction state, we need to synchronize remote side to, before we can mark it write sync.
      */
-    vms::api::TranState m_tranStateToSynchronizeTo;
+    NodeState m_tranStateToSynchronizeTo;
     /**
      * Transaction state of remote peer. Transactions before this state have been sent to the peer.
      */
-    vms::api::TranState m_remotePeerTranState;
-    std::optional<vms::api::TranState> m_prevReadResult;
+    NodeState m_remotePeerTranState;
+    std::optional<NodeState> m_prevReadResult;
     bool m_haveToSendSyncDone = false;
     std::unique_ptr<CommandLogReader> m_transactionLogReader;
     CommandTransportHeader m_commonTransportHeaderOfRemoteTransaction;
@@ -105,11 +105,14 @@ private:
     void onTransactionsReadFromLog(
         ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransaction,
-        vms::api::TranState readedUpTo);
+        NodeState readedUpTo);
 
     void sendTransactions(std::vector<dao::TransactionLogRecord> serializedTransactions);
 
     void enableOutputChannel();
 };
+
+nx::vms::api::TranState toVmsTranState(const NodeState& nodeState);
+NodeState toNodeState(const nx::vms::api::TranState& tranState);
 
 } // namespace nx::clusterdb::engine::transport

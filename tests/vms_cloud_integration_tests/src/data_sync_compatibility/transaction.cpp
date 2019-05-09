@@ -106,6 +106,38 @@ REGISTER_TYPED_TEST_CASE_P(TypesCompatibility,
 
 //-------------------------------------------------------------------------------------------------
 
+struct DataSyncTimestampTypes
+{
+    class One:
+        public nx::vms::api::Timestamp
+    {
+    public:
+        One(): nx::vms::api::Timestamp(rand(), rand()) {}
+    };
+
+    class Two:
+        public nx::clusterdb::engine::Timestamp
+    {
+    public:
+        Two(): nx::clusterdb::engine::Timestamp(rand(), rand()) {}
+    };
+
+    static void copy(
+        nx::clusterdb::engine::Timestamp* dest,
+        const nx::vms::api::Timestamp& src)
+    {
+        dest->sequence = src.sequence;
+        dest->ticks = src.ticks;
+    }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    Timestamp,
+    TypesCompatibility,
+    DataSyncTimestampTypes);
+
+//-------------------------------------------------------------------------------------------------
+
 struct DataSyncTransactionTypes
 {
     class One:
@@ -141,7 +173,7 @@ struct DataSyncTransactionTypes
         dest->transactionType = src.transactionType;
         dest->persistentInfo.dbID = src.persistentInfo.dbID;
         dest->persistentInfo.sequence = src.persistentInfo.sequence;
-        dest->persistentInfo.timestamp = src.persistentInfo.timestamp;
+        DataSyncTimestampTypes::copy(&dest->persistentInfo.timestamp, src.persistentInfo.timestamp);
         dest->historyAttributes.author = src.historyAttributes.author;
     }
 };

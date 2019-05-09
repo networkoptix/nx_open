@@ -8,7 +8,7 @@
 #include <nx/vms/api/data/peer_data.h>
 
 #include "../abstract_acceptor.h"
-#include "../abstract_transaction_transport.h"
+#include "../abstract_command_transport.h"
 
 namespace nx::clusterdb::engine {
 

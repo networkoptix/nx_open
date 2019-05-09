@@ -9,8 +9,8 @@
 
 #include "command_descriptor.h"
 #include "compatible_ec2_protocol_version.h"
-#include "incoming_transaction_dispatcher.h"
-#include "outgoing_transaction_dispatcher.h"
+#include "incoming_command_dispatcher.h"
+#include "outgoing_command_dispatcher.h"
 #include "p2p_sync_settings.h"
 
 namespace nx::clusterdb::engine {
@@ -65,8 +65,8 @@ void ConnectionManager::dispatchTransaction(
     const std::string& systemId,
     std::shared_ptr<const SerializableAbstractCommand> transactionSerializer)
 {
-    NX_VERBOSE(this, lm("systemId %1. Dispatching command %2")
-        .args(systemId, toString(transactionSerializer->header())));
+    NX_VERBOSE(this, "systemId %1. Dispatching command %2",
+        systemId, transactionSerializer->header());
 
     // Generating transport header.
     CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());

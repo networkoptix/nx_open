@@ -94,7 +94,7 @@ void MaintenanceManager::onTransactionLogRead(
     const std::string& systemId,
     clusterdb::engine::ResultCode ec2ResultCode,
     std::vector<clusterdb::engine::dao::TransactionLogRecord> serializedTransactions,
-    vms::api::TranState /*readedUpTo*/,
+    nx::clusterdb::engine::NodeState /*readedUpTo*/,
     std::function<void(
         api::Result,
         nx::clusterdb::engine::CommandDataList)> completionHandler)
