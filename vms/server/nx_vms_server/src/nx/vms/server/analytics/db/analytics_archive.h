@@ -1,11 +1,13 @@
 #pragma once
 
 #include <chrono>
+#include <limits>
 #include <set>
 #include <vector>
 
 #include <QtCore/QRectF>
 #include <QtCore/QString>
+#include <QtGui/QRegion>
 
 #include <nx/utils/uuid.h>
 
@@ -18,11 +20,12 @@ class AnalyticsArchive
 public:
     struct Filter
     {
-        std::vector<QRectF> region;
+        // Region with the search grid resolution.
+        QRegion region;
         QnTimePeriod timePeriod;
         std::chrono::milliseconds detailLevel = std::chrono::milliseconds::zero();
         Qt::SortOrder sortOrder = Qt::AscendingOrder;
-        int limit = -1;
+        int limit = std::numeric_limits<int>::max();
         std::set<int> objectTypes;
         std::set<int> allAttributesHash;
     };

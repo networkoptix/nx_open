@@ -41,7 +41,7 @@ bool AnalyticsArchive::matchAdditionData(const Filter& filter, const quint8* dat
 
 bool AnalyticsArchive::saveToArchive(
     std::chrono::milliseconds startTime,
-    const QList<QRectF>& data, 
+    const std::vector<QRectF>& data,
     int objectType, 
     int allAttributesHash)
 {

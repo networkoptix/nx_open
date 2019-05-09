@@ -45,9 +45,13 @@ QnTimePeriodList AnalyticsArchive::matchPeriod(const Filter& filter)
 {
     QnTimePeriodList periods;
 
-    const auto translatedRegion = translate<>(
-        filter.region,
-        QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+    std::vector<QRect> translatedRegion;
+    for (const auto& rect: filter.region)
+        translatedRegion.push_back(rect);
+
+    //const auto translatedRegion = translate<>(
+    //    filter.region,
+    //    QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
 
     for (const auto& item: m_items)
     {

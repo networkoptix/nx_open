@@ -39,8 +39,7 @@ class AnalyticsArchive: public MediaServerModuleFixture
               serverModule().metadataDatabaseDir(),
               m_camera->getPhysicalId());
 
-          QList<QRectF> rects;
-          rects << QRectF(0.0, 0.0, 0.5, 0.5);
+          std::vector<QRectF> rects{QRectF(0.0, 0.0, 0.5, 0.5)};
 
           auto baseDateMs =
               QDateTime::fromString("2017-12-31T00:23:50", Qt::ISODate).toMSecsSinceEpoch();

@@ -45,7 +45,7 @@ nx::sql::DBResult TimePeriodFetcher::selectTimePeriods(
     {
         *result = selectTimePeriodsByObject(queryContext, filter, options);
     }
-    else if (!m_analyticsArchive || localFilter.empty())
+    else if (!m_analyticsArchive || (localFilter.empty() && options.region.isEmpty()))
     {
         *result = selectFullTimePeriods(
             queryContext, filter.deviceIds, filter.timePeriod, options);
@@ -173,9 +173,6 @@ AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
 {
     AnalyticsArchive::Filter archiveFilter;
 
-    if (!filter.boundingBox.isEmpty())
-        archiveFilter.region.push_back(filter.boundingBox);
-
     if (!filter.objectTypeId.empty())
     {
         std::transform(
@@ -184,6 +181,7 @@ AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
             [this](const auto& objectTypeName) { return m_objectTypeDao.objectTypeIdFromName(objectTypeName); });
     }
 
+    archiveFilter.region = options.region;
     archiveFilter.timePeriod = filter.timePeriod;
     archiveFilter.sortOrder = filter.sortOrder;
     if (filter.maxObjectsToSelect > 0)

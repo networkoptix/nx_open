@@ -3,6 +3,8 @@
 #include <chrono>
 #include <vector>
 
+#include <QtGui/QRegion>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/http_types.h>
 #include <nx/sql/types.h>
@@ -125,6 +127,14 @@ using LookupResult = std::vector<DetectedObject>;
 
 struct TimePeriodsLookupOptions
 {
+    /**
+     * This is a time periods search region. Filter::boundingBox is ignored!
+     * This region is in search resolution coordinates (not [0; 1]!).
+     * NOTE: Introduced as an AnalyticsArchive requirement.
+     * TODO: #ak Refactor it out when AnalyticsArchive::save/match are symmetric.
+     */
+    QRegion region;
+
     /**
      * If distance between two time periods less than this value,
      * then those periods SHOULD be merged ignoring gap.

@@ -407,7 +407,7 @@ private:
 
     bool initializeStorage()
     {
-        m_eventsStorage = std::make_unique<EventsStorage>();
+        m_eventsStorage = std::make_unique<EventsStorage>(nullptr);
         return m_eventsStorage->initialize(m_settings);
     }
 
@@ -850,6 +850,14 @@ protected:
             nx::utils::random::number<float>(0, 1),
             nx::utils::random::number<float>(0, 1),
             nx::utils::random::number<float>(0, 1));
+
+        auto bottomRight = m_filter.boundingBox.bottomRight();
+        if (bottomRight.x() > 1.0)
+            bottomRight.setX(1.0);
+        if (bottomRight.y() > 1.0)
+            bottomRight.setY(1.0);
+
+        m_filter.boundingBox.setBottomRight(bottomRight);
     }
 
     void givenEmptyFilter()
@@ -1245,11 +1253,9 @@ protected:
 
     void whenCreateCursor()
     {
-        using namespace std::placeholders;
-
         eventsStorage().createLookupCursor(
             filter(),
-            std::bind(&AnalyticsDbCursor::saveCursor, this, _1, _2));
+            [this](auto&&... args) { saveCursor(std::forward<decltype(args)>(args)...); });
     }
 
     void thenCursorIsCreated()
@@ -1407,7 +1413,12 @@ protected:
 
     void whenLookupTimePeriods()
     {
-        using namespace std::placeholders;
+        if (!filter().boundingBox.isEmpty())
+        {
+            m_lookupOptions.region += translate(
+                filter().boundingBox,
+                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+        }
 
         eventsStorage().lookupTimePeriods(
             filter(),
@@ -1581,6 +1592,16 @@ TEST_F(AnalyticsDbTimePeriodsLookup, with_aggregation_period)
 {
     givenRandomLookupOptions();
     whenLookupTimePeriods();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbTimePeriodsLookup, DISABLED_with_region)
+{
+    givenRandomFilter();
+    addRandomBoundingBoxToFilter();
+
+    whenLookupTimePeriods();
+
     thenResultMatchesExpectations();
 }
 

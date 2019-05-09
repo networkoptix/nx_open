@@ -23,7 +23,8 @@ static constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833
 
 //-------------------------------------------------------------------------------------------------
 
-EventsStorage::EventsStorage():
+EventsStorage::EventsStorage(QnMediaServerModule* mediaServerModule):
+    m_mediaServerModule(mediaServerModule),
     m_timePeriodDao(&m_deviceDao),
     m_objectCache(kTrackAggregationPeriod, kMaxCachedObjectLifeTime),
     m_trackAggregator(
@@ -69,6 +70,7 @@ bool EventsStorage::initialize(const Settings& settings)
     if (kSaveTimePeriodsToFile)
     {
         m_analyticsArchiveDirectory = std::make_unique<AnalyticsArchiveDirectory>(
+            m_mediaServerModule,
             settings.path + "/archive/");
     }
 
@@ -1033,7 +1035,8 @@ QRectF EventsStorage::unpackRect(const QRect& rect)
 //-------------------------------------------------------------------------------------------------
 
 EventsStorageFactory::EventsStorageFactory():
-    base_type(std::bind(&EventsStorageFactory::defaultFactoryFunction, this))
+    base_type([this](auto&&... args)
+        { return defaultFactoryFunction(std::forward<decltype(args)>(args)...); })
 {
 }
 
@@ -1043,9 +1046,10 @@ EventsStorageFactory& EventsStorageFactory::instance()
     return staticInstance;
 }
 
-std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunction()
+std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunction(
+    QnMediaServerModule* mediaServerModule)
 {
-    return std::make_unique<EventsStorage>();
+    return std::make_unique<EventsStorage>(mediaServerModule);
 }
 
 } // namespace nx::analytics::db

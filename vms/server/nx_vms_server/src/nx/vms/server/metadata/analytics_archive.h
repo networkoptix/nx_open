@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "metadata_archive.h"
 
 namespace nx::vms::server::metadata {
@@ -22,8 +24,9 @@ public:
 
     bool saveToArchive(
         std::chrono::milliseconds startTime,
-        const QList<QRectF>& data, 
-        int objectType, int allAttributesHash);
+        const std::vector<QRectF>& data,
+        int objectType,
+        int allAttributesHash);
 
     struct AnalyticsFilter: public Filter
     {
