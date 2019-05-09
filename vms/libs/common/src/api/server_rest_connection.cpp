@@ -809,13 +809,13 @@ Handle ServerConnection::changeCameraPassword(
 }
 
 Handle ServerConnection::lookupDetectedObjects(
-    const nx::analytics::storage::Filter& request,
+    const nx::analytics::db::Filter& request,
     bool isLocal,
-    Result<nx::analytics::storage::LookupResult>::type callback,
+    Result<nx::analytics::db::LookupResult>::type callback,
     QThread* targetThread)
 {
     QnRequestParamList queryParams;
-    nx::analytics::storage::serializeToParams(request, &queryParams);
+    nx::analytics::db::serializeToParams(request, &queryParams);
     queryParams.insert(lit("isLocal"), isLocal? lit("true") : lit("false"));
 
     return executeGet(

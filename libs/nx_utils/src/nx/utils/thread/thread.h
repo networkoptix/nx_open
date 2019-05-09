@@ -51,6 +51,12 @@ public:
     virtual void pleaseStop() override;
     virtual void stop();
 
+    using QThread::wait;
+    bool wait(const std::chrono::milliseconds& t) { return wait((unsigned long) t.count()); }
+
+    using QThread::usleep;
+    static void sleep(const std::chrono::milliseconds& t) { msleep((unsigned long) t.count()); }
+
 protected:
     void initSystemThreadId();
 

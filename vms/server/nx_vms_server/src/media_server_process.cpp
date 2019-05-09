@@ -32,7 +32,7 @@
 #include <QtNetwork/QNetworkInterface>
 
 #include <api/global_settings.h>
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <nx/vms/server/analytics/db/analytics_db.h>
 
 #include <appserver/processor.h>
 
@@ -1089,8 +1089,6 @@ void MediaServerProcess::stopSync()
 {
     qWarning() << "Stopping server";
 
-    const int kStopTimeoutMs = 100 * 1000;
-
     {
         QnMutexLocker lock( &m_stopMutex );
         if (m_stopping)
@@ -1102,11 +1100,9 @@ void MediaServerProcess::stopSync()
     pleaseStop();
     quit();
 
-    if (!wait(kStopTimeoutMs))
-    {
-        terminate();
-        wait();
-    }
+    const std::chrono::seconds kStopTimeout(100);
+    if (!wait(kStopTimeout))
+        NX_CRITICAL(false, lm("Server was unable to stop within %1").arg(kStopTimeout));
 
     qApp->quit();
 }
@@ -3594,8 +3590,6 @@ bool MediaServerProcess::setUpMediaServerResource(
 
 void MediaServerProcess::stopObjects()
 {
-    commonModule()->setNeedToStop(true);
-
     auto safeDisconnect =
         [this](QObject* src, QObject* dst)
         {
@@ -3603,7 +3597,18 @@ void MediaServerProcess::stopObjects()
                 src->disconnect(dst);
         };
 
-    NX_INFO(this, "QnMain event loop has returned. Destroying objects...");
+    NX_INFO(this, "Event loop has returned. Destroying objects...");
+
+    quint64 dumpSystemResourceUsageTaskID = 0;
+    {
+        QnMutexLocker lk(&m_mutex);
+        dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskId;
+        m_dumpSystemResourceUsageTaskId = 0;
+    }
+    if (dumpSystemResourceUsageTaskID)
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
+
+    commonModule()->setNeedToStop(true);
     m_universalTcpListener->stop();
     serverModule()->stop();
 
@@ -3631,17 +3636,6 @@ void MediaServerProcess::stopObjects()
 
     m_discoveryMonitor.reset();
     m_crashReporter.reset();
-
-    //cancelling dumping system usage
-    quint64 dumpSystemResourceUsageTaskID = 0;
-    {
-        QnMutexLocker lk(&m_mutex);
-        dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskId;
-        m_dumpSystemResourceUsageTaskId = 0;
-    }
-    if (dumpSystemResourceUsageTaskID)
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
-
     m_ipDiscovery.reset(); // stop it before IO deinitialized
     m_multicastHttp.reset();
 
@@ -4095,8 +4089,10 @@ QString MediaServerProcess::getMetadataDatabaseName() const
 
 bool MediaServerProcess::initializeAnalyticsEvents()
 {
+    const auto dbFilePath = getMetadataDatabaseName();
     auto settings = this->serverModule()->analyticEventsStorageSettings();
-    settings.dbConnectionOptions.dbName = getMetadataDatabaseName();
+    settings.path = QFileInfo(dbFilePath).absoluteDir().path();
+    settings.dbConnectionOptions.dbName = QFileInfo(dbFilePath).fileName();
 
     if (!this->serverModule()->analyticsEventsStorage()->initialize(settings))
     {

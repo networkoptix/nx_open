@@ -6,7 +6,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
 
-#include <analytics/detected_objects_storage/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 #include <camera/data/time_period_camera_data.h>
 #include <camera/loaders/camera_data_loader_fwd.h>
 #include <common/common_globals.h>
@@ -36,7 +36,7 @@ public:
     void setMotionRegions(const QList<QRegion> &motionRegions);
     bool isMotionRegionsEmpty() const;
 
-    using AnalyticsFilter = nx::analytics::storage::Filter;
+    using AnalyticsFilter = nx::analytics::db::Filter;
     const AnalyticsFilter& analyticsFilter() const;
     void setAnalyticsFilter(const AnalyticsFilter& value);
 

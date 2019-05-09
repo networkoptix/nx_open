@@ -2652,7 +2652,7 @@ void QnWorkbenchNavigator::updatePlaybackMask()
     }
 }
 
-void QnWorkbenchNavigator::setAnalyticsFilter(const nx::analytics::storage::Filter& value)
+void QnWorkbenchNavigator::setAnalyticsFilter(const nx::analytics::db::Filter& value)
 {
     if (auto loader = loaderByWidget(m_currentMediaWidget))
         loader->setAnalyticsFilter(value);

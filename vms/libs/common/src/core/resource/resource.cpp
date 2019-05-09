@@ -291,9 +291,14 @@ void QnResource::setTypeByName(const QString& resTypeName)
 
 Qn::ResourceStatus QnResource::getStatus() const
 {
-    return commonModule()
-        ? commonModule()->resourceStatusDictionary()->value(getId())
-        : Qn::NotDefined;
+    if (!commonModule())
+        return Qn::NotDefined;
+
+    const auto statusDictionary = commonModule()->resourceStatusDictionary();
+    if (!statusDictionary)
+        return Qn::NotDefined;
+
+    return statusDictionary->value(getId());
 }
 
 void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)

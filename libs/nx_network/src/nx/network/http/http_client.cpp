@@ -393,8 +393,12 @@ bool HttpClient::doRequest(AsyncClientFunc func)
     func(m_asyncHttpClient.get());
 
     m_msgBodyBuffer.clear();
-    while (!m_terminated && (m_asyncHttpClient->state() < AsyncClient::State::sResponseReceived))
+    while (!m_terminated &&
+        (m_asyncHttpClient->state() <= AsyncClient::State::sResponseReceived) &&
+        !m_lastResponse)
+    {
         m_cond.wait(lk.mutex());
+    }
 
     return m_asyncHttpClient->state() != AsyncClient::State::sFailed;
 }
