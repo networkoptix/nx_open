@@ -12,13 +12,15 @@ Variables         getIds.py    ${ENV}
 ${directory}    ${SCREENSHOTDIRECTORY}
 ${variables_file}    variables-env.robot
 ${options}    true
-@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox    --log-level=3
+${headless}    true
+@{chrome_arguments}    --disable-gpu    --no-sandbox    --log-level=3    --start-maximized
+@{chrome_arguments_headless}    --disable-infobars    --headless    --disable-gpu    --no-sandbox    --log-level=3
 ${speed}    0
 
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    run keyword if    "${options}"=="false"    Regular Open Browser
+    Run Keyword If    "${options}"=="false" or "${headless}"=="false"    Regular Open Browser
     ...          ELSE    Open Browser With Options
     Set Selenium Speed    ${speed}
     Set Selenium Timeout    20
@@ -27,20 +29,29 @@ Open Browser and go to URL
 
 Regular Open Browser
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
-    Open Browser    ${ENV}    ${BROWSER}
-    Set Window Size    1920    1080
+    ${chrome_options}=    Set Chrome Options
+    Create Webdriver    Chrome    chrome_options=${chrome_options}
+    Maximize Browser Window
+    Go To    ${ENV}
 
 Open Browser With Options
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
-    ${chrome_options}=    Set Chrome Options
+    ${chrome_options}=    Set Chrome Options Headless
     Create Webdriver    Chrome    chrome_options=${chrome_options}
-    Set Window Size    1920    1080
+    Maximize Browser Window
     Go to    ${ENV}
 
 Set Chrome Options
     [Documentation]    Set Chrome options for headless mode
     ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
     : FOR    ${option}    IN    @{chrome_arguments}
+    \    Call Method    ${options}    add_argument    ${option}
+    [Return]    ${options}
+
+Set Chrome Options Headless
+    [Documentation]    Set Chrome options for headless mode
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+    : FOR    ${option}    IN    @{chrome_arguments_headless}
     \    Call Method    ${options}    add_argument    ${option}
     [Return]    ${options}
 
@@ -381,3 +392,25 @@ Reset System Names
     Check For Alert    ${SYSTEM NAME SAVED}
     Verify In System    Auto Tests
     Close Browser
+
+Validate Input Field State
+    [arguments]    ${FIELD LOCATOR}    ${Valid True or False}
+    ${class}    Get Element Attribute    ${FIELD LOCATOR}    class
+    Run Keyword If    ${Valid True or False}==True    Should Contain    ${class}    ng-valid
+    Run Keyword If    ${Valid True or False}==False    Should Contain    ${class}    ng-invalid
+
+Get Checkbox Value
+    [arguments]    ${CHECKBOX ELEMENT}
+    ${id}    Get Element Attribute    ${CHECKBOX ELEMENT}    id
+    Should Not Be Empty    ${id}    'The specified checkbox element "${CHECKBOX ELEMENT}" does not have an id attribute and cannot be used with the Get Checkbox Value Keyword.'
+    Sleep    2    #Wait for form to load & dynamic control values to populate
+    ${checked}    Execute Javascript    return window.document.getElementById('${id}').checked;
+    [return]    ${checked}
+
+Set Checkbox Value
+    [arguments]    ${CHECKBOX ELEMENT}    ${Desired Bool Value}
+    ${Desired Bool Value}    Convert To Boolean    ${Desired Bool Value}    #input standardization
+    ${id}    Get Element Attribute    ${CHECKBOX ELEMENT}    id
+    Should Not Be Empty    ${id}    'The specified checkbox element "${CHECKBOX ELEMENT}" does not have an id attribute and cannot be used with the Set Checkbox Value Keyword.'
+    ${checked}    Get Checkbox Value    ${CHECKBOX ELEMENT}
+    Run Keyword If    ${checked} != ${Desired Bool Value}    Execute Javascript    window.document.getElementById('${id}').click()

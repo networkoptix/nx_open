@@ -98,7 +98,7 @@ ${TERMS AND CONDITIONS CHECKBOX REAL}       //form[@name= 'registerForm']//input
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), "${CREATE ACCOUNT BUTTON TEXT}")]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula']
 ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//span[@ng-if='registerForm.accept.$dirty && registerForm.accept.$error.required' and contains(text(), "${TERMS AND CONDITIONS ERROR TEXT}")]
-${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='${PRIVACY POLICY URL}']
+${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='${PRIVACY POLICY URL FULL}']
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'loginForm']//a[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
 ${REGISTER EYE ICON OPEN}             ${REGISTER FORM}${EYE ICON OPEN}
 ${REGISTER EYE ICON CLOSED}           ${REGISTER FORM}${EYE ICON CLOSED}
@@ -238,14 +238,31 @@ ${IPVD SEARCH BAR}                   //ipvd//input[@name="query"]
 ${IPVD ADVANCED SEARCH BUTTON}       //ipvd//span[contains(text(),"${IPVD ADVANCED SEARCH BUTTON TEXT}")]
 ${IPVD MANFUACTURERS PANE}           //ipvd//header/span[contains(text(),"manufacturers")]/../../../..
 ${IPVD DEVICES PANE}                 //ipvd//header/span[contains(text(),"devices")]/../../../..
+${IPVD DEVICE DETAILS}               //ipvd//nx-block[@id="cam-view"]
+${IPVD DEVICE MAKE}                  ${IPVD DEVICE DETAILS}//div[@class="camera-vendor-model"]//span[1]
+${IPVD DEVICE MODEL}                 ${IPVD DEVICE DETAILS}//div[@class="camera-vendor-model"]//span[2]
 ${IPVD CLEAR FILTERS BUTTON}         //ipvd//span[@class="close-button"]
 ${IPVD TABLE}                        //ipvd//table
-${IPVD FIRST TABLE ITEM}             ${IPVD TABLE}/tbody/tr[1]
-${IPVD LAST TABLE ITEM}              ${IPVD TABLE}/tbody/tr[0=count(following-sibling::tr)]//td
+${IPVD TABLE FIRST ITEM}             ${IPVD TABLE}/tbody/tr[1]
+${IPVD TABLE LAST ITEM}              ${IPVD TABLE}/tbody/tr[0=count(following-sibling::tr)]//td
 ${IPVD PREVIOUS BUTTON}              //ipvd//a/span[contains(text(),"«")]
 ${IPVD NEXT BUTTON}                  //ipvd//a/span[contains(text(),"»")]
 ${IPVD LAST PAGE BUTTON}             //ipvd//ul/[@class="pagination"]/li[@class="page-item disabled"]/following-sibling::li/a
 ${IPVD CLOSE DETAILS BUTTON}         //ipvd//header//span[@class="glyphicon close-icon detailsClose"]
+#IPVD Feedback
+${SUBMIT A REQUEST}     //ipvd//a[contains(text(),'submit a request')]
+${SEND DEVICE FEEDBACK}     //ipvd//a[contains(text(),'Send feedback about this device')]
+${IPVD FEEDBACK}                     //nx-modal-message-content//form[@name='messageForm']
+${IPVD FEEDBACK TITLE}               ${IPVD FEEDBACK}//h1
+${IPVD FEEDBACK YOUR NAME}           ${IPVD FEEDBACK}//form[@name='feedbackForm']//input[@id='user_name']
+${IPVD FEEDBACK EMAIL}               ${IPVD FEEDBACK}//form[@name='feedbackForm']//input[@id='user_email']
+${IPVD FEEDBACK MESSAGE}             ${IPVD FEEDBACK}//form[@name='feedbackForm']//textarea[@id='message']
+${IPVD FEEDBACK CONTACT ME}          ${IPVD FEEDBACK}//form[@name='feedbackForm']//input[@type='checkbox' and @id='contact']
+${IPVD FEEDBACK AGREE}               ${IPVD FEEDBACK}//form[@name='feedbackForm']//input[@type='checkbox' and @id='agree']
+${IPVD FEEDBACK PRIVACY POLICY}      ${IPVD FEEDBACK}//form[@name='feedbackForm']//a[text()='Privacy Policy']
+${IPVD FEEDBACK SEND BUTTON}         ${IPVD FEEDBACK}//button[text()='Send']
+${IPVD FEEDBACK CANCEL BUTTON}       ${IPVD FEEDBACK}//button[text()='Cancel']
+${IPVD FEEDBACK CLOSE BUTTON}        ${IPVD FEEDBACK}//button[@class='close']
 
 #Footer
 ${FOOTER ABOUT LINK}                 //footer//a[contains(text(),"${ABOUT} ${PRODUCT_NAME}")]
@@ -265,6 +282,8 @@ ${UBUNTU TAB}                         //a[@ng-click="select()"]//span[text()="Ub
 ${MAC OS TAB}                         //a[@ng-click="select()"]//span[text()="Mac OS"]/../..
 
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b
+
+${PRIVACY POLICY HEADER}              //h1[contains(text(),'Personal data and privacy policy')]
 
 #Password badges
 ${PASSWORD BADGE}                     //span[contains(@class,"badge")]
