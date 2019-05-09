@@ -14,19 +14,19 @@ ${url}         ${ENV}
 
 *** Test Cases ***
 IPVD page loads without login
-    IPVD page
+    Go To IPVD page
 
 IPVD page loads while logged in
     Log In    ${EMAIL OWNER}    ${BASE PASSWORD}
     Validate Log In
-    IPVD page
+    Go To IPVD page
 
 #Submit request can be closed by 'X', cancel, and escape
 #Submit request cannot be close by clicking outside the form
 #Submit request correctly sends request
 
 Text search correctly finds manufacturers
-    IPVD page
+    Go To IPVD page
     IPVD Text Search    hanwha
     Element Text Should Be    ${IPVD TABLE FIRST ITEM}/td[1]/div     Hanwha Techwin (Samsung)
 
@@ -55,7 +55,7 @@ Text search correctly finds manufacturers
 
 IPVD Request Form Basic Validations
     [tags]    C48969
-    IPVD page
+    Go To IPVD page
     Wait Until Element Is Visible    ${SUBMIT A REQUEST}
     Click Element    ${SUBMIT A REQUEST}
     Wait Until Element Is Visible    ${IPVD FEEDBACK}
@@ -76,7 +76,7 @@ IPVD Feedback Form Basic Validations
     [tags]    C54182
     #IPVD page    Login=True
     #Wait Until Element Is Not Visible    ${LOG IN MODAL}
-    IPVD page with Log In
+    Open IPVD page and Log In
     IPVD Text Search    Axis
     IPVD Select Device From Table Randomly
     Wait Until Element Is Visible    ${SEND DEVICE FEEDBACK}

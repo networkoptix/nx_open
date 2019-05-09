@@ -5,17 +5,17 @@ Resource          resource.robot
 ${IPVD TABLE ROWS}    ${IPVD TABLE}//tr
 
 *** Keywords ***
-IPVD page
+Go To IPVD page
     Go To    ${url}/ipvd
     Validate on IPVD page
 
-IPVD page with Log In
+Open IPVD page and Log In
     Open Browser and go to URL    ${url}/ipvd
     Validate on IPVD page
     Log In    ${EMAIL OWNER}    ${BASE PASSWORD}
     Validate Log In
     Wait Until Element Is Not Visible    ${LOG IN MODAL}
-    IPVD page  #Have to call it a 2nd time to get back onto the IPVD page after logging in
+    Go To IPVD page  #Have to call it a 2nd time to get back onto the IPVD page after logging in
 
 IPVD Text Search
     [Arguments]    ${SearchString}
@@ -73,7 +73,7 @@ Open New Browser On Failure
     Close Browser
     #Open Browser and go to URL    ${url}/ipvd
     Open Browser
-    IPVD page
+    Go To IPVD page
 
 Restart
     Register Keyword To Run On Failure    NONE

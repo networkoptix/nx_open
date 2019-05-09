@@ -1,6 +1,6 @@
 *** Settings ***
 Resource          ../ipvd_resource.robot
-Suite Setup       IPVD page with Log In
+Suite Setup       Open IPVD page and Log In
 Test Template     Test Submit Feedback Message
 Test Teardown     NONE
 Suite Teardown    Close All Browsers
@@ -34,7 +34,7 @@ Invalid email with all required data 6    False         ${name}         myemail@
 *** Keywords ***
 Test Submit Feedback Message
     [Arguments]    ${Expect Success}    ${Your Name}    ${Email}    ${Message}    ${Contact Me}    ${Agree to Privacy Policy}
-    IPVD page
+    Go To IPVD page
     #Search for Axis and click any camera from list
     IPVD Text Search    Axis
     IPVD Select Device From Table Randomly

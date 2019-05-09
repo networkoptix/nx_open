@@ -34,7 +34,7 @@ Invalid email with all required data 6    False         ${name}         myemail@
 *** Keywords ***
 Test Submit Request Message
     [Arguments]    ${Expect Success}    ${Your Name}    ${Email}    ${Message}    ${Contact Me}    ${Agree to Privacy Policy}
-    IPVD page
+    Go To IPVD page
     Wait Until Element Is Visible    ${SUBMIT A REQUEST}
     Click Element    ${SUBMIT A REQUEST}
     Wait Until Element Is Visible    ${IPVD FEEDBACK}
