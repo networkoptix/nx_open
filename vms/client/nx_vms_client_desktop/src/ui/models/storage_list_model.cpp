@@ -1,5 +1,9 @@
 #include "storage_list_model.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
+#include <QtGui/QPalette>
+
 #include <core/resource/storage_resource.h>
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>

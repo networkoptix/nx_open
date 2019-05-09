@@ -4,6 +4,8 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <nx/utils/log/assert.h>
+
 #include <utils/common/warnings.h>
 #include <ui/style/custom_style.h>
 

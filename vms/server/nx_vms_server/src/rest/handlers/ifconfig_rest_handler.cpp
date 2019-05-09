@@ -1,5 +1,7 @@
 #include <QFile>
 
+#include <QtNetwork/QHostAddress>
+
 #include "ifconfig_rest_handler.h"
 #include <nx/network/http/line_splitter.h>
 #include <network/tcp_connection_priv.h>

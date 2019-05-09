@@ -1,9 +1,17 @@
 #pragma once
 
+#include <chrono>
+#include <deque>
+
+#include <QtCore/QMap>
+#include <QtCore/QSet>
+#include <QtCore/QObject>
 #include <QtGui/QImage>
 
-#include <deque>
 #include <utils/media/frame_info.h>
+
+#include <nx/utils/uuid.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx::vms::client::desktop {
 
@@ -17,7 +25,7 @@ public:
     /*
      * @brief Setup resource list to cache.
      */
-    void setCachedDevices(const QSet<QnUuid>& value);
+    void setCachedDevices(intptr_t consumerId, const QSet<QnUuid>& value);
 
     /*
      * @brief Find image in the video cache.
@@ -35,8 +43,13 @@ public:
 
     void setCacheSize(std::chrono::microseconds value);
     std::chrono::microseconds cacheSize() const;
+
+private:
+    void setCachedDevices(const QSet<QnUuid>& value);
+
 private:
     mutable QnMutex m_mutex;
+    QMap<intptr_t, QSet<QnUuid>> m_cachedDevices;
     QMap<QnUuid, std::deque<CLVideoDecoderOutputPtr>> m_cache;
     std::chrono::microseconds m_cacheSize{};
 };

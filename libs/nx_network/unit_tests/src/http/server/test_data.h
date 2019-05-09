@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/network/http/http_types.h>
 
 namespace nx {
 namespace network {

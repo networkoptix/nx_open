@@ -5,6 +5,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource_management/resource_searcher.h>
 
+class QHostAddress;
 class QnMediaServerModule;
 
 class QnMdnsResourceSearcher: virtual public QnAbstractNetworkResourceSearcher

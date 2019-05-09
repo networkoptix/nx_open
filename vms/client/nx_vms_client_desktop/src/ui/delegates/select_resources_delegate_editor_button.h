@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <nx/utils/uuid.h>
+
 class QnSelectResourcesDialogButton : public QPushButton
 {
     Q_OBJECT

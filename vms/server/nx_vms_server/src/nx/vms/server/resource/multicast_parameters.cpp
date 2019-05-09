@@ -1,5 +1,7 @@
 #include "multicast_parameters.h"
 
+#include <nx/utils/log/log_message.h>
+
 namespace nx::vms::server::resource {
 
 QString MulticastParameters::toString() const

@@ -11,6 +11,8 @@
 
 #include <ui/common/color_to_vector_converter.h>
 
+#include <nx/utils/log/assert.h>
+
 template<class T>
 class QnGlBufferStream {
 public:

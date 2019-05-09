@@ -89,10 +89,7 @@ QString askPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
     dialog->setValidator(passwordValidator(layout));
 
     if (dialog->exec() == QDialog::Accepted)
-    {
-        fileLayout->usePasswordToRead(dialog->value().trimmed());
         return dialog->value().trimmed();
-    }
 
     return QString();
 }

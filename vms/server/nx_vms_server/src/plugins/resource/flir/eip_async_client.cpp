@@ -1,6 +1,10 @@
 #include "eip_async_client.h"
-#include <nx/utils/log/log.h>
+
 #include <chrono>
+
+#include <QtCore/QDataStream>
+
+#include <nx/utils/log/log.h>
 
 namespace {
 

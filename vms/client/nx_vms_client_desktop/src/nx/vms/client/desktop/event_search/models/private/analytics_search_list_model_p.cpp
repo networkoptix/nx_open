@@ -40,7 +40,7 @@
 
 namespace nx::vms::client::desktop {
 
-using namespace analytics::storage;
+using namespace analytics::db;
 
 namespace {
 
@@ -314,7 +314,7 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
                 return;
 
             QnTimePeriod actuallyFetched;
-            m_prefetch = analytics::storage::LookupResult();
+            m_prefetch = analytics::db::LookupResult();
 
             if (success)
             {
@@ -731,7 +731,7 @@ QString AnalyticsSearchListModel::Private::attributes(
 }
 
 QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
-    const analytics::storage::DetectedObject& object) const
+    const analytics::db::DetectedObject& object) const
 {
     using nx::vms::api::analytics::ActionTypeDescriptor;
     const auto camera = this->camera(object);
@@ -764,7 +764,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 }
 
 AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Private::previewParams(
-    const analytics::storage::DetectedObject& object)
+    const analytics::db::DetectedObject& object)
 {
     PreviewParams result;
     result.timestamp = std::chrono::microseconds(object.firstAppearanceTimeUsec);
@@ -832,7 +832,7 @@ AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Priva
 }
 
 QnVirtualCameraResourcePtr AnalyticsSearchListModel::Private::camera(
-    const analytics::storage::DetectedObject& object) const
+    const analytics::db::DetectedObject& object) const
 {
     NX_ASSERT(!object.track.empty());
     if (object.track.empty())

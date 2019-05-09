@@ -1,9 +1,9 @@
 #pragma once
 
-#include <client/client_globals_fwd.h>
+#include <QtWidgets/QWidget>
 
+#include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
-
 #include <utils/common/connective.h>
 
 class QLabel;
@@ -26,7 +26,7 @@ class AsyncImageWidget : public Connective<QWidget>
 
 public:
     explicit AsyncImageWidget(QWidget* parent = nullptr);
-    virtual ~AsyncImageWidget();
+    virtual ~AsyncImageWidget() override;
 
     ImageProvider* imageProvider() const;
     void setImageProvider(ImageProvider* provider);

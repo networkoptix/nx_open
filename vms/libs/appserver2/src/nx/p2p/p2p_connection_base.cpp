@@ -139,8 +139,9 @@ void ConnectionBase::pleaseStopSync()
         NX_ASSERT(m_startedClassId == typeid(*this).hash_code(),
             "Please call pleaseStopSync() in the destructor of the nested class.");
         m_startedClassId = 0;
-        m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
     }
+
+    m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
 }
 
 ConnectionBase::~ConnectionBase()

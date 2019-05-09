@@ -1,7 +1,4 @@
-
 #include "masked_proxy_widget.h"
-
-#include <iostream>
 
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEngine>
@@ -9,7 +6,9 @@
 #include <QtWidgets/private/qgraphicsitem_p.h>
 #include <QtWidgets/private/qwidget_p.h>
 
+#include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
+
 #include <ui/workaround/sharp_pixmap_painting.h>
 
 namespace {

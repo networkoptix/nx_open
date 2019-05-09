@@ -1,8 +1,8 @@
-#ifndef QN_ABSTRACT_ANIMATOR_H
-#define QN_ABSTRACT_ANIMATOR_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
+
 #include "animation_timer_listener.h"
 
 class AnimatorGroup;
@@ -10,20 +10,21 @@ class AnimatorGroup;
 /**
  * Base class for animators. 
  */
-class AbstractAnimator: public QObject, public AnimationTimerListener {
-    Q_OBJECT;
+class AbstractAnimator: public QObject, public AnimationTimerListener
+{
+    Q_OBJECT
 public:
     /**
      * Constructor.
      * 
      * \param parent                    Parent object.
      */
-    AbstractAnimator(QObject *parent = NULL);
+    AbstractAnimator(QObject* parent = nullptr);
 
     /**
      * Virtual destructor.
      */
-    virtual ~AbstractAnimator();
+    virtual ~AbstractAnimator() override;
 
     /**
      * Animator state.
@@ -191,17 +192,14 @@ private:
 
     /* 'Stable' state. */
 
-    AnimatorGroup *m_group;
-    State m_state;
-    int m_timeLimitMSec;
-    int m_durationOverride;
+    AnimatorGroup* m_group = nullptr;
+    State m_state = Stopped;
+    int m_timeLimitMSec = -1;
+    int m_durationOverride = -1;
     
     /* 'Working' state. */
 
-    mutable bool m_durationValid;
-    mutable int m_duration;
-    int m_currentTime;
+    mutable bool m_durationValid = false;
+    mutable int m_duration = -1;
+    int m_currentTime = 0;
 };
-
-
-#endif // QN_ABSTRACT_ANIMATOR_H

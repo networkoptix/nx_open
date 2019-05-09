@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <nx/utils/uuid.h>
 
 class QnMediaServerModule;

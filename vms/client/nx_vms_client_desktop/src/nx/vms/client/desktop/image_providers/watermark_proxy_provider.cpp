@@ -3,6 +3,7 @@
 #include <QtGui/QPainter>
 
 #include <nx/vms/client/desktop/watermark/watermark_painter.h>
+#include <nx/utils/log/assert.h>
 #include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {

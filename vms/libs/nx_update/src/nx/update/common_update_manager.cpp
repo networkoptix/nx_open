@@ -230,8 +230,12 @@ bool CommonUpdateManager::canDownloadFile(
         }
     }
 
-    const double requiredSpace = package.size * 2 * 1.2;
+    const int64_t requiredSpace = package.size * 2 * 1.2;
     const int64_t deviceFreeSpace = freeSpace(installer()->dataDirectoryPath());
+    NX_DEBUG(
+        this,
+        "Checking if there is enough space to download and install the update package. Required space: %1Mb, free space on device: %2Mb",
+        requiredSpace / (1024 * 1024), deviceFreeSpace / (1024 * 1024));
     if (deviceFreeSpace < requiredSpace)
     {
         NX_WARNING(
