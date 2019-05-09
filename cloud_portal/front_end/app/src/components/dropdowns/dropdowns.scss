@@ -98,11 +98,7 @@ header {
         border           : none;
         border-radius    : 2px;
         width            : 100%;
-        padding          : 4px 0 8px !important;
-    
-        @include media-breakpoint-up(md) {
-            padding-bottom : 4px !important;
-        }
+        padding          : 4px 0 0 !important;
         
         &--list {
             max-height      : $dropdown-list-height;
@@ -123,6 +119,7 @@ header {
             li:last-of-type {
                 margin-bottom : 4px;
             }
+            margin-bottom: 4px !important;
         }
         
         .multi-column-dropdown {
@@ -143,6 +140,7 @@ header {
                 line-height : 26px;
                 font-family : $font-family-medium;
                 text-decoration: none;
+                cursor      : pointer !important;
                 
                 @media (max-width : $collapse-second-width) {
                     height : 32px;
