@@ -20,10 +20,12 @@ protected:
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
+    virtual void pleaseStop() override;
 
     int receiveData(quint8* buffer, int size);
 private:
-    std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
+    mutable QnMutex m_socketMutex;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
     QnConstMediaContextPtr m_context;
 };
 

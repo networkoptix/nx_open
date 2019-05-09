@@ -39,7 +39,7 @@ void ServerAlivenessTester::probe(ProbeResultHandler handler)
 
 void ServerAlivenessTester::cancelProbe()
 {
-    m_client->cancelHandlers(this, []() {});
+    m_client->cancelHandlersSync(this);
 }
 
 void ServerAlivenessTester::processResponse(

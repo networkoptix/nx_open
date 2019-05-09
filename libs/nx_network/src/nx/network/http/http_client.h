@@ -46,16 +46,16 @@ public:
      */
     bool doPost(
         const nx::utils::Url& url,
-        const nx::network::http::StringType& contentType,
-        nx::network::http::StringType messageBody);
+        const nx::network::http::StringType& contentType = {},
+        nx::network::http::StringType messageBody = {});
 
     /**
      * @return true if response has been received.
      */
     bool doPut(
         const nx::utils::Url& url,
-        const nx::network::http::StringType& contentType,
-        nx::network::http::StringType messageBody);
+        const nx::network::http::StringType& contentType = {},
+        nx::network::http::StringType messageBody = {});
 
     /**
      * @return true if response has been received.

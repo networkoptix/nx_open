@@ -147,6 +147,7 @@ private slots:
     void at_databaseDumped();
     void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIp);
+    void at_metadataStorageIdChanged(const QnResourcePtr& resource);
 
 private:
     void updateDisabledVendorsIfNeeded();
@@ -232,7 +233,12 @@ private:
     void connectSignals();
     void connectStorageSignals(QnStorageManager* storage);
     void setUpDataFromSettings();
-    void initializeAnalyticsEvents();
+    bool initializeAnalyticsEvents();
+    void saveMediaServerUserAttributes(
+        ec2::AbstractECConnectionPtr ec2Connection,
+        const nx::vms::api::MediaServerUserAttributesData& userAttrsData);
+    QString getMetadataDatabaseName() const;
+    QnUuid selectDefaultStorageForAnalyticsEvents(QnMediaServerResourcePtr server);
     void setUpTcpLogReceiver();
     void initNewSystemStateIfNeeded(
         bool foundOwnServerInDb,
@@ -246,7 +252,6 @@ private:
     void createResourceProcessor();
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
     void loadResourceParamsData();
-
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
@@ -267,6 +272,7 @@ private:
     std::unique_ptr<QTimer> m_createDbBackupTimer;
     QVector<QString> m_hardwareIdHlist;
     QnServerMessageProcessor* m_serverMessageProcessor = nullptr;
+    QString m_oldAnalyticsStoragePath;
 
     static std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
     std::weak_ptr<QnMediaServerModule> m_serverModule;

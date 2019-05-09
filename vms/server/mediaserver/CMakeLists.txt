@@ -4,6 +4,7 @@ if(LINUX)
     # solution is to add an absolute libs path because we know it. The "$ORIGIN/../lib" stays here
     # too to simplify server execution by developers.
     list(APPEND CMAKE_INSTALL_RPATH "/opt/${deb.customization.company.name}/mediaserver/lib")
+    list(APPEND CMAKE_INSTALL_RPATH "/opt/${deb.customization.company.name}/mediaserver/lib/ffmpeg")
 endif()
 
 set(file_internal_name "${mediaserver_application_name}")

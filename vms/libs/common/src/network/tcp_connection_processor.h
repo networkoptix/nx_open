@@ -16,6 +16,8 @@
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
 
+namespace Qn { struct UserAccessData; }
+
 class QnTCPConnectionProcessor: public QnLongRunnable, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
@@ -81,6 +83,7 @@ public:
 
     static const int kMaxRequestSize;
 protected:
+    QnAuthSession authSession(const Qn::UserAccessData& accessRights) const;
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
 

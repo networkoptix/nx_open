@@ -27,7 +27,7 @@
 
 #include <nx/vms/server/sdk_support/loggers.h>
 
-#include <analytics/detected_objects_storage/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_plugin_event.h>
@@ -38,11 +38,7 @@
 
 class QnMediaServerModule;
 
-namespace nx::vms::server::analytics {
-
-class SdkObjectFactory;
-
-} // namespace nx::vms::server::analytics
+namespace nx::vms::server::analytics { class SdkObjectFactory; }
 
 namespace nx::vms::server::sdk_support {
 
@@ -51,6 +47,13 @@ nx::vms::api::analytics::PixelFormat fromSdkPixelFormat(
 
 std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> toSdkPixelFormat(
     nx::vms::api::analytics::PixelFormat pixelFormat);
+
+/** @return Converted value, or, on error, AV_PIX_FMT_NONE, after failing an assertion. */
+AVPixelFormat sdkToAvPixelFormat(
+    nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat sdkPixelFormat);
+
+std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> avPixelFormatToSdk(
+    AVPixelFormat avPixelFormat);
 
 template<typename Manifest>
 std::optional<Manifest> loadManifestFromFile(const QString& filename)
@@ -217,11 +220,11 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
 nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level);
 
 nx::sdk::Ptr<nx::sdk::analytics::ITimestampedObjectMetadata> createTimestampedObjectMetadata(
-    const nx::analytics::storage::DetectedObject& detectedObject,
-    const nx::analytics::storage::ObjectPosition& objectPosition);
+    const nx::analytics::db::DetectedObject& detectedObject,
+    const nx::analytics::db::ObjectPosition& objectPosition);
 
 nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::ITimestampedObjectMetadata>> createObjectTrack(
-    const nx::analytics::storage::DetectedObject& detectedObject);
+    const nx::analytics::db::DetectedObject& detectedObject);
 
 nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> createUncompressedVideoFrame(
     const CLVideoDecoderOutputPtr& frame,

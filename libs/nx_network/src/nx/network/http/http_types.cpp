@@ -1918,20 +1918,25 @@ const StringType ContentType::NAME(kContentType);
 const StringType ContentType::kAny("*/*");
 const StringType ContentType::kDefaultCharset("utf-8");
 
-const ContentType ContentType::kPlain("text/plain");
-const ContentType ContentType::kHtml("text/html");
+// TODO: Apply default charset (UTF-8) to every text based content types when it's not specified.
+// Currenlt UTF-8 is explicitly specified for texts only because some browsers may fail otherwise.
+const ContentType ContentType::kPlain("text/plain; charset=utf-8");
+const ContentType ContentType::kHtml("text/html; charset=utf-8");
+const ContentType ContentType::kXml("application/xml");
+const ContentType ContentType::kForm("application/x-www-form-urlencoded");
 const ContentType ContentType::kJson("application/json");
+const ContentType ContentType::kUbjson("application/ubjson");
+const ContentType ContentType::kBinary("application/octet-stream");
 
 ContentType::ContentType(const StringType& headerValue)
 {
     const auto records = headerValue.split(';');
-    value = records[0];
-    charset = kDefaultCharset;
+    value = records[0].toLower();
     for (int i = 1; i < records.count(); ++i)
     {
         const auto parts = records[i].trimmed().split('=');
         if (parts[0] == "charset" && parts.size() == 2)
-            charset = parts[1];
+            charset = parts[1].toLower();
     }
 }
 
@@ -1943,6 +1948,18 @@ StringType ContentType::toString() const
 
     return result;
 }
+
+bool ContentType::operator==(const ContentType& rhs) const
+{
+    if (value != rhs.value)
+        return false;
+
+    if (charset.isEmpty() || rhs.charset.isEmpty())
+        return true;
+
+    return charset == rhs.charset;
+}
+
 
 } // namespace header
 

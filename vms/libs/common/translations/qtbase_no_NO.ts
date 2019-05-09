@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>About %1</source>
-      <translation type="unfinished">About %1</translation>
+      <translation>Om %1</translation>
     </message>
   </context>
   <context>
@@ -180,7 +180,7 @@
     </message>
     <message>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Om</translation>
     </message>
     <message>
       <source>Config</source>
@@ -204,7 +204,7 @@
     </message>
     <message>
       <source>Quit</source>
-      <translation type="unfinished">Quit</translation>
+      <translation>Avslutt</translation>
     </message>
     <message>
       <source>Exit</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Velg alle</translation>
     </message>
   </context>
   <context>
@@ -867,7 +867,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Velg alle</translation>
     </message>
   </context>
   <context>
@@ -1173,7 +1173,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Velg alle</translation>
     </message>
   </context>
 </TS>

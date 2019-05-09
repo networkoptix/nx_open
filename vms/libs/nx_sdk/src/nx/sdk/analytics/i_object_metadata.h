@@ -4,6 +4,7 @@
 
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/i_attribute.h>
+#include <nx/sdk/analytics/rect.h>
 #include <nx/sdk/analytics/i_metadata.h>
 
 namespace nx {
@@ -17,41 +18,6 @@ class IObjectMetadata: public Interface<IObjectMetadata, IMetadata>
 {
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IObjectMetadata"); }
-
-    /**
-     * Bounding box of an object detected in a video frame.
-     */
-    struct Rect
-    {
-        Rect() = default;
-
-        Rect(float x, float y, float width, float height):
-            x(x), y(y), width(width), height(height)
-        {
-        }
-
-        /**
-         * X-coordinate of the top left corner. Must be in the range [0..1].
-         */
-        float x = 0;
-
-        /**
-         * Y-coordinate of the top left corner. Must be in the range [0..1].
-         */
-        float y = 0;
-
-        /**
-         * Width of the rectangle. Must be in the range [0..1], and the rule `x + width <= 1` must
-         * be satisfied.
-         */
-        float width = 0;
-
-        /**
-         * Height of the rectangle. Must be in the range [0..1], and the rule `y + height <= 1`
-         * must be satisfied.
-         */
-        float height = 0;
-    };
 
     /**
      * Id of the object. If the object (e.g. a particular person) is detected on multiple frames,

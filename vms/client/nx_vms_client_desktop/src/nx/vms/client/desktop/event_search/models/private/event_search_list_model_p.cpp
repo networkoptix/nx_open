@@ -121,6 +121,11 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
         case Qn::DescriptionTextRole:
             return description(eventParams);
 
+        case Qn::ForcePrecisePreviewRole:
+            return hasPreview(eventParams.eventType)
+                && eventParams.eventTimestampUsec > 0
+                && eventParams.eventTimestampUsec != DATETIME_NOW;
+
         case Qn::PreviewTimeRole:
             if (!hasPreview(eventParams.eventType))
                 return QVariant();

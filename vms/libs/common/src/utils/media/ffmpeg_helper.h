@@ -2,15 +2,19 @@
 
 #include "core/resource/resource_fwd.h"
 
-extern "C"
-{
+extern "C" {
+
 #include <libavcodec/avcodec.h>
 #include <libavformat/avio.h>
-}
+#include <libavutil/mem.h>
+#include <libavutil/imgutils.h>
+
+} // extern "C"
 
 #include <QtCore/QIODevice>
 
 #include "audioformat.h"
+#include <nx/streaming/config.h>
 #include <nx/streaming/media_context.h>
 #include <nx/streaming/media_context_serializable_data.h>
 
@@ -83,13 +87,13 @@ public:
     static AVSampleFormat fromQtAudioFormatToFfmpegSampleType(const QnAudioFormat& format);
     static AVCodecID fromQtAudioFormatToFfmpegPcmCodec(const QnAudioFormat& format);
 
-
     static int getDefaultFrameSize(AVCodecContext* context);
+
 private:
     static void copyMediaContextFieldsToAvCodecContext(
         AVCodecContext* av, const QnConstMediaContextPtr& media);
 
-    /** 
+    /**
      * Holds a globally shared static instance of a stub AVCodec used for
      * AVCodecContext when the proper codec is not available in ffmpeg.
      */
@@ -119,10 +123,11 @@ struct SwrContext;
 class QnFfmpegAudioHelper
 {
 public:
-    QnFfmpegAudioHelper(AVCodecContext* decoderContex);
+    QnFfmpegAudioHelper(AVCodecContext* decoderContext);
     ~QnFfmpegAudioHelper();
 
-    void copyAudioSamples(quint8* dst, const AVFrame* src);
+    void copyAudioSamples(quint8* dst, const AVFrame* src) const;
+
 private:
     SwrContext* m_swr;
 };
@@ -135,3 +140,5 @@ struct QnFfmpegAvPacket: AVPacket
     QnFfmpegAvPacket(const QnFfmpegAvPacket&) = delete;
     QnFfmpegAvPacket& operator=(const QnFfmpegAvPacket&) = delete;
 };
+
+QString toString(AVPixelFormat pixelFormat);

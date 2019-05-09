@@ -1112,7 +1112,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>שגיאה לא מוכרת.</translation>
+      <translation>שגיאה לא ידועה.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>

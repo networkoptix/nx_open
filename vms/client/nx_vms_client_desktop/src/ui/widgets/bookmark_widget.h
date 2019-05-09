@@ -1,7 +1,7 @@
-#ifndef BOOKMARK_WIDGET_H
-#define BOOKMARK_WIDGET_H
+#pragma once
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QSet>
 #include <QtWidgets/QWidget>
 
 #include <core/resource/camera_bookmark_fwd.h>
@@ -40,5 +40,3 @@ private:
     QnCameraBookmarkTags m_selectedTags;
     bool m_isValid;
 };
-
-#endif // BOOKMARK_WIDGET_H

@@ -154,8 +154,7 @@ angular.module('webadminApp')
             };
             return obj;
         }
-
-
+        
         // Special hack to make our json recognizable by fusion on mediaserver
         function stringifyValues(object){
             if(!jQuery.isPlainObject(object) && !jQuery.isArray(object)){
@@ -167,7 +166,26 @@ angular.module('webadminApp')
             }
             return result;
         }
+    
+        function isEmptyId(id) {
+            return !id || id === '{00000000-0000-0000-0000-000000000000}';
+        }
 
+        function userObj(user) {
+            var hasEditServerPermission = user.permissions.indexOf(Config.globalEditServersPermissions) >= 0;
+            var hasAllResources = user.permissions.indexOf(Config.globalAccessAllMediaPermission) >= 0;
+    
+            var isAdmin = user.isAdmin || hasEditServerPermission;
+            var isOwner = user.isAdmin;
+    
+            return {
+                hasAllResources: hasAllResources || isAdmin,
+                isAdmin: isAdmin,
+                isOwner: isOwner,
+                name: user.name,
+                permissions: user.permissions
+            };
+        }
 
         mediaserver = {
             // TODO: remove this method and all usages in 4.1 release or later. We keep it for now to simplify merges
@@ -292,21 +310,24 @@ angular.module('webadminApp')
             hasProxy:function(){
                 return proxy !=='';
             },
-            getUser:function(reload){
-                return this.getCurrentUser(reload).then(function(result){
-                    var hasEditServerPermission = result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0;
-                    var hasAllResources = result.data.reply.permissions.indexOf(Config.globalAccessAllMediaPermission)>=0;
-
-                    var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
-                    var isOwner = result.data.reply.isAdmin ;
-
-                    return {
-                        isAdmin:isAdmin,
-                        isOwner:isOwner,
-                        name:result.data.reply.name,
-                        hasAllResources:hasAllResources || isAdmin,
-                        permissions:result.data.reply.permissions
-                    };
+            getRolePermissions: function(roleId) {
+                return wrapGet(proxy +'/ec2/getUserRoles', {id: roleId});
+            },
+            getUser: function(reload) {
+                var that = this;
+                return this.getCurrentUser(reload).then(function(result) {
+                    var user = result.data.reply;
+                    
+                    if (!isEmptyId(user.userRoleId)) {
+                        return that.getRolePermissions(user.userRoleId)
+                            .then(function(response) {
+                                user.permissions = response.data[0].permissions;
+    
+                                return userObj(user);
+                            });
+                    } else {
+                        return userObj(user);
+                    }
                 });
             },
             getScripts:function(){

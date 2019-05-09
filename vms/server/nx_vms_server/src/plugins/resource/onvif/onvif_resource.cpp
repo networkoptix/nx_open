@@ -88,20 +88,6 @@ onvifXsd__H264Profile fromStringToH264Profile(const QString& str)
         return onvifXsd__H264Profile::Baseline;
 };
 
-void updateTimer(nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
-    nx::utils::MoveOnlyFunc<void(nx::utils::TimerId)> function)
-{
-    if (*timerId != 0)
-    {
-        // Can be called from IO thread. Non blocking call should be used here.
-        nx::utils::TimerManager::instance()->deleteTimer(*timerId);
-        *timerId = 0;
-    }
-
-    *timerId = nx::utils::TimerManager::instance()->addTimer(
-        std::move(function), timeout);
-}
-
 /* Some cameras declare invalid max resolution */
 struct StrictResolution
 {
@@ -149,6 +135,27 @@ QString QnOnvifServiceUrls::getUrl(OnvifWebService onvifWebService) const
 
 //-------------------------------------------------------------------------------------------------
 // QnPlOnvifResource::VideoEncoderCapabilities
+
+void QnPlOnvifResource::updateTimer(
+    nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
+    nx::utils::MoveOnlyFunc<void(nx::utils::TimerId)> function)
+{
+    if (*timerId != 0)
+    {
+        // Can be called from IO thread. Non blocking call should be used here.
+        nx::utils::TimerManager::instance()->deleteTimer(*timerId);
+        *timerId = 0;
+    }
+
+    *timerId = nx::utils::TimerManager::instance()->addTimer(
+        [operationGuard = m_asyncConnectGuard.sharedGuard(),
+        function = std::move(function)](nx::utils::TimerId timerId) mutable
+        {
+            if (const auto lock = operationGuard->lock())
+                function(timerId);
+        },
+        timeout);
+}
 
 QnPlOnvifResource::VideoEncoderCapabilities::VideoEncoderCapabilities(
     std::string videoEncoderToken,
@@ -464,6 +471,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
     }
 
     stopInputPortStatesMonitoring();
+    m_asyncConnectGuard->terminate();
 
     QnMutexLocker lock(&m_physicalParamsMutex);
     m_imagingParamsProxy.reset();
@@ -1711,21 +1719,17 @@ std::string QnPlOnvifResource::videoEncoderConfigurationToken(
     nx::vms::api::StreamIndex streamIndex) const
 {
     QnMutexLocker lock(&m_mutex);
-    if (const auto it = m_videoEncoderConfigurationTokens.find(streamIndex);
-        it != m_videoEncoderConfigurationTokens.cend())
+    if (streamIndex == nx::vms::api::StreamIndex::primary
+        && !m_primaryStreamCapabilitiesList.empty())
     {
-        return it->second;
+        return m_primaryStreamCapabilitiesList[0].videoEncoderToken;
     }
-
+    if (streamIndex == nx::vms::api::StreamIndex::secondary
+        && !m_secondaryStreamCapabilitiesList.empty())
+    {
+        return m_secondaryStreamCapabilitiesList[0].videoEncoderToken;
+    }
     return std::string();
-}
-
-void QnPlOnvifResource::setVideoEncoderConfigurationToken(
-    nx::vms::api::StreamIndex streamIndex,
-    std::string token)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_videoEncoderConfigurationTokens[streamIndex] = std::move(token);
 }
 
 std::string QnPlOnvifResource::audioSourceConfigurationToken() const
@@ -5003,6 +5007,37 @@ SoapTimeouts QnPlOnvifResource::onvifTimeouts() const
         return SoapTimeouts::minivalValue();
     else
         return SoapTimeouts(serverModule()->settings().onvifTimeouts());
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::ensureMulticastIsEnabled(
+    nx::vms::api::StreamIndex streamIndex)
+{
+    auto& multicastParametersProvider = streamIndex == nx::vms::api::StreamIndex::primary
+        ? m_primaryMulticastParametersProvider
+        : m_secondaryMulticastParametersProvider;
+
+    auto multicastParameters = multicastParametersProvider.getMulticastParameters();
+    if (!Camera::fixMulticastParametersIfNeeded(&multicastParameters, streamIndex))
+    {
+        NX_VERBOSE(this, "Multicast parameters are ok for stream %1", streamIndex);
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    if (!multicastParametersProvider.setMulticastParameters(multicastParameters))
+    {
+        NX_DEBUG(this, "Unable to update multicast parameters for stream %1, parameters: %2",
+            streamIndex, multicastParameters);
+
+        return CameraDiagnostics::RequestFailedResult("Updating multicast parameters",
+            lm("Unable to update multicast parameters for stream %1, parameters: %2")
+                .args(streamIndex, multicastParameters));
+    }
+
+    NX_VERBOSE(this,
+        "Multicast parameters has been successfully updated for stream %1, parameters %2",
+        streamIndex, multicastParameters);
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 #endif //ENABLE_ONVIF

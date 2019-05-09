@@ -3,7 +3,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/url.h>
-#include <nx/utils/app_info.h>
+#include <nx/vms/utils/installation_info.h>
 
 #include "camera/default_audio_encoder.h"
 #include "camera_manager.h"
@@ -236,7 +236,8 @@ int MediaEncoder::getResolutionList(
         infoList[index].maxFps = kDefaultSecondaryFps;
 
         *infoListCount = index + 1;
-        if (nx::utils::AppInfo::isRaspberryPi())
+        if (nx::vms::utils::installationInfo().hwPlatform ==
+            nx::vms::api::HwPlatform::raspberryPi)
         {
             int width = kDefaultSecondaryWidth / 2;
             infoList[0].resolution = { width, (int)(width / aspectRatio) };

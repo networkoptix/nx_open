@@ -8,7 +8,7 @@
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
 
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/db/abstract_storage.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/resource.h>
@@ -54,6 +54,9 @@
 #include <media_server/media_server_module.h>
 #include <media_server_process_aux.h>
 #include <nx/sql/database.h>
+#include <core/resource/media_server_resource.h>
+#include <nx/utils/std/algorithm.h>
+#include <nx/analytics/utils.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -70,6 +73,7 @@ const qint64 kMinSystemStorageFreeSpace = 500 * 1000 * 1000LL;
 #else
 const qint64 kMinSystemStorageFreeSpace = 5000 * 1000 * 1000LL;
 #endif
+const qint64 kMinMetadataStorageFreeSpace = 1024 * 1024;
 
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
@@ -730,7 +734,7 @@ private:
 
 QnStorageManager::QnStorageManager(
     QnMediaServerModule* serverModule,
-    nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
+    nx::analytics::db::AbstractEventsStorage* analyticsEventsStorage,
     QnServer::StoragePool role,
     const char* threadName)
 :
@@ -1831,6 +1835,47 @@ void QnStorageManager::checkSystemStorageSpace()
     }
 }
 
+void QnStorageManager::checkMetadataStorageSpace()
+{
+    auto server = serverModule()->resourcePool()->getResourceById<QnMediaServerResource>(
+        serverModule()->commonModule()->moduleGUID());
+    if (!server)
+        return;
+
+    bool hasAnalyticsEngine = false;
+    auto cameras = serverModule()->resourcePool()->getAllCameras(server);
+    for (const auto& camera: cameras)
+    {
+        QSet<QnUuid> objectEngines;
+        for (const auto& objectType: camera->supportedObjectTypes())
+        {
+            if (!objectType.second.empty())
+                objectEngines.insert(objectType.first);
+        }
+        auto usedObjectEngines = camera->enabledAnalyticsEngines().intersect(objectEngines);
+        if (!usedObjectEngines.empty())
+        {
+            hasAnalyticsEngine = true;
+        }
+    }
+    if (!nx::analytics::hasActiveObjectEngines(
+        serverModule()->commonModule(),
+        serverModule()->commonModule()->moduleGUID()))
+    {
+        return; //< No active analytics engine.
+    }
+
+    for (const auto& storage: getAllStorages())
+    {
+        if (storage->getId() != server->metadataStorageId())
+            continue;
+        if (storage->getStatus() != Qn::Online)
+            emit storageFailure(storage, nx::vms::api::EventReason::metadataStorageOffline);
+        else if (storage->getFreeSpace()< kMinMetadataStorageFreeSpace)
+            emit storageFailure(storage, nx::vms::api::EventReason::metadataStorageFull);
+    }
+}
+
 void QnStorageManager::clearSpace(bool forced)
 {
     QnMutexLocker lk(&m_clearSpaceMutex);
@@ -2610,7 +2655,12 @@ void QnStorageManager::startAuxTimerTasks()
 
     static const std::chrono::minutes kCheckSystemStorageSpace(1);
     m_auxTasksTimerManager.addNonStopTimer(
-        [this](nx::utils::TimerId) { checkSystemStorageSpace(); },
+        [this](nx::utils::TimerId)
+        {
+            checkSystemStorageSpace();
+            if (m_role == QnServer::StoragePool::Normal)
+                checkMetadataStorageSpace();
+        },
         kCheckSystemStorageSpace,
         kCheckSystemStorageSpace);
 

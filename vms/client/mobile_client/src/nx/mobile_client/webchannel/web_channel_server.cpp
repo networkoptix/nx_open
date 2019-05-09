@@ -26,7 +26,7 @@ public:
             this, &WebSocketTransport::deleteLater);
     }
 
-    ~WebSocketTransport()
+    virtual ~WebSocketTransport() override
     {
         m_socket->deleteLater();
     }
@@ -44,13 +44,12 @@ private:
         QJsonDocument message = QJsonDocument::fromJson(messageData.toUtf8(), &error);
         if (error.error)
         {
-            NX_ERROR(this, lit("Failed to parse text message as JSON object: ")
-                + error.errorString());
+            NX_ERROR(this, "Failed to parse text message as JSON object: %1", error.errorString());
             return;
         }
         else if (!message.isObject())
         {
-            NX_ERROR(this, lit("Received JSON message that is not an object: ") + messageData);
+            NX_ERROR(this, "Received JSON message that is not an object: %1", messageData);
             return;
         }
         emit messageReceived(message.object(), this);
@@ -63,19 +62,19 @@ private:
 WebChannelServer::WebChannelServer(const quint16 port, QObject* parent):
     QWebChannel(parent),
     m_server(new QWebSocketServer(
-        lit("%1 WebChannel Server").arg(QnAppInfo::productNameLong()),
+        QString("%1 WebChannel Server").arg(QnAppInfo::productNameLong()),
         QWebSocketServer::NonSecureMode))
 {
     if (!m_server->listen(QHostAddress::LocalHost, port))
     {
-        NX_ERROR(this, lit("Could not start server"));
+        NX_ERROR(this, "Could not start server");
 
         delete m_server;
         m_server = nullptr;
         return;
     }
 
-    NX_DEBUG(this, lit("Server started at localhost:%1").arg(m_server->serverPort()));
+    NX_DEBUG(this, "Server started at localhost: %1", m_server->serverPort());
 
     connect(m_server, &QWebSocketServer::newConnection, this,
         [this]

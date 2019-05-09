@@ -16,7 +16,6 @@
 #include <nx/network/nettools.h>
 
 #define DEFAULT_RTP_PORT 554
-#define RESERVED_TIMEOUT_TIME (10*1000)
 
 static const int TCP_RECEIVE_TIMEOUT_MS = 1000 * 5;
 static const int TCP_CONNECT_TIMEOUT_MS = 1000 * 5;
@@ -25,8 +24,11 @@ static const int SDP_TRACK_STEP = 2;
 QByteArray QnRtspClient::m_guid;
 QnMutex QnRtspClient::m_guidMutex;
 
+using namespace std::chrono;
+
 namespace {
 
+const seconds kReservedTimeoutTime(10);
 const QString METADATA_STR(lit("ffmpeg-metadata"));
 constexpr int kSocketBufferSize = 512 * 1024;
 
@@ -245,6 +247,28 @@ void QnRtspIoDevice::updateSockets()
         : 0);
 }
 
+QnRtspIoDevice::AddressInfo QnRtspIoDevice::mediaAddressInfo() const
+{
+    return addressInfo(m_remoteMediaPort);
+}
+
+QnRtspIoDevice::AddressInfo QnRtspIoDevice::rtcpAddressInfo() const
+{
+    return addressInfo(m_remoteRtcpPort);
+}
+
+QnRtspIoDevice::AddressInfo QnRtspIoDevice::addressInfo(int port) const
+{
+    AddressInfo info;
+    info.transport = m_transport;
+    info.address.address = m_transport == nx::vms::api::RtpTransportType::multicast
+        ? nx::network::HostAddress(m_multicastAddress.toString())
+        : nx::network::HostAddress(m_hostAddress.toString());
+
+    info.address.port = port;
+    return info;
+}
+
 static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64 * 1024;
 
 //-------------------------------------------------------------------------------------------------
@@ -265,7 +289,6 @@ QnRtspClient::QnRtspClient(
     m_tcpTimeout(10 * 1000),
     m_responseCode(nx::network::http::StatusCode::ok),
     m_isAudioEnabled(true),
-    m_TimeOut(0),
     m_tcpSock(std::move(tcpSock)),
     m_rtspAuthCtx(config.shouldGuessAuthDigest),
     m_userAgent(nx::network::http::userAgentString()),
@@ -363,6 +386,10 @@ void QnRtspClient::updateResponseStatus(const QByteArray& response)
 
 CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 startTime)
 {
+    m_actualTransport = m_transport;
+    if (m_actualTransport == nx::vms::api::RtpTransportType::automatic)
+        m_actualTransport = nx::vms::api::RtpTransportType::tcp;
+
     if (startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
 
@@ -480,14 +507,9 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
 
 bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
 {
-    m_prefferedTransport = m_transport;
-    if (m_prefferedTransport == nx::vms::api::RtpTransportType::automatic)
-        m_prefferedTransport = nx::vms::api::RtpTransportType::tcp;
-    m_TimeOut = 0; // default timeout 0 ( do not send keep alive )
-    if (!m_playNowMode) {
-        if (!sendSetup() || m_sdpTracks.empty())
-            return false;
-    }
+    setKeepAliveTimeout(milliseconds::zero());
+    if (!sendSetupIfNotPlaying())
+        return false;
 
     if (!sendPlay(positionStart, positionEnd, scale))
     {
@@ -519,7 +541,7 @@ bool QnRtspClient::isOpened() const
 
 unsigned int QnRtspClient::sessionTimeoutMs()
 {
-    return m_TimeOut;
+    return duration_cast<milliseconds>(m_keepAliveTimeOut).count();
 }
 
 const nx::streaming::Sdp& QnRtspClient::getSdp() const
@@ -665,24 +687,24 @@ bool QnRtspClient::sendSetup()
 
         {   //generating transport header
             nx::network::http::StringType transportStr = "RTP/AVP/";
-            transportStr += m_prefferedTransport == nx::vms::api::RtpTransportType::tcp
+            transportStr += m_actualTransport == nx::vms::api::RtpTransportType::tcp
                 ? "TCP"
                 : "UDP";
 
-            transportStr += m_prefferedTransport == nx::vms::api::RtpTransportType::multicast
+            transportStr += m_actualTransport == nx::vms::api::RtpTransportType::multicast
                 ? ";multicast;"
                 : ";unicast;";
 
-            track.ioDevice->setTransport(m_prefferedTransport);
-            if (m_prefferedTransport == nx::vms::api::RtpTransportType::multicast)
+            track.ioDevice->setTransport(m_actualTransport);
+            if (m_actualTransport == nx::vms::api::RtpTransportType::multicast)
             {
                 track.ioDevice->bindToMulticastAddress(track.sdpMedia.connectionAddress,
                     m_tcpSock->getLocalAddress().address.toString());
             }
 
-            if (m_prefferedTransport != nx::vms::api::RtpTransportType::tcp)
+            if (m_actualTransport != nx::vms::api::RtpTransportType::tcp)
             {
-                transportStr += m_prefferedTransport == nx::vms::api::RtpTransportType::multicast
+                transportStr += m_actualTransport == nx::vms::api::RtpTransportType::multicast
                     ? "port="
                     : "client_port=";
 
@@ -708,9 +730,9 @@ bool QnRtspClient::sendSetup()
         if (!responce.startsWith("RTSP/1.0 200"))
         {
             if (m_transport == nx::vms::api::RtpTransportType::automatic
-                && m_prefferedTransport == nx::vms::api::RtpTransportType::tcp)
+                && m_actualTransport == nx::vms::api::RtpTransportType::tcp)
             {
-                m_prefferedTransport = nx::vms::api::RtpTransportType::udp;
+                m_actualTransport = nx::vms::api::RtpTransportType::udp;
                 if (!sendSetup()) //< Try UDP transport.
                     return false;
             }
@@ -731,10 +753,11 @@ bool QnRtspClient::sendSetup()
                 if (tmpList[i].startsWith(QLatin1String("timeout")))
                 {
                     QStringList tmpParams = tmpList[i].split(QLatin1Char('='));
-                    if (tmpParams.size() > 1) {
-                        m_TimeOut = tmpParams[1].toInt();
-                        if (m_TimeOut > 0 && m_TimeOut < 5000)
-                            m_TimeOut *= 1000; // convert seconds to ms
+                    if (tmpParams.size() > 1)
+                    {
+                        const auto timeoutS = tmpParams[1].toInt();
+                        if (timeoutS > 0 && timeoutS < 5000)
+                            m_keepAliveTimeOut = seconds(timeoutS);
                     }
                 }
             }
@@ -930,7 +953,6 @@ bool QnRtspClient::sendPlay(qint64 startPos, qint64 endPos, double scale)
     }
 
     return false;
-
 }
 
 bool QnRtspClient::sendPause()
@@ -955,14 +977,21 @@ bool QnRtspClient::sendTeardown()
     return sendRequestInternal(std::move(request));
 }
 
+void QnRtspClient::setKeepAliveTimeout(std::chrono::milliseconds keepAliveTimeout)
+{
+    m_keepAliveTimeOut = std::move(keepAliveTimeout);
+}
+
 bool QnRtspClient::sendKeepAliveIfNeeded()
 {
     // send rtsp keep alive
-    if (m_TimeOut==0)
+    if (m_keepAliveTimeOut == std::chrono::milliseconds::zero())
         return true;
 
-    if (m_keepAliveTime.elapsed() < (int) m_TimeOut - RESERVED_TIMEOUT_TIME)
+    if (milliseconds(m_keepAliveTime.elapsed()) < m_keepAliveTimeOut - kReservedTimeoutTime)
+    {
         return true;
+    }
     else
     {
         bool res= sendKeepAlive();
@@ -980,6 +1009,14 @@ bool QnRtspClient::sendKeepAlive()
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     return sendRequestInternal(std::move(request));
+}
+
+bool QnRtspClient::sendSetupIfNotPlaying()
+{
+    if (m_playNowMode)
+        return true;
+
+    return sendSetup() && !m_sdpTracks.empty();
 }
 
 void QnRtspClient::sendBynaryResponse(const quint8* buffer, int size)

@@ -10,10 +10,10 @@ You can use build.sh utility:
 
 ```bash
 # Building from existing debian package. It will copy it to build folder and build an image.
-build.sh -d ~/Downloads/nxwitness-server-4.0.0.28737-linux64-beta-test.deb
+build.sh ~/Downloads/nxwitness-server-4.0.0.28737-linux64-beta-test.deb
 
 # Or using url to debian package. It will download it and build an image.
-build.sh -u https://beta.networkoptix.com/beta-builds/default/28608/linux/nxwitness-server-4.0.0.28608-linux64-beta-prod.deb
+build.sh https://beta.networkoptix.com/beta-builds/default/28608/linux/nxwitness-server-4.0.0.28608-linux64-beta-prod.deb
 ```
 
 The script will use current directory as a docker workspace. It also copies necessary files (deb package) to 
@@ -27,12 +27,33 @@ docker build -t mediaserver --build-arg mediaserver_deb=path_to_mediaserver.deb 
 
 It will fetch all necessary layers and build docker image with name `mediaserver`.
 
+## Altering cloud_host ##
+
+build.sh can override cloud host setting for mediaserver:
+
+```bash
+build.sh --cloud cloud-dev2.hdw.mx ~/Downloads/nxwitness-server-4.0.0.28737-linux64-beta-test.deb
+```
+
+It sets `cloud_host` build argument for docker. You can invoke it directly:
+
+```bash
+docker build -t mediaserver --build-arg cloud_host=cloud-dev2.hdw.mx --build-arg mediaserver_deb=path_to_mediaserver.deb .
+```
+
+It is possible to change cloud host for existing container instance as well: 
+
+```bash
+sudo docker exec -i -t mediaserver1 /setup/manage.sh --cloud cloud-dev2.hdw.mx
+```
+
 ## Running ##
 
 systemd needs `/run`, `/run/lock` to be present, so we need to map them
-Also we need to have access to /sys/fs/cgroup:/sys/fs/cgroup
+Also container needs `/sys/fs/cgroup:/sys/fs/cgroup` to be mapped
 
-Running it
+Running it:
+
 ```bash
 sudo docker run -d --name mediaserver1 --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro -t mediaserver
 ```
@@ -67,6 +88,6 @@ sudo docker stop mediaserver1 && sudo docker rm mediaserver1
 
 ## TODO ##
 
-1. Interaction with cmake
-2. Provide a better ways to specify deb file for mediaserver
-3. Provide some scripts to simplify start&restart
+1. ~~Provide a better ways to specify deb file for mediaserver.~~ Done
+1. Provide some scripts to simplify start&restart.
+1. Interaction with cmake.

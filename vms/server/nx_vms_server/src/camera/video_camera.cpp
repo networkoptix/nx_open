@@ -432,12 +432,12 @@ void VideoCamera::stopIfNoActivity()
     if( (m_liveCache[MEDIA_Quality_High] || m_liveCache[MEDIA_Quality_Low])     //has live cache ever been started?
         &&
         (!m_liveCache[MEDIA_Quality_High] ||                                    //has hi quality live cache been started?
-            (m_hlsLivePlaylistManager[MEDIA_Quality_High].unique() &&           //no one uses playlist
+            (m_hlsLivePlaylistManager[MEDIA_Quality_High] &&           //no one uses playlist
              m_hlsLivePlaylistManager[MEDIA_Quality_High]->inactivityPeriod() > m_hiStreamHlsInactivityPeriodMS &&  //checking inactivity timer
              m_liveCache[MEDIA_Quality_High]->inactivityPeriod() > m_hiStreamHlsInactivityPeriodMS))
         &&
         (!m_liveCache[MEDIA_Quality_Low] ||
-            (m_hlsLivePlaylistManager[MEDIA_Quality_Low].unique() &&
+            (m_hlsLivePlaylistManager[MEDIA_Quality_Low] &&
              m_hlsLivePlaylistManager[MEDIA_Quality_Low]->inactivityPeriod() > m_loStreamHlsInactivityPeriodMS &&
              m_liveCache[MEDIA_Quality_Low]->inactivityPeriod() > m_loStreamHlsInactivityPeriodMS)) )
     {
@@ -453,7 +453,6 @@ void VideoCamera::stopIfNoActivity()
                 if (!reader)
                     return;
 
-                reader->removeDataProcessor(m_liveCache[streamQuality].get());
                 auto& timer = m_liveCacheValidityTimers[streamQuality];
                 if (!timer.isValid())
                     timer.restart();
@@ -462,6 +461,8 @@ void VideoCamera::stopIfNoActivity()
                 {
                     NX_DEBUG(this, "Resetting live cache for %1 stream",
                          mediaQualityToStreamName(streamQuality));
+
+                    reader->removeDataProcessor(m_liveCache[streamQuality].get());
                     m_hlsLivePlaylistManager[streamQuality].reset();
                     m_liveCache[streamQuality].reset();
                 }

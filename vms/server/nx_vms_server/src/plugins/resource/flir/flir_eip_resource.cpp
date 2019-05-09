@@ -736,7 +736,7 @@ void QnFlirEIPResource::checkAlarmStatus()
     request.pathSize = 3;
     request.epath = MessageRouterRequest::buildEPath(
         FlirEIPClass::kAlarmSettings,
-        m_currentCheckingAlarmNumber + 1,
+        quint8(m_currentCheckingAlarmNumber + 1),
         kAlarmAttributeCode);
 
     m_currentAlarmMonitoringState = FlirAlarmMonitoringState::CheckingAlaramState;

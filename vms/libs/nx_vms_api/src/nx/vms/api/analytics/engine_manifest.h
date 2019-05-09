@@ -11,6 +11,7 @@
 
 namespace nx::vms::api::analytics {
 
+// TODO: Move this class to a server-only library; eliminate its usages in the Client.
 /**
  * The JSON-serializable data structure that is given by each Analytics Plugin's Engine to the
  * Server after the Engine has been created by the Plugin.

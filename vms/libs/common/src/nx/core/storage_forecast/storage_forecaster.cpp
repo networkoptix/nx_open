@@ -1,5 +1,7 @@
 #include "storage_forecaster.h"
 
+#include <nx/utils/log/assert.h>
+
 #include <QtCore/QMap>
 
 static constexpr qint64 kSecsInDay = 24 * 60 * 60;

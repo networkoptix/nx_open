@@ -65,7 +65,12 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(
                 updatePermissions(subject.user());
         });
 
-    recalculateAllPermissions();
+    recalculateGlobalPermissions();
+
+    // Some (exported layout) resources do already exist at this point.
+    // We should process them as newly added. Permission updates are included for free.
+    for (const QnResourcePtr& resource: resourcePool()->getResources())
+        at_resourcePool_resourceAdded(resource);
 }
 
 QnWorkbenchAccessController::~QnWorkbenchAccessController()
@@ -321,7 +326,7 @@ void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr& re
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnWorkbenchAccessController::recalculateAllPermissions()
+void QnWorkbenchAccessController::recalculateGlobalPermissions()
 {
     auto newGlobalPermissions = calculateGlobalPermissions();
     bool changed = newGlobalPermissions != m_globalPermissions;
@@ -329,6 +334,11 @@ void QnWorkbenchAccessController::recalculateAllPermissions()
 
     if (changed)
         emit globalPermissionsChanged();
+}
+
+void QnWorkbenchAccessController::recalculateAllPermissions()
+{
+    recalculateGlobalPermissions();
 
     for (const QnResourcePtr& resource: resourcePool()->getResources())
         updatePermissions(resource);
@@ -366,4 +376,3 @@ void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResour
     resource->disconnect(this);
     m_dataByResource.remove(resource);
 }
-

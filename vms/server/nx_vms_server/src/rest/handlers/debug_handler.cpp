@@ -100,15 +100,15 @@ int QnDebugHandler::executeGet(
 }
 
 int QnDebugHandler::executePost(
-    const QString& /*path*/,
-    const QnRequestParamList& /*params*/,
+    const QString& path,
+    const QnRequestParamList& params,
     const QByteArray& /*requestBody*/,
     const QByteArray& /*srcBodyContentType*/,
-    QByteArray& /*responseMessageBody*/,
-    QByteArray& /*contentType*/,
-    const QnRestConnectionProcessor* /*owner*/)
+    QByteArray& responseMessageBody,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
 {
-    return nx::network::http::StatusCode::notFound;
+    return executeGet(path, params, responseMessageBody, contentType, owner);
 }
 
 /**

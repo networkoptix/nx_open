@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QObject>
+
 class QLabel;
 
 namespace nx::vms::client::desktop {

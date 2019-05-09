@@ -63,6 +63,8 @@ target_compile_definitions(nx_vms_client_desktop
     PRIVATE NX_VMS_CLIENT_DESKTOP_API=${API_EXPORT_MACRO}
     INTERFACE NX_VMS_CLIENT_DESKTOP_API=${API_IMPORT_MACRO})
 
+nx_force_include(nx_vms_client_desktop ${CMAKE_SOURCE_DIR}/libs/nx_utils/src/nx/utils/literal.h)
+
 if(WINDOWS)
     add_dependencies(nx_vms_client_desktop nov_file_launcher)
 endif()

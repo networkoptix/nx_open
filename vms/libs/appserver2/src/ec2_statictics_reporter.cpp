@@ -15,9 +15,10 @@
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/fusion/serialization/json.h>
-#include <nx/utils/random.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 
 static const std::chrono::hours kDefaultSendCycleTime(30 * 24); //< About a month.
 static const std::chrono::hours kSendAfterUpdateTime(3);
@@ -284,7 +285,9 @@ namespace ec2
         const QString serverApi = configApi.isEmpty() ? DEFAULT_SERVER_API : configApi;
         const nx::utils::Url url = lit("%1/%2").arg(serverApi).arg(kServerReportApi);
         const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-        m_httpClient->doPost(url, contentType, QJson::serialized(data));
+        auto content = QJson::serialized(data);
+        m_httpClient->addAdditionalHeader("Content-MD5", nx::utils::md5(content).toHex());
+        m_httpClient->doPost(url, contentType, std::move(content));
 
         NX_DEBUG(this, lm("Sending statistics asynchronously to %1")
                .arg(url.toString(QUrl::RemovePassword)));

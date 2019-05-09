@@ -118,7 +118,8 @@ private:
         const nx::utils::Url &remoteUrl,
         const QString& getKey,
         ResultDataType& result,
-        const QString& path);
+        const QString& path,
+        bool post = false);
 
     void addAuthToRequest(nx::utils::Url& request, const QString& remoteAuthKey);
 

@@ -8,6 +8,7 @@
 #include <QtHttpReply.h>
 
 #include <nx/vms/client/desktop/director/director_json_interface.h>
+#include <nx/utils/log/assert.h>
 #include <nx/utils/app_info.h>
 
 namespace {

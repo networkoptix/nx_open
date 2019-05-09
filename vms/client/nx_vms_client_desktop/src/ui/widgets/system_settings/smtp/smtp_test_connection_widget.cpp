@@ -9,6 +9,7 @@
 
 #include <utils/email/email.h>
 #include <common/common_module.h>
+#include <ui/dialogs/common/message_box.h>
 
 namespace {
     const int testSmtpTimeoutMSec = 20 * 1000;

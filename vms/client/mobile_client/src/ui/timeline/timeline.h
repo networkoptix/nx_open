@@ -4,6 +4,7 @@
 #include <QtQuick/QQuickItem>
 
 #include <recording/time_period_list.h>
+#include <common/common_globals.h>
 
 class QnTimelinePrivate;
 class QSGGeometryNode;
@@ -84,7 +85,7 @@ class QnTimeline: public QQuickItem
 
 public:
     explicit QnTimeline(QQuickItem* parent = nullptr);
-    ~QnTimeline();
+    virtual ~QnTimeline() override;
 
     virtual QSGNode* updatePaintNode(
         QSGNode* node, UpdatePaintNodeData* updatePaintNodeData) override;

@@ -3,6 +3,8 @@
 #include "view_node_helpers.h"
 #include "view_node_data_builder.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace {
 
 template<typename RoleDataHash>

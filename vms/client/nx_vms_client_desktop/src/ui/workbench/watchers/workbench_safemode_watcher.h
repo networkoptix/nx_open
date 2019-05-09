@@ -3,6 +3,7 @@
 #include <client_core/connection_context_aware.h>
 
 class QLabel;
+class QDialogButtonBox;
 
 class QnWorkbenchSafeModeWatcher: public QObject, public QnConnectionContextAware
 {

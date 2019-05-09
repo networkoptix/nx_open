@@ -1,7 +1,5 @@
 #include "parameter_helper.h"
 
-#include <QtCore/QPointer>
-
 #include <client/client_globals.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 

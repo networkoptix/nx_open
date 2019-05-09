@@ -608,6 +608,8 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
     if (watcher->hasMismatches())
         menu()->trigger(action::VersionMismatchMessageAction);
 
+    menu()->triggerIfPossible(action::ConfirmAnalyticsStorageAction);
+
     context()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();
 }
 
@@ -1012,7 +1014,10 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(DisconnectFlags flags)
         qnGlobalSettings->synchronizeNow();
 
     if (flags.testFlag(SessionTimeout))
-        executeDelayedParented([this]() { SessionExpiredDialog::exec(context()); }, this);
+    {
+        executeDelayedParented([this]() { SessionExpiredDialog::exec(context()->mainWindowWidget()); },
+            this);
+    }
 
     if (isErrorReason && mainWindow()->welcomeScreen())
         mainWindow()->welcomeScreen()->openConnectingTile();

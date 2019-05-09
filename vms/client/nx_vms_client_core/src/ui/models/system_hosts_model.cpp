@@ -158,9 +158,9 @@ QVariant QnSystemHostsModel::HostsModel::data(const QModelIndex& index, int role
     switch (role)
     {
         case Qt::DisplayRole:
-            return (data.second.port() != helpers::kDefaultConnectionPort
-                ? lit("%1:%2").arg(data.second.host(), QString::number(data.second.port()))
-                : data.second.host());
+            return data.second.port() != helpers::kDefaultConnectionPort
+                ? data.second.displayAddress()
+                : data.second.host();
         case UrlRole:
             return qVariantFromValue(data.second);
         case UrlDisplayRole:
@@ -190,7 +190,7 @@ void QnSystemHostsModel::HostsModel::reloadHosts()
             if (m_systemId != system->id())
                 return;
 
-            for (const auto server: system->servers())
+            for (const auto& server: system->servers())
                 addServer(system, server.id);
 
             m_connections << connect(system, &QnBaseSystemDescription::serverAdded, this,

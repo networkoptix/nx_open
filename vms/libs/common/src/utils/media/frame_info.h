@@ -4,22 +4,24 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <atomic>
+#include <memory>
 
 #include <QtCore/QAtomicInt>
 #include <QtGui/QImage>
 
-extern "C"
-{
-    #include <libavcodec/avcodec.h>
-}
-#include "nx/streaming/media_data_packet.h"
+extern "C" {
+
+#include <libavcodec/avcodec.h>
+
+} // extern "C"
+
+#include <nx/streaming/media_data_packet.h>
+#include <utils/media/ffmpeg_helper.h>
 
 #include "transcoding/filters/filter_helper.h"
 
-
 #define AV_REVERSE_BLOCK_START QnAbstractMediaData::MediaFlags_ReverseBlockStart
 #define AV_REVERSE_REORDERED   QnAbstractMediaData::MediaFlags_ReverseReordered
-
 
 //!base class for differently-stored pictures
 /*!
@@ -151,8 +153,12 @@ private:
 };
 
 
-//!Decoded frame, ready to be rendered
-
+/**
+ * Decoded frame, ready to be rendered.
+ *
+ * ATTENTION: AVFrame's field pkt_dts is filled with the time since epoch in microseconds, instead
+ * of time_base units as ffmpeg states in the documentation.
+ */
 class CLVideoDecoderOutput: public AVFrame
 {
 public:
@@ -165,8 +171,11 @@ public:
 
     QImage toImage() const;
 
-    /** On error, return an empty array after logging the error. */
-    std::vector<char> toRgb(int* outLineSize, AVPixelFormat pixelFormat) const;
+    /**
+     * Copies the frame to another already allocated frame, converting to the required pixel format
+     * if needed.
+     */
+    bool convertTo(const AVFrame* avFrame) const;
 
     static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
@@ -179,7 +188,7 @@ public:
     void reallocate(int newWidth, int newHeight, int format);
     void reallocate(const QSize& size, int format);
     void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
-    void memZerro();
+    void memZero();
 
     void copyDataFrom(const AVFrame* frame);
     CLVideoDecoderOutput* rotated(int angle);
@@ -206,8 +215,10 @@ public:
     int channel = 0;
 
     FrameMetadata metadata; // addition data associated with video frame
+
 private:
     bool m_useExternalData = false; // pointers only copied to this frame
+
 private:
     bool invalidScaleParameters(const QSize& size) const;
     static void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height);
@@ -215,6 +226,8 @@ private:
 
     CLVideoDecoderOutput( const CLVideoDecoderOutput& );
     const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );
+
+    bool convertUsingSimdIntrTo(const AVFrame* avFrame) const;
 };
 typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;
 typedef QSharedPointer<const CLVideoDecoderOutput> CLConstVideoDecoderOutputPtr;

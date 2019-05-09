@@ -85,10 +85,10 @@ QJsonObject Params::toJson() const
 
 std::optional<QJsonValue> Content::parse() const
 {
-    if (type == kFormContentType)
+    if (type == http::header::ContentType::kForm)
         return Params::fromUrlQuery(QUrlQuery(body)).toJson();
 
-    if (type == kJsonContentType)
+    if (type == http::header::ContentType::kJson)
     {
         QJsonValue value;
         if (!QJson::deserialize(body, &value))

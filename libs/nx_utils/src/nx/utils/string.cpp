@@ -523,12 +523,14 @@ std::vector<QnByteArrayConstRef> splitQuotedString(
             continue;
         }
 
-        if (((groupTokens & GroupToken::doubleQuotes) && ch == '"')
-            || ((groupTokens & GroupToken::squareBraces) && ch == '[')
-            || ((groupTokens & GroupToken::roundBraces) && ch == '('))
+        if (((groupTokens & GroupToken::doubleQuotes) && ch == '"') ||
+            ((groupTokens & GroupToken::singleQuotes) && ch == '\'') ||
+            ((groupTokens & GroupToken::squareBraces) && ch == '[') ||
+            ((groupTokens & GroupToken::roundBraces) && ch == '('))
         {
             currentGroupClosingToken =
                 ch == '"' ? '"' :
+                ch == '\'' ? '\'' :
                 ch == '[' ? ']' :
                 ')'; // ch == '('
         }

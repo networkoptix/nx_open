@@ -16,6 +16,7 @@
 #include <test_support/utils.h>
 #include <test_support/mediaserver_launcher.h>
 #include <common/static_common_module.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
 
 namespace
 {
@@ -48,7 +49,11 @@ public:
         newPassword(kNewTestPassword),
         oldPassword(lit("admin"))
     {
-        connect(&launcher, &MediaServerLauncher::started, this, [this]() { m_processorStarted = true; } );
+        connect(&launcher, &MediaServerLauncher::started, [this]() { m_processorStarted = true; } );
+
+        // TODO: should be removed as soon as HTTP multicast supports POST and api/configure can be
+        // switched to it.
+        iniTweaks.set(&nx::network::rest::ini().allowModificationsViaGetMethod, true);
     }
 
     void setState(State value)
@@ -285,6 +290,7 @@ private:
     int m_firstRequest;
     QString newPassword;
     QString oldPassword;
+    nx::kit::IniConfig::Tweaks iniTweaks;
 };
 
 TEST(MulticastHttpTest, main)

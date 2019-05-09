@@ -20,7 +20,7 @@
 namespace {
 
 template<typename F>
-auto measureTime(F f, const QString& message) -> std::result_of_t<F()>
+auto measureTime(F f, const QString& message) -> std::invoke_result_t<F>
 {
     NX_DEBUG(typeid(QnStorageDb), lm("%1 Starting").args(message));
     nx::utils::ElapsedTimer timer;

@@ -25,7 +25,6 @@ namespace {
 
 const auto kSendStatUser = lit("nx");
 const auto kSendStatPass = lit("f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
-const nx::network::http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 
 QString makeFullPath(const QString& basePath, const QString& postfix)
 {
@@ -332,7 +331,7 @@ nx::network::http::StatusCode::Value SendStatisticsActionHandler::sendStatistics
     const auto error = nx::network::http::uploadDataSync(
         statisticsServerUrl,
         metricsList,
-        kJsonContentType,
+        nx::network::http::header::ContentType::kJson,
         kSendStatUser,
         kSendStatPass,
         nx::network::http::AuthType::authBasicAndDigest,

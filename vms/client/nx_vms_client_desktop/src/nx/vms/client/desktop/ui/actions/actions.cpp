@@ -554,6 +554,11 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .requiredGlobalPermission(GlobalPermission::admin);
 
+    factory(ConfirmAnalyticsStorageAction)
+        .flags(NoTarget)
+        .mode(DesktopMode)
+        .requiredGlobalPermission(GlobalPermission::admin);
+
     factory(BrowseUrlAction)
         .flags(NoTarget)
         .mode(DesktopMode)

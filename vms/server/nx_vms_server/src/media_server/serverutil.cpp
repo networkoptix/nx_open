@@ -328,18 +328,13 @@ void SystemName::clear()
 
 QByteArray Utils::autoDetectHttpContentType(const QByteArray& msgBody)
 {
-    static const QByteArray kDefaultContentType("text/plain");
-    static const QByteArray kJsonContentType("application/json");
-    static const QByteArray kXMLContentType("application/xml");
-    static const QByteArray kHTMLContentType("text/html; charset=utf-8");
-
     if (msgBody.isEmpty())
         return QByteArray();
 
     QJsonParseError error;
     QJsonDocument document = QJsonDocument::fromJson(msgBody, &error);
     if(error.error == QJsonParseError::NoError)
-        return kJsonContentType;
+        return nx::network::http::header::ContentType::kJson;
 
     const QRegExp regExpr(lit("<html[^<]*>"));
 
@@ -349,15 +344,15 @@ QByteArray Utils::autoDetectHttpContentType(const QByteArray& msgBody)
         // Check that <html pattern found not inside string
         int quoteCount = QByteArray::fromRawData(msgBody.data(), pos).count('\"');
         if (quoteCount % 2 == 0)
-            return kHTMLContentType;
+            return nx::network::http::header::ContentType::kHtml;
         pos = regExpr.indexIn(msgBody, pos+1);
     }
 
     QDomDocument xmlDoc;
     if (xmlDoc.setContent(msgBody))
-        return kXMLContentType;
+        return nx::network::http::header::ContentType::kXml;
 
-    return kDefaultContentType;
+    return nx::network::http::header::ContentType::kPlain;
 }
 
 } // namespace vms::server

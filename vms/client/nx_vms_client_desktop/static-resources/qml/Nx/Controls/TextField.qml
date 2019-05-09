@@ -14,6 +14,7 @@ TextField
     rightPadding: 8
 
     font.pixelSize: 14
+    passwordCharacter: "\u25cf"
 
     color: enabled ? ColorTheme.text : ColorTheme.transparent(ColorTheme.text, 0.3)
 

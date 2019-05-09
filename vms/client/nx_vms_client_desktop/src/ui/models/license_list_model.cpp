@@ -1,6 +1,6 @@
 #include "license_list_model.h"
 
-#include <cassert>
+#include <QtGui/QBrush>
 
 #include <translation/datetime_formatter.h>
 
@@ -214,7 +214,7 @@ QVariant QnLicenseListModel::headerData(int section, Qt::Orientation orientation
             return tr("Type");
 
         case CameraCountColumn:
-            return tr("Qty");
+            return tr("Channels");
 
         case LicenseKeyColumn:
             return tr("License Key");

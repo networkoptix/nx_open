@@ -32,7 +32,7 @@
 #include <QtNetwork/QNetworkInterface>
 
 #include <api/global_settings.h>
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <nx/vms/server/analytics/db/analytics_db.h>
 
 #include <appserver/processor.h>
 
@@ -282,10 +282,9 @@
 
 #include <providers/speech_synthesis_data_provider.h>
 #include <nx/utils/file_system.h>
+#include <nx/network/url/url_builder.h>
 
-#if defined(__arm__)
-    #include "nx/vms/server/system/nx1/info.h"
-#endif
+#include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
 
 using namespace nx::vms::server;
@@ -742,6 +741,15 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         serverModule()->normalStorageManager()->initDone();
         serverModule()->backupStorageManager()->initDone();
+
+        if (m_mediaServer->metadataStorageId().isNull() && !QFile::exists(getMetadataDatabaseName()))
+        {
+            m_mediaServer->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(m_mediaServer));
+            nx::vms::api::MediaServerUserAttributesData userAttrsData;
+            ec2::fromResourceToApi(m_mediaServer->userAttributes(), userAttrsData);
+            saveMediaServerUserAttributes(ec2Connection, userAttrsData);
+        }
+        initializeAnalyticsEvents();
     });
 }
 
@@ -817,25 +825,34 @@ QnMediaServerResourcePtr MediaServerProcess::registerServer(
     // insert server user attributes if defined
     QString dir = serverModule()->settings().staticDataDir();
 
+    nx::vms::api::MediaServerUserAttributesData userAttrsData;
+    ec2::fromResourceToApi(server->userAttributes(), userAttrsData);
+
     QFile f(closeDirPath(dir) + "server_settings.json");
     if (!f.open(QFile::ReadOnly))
         return server;
     QByteArray data = f.readAll();
-    nx::vms::api::MediaServerUserAttributesData userAttrsData;
-    if (!QJson::deserialize(data, &userAttrsData))
-        return server;
-    userAttrsData.serverId = server->getId();
+    if (QJson::deserialize(data, &userAttrsData))
+    {
+        userAttrsData.serverId = server->getId();
+        saveMediaServerUserAttributes(ec2Connection, userAttrsData);
+    }
+    else
+    {
+        NX_WARNING(this, "Can not deserialize server_settings.json file");
+    }
+    return server;
+}
 
+void MediaServerProcess::saveMediaServerUserAttributes(
+    ec2::AbstractECConnectionPtr ec2Connection,
+    const nx::vms::api::MediaServerUserAttributesData& userAttrsData)
+{
     nx::vms::api::MediaServerUserAttributesDataList attrsList;
     attrsList.push_back(userAttrsData);
-    rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
+    auto rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
     if (rez != ec2::ErrorCode::ok)
-    {
         qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
-        return QnMediaServerResourcePtr();
-    }
-
-    return server;
 }
 
 void MediaServerProcess::saveStorages(
@@ -1042,6 +1059,11 @@ void MediaServerProcess::at_databaseDumped()
     restartServer(500);
 }
 
+void MediaServerProcess::at_metadataStorageIdChanged(const QnResourcePtr& /*resource*/)
+{
+    initializeAnalyticsEvents();
+}
+
 void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
 {
     if (isStopping())
@@ -1066,8 +1088,6 @@ void MediaServerProcess::stopSync()
 {
     qWarning() << "Stopping server";
 
-    const int kStopTimeoutMs = 100 * 1000;
-
     {
         QnMutexLocker lock( &m_stopMutex );
         if (m_stopping)
@@ -1079,11 +1099,9 @@ void MediaServerProcess::stopSync()
     pleaseStop();
     quit();
 
-    if (!wait(kStopTimeoutMs))
-    {
-        terminate();
-        wait();
-    }
+    const std::chrono::seconds kStopTimeout(100);
+    if (!wait(kStopTimeout))
+        NX_CRITICAL(false, lm("Server was unable to stop within %1").arg(kStopTimeout));
 
     qApp->quit();
 }
@@ -2603,6 +2621,8 @@ void MediaServerProcess::registerRestHandlers(
      *     %value source Use the source frame aspect ratio, despite the value in camera settings.
      * %param[opt]:option ignoreExternalArchive If present and "time" parameter has value
      *     "latest", the image will not be downloaded from archive of the dts-based devices.
+     * %param[opt]:string crop Apply cropping to the source image. Parameter defines rect in range [0..1].
+     *     Format: 'left,top,widthxheight'. Example: '0.5,0.4,0.25x0.3'.
      * %param[proprietary]:option local If present, the request should not be redirected to another
      *     server.
      * %param[proprietary]:option extraFormatting If present and the requested result format is
@@ -3030,7 +3050,7 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
     if (nx::utils::AppInfo::isEdgeServer())
         serverFlags |= nx::vms::api::SF_Edge;
 
-    if (QnAppInfo::isBpi())
+    if (QnAppInfo::isNx1())
     {
         serverFlags |= nx::vms::api::SF_IfListCtrl | nx::vms::api::SF_timeCtrl;
         QnStartLiteClientRestHandler handler(serverModule());
@@ -3591,13 +3611,15 @@ bool MediaServerProcess::setUpMediaServerResource(
     commonModule()->setModuleInformation(selfInformation);
     commonModule()->bindModuleInformation(m_mediaServer);
 
+
+    connect(m_mediaServer.get(), &QnMediaServerResource::metadataStorageIdChanged, this,
+        &MediaServerProcess::at_metadataStorageIdChanged);
+
     return foundOwnServerInDb;
 }
 
 void MediaServerProcess::stopObjects()
 {
-    commonModule()->setNeedToStop(true);
-
     auto safeDisconnect =
         [this](QObject* src, QObject* dst)
         {
@@ -3605,7 +3627,18 @@ void MediaServerProcess::stopObjects()
                 src->disconnect(dst);
         };
 
-    NX_INFO(this, "QnMain event loop has returned. Destroying objects...");
+    NX_INFO(this, "Event loop has returned. Destroying objects...");
+
+    quint64 dumpSystemResourceUsageTaskID = 0;
+    {
+        QnMutexLocker lk(&m_mutex);
+        dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskId;
+        m_dumpSystemResourceUsageTaskId = 0;
+    }
+    if (dumpSystemResourceUsageTaskID)
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
+
+    commonModule()->setNeedToStop(true);
     m_universalTcpListener->stop();
     serverModule()->stop();
 
@@ -3633,17 +3666,6 @@ void MediaServerProcess::stopObjects()
 
     m_discoveryMonitor.reset();
     m_crashReporter.reset();
-
-    //cancelling dumping system usage
-    quint64 dumpSystemResourceUsageTaskID = 0;
-    {
-        QnMutexLocker lk(&m_mutex);
-        dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskId;
-        m_dumpSystemResourceUsageTaskId = 0;
-    }
-    if (dumpSystemResourceUsageTaskID)
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
-
     m_ipDiscovery.reset(); // stop it before IO deinitialized
     m_multicastHttp.reset();
 
@@ -3666,15 +3688,17 @@ void MediaServerProcess::stopObjects()
 
     commonModule()->resourceDiscoveryManager()->stop();
     serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
+    serverModule()->pluginManager()->unloadPlugins();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
     m_serverResourceProcessor.reset();
 
+    serverModule()->resourcePool()->threadPool()->waitForDone();
+
     m_ec2ConnectionFactory->shutdown();
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
 
-    serverModule()->resourcePool()->threadPool()->waitForDone();
     commonModule()->resourcePool()->clear();
 
 
@@ -3809,13 +3833,11 @@ void MediaServerProcess::setUpServerRuntimeData()
     runtimeData.customization = QnAppInfo::customizationName();
     runtimeData.platform = QnAppInfo::applicationPlatform();
 
-#ifdef __arm__
-    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
+    if (QnAppInfo::isNx1())
     {
         runtimeData.nx1mac = Nx1::getMac();
         runtimeData.nx1serial = Nx1::getSerial();
     }
-#endif
 
     runtimeData.hardwareIds = m_hardwareIdHlist;
     commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
@@ -4063,16 +4085,63 @@ void MediaServerProcess::setUpDataFromSettings()
     nx::network::SocketFactory::setIpVersion(ipVersion);
 }
 
-void MediaServerProcess::initializeAnalyticsEvents()
+QnUuid MediaServerProcess::selectDefaultStorageForAnalyticsEvents(QnMediaServerResourcePtr server)
 {
-    while (!needToStop())
-    {
-        if (serverModule()->analyticsEventsStorage()->initialize())
-            break;
+    QnUuid result;
+    qint64 maxTotalSpace = 0;
 
-        NX_WARNING(this, lm("Failed to initialize analytics events storage. Retrying..."));
-        QnSleep::msleep(1000);
+    for (const auto& storage: server->getStorages())
+    {
+        if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+        {
+            if (fileStorage->isLocal()
+                && !fileStorage->isSystem()
+                && fileStorage->isUsedForWriting()
+                && fileStorage->getTotalSpace() > maxTotalSpace)
+            {
+                maxTotalSpace = fileStorage->getTotalSpace();
+                result = fileStorage->getId();
+            }
+        }
     }
+
+    return result;
+}
+
+QString MediaServerProcess::getMetadataDatabaseName() const
+{
+    auto storageResource = commonModule()->resourcePool()->getResourceById<QnStorageResource>(
+        m_mediaServer->metadataStorageId());
+    const auto pathBase = storageResource ? storageResource->getPath()
+        : nx::network::url::normalizePath(serverModule()->settings().dataDir());
+    return closeDirPath(pathBase) + "object_detection.sqlite";
+}
+
+bool MediaServerProcess::initializeAnalyticsEvents()
+{
+    const auto dbFilePath = getMetadataDatabaseName();
+    auto settings = this->serverModule()->analyticEventsStorageSettings();
+    settings.path = QFileInfo(dbFilePath).absoluteDir().path();
+    settings.dbConnectionOptions.dbName = QFileInfo(dbFilePath).fileName();
+
+    if (!this->serverModule()->analyticsEventsStorage()->initialize(settings))
+    {
+        NX_ERROR(this, "Failed to change analytics events storage, initialization error");
+        return false;
+    }
+
+    if (!m_oldAnalyticsStoragePath.isEmpty())
+    {
+        auto policy = commonModule()->globalSettings()->metadataStorageChangePolicy();
+        if (policy == nx::vms::api::MetadataStorageChangePolicy::remove)
+        {
+            if (!QFile::remove(m_oldAnalyticsStoragePath))
+                NX_WARNING(this, "Can not remove database %1", m_oldAnalyticsStoragePath);
+        }
+    }
+
+    m_oldAnalyticsStoragePath = settings.dbConnectionOptions.dbName;
+    return true;
 }
 
 void MediaServerProcess::setUpTcpLogReceiver()
@@ -4473,8 +4542,6 @@ void MediaServerProcess::run()
 
     m_discoveryMonitor = std::make_unique<nx::vms::server::discovery::DiscoveryMonitor>(
         m_ec2ConnectionFactory->messageBus());
-
-    initializeAnalyticsEvents();
 
     if (needToStop())
         return;
