@@ -169,7 +169,7 @@ protected:
     void thenTcpConnectionIsClosed()
     {
         // Waiting for the connection to process all its asynchronous calls.
-        m_connection->executeInAioThreadSync([this]() {});
+        m_connection->executeInAioThreadSync([]() {});
 
         ASSERT_EQ(0, m_socketCounter);
     }

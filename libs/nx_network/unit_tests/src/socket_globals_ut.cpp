@@ -74,7 +74,7 @@ protected:
 
             ctx.socket->bindToAioThread(m_aioThread);
             ctx.readBuf.reserve(128);
-            ctx.socket->readSomeAsync(&ctx.readBuf, [this](auto... /*args*/){});
+            ctx.socket->readSomeAsync(&ctx.readBuf, [](auto... /*args*/){});
         }
     }
 

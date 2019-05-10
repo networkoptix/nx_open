@@ -222,7 +222,7 @@ protected:
         bool terminated = false;
         std::atomic<bool> connectorDone(false);
         nx::utils::thread establishConnectionThread(
-            [this, &terminated, testDurationLimit, maxConnectionsToEstablish, &connectorDone]()
+            [this, &terminated, &connectorDone]()
             {
                 for (int i = 0; !terminated; ++i)
                 {
@@ -329,7 +329,7 @@ protected:
         {
             nx::utils::promise<std::unique_ptr<AbstractStreamSocket>> accepted;
             serverSocket()->acceptAsync(
-                [this, &accepted](
+                [&accepted](
                     SystemError::ErrorCode /*sysErrorCode*/,
                     std::unique_ptr<AbstractStreamSocket> acceptedConnection)
                 {
