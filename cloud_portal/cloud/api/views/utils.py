@@ -337,5 +337,10 @@ def get_ipvd(request):
 
 @api_view(['GET'])
 @handle_exceptions
-def is_integration_store_enabled(request):
-    return Response(get_settings_from_cache()['integrationStoreEnabled'])
+def cloud_capabilities(request):
+    cloud_settings = get_settings_from_cache()
+
+    capabilities = {
+        'integrationStoreEnabled': cloud_settings['integration_store_enabled']
+    }
+    return Response(capabilities)
