@@ -211,25 +211,24 @@ protected:
     {
         using namespace std::chrono;
 
-        const auto millisInSecond = duration_cast<milliseconds>(seconds(1)).count();
-
-        const seconds testDurationLimit(3);
+        static constexpr auto millisInSecond = duration_cast<milliseconds>(seconds(1)).count();
+        static constexpr seconds testDurationLimit(3);
         // Limiting number of connections to limit number of allocated ports.
-        const int maxConnectionsToEstablish = 2000;
+        static constexpr int kMaxConnectionsToEstablish = 2000;
 
         TestResult testResult;
 
         bool terminated = false;
         std::atomic<bool> connectorDone(false);
         nx::utils::thread establishConnectionThread(
-            [this, &terminated, maxConnectionsToEstablish, &connectorDone]()
+            [this, &terminated, &connectorDone]()
             {
                 for (int i = 0; !terminated; ++i)
                 {
                     TCPSocket socket;
                     ASSERT_TRUE(socket.setReuseAddrFlag(true));
                     socket.connect(m_localServerAddress, std::chrono::milliseconds(50));
-                    if (i >= maxConnectionsToEstablish && !connectorDone)
+                    if (i >= kMaxConnectionsToEstablish && !connectorDone)
                         connectorDone = true;
                 }
             });
