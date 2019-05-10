@@ -221,14 +221,13 @@ class ProductForm(forms.ModelForm):
 
     def clean_customizations(self):
         customizations = self.cleaned_data['customizations']
-        customizations_len = len(customizations)
         product_type = ProductType.objects.get(id=self.data['product_type'])
 
         if product_type and product_type.single_customization:
-            if customizations_len > 1:
+            if len(customizations) > 1:
                 raise ValidationError("Too many customizations selected for product type.")
 
-            if customizations_len > 0 and product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+            if customizations and product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
                 customization_portal_id = get_cloud_portal_product(customizations[0])
                 product_id = self.instance and self.instance.id
 
