@@ -275,7 +275,7 @@ def remove_unused_records(product):
 
 def generate_preview_link(context=None, product=None):
     if product and product.product_type.type == ProductType.PRODUCT_TYPES.integration:
-        return '/integrations'
+        return settings.INTEGRATION_STORE_PAGE
 
     return context.url + "?preview" if context else "/content/about?preview"
 
