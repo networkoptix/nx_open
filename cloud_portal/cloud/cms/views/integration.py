@@ -116,7 +116,6 @@ def get_integration(request, product_id=None):
 @permission_classes((AllowAny, ))
 def get_integrations(request):
     is_enabled = check_integration_store_enabled()
-    print (is_enabled)
     integrations = Product.objects.filter(product_type__type=INTEGRATION,
                                           customizations__name__in=[settings.CUSTOMIZATION])
 
