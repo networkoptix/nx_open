@@ -7,9 +7,7 @@
 #include "../http_types.h"
 #include "http_message_dispatcher.h"
 
-namespace nx {
-namespace network {
-namespace http {
+namespace nx::network::http {
 
 /**
  * HTTP server request handler which deserializes input/serializes output data using fusion.
@@ -27,7 +25,14 @@ class AbstractFusionRequestHandler:
         Output,
         AbstractFusionRequestHandler<Input, Output>>
 {
+    using base_type = detail::BaseFusionRequestHandlerWithInput<
+        Input,
+        Output,
+        AbstractFusionRequestHandler<Input, Output>>;
+
 public:
+    using base_type::processRequest;
+
     /**
      * Here actual HTTP request implementation resides.
      * On request processing completion requestCompleted(FusionRequestResult, Output) MUST be invoked.
@@ -52,32 +57,24 @@ public:
  */
 template<typename Output>
 class AbstractFusionRequestHandler<void, Output>:
-    public detail::BaseFusionRequestHandlerWithOutput<Output>
+    public detail::BaseFusionRequestHandlerWithInput<
+        void,
+        Output,
+        AbstractFusionRequestHandler<void, Output>>
 {
+    using base_type = detail::BaseFusionRequestHandlerWithInput<
+        void,
+        Output,
+        AbstractFusionRequestHandler<void, Output>>;
+
 public:
+    using base_type::processRequest;
+
     /**
      * Here actual HTTP request implementation resides.
      * On request processing completion requestCompleted(FusionRequestResult) MUST be invoked.
      */
     virtual void processRequest(http::RequestContext requestContext) = 0;
-
-protected:
-    virtual void processRawHttpRequest(
-        http::RequestContext requestContext,
-        http::RequestProcessedHandler completionHandler) override
-    {
-        this->m_completionHandler = std::move(completionHandler);
-        this->m_requestMethod = requestContext.request.requestLine.method;
-
-        FusionRequestResult errorDescription;
-        if (!this->getDataFormat(requestContext.request, nullptr, &errorDescription))
-        {
-            this->requestCompleted(std::move(errorDescription));
-            return;
-        }
-
-        processRequest(std::move(requestContext));
-    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -123,6 +120,4 @@ void registerFusionRequestHandler(
         method);
 }
 
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http
