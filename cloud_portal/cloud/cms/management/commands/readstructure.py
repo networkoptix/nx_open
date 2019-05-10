@@ -22,7 +22,7 @@ def create_new_cloudportals_for_each_customization(logger):
     customizations = Customization.objects.all()
 
     for customization in customizations:
-        records_with_name = DataRecord.objects.filter(data_structure__name="%PRODUCT_NAME%",
+        records_with_name = DataRecord.objects.filter(data_structure__name="%CLOUD_NAME%",
                                                       customization=customization) \
             .exclude(version=None)
         if records_with_name.exists():

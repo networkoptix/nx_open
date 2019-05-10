@@ -16,7 +16,7 @@
             "label": "Content",
             "name": "%CONTENT%",
             "old_name": "%BLOCK_CONTENT%",
-            "value": "<h1>%PRODUCT_NAME% is under maintenance</h1><p>New better version will be online soon!</p><p>Your %VMS_NAME% system is still recording and<br> you can connect there using <a href=\"%DOWNLOAD_LINK%\">our apps</a></p>",
+            "value": "<h1>%CLOUD_NAME% is under maintenance</h1><p>New better version will be online soon!</p><p>Your %VMS_NAME% system is still recording and<br> you can connect there using <a href=\"%DOWNLOAD_LINK%\">our apps</a></p>",
             "description": "Message to show on Cloud maintenance page (503)",
             "type": "html"
           },
@@ -55,8 +55,8 @@
         "values": [
           {
             "label": "Product Name",
-            "name": "%PRODUCT_NAME%",
-            "old_name": "{{PRODUCT_NAME}}",
+            "name": "%CLOUD_NAME%",
+            "old_name": "%PRODUCT_NAME%",
             "value": "VMS Demo Cloud",
             "description": "Name for cloud"
           },
@@ -255,7 +255,7 @@
           {
             "label": "Left block text",
             "name": "%BLOCK1_CONTENT%",
-            "value": "Connect to your Systems with %PRODUCT_NAME% account",
+            "value": "Connect to your Systems with %CLOUD_NAME% account",
             "description": "8-10 words",
             "type": "long_text"
           },
@@ -686,7 +686,7 @@
             "name": "%FOOTER_ITEMS%",
             "value": [
               {
-                "name": "About %PRODUCT_NAME%",
+                "name": "About %CLOUD_NAME%",
                 "url": "/content/about",
                 "newWindow": false,
                 "enabled": true

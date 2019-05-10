@@ -86,7 +86,7 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'supported_hardware_types': product.read_global_value("%SUPPORTED_HARDWARE_TYPES%"),
                 'search_tags': product.read_global_value("%SEARCH_TAGS%"),
                 'vendors_shown': product.read_global_value("%VENDORS_SHOWN%"),
-                'product_name': product.read_global_value("%PRODUCT_NAME%"),
+                'product_name': product.read_global_value("%CLOUD_NAME%"),
                 'vms_name': product.read_global_value("%VMS_NAME%"),
 
             }
