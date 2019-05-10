@@ -7,7 +7,7 @@ from api.helpers.exceptions import api_success, handle_exceptions
 
 from cms.controllers.filldata import global_contexts_to_dict, process_context_structure
 from cms.models import Context, DataStructure, Product, ProductCustomizationReview, ProductType,\
-    UserGroupsToProductPermissions
+    UserGroupsToProductPermissions, cloud_portal_customization_cache
 
 CLOUD_PORTAL = ProductType.PRODUCT_TYPES.cloud_portal
 INTEGRATION = ProductType.PRODUCT_TYPES.integration
@@ -95,6 +95,10 @@ def make_integrations_json(integrations, contexts=None, show_pending=False, show
     return integrations_json
 
 
+def check_integration_store_enabled():
+    return cloud_portal_customization_cache(settings.CUSTOMIZATION, 'config')['integration_store_enabled']
+
+
 @api_view(("GET", ))
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
@@ -111,6 +115,8 @@ def get_integration(request, product_id=None):
 @api_view(("GET", ))
 @permission_classes((AllowAny, ))
 def get_integrations(request):
+    is_enabled = check_integration_store_enabled()
+    print (is_enabled)
     integrations = Product.objects.filter(product_type__type=INTEGRATION,
                                           customizations__name__in=[settings.CUSTOMIZATION])
 
@@ -122,18 +128,21 @@ def get_integrations(request):
         drafts = Product.objects. \
             filter(product_type__type=INTEGRATION,
                    contentversion__productcustomizationreview__customization__name=settings.CUSTOMIZATION).distinct()
-        # Users without manager permissions will see drafts and reviews of products they have access to.
+
+        # Users without manager permissions will see only their integration (accepted, reviews, drafts).
         if not UserGroupsToProductPermissions.\
                 check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
             drafts = drafts.filter(id__in=request.user.products).distinct()
-            if drafts.exists():
-                integration_list = make_integrations_json(drafts.filter(preview_status=Product.PREVIEW_STATUS.draft),
-                                                          show_drafts=True)
+            integration_list = make_integrations_json(drafts.filter(preview_status=Product.PREVIEW_STATUS.draft),
+                                                      show_drafts=True)
 
-        # Managers can see all pending reviews
+        # Manager level users will see all accepted and pending integrations
+        elif not is_enabled:
+            integration_list.extend(make_integrations_json(integrations))
+
         drafts = drafts.filter(contentversion__productcustomizationreview__state=PENDING)
-        if drafts.exists():
-            integration_list.extend(make_integrations_json(drafts, show_pending=True))
+        integration_list.extend(make_integrations_json(drafts, show_pending=True))
 
-    integration_list.extend(make_integrations_json(integrations))
+    if is_enabled:
+        integration_list.extend(make_integrations_json(integrations))
     return api_success({'data': integration_list})
