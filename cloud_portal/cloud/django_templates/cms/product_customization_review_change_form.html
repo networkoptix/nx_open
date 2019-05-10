@@ -62,7 +62,7 @@
                     <div>
                         {% with context_url=records.0.data_structure.context.url %}
                             {{ context_name }}
-                            {% if context_url and can_preview and version.state == 'in review'%}
+                            {% if can_preview and version.state == 'in review'%}
                                 <a class="float-right preview" href="{% url 'preview' %}"
                                    value="{{records.0.data_structure.context.id}}"
                                    target="_blank">Preview</a>

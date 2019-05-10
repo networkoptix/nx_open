@@ -102,6 +102,7 @@ def context_editor_action(request, product, context_id, language_code):
 
         if 'Preview' in request_data:
             saved_msg += " Preview has been created."
+            product.change_preview_status(product.PREVIEW_STATUS.draft)
 
         if 'SendReview' in request_data:
             if upload_errors:
@@ -117,8 +118,8 @@ def context_editor_action(request, product, context_id, language_code):
             add_upload_error_messages(request, "Product error for {}. {}", product_errors)
         else:
             messages.success(request, saved_msg)
-            if product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
-                preview_link = modify_db.generate_preview_link(context)
+            if product.product_type.can_preview:
+                preview_link = modify_db.generate_preview_link(context, product)
 
     return preview_link, upload_errors, product_errors
 
@@ -212,10 +213,11 @@ def review(request):
 @permission_required('cms.change_productcustomizationreview')
 def make_preview(request):
     version_id = request.POST['version_id'] if 'version_id' in request.POST else None
-    context = Context.objects.get(id=request.POST['context_id'])
+    context = Context.objects.filter(id=request.POST['context_id']).first()
     product = get_product_by_revision(version_id)
     if product.product_type.can_preview:
         redirect_url = modify_db.generate_preview(product, context, version_id=version_id, send_to_review=True)
+        product.change_preview_status(product.PREVIEW_STATUS.review)
     else:
         review = ProductCustomizationReview.objects.get(version_id=version_id,
                                                         customization=product.customizations.first())

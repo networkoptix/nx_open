@@ -143,6 +143,11 @@ class Account(AbstractBaseUser, PermissionsMixin):
         return list(set(permissions))
 
     @property
+    def products(self):
+        return set(UserGroupsToProductPermissions.objects.filter(group__permissions__codename='access_product').
+                   values_list('product_id', flat=True))
+
+    @property
     def customizations(self):
         if self.is_superuser:
             return list(Customization.objects.all().values_list('name', flat=True))

@@ -273,7 +273,10 @@ def remove_unused_records(product):
             record.delete()
 
 
-def generate_preview_link(context=None):
+def generate_preview_link(context=None, product=None):
+    if product and product.product_type.type == ProductType.PRODUCT_TYPES.integration:
+        return '/integrations'
+
     return context.url + "?preview" if context else "/content/about?preview"
 
 
@@ -284,7 +287,7 @@ def generate_preview(product, context=None, version_id=None, send_to_review=Fals
                  changed_context=context,
                  version_id=version_id,
                  send_to_review=send_to_review)
-    return generate_preview_link(context)
+    return generate_preview_link(context, product=product)
 
 
 def publish_latest_version(product, review_id, user):
