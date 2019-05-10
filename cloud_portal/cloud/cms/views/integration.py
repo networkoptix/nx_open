@@ -145,7 +145,7 @@ def get_integrations(request):
             integration_list.extend(make_integrations_json(integrations))
 
         # Shows pending reviews. If the users is not a manager they will only see their pending reviews
-        # If they are a manager they will sell all of the pending reviews
+        # Otherwise they will see all of the pending reviews
         drafts = drafts.filter(contentversion__productcustomizationreview__state=PENDING)
         integration_list.extend(make_integrations_json(drafts, show_pending=True))
 
