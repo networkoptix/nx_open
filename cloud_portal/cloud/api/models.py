@@ -144,7 +144,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     @property
     def products(self):
-        return set(UserGroupsToProductPermissions.objects.filter(group__permissions__codename='access_product').
+        return set(UserGroupsToProductPermissions.objects.filter(group__in=self.groups.all(), group__permissions__codename='access_product').
                    values_list('product_id', flat=True))
 
     @property
