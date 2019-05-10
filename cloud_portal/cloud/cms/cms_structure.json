@@ -782,7 +782,7 @@
   },
   {
     "type": "integration",
-    "can_preview": false,
+    "can_preview": true,
     "single_customization": false,
     "contexts": [
       {
