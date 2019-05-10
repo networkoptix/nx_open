@@ -100,7 +100,7 @@ window.L = {};
                     appState.publicReleases = response.publicReleases;
                     appState.trafficRelayHost = response.trafficRelayHost;
                     appState.supportLink = response.supportLink;
-                    appState.productName = response.productName;
+                    appState.cloudName = response.cloudName;
                     appState.vmsName = response.vmsName;
 
                     if (response.cloudMerge) {
