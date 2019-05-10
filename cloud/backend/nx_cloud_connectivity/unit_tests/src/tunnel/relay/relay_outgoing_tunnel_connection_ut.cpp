@@ -221,7 +221,6 @@ private:
     std::unique_ptr<relay::OutgoingTunnelConnection> m_tunnelConnection;
     nx::utils::SyncQueue<Result> m_connectResultQueue;
     std::atomic<int> m_clientToRelayConnectionCounter;
-    bool m_isRelayHappy;
     nx::utils::promise<SystemError::ErrorCode> m_tunnelClosed;
     bool m_destroyTunnelConnectionOnConnectFailure;
     RequestProcessingBehavior m_relayType = RequestProcessingBehavior::succeed;

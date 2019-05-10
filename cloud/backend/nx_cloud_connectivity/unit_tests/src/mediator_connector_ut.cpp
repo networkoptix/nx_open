@@ -106,7 +106,7 @@ protected:
         std::promise<ResultCode> done;
         client->connect(
             request,
-            [this, &done](
+            [&done](
                 network::stun::TransportHeader /*stunTransportHeader*/,
                 ResultCode resultCode,
                 ConnectResponse)
