@@ -124,6 +124,7 @@ def get_integrations(request):
         return api_success([])
     integration_list = []
 
+    # Only known users can see Drafts and reviews
     if not request.user.is_anonymous:
         drafts = Product.objects. \
             filter(product_type__type=INTEGRATION,
@@ -135,11 +136,16 @@ def get_integrations(request):
             drafts = drafts.filter(id__in=request.user.products).distinct()
             integration_list = make_integrations_json(drafts.filter(preview_status=Product.PREVIEW_STATUS.draft),
                                                       show_drafts=True)
+            # If the integration store is disabled show developers their approved integrations
+            if not is_enabled:
+                integration_list.extend(make_integrations_json(drafts))
 
-        # Manager level users will see all accepted and pending integrations
+        # If the integration store is disabled Manager level users will see all accepted and pending integrations
         elif not is_enabled:
             integration_list.extend(make_integrations_json(integrations))
 
+        # Shows pending reviews. If the users is not a manager they will only see their pending reviews
+        # If they are a manager they will sell all of the pending reviews
         drafts = drafts.filter(contentversion__productcustomizationreview__state=PENDING)
         integration_list.extend(make_integrations_json(drafts, show_pending=True))
 
