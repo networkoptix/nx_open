@@ -54,6 +54,8 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 footer_items = process_context_structure(product, context, footer_items,
                                                          None, product.version_id(), False, True)
 
+        integration_store_enabled = product.read_global_value("%INTEGRATION_STORE_ENABLED%")
+
         data = {
             'version_id': product.version_id(),
             'languages': customization.languages_list,
@@ -76,7 +78,7 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'feedback_enabled': product.read_global_value("%FEEDBACK_ENABLED%"),
                 'footer_items': footer_items,
                 'integration_filter_items': product.read_global_value("%INTEGRATION_FILTER_ITEMS%"),
-                'integration_store_enabled': product.read_global_value("%INTEGRATION_STORE_ENABLED%"),
+                'integration_store_enabled': integration_store_enabled,
                 'public_downloads': product.read_global_value("%PUBLIC_DOWNLOADS%"),
                 'public_releases': product.read_global_value("%PUBLIC_RELEASE_HISTORY%"),
                 'sort_supported_devices_by_popularity': product.read_global_value(
@@ -87,8 +89,10 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'search_tags': product.read_global_value("%SEARCH_TAGS%"),
                 'vendors_shown': product.read_global_value("%VENDORS_SHOWN%"),
                 'cloud_name': product.read_global_value("%CLOUD_NAME%"),
-                'vms_name': product.read_global_value("%VMS_NAME%"),
-
+                'vms_name': product.read_global_value("%VMS_NAME%")
+            },
+            'cloud_capabilities': {
+                'integration_store_enabled': integration_store_enabled
             }
         }
         cache.set(customization_name, data)

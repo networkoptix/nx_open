@@ -18,6 +18,13 @@ from cms.models import DataStructure, get_cloud_portal_product,\
 logger = logging.getLogger(__name__)
 
 
+def get_cloud_capabilities_from_cache():
+    customization_cache = cloud_portal_customization_cache(settings.CUSTOMIZATION, 'cloud_capabilities')
+    return {
+        'integrationStoreEnabled': customization_cache['integration_store_enabled']
+    }
+
+
 def get_settings_from_cache():
     customization_cache = cloud_portal_customization_cache(settings.CUSTOMIZATION, 'config')
     return {
@@ -338,9 +345,6 @@ def get_ipvd(request):
 @api_view(['GET'])
 @handle_exceptions
 def cloud_capabilities(request):
-    cloud_settings = get_settings_from_cache()
+    capabilities = get_cloud_capabilities_from_cache()
 
-    capabilities = {
-        'integrationStoreEnabled': cloud_settings['integration_store_enabled']
-    }
     return Response(capabilities)
