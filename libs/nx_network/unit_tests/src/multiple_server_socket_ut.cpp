@@ -222,7 +222,7 @@ protected:
         bool terminated = false;
         std::atomic<bool> connectorDone(false);
         nx::utils::thread establishConnectionThread(
-            [this, &terminated, &connectorDone]()
+            [this, &terminated, maxConnectionsToEstablish, &connectorDone]()
             {
                 for (int i = 0; !terminated; ++i)
                 {
