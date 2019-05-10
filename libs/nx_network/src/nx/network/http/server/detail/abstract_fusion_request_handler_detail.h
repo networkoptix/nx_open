@@ -293,18 +293,18 @@ private:
         // So, Input=void cannot be used with a method that may contain a request body.
         // TODO: #ak Currently, these classes do not distinguish request body and query.
         // So, making the check softer than it should be to take this into account.
-        constexpr bool isRequestMsgBodyExpected = !std::is_same_v<Input, void>;
-        if (!isRequestMsgBodyExpected && Method::isMessageBodyAllowed(this->m_requestMethod))
-            return false;
+        //constexpr bool isRequestMsgBodyExpected = !std::is_same_v<Input, void>;
+        //if (!isRequestMsgBodyExpected && Method::isMessageBodyAllowed(this->m_requestMethod))
+        //    return false;
 
         // For the response introducing a soft check: we may send an empty response body.
         // So, Output=void is allowed to be used with a method that may produce a response body.
-        constexpr bool isResponseMsgBodySuggested = !std::is_same_v<Output, void>;
-        if (isResponseMsgBodySuggested && 
-            !Method::isMessageBodyAllowedInResponse(this->m_requestMethod, StatusCode::ok))
-        {
-            return false;
-        }
+        //constexpr bool isResponseMsgBodySuggested = !std::is_same_v<Output, void>;
+        //if (isResponseMsgBodySuggested && 
+        //    !Method::isMessageBodyAllowedInResponse(this->m_requestMethod, StatusCode::ok))
+        //{
+        //    return false;
+        //}
 
         return true;
     }

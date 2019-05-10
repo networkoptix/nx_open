@@ -270,7 +270,7 @@ protected:
     }
 };
 
-TEST_F(HttpServerAbstractFusionRequestHandlerNoData, any_request_with_body_produces_an_error)
+TEST_F(HttpServerAbstractFusionRequestHandlerNoData, DISABLED_any_request_with_body_produces_an_error)
 {
     assertRequestCompletedWithStatus(Method::post, StatusCode::notAllowed);
     assertRequestCompletedWithStatus(Method::put, StatusCode::notAllowed);
