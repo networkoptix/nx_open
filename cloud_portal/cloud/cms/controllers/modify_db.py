@@ -2,7 +2,6 @@ from datetime import datetime
 
 from notifications.notifications_api import send
 from django.contrib.auth.models import Permission
-from django.db.models import Q
 
 from PIL import Image
 import base64
@@ -37,12 +36,16 @@ def update_draft_state(review_id, target_state, user):
 
 def notify_version_ready(product, version, exclude_user):
     perm = Permission.objects.filter(codename='publish_version')
-    users = Account.objects.\
-        filter(Q(groups__permissions__in=perm) | Q(user_permissions__in=perm)).\
-        filter(subscribe=True).exclude(pk=exclude_user.pk).distinct()
+    users = Account.objects.filter(groups__permissions__in=perm).exclude(pk=exclude_user.pk).distinct()
 
     product_name = product.name
-    product_customizations_set = set(product.customizations.values_list('name', flat=True))
+    product_customizations_set = set()
+    product_is_integration = product.product_type.type == ProductType.PRODUCT_TYPES.integration
+    for customization in product.customizations.values_list('name', flat=True):
+        cloud_capabilities = cloud_portal_customization_cache(customization, 'cloud_capabilities')
+        # Ignore integrations if the integration store is disabled.
+        if not product_is_integration or cloud_capabilities['integration_store_enabled']:
+            product_customizations_set.add(customization)
 
     for user in users:
         # If the user has a customization in common with product send them a notification

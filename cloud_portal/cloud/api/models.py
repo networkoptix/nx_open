@@ -108,7 +108,6 @@ class Account(AbstractBaseUser, PermissionsMixin):
     created_date = models.DateTimeField(auto_now_add=True)
     activated_date = models.DateTimeField(null=True, blank=True)
     last_login = models.DateTimeField(null=True, blank=True)
-    subscribe = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True, help_text="If false the account is disabled. <br> If user was "
                                                             "invited to the cloud it will switch to true on its own "
                                                             "when the user completes registration.")
