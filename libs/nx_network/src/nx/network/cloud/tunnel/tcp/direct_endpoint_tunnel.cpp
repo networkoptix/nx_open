@@ -98,6 +98,11 @@ void DirectTcpEndpointTunnel::setControlConnectionClosedHandler(
     m_connectionClosedHandler = std::move(handler);
 }
 
+ConnectType DirectTcpEndpointTunnel::connectType() const
+{
+    return ConnectType::tcpHp;
+}
+
 std::string DirectTcpEndpointTunnel::toString() const
 {
     return lm("Direct tcp connect to %1").args(m_targetEndpoint).toStdString();

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/clusterdb/engine/compatible_ec2_protocol_version.h>
+#include <nx/utils/random.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/db/controller.h>
@@ -89,10 +90,19 @@ TEST_F(Ec2MserverCloudCompatibility, compatible_protocol_range_is_meaningful)
 
 TEST_F(Ec2MserverCloudCompatibility, any_compatible_proto_version_is_accepted_by_cloud)
 {
-    for (int
-        version = nx::cloud::db::kMinSupportedProtocolVersion;
-        version <= nx::cloud::db::kMaxSupportedProtocolVersion;
-        ++version)
+    // Peeking few random protocol version in the supported range.
+    std::vector<int> versions(3, 0);
+    std::generate(
+        versions.begin(), versions.end(),
+        []()
+        {
+            return nx::utils::random::number<int>(
+                kMinSupportedProtocolVersion, kMaxSupportedProtocolVersion);
+        });
+    versions.push_back(kMinSupportedProtocolVersion);
+    versions.push_back(kMaxSupportedProtocolVersion);
+
+    for (const auto version: versions)
     {
         assertCdbAcceptsConnectionOfVersion(version);
         useAnotherSystem();
