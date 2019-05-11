@@ -400,7 +400,7 @@ void NotifyingRelayClusterClient::findRelayInstancePeerIsListeningOn(
 
 } // namespace
 
-TEST_F(MultipleRelays, mediator_reports_multiple_traffic_relays)
+TEST_F(MultipleRelays, mediator_reports_multiple_traffic_relays_in_same_region_as_server)
 {
     // givenMultipleRelays();
     // givenServer();
@@ -409,7 +409,7 @@ TEST_F(MultipleRelays, mediator_reports_multiple_traffic_relays)
     thenMultipleRelaysAreReportedToServer();
 }
 
-TEST_F(MultipleRelays, client_connects_to_server_on_multiple_reported_relays)
+TEST_F(MultipleRelays, client_connects_to_server_via_all_relays_reported_to_server)
 {
     // givenMultipleRelays();
     // givenServer();
@@ -421,7 +421,7 @@ TEST_F(MultipleRelays, client_connects_to_server_on_multiple_reported_relays)
     thenClientCanConnectToServerViaReportedRelays();
 }
 
-TEST_F(MultipleRelays, client_receives_traffic_relay_url_in_same_region)
+TEST_F(MultipleRelays, mediator_reports_traffic_relay_in_same_region_as_client)
 {
     // givenMultipleRelays();
     // givenServer();
