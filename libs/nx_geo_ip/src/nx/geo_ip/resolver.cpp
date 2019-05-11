@@ -2,8 +2,6 @@
 
 #include <maxminddb.h>
 
-#include "settings.h"
-
 namespace nx::geo_ip {
 
 namespace {

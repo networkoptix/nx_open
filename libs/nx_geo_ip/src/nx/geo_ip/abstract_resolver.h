@@ -1,7 +1,5 @@
 #pragma once
 
-#include <nx/network/socket_common.h>
-
 #include "types.h"
 
 namespace nx {
