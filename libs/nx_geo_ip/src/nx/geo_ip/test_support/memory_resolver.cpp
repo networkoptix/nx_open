@@ -2,26 +2,17 @@
 
 namespace nx::geo_ip::test {
 
-namespace {
-
-static std::string toString (const nx::network::SocketAddress& endpoint)
+void MemoryResolver::add(const std::string& ipAddress, const Location& location)
 {
-    return endpoint.toString().replace("localhost", "127.0.0.1").toStdString();
+    m_endpointLocations.emplace(ipAddress, location);
 }
 
-}
-
-void MemoryResolver::add(const nx::network::SocketAddress& endpoint, const Location& location)
+Location MemoryResolver::resolve(const std::string& ipAddress)
 {
-    m_endpointLocations.emplace(toString(endpoint), location);
-}
-
-Result MemoryResolver::resolve(const nx::network::SocketAddress& endpoint)
-{
-    auto it = m_endpointLocations.find(toString(endpoint));
+    auto it = m_endpointLocations.find(ipAddress);
     if (it == m_endpointLocations.end())
-        return {ResultCode::notFound, {}};
-    return {ResultCode::ok, it->second};
+        throw Exception(ResultCode::notFound, "ip address: " + ipAddress + " not found");
+    return it->second;
 }
 
 } // namespace nx::geo_ip::test

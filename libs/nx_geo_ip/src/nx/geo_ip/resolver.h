@@ -7,27 +7,19 @@
 
 namespace nx::geo_ip {
 
-class Settings;
-
 class NX_GEO_IP_API Resolver: public AbstractResolver
 {
 public:
-    Resolver(const Settings& settings);
+    Resolver(const std::string& mmdbPath);
     ~Resolver();
 
-    ResultCode initialize();
-
-    virtual Result resolve(const nx::network::SocketAddress& endpoint) override;
-
-private:
-    ResultCode initializeInternal();
+    virtual Location resolve(const std::string& ipAddress) override;
 
 private:
     class ResolverImpl;
 
-    const Settings& m_settings;
+    std::string m_mmdbPath;
     std::unique_ptr<ResolverImpl> m_impl;
-    ResultCode m_initCode = ResultCode::unknownError;
 };
 
 } // namespace nx::geo_ip

@@ -1,10 +1,52 @@
-#pragma once
-
 #include "types.h"
+
+#include <math.h>
 
 namespace nx::geo_ip {
 
-const char * toString(Continent continent)
+namespace {
+
+static constexpr double kPi = 3.14159265358979323846;
+static constexpr double kDegreesToRadians = kPi / 180;
+static constexpr Kilometers kEarthDiameter = 6371 * 2;
+
+double toRadians(double degrees)
+{
+    return degrees * kDegreesToRadians;
+}
+
+const char* continentString(Continent continent)
+{
+    return toString(continent);
+}
+
+} // namespace
+
+bool Geopoint::isValid() const
+{
+    return
+        latitude >= -180 && latitude <= 180
+        && longitude >= -180 && longitude <= 180;
+}
+
+Kilometers Geopoint::distanceTo(const Geopoint& other) const
+{
+    double lat1r = toRadians(latitude);
+    double lon1r = toRadians(longitude);
+    double lat2r = toRadians(other.latitude);
+    double lon2r = toRadians(other.longitude);
+    double u = std::sin((lat2r - lat1r) / 2);
+    double v = std::sin((lon2r - lon1r) / 2);
+    return
+        kEarthDiameter * std::asin(std::sqrt(u * u + std::cos(lat1r) * std::cos(lat2r) * v * v));
+}
+
+std::string Geopoint::toString() const
+{
+    return "{ lat: " + std::to_string(latitude) + ", lon: " + std::to_string(longitude) + " }";
+}
+
+const char* toString(Continent continent)
 {
     switch (continent)
     {
@@ -14,6 +56,8 @@ const char * toString(Continent continent)
             return "Antarctica";
         case Continent::asia:
             return "Asia";
+        case Continent::australia:
+            return "Australia";
         case Continent::europe:
             return "Europe";
         case Continent::northAmerica:
@@ -21,8 +65,41 @@ const char * toString(Continent continent)
         case Continent::southAmerica:
             return "South America";
         default:
-            return "unknown"; //< Should never get here, Continent is an enum class.
+            return "unknown";
     }
+}
+
+Exception::Exception(ResultCode resultCode, const std::string& message):
+    base_type(message),
+    m_resultCode(resultCode)
+{
+}
+
+ResultCode Exception::resultCode() const
+{
+    return m_resultCode;
+}
+
+Location::Location(Continent continent):
+    continent(continent),
+    geopoint(kContinentalCenters[continent])
+{
+}
+
+std::string Location::toString() const
+{
+    std::string s;
+    std::string geopointStr = geopoint.toString();
+    // 22 == number of format characters + length of longest continent name
+    s.reserve(country.size() + geopointStr.size() + 22);
+    s += "{ ";
+    s += continentString(continent);
+    s += ", ";
+    s += std::move(geopointStr);
+    if (!country.empty())
+        s += ", " + country;
+    s += " }";
+    return s;
 }
 
 } // namespace nx::geo_ip

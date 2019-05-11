@@ -1,7 +1,8 @@
 #pragma once
 
-#include <string>
+#include <map>
 #include <optional>
+#include <string>
 
 namespace nx::geo_ip {
 
@@ -18,34 +19,73 @@ enum class Continent
     africa,
     antarctica,
     asia,
-    australia,
+    australia, //<includes Australasia
     europe,
     northAmerica,
     southAmerica
 };
 
-struct Geopoint
+using Kilometers = double;
+
+struct NX_GEO_IP_API Geopoint
 {
+    /* Decimal degrees [-180, 180], negative value is Southern hemisphere. */
     double latitude = 0;
+    /* Decimal degrees [-180, 180], negative value is Western hemisphere. */
     double longitude = 0;
 
-    std::string toString() const
-    {
-        return "{ lat: " + std::to_string(latitude) + ", lon: " + std::to_string(longitude) + " }";
-    }
+    /* True if both latitude and longitude are in the range [-180, 180] */
+    bool isValid() const;
+
+    /**
+     * Assuming Earth radius of 6371 kilometers, get the distance between this point and /a other
+     * using Haversine formula.
+     */
+    Kilometers distanceTo(const Geopoint& other) const;
+
+    std::string toString() const;
 };
 
-struct Location
+static std::map<Continent, Geopoint> kContinentalCenters = {
+    {Continent::africa, {0, 26.121}},
+    {Continent::antarctica, {-90, 0}},
+    {Continent::asia, {43.681, 87.331}},
+    {Continent::australia, {-25.61, 134.354}},
+    {Continent::europe, {55.182, 28.258}},
+    {Continent::northAmerica, {47.115, -101.298}},
+    {Continent::southAmerica, {-20.719, -58.061}}
+};
+
+struct NX_GEO_IP_API Location
 {
-    Continent continent;
+    Continent continent = Continent::africa;
+    Geopoint geopoint = kContinentalCenters[continent];
     std::string country;
-    std::optional<Geopoint> geopoint;
+
+    Location() = default;
+    /**
+     * Constructs Location with the given continent and
+     * geopoint at kContinentalCenters[continent]
+     */
+    Location(Continent continent);
+
+    std::string toString() const;
 };
 
-using Result = std::pair<ResultCode, Location>;
+class Exception:public std::runtime_error
+{
+    using base_type = std::runtime_error;
+public:
+    Exception(ResultCode resultCode, const std::string& mmdbError);
+
+    ResultCode resultCode() const;
+
+private:
+    ResultCode m_resultCode;
+};
 
 //-------------------------------------------------------------------------------------------------
 
-NX_GEO_IP_API const char * toString(Continent continent);
+NX_GEO_IP_API const char* toString(Continent continent);
 
-} // namespace geo_ip::types
+} // namespace geo_ip

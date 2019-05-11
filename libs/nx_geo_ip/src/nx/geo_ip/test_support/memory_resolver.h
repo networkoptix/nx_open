@@ -11,9 +11,9 @@ class NX_GEO_IP_API MemoryResolver: public AbstractResolver
 public:
     virtual ~MemoryResolver() override = default;
 
-    void add(const nx::network::SocketAddress& endpoint, const Location& location);
+    void add(const std::string& endpoint, const Location& location);
 
-    virtual Result resolve(const nx::network::SocketAddress& endpoint) override;
+    virtual Location resolve(const std::string &endpoint) override;
 
 private:
     std::map<std::string, Location> m_endpointLocations;

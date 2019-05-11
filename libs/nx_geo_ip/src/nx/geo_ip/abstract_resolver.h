@@ -13,7 +13,10 @@ class NX_GEO_IP_API AbstractResolver
 public:
     virtual ~AbstractResolver() = default;
 
-    virtual Result resolve(const nx::network::SocketAddress& endpoint) = 0;
+    /**
+     * Throws exception
+     */
+    virtual Location resolve(const std::string& ipAddress) = 0;
 };
 
 }// namespace geo_ip

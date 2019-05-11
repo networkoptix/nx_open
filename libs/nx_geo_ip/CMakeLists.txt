@@ -5,7 +5,7 @@ endif()
 
 nx_add_target(nx_geo_ip LIBRARY ${library_type} NO_MOC WERROR
     PUBLIC_LIBS
-        maxminddb nx_utils nx_network)
+        maxminddb)
 
 target_compile_definitions(nx_geo_ip
     PRIVATE NX_GEO_IP_API=${API_EXPORT_MACRO}
