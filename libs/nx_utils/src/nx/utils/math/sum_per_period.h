@@ -132,6 +132,19 @@ private:
     }
 };
 
+//-------------------------------------------------------------------------------------------------
+
+template<typename Value>
+class SumPerMinute:
+    public SumPerPeriod<Value>
+{
+public:
+    SumPerMinute(int subPeriodCount = 20):
+        SumPerPeriod(std::chrono::minutes(1), subPeriodCount)
+    {
+    }
+};
+
 } // namespace math
 } // namespace utils
 } // namespace nx
