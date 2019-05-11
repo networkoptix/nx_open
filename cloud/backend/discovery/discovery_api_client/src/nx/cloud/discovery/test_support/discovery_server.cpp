@@ -166,13 +166,6 @@ Node DiscoveryServer::updateNode(
     auto it = m_clientPublicIpAddresses.find(node.nodeId);
     if (it != m_clientPublicIpAddresses.end())
         node.publicIpAddress = it->second;
-    // Fall back to endpoint advertised by a node, as it is likely its "public" interface
-    if (!node.urls.empty())
-        node.publicIpAddress = nx::network::url::getEndpoint(node.urls.front()).toStdString();
-    // Fall back on the client's endpoint, which, likely being the DiscoveryClient's internal
-    // http client, is not very useful
-    if (node.publicIpAddress.empty())
-        node.publicIpAddress = requestContext.connection->clientEndpoint().toStdString();
 
     node.infoJson = nodeInfo.infoJson;
     node.expirationTime = std::chrono::system_clock::now() + m_nodeLifetime;
