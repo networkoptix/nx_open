@@ -40,7 +40,6 @@ public:
 
 private:
     MultipleRelays * m_testFixture = nullptr;
-    bool m_serverRegionMockedUp = false;
 };
 
 } // namespace
