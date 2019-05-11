@@ -15,7 +15,6 @@
 #include <nx/utils/std/optional.h>
 #include <nx/clusterdb/map/settings.h>
 #include <nx/cloud/discovery/settings.h>
-#include <nx/geo_ip/settings.h>
 
 #include "discovery/discovery_settings.h"
 
@@ -74,6 +73,12 @@ struct TrafficRelay
     nx::cloud::discovery::Settings discovery;
 };
 
+struct GeoIp
+{
+    std::string dbPath;
+    int resolveErrorUrlCount;
+};
+
 struct ListeningPeer
 {
     std::optional<std::chrono::milliseconds> connectionInactivityTimeout;
@@ -130,7 +135,7 @@ public:
     const nx::sql::ConnectionOptions& dbConnectionOptions() const;
     const Statistics& statistics() const;
     const TrafficRelay& trafficRelay() const;
-    const nx::geo_ip::Settings& geoIp() const;
+    const GeoIp& geoIp() const;
     const nx::cloud::discovery::conf::Discovery& discovery() const;
     const ListeningPeer& listeningPeer() const;
     const Server& server() const;
@@ -147,7 +152,7 @@ private:
     nx::sql::ConnectionOptions m_dbConnectionOptions;
     Statistics m_statistics;
     TrafficRelay m_trafficRelay;
-    nx::geo_ip::Settings m_geoIp;
+    GeoIp m_geoIp;
     nx::cloud::discovery::conf::Discovery m_discovery;
     ListeningPeer m_listeningPeer;
     Server m_server;

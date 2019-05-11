@@ -26,17 +26,44 @@ public:
         RelayInstanceSearchCompletionHandler completionHandler) override;
 
 private:
+    struct RelayContext
+    {
+        nx::geo_ip::Location location;
+        nx::cloud::discovery::Node node;
+        bool operator<(const RelayContext& rhs)const
+        {
+            return node < rhs.node;
+        }
+    };
+
     void onRelayDiscovered(nx::cloud::discovery::Node node);
     void onRelayLost(nx::cloud::discovery::Node node);
 
-    std::vector<nx::utils::Url> findOnlineRelaysBy(nx::geo_ip::Continent continent);
+    std::vector<nx::utils::Url> findRelaysByLocation(
+        const std::string& entity,
+        const std::optional<nx::geo_ip::Location>& location);
+
+    std::vector<nx::utils::Url> findRelaysByContinent(
+        nx::geo_ip::Continent continent) const;
+
+    std::vector<nx::utils::Url> findRelaysByDistance(
+        const nx::geo_ip::Geopoint& geopoint) const;
+
+    std::vector<nx::utils::Url> getUnresolvedRelays() const;
+
+    std::optional<nx::geo_ip::Location> resolve(
+        const std::string& entity,
+        const std::string& ipAddress);
 
 private:
+    const conf::Settings& m_settings;
+
     std::unique_ptr<nx::geo_ip::AbstractResolver> m_geoIpResolver;
     nx::cloud::discovery::DiscoveryClient m_trafficRelayDiscoveryClient;
 
-    QnMutex m_mutex;
-    std::multimap<nx::geo_ip::Continent, nx::cloud::discovery::Node> m_onlineRelayLocations;
+    mutable QnMutex m_mutex;
+    std::multimap<nx::geo_ip::Continent, RelayContext> m_resolvedRelays;
+    std::set<nx::cloud::discovery::Node> m_unresolvedRelays;
 
     nx::network::aio::BasicPollable m_aioThreadBinder;
 };

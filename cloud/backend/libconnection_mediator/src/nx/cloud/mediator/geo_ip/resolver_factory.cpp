@@ -21,7 +21,7 @@ ResolverFactory& ResolverFactory::instance()
 std::unique_ptr<nx::geo_ip::AbstractResolver>
 ResolverFactory::defaultFactoryFunction(const conf::Settings& settings)
 {
-    return std::make_unique<nx::geo_ip::Resolver>(settings.geoIp());
+    return std::make_unique<nx::geo_ip::Resolver>(settings.geoIp().dbPath);
 }
 
 } // namespace nx::hpm::geo_ip

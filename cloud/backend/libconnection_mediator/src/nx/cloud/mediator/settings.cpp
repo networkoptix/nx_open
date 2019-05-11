@@ -156,6 +156,8 @@ const QLatin1String kClusterId("clusterId");
 // GeoIp - related settings.
 
 const QLatin1String kGeoIpDbPath("geoIp/dbPath");
+const QLatin1String kGeoIpResolveErrorUrlCount("geoIp/resolveErrorUrlCount");
+static constexpr int kDefaultGeoIpResolveErrorUrlCount = 2;
 
 const QLatin1String kListeningPeerConnectionInactivityTimeout(
     "listeningPeer/connectionInactivityTimeout");
@@ -256,7 +258,7 @@ const TrafficRelay& Settings::trafficRelay() const
     return m_trafficRelay;
 }
 
-const nx::geo_ip::Settings& Settings::geoIp() const
+const GeoIp& Settings::geoIp() const
 {
     return m_geoIp;
 }
@@ -497,6 +499,9 @@ void Settings::loadTrafficRelay()
 void Settings::loadGeoIp()
 {
     m_geoIp.dbPath = settings().value(kGeoIpDbPath).toString().toStdString();
+    m_geoIp.resolveErrorUrlCount = settings().value(
+        kGeoIpResolveErrorUrlCount,
+        kDefaultGeoIpResolveErrorUrlCount).toInt();
 }
 
 void Settings::loadListeningPeer()

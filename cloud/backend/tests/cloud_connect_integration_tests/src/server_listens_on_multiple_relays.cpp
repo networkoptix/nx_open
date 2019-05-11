@@ -9,17 +9,14 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/url/url_parse_helper.h>
+#include <nx/network/cloud/mediator/api/mediator_api_client.h>
 
 namespace nx::network::cloud::test {
 
 class MultipleRelays;
 
 namespace {
-
-nx::network::SocketAddress getEndpoint(const nx::utils::Url& url)
-{
-    return nx::network::SocketAddress(url.host(), url.port());
-}
 
 class NotifyingRelayClusterClient:
     public nx::hpm::OnlineRelaysClusterClient
@@ -36,7 +33,10 @@ public:
         const nx::network::SocketAddress& serverEndpoint,
         nx::hpm::RelayInstanceSelectCompletionHandler completionHandler) override;
 
-    void mockupServerRegion(const nx::network::SocketAddress& serverEndpoint);
+    virtual void findRelayInstancePeerIsListeningOn(
+        const std::string& peerId,
+        const nx::network::SocketAddress& clientEndpoint,
+        nx::hpm::RelayInstanceSearchCompletionHandler completionHandler) override;
 
 private:
     MultipleRelays * m_testFixture = nullptr;
@@ -50,8 +50,6 @@ class MultipleRelays:
     public testing::Test
 {
     using base_type = BasicTestFixture;
-
-    friend class NotifyingRelayClusterClient;
 
 public:
     ~MultipleRelays()
@@ -74,9 +72,19 @@ public:
         }
     }
 
+    void addIpAndRegion(const std::string& ipAddress, const nx::geo_ip::Location& location)
+    {
+        m_geoIpResolver->add(ipAddress, location);
+    }
+
     void reportTrafficRelayUrlsForServer(const std::vector<nx::utils::Url>& trafficRelayUrls)
     {
         m_reportedRelayUrlsForServerPromise.set_value(trafficRelayUrls);
+    }
+
+    void reportTrafficRelayUrlForClient(const nx::utils::Url& trafficRelayUrl)
+    {
+        m_reportedRelayUrlForClientPromise.set_value(trafficRelayUrl);
     }
 
 protected:
@@ -86,11 +94,11 @@ protected:
         //  - Relays 0 and 1 live in NorthAmerica
         //  - The mediaserver also lives in North America
         //  - Relay 2 lives in Australia
-        //  - The client connects to Australia relay.
+        //  - The client lives in Australia.
         // 1. When the server connects to mediator, it should receive exactly two relay urls,
         // the two from North America, and NOT the one from Australia. Any other result fails.
-        // 2. When the client connects to the mediator, it should receive a relay url from North America,
-        // and NOT the one from Australia. Any other result fails.
+        // 2. When the client connects to the mediator, it should receive a relay url from Australia,
+        // and NOT the one from North America. Any other result fails.
         // 3. The client should be able to connect to all relay urls that the mediaserver is
         // listening on (the two form North America),
         // 4. The relay from Australia should synchronize information about listening servers
@@ -111,9 +119,20 @@ protected:
             {
                 if (clusterId == relayClusterId())
                 {
+                    auto publicIpAddress = lm("10.10.10.%1").arg(++m_relayIpHostPart).toStdString();
+
                     discoveryServer().mockupClientPublicIpAddress(
                         nodeInfo.nodeId,
-                        getEndpoint(nodeInfo.urls.front()).toStdString());
+                        publicIpAddress);
+
+                    // note: continent can't be mocked up yet because not all relays have been
+                    // started. There is no way to safely compare this relay's url to
+                    // relayUrl(1) or (2)
+
+                    nx::utils::Url url(nodeInfo.urls.front());
+                    url.setPath({});
+
+                    m_relaysMockedUp.emplace(std::move(url), publicIpAddress);
                 }
             });
         ASSERT_NE(m_nodeDiscoveredSubscriptionId, nx::utils::kInvalidSubscriptionId);
@@ -148,6 +167,16 @@ protected:
     void whenConnectToMediator()
     {
         assertCloudConnectionCanBeEstablished();
+    }
+
+    void thenClientReceivesRelayUrl()
+    {
+        waitForReportedRelayUrlForClient();
+    }
+
+    void andClientAndReportedRelayAreInTheSameRegion()
+    {
+        ASSERT_EQ(m_reportedRelayUrlForClient, m_expectedRelayUrlForClient);
     }
 
     void thenClientCanConnectToServerViaReportedRelays()
@@ -189,7 +218,7 @@ private:
                 std::lock_guard<std::mutex> lock(m_mutex);
                 for (const auto& expectedUrl : m_expectedRelayUrlsForServer)
                 {
-                    auto endpoint = getEndpoint(expectedUrl);
+                    auto endpoint = nx::network::url::getEndpoint(expectedUrl);
 
                     if (m_reportedRelayDomains.find(endpoint.toStdString())
                         == m_reportedRelayDomains.end())
@@ -202,7 +231,8 @@ private:
 
         while (shouldWait())
         {
-            relay.moduleInstance()->remoteRelayPeerPool().findRelayByDomain(systemId,
+            relay.moduleInstance()->remoteRelayPeerPool().findRelayByDomain(
+                systemId,
                 [this](std::string relayDomain)
                 {
                     std::lock_guard<std::mutex> lock(m_mutex);
@@ -221,7 +251,7 @@ private:
         using namespace nx::cloud::relay;
 
         std::string actualRelayUrl;
-        auto relayClient = std::make_unique<api::Client>(relayUrl.toString());
+        auto relayClient = std::make_unique<api::Client>(relayUrl);
 
         for (;;)
         {
@@ -260,21 +290,32 @@ private:
         m_reportedRelayUrlsForServer = m_reportedRelayUrlsForServerPromise.get_future().get();
     }
 
+    void waitForReportedRelayUrlForClient()
+    {
+        m_reportedRelayUrlForClient = m_reportedRelayUrlForClientPromise.get_future().get();
+    }
+
     void mockupRelayRegions()
     {
-        ASSERT_TRUE(m_geoIpResolver != nullptr);
+        ASSERT_NE(m_geoIpResolver, nullptr);
 
-        // NOTE: server region can't be mocked up until it is started because its SocketAddress is
-        // needed. It is done inside
-        // NotifyingRelayClusterClient::selectRelayInstanceForListeningPeer()
+        while (m_relaysMockedUp.size() < m_relayClusterSize)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-        {
-            using namespace nx::geo_ip;
-            m_geoIpResolver->add(getEndpoint(relayUrl(0)), {Continent::northAmerica});
-            m_geoIpResolver->add(getEndpoint(relayUrl(1)), {Continent::northAmerica});
-            m_geoIpResolver->add(getEndpoint(relayUrl(2)), {Continent::australia});
-        }
+        using namespace nx::geo_ip;
+        m_geoIpResolver->add(
+            m_relaysMockedUp.at(relayUrl(0)),
+            Location(Continent::northAmerica));
 
+        m_geoIpResolver->add(
+            m_relaysMockedUp.at(relayUrl(1)),
+            Location(Continent::northAmerica));
+
+        m_geoIpResolver->add(
+            m_relaysMockedUp.at(relayUrl(2)),
+            Location(Continent::australia));
+
+        m_expectedRelayUrlForClient = relayUrl(2);
         m_expectedRelayUrlsForServer = { relayUrl(0), relayUrl(1) };
     }
 
@@ -294,7 +335,14 @@ private:
     std::promise<std::vector<nx::utils::Url>> m_reportedRelayUrlsForServerPromise;
     std::vector<nx::utils::Url> m_reportedRelayUrlsForServer;
 
+    nx::utils::Url m_expectedRelayUrlForClient;
+    std::promise<nx::utils::Url> m_reportedRelayUrlForClientPromise;
+    nx::utils::Url m_reportedRelayUrlForClient;
+
     nx::geo_ip::test::MemoryResolver* m_geoIpResolver = nullptr;
+
+    std::map<nx::utils::Url, std::string/*publicIpAddress*/> m_relaysMockedUp;
+    int m_relayIpHostPart = 0;
     NotifyingRelayClusterClient* m_relayClusterClient = nullptr;
 
     std::mutex m_mutex;
@@ -317,13 +365,11 @@ void NotifyingRelayClusterClient::selectRelayInstanceForListeningPeer(
     const nx::network::SocketAddress& serverEndpoint,
     nx::hpm::RelayInstanceSelectCompletionHandler completionHandler)
 {
-    // NOTE: we need to wait until the server is started to mockup its region, its address
-    // isn't determined until it is started.
-    mockupServerRegion(serverEndpoint);
+    m_testFixture->addIpAndRegion("127.0.0.1", nx::geo_ip::Continent::northAmerica);
 
     base_type::selectRelayInstanceForListeningPeer(
         peerId,
-        serverEndpoint,
+        nx::network::SocketAddress("127.0.0.1", 1),
         [this, completionHandler = std::move(completionHandler)](
             nx::cloud::relay::api::ResultCode resultCode,
             std::vector<nx::utils::Url> relayUrls)
@@ -333,17 +379,23 @@ void NotifyingRelayClusterClient::selectRelayInstanceForListeningPeer(
         });
 }
 
-void NotifyingRelayClusterClient::mockupServerRegion(
-    const nx::network::SocketAddress& serverEndpoint)
+void NotifyingRelayClusterClient::findRelayInstancePeerIsListeningOn(
+    const std::string& peerId,
+    const nx::network::SocketAddress& clientEndpoint,
+    nx::hpm::RelayInstanceSearchCompletionHandler completionHandler)
 {
-    if (m_serverRegionMockedUp)
-        return;
+    m_testFixture->addIpAndRegion("127.0.0.2", nx::geo_ip::Continent::australia);
 
-    m_testFixture->m_geoIpResolver->add(
-        serverEndpoint,
-        {nx::geo_ip::Continent::northAmerica});
-
-    m_serverRegionMockedUp = true;
+    base_type::findRelayInstancePeerIsListeningOn(
+        peerId,
+        nx::network::SocketAddress("127.0.0.2", 1),
+        [this, completionHandler = std::move(completionHandler)](
+            nx::cloud::relay::api::ResultCode resultCode,
+            nx::utils::Url relayUrl)
+        {
+            m_testFixture->reportTrafficRelayUrlForClient(relayUrl);
+            completionHandler(resultCode, std::move(relayUrl));
+        });
 }
 
 } // namespace
@@ -367,6 +419,18 @@ TEST_F(MultipleRelays, client_connects_to_server_on_multiple_reported_relays)
     thenServerIsListeningOnMultipleRelays();
 
     thenClientCanConnectToServerViaReportedRelays();
+}
+
+TEST_F(MultipleRelays, client_receives_traffic_relay_url_in_same_region)
+{
+    // givenMultipleRelays();
+    // givenServer();
+
+    whenServerConnectsToMediator();
+    whenConnectToMediator();
+
+    thenClientReceivesRelayUrl();
+    andClientAndReportedRelayAreInTheSameRegion();
 }
 
 } //namespace nx::network::cloud::test

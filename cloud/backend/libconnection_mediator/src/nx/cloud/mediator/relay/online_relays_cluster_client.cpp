@@ -9,7 +9,22 @@
 
 namespace nx::hpm {
 
+namespace {
+
+static constexpr char kTrafficRelay[] = "traffic relay";
+static constexpr char kListeningPeer[] = "listening peer";
+static constexpr char kClient[] = "client";
+
+nx::utils::Url urlWithoutPath(nx::utils::Url url)
+{
+    url.setPath({});
+    return url;
+}
+
+}
+
 OnlineRelaysClusterClient::OnlineRelaysClusterClient(const conf::Settings& settings):
+    m_settings(settings),
     m_geoIpResolver(geo_ip::ResolverFactory::instance().create(settings)),
     m_trafficRelayDiscoveryClient(
         settings.trafficRelay().discovery,
@@ -38,35 +53,23 @@ void OnlineRelaysClusterClient::selectRelayInstanceForListeningPeer(
     const nx::network::SocketAddress& serverEndpoint,
     RelayInstanceSelectCompletionHandler completionHandler)
 {
-    using namespace nx::cloud::relay::api;
-
     m_aioThreadBinder.post(
         [this, peerId, serverEndpoint, completionHandler = std::move(completionHandler)]()
     {
-        auto[resultCode, location] = m_geoIpResolver->resolve(serverEndpoint);
-        if (resultCode != nx::geo_ip::ResultCode::ok)
-        {
-            NX_WARNING(this, "Error resolving peerId: %1 with server address: %1 to a continent",
-                peerId, serverEndpoint);
-
-            return completionHandler(ResultCode::notFound, std::vector<nx::utils::Url>());
-        }
-
-        auto relayUrls = findOnlineRelaysBy(location.continent);
+        auto location = resolve(kListeningPeer, serverEndpoint.address.toStdString());
+        std::string listeningPeer = std::string(kListeningPeer) + ": " + peerId;
+        auto relayUrls = findRelaysByLocation(listeningPeer, location);
         if (relayUrls.empty())
         {
-            NX_WARNING(this, "There were no online relays found for continent: %1",
-                nx::geo_ip::toString(location.continent));
-
-            return completionHandler(ResultCode::notFound, std::vector<nx::utils::Url>());
+            return completionHandler(
+                nx::cloud::relay::api::ResultCode::notFound,
+                std::vector<nx::utils::Url>());
         }
 
-        NX_VERBOSE(this,
-            "Resolved peerId: %1 with server endpoint: %2 to continent: %3 and found relay urls: %4",
-                peerId, serverEndpoint, nx::geo_ip::toString(location.continent),
-                containerString(relayUrls));
+        NX_VERBOSE(this, "%1 reporting relay urls: %2 for listening peer: %3",
+            __func__, containerString(relayUrls), peerId);
 
-        return completionHandler(ResultCode::ok, std::move(relayUrls));
+        return completionHandler(nx::cloud::relay::api::ResultCode::ok, std::move(relayUrls));
     });
 }
 
@@ -75,53 +78,55 @@ void OnlineRelaysClusterClient::findRelayInstancePeerIsListeningOn(
      const nx::network::SocketAddress& clientEndpoint,
      RelayInstanceSearchCompletionHandler completionHandler)
 {
-    using namespace nx::cloud::relay::api;
-
     m_aioThreadBinder.post(
         [this, peerId, clientEndpoint, completionHandler = std::move(completionHandler)]()
     {
-        auto[resultCode, location] =
-            m_geoIpResolver->resolve(clientEndpoint);
-
-        if (resultCode != nx::geo_ip::ResultCode::ok)
-        {
-            NX_WARNING(this, "Error resolving peerId: %1with client address: %2 to a continent",
-                peerId, clientEndpoint);
-            return completionHandler(ResultCode::notFound, nx::utils::Url());
-        }
-
-        auto relayUrls = findOnlineRelaysBy(location.continent);
+        auto location = resolve(kClient, clientEndpoint.address.toStdString());
+        auto relayUrls = findRelaysByLocation(kClient, location);
         if (relayUrls.empty())
         {
-            NX_WARNING(this, "There were no online relays found for continent: %1",
-                nx::geo_ip::toString(location.continent));
-            return completionHandler(ResultCode::notFound, nx::utils::Url());
+            return completionHandler(
+                nx::cloud::relay::api::ResultCode::notFound,
+                nx::utils::Url());
         }
 
         std::random_device rd;  //Will be used to obtain a seed for the random number engine
         std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
         std::uniform_int_distribution<> dis(0, (int)relayUrls.size() - 1);
 
-        return completionHandler(cloud::relay::api::ResultCode::ok, relayUrls[dis(gen)]);
+        auto url = relayUrls[dis(gen)];
+
+        NX_VERBOSE(this, "%1 reporting relay url: %2 for listening peer: %3 and client ip: %4",
+            __func__, url, peerId, clientEndpoint.address);
+
+        return completionHandler(
+            nx::cloud::relay::api::ResultCode::ok,
+            std::move(url));
     });
 }
 
 void OnlineRelaysClusterClient::onRelayDiscovered(nx::cloud::discovery::Node trafficRelayNode)
 {
-    auto [resultCode, location] = m_geoIpResolver->resolve(trafficRelayNode.publicIpAddress);
-    if (resultCode != nx::geo_ip::ResultCode::ok)
+    if (trafficRelayNode.urls.empty())
     {
-        NX_WARNING(this, "Failed to resolve traffic relay: %1 to a known continent using"
-            " public ip address: %2",
-            trafficRelayNode, trafficRelayNode.publicIpAddress);
+        NX_ERROR(this, "Discovered traffic relay: %1 that provides no urls. Ignoring",
+            trafficRelayNode);
         return;
     }
 
-    NX_VERBOSE(this, "Traffic relay: %1 discovered and resolved to continent: %2",
-        trafficRelayNode, nx::geo_ip::toString(location.continent));
-
-    QnMutexLocker lock(&m_mutex);
-    m_onlineRelayLocations.emplace(location.continent, trafficRelayNode);
+    auto location = resolve(kTrafficRelay, trafficRelayNode.publicIpAddress);
+    if (location)
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_resolvedRelays.emplace(
+            location->continent,
+            RelayContext{std::move(*location), std::move(trafficRelayNode)});
+    }
+    else
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_unresolvedRelays.emplace(std::move(trafficRelayNode));
+    }
 }
 
 void OnlineRelaysClusterClient::onRelayLost(nx::cloud::discovery::Node trafficRelayNode)
@@ -129,37 +134,146 @@ void OnlineRelaysClusterClient::onRelayLost(nx::cloud::discovery::Node trafficRe
     NX_VERBOSE(this, "Traffic relay: %1 was dropped by discovery service.", trafficRelayNode);
 
     QnMutexLocker lock(&m_mutex);
-    for (auto it = m_onlineRelayLocations.begin(); it != m_onlineRelayLocations.end(); ++it)
+    for (auto it = m_resolvedRelays.begin(); it != m_resolvedRelays.end(); ++it)
     {
-        if (it->second == trafficRelayNode)
+        if (it->second.node == trafficRelayNode)
         {
-            m_onlineRelayLocations.erase(it);
-            break;
+            m_resolvedRelays.erase(it);
+            return;
         }
     }
+
+    m_unresolvedRelays.erase(trafficRelayNode);
 }
 
-std::vector<nx::utils::Url> OnlineRelaysClusterClient::findOnlineRelaysBy(
-    nx::geo_ip::Continent continent)
+std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByContinent(
+    nx::geo_ip::Continent continent) const
 {
     QnMutexLocker lock(&m_mutex);
     std::vector<nx::utils::Url> relayUrls;
 
-    auto range = m_onlineRelayLocations.equal_range(continent);
+    auto range = m_resolvedRelays.equal_range(continent);
     for (auto it = range.first; it != range.second; ++it)
     {
-        if (it->second.urls.empty())
-        {
-            NX_WARNING(this, "Traffic relay: %1 is online but provides no urls. Ignoring",
-                it->second);
+        if (it->second.node.urls.empty())
             continue;
-        }
 
-        relayUrls.emplace_back(it->second.urls.front());
-        relayUrls.back().setPath({});
+        relayUrls.emplace_back(urlWithoutPath(it->second.node.urls.front()));
     }
 
     return relayUrls;
 }
+
+std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByDistance(
+    const nx::geo_ip::Geopoint& geopoint) const
+{
+    std::vector<nx::utils::Url> urls;
+    std::multimap<nx::geo_ip::Kilometers, const nx::cloud::discovery::Node&> relaysByDistance;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        for (const auto& context : m_resolvedRelays)
+        {
+            relaysByDistance.emplace(
+                geopoint.distanceTo(context.second.location.geopoint),
+                context.second.node);
+        }
+    }
+
+    for (const auto& relay : relaysByDistance)
+    {
+        if (!relay.second.urls.empty())
+            urls.emplace_back(urlWithoutPath(relay.second.urls.front()));
+
+        if (urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
+            break;
+    }
+
+    return urls;
+}
+
+std::vector<nx::utils::Url> OnlineRelaysClusterClient::getUnresolvedRelays() const
+{
+    std::vector<nx::utils::Url> urls;
+    for (const auto& relay: m_unresolvedRelays)
+    {
+        if (!relay.urls.empty())
+            urls.emplace_back(urlWithoutPath(relay.urls.front()));
+
+        if (urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
+            break;
+    }
+
+    return urls;
+}
+
+std::optional<nx::geo_ip::Location> OnlineRelaysClusterClient::resolve(
+    const std::string& entity,
+    const std::string& ipAddress)
+{
+    try
+    {
+        auto location = m_geoIpResolver->resolve(ipAddress);
+        NX_VERBOSE(this, "Resolved %1 with ipAddress: %2 to location: %3",
+            entity, ipAddress, location);
+        return location;
+    }
+    catch (const std::exception& e)
+    {
+        NX_ERROR(this, "Error resolving ip address: %1 of %2 to location: %3",
+            ipAddress, entity, e.what());
+        return std::nullopt;
+    }
+}
+
+std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByLocation(
+    const std::string& entity,
+    const std::optional<nx::geo_ip::Location>& location)
+{
+    if (!location)
+    {
+        NX_ERROR(this, "Failed to resolve location for %1. Falling back urls in"
+            " traffic relay settings",
+            entity);
+        if (m_settings.trafficRelay().urls.empty())
+            NX_ERROR(this, "No default traffic relayUrls provided in settings");
+        return m_settings.trafficRelay().urls;
+    }
+
+    auto urls = findRelaysByContinent(location->continent);
+    if (!urls.empty())
+    {
+        NX_VERBOSE(this, "Found relays by location: %1, reporting urls: %2",
+            location, containerString(urls));
+        return urls;
+    }
+
+    NX_WARNING(this, "Found 0 relays in %1. Falling back to relays by distance",
+        location);
+    urls = findRelaysByDistance(location->geopoint);
+    if (!urls.empty())
+    {
+        NX_VERBOSE(this, "Found relays by distance: %1", containerString(urls));
+        return urls;
+    }
+
+    NX_ERROR(this, "Found 0 relays by distance. GeoIp resolution is not working."
+        " Falling back to any unresolved relays");
+    urls = getUnresolvedRelays();
+    if (!urls.empty())
+    {
+        NX_VERBOSE(this, "Found unresolved relays: %1", containerString(urls));
+        return urls;
+    }
+
+    NX_ERROR(this, "Found 0 relays, resolved or unresolved. Discovery service"
+        " is not working. Falling back to relay urls from settings");
+
+    if (m_settings.trafficRelay().urls.empty())
+        NX_ERROR(this, "TrafficRelay settings do not have any fallback urls. No relays found");
+
+    return m_settings.trafficRelay().urls;
+}
+
 
 } // namespace nx::hpm
