@@ -2478,7 +2478,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Quá nhiều lần thử. Vui lòng thử lại sau một phút.</translation>
     </message>
   </context>
   <context>
@@ -2701,7 +2701,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Quá nhiều lần thử. Vui lòng thử lại sau một phút.</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -2932,7 +2932,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Quá nhiều lần thử. Vui lòng thử lại sau một phút.</translation>
     </message>
   </context>
   <context>
@@ -3168,6 +3168,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>Đã thêm thư mục</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Không</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -5815,14 +5823,6 @@ to %1</source>
   <context>
     <name>QnSystemSettingsWidget</name>
     <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>Kích hoạt các thiết bị và máy chủ phát hiện tự động</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>Kích hoạt máy ảnh và máy chủ phát hiện tự động</translation>
-    </message>
-    <message>
       <source>Allow System to optimize device settings</source>
       <translation>Cho phép Hệ thống tối ưu hóa cài đặt thiết bị</translation>
     </message>
@@ -5837,6 +5837,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Không bao gồm bất kỳ thông tin cá nhân nào và hoàn toàn ẩn danh.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -6981,6 +6997,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7004,41 +7031,41 @@ to %1</source>
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Đặt trước</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Không xác định</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
+      <translation>Short cho thấp nhất Ls</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation type="unfinished">Lo</translation>
+      <translation>Short cho Low L</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
+      <translation>Short cho vừa M</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
+      <translation>Short cho cao H</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
+      <translation>Short cho tốt nhất Hs</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
+      <translation>Short cho đặt trước</translation>
     </message>
   </context>
   <context>
@@ -7182,6 +7209,14 @@ to %1</source>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+    </message>
+    <message>
+      <source>Show</source>
+      <translation>Buổi diễn</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
     </message>
   </context>
   <context>
@@ -7331,10 +7366,6 @@ to %1</source>
       <translation>Riêng</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Giúp sửa các vấn đề về chất lượng hình ảnh trên một số máy ảnh; cho những người khác sẽ làm tăng đáng kể tốc độ bitrate.</translation>
     </message>
@@ -7354,24 +7385,32 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
-      <translation type="unfinished">
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
+      <translation>
+        <numerusform>Mã này đã được sử dụng trên %n camera sau:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>UDP Multicast</source>
+      <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Máy chủ sẽ không thay đổi bất kỳ cài đặt máy ảnh nào, nó sẽ nhận và sử dụng luồng máy ảnh như hiện tại.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation type="unfinished">Device Rules</translation>
+      <translation>Quy định thiết bị</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation type="unfinished">Camera Rules</translation>
+      <translation>Nội quy Camera</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation type="unfinished">I/O Module Rules</translation>
+      <translation>Quy tắc mô-đun I/O</translation>
     </message>
     <message>
       <source>More Info</source>
@@ -7482,11 +7521,11 @@ to %1</source>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Vận động</translation>
     </message>
     <message>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>Fisheye</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -7502,7 +7541,7 @@ to %1</source>
     </message>
     <message>
       <source>Expert</source>
-      <translation type="unfinished">Expert</translation>
+      <translation>Xuất khẩu</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
@@ -7724,7 +7763,7 @@ to %1</source>
     </message>
     <message>
       <source>Scan</source>
-      <translation type="unfinished">Scan</translation>
+      <translation>Quét</translation>
     </message>
     <message>
       <source>Search</source>
@@ -7786,14 +7825,6 @@ to %1</source>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-    <message>
       <source>Please review and agree to the %1 in order to proceed</source>
       <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
     </message>
@@ -7812,7 +7843,7 @@ to %1</source>
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation type="unfinished">Motion</translation>
+      <translation>Vận động</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -7822,7 +7853,7 @@ to %1</source>
     <message>
       <source>Events</source>
       <comment>Events tab title</comment>
-      <translation type="unfinished">Events</translation>
+      <translation>Sự kiện</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -8109,7 +8140,7 @@ to %1</source>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
-      <translation type="unfinished">Brand</translation>
+      <translation>Nhãn hiệu</translation>
     </message>
     <message>
       <source>Model</source>
@@ -8275,7 +8306,7 @@ to %1</source>
     <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Vận động</translation>
     </message>
     <message>
       <source>deleted camera</source>
@@ -8391,15 +8422,11 @@ to %1</source>
     </message>
     <message>
       <source>Try again</source>
-      <translation type="unfinished">Try again</translation>
+      <translation>Thử lại</translation>
     </message>
     <message>
       <source>Cancel Update</source>
       <translation>Hủy cập nhật</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation type="unfinished">Failed to download update packages to some servers</translation>
     </message>
     <message>
       <source>Please make sure they have enough free storage space and stable network connection.</source>
@@ -8479,7 +8506,7 @@ to %1</source>
     </message>
     <message>
       <source>Updating to ...</source>
-      <translation type="unfinished">Updating to ...</translation>
+      <translation>Đang cập nhật tới ...</translation>
     </message>
     <message>
       <source>Ready to update to</source>
@@ -8555,6 +8582,10 @@ to %1</source>
       <source>Cancel update and delete all downloaded data?</source>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8579,6 +8610,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>Công nhận</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>sự kiện chung</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Event</source>
+      <translation type="unfinished">Unknown Plugin Event</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8598,10 +8649,6 @@ to %1</source>
       <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation type="unfinished">Local layouts can only be shown to their owners. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation type="unfinished">Select layout...</translation>
     </message>
@@ -8616,6 +8663,45 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
     </message>
   </context>
   <context>
@@ -8734,7 +8820,7 @@ to %1</source>
     </message>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation type="unfinished">To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</translation>
+      <translation>Để bật hoặc điều chỉnh nó, đi tới tab &quot;Motion&quot; trong Cài đặt camera</translation>
     </message>
     <message>
       <source>Motion detection disabled or not supported</source>
@@ -8759,16 +8845,16 @@ to %1</source>
       <translation>Theo dõi và ghi lại tất cả các hành động của người dùng.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>phút</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>giờ</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
     </message>
   </context>
   <context>
@@ -8789,13 +8875,13 @@ to %1</source>
       <source>Downloaded</source>
       <translation type="unfinished">Downloaded</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation type="unfinished">Current Version</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>Trạng thái</translation>
@@ -8816,12 +8902,16 @@ to %1</source>
       <source>Component</source>
       <translation type="unfinished">Component</translation>
     </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Vận động</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -9020,7 +9110,7 @@ to %1</source>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User %1 is currently uploading footage to this camera.</translation>
+      <translation>Người dùng %1 hiện đang tải lên cảnh quay cho camera này.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
@@ -9108,6 +9198,26 @@ to %1</source>
     <message>
       <source>Starting export...</source>
       <translation type="unfinished">Starting export...</translation>
+    </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
     </message>
   </context>
   <context>

@@ -4,13 +4,21 @@
 
 namespace nx::test {
 
+bool compare(
+    const nx::vms::api::Timestamp& vmsTimestamp,
+    const nx::clusterdb::engine::Timestamp& cloudTimestamp)
+{
+    return vmsTimestamp.sequence == cloudTimestamp.sequence
+        && vmsTimestamp.ticks == cloudTimestamp.ticks;
+}
+
 static bool compare(
     const ::ec2::QnAbstractTransaction::PersistentInfo& vmsTranPersistentInfo,
     const nx::clusterdb::engine::PersistentInfo& cloudCommandPersistentInfo)
 {
     return vmsTranPersistentInfo.dbID == cloudCommandPersistentInfo.dbID
         && vmsTranPersistentInfo.sequence == cloudCommandPersistentInfo.sequence
-        && vmsTranPersistentInfo.timestamp == cloudCommandPersistentInfo.timestamp;
+        && compare(vmsTranPersistentInfo.timestamp, cloudCommandPersistentInfo.timestamp);
 }
 
 bool compare(

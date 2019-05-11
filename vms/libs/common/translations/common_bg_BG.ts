@@ -969,11 +969,11 @@
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Собственик</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Администратор</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>

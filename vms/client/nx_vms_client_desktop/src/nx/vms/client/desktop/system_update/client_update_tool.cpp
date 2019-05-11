@@ -9,10 +9,13 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/update/update_check.h>
-#include <nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h>
+#include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>
+#include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
+
+using namespace nx::vms::common::p2p::downloader;
 
 bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 {
@@ -39,18 +42,20 @@ bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 
 ClientUpdateTool::ClientUpdateTool(QObject *parent):
     base_type(parent),
-    m_outputDir(QDir::temp().absoluteFilePath("nx_updates/client"))
+    m_outputDir(QDir::temp().absoluteFilePath("nx_updates/client")),
+    m_peerManager(new ResourcePoolPeerManager(commonModule())),
+    m_proxyPeerManager(new ResourcePoolProxyPeerManager(commonModule()))
 {
     // Expecting m_outputDir to be like /temp/nx_updates/client
 
     if (ini().massSystemUpdateClearDownloads)
         clearDownloadFolder();
 
-    vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
-    m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
-    m_peerManager->setParent(this);
+    m_downloader.reset(new Downloader(
+        m_outputDir,
+        commonModule(),
+        {m_peerManager, new InternetOnlyPeerManager(), m_proxyPeerManager}));
 
-    m_downloader.reset(new Downloader(m_outputDir, commonModule(), this));
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ClientUpdateTool::atDownloaderStatusChanged);
 
@@ -84,11 +89,10 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 
 ClientUpdateTool::~ClientUpdateTool()
 {
+    // Forcing downloader to be destroyed before serverConnection.
     m_downloader->disconnect(this);
-    // Forcing downloader to be destroyed before peerManager and serverConnection.
     m_downloader.reset();
-    // And peer manager should die before serverConnection.
-    m_peerManager.reset();
+
     m_serverConnection.reset();
 }
 
@@ -162,7 +166,8 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
 void ClientUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId)
 {
     m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
-    m_peerManager->setServerUrl(serverUrl, serverId);
+    m_peerManager->setServerDirectConnection(serverId, m_serverConnection);
+    m_proxyPeerManager->setServerDirectConnection(serverId, m_serverConnection);
 }
 
 void ClientUpdateTool::atRemoteUpdateInformation(
@@ -625,12 +630,6 @@ bool ClientUpdateTool::hasUpdate() const
         && m_state != State::error
         && m_state != State::applauncherError
         && m_state != State::complete;
-}
-
-ClientUpdateTool::PeerManagerPtr ClientUpdateTool::createPeerManager(
-    FileInformation::PeerSelectionPolicy /*peerPolicy*/, const QList<QnUuid>& /*additionalPeers*/)
-{
-    return m_peerManager.get();
 }
 
 QString ClientUpdateTool::toString(State state)

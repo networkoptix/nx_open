@@ -164,6 +164,11 @@ enum IDType
     AllowStatisticsReportMessageAction,
 
     /**
+     * Asks user to select analytics storage location.
+     */
+    ConfirmAnalyticsStorageAction,
+
+    /**
      * Opens the provided url in the default browser.
      *
      * Parameters:

@@ -464,7 +464,7 @@ protected:
         SystemError::ErrorCode error = SystemError::noError;
 
         clientWebSocket->readSomeAsync(&clientReadBuf,
-            [this, &error, p](SystemError::ErrorCode ecode, size_t) mutable
+            [&error, p](SystemError::ErrorCode ecode, size_t) mutable
             {
                 error = ecode;
                 p->set_value();
@@ -487,7 +487,7 @@ protected:
 
     void whenServerStartsAnsweringPings()
     {
-        serverReadCb = [this](SystemError::ErrorCode, size_t) {};
+        serverReadCb = [](SystemError::ErrorCode, size_t) {};
         serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
     }
 
@@ -498,7 +498,7 @@ protected:
             {
                 serverSendBuf = "hello";
                 serverWebSocket->sendAsync(serverSendBuf,
-                    [this](SystemError::ErrorCode ecode, size_t)
+                    [](SystemError::ErrorCode ecode, size_t)
                     {
                         NX_ASSERT(ecode == SystemError::noError);
                     });

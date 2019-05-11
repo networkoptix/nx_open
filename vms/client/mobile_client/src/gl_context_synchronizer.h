@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtQuick/QQuickWindow>

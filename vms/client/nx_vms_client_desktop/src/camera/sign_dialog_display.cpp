@@ -3,6 +3,7 @@
 #include "utils/common/synctime.h"
 #include "nx/streaming/archive_stream_reader.h"
 #include "core/resource/avi/avi_archive_delegate.h"
+#include "core/resource/resource.h"
 
 QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource):
     QnCamDisplay(resource, 0),
@@ -38,6 +39,8 @@ void QnSignDialogDisplay::finalizeSign()
         if (aviFile)
         {
             auto signPattern = aviFile->metadata().signature;
+            if (signPattern.isEmpty())
+                signPattern = QnSignHelper::loadSignatureFromFileEnd(m_reader->getResource()->getUrl());
             if (!signPattern.isEmpty())
             {
                 QByteArray baPattern = QByteArray(signPattern).trimmed();

@@ -2,11 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace network {
-namespace http {
-namespace server {
-namespace test {
+namespace nx::network::http::test {
 
 namespace {
 
@@ -37,8 +33,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-} // namespace test
-} // namespace server
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http::test

@@ -18,3 +18,7 @@ TextArea 1.0 TextArea.qml
 
 ArrowIcon 1.0 ArrowIcon.qml
 SwitchIcon 1.0 SwitchIcon.qml
+
+NxCircle 1.0 NxCircle.qml
+NxCirclesPreloader 1.0 NxCirclesPreloader.qml
+NxDotPreloader 1.0 NxDotPreloader.qml

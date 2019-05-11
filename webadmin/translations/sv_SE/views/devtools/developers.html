@@ -11,34 +11,34 @@
     <div>
         <h3>Generic Events Generator</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party Systems to a System,
+            A Generic Event is a method of sending events from 3rd party systems to a System
             which can be used to trigger System actions in the Events & Rules engine.
-            Den generiska Eventgeneratorn är ett verktyg som hjälper bygga HTTP Generic Event förfrågningar.
+            The Generic Event Generator is a tool which helps developers and integrators build
+            and test HTTP Generic Event calls.
         </p>
         <p><a href="#/developers/events">Generic Events Generator</a></p>
     </div>
     <div>
         <h3>Server API</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party Systems. It gives developers the ability to
-            access almost every System feature available in the regular client: query/manage System resources (servers,
-            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
-            control PTZ cameras, and more.
+            A REST API that gives developers the ability to access almost every system feature available in the regular
+            client: query/manage system resources (servers, cameras, users, permissions), pull live or recorded video
+            out of System, generate events, create rules, control PTZ cameras, and more.
         </p>
         <p>
-            <a href="#/developers/api"><b> API-testverktyg (nytt) </b></a>
-            - Interaktiv dokumentation med verktyg för testning av API-samtal <br>
-            <a href="#/developers/changelog"> API Changelog </a>
-            - lista över bryta ändringar i API <br>
-            <a id="api-doc" href="api.xml" target="_blank"> API-dokumentation </a> <br>
-            <a href="#/developers/serverDocumentation"> Serverinställningar Dokumentation </a>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation and tools for testing API calls<br>
+            <a href="#/developers/changelog">API Changelog</a>
+            - a list of breaking changes in API since the last release<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+            - a full list of available Server API calls
         </p>
 
     </div>
     <div>
         <h3>Panel för kameradetaljer</h3>
         <p>
-            Visar ytterligare utvecklarvänlig information för kameror i Web Admin-gränssnittet:
+            Displays additional developer-friendly information for individual cameras in the Web Admin Interface’s View tab:
         </p>
         <ul>
             <li>Kamera-ID</li>
@@ -52,11 +52,12 @@
         <p><a href="#/view/?cameraLinks">Öppna panel för kameradetaljer</a></p>
     </div>
     <div>
-        <h3>Integration av videokälla SDK</h3>
+        <h3>Video Source SDK</h3>
         <p>
-            Videokälla Integration SDK ger möjlighet att integrera praktiskt taget alla live eller inspelade videokällor
-            (IP-kameror, NVR, DVR, etc.) till System. SDK gör det möjligt att skapa metoder för att upptäcka,
-            visa, analysera och spela in video. Det möjliggör också integrering av enhetens I/O-portar och information om rörelsedetektering.
+            The Video Source SDK provides the ability to integrate almost any live or recorded video source (IP Cameras,
+            NVRs, DVRs, etc) into System and makes it possible to create methods for discovering, displaying, analyzing
+            and recording video. It also allows integrating I/O ports and devices, as well as pulling motion detection
+            information from 3rd party devices.
         </p>
         <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >hämta SDK</a></p>
     </div>
@@ -64,10 +65,10 @@
     <div>
         <h3>Lagrings SDK</h3>
         <p>
-            Lagring SDK ger möjlighet att integrera potentiell lagring i System. Det låter utvecklare
-            läsa från eller skriva till någon lagringsplats: lokal, fjärr och till och med moln. Skapa ett
-            plugin för lagringsutrymme kräver implementering av standardfunktioner som: I/O-ström, om filen finns, radera fil, lista med
-            filer i mappen etc. LagringsSDK innehåller också ett exempel för att använda en FTP-server som en lagringsplats.
+            The Storage SDK allows developers to read from or write to any storage location: local, remote, and even
+            cloud one. Creating a storage plugin requires implementing standard functions such as: I/O stream, if file
+            exist, delete file, list of files in the folder, etc. The Storage SDK contains an example for using an FTP
+            server as a storage location.
         </p>
         <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >hämta SDK</a></p>
     </div>

@@ -9,8 +9,8 @@
 #include <nx/sql/db_instance_controller.h>
 
 #include <nx/clusterdb/engine/command_data.h>
-#include <nx/clusterdb/engine/serialization/transaction_serializer.h>
-#include <nx/clusterdb/engine/transaction_log.h>
+#include <nx/clusterdb/engine/serialization/command_serializer.h>
+#include <nx/clusterdb/engine/command_log.h>
 
 #include "../data/statistics_data.h"
 #include "../data/system_data.h"
@@ -60,7 +60,7 @@ private:
         const std::string& systemId,
         clusterdb::engine::ResultCode resultCode,
         std::vector<clusterdb::engine::dao::TransactionLogRecord> serializedTransactions,
-        vms::api::TranState readedUpTo,
+        nx::clusterdb::engine::NodeState readedUpTo,
         std::function<void(
             api::Result,
             nx::clusterdb::engine::CommandDataList)> completionHandler);

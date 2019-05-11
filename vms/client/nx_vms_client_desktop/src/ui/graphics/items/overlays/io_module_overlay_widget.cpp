@@ -12,6 +12,7 @@
 
 #include <camera/iomodule/iomodule_monitor.h>
 #include <client_core/connection_context_aware.h>
+#include <ui/dialogs/common/message_box.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <utils/common/connective.h>

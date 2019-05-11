@@ -188,7 +188,6 @@ private:
 QnEventLogModel::QnEventLogModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_columns(),
     m_linkBrush(QPalette().link()),
     m_index(new DataIndex(this)),
     m_stringsHelper(new vms::event::StringsHelper(commonModule()))

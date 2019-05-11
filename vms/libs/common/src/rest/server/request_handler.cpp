@@ -5,14 +5,13 @@ using namespace nx::network;
 rest::Response QnRestRequestHandler::executeGet(const rest::Request& request)
 {
     rest::Response result;
-    rest::Content content;
+    http::StringType type;
+    http::StringType body;
     result.statusCode = static_cast<http::StatusCode::Value>(executeGet(
-        request.path(), request.params(),
-        content.body, content.type,
-        request.owner));
+        request.path(), request.params(), body, type, request.owner));
 
-    if (!content.type.isEmpty() || !content.body.isEmpty())
-        result.content = std::move(content);
+    if (!type.isEmpty() || !body.isEmpty())
+        result.content = {type, body};
 
     return result;
 }
@@ -20,14 +19,13 @@ rest::Response QnRestRequestHandler::executeGet(const rest::Request& request)
 rest::Response QnRestRequestHandler::executeDelete(const rest::Request& request)
 {
     rest::Response result;
-    rest::Content content;
+    http::StringType type;
+    http::StringType body;
     result.statusCode = static_cast<http::StatusCode::Value>(executeDelete(
-        request.path(), request.params(),
-        content.body, content.type,
-        request.owner));
+        request.path(), request.params(), body, type, request.owner));
 
-    if (!content.type.isEmpty() || !content.body.isEmpty())
-        result.content = std::move(content);
+    if (!type.isEmpty() || !body.isEmpty())
+        result.content = {type, body};
 
     return result;
 }
@@ -35,16 +33,17 @@ rest::Response QnRestRequestHandler::executeDelete(const rest::Request& request)
 rest::Response QnRestRequestHandler::executePost(const rest::Request& request)
 {
     rest::Response result;
-    rest::Content content;
+    http::StringType type;
+    http::StringType body;
     result.statusCode = static_cast<http::StatusCode::Value>(executePost(
         request.path(), request.params(),
-        request.content ? request.content->body : QByteArray(),
-        request.content ? request.content->type : QByteArray(),
-        content.body, content.type,
+        request.content ? request.content->body : http::StringType(),
+        request.content ? request.content->type.toString() : http::StringType(),
+        body, type,
         request.owner));
 
-    if (!content.type.isEmpty() || !content.body.isEmpty())
-        result.content = std::move(content);
+    if (!type.isEmpty() || !body.isEmpty())
+        result.content = {type, body};
 
     return result;
 }
@@ -52,16 +51,17 @@ rest::Response QnRestRequestHandler::executePost(const rest::Request& request)
 rest::Response QnRestRequestHandler::executePut(const rest::Request& request)
 {
     rest::Response result;
-    rest::Content content;
+    http::StringType type;
+    http::StringType body;
     result.statusCode = static_cast<http::StatusCode::Value>(executePost(
         request.path(), request.params(),
-        request.content ? request.content->body : QByteArray(),
-        request.content ? request.content->type : QByteArray(),
-        content.body, content.type,
+        request.content ? request.content->body : http::StringType(),
+        request.content ? request.content->type.toString() : http::StringType(),
+        body, type,
         request.owner));
 
-    if (!content.type.isEmpty() || !content.body.isEmpty())
-        result.content = std::move(content);
+    if (!type.isEmpty() || !body.isEmpty())
+        result.content = {type, body};
 
     return result;
 }

@@ -1,6 +1,6 @@
 #include "workbench_action_handler.h"
 
-#include <cassert>
+#include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <QtCore/QProcess>
 
@@ -104,6 +104,7 @@
 #include <ui/dialogs/system_administration_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/camera_password_change_dialog.h>
+#include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -168,6 +169,7 @@
 #include <utils/connection_diagnostics_helper.h>
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 
+#include <nx/analytics/utils.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/guarded_callback.h>
 
@@ -371,6 +373,7 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::VersionMismatchMessageAction), &QAction::triggered, this, &ActionHandler::at_versionMismatchMessageAction_triggered);
     connect(action(action::BetaVersionMessageAction), SIGNAL(triggered()), this, SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(action::AllowStatisticsReportMessageAction), &QAction::triggered, this, [this] { checkIfStatisticsReportAllowed(); });
+    connect(action(action::ConfirmAnalyticsStorageAction), &QAction::triggered, this, [this] { confirmAnalyticsStorageLocation(); });
 
     connect(action(action::QueueAppRestartAction), SIGNAL(triggered()), this, SLOT(at_queueAppRestartAction_triggered()));
     connect(action(action::SelectTimeServerAction), SIGNAL(triggered()), this, SLOT(at_selectTimeServerAction_triggered()));
@@ -2550,6 +2553,51 @@ void ActionHandler::checkIfStatisticsReportAllowed() {
 
     qnGlobalSettings->setStatisticsAllowed(true);
     qnGlobalSettings->synchronizeNow();
+}
+
+void ActionHandler::confirmAnalyticsStorageLocation()
+{
+    const QnMediaServerResourceList servers = resourcePool()->getResources<QnMediaServerResource>();
+    for (const auto& server: servers)
+    {
+        if (server->metadataStorageId().isNull()
+            && nx::analytics::hasActiveObjectEngines(commonModule(), server->getId()))
+        {
+            QnMessageBox msgBox(
+                QnMessageBoxIcon::Warning,
+                tr("Confirm storage location to store analytics data"),
+                tr("Analytics database should be stored on a local storage"
+                    " and can occupy up to hundred gigabytes."
+                    "\n\n"
+                    "Once location to store analytics data is selected,"
+                    " it cannot be easily changed without loosing exitsing data. "
+                    "We recommed to choose location carefully and not to use"
+                    " system partition to avoid severe system malfunction."
+                    "\n\n"
+                    "You can change storage location in the \"Storage Management\""
+                    " tab in the Server Settings dialog."
+                ),
+                QDialogButtonBox::StandardButtons(),
+                QDialogButtonBox::NoButton,
+                mainWindowWidget());
+
+            const auto openSettings = msgBox.addButton(tr("Open Server Settings"),
+                QDialogButtonBox::ButtonRole::ResetRole, Qn::ButtonAccent::NoAccent);
+            const auto ok = msgBox.addButton(tr("OK"),
+                QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Standard);
+
+            msgBox.exec();
+
+            if (msgBox.clickedButton() == openSettings)
+            {
+                QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(mainWindowWidget()));
+                dialog->setWindowModality(Qt::ApplicationModal);
+                dialog->setServer(server);
+                dialog->setCurrentPage(QnServerSettingsDialog::StorageManagmentPage);
+                dialog->exec();
+            }
+        }
+    }
 }
 
 void ActionHandler::at_queueAppRestartAction_triggered()

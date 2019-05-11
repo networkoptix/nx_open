@@ -42,9 +42,10 @@ public:
 
     /**
      * @param pixelFormat If omitted, a compressed frame request is assumed.
-     * @return Null if the frame is not available.
+     * @return Either IUncompressedVideoFrame or ICompressedVideoFrame; null if the frame is not
+     *     available.
      */
-    nx::sdk::analytics::IDataPacket* getDataPacket(
+    nx::sdk::Ptr<nx::sdk::analytics::IDataPacket> getDataPacket(
         std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> pixelFormat);
 
 private:

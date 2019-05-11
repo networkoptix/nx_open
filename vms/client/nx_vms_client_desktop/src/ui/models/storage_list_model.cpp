@@ -1,9 +1,14 @@
 #include "storage_list_model.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
+#include <QtGui/QPalette>
+
 #include <core/resource/storage_resource.h>
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
+#include <nx/analytics/utils.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/algorithm/index_of.h>
 
@@ -94,6 +99,27 @@ void QnStorageListModel::setServer(const QnMediaServerResourcePtr& server)
 
     ScopedReset reset(this); // TODO: #common Do we need this reset?
     m_server = server;
+}
+
+QnUuid QnStorageListModel::metadataStorageId() const
+{
+    return m_metadataStorageId;
+}
+
+void QnStorageListModel::setMetadataStorageId(const QnUuid &id, MetadataAction action)
+{
+    m_keepMetadata = (action == KeepExistingMetadata);
+
+    if (m_metadataStorageId == id)
+        return;
+
+    ScopedReset reset(this); // TODO: #common Do we need this reset?
+    m_metadataStorageId = id;
+}
+
+bool QnStorageListModel::keepMetadata() const
+{
+    return m_keepMetadata;
 }
 
 void QnStorageListModel::updateRebuildInfo(QnServerStoragesPool pool, const QnStorageScanData& rebuildStatus)
@@ -208,15 +234,24 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
             }
         }
 
-        case RemoveActionColumn:
+        case ActionsColumn:
         {
-            /* Calculate predefined column width */
             if (forcedText)
+                return tr("Use to store analytics data"); // Calculate predefined column width.
+
+            const bool analyticsEnabled = nx::analytics::hasActiveObjectEngines(
+                m_server->commonModule(), m_server->getId());
+
+            if (analyticsEnabled && storageData.id == m_metadataStorageId)
+                return tr("Stores analytics data");
+
+            if (canRemoveStorage(storageData))
                 return tr("Remove");
 
-            return canRemoveStorage(storageData)
-                ? tr("Remove")
-                : QString();
+            if (analyticsEnabled)
+                return tr("Use to store analytics data");
+
+            return QString();
         }
 
         default:
@@ -231,7 +266,7 @@ QVariant QnStorageListModel::mouseCursorData(const QModelIndex& index) const
     if (m_readOnly)
         return QVariant();
 
-    if (index.column() == RemoveActionColumn)
+    if (index.column() == ActionsColumn)
         if (!index.data(Qt::DisplayRole).toString().isEmpty())
             return QVariant::fromValue<int>(Qt::PointingHandCursor);
 
@@ -267,11 +302,6 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
 
         case Qn::StorageInfoDataRole:
             return QVariant::fromValue<QnStorageModelInfo>(storage(index));
-
-        case Qt::TextAlignmentRole:
-            if (index.column() == TotalSpaceColumn)
-                return static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
-            return QVariant();
 
         case Qt::ToolTipRole:
             if (index.column() == StoragePoolColumn)
@@ -325,7 +355,7 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex& index) const
         if (m_readOnly)
             return false;
 
-        if (index.column() == RemoveActionColumn)
+        if (index.column() == ActionsColumn)
             return true;
 
         QnStorageModelInfo storageData = storage(index);

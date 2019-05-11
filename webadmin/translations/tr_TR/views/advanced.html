@@ -1,5 +1,5 @@
 <div class="container">
-    <h1><a href="#/metrics/">New: System health report</a></h1>
+    <h1><a href="#/metrics/">Yeni: Sistem sağlığı raporu</a></h1>
 </div>
 <div class="container">
     <h1>Gelişmiş sunucu ayarları</h1>
@@ -120,7 +120,7 @@
     <h2>Günlük ayarları</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">{{name}} günlük seviyesi</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">None: Günlük Devre dışı.</option>
@@ -128,9 +128,8 @@
                     <option value="error">Hata: Sadece log hataları.</option>
                     <option value="warning">Uyarı: log uyarıları ve hataları.</option>
                     <option value="info">Bilgi: Hataları, uyarıları ve tüm mesajları günlüğe yazınız.</option>
-                    <option value="debug">Debug: Log every System message and debug information.</option>
-                    <option value="debug2">Debug2: Log every System message and extended debug information.</option>
-                    <option value="verbose">Verbose: Log all information available.</option>
+                    <option value="debug">Hata ayıklama: tüm sistem mesajları ve hata ayıklama bilgileri.</option>
+                    <option value="verbose">Detaylar: Kullanılabilir tüm bilgileri günlükle.</option>
                 </select>
             </div>
         </div>
@@ -139,7 +138,7 @@
         </div>
     </form>
 
-    <h1>Advanced System settings</h1>
+    <h1>Gelişmiş Sistem ayarları</h1>
     <div class="alert alert-danger" role="alert">
         <b>Dikkat!</b> Yapılan herhangi bir değişiklik sunucunun düzgün çalışmamasına neden olabilir.
     </div>

@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/aio/test/aio_test_async_channel.h>
+#include <nx/utils/uuid.h>
 #include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/random.h>
 #include <nx/utils/string.h>

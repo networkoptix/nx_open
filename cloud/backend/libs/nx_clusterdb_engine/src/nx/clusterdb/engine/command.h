@@ -5,11 +5,9 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/uuid.h>
 
-#include <nx/vms/api/data/timestamp.h>
+#include "timestamp.h"
 
 namespace nx::clusterdb::engine {
-
-using TimestampType = nx::vms::api::Timestamp;
 
 struct NX_DATA_SYNC_ENGINE_API HistoryAttributes
 {
@@ -32,9 +30,9 @@ struct NX_DATA_SYNC_ENGINE_API PersistentInfo
 {
     QnUuid dbID;
     qint32 sequence = 0;
-    TimestampType timestamp;
+    Timestamp timestamp;
 
-    PersistentInfo();
+    PersistentInfo() = default;
 
     bool isNull() const;
 
@@ -69,6 +67,8 @@ public:
     int transactionType = 2;
     HistoryAttributes historyAttributes;
 
+    std::string toString() const;
+
     bool operator==(const CommandHeader& rhs) const;
     bool operator!=(const CommandHeader& rhs) const;
 };
@@ -79,8 +79,6 @@ QN_FUSION_DECLARE_FUNCTIONS(
     CommandHeader,
     (json)(ubjson),
     NX_DATA_SYNC_ENGINE_API)
-
-NX_DATA_SYNC_ENGINE_API std::string toString(const CommandHeader& header);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -95,7 +93,7 @@ public:
 
     Command() = default;
 
-    Command(CommandHeader header):
+    explicit Command(CommandHeader header):
         base_type(std::move(header))
     {
     }

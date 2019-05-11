@@ -13,7 +13,8 @@ using namespace vms::client::desktop::ui;
 
 namespace {
 
-int kQuitDelay = 2000; //< 2s.
+using namespace std::chrono_literals;
+std::chrono::milliseconds kQuitDelay = 2s;
 
 } // namespace
 

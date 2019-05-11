@@ -7,6 +7,8 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QScrollBar>
+#include <QtWidgets/QAbstractButton>
+#include <QtWidgets/QDialogButtonBox>
 
 #include <limits>
 

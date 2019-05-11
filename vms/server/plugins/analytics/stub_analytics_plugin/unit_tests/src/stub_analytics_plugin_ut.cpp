@@ -230,9 +230,8 @@ public:
         ASSERT_TRUE(metadata != nullptr);
 
         NX_PRINT << "DeviceAgentHandler: Received metadata packet with timestamp "
-            << metadata->timestampUs() << " us, duration " << metadata->durationUs() << " us";
+            << metadata->timestampUs() << " us";
 
-        ASSERT_TRUE(metadata->durationUs() >= 0);
         ASSERT_TRUE(metadata->timestampUs() >= 0);
     }
 

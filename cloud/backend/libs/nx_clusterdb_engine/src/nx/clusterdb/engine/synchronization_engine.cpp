@@ -25,6 +25,7 @@ SynchronizationEngine::SynchronizationEngine(
     m_outgoingTransactionDispatcher(m_outgoingCommandFilter),
     m_structureUpdater(dbManager),
     m_commandLog(
+        settings,
         m_peerId,
         m_supportedProtocolRange,
         dbManager,

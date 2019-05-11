@@ -15,7 +15,7 @@ Item
     property var analyticsEngines: []
     property var enabledAnalyticsEngines: []
 
-    property var currentEngineId
+    readonly property alias currentEngineId: menu.currentItemId
     property bool loading: false
 
     Connections
@@ -31,19 +31,29 @@ Item
             {
                 settingsView.setValues(store.deviceAgentSettingsValues(currentEngineId))
             }
-            else
+            else if (analyticsEngines.length > 0)
             {
-                currentEngineId = store.currentAnalyticsEngineId()
-
+                var engineFound = false
                 for (var i = 0; i < analyticsEngines.length; ++i)
                 {
-                    const engineInfo = analyticsEngines[i]
+                    var engineInfo = analyticsEngines[i]
                     if (engineInfo.id === currentEngineId)
                     {
+                        engineFound = true
                         settingsView.loadModel(
                             engineInfo.settingsModel,
                             store.deviceAgentSettingsValues(currentEngineId))
                     }
+                }
+
+                // Select first engine in the list if nothing selected.
+                if (!engineFound)
+                {
+                    engineInfo = analyticsEngines[0]
+                    menu.currentItemId = engineInfo.id
+                    settingsView.loadModel(
+                        engineInfo.settingsModel,
+                        store.deviceAgentSettingsValues(currentEngineId))
                 }
             }
 
@@ -64,6 +74,7 @@ Item
 
             MenuItem
             {
+                itemId: modelData.id
                 text: modelData.name
                 active: enabledAnalyticsEngines.indexOf(modelData.id) !== -1
                 onClicked: store.setCurrentAnalyticsEngineId(modelData.id)

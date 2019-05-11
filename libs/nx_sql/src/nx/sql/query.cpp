@@ -31,6 +31,11 @@ void SqlQuery::prepare(const QString& query)
     }
 }
 
+void SqlQuery::addBindValue(const QVariant& value) noexcept
+{
+    m_sqlQuery.addBindValue(value);
+}
+
 void SqlQuery::bindValue(const QString& placeholder, const QVariant& value) noexcept
 {
     m_sqlQuery.bindValue(placeholder, value);
@@ -88,6 +93,11 @@ QSqlRecord SqlQuery::record()
 QVariant SqlQuery::lastInsertId() const
 {
     return m_sqlQuery.lastInsertId();
+}
+
+int SqlQuery::numRowsAffected() const
+{
+    return m_sqlQuery.numRowsAffected();
 }
 
 QSqlQuery& SqlQuery::impl()

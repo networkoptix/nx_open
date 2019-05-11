@@ -12,7 +12,6 @@ CloudConnectSettings::CloudConnectSettings(const CloudConnectSettings& right):
     isUdpHpEnabled(right.isUdpHpEnabled),
     isCloudProxyEnabled(right.isCloudProxyEnabled),
     isDirectTcpConnectEnabled(right.isDirectTcpConnectEnabled),
-    useHttpConnectToListenOnRelay(right.useHttpConnectToListenOnRelay),
     delayBeforeSendingConnectToMediatorOverTcp(right.delayBeforeSendingConnectToMediatorOverTcp),
     m_originatingHostAddressReplacement(right.originatingHostAddressReplacement())
 {
@@ -27,7 +26,6 @@ CloudConnectSettings& CloudConnectSettings::operator=(const CloudConnectSettings
     isUdpHpEnabled = right.isUdpHpEnabled;
     isCloudProxyEnabled = right.isCloudProxyEnabled;
     isDirectTcpConnectEnabled = right.isDirectTcpConnectEnabled;
-    useHttpConnectToListenOnRelay = right.useHttpConnectToListenOnRelay;
     delayBeforeSendingConnectToMediatorOverTcp =
         right.delayBeforeSendingConnectToMediatorOverTcp;
 

@@ -19,7 +19,7 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 #include <api/model/time_reply.h>
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/db/abstract_storage.h>
 #include <api/model/analytics_actions.h>
 #include <api/model/wearable_prepare_data.h>
 #include <api/model/manual_camera_seach_reply.h>
@@ -382,9 +382,9 @@ public:
     Handle getStatistics(GetCallback callback, QThread* targetThread = nullptr);
 
     Handle lookupDetectedObjects(
-        const nx::analytics::storage::Filter& request,
+        const nx::analytics::db::Filter& request,
         bool isLocal,
-        Result<nx::analytics::storage::LookupResult>::type callback,
+        Result<nx::analytics::db::LookupResult>::type callback,
         QThread* targetThread = nullptr);
 
     Handle addCamera(
@@ -596,11 +596,31 @@ private:
     template <typename ResultType> Handle executePost(
         const QString& path,
         const QnRequestParamList& params,
+        Callback<ResultType> callback,
+        QThread* targetThread);
+
+    /**
+     * This overload thould only be used if API requires custum message body so paramiters can only
+     * be passed by URL.
+     */
+    template <typename ResultType> Handle executePost(
+        const QString& path,
+        const QnRequestParamList& params,
         const nx::network::http::StringType& contentType,
         const nx::network::http::StringType& messageBody,
         Callback<ResultType> callback,
         QThread* targetThread);
 
+    template <typename ResultType> Handle executePut(
+        const QString& path,
+        const QnRequestParamList& params,
+        Callback<ResultType> callback,
+        QThread* targetThread);
+
+    /**
+     * This overload thould only be used if API requires custum message body so paramiters can only
+     * be passed by URL.
+     */
     template <typename ResultType> Handle executePut(
         const QString& path,
         const QnRequestParamList& params,

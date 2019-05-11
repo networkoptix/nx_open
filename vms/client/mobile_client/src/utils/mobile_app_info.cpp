@@ -24,7 +24,7 @@ QString QnMobileAppInfo::organizationName() const
 
 QString QnMobileAppInfo::version() const
 {
-    return lit("%1.%2 (rev: %3)").arg(
+    return QStringLiteral("%1.%2 (rev: %3)").arg(
         QnMobileClientAppInfo::applicationVersion(),
         QString::number(nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()).build()),
         QnAppInfo::applicationRevision());

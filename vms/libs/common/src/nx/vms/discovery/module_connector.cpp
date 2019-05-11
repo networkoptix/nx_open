@@ -127,6 +127,7 @@ ModuleConnector::InformationReader::InformationReader(const ModuleConnector* par
     m_httpClient(nx::network::http::AsyncHttpClient::create())
 {
     m_httpClient->bindToAioThread(parent->getAioThread());
+    m_httpClient->setUseCompression(false); //< NOTE: Module information doesn't support compression.
 }
 
 ModuleConnector::InformationReader::~InformationReader()
@@ -150,7 +151,12 @@ void ModuleConnector::InformationReader::start(const nx::network::SocketAddress&
             const auto clientGuard = nx::utils::makeScopeGuard([client](){ client->pleaseStopSync(); });
             m_httpClient.reset();
             if (!client->hasRequestSucceeded())
-                return nx::utils::swapAndCall(m_handler, boost::none, lit("HTTP request has failed"));
+            {
+                return nx::utils::swapAndCall(m_handler, boost::none,
+                    lm("HTTP request has failed: [%1], http code [%2]").args(
+                        SystemError::toString(client->lastSysErrorCode()),
+                        client->response() ? client->response()->statusLine.statusCode : 0));
+            }
 
             m_buffer = client->fetchMessageBodyBuffer();
             m_socket = client->takeSocket();
@@ -228,7 +234,7 @@ void ModuleConnector::InformationReader::readUntilError()
                 return nx::utils::swapAndCall(m_handler, boost::none, SystemError::toString(code));
 
             if (size == 0)
-                return nx::utils::swapAndCall(m_handler, boost::none, lit("Disconnected"));
+                return nx::utils::swapAndCall(m_handler, boost::none, "Peer has closed connection");
 
             readUntilError();
         });
@@ -458,7 +464,7 @@ void ModuleConnector::Module::connectToEndpoint(
                return;
            }
 
-           NX_VERBOSE(this, lm("Could not connect by %1: %2").args(endpoint, description));
+           NX_DEBUG(this, lm("Could not connect to %1: %2").args(endpoint, description));
 
            // When the last endpoint in a group fails try the next group.
            if (m_attemptingReaders.empty())

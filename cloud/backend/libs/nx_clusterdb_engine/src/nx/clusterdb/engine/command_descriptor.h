@@ -1,6 +1,7 @@
 #pragma once
 
 #include <transaction/transaction_descriptor.h>
+#include <nx/network/buffer.h>
 
 #include "command.h"
 

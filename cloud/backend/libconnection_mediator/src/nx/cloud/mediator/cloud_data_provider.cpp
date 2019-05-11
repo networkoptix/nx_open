@@ -102,23 +102,24 @@ CloudDataProvider::CloudDataProvider(
     m_updateInterval(std::move(updateInterval)),
     m_startTime(std::chrono::steady_clock::now()),
     m_startTimeout(startTimeout),
-    m_isTerminated(false),
     m_connectionFactory(makeConnectionFactory(cdbUrl)),
     m_connection(m_connectionFactory->createConnection())
 {
     m_connection->setCredentials(user, password);
+    m_connection->bindToAioThread(m_timer.getAioThread());
+
     updateSystemsAsync();
 }
 
 CloudDataProvider::~CloudDataProvider()
 {
-    QnMutexLocker lk(&m_mutex);
-    m_isTerminated = true;
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_terminated = true;
+    }
 
-    const auto connection = std::move(m_connection);
-    const auto guard = std::move(m_timerGuard);
-
-    lk.unlock();
+    m_timer.pleaseStopSync();
+    m_connection.reset();
 }
 
 std::optional< AbstractCloudDataProvider::System >
@@ -136,39 +137,42 @@ void CloudDataProvider::updateSystemsAsync()
 {
     m_connection->systemManager()->getSystemsFiltered(
         nx::cloud::db::api::Filter(/* Empty filter to get all systems independent of customization. */),
-        [this](nx::cloud::db::api::ResultCode code, nx::cloud::db::api::SystemDataExList systems)
+        [this](
+            nx::cloud::db::api::ResultCode code,
+            nx::cloud::db::api::SystemDataExList systems)
         {
+            QnMutexLocker lock(&m_mutex);
+        
             if (code != nx::cloud::db::api::ResultCode::ok)
             {
                 NX_UTILS_LOG((std::chrono::steady_clock::now() - m_startTime > m_startTimeout)
                     ? utils::log::Level::error
                     : utils::log::Level::debug,
                     this, lm("Error: %1").arg(m_connectionFactory->toString(code)));
-                // TODO: shall we m_systemCache.clear() after a few failing attempts?
             }
             else
             {
-                QnMutexLocker lk(&m_mutex);
-                m_systemCache.clear();
-                for (auto& sys : systems.systems)
-                {
-                    m_systemCache.emplace(
-                        sys.id.c_str(),
-                        System(String(sys.authKey.c_str()),
-                            sys.cloudConnectionSubscriptionStatus));
-                }
-
-                NX_DEBUG(this, lm("There is(are) %1 system(s) updated").arg(systems.systems.size()));
+                saveSystems(std::move(systems));
             }
-
-            QnMutexLocker lk(&m_mutex);
-            if (!m_isTerminated)
-            {
-                m_timerGuard =
-                    nx::utils::TimerManager::instance()->addTimerEx(
-                        [this](quint64) { updateSystemsAsync(); }, m_updateInterval);
-            }
+            
+            if (!m_terminated)
+                m_timer.start(m_updateInterval, [this]() { updateSystemsAsync(); });
         });
+}
+
+void CloudDataProvider::saveSystems(
+    nx::cloud::db::api::SystemDataExList systems)
+{
+    m_systemCache.clear();
+    for (auto& sys: systems.systems)
+    {
+        m_systemCache.emplace(
+            sys.id.c_str(),
+            System(String(sys.authKey.c_str()),
+                sys.cloudConnectionSubscriptionStatus));
+    }
+
+    NX_DEBUG(this, "There is(are) %1 system(s) updated", systems.systems.size());
 }
 
 } // namespace hpm

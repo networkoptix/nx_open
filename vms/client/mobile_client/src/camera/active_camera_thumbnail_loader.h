@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QUrl>
 
 #include <client_core/connection_context_aware.h>
 

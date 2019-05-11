@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/utils/std/optional.h>
+#include <nx/utils/url.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 
 #include <nx/sql/test_support/test_with_db_helper.h>

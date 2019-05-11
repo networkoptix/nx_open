@@ -2478,7 +2478,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>시도 횟수가 너무 많습니다. 1 분 후에 다시 시도하십시오.</translation>
     </message>
   </context>
   <context>
@@ -2701,7 +2701,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>시도 횟수가 너무 많습니다. 1 분 후에 다시 시도하십시오.</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -2932,7 +2932,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>시도 횟수가 너무 많습니다. 1 분 후에 다시 시도하십시오.</translation>
     </message>
   </context>
   <context>
@@ -3168,6 +3168,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>이미 추가 폴더</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>없음</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -5816,14 +5824,6 @@ to %1</source>
   <context>
     <name>QnSystemSettingsWidget</name>
     <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>장치 자동 추가 설정</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>카메라 자동 추가 설정</translation>
-    </message>
-    <message>
       <source>Allow System to optimize device settings</source>
       <translation>장치 설정을 최적화 하는 시스템을 허용</translation>
     </message>
@@ -5838,6 +5838,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>개인 정보는 포함되지 않으며 완전히 익명입니다.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -6982,6 +6998,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7005,41 +7032,41 @@ to %1</source>
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>프리셋</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>한정되지 않은</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
+      <translation>최저</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation type="unfinished">Lo</translation>
+      <translation>낮은</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
+      <translation>일반</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
+      <translation>높은</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
+      <translation>최적</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
+      <translation>프리셋</translation>
     </message>
   </context>
   <context>
@@ -7183,6 +7210,14 @@ to %1</source>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+    </message>
+    <message>
+      <source>Show</source>
+      <translation>보이기</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
     </message>
   </context>
   <context>
@@ -7332,10 +7367,6 @@ to %1</source>
       <translation>네이티브</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>일부 카메라에서 이미지 품질 문제를 해결하는 데 도움이되고 다른 것들은 상당한 비트 전송률 증가를 야기 할 것이다.</translation>
     </message>
@@ -7355,24 +7386,32 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
-      <translation type="unfinished">
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
+      <translation>
+        <numerusform>이 ID는 이미 %n 카메라에서 사용되었습니다:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>UDP Multicast</source>
+      <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>서버는 어떤 카메라 설정도 변경하지 않고 그대로 카메라 스트림을 수신하여 사용합니다.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation type="unfinished">Device Rules</translation>
+      <translation>장치 설정</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation type="unfinished">Camera Rules</translation>
+      <translation>카메라 설정</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation type="unfinished">I/O Module Rules</translation>
+      <translation>I/O 모듈 규칙</translation>
     </message>
     <message>
       <source>More Info</source>
@@ -7483,11 +7522,11 @@ to %1</source>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>움직임</translation>
     </message>
     <message>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>Fisheye</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -7503,7 +7542,7 @@ to %1</source>
     </message>
     <message>
       <source>Expert</source>
-      <translation type="unfinished">Expert</translation>
+      <translation>전문가</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
@@ -7725,7 +7764,7 @@ to %1</source>
     </message>
     <message>
       <source>Scan</source>
-      <translation type="unfinished">Scan</translation>
+      <translation>검색</translation>
     </message>
     <message>
       <source>Search</source>
@@ -7787,14 +7826,6 @@ to %1</source>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-    <message>
       <source>Please review and agree to the %1 in order to proceed</source>
       <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
     </message>
@@ -7813,7 +7844,7 @@ to %1</source>
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation type="unfinished">Motion</translation>
+      <translation>움직임</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -7823,7 +7854,7 @@ to %1</source>
     <message>
       <source>Events</source>
       <comment>Events tab title</comment>
-      <translation type="unfinished">Events</translation>
+      <translation>이벤트</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -8110,7 +8141,7 @@ to %1</source>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
-      <translation type="unfinished">Brand</translation>
+      <translation>브랜드</translation>
     </message>
     <message>
       <source>Model</source>
@@ -8276,7 +8307,7 @@ to %1</source>
     <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>움직임</translation>
     </message>
     <message>
       <source>deleted camera</source>
@@ -8392,15 +8423,11 @@ to %1</source>
     </message>
     <message>
       <source>Try again</source>
-      <translation type="unfinished">Try again</translation>
+      <translation>재시도</translation>
     </message>
     <message>
       <source>Cancel Update</source>
       <translation>업데이트 취소</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation type="unfinished">Failed to download update packages to some servers</translation>
     </message>
     <message>
       <source>Please make sure they have enough free storage space and stable network connection.</source>
@@ -8480,7 +8507,7 @@ to %1</source>
     </message>
     <message>
       <source>Updating to ...</source>
-      <translation type="unfinished">Updating to ...</translation>
+      <translation>업데이트 ...</translation>
     </message>
     <message>
       <source>Ready to update to</source>
@@ -8556,6 +8583,10 @@ to %1</source>
       <source>Cancel update and delete all downloaded data?</source>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8580,6 +8611,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>확인함</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>일반 이벤트</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Event</source>
+      <translation type="unfinished">Unknown Plugin Event</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8599,16 +8650,12 @@ to %1</source>
       <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation type="unfinished">Local layouts can only be shown to their owners. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>레이아웃 선택...</translation>
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>자신의 로컬 레이아웃을 보여지게 하려면 &quot;Show to&quot;에서 한 사용자를 선택</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
@@ -8617,6 +8664,45 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
     </message>
   </context>
   <context>
@@ -8735,7 +8821,7 @@ to %1</source>
     </message>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation type="unfinished">To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</translation>
+      <translation>활성하거나 조정하려면 카메라 설정의 &quot;Motion&quot; 탭으로 이동하십시오</translation>
     </message>
     <message>
       <source>Motion detection disabled or not supported</source>
@@ -8760,16 +8846,16 @@ to %1</source>
       <translation>모든 사용자 작업을 추적하고 기록합니다.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>분</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>시간</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
     </message>
   </context>
   <context>
@@ -8790,13 +8876,13 @@ to %1</source>
       <source>Downloaded</source>
       <translation type="unfinished">Downloaded</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation type="unfinished">Current Version</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>상태</translation>
@@ -8817,12 +8903,16 @@ to %1</source>
       <source>Component</source>
       <translation type="unfinished">Component</translation>
     </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>움직임</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -9021,7 +9111,7 @@ to %1</source>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User %1 is currently uploading footage to this camera.</translation>
+      <translation>사용자 %1 는 이 카메라로 촬영영상을 업로드하고 있습니다.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
@@ -9109,6 +9199,26 @@ to %1</source>
     <message>
       <source>Starting export...</source>
       <translation type="unfinished">Starting export...</translation>
+    </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
     </message>
   </context>
   <context>

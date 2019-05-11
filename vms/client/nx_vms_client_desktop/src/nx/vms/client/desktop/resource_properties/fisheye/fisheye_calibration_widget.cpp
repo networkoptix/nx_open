@@ -7,6 +7,7 @@
 
 #include <client/client_globals.h>
 #include <ui/common/read_only.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/fisheye/fisheye_calibrator.h>
 
 #include <nx/vms/client/desktop/image_providers/image_provider.h>

@@ -104,8 +104,8 @@ int testRelay(const nx::utils::ArgumentParser& args)
     TestHttpServerOnProxy server(settings);
 
     auto connection = openConnectionToThePeerWithRetries(
-        settings.baseRelayUrl(),
-        settings.listeningPeerHostName());
+        settings.baseRelayUrl,
+        settings.listeningPeerHostName);
     if (!connection)
         return 1;
 

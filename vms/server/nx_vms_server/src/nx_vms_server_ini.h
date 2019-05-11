@@ -29,26 +29,26 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, allowMtDecoding,
         "Allow multithreading decoding of video when software motion detection is enabled.");
 
+    #define NX_VMS_SERVER_INI_LIVE_STREAM_CACHE_HELP \
+        "Live Stream Cache allows Desktop Client's Right Panel receive adequate thumbnails of\n" \
+        "the detected Objects and Events. It is needed because frames in the video archive are\n" \
+        "inaccessible for ~1 minute since the moment of recording. Beware that increasing the\n" \
+        "Live Stream Cache size increases the RAM usage."
 
     NX_INI_INT(67000, liveStreamCacheForPrimaryStreamMinSizeMs,
-        (std::string("Lower bound of Live Stream Cache size for primary stream, milliseconds.\n\n")
-        + kLiveStreamCacheHelp).c_str());
+        "Lower bound of Live Stream Cache size for primary stream, milliseconds.\n\n"
+        NX_VMS_SERVER_INI_LIVE_STREAM_CACHE_HELP);
     NX_INI_INT(100000, liveStreamCacheForPrimaryStreamMaxSizeMs,
-        (std::string("Upper bound of Live Stream Cache size for primary stream, milliseconds.\n\n")
-        + kLiveStreamCacheHelp).c_str());
+        "Upper bound of Live Stream Cache size for primary stream, milliseconds.\n\n"
+        NX_VMS_SERVER_INI_LIVE_STREAM_CACHE_HELP);
     NX_INI_INT(67000, liveStreamCacheForSecondaryStreamMinSizeMs,
-        (std::string("Lower bound of Live Stream Cache size for secondary stream, milliseconds.\n\n")
-        + kLiveStreamCacheHelp).c_str());
+        "Lower bound of Live Stream Cache size for secondary stream, milliseconds.\n\n"
+        NX_VMS_SERVER_INI_LIVE_STREAM_CACHE_HELP);
     NX_INI_INT(100000, liveStreamCacheForSecondaryStreamMaxSizeMs,
-        (std::string("Upper bound of Live Stream Cache size for secondary stream, milliseconds.\n\n")
-        + kLiveStreamCacheHelp).c_str());
+        "Upper bound of Live Stream Cache size for secondary stream, milliseconds.\n\n"
+        NX_VMS_SERVER_INI_LIVE_STREAM_CACHE_HELP);
 
-private:        
-    static constexpr char kLiveStreamCacheHelp[] =
-        "Live Stream Cache allows Desktop Client's Right Panel receive adequate thumbnails of\n"
-        "the detected Objects and Events. It is needed because frames in the video archive are\n"
-        "inaccessible for ~1 minute since the moment of recording. Beware that increasing the\n"
-        "Live Stream Cache size increases the RAM usage.";
+    #undef NX_VMS_SERVER_INI_LIVE_STREAM_CACHE_HELP
 };
 
 inline Ini& ini()

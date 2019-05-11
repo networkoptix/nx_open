@@ -2,6 +2,7 @@
 #include "../rapid_review_settings_widget.h"
 
 #include <array>
+#include <cmath>
 
 #include <QtGui/QStandardItemModel>
 
@@ -29,8 +30,6 @@ static constexpr qint64 kMsInHour = kMsInMin * 60;
 static constexpr qint64 kMsInDay = kMsInHour * 24;
 
 static constexpr int kLevelCount = 4;
-
-static constexpr std::array<qint64, kLevelCount> kUnits = {kMsInSec, kMsInMin, kMsInHour, kMsInDay};
 
 // After this value units will be changed to bigger one
 static constexpr std::array<int, kLevelCount - 1> kMaxValuePerUnit = {120, 120, 720};

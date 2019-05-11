@@ -346,8 +346,6 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
 static const size_t kThreadCount = 5;
 static const size_t kClientCount = 15;
 static const size_t kPeerCount = 3;
-static const size_t kQueueLimit = 10;
-static const size_t kRetryDelay = 100;
 
 class CloudServerSocketStressTcpTest:
     public ::testing::Test

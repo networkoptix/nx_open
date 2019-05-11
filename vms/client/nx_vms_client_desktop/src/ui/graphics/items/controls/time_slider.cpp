@@ -607,7 +607,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
     m_lastThumbnailsUpdateTime(0),
     m_lastHoverThumbnail(-1),
     m_thumbnailsVisible(false),
-    m_tooltipVisible(true),
+    m_tooltipVisible(false),
     m_rulerHeight(kDateBarHeightPixels + kTickBarHeightPixels + kLineBarHeightPixels),
     m_lastMinuteAnimationDelta(0),
     m_pixmapCache(new QnTimeSliderPixmapCache(kNumTickmarkLevels, this)),

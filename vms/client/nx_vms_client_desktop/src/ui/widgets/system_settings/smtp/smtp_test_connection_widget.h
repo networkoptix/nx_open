@@ -1,8 +1,12 @@
 #pragma once
 
+#include <QtWidgets/QWidget>
+
 #include <client_core/connection_context_aware.h>
 
 #include <utils/email/email_fwd.h>
+
+class QTimer;
 
 namespace Ui {
     class SmtpTestConnectionWidget;

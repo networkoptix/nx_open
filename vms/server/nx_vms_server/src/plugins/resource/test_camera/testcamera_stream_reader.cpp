@@ -16,8 +16,8 @@ QnTestCameraStreamReader::QnTestCameraStreamReader(
     :
     CLServerPushStreamReader(res)
 {
-    m_tcpSock = nx::network::SocketFactory::createStreamSocket();
-    m_tcpSock->setRecvTimeout(TESTCAM_TIMEOUT);
+    m_socket = nx::network::SocketFactory::createStreamSocket();
+    m_socket->setRecvTimeout(TESTCAM_TIMEOUT);
 }
 
 QnTestCameraStreamReader::~QnTestCameraStreamReader()
@@ -30,7 +30,7 @@ int QnTestCameraStreamReader::receiveData(quint8* buffer, int size)
     int done = 0;
     while (done < size)
     {
-        int bytesRead = m_tcpSock->recv(buffer + done, size - done);
+        int bytesRead = m_socket->recv(buffer + done, size - done);
         if (bytesRead < 1)
             return bytesRead;
         done += bytesRead;
@@ -153,24 +153,28 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
     }
     url.setQuery(lm("primary=%1&fps=%2").args(getRole() == Qn::CR_LiveVideo ? "1" : "0", params.fps));
 
-    if (m_tcpSock->isClosed())
+    if (m_socket->isClosed())
     {
-        m_tcpSock = nx::network::SocketFactory::createStreamSocket();
-        m_tcpSock->setRecvTimeout(TESTCAM_TIMEOUT);
+        QnMutexLocker lock(&m_socketMutex);
+        if (needToStop())
+            return CameraDiagnostics::NoErrorResult();
+
+        m_socket = nx::network::SocketFactory::createStreamSocket();
+        m_socket->setRecvTimeout(TESTCAM_TIMEOUT);
     }
 
-    m_tcpSock->setRecvTimeout(TESTCAM_TIMEOUT);
-    m_tcpSock->setSendTimeout(TESTCAM_TIMEOUT);
+    m_socket->setRecvTimeout(TESTCAM_TIMEOUT);
+    m_socket->setSendTimeout(TESTCAM_TIMEOUT);
 
     NX_VERBOSE(this, "Sending data to URL [%1]", url);
-    if (!m_tcpSock->connect(url.host(), url.port(), nx::network::deprecated::kDefaultConnectTimeout))
+    if (!m_socket->connect(url.host(), url.port(), nx::network::deprecated::kDefaultConnectTimeout))
     {
         closeStream();
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), url.port());
     }
 
     const QByteArray data = url.toString(QUrl::RemoveAuthority | QUrl::RemoveScheme).toUtf8();
-    if (m_tcpSock->send(data.data(), data.size() + 1) <= 0)
+    if (m_socket->send(data.data(), data.size() + 1) <= 0)
     {
        closeStream();
        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url.toString(), url.port());
@@ -181,12 +185,21 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
 
 void QnTestCameraStreamReader::closeStream()
 {
-    m_tcpSock->close();
+    QnMutexLocker lock(&m_socketMutex);
+    m_socket->close();
 }
 
 bool QnTestCameraStreamReader::isStreamOpened() const
 {
-    return m_tcpSock->isConnected();
+    QnMutexLocker lock(&m_socketMutex);
+    return m_socket->isConnected();
+}
+
+void QnTestCameraStreamReader::pleaseStop()
+{
+    CLServerPushStreamReader::pleaseStop();
+    QnMutexLocker lock(&m_socketMutex);
+    m_socket->shutdown();
 }
 
 #endif // #ifdef ENABLE_TEST_CAMERA

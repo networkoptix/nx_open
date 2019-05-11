@@ -139,8 +139,9 @@ void ConnectionBase::pleaseStopSync()
         NX_ASSERT(m_startedClassId == typeid(*this).hash_code(),
             "Please call pleaseStopSync() in the destructor of the nested class.");
         m_startedClassId = 0;
-        m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
     }
+
+    m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
 }
 
 ConnectionBase::~ConnectionBase()
@@ -345,7 +346,7 @@ void ConnectionBase::startConnection()
 
     m_httpClient->bindToAioThread(m_timer.getAioThread());
 
-    if (requestUrl.userName().isEmpty())
+    if (requestUrl.password().isEmpty())
         fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
 
     m_httpClient->doGet(

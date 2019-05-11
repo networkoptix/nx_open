@@ -2,6 +2,8 @@
 
 #include "integrations_fwd.h"
 
+class QObject;
+
 namespace nx::vms::client::desktop::integrations {
 
 /**

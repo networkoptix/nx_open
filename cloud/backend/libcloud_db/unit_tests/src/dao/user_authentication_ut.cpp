@@ -5,6 +5,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/time.h>
+#include <nx/utils/string.h>
 
 #include <nx/cloud/db/dao/rdb/dao_rdb_user_authentication.h>
 #include <nx/cloud/db/dao/memory/dao_memory_user_authentication.h>

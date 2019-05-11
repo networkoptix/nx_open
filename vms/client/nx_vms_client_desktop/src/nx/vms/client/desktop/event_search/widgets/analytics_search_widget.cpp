@@ -25,6 +25,7 @@
 #include <core/resource_management/resource_changes_listener.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/dialogs/common/message_box.h>
 
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
@@ -58,7 +59,7 @@ public:
     void executePluginAction(
         const QnUuid& engineId,
         const QString& actionTypeId,
-        const analytics::storage::DetectedObject& object,
+        const analytics::db::DetectedObject& object,
         const QnVirtualCameraResourcePtr& camera) const;
 
 private:
@@ -279,6 +280,7 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     const auto objectTypeDescriptors = objectTypeDescriptorManager.descriptors();
     const auto engineDescriptors = engineDescriptorManager.descriptors();
     m_objectTypeMenu->clear();
+    m_defaultAction = addMenuAction(m_objectTypeMenu, tr("Any type"), {});
 
     const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
     QSet<QnUuid> enabledEngines;
@@ -287,6 +289,8 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
 
     if (!objectTypeDescriptors.empty())
     {
+        m_objectTypeMenu->addSeparator();
+
         QHash<QnUuid, EngineInfo> engineById;
         for (const auto& [engineId, engineDescriptor]: engineDescriptors)
         {
@@ -343,9 +347,6 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
         }
     }
 
-    m_objectTypeMenu->addSeparator();
-    m_defaultAction = addMenuAction(m_objectTypeMenu, tr("Any type"), {});
-
     if (!currentSelectionStillAvailable)
         m_model->setSelectedObjectType({});
 }
@@ -393,9 +394,6 @@ void AnalyticsSearchWidget::Private::setAreaSelectionEnabled(bool value)
 
 void AnalyticsSearchWidget::Private::updateAreaButtonAppearance()
 {
-    if (!m_areaSelectionEnabled)
-        return;
-
     m_areaSelectionButton->setState(m_model->filterRect().isValid()
         ? SelectableTextButton::State::unselected
         : SelectableTextButton::State::deactivated);
@@ -425,7 +423,7 @@ QAction* AnalyticsSearchWidget::Private::addMenuAction(
 void AnalyticsSearchWidget::Private::executePluginAction(
     const QnUuid& engineId,
     const QString& actionTypeId,
-    const analytics::storage::DetectedObject& object,
+    const analytics::db::DetectedObject& object,
     const QnVirtualCameraResourcePtr& camera) const
 {
     const auto server = q->commonModule()->currentServer();

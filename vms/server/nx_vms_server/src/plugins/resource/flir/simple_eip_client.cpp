@@ -1,9 +1,12 @@
 #include "simple_eip_client.h"
-#include <QtEndian>
 
-#include "eip_cip.h"
+#include <QtCore/QtEndian>
+#include <QtCore/QDataStream>
+
 #include <nx/network/socket_factory.h>
 #include <nx/utils/log/log.h>
+
+#include "eip_cip.h"
 
 SimpleEIPClient::SimpleEIPClient(QString addr) :
     m_hostAddress(addr),

@@ -1,5 +1,7 @@
 #include "abstract_statistics_settings_loader.h"
 
+#include <nx/utils/log/assert.h>
+
 QnAbstractStatisticsSettingsLoader::QnAbstractStatisticsSettingsLoader(QObject *parent):
     base_type(parent)
 {

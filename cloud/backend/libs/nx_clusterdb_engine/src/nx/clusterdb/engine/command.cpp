@@ -12,12 +12,6 @@ bool HistoryAttributes::operator==(const HistoryAttributes& rhs) const
 
 //-------------------------------------------------------------------------------------------------
 
-PersistentInfo::PersistentInfo():
-    sequence(0),
-    timestamp(TimestampType::fromInteger(0))
-{
-}
-
 bool PersistentInfo::isNull() const
 {
     return dbID.isNull();
@@ -44,6 +38,16 @@ CommandHeader::CommandHeader(int value, QnUuid peerId):
 {
 }
 
+std::string CommandHeader::toString() const
+{
+    return lm("command=%1 time=%2 seq=%3 peer=%4 dbId=%5")
+        .args(command,
+            persistentInfo.timestamp,
+            persistentInfo.sequence,
+            peerID.toString(),
+            persistentInfo.dbID.toString()).toStdString();
+}
+
 bool CommandHeader::operator==(const CommandHeader& rhs) const
 {
     return command == rhs.command
@@ -59,16 +63,6 @@ bool CommandHeader::operator!=(const CommandHeader& rhs) const
 }
 
 //-------------------------------------------------------------------------------------------------
-
-std::string toString(const CommandHeader& header)
-{
-    return lm("command=%1 time=%2 seq=%3 peer=%4 dbId=%5")
-        .args(static_cast<int>(header.command),
-            header.persistentInfo.timestamp,
-            header.persistentInfo.sequence,
-            header.peerID.toString(),
-            header.persistentInfo.dbID.toString()).toStdString();
-}
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (HistoryAttributes)(PersistentInfo)(CommandHeader),

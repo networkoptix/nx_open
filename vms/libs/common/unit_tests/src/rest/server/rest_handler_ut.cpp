@@ -2,6 +2,7 @@
 
 #include <nx/network/rest/handler.h>
 #include <nx/network/rest/nx_network_rest_ini.h>
+#include <nx/kit/ini_config.h>
 #include <nx/utils/test_support/run_test.h>
 
 namespace nx::network::rest::test {
@@ -88,7 +89,7 @@ public:
         return request;
     }
 
-    nx::utils::test::IniConfigTweaks iniTweaks;
+    nx::kit::IniConfig::Tweaks iniTweaks;
 
 private:
     std::vector<std::unique_ptr<http::Request>> m_requests;
@@ -321,7 +322,7 @@ TEST_F(RestRequestTest, PostJson)
     });
     ASSERT_TRUE(request);
     ASSERT_TRUE(request->content);
-    EXPECT_EQ("application/json", request->content->type);
+    EXPECT_EQ(http::StringType("application/json"), request->content->type);
     EXPECT_EQ(R"json({"b":true,"i":222,"s":"data"})json", request->content->body);
 
     EXPECT_EQ("POST", request->method());
@@ -344,7 +345,7 @@ TEST_F(RestRequestTest, PostForm)
     });
     ASSERT_TRUE(request);
     ASSERT_TRUE(request->content);
-    EXPECT_EQ("application/x-www-form-urlencoded", request->content->type);
+    EXPECT_EQ(http::StringType("application/x-www-form-urlencoded"), request->content->type);
     EXPECT_EQ("b=false&i=123&s=some%20text", request->content->body);
 
     EXPECT_EQ("POST", request->method());
@@ -367,7 +368,7 @@ TEST_F(RestRequestTest, PostBadJson)
     });
     ASSERT_TRUE(request);
     ASSERT_TRUE(request->content);
-    EXPECT_EQ("application/json", request->content->type);
+    EXPECT_EQ(http::StringType("application/json"), request->content->type);
     EXPECT_EQ("not a json", request->content->body);
 
     EXPECT_EQ("POST", request->method());
@@ -472,7 +473,7 @@ TEST_F(RestRequestTest, PutJson)
     });
     ASSERT_TRUE(request);
     ASSERT_TRUE(request->content);
-    EXPECT_EQ("application/json", request->content->type);
+    EXPECT_EQ(http::StringType("application/json"), request->content->type);
     EXPECT_EQ(R"json({"s":"some text"})json", request->content->body);
 
     EXPECT_EQ("PUT", request->method());
@@ -565,7 +566,7 @@ public:
     {
         EXPECT_EQ(statusCode, response.statusCode);
         ASSERT_TRUE(response.content);
-        EXPECT_EQ("application/json", response.content->type);
+        EXPECT_EQ(http::StringType("application/json"), response.content->type);
         EXPECT_EQ(json, response.content->body);
     }
 };

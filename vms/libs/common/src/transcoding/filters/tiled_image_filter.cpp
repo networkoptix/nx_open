@@ -35,7 +35,7 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
         {
             m_tiledFrame = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
             m_tiledFrame->reallocate(newSize, frame->format);
-            m_tiledFrame->memZerro();
+            m_tiledFrame->memZero();
         }
     }
     m_tiledFrame->assignMiscData(frame.data());

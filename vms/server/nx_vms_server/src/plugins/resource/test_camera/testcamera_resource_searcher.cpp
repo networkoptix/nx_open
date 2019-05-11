@@ -58,7 +58,7 @@ void QnTestCameraResourceSearcher::sendBroadcast()
     for (const DiscoveryInfo& info: m_sockList)
     {
         info.sock->sendTo(
-            testCameraIni().findMessage, strlen(testCameraIni().findMessage),
+            testCameraIni().findMessage, int(strlen(testCameraIni().findMessage)),
             nx::network::BROADCAST_ADDRESS, testCameraIni().discoveryPort);
     }
 }

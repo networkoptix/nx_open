@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/network/cloud/cloud_connect_type.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/stun/message.h>
@@ -133,10 +134,10 @@ enum AttributeType
     tcpReverseHttpMsgBodyTimeout,
     tunnelInactivityTimeout,
     tcpConnectionKeepAlive,
-
     udpHolePunchingStartDelay,
     trafficRelayingStartDelay,
     directTcpConnectStartDelay,
+    connectType,
 
     systemErrorCode = stun::attrs::userDefined + 0x500,
 };
@@ -212,6 +213,13 @@ struct NX_NETWORK_API UdpHolePunchingResultCodeAttr: stun::attrs::IntAttribute
     static const AttributeType TYPE = udpHolePunchingResultCode;
     UdpHolePunchingResultCodeAttr(int value)
         : stun::attrs::IntAttribute(TYPE, value) {}
+};
+
+struct NX_NETWORK_API ConnectTypeAttr: stun::attrs::IntAttribute
+{
+    static const AttributeType TYPE = connectType;
+    ConnectTypeAttr(cloud::ConnectType value)
+        : stun::attrs::IntAttribute(TYPE, (int) value) {}
 };
 
 struct NX_NETWORK_API SystemErrorCodeAttr: stun::attrs::IntAttribute

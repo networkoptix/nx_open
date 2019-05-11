@@ -23,6 +23,8 @@ PreprocessRequestFunc keepOnlyJsonFields(const QSet<QString>& fields);
 
 PreprocessRequestFunc removeJsonFields(const QSet<QString>& fields);
 
+inline QJsonObject jsonParams(const nx::network::rest::Params& params) { return params.toJson(); }
+
 /** Perform Rest API POST request synchronously. See args in the function definition. */
 #define NX_TEST_API_POST(...) ASSERT_NO_FATAL_FAILURE(api_requests_detail::executePost(__VA_ARGS__))
 

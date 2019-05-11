@@ -3,6 +3,7 @@
 #include "ffmpeg/utils.h"
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/utils/installation_info.h>
 
 namespace nx::usb_cam::ffmpeg {
 
@@ -13,10 +14,16 @@ int VideoTranscoder::initializeDecoder(AVCodecParameters* codecPar)
 {
     auto decoder = std::make_unique<ffmpeg::Codec>();
     int status;
-    if (nx::utils::AppInfo::isRaspberryPi() && codecPar->codec_id == AV_CODEC_ID_H264)
+    if (nx::vms::utils::installationInfo().hwPlatform ==
+        nx::vms::api::HwPlatform::raspberryPi
+            && codecPar->codec_id == AV_CODEC_ID_H264)
+    {
         status = decoder->initializeDecoder("h264_mmal");
+    }
     else
+    {
         status = decoder->initializeDecoder(codecPar);
+    }
 
     if (status < 0)
         return status;

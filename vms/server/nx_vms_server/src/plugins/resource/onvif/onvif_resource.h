@@ -270,9 +270,6 @@ public:
     void setVideoSourceToken(std::string token);
 
     std::string videoEncoderConfigurationToken(nx::vms::api::StreamIndex streamIndex) const;
-    void setVideoEncoderConfigurationToken(
-        nx::vms::api::StreamIndex streamIndex,
-        std::string token);
 
     std::string audioSourceConfigurationToken() const;
     void setAudioSourceConfigurationToken(std::string token);
@@ -379,6 +376,8 @@ public:
         const QnLiveStreamParams& streamParams);
 
     SoapTimeouts onvifTimeouts() const;
+
+    CameraDiagnostics::Result ensureMulticastIsEnabled(nx::vms::api::StreamIndex streamIndex);
 
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
@@ -605,8 +604,6 @@ private:
     std::string m_ptzConfigurationToken;
     std::string m_ptzProfileToken;
 
-    std::map<nx::vms::api::StreamIndex, std::string> m_videoEncoderConfigurationTokens;
-
     QString m_imagingUrl;
     QString m_ptzUrl;
     mutable int m_timeDrift;
@@ -720,7 +717,9 @@ protected:
         const QString& text = QString());
 
     QString makeFailMessage(const QString& text) const;
-
+    void updateTimer(
+        nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
+        nx::utils::MoveOnlyFunc<void(nx::utils::TimerId)> function);
 private:
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;
@@ -729,7 +728,7 @@ private:
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
     mutable QnConstResourceVideoLayoutPtr m_videoLayout;
     mutable QnOnvifServiceUrls m_serviceUrls;
-
+    nx::utils::AsyncOperationGuard m_asyncConnectGuard;
 protected:
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     nx::vms::server::resource::OnvifMulticastParametersProvider m_primaryMulticastParametersProvider;

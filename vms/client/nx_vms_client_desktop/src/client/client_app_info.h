@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QString>
+
 struct QnClientAppInfo
 {
     /** History name, used as a key in windows registry, appdata folder, etc. */

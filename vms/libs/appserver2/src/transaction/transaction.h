@@ -216,7 +216,7 @@ APPLY(202, setResourceStatus, nx::vms::api::ResourceStatusData, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),                     \
-                       SetStatusTransactionType()) /* Check remote peer rights for outgoing transaction */ \
+                       SetStatusTransactionType<nx::vms::api::ResourceStatusData>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(213, removeResourceStatus, nx::vms::api::IdData, /* Remove records from vms_resource_status by resource id */ \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -227,7 +227,7 @@ APPLY(213, removeResourceStatus, nx::vms::api::IdData, /* Remove records from vm
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),                     \
-                       RegularTransactionType()) /* local transaction type is set manually in  server query processor via removeResourceStatusHelper call*/ \
+                       SetStatusTransactionType<nx::vms::api::IdData>()) \
 APPLY(204, setResourceParams, nx::vms::api::ResourceParamWithRefDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \

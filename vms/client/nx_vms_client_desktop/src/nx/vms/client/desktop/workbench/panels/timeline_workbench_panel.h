@@ -9,6 +9,7 @@ class HoverFocusProcessor;
 class VariantAnimator;
 class QnImageButtonWidget;
 class AnimatorGroup;
+class QTimer;
 
 namespace nx::vms::client::desktop {
 

@@ -4,7 +4,7 @@
 
 namespace nx::vms::server::test::test_support {
 
-void createTestLogger(const QSet<QString>& filters, nx::utils::log::Buffer** outBuffer)
+void createTestLogger(const std::set<utils::log::Filter>& logFilters, nx::utils::log::Buffer** outBuffer)
 {
     namespace log = nx::utils::log;
     log::unlockConfiguration();
@@ -16,10 +16,6 @@ void createTestLogger(const QSet<QString>& filters, nx::utils::log::Buffer** out
     settings.loggers.front().level.primary = log::levelFromString("VERBOSE");
 
     auto logWriter = std::unique_ptr<log::AbstractWriter>(*outBuffer = new log::Buffer);
-    std::set<log::Filter> logFilters;
-    for (const auto& filterString: filters)
-        logFilters.insert(log::Filter(filterString));
-
     addLogger(buildLogger(settings, QString("log_ut"), QString(), logFilters, std::move(logWriter)));
 }
 

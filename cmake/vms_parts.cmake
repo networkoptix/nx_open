@@ -17,7 +17,8 @@ if("${platform}" STREQUAL "linux")
         set(_withMobileClient OFF)
         set(_withTests OFF)
 
-        if("${box}" STREQUAL "bpi")
+        if("${box}" STREQUAL "none"
+            OR "${box}" STREQUAL "bpi")
             set(_withTests ON)
         endif()
     elseif("${arch}" STREQUAL "arm64")
@@ -59,7 +60,9 @@ if(targetDevice STREQUAL "edge1")
     set(_withTestCamera OFF)
 endif()
 
-if(LINUX AND box MATCHES "none" AND NOT developerBuild AND NOT "${arch}" STREQUAL "arm64")
+if(LINUX AND box MATCHES "none" AND NOT developerBuild
+    AND NOT "${arch}" STREQUAL "arm64" AND NOT "${arch}" STREQUAL "arm"
+)    
     set(_withRootTool ON)
 endif()
 
