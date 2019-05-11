@@ -90,11 +90,11 @@ void OnlineRelaysClusterClient::findRelayInstancePeerIsListeningOn(
                 nx::utils::Url());
         }
 
-        std::random_device rd;  //Will be used to obtain a seed for the random number engine
-        std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-        std::uniform_int_distribution<> dis(0, (int)relayUrls.size() - 1);
+        std::random_device randomDevice;
+        std::mt19937 engine(randomDevice());
+        std::uniform_int_distribution<> distribution(0, (int)relayUrls.size() - 1);
 
-        auto url = relayUrls[dis(gen)];
+        auto url = relayUrls[distribution(engine)];
 
         NX_VERBOSE(this, "%1 reporting relay url: %2 for listening peer: %3 and client ip: %4",
             __func__, url, peerId, clientEndpoint.address);
@@ -232,7 +232,7 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByLocation(
 {
     if (!location)
     {
-        NX_ERROR(this, "Failed to resolve location for %1. Falling back urls in"
+        NX_ERROR(this, "Failed to resolve location for %1. Falling back to urls in"
             " traffic relay settings",
             entity);
         if (m_settings.trafficRelay().urls.empty())
