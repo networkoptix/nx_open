@@ -83,6 +83,13 @@ void OutgoingTunnelConnectionWatcher::setControlConnectionClosedHandler(
         std::bind(&OutgoingTunnelConnectionWatcher::closeTunnel, this, _1));
 }
 
+ConnectType OutgoingTunnelConnectionWatcher::connectType() const
+{
+    return m_tunnelConnection
+        ? m_tunnelConnection->connectType()
+        : ConnectType::unknown;
+}
+
 std::string OutgoingTunnelConnectionWatcher::toString() const
 {
     return m_tunnelConnection
