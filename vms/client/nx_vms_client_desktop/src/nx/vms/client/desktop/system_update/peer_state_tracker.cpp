@@ -237,6 +237,21 @@ bool PeerStateTracker::hasStatusErrors() const
     return false;
 }
 
+QString PeerStateTracker::getErrorMessage() const
+{
+    auto lastCode = UpdateItem::ErrorCode::noError;
+    for (auto& item: m_items)
+    {
+        if (item->errorCode == UpdateItem::ErrorCode::noError)
+            continue;
+        auto errorCode = item->errorCode;
+        if (errorCode < lastCode || lastCode == UpdateItem::ErrorCode::noError)
+            lastCode = errorCode;
+    }
+
+    return errorString(lastCode);
+}
+
 int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)
 {
     QList<UpdateItemPtr> itemsChanged;
@@ -260,11 +275,15 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>
                     NX_INFO(this, "setUpdateStatus() - changing status %1->%2 for peer %3: %4",
                         toString(item->state), toString(status.second.code), name, item->id);
                     item->state = status.second.code;
+
+                    if (status.second.code == StatusCode::error)
+                        item->statusMessage = errorString(status.second.errorCode);
                     changed = true;
                 }
 
                 changed |= compareAndSet(status.second.progress, item->progress);
-                changed |= compareAndSet(status.second.message, item->statusMessage);
+                changed |= compareAndSet(status.second.message, item->debugMessage);
+                changed |= compareAndSet(status.second.errorCode, item->errorCode);
                 //changed |= compareAndSet(status.second.code, item->state);
 
                 if (item->state == StatusCode::latestUpdateInstalled && item->installing)
@@ -388,7 +407,7 @@ void PeerStateTracker::clearState()
             continue;
         item->state = StatusCode::idle;
         item->progress = 0;
-        item->statusMessage = "Waiting for peer data";
+        item->statusMessage = tr("Waiting for peer data");
         item->verificationMessage = "";
         item->installing = false;
     }
@@ -779,6 +798,40 @@ void PeerStateTracker::setTaskError(const QSet<QnUuid>& targets, const QString& 
         if (auto item = findItemById(id))
             m_peersFailed.insert(id);
     }
+}
+
+QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
+{
+    using Code = nx::update::Status::ErrorCode;
+
+    switch (code)
+    {
+        case Code::noError:
+            return "";
+        case Code::updatePackageNotFound:
+            return tr("Update package not found");
+        case Code::noFreeSpaceToDownload:
+            return tr("Not enough space to download files");
+        case Code::noFreeSpaceToExtract:
+            return tr("Not enough space to extract files");
+        case Code::downloadFailed:
+            return tr("Failed to download update files");
+        case Code::invalidUpdateContents:
+            return tr("Update contents are invalid");
+        case Code::corruptedArchive:
+            return tr("Update archive is invalid");
+        case Code::extractionError:
+            return tr("Failed to extract update files");
+        case Code::internalDownloaderError:
+            return tr("Internal downloader error");
+        case Code::internalError:
+            return tr("Iternal server error");
+        case Code::unknownError:
+            return tr("Unknown error");
+        case Code::applauncherError:
+            return tr("Internal client error");
+    }
+    return tr("Unknown error.");
 }
 
 void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)

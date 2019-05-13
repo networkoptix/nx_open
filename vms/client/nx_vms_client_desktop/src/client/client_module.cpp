@@ -389,6 +389,7 @@ void QnClientModule::initSingletons()
     m_clientCoreModule.reset(new QnClientCoreModule());
 
     // Settings migration depends on client core settings.
+    clientSettings->migrate(); //< TODO: Combine with the following method.
     nx::vms::client::desktop::settings::migrate();
 
     // We should load translations before major client's services are started to prevent races

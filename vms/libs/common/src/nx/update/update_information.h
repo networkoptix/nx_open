@@ -108,6 +108,7 @@ public:
 
     enum class ErrorCode
     {
+        noError = 0,
         updatePackageNotFound,
         noFreeSpaceToDownload,
         noFreeSpaceToExtract,
@@ -118,7 +119,7 @@ public:
         internalDownloaderError,
         internalError,
         unknownError,
-        noError,
+        applauncherError,
     };
     Q_ENUM(ErrorCode)
 
