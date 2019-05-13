@@ -40,8 +40,8 @@ public:
     void setConfidence(float confidence);
     void setId(const Uuid& value);
     void setSubtype(const std::string& value);
-    void addAttribute(Attribute attribute);
-    void addAttributes(const std::vector<Attribute>& value);
+    void addAttribute(nx::sdk::Ptr<Attribute> attribute);
+    void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);
     void setAuxiliaryData(std::string value);
     void setBoundingBox(const Rect& rect);
     void setTimestampUs(int64_t timestampUs);

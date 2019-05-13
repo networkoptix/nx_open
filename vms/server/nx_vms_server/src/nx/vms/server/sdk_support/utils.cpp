@@ -327,7 +327,7 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
 
     for (const auto& attribute: detectedObject.attributes)
     {
-        Attribute sdkAttribute(
+        auto sdkAttribute = nx::sdk::makePtr<Attribute>(
             // Information about attribute types isn't stored in the database.
             nx::sdk::IAttribute::Type::undefined,
             attribute.name.toStdString(),

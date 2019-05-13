@@ -1,9 +1,11 @@
 #pragma once
 
+#include <nx/sdk/interface.h>
+
 namespace nx {
 namespace sdk {
 
-class IAttribute
+class IAttribute: public Interface<IAttribute>
 {
 public:
     enum class Type
@@ -15,7 +17,7 @@ public:
         // TODO: Consider adding other specific types like DateTime, Coordinates, Temperature.
     };
 
-    virtual ~IAttribute() = default;
+    static auto interfaceId() { return InterfaceId("nx::sdk::IAttribute"); }
 
     virtual Type type() const = 0;
     virtual const char* name() const = 0;

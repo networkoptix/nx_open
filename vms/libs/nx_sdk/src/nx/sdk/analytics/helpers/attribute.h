@@ -3,12 +3,13 @@
 #include <string>
 
 #include <nx/sdk/i_attribute.h>
+#include <nx/sdk/helpers/ref_countable.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
-class Attribute: public IAttribute
+class Attribute: public nx::sdk::RefCountable<IAttribute>
 {
 public:
     Attribute(

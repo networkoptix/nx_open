@@ -305,38 +305,54 @@ static IObjectMetadata* makeObjectMetadata(
     {
         // Make a box smaller than the one in setBoundingBox() to make the change visible.
         objectMetadata->addAttributes({
-            {IAttribute::Type::number, "nx.sys.preview.timestampUs",
-                std::to_string(lastVideoFrameTimestampUs)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(offset)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.y",
-                std::to_string(offset)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.width", "0.1"},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"},
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::number,
+                "nx.sys.preview.timestampUs",
+                std::to_string(lastVideoFrameTimestampUs)),
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::number,
+                "nx.sys.preview.boundingBox.x",
+                std::to_string(offset)),
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::number,
+                "nx.sys.preview.boundingBox.y",
+                std::to_string(offset)),
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::number,
+                "nx.sys.preview.boundingBox.width",
+                "0.1"),
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::number,
+                "nx.sys.preview.boundingBox.height",
+                "0.1")
         });
     }
 
-    const std::map<std::string, std::vector<Attribute>> kObjectAttributes = {
+    const std::map<std::string, std::vector<nx::sdk::Ptr<Attribute>>> kObjectAttributes = {
         {kCarObjectType, {
-            {IAttribute::Type::string, "Brand", "Tesla"},
-            {IAttribute::Type::string, "Model", "X"},
-            {IAttribute::Type::string, "Color", "Pink"},
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Brand", "Tesla"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Model", "X"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Color", "Pink"),
         }},
         {kHumanFaceObjectType, {
-            {IAttribute::Type::string, "Sex", "Female"},
-            {IAttribute::Type::string, "Hair color", "Red"},
-            {IAttribute::Type::string, "Age", "29"},
-            {IAttribute::Type::string, "Name", "Triss"},
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Sex", "Female"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Hair color", "Red"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Age", "29"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Name", "Triss"),
 
         }},
         {kTruckObjectType, {
-            {IAttribute::Type::string, "Length", "12 m"},
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Length", "12 m"),
         }},
         {kPedestrianObjectType, {
-            {IAttribute::Type::string, "Direction", "Towards the camera"},
-            {IAttribute::Type::string, "Clothes color", "White"},
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::string,
+                "Direction",
+                "Towards the camera"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Clothes color", "White"),
         }},
         {kBicycleObjectType, {
-            {IAttribute::Type::string, "Type", "Mountain bike"},
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Type", "Mountain bike"),
         }},
     };
 
