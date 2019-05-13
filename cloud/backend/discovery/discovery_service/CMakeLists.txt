@@ -1,12 +1,10 @@
 add_custom_target(discovery_service)
 
 function (nx_go_get)
-    foreach (packageName ${ARGV})
-        add_custom_command(
-            TARGET discovery_service
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            COMMAND ${CMAKE_COMMAND} -E env GOOS=linux go get ${packageName})
-    endforeach (packageName)
+    add_custom_command(
+        TARGET discovery_service
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E env GOOS=linux go get ${ARGV})
 endfunction(nx_go_get)
 
 nx_go_get (
@@ -31,9 +29,11 @@ add_custom_command(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_CURRENT_SOURCE_DIR}/discovery_service)
 
+set (DISCOVERY_SERVICE_ARCHIVE_NAME "discovery_service-${cloudVersion}.zip")
+
 add_custom_command(
     TARGET discovery_service
-    COMMAND ${CMAKE_COMMAND} -E env zip ./discovery_service-${cloudVersion}.zip ./discovery_service)
+    COMMAND ${CMAKE_COMMAND} -E env zip ./${DISCOVERY_SERVICE_ARCHIVE_NAME} ./discovery_service)
 
 #--------------------------------------------------------------------------------------------------
 
@@ -42,4 +42,4 @@ add_dependencies(discovery_service-push discovery_service)
 
 add_custom_command(
     TARGET discovery_service-push
-    COMMAND ${CMAKE_COMMAND} -E env aws s3 cp discovery_service-${cloudVersion}.zip s3://nx-lambda-packages/discovery_service/discovery_service-${cloudVersion}.zip)
+    COMMAND ${CMAKE_COMMAND} -E env aws s3 cp ${DISCOVERY_SERVICE_ARCHIVE_NAME} s3://nx-lambda-packages/discovery_service/${DISCOVERY_SERVICE_ARCHIVE_NAME})
