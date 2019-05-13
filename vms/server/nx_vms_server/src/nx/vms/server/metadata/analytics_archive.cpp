@@ -2,8 +2,8 @@
 
 namespace nx::vms::server::metadata {
 
-static const std::chrono::seconds kAggregationInterval{5};
 static const int kRecordSize = QnMetaDataV1::kMotionDataBufferSize + sizeof(BinaryRecordEx);
+const std::chrono::seconds AnalyticsArchive::kAggregationInterval{ 5 };
 
 AnalyticsArchive::AnalyticsArchive(const QString& dataDir, const QString& uniqueId):
     MetadataArchive(
@@ -22,8 +22,8 @@ QnTimePeriodList AnalyticsArchive::matchPeriod(const AnalyticsFilter& filter)
     return base_type::matchPeriodInternal(filter);
 }
 
-bool AnalyticsArchive::matchAdditionData(const Filter& filter, const quint8* data, int size) 
-{ 
+bool AnalyticsArchive::matchAdditionData(const Filter& filter, const quint8* data, int size)
+{
     auto matchIntInList = [](int64_t value, const std::vector<int64_t>& values)
     {
         if (values.empty())

@@ -17,6 +17,8 @@ static const int kDeltaMs = 10 * 1000LL;
 static const int kObjectTypeId = 1;
 static const int kAllAttributesHash = 1;
 
+using namespace std::chrono;
+
 class DataProviderStub: public QnAbstractStreamDataProvider
 {
 public:
@@ -107,7 +109,8 @@ TEST_F(AnalyticsArchive, findAnalyticsDesc)
     QnChunksRequestData request = createRequest(Qt::SortOrder::DescendingOrder);
     std::reverse(m_numericDates.begin(), m_numericDates.end());
 
-    checkData(archive.matchImage(request), m_numericDates.size());
+    auto response = archive.matchImage(request);
+    checkData(response, m_numericDates.size());
 
     request.limit = 50;
     checkData(archive.matchImage(request), request.limit);
@@ -118,7 +121,7 @@ TEST_F(AnalyticsArchive, findAnalyticsDesc)
     ASSERT_EQ(1, result.size());
     ASSERT_EQ(m_numericDates[m_numericDates.size()-1], result[0].startTimeMs);
     auto deltaMs = m_numericDates[0] - m_numericDates[m_numericDates.size() - 1]
-        + QnMotionArchive::kMinimalDurationMs;
+        + milliseconds(nx::vms::server::metadata::AnalyticsArchive::kAggregationInterval).count();
     ASSERT_EQ(deltaMs,result[0].durationMs);
 }
 

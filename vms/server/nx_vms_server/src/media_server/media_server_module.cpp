@@ -703,11 +703,11 @@ QnStoragePluginFactory* QnMediaServerModule::storagePluginFactory() const
 QString QnMediaServerModule::metadataDatabaseDir() const
 {
     auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+    const auto defaultDir = nx::network::url::normalizePath(settings().dataDir());
     if (!server)
-        return QString();
+        return defaultDir;
     auto storageResource = resourcePool()->getResourceById<QnStorageResource>(
         server->metadataStorageId());
-    const auto pathBase = storageResource ? storageResource->getPath()
-        : nx::network::url::normalizePath(settings().dataDir());
+    const auto pathBase = storageResource ? storageResource->getPath() : defaultDir;
     return closeDirPath(pathBase);
 }

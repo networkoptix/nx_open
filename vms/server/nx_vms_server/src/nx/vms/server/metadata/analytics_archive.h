@@ -18,6 +18,9 @@ class AnalyticsArchive: public MetadataArchive
 {
     using base_type = MetadataArchive;
 public:
+
+    static const std::chrono::seconds kAggregationInterval;
+
     AnalyticsArchive(const QString& dataDir, const QString& uniqueId);
 
     bool saveToArchive(
