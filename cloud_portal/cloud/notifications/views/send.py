@@ -52,8 +52,7 @@ def update_or_create_notification(data, customizations=None):
         notification.body = data['body']
         notification.save()
         if customizations:
-            customization_ids = Customization.objects.filter(name__in=customizations).all()
-            notification.customizations.set(customization_ids)
+            notification.customizations.set(Customization.objects.filter(name__in=customizations))
     notification.save()
     return notification.id
 

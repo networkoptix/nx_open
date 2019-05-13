@@ -33,8 +33,8 @@ def register(request):
     data['language'] = lang
     data['IP'] = get_ip(request)
 
-    account = models.Account.objects.filter(email=data['email'])
-    if not (account.exists() and not account[0].is_active):
+    account = models.Account.objects.filter(email=data['email']).first()
+    if not (account and not account.is_active):
         AccountManager.check_email_in_portal(data['email'], False)  # Check if account is in Cloud_db
     else:
         AccountManager().register_cloud_invite_user(data['email'], data['password'], data)
@@ -72,7 +72,7 @@ def login(request):
             raise APINotAuthorisedException("Account is blocked", ErrorCodes.account_blocked)
         # try to find user in the DB
         if not AccountManager.is_email_in_portal(email):
-            raise APINotFoundException("User not in cloud portal", )  # user not found here
+            raise APINotFoundException("User not in cloud portal")  # user not found here
         raise APINotAuthorisedException("Password is invalid")
 
     if 'remember' not in request.data or not request.data['remember']:
@@ -136,7 +136,7 @@ def index(request):
 def auth_key(request):
     data = Account.create_temporary_credentials(request.session['login'], request.session['password'], 'short')
 
-    key = base64.b64encode(data['login'] + ':' + data['password'])
+    key = base64.b64encode((data['login'] + ':' + data['password']).encode('utf-8'))
     return api_success({'auth_key': key})
 
 
@@ -244,7 +244,7 @@ def check_code_in_portal(request):
 class AccountAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated or not self.request.user.is_superuser:
+        if not self.request.user.is_superuser:
             return models.Account.objects.none()
 
         qs = models.Account.objects.all()

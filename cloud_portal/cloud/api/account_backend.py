@@ -37,7 +37,7 @@ class AccountBackend(ModelBackend):
             elif username.find('-') > -1:  # CLOUD-1661 - temp login now has format: guid-crc32(accountEmail)
                 import zlib
                 (uuid, temp_crc32) = username.split('-')
-                email_crc32 = zlib.crc32(user['email']) & 0xffffffff  # convert signed to unsigned crc32
+                email_crc32 = zlib.crc32(user['email'].encode('utf-8')) & 0xffffffff  # convert signed to unsigned crc32
                 if email_crc32 != int(temp_crc32):
                     raise APILogicException('Login does not match users email', ErrorCodes.wrong_code)
 

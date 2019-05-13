@@ -167,12 +167,13 @@ class Account(object):
         try:
             (temp_password, email) = base64.b64decode(code).decode('utf-8').split(":")
         except TypeError:
-            raise APIRequestException('Activation code has wrong structure - TypeError:' + code, ErrorCodes.wrong_code)
+            raise APIRequestException(f"Activation code has wrong structure - TypeError: {code}", ErrorCodes.wrong_code)
         except ValueError:
-            raise APIRequestException('Activation code has wrong structure - ValueError:' + code, ErrorCodes.wrong_code)
+            raise APIRequestException(f"Activation code has wrong structure - ValueError: {code}", ErrorCodes.wrong_code)
 
         if not email or not temp_password:
-            raise APIRequestException('Activation code has wrong structure - no email:' + code, ErrorCodes.wrong_code)
+            raise APIRequestException(f"Activation code has wrong structure - no email or temp_password: {code}",
+                                      ErrorCodes.wrong_code)
 
         return temp_password, email
 
