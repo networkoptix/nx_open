@@ -394,7 +394,8 @@ QByteArray DeviceAgent::extractRequestFromBuffer()
 
 Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
-    m_handler = handler;
+    handler->addRef();
+    m_handler.reset(handler);
     return Error::noError;
 }
 

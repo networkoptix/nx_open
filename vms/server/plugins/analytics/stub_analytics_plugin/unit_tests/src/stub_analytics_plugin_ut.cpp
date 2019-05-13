@@ -222,7 +222,7 @@ static void testExecuteActionAddPerson(IEngine* engine)
     action->assertExpectedState();
 }
 
-class DeviceAgentHandler: public IDeviceAgent::IHandler
+class DeviceAgentHandler: public nx::sdk::RefCountable<IDeviceAgent::IHandler>
 {
 public:
     virtual void handleMetadata(IMetadataPacket* metadata) override
@@ -245,7 +245,7 @@ public:
     }
 };
 
-class EngineHandler: public IEngine::IHandler
+class EngineHandler: public nx::sdk::RefCountable<IEngine::IHandler>
 {
 public:
     virtual void handlePluginEvent(IPluginEvent* event) override
@@ -278,8 +278,8 @@ private:
 TEST(stub_analytics_plugin, test)
 {
     // These handlers should be destroyed after the Plugin, Engine and DeviceAgent objects.
-    const auto engineHandler = std::make_unique<EngineHandler>();
-    const auto deviceAgentHandler = std::make_unique<DeviceAgentHandler>();
+    const auto engineHandler = nx::sdk::makePtr<EngineHandler>();
+    const auto deviceAgentHandler = nx::sdk::makePtr<DeviceAgentHandler>();
 
     Error error = Error::noError;
 

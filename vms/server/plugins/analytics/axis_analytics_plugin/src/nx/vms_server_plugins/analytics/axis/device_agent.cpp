@@ -41,7 +41,8 @@ DeviceAgent::~DeviceAgent()
 
 Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
-    m_handler = handler;
+    handler->addRef();
+    m_handler.reset(handler);
     return Error::noError;
 }
 
@@ -70,7 +71,7 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 Error DeviceAgent::startFetchingMetadata(
     const IMetadataTypes* metadataTypes)
 {
-    m_monitor = new Monitor(this, m_url, m_auth, m_handler);
+    m_monitor = new Monitor(this, m_url, m_auth, m_handler.get());
     return m_monitor->startMonitoring(metadataTypes);
 }
 
