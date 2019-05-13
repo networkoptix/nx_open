@@ -28,4 +28,18 @@ add_custom_command(
 
 add_custom_command(
     TARGET discovery_service
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_CURRENT_SOURCE_DIR}/discovery_service)
+
+add_custom_command(
+    TARGET discovery_service
     COMMAND ${CMAKE_COMMAND} -E env zip ./discovery_service-${cloudVersion}.zip ./discovery_service)
+
+#--------------------------------------------------------------------------------------------------
+
+add_custom_target(discovery_service-push)
+add_dependencies(discovery_service-push discovery_service)
+
+add_custom_command(
+    TARGET discovery_service-push
+    COMMAND ${CMAKE_COMMAND} -E env aws s3 cp discovery_service-${cloudVersion}.zip s3://nx-lambda-packages/discovery_service/discovery_service-${cloudVersion}.zip)
