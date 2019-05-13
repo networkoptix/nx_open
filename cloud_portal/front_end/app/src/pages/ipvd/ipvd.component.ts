@@ -1,18 +1,18 @@
 import {
-    Component,
-    OnInit,
+    Component, Inject,
+    OnInit, PLATFORM_ID,
     ViewEncapsulation
-}                                              from '@angular/core';
-import { CamerasService }                      from '../../services/cameras.service';
-import { IpvdSearchService }                   from './ipvd-search.service';
-import { NxModalMessageComponent }                                                          from '../../dialogs/message/message.component';
-import { NxConfigService }                                                                  from '../../services/nx-config';
-import { TranslateService }                                                                 from '@ngx-translate/core';
-import { NxUriService }                                                                     from '../../services/uri.service';
-import { BreakpointObserver, BreakpointState }                                              from '@angular/cdk/layout';
-import { NxUtilsService }                                                                   from '../../services/utils.service';
-import { ActivatedRoute, NavigationStart, Router, Event as NavigationEvent, NavigationEnd } from '@angular/router';
-import { filter }                                                                           from 'rxjs/operators';
+} from '@angular/core';
+import { isPlatformBrowser, Location }           from '@angular/common';
+import { BreakpointObserver, BreakpointState }   from '@angular/cdk/layout';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { TranslateService }                      from '@ngx-translate/core';
+import { CamerasService }                        from '../../services/cameras.service';
+import { IpvdSearchService }                     from './ipvd-search.service';
+import { NxModalMessageComponent }               from '../../dialogs/message/message.component';
+import { NxConfigService }                       from '../../services/nx-config';
+import { NxUriService }                          from '../../services/uri.service';
+import { NxUtilsService }                        from '../../services/utils.service';
 
 interface Params {
     [key: string]: any;
@@ -98,26 +98,27 @@ export class NxIpvdComponent implements OnInit {
                 private messageDialog: NxModalMessageComponent,
                 private uri: NxUriService,
                 private route: ActivatedRoute,
+                private location: Location,
                 private breakpointObserver: BreakpointObserver,
-                router: Router) {
+                private router: Router,
+                @Inject(PLATFORM_ID) private platformId: object) {
 
         this.setupDefaults();
 
-        router.events
-              .pipe(
-                  filter((event: NavigationEvent) => {
-                          return (event instanceof NavigationEnd);
-                      }
-                  )
-              ).subscribe(
-                (event: NavigationEnd) => {
-                    if (event.url.indexOf('/ipvd') < 0) {
-                        return;
-                    }
+        if (isPlatformBrowser(this.platformId)) {
+            this.router.events.subscribe((event: NavigationEnd) => {
+                window.scroll(0, this.uri.pageOffset);
+            });
+        }
 
-                    this.filterModel = {... this.filterModel}; // force search component update
-
-                });
+        this.location.subscribe((event: PopStateEvent) => {
+            // force view component update without URI update
+            setTimeout(() => {
+                if (!this.params.camera && this.activeCamera) {
+                    this.resetActiveCamera(true);
+                }
+            });
+        });
     }
 
     ngOnInit() {
@@ -158,6 +159,7 @@ export class NxIpvdComponent implements OnInit {
 
     setActiveCamera() {
         if (this.params.camera && this.camerasTable.length) {
+            this.uri.pageOffset = window.pageYOffset;
             const selectedCamera = this.camerasTable.find((camera) => camera.model === this.params.camera);
             this.activateCamera(selectedCamera);
         }
@@ -322,55 +324,57 @@ export class NxIpvdComponent implements OnInit {
             return;
         }
 
-        const queryParams: Params = {};
-        queryParams.camera = elementSelected.model || elementSelected.value.model;
-        this.uri.updateURI(this.uriPath, queryParams, true);
-
         const selectedCamera = this.cameras.find((camera) => {
             return camera.sortKey === (elementSelected.sortKey || elementSelected.value.sortKey);
         });
 
-        if (this.activeCamera && this.activeCamera.sortKey === selectedCamera.sortKey) {
-            return;
-        }
+        setTimeout(() => {
+            if (this.activeCamera && this.activeCamera.sortKey === selectedCamera.sortKey) {
+                return;
+            }
+            this.activeCamera = {... selectedCamera};
+            this.showAll = false;
 
-        this.activeCamera = { ...selectedCamera };
-        this.showAll = false;
+            const queryParams: Params = {};
+            queryParams.camera = selectedCamera.model || selectedCamera.value.model;
+            this.uri.updateURI(this.uriPath, queryParams);
 
-        if (this.breakpointObserver.isMatched(this.breakpoint)) {
-            this.mobileDetailMode = true;
-        }
+            if (this.breakpointObserver.isMatched(this.breakpoint)) {
+                this.mobileDetailMode = true;
+            }
 
-        if (typeof this.activeCamera.firmwares === 'string') {
-            const firmwares = JSON.parse(this.activeCamera.firmwares);
-            let firmwaresArray = [];
+            if (typeof this.activeCamera.firmwares === 'string') {
+                const firmwares = JSON.parse(this.activeCamera.firmwares);
+                let firmwaresArray = [];
 
-            let maxFirmwareCount = 0,
-                totalCameraCount = 0;
+                let maxFirmwareCount = 0,
+                    totalCameraCount = 0;
 
-            Object.keys(firmwares).forEach(key => {
-                const count = firmwares[key];
-                firmwaresArray.push({ name: key, count });
+                Object.keys(firmwares).forEach(key => {
+                    const count = firmwares[key];
+                    firmwaresArray.push({ name: key, count });
 
-                totalCameraCount += count;
-                if (count > maxFirmwareCount) {
-                    maxFirmwareCount = count;
-                }
-            });
+                    totalCameraCount += count;
+                    if (count > maxFirmwareCount) {
+                        maxFirmwareCount = count;
+                    }
+                });
 
-            firmwaresArray = firmwaresArray.sort((a, b) => {
-                return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-            });
+                firmwaresArray = firmwaresArray.sort((a, b) => {
+                    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+                });
 
-            firmwaresArray.reverse();
+                firmwaresArray.reverse();
 
-            this.activeCamera.maxFirmwareCount = maxFirmwareCount;
-            this.activeCamera.totalCameraCount = totalCameraCount;
-            this.activeCamera.firmwares = firmwaresArray;
-        }
+                this.activeCamera.maxFirmwareCount = maxFirmwareCount;
+                this.activeCamera.totalCameraCount = totalCameraCount;
+                this.activeCamera.firmwares = firmwaresArray;
+            }
 
-        this.toggleCamview = true;
+            this.toggleCamview = true;
+        }, 10);
     }
+
 
     openFeedback(param) {
         const type = (param === 'device') ? this.CONFIG.messageType.ipvd_device : this.CONFIG.messageType.ipvd_page;
@@ -383,13 +387,15 @@ export class NxIpvdComponent implements OnInit {
         return false;
     }
 
-    resetActiveCamera() {
-        const queryParams: Params = {};
-        queryParams.camera = undefined;
-        this.uri.updateURI(this.uriPath, queryParams, true);
+    resetActiveCamera(skipUpdateURI?) {
+        if (!skipUpdateURI) {
+            const queryParams: Params = {};
+            queryParams.camera = undefined;
+            this.uri.updateURI(this.uriPath, queryParams);
+        }
 
         this.activeCamera = undefined;
-        this.toggleCamview = false;
         this.mobileDetailMode = false;
+        this.toggleCamview = false;
     }
 }

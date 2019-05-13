@@ -1,5 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChange, SimpleChanges } from '@angular/core';
-import { NxConfigService }                                                             from '../../../../services/nx-config';
+import {
+    Component, EventEmitter, Input,
+    OnInit, Output, SimpleChanges
+}                          from '@angular/core';
+import { NxConfigService } from '../../../../services/nx-config';
 
 @Component({
     selector   : 'nx-cam-view',

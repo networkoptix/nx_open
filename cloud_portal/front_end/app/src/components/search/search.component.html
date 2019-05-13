@@ -83,7 +83,7 @@
                                     <nx-tag
                                             [name]="tag.label"
                                             [(ngModel)]="tag.value"
-                                            (ngModelChange)="selectBooleanFilter()"
+                                            (ngModelChange)="modelChanged('tags')"
                                             [value]="tag.value">
                                         {{ tag.label }}
                                     </nx-tag>

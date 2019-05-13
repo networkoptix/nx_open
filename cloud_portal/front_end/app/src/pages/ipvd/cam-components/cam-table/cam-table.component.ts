@@ -1,13 +1,18 @@
 import {
     Component, Input, Output, EventEmitter,
     OnChanges, SimpleChanges,
-    OnInit, ViewEncapsulation
-}                           from '@angular/core';
+    OnInit, ViewEncapsulation, Inject, PLATFORM_ID
+} from '@angular/core';
 
-import { NxConfigService }  from '../../../../services/nx-config';
-import { TranslateService } from '@ngx-translate/core';
-import { NxUriService }     from '../../../../services/uri.service';
-import { NxUtilsService }   from '../../../../services/utils.service';
+import { NxConfigService }       from '../../../../services/nx-config';
+import { TranslateService }      from '@ngx-translate/core';
+import { NxUriService }          from '../../../../services/uri.service';
+import { NxUtilsService }        from '../../../../services/utils.service';
+import { Router }                from '@angular/router';
+
+interface Params {
+    [key: string]: any;
+}
 
 @Component({
     selector     : 'nx-cam-table',
@@ -37,6 +42,7 @@ export class CamTableComponent implements OnChanges, OnInit {
     private lang;
     private debug: boolean;
 
+    offset: number;
     currentPage: number;
     pageSize: number;
     totalItems: number;
@@ -60,9 +66,11 @@ export class CamTableComponent implements OnChanges, OnInit {
         removeNewLines  : true
     };
 
-    constructor(private translate: TranslateService,
+    constructor(private router: Router,
+                private translate: TranslateService,
                 private uri: NxUriService,
-                config: NxConfigService) {
+                config: NxConfigService,
+                @Inject(PLATFORM_ID) private platformId: object) {
 
         this.lang = this.translate.translations[this.translate.currentLang];
         this.CONFIG = config.getConfig();
@@ -282,23 +290,19 @@ export class CamTableComponent implements OnChanges, OnInit {
     setPage(page: number, keep?: boolean) {
         this.currentPage = page;
 
+        const pageParam = (this.currentPage === 1) ? undefined : this.currentPage;
+        // preserve window offset
+        this.uri.pageOffset = window.pageYOffset;
+
         const startIndex = (this.currentPage - 1) * this.pageSize;
         const endIndex = startIndex + this.pageSize;
         this.pagedItems = this._elements.slice(startIndex, endIndex);
 
-        this.uri.updateURI('/ipvd', [
-            {
-                key: 'page', value: (this.currentPage === 1) ? undefined : this.currentPage
-            }
-        ]);
+        if (this.params && this.params.page != pageParam) { // this.params.page is string - no strict comparison
+            const queryParams: Params = {};
+            queryParams.page = (this.currentPage === 1) ? undefined : this.currentPage;
 
-        if (!keep) {
-            // clear selected camera
-            this.setClickedRow(-1, {});
-            this.uri.updateURI('/ipvd', [
-                {
-                    key: 'camera', value: undefined
-                }]);
+            this.uri.updateURI('/ipvd', queryParams);
         }
     }
 

@@ -33,7 +33,7 @@
     }
     
     .search-group {
-        flex-shrink : 8;
+        flex-shrink : 20;
         position    : relative;
         width       : 100%;
         
@@ -93,8 +93,8 @@
     }
     
     .drop-container {
-        @include media-breakpoint-up(lg) {
-            max-width: 715px; // overwrite Bootstrap's column width in percentage
+        @include media-breakpoint-up(md) {
+            max-width: $collapse-second-width; // medium break point
         }
         
         .drop {
