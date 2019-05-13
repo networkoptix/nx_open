@@ -294,6 +294,10 @@ bool GlobalToolTipAttached::Private::eventFilter(QObject* watched, QEvent* event
             const auto hover = static_cast<QHoverEvent*>(event);
             hoverPos = hover->pos();
 
+            // Avoid restarting the tooltip show timer when there is no movement.
+            if (event->type() == QEvent::HoverMove && hoverPos == hover->oldPos())
+                break;
+
             if (event->type() == QEvent::HoverLeave)
                 q->hide();
             else
@@ -301,6 +305,10 @@ bool GlobalToolTipAttached::Private::eventFilter(QObject* watched, QEvent* event
 
             break;
         }
+        case QEvent::KeyPress:
+        case QEvent::MouseButtonPress:
+            q->hide();
+            break;
         default:
             break;
     }
