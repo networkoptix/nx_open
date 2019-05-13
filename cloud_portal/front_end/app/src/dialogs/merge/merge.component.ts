@@ -265,7 +265,6 @@ export class NxModalMergeComponent {
         this.modalRef = this.modalService.open(MergeModalContent,
             {
                 backdrop: 'static',
-                centered: true,
                 windowClass: 'modal-holder'
             });
         this.modalRef.componentInstance.language = this.language.lang;
