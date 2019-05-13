@@ -1485,17 +1485,15 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
         // 3. All other cases. Some servers have failed
         messageBox->setIcon(QnMessageBoxIcon::Critical);
-        messageBox->setText(tr("Failed to download update packages to some components"));
+        messageBox->setText(tr("Can not download updates:"));
 
         // TODO: Client can be here as well, but it would not be displayed.
         // Should we display it somehow?
         auto resourcesFailed = resourcePool()->getResourcesByIds(peersFailed.toList());
         injectResourceList(*messageBox, resourcesFailed);
 
-        QString text;
-        text += htmlParagraph(tr("Please make sure they have enough free storage space and stable network connection."));
-        text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
-        messageBox->setInformativeText(text);
+        QString errorText = m_stateTracker->getErrorMessage();
+        messageBox->setInformativeText(errorText);
 
         auto tryAgain = messageBox->addButton(tr("Try again"),
             QDialogButtonBox::AcceptRole);
@@ -1581,11 +1579,9 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
             QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
             // 1. Everything is complete
             messageBox->setIcon(QnMessageBoxIcon::Critical);
-            messageBox->setText(tr("Failed to install updates to servers:"));
+            messageBox->setText(tr("There was an error while installing updates:"));
             injectResourceList(*messageBox, resourcePool()->getResourcesByIds(peersFailed));
-            QString text;
-            text += htmlParagraph(tr("Please make sure there is enough free storage space and network connection is stable."));
-            text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
+            QString text = m_stateTracker->getErrorMessage();
             messageBox->setInformativeText(text);
             auto installNow = messageBox->addButton(tr("OK"),
                 QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
