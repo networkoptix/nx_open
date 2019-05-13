@@ -7,12 +7,8 @@ namespace nx {
 namespace utils {
 namespace test {
 
-#ifdef Q_OS_WIN32
-    // Current version of google test doesn't support crash tests on WIN32.
-    #define NX_UTILS_ASSERT_TEST_NAME Main_DISABLED
-#else
-    #define NX_UTILS_ASSERT_TEST_NAME Main
-#endif
+// Current version of google test doesn't support crash tests on WIN32.
+#ifndef Q_OS_WIN32
 
 TEST(NxAssertHeavyCondition, All3)
 {
@@ -45,6 +41,8 @@ TEST(NxCritical, All3)
     EXPECT_DEATH(NX_CRITICAL(false, "oops"), "");
     EXPECT_DEATH(NX_CRITICAL(false, "oops %1 != %2", "a", 7), "");
 }
+
+#endif // Q_OS_WIN32
 
 } // namespace test
 } // namespace utils
