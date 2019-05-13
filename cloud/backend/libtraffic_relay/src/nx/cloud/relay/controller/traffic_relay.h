@@ -35,6 +35,7 @@ struct RelaySessionStatistics
     int sessionDurationSecAveragePerLastHour = 0;
     /** Sessions that were terminated during last hour are counted here. */
     int sessionDurationSecMaxPerLastHour = 0;
+    int newSessionCountPerLastMinute = 0;
 
     bool operator==(const RelaySessionStatistics& right) const;
 };
@@ -44,7 +45,8 @@ struct RelaySessionStatistics
     (concurrentSessionToSameServerCountMaxPerHour) \
     (concurrentSessionToSameServerCountAveragePerHour) \
     (sessionDurationSecAveragePerLastHour) \
-    (sessionDurationSecMaxPerLastHour)
+    (sessionDurationSecMaxPerLastHour) \
+    (newSessionCountPerLastMinute)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (RelaySessionStatistics),
@@ -73,6 +75,7 @@ private:
     nx::utils::statistics::MaxValuePerPeriodCalculator<std::chrono::seconds>
         m_maxSessionDurationCalculator;
     nx::utils::math::AveragePerPeriod<int> m_averageSessionDurationCalculator;
+    nx::utils::math::SumPerMinute<int> m_newSessionCounter;
 };
 
 //-------------------------------------------------------------------------------------------------

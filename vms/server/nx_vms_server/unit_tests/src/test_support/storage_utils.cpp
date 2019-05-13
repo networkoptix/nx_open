@@ -10,6 +10,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <media_server/media_server_module.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -56,7 +57,7 @@ static void waitForStorageToAppear(MediaServerLauncher* server, const QString& s
     }
 }
 
-void addTestStorage(MediaServerLauncher* server, const QString& storagePath)
+void addStorage(MediaServerLauncher* server, const QString& storagePath)
 {
     NX_ASSERT(!storagePath.isEmpty());
 
@@ -102,6 +103,158 @@ void addTestStorage(MediaServerLauncher* server, const QString& storagePath)
 
     server->serverModule()->normalStorageManager()->initDone();
     waitForStorageToAppear(server, storagePath);
+}
+
+class StorageFixtureResource: public QnStorageResource
+{
+public:
+    StorageFixtureResource(
+        QnMediaServerModule* serverModule, const QString& url, int64_t totalSpace,
+        int64_t freeSpace, int64_t spaceLimit, bool isSystem, bool isOnline, bool isUsedForWriting)
+        :
+        QnStorageResource(serverModule->commonModule()), m_url(url), m_totalSpace(totalSpace),
+        m_freeSpace(freeSpace), m_isSystem(isSystem), m_isOnline(isOnline)
+    {
+        setSpaceLimit(spaceLimit);
+        setUsedForWriting(isUsedForWriting);
+        setId(QnUuid::createUuid());
+    }
+
+    virtual QIODevice* open(const QString& /*fileName*/, QIODevice::OpenMode /*openMode*/) override
+    {
+        return nullptr;
+    }
+
+    virtual float getAvarageWritingUsage() const override
+    {
+        return 0.0;
+    }
+
+    virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& /*dirName*/) override
+    {
+        return QnAbstractStorageResource::FileInfoList();
+    }
+
+    virtual qint64 getFileSize(const QString& /*url*/) const override
+    {
+        return -1LL;
+    }
+
+    virtual bool removeFile(const QString& /*url*/) override
+    {
+        return true;
+    }
+
+    virtual bool removeDir(const QString& /*url*/) override
+    {
+        return true;
+    }
+
+    virtual bool renameFile(const QString& /*oldName*/, const QString& /*newName*/) override
+    {
+        return true;
+    }
+
+    virtual bool isFileExists(const QString& /*url*/) override
+    {
+        return true;
+    }
+
+    virtual bool isDirExists(const QString& /*url*/) override
+    {
+        return true;
+    }
+
+    virtual qint64 getFreeSpace() override
+    {
+        return m_freeSpace;
+    }
+
+    virtual qint64 getTotalSpace() const override
+    {
+        return m_totalSpace;
+    }
+
+    virtual int getCapabilities() const override
+    {
+        return ListFile | RemoveFile | ReadFile | WriteFile | DBReady;
+    }
+
+    virtual Qn::StorageInitResult initOrUpdate() override
+    {
+        return Qn::StorageInit_Ok;
+    }
+
+    virtual void setUrl(const QString& url) override
+    {
+        m_url = url;
+    }
+
+    virtual QString getUrl() const override
+    {
+        return m_url;
+    }
+
+    virtual bool isSystem() const override
+    {
+        return m_isSystem;
+    }
+
+    virtual QString getPath() const override
+    {
+        return QnStorageResource::getPath();
+    }
+
+    virtual Qn::ResourceStatus getStatus() const override
+    {
+        return m_isOnline ? Qn::ResourceStatus::Online : Qn::ResourceStatus::Offline;
+    }
+
+private:
+    QString m_url;
+    int64_t m_totalSpace = -1;
+    int64_t m_freeSpace = -1;
+    bool m_isSystem = false;
+    bool m_isOnline = false;
+};
+
+QnStorageResourcePtr addStorageFixture(
+    MediaServerLauncher* server, QnMediaServerModule* serverModule, const QString& url,
+    int64_t totalSpace, int64_t freeSpace, int64_t spaceLimit, bool isSystem, bool isOnline,
+    bool isUsedForWriting)
+{
+    auto storage = QnStorageResourcePtr(new StorageFixtureResource(
+        serverModule, url, totalSpace, freeSpace, spaceLimit, isSystem, isOnline, isUsedForWriting));
+    server->serverModule()->normalStorageManager()->addStorage(storage);
+    return storage;
+}
+
+vms::server::ChunksDeque generateChunks(
+    int storageIndex, int64_t startTimeMs, int32_t chunkSize, int64_t spaceToFill)
+{
+    int64_t totalSpaceFilled = 0LL;
+    vms::server::ChunksDeque chunks;
+    const int kDurationMs = 60*1000;
+    while (totalSpaceFilled < spaceToFill)
+    {
+        chunks.push_back(Chunk(
+            startTimeMs, storageIndex, vms::server::Chunk::FILE_INDEX_WITH_DURATION, kDurationMs,
+            0, 0, chunkSize));
+        startTimeMs += kDurationMs;
+        totalSpaceFilled += chunkSize;
+    }
+    return chunks;
+}
+
+void setNxOccupiedSpace(
+    MediaServerLauncher* server, const QnStorageResourcePtr& storage, int64_t nxOccupiedSpace)
+{
+    const auto storageManager = server->serverModule()->normalStorageManager();
+    const int storageIndex = storageManager->storageDbPool()->getStorageIndex(storage);
+    NX_ASSERT(storageIndex >= 0);
+    const auto fileCatalog = storageManager->getFileCatalog(
+        "camera-unique-id", QnServer::ChunksCatalog::LowQualityCatalog);
+    fileCatalog->addChunks(generateChunks(storageIndex, 0LL, 10*1024*1024, nxOccupiedSpace));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

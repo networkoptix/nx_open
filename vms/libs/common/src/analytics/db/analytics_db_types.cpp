@@ -75,6 +75,7 @@ bool Filter::operator==(const Filter& right) const
         && objectAppearanceId == right.objectAppearanceId
         && timePeriod == right.timePeriod
         && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
+        && isSameItems(requiredAttributes, right.requiredAttributes)
         && freeText == right.freeText
         && sortOrder == right.sortOrder;
 }

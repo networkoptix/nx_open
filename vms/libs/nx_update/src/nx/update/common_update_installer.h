@@ -20,7 +20,6 @@ public:
         idle,
         ok,
         inProgress,
-        corruptedArchive,
         noFreeSpace,
         brokenZip,
         wrongDir,

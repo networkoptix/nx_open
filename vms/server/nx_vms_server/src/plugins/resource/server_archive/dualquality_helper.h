@@ -24,11 +24,11 @@ public:
     void setPrefferedQuality(MediaQuality quality);
     void findDataForTime(
         const qint64                                time,
-        DeviceFileCatalog::TruncableChunk           &resultChunk,
+        nx::vms::server::TruncableChunk           &resultChunk,
         DeviceFileCatalogPtr                        &resultCatalog,
         DeviceFileCatalog::FindMethod               findMethod,
         bool                                        preciseFind,
-        const DeviceFileCatalog::UniqueChunkCont    &ignoreChunks
+        const nx::vms::server::UniqueChunkCont    &ignoreChunks
     );
 
 private:
@@ -37,17 +37,17 @@ private:
 private:
     void findDataForTimeHelper(
         const qint64                                time,
-        DeviceFileCatalog::TruncableChunk           &resultChunk,
+        nx::vms::server::TruncableChunk           &resultChunk,
         DeviceFileCatalogPtr                        &resultCatalog,
         DeviceFileCatalog::FindMethod               findMethod,
         bool                                        preciseFind,
         SearchStack                                 &searchStack,
         qint64                                      previousDistance,
-        const DeviceFileCatalog::UniqueChunkCont    &ignoreChunks
+        const nx::vms::server::UniqueChunkCont    &ignoreChunks
     );
 
     static int64_t calcDistanceHelper(
-        const DeviceFileCatalog::Chunk  &chunk,
+        const nx::vms::server::Chunk  &chunk,
         const int64_t                   time,
         DeviceFileCatalog::FindMethod   findMethod
     );

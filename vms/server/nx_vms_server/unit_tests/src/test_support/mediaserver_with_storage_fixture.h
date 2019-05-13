@@ -49,7 +49,7 @@ protected:
             m_server->serverModule()->normalStorageManager(), &QnStorageManager::rebuildFinished,
             this, &MediaserverWithStorageFixture::onReindexFinished, Qt::DirectConnection);
 
-        test_support::addTestStorage(m_server.get(), m_storagePath);
+        test_support::addStorage(m_server.get(), m_storagePath);
     }
 
     void whenServerStopped()
@@ -164,7 +164,7 @@ protected:
         const auto& serverChunks = serverCatalogIt.value()->getChunksUnsafe();
         ASSERT_EQ(generatedChunks.size(), serverChunks.size());
         for (int i = 0; i < serverChunks.size(); ++i)
-            ASSERT_EQ(generatedChunks[i].startTimeMs, serverChunks[i].startTimeMs);
+            ASSERT_EQ(generatedChunks[i].startTimeMs, serverChunks[i].chunk().startTimeMs);
     }
 };
 } // namespace nx::vms::server::test::test_support

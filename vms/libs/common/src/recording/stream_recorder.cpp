@@ -197,8 +197,8 @@ void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
     QByteArray signPlaceholder = signPattern;
 
     NX_ASSERT(signPattern.indexOf(placeholder) >= 0, "Sign magic must be present in metadata");
-    signPattern.replace(QnSignHelper::getSignMagic(),
-        QnSignHelper::getSignFromDigest(getSignature()));
+    signPattern.replace(
+        QnSignHelper::getSignMagic(), QnSignHelper::getSignFromDigest(getSignature()));
 
     metadata.signature = QnSignHelper::makeSignature(signPattern);
 
