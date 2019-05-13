@@ -208,32 +208,7 @@ void QnRtspIoDevice::shutdown()
 void QnRtspIoDevice::setTransport(nx::vms::api::RtpTransportType rtpTransport)
 {
     m_transport = rtpTransport;
-    if (m_transport == nx::vms::api::RtpTransportType::tcp)
-    {
-        m_mediaSocket.reset();
-        m_rtcpSocket.reset();
-        return;
-    }
-
-    auto createSocket =
-        [this](int port)
-        {
-            auto result = SocketFactory::createDatagramSocket();
-            if (m_transport == nx::vms::api::RtpTransportType::multicast)
-                result->setReuseAddrFlag(true);
-
-            result->bind(SocketAddress(HostAddress::anyHost, port));
-            result->setRecvTimeout(500);
-            return result;
-        };
-
-    m_mediaSocket = createSocket(m_transport == nx::vms::api::RtpTransportType::multicast
-        ? m_remoteMediaPort
-        : 0);
-
-    m_rtcpSocket = createSocket(m_transport == nx::vms::api::RtpTransportType::multicast
-        ? m_remoteRtcpPort
-        : 0);
+    updateSockets();
 }
 
 void QnRtspIoDevice::processRtcpData()
