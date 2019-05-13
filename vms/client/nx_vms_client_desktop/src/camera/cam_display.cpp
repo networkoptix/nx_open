@@ -1169,6 +1169,12 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
     }
     else if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
     {
+        if (m_lastQueuedVideoTime != AV_NOPTS_VALUE)
+        {
+            NX_VERBOSE(this, "Metadata lag behing last video packet: %1ms",
+                (m_lastQueuedVideoTime - metadata->timestamp) / 1000);
+        }
+
         processMetadata(metadata);
         return;
     }
