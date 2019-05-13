@@ -14,11 +14,13 @@ public:
     Attribute(
         Type type,
         std::string name,
-        std::string value);
+        std::string value,
+        float confidence = 1.0);
 
     virtual Type type() const override;
     virtual const char* name() const override;
     virtual const char* value() const override;
+    virtual float confidence() const override;
 
     void setValue(std::string value) { m_value = std::move(value); }
 
@@ -26,6 +28,7 @@ private:
     const Type m_type;
     const std::string m_name;
     std::string m_value;
+    float m_confidence;
 };
 
 } // namespace analytics

@@ -20,6 +20,7 @@ public:
     virtual Type type() const = 0;
     virtual const char* name() const = 0;
     virtual const char* value() const = 0;
+    virtual float confidence() const = 0;
 };
 
 } // namespace sdk
