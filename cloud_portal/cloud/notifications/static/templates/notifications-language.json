@@ -12,7 +12,7 @@
     "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
-    "emailSubject": "Version {{message.id}} for {{message.product}} is ready to be reviewed"
+    "emailSubject": "{{message.product_type}}: {{message.product}} has a new version to review"
   },
   "cloud_notification": {
     "emailSubject": "{{message.subject}}"

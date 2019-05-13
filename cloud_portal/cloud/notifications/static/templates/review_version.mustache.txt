@@ -1,4 +1,4 @@
-There is a new revision for {{ message.product }}
+There is a new version for {{ message.product }}({{message.product_type}}) to review.
 
 Click on the link to review draft {{ message.id }} for {{ message.product }}
 

@@ -39,6 +39,7 @@ def notify_version_ready(product, version, exclude_user):
     users = Account.objects.filter(groups__permissions__in=perm).exclude(pk=exclude_user.pk).distinct()
 
     product_name = product.name
+    product_type = ProductType.PRODUCT_TYPES[product.product_type]
     product_customizations_set = set()
     product_is_integration = product.product_type.type == ProductType.PRODUCT_TYPES.integration
     for customization in product.customizations.values_list('name', flat=True):
@@ -57,7 +58,8 @@ def notify_version_ready(product, version, exclude_user):
             send(user.email, "review_version",
                  {
                      'id': review_id,
-                     'product': product_name
+                     'product': product_name,
+                     'product_type': product_type
                  },
                  user.customization)
 
