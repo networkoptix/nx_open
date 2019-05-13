@@ -103,6 +103,11 @@ void OutgoingTunnelConnection::setControlConnectionClosedHandler(
     m_tunnelClosedHandler = std::move(handler);
 }
 
+ConnectType OutgoingTunnelConnection::connectType() const
+{
+    return ConnectType::proxy;
+}
+
 std::string OutgoingTunnelConnection::toString() const
 {
     return lm("Relaying. Relay server in use: %1").args(m_relayUrl).toStdString();

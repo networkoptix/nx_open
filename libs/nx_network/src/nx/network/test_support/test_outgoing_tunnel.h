@@ -65,6 +65,11 @@ public:
         m_onClosedHandler = std::move(handler);
     }
 
+    virtual ConnectType connectType() const override
+    {
+        return ConnectType::unknown;
+    }
+
     virtual std::string toString() const override
     {
         return "test::OutgoingTunnelConnection";

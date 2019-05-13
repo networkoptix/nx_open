@@ -38,8 +38,12 @@ public:
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         OnNewConnectionHandler handler) override;
+
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+
+    virtual ConnectType connectType() const override;
+
     virtual std::string toString() const override;
 
     void setInactivityTimeout(std::chrono::milliseconds timeout);

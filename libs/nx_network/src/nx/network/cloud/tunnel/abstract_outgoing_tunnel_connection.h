@@ -7,6 +7,8 @@
 #include <nx/network/async_stoppable.h>
 #include <nx/network/socket_attributes_cache.h>
 
+#include "../cloud_connect_type.h"
+
 namespace nx {
 namespace network {
 namespace cloud {
@@ -52,6 +54,8 @@ public:
 
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
+
+    virtual ConnectType connectType() const = 0;
 
     virtual std::string toString() const = 0;
 };

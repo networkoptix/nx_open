@@ -59,7 +59,7 @@ public:
     void executePluginAction(
         const QnUuid& engineId,
         const QString& actionTypeId,
-        const analytics::storage::DetectedObject& object,
+        const analytics::db::DetectedObject& object,
         const QnVirtualCameraResourcePtr& camera) const;
 
 private:
@@ -423,7 +423,7 @@ QAction* AnalyticsSearchWidget::Private::addMenuAction(
 void AnalyticsSearchWidget::Private::executePluginAction(
     const QnUuid& engineId,
     const QString& actionTypeId,
-    const analytics::storage::DetectedObject& object,
+    const analytics::db::DetectedObject& object,
     const QnVirtualCameraResourcePtr& camera) const
 {
     const auto server = q->commonModule()->currentServer();
