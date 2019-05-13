@@ -229,7 +229,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_context.reset(new UniquePtrContext());
 
     m_analyticsEventsStorage =
-        nx::analytics::db::EventsStorageFactory::instance().create();
+        nx::analytics::db::EventsStorageFactory::instance().create(this);
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
