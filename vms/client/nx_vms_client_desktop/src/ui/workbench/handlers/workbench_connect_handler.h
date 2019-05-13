@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QObject>
 
 #include <nx/utils/scope_guard.h>
@@ -141,6 +143,9 @@ private:
     void at_disconnectAction_triggered();
 
     void showPreloader();
+
+    /** Limit the time UI spends in "Loading..." state. */
+    void setupConnectTimeoutTimer(std::chrono::milliseconds timeout);
 
 private:
     struct
