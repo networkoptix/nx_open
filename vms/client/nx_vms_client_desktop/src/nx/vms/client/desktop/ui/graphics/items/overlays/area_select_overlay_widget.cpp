@@ -8,6 +8,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/client/core/utils/geometry.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 
 namespace nx::vms::client::desktop {
@@ -50,9 +51,6 @@ AreaSelectOverlayWidget::Private::Private(
     resourceWidget(resourceWidget)
 {
     dragProcessor->setHandler(this);
-
-    QObject::connect(this->resourceWidget.data(), &QnResourceWidget::selectionStateChanged, this,
-        [this]() { this->q->update(); });
 }
 
 void AreaSelectOverlayWidget::Private::updateRect(const DragInfo* info)
@@ -102,6 +100,12 @@ AreaSelectOverlayWidget::AreaSelectOverlayWidget(
 {
     setFocusPolicy(Qt::NoFocus);
     setAcceptedMouseButtons(Qt::NoButton);
+
+    if (!NX_ASSERT(resourceWidget))
+        return;
+
+    connect(resourceWidget, &QnResourceWidget::selectionStateChanged, this,
+        [this]() { update(); });
 }
 
 AreaSelectOverlayWidget::~AreaSelectOverlayWidget()
