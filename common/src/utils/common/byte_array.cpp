@@ -6,6 +6,7 @@
 #include <plugins/plugin_tools.h>
 #include <utils/memory/system_allocator.h>
 #include <nx/utils/log/assert.h>
+#include <libavcodec/avcodec.h>
 
 #include "warnings.h"
 
@@ -66,7 +67,7 @@ QnByteArray::~QnByteArray()
     {
         nxpt::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
 #ifdef CALC_QnByteArray_ALLOCATION
-        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
+        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + AV_INPUT_BUFFER_PADDING_SIZE) );
 #endif
     }
 }
@@ -196,7 +197,7 @@ QnByteArray& QnByteArray::operator=( const QnByteArray& right )
     if( m_ownBuffer )
     {
 #ifdef CALC_QnByteArray_ALLOCATION
-        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
+        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + AV_INPUT_BUFFER_PADDING_SIZE) );
 #endif
         nxpt::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
     }
@@ -206,12 +207,12 @@ QnByteArray& QnByteArray::operator=( const QnByteArray& right )
     m_capacity = right.m_size;
     m_size = right.m_size;
     m_data = (char*)nxpt::mallocAligned(
-        m_capacity + QN_BYTE_ARRAY_PADDING,
+        m_capacity + AV_INPUT_BUFFER_PADDING_SIZE,
         m_alignment,
         std::bind( &QnAbstractAllocator::alloc, m_allocator, _1 ) );
 
 #ifdef CALC_QnByteArray_ALLOCATION
-    QnByteArray_bytesAllocated.fetchAndAddOrdered( m_capacity + QN_BYTE_ARRAY_PADDING );
+    QnByteArray_bytesAllocated.fetchAndAddOrdered( m_capacity + AV_INPUT_BUFFER_PADDING_SIZE );
 #endif
     memcpy( m_data, right.constData(), right.size() );
     m_ignore = 0;
@@ -229,7 +230,7 @@ QnByteArray& QnByteArray::operator=( QnByteArray&& right )
     {
         nxpt::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
 #ifdef CALC_QnByteArray_ALLOCATION
-        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
+        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + AV_INPUT_BUFFER_PADDING_SIZE) );
 #endif
     }
 
@@ -266,21 +267,29 @@ bool QnByteArray::reallocate(unsigned int capacity)
         return true;
 
     char* data = (char*)nxpt::mallocAligned(
-        capacity + QN_BYTE_ARRAY_PADDING,
+        (size_t) capacity + AV_INPUT_BUFFER_PADDING_SIZE,
         m_alignment,
         std::bind( &QnAbstractAllocator::alloc, m_allocator, _1 ) );
+
     if(!data)
         return false;
+
 #ifdef CALC_QnByteArray_ALLOCATION
-    QnByteArray_bytesAllocated.fetchAndAddOrdered( capacity + QN_BYTE_ARRAY_PADDING );
+    QnByteArray_bytesAllocated.fetchAndAddOrdered( capacity + AV_INPUT_BUFFER_PADDING_SIZE );
 #endif
 
     memcpy(data, m_data, m_size);
+    /**
+     * If the first 23 bits of the additional bytes are not 0, then damaged
+     * MPEG bitstreams could cause overread and segfault.
+     */
+    memset(data + capacity, 0, AV_INPUT_BUFFER_PADDING_SIZE);
+
     if( m_ownBuffer )
     {
         nxpt::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
 #ifdef CALC_QnByteArray_ALLOCATION
-        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
+        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + AV_INPUT_BUFFER_PADDING_SIZE) );
 #endif
     }
     m_capacity = capacity;

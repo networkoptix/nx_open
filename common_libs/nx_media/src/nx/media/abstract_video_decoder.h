@@ -61,7 +61,7 @@ public:
      *     internal decoder buffer. If no more frames are left in the buffer, return zero value as
      *     a result, and set outDecodedFrame to null.
      *     ATTENTION: compressedVideoData->data() is guaranteed to be non-null, have dataSize() > 0
-     *     and have additional QN_BYTE_ARRAY_PADDING bytes allocated after frame->dataSize(), which
+     *     and have additional AV_INPUT_BUFFER_PADDING_SIZE bytes allocated after frame->dataSize(), which
      *     is needed by e.g. ffmpeg decoders and can be zeroed by this function.
      *
      * @param outDecodedFrame Decoded video data. If decoder still fills its internal buffer, then
