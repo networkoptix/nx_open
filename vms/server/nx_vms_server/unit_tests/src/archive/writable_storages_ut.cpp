@@ -228,7 +228,7 @@ protected:
     {
         for (const auto& p: m_urlToEffectiveSpace)
         {
-            const double diff = std::abs<double>(
+            const double diff = std::abs(
                 p.second.ratio - static_cast<double>(m_urlToSelectedCount[p.first]) / kIterations);
             ASSERT_LE(diff, 0.1);
         }

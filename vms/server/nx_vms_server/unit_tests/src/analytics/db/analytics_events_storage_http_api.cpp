@@ -38,7 +38,7 @@ public:
         m_asyncCaller.pleaseStopSync();
     }
 
-    virtual bool initialize(const nx::analytics::storage::Settings& /*settings*/) override
+    virtual bool initialize(const nx::analytics::db::Settings& /*settings*/) override
     {
         return true;
     }

@@ -304,8 +304,9 @@ private:
         assertSpace(result, referenceResult, kStorageCount);
     }
 
+    template<typename F1, typename F2, typename F3, typename F4>
     void assertIteratorTraversal(
-        auto dequeBeginF, auto dequeEndF, auto referenceDequeBeginF, auto referenceDequeEndF)
+        F1 dequeBeginF, F2 dequeEndF, F3 referenceDequeBeginF, F4 referenceDequeEndF)
     {
         auto it1 = dequeBeginF();
         auto it2 = referenceDequeBeginF();
