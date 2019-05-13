@@ -7,6 +7,8 @@ def remove_permissions(apps, schema_editor):
     codenames_to_remove = ['can_access_product',
                            'can_view_customization',
                            'can_view_pending',
+                           'publish_version',
+                           'force_update',
                            'add_usergroupstocustomizationpermissions',
                            'change_usergroupstocustomizationpermissions',
                            'delete_usergroupstocustomizationpermissions',
