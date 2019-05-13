@@ -12,20 +12,23 @@ namespace test {
 
 TEST(NxAssertHeavyCondition, All3)
 {
-    if (!ini().assertHeavyCondition || !ini().assertCrash)
-        return;
+    nx::kit::IniConfig::Tweaks iniTweaks;
+    iniTweaks.set(&nx::utils::ini().assertCrash, true);
+    iniTweaks.set(&nx::utils::ini().assertHeavyCondition, true);
 
     EXPECT_DEATH(NX_ASSERT_HEAVY_CONDITION(false), "");
     EXPECT_DEATH(NX_ASSERT_HEAVY_CONDITION(false, "oops"), "");
+    EXPECT_DEATH(NX_ASSERT_HEAVY_CONDITION(false, "oops %1 != %2", "a", 7), "");
 }
 
 TEST(NxAssert, All3)
 {
-    if (!ini().assertCrash)
-        return;
+    nx::kit::IniConfig::Tweaks iniTweaks;
+    iniTweaks.set(&nx::utils::ini().assertCrash, true);
 
     EXPECT_DEATH(NX_ASSERT(false), "");
     EXPECT_DEATH(NX_ASSERT(false, "oops"), "");
+    EXPECT_DEATH(NX_ASSERT(false, "oops %1 != %2", "a", 7), "");
 
     EXPECT_DEATH((enableQtMessageAsserts(), qFatal("Fatal")), "");
     EXPECT_DEATH((enableQtMessageAsserts(), qCritical("Critical")), "");
@@ -36,6 +39,7 @@ TEST(NxCritical, All3)
 {
     EXPECT_DEATH(NX_CRITICAL(false), "");
     EXPECT_DEATH(NX_CRITICAL(false, "oops"), "");
+    EXPECT_DEATH(NX_CRITICAL(false, "oops %1 != %2", "a", 7), "");
 }
 
 #endif // Q_OS_WIN32

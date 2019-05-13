@@ -94,10 +94,11 @@ private:
 } // namespace nx::utils
 
 #if defined(NX_CHECK_MEASURE_TIME)
-    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) ( \
+    #define NX_CHECK(IS_CRITICAL, CONDITION, ...) ( \
         [begin = std::chrono::steady_clock::now(), \
             result = (CONDITION) || ::nx::utils::assertFailure( \
-                IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE)]() \
+                IS_CRITICAL, __FILE__, __LINE__, #CONDITION, \
+                ::nx::utils::log::makeMessage(__VA_ARGS__))]() \
         { \
             const auto time = std::chrono::steady_clock::now() - begin; \
             static const auto info = nx::utils::AssertTimer::instance.info(__FILE__, __LINE__); \
@@ -106,9 +107,10 @@ private:
         }() \
     )
 #else
-    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) ( \
+    #define NX_CHECK(IS_CRITICAL, CONDITION, ...) ( \
         [result = (CONDITION) || ::nx::utils::assertFailure( \
-            IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE)]() \
+            IS_CRITICAL, __FILE__, __LINE__, #CONDITION, \
+            ::nx::utils::log::makeMessage(__VA_ARGS__))]() \
         { \
             return result; \
         }() \
@@ -122,15 +124,8 @@ private:
  *         NX_CRITICAL(veryImportantObjectPointer);
  *     ```
  */
-#define NX_CRITICAL(...) \
-    NX_MSVC_EXPAND(NX_GET_3RD_ARG( \
-        __VA_ARGS__, NX_CRITICAL2, NX_CRITICAL1, args_reqired)(__VA_ARGS__))
-
-#define NX_CRITICAL1(CONDITION) \
-    NX_CHECK(/*isCritical*/ true, CONDITION, "")
-
-#define NX_CRITICAL2(CONDITION, MESSAGE) \
-    NX_CHECK(/*isCritical*/ true, CONDITION, MESSAGE)
+#define NX_CRITICAL(CONDITION, ...) \
+    NX_CHECK(/*isCritical*/ true, CONDITION, __VA_ARGS__)
 
 /**
  * - Debug: Causes segfault in case of assertion failure, if not disabled via
@@ -146,15 +141,8 @@ private:
  *     ```
  * @return Condition evaluation result.
  */
-#define NX_ASSERT(...) \
-    NX_MSVC_EXPAND(NX_GET_3RD_ARG( \
-        __VA_ARGS__, NX_ASSERT2, NX_ASSERT1, args_reqired)(__VA_ARGS__))
-
-#define NX_ASSERT1(CONDITION) \
-    NX_CHECK(/*isCritical*/ false, CONDITION, "")
-
-#define NX_ASSERT2(CONDITION, MESSAGE) \
-    NX_CHECK(/*isCritical*/ false, CONDITION, MESSAGE)
+#define NX_ASSERT(CONDITION, ...) \
+    NX_CHECK(/*isCritical*/ false, CONDITION, __VA_ARGS__)
 
 /**
  * - Debug: Works the same way as NX_ASSERT(), if not disabled via
