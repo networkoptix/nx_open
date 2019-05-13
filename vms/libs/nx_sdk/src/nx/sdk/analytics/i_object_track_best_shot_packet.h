@@ -20,7 +20,10 @@ public:
         return InterfaceId("nx::sdk::analytics::IObjectTrackBestShotPacket");
     }
 
-    /** Timestamp of the frame the best shot belongs to. */
+    /**
+     * Timestamp of the frame (in microseconds) the best shot belongs to. Should be a positive
+     * number.
+     */
     virtual int64_t timestampUs() const = 0;
 
     /** Id of the track the best shot belongs to. */
