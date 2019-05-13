@@ -165,6 +165,11 @@ public:
     bool isWritable() const;
     QSettings* rawSettings();
 
+    /**
+     * Execute settings migration.
+     */
+    void migrate();
+
 signals:
     void saved();
 
