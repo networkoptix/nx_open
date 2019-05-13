@@ -8,6 +8,7 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
 
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
 #include <nx/utils/basic_factory.h>
@@ -61,7 +62,7 @@ public:
     virtual void flush(StoreCompletionHandler completionHandler) override;
 
 private:
-    std::shared_ptr<DbController> m_dbController;
+    std::unique_ptr<DbController> m_dbController;
     std::list<std::shared_ptr<AbstractCursor>> m_openedCursors;
     QnMutex m_dbControllerMutex;
     QnMutex m_cursorsMutex;
