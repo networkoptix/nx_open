@@ -232,7 +232,7 @@ std::vector<WritableStoragesHelper::SpaceInfo> WritableStoragesHelper::filterOut
 {
     const auto maxIt = std::max_element(
         infos.cbegin(), infos.cend(),
-        [](const auto& info1, const auto& info2) { return info1.available - info2.available; });
+        [](const auto& info1, const auto& info2) { return info1.available < info2.available; });
 
     if (maxIt == infos.cend())
         return infos;
