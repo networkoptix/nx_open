@@ -133,13 +133,25 @@ TEST_F(AnalyticsArchive, findAnalyticsWithFilter)
         serverModule().metadataDatabaseDir());
 
     QnChunksRequestData request = createRequest(Qt::SortOrder::AscendingOrder);
-    request.limit = 50;
-
     QList<QRegion> rectFilter;
     rectFilter << QRect(0, 0, 1, 1);
     request.filter = QJson::serialized<QList<QRegion>>(rectFilter);
 
+    request.sortOrder = Qt::SortOrder::DescendingOrder;
+    request.limit = 5;
+    request.startTimeMs = m_numericDates[4];
+    request.endTimeMs = m_numericDates[5];
+    auto result = archive.matchImage(request);
+    ASSERT_EQ(2, result.size());
+    ASSERT_EQ(result[0].startTimeMs, m_numericDates[5]);
+    ASSERT_EQ(result[1].startTimeMs, m_numericDates[4]);
+
+    request.limit = 50;
+    request.startTimeMs = 0;
+    request.endTimeMs = DATETIME_NOW;
+    request.sortOrder = Qt::SortOrder::AscendingOrder;
     checkData(archive.matchImage(request), request.limit);
+
     request.sortOrder = Qt::SortOrder::DescendingOrder;
     std::reverse(m_numericDates.begin(), m_numericDates.end());
     checkData(archive.matchImage(request), request.limit);
