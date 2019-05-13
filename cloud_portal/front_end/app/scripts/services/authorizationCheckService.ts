@@ -44,6 +44,7 @@
                         console.error(exception);
                     }
                     if (auth) {
+                        console.log(auth);
                         const index = auth.indexOf(':');
                         const tempLogin = auth.substring(0, index);
                         const tempPassword = auth.substring(index + 1);
@@ -96,6 +97,8 @@
                                             $rootScope.session.loginState = result.data.email; // Forcing changing loginState to reload interface
                                         }
                                     });
+                        }, () => {
+                            NxDialogsService.notify(languageService.lang.errorCodes.wrongAuthCode, 'danger');
                         });
             }
 
