@@ -79,13 +79,13 @@
                         <div class="radio-group">
                             <nx-radio name="firstSystem" [value]="system"
                                       [label]="system.name || system.info && system.info.name"
-                                      compId="firstSystem" [(ngModel)]="primarySystem"
+                                      componentId="firstSystem" [(ngModel)]="primarySystem"
                                       (ngModelChange)="setSystems()"></nx-radio>
                         </div>
                         <div class="radio-group">
                             <nx-radio name="secondSystem" [value]="targetSystem"
                                       [label]="targetSystem.name || targetSystem.info && targetSystem.info.name"
-                                      compId="secondSystem" [(ngModel)]="primarySystem"
+                                      componentId="secondSystem" [(ngModel)]="primarySystem"
                                       (ngModelChange)="setSystems()"></nx-radio>
                         </div>
                     </div>
