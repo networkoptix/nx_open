@@ -183,17 +183,31 @@ class NoptixLibrary(object):
         client = docker.from_env()
         return client.images.build(path="/home/kyle/develop/nx_vms/cloud_portal/robot_tests/Docker", 
                             tag="mediaserver", 
-                            buildargs={"mediaserver_deb":"nxwitness-server-4.0.0.28389-linux64-beta-test.deb"})
+                            buildargs={"mediaserver_deb":"nxwitness-server-4.0.0.28541-linux64-beta-test.deb"})
 
-    def run_container(self, image):
+    def run_container(self, image, port):
         tmp = {'/run':'', '/run/lock':''}
-        vol = {'/sys/fs/cgroup':'/sys/fs/cgroup', '/home/kyle/develop/nx_vms/cloud_portal/robot_tests/video':'/dokk', '/home/kyle/develop/nx_vms/cloud_portal/robot_tests/data/':'/opt/networkoptix/mediaserver/var'}
-        prt = {'7001':'7001'}
+        vol = {'/sys/fs/cgroup': {
+                    'bind':'/sys/fs/cgroup',
+                    'mode':'rw'},
+                }
+        prt = {7001:port}
         client = docker.from_env()
-        cont = client.containers.run(image, detach=True, tmpfs=tmp, volumes=vol, ports=prt, network_mode="bridge", name="mediaserver")
+        cont = client.containers.run(image[0].id, detach=True, tmpfs=tmp, volumes=vol, ports=prt, network_mode="bridge", name=time.time())
         return cont
 
-    def stop_container(self, cont):
-        cont.stop()
+    def stop_containers(self):
+        client = docker.from_env()
+        conts = client.containers.list()
+        for cont in conts:
+            cont.stop()        
+
+    def prune_containers(self):
         client = docker.from_env()
         client.containers.prune()
+
+    def remove_image(self):
+        client = docker.from_env()
+        imgs = client.images.list()
+        for img in imgs:
+            client.images.remove(img)

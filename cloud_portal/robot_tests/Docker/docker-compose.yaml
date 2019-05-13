@@ -1,13 +1,13 @@
 version: '3'
 services:
   webapp:
-    image: mediaserver
+    image: mediaserver2
     ports:
       - "7001:7001"
-    network_mode: "bridge"
+    network_mode: "host"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - ./video:/dokk
+      - ./video:/dock
       - ./data/:/opt/networkoptix/mediaserver/var
       - ~/develop/devtools/util/:/scripts
     tmpfs:

@@ -26,6 +26,8 @@ ${EMAIL CUSTOM}                       noptixautoqa+custom@gmail.com
 ${EMAIL CLIENT CUSTOM}                noptixautoqa+clientcustom@gmail.com
 ${EMAIL AUTO TESTS ANCHOR}            noptixautoqa+autotestsanchor@gmail.com
 ${EMAIL AUTO TESTS 2 ANCHOR}          noptixautoqa+autotests2anchor@gmail.com
+${EMAIL MERGE OWNER 1}                noptixautoqa+mergeowner1@gmail.com
+${EMAIL MERGE OWNER 2}                noptixautoqa+mergeowner2@gmail.com
 @{EMAILS LIST}                        ${EMAIL VIEWER}    ${EMAIL ADV VIEWER}    ${EMAIL LIVE VIEWER}    ${EMAIL OWNER}    ${EMAIL ADMIN}    ${EMAIL CUSTOM}    ${EMAIL CLIENT CUSTOM}
 ${ADMIN FIRST NAME}                   mark
 ${ADMIN LAST NAME}                    hamil
