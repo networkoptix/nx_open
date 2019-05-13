@@ -31,7 +31,7 @@ bool SimpleEIPClient::sendAll(AbstractStreamSocket* socket, QByteArray& data)
 {
     if (!socket)
     {
-        NX_ASSERT(false, "sendAll(): socket is nullptr");
+        NX_ASSERT(false, lm("%1(): socket is nullptr").args(__func__));
         return false;
     }
 
@@ -44,10 +44,8 @@ bool SimpleEIPClient::sendAll(AbstractStreamSocket* socket, QByteArray& data)
         auto bytesSent = socket->send(rawData + totalBytesSent, dataSize);
         if (bytesSent <= 0)
         {
-            qDebug()
-                << "SimpleEIPCLient, error while sending data"
-                << SystemError::getLastOSErrorText()
-                << SystemError::getLastOSErrorCode();
+            NX_DEBUG(this, lm("Error while sending data: [%1] %2").args(
+                SystemError::getLastOSErrorCode(), SystemError::getLastOSErrorText()));
 
             return false;
         }
@@ -63,13 +61,13 @@ bool SimpleEIPClient::receiveMessage(AbstractStreamSocket* socket, char* const b
 {
     if (!socket)
     {
-        NX_ASSERT(false, "receiveMessage(): socket is nullptr");
+        NX_ASSERT(false, lm("%1(): socket is nullptr").args(__func__));
         return false;
     }
 
     if (!buffer)
     {
-        NX_ASSERT(false, "receiveMessage(): buffer is nullptr");
+        NX_ASSERT(false, lm("%1(): buffer is nullptr").args(__func__));
         return false;
     }
 
@@ -350,7 +348,7 @@ bool SimpleEIPClient::registerSessionUnsafe()
 
     if(encPacketHeader.status != EIPStatus::kEipStatusSuccess)
     {
-        qDebug() << "Sync Ethernet/IP client session registration error:" << encPacketHeader.status;
+        NX_DEBUG(this, lm("Sync Ethernet/IP client session registration error: ").args(encPacketHeader.status));
         return false;
     }
 
