@@ -77,7 +77,7 @@ HostAddress::HostAddress(const QString& addrStr):
             nx::utils::Url url;
             url.setHost(addrStr);
             return url.isValid();
-        }(), lm("Invalid host address: [%1]").args(addrStr));
+        }());
 }
 
 HostAddress::HostAddress(const char* addrStr):
