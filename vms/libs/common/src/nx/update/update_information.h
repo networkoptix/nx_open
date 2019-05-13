@@ -36,7 +36,7 @@ struct Package
 };
 
 #define Package_Fields (component)(arch)(platform)(variant)(variantVersion)(file)(url)(size)(md5)
-QN_FUSION_DECLARE_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(Package, (ubjson)(json)(eq))
 
 struct Information
 {
@@ -65,7 +65,7 @@ struct Information
 #define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl) \
     (description)(packages)(participants)(lastInstallationRequestTime)(eula)
 
-QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(Information, (ubjson)(json)(eq))
 
 enum class InformationError
 {
@@ -106,30 +106,48 @@ public:
     };
     Q_ENUM(Code)
 
+    enum class ErrorCode
+    {
+        updatePackageNotFound,
+        noFreeSpaceToDownload,
+        noFreeSpaceToExtract,
+        downloadFailed,
+        invalidUpdateContents,
+        corruptedArchive,
+        extractionError,
+        internalDownloaderError,
+        internalError,
+        unknownError,
+        noError,
+    };
+    Q_ENUM(ErrorCode)
+
     QnUuid serverId;
     Code code = Code::idle;
+    ErrorCode errorCode = ErrorCode::noError;
     QString message;
-    double progress = 0.0;
+    int progress = 0;
 
     Status() = default;
     Status(
         const QnUuid& serverId,
         Code code,
-        const QString& message = QString(),
-        double progress = 0.0)
+        ErrorCode errorCode = ErrorCode::noError,
+        int progress = 0)
         :
         serverId(serverId),
         code(code),
-        message(message),
+        errorCode(errorCode),
         progress(progress)
     {}
 };
 
-#define UpdateStatus_Fields (serverId)(code)(progress)(message)
+#define UpdateStatus_Fields (serverId)(code)(errorCode)(progress)(message)
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Status::Code)
-QN_FUSION_DECLARE_FUNCTIONS(Status::Code, (lexical))
-QN_FUSION_DECLARE_FUNCTIONS(Status, (xml)(csv_record)(ubjson)(json))
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Status::ErrorCode)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Status::Code)(Status::ErrorCode), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS(Status, (ubjson)(json))
 
 /**
  * Source type for update information.

@@ -48,10 +48,10 @@ void QnScheduleSync::updateLastSyncChunk()
     NX_VERBOSE(this, lit("[Backup] GetLastSyncPoint: %1").arg(m_syncTimePoint));
 }
 
-DeviceFileCatalog::Chunk QnScheduleSync::findLastSyncChunkUnsafe() const
+nx::vms::server::Chunk QnScheduleSync::findLastSyncChunkUnsafe() const
 {
-    DeviceFileCatalog::Chunk resultChunk;
-    DeviceFileCatalog::Chunk prevResultChunk;
+    nx::vms::server::Chunk resultChunk;
+    nx::vms::server::Chunk prevResultChunk;
     resultChunk.startTimeMs = resultChunk.durationMs
                             = prevResultChunk.startTimeMs
                             = prevResultChunk.durationMs = 0;
@@ -226,15 +226,12 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             }
         }
 
-        auto optimalRootBackupPred = [](const QnStorageResourcePtr & storage) {
-            return storage->getFreeSpace() > storage->getSpaceLimit() / 2;
-        };
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
-        auto toStorage = serverModule()->backupStorageManager()->getOptimalStorageRoot(optimalRootBackupPred);
+        auto toStorage = serverModule()->backupStorageManager()->getOptimalStorageRoot();
 
         if (!toStorage) {
             serverModule()->backupStorageManager()->clearSpace(true);
-            toStorage = serverModule()->backupStorageManager()->getOptimalStorageRoot(optimalRootBackupPred);
+            toStorage = serverModule()->backupStorageManager()->getOptimalStorageRoot();
             if (!toStorage)
                 return CopyError::NoBackupStorageError;
         }

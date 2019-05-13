@@ -263,7 +263,7 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>
                     changed = true;
                 }
 
-                changed |= compareAndSet<int>(status.second.progress, item->progress);
+                changed |= compareAndSet(status.second.progress, item->progress);
                 changed |= compareAndSet(status.second.message, item->statusMessage);
                 //changed |= compareAndSet(status.second.code, item->state);
 
