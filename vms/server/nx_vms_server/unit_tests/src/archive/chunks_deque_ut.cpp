@@ -19,6 +19,7 @@ protected:
     {
         addChunks(0, kChunksToAddCount, kStorageCount, m_deque, m_referenceDeque);
         addChunks(10, kChunksToAddCount, kStorageCount, m_deque2, m_referenceDeque2);
+        whenChunksAreSorted();
     }
 
     void whenSomeChunksRemoved()
@@ -95,7 +96,12 @@ protected:
     void whenChunksAreSorted()
     {
         std::sort(m_deque.begin(), m_deque.end());
+        std::sort(m_deque2.begin(), m_deque2.end());
         std::sort(m_referenceDeque.begin(), m_referenceDeque.end());
+        std::sort(m_referenceDeque2.begin(), m_referenceDeque2.end());
+
+        ASSERT_TRUE(std::is_sorted(m_deque.begin(), m_deque.end()));
+        ASSERT_TRUE(std::is_sorted(m_deque2.begin(), m_deque2.end()));
     }
 
     void assertReverseIteratorsTraversal()
@@ -359,12 +365,14 @@ TEST_F(ChunksDeque, find)
 TEST_F(ChunksDeque, lowerBound)
 {
     givenChunksDequeWithSomeChunks();
+    whenChunksAreSorted();
     assertLowerBoundWorksCorrectly();
 }
 
 TEST_F(ChunksDeque, upperBound)
 {
     givenChunksDequeWithSomeChunks();
+    whenChunksAreSorted();
     assertUpperBoundWorksCorrectly();
 }
 
