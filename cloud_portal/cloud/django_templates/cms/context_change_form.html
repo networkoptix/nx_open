@@ -40,7 +40,7 @@
                 <p class="help">{{ field.name }}</p>
                 {% if not data_structure.optional %} <p class="help">required</p> {% endif %}
             </label>
-            <div id="{{ field.name }}" style="width: 100%">
+            <div id="{{ field.name }}" class="ml-160">
                 {% if field|is_ImageField and field.value %}
                     <div>
                         {% if data_structure.optional and record_exists %}

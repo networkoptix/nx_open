@@ -38,10 +38,6 @@
     text-align: center;
 }
 
-.form-row ul {
-    padding-inline-start: 160px;
-}
-
 .text-danger{
     color: red !important;
 }
@@ -71,6 +67,7 @@ img.preview-image{
 .context-preview{
     max-height: 400px;
     max-width: 400px;
+    margin-bottom: 6px;
 }
 
 .review-preview{
@@ -127,4 +124,15 @@ img.preview-image{
 
 .disabled-row{
     background-color: lightgray;
+}
+
+.ml-160 {
+    margin-left: 160px !important;
+}
+
+.nodots {
+    padding-left: 0 !important;
+}
+.nodots > li {
+    list-style-type: none;
 }

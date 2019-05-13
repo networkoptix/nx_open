@@ -134,7 +134,7 @@ class CustomContextForm(forms.Form):
                                                                                  choices=queryset,
                                                                                  required=False,
                                                                                  disabled=disabled,
-                                                                                 widget=forms.CheckboxSelectMultiple)
+                                                                                 widget=forms.CheckboxSelectMultiple(attrs={'class': 'nodots'}))
                 else:
                     self.fields[data_structure.name] = forms.ChoiceField(label=ds_label,
                                                                          help_text=ds_description,
