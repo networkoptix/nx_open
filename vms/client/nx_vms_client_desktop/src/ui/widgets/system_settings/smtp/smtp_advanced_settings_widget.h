@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtWidgets/QWidget>
+
 #include <utils/email/email_fwd.h>
 
 namespace Ui {

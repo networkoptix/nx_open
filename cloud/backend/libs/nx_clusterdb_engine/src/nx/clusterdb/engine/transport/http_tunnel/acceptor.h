@@ -7,7 +7,8 @@
 
 #include <nx/vms/api/data/peer_data.h>
 
-#include "../abstract_transaction_transport.h"
+#include "../abstract_acceptor.h"
+#include "../abstract_command_transport.h"
 
 namespace nx::clusterdb::engine {
 
@@ -32,6 +33,7 @@ struct ConnectRequestContext
 } // namespace detail
 
 class HttpTunnelTransportAcceptor:
+    public AbstractAcceptor,
     private network::http::tunneling::TunnelAuthorizer<detail::ConnectRequestContext>
 {
     using base_type =
@@ -45,9 +47,9 @@ public:
         ConnectionManager* connectionManager,
         const OutgoingCommandFilter& outgoingCommandFilter);
 
-    void registerHandlers(
+    virtual void registerHandlers(
         const std::string& rootPath,
-        nx::network::http::server::rest::MessageDispatcher* messageDispatcher);
+        nx::network::http::server::rest::MessageDispatcher* messageDispatcher) override;
 
 private:
     const QnUuid m_peerId;

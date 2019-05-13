@@ -1,5 +1,7 @@
 #include "eip_cip.h"
 
+#include <QtCore/QDataStream>
+
 QByteArray MessageRouterRequest::encode(const MessageRouterRequest& request)
 {
     QByteArray encoded;

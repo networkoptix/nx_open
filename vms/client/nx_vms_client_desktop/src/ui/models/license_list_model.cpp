@@ -1,6 +1,6 @@
 #include "license_list_model.h"
 
-#include <cassert>
+#include <QtGui/QBrush>
 
 #include <translation/datetime_formatter.h>
 

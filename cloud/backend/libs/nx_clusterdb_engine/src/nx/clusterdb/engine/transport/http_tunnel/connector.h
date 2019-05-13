@@ -5,7 +5,7 @@
 #include <nx/network/http/tunneling/client.h>
 #include <nx/utils/url.h>
 
-#include "../abstract_transaction_transport_connector.h"
+#include "../abstract_command_transport_connector.h"
 
 namespace nx::clusterdb::engine::transport {
 
@@ -16,7 +16,7 @@ class HttpTunnelTransportConnector:
 
 public:
     HttpTunnelTransportConnector(
-        const std::string& systemId,
+        const std::string& clusterId,
         const std::string& connectionId,
         const nx::utils::Url& targetUrl);
 
@@ -28,7 +28,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    const std::string m_systemId;
+    const std::string m_clusterId;
     const std::string m_connectionId;
     const nx::utils::Url m_targetUrl;
     std::unique_ptr<nx::network::http::tunneling::Client> m_client;

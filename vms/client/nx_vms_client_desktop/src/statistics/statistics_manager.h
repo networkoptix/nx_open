@@ -11,6 +11,8 @@
 
 #include <nx/utils/uuid.h>
 
+class QTimer;
+
 class QnStatisticsManager: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT

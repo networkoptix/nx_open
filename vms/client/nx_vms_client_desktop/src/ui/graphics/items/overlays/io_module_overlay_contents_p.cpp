@@ -1,5 +1,7 @@
 #include "io_module_overlay_contents_p.h"
 
+#include <QtGui/QFontMetrics>
+
 #include <nx/client/core/utils/geometry.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/workaround/sharp_pixmap_painting.h>

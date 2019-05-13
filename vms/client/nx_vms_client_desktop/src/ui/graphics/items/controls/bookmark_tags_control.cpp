@@ -1,5 +1,6 @@
-
 #include "bookmark_tags_control.h"
+
+#include <QtGui/QCursor>
 
 namespace
 {

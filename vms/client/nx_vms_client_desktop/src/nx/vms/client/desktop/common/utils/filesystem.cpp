@@ -4,6 +4,7 @@
 #include <QtCore/QDir>
 
 #include <utils/common/app_info.h>
+#include <client/client_globals.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/app_info.h>

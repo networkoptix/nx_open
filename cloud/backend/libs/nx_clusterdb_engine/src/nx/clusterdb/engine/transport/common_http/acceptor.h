@@ -14,6 +14,7 @@
 #include <transaction/connection_guard_shared_state.h>
 
 #include "connection.h"
+#include "../abstract_acceptor.h"
 #include "../command_transport_delegate.h"
 
 namespace nx::clusterdb::engine {
@@ -29,7 +30,8 @@ namespace nx::clusterdb::engine::transport {
 
 class GenericTransport;
 
-class CommonHttpAcceptor
+class CommonHttpAcceptor:
+    public AbstractAcceptor
 {
 public:
     CommonHttpAcceptor(
@@ -39,9 +41,9 @@ public:
         ConnectionManager* connectionManager,
         const OutgoingCommandFilter& outgoingCommandFilter);
 
-    void registerHandlers(
+    virtual void registerHandlers(
         const std::string& rootPath,
-        nx::network::http::server::rest::MessageDispatcher* messageDispatcher);
+        nx::network::http::server::rest::MessageDispatcher* messageDispatcher) override;
 
 private:
     const ProtocolVersionRange& m_protocolVersionRange;

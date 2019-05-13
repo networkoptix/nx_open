@@ -4,6 +4,7 @@
 #include <nx/network/cloud/tunnel/udp/outgoing_tunnel_connection.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/utils/uuid.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>

@@ -28,7 +28,7 @@ class TestRelayClusterClient:
 public:
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& /*peerId*/,
-        RelayInstanceSearchCompletionHandler /*completionHandler*/)
+        RelayInstanceSelectCompletionHandler /*completionHandler*/)
     {
         // Unused.
     }
@@ -346,7 +346,7 @@ TEST_F(UDPHolePunchingConnectionInitiationFsm, find_a_relay_instance_takes_a_lon
 TEST_F(UDPHolePunchingConnectionInitiationFsm, connect_over_tcp)
 {
     whenIssueConnectRequestOverTcp();
-    
+
     thenConnectResultIsReported();
     andConnectionResultIsSuccess();
     andResponseContainsRelayInfo();

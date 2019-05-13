@@ -2,6 +2,7 @@
 
 #if defined(Q_OS_ANDROID)
 
+#include <QtCore/QDebug>
 #include <QtGui/QDesktopServices>
 #include <QtAndroidExtras/QtAndroid>
 #include <private/qjnihelpers_p.h>

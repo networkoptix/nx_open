@@ -17,6 +17,7 @@
 #include <text/time_strings.h>
 
 #include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>

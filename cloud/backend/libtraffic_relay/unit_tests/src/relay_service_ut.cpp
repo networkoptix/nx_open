@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/casssandra/async_cassandra_connection.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/optional.h>
@@ -15,7 +14,6 @@
 #include <nx/cloud/relay/settings.h>
 
 #include "basic_component_test.h"
-#include "cassandra_connection_stub.h"
 
 namespace nx {
 namespace cloud {

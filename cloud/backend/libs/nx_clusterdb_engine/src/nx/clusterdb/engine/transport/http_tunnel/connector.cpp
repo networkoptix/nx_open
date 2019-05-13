@@ -7,11 +7,11 @@
 namespace nx::clusterdb::engine::transport {
 
 HttpTunnelTransportConnector::HttpTunnelTransportConnector(
-    const std::string& systemId,
+    const std::string& clusterId,
     const std::string& connectionId,
     const nx::utils::Url& targetUrl)
     :
-    m_systemId(systemId),
+    m_clusterId(clusterId),
     m_connectionId(connectionId),
     m_targetUrl(targetUrl),
     m_client(std::make_unique<nx::network::http::tunneling::Client>(targetUrl))

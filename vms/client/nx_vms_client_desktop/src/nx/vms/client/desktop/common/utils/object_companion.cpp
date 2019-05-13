@@ -1,6 +1,7 @@
 #include "object_companion.h"
 
 #include <QtCore/QPointer>
+#include <QtCore/QVariant>
 
 namespace nx::vms::client::desktop {
 

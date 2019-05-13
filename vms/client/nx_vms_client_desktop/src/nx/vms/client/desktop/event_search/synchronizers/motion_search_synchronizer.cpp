@@ -1,14 +1,17 @@
 #include "motion_search_synchronizer.h"
 
-#include <core/resource/media_resource.h>
+#include <client/client_module.h>
+#include <core/resource/camera_resource.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/utils/video_cache.h>
 
 namespace nx::vms::client::desktop {
 
@@ -61,6 +64,7 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
         [this](bool isActive)
         {
             updateAreaSelection();
+            updateCachedDevices();
             setTimeContentDisplayed(Qn::MotionContent, isActive);
 
             const auto action = isActive
@@ -82,6 +86,9 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
             updateActiveState(active());
         });
 
+    connect(m_motionSearchWidget.data(), &SimpleMotionSearchWidget::cameraSetChanged,
+        this, &MotionSearchSynchronizer::updateCachedDevices);
+
     connect(m_motionSearchWidget.data(), &SimpleMotionSearchWidget::filterRegionsChanged, this,
         [this](const QList<QRegion>& value)
         {
@@ -96,6 +103,24 @@ void MotionSearchSynchronizer::updateAreaSelection()
     const auto mediaWidget = this->mediaWidget();
     if (mediaWidget && m_motionSearchWidget && active())
         m_motionSearchWidget->setFilterRegions(mediaWidget->motionSelection());
+}
+
+void MotionSearchSynchronizer::updateCachedDevices()
+{
+    if (!ini().cacheLiveVideoForRightPanelPreviews)
+        return;
+
+    if (auto cache = qnClientModule->videoCache())
+    {
+        QnUuidSet cachedDevices;
+        if (active())
+        {
+            for (const auto& camera: m_motionSearchWidget->cameras())
+                cachedDevices.insert(camera->getId());
+        }
+
+        cache->setCachedDevices(intptr_t(this), cachedDevices);
+    }
 }
 
 bool MotionSearchSynchronizer::isMediaAccepted(QnMediaResourceWidget* widget) const

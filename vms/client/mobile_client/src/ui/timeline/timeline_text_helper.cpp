@@ -6,6 +6,8 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QGuiApplication>
 
+#include <nx/utils/log/log.h>
+
 namespace
 {
     const int kMinTextureSize = 256;
@@ -81,9 +83,9 @@ public:
         this->font.setPixelSize(font.pixelSize() * pixelRatio);
         const auto fm = QFontMetrics(this->font);
         lineHeight = fm.height();
-        digitWidth = fm.size(Qt::TextSingleLine, lit("0")).width();
-        maxCharWidth = fm.size(Qt::TextSingleLine, lit("m")).width();
-        spaceWidth = fm.size(Qt::TextSingleLine, lit(" ")).width();
+        digitWidth = fm.size(Qt::TextSingleLine, "0").width();
+        maxCharWidth = fm.size(Qt::TextSingleLine, "m").width();
+        spaceWidth = fm.size(Qt::TextSingleLine, " ").width();
     }
 
     void addString(const QString& string, QPainter* painter, int& x, int& y)
@@ -103,7 +105,7 @@ public:
         strings.insert(string, QRect(x, y, size.width(), size.height()));
         x += size.width();
         if (x > texture.width() || y + lineHeight > texture.height())
-            qWarning() << "QnTimelineTextHelper: String is out of bounds:" << string;
+            NX_WARNING(this, "String is out of bounds: \"%1\"", string);
     }
 };
 

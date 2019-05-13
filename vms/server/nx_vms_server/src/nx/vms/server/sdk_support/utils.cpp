@@ -309,8 +309,8 @@ nx::vms::api::EventLevel fromSdkPluginEventLevel(IPluginEvent::Level level)
 }
 
 nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
-    const nx::analytics::storage::DetectedObject& detectedObject,
-    const nx::analytics::storage::ObjectPosition& objectPosition)
+    const nx::analytics::db::DetectedObject& detectedObject,
+    const nx::analytics::db::ObjectPosition& objectPosition)
 {
     auto objectMetadata = nx::sdk::makePtr<TimestampedObjectMetadata>();
     objectMetadata->setId(
@@ -339,7 +339,7 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
 }
 
 nx::sdk::Ptr<nx::sdk::IList<ITimestampedObjectMetadata>> createObjectTrack(
-    const nx::analytics::storage::DetectedObject& detectedObject)
+    const nx::analytics::db::DetectedObject& detectedObject)
 {
     auto track = nx::sdk::makePtr<nx::sdk::List<ITimestampedObjectMetadata>>();
     for (const auto& objectPosition : detectedObject.track)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QHash>
 #include <QtCore/QFileSystemWatcher>
 #include <QtCore/QTimer>
 

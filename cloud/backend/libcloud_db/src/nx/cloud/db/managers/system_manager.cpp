@@ -2032,8 +2032,7 @@ nx::sql::DBResult SystemManager::processRemoveResourceParam(
 {
     // This can only be removal of already-removed user attribute.
     NX_VERBOSE(this, "Ignoring transaction %1 with systemId %2, resourceId %3, param name %4",
-        ::ec2::ApiCommand::toString(data.command), systemId, data.params.resourceId,
-        data.params.name);
+        data.command, systemId, data.params.resourceId, data.params.name);
     return nx::sql::DBResult::ok;
 }
 

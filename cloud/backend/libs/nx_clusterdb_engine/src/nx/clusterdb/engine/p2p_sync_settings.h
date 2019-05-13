@@ -21,6 +21,7 @@ public:
     unsigned int maxConcurrentConnectionsFromSystem;
     std::chrono::milliseconds nodeConnectRetryTimeout;
     nx::cloud::discovery::Settings discovery;
+    bool groupCommandsUnderDbTransaction = false;
 
     SynchronizationSettings();
 

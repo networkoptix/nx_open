@@ -6,6 +6,8 @@
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QWidget>
 
+#include <nx/utils/log/assert.h>
+
 namespace {
     const int extrah = 40;
     const int extraw = 10;

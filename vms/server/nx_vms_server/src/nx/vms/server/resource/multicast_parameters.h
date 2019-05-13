@@ -1,5 +1,9 @@
 #pragma once
 
+#include <optional>
+
+#include <QtCore/QString>
+
 namespace nx::vms::server::resource {
 
 struct MulticastParameters

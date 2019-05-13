@@ -136,7 +136,7 @@ protected:
         const Relay& relayInstance,
         const std::string& hostName)
     {
-        auto url = relayInstance.basicUrl();
+        auto url = relayInstance.httpUrl();
 
         auto host = lm("%1.%2").args(hostName, url.host()).toStdString();
         addLocalHostAlias(host);
@@ -287,7 +287,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        auto url = relay().basicUrl();
+        auto url = relay().httpUrl();
         url.setUserName(listeningPeerHostName.c_str());
 
         auto acceptor = std::make_unique<RelayConnectionAcceptor>(url);
@@ -621,7 +621,7 @@ protected:
             addRelayInstance({ relayNameArgument.c_str() });
 
             nx::network::SocketGlobals::addressResolver().addFixedAddress(
-                m_relayNames.back(), nx::network::SocketAddress(nx::network::HostAddress::localhost, relay(i).basicUrl().port()));
+                m_relayNames.back(), nx::network::SocketAddress(nx::network::HostAddress::localhost, relay(i).httpUrl().port()));
         }
 
         m_httpClient.setResponseReadTimeout(network::kNoTimeout);

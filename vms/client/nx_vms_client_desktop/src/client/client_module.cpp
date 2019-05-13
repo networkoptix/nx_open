@@ -465,6 +465,8 @@ void QnClientModule::initSingletons()
     m_wearableManager = new WearableManager(commonModule);
 
     m_videoCache = new VideoCache(commonModule);
+    if (ini().globalLiveVideoCacheLength > 0)
+        m_videoCache->setCacheSize(std::chrono::seconds(ini().globalLiveVideoCacheLength));
 
     commonModule->store(m_uploadManager);
     commonModule->store(m_wearableManager);

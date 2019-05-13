@@ -111,7 +111,7 @@ void MSSettings::syncRoSettings() const
     m_roSettings->sync();
 }
 
-nx::analytics::storage::Settings MSSettings::analyticEventsStorage() const
+nx::analytics::db::Settings MSSettings::analyticEventsStorage() const
 {
     return m_analyticEventsStorage;
 }
