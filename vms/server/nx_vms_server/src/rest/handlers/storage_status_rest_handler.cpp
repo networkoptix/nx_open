@@ -29,12 +29,7 @@ QnStorageStatusReply createReply(
     reply.storage.url  = storage->getUrl();
     reply.storage = QnStorageSpaceData(storage, false);
     reply.storage.storageStatus = QnStorageManager::storageStatus(serverModule, storage);
-
-    QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
-    if (fileStorage)
-        reply.storage.reservedSpace = fileStorage->calcInitialSpaceLimit();
-    else
-        reply.storage.reservedSpace = QnStorageResource::kThirdPartyStorageLimit;
+    reply.storage.isWritable &= QnStorageManager::canStorageBeUsedByVms(storage);
 
 #if defined (Q_OS_WIN)
     if (!reply.storage.isExternal)
@@ -66,7 +61,9 @@ QnStorageResourcePtr QnStorageStatusRestHandler::getOrCreateStorage(
     if (!storage)
     {
         storage = QnStorageResourcePtr(serverModule()->storagePluginFactory()->createStorage(
-            serverModule()->commonModule(), storageUrl, false));
+            serverModule()->commonModule(),
+            storageUrl,
+            false));
     }
 
     if (storage)

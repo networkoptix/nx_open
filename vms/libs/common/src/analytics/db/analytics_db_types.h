@@ -82,7 +82,7 @@ struct Filter
      * Coordinates are in range [0;1].
      */
     QRectF boundingBox;
-
+    std::vector<common::metadata::Attribute> requiredAttributes;
     /**
      * Set of words separated by spaces, commas, etc...
      * Search is done across all attributes (names and values).

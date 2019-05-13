@@ -29,7 +29,6 @@
 #include "api/model/recording_stats_reply.h"
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <recorder/camera_info.h>
-#include <recorder/space_info.h>
 
 #include <atomic>
 #include <future>
@@ -58,6 +57,7 @@ class QnUuid;
 class QnScheduleSync;
 
 namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
+namespace nx::vms::server { class WritableStoragesHelper; }
 
 class QnStorageManager: public QObject, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
@@ -70,7 +70,7 @@ public:
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;   /* Map by camera unique id. */
     typedef QMap<QString, QSet<QDate>> UsedMonthsMap; /* Map by camera unique id. */
 
-    static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
+    static constexpr int64_t kBigStorageTreshold = 10;
 
     QnStorageManager(
         QnMediaServerModule* serverModule,
@@ -134,13 +134,7 @@ public:
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
 
-    QnStorageResourcePtr getOptimalStorageRoot(
-        std::function<bool(const QnStorageResourcePtr &)> pred =
-            [](const QnStorageResourcePtr &storage) {
-                return !storage->hasFlags(Qn::storage_fastscan) ||
-                        storage->getFreeSpace() > storage->getSpaceLimit();
-            });
-
+    QnStorageResourcePtr getOptimalStorageRoot();
     QnStorageResourceList getStorages() const;
 
     /*
@@ -152,8 +146,8 @@ public:
     /*
      * Return all storages which can be used for writing
      */
-    QSet<QnStorageResourcePtr> getAllWritableStorages(
-        const QnStorageResourceList* additionalStorages = nullptr) const;
+    QnStorageResourceList getAllWritableStorages(
+        const QnStorageResourceList& additional = QnStorageResourceList()) const;
 
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
@@ -169,7 +163,7 @@ public:
     void clearMaxDaysData(QnServer::ChunksCatalog catalogIdx);
 
     void deleteRecordsToTime(DeviceFileCatalogPtr catalog, qint64 minTime);
-    void clearDbByChunk(DeviceFileCatalogPtr catalog, const DeviceFileCatalog::Chunk& chunk);
+    void clearDbByChunk(DeviceFileCatalogPtr catalog, const nx::vms::server::Chunk& chunk);
 
     bool isWritableStoragesAvailable() const;
 
@@ -197,6 +191,8 @@ public:
     static Qn::StorageStatuses storageStatus(
         QnMediaServerModule* serverModule,
         const QnStorageResourcePtr& storage);
+
+    static bool canStorageBeUsedByVms(const QnStorageResourcePtr& storage);
 
 signals:
     void storagesAvailable();
@@ -261,7 +257,7 @@ private:
     void updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths);
     void findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog);
     void addDataFromDatabase(const QnStorageResourcePtr &storage);
-    bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
+    bool writeCSVCatalog(const QString& fileName, const QVector<nx::vms::server::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
     void getCamerasWithArchiveInternal(std::set<QString>& result,  const FileCatalogMap& catalog) const;
     void testStoragesDone();
@@ -285,8 +281,8 @@ private:
     );
     void updateCameraHistory() const;
     static std::vector<QnUuid> getCamerasWithArchive(QnMediaServerModule* serverModule);
-    int64_t calculateNxOccupiedSpace(int storageIndex) const;
     bool hasArchive(int storageIndex) const;
+    int64_t occupiedSpace(int storageIndex) const;
     QnStorageResourcePtr getStorageByIndex(int index) const;
     bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
     void startAuxTimerTasks();
@@ -329,6 +325,7 @@ private:
 
     QnStorageScanData m_archiveRebuildInfo;
 
+    friend class nx::vms::server::WritableStoragesHelper;
     friend class RebuildAsyncTask;
     friend class AuxiliaryTask;
     friend class ArchiveIndexer;
@@ -346,7 +343,6 @@ private:
     std::atomic<bool> m_firstStoragesTestDone;
 
     bool m_isRenameDisabled;
-    nx::recorder::SpaceInfo m_spaceInfo;
     nx::caminfo::ServerWriterHandler m_camInfoWriterHandler;
     nx::caminfo::Writer m_camInfoWriter;
 
