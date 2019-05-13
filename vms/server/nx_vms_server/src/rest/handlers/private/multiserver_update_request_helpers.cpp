@@ -13,7 +13,6 @@ void checkUpdateStatusRemotely(
     QList<nx::update::Status>* reply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context)
 {
-    static const QString kOfflineMessage = "peer is offline";
     auto mergeFunction =
         [serverModule, reply](
             const QnUuid& serverId, bool success, QnJsonRestResult& result, QnJsonRestResult&)
@@ -23,27 +22,15 @@ void checkUpdateStatusRemotely(
                 const auto remotePeerUpdateStatus =
                     result.deserialized<QList<nx::update::Status>>()[0];
 
-                if (remotePeerUpdateStatus.serverId.isNull())
-                {
-                    reply->append(nx::update::Status(
-                        serverId, nx::update::Status::Code::offline, kOfflineMessage));
-                }
-                else
-                {
-                    reply->append(remotePeerUpdateStatus);
-                }
+                reply->append(remotePeerUpdateStatus.serverId.isNull()
+                    ? nx::update::Status(serverId, nx::update::Status::Code::offline)
+                    : remotePeerUpdateStatus);
             }
             else
             {
-                if (serverId != serverModule->commonModule()->moduleGUID())
-                {
-                    reply->append(nx::update::Status(
-                        serverId, nx::update::Status::Code::offline, kOfflineMessage));
-                }
-                else
-                {
-                    reply->append(serverModule->updateManager()->status());
-                }
+                reply->append(serverId != serverModule->commonModule()->moduleGUID()
+                    ? nx::update::Status(serverId, nx::update::Status::Code::offline)
+                    : serverModule->updateManager()->status());
             }
         };
 
@@ -54,7 +41,7 @@ void checkUpdateStatusRemotely(
     auto offlineServers = QSet<QnMediaServerResourcePtr>::fromList(
         serverModule->commonModule()->resourcePool()->getAllServers(Qn::Offline));
 
-    for (const auto offlineServer: offlineServers)
+    for (const auto& offlineServer: offlineServers)
     {
         if (ifParticipantPredicate)
         {
@@ -75,8 +62,8 @@ void checkUpdateStatusRemotely(
             continue;
         }
 
-        reply->append(nx::update::Status(offlineServer->getId(), nx::update::Status::Code::offline,
-            kOfflineMessage));
+        reply->append(nx::update::Status(
+            offlineServer->getId(), nx::update::Status::Code::offline));
     }
 }
 

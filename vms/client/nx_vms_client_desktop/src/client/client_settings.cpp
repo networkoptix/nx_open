@@ -168,8 +168,6 @@ QnClientSettings::QnClientSettings(const QnStartupParameters& startupParameters,
     load();
     NX_ASSERT(!updateFeedUrl().isEmpty());
 
-    migrateKnownServerConnections();
-
     nx::utils::file_system::ensureDir(mediaFolder());
 
     setThreadSafe(true);
@@ -453,12 +451,16 @@ QnPropertyStorage::UpdateStatus QnClientSettings::updateValue(int id, const QVar
 
 void QnClientSettings::migrateKnownServerConnections()
 {
+    const auto clientCoreSettings = QnClientCoreSettings::instance();
+    if (!NX_ASSERT(clientCoreSettings))
+        return;
+
     const auto& knownUrls = knownServerUrls();
     if (knownUrls.isEmpty())
         return;
 
-    auto migratedKnownUrls = qnClientCoreSettings->knownServerUrls();
-    const auto& knownConnections = qnClientCoreSettings->knownServerConnections();
+    auto migratedKnownUrls = clientCoreSettings->knownServerUrls();
+    const auto& knownConnections = clientCoreSettings->knownServerConnections();
 
     for (const auto qUrl: knownUrls)
     {
@@ -482,7 +484,7 @@ void QnClientSettings::migrateKnownServerConnections()
         migratedKnownUrls.prepend(url);
     }
 
-    qnClientCoreSettings->setKnownServerUrls(migratedKnownUrls);
+    clientCoreSettings->setKnownServerUrls(migratedKnownUrls);
     setKnownServerUrls(QList<QUrl>());
 }
 
@@ -510,4 +512,9 @@ bool QnClientSettings::isWritable() const
 QSettings* QnClientSettings::rawSettings()
 {
     return m_settings;
+}
+
+void QnClientSettings::migrate()
+{
+    migrateKnownServerConnections();
 }

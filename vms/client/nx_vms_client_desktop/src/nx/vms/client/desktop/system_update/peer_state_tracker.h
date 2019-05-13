@@ -23,6 +23,7 @@ struct UpdateItem
 {
     using Clock = std::chrono::steady_clock;
     using TimePoint = std::chrono::time_point<Clock>;
+    using ErrorCode = nx::update::Status::ErrorCode;
 
     enum class Component
     {
@@ -33,7 +34,16 @@ struct UpdateItem
     QnUuid id;
     StatusCode state = StatusCode::offline;
     int progress = -1;
+
+    /**
+     * Message generated from nx::update::Status::message.
+     * It is displayed only in debug mode.
+     */
+    QString debugMessage;
+    /** Message generated from nx::update::Status::errorCode. */
     QString statusMessage;
+    ErrorCode errorCode = ErrorCode::noError;
+
     QString verificationMessage;
 
     /** Current version of the component. */
@@ -142,6 +152,12 @@ public:
 
     bool hasStatusErrors() const;
 
+    /**
+     * Generates a common error for multiple peers.
+     * This error will be displayed in error dialog from multi_server_updates_widget
+     */
+    QString getErrorMessage() const;
+
 public:
     std::map<QnUuid, nx::update::Status::Code> allPeerStates() const;
     std::map<QnUuid, QnMediaServerResourcePtr> activeServers() const;
@@ -194,6 +210,8 @@ public:
     void setTask(const QSet<QnUuid>& targets);
 
     void setTaskError(const QSet<QnUuid>& targets, const QString& error);
+
+    static QString errorString(nx::update::Status::ErrorCode code);
 
 public:
     /**

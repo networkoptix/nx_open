@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QObject>
+
 class QnLabelFocusListener: public QObject
 {
 public:

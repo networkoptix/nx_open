@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QByteArray>
+
 namespace Qn {
 
 enum QnMobileClientRoles
@@ -20,4 +22,4 @@ enum QnMobileClientRoles
 
 QByteArray roleName(int role);
 
-}
+} // namespace Qn

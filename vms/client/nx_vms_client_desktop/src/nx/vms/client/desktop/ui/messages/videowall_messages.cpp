@@ -1,5 +1,7 @@
 #include "videowall_messages.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QPushButton>
 

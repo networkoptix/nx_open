@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QStringList>
+
 namespace nx {
 namespace vms::server {
 namespace fs {

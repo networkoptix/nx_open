@@ -7,6 +7,8 @@
 #include <boost/optional.hpp>
 #endif
 
+#include <QtCore/QString>
+
 namespace nx {
 namespace vms::server {
 namespace hls {

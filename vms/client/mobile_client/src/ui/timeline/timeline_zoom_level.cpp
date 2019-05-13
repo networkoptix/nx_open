@@ -140,19 +140,19 @@ QString QnTimelineZoomLevel::baseValue(qint64 tick) const {
     QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
     switch (type) {
     case Milliseconds:
-        return dateTime.toString(lit("z"));
+        return dateTime.toString(QStringLiteral("z"));
     case Seconds:
-        return dateTime.toString(lit("s"));
+        return dateTime.toString(QStringLiteral("s"));
     case Minutes:
-        return dateTime.toString(lit("h"));
+        return dateTime.toString(QStringLiteral("h"));
     case Hours:
-        return dateTime.toString(lit("h"));
+        return dateTime.toString(QStringLiteral("h"));
     case Days:
-        return dateTime.toString(lit("d"));
+        return dateTime.toString(QStringLiteral("d"));
     case Months:
         return QString();
     case Years:
-        return dateTime.toString(lit("yyyy"));
+        return dateTime.toString(QStringLiteral("yyyy"));
     }
     return QString();
 }
@@ -161,9 +161,9 @@ QString QnTimelineZoomLevel::subValue(qint64 tick) const {
     QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
     switch (type) {
     case Minutes:
-        return dateTime.toString(lit("mm"));
+        return dateTime.toString(QStringLiteral("mm"));
     case Hours:
-        return dateTime.toString(lit("mm"));
+        return dateTime.toString(QStringLiteral("mm"));
     default:
         return QString();
     }
@@ -181,12 +181,12 @@ QString QnTimelineZoomLevel::suffix(qint64 tick) const {
     case Months:
         return QLocale().standaloneMonthName(dateTime.date().month(), QLocale::ShortFormat);
     case Milliseconds:
-        return lit("ms");
+        return QStringLiteral("ms");
     case Seconds:
-        return lit("s");
+        return QStringLiteral("s");
     case Minutes:
     case Hours:
-        return lit(":");
+        return QStringLiteral(":");
     default:
         return QString();
     }
@@ -197,14 +197,14 @@ QString QnTimelineZoomLevel::longestText() const
     switch (type)
     {
         case Milliseconds:
-            return lit("000 ms");
+            return QStringLiteral("000 ms");
         case Seconds:
-            return lit("00 s");
+            return QStringLiteral("00 s");
         case Minutes:
         case Hours:
-            return lit("00:00");
+            return QStringLiteral("00:00");
         case Years:
-            return lit("0000");
+            return QStringLiteral("0000");
         case Days:
         case Months:
             // Cannot be evaluated accurately.

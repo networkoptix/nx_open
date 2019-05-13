@@ -12,52 +12,52 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
     QCommandLineParser parser;
 
     const auto qmlRootOption = QCommandLineOption(
-        lit("qml-root"),
-        lit("The directory which contains runtime ui resources: 'qml' and 'images'."),
-        lit("qmlRoot"));
+        "qml-root",
+        "The directory which contains runtime ui resources: 'qml' and 'images'.",
+        "qmlRoot");
     parser.addOption(qmlRootOption);
 
     const auto liteModeOption = QCommandLineOption(
-        lit("lite-mode"),
-        lit("Enable lite mode."));
+        "lite-mode",
+        "Enable lite mode.");
     parser.addOption(liteModeOption);
 
     const auto logLevelOption = QCommandLineOption(
-        lit("log-level"),
-        lit("Log level."),
-        lit("logLevel"));
+        "log-level",
+        "Log level.",
+        "logLevel");
     parser.addOption(logLevelOption);
 
     const auto urlOption = QCommandLineOption(
-        lit("url"),
-        lit("URL to be used for server connection instead of asking login/password."),
-        lit("url"));
+        "url",
+        "URL to be used for server connection instead of asking login/password.",
+        "url");
     parser.addOption(urlOption);
 
     auto videowallInstanceGuidOption = QCommandLineOption(
-        lit("videowall-instance-guid"),
-        lit("GUID which is used to check Videowall Control messages."),
-        lit("videowallInstanceGuid"));
+        "videowall-instance-guid",
+        "GUID which is used to check Videowall Control messages.",
+        "videowallInstanceGuid");
     parser.addOption(videowallInstanceGuidOption);
     videowallInstanceGuidOption.setHidden(true);
 
     const auto autoLoginModeOption = QCommandLineOption(
-        lit("auto-login"),
-        lit("Auto-login mode: enabled, disabled or auto (default)."),
-        lit("autoLoginMode"));
+        "auto-login",
+        "Auto-login mode: enabled, disabled or auto (default).",
+        "autoLoginMode");
     parser.addOption(autoLoginModeOption);
 
     auto testOption = QCommandLineOption(
-        lit("test"),
-        lit("Enable test."),
-        lit("test"));
+        "test",
+        "Enable test.",
+        "test");
     testOption.setHidden(true);
     parser.addOption(testOption);
 
     auto webSocketPortOption = QCommandLineOption(
-       lit("webSocketPort"),
-       lit("WEB socket port."),
-       lit("webSocketPort"));
+       "webSocketPort",
+       "WEB socket port.",
+       "webSocketPort");
     webSocketPortOption.setHidden(true);
     parser.addOption(webSocketPortOption);
 
@@ -80,11 +80,11 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
     if (parser.isSet(autoLoginModeOption))
     {
         const auto value = parser.value(autoLoginModeOption);
-        if (value == lit("disabled"))
+        if (value == "disabled")
             autoLoginMode = AutoLoginMode::Disabled;
-        else if (value == lit("enabled"))
+        else if (value == "enabled")
             autoLoginMode = AutoLoginMode::Enabled;
-        else if (value == lit("auto"))
+        else if (value == "auto")
             autoLoginMode = AutoLoginMode::Auto;
     }
 
@@ -95,5 +95,5 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
     }
 
     if (parser.isSet(webSocketPortOption))
-        webSocketPort = parser.value(webSocketPortOption).toUShort();
+        webSocketPort = parser.value(webSocketPortOption).toShort();
 }

@@ -49,7 +49,7 @@ private:
     QPointF m_corner;
 
     /** Viewport that this selection item will be drawn at. */
-    QWidget *m_viewport;
+    QWidget *m_viewport = nullptr;
 };
 
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/utils/thread/mutex.h>
+
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 

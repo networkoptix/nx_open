@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtGui/QIcon>
+
 #include <nx/utils/uuid.h>
 
 #include <common/common_globals.h>

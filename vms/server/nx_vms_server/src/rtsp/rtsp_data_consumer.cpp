@@ -495,11 +495,12 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1) )
     {
-        NX_ASSERT( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) );
         //TODO #ak changing packet's timestamp. It is OK for archive, but generally unsafe.
             //Introduce safe solution
-        if( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) )
+        if (!media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE))
             (static_cast<QnAbstractMediaData*>(nonConstData.get()))->timestamp /= m_streamingSpeed;
+        else
+            NX_DEBUG(this, "Speed parameter was ignored for live mode");
     }
 
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;

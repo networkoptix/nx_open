@@ -1,8 +1,9 @@
 #include "fixed_rotation.h"
 
 #include <QtCore/QtMath>
-
 #include <QtWidgets/QGraphicsWidget>
+
+#include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
 
 QnFixedRotationTransform::QnFixedRotationTransform(QObject *parent):

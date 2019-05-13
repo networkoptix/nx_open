@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QSize>
 
 class QWidget;
 class QWidgetPrivate;

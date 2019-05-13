@@ -1,6 +1,7 @@
 #pragma once
 
-#include <qglobal.h>
+#include <QtCore/QList>
+
 #include <nx/network/buffer.h>
 
 namespace nx

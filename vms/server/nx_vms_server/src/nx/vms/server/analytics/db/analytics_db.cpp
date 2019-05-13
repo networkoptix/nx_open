@@ -59,11 +59,13 @@ bool EventsStorage::initialize(const Settings& settings)
     
     auto dbConnectionOptions = settings.dbConnectionOptions;
     dbConnectionOptions.dbName = settings.path + "/" + dbConnectionOptions.dbName;
-    m_dbController = std::make_shared<DbController>(dbConnectionOptions);
+    m_dbController = std::make_unique<DbController>(dbConnectionOptions);
     if (!m_dbController->initialize()
         || !readMaximumEventTimestamp()
         || !loadDictionaries())
     {
+        m_dbController.reset();
+        NX_WARNING(this, "Failed to open analytics DB at %1", settings.path);
         return false;
     }
 
@@ -94,6 +96,13 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
     if (!kUseTrackAggregation)
     {
         QnMutexLocker lock(&m_dbControllerMutex);
+
+        if (!m_dbController)
+        {
+            NX_DEBUG(this, "Attempt to write to non-initialized analytics DB");
+            return;
+        }
+
         m_dbController->queryExecutor().executeUpdate(
             std::bind(&EventsStorage::savePacket, this, _1, std::move(packet)),
             [this](sql::DBResult resultCode) { logDataSaveResult(resultCode); },
@@ -102,13 +111,19 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
     else
     {
         QnMutexLocker lock(&m_mutex);
-
         savePacketDataToCache(lock, packet);
-
         auto detectionDataSaver = takeDataToSave(lock, /*flush*/ false);
+        lock.unlock();
+
+        QnMutexLocker dbLock(&m_dbControllerMutex);
+        
+        if (!m_dbController)
+        {
+            NX_DEBUG(this, "Attempt to write to non-initialized analytics DB");
+            return;
+        }
 
         // TODO: #ak Avoid executeUpdate for every packet. We need it only to save a time period.
-        QnMutexLocker dbLock(&m_dbControllerMutex);
         m_dbController->queryExecutor().executeUpdate(
             [this, packet = packet, detectionDataSaver = std::move(detectionDataSaver)](
                 nx::sql::QueryContext* queryContext) mutable
@@ -133,6 +148,14 @@ void EventsStorage::createLookupCursor(
     NX_VERBOSE(this, "Requested cursor with filter %1", filter);
 
     QnMutexLocker lock(&m_dbControllerMutex);
+
+    if (!m_dbController)
+    {
+        NX_DEBUG(this, "Attempt to stream data from non-initialized analytics DB");
+        lock.unlock();
+        completionHandler(ResultCode::error, nullptr);
+        return;
+    }
 
     if (kUseTrackAggregation)
     {
@@ -183,8 +206,17 @@ void EventsStorage::lookup(
     Filter filter,
     LookupCompletionHandler completionHandler)
 {
-    auto result = std::make_shared<std::vector<DetectedObject>>();
     QnMutexLocker lock(&m_dbControllerMutex);
+
+    if (!m_dbController)
+    {
+        NX_DEBUG(this, "Attempt to look up objects in non-initialized analytics DB");
+        lock.unlock();
+        completionHandler(ResultCode::error, LookupResult());
+        return;
+    }
+
+    auto result = std::make_shared<std::vector<DetectedObject>>();
     m_dbController->queryExecutor().executeSelect(
         [this, filter = std::move(filter), result](nx::sql::QueryContext* queryContext)
         {
@@ -216,10 +248,17 @@ void EventsStorage::lookupTimePeriods(
     TimePeriodsLookupOptions options,
     TimePeriodsLookupCompletionHandler completionHandler)
 {
-    using namespace std::placeholders;
+    QnMutexLocker lock(&m_dbControllerMutex);
+
+    if (!m_dbController)
+    {
+        NX_DEBUG(this, "Attempt to look up time periods in non-initialized analytics DB");
+        lock.unlock();
+        completionHandler(ResultCode::error, QnTimePeriodList());
+        return;
+    }
 
     auto result = std::make_shared<QnTimePeriodList>();
-    QnMutexLocker lock(&m_dbControllerMutex);
     m_dbController->queryExecutor().executeSelect(
         [this, filter = std::move(filter), options = std::move(options), result](
             nx::sql::QueryContext* queryContext)
@@ -255,10 +294,16 @@ void EventsStorage::markDataAsDeprecated(
 {
     using namespace std::placeholders;
 
+    QnMutexLocker lock(&m_dbControllerMutex);
+
+    if (!m_dbController)
+    {
+        NX_DEBUG(this, "Attempt to delete data from non-initialized analytics DB");
+        return;
+    }
+
     NX_VERBOSE(this, "Cleaning data of device %1 up to timestamp %2",
         deviceId, oldestDataToKeepTimestamp.count());
-
-    QnMutexLocker lock(&m_dbControllerMutex);
 
     if (kUseTrackAggregation)
     {
@@ -278,6 +323,13 @@ void EventsStorage::markDataAsDeprecated(
 void EventsStorage::flush(StoreCompletionHandler completionHandler)
 {
     QnMutexLocker lock(&m_dbControllerMutex);
+
+    if (!m_dbController)
+    {
+        NX_DEBUG(this, "Attempt to flush non-initialized analytics DB");
+        return;
+    }
+
     m_dbController->queryExecutor().executeUpdate(
         [this](nx::sql::QueryContext* queryContext)
         {

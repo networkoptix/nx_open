@@ -1,5 +1,7 @@
 #include "mandatory.h"
 
+#include <nx/utils/log/assert.h>
+
 #include <ui/style/custom_style.h>
 
 bool defaultValidateFunction( const QString &text ) {

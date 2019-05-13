@@ -1,7 +1,11 @@
 #pragma once
 
+#include <QtCore/QPoint>
+
 class QWidget;
+class QLayout;
 class QGraphicsWidget;
+class QGraphicsProxyWidget;
 
 namespace nx::vms::client::desktop {
 

@@ -38,7 +38,7 @@ WorkbenchSessionTimeoutWatcher::WorkbenchSessionTimeoutWatcher(QnWorkbenchConnec
                 / kMsecPerMinute;
 
             if (minutesPassed >= sessionTimeoutMinutes)
-                owner->disconnectFromServer( DisconnectFlag::Force | DisconnectFlag::SessionTimeout);
+                owner->disconnectFromServer(DisconnectFlag::Force | DisconnectFlag::SessionTimeout);
         });
 
     const auto handleConnectionStateChanged =

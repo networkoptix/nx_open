@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QPoint>
+
 #include "abstract_workbench_panel.h"
 
 class QGraphicsItem;
