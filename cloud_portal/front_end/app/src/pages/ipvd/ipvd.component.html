@@ -39,13 +39,11 @@
         <div class="order-0 order-md-1 pb-3 pl-0 pl-lg-2 pr-0 col-12 col-md-5 col-xl-3"
              *ngIf="activeCamera">
 
-            <nx-block id="cam-view">
-                <nx-cam-view
-                        [activeCamera]="activeCamera"
-                        (onCloseView)="resetActiveCamera()"
-                        (onFeedbackClick)="openFeedback('device')">
-                </nx-cam-view>
-            </nx-block>
+            <nx-cam-view
+                    [activeCamera]="activeCamera"
+                    (onCloseView)="resetActiveCamera()"
+                    (onFeedbackClick)="openFeedback('device')">
+            </nx-cam-view>
         </div>
     </div>
 
