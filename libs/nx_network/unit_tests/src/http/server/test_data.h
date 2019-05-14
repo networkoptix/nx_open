@@ -3,15 +3,16 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/http_types.h>
 
-namespace nx {
-namespace network {
-namespace http {
-namespace server {
-namespace test {
+namespace nx::network::http::test {
 
 struct Serializable
 {
     int dummyInt = 0;
+
+    bool operator==(const Serializable& right) const
+    {
+        return dummyInt == right.dummyInt;
+    }
 };
 
 #define Serializable_Fields (dummyInt)
@@ -23,8 +24,4 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Serializable),
     (json))
 
-} // namespace test
-} // namespace server
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http::test

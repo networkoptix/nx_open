@@ -20,8 +20,6 @@ namespace test {
 
 using nx::hpm::MediaServerEmulator;
 
-constexpr const std::chrono::seconds kDefaultTestTimeout = std::chrono::seconds(15);
-
 class UdpTunnelConnector:
     public cloud::test::TunnelConnector
 {
@@ -141,7 +139,6 @@ TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
 
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen().first);
 
-    nx::utils::promise<ConnectResult> connectedPromise;
     CrossNatConnector connector(
         &SocketGlobals::cloud(),
         nx::network::SocketAddress((server1->serverId() + "." + system1.id).constData()));
@@ -149,7 +146,7 @@ TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
 
     connector.connect(
         connectTimeout,
-        [&connectedPromise](
+        [](
             SystemError::ErrorCode /*errorCode*/,
             std::unique_ptr<AbstractOutgoingTunnelConnection> /*connection*/)
         {

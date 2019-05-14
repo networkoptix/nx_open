@@ -19,7 +19,7 @@ public:
             stopWhileInAioThread();
     }
 
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread)
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
     {
         stun::AbstractAsyncClient::bindToAioThread(aioThread);
     }
@@ -64,7 +64,7 @@ public:
     }
 
     virtual bool addConnectionTimer(
-        std::chrono::milliseconds /*period*/, TimerHandler /*handler*/, void* /*client*/)
+        std::chrono::milliseconds /*period*/, TimerHandler /*handler*/, void* /*client*/) override
     {
         return true;
     }

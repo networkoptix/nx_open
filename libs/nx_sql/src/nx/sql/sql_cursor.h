@@ -38,7 +38,7 @@ public:
         std::promise<std::tuple<DBResult, Record>> recordFetched;
         m_asyncSqlQueryExecutor->fetchNextRecordFromCursor<Record>(
             m_id,
-            [this, &recordFetched](DBResult resultCode, Record record)
+            [&recordFetched](DBResult resultCode, Record record)
             {
                 recordFetched.set_value(std::make_tuple(resultCode, std::move(record)));
             });
