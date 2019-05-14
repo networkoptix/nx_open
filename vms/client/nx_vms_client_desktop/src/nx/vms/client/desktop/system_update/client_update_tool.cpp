@@ -303,7 +303,6 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
 
         const auto code = m_downloader->addFile(info);
         NX_VERBOSE(this, "setUpdateTarget(%1) m_downloader->addFile code=%2", contents.info.version, code);
-        m_updateFile = m_downloader->filePath(m_clientPackage.file);
 
         if (code == common::p2p::downloader::ResultCode::fileAlreadyExists
             || code == common::p2p::downloader::ResultCode::fileAlreadyDownloaded)
@@ -362,8 +361,11 @@ void ClientUpdateTool::atDownloadFinished(const QString& fileName)
     if (fileName != m_clientPackage.file)
         return;
 
+    m_updateFile = m_downloader->filePath(fileName);
+
     NX_VERBOSE(this, "atDownloadFinished(%1) - finally downloaded file to %2",
-        fileName, m_downloader->filePath(fileName));
+        fileName, m_updateFile);
+
     setState(State::readyInstall);
 }
 
