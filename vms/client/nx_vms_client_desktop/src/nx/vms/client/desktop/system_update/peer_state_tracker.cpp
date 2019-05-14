@@ -809,27 +809,27 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
         case Code::noError:
             return "";
         case Code::updatePackageNotFound:
-            return tr("Update package not found");
+            return tr("Update package can't be not found.");
         case Code::noFreeSpaceToDownload:
-            return tr("Not enough space to download files");
+            return tr("There is not enough space to download update files.");
         case Code::noFreeSpaceToExtract:
-            return tr("Not enough space to extract files");
+            return tr("There is not enough space to extract update files.");
         case Code::downloadFailed:
-            return tr("Failed to download update files");
+            return tr("Failed to download update packages.");
         case Code::invalidUpdateContents:
-            return tr("Update contents are invalid");
+            return tr("Update contents are invalid.");
         case Code::corruptedArchive:
-            return tr("Update archive is invalid");
+            return tr("Update archive is invalid.");
         case Code::extractionError:
-            return tr("Failed to extract update files");
+            return tr("Update files cannot be extracted.");
         case Code::internalDownloaderError:
-            return tr("Internal downloader error");
+            return tr("Internal downloader error.");
         case Code::internalError:
-            return tr("Iternal server error");
+            return tr("Iternal server error.");
         case Code::unknownError:
-            return tr("Unknown error");
+            return tr("Unknown error.");
         case Code::applauncherError:
-            return tr("Internal client error");
+            return tr("Internal client error.");
     }
     return tr("Unknown error.");
 }
