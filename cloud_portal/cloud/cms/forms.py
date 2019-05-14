@@ -22,7 +22,7 @@ def convert_meta_to_description(meta):
                      }
     converted_msg = ""
     if 'size' in meta:
-        meta['size'] = meta['size'] / BYTES_TO_MEGABYTES
+        meta['size'] = round(meta['size'] / BYTES_TO_MEGABYTES, 2)
     for k in meta:
         if k in meta_to_plain:
             value = meta[k]

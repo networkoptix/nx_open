@@ -908,7 +908,7 @@
           },
           {
             "name": "version",
-            "label": "Version",
+            "label": "Integration version",
             "value": "",
             "description": "",
             "type": "text",
@@ -918,9 +918,10 @@
             "name": "changelog",
             "label": "Version Changelog",
             "value": "",
-            "description": "",
+            "description": "This information is only visible to reviews and not users.",
             "type": "html",
-            "optional": true
+            "optional": true,
+            "public": false
           }
         ]
       },
@@ -943,12 +944,14 @@
             "name": "overviewScreenshot1",
             "label": "Screenshot 1",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -956,12 +959,14 @@
             "name": "overviewScreenshot2",
             "label": "Screenshot 2",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -969,12 +974,14 @@
             "name": "overviewScreenshot3",
             "label": "Screenshot 3",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1006,12 +1013,14 @@
             "name": "instructionScreenshot1",
             "label": "Screenshot 1",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1019,12 +1028,14 @@
             "name": "instructionScreenshot2",
             "label": "Screenshot 2",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1032,12 +1043,14 @@
             "name": "instructionScreenshot3",
             "label": "Screenshot 3",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1045,12 +1058,14 @@
             "name": "instructionScreenshot4",
             "label": "Screenshot 4",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1058,12 +1073,14 @@
             "name": "instructionScreenshot5",
             "label": "Screenshot 5",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1071,12 +1088,14 @@
             "name": "instructionScreenshot6",
             "label": "Screenshot 6",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1084,12 +1103,14 @@
             "name": "instructionScreenshot7",
             "label": "Screenshot 7",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1097,12 +1118,14 @@
             "name": "instructionScreenshot8",
             "label": "Screenshot 8",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1110,12 +1133,14 @@
             "name": "instructionScreenshot9",
             "label": "Screenshot 9",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1123,12 +1148,14 @@
             "name": "instructionScreenshot10",
             "label": "Screenshot 10",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
