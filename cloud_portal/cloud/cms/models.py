@@ -84,6 +84,7 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'sort_supported_devices_by_popularity': product.read_global_value(
                     "%SORT_SUPPORTED_DEVICES_BY_POPULARITY%"),
                 'support_link': product.read_global_value("%SUPPORT_LINK%"),
+                'privacy_link': product.read_global_value("%PRIVACY_LINK%"),
                 'supported_resolutions': product.read_global_value("%SUPPORTED_RESOLUTIONS%"),
                 'supported_hardware_types': product.read_global_value("%SUPPORTED_HARDWARE_TYPES%"),
                 'search_tags': product.read_global_value("%SEARCH_TAGS%"),

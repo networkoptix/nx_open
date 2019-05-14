@@ -100,6 +100,7 @@ window.L = {};
                     appState.publicReleases = response.publicReleases;
                     appState.trafficRelayHost = response.trafficRelayHost;
                     appState.supportLink = response.supportLink;
+                    appState.privacyLink = response.privacyLink;
                     appState.cloudName = response.cloudName;
                     appState.vmsName = response.vmsName;
 

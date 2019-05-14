@@ -15,8 +15,8 @@ export class MessageModalContent {
     @Input() productId;
     @Input() product;
     @Input() closable;
+    @Input() config;
 
-    config: any;
     lang: any;
     placeholder: string;
     sendMessage: any;
@@ -30,7 +30,6 @@ export class MessageModalContent {
     @ViewChild('feedbackForm') public feedbackForm: NgForm;
 
     constructor(private activeModal: NgbActiveModal,
-                private configService: NxConfigService,
                 private renderer: Renderer2,
                 private translation: TranslateService,
                 @Inject('account') private account: any,
@@ -39,7 +38,6 @@ export class MessageModalContent {
                 @Inject('languageService') private language: any
                 ) {
 
-        this.config = configService.getConfig();
         this.placeholder = '';
         this.lang = this.translation.translations[this.translation.currentLang];
     }
@@ -109,6 +107,8 @@ export class NxModalMessageComponent implements OnInit {
         this.modalRef.componentInstance.messageType = type;
         this.modalRef.componentInstance.product = product;
         this.modalRef.componentInstance.productId = productId;
+        this.modalRef.componentInstance.config = this.config;
+
 
         return this.modalRef;
     }
