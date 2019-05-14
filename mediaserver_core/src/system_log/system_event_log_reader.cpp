@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include <QtCore/QString.h>
+#include <QString>
 
 #ifdef WIN32
     #include <winevt.h>
