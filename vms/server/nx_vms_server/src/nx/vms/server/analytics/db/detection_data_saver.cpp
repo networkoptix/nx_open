@@ -259,7 +259,7 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
     struct Item
     {
         QRegion region;
-        std::vector<long long> attributesIds;
+        std::vector<int64_t> attributesIds;
     };
 
     std::map<std::pair<QnUuid, int /*objectType*/>, Item> regionByObjectType;
@@ -274,7 +274,7 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
         for (const auto& objectId: aggregatedTrackData.objectIds)
         {
             const auto objectAttributes = getObjectDbDataById(objectId);
-            
+
             Item& item = regionByObjectType[
                 {objectAttributes.deviceId, objectAttributes.objectTypeId}];
             item.region += aggregatedTrackData.boundingBox;
@@ -311,9 +311,9 @@ DetectionDataSaver::ObjectDbAttributes
     return result;
 }
 
-long long DetectionDataSaver::combineAttributes(
+int64_t DetectionDataSaver::combineAttributes(
     nx::sql::QueryContext* queryContext,
-    const std::vector<long long>& attributesIds)
+    const std::vector<int64_t>& attributesIds)
 {
     if (attributesIds.empty())
         return -1;

@@ -25,15 +25,15 @@ public:
     AnalyticsArchiveDirectory(
         QnMediaServerModule* mediaServerModule,
         const QString& dataDir);
-    
+
     virtual ~AnalyticsArchiveDirectory() = default;
 
     bool saveToArchive(
         const QnUuid& deviceId,
         std::chrono::milliseconds timestamp,
         const std::vector<QRectF>& region,
-        int objectType,
-        long long allAttributesHash);
+        int64_t objectType,
+        int64_t allAttributesHash);
 
     QnTimePeriodList matchPeriods(
         const std::vector<QnUuid>& deviceIds,

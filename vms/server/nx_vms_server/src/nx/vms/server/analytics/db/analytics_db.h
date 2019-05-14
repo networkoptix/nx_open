@@ -96,8 +96,8 @@ private:
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject,
-        long long attributesId,
-        long long timePeriodId);
+        int64_t attributesId,
+        int64_t timePeriodId);
 
     void updateDictionariesIfNeeded(
         nx::sql::QueryContext* queryContext,

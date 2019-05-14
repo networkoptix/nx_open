@@ -22,8 +22,8 @@ AnalyticsArchive::~AnalyticsArchive()
 bool AnalyticsArchive::saveToArchive(
     std::chrono::milliseconds timestamp,
     const std::vector<QRectF>& region,
-    int objectType,
-    long long allAttributesId)
+    int64_t objectType,
+    int64_t allAttributesId)
 {
     const auto translatedRegion = restore<>(
         region,
@@ -82,7 +82,7 @@ bool AnalyticsArchive::satisfiesFilter(
     if (!filter.objectTypes.empty() && filter.objectTypes.count(item.objectType) == 0)
         return false;
 
-    if (!filter.allAttributesHash.empty() && 
+    if (!filter.allAttributesHash.empty() &&
         filter.allAttributesHash.count(item.allAttributesId) == 0)
     {
         return false;

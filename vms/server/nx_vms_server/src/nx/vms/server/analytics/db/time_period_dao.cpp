@@ -44,7 +44,7 @@ TimePeriodDao::TimePeriodDao(DeviceDao* deviceDao):
 {
 }
 
-long long TimePeriodDao::insertOrUpdateTimePeriod(
+int64_t TimePeriodDao::insertOrUpdateTimePeriod(
     nx::sql::QueryContext* queryContext,
     const common::metadata::DetectionMetadataPacket& packet)
 {
@@ -80,7 +80,7 @@ long long TimePeriodDao::insertOrUpdateTimePeriod(
 
 detail::TimePeriod* TimePeriodDao::insertOrFetchCurrentTimePeriod(
     nx::sql::QueryContext* queryContext,
-    long long deviceId,
+    int64_t deviceId,
     std::chrono::milliseconds packetTimestamp,
     std::chrono::milliseconds packetDuration)
 {
@@ -126,7 +126,7 @@ detail::TimePeriod* TimePeriodDao::insertOrFetchCurrentTimePeriod(
 
 void TimePeriodDao::closeCurrentTimePeriod(
     nx::sql::QueryContext* queryContext,
-    long long deviceId)
+    int64_t deviceId)
 {
     auto periodIter = m_deviceIdToCurrentTimePeriod.find(deviceId);
     NX_ASSERT(periodIter != m_deviceIdToCurrentTimePeriod.end());
@@ -149,7 +149,7 @@ void TimePeriodDao::closeCurrentTimePeriod(
 
 void TimePeriodDao::saveTimePeriodEnd(
     nx::sql::QueryContext* queryContext,
-    long long id,
+    int64_t id,
     std::chrono::milliseconds endTime)
 {
     auto query = queryContext->connection()->createQuery();
@@ -190,7 +190,7 @@ void TimePeriodDao::fillCurrentTimePeriodsCache(
     }
 }
 
-std::optional<detail::TimePeriod> TimePeriodDao::getTimePeriodById(long long id) const
+std::optional<detail::TimePeriod> TimePeriodDao::getTimePeriodById(int64_t id) const
 {
     QnMutexLocker lock(&m_mutex);
 

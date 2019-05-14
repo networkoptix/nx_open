@@ -56,7 +56,7 @@ bool EventsStorage::initialize(const Settings& settings)
     m_dbController.reset();
 
     m_closingDbController = false;
-    
+
     auto dbConnectionOptions = settings.dbConnectionOptions;
     dbConnectionOptions.dbName = settings.path + "/" + dbConnectionOptions.dbName;
     m_dbController = std::make_unique<DbController>(dbConnectionOptions);
@@ -441,8 +441,8 @@ void EventsStorage::insertEvent(
     sql::QueryContext* queryContext,
     const common::metadata::DetectionMetadataPacket& packet,
     const common::metadata::DetectedObject& detectedObject,
-    long long attributesId,
-    long long /*timePeriodId*/)
+    int64_t attributesId,
+    int64_t /*timePeriodId*/)
 {
     sql::SqlQuery insertEventQuery(queryContext->connection());
     insertEventQuery.prepare(QString::fromLatin1(R"sql(
@@ -463,7 +463,7 @@ void EventsStorage::insertEvent(
         ":objectAppearanceId",
         QnSql::serialized_field(detectedObject.objectId));
 
-    insertEventQuery.bindValue(":attributesId", attributesId);
+    insertEventQuery.bindValue(":attributesId", (long long) attributesId);
 
     const auto packedBoundingBox = packRect(detectedObject.boundingBox);
 

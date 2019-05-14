@@ -24,8 +24,8 @@ QnTimePeriodList AnalyticsHelper::matchImage(
         AnalyticsArchive archive(m_dataDir, res->getPhysicalId());
 
         // TODO: #akolesnikov fill it here from filter.
-        std::vector<int> objectTypes;
-        std::vector<int> allAttributesHash;
+        std::vector<int64_t> objectTypes;
+        std::vector<int64_t> allAttributesHash;
 
         // Analytics not use separate files for different video channels.
         // Use motionRegions[0] only because of that.

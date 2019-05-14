@@ -140,7 +140,7 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
     AnalyticsArchive::Filter archiveFilter = prepareArchiveFilter(filter, options);
 
     nx::utils::ElapsedTimer timer;
-    
+
     if (!filter.freeText.isEmpty())
     {
         timer.restart();
@@ -178,7 +178,7 @@ AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
     return archiveFilter;
 }
 
-std::set<int> TimePeriodFetcher::lookupCombinedAttributes(
+std::set<int64_t> TimePeriodFetcher::lookupCombinedAttributes(
     nx::sql::QueryContext* queryContext,
     const QString& text)
 {
@@ -193,9 +193,9 @@ std::set<int> TimePeriodFetcher::lookupCombinedAttributes(
     query->addBindValue(text);
     query->exec();
 
-    std::set<int> attributesIds;
+    std::set<int64_t> attributesIds;
     while (query->next())
-        attributesIds.insert(query->value(0).toInt());
+        attributesIds.insert(query->value(0).toLongLong());
 
     return attributesIds;
 }

@@ -18,8 +18,8 @@ bool AnalyticsArchiveDirectory::saveToArchive(
     const QnUuid& deviceId,
     std::chrono::milliseconds timestamp,
     const std::vector<QRectF>& region,
-    int objectType,
-    long long allAttributesHash)
+    int64_t objectType,
+    int64_t allAttributesHash)
 {
     auto& archive = m_deviceIdToArchive[deviceId];
     if (!archive)
@@ -50,7 +50,7 @@ QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(
     const Filter& filter)
 {
     // TODO: #ak If there are more than one device given we can apply map/reduce to speed things up.
-    
+
     std::vector<QnTimePeriodList> timePeriods;
     if (!deviceIds.empty())
     {

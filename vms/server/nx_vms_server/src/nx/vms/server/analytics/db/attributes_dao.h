@@ -22,7 +22,7 @@ public:
      * @return attributesId
      * NOTE: Throws on failure.
      */
-    long long insertOrFetchAttributes(
+    int64_t insertOrFetchAttributes(
         nx::sql::QueryContext* queryContext,
         const std::vector<common::metadata::Attribute>& eventAttributes);
 
@@ -32,10 +32,10 @@ public:
         const QString& attributesStr);
 
 private:
-    QCache<QByteArray /*md5*/, long long /*id*/> m_attributesCache;
+    QCache<QByteArray /*md5*/, int64_t /*id*/> m_attributesCache;
 
-    void addToAttributesCache(long long id, const QByteArray& content);
-    long long findAttributesIdInCache(const QByteArray& content);
+    void addToAttributesCache(int64_t id, const QByteArray& content);
+    int64_t findAttributesIdInCache(const QByteArray& content);
 };
 
 } // namespace nx::analytics::db

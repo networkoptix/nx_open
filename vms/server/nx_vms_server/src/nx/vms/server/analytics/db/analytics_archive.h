@@ -26,8 +26,8 @@ public:
         std::chrono::milliseconds detailLevel = std::chrono::milliseconds::zero();
         Qt::SortOrder sortOrder = Qt::AscendingOrder;
         int limit = std::numeric_limits<int>::max();
-        std::set<int> objectTypes;
-        std::set<int> allAttributesHash;
+        std::set<int64_t> objectTypes;
+        std::set<int64_t> allAttributesHash;
     };
 
     AnalyticsArchive(const QString& dataDir, const QnUuid& resourceId);
@@ -36,8 +36,8 @@ public:
     bool saveToArchive(
         std::chrono::milliseconds timestamp,
         const std::vector<QRectF>& region,
-        int objectType,
-        long long allAttributesHash);
+        int64_t objectType,
+        int64_t allAttributesHash);
 
     QnTimePeriodList matchPeriod(const Filter& filter);
 
@@ -46,8 +46,8 @@ private:
     {
         std::chrono::milliseconds timestamp = std::chrono::milliseconds::zero();
         QRect rect;
-        int objectType = -1;
-        long long allAttributesId = -1;
+        int64_t objectType = -1;
+        int64_t allAttributesId = -1;
     };
 
     const QString m_dataDir;

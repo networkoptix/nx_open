@@ -1590,7 +1590,7 @@ TEST_F(AnalyticsDbTimePeriodsLookup, selecting_all_periods_by_device)
 {
     givenEmptyFilter();
     addRandomKnownDeviceIdToFilter();
-    
+
     whenLookupTimePeriods();
     thenResultMatchesExpectations();
 }

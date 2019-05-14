@@ -9,10 +9,8 @@ namespace nx::vms::server::metadata {
 #pragma pack(push, 1)
     struct BinaryRecordEx
     {
-        int objectType = 0;
-        int attributesHash = 0;
-        int reserved1 = 0;
-        int reserved2 = 0;
+        int64_t objectType = 0;
+        int64_t attributesHash = 0;
     };
 #pragma pack(pop)
 
@@ -25,13 +23,13 @@ public:
     bool saveToArchive(
         std::chrono::milliseconds startTime,
         const std::vector<QRectF>& data,
-        int objectType,
-        int allAttributesHash);
+        int64_t objectType,
+        int64_t allAttributesHash);
 
     struct AnalyticsFilter: public Filter
     {
-        std::vector<int> objectTypes;
-        std::vector<int> allAttributesHash;
+        std::vector<int64_t> objectTypes;
+        std::vector<int64_t> allAttributesHash;
     };
 
     QnTimePeriodList matchPeriod(const AnalyticsFilter& filter);

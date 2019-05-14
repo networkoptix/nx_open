@@ -24,7 +24,7 @@ QnTimePeriodList AnalyticsArchive::matchPeriod(const AnalyticsFilter& filter)
 
 bool AnalyticsArchive::matchAdditionData(const Filter& filter, const quint8* data, int size) 
 { 
-    auto matchIntInList = [](int value, const std::vector<int>& values)
+    auto matchIntInList = [](int64_t value, const std::vector<int64_t>& values)
     {
         if (values.empty())
             return true;
@@ -42,8 +42,8 @@ bool AnalyticsArchive::matchAdditionData(const Filter& filter, const quint8* dat
 bool AnalyticsArchive::saveToArchive(
     std::chrono::milliseconds startTime,
     const std::vector<QRectF>& data,
-    int objectType, 
-    int allAttributesHash)
+    int64_t objectType,
+    int64_t allAttributesHash)
 {
     QnMetaDataV1Ptr packet(
         new QnMetaDataV1(0 /*filler*/, sizeof(BinaryRecordEx) /*extraBufferSize*/));

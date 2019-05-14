@@ -12,11 +12,11 @@
 
 namespace nx::analytics::db {
 
-static constexpr long long kInvalidDbId = -1;
+static constexpr int64_t kInvalidDbId = -1;
 
 struct ObjectUpdate
 {
-    long long dbId = kInvalidDbId;
+    int64_t dbId = kInvalidDbId;
     QnUuid objectId;
     std::vector<ObjectPosition> appendedTrack;
     /** Attributes that were added since the last insert/update. */
@@ -71,16 +71,16 @@ public:
     /**
      * MUST be invoked after inserting object to the DB.
      */
-    void setObjectIdInDb(const QnUuid& objectId, long long dbId);
+    void setObjectIdInDb(const QnUuid& objectId, int64_t dbId);
 
     /**
      * @return kInvalidDbId if object id is unknown.
      */
-    long long dbIdFromObjectId(const QnUuid& objectId) const;
+    int64_t dbIdFromObjectId(const QnUuid& objectId) const;
 
-    void saveObjectGuidToAttributesId(const QnUuid& guid, long long attributesId);
+    void saveObjectGuidToAttributesId(const QnUuid& guid, int64_t attributesId);
 
-    long long getAttributesIdByObjectGuid(const QnUuid& guid) const;
+    int64_t getAttributesIdByObjectGuid(const QnUuid& guid) const;
 
     /**
      * NOTE: Data removal happens only in this method.
@@ -91,8 +91,8 @@ public:
 private:
     struct ObjectContext
     {
-        long long dbId = -1;
-        long long attributesDbId = -1;
+        int64_t dbId = -1;
+        int64_t attributesDbId = -1;
 
         DetectedObject object;
         std::vector<common::metadata::Attribute> newAttributesSinceLastUpdate;
