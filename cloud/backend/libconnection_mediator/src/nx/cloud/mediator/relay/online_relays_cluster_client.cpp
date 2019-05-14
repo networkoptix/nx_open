@@ -92,7 +92,7 @@ void OnlineRelaysClusterClient::findRelayInstancePeerIsListeningOn(
 
         std::random_device randomDevice;
         std::mt19937 engine(randomDevice());
-        std::uniform_int_distribution<> distribution(0, (int)relayUrls.size() - 1);
+        std::uniform_int_distribution<> distribution(0, static_cast<int>(relayUrls.size()) - 1);
 
         auto url = relayUrls[distribution(engine)];
 
@@ -185,7 +185,7 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByDistance(
         if (!relay.second.urls.empty())
             urls.emplace_back(urlWithoutPath(relay.second.urls.front()));
 
-        if (urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
+        if (static_cast<int>(urls.size()) >= m_settings.geoIp().resolveErrorUrlCount)
             break;
     }
 
@@ -200,7 +200,7 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::getUnresolvedRelays() con
         if (!relay.urls.empty())
             urls.emplace_back(urlWithoutPath(relay.urls.front()));
 
-        if (urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
+        if (static_cast<int>(urls.size()) >= m_settings.geoIp().resolveErrorUrlCount)
             break;
     }
 

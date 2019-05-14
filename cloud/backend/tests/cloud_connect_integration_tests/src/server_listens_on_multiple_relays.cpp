@@ -298,7 +298,7 @@ private:
     {
         ASSERT_NE(m_geoIpResolver, nullptr);
 
-        while (m_relaysMockedUp.size() < m_relayClusterSize)
+        while ((int)m_relaysMockedUp.size() < m_relayClusterSize)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         using namespace nx::geo_ip;
@@ -361,7 +361,7 @@ NotifyingRelayClusterClient::NotifyingRelayClusterClient(
 
 void NotifyingRelayClusterClient::selectRelayInstanceForListeningPeer(
     const std::string& peerId,
-    const nx::network::SocketAddress& serverEndpoint,
+    const nx::network::SocketAddress& /*serverEndpoint*/,
     nx::hpm::RelayInstanceSelectCompletionHandler completionHandler)
 {
     m_testFixture->addIpAndRegion("127.0.0.1", nx::geo_ip::Continent::northAmerica);
@@ -380,7 +380,7 @@ void NotifyingRelayClusterClient::selectRelayInstanceForListeningPeer(
 
 void NotifyingRelayClusterClient::findRelayInstancePeerIsListeningOn(
     const std::string& peerId,
-    const nx::network::SocketAddress& clientEndpoint,
+    const nx::network::SocketAddress& /*clientEndpoint*/,
     nx::hpm::RelayInstanceSearchCompletionHandler completionHandler)
 {
     m_testFixture->addIpAndRegion("127.0.0.2", nx::geo_ip::Continent::australia);
