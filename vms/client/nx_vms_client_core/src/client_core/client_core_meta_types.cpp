@@ -70,8 +70,6 @@ void initializeMetaTypes()
     // alias at it was used long time ago.
     // TODO: #GDM Create a settings migration from QVariant to json and get rid of these operators.
     qRegisterMetaType<QnStringSet>("QnStringSet");
-    qRegisterMetaType<QSet<QString>>();
-
     qRegisterMetaTypeStreamOperators<QnStringSet>();
 
     qRegisterMetaType<nx::media::PlayerStatistics>();
