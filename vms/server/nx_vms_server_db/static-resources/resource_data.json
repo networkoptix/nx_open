@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.52",
+    "version": "1.0.1.53",
     "data": [
         {
             "keys": [
@@ -381,7 +381,6 @@
             "keys":[
                 "Hanwha|*", "Samsung|*", "*|XNB-6000"
             ],
-            "ignoreONVIF": true,
             "forcedAdditionalManufacturer": "Hanwha"
         },
         {
