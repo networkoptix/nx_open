@@ -23,7 +23,6 @@ static const char kSecretNonceKey[] = "neurod.ru";
 static const size_t kCdbNonceSize = 31;
 
 const constexpr int kRandomBytesCount = 3;
-const constexpr int kFullNonceTrailerSize = 3;
 
 constexpr const auto kNonceTrailingRandomByteCount = 4;
 constexpr const char kMagicBytes[] = {'h', 'z'};

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <memory>
 
 #include <nx/fusion/model_functions_fwd.h>
@@ -54,12 +55,15 @@ struct CloudConnectStatistics
 {
     int serverCount = 0;
     int clientCount = 0;
-    int connectionsEstablishedPerMinute = 0;
-    int connectionsFailedPerMinute = 0;
+    int totalConnectionsEstablishedPerMinute = 0;
+    std::map<nx::network::cloud::ConnectType, int> establishedConnectionsPerType;
+    int totalConnectionsFailedPerMinute = 0;
+    std::map<api::NatTraversalResultCode, int> failedConnectionsPerResultCode;
 };
 
 #define CloudConnectStatistics_Fields (serverCount)(clientCount) \
-    (connectionsEstablishedPerMinute)(connectionsFailedPerMinute)
+    (totalConnectionsEstablishedPerMinute)(totalConnectionsFailedPerMinute) \
+    (establishedConnectionsPerType)(failedConnectionsPerResultCode)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (CloudConnectStatistics),
@@ -72,7 +76,7 @@ class StatisticsCalculator:
     public AbstractCollector
 {
 public:
-    StatisticsCalculator();
+    StatisticsCalculator() = default;
 
     virtual void saveConnectSessionStatistics(const ConnectSession& data) override;
 
@@ -80,8 +84,15 @@ public:
 
 private:
     mutable QnMutex m_mutex;
-    nx::utils::math::SumPerPeriod<int> m_connectionsEstablishedPerPeriod;
-    nx::utils::math::SumPerPeriod<int> m_connectionsFailedPerPeriod;
+
+    nx::utils::math::SumPerMinute<int> m_connectionsEstablishedPerPeriod;
+    nx::utils::math::SumPerMinute<int> m_connectionsFailedPerPeriod;
+
+    std::map<nx::network::cloud::ConnectType, nx::utils::math::SumPerMinute<int>>
+        m_establishedConnectionsPerType;
+
+    std::map<api::NatTraversalResultCode, nx::utils::math::SumPerMinute<int>>
+        m_failedConnectionsPerResultCode;
 };
 
 //-------------------------------------------------------------------------------------------------

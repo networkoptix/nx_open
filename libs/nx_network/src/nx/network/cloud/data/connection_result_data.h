@@ -57,4 +57,4 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::hpm::api::NatTraversalResultCode)
 } // namespace hpm
 } // namespace nx
 
-NX_NETWORK_API void serialize(const nx::hpm::api::NatTraversalResultCode&, QString*);
+QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::NatTraversalResultCode, (lexical), NX_NETWORK_API)

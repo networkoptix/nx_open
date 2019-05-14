@@ -1,14 +1,6 @@
 #include "abstract_fusion_request_handler_detail.h"
 
-namespace nx {
-namespace network {
-namespace http {
-namespace detail {
-
-BaseFusionRequestHandler::BaseFusionRequestHandler():
-    m_outputDataFormat(Qn::JsonFormat)
-{
-}
+namespace nx::network::http::detail {
 
 void BaseFusionRequestHandler::requestCompleted(FusionRequestResult result)
 {
@@ -40,20 +32,18 @@ void BaseFusionRequestHandler::requestCompleted(
     completionHandler(std::move(requestResult));
 }
 
-bool BaseFusionRequestHandler::getDataFormat(
+bool BaseFusionRequestHandler::getInputFormat(
     const nx::network::http::Request& request,
-    Qn::SerializationFormat* inputDataFormat,
     FusionRequestResult* errorDescription)
 {
+    m_inputFormat = Qn::SerializationFormat::UnsupportedFormat;
+    QByteArray formatString;
+
     // Input/output formats can differ. E.g., GET request can specify input data in url query only.
     // TODO: #ak Fetching m_outputDataFormat from url query.
     if (!nx::network::http::Method::isMessageBodyAllowed(request.requestLine.method))
     {
-        if (inputDataFormat)
-        {
-            // TODO: #ak Fetching format from Accept header.
-            *inputDataFormat = Qn::UrlQueryFormat;
-        }
+        m_inputFormat = Qn::UrlQueryFormat;
     }
     else //< POST, PUT
     {
@@ -61,37 +51,56 @@ bool BaseFusionRequestHandler::getDataFormat(
         if (contentTypeIter != request.headers.cend())
         {
             // TODO: #ak Add Content-Type header parser to nx::network::http.
-            const QByteArray dataFormatStr = contentTypeIter->second.split(';')[0];
-            m_outputDataFormat = Qn::serializationFormatFromHttpContentType(dataFormatStr);
+            formatString = contentTypeIter->second.split(';')[0];
+            m_inputFormat = Qn::serializationFormatFromHttpContentType(formatString);
         }
-        if (inputDataFormat)
-            *inputDataFormat = m_outputDataFormat;
     }
 
-    if (inputDataFormat && !isFormatSupported(*inputDataFormat))
+    if (!isFormatSupported(m_inputFormat))
     {
         *errorDescription = FusionRequestResult(
             FusionRequestErrorClass::badRequest,
             QnLexical::serialized(FusionRequestErrorDetail::notAcceptable),
             FusionRequestErrorDetail::notAcceptable,
-            lm("Input format %1 not supported. Input data attributes "
-                "can be specified in url or by %2 POST message body")
-                .arg(Qn::serializationFormatToHttpContentType(*inputDataFormat))
-                .arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
+            lm("Input format %1 not supported").args(formatString));
         return false;
     }
 
-    if (!isFormatSupported(m_outputDataFormat))
+    return true;
+}
+
+bool BaseFusionRequestHandler::getOutputFormat(
+    const nx::network::http::Request& /*request*/,
+    FusionRequestResult* /*errorDescription*/)
+{
+    m_outputFormat = Qn::SerializationFormat::JsonFormat;
+
+    // TODO: #ak Fetching m_outputDataFormat from url query.
+    // TODO: #ak Fetch format from Accept header.
+
+#if 0
+    if (*format == Qn::SerializationFormat::UnsupportedFormat)
+    {
+        const auto contentTypeIter = request.headers.find("Content-Type");
+        if (contentTypeIter != request.headers.cend())
+        {
+            // Using same output format as input.
+            const QByteArray dataFormatStr = contentTypeIter->second.split(';')[0];
+            *format = Qn::serializationFormatFromHttpContentType(dataFormatStr);
+        }
+    }
+
+    if (!isFormatSupported(*format))
     {
         *errorDescription = FusionRequestResult(
             FusionRequestErrorClass::badRequest,
             QnLexical::serialized(FusionRequestErrorDetail::notAcceptable),
             FusionRequestErrorDetail::notAcceptable,
-            lm("Output format %1 not supported. Only %2 is supported")
-                .arg(Qn::serializationFormatToHttpContentType(m_outputDataFormat))
-                .arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
+            lm("Output format %1 not supported").args(
+                Qn::serializationFormatToHttpContentType(m_outputDataFormat)));
         return false;
     }
+#endif
 
     return true;
 }
@@ -108,7 +117,4 @@ void BaseFusionRequestHandler::setConnectionEvents(
     m_connectionEvents = std::move(connectionEvents);
 }
 
-} // namespace detail
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http::detail

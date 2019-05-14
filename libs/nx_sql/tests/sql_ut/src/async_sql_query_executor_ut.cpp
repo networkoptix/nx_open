@@ -194,7 +194,7 @@ protected:
 
                 std::for_each(
                     queries.begin(), queries.end(),
-                    [this, queryContext](std::unique_ptr<SqlQuery>& query)
+                    [this](std::unique_ptr<SqlQuery>& query)
                     {
                         saveQueryResult(query->next() ? DBResult::ok : DBResult::ioError);
                     });

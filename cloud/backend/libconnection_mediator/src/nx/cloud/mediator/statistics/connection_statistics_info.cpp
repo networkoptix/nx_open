@@ -21,7 +21,8 @@ bool ConnectSession::operator==(const ConnectSession& rhs) const
         originatingHostEndpoint == rhs.originatingHostEndpoint &&
         originatingHostName == rhs.originatingHostName &&
         destinationHostEndpoint == rhs.destinationHostEndpoint &&
-        destinationHostName == rhs.destinationHostName;
+        destinationHostName == rhs.destinationHostName &&
+        connectType == rhs.connectType;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

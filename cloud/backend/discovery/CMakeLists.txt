@@ -1,1 +1,2 @@
 add_subdirectory(discovery_api_client)
+add_subdirectory(discovery_service)

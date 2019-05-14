@@ -165,6 +165,7 @@ void HolePunchingProcessor::connectionResult(
     auto statisticsInfo = connectionIter->second->statisticsInfo();
     statisticsInfo.resultCode = request.resultCode;
     statisticsInfo.endTime = nx::utils::utcTime();
+    statisticsInfo.connectType = request.connectType;
     m_statisticsCollector->saveConnectSessionStatistics(std::move(statisticsInfo));
 
     connectionIter->second->onConnectionResultRequest(

@@ -27,7 +27,7 @@ void AsyncClientMock::externalIp(
     std::function< void(const HostAddress&) > callback)
 {
     QnMutexLocker lock(&m_mutex);
-    m_tasks.push([this, callback, ip = m_externalIp] { callback(ip); });
+    m_tasks.push([callback, ip = m_externalIp] { callback(ip); });
 }
 
 void AsyncClientMock::addMapping(

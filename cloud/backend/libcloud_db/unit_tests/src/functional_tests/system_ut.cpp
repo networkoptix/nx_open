@@ -72,6 +72,26 @@ protected:
         ASSERT_TRUE(restart());
     }
 
+    void whenRequestSystemById(const std::string& id)
+    {
+        api::SystemDataEx system;
+        m_lastResultCode = getSystem(
+            owner().email,
+            owner().password,
+            id,
+            &system);
+    }
+
+    void thenRequestFailed()
+    {
+        ASSERT_NE(api::ResultCode::ok, m_lastResultCode);
+    }
+
+    void andResultCodeIs(api::ResultCode expected)
+    {
+        ASSERT_EQ(expected, m_lastResultCode);
+    }
+
     void assertUserCannotSeeSystem(
         const AccountWithPassword& user,
         const api::SystemData& systemToCheck)
@@ -102,6 +122,7 @@ protected:
 
 private:
     std::map<std::string, AccountWithPassword> m_registeredAccounts;
+    api::ResultCode m_lastResultCode = api::ResultCode::ok;
 
     bool isUserHasAccessToSystem(
         const AccountWithPassword& user,
@@ -295,23 +316,6 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
     }
 
     {
-        // Requesting unknown system.
-        std::vector<api::SystemDataEx> systems;
-        ASSERT_EQ(
-            api::ResultCode::forbidden,
-            testSetup->getSystem(account1.email, account1Password, "unknown_system_id", &systems));
-        ASSERT_TRUE(systems.empty());
-    }
-
-    {
-        nx::network::http::HttpClient client;
-        nx::utils::Url url(lit("http://127.0.0.1:%1/cdb/system/get?systemId=1").arg(testSetup->endpoint().port));
-        url.setUserName(QString::fromStdString(account1.email));
-        url.setPassword(QString::fromStdString(account1Password));
-        ASSERT_TRUE(client.doGet(url));
-    }
-
-    {
         nx::network::http::HttpClient client;
         nx::utils::Url url(lit("http://127.0.0.1:%1/cdb/system/get?systemId=%2").
             arg(testSetup->endpoint().port).arg(QString::fromStdString(system1.id)));
@@ -341,6 +345,14 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
 TEST_F(FtSystem, get)
 {
     cdbFunctionalTestSystemGet(this);
+}
+
+TEST_F(FtSystem, DISABLED_requesting_unknown_system_produces_404_not_found)
+{
+    whenRequestSystemById("unknown_system_id");
+
+    thenRequestFailed();
+    andResultCodeIs(api::ResultCode::notFound);
 }
 
 //-------------------------------------------------------------------------------------------------

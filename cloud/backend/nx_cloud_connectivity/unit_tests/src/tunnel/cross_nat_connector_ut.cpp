@@ -123,8 +123,7 @@ protected:
     void installMalfunctioningDatagramSocketFactory(SystemError::ErrorCode error)
     {
         m_datagramSocketFactoryBak = SocketFactory::setCustomDatagramSocketFactoryFunc(
-            [this, error](int ipVersion)
-            { return std::make_unique<FailingDatagramSocket>(ipVersion, error); });
+            [error](int ipVersion) { return std::make_unique<FailingDatagramSocket>(ipVersion, error); });
     }
 
 private:

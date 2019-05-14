@@ -302,7 +302,7 @@ protected:
         m_connection->executeInAioThreadSync(
             [this, &connection]()
             {
-                connection = std::move(m_connection->takeSocket());
+                connection = m_connection->takeSocket();
                 m_connection->pleaseStopSync();
             });
 

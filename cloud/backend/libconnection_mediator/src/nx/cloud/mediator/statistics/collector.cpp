@@ -40,20 +40,20 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-StatisticsCalculator::StatisticsCalculator():
-    m_connectionsEstablishedPerPeriod(std::chrono::minutes(1)),
-    m_connectionsFailedPerPeriod(std::chrono::minutes(1))
-{
-}
-
 void StatisticsCalculator::saveConnectSessionStatistics(const ConnectSession& data)
 {
     QnMutexLocker lock(&m_mutex);
 
     if (data.resultCode == api::NatTraversalResultCode::ok)
+    {
         m_connectionsEstablishedPerPeriod.add(1);
+        m_establishedConnectionsPerType[data.connectType].add(1);
+    }
     else
+    {
         m_connectionsFailedPerPeriod.add(1);
+        m_failedConnectionsPerResultCode[data.resultCode].add(1);
+    }
 }
 
 CloudConnectStatistics StatisticsCalculator::statistics() const
@@ -62,10 +62,17 @@ CloudConnectStatistics StatisticsCalculator::statistics() const
 
     CloudConnectStatistics statistics;
 
-    statistics.connectionsEstablishedPerMinute =
+    statistics.totalConnectionsEstablishedPerMinute =
         m_connectionsEstablishedPerPeriod.getSumPerLastPeriod();
-    statistics.connectionsFailedPerMinute =
+
+    for (const auto& [connectType, counter]: m_establishedConnectionsPerType)
+        statistics.establishedConnectionsPerType[connectType] = counter.getSumPerLastPeriod();
+
+    statistics.totalConnectionsFailedPerMinute =
         m_connectionsFailedPerPeriod.getSumPerLastPeriod();
+
+    for (const auto& [resultCode, counter]: m_failedConnectionsPerResultCode)
+        statistics.failedConnectionsPerResultCode[resultCode] = counter.getSumPerLastPeriod();
 
     return statistics;
 }

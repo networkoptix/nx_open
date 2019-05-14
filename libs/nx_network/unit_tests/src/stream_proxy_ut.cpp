@@ -39,8 +39,6 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-static constexpr char kTestHandlerPath[] = "/StreamProxyPool/test";
-
 class StreamProxyPool:
     public ::testing::Test
 {
@@ -300,9 +298,9 @@ protected:
         base_type::SetUp();
 
         m_proxy.setDownStreamConverterFactory(
-            [this]() { return std::make_unique<CustomFuncOutputConverter>(&convert); });
+            []() { return std::make_unique<CustomFuncOutputConverter>(&convert); });
         m_proxy.setUpStreamConverterFactory(
-            [this]() { return std::make_unique<CustomFuncOutputConverter>(&convert); });
+            []() { return std::make_unique<CustomFuncOutputConverter>(&convert); });
 
         givenListeningPingPongServer();
 
