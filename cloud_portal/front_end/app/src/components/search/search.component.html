@@ -8,7 +8,7 @@
                     <input [(ngModel)]="localFilter.query"
                            [ngModelOptions]="{debounceTime : config.search.debounceTime}"
                            (ngModelChange)="modelChanged()"
-                           [ngClass]="{'non-empty': localFilter.query != ''}"
+                           [ngClass]="{'non-empty': localFilter.query && localFilter.query != ''}"
                            [maxLength]="config.search.maxLength"
                            type="text"
                            class="form-control search-input"
