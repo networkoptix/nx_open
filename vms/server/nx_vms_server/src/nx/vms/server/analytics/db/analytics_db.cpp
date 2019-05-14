@@ -69,12 +69,9 @@ bool EventsStorage::initialize(const Settings& settings)
         return false;
     }
 
-    if (kSaveTimePeriodsToFile)
-    {
-        m_analyticsArchiveDirectory = std::make_unique<AnalyticsArchiveDirectory>(
-            m_mediaServerModule,
-            settings.path + "/archive/");
-    }
+    m_analyticsArchiveDirectory = std::make_unique<AnalyticsArchiveDirectory>(
+        m_mediaServerModule,
+        settings.path + "/archive/");
 
     return true;
 }

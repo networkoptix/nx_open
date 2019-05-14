@@ -37,23 +37,10 @@ nx::sql::DBResult TimePeriodFetcher::selectTimePeriods(
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
-    Filter localFilter = filter;
-    localFilter.deviceIds.clear();
-    localFilter.timePeriod.clear();
-
     if (!filter.objectAppearanceId.isNull())
-    {
         *result = selectTimePeriodsByObject(queryContext, filter, options);
-    }
-    else if (!m_analyticsArchive || (localFilter.empty() && options.region.isEmpty()))
-    {
-        *result = selectFullTimePeriods(
-            queryContext, filter.deviceIds, filter.timePeriod, options);
-    }
     else
-    {
         *result = selectTimePeriodsFiltered(queryContext, filter, options);
-    }
 
     return nx::sql::DBResult::ok;
 }

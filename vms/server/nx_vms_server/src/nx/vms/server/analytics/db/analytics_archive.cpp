@@ -59,7 +59,16 @@ QnTimePeriodList AnalyticsArchive::matchPeriod(const Filter& filter)
             periods += QnTimePeriod(item.timestamp, std::chrono::milliseconds(1));
     }
 
-    return QnTimePeriodList::aggregateTimePeriodsUnconstrained(periods, filter.detailLevel);
+    periods = QnTimePeriodList::aggregateTimePeriodsUnconstrained(periods, filter.detailLevel);
+
+    if (filter.sortOrder == Qt::SortOrder::DescendingOrder)
+    {
+        std::sort(
+            periods.begin(), periods.end(),
+            [](const auto& left, const auto& right) { return left.startTime() > right.startTime(); });
+    }
+
+    return periods;
 }
 
 bool AnalyticsArchive::satisfiesFilter(
@@ -67,7 +76,7 @@ bool AnalyticsArchive::satisfiesFilter(
     const Filter& filter,
     const std::vector<QRect>& regionFilter)
 {
-    if (!filter.timePeriod.isEmpty() && !filter.timePeriod.contains(item.timestamp))
+    if (!filter.timePeriod.isInfinite() && !filter.timePeriod.contains(item.timestamp))
         return false;
 
     if (!filter.objectTypes.empty() && filter.objectTypes.count(item.objectType) == 0)

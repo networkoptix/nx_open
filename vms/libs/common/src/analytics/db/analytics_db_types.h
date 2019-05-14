@@ -103,6 +103,8 @@ struct Filter
      */
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
+    Filter();
+
     bool empty() const;
 
     bool operator==(const Filter& right) const;

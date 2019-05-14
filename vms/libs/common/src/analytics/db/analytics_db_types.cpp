@@ -45,6 +45,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 //-------------------------------------------------------------------------------------------------
 
+Filter::Filter()
+{
+    // NOTE: The default time period constructor provides an empty time period.
+    timePeriod.setEndTimeMs(QnTimePeriod::kMaxTimeValue);
+}
+
 bool Filter::empty() const
 {
     return *this == Filter();
