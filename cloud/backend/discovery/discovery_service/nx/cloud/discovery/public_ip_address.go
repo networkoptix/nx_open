@@ -12,7 +12,7 @@ var parseFunctions = []func(*http.Request) string{
 	parseForwardedHeader,
 	parseRemoteAddr}
 
-func parsePublicIpAddress(request *http.Request) string {
+func ParsePublicIpAddress(request *http.Request) string {
 	for _, parseFunc := range parseFunctions {
 		if ipAddress := parseFunc(request); len(ipAddress) > 0 {
 			return ipAddress

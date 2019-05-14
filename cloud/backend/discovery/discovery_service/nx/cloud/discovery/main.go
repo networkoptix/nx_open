@@ -99,7 +99,7 @@ func postNode(writer http.ResponseWriter, request *http.Request, params httprout
 		InfoJson:        nodeInfo.InfoJson,
 		Urls:            nodeInfo.Urls,
 		ExpirationTime:  calculateExpirationTime(request),
-		PublicIpAddress: parsePublicIpAddress(request),
+		PublicIpAddress: ParsePublicIpAddress(request),
 	}
 
 	err = dao.InsertOrUpdate(node, params.ByName("clusterId"))
