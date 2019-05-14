@@ -96,10 +96,10 @@ private:
 } // namespace nx::utils
 
 #if defined(NX_CHECK_MEASURE_TIME)
-    #define NX_CHECK(IS_CRITICAL, CONDITION, ...) ( \
+    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) ( \
         [begin = std::chrono::steady_clock::now(), \
             result = (CONDITION) || ::nx::utils::assertFailure( \
-                IS_CRITICAL, __FILE__, __LINE__, #CONDITION, __VA_ARGS__)]() \
+                IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE)]() \
         { \
             const auto time = std::chrono::steady_clock::now() - begin; \
             static const auto info = nx::utils::AssertTimer::instance.info(__FILE__, __LINE__); \
@@ -108,9 +108,9 @@ private:
         }() \
     )
 #else
-    #define NX_CHECK(IS_CRITICAL, CONDITION, ...) ( \
+    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) ( \
         [result = (CONDITION) || ::nx::utils::assertFailure( \
-            IS_CRITICAL, __FILE__, __LINE__, #CONDITION, __VA_ARGS__)]() \
+            IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE)]() \
         { \
             return result; \
         }() \
@@ -125,7 +125,7 @@ private:
  *     ```
  */
 #define NX_CRITICAL(CONDITION, ...) \
-    NX_CHECK(/*isCritical*/ true, CONDITION, __VA_ARGS__)
+    NX_CHECK(/*isCritical*/ true, CONDITION, nx::utils::log::makeMessage(__VA_ARGS__))
 
 /**
  * - Debug: Causes segfault in case of assertion failure, if not disabled via
@@ -142,7 +142,7 @@ private:
  * @return Condition evaluation result.
  */
 #define NX_ASSERT(CONDITION, ...) \
-    NX_CHECK(/*isCritical*/ false, CONDITION, __VA_ARGS__)
+    NX_CHECK(/*isCritical*/ false, CONDITION, nx::utils::log::makeMessage(__VA_ARGS__))
 
 /**
  * - Debug: Works the same way as NX_ASSERT(), if not disabled via
@@ -158,5 +158,5 @@ private:
 #define NX_ASSERT_HEAVY_CONDITION(CONDITION, ...) do \
 { \
     if (::nx::utils::detail::assertHeavyConditionEnabled) \
-        NX_CHECK(/*isCritical*/ false, CONDITION, __VA_ARGS__); \
+        NX_CHECK(/*isCritical*/ false, CONDITION, nx::utils::log::makeMessage(__VA_ARGS__)); \
 } while (0)
