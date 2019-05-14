@@ -8,7 +8,6 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
 
-#include <nx/network/aio/basic_pollable.h>
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
 #include <nx/utils/basic_factory.h>
