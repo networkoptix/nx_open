@@ -173,49 +173,6 @@ QString dt(qint64 time)
 }
 #endif
 
-
-void setWidgetScreen(QWidget* target, QScreen* screen)
-{
-    if (!target)
-        return;
-
-    const auto window = target->window();
-    if (!window)
-        return;
-
-    if (const auto handle = window->windowHandle())
-        handle->setScreen(screen);
-}
-
-void setScreenRecursive(QWidget* target, QScreen* screen)
-{
-    if (!target)
-        return;
-
-    for (const auto& child : target->children())
-    {
-        if (const auto widget = qobject_cast<QWidget*>(child))
-            setScreenRecursive(widget, screen);
-    }
-
-    setWidgetScreen(target, screen);
-}
-
-void setScreenRecursive(QGraphicsItem* target, QScreen* screen)
-{
-    if (!target)
-        return;
-
-    for (const auto& child : target->childItems())
-        setScreenRecursive(child, screen);
-
-    if (!target->isWidget())
-        return;
-
-    if (const auto proxy = dynamic_cast<QGraphicsProxyWidget*>(target))
-        setScreenRecursive(proxy->widget(), screen);
-};
-
 } // namespace
 
 using namespace nx::vms::client::desktop::ui::workbench;
@@ -558,29 +515,17 @@ void QnWorkbenchDisplay::initSceneView()
     if (!m_view->property(qn_viewInitializedPropertyName).toBool())
     {
         const auto viewport = new QOpenGLWidget(m_view);
-        if (const auto window = viewport->windowHandle())
-        {
-            connect(window, &QWindow::screenChanged, this,
-                [this](QScreen *screen)
-                {
-                    for (auto& item : m_view->items())
-                        setScreenRecursive(item, screen);
-                });
-        }
-
         viewport->makeCurrent();
         m_view->setViewport(viewport);
+
         /* Turn on antialiasing at QPainter level. */
         m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 
-        /* In OpenGL mode this one seems to be ignored, but it will help in software mode. */
-        m_view->setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
-
-        /* All our items save and restore painter state. */
-        m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
+        // All our items save and restore painter state. Required by framed widgets.
+        m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false);
 
         // ----------------------------------------------------------------------------------------
-        // TODO: FIXME: THIS IS A HACK THAT SHOULD BE REPLACED WITH A QT PATCH.
+        // TODO: #vkutin FIXME: THIS IS A HACK THAT SHOULD BE REPLACED WITH A QT PATCH.
         QSharedPointer<QMetaObject::Connection> connection(new QMetaObject::Connection);
         const auto hackInit =
             [this, connection, viewport]()
