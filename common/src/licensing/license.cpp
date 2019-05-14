@@ -340,7 +340,7 @@ Qn::LicenseType QnLicense::type() const
     if (xclass().toLower().toUtf8() == ::licenseTypeInfo[Qn::LC_VideoWall].className)
         return Qn::LC_VideoWall;
 
-    if (!expiration().isEmpty() && m_orderType != "saas")
+    if (!expiration().isEmpty() && !isSaas())
         return Qn::LC_Trial;
 
     for (int i = 0; i < Qn::LC_Count; ++i) {
@@ -349,6 +349,11 @@ Qn::LicenseType QnLicense::type() const
     }
 
     return Qn::LC_Invalid; // default value
+}
+
+bool QnLicense::isSaas() const
+{
+    return orderType() == "saas";
 }
 
 void QnLicense::parseLicenseBlock(

@@ -67,6 +67,7 @@ public:
     bool neverExpire() const;
 
     QString orderType() const;
+    bool isSaas() const; //< Returns orderType() == "saas".
 
     QByteArray rawLicense() const;
 
