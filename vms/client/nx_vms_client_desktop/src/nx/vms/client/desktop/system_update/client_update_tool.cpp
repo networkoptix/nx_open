@@ -361,11 +361,8 @@ void ClientUpdateTool::atDownloadFinished(const QString& fileName)
     if (fileName != m_clientPackage.file)
         return;
 
-    m_updateFile = m_downloader->filePath(fileName);
-
     NX_VERBOSE(this, "atDownloadFinished(%1) - finally downloaded file to %2",
-        fileName, m_updateFile);
-
+        fileName, m_downloader->filePath(fileName));
     setState(State::readyInstall);
 }
 
