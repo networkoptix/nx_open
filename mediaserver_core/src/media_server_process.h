@@ -29,6 +29,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/vms/discovery/manager.h>
+#include <system_log/system_event_log_reader.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -228,4 +229,5 @@ private:
     const bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
     bool m_stopObjectsCalled = false;
+    std::unique_ptr<SystemEventLogReader> m_raidEventLogReader;
 };

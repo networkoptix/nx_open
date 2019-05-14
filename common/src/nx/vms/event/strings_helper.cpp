@@ -68,8 +68,6 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
 
 } // namespace
 
-
-
 namespace nx {
 namespace vms {
 namespace event {
@@ -282,8 +280,8 @@ QString StringsHelper::getResoureNameFromParams(const EventParameters& params,
 QString StringsHelper::getResoureIPFromParams(
     const EventParameters& params) const
 {
-	QString result = QnResourceDisplayInfo(eventSource(params)).host();
-	return result.isNull() ? params.resourceName : result;
+    QString result = QnResourceDisplayInfo(eventSource(params)).host();
+    return result.isNull() ? params.resourceName : result;
 }
 
 QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
@@ -432,16 +430,16 @@ QString StringsHelper::eventTimestamp(const EventParameters &params,
 
 QString StringsHelper::eventTimestampDate(const EventParameters &params) const
 {
-	quint64 ts = params.eventTimestampUsec;
-	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return time.date().toString(Qt::DefaultLocaleShortDate);
+    quint64 ts = params.eventTimestampUsec;
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+    return time.date().toString(Qt::DefaultLocaleShortDate);
 }
 
 QString StringsHelper::eventTimestampTime(const EventParameters &params) const
 {
-	quint64 ts = params.eventTimestampUsec;
-	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return time.time().toString(Qt::DefaultLocaleShortDate);
+    quint64 ts = params.eventTimestampUsec;
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+    return time.time().toString(Qt::DefaultLocaleShortDate);
 }
 
 QnResourcePtr StringsHelper::eventSource(const EventParameters &params) const
@@ -540,6 +538,12 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         {
             QString storageUrl = reasonParamsEncoded;
             result = tr("System disk \"%1\" is almost full.").arg(storageUrl);
+            break;
+        }
+        case EventReason::raidStorageError:
+        {
+            QString storageUrl = reasonParamsEncoded;
+            result = tr("RAID error occurred on the server machine.");
             break;
         }
         case EventReason::backupFailedNoBackupStorageError:

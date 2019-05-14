@@ -281,6 +281,8 @@
 #include <nx/mediaserver/root_tool.h>
 #include <nx/streaming/rtsp_client.h>
 
+#include <system_log/raid_event_ini_config.h>
+
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
     #include <nx/utils/file_system.h>
@@ -1037,6 +1039,10 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
     m_platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
     m_platform->setUpdatePeriodMs(
         isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
+
+    const QString raidEventLogName = system_log::ini().getLogName();
+
+    m_raidEventLogReader.reset(new RaidEventLogReader(raidEventLogName));
 }
 
 void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
@@ -4321,6 +4327,10 @@ void MediaServerProcess::at_appStarted()
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
+
+    connect(m_raidEventLogReader.get(), &SystemEventLogReader::eventOccurred, this,
+        &MediaServerProcess::at_storageManager_storageFailure);
+    m_raidEventLogReader->subscribeRaidEvents();
 };
 
 void MediaServerProcess::at_timeChanged(qint64 newTime)

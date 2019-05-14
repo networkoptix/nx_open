@@ -75,6 +75,7 @@ enum class EventReason
     networkCameraTimeBackToNormal,
     networkMulticastAddressConflict,
     networkMulticastAddressIsInvalid,
+    raidStorageError = 1012,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 

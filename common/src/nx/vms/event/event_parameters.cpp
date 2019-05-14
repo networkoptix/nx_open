@@ -28,6 +28,7 @@ QnUuid EventParameters::getParamsHash() const
                 || reasonCode == EventReason::storageTooSlow
                 || reasonCode == EventReason::storageFull
                 || reasonCode == EventReason::systemStorageFull
+                || reasonCode == EventReason::raidStorageError
                 || reasonCode == EventReason::licenseRemoved)
             {
                 paramKey += '_' + description.toUtf8();
