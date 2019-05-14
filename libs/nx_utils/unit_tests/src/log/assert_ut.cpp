@@ -3,12 +3,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/nx_utils_ini.h>
 
-namespace nx {
-namespace utils {
-namespace test {
-
-// Current version of google test doesn't support crash tests on WIN32.
-#ifndef Q_OS_WIN32
+namespace nx::utils::test {
 
 TEST(NxAssertHeavyCondition, All3)
 {
@@ -42,8 +37,4 @@ TEST(NxCritical, All3)
     EXPECT_DEATH(NX_CRITICAL(false, "oops %1 != %2", "a", 7), "");
 }
 
-#endif // Q_OS_WIN32
-
-} // namespace test
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils::test
