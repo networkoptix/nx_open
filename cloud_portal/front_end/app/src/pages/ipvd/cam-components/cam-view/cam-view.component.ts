@@ -50,7 +50,9 @@ export class CamViewComponent implements OnInit {
     }
 
     firmwareCleanUp() {
-        this.firmwares = this.activeCamera.firmwares.filter((fw) => !fw.name.match(/[<>]+/g));
+        if (this.activeCamera.firmwares) {
+            this.firmwares = this.activeCamera.firmwares.filter((fw) => !fw.name.match(/[<>]+/g));
+        }
     }
 
     firmwarePercentage(count, total) {
