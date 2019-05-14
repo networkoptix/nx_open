@@ -144,7 +144,7 @@ func (dao *DAO) GetOnlineNodes(clusterId string) ([]Node, error) {
 			":clusterId": &dynamodb.AttributeValue{S: &clusterId},
 			":now":       &dynamodb.AttributeValue{N: toUnixStr(time.Now())},
 		},
-		ProjectionExpression: aws.String("nodeId, urls, expirationTime, infoJson"),
+		ProjectionExpression: aws.String("nodeId, urls, expirationTime, infoJson, publicIpAddress"),
 	}
 
 	var onlineNodes []Node
