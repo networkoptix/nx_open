@@ -44,8 +44,9 @@ public:
         const CLConstVideoDecoderOutputPtr& uncompressedFrame) override;
 
 private:
-    void at_deviceUpdated(const QnResourcePtr& device);
-    void at_devicePropertyChanged(const QnResourcePtr& device, const QString& propertyName);
+    void at_deviceStatusChanged(const QnResourcePtr& resource);
+    void at_deviceUpdated(const QnResourcePtr& resource);
+    void at_devicePropertyChanged(const QnResourcePtr& resource, const QString& propertyName);
     void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
 private:
@@ -69,6 +70,7 @@ private:
     bool m_cachedNeedCompressedFrames{false};
     AbstractVideoDataReceptor::NeededUncompressedPixelFormats m_cachedUncompressedPixelFormats;
     bool m_missingUncompressedFrameWarningIssued = false;
+    Qn::ResourceStatus m_previousDeviceStatus = Qn::ResourceStatus::NotDefined;
 };
 
 } // namespace nx::vms::server::analytics
