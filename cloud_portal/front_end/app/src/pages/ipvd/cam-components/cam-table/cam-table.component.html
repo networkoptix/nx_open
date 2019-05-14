@@ -24,9 +24,9 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let item of pagedItems; let i = index"
-                    [ngClass]="{'selected': i == selectedRow}"
-                    (click)="setClickedRow(i, item);">
+                <tr *ngFor="let item of pagedItems;"
+                    [ngClass]="{'selected': item.sortKey == selectedCamera}"
+                    (click)="setClickedRow(item);">
 
                     <td *ngFor="let p of showParametersFor(item)" class="text-left"
                         [ngClass]="{'debug' : debug}">

@@ -34,7 +34,7 @@ export class CamTableComponent implements OnChanges, OnInit {
     public showHeaders;
 
     private _elements: any[];
-    private selectedRow;
+    private selectedCamera;
     private sortOrderASC: boolean;
     private results;
     private cameraHeaders;
@@ -244,7 +244,7 @@ export class CamTableComponent implements OnChanges, OnInit {
 
         if (changes.activeCamera) {
             if (!changes.activeCamera.currentValue) {
-                this.selectedRow = undefined;
+                this.selectedCamera = undefined;
             }
         }
 
@@ -271,7 +271,7 @@ export class CamTableComponent implements OnChanges, OnInit {
                     return camera.model === this.params.camera;
                 });
 
-                this.setClickedRow(row, { key: row, value: camera });
+                this.setClickedRow(camera);
             }
         }
     }
@@ -282,9 +282,13 @@ export class CamTableComponent implements OnChanges, OnInit {
         this.csvCameraData = this.getCsvData();
     }
 
-    setClickedRow(index, element) {
-        this.selectedRow = index;
-        this.onRowClick.emit(element);
+    setClickedRow(element) {
+        if (element) {
+            this.selectedCamera = element.sortKey;
+            this.onRowClick.emit(element);
+        } else {
+            this.selectedCamera = undefined;
+        }
     }
 
     setPage(page: number, keep?: boolean) {
