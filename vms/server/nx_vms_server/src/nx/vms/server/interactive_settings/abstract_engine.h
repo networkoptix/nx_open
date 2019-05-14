@@ -81,7 +81,7 @@ protected:
     Error setSettingsItem(components::Settings* item);
 
 private:
-    QPointer<components::Settings> m_settingsItem;
+    QScopedPointer<components::Settings> m_settingsItem;
 };
 
 } // namespace nx::vms::server::interactive_settings
