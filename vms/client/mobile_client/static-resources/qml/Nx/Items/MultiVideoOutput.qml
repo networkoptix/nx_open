@@ -19,6 +19,12 @@ Item
     implicitWidth: __sourceSize.width * layoutSize.width
     implicitHeight: __sourceSize.height * layoutSize.height
 
+    Connections
+    {
+        target: resourceHelper
+        onResourceIdChanged: __sourceSize = Qt.size(0, 0)
+    }
+
     function pointInVideo(position)
     {
         for (var i = 0; i != repeater.count; ++i)
