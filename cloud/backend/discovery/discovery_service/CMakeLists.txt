@@ -29,7 +29,7 @@ add_custom_command(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_CURRENT_SOURCE_DIR}/discovery_service)
 
-set (DISCOVERY_SERVICE_ARCHIVE_NAME "discovery_service-${cloudVersion}.zip")
+set (DISCOVERY_SERVICE_ARCHIVE_NAME "discovery_service-v${cloudVersion}.zip")
 
 add_custom_command(
     TARGET discovery_service

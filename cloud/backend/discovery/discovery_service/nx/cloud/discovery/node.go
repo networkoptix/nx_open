@@ -9,8 +9,9 @@ type NodeInfo struct {
 
 // Node represents a discovered node, sent back to client in response to registration
 type Node struct {
-	NodeId         string   `json:"nodeId"`
-	Urls           []string `json:"urls"`
-	ExpirationTime Date     `json:"expirationTime"`
-	InfoJson       string   `json:"infoJson"`
+	NodeId          string   `json:"nodeId"`
+	Urls            []string `json:"urls"`
+	ExpirationTime  Date     `json:"expirationTime"`
+	InfoJson        string   `json:"infoJson"`
+	PublicIpAddress string   `json:"publicIpAddress"`
 }

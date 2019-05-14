@@ -33,7 +33,7 @@ func calculateExpirationTime(request *http.Request) Date {
 	travelTime := now.Sub(requestTime)
 	if travelTime < 0 {
 		const nsecToMsec = 1000000
-		log.Printf("Expected positive travel time, got: %d millieconds", travelTime/nsecToMsec)
+		log.Printf("Expected positive travel time, got: %d milliseconds", travelTime/nsecToMsec)
 		return date
 	}
 	date.Time = date.Time.Add(-travelTime)
@@ -95,10 +95,11 @@ func postNode(writer http.ResponseWriter, request *http.Request, params httprout
 	}
 
 	node := &Node{
-		NodeId:         nodeInfo.NodeId,
-		InfoJson:       nodeInfo.InfoJson,
-		Urls:           nodeInfo.Urls,
-		ExpirationTime: calculateExpirationTime(request),
+		NodeId:          nodeInfo.NodeId,
+		InfoJson:        nodeInfo.InfoJson,
+		Urls:            nodeInfo.Urls,
+		ExpirationTime:  calculateExpirationTime(request),
+		PublicIpAddress: parsePublicIpAddress(request),
 	}
 
 	err = dao.InsertOrUpdate(node, params.ByName("clusterId"))

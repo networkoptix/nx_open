@@ -48,14 +48,18 @@ func toNode(item map[string]*dynamodb.AttributeValue) Node {
 	if infoJson, ok := item["infoJson"]; ok {
 		node.InfoJson = *infoJson.S
 	}
+	if publicIpAddress, ok := item["publicIpAddress"]; ok {
+		node.PublicIpAddress = *publicIpAddress.S
+	}
 	return node
 }
 
 func toItem(node *Node, clusterId string) map[string]*dynamodb.AttributeValue {
 	item := map[string]*dynamodb.AttributeValue{
-		"clusterId":      &dynamodb.AttributeValue{S: &clusterId},
-		"nodeId":         &dynamodb.AttributeValue{S: &node.NodeId},
-		"expirationTime": &dynamodb.AttributeValue{N: toUnixStr(node.ExpirationTime.Time)},
+		"clusterId":       &dynamodb.AttributeValue{S: &clusterId},
+		"nodeId":          &dynamodb.AttributeValue{S: &node.NodeId},
+		"expirationTime":  &dynamodb.AttributeValue{N: toUnixStr(node.ExpirationTime.Time)},
+		"publicIpAddress": &dynamodb.AttributeValue{S: &node.PublicIpAddress},
 	}
 	if len(node.Urls) > 0 {
 		item["urls"] = &dynamodb.AttributeValue{SS: toStrPtrSlice(node.Urls)}
