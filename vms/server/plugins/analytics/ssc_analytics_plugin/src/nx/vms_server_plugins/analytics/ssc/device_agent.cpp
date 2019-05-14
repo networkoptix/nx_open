@@ -104,7 +104,11 @@ Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 
 Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->eventTypeIds()->count() == 0)
+    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
+    if (!NX_ASSERT(eventTypeIds, "Event type id list is nullptr"))
+        return Error::unknownError;
+
+    if (eventTypeIds->count() == 0)
     {
         stopFetchingMetadata();
         return Error::noError;

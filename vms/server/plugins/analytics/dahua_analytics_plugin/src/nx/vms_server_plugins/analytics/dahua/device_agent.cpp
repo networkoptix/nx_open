@@ -98,8 +98,13 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
     NX_ASSERT(m_engine);
     std::vector<QString> eventTypes;
 
-    for (int i = 0; i < metadataTypes->eventTypeIds()->count(); ++i)
-        eventTypes.push_back(metadataTypes->eventTypeIds()->at(i));
+
+    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
+    if (!NX_ASSERT(eventTypeIds, "Event type id list is empty"))
+        return Error::unknownError;
+
+    for (int i = 0; i < eventTypeIds->count(); ++i)
+        eventTypes.push_back(eventTypeIds->at(i));
 
     m_monitor = std::make_unique<MetadataMonitor>(
         m_engine->parsedManifest(),

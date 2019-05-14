@@ -49,7 +49,8 @@ Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 Error DeviceAgent::setNeededMetadataTypes(
     const IMetadataTypes* metadataTypes)
 {
-    if (!metadataTypes->eventTypeIds()->count())
+    nx::sdk::Ptr<const nx::sdk::IStringList> neededEventTypeIds(metadataTypes->eventTypeIds());
+    if (!neededEventTypeIds || !neededEventTypeIds->count())
     {
         stopFetchingMetadata();
         return Error::noError;
