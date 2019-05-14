@@ -75,7 +75,7 @@ func parseForwardedHeader(request *http.Request) string {
 		// Try ip v4 first
 		if ip := net.ParseIP(parts[i]); ip != nil {
 			return parts[i]
-		}vim 
+		}
 
 		// Maybe it's an ip v6 address enclosed in brackets
 		if ipV6Str := extract(parts[i], "[", "]"); len(ipV6Str) > 0 {
