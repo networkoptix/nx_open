@@ -76,6 +76,59 @@ ResultType::Value installZip(
     return response.result;
 }
 
+ResultType::Value installZipAsync(
+    const nx::utils::SoftwareVersion& version,
+    const QString& zipFileName)
+{
+    InstallZipTaskAsync request;
+    request.version = version;
+    request.zipFileName = zipFileName;
+    Response response;
+
+    ResultType::Value result = ResultType::otherError;
+    static const int kMaxTries = 5;
+
+    for (int retries = 0; retries < kMaxTries; retries++)
+    {
+        result = sendCommandToApplauncher(request, &response);
+        if (result == ResultType::ok)
+            result = response.result;
+
+        switch (result)
+        {
+            case ResultType::alreadyInstalled:
+            case ResultType::otherError:
+            case ResultType::versionNotInstalled:
+            case ResultType::invalidVersionFormat:
+            case ResultType::notEnoughSpace:
+            case ResultType::notFound:
+            case ResultType::busy:
+            case ResultType::ok:
+                return result;
+            case ResultType::connectError:
+            case ResultType::ioError:
+            default:
+                break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+    return result;
+}
+
+ResultType::Value checkInstallationProgress()
+{
+    InstallZipCheckStatus request;
+    Response response;
+    const auto result = sendCommandToApplauncher(request, &response);
+    if (result != ResultType::ok)
+        return result;
+    if (response.result != ResultType::ok)
+        return response.result;
+    return response.result;
+}
+
 ResultType::Value scheduleProcessKill(qint64 processID, quint32 timeoutMillis)
 {
     AddProcessKillTimerRequest request;
