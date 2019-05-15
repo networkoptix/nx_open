@@ -539,6 +539,7 @@ void fromResourceToApi(const QnLicensePtr& src, ApiDetailedLicenseData& dst)
     dst.version = src->version();
     dst.brand = src->brand();
     dst.expiration = src->expiration();
+    dst.orderType = src->orderType();
 }
 
 void fromResourceListToApi(const QnLicenseList& src, ApiLicenseDataList& dst)

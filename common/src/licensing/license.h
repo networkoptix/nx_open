@@ -47,11 +47,11 @@ public:
     QnLicense(const ec2::ApiDetailedLicenseData& value);
     virtual ~QnLicense() = default;
 
-    void loadLicenseBlock( const QByteArray& licenseBlock );
+    void loadLicenseBlock(const QByteArray& licenseBlock);
 
     QString name() const;
     QByteArray key() const;
-    void setKey(const QByteArray &value);
+    void setKey(const QByteArray& value);
 
     qint32 cameraCount() const;
     void setCameraCount(qint32 count);
@@ -65,6 +65,9 @@ public:
     QString brand() const;
     QString expiration() const; // TODO: #Ivan Passing date as a string is totally evil. Please make sure your code is easy to use!!!
     bool neverExpire() const;
+
+    QString orderType() const;
+    bool isSaas() const; //< Returns orderType() == "saas".
 
     QByteArray rawLicense() const;
 
@@ -80,7 +83,7 @@ public:
 
     bool isInfoMode() const;
 
-    static QnLicensePtr readFromStream(QTextStream &stream);
+    static QnLicensePtr readFromStream(QTextStream& stream);
     static QnLicensePtr createFromKey(const QByteArray& key);
 
     QString displayName() const;
@@ -91,14 +94,15 @@ public:
     static LicenseTypeInfo licenseTypeInfo(Qn::LicenseType licenseType);
 
 protected:
-    void setClass(const QString &xclass);
+    void setClass(const QString& xclass);
+
 private:
     void parseLicenseBlock(
         const QByteArray& licenseBlock,
         QByteArray* const v1LicenseBlock,
-        QByteArray* const v2LicenseBlock );
-    void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
+        QByteArray* const v2LicenseBlock);
 
+    void verify(const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock);
 
 private:
     QByteArray m_rawLicense;
@@ -114,6 +118,8 @@ private:
     QString m_brand;
     QString m_expiration;
     QByteArray m_signature2;
+
+    QString m_orderType;
 
     // Is partial v1 license valid (signature1 is used)
     bool m_isValid1 = false;
@@ -145,7 +151,6 @@ private:
 
 Q_DECLARE_METATYPE(QnLicenseList)
 
-
 /**
  * License storage which is associated with instance of Server (i.e. should be reloaded when switching appserver).
  */
@@ -161,10 +166,10 @@ public:
 
     QnLicenseList getLicenses() const;
 
-    void addLicense(const QnLicensePtr &license);
-    void addLicenses(const QnLicenseList &licenses);
+    void addLicense(const QnLicensePtr& license);
+    void addLicenses(const QnLicenseList& licenses);
     void replaceLicenses(const ec2::ApiLicenseDataList& licenses);
-    void removeLicense(const QnLicensePtr &license);
+    void removeLicense(const QnLicensePtr& license);
 
     void reset();
     bool isEmpty() const;
@@ -175,14 +180,17 @@ public:
     QnLicenseValidator* validator() const;
     QnLicenseErrorCode validateLicense(const QnLicensePtr& license) const;
     bool isLicenseValid(const QnLicensePtr& license) const;
+
 signals:
     void licensesChanged();
 
 private slots:
     void at_timer();
+
 private:
-    bool addLicense_i(const QnLicensePtr &license);
-    bool addLicenses_i(const QnLicenseList &licenses);
+    bool addLicense_i(const QnLicensePtr& license);
+    bool addLicenses_i(const QnLicenseList& licenses);
+
 private:
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QnMutex m_mutex;

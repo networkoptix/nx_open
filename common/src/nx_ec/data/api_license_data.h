@@ -25,9 +25,11 @@ struct ApiDetailedLicenseData: ApiData
     QString brand;
     QString expiration;
     QnLatin1Array signature;
+    QString orderType;
 };
 #define ApiDetailedLicenseData_Fields \
-    (key)(name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)(signature)
+    (key)(name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)(signature)\
+    (orderType)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ApiLicenseData)(ApiDetailedLicenseData), (eq))
 
