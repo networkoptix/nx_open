@@ -6,6 +6,7 @@
 
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
+class QCheckBox;
 class QnAbstractPermissionsModel;
 
 namespace Ui

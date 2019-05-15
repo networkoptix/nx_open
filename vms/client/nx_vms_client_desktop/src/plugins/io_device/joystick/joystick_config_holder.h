@@ -4,6 +4,8 @@
 
 #include <boost/optional/optional.hpp>
 
+#include <nx/utils/thread/mutex.h>
+
 namespace nx {
 namespace client {
 namespace plugins {

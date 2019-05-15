@@ -99,7 +99,7 @@ QnChunksRequestData QnChunksRequestData::fromParams(QnResourcePool* resourcePool
 
     if (request.periodsType == Qn::TimePeriodContent::AnalyticsContent)
     {
-        request.analyticsStorageFilter = nx::analytics::storage::Filter();
+        request.analyticsStorageFilter = nx::analytics::db::Filter();
         if (!deserializeFromParams(params, &request.analyticsStorageFilter.get()))
             request.analyticsStorageFilter.reset();
     }

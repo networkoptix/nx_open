@@ -428,10 +428,10 @@ float NaiveObjectTracker::bottomRightY(const TegraVideo::Rect& rectangle)
     return rectangle.y + rectangle.h;
 }
 
-nx::sdk::analytics::IObjectMetadata::Rect NaiveObjectTracker::toSdkRect(
+nx::sdk::analytics::Rect NaiveObjectTracker::toSdkRect(
     const TegraVideo::Rect& rectangle)
 {
-    return nx::sdk::analytics::IObjectMetadata::Rect(
+    return nx::sdk::analytics::Rect(
         rectangle.x,
         rectangle.y,
         rectangle.w,

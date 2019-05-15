@@ -25,7 +25,7 @@
 #include <utils/media/hevc_sps.h>
 #include <camera/video_camera.h>
 #include <nx_vms_server_ini.h>
-#include <analytics/detected_objects_storage/analytics_events_receptor.h>
+#include <nx/vms/server/analytics/db/analytics_events_receptor.h>
 #include <media_server/media_server_module.h>
 #include <nx/vms/server/analytics/manager.h>
 #include <nx/fusion/model_functions.h>
@@ -103,7 +103,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     if (serverModule())
     {
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
-            new nx::analytics::storage::AnalyticsEventsReceptor(
+            new nx::analytics::db::AnalyticsEventsReceptor(
                 serverModule()->analyticsEventsStorage()));
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new ConditionalDataProxy(
@@ -641,7 +641,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     if (m_cameraRes->saveBitrateIfNeeded(info))
     {
         m_cameraRes->savePropertiesAsync();
-        NX_INFO(this, lm("bitrateInfo has been updated for %1 stream")
+        NX_VERBOSE(this, lm("bitrateInfo has been updated for %1 stream")
                 .arg(QnLexical::serialized(info.encoderIndex)));
     }
 }

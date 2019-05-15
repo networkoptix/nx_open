@@ -31,9 +31,11 @@ struct NX_VMS_API DetailedLicenseData: Data
     QString brand;
     QString expiration;
     QnLatin1Array signature;
+    QString orderType;
 };
 #define DetailedLicenseData_Fields \
-    (key)(name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)(signature)
+    (key)(name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)(signature)\
+    (orderType)
 
 } // namespace api
 } // namespace vms

@@ -14,6 +14,13 @@ Settings
                 "defaultValue": "a text",
             },
             {
+                "type": "TextArea",
+                "name": "textArea",
+                "caption": "Text Area",
+                "description": "A text area",
+                "defaultValue": "a text"
+            },
+            {
                 "type": "GroupBox",
                 "caption": "Group",
                 "items": [
@@ -60,6 +67,7 @@ Settings
     readonly property var _values:
     {
         "text": "a text",
+        "textArea": "a text",
         "number": 42,
         "double": 3.1415,
         "combobox": "value2",
@@ -71,6 +79,14 @@ Settings
         name: "text"
         caption: "Text Field"
         description: "A text field"
+        defaultValue: "a text"
+    }
+
+    TextArea
+    {
+        name: "textArea"
+        caption: "Text Area"
+        description: "A text area"
         defaultValue: "a text"
     }
 

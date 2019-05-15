@@ -57,20 +57,10 @@ using namespace std;
 
 CUDTSocket::CUDTSocket()
 {
-    memset(&m_pPeerAddr, 0, sizeof(m_pPeerAddr));
 }
 
 CUDTSocket::~CUDTSocket()
 {
-    if (AF_INET == m_iIPversion)
-    {
-        delete (sockaddr_in*)m_pSelfAddr;
-    }
-    else
-    {
-        delete (sockaddr_in6*)m_pSelfAddr;
-    }
-
     m_pUDT = nullptr;
 }
 
@@ -90,8 +80,7 @@ void CUDTSocket::removeEPoll(const int eid)
 ////////////////////////////////////////////////////////////////////////////////
 
 CUDTUnited::CUDTUnited():
-    m_TLSError(),
-    m_MultiplexerLock()
+    m_TLSError()
 {
     // Socket ID MUST start from a random value
     srand((unsigned int)CTimer::getTime());
@@ -109,6 +98,13 @@ CUDTUnited::CUDTUnited():
 
 CUDTUnited::~CUDTUnited()
 {
+    m_Sockets.clear();
+    m_ClosedSockets.clear();
+
+    for (auto& idAndMultiplexer: m_multiplexers)
+        idAndMultiplexer.second->shutdown();
+    m_multiplexers.clear();
+
 #ifndef _WIN32
     pthread_key_delete(m_TLSError);
 #else
@@ -190,16 +186,6 @@ UDTSOCKET CUDTUnited::newSocket(int af, int type)
     {
         ns = std::make_shared<CUDTSocket>();
         ns->m_pUDT = std::make_shared<CUDT>();
-        if (AF_INET == af)
-        {
-            ns->m_pSelfAddr = (sockaddr*)(new sockaddr_in);
-            ((sockaddr_in*)(ns->m_pSelfAddr))->sin_port = 0;
-        }
-        else
-        {
-            ns->m_pSelfAddr = (sockaddr*)(new sockaddr_in6);
-            ((sockaddr_in6*)(ns->m_pSelfAddr))->sin6_port = 0;
-        }
     }
     catch (...)
     {
@@ -239,7 +225,10 @@ UDTSOCKET CUDTUnited::newSocket(int af, int type)
     return ns->m_SocketId;
 }
 
-int CUDTUnited::newConnection(const UDTSOCKET listen, const sockaddr* peer, CHandShake* hs)
+int CUDTUnited::newConnection(
+    const UDTSOCKET listen,
+    const detail::SocketAddress& remotePeerAddress,
+    CHandShake* hs)
 {
     std::shared_ptr<CUDTSocket> ns;
     std::shared_ptr<CUDTSocket> ls = locate(listen);
@@ -248,7 +237,7 @@ int CUDTUnited::newConnection(const UDTSOCKET listen, const sockaddr* peer, CHan
         return -1;
 
     // if this connection has already been processed
-    if (nullptr != (ns = locate(peer, hs->m_iID, hs->m_iISN)))
+    if (nullptr != (ns = locate(remotePeerAddress, hs->m_iID, hs->m_iISN)))
     {
         if (ns->m_pUDT->broken())
         {
@@ -285,19 +274,8 @@ int CUDTUnited::newConnection(const UDTSOCKET listen, const sockaddr* peer, CHan
     {
         ns = std::make_shared<CUDTSocket>();
         ns->m_pUDT = std::make_shared<CUDT>(*(ls->m_pUDT));
-        if (AF_INET == ls->m_iIPversion)
-        {
-            ns->m_pSelfAddr = (sockaddr*)(new sockaddr_in);
-            ((sockaddr_in*)(ns->m_pSelfAddr))->sin_port = 0;
-            memcpy(&ns->m_pPeerAddr, peer, sizeof(*peer));
-        }
-        else
-        {
-            ns->m_pSelfAddr = (sockaddr*)(new sockaddr_in6);
-            ((sockaddr_in6*)(ns->m_pSelfAddr))->sin6_port = 0;
-            memcpy(&ns->m_pPeerAddr, peer, sizeof(*peer));
-        }
-        ns->m_pPeerAddr.sa_family = ls->m_iIPversion;
+        ns->m_pPeerAddr = remotePeerAddress;
+        ns->m_pPeerAddr.get()->sa_family = ls->m_iIPversion;
     }
     catch (...)
     {
@@ -327,7 +305,7 @@ int CUDTUnited::newConnection(const UDTSOCKET listen, const sockaddr* peer, CHan
         // bind to the same addr of listening socket
         ns->m_pUDT->open();
         updateMux(ns.get(), ls.get());
-        ns->m_pUDT->connect(peer, hs);
+        ns->m_pUDT->connect(remotePeerAddress, hs);
     }
     catch (...)
     {
@@ -338,8 +316,8 @@ int CUDTUnited::newConnection(const UDTSOCKET listen, const sockaddr* peer, CHan
     ns->m_Status = CONNECTED;
 
     // copy address information of local node
-    ns->m_pUDT->sndQueue().channel()->getSockAddr(ns->m_pSelfAddr);
-    CIPAddress::pton(ns->m_pSelfAddr, ns->m_pUDT->selfIp(), ns->m_iIPversion);
+    ns->m_pSelfAddr = ns->m_pUDT->sndQueue().channel()->getSockAddr();
+    CIPAddress::pton(&ns->m_pSelfAddr, ns->m_pUDT->selfIp(), ns->m_iIPversion);
 
     {
         // protect the m_Sockets structure.
@@ -448,11 +426,11 @@ int CUDTUnited::bind(const UDTSOCKET u, const sockaddr* name, int namelen)
     }
 
     s->m_pUDT->open();
-    updateMux(s.get(), name);
+    updateMux(s.get(), detail::SocketAddress(name, namelen));
     s->m_Status = OPENED;
 
     // copy address information of local node
-    s->m_pUDT->sndQueue().channel()->getSockAddr(s->m_pSelfAddr);
+    s->m_pSelfAddr = s->m_pUDT->sndQueue().channel()->getSockAddr();
 
     return 0;
 }
@@ -469,31 +447,17 @@ int CUDTUnited::bind(UDTSOCKET u, UDPSOCKET udpsock)
     if (INIT != s->m_Status)
         throw CUDTException(5, 0, 0);
 
-    sockaddr_in name4;
-    sockaddr_in6 name6;
-    sockaddr* name = nullptr;
-    socklen_t namelen = 0;
+    detail::SocketAddress socketAddress;
 
-    if (AF_INET == s->m_iIPversion)
-    {
-        namelen = sizeof(sockaddr_in);
-        name = (sockaddr*)&name4;
-    }
-    else
-    {
-        namelen = sizeof(sockaddr_in6);
-        name = (sockaddr*)&name6;
-    }
-
-    if (-1 == ::getsockname(udpsock, name, &namelen))
+    if (-1 == ::getsockname(udpsock, socketAddress.get(), &socketAddress.length()))
         throw CUDTException(5, 3);
 
     s->m_pUDT->open();
-    updateMux(s.get(), name, &udpsock);
+    updateMux(s.get(), socketAddress, &udpsock);
     s->m_Status = OPENED;
 
     // copy address information of local node
-    s->m_pUDT->sndQueue().channel()->getSockAddr(s->m_pSelfAddr);
+    s->m_pSelfAddr = s->m_pUDT->sndQueue().channel()->getSockAddr();
 
     return 0;
 }
@@ -623,6 +587,9 @@ int CUDTUnited::connect(const UDTSOCKET u, const sockaddr* name, int namelen)
             throw CUDTException(5, 3, 0);
     }
 
+    if (name->sa_family != s->m_iIPversion)
+        throw CUDTException(5, 3, 0);
+
     // a socket can "connect" only if it is in INIT or OPENED status
     if (INIT == s->m_Status)
     {
@@ -644,7 +611,7 @@ int CUDTUnited::connect(const UDTSOCKET u, const sockaddr* name, int namelen)
     s->m_Status = CONNECTING;
     try
     {
-        s->m_pUDT->connect(name);
+        s->m_pUDT->connect(detail::SocketAddress(name, namelen));
     }
     catch (const CUDTException& e)
     {
@@ -653,8 +620,8 @@ int CUDTUnited::connect(const UDTSOCKET u, const sockaddr* name, int namelen)
     }
 
     // record peer address
-    memcpy(&s->m_pPeerAddr, name, sizeof(*name));
-    s->m_pPeerAddr.sa_family = s->m_iIPversion;
+    s->m_pPeerAddr = detail::SocketAddress(name, namelen);
+    s->m_pPeerAddr.setFamily(s->m_iIPversion);
 
     return 0;
 }
@@ -668,8 +635,9 @@ void CUDTUnited::connect_complete(const UDTSOCKET u)
     // copy address information of local node
     // the local port must be correctly assigned BEFORE CUDT::connect(),
     // otherwise if connect() fails, the multiplexer cannot be located by garbage collection and will cause leak
-    s->m_pUDT->sndQueue().channel()->getSockAddr(s->m_pSelfAddr);
-    CIPAddress::pton(s->m_pSelfAddr, s->m_pUDT->selfIp(), s->m_iIPversion);
+    s->m_pSelfAddr = s->m_pUDT->sndQueue().channel()->getSockAddr();
+    // TODO: #ak wtf? Same variable is assigned twice to different values.
+    CIPAddress::pton(&s->m_pSelfAddr, s->m_pUDT->selfIp(), s->m_iIPversion);
 
     s->m_Status = CONNECTED;
 }
@@ -774,13 +742,8 @@ int CUDTUnited::getsockname(const UDTSOCKET u, sockaddr* name, int* namelen)
     if (INIT == s->m_Status)
         throw CUDTException(2, 2, 0);
 
-    if (AF_INET == s->m_iIPversion)
-        *namelen = sizeof(sockaddr_in);
-    else
-        *namelen = sizeof(sockaddr_in6);
-
     // copy address information of local node
-    memcpy(name, s->m_pSelfAddr, *namelen);
+    s->m_pSelfAddr.copy(name, namelen);
 
     return 0;
 }
@@ -1043,7 +1006,7 @@ std::shared_ptr<CUDTSocket> CUDTUnited::locate(const UDTSOCKET u)
 }
 
 std::shared_ptr<CUDTSocket> CUDTUnited::locate(
-    const sockaddr* peer,
+    const detail::SocketAddress& peer,
     const UDTSOCKET id,
     int32_t isn)
 {
@@ -1060,7 +1023,7 @@ std::shared_ptr<CUDTSocket> CUDTUnited::locate(
         if (k == m_Sockets.end())
             continue;
 
-        if (CIPAddress::ipcmp(peer, &k->second->m_pPeerAddr))
+        if (peer == k->second->m_pPeerAddr)
             return k->second;
     }
 
@@ -1271,15 +1234,16 @@ void CUDTUnited::checkTLSValue()
 }
 #endif
 
-void CUDTUnited::updateMux(CUDTSocket* s, const sockaddr* addr, const UDPSOCKET* udpsock)
+void CUDTUnited::updateMux(
+    CUDTSocket* s,
+    const std::optional<detail::SocketAddress>& addr,
+    const UDPSOCKET* udpsock)
 {
     std::lock_guard<std::mutex> lock(m_ControlLock);
 
-    if ((s->m_pUDT->reuseAddr()) && (nullptr != addr))
+    if ((s->m_pUDT->reuseAddr()) && addr)
     {
-        int port = (AF_INET == s->m_pUDT->ipVersion())
-            ? ntohs(((sockaddr_in*)addr)->sin_port)
-            : ntohs(((sockaddr_in6*)addr)->sin6_port);
+        const auto port = addr->port();
 
         // find a reusable address
         for (auto i = m_multiplexers.begin(); i != m_multiplexers.end(); ++i)
@@ -1327,12 +1291,8 @@ void CUDTUnited::updateMux(CUDTSocket* s, const sockaddr* addr, const UDPSOCKET*
         throw e;
     }
 
-    struct sockaddr sa;
-    memset(&sa, 0, sizeof(sa));
-    multiplexer->channel().getSockAddr(&sa);
-    multiplexer->udpPort = (AF_INET == sa.sa_family)
-        ? ntohs(((sockaddr_in*)&sa)->sin_port)
-        : ntohs(((sockaddr_in6*)&sa)->sin6_port);
+    const auto sa = multiplexer->channel().getSockAddr();
+    multiplexer->udpPort = sa.port();
 
     m_multiplexers[multiplexer->id] = multiplexer;
 
@@ -1346,9 +1306,7 @@ void CUDTUnited::updateMux(CUDTSocket* s, const CUDTSocket* ls)
 {
     std::lock_guard<std::mutex> lock(m_ControlLock);
 
-    int port = (AF_INET == ls->m_iIPversion)
-        ? ntohs(((sockaddr_in*)ls->m_pSelfAddr)->sin_port)
-        : ntohs(((sockaddr_in6*)ls->m_pSelfAddr)->sin6_port);
+    const int port = ls->m_pSelfAddr.port();
 
     // find the listener's address
     for (auto i = m_multiplexers.begin(); i != m_multiplexers.end(); ++i)

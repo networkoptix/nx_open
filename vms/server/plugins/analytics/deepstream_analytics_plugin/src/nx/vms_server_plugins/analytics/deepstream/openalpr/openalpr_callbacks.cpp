@@ -23,6 +23,7 @@ extern "C" {
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
+#include <nx/sdk/analytics/rect.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -113,7 +114,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
         }
 
         auto detectedObject = nx::sdk::makePtr<nx::sdk::analytics::ObjectMetadata>();
-        nx::sdk::analytics::IObjectMetadata::Rect rectangle;
+        nx::sdk::analytics::Rect rectangle;
 
         rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
         rectangle.y = roiMeta.rect_params.top / (double) frameHeight;

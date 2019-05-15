@@ -1,9 +1,10 @@
-#ifndef BACKUP_STATUS_REPLY_H
-#define BACKUP_STATUS_REPLY_H
+#pragma once
 
 #include <QtCore/QMetaType>
 
 #include <nx/fusion/model_functions_fwd.h>
+
+#include <common/common_globals.h>
 
 struct QnBackupStatusData
 {
@@ -19,7 +20,3 @@ struct QnBackupStatusData
 #define QnBackupStatusData_Fields (state)(progress)(backupTimeMs)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBackupStatusData, (json)(metatype)(eq))
-
-
-
-#endif // BACKUP_STATUS_REPLY_H

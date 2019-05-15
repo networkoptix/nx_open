@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {

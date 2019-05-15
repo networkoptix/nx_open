@@ -221,6 +221,8 @@ private:
     /** Check if statistics reporting is allowed in the system - and ask user if still not defined. */
     void checkIfStatisticsReportAllowed();
 
+    void confirmAnalyticsStorageLocation();
+
     void deleteDialogs();
 
     void closeApplication(bool force = false);

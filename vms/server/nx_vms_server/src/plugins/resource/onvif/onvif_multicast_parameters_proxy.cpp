@@ -156,11 +156,6 @@ bool setAudioEncoderConfiguration(
 
 } // namespace
 
-QString MulticastParameters::toString() const
-{
-    return lm("address: %1. port: %2, ttl: %3").args(address, port, ttl);
-}
-
 OnvifMulticastParametersProxy::OnvifMulticastParametersProxy(
     QnPlOnvifResource* onvifResource,
     nx::vms::api::StreamIndex streamIndex)
@@ -173,8 +168,18 @@ OnvifMulticastParametersProxy::OnvifMulticastParametersProxy(
 MulticastParameters OnvifMulticastParametersProxy::multicastParameters()
 {
     std::string token = m_resource->videoEncoderConfigurationToken(m_streamIndex);
-    if (!NX_ASSERT(!token.empty()))
-        return MulticastParameters();
+    if (m_streamIndex == nx::vms::api::StreamIndex::secondary)
+    {
+        // secondary stream may absent
+        if (token.empty())
+            return MulticastParameters();
+    }
+    else
+    {
+        // primary stream may not absent
+        if (!NX_ASSERT(!token.empty()))
+            return MulticastParameters();
+    }
 
     if (m_resource->getMedia2Url().isEmpty())
         return getMulticastParametersViaMedia1(token, m_resource);

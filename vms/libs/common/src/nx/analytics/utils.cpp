@@ -31,8 +31,7 @@ std::set<QString> supportedObjectTypeIdsFromManifest(const DeviceAgentManifest& 
 
 bool hasActiveObjectEngines(QnCommonModule* commonModule, const QnUuid& serverId)
 {
-    auto server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
-        commonModule->moduleGUID());
+    auto server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(serverId);
     if (!server)
         return false;
 

@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include <nx/utils/thread/mutex.h>
+#include <nx/vms/api/types_fwd.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/scope_guard.h>

@@ -5,6 +5,7 @@
 
 #include "nx/streaming/video_data_packet.h"
 #include <nx/streaming/config.h>
+#include <nx/utils/log/log.h>
 
 #include <licensing/license.h>
 #include <licensing/license_validator.h>
@@ -31,6 +32,8 @@ extern "C" {
 using namespace nx::utils;
 
 namespace {
+
+constexpr char kEndFileSignatureGuid[] = "29b5406f33174153aa5b3a63938507fe";
 
 static const int text_x_offs = 16;
 static const int text_y_offs = 16;
@@ -814,4 +817,38 @@ void QnSignHelper::setHwIdStr(const QString& value)
 void QnSignHelper::setLicensedToStr(const QString& value)
 {
     m_licensedToStr = value;
+}
+
+QByteArray QnSignHelper::buildSignatureFileEnd(const QByteArray& signature)
+{
+    QByteArray result;
+    result.append(kEndFileSignatureGuid, sizeof(kEndFileSignatureGuid));
+    result.append(signature);
+    return result;
+}
+
+QByteArray QnSignHelper::loadSignatureFromFileEnd(const QString& filename)
+{
+    QFile file(filename);
+    if (!file.open(QFile::ReadOnly) || file.size() < kSignatureSize)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to open file [%1] to load signature", filename);
+        return QByteArray();
+    }
+
+    if (!file.seek(file.size() - kSignatureSize))
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to seek on file [%1] to load signature", filename);
+        return QByteArray();
+    }
+
+    const auto data = file.read(kSignatureSize);
+    int index = data.indexOf(kEndFileSignatureGuid);
+    if (index == -1)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Signature not found in file [%1]", filename);
+        return QByteArray();
+    }
+
+    return data.mid(index + sizeof(kEndFileSignatureGuid));
 }

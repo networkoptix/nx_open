@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/url/url_builder.h>
+#include <nx/network/http/http_types.h>
 
 namespace nx::network::url {
 namespace test {

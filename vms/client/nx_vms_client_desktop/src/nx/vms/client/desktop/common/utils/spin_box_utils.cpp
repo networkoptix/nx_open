@@ -9,6 +9,8 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QWheelEvent>
 
+#include <nx/utils/log/assert.h>
+
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx::vms::client::desktop {

@@ -23,8 +23,8 @@ public:
             aio::BasicPollable* aioObject,
             InterruptionFlag* flag);
 
-        ScopeWatcher(ScopeWatcher&&) = default;
-        ScopeWatcher& operator=(ScopeWatcher&&) = default;
+        ScopeWatcher(ScopeWatcher&&) = delete;
+        ScopeWatcher& operator=(ScopeWatcher&&) = delete;
 
         bool interrupted() const;
 

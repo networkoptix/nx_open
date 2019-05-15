@@ -44,7 +44,7 @@ const char* TimestampedObjectMetadata::auxiliaryData() const
     return m_objectMetadata->auxiliaryData();
 }
 
-IObjectMetadata::Rect TimestampedObjectMetadata::boundingBox() const
+Rect TimestampedObjectMetadata::boundingBox() const
 {
     return m_objectMetadata->boundingBox();
 }

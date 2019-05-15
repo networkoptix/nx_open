@@ -37,6 +37,11 @@ public:
     /** Get binary digest from hex sign */
     static QByteArray getDigestFromSign(const QByteArray& sign);
 
+    /** Get signature from file end if it present*/
+    static QByteArray loadSignatureFromFileEnd(const QString& filename);
+
+    static QByteArray buildSignatureFileEnd(const QByteArray& signature);
+
     void setSign(const QByteArray& sign);
     void draw(QImage& img, bool drawText);
     void draw(QPainter& painter, const QSize& paintSize, bool drawText);
@@ -60,6 +65,7 @@ public:
     void setVersionStr(const QString& value);
     void setHwIdStr(const QString& value);
     void setLicensedToStr(const QString& value);
+
 private:
     void drawOnSignFrame(AVFrame* frame);
     void extractSpsPpsFromPrivData(const quint8* buffer, int bufferSize, SPSUnit& sps, PPSUnit& pps, bool& spsReady, bool& ppsReady);

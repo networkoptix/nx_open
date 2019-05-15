@@ -7,6 +7,8 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 
+#include <nx/utils/log/assert.h>
+
 QnViewportScaleWatcher::QnViewportScaleWatcher(QObject* parent)
     :
     base_type(parent),

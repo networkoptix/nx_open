@@ -3,8 +3,10 @@
 #include <QtCore/QPointer>
 
 #include <utils/common/connective.h>
-#include <nx/vms/server/server_module_aware.h>
 #include <core/resource/resource_fwd.h>
+
+#include <nx/utils/thread/mutex.h>
+#include <nx/vms/server/server_module_aware.h>
 
 #include "abstract_remote_archive_synchronization_task.h"
 #include "wearable_archive_synchronization_state.h"

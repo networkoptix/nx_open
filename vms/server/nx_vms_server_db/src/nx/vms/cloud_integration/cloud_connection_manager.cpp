@@ -121,19 +121,18 @@ const nx::cloud::db::api::ConnectionFactory& CloudConnectionManager::connectionF
 void CloudConnectionManager::processCloudErrorCode(
     nx::cloud::db::api::ResultCode resultCode)
 {
-    NX_DEBUG(this, lm("Error %1 while referring to cloud")
-        .arg(nx::cloud::db::api::toString(resultCode)));
+    NX_DEBUG(this, "Error %1 while referring to cloud",
+        nx::cloud::db::api::toString(resultCode));
 
     if (resultCode == nx::cloud::db::api::ResultCode::credentialsRemovedPermanently)
     {
-        NX_DEBUG(this, lm("Error. Cloud reported %1 error. Removing local cloud credentials...")
-            .arg(nx::cloud::db::api::toString(resultCode)));
+        NX_DEBUG(this, "Error. Cloud reported %1 error. Removing local cloud credentials...",
+            nx::cloud::db::api::toString(resultCode));
 
-        // System has been disconnected from cloud: cleaning up cloud credentials...
-        if (!detachSystemFromCloud())
-        {
-            NX_WARNING(this, lit("Error resetting cloud credentials in local DB"));
-        }
+        metaObject()->invokeMethod(
+            this,
+            &CloudConnectionManager::detachSystemFromCloud,
+            Qt::QueuedConnection);
     }
 }
 

@@ -202,6 +202,8 @@ public:
         bool sslRequired,
         nx::network::NatTraversalSupport natTraversalSupport);
 
+    virtual ~RandomlyFailingHttpServer() override;
+
     void setResponseBuffer(const QByteArray& buf);
 
 private:

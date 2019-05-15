@@ -5,6 +5,7 @@
 #include "stun_message_data.h"
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/network/cloud/cloud_connect_type.h>
 #include <nx/utils/system_error.h>
 
 namespace nx {
@@ -41,8 +42,9 @@ public:
         network::stun::extension::methods::connectionResult;
 
     nx::String connectSessionId;
-    NatTraversalResultCode resultCode;
-    SystemError::ErrorCode sysErrorCode;
+    NatTraversalResultCode resultCode = NatTraversalResultCode::ok;
+    SystemError::ErrorCode sysErrorCode = SystemError::noError;
+    nx::network::cloud::ConnectType connectType = nx::network::cloud::ConnectType::unknown;
 
     ConnectionResultRequest();
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;

@@ -47,7 +47,7 @@ private:
     virtual Engine* engine() const override { return engineCasted<Engine>(); }
 
     nx::sdk::analytics::IMetadataPacket* cookSomeEvents();
-    nx::sdk::analytics::IMetadataPacket* cookSomeObjects();
+    std::vector<nx::sdk::analytics::IMetadataPacket*> cookSomeObjects();
 
     int64_t usSinceEpoch() const;
 

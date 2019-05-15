@@ -47,6 +47,7 @@ protected:
     virtual void probe(ProbeResultHandler handler) = 0;
 
     /**
+     * Cancels any scheduled probe immediately and without blocking.
      * NOTE: Always called from object's AIO thread.
      */
     virtual void cancelProbe() = 0;

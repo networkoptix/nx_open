@@ -1856,6 +1856,11 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate)
         /* Layout containing only one item (current) is supposed to have the same AR as the item.
          * So we just set item size to its video layout size. */
         size = widget->channelLayout()->size();
+        if (QnAspectRatio::isRotated90(
+            widget->resource().dynamicCast<QnMediaResource>()->defaultRotation()))
+        {
+            size = size.transposed();
+        }
     }
     else
     {

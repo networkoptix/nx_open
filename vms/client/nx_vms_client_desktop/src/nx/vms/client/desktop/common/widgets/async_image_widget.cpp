@@ -108,23 +108,23 @@ void AsyncImageWidget::setImageProvider(ImageProvider* provider)
     if (m_imageProvider)
     {
         connect(m_imageProvider, &ImageProvider::imageChanged, this,
-            &AsyncImageWidget::updateThumbnailImage);
+            &AsyncImageWidget::updateCache);
 
         connect(m_imageProvider, &ImageProvider::statusChanged, this,
             &AsyncImageWidget::updateThumbnailStatus);
 
         connect(m_imageProvider, &ImageProvider::sizeHintChanged, this,
-            &AsyncImageWidget::invalidateGeometry);
+            &AsyncImageWidget::updateCache);
 
         connect(m_imageProvider, &QObject::destroyed, this,
             [this]
             {
-                updateThumbnailImage({});
+                updateCache();
                 updateThumbnailStatus(Qn::ThumbnailStatus::Invalid);
             });
     }
 
-    updateThumbnailImage(m_imageProvider ? m_imageProvider->image() : QImage());
+    updateCache();
     updateThumbnailStatus(m_imageProvider ? m_imageProvider->status() : Qn::ThumbnailStatus::Invalid);
     invalidateGeometry();
 }
@@ -201,35 +201,80 @@ bool AsyncImageWidget::cropRequired() const
     return false;
 }
 
+QTransform AsyncImageWidget::getAdjustment(QRectF target, QRectF image)
+{
+    qreal dx = 0.0;
+    qreal dy = 0.0;
+    // Horizontal correction
+    if (image.left() < target.left() && image.right() < target.right())
+    {
+        dx = image.width() > target.width()
+            ? target.right() - image.right() //< Align right edges.
+            : target.left() - image.left(); //< Align left edges.
+    }
+    else if (image.right() > target.right() && image.left() > target.left())
+    {
+        dx = image.width() > target.width()
+            ? target.left() - image.left() //< Align left edges.
+            : target.right() - image.right(); //< Align right edges.
+    }
+    // Vertical correction
+    if (image.top() < target.top() && image.bottom() < target.bottom())
+    {
+        dy = image.height() > target.height()
+            ? target.bottom() - image.bottom() //< Align bottom edges.
+            : target.top() - image.top(); //< Align top edges.
+    }
+    else if (image.bottom() > target.bottom() && image.top() > target.top())
+    {
+        dy = image.height() > target.height()
+            ? target.top() - image.top() //< Align top edges.
+            : target.bottom() - image.bottom(); //< Align bottom edges.
+    }
+    return QTransform::fromTranslate(dx, dy);
+}
+
 void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
     painter.setRenderHints(QPainter::SmoothPixmapTransform);
 
-    QRect paintRect;
-    QRectF highlightSubRect;
+    QRect targetImageRect; //< Image rectangle in target coordinates.
+    QRect targetHighlightRect; //< Highlight rectangle in target coordinates.
 
     if (!m_preview.isNull() && !m_placeholder->isVisible())
     {
-        const auto paintSize = core::Geometry::scaled(m_preview.size(), size(), Qt::KeepAspectRatio);
-        paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter, paintSize.toSize(), rect());
-
+        QRectF sourceRect = m_preview.rect();
+        const QRectF sourceHighlightRect = core::Geometry::subRect(sourceRect, m_highlightRect);
         if (cropRequired())
-        {
-            const auto croppedImageRect = core::Geometry::subRect(m_preview.rect(), m_highlightRect);
-            const auto boundingRect = core::Geometry::expanded(core::Geometry::aspectRatio(paintRect),
-                croppedImageRect, Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
+            sourceRect = sourceHighlightRect;
 
-            const auto sourceRect = core::Geometry::movedInto(boundingRect, m_preview.rect());
+        QRectF targetRect = rect();
+        const qreal scaleFactor = core::Geometry::scaleFactor(sourceRect.size(), size());
+        qreal actualScale = 1.0;
+        if (autoScaleUp() && scaleFactor > 1)
+            actualScale = scaleFactor;
+        if (autoScaleDown() && scaleFactor < 1)
+            actualScale = scaleFactor;
 
-            painter.drawPixmap(paintRect, m_preview, sourceRect);
-            highlightSubRect = core::Geometry::toSubRect(sourceRect, croppedImageRect);
-        }
-        else
-        {
-            painter.drawPixmap(paintRect, m_preview);
-            highlightSubRect = m_highlightRect;
-        }
+        QTransform transform; // Transformations are applied in reversed order.
+        // 3. Return (0,0) to target center.
+        transform.translate(targetRect.center().x(), targetRect.center().y());
+        // 2. Scale
+        transform.scale(actualScale, actualScale);
+        // 1. Move source rectangle center to (0,0).
+        transform.translate(-sourceRect.center().x(), -sourceRect.center().y());
+
+        targetImageRect = transform.mapRect(m_preview.rect());
+        // Adjust transformation if targetImageRect is not inside targetRect to get better display.
+        const QTransform adjustment = getAdjustment(targetRect, targetImageRect);
+        // 4. Adjust main transformation.
+        transform = transform * adjustment;
+
+        targetImageRect = transform.mapRect(m_preview.rect()); //< transform probably was adjusted.
+        targetHighlightRect = transform.mapRect(sourceHighlightRect).toRect();
+
+        painter.drawPixmap(targetImageRect, m_preview); //< Draw main image.
     }
 
     // For simplification, in current implementation the border covers 1-pixel frame boundary.
@@ -240,22 +285,20 @@ void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
         painter.drawRect(QRectF(rect()).adjusted(0.5, 0.5, -0.5, -0.5));
     }
 
-    if (!highlightSubRect.isEmpty())
+    // Draw highlight
+    if (!targetHighlightRect.isEmpty())
     {
         // Dim everything around highlighted area.
-        const auto highlightRect = core::Geometry::subRect(paintRect, highlightSubRect)
-            .toAlignedRect().intersected(paintRect);
-
-        if (highlightRect != paintRect)
+        if (targetImageRect != targetHighlightRect)
         {
             QPainterPath path;
-            path.addRegion(QRegion(paintRect).subtracted(highlightRect));
+            path.addRegion(QRegion(targetImageRect).subtracted(targetHighlightRect));
             painter.fillPath(path, palette().alternateBase());
         }
 
         // Paint highlight frame.
         painter.setPen(QPen(palette().highlight(), 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-        painter.drawRect(core::Geometry::eroded(QRectF(highlightRect), 0.5));
+        painter.drawRect(core::Geometry::eroded(QRectF(targetHighlightRect), 0.5));
     }
 }
 
@@ -281,28 +324,7 @@ void AsyncImageWidget::changeEvent(QEvent* event)
 QSize AsyncImageWidget::sizeHint() const
 {
     if (!m_cachedSizeHint.isValid())
-    {
-        if (m_cachedSizeHint.isEmpty())
-        {
-            if (m_imageProvider)
-                m_cachedSizeHint = m_imageProvider->sizeHint();
-
-            if (m_cachedSizeHint.isNull())
-                m_cachedSizeHint = minimumSize();
-
-            if (m_cachedSizeHint.isNull())
-                m_cachedSizeHint = kDefaultThumbnailSize;
-        }
-
-        const QSize maxSize = maximumSize();
-
-        qreal oversizeCoefficient = qMax(
-            static_cast<qreal>(m_cachedSizeHint.width()) / maxSize.width(),
-            static_cast<qreal>(m_cachedSizeHint.height()) / maxSize.height());
-
-        if (oversizeCoefficient > 1.0)
-            m_cachedSizeHint /= oversizeCoefficient;
-    }
+        updateSizeHint();
 
     return m_cachedSizeHint;
 }
@@ -315,7 +337,15 @@ bool AsyncImageWidget::hasHeightForWidth() const
 int AsyncImageWidget::heightForWidth(int width) const
 {
     const QSizeF hint = sizeHint();
-    return qMin(hint.height(), qRound(hint.height() / hint.width() * width));
+    double height = hint.height();
+
+    if (autoScaleDown())
+        height = qMin(height, qRound(width * height / hint.width()));
+
+    if (autoScaleUp())
+        height = qMax(height, qRound(width * height / hint.width()));
+
+    return (int)height;
 }
 
 void AsyncImageWidget::retranslateUi()
@@ -366,6 +396,54 @@ void AsyncImageWidget::setNoDataMode(bool noData)
     updateThumbnailStatus(m_previousStatus);
 }
 
+void AsyncImageWidget::updateSizeHint() const
+{
+    QSize perfectSize;
+
+    if (m_imageProvider)
+    {
+        perfectSize = m_imageProvider->image().size(); //< Take image size if possible.
+        if (perfectSize.isNull())
+            perfectSize = m_imageProvider->sizeHint(); //< Take sizeHint if possible.
+    }
+
+    if (perfectSize.isNull())
+        perfectSize = minimumSize(); //< Take minimumSize if possible.
+
+    if (perfectSize.isNull())
+        perfectSize = kDefaultThumbnailSize; //< Take a constant.
+
+    // Decrease sizeHint if it does not fit in maximumSize() and autoScaleDown.
+    m_cachedSizeHint = perfectSize;
+    if (autoScaleDown())
+    {
+        const qreal oversizeCoefficient = qMax(
+            static_cast<qreal>(m_cachedSizeHint.width()) / maximumSize().width(),
+            static_cast<qreal>(m_cachedSizeHint.height()) / maximumSize().height());
+        if (oversizeCoefficient > 1.0)
+        {
+            m_cachedSizeHint.setWidth(qMax(1, perfectSize.width() / oversizeCoefficient));
+            m_cachedSizeHint.setHeight(qMax(1, perfectSize.height() / oversizeCoefficient));
+        }
+    }
+}
+
+void AsyncImageWidget::updateCache()
+{
+    m_preview = QPixmap();
+    const QImage image = m_imageProvider ? m_imageProvider->image() : QImage();
+    if (!image.isNull())
+        m_preview = QPixmap::fromImage(image);
+
+    // Update geometry if we got new sizeHint value (probably due to new image).
+    const QSize oldSizeHint = m_cachedSizeHint;
+    updateSizeHint();
+    if (m_cachedSizeHint != oldSizeHint)
+        updateGeometry();
+
+    update();
+}
+
 void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 {
     if (m_noDataMode)
@@ -408,33 +486,4 @@ void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
     m_previousStatus = status;
 }
 
-void AsyncImageWidget::updateThumbnailImage(const QImage& image)
-{
-    QSize sourceSize = image.size();
-    const auto maxHeight = qMin(maximumHeight(), heightForWidth(maximumWidth()));
-
-    bool scale = false;
-    QSize targetSize;
-
-    if (sourceSize.height() > maxHeight && m_autoScaleDown)
-    {
-        scale = true;
-        targetSize = maximumSize();
-    }
-
-    if (sourceSize.height() < maxHeight && m_autoScaleUp)
-    {
-        scale = true;
-        targetSize = maximumSize();
-    }
-
-    m_preview = QPixmap::fromImage(scale
-        ? image.scaled(maximumSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation)
-        : image);
-
-    invalidateGeometry();
-    update();
-}
-
 } // namespace nx::vms::client::desktop
-

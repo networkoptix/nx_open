@@ -1,5 +1,7 @@
 #include "mobile_client_uri_handler.h"
 
+#include <QtGui/QDesktopServices>
+
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>

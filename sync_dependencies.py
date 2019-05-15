@@ -28,7 +28,7 @@ def determine_package_versions(
 ):
     v = {
         "gcc": "8.1",
-        "clang": "6.0.0",
+        "clang": "8.0.0",
         "qt": "5.11.3",
         "boost": "1.67.0",
         "openssl": "1.0.2q",
@@ -185,7 +185,6 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
 
     if have_desktop_client or have_mobile_client:
         sync("any/roboto-fonts")
-        sync("any/dejavu-fonts")
 
     if (have_mediaserver or have_desktop_client) and box != "edge1":
         sync("festival")

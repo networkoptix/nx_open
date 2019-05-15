@@ -119,6 +119,12 @@ public:
         void* client, utils::MoveOnlyFunc<void()> handler) = 0;
 
     /**
+     * If called in object's AIO thread then cancels immediately and without blocking.
+     * If called from any other thread, then it can block.
+     */
+    virtual void cancelHandlersSync(void* client) = 0;
+
+    /**
      * Configures connection keep-alive options.
      */
     virtual void setKeepAliveOptions(KeepAliveOptions options) = 0;

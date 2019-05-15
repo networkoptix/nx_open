@@ -21,12 +21,12 @@
 #include <nx/analytics/action_type_descriptor_manager.h>
 
 #include <camera/get_image_helper.h>
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/db/abstract_storage.h>
 
 #include <plugins/settings.h>
 
 using namespace nx::vms::server;
-using namespace nx::analytics::storage;
+using namespace nx::analytics::db;
 
 namespace {
 
@@ -413,12 +413,12 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     return errorMessage(error);
 }
 
-std::optional<nx::analytics::storage::ObjectPosition>
+std::optional<nx::analytics::db::ObjectPosition>
     QnExecuteAnalyticsActionRestHandler::fetchObjectPositionByTimestamp(
         const QnUuid& objectTrackId,
         int64_t timestampUs)
 {
-    using namespace nx::analytics::storage;
+    using namespace nx::analytics::db;
     using namespace std::chrono;
 
     static const seconds kSearchTimeRangeDuration(2);
@@ -484,12 +484,12 @@ std::optional<nx::analytics::storage::ObjectPosition>
     return *lowerBound;
 }
 
-std::optional<nx::analytics::storage::DetectedObject>
+std::optional<nx::analytics::db::DetectedObject>
     QnExecuteAnalyticsActionRestHandler::fetchDetectedObject(
         const QnUuid& objectTrackId,
         bool needFullTrack)
 {
-    using namespace nx::analytics::storage;
+    using namespace nx::analytics::db;
     Filter filter;
     filter.objectAppearanceId = objectTrackId;
     filter.maxTrackSize = needFullTrack ? /*unlimited length*/ 0 : 1;
@@ -519,7 +519,7 @@ std::optional<nx::analytics::storage::DetectedObject>
 int64_t QnExecuteAnalyticsActionRestHandler::tryToFindBestShotTimestampUsByAttrubute(
     const QnUuid& objectTrackId)
 {
-    using namespace nx::analytics::storage;
+    using namespace nx::analytics::db;
     Filter filter;
     filter.objectAppearanceId = objectTrackId;
     filter.maxTrackSize = 1;

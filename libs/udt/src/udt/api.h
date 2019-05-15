@@ -45,6 +45,7 @@ Yunhong Gu, last updated 09/28/2010
 #include <condition_variable>
 #include <map>
 #include <mutex>
+#include <optional>
 #include <thread>
 #include <vector>
 
@@ -53,6 +54,7 @@ Yunhong Gu, last updated 09/28/2010
 #include "queue.h"
 #include "cache.h"
 #include "epoll.h"
+#include "socket_addresss.h"
 
 class CUDT;
 class Multiplexer;
@@ -71,8 +73,8 @@ public:
     uint64_t m_TimeStamp = 0;                     // time when the socket is closed
 
     int m_iIPversion = 0;                         // IP version
-    sockaddr* m_pSelfAddr = nullptr;                    // pointer to the local address of the socket
-    struct sockaddr m_pPeerAddr;                    // pointer to the peer address of the socket
+    detail::SocketAddress m_pSelfAddr;                    // pointer to the local address of the socket
+    detail::SocketAddress m_pPeerAddr;                    // pointer to the peer address of the socket
 
     UDTSOCKET m_SocketId = 0;                     // socket ID
     UDTSOCKET m_ListenSocket = 0;                 // ID of the listener socket; 0 means this is an independent socket
@@ -150,7 +152,10 @@ public:
     // Returned value:
     //    If the new connection is successfully created: 1 success, 0 already exist, -1 error.
 
-    int newConnection(const UDTSOCKET listen, const sockaddr* peer, CHandShake* hs);
+    int newConnection(
+        const UDTSOCKET listen,
+        const detail::SocketAddress& remotePeerAddress,
+        CHandShake* hs);
 
     // Functionality:
     //    look up the UDT entity according to its ID.
@@ -238,14 +243,21 @@ private:
 
 private:
     void connect_complete(const UDTSOCKET u);
+
     std::shared_ptr<CUDTSocket> locate(const UDTSOCKET u);
-    std::shared_ptr<CUDTSocket> locate(const sockaddr* peer, const UDTSOCKET id, int32_t isn);
-    void updateMux(CUDTSocket* s, const sockaddr* addr = NULL, const UDPSOCKET* = NULL);
+
+    std::shared_ptr<CUDTSocket> locate(
+        const detail::SocketAddress& peer, const UDTSOCKET id, int32_t isn);
+
+    void updateMux(
+        CUDTSocket* s,
+        const std::optional<detail::SocketAddress>& addr = std::nullopt,
+        const UDPSOCKET* = NULL);
+
     void updateMux(CUDTSocket* s, const CUDTSocket* ls);
 
 private:
     std::map<int, std::shared_ptr<Multiplexer>> m_multiplexers;
-    pthread_mutex_t m_MultiplexerLock;
 
 private:
     std::unique_ptr<CCache<CInfoBlock>> m_cache;            // UDT network information cache

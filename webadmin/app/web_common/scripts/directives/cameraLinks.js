@@ -69,9 +69,9 @@ angular.module('nxCommon')
                         replace("{{streamIndex}}", stream).
                         replace("{{streamLetter}}", stream?'lo':'hi').
                         replace("{{auth}}", !scope.linkSettings.useAuth?'':'&auth=' + (transport=='rtsp'?systemAPI.authPlay():systemAPI.authGet())).
-                        replace("{{position}}", scope.liveMode || !scope.position?'':'&pos=' + Math.round(scope.position)).
-                        replace("{{previewPosition}}", scope.liveMode || !scope.position?'&time=LATEST&ignoreExternalArchive':'&time=' + Math.round(scope.position)).
-                        replace("{{webPosition}}", scope.liveMode || !scope.position?'':'time=' + Math.round(scope.position)).
+                        replace("{{position}}", scope.liveMode || !scope.positionServer?'':'&pos=' + Math.round(scope.positionServer)).
+                        replace("{{previewPosition}}", scope.liveMode || !scope.positionServer?'&time=LATEST&ignoreExternalArchive':'&time=' + Math.round(scope.positionServer)).
+                        replace("{{webPosition}}", scope.liveMode || !scope.positionServer?'':'time=' + Math.round(scope.positionServer)).
                         replace("{{webRootPath}}", systemAPI.systemId? '/' : (window.location.pathname + '#')).
                         replace("{{debug}}", scope.debugMode? 'debug' : '').
                         replace("{{duration}}", scope.linkSettings.duration).
@@ -79,7 +79,11 @@ angular.module('nxCommon')
                 };
 
                 scope.$watch("player",function(){scope.transport = scope.player == 'webm' ? 'WEBM' : 'HLS'});
-
+    
+                scope.$watch("position", function () {
+                    scope.positionServer = window.timeManager.displayToLocal(scope.position);
+                });
+    
             }
         };
     }]);

@@ -3,6 +3,7 @@
 #include <array>
 
 #include <QtGui/QPixmap>
+#include <QtGui/QIcon>
 #include <QtGui/QOpenGLBuffer>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLVertexArrayObject>

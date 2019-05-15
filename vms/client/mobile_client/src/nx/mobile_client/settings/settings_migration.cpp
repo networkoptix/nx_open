@@ -55,7 +55,7 @@ static void migrateFrom24To25()
         QnLoginSession session;
         session.systemName = importedSession.title;
         session.url = nx::network::url::Builder()
-            .setScheme(lit("http"))
+            .setScheme("http")
             .setHost(importedSession.host)
             .setPort(importedSession.port)
             .setUserName(importedSession.login)
@@ -65,7 +65,7 @@ static void migrateFrom24To25()
 
     qnSettings->setSavedSessions(sessions);
 
-    NX_INFO(typeid(QnMigratedSession), lit("Imported %1 sessions.").arg(importedSessions.size()));
+    NX_INFO(NX_SCOPE_TAG, "Imported %1 sessions.", importedSessions.size());
 
     qnSettings->setSettingsMigrated(true);
 }

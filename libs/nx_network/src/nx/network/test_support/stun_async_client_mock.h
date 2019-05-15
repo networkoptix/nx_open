@@ -60,6 +60,10 @@ public:
         handler();
     }
 
+    virtual void cancelHandlersSync(void*) override
+    {
+    }
+
     void emulateIndication(stun::Message indication)
     {
         IndicationHandler handler;

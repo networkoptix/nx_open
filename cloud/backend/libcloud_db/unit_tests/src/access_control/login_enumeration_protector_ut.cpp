@@ -2,6 +2,7 @@
 
 #include <nx/cloud/db/access_control/login_enumeration_protector.h>
 #include <nx/utils/time.h>
+#include <nx/utils/string.h>
 
 namespace nx::cloud::db::test {
 

@@ -47,6 +47,8 @@ public:
     virtual void cancelHandlers(
         void* client, utils::MoveOnlyFunc<void()> handler) override;
 
+    virtual void cancelHandlersSync(void* client) override;
+
     virtual void setKeepAliveOptions(
         nx::network::KeepAliveOptions options) override;
 

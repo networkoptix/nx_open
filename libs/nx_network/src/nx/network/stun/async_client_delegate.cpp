@@ -85,6 +85,11 @@ void AsyncClientDelegate::cancelHandlers(
     m_delegate->cancelHandlers(client, std::move(handler));
 }
 
+void AsyncClientDelegate::cancelHandlersSync(void* client)
+{
+    m_delegate->cancelHandlersSync(client);
+}
+
 void AsyncClientDelegate::setKeepAliveOptions(
     nx::network::KeepAliveOptions options)
 {

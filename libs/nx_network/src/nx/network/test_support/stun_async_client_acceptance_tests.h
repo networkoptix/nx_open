@@ -222,9 +222,7 @@ protected:
 
     void whenRemoveHandler()
     {
-        nx::utils::promise<void> done;
-        m_client->cancelHandlers(this, [&done]() { done.set_value(); });
-        done.get_future().wait();
+        m_client->cancelHandlersSync(this);
     }
 
     void whenStopServer()

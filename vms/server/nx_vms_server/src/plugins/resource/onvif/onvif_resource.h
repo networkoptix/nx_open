@@ -377,6 +377,8 @@ public:
 
     SoapTimeouts onvifTimeouts() const;
 
+    CameraDiagnostics::Result ensureMulticastIsEnabled(nx::vms::api::StreamIndex streamIndex);
+
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 

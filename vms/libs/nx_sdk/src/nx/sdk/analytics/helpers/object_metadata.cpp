@@ -42,7 +42,7 @@ int ObjectMetadata::attributeCount() const
     return (int) m_attributes.size();
 }
 
-IObjectMetadata::Rect ObjectMetadata::boundingBox() const
+Rect ObjectMetadata::boundingBox() const
 {
     return m_rect;
 }

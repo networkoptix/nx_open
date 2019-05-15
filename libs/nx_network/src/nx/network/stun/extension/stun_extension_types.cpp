@@ -115,6 +115,8 @@ const char* toString(AttributeType val)
             return "trafficRelayingStartDelay";
         case directTcpConnectStartDelay:
             return "directTcpConnectStartDelay";
+        case connectType:
+            return "connectType";
 
         case systemErrorCode:
             return "systemErrorCode";
