@@ -33,9 +33,12 @@ public:
     AnalyticsArchive(const QString& dataDir, const QnUuid& resourceId);
     virtual ~AnalyticsArchive();
 
+    /**
+     * @param region Region on the search grid. (Qn::kMotionGridWidth * Qn::kMotionGridHeight).
+     */
     bool saveToArchive(
         std::chrono::milliseconds timestamp,
-        const std::vector<QRectF>& region,
+        const std::vector<QRect>& region,
         int64_t objectType,
         int64_t allAttributesHash);
 

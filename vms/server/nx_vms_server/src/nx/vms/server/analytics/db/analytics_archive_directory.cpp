@@ -17,7 +17,7 @@ AnalyticsArchiveDirectory::AnalyticsArchiveDirectory(
 bool AnalyticsArchiveDirectory::saveToArchive(
     const QnUuid& deviceId,
     std::chrono::milliseconds timestamp,
-    const std::vector<QRectF>& region,
+    const std::vector<QRect>& region,
     int64_t objectType,
     int64_t allAttributesHash)
 {

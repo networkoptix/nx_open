@@ -21,15 +21,11 @@ AnalyticsArchive::~AnalyticsArchive()
 
 bool AnalyticsArchive::saveToArchive(
     std::chrono::milliseconds timestamp,
-    const std::vector<QRectF>& region,
+    const std::vector<QRect>& region,
     int64_t objectType,
     int64_t allAttributesId)
 {
-    const auto translatedRegion = restore<>(
-        region,
-        QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
-
-    for (const auto& rect: translatedRegion)
+    for (const auto& rect: region)
     {
         m_items.push_back({
             timestamp,
@@ -48,10 +44,6 @@ QnTimePeriodList AnalyticsArchive::matchPeriod(const Filter& filter)
     std::vector<QRect> translatedRegion;
     for (const auto& rect: filter.region)
         translatedRegion.push_back(rect);
-
-    //const auto translatedRegion = translate<>(
-    //    filter.region,
-    //    QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
 
     for (const auto& item: m_items)
     {

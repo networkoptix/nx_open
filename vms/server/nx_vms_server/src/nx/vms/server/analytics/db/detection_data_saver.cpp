@@ -243,9 +243,7 @@ void DetectionDataSaver::saveToAnalyticsArchive(nx::sql::QueryContext* queryCont
         const auto result = m_analyticsArchive->saveToArchive(
             item.deviceId,
             item.timestamp,
-            translate<>(
-                std::vector<QRect>(item.region.begin(), item.region.end()),
-                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY)),
+            std::vector<QRect>(item.region.begin(), item.region.end()),
             item.objectType,
             item.combinedAttributesId);
         if (!result)

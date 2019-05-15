@@ -1614,7 +1614,7 @@ TEST_F(AnalyticsDbTimePeriodsLookup, with_aggregation_period)
 
 TEST_F(AnalyticsDbTimePeriodsLookup, with_region)
 {
-    givenRandomFilter();
+    givenEmptyFilter();
     addRandomBoundingBoxToFilter();
 
     whenLookupTimePeriods();
