@@ -100,7 +100,7 @@ protected:
         return plugin;
     }
 
-    IEngine::IHandler* handler() const { return m_handler; }
+    IEngine::IHandler* handler() const { return m_handler.get(); }
 
 public:
     virtual ~Engine() override;
@@ -128,7 +128,7 @@ private:
     IPlugin* const m_plugin;
     const std::string m_overridingPrintPrefix;
     std::map<std::string, std::string> m_settings;
-    IEngine::IHandler* m_handler = nullptr;
+    nx::sdk::Ptr<IEngine::IHandler> m_handler;
 };
 
 } // namespace analytics

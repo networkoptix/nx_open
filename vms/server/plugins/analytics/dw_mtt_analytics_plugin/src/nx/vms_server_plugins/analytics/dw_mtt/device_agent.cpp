@@ -394,13 +394,18 @@ QByteArray DeviceAgent::extractRequestFromBuffer()
 
 Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
-    m_handler = handler;
+    handler->addRef();
+    m_handler.reset(handler);
     return Error::noError;
 }
 
 Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->eventTypeIds()->count() == 0)
+    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
+    if (!NX_ASSERT(eventTypeIds, "Event type id list is nullptr"))
+        return Error::unknownError;
+
+    if (eventTypeIds->count() == 0)
     {
         stopFetchingMetadata();
         return Error::noError;
@@ -418,10 +423,13 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
     m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
     // Assuming that the list contains only events, since this plugin does not produce objects.
-    const auto eventTypeList = metadataTypes->eventTypeIds();
-    for (int i = 0; i < eventTypeList->count(); ++i)
+    nx::sdk::Ptr<const IStringList> eventTypeIdList(metadataTypes->eventTypeIds());
+    if (!NX_ASSERT(eventTypeIdList, "Event type id list is nullptr"))
+        return Error::unknownError;
+
+    for (int i = 0; i < eventTypeIdList->count(); ++i)
     {
-        const QString id(eventTypeList->at(i));
+        const QString id(eventTypeIdList->at(i));
         const EventType* eventType = m_engine->eventTypeById(id);
         if (!eventType)
             NX_URL_PRINT << "Unknown event type. TypeId = " << id.toStdString();
