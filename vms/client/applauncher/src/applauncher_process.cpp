@@ -37,7 +37,8 @@ const nx::utils::SoftwareVersion kNewGstreamerUsedVersion(4, 0);
 
 } // namespace
 
-using namespace applauncher;
+namespace applauncher {
+
 using namespace api;
 
 ApplauncherProcess::ApplauncherProcess(
@@ -191,7 +192,7 @@ bool ApplauncherProcess::startApplication(
     const std::shared_ptr<StartApplicationTask>& task,
     Response* const response)
 {
-    NX_VERBOSE(this, lm("Entered LaunchingApplication"));
+    NX_VERBOSE(this, "Entered LaunchingApplication");
 
     auto installation = m_installationManager->installationForVersion(task->version);
 
@@ -209,8 +210,7 @@ bool ApplauncherProcess::startApplication(
 
     if (installation.isNull())
     {
-        NX_DEBUG(this, lm("Failed to find installed version %1")
-            .arg(task->version.toString()));
+        NX_DEBUG(this, "Failed to find installed version %1", task->version);
         response->result = ResultType::versionNotInstalled;
         return false;
     }
@@ -276,8 +276,7 @@ bool ApplauncherProcess::startApplication(
         }
     }
 
-    NX_VERBOSE(this, lm("Launching version %1 (path %2)")
-        .args(task->version.toString(), binPath));
+    NX_VERBOSE(this, "Launching version %1 (path %2)", task->version, binPath);
 
     const QFileInfo info(binPath);
     if (ProcessUtils::startProcessDetached(
@@ -288,15 +287,13 @@ bool ApplauncherProcess::startApplication(
         info.absolutePath(),
         environment))
     {
-        NX_DEBUG(this, lm("Successfully launched version %1 (path %2)")
-            .args(task->version.toString(), binPath));
+        NX_DEBUG(this, "Successfully launched version %1 (path %2)", task->version, binPath);
         m_settings->sync();
         response->result = ResultType::ok;
         return true;
     }
 
-    NX_DEBUG(this, lm("Failed to launch version %1 (path %2)")
-        .args(task->version.toString(), binPath));
+    NX_DEBUG(this, "Failed to launch version %1 (path %2)", task->version, binPath);
     response->result = ResultType::ioError;
     return false;
 }
@@ -367,3 +364,5 @@ void ApplauncherProcess::onTimer(const quint64& timerID)
     const auto code = nx::killProcessByPid(task.processID);
     static_cast<void>(code);
 }
+
+} // namespace applauncher

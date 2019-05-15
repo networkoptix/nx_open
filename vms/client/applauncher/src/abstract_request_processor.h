@@ -1,17 +1,20 @@
 #pragma once
 
+#include <memory>
+
 #include <nx/vms/applauncher/api/applauncher_api.h>
+
+namespace applauncher {
 
 class AbstractRequestProcessor
 {
 public:
-    virtual ~AbstractRequestProcessor() {}
+    virtual ~AbstractRequestProcessor() = default;
 
-    //!
-    /*!
-        It is recommended that implementation does not block!
-    */
+    /** It is recommended that implementation does not block! */
     virtual void processRequest(
-        const std::shared_ptr<applauncher::api::BaseTask>& request,
-        applauncher::api::Response** const response ) = 0;
+        const std::shared_ptr<api::BaseTask>& request,
+        api::Response** const response) = 0;
 };
+
+} // namespace applauncher
