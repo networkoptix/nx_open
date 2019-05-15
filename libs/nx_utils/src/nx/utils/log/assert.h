@@ -43,17 +43,19 @@ static const bool assertHeavyConditionEnabled = ini().assertHeavyCondition;
 /**
  * @return Always false.
  */
-template<typename Reason>
+template<typename... Args>
 bool assertFailure(
-    bool isCritical, const char* file, int line, const char* condition, const Reason& message)
+    bool isCritical, const char* file, int line, const char* condition, Args... args)
 {
     // NOTE: If message is empty, an extra space will appear before newline, which is hard to avoid.
     #if defined(ANDROID) || defined(__ANDROID__)
         const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4\nAndroid backtrace:\n%5")
-            .arg(file).arg(line).arg(condition).arg(message).arg(buildBacktrace());
+            .arg(file).arg(line).arg(condition)
+            .arg(log::makeMessage(std::forward<Args>(args)...)).arg(buildBacktrace());
     #else
         const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4")
-            .arg(file).arg(line).arg(condition).arg(message);
+            .arg(file).arg(line).arg(condition)
+            .arg(log::makeMessage(std::forward<Args>(args)...));
     #endif
 
     return assertFailure(isCritical, out);
@@ -94,11 +96,10 @@ private:
 } // namespace nx::utils
 
 #if defined(NX_CHECK_MEASURE_TIME)
-    #define NX_CHECK(IS_CRITICAL, CONDITION, ...) ( \
+    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) ( \
         [begin = std::chrono::steady_clock::now(), \
             result = (CONDITION) || ::nx::utils::assertFailure( \
-                IS_CRITICAL, __FILE__, __LINE__, #CONDITION, \
-                ::nx::utils::log::makeMessage(__VA_ARGS__))]() \
+                IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE)]() \
         { \
             const auto time = std::chrono::steady_clock::now() - begin; \
             static const auto info = nx::utils::AssertTimer::instance.info(__FILE__, __LINE__); \
@@ -107,10 +108,9 @@ private:
         }() \
     )
 #else
-    #define NX_CHECK(IS_CRITICAL, CONDITION, ...) ( \
+    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) ( \
         [result = (CONDITION) || ::nx::utils::assertFailure( \
-            IS_CRITICAL, __FILE__, __LINE__, #CONDITION, \
-            ::nx::utils::log::makeMessage(__VA_ARGS__))]() \
+            IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE)]() \
         { \
             return result; \
         }() \
@@ -125,7 +125,7 @@ private:
  *     ```
  */
 #define NX_CRITICAL(CONDITION, ...) \
-    NX_CHECK(/*isCritical*/ true, CONDITION, __VA_ARGS__)
+    NX_CHECK(/*isCritical*/ true, CONDITION, nx::utils::log::makeMessage(__VA_ARGS__))
 
 /**
  * - Debug: Causes segfault in case of assertion failure, if not disabled via
@@ -142,7 +142,7 @@ private:
  * @return Condition evaluation result.
  */
 #define NX_ASSERT(CONDITION, ...) \
-    NX_CHECK(/*isCritical*/ false, CONDITION, __VA_ARGS__)
+    NX_CHECK(/*isCritical*/ false, CONDITION, nx::utils::log::makeMessage(__VA_ARGS__))
 
 /**
  * - Debug: Works the same way as NX_ASSERT(), if not disabled via
@@ -155,8 +155,8 @@ private:
  *         NX_ASSERT_HEAVY_CONDITION(!getObjectFromDb().isEmpty());
  *     ```
  */
-#define NX_ASSERT_HEAVY_CONDITION(...) do \
+#define NX_ASSERT_HEAVY_CONDITION(CONDITION, ...) do \
 { \
     if (::nx::utils::detail::assertHeavyConditionEnabled) \
-        NX_ASSERT(__VA_ARGS__); \
+        NX_CHECK(/*isCritical*/ false, CONDITION, nx::utils::log::makeMessage(__VA_ARGS__)); \
 } while (0)

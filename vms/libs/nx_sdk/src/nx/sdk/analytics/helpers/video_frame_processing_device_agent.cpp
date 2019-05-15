@@ -183,7 +183,10 @@ void VideoFrameProcessingDeviceAgent::processMetadataPacket(
         {
 
             if (compoundMetadataPacket->count() == 0)
+            {
                 NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " is empty.";
+                return;
+            }
 
             const std::string itemsName = (compoundMetadataPacket->count() == 1)
                 ? (std::string("item of type ") + compoundMetadataPacket->at(0)->typeId())

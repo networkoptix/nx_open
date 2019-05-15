@@ -73,7 +73,7 @@ public:
                 NX_DEBUG(this, lm("Still created: %1").args(created));
             if (m_relaxedChecking)
                 break;
-			m_waitCondition.wait(&m_mutex);
+            m_waitCondition.wait(&m_mutex);
         }
     }
 
@@ -85,8 +85,29 @@ public:
 private:
     void waitAllLocked()
     {
+        using namespace std::chrono;
+        static const seconds kStopTimeout(60);
+        const auto start = system_clock::now();
+
         while (!m_running.isEmpty())
-            m_waitCondition.wait(&m_mutex);
+        {
+            const auto timeFromStart = duration_cast<milliseconds>((system_clock::now() - start));
+            const milliseconds timeToWait = kStopTimeout - timeFromStart;
+            if (timeToWait.count() > 0)
+                m_waitCondition.wait(&m_mutex, timeToWait);
+
+            if (system_clock::now() - start >= kStopTimeout)
+            {
+                for (const auto runnable: m_running)
+                {
+                    NX_WARNING(
+                        this, "A long runnable %1 hasn't stopped in %2 seconds", runnable,
+                        kStopTimeout);
+                }
+
+                return;
+            }
+        }
     }
 
 private:

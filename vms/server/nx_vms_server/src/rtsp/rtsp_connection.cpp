@@ -221,6 +221,7 @@ public:
         deleteDP();
     }
 
+    nx::rtsp::UrlParams urlParams;
     QnLiveStreamProviderPtr liveDpHi;
     QnLiveStreamProviderPtr liveDpLow;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
@@ -921,7 +922,6 @@ void QnRtspConnectionProcessor::processRangeHeader()
     const auto rangeStr = nx::network::http::getHeaderValue(d->request.headers, "Range");
     if (!rangeStr.isEmpty())
     {
-        QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
         if (!nx::network::rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime))
             d->startTime = DATETIME_NOW;
 
@@ -1500,14 +1500,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeGetParamete
 bool QnRtspConnectionProcessor::applyUrlParams()
 {
     Q_D(QnRtspConnectionProcessor);
-
-    nx::rtsp::UrlParams params;
-    if (!params.parse(QUrlQuery(d->request.requestLine.url.query())))
-    {
-        d->errorMessage = params.getParseError();
-        return false;
-    }
-    d->applyUrlParams(params);
+    d->applyUrlParams(d->urlParams);
 
     // Set codec if resolution confugired
     if (d->transcodeParams.resolution.isValid() && d->transcodeParams.codecId == AV_CODEC_ID_NONE)
@@ -1517,6 +1510,7 @@ bool QnRtspConnectionProcessor::applyUrlParams()
         if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
         {
             d->errorMessage = QString("Default video codec not found: [%1]").arg(defaultCodec);
+            NX_DEBUG(this, "%1", d->errorMessage);
             return false;
         }
     }
@@ -1555,10 +1549,19 @@ bool QnRtspConnectionProcessor::processRequest()
     QString method = d->request.requestLine.method;
     if (method == "DESCRIBE" || (method == "PLAY" && d->useProprietaryFormat))
     {
-        if (!applyUrlParams())
+        if (!d->urlParams.parse(QUrlQuery(d->request.requestLine.url.query())))
         {
             NX_DEBUG(this, "Request parsing failed: [%1], [%2]",
-                d->request.requestLine.toString().trimmed(), d->errorMessage);
+                d->request.requestLine.toString().trimmed(), d->urlParams.getParseError());
+            d->response.messageBody = d->urlParams.getParseError().toUtf8();
+            sendResponse(nx::network::http::StatusCode::badRequest, QByteArray());
+            return false;
+        }
+    }
+    if (method == "DESCRIBE" || method == "PLAY")
+    {
+        if (!applyUrlParams()) // < URL parameters override header parameters
+        {
             d->response.messageBody = d->errorMessage.toUtf8();
             sendResponse(nx::network::http::StatusCode::badRequest, QByteArray());
             return false;

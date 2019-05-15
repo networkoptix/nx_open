@@ -55,11 +55,46 @@ TEST(Settings, loadSave)
     settings.option1.remove();
     ASSERT_FALSE(qSettings->contains("option1"));
     ASSERT_FALSE(qSettings->contains("option2"));
+    file.remove();
+}
 
+TEST(Settings, stringWithCommas)
+{
+    struct Settings: nx::utils::Settings
+    {
+        Option<QString> option1{this, "option1", "qwerty", "Option description"};
+    };
+
+    QFile file (kSettingsFilename);
     QString stringWithCommas = "info,debug[nx::network],verbose[nx::utils , nx::vms::server]";
-    qSettings->setValue("option1", stringWithCommas);
-    settings.attach(qSettings);
-    ASSERT_EQ(settings.option1(), stringWithCommas);
+    file.remove();
+    {
+        Settings settings;
+        std::shared_ptr<QSettings> qSettings(new QSettings(kSettingsFilename, QSettings::IniFormat));
+        qSettings->setValue("option1", stringWithCommas);
+        settings.attach(qSettings);
+        ASSERT_EQ(settings.option1(), stringWithCommas);
+        qSettings->sync();
+    }
+
+    {
+        std::shared_ptr<QSettings> qSettings(new QSettings(kSettingsFilename, QSettings::IniFormat));
+        Settings settings;
+        settings.attach(qSettings);
+        ASSERT_EQ(settings.option1(), stringWithCommas);
+    }
+
+    {
+        QFile file(kSettingsFilename);
+        file.open(QIODevice::WriteOnly | QIODevice::Truncate);
+        file.write("option1 = info,debug[nx::network],verbose[nx::utils , nx::vms::server]");
+        file.close();
+        std::shared_ptr<QSettings> qSettings(new QSettings(kSettingsFilename, QSettings::IniFormat));
+        Settings settings;
+        settings.attach(qSettings);
+        ASSERT_EQ(settings.option1().remove(' '), stringWithCommas.remove(' '));
+    }
+    file.remove();
 }
 
 TEST(Settings, getWithLambda)
@@ -95,4 +130,5 @@ TEST(Settings, getWithLambda)
     settings.attach(qSettings);
     ASSERT_EQ(settings.option1(), QString("qwerty"));
     ASSERT_EQ(settings.option2(), 10);
+    file.remove();
 }
