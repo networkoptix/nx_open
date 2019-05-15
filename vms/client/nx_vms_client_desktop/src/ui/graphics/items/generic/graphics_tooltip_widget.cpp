@@ -51,6 +51,7 @@ QnGraphicsToolTipWidget::QnGraphicsToolTipWidget(QGraphicsItem* parent):
     font.setWeight(kNoDataFontWeight);
     m_previewWidget->setFont(font);
     m_previewWidget->setCropMode(nx::vms::client::desktop::AsyncImageWidget::CropMode::notHovered);
+    m_previewWidget->setAutoScaleUp(true);
 
     setThumbnailVisible(false);
 }
