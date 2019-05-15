@@ -102,6 +102,28 @@ void DeviceAdditionDialog::initializeControls()
 
     ui->searchButton->setFocusPolicy(Qt::StrongFocus);
     ui->stopSearchButton->setFocusPolicy(Qt::StrongFocus);
+    ui->addDevicesButton->setFocusPolicy(Qt::StrongFocus);
+    ui->knownAddressAutoPortCheckBox->setFocusPolicy(Qt::StrongFocus);
+    ui->foundDevicesTable->setFocusPolicy(Qt::StrongFocus);
+
+    // Monitor focus and change accent button accodringly.
+    ui->searchButton->installEventFilter(this);
+    ui->startAddressEdit->installEventFilter(this);
+    ui->endAddressEdit->installEventFilter(this);
+    ui->addressEdit->lineEdit()->installEventFilter(this);
+    ui->knownAddressAutoPortCheckBox->installEventFilter(this);
+    ui->knownAddressPortSpinBox->installEventFilter(this);
+    ui->subnetScanAutoPortCheckBox->installEventFilter(this);
+    ui->subnetScanPortSpinBox->installEventFilter(this);
+    ui->loginEdit->installEventFilter(this);
+    ui->passwordEdit->installEventFilter(this);
+    ui->stopSearchButton->installEventFilter(this);
+    ui->foundDevicesTable->installEventFilter(this);
+    ui->addDevicesButton->installEventFilter(this);
+
+    ui->searchButton->setAutoDefault(true);
+    ui->stopSearchButton->setAutoDefault(true);
+    ui->addDevicesButton->setAutoDefault(false);
 
     connect(ui->searchButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleStartSearchClicked);
@@ -185,8 +207,7 @@ void DeviceAdditionDialog::initializeControls()
     setupPortStuff(ui->knownAddressAutoPortCheckBox, ui->knownAddressPortSpinWidget);
     setupPortStuff(ui->subnetScanAutoPortCheckBox, ui->subnetScanPortSpinWidget);
 
-    setAccentStyle(ui->searchButton);
-    setAccentStyle(ui->addDevicesButton);
+    setSearchAccent(true);
 
     PasswordPreviewButton::createInline(ui->passwordEdit);
 
@@ -205,6 +226,37 @@ void DeviceAdditionDialog::initializeControls()
 
     setPaletteColor(ui->knownAddressPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
     setPaletteColor(ui->subnetScanPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
+}
+
+void DeviceAdditionDialog::setSearchAccent(bool isEnabled)
+{
+    if (isEnabled)
+    {
+        ui->addDevicesButton->setDefault(false);
+        resetButtonStyle(ui->addDevicesButton);
+
+        ui->searchButton->setDefault(true);
+        setAccentStyle(ui->searchButton);
+    }
+    else
+    {
+        ui->searchButton->setDefault(false);
+        resetButtonStyle(ui->searchButton);
+
+        ui->addDevicesButton->setDefault(true);
+        setAccentStyle(ui->addDevicesButton);
+    }
+    
+}
+
+bool DeviceAdditionDialog::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::FocusIn)
+    {
+        const bool isSearchAccent = object != ui->foundDevicesTable && object != ui->addDevicesButton;
+        setSearchAccent(isSearchAccent);
+    }
+    return base_type::eventFilter(object, event);
 }
 
 void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& value)
@@ -655,11 +707,6 @@ void DeviceAdditionDialog::updateResultsWidgetState()
         ui->placeholderLabel->setText(text.toUpper());
     }
 
-    if (empty)
-        setAccentStyle(ui->searchButton);
-    else
-        resetButtonStyle(ui->searchButton);
-
     const bool showSearchProgressControls = m_currentSearch && m_currentSearch->searching();
     ui->searchControls->setCurrentIndex(showSearchProgressControls ? 1 : 0);
     ui->searchButton->setVisible(!showSearchProgressControls);
@@ -719,12 +766,14 @@ void DeviceAdditionDialog::showAddDevicesButton(const QString& buttonText)
 {
     ui->addDevicesStackedWidget->setCurrentWidget(ui->addDevicesButtonPage);
     ui->addDevicesButton->setText(buttonText);
+    ui->foundDevicesTable->setFocus();
 }
 
 void DeviceAdditionDialog::showAddDevicesPlaceholder(const QString& placeholderText)
 {
     ui->addDevicesStackedWidget->setCurrentWidget(ui->addDevicesPlaceholderPage);
     ui->addDevicesPlaceholder->setText(placeholderText);
+    setSearchAccent(true);
 }
 
 } // namespace nx::vms::client::desktop
