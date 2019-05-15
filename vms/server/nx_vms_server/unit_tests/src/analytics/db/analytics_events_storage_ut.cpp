@@ -732,9 +732,9 @@ private:
             if (!detectedObject.track.empty())
             {
                 detectedObject.firstAppearanceTimeUsec =
-                    detectedObject.track.begin()->timestampUsec;
+                    (detectedObject.track.begin()->timestampUsec / kUsecInMs) * kUsecInMs;
                 detectedObject.lastAppearanceTimeUsec =
-                    detectedObject.track.rbegin()->timestampUsec;
+                    (detectedObject.track.rbegin()->timestampUsec / kUsecInMs) * kUsecInMs;
             }
         }
     }
@@ -1613,8 +1613,11 @@ TEST_F(
 
 TEST_F(AnalyticsDbTimePeriodsLookup, with_aggregation_period)
 {
+    addRandomKnownDeviceIdToFilter();
     givenRandomLookupOptions();
+
     whenLookupTimePeriods();
+
     thenResultMatchesExpectations();
 }
 
