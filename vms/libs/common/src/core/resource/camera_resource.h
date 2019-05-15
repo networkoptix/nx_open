@@ -64,7 +64,11 @@ public:
     CameraMediaStreams mediaStreams() const;
     CameraMediaStreamInfo streamInfo(StreamIndex index = StreamIndex::primary) const;
 
+    /** @return frame aspect ratio of a single channel. Does not account for default rotation. */
     virtual QnAspectRatio aspectRatio() const;
+
+    /** @return frame aspect ratio of a single channel. Accounts for default rotation. */
+    virtual QnAspectRatio aspectRatioRotated() const;
 
     // TODO: saveMediaStreamInfoIfNeeded and saveBitrateIfNeeded should be moved into
     // nx::vms::server::resource::Camera, as soon as QnLiveStreamProvider moved into nx::vms::server.

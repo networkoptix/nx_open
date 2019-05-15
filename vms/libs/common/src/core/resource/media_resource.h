@@ -18,8 +18,11 @@ class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 class QnCameraUserAttributePool;
 
-/*!
-    \note Derived class MUST call \a initMediaResource() just after object instantiation
+/**
+ * Represents a camera or a local video file.
+ * This class is baseless to prevent diamond inheritance. Its descendants are QnVirtualCameraResource
+ * or local QnAbstractArchiveResource based.
+ * \note Derived class MUST call \a initMediaResource() just after object instantiation
 */
 class QnMediaResource
 {
@@ -50,6 +53,12 @@ public:
     virtual QnAspectRatio customAspectRatio() const;
     void setCustomAspectRatio(const QnAspectRatio& value);
     void clearCustomAspectRatio();
+
+    /**
+     * Returns default rotation. 
+     * The class should be refactored and this function moved out.
+     */
+    qreal defaultRotation() const;
 
     /**
         Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
