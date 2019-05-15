@@ -58,7 +58,7 @@ public:
 
     static constexpr quint32 kMinimalDurationMs = 125;
 protected:
-    static const int kGridDataSize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128;
+    static const int kGridDataSizeBytes = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8;
 
     QnTimePeriodList matchPeriodInternal(const Filter& filter);
     QString getFilePrefix(const QDate& datetime) const;

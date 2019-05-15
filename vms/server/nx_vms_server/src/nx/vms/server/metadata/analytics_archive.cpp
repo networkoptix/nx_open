@@ -29,7 +29,7 @@ bool AnalyticsArchive::matchAdditionData(const Filter& filter, const quint8* dat
         if (values.empty())
             return true;
         return std::any_of(values.begin(), values.end(),
-            [&](const int& data) { return data == value; });
+            [&](const int64_t& data) { return data == value; });
 
     };
 

@@ -276,7 +276,7 @@ void MetadataArchive::loadDataFromIndex(
         while (i < endItr && curData < dataEnd)
         {
             if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd)
-                && matchAdditionData(filter, curData + kGridDataSize, recordSize() - kGridDataSize))
+                && matchAdditionData(filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes))
             {
                 qint64 fullStartTime = i->start + indexHeader.startTime;
 
@@ -339,7 +339,7 @@ void MetadataArchive::loadDataFromIndexDesc(
         while (i >= startItr && curData < dataEnd)
         {
             if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd)
-                && matchAdditionData(filter, curData + kGridDataSize, recordSize() - kGridDataSize))
+                && matchAdditionData(filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes))
             {
                 qint64 fullStartTimeMs = i->start + indexHeader.startTime;
 
@@ -387,7 +387,7 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(const Filter& filter)
         qFreeAligned(buffer);
     });
 
-    simd128i mask[kGridDataSize];
+    simd128i mask[kGridDataSizeBytes / sizeof(simd128i)];
     int maskStart, maskEnd;
 
     NX_ASSERT(!useSSE2() || ((std::ptrdiff_t)mask) % 16 == 0);
