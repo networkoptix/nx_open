@@ -216,6 +216,11 @@ TextField::TextField(QObject* parent):
 {
 }
 
+TextArea::TextArea(QObject* parent):
+    ValueItem(QStringLiteral("TextArea"), parent)
+{
+}
+
 ComboBox::ComboBox(QObject* parent):
     EnumerationItem(QStringLiteral("ComboBox"), parent)
 {
@@ -284,6 +289,7 @@ void Factory::registerTypes()
     registerType<Section>("Section");
     registerType<Row>("Row");
     registerType<TextField>("TextField");
+    registerType<TextArea>("TextArea");
     registerType<ComboBox>("ComboBox");
     registerType<SpinBox>("SpinBox");
     registerType<DoubleSpinBox>("DoubleSpinBox");
