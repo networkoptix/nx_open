@@ -39,8 +39,8 @@
   },
   "systemStatuses": {
     "activated": "đã kích hoạt",
-    "incompatible": "incompatible",
-    "merging": "merging",
+    "incompatible": "không tương thích",
+    "merging": "đang tích hợp",
     "notActivated": "chưa kích hoạt",
     "online": "trực tuyến",
     "offline": "ngoại tuyến",
@@ -141,14 +141,14 @@
     "lostConnection": "Kết nối với {{systemName}} bị mất",
     "thisSystem": "hệ thống",
     "oldSafariNotSupported": "Không hỗ trợ các phiên bản cũ hơn Safari 10",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
-    "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/download\">latest build</a>.",
-    "FAIL": "System <strong>{{failedSystem}}</strong> is currently unreachable.<br>Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "Một số máy chủ liệt kê tồn tại trong cả hệ thống được chọn và hệ thống hiện tại.<br>Xóa các máy chủ ngoại tuyến và không tương thích khỏi mỗi Hệ thống và thử lại.",
+    "mergedSystemIsOffline": "Hệ thống <strong>{{failedSystem}}</strong> đang ngoại tuyến.",
+    "INCOMPATIBLE": "Hệ thống đang có các phiên bản phần mềm khác nhau. Vui lòng cập nhật tất cả lên <a href=\"/download\">phiên bản mới nhất</a>.",
+    "FAIL": "Hệ thống <strong>{{failedSystem}}</strong> hiện không thể truy cập được.<br>Vu lòng thử lại sau vài phút hoặc liên hệ với <a href=\"%SUPPORT_LINK%\" target=\"_blank\"> để được hỗ trợ</a>."
   },
   "merging": {
-    "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "mergeFailedTitle": "Hợp nhất hệ thống không thành công",
+    "commonText": "Không thể hợp nhất Hệ thống <strong>{{primarySystem}}</strong> và <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "tốt",
@@ -194,11 +194,11 @@
     "confirmUnshareAction": "Xoá",
     "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ %PRODUCT_NAME%",
     "successDeleted": "Tài khoản {{systemName}} đã xóa thành công từ hệ thống của bạn",
-    "mergeFailed": "System merge failed",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "Hợp nhất hệ thống không thành công",
+    "mergeStart": "Các hệ thống đã được hợp nhất",
     "mergeSuccess": "System merge completed",
     "permissionsRemoved": "Các quyền đã bị xóa khỏi {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Tên không xác định cho hệ thống (do hợp nhất Cloud)"
   },
   "account": {
     "accountSavedSuccess": "Tài khoản của bạn đã được lưu thành công",
@@ -253,7 +253,7 @@
       "sdk": {
         "label": "SDK",
         "shortLabel": "SDK",
-        "supported": "C++ cross platform SDK"
+        "supported": "SDK đa nền tảng C ++"
       }
     },
     "platforms": {
@@ -342,8 +342,8 @@
     }
   },
   "recommendSupport": {
-    "a_recommend": "We'd recommend consulting with",
+    "a_recommend": "Chúng tôi khuyên bạn nên tham khảo ý kiến với",
     "b_support": "hỗ trợ",
-    "c_proceeding": "before proceeding."
+    "c_proceeding": "trước khi tiến hành."
   }
 }

@@ -39,7 +39,7 @@
   },
   "systemStatuses": {
     "activated": "アクティベート済",
-    "incompatible": "incompatible",
+    "incompatible": "互換性なし",
     "merging": "統合中",
     "notActivated": "アクティベートされていません",
     "online": "オンライン",
@@ -141,14 +141,14 @@
     "lostConnection": "{{systemName}} への接続が失われました",
     "thisSystem": "システム",
     "oldSafariNotSupported": "Safariのバージョン10以前はサポートされません",
-    "DUPLICATE_MEDIASERVER_FOUND": "Some server lists as existing in both Systems – in the selected and in the current one.<br>Remove offline and incompatible servers from each System and try again.",
-    "mergedSystemIsOffline": "System <strong>{{failedSystem}}</strong> is offline.",
-    "INCOMPATIBLE": "Systems have different software versions. Please update both of them to the <a href=\"/download\">latest build</a>.",
-    "FAIL": "System <strong>{{failedSystem}}</strong> is currently unreachable.<br>Try again in a few moments or contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+    "DUPLICATE_MEDIASERVER_FOUND": "選択したものと現在のもの両方のシステムに存在するサーバーリストがあります。<br>各システムからオフラインで互換性のないサーバーを削除してやり直してください。",
+    "mergedSystemIsOffline": "システム <strong>{{failedSystem}}</strong> はオフラインです。",
+    "INCOMPATIBLE": "システムには異なるソフトウェアバージョンがあります。両方とも <a href=\"/download\">最新のビルド</a>を更新してください。",
+    "FAIL": "システム <strong>{{failedSystem}}</strong> は現在到達不能です。<br>しばらくしてからもう一度試すか、<a href=\"%SUPPORT_LINK%\" target=\"_blank\">サポート</a>に連絡してください。"
   },
   "merging": {
-    "mergeFailedTitle": "Systems merge failed",
-    "commonText": "Failed to merge Systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>."
+    "mergeFailedTitle": "システムのマージに失敗しました",
+    "commonText": "システム <strong>{{primarySystem}}</strong> および <strong>{{secondarySystem}}</strong>をマージできませんでした。"
   },
   "passwordRequirements": {
     "good": "良い",
@@ -194,8 +194,8 @@
     "confirmUnshareAction": "削除",
     "successDisconnected": "システムが正常に %PRODUCT_NAME% から切断されました",
     "successDeleted": "システム {{systemName}} はあなたのアカウントから正常に削除されました",
-    "mergeFailed": "System merge failed",
-    "mergeStart": "Systems have started merging",
+    "mergeFailed": "システム統合が失敗しました",
+    "mergeStart": "システムが統合を開始しました",
     "mergeSuccess": "システムが統合されました",
     "permissionsRemoved": "{{email}} からアクセス権限が削除されました",
     "unknownName": "システムの名前が不明です（クラウド統合が原因）"
@@ -253,7 +253,7 @@
       "sdk": {
         "label": "SDK",
         "shortLabel": "SDK",
-        "supported": "C++ cross platform SDK"
+        "supported": "C ++クロスプラットフォームSDK"
       }
     },
     "platforms": {

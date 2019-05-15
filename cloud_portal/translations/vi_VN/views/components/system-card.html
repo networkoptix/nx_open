@@ -38,11 +38,11 @@
         <br>
         <div ng-if="mergeTargetSystem.name" >
             <div><strong>{{mergeTargetSystem.name}}</strong>
-                is being merged to this system</div>
+                đang được hợp nhất vào hệ thống này</div>
             <hr />
             <div class="merge-info-text light-text">Tùy thuộc vào kích thước của cơ sở dữ liệu có thể mất đến vài giờ</div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Hoàn tất việc hợp nhất hệ thống</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
@@ -50,16 +50,16 @@
         </div>
         <br>
         <div ng-if="mergeTargetSystem.name">
-            <div>This system is being merged to
+            <div>Hệ thống này đang được hợp nhất thành
                 <strong>{{mergeTargetSystem.name}}</strong></div>
             <hr />
             <div class="merge-info-text light-text">
                 <p>Tùy thuộc vào kích thước của cơ sở dữ liệu có thể mất đến vài giờ.</p>
                 <p>Cho đến khi hợp nhất xong bạn có thể đăng nhập vào hệ thống này và xem video, nhưng không thể thay đổi bất kỳ cài đặt.</p>
-                <p>When merge is finished, all users and cameras from this system will become available
-                    in <strong>{{mergeTargetSystem.name}}</strong> System, and this system will be deleted.</p>
+                <p>Khi hợp nhất kết thúc, tất cả người dùng và máy ảnh từ hệ thống này sẽ sẵn sàng
+                    trong <strong>{{mergeTargetSystem.name}}</strong> Hệ thống, và hệ thống này sẽ bị xóa.</p>
             </div>
         </div>
-        <div ng-if="!mergeTargetSystem.name">Finishing systems merge</div>
+        <div ng-if="!mergeTargetSystem.name">Hoàn tất việc hợp nhất hệ thống</div>
     </div>
 </div>
