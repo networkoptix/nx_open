@@ -1,7 +1,3 @@
-#include <iomanip>
-#include <iostream>
-
-#include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 
 #include <qtsinglecoreapplication.h>
@@ -29,13 +25,15 @@ static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
 }
 #endif
 
+using namespace applauncher;
+
 ApplauncherProcess::StartupParameters parseCommandLineParameters(int argc, char* argv[])
 {
     QString installationsDir = InstallationManager::defaultDirectoryForInstallations();
     if (!QDir(installationsDir).exists())
         QDir().mkpath(installationsDir);
 
-    QString logLevel = "WARN";
+    QString logLevel = "warning";
     QString logFilePath = installationsDir + "/applauncher";
     bool quitMode = false;
     bool backgroundMode = false;
