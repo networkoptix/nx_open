@@ -12,10 +12,15 @@
 #include "applauncher_process.h"
 #include "process_utils.h"
 
-#ifdef _WIN32
+#if defined(Q_OS_WIN)
 #include <windows.h>
+#endif
 
-static ApplauncherProcess* applauncherProcessInstance = 0;
+using namespace applauncher;
+
+#if defined(Q_OS_WIN)
+
+static ApplauncherProcess* applauncherProcessInstance = nullptr;
 
 static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
 {
@@ -23,9 +28,9 @@ static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
         applauncherProcessInstance->pleaseStop();
     return TRUE;
 }
-#endif
 
-using namespace applauncher;
+#endif // defined(Q_OS_WIN)
+
 
 ApplauncherProcess::StartupParameters parseCommandLineParameters(int argc, char* argv[])
 {
@@ -103,25 +108,25 @@ int main(int argc, char* argv[])
         &installationManager,
         startupParameters);
 
-#ifdef _WIN32
-    applauncherProcessInstance = &applauncherProcess;
-    SetConsoleCtrlHandler(stopServer_WIN, true);
-#endif
+    #if defined(Q_OS_WIN)
+        applauncherProcessInstance = &applauncherProcess;
+        SetConsoleCtrlHandler(stopServer_WIN, true);
+    #endif
 
     int status = applauncherProcess.run();
 
-#ifdef _WIN32
-    if (startupParameters.mode == ApplauncherProcess::StartupParameters::Mode::Quit)
-    {
-        // Wait for app to finish + 100ms just in case.
-        // It may be still running after unlocking QSingleApplication lock file.
-        while (app.isRunning())
+    #if defined(Q_OS_WIN)
+        if (startupParameters.mode == ApplauncherProcess::StartupParameters::Mode::Quit)
         {
+            // Wait for app to finish + 100ms just in case.
+            // It may be still running after unlocking QSingleApplication lock file.
+            while (app.isRunning())
+            {
+                Sleep(100);
+            }
             Sleep(100);
         }
-        Sleep(100);
-    }
-#endif
+    #endif
 
     return status;
 }
