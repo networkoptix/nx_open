@@ -30,14 +30,15 @@ func parseXForwardedForHeader(request *http.Request) string {
 		return ""
 	}
 
-	ipAddresses := strings.Split(strings.Replace(header, " ", "", -1), ",")
+	ipAddresses := strings.Split(header, ",")
 	if len(ipAddresses) > 1 {
-		if net.ParseIP(ipAddresses[0]) != nil {
-			return ipAddresses[0]
+		ip := strings.Trim(ipAddresses[0], " ")
+		if net.ParseIP(ip) != nil {
+			return ip
 		}
 	}
 
-	log.Println("Failed to parse \"X-Forwarded-For\"")
+	log.Printf("Failed to parse \"X-Forwarded-For\" header: %s", header)
 	return ""
 }
 
@@ -59,11 +60,11 @@ func parseForwardedHeader(request *http.Request) string {
 	ipStr := matches[0][1]
 	if strings.HasPrefix(ipStr, "\"[") && strings.HasSuffix(ipStr, "]") {
 		ipStr = ipStr[2 : len(ipStr)-1]
-		}
+	}
 
 	if net.ParseIP(ipStr) != nil {
 		return ipStr
-		}
+	}
 
 	log.Printf("Failed to parse ip address from \"Forwarded\" header: %s", header)
 	return ""
