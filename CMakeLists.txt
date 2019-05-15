@@ -48,7 +48,7 @@ include(cmake/find_python.cmake)
 include(cmake/rdep.cmake)
 nx_rdep_configure()
 
-include(cmake/mercurial.cmake)
+include(cmake/vcs_helpers.cmake)
 vcs_changeset(${CMAKE_CURRENT_LIST_DIR} changeSet)
 if(NOT changeSet AND NOT developerBuild)
     message(FATAL_ERROR "Hg changeset cannot be calculated.")
