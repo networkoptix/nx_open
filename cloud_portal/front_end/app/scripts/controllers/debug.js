@@ -3,13 +3,13 @@
 angular.module('cloudApp')
     .controller('DebugCtrl', ['$scope', 'cloudApi', 'account', 'process', '$q', '$timeout',
                 'dialogs', 'urlProtocol', '$base64', 'systemsProvider', 'authorizationCheckService', '$http',
-                'languageService', 'nxTitle',
+                'languageService', 'nxPageService',
         function ($scope, cloudApi, account, process, $q, $timeout,
                   dialogs, urlProtocol, $base64, systemsProvider, authorizationCheckService, $http,
-                  languageService, nxTitle) {
+                  languageService, nxPageService) {
 
             authorizationCheckService.requireLogin();
-            nxTitle.setTitle(languageService.lang.pageTitles.debug);
+            nxPageService.setPageTitle(languageService.lang.pageTitles.debug);
 
         $scope.user_email = 'ebalashov@networkoptix.com';
         $scope.type = 'activate_account';

@@ -16,7 +16,7 @@ export class NxLandingComponent implements OnInit {
 
     private setupDefaults() {
         this.CONFIG = this.config.getConfig();
-        this.title.setTitle(this.CONFIG.vmsName);
+        this.title.setTitle(this.CONFIG.cloudName);
     }
 
     constructor(private config: NxConfigService,

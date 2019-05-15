@@ -131,9 +131,3 @@ export class AppModule {
     ngDoBootstrap() {
     }
 }
-
-
-declare var angular: angular.IAngularStatic;
-angular
-        .module('cloudApp.services')
-        .service('nxTitle', downgradeInjectable(Title));
