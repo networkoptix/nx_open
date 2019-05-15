@@ -7,10 +7,10 @@
         .controller('AccountCtrl', AccountCtrl);
 
     AccountCtrl.$inject = [ '$scope', 'cloudApi', 'process', '$routeParams', 'account', 'languageService',
-        'systemsProvider', 'authorizationCheckService', '$localStorage', 'dialogs' ];
+        'systemsProvider', 'authorizationCheckService', '$localStorage', 'dialogs', 'nxTitle' ];
 
     function AccountCtrl($scope, cloudApi, process, $routeParams, account, languageService,
-                         systemsProvider, authorizationCheckService, $localStorage, dialogs) {
+                         systemsProvider, authorizationCheckService, $localStorage, dialogs, nxTitle) {
 
         $scope.lang = languageService.lang;
         var currentLanguageCode = $scope.lang.language;
@@ -28,7 +28,15 @@
 
         $scope.accountMode = $routeParams.accountMode;
         $scope.passwordMode = $routeParams.passwordMode;
-
+    
+        if ($scope.accountMode) {
+            nxTitle.setTitle($scope.lang.pageTitles.account);
+        }
+    
+        if ($scope.passwordMode) {
+            nxTitle.setTitle($scope.lang.pageTitles.changePassword);
+        }
+    
         $scope.pass = {
             password   : '',
             newPassword: ''

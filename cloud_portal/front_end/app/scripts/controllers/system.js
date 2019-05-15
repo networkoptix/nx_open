@@ -3,23 +3,28 @@
 angular.module('cloudApp')
     .controller('SystemCtrl', [ '$scope', 'cloudApi', '$routeParams', '$location', 'urlProtocol', 'dialogs', 'process',
         'account', 'authorizationCheckService', '$q', 'system', '$poll', 'page', '$timeout', 'systemsProvider',
+        'languageService', 'nxTitle',
         function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process,
-                  account, authorizationCheckService, $q, system, $poll, page, $timeout, systemsProvider) {
-
+                  account, authorizationCheckService, $q, system, $poll, page, $timeout, systemsProvider,
+                  languageService, nxTitle) {
+        
+        
             var systemId = $routeParams.systemId;
             $scope.currentlyMerging = false;
             $scope.debugMode = Config.allowDebugMode;
             $scope.betaMode = Config.allowBetaMode;
             $scope.configCanMerge = Config.cloudMerge || false;
-
+    
+            nxTitle.setTitle(languageService.lang.pageTitles.system);
+            
             authorizationCheckService.requireLogin().then(function (account) {
                 $scope.account = account;
                 $scope.system = system(systemId, account.email);
                 $scope.gettingSystem.run();
                 $scope.systems = systemsProvider.systems;
-
+                
                 $scope.$watch('system.info.name', function (value) {
-                    page.title(value ? value + ' -' : '');
+                    nxTitle.setTitle(value ? value + ' -' : '');
                     systemsProvider.forceUpdateSystems();
                 });
                 

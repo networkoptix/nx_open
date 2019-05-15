@@ -4,7 +4,7 @@ import {
 }                                            from '@angular/core';
 import { ActivatedRoute, Router }            from '@angular/router';
 import { Title }                             from '@angular/platform-browser';
-import { DOCUMENT, Location, TitleCasePipe } from '@angular/common';
+import { DOCUMENT, Location }                from '@angular/common';
 import { NgbTabChangeEvent, NgbTabset }      from '@ng-bootstrap/ng-bootstrap';
 import { DeviceDetectorService }             from 'ngx-device-detector';
 import { NxConfigService }                   from '../../services/nx-config';

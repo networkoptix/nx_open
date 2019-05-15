@@ -6,15 +6,17 @@
         .module('cloudApp')
         .controller('ViewPageCtrl', [ '$rootScope', '$scope', '$window', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
             '$location', '$q', '$poll', 'authorizationCheckService', 'camerasProvider',
-            'nxConfigService', 'languageService', 'nxAppStateService',
+            'nxConfigService', 'languageService', 'nxAppStateService', 'nxTitle',
 
             function ($rootScope, $scope, $window, account, system, $routeParams, systemAPI, dialogs,
                       $location, $q, $poll, authorizationCheckService, camerasProvider,
-                      nxConfigService, languageService, nxAppStateService) {
+                      nxConfigService, languageService, nxAppStateService, nxTitle) {
     
                 const CONFIG = nxConfigService.getConfig();
                 const LANG = languageService.lang;
-            
+    
+                nxTitle.setTitle(LANG.pageTitles.view);
+                
                 $scope.systemReady = false;
                 $scope.hasCameras = false;
     

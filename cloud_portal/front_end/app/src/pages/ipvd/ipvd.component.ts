@@ -7,12 +7,13 @@ import { isPlatformBrowser, Location }           from '@angular/common';
 import { BreakpointObserver, BreakpointState }   from '@angular/cdk/layout';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { TranslateService }                      from '@ngx-translate/core';
-import { CamerasService }                        from '../../services/cameras.service';
-import { IpvdSearchService }                     from './ipvd-search.service';
-import { NxModalMessageComponent }               from '../../dialogs/message/message.component';
-import { NxConfigService }                       from '../../services/nx-config';
-import { NxUriService }                          from '../../services/uri.service';
-import { NxUtilsService }                        from '../../services/utils.service';
+import { CamerasService }          from '../../services/cameras.service';
+import { IpvdSearchService }       from './ipvd-search.service';
+import { NxModalMessageComponent } from '../../dialogs/message/message.component';
+import { NxConfigService }         from '../../services/nx-config';
+import { NxUriService }            from '../../services/uri.service';
+import { NxUtilsService }          from '../../services/utils.service';
+import { Title }                   from '@angular/platform-browser';
 
 interface Params {
     [key: string]: any;
@@ -91,6 +92,7 @@ export class NxIpvdComponent implements OnInit {
     }
 
     constructor(private configService: NxConfigService,
+                private language: TranslateService,
                 private translate: TranslateService,
                 private cameraService: CamerasService,
                 private cameraSearchService: IpvdSearchService,
@@ -101,6 +103,7 @@ export class NxIpvdComponent implements OnInit {
                 private location: Location,
                 private breakpointObserver: BreakpointObserver,
                 private router: Router,
+                private title: Title,
                 @Inject(PLATFORM_ID) private platformId: object) {
 
         this.setupDefaults();
@@ -118,6 +121,17 @@ export class NxIpvdComponent implements OnInit {
                     this.resetActiveCamera(true);
                 }
             });
+        });
+
+        this.CONFIG = this.configService.getConfig();
+
+        setTimeout(() => {
+            this.lang = this.translate.translations[this.translate.currentLang];
+            this.title.setTitle(this.lang.pageTitles.supportedDevices);
+
+            this.company = this.CONFIG.companyName;
+            this.placeholder = this.lang.search.search_ipvd;
+
         });
     }
 
@@ -202,14 +216,6 @@ export class NxIpvdComponent implements OnInit {
         this.cameraService
             .getIPVD()
             .subscribe(data => {
-                // LANG and CONFIG are available till now
-                this.CONFIG = this.configService.getConfig();
-                this.company = this.CONFIG.companyName;
-                this.lang = this.translate.translations[this.translate.currentLang];
-                this.placeholder = this.lang.search.search_ipvd;
-
-                // this.data = data;
-
                 this.cameras = data.cameras;
                 this.vendors = data.vendors;
                 this.vendors.sort(NxUtilsService.byParam((elm) => {

@@ -1,6 +1,5 @@
 {
     "2-Way Audio": "2-Way Audio", 
-    "About %CLOUD_NAME%": "About %CLOUD_NAME%", 
     "Account Settings": "Account Settings", 
     "Account not activated": "Account not activated", 
     "Account not found": "Account not found", 
@@ -50,7 +49,6 @@
     "I/O": "I/O", 
     "In-Client Upgrade:": "In-Client Upgrade:", 
     "Instructions": "Instructions", 
-    "Integrations": "Integrations", 
     "Latest version": "Latest version", 
     "Log In": "Log In", 
     "Log Out": "Log Out", 
@@ -71,7 +69,6 @@
     "Password:": "Password:", 
     "Permissions": "Permissions", 
     "Popularity": "Popularity", 
-    "Privacy": "Privacy", 
     "Release Notes": "Release Notes", 
     "Release notes": "Release notes", 
     "Remember me": "Remember me", 
@@ -87,7 +84,6 @@
     "Show All": "Show All", 
     "Some of your servers don't support cloud System merge because of outdated software version.": "Some of your servers don't support cloud System merge because of outdated software version.", 
     "Support": "Support", 
-    "Supported Devices": "Supported Devices", 
     "System name": "System name", 
     "System name is required": "System name is required", 
     "System will be accessible through local network with local administrator account.": "System will be accessible through local network with local administrator account.", 
@@ -95,7 +91,6 @@
     "Systems": "Systems", 
     "Systems of such size may work but will be unstable and have troubles with updates and synchronisation.": "Systems of such size may work but will be unstable and have troubles with updates and synchronisation.", 
     "Take the name and settings from": "Take the name and settings from", 
-    "Terms": "Terms", 
     "Test": "Test", 
     "The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.": "The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.", 
     "There will be more than": "There will be more than", 
@@ -265,6 +260,10 @@
     "manufacturers": "manufacturers", 
     "messageDialogPlaceholders": {
         "feedback": "Make sure you include your camera model and manufacturer..."
+    }, 
+    "pageTitles": {
+        "integrations": "Integrations", 
+        "supportedDevices": "Supported Devices"
     }, 
     "search": {
         "Any": "Any", 

@@ -171,7 +171,6 @@ window.L = {};
 
                         $routeProvider
                             .when('/register/success', {
-                                title: lang.pageTitles.registerSuccess,
                                 templateUrl: CONFIG.viewsDir + 'regActions.html',
                                 controller: 'RegisterCtrl',
                                 resolve: {
@@ -181,7 +180,6 @@ window.L = {};
                                 }
                             })
                             .when('/register/successActivated', {
-                                title: lang.pageTitles.registerSuccess,
                                 templateUrl: CONFIG.viewsDir + 'regActions.html',
                                 controller: 'RegisterCtrl',
                                 resolve: {
@@ -192,17 +190,14 @@ window.L = {};
                                 }
                             })
                             .when('/register/:code', {
-                                title: lang.pageTitles.register,
                                 templateUrl: CONFIG.viewsDir + 'regActions.html',
                                 controller: 'RegisterCtrl'
                             })
                             .when('/register', {
-                                title: lang.pageTitles.register,
                                 templateUrl: CONFIG.viewsDir + 'regActions.html',
                                 controller: 'RegisterCtrl'
                             })
                             .when('/account/password', {
-                                title: lang.pageTitles.changePassword,
                                 templateUrl: CONFIG.viewsDir + 'account.html',
                                 controller: 'AccountCtrl',
                                 resolve: {
@@ -212,7 +207,6 @@ window.L = {};
                                 }
                             })
                             .when('/account', {
-                                title: lang.pageTitles.account,
                                 templateUrl: CONFIG.viewsDir + 'account.html',
                                 controller: 'AccountCtrl',
                                 resolve: {
@@ -222,12 +216,10 @@ window.L = {};
                                 }
                             })
                             .when('/systems', {
-                                title: lang.pageTitles.systems,
                                 templateUrl: CONFIG.viewsDir + 'systems.html',
                                 controller: 'SystemsCtrl'
                             })
                             .when('/systems/:systemId', {
-                                title: lang.pageTitles.system,
                                 templateUrl: CONFIG.viewsDir + 'system.html',
                                 controller: 'SystemCtrl'
                             })
@@ -242,17 +234,14 @@ window.L = {};
                                 }
                             })
                             .when('/systems/:systemId/view', {
-                                title: lang.pageTitles.view,
                                 templateUrl: CONFIG.viewsDir + 'view.html',
                                 controller: 'ViewPageCtrl'
                             })
                             .when('/systems/:systemId/view/:cameraId', {
-                                title: lang.pageTitles.view,
                                 templateUrl: CONFIG.viewsDir + 'view.html',
                                 controller: 'ViewPageCtrl'
                             })
                             .when('/embed/:systemId/view/:cameraId', {
-                                title      : lang.pageTitles.view,
                                 templateUrl: CONFIG.viewsDir + 'view.html',
                                 controller : 'ViewPageCtrl',
                                 resolve: {
@@ -262,7 +251,6 @@ window.L = {};
                                 }
                             })
                             .when('/activate', {
-                                title: lang.pageTitles.activate,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -272,7 +260,6 @@ window.L = {};
                                 }
                             })
                             .when('/activate/success', {
-                                title: lang.pageTitles.activateSuccess,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -282,12 +269,10 @@ window.L = {};
                                 }
                             })
                             .when('/activate/:activateCode', {
-                                title: lang.pageTitles.activateCode,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl'
                             })
                             .when('/restore_password', {
-                                title: lang.pageTitles.restorePassword,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -297,7 +282,6 @@ window.L = {};
                                 }
                             })
                             .when('/restore_password/sent', {
-                                title: lang.pageTitles.restorePassword,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -307,7 +291,6 @@ window.L = {};
                                 }
                             })
                             .when('/restore_password/success', {
-                                title: lang.pageTitles.restorePasswordSuccess,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -317,7 +300,6 @@ window.L = {};
                                 }
                             })
                             .when('/restore_password/:restoreCode', {
-                                title: lang.pageTitles.restorePasswordCode,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl'
                             })
@@ -327,7 +309,6 @@ window.L = {};
                                 controller: 'StaticCtrl'
                             })
                             .when('/debug', {
-                                title: lang.pageTitles.debug,
                                 templateUrl: CONFIG.viewsDir + 'debug.html',
                                 controller: 'DebugCtrl'
                             })

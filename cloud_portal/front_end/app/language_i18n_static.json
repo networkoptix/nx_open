@@ -147,13 +147,10 @@
 	"messageDialogPlaceholders": {
 		"feedback": "Make sure you include your camera model and manufacturer..."
 	},
-	"About %CLOUD_NAME%": "About %CLOUD_NAME%",
-	"Download %VMS_NAME%": "Download %VMS_NAME%",
-	"Integrations": "Integrations",
-	"Support": "Support",
-	"Terms": "Terms",
-	"Privacy": "Privacy",
-	"Supported Devices": "Supported Devices",
+	"pageTitles": {
+		"supportedDevices": "Supported Devices",
+		"integrations": "Integrations"
+	},
 	"dialogs": {
 		"merge": {
 			"connectToCloud": "Connect System you want to merge with this one to <strong>{{cloudName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.",

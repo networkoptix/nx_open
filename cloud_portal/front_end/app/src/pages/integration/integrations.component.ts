@@ -2,6 +2,8 @@ import { Component, OnInit }  from '@angular/core';
 import { IntegrationService } from './integration.service';
 import { NxUriService }       from '../../services/uri.service';
 import { NxConfigService }    from '../../services/nx-config';
+import { TranslateService }   from '@ngx-translate/core';
+import { Title }              from '@angular/platform-browser';
 
 @Component({
     selector   : 'integrations-component',
@@ -11,6 +13,7 @@ import { NxConfigService }    from '../../services/nx-config';
 
 export class NxIntegrationsComponent implements OnInit {
     private CONFIG: any = {};
+    private lang: any = {};
     private searchBy: any;
     private allElements: any;
     private elements: any;
@@ -40,7 +43,9 @@ export class NxIntegrationsComponent implements OnInit {
 
     constructor(private uri: NxUriService,
                 private integrations: IntegrationService,
-                private config: NxConfigService) {
+                private config: NxConfigService,
+                private translate: TranslateService,
+                private title: Title) {
 
         this.setupDefaults();
     }
@@ -67,6 +72,11 @@ export class NxIntegrationsComponent implements OnInit {
                     error => {
                         console.error('Integration plugins error -> ', error);
                     });
+
+        setTimeout(() => {
+            this.lang = this.translate.translations[this.translate.currentLang];
+            this.title.setTitle(this.lang.pageTitles.integrations);
+        });
     }
 
     setTags() {

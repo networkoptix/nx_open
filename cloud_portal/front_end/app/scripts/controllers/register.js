@@ -1,19 +1,27 @@
 'use strict';
 
 angular.module('cloudApp')
-    .run(['$http','$templateCache', function($http,$templateCache) {
+    .run(['$http', '$templateCache', function($http, $templateCache) {
         // Preload content into cache
         $http.get(Config.viewsDir + 'static/register-intro.html', {cache: $templateCache});
     }])
     .controller('RegisterCtrl', [
         '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$timeout', 'dialogs',
         '$sessionStorage', '$routeParams', 'account', 'urlProtocol', '$base64', 'authorizationCheckService',
+        'languageService', 'nxTitle',
 
         function ($scope, cloudApi, process, $location, $localStorage, $timeout, dialogs,
-                  $sessionStorage, $routeParams, account, urlProtocol, $base64, authorizationCheckService) {
+                  $sessionStorage, $routeParams, account, urlProtocol, $base64, authorizationCheckService,
+                  languageService, nxTitle) {
 
         $scope.registerSuccess = $routeParams.registerSuccess;
         $scope.activated = $routeParams.activated;
+    
+        if ($scope.registerSuccess) {
+            nxTitle.setTitle($scope.lang.pageTitles.registerSuccess);
+        } else {
+            nxTitle.setTitle($scope.lang.pageTitles.register);
+        }
 
         if(!$scope.registerSuccess){
             authorizationCheckService.logoutAuthorised();
