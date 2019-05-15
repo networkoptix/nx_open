@@ -1,5 +1,5 @@
 # Components Namings
-set(display.product.name "Sentry Matrix")
+set(display.product.name "Senturian Matrix")
 set(display.mobile.name "Sentry Mobile")
 set(product.name "Sentry Matrix")
 set(product.name.short "senturian")
