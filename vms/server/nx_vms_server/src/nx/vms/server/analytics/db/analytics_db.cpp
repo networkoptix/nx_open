@@ -458,7 +458,7 @@ void EventsStorage::insertEvent(
     insertEventQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(packet.deviceId));
     insertEventQuery.bindValue(
         ":objectTypeId",
-        m_objectTypeDao.objectTypeIdFromName(detectedObject.objectTypeId));
+        (long long) m_objectTypeDao.objectTypeIdFromName(detectedObject.objectTypeId));
     insertEventQuery.bindValue(
         ":objectAppearanceId",
         QnSql::serialized_field(detectedObject.objectId));

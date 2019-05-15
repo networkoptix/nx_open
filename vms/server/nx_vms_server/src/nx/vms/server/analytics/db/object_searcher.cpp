@@ -377,7 +377,7 @@ void ObjectSearcher::addObjectTypeIdToFilter(
     auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
         "object_type_id", ":objectTypeId");
     for (const auto& objectType: objectTypes)
-        condition->addValue(objectTypeDao.objectTypeIdFromName(objectType));
+        condition->addValue((long long) objectTypeDao.objectTypeIdFromName(objectType));
     sqlFilter->addCondition(std::move(condition));
 }
 

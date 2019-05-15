@@ -115,12 +115,12 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         auto [trackMinTimestamp, trackMaxTimestamp] = findMinMaxTimestamp(object.track);
 
         query->bindValue(0, deviceDbId);
-        query->bindValue(1, objectTypeDbId);
+        query->bindValue(1, (long long) objectTypeDbId);
         query->bindValue(2, QnSql::serialized_field(object.objectAppearanceId));
         query->bindValue(3, trackMinTimestamp / kUsecInMs);
         query->bindValue(4, trackMaxTimestamp / kUsecInMs);
         query->bindValue(5, TrackSerializer::serialized(object.track));
-        query->bindValue(6, attributesId);
+        query->bindValue(6, (long long) attributesId);
         query->bindValue(7, object.bestShot.initialized()
             ? object.bestShot.timestampUsec / kUsecInMs
             : 0);
@@ -178,12 +178,12 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
             findMinMaxTimestamp(objectUpdate.appendedTrack);
 
         updateObjectQuery->bindValue(0, TrackSerializer::serialized(objectUpdate.appendedTrack));
-        updateObjectQuery->bindValue(1, newAttributesId);
+        updateObjectQuery->bindValue(1, (long long) newAttributesId);
         updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
         updateObjectQuery->bindValue(3, trackMaxTimestamp / kUsecInMs);
         updateObjectQuery->bindValue(4, objectUpdate.dbId != -1
-            ? objectUpdate.dbId
-            : m_objectCache->dbIdFromObjectId(objectUpdate.objectId));
+            ? (long long) objectUpdate.dbId
+            : (long long) m_objectCache->dbIdFromObjectId(objectUpdate.objectId));
         updateObjectQuery->exec();
 
         m_objectCache->saveObjectGuidToAttributesId(objectUpdate.objectId, newAttributesId);
@@ -225,7 +225,7 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
             const auto objectDbId = m_objectCache->dbIdFromObjectId(objectId);
 
             insertObjectSearchToAttributesBinding->bindValue(0, objectSearchCellId);
-            insertObjectSearchToAttributesBinding->bindValue(1, objectDbId);
+            insertObjectSearchToAttributesBinding->bindValue(1, (long long) objectDbId);
             insertObjectSearchToAttributesBinding->exec();
         }
     }
@@ -324,7 +324,7 @@ int64_t DetectionDataSaver::combineAttributes(
     )sql");
 
     query->bindValue(0, -1);
-    query->bindValue(1, attributesIds.front());
+    query->bindValue(1, (long long) attributesIds.front());
     query->exec();
 
     const auto combinationId = query->lastInsertId().toLongLong();
@@ -337,7 +337,7 @@ int64_t DetectionDataSaver::combineAttributes(
     for (std::size_t i = 1; i < attributesIds.size(); ++i)
     {
         query->bindValue(0, combinationId);
-        query->bindValue(1, attributesIds[i]);
+        query->bindValue(1, (long long) attributesIds[i]);
         query->exec();
     }
 

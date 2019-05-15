@@ -103,10 +103,10 @@ detail::TimePeriod* TimePeriodDao::insertOrFetchCurrentTimePeriod(
         INSERT INTO time_period_full(device_id, period_start_ms, period_end_ms)
         VALUES (:deviceId, :periodStartMs, :periodEndMs)
     )sql");
-    query->bindValue(":deviceId", deviceId);
-    query->bindValue(":periodStartMs", (long long)packetTimestamp.count());
+    query->bindValue(":deviceId", (long long) deviceId);
+    query->bindValue(":periodStartMs", (long long) packetTimestamp.count());
     // Filling period end so that this period is used in queries.
-    query->bindValue(":periodEndMs", (long long)(timePeriod.endTime + kTimePeriodPreemptiveLength).count());
+    query->bindValue(":periodEndMs", (long long) (timePeriod.endTime + kTimePeriodPreemptiveLength).count());
 
     query->exec();
 
@@ -156,8 +156,8 @@ void TimePeriodDao::saveTimePeriodEnd(
     query->prepare(
         "UPDATE time_period_full SET period_end_ms=:periodEndMs WHERE id=:id");
 
-    query->bindValue(":id", id);
-    query->bindValue(":periodEndMs", (long long)endTime.count());
+    query->bindValue(":id", (long long) id);
+    query->bindValue(":periodEndMs", (long long) endTime.count());
     query->exec();
 
     NX_VERBOSE(this, "Updated end of time period %1 to %2", id, endTime);
