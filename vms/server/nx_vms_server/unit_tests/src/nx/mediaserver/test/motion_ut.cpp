@@ -136,6 +136,25 @@ TEST_F(MotionArchive, findMotionWithFilter)
     checkData(serverModule().motionHelper()->matchImage(request), 0);
 }
 
+TEST_F(MotionArchive, rectFromNormalizedRect)
+{
+    ASSERT_EQ(
+        QRect(0, 0, 44, 32),
+        QnMetaDataV1::rectFromNormalizedRect(QRectF(0.0, 0.0, 1.0, 1.0)));
+
+    ASSERT_EQ(
+        QRect(0, 0, 22, 16),
+        QnMetaDataV1::rectFromNormalizedRect(QRectF(0.0, 0.0, 0.5, 0.5)));
+
+    ASSERT_EQ(
+        QRect(0, 0, 23, 17),
+        QnMetaDataV1::rectFromNormalizedRect(QRectF(1/44.0 * 0.8, 1/32.0 * 0.8, 0.5, 0.5)));
+
+    ASSERT_EQ(
+        QRect(0, 0, 23, 17),
+        QnMetaDataV1::rectFromNormalizedRect(QRectF(1 / 44.0 * 0.8, 1 / 32.0 * 0.8, 0.501, 0.501)));
+}
+
 TEST_F(MotionArchive, addMotion)
 {
     auto checkMotion = [](const QRectF& rectF)

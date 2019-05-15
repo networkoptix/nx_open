@@ -354,15 +354,17 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 
 QRect QnMetaDataV1::rectFromNormalizedRect(const QRectF& rectF)
 {
+    const qreal kEpsilon = 0.01;
+
     const auto x1 = rectF.left() * Qn::kMotionGridWidth;
     const auto y1 = rectF.top() * Qn::kMotionGridHeight;
     const auto x2 = rectF.right() * Qn::kMotionGridWidth;
     const auto y2 = rectF.bottom() * Qn::kMotionGridHeight;
-    
-    const int x = x1 + 0.5;
-    const int y = y1 + 0.5;
 
-    return QRect(x, y, x2 - x + 0.5, y2 - y + 0.5);
+    const int x = x1 + kEpsilon;
+    const int y = y1 + kEpsilon;
+
+    return QRect(x, y, x2 - x + (1.0 - kEpsilon), y2 - y + (1.0 - kEpsilon));
 }
 
 void QnMetaDataV1::addMotion(const QRectF& rectF)
