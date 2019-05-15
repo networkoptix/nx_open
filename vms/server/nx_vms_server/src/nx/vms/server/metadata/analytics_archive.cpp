@@ -39,9 +39,10 @@ bool AnalyticsArchive::matchAdditionData(const Filter& filter, const quint8* dat
         && matchIntInList(recordEx->attributesHash, analyticsFilter.allAttributesHash);
 }
 
+template <typename RectType>
 bool AnalyticsArchive::saveToArchive(
     std::chrono::milliseconds startTime,
-    const std::vector<QRectF>& data,
+    const std::vector<RectType>& data,
     int64_t objectType,
     int64_t allAttributesHash)
 {
@@ -54,10 +55,22 @@ bool AnalyticsArchive::saveToArchive(
     recordEx->objectType = objectType;
     recordEx->attributesHash = allAttributesHash;
 
-    for (const auto& rectF: data)
-        packet->addMotion(rectF);
+    for (const auto& rect: data)
+        packet->addMotion(rect);
 
     return saveToArchiveInternal(packet);
 }
+
+template bool AnalyticsArchive::saveToArchive<QRect>(
+    std::chrono::milliseconds startTime,
+    const std::vector<QRect>& data,
+    int64_t objectType,
+    int64_t allAttributesHash);
+
+template bool AnalyticsArchive::saveToArchive<QRectF>(
+    std::chrono::milliseconds startTime,
+    const std::vector<QRectF>& data,
+    int64_t objectType,
+    int64_t allAttributesHash);
 
 } // namespace nx::vms::server::metadata

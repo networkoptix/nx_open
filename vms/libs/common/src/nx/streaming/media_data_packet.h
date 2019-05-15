@@ -274,6 +274,7 @@ public:
 
     static QRect rectFromNormalizedRect(const QRectF& rectF);
     void addMotion(const QRectF& data);
+    void addMotion(const QRect& data);
 
     // Removes part of motion info by motion mask.
     void removeMotion(const simd128i* data);

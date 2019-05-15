@@ -369,8 +369,11 @@ QRect QnMetaDataV1::rectFromNormalizedRect(const QRectF& rectF)
 
 void QnMetaDataV1::addMotion(const QRectF& rectF)
 {
-    const QRect rect = rectFromNormalizedRect(rectF);
+    return addMotion(rectFromNormalizedRect(rectF));
+}
 
+void QnMetaDataV1::addMotion(const QRect& rect)
+{
     const quint32 maskL = (1LL << (32 - rect.top())) - 1;
     const quint32 maskR = ~((1 << (31 - rect.bottom())) - 1);
     const quint32 mask = qToBigEndian(maskL & maskR);

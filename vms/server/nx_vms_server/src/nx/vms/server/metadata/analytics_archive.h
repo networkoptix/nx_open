@@ -23,9 +23,10 @@ public:
 
     AnalyticsArchive(const QString& dataDir, const QString& uniqueId);
 
+    template <typename RectType>
     bool saveToArchive(
         std::chrono::milliseconds startTime,
-        const std::vector<QRectF>& data,
+        const std::vector<RectType>& data,
         int64_t objectType,
         int64_t allAttributesHash);
 
