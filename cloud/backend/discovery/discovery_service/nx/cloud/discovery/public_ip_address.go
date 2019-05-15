@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"regexp"
 	"strings"
 )
 
@@ -41,53 +42,30 @@ func parseXForwardedForHeader(request *http.Request) string {
 }
 
 func parseForwardedHeader(request *http.Request) string {
-	extract := func(str string, s1 string, s2 string) string {
-		start := strings.Index(str, s1)
-		end := strings.Index(str, s2)
-		if start == -1 || end == -1 {
-			return ""
-		}
-		return str[start:end]
-	}
-
-	// Replacing all uppercase "For=" with lowercase "for="
-	header := strings.ToLower(request.Header.Get("Forwarded"))
+	header := request.Header.Get("Forwarded")
 	if len(header) == 0 {
 		log.Println("Empty \"Forwarded\" header")
 		return ""
 	}
 
-	parts := strings.Split(header, "for=")
-	if len(parts) <= 1 {
-		log.Printf("\"Forwarded\" header exists but \"for=\" is missing. Full header: %s", header)
+	// ipv4: [\\d\\.]+
+	// ipv6: \"\\[(([a-fA-F0-9]*:*)+)\\], match includes  "[  and  ]
+	re := regexp.MustCompile("[fF]or=(([\\d\\.]+)|(\"\\[(([a-fA-F0-9]*:*)+)\\]))")
+	matches := re.FindAllStringSubmatch(header, 1)
+	if len(matches) == 0 || len(matches[0]) == 0 {
 		return ""
 	}
 
-	// i := 1 because parts[0] will be empty, as the string being split starts with "for="
-	for i := 1; i < len(parts); i++ {
-		// Dropping semicolon or comma separators
-		if semicolon := strings.Index(parts[i], ";"); semicolon != -1 {
-			parts[i] = parts[i][:semicolon]
-		} else if comma := strings.Index(parts[i], ","); comma != -1 {
-			parts[i] = parts[i][:comma]
+	ipStr := matches[0][1]
+	if strings.HasPrefix(ipStr, "\"[") && strings.HasSuffix(ipStr, "]") {
+		ipStr = ipStr[2 : len(ipStr)-1]
 		}
 
-		// Try ip v4 first
-		if ip := net.ParseIP(parts[i]); ip != nil {
-			return parts[i]
+	if net.ParseIP(ipStr) != nil {
+		return ipStr
 		}
 
-		// Maybe it's an ip v6 address enclosed in brackets
-		if ipV6Str := extract(parts[i], "[", "]"); len(ipV6Str) > 0 {
-			if ipV6 := net.ParseIP(ipV6Str); ipV6 != nil {
-				return parts[i]
-			}
-		}
-
-		log.Printf("Failed to parse an ip address from: %s", parts[i])
-	}
-
-	log.Println("Failed to parse \"Forwarded\" header")
+	log.Printf("Failed to parse ip address from \"Forwarded\" header: %s", header)
 	return ""
 }
 
