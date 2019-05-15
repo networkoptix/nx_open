@@ -370,6 +370,9 @@ window.L = {};
                             .when('/integrations/:plugin?', {
                                 template: ''
                             })
+                            .when('/integrations/:plugin/:status', {
+                                template: ''
+                            })
                             .when('/new-content', {
                                 template: ''
                             })

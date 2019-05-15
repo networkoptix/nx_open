@@ -136,7 +136,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
 
         this.localFilter.query = this.params.search || '';
 
-        if (this.localFilter.tags.length) {
+        if (this.localFilter.tags && this.localFilter.tags.length) {
             this.localFilter.tags.forEach(tag => tag.value = false);
             if (this.params.tags) {
                 this.params.tags
