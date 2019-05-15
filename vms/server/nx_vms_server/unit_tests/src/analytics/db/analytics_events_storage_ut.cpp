@@ -553,13 +553,8 @@ private:
 
     bool rectsIntersectToPrecision(const QRectF& one, const QRectF& two)
     {
-        const auto translatedOne = translate(
-            one,
-            QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
-
-        const auto translatedTwo = translate(
-            two,
-            QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+        const auto translatedOne = translateToSearchGrid(one);
+        const auto translatedTwo = translateToSearchGrid(two);
 
         return translatedOne.intersects(translatedTwo);
     }
@@ -1431,11 +1426,7 @@ protected:
     void whenLookupTimePeriods()
     {
         if (!filter().boundingBox.isEmpty())
-        {
-            m_lookupOptions.region += translate(
-                filter().boundingBox,
-                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
-        }
+            m_lookupOptions.region += translateToSearchGrid(filter().boundingBox);
 
         filter().sortOrder = Qt::AscendingOrder;
 

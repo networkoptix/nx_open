@@ -243,7 +243,7 @@ std::tuple<QString /*query text*/, nx::sql::Filter> ObjectSearcher::prepareBoxFi
 
     nx::sql::Filter sqlFilter;
     addBoundingBoxToFilter(
-        translate(m_filter.boundingBox, kSearchResolution),
+        translateToSearchGrid(m_filter.boundingBox),
         &sqlFilter);
 
     if (!m_filter.timePeriod.isEmpty())
