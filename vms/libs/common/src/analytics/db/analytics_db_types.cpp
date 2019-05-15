@@ -58,10 +58,18 @@ bool Filter::empty() const
 
 bool Filter::operator==(const Filter& right) const
 {
+    if (boundingBox.has_value() != right.boundingBox.has_value())
+        return false;
+    
+    if (boundingBox.has_value() && 
+        !equalWithPrecision(*boundingBox, *right.boundingBox, kCoordinateDecimalDigits))
+    {
+        return false;
+    }
+
     return objectTypeId == right.objectTypeId
         && objectAppearanceId == right.objectAppearanceId
         && timePeriod == right.timePeriod
-        && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && freeText == right.freeText
         && sortOrder == right.sortOrder;
 }
@@ -85,12 +93,12 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
     params->insert(lit("startTime"), QnLexical::serialized(filter.timePeriod.startTimeMs));
     params->insert(lit("endTime"), QnLexical::serialized(filter.timePeriod.endTimeMs()));
 
-    if (!filter.boundingBox.isNull())
+    if (filter.boundingBox)
     {
-        params->insert(lit("x1"), QString::number(filter.boundingBox.topLeft().x()));
-        params->insert(lit("y1"), QString::number(filter.boundingBox.topLeft().y()));
-        params->insert(lit("x2"), QString::number(filter.boundingBox.bottomRight().x()));
-        params->insert(lit("y2"), QString::number(filter.boundingBox.bottomRight().y()));
+        params->insert(lit("x1"), QString::number(filter.boundingBox->topLeft().x()));
+        params->insert(lit("y1"), QString::number(filter.boundingBox->topLeft().y()));
+        params->insert(lit("x2"), QString::number(filter.boundingBox->bottomRight().x()));
+        params->insert(lit("y2"), QString::number(filter.boundingBox->bottomRight().y()));
     }
 
     if (!filter.freeText.isEmpty())
@@ -137,13 +145,13 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
         if (!(params.contains(lit("y1")) && params.contains(lit("x2")) && params.contains(lit("y2"))))
             return false;
 
-        filter->boundingBox.setTopLeft(QPointF(
-            params.value(lit("x1")).toDouble(),
-            params.value(lit("y1")).toDouble()));
-
-        filter->boundingBox.setBottomRight(QPointF(
-            params.value(lit("x2")).toDouble(),
-            params.value(lit("y2")).toDouble()));
+        filter->boundingBox = QRectF(
+            QPointF(
+                params.value(lit("x1")).toDouble(),
+                params.value(lit("y1")).toDouble()),
+            QPointF(
+                params.value(lit("x2")).toDouble(),
+                params.value(lit("y2")).toDouble()));
     }
 
     if (params.contains(lit("freeText")))
@@ -174,13 +182,13 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
         os << "objectAppearanceId " << filter.objectAppearanceId.toSimpleString().toStdString() << "; ";
     os << "timePeriod [" << filter.timePeriod.startTimeMs << ", " <<
         filter.timePeriod.durationMs << "]; ";
-    if (!filter.boundingBox.isNull())
+    if (filter.boundingBox)
     {
         os << "boundingBox [" <<
-            filter.boundingBox.topLeft().x() << ", " <<
-            filter.boundingBox.topLeft().y() << ", " <<
-            filter.boundingBox.bottomRight().x() << ", " <<
-            filter.boundingBox.bottomRight().y() << "]; ";
+            filter.boundingBox->topLeft().x() << ", " <<
+            filter.boundingBox->topLeft().y() << ", " <<
+            filter.boundingBox->bottomRight().x() << ", " <<
+            filter.boundingBox->bottomRight().y() << "]; ";
     }
     if (!filter.freeText.isEmpty())
         os << "freeText \"" << filter.freeText.toStdString() << "\"; ";
@@ -202,7 +210,7 @@ QString toString(const Filter& filter)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (Filter),
-    (json)(ubjson),
+    (json),
     _analytics_storage_Fields)
 
 //-------------------------------------------------------------------------------------------------

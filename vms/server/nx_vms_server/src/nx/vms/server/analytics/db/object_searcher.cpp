@@ -196,7 +196,7 @@ void ObjectSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
         {kObjectOrderByTrackStart, "DESC"}});
 
     nx::sql::Filter boxSubqueryFilter;
-    if (!m_filter.boundingBox.isEmpty())
+    if (m_filter.boundingBox)
     {
         QString queryText;
         std::tie(queryText, boxSubqueryFilter) = prepareBoxFilterSubQuery();
@@ -241,9 +241,11 @@ std::tuple<QString /*query text*/, nx::sql::Filter> ObjectSearcher::prepareBoxFi
 {
     using namespace std::chrono;
 
+    NX_ASSERT(m_filter.boundingBox);
+
     nx::sql::Filter sqlFilter;
     addBoundingBoxToFilter(
-        translateToSearchGrid(m_filter.boundingBox),
+        translateToSearchGrid(*m_filter.boundingBox),
         &sqlFilter);
 
     if (!m_filter.timePeriod.isEmpty())

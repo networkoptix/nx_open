@@ -618,8 +618,8 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
         {"object_id", "timestamp_usec_utc", "timestamp_usec_utc"},
         &sqlFilter);
 
-    if (!filter.boundingBox.isNull())
-        ObjectSearcher::addBoundingBoxToFilter(packRect(filter.boundingBox), &sqlFilter);
+    if (filter.boundingBox)
+        ObjectSearcher::addBoundingBoxToFilter(packRect(*filter.boundingBox), &sqlFilter);
 
     if (!filter.freeText.isEmpty())
     {

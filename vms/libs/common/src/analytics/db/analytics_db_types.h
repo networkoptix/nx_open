@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <optional>
 #include <vector>
 
 #include <QtGui/QRegion>
@@ -83,7 +84,7 @@ struct Filter
     /**
      * Coordinates are in range [0;1].
      */
-    QRectF boundingBox;
+    std::optional<QRectF> boundingBox;
 
     /**
      * Set of words separated by spaces, commas, etc...
@@ -119,7 +120,7 @@ QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
     (deviceIds)(objectTypeId)(objectAppearanceId)(timePeriod)(boundingBox)(freeText)
-QN_FUSION_DECLARE_FUNCTIONS(Filter, (json)(ubjson));
+QN_FUSION_DECLARE_FUNCTIONS(Filter, (json));
 
 //-------------------------------------------------------------------------------------------------
 

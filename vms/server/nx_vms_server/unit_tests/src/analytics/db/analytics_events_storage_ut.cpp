@@ -542,13 +542,13 @@ private:
         if (!satisfiesCommonConditions(filter, data))
             return false;
 
-        if (filter.boundingBox.isNull())
+        if (!filter.boundingBox)
             return true;
 
         if (kUseTrackAggregation)
-            return rectsIntersectToPrecision(filter.boundingBox, data.boundingBox);
+            return rectsIntersectToPrecision(*filter.boundingBox, data.boundingBox);
         else
-            return filter.boundingBox.intersects(data.boundingBox);
+            return filter.boundingBox->intersects(data.boundingBox);
     }
 
     bool rectsIntersectToPrecision(const QRectF& one, const QRectF& two)
@@ -572,11 +572,11 @@ private:
                 return false;
         }
 
-        if (!filter.boundingBox.isNull())
+        if (filter.boundingBox)
         {
             bool intersects = false;
             for (const auto& object: data.objects)
-                intersects |= rectsIntersectToPrecision(filter.boundingBox, object.boundingBox);
+                intersects |= rectsIntersectToPrecision(*filter.boundingBox, object.boundingBox);
             if (!intersects)
                 return false;
         }
@@ -612,11 +612,8 @@ private:
         if (!filter.deviceIds.empty() && !nx::utils::contains(filter.deviceIds, data.deviceId))
             return false;
 
-        if (!filter.timePeriod.isInfinite() &&
-            !filter.timePeriod.contains(data.timestampUsec / kUsecInMs))
-        {
+        if (!filter.timePeriod.contains(data.timestampUsec / kUsecInMs))
             return false;
-        }
 
         return true;
     }
@@ -863,13 +860,13 @@ protected:
             nx::utils::random::number<float>(0, 1),
             nx::utils::random::number<float>(0, 1));
 
-        auto bottomRight = m_filter.boundingBox.bottomRight();
+        auto bottomRight = m_filter.boundingBox->bottomRight();
         if (bottomRight.x() > 1.0)
             bottomRight.setX(1.0);
         if (bottomRight.y() > 1.0)
             bottomRight.setY(1.0);
 
-        m_filter.boundingBox.setBottomRight(bottomRight);
+        m_filter.boundingBox->setBottomRight(bottomRight);
     }
 
     void givenEmptyFilter()
@@ -909,10 +906,10 @@ protected:
         if (nx::utils::random::number<bool>())
         {
             addRandomBoundingBoxToFilter();
-            if (!m_filter.boundingBox.intersects(randomPacket->objects.front().boundingBox))
+            if (!m_filter.boundingBox->intersects(randomPacket->objects.front().boundingBox))
             {
                 m_filter.boundingBox =
-                    m_filter.boundingBox.united(randomPacket->objects.front().boundingBox);
+                    m_filter.boundingBox->united(randomPacket->objects.front().boundingBox);
             }
         }
 
@@ -1425,8 +1422,8 @@ protected:
 
     void whenLookupTimePeriods()
     {
-        if (!filter().boundingBox.isEmpty())
-            m_lookupOptions.region += translateToSearchGrid(filter().boundingBox);
+        if (filter().boundingBox)
+            m_lookupOptions.region += translateToSearchGrid(*filter().boundingBox);
 
         filter().sortOrder = Qt::AscendingOrder;
 
@@ -1472,7 +1469,7 @@ protected:
 
         for (int i = 0; i < left.size(); ++i)
         {
-            ASSERT_LT(
+            ASSERT_LE(
                 std::chrono::abs(left[i].startTime() - right[i].startTime()),
                 kTrackAggregationPeriod);
         }
@@ -1503,6 +1500,9 @@ private:
                 [](const auto& left, const auto& right) { return left.startTime() > right.startTime(); });
         }
 
+        if (filter().maxObjectsToSelect > 0 && periods.size() > filter().maxObjectsToSelect)
+            periods.erase(periods.begin() + filter().maxObjectsToSelect);
+
         return periods;
     }
 
@@ -1526,9 +1526,6 @@ private:
         const Filter& filter,
         const QnTimePeriodList& timePeriods)
     {
-        if (filter.timePeriod.isInfinite())
-            return timePeriods;
-
         QnTimePeriodList result;
         for (const auto& timePeriod: timePeriods)
         {
