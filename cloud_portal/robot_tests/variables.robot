@@ -37,11 +37,11 @@ ${REMEMBER ME CHECKBOX REAL}          //form[@name='loginForm']//input[@id='reme
 
 ${FORGOT PASSWORD}                    //form[@name='loginForm']//a[@href='/restore_password']
 ${LOG IN CLOSE BUTTON}                //button[@data-dismiss='modal']
-${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//label[contains(text(), '${ACCOUNT NOT FOUND TEXT}')]
+${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//div[contains(text(), '${ACCOUNT NOT FOUND TEXT}')]
 ${RESEND ACTIVATION EMAIL LINK}       //form[@name='loginForm']//a[text()='${RESEND ACTIVATION LINK BUTTON TEXT}']
-${WRONG PASSWORD MESSAGE}             //form[@name='loginForm']//label[text()="${WRONG PASSWORD}"]
-${ACCOUNT NOT FOUND MESSAGE}          //form[@name='loginForm']//label[text()="${ACCOUNT DOES NOT EXIST}"]
-${TOO MANY ATTEMPTS MESSAGE}          //form[@name='loginForm']//label[text()="${TOO MANY ATTEMPTS TEXT}"]
+${WRONG PASSWORD MESSAGE}             //form[@name='loginForm']//div[text()="${WRONG PASSWORD}"]
+${ACCOUNT NOT FOUND MESSAGE}          //form[@name='loginForm']//div[text()="${ACCOUNT DOES NOT EXIST}"]
+${TOO MANY ATTEMPTS MESSAGE}          //form[@name='loginForm']//div[text()="${TOO MANY ATTEMPTS TEXT}"]
 
 ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),"${YOU HAVE NO SYSTEMS TEXT}")]

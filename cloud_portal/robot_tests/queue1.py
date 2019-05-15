@@ -13,7 +13,8 @@ CMD_LIST = []
 # list of files that are going to be run as a whole file, but threaded
 THREADABLE_FILE_LIST = ("activate", "register-form-validation", "login-form-validation",
                         "change-pass-form-validation", "restore-pass-form-validation-email",
-                        "restore-pass-form-validation-password", "share-form-validation")
+                        "restore-pass-form-validation-password", "share-form-validation", 
+                        "ipvd-form-feedback-validation", "ipvd-form-request-validation")
 
 TEST_LIST = get_threaded_names("Threaded")
 
