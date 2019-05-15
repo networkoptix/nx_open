@@ -91,8 +91,8 @@ private:
 
         while (!m_running.isEmpty())
         {
-            auto timeFromStart = duration_cast<milliseconds>((system_clock::now() - start));
-            milliseconds timeToWait = kStopTimeout - timeFromStart;
+            const auto timeFromStart = duration_cast<milliseconds>((system_clock::now() - start));
+            const milliseconds timeToWait = kStopTimeout - timeFromStart;
             if (timeToWait.count() > 0)
                 m_waitCondition.wait(&m_mutex, timeToWait);
 
@@ -104,6 +104,7 @@ private:
                         this, "A long runnable %1 hasn't stopped in %2 seconds", runnable,
                         kStopTimeout);
                 }
+
                 return;
             }
         }
