@@ -208,20 +208,20 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::getUnresolvedRelays() con
 }
 
 std::optional<nx::geo_ip::Location> OnlineRelaysClusterClient::resolve(
-    const std::string& entity,
+    const std::string& peerType,
     const std::string& ipAddress)
 {
     try
     {
         auto location = m_geoIpResolver->resolve(ipAddress);
         NX_VERBOSE(this, "Resolved %1 with ipAddress: %2 to location: %3",
-            entity, ipAddress, location);
+            peerType, ipAddress, location);
         return location;
     }
     catch (const std::exception& e)
     {
         NX_ERROR(this, "Error resolving ip address: %1 of %2 to location: %3",
-            ipAddress, entity, e.what());
+            ipAddress, peerType, e.what());
         return std::nullopt;
     }
 }

@@ -52,7 +52,7 @@ private:
     std::vector<nx::utils::Url> getUnresolvedRelays() const;
 
     std::optional<nx::geo_ip::Location> resolve(
-        const std::string& entity,
+        const std::string& peerType,
         const std::string& ipAddress);
 
 private:
