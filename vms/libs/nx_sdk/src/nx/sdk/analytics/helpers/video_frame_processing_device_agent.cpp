@@ -70,7 +70,8 @@ VideoFrameProcessingDeviceAgent::~VideoFrameProcessingDeviceAgent()
 Error VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_handler = handler;
+    handler->addRef();
+    m_handler.reset(handler);
     return Error::noError;
 }
 
@@ -178,18 +179,23 @@ void VideoFrameProcessingDeviceAgent::processMetadataPacket(
         }
         packetName += " metadata packet" + packetIndexName;
 
-        if (metadataPacket->count() == 0)
-            NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " is empty.";
+        auto compoundMetadataPacket = queryInterfacePtr<ICompoundMetadataPacket>(metadataPacket);
+        if (compoundMetadataPacket)
+        {
 
-        const std::string itemsName = (metadataPacket->count() == 1)
-            ? (std::string("item of type ") + metadataPacket->at(0)->typeId())
-            : "item(s)";
+            if (compoundMetadataPacket->count() == 0)
+                NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " is empty.";
 
-        NX_OUTPUT << __func__ << "(): " << packetName << " contains "
-            << metadataPacket->count() << " " << itemsName << ".";
+            const std::string itemsName = (compoundMetadataPacket->count() == 1)
+                ? (std::string("item of type ") + compoundMetadataPacket->at(0)->typeId())
+                : "item(s)";
 
-        if (metadataPacket->timestampUs() == 0)
-            NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " has timestamp 0.";
+            NX_OUTPUT << __func__ << "(): " << packetName << " contains "
+                << compoundMetadataPacket->count() << " " << itemsName << ".";
+
+            if (metadataPacket->timestampUs() == 0)
+                NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " has timestamp 0.";
+        }
     }
 
     NX_KIT_ASSERT(metadataPacket->timestampUs() >= 0);

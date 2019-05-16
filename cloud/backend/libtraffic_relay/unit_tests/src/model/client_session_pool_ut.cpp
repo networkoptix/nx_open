@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/utils/uuid.h>
 #include <nx/cloud/relay/model/client_session_pool.h>
 #include <nx/cloud/relay/settings.h>
 

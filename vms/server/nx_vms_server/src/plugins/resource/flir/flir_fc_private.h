@@ -1,5 +1,9 @@
 #pragma once
 
+#include <map>
+
+#include <QtCore/QUrl>
+
 namespace nx {
 namespace plugins {
 namespace flir {

@@ -1,6 +1,7 @@
 #include "ini_config.h"
 
 #include <algorithm>
+#include <atomic>
 #include <cerrno>
 #include <climits>
 #include <cstdlib>
@@ -10,7 +11,6 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include <vector>
 #include <unordered_set>
 
 #if !defined(NX_INI_CONFIG_DEFAULT_OUTPUT)
@@ -178,8 +178,8 @@ static std::string determineIniFilesDir()
 
 struct AbstractParam
 {
-    const char* const name;
-    const char* const description;
+    const std::string name;
+    const std::string description;
 
     AbstractParam(const char* name, const char* description):
         name(name), description(description)
@@ -205,9 +205,9 @@ struct AbstractParam
         {
             const char* const prefix = (error[0] != '\0') ? "!!! " : (eqDefault ? "    " : "  * ");
             std::string descriptionStr;
-            if (description[0])
+            if (!description.empty())
             {
-                descriptionStr = std::string(" # ") + description;
+                descriptionStr = " # " + description;
                 stringReplaceAllChars(&descriptionStr, '\n', ' ');
             }
             *output << prefix << value << valueNameSeparator << name << error << descriptionStr
@@ -407,6 +407,16 @@ public:
     Impl(const char* iniFile):
         iniFile(validateIniFile(iniFile))
     {
+    }
+
+    static bool& isEnabled()
+    {
+        #if defined(NX_INI_CONFIG_DISABLED)
+            static bool isEnabled = false;
+        #else
+            static bool isEnabled = true;
+        #endif
+        return isEnabled;
     }
 
     /**
@@ -644,11 +654,13 @@ void IniConfig::Impl::reload()
 
 /*static*/ bool IniConfig::isEnabled()
 {
-    #if defined(NX_INI_CONFIG_DISABLED)
-        return false;
-    #else
-        return true;
-    #endif
+    return Impl::isEnabled();
+}
+
+
+/*static*/ void IniConfig::setEnabled(bool value)
+{
+    Impl::isEnabled() = value;
 }
 
 /*static*/ const char* IniConfig::iniFilesDir()
@@ -724,6 +736,29 @@ const char* IniConfig::iniFilePath() const
 void IniConfig::reload()
 {
     return d->reload();
+}
+
+static std::atomic<int> s_tweaksInstances(false);
+static bool s_tweaksIsEnabledBackup(false);
+
+IniConfig::Tweaks::Tweaks()
+{
+    m_guards = new std::vector<std::function<void()>>();
+    if (++s_tweaksInstances != 0)
+    {
+        s_tweaksIsEnabledBackup = isEnabled();
+        setEnabled(false);
+    }
+}
+
+IniConfig::Tweaks::~Tweaks()
+{
+    for (const auto& guard: *m_guards)
+        guard();
+    delete m_guards;
+
+    if (--s_tweaksInstances == 0)
+        setEnabled(s_tweaksIsEnabledBackup);
 }
 
 } // namespace kit

@@ -10,6 +10,7 @@
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 #include <nx/sdk/helpers/string_map.h>
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
@@ -158,10 +159,10 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     const char* logMessage = "";
     if (ini().generateObjects)
     {
-        IMetadataPacket* const metadataPacket = cookSomeObjects();
-        if (metadataPacket)
+        std::vector<IMetadataPacket*> result = cookSomeObjects();
+        if (!result.empty())
         {
-            metadataPackets->push_back(metadataPacket);
+            *metadataPackets = result;
             logMessage = "Generated 1 metadata packet";
         }
         else
@@ -298,51 +299,78 @@ static IObjectMetadata* makeObjectMetadata(
     objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
     objectMetadata->setTypeId(objectTypeId);
     objectMetadata->setId(objectId);
-    objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) offset,
-        (float) offset + 0.05F * (float) objectIndex, 0.25F, 0.25F));
+    objectMetadata->setBoundingBox(
+		Rect((float) offset, (float) offset + 0.05F * (float) objectIndex, 0.25F, 0.25F));
 
-    if (generatePreviewAttributes)
+    if (generatePreviewAttributes && ini().useOldStylePreviewAttributes)
     {
         // Make a box smaller than the one in setBoundingBox() to make the change visible.
         objectMetadata->addAttributes({
-            {IAttribute::Type::number, "nx.sys.preview.timestampUs",
-                std::to_string(lastVideoFrameTimestampUs)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(offset)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.y",
-                std::to_string(offset)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.width", "0.1"},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"},
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::number,
+                "nx.sys.preview.timestampUs",
+                std::to_string(lastVideoFrameTimestampUs)),
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::number,
+                "nx.sys.preview.boundingBox.x",
+                std::to_string(offset)),
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::number,
+                "nx.sys.preview.boundingBox.y",
+                std::to_string(offset)),
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::number,
+                "nx.sys.preview.boundingBox.width",
+                "0.1"),
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::number,
+                "nx.sys.preview.boundingBox.height",
+                "0.1")
         });
     }
 
-    const std::map<std::string, std::vector<Attribute>> kObjectAttributes = {
+    const std::map<std::string, std::vector<nx::sdk::Ptr<Attribute>>> kObjectAttributes = {
         {kCarObjectType, {
-            {IAttribute::Type::string, "Brand", "Tesla"},
-            {IAttribute::Type::string, "Model", "X"},
-            {IAttribute::Type::string, "Color", "Pink"},
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Brand", "Tesla"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Model", "X"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Color", "Pink"),
         }},
         {kHumanFaceObjectType, {
-            {IAttribute::Type::string, "Sex", "Female"},
-            {IAttribute::Type::string, "Hair color", "Red"},
-            {IAttribute::Type::string, "Age", "29"},
-            {IAttribute::Type::string, "Name", "Triss"},
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Sex", "Female"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Hair color", "Red"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Age", "29"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Name", "Triss"),
 
         }},
         {kTruckObjectType, {
-            {IAttribute::Type::string, "Length", "12 m"},
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Length", "12 m"),
         }},
         {kPedestrianObjectType, {
-            {IAttribute::Type::string, "Direction", "Towards the camera"},
-            {IAttribute::Type::string, "Clothes color", "White"},
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::string,
+                "Direction",
+                "Towards the camera"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Clothes color", "White"),
         }},
         {kBicycleObjectType, {
-            {IAttribute::Type::string, "Type", "Mountain bike"},
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Type", "Mountain bike"),
         }},
     };
 
     objectMetadata->addAttributes(kObjectAttributes.at(objectTypeId));
 
     return objectMetadata;
+}
+
+static IObjectTrackBestShotPacket* makeObjectTrackBestShotPacket(
+    const Uuid& objectTrackId,
+    int64_t timestampUs,
+    float offset)
+{
+    return new ObjectTrackBestShotPacket(
+        objectTrackId,
+        timestampUs,
+        Rect(offset, offset, 0.1, 0.1));
 }
 
 void DeviceAgent::generateObjectIds()
@@ -398,13 +426,14 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
     return eventMetadataPacket;
 }
 
-IMetadataPacket* DeviceAgent::cookSomeObjects()
+std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 {
+    std::vector<IMetadataPacket*> result;
     if (m_lastVideoFrameTimestampUs == 0)
-        return nullptr;
+        return {};
 
     if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
-        return nullptr;
+        return {};
 
     double dt = m_objectCounter / 32.0;
     ++m_objectCounter;
@@ -452,12 +481,25 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
             m_lastVideoFrameTimestampUs,
             generatePreviewAttributes,
             i));
+
         objectMetadataPacket->addItem(objectMetadata.get());
+
+        if (generatePreviewAttributes && !ini().useOldStylePreviewAttributes)
+        {
+            auto bestShotMetadataPacket = makeObjectTrackBestShotPacket(
+                m_objectIds[i],
+                m_lastVideoFrameTimestampUs,
+                dt);
+
+            if (bestShotMetadataPacket)
+                result.push_back(bestShotMetadataPacket);
+        }
     }
 
     objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
     objectMetadataPacket->setDurationUs(0);
-    return objectMetadataPacket;
+    result.push_back(objectMetadataPacket);
+    return result;
 }
 
 int64_t DeviceAgent::usSinceEpoch() const

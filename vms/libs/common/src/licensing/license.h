@@ -60,6 +60,9 @@ public:
     QString expiration() const; // TODO: #Ivan Passing date as a string is totally evil. Please make sure your code is easy to use!!!
     bool neverExpire() const;
 
+    QString orderType() const;
+    bool isSaas() const; //< Whether orderType() == "saas".
+
     QByteArray rawLicense() const;
 
     QByteArray toString() const;
@@ -95,9 +98,9 @@ private:
     void parseLicenseBlock(
         const QByteArray& licenseBlock,
         QByteArray* const v1LicenseBlock,
-        QByteArray* const v2LicenseBlock );
+        QByteArray* const v2LicenseBlock);
 
-    void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
+    void verify(const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock);
 
 private:
     QByteArray m_rawLicense;
@@ -113,6 +116,8 @@ private:
     QString m_brand;
     QString m_expiration;
     QByteArray m_signature2;
+
+    QString m_orderType;
 
     // Is partial v1 license valid (signature1 is used)
     bool m_isValid1 = false;

@@ -3,7 +3,7 @@
 #include <nx/sdk/interface.h>
 
 #include "i_event_metadata.h"
-#include "i_metadata_packet.h"
+#include "i_compound_metadata_packet.h"
 
 namespace nx {
 namespace sdk {
@@ -12,7 +12,7 @@ namespace analytics {
 /**
  * Metadata packet containing information about some event which occurred on the scene.
  */
-class IEventMetadataPacket: public Interface<IEventMetadataPacket, IMetadataPacket>
+class IEventMetadataPacket: public Interface<IEventMetadataPacket, ICompoundMetadataPacket>
 {
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEventMetadataPacket"); }

@@ -1,6 +1,9 @@
+#include "server_stream_recorder.h"
+
 #include <limits>
 #include <cstdint>
-#include "server_stream_recorder.h"
+
+#include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <api/global_settings.h>
 
@@ -628,11 +631,11 @@ void QnServerStreamRecorder::setSpecialRecordingMode(const ScheduleTaskWithThres
 bool QnServerStreamRecorder::isPanicMode() const
 {
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
-    return boost::algorithm::any_of(onlineServers
-        , [](const QnMediaServerResourcePtr& server)
-    {
-        return (server->getPanicMode() != Qn::PM_None);
-    });
+    return boost::algorithm::any_of(onlineServers,
+        [](const QnMediaServerResourcePtr& server)
+        {
+            return server->getPanicMode() != Qn::PM_None;
+        });
 }
 
 void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
@@ -974,7 +977,7 @@ bool QnServerStreamRecorder::mediaHasBuiltinContext(const QnConstAbstractMediaDa
                 else if (codecId == AV_CODEC_ID_HEVC)
                 {
                     hevc::NalUnitHeader header;
-                    header.decode(nalu.first, nalu.second);
+                    header.decode(nalu.first, (int) nalu.second);
                     if (hevc::isParameterSet(header.unitType))
                         return true;
                 }

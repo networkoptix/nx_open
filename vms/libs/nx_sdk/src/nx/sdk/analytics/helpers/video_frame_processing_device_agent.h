@@ -7,10 +7,11 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/log_utils.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
-#include <nx/sdk/analytics/i_metadata_packet.h>
+#include <nx/sdk/analytics/i_compound_metadata_packet.h>
 #include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
@@ -148,7 +149,7 @@ private:
 private:
     mutable std::mutex m_mutex;
     IEngine* const m_engine;
-    IDeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::Ptr<IDeviceAgent::IHandler> m_handler;
     std::map<std::string, std::string> m_settings;
 };
 

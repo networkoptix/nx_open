@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QRect>
 
 #include "abstract_workbench_panel.h"
 

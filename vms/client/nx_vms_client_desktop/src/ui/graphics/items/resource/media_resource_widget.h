@@ -61,6 +61,9 @@ class QnTwoWayAudioWidget;
 
 struct QnHtmlTextItemOptions;
 
+/**
+ * Widget to show media from a camera or disk file (from QnMediaResource). 
+ */
 class QnMediaResourceWidget: public Customized<QnResourceWidget>
 {
     Q_OBJECT

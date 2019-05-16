@@ -3,6 +3,8 @@
 #include <initializer_list>
 #include <string>
 
+#include <nx/utils/log/assert.h>
+
 namespace nx {
 namespace network {
 namespace http {

@@ -16,7 +16,7 @@
 
 FileTranscoder::FileTranscoder(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
-    m_transcoder(DecoderConfig(), commonModule->metrics()),
+    m_transcoder(QnFfmpegTranscoder::Config(), commonModule->metrics()),
     m_resultCode( 0 ),
     m_state( sInit ),
     m_transcodeDurationLimit( 0 ),

@@ -34,6 +34,12 @@ QVariantMap engineInfoToVariantMap(const AnalyticsEnginesWatcher::AnalyticsEngin
     };
 }
 
+bool isEngineVisible(const AnalyticsEnginesWatcher::AnalyticsEngineInfo& info)
+{
+    const auto settings = info.settingsModel.value("items").toArray();
+    return !settings.isEmpty();
+}
+
 } // namespace
 
 class AnalyticsSettingsWidget::Private: public QObject, public QnConnectionContextAware
@@ -152,6 +158,10 @@ void AnalyticsSettingsWidget::Private::addEngine(
     const QnUuid& /*engineId*/,
     const AnalyticsEnginesWatcher::AnalyticsEngineInfo& engineInfo)
 {
+    // Hide engines without settings on the model level.
+    if (!isEngineVisible(engineInfo))
+        return;
+
     auto it = std::lower_bound(engines.begin(), engines.end(), engineInfo,
         [](const auto& item, const auto& engineInfo)
         {

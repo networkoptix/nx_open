@@ -76,130 +76,130 @@ static const int kHanwhaProfileNameDefaultMaxLength = 12;
 static const QString kHanwhaDateTimeFormat("yyyy-MM-dd hh:mm:ss");
 static const QString kHanwhaUtcDateTimeFormat("yyyy-MM-ddThh:mm:ssZ");
 
-static const QString kHanwhaPrimaryNxProfileSuffix = lit("Primary");
-static const QString kHanwhaSecondaryNxProfileSuffix = lit("Secondary");
+static const QString kHanwhaPrimaryNxProfileSuffix = "Primary";
+static const QString kHanwhaSecondaryNxProfileSuffix = "Secondary";
 
-static const QString kHanwhaTrue = lit("True");
-static const QString kHanwhaFalse = lit("False");
+static const QString kHanwhaTrue = "True";
+static const QString kHanwhaFalse = "False";
 
-static const QString kHanwhaMjpeg = lit("MJPEG");
-static const QString kHanwhaH264 = lit("H264");
-static const QString kHanwhaHevc = lit("H265");
+static const QString kHanwhaMjpeg = "MJPEG";
+static const QString kHanwhaH264 = "H264";
+static const QString kHanwhaHevc = "H265";
 
-static const QString kHanwhaCbr = lit("CBR");
-static const QString kHanwhaVbr = lit("VBR");
+static const QString kHanwhaCbr = "CBR";
+static const QString kHanwhaVbr = "VBR";
 
-static const QString kHanwhaFrameRatePriority = lit("FrameRate");
-static const QString kHanwhaCompressionLevelPriority = lit("CompressionLevel");
+static const QString kHanwhaFrameRatePriority = "FrameRate";
+static const QString kHanwhaCompressionLevelPriority = "CompressionLevel";
 
-static const QString kHanwhaCabac = lit("CABAC");
-static const QString kHanwhaCavlc = lit("CAVLC");
+static const QString kHanwhaCabac = "CABAC";
+static const QString kHanwhaCavlc = "CAVLC";
 
-static const QString kHanwhaBaselineProfile = lit("Baseline");
-static const QString kHanwhaMainProfile = lit("Main");
-static const QString kHanwhaHighProfile = lit("High");
+static const QString kHanwhaBaselineProfile = "Baseline";
+static const QString kHanwhaMainProfile = "Main";
+static const QString kHanwhaHighProfile = "High";
 
-static const QString kHanwhaLiveMediaType = lit("Live");
-static const QString kHanwhaSearchMediaType = lit("Search");
-static const QString kHanwhaBackupMediaType = lit("Backup");
+static const QString kHanwhaLiveMediaType = "Live";
+static const QString kHanwhaSearchMediaType = "Search";
+static const QString kHanwhaBackupMediaType = "Backup";
 
-static const QString kHanwhaIframeOnlyMode = lit("IframeOnly");
-static const QString kHanwhaFullMode = lit("Full");
+static const QString kHanwhaIframeOnlyMode = "IframeOnly";
+static const QString kHanwhaFullMode = "Full";
 
-static const QString kHanwhaRtpUnicast = lit("RTPUnicast");
-static const QString kHanwhaRtpMulticast = lit("RTPMulticast");
-static const QString kHanwhaRtpMulticastEnable = lit("RTPMulticastEnable");
-static const QString kHanwhaRtpMulticastAddress = lit("RTPMulticastAddress");
-static const QString kHanwhaRtpMulticastPort = lit("RTPMulticastPort");
-static const QString kHanwhaRtpMulticastTtl = lit("RTPMulticastTTL");
+static const QString kHanwhaRtpUnicast = "RTPUnicast";
+static const QString kHanwhaRtpMulticast = "RTPMulticast";
+static const QString kHanwhaRtpMulticastEnable = "RTPMulticastEnable";
+static const QString kHanwhaRtpMulticastAddress = "RTPMulticastAddress";
+static const QString kHanwhaRtpMulticastPort = "RTPMulticastPort";
+static const QString kHanwhaRtpMulticastTtl = "RTPMulticastTTL";
 
-static const QString kHanwhaPcClient = lit("PC");
-static const QString kHanwhaMobileClient = lit("Mobile");
+static const QString kHanwhaPcClient = "PC";
+static const QString kHanwhaMobileClient = "Mobile";
 
-static const QString kHanwhaAll = lit("All");
+static const QString kHanwhaAll = "All";
 
-static const QString kHanwhaChannelPropertyTemplate = lit("Channel.%1");
-static const QString kHanwhaChannelProperty = lit("Channel");
-static const QString kHanwhaIsFixedProfileProperty = lit("IsFixedProfile");
-static const QString kHanwhaProfileNameProperty = lit("Name");
-static const QString kHanwhaProfileNumberProperty = lit("Profile");
-static const QString kHanwhaEncodingTypeProperty = lit("EncodingType");
-static const QString kHanwhaFrameRateProperty = lit("FrameRate");
-static const QString kHanwhaBitrateProperty = lit("Bitrate");
-static const QString kHanwhaResolutionProperty = lit("Resolution");
-static const QString kHanwhaAudioInputEnableProperty = lit("AudioInputEnable");
-static const QString kHanwhaMediaTypeProperty = lit("MediaType");
+static const QString kHanwhaChannelPropertyTemplate = "Channel.%1";
+static const QString kHanwhaChannelProperty = "Channel";
+static const QString kHanwhaIsFixedProfileProperty = "IsFixedProfile";
+static const QString kHanwhaProfileNameProperty = "Name";
+static const QString kHanwhaProfileNumberProperty = "Profile";
+static const QString kHanwhaEncodingTypeProperty = "EncodingType";
+static const QString kHanwhaFrameRateProperty = "FrameRate";
+static const QString kHanwhaBitrateProperty = "Bitrate";
+static const QString kHanwhaResolutionProperty = "Resolution";
+static const QString kHanwhaAudioInputEnableProperty = "AudioInputEnable";
+static const QString kHanwhaMediaTypeProperty = "MediaType";
 static const QString kHanwhaStreamingModeProperty("Mode");
-static const QString kHanwhaStreamingTypeProperty = lit("StreamType");
-static const QString kHanwhaTransportProtocolProperty = lit("TransportProtocol");
-static const QString kHanwhaRtspOverHttpProperty = lit("RTSPOverHTTP");
-static const QString kHanwhaClientTypeProperty = lit("ClientType");
-static const QString kHanwhaUriProperty = lit("URI");
-static const QString kHanwhaPanProperty = lit("Pan");
-static const QString kHanwhaTiltProperty = lit("Tilt");
-static const QString kHanwhaZoomProperty = lit("Zoom");
-static const QString kHanwhaFocusProperty = lit("Focus");
-static const QString kHanwhaNormalizedSpeedProperty = lit("NormalizedSpeed");
-static const QString kHanwhaPtzQueryProperty = lit("Query");
-static const QString kHanwhaPresetNumberProperty = lit("Preset");
-static const QString kHanwhaPresetNameProperty = lit("Name");
-static const QString kHanwhaHorizontalFlipProperty = lit("HorizontalFlipEnable");
-static const QString kHanwhaVerticalFlipProperty = lit("VerticalFlipEnable");
-static const QString kHanwhaRotationProperty = lit("Rotate");
+static const QString kHanwhaStreamingTypeProperty = "StreamType";
+static const QString kHanwhaTransportProtocolProperty = "TransportProtocol";
+static const QString kHanwhaRtspOverHttpProperty = "RTSPOverHTTP";
+static const QString kHanwhaClientTypeProperty = "ClientType";
+static const QString kHanwhaUriProperty = "URI";
+static const QString kHanwhaPanProperty = "Pan";
+static const QString kHanwhaTiltProperty = "Tilt";
+static const QString kHanwhaZoomProperty = "Zoom";
+static const QString kHanwhaFocusProperty = "Focus";
+static const QString kHanwhaNormalizedSpeedProperty = "NormalizedSpeed";
+static const QString kHanwhaPtzQueryProperty = "Query";
+static const QString kHanwhaPresetNumberProperty = "Preset";
+static const QString kHanwhaPresetNameProperty = "Name";
+static const QString kHanwhaHorizontalFlipProperty = "HorizontalFlipEnable";
+static const QString kHanwhaVerticalFlipProperty = "VerticalFlipEnable";
+static const QString kHanwhaRotationProperty = "Rotate";
 
-static const QString kHanwhaMaxFpsProperty = lit("MaxFPS");
-static const QString kHanwhaDefaultFpsProperty = lit("DefaultFPS");
-static const QString kHanwhaMaxCbrBitrateProperty = lit("MaxCBRTargetBitrate");
-static const QString kHanwhaMinCbrBitrateProperty = lit("MinCBRTargetBitrate");
-static const QString kHanwhaDefaultCbrBitrateProperty = lit("DefaultCBRTargetBitrate");
-static const QString kHanwhaMaxVbrBitrateProperty = lit("MaxVBRTargetBitrate");
-static const QString kHanwhaMinVbrBitrateProperty = lit("MinVBRTargetBitrate");
-static const QString kHanwhaDefaultVbrBitrateProperty = lit("DefaultVBRTargetBitrate");
-static const QString kHanwhaChannelIdListProperty = lit("ChannelIDList");
-static const QString kHanwhaFromDateProperty = lit("FromDate");
-static const QString kHanwhaToDateProperty = lit("ToDate");
-static const QString kHanwhaOverlappedIdProperty = lit("OverlappedID");
-static const QString kHanwhaResultsInUtcProperty = lit("ResultsInUTC");
-static const QString kHanwhaRecordingTypeProperty = lit("Type");
-static const QString kHanwhaSequenceIdProperty = lit("SunapiSeqId");
+static const QString kHanwhaMaxFpsProperty = "MaxFPS";
+static const QString kHanwhaDefaultFpsProperty = "DefaultFPS";
+static const QString kHanwhaMaxCbrBitrateProperty = "MaxCBRTargetBitrate";
+static const QString kHanwhaMinCbrBitrateProperty = "MinCBRTargetBitrate";
+static const QString kHanwhaDefaultCbrBitrateProperty = "DefaultCBRTargetBitrate";
+static const QString kHanwhaMaxVbrBitrateProperty = "MaxVBRTargetBitrate";
+static const QString kHanwhaMinVbrBitrateProperty = "MinVBRTargetBitrate";
+static const QString kHanwhaDefaultVbrBitrateProperty = "DefaultVBRTargetBitrate";
+static const QString kHanwhaChannelIdListProperty = "ChannelIDList";
+static const QString kHanwhaFromDateProperty = "FromDate";
+static const QString kHanwhaToDateProperty = "ToDate";
+static const QString kHanwhaOverlappedIdProperty = "OverlappedID";
+static const QString kHanwhaResultsInUtcProperty = "ResultsInUTC";
+static const QString kHanwhaRecordingTypeProperty = "Type";
+static const QString kHanwhaSequenceIdProperty = "SunapiSeqId";
 
-static const QString kHanwhaNearFocusMove = lit("Near");
-static const QString kHanwhaFarFocusMove = lit("Far");
-static const QString kHanwhaStopFocusMove = lit("Stop");
+static const QString kHanwhaNearFocusMove = "Near";
+static const QString kHanwhaFarFocusMove = "Far";
+static const QString kHanwhaStopFocusMove = "Stop";
 
-static const QString kHanwhaNameAttribute = lit("name");
-static const QString kHanwhaValueAttribute = lit("value");
-static const QString kHanwhaChannelNumberAttribute = lit("number");
+static const QString kHanwhaNameAttribute = "name";
+static const QString kHanwhaValueAttribute = "value";
+static const QString kHanwhaChannelNumberAttribute = "number";
 
-static const QString kHanwhaAttributesNodeName = lit("attributes");
-static const QString kHanwhaGroupNodeName = lit("group");
-static const QString kHanwhaCategoryNodeName = lit("category");
-static const QString kHanwhaChannelNodeName = lit("channel");
-static const QString kHanwhaAttributeNodeName = lit("attribute");
+static const QString kHanwhaAttributesNodeName = "attributes";
+static const QString kHanwhaGroupNodeName = "group";
+static const QString kHanwhaCategoryNodeName = "category";
+static const QString kHanwhaChannelNodeName = "channel";
+static const QString kHanwhaAttributeNodeName = "attribute";
 
-static const QString kHanwhaCgiNodeName = lit("cgi");
-static const QString kHanwhaCgisNodeName = lit("cgis");
-static const QString kHanwhaSubmenuNodeName = lit("submenu");
-static const QString kHanwhaActionNodeName = lit("action");
-static const QString kHanwhaParameterNodeName = lit("parameter");
-static const QString kHanwhaDataTypeNodeName = lit("dataType");
-static const QString kHanwhaEnumNodeName = lit("enum");
-static const QString kHanwhaCsvNodeName = lit("csv");
-static const QString kHanwhaEnumEntryNodeName = lit("entry");
-static const QString kHanwhaIntegerNodeName = lit("int");
-static const QString kHanwhaBooleanNodeName = lit("bool");
-static const QString kHanwhaStringNodeName = lit("string");
-static const QString kHanwhaFloatNodeName = lit("float");
+static const QString kHanwhaCgiNodeName = "cgi";
+static const QString kHanwhaCgisNodeName = "cgis";
+static const QString kHanwhaSubmenuNodeName = "submenu";
+static const QString kHanwhaActionNodeName = "action";
+static const QString kHanwhaParameterNodeName = "parameter";
+static const QString kHanwhaDataTypeNodeName = "dataType";
+static const QString kHanwhaEnumNodeName = "enum";
+static const QString kHanwhaCsvNodeName = "csv";
+static const QString kHanwhaEnumEntryNodeName = "entry";
+static const QString kHanwhaIntegerNodeName = "int";
+static const QString kHanwhaBooleanNodeName = "bool";
+static const QString kHanwhaStringNodeName = "string";
+static const QString kHanwhaFloatNodeName = "float";
 
-static const QString kHanwhaParameterIsRequestAttribute = lit("request");
-static const QString kHanwhaParameterIsResponseAttribute = lit("response");
-static const QString kHanwhaMinValueAttribute = lit("min");
-static const QString kHanwhaMaxValueAttribute = lit("max");
-static const QString kHanwhaTrueValueAttribute = lit("true");
-static const QString kHanwhaFalseValueAttribute = lit("false");
-static const QString kHanwhaFormatInfoAttribute = lit("formatInfo");
-static const QString kHanwhaFormatAttribute = lit("format");
-static const QString kHanwhaMaxLengthAttribute = lit("maxlen");
+static const QString kHanwhaParameterIsRequestAttribute = "request";
+static const QString kHanwhaParameterIsResponseAttribute = "response";
+static const QString kHanwhaMinValueAttribute = "min";
+static const QString kHanwhaMaxValueAttribute = "max";
+static const QString kHanwhaTrueValueAttribute = "true";
+static const QString kHanwhaFalseValueAttribute = "false";
+static const QString kHanwhaFormatInfoAttribute = "formatInfo";
+static const QString kHanwhaFormatAttribute = "format";
+static const QString kHanwhaMaxLengthAttribute = "maxlen";
 
 static const int kHanwhaConfigurationNotFoundError = 612;
 
@@ -216,31 +216,31 @@ static const QString kHanwhaAlternativeRotateTrait("AlternativeRotateTrait");
 
 static const int kMaxPossibleFps = 1000;
 
-static const QString kHanwhaProxiedIdParamName = lit("proxiedId");
+static const QString kHanwhaProxiedIdParamName = "proxiedId";
 
-static const QString kHanwhaDefaultMinimalBypassFirmware = lit("2.10");
-static const QString kHanwhaBypassOverrideParameterName = lit("bypassOverride");
-static const QString kHanwhaMinimalBypassFirmwareParameterName = lit("bypassFirmware");
+static const QString kHanwhaDefaultMinimalBypassFirmware = "2.10";
+static const QString kHanwhaBypassOverrideParameterName = "bypassOverride";
+static const QString kHanwhaMinimalBypassFirmwareParameterName = "bypassFirmware";
 
 // TODO: #dmishin get rid of the properties below and move Hanwha driver to the standard
 // profile configuration mechanism.
-static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");
-static const QString kPrimaryStreamCodecParamName = lit("primaryStreamCodec");
-static const QString kPrimaryStreamCodecProfileParamName = lit("primaryStreamCodecProfile");
-static const QString kPrimaryStreamGovLengthParamName = lit("primaryStreamGovLength");
-static const QString kPrimaryStreamBitrateControlParamName = lit("primaryStreamBitrateControl");
-static const QString kPrimaryStreamBitrateParamName = lit("primaryStreamBitrate");
-static const QString kPrimaryStreamEntropyCodingParamName = lit("primaryStreamEntropyCoding");
-static const QString kPrimaryStreamFpsParamName = lit("primaryStreamFps");
+static const QString kPrimaryStreamResolutionParamName = "primaryStreamResolution";
+static const QString kPrimaryStreamCodecParamName = "primaryStreamCodec";
+static const QString kPrimaryStreamCodecProfileParamName = "primaryStreamCodecProfile";
+static const QString kPrimaryStreamGovLengthParamName = "primaryStreamGovLength";
+static const QString kPrimaryStreamBitrateControlParamName = "primaryStreamBitrateControl";
+static const QString kPrimaryStreamBitrateParamName = "primaryStreamBitrate";
+static const QString kPrimaryStreamEntropyCodingParamName = "primaryStreamEntropyCoding";
+static const QString kPrimaryStreamFpsParamName = "primaryStreamFps";
 
-static const QString kSecondaryStreamResolutionParamName = lit("secondaryStreamResolution");
-static const QString kSecondaryStreamCodecParamName = lit("secondaryStreamCodec");
-static const QString kSecondaryStreamCodecProfileParamName = lit("secondaryStreamCodecProfile");
-static const QString kSecondaryStreamGovLengthParamName = lit("secondaryStreamGovLength");
-static const QString kSecondaryStreamBitrateControlParamName = lit("secondaryStreamBitrateControl");
-static const QString kSecondaryStreamBitrateParamName = lit("secondaryStreamBitrate");
-static const QString kSecondaryStreamEntropyCodingParamName = lit("secondaryStreamEntropyCoding");
-static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFps");
+static const QString kSecondaryStreamResolutionParamName = "secondaryStreamResolution";
+static const QString kSecondaryStreamCodecParamName = "secondaryStreamCodec";
+static const QString kSecondaryStreamCodecProfileParamName = "secondaryStreamCodecProfile";
+static const QString kSecondaryStreamGovLengthParamName = "secondaryStreamGovLength";
+static const QString kSecondaryStreamBitrateControlParamName = "secondaryStreamBitrateControl";
+static const QString kSecondaryStreamBitrateParamName = "secondaryStreamBitrate";
+static const QString kSecondaryStreamEntropyCodingParamName = "secondaryStreamEntropyCoding";
+static const QString kSecondaryStreamFpsParamName = "secondaryStreamFps";
 
 } // namespace plugins
 } // namespace vms::server

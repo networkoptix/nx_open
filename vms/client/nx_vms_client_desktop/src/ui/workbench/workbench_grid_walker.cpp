@@ -1,5 +1,6 @@
 #include "workbench_grid_walker.h"
 
+#include <nx/utils/log/assert.h>
 
 QnWorkbenchGridWalker::QnWorkbenchGridWalker():
     m_rect(0.0, 0.0, 1.0, 1.0),

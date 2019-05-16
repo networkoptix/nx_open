@@ -5,12 +5,6 @@
 
 #include <nx/utils/log/log.h>
 
-namespace {
-
-static nx::utils::log::Tag kTag(lit("nx::vms::client::core::FontLoader"));
-
-} // namespace
-
 namespace nx::vms::client::core {
 
 void FontLoader::loadFonts(const QString& path)
@@ -21,9 +15,9 @@ void FontLoader::loadFonts(const QString& path)
     {
         const auto fontFile = fontsDir.absoluteFilePath(entry);
         if (QFontDatabase::addApplicationFont(fontFile) == -1)
-            NX_WARNING(kTag, lm("Could not load font %1").arg(fontFile));
+            NX_WARNING(NX_SCOPE_TAG, lm("Could not load font %1").arg(fontFile));
         else
-            NX_DEBUG(kTag, lm("Font loaded: %1").arg(fontFile));
+            NX_DEBUG(NX_SCOPE_TAG, lm("Font loaded: %1").arg(fontFile));
     }
 }
 

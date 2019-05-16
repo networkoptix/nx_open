@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/utils/thread/mutex.h>
 #include <nx/vms/server/analytics/abstract_video_data_receptor.h>
 
 namespace nx::vms::server::analytics {

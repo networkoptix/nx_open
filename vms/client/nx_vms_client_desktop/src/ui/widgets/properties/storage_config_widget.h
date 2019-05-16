@@ -66,8 +66,7 @@ private:
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
     void updateBackupUi(const QnBackupStatusData& reply, int overallSelectedCameras);
 
-    QString calculateWarningMessage() const;
-    void setWarningText(const QString& message);
+    void updateWarnings();
 
     void updateIntervalLabels();
 

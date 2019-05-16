@@ -20,6 +20,7 @@ public:
 
 private:
     void updateAreaSelection();
+    void updateCachedDevices();
     virtual bool isMediaAccepted(QnMediaResourceWidget* widget) const override;
 
 private:

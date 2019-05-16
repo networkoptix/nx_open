@@ -217,9 +217,8 @@ bool deserialize(
     bool ok = QJson::deserialize(ctx, *pos, outTarget);
     if (!ok && !optional)
     {
-        qCritical() << QString(QLatin1String(
-            "Can't deserialize field \"%1\" from value \"%2\""))
-            .arg(key).arg(pos.value().toString());
+        qWarning() << QString("Can't deserialize field \"%1\" from value \"%2\"").arg(
+            key, pos.value().toString());
     }
     return ok || optional;
 }

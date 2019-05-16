@@ -23,6 +23,7 @@ struct UpdateItem
 {
     using Clock = std::chrono::steady_clock;
     using TimePoint = std::chrono::time_point<Clock>;
+    using ErrorCode = nx::update::Status::ErrorCode;
 
     enum class Component
     {
@@ -33,7 +34,16 @@ struct UpdateItem
     QnUuid id;
     StatusCode state = StatusCode::offline;
     int progress = -1;
+
+    /**
+     * Message generated from nx::update::Status::message.
+     * It is displayed only in debug mode.
+     */
+    QString debugMessage;
+    /** Message generated from nx::update::Status::errorCode. */
     QString statusMessage;
+    ErrorCode errorCode = ErrorCode::noError;
+
     QString verificationMessage;
 
     /** Current version of the component. */
@@ -110,7 +120,11 @@ public:
 
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
-    void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
+    /**
+     * Update internal data using response from mediaservers.
+     * It will return number if peers with changed data.
+     */
+    int setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
     void markStatusUnknown(const QSet<QnUuid>& targets);
     /**
      * Forcing update for mediaserver versions.
@@ -138,6 +152,12 @@ public:
 
     bool hasStatusErrors() const;
 
+    /**
+     * Generates a common error for multiple peers.
+     * This error will be displayed in error dialog from multi_server_updates_widget
+     */
+    QString getErrorMessage() const;
+
 public:
     std::map<QnUuid, nx::update::Status::Code> allPeerStates() const;
     std::map<QnUuid, QnMediaServerResourcePtr> activeServers() const;
@@ -147,17 +167,26 @@ public:
     QSet<QnUuid> peersInState(StatusCode state) const;
     QSet<QnUuid> legacyServers() const;
     QSet<QnUuid> offlineServers() const;
+    QSet<QnUuid> offlineNotTooLong() const;
     QSet<QnUuid> peersInstalling() const;
     QSet<QnUuid> peersCompleteInstall() const;
     QSet<QnUuid> serversWithChangedProtocol() const;
     QSet<QnUuid> peersWithUnknownStatus() const;
 
     /**
+     * Process unknown or offline states. It will change item states.
+     */
+    void processUnknownStates();
+
+    /**
      * Processing for task sets. These functions are called every 1sec from
      * MultiServerUpdatesWidget.
+     * These functions should only affect task sets and do not change state for each item.
      */
     void processDownloadTaskSet();
     void processInstallTaskSet();
+
+    void skipFailedPeers();
 
     /**
      * Getters for task sets.
@@ -181,6 +210,8 @@ public:
     void setTask(const QSet<QnUuid>& targets);
 
     void setTaskError(const QSet<QnUuid>& targets, const QString& error);
+
+    static QString errorString(nx::update::Status::ErrorCode code);
 
 public:
     /**

@@ -65,6 +65,7 @@ def create_client_update_file(config, output_file):
     launcher_version_name = config['launcher_version_file']
     minilauncher_binary_name = config['minilauncher_binary_name']
     client_update_files_directory = config['client_update_files_directory']
+    fonts_directory = config['fonts_directory']
 
     with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zip:
         e.zip_files_to(zip, e.ffmpeg_files(binaries_dir), binaries_dir)
@@ -75,6 +76,7 @@ def create_client_update_file(config, output_file):
         e.zip_files_to(zip, e.find_all_files(client_update_files_directory),
                        client_update_files_directory)
         e.zip_files_to(zip, e.icu_files(icu_directory), icu_directory)
+        e.zip_files_to(zip, e.find_all_files(fonts_directory), binaries_dir)
 
         qt_bin_dir = os.path.join(qt_directory, 'bin')
         e.zip_files_to(zip, e.qt_files(qt_bin_dir, qt_libraries), qt_bin_dir)
@@ -87,7 +89,6 @@ def create_client_update_file(config, output_file):
         e.zip_rdep_package_to(zip, config['ucrt_directory'])
         e.zip_rdep_package_to(zip, config['vcrt_directory'])
         e.zip_rdep_package_to(zip, config['festival_vox_directory'])
-        e.zip_rdep_package_to(zip, config['fonts_directory'])
 
         zip.write(os.path.join(binaries_dir, client_binary_name), client_binary_name)
         zip.write(os.path.join(binaries_dir, 'applauncher.exe'), 'applauncher.exe')

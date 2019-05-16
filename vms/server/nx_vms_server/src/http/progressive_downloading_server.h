@@ -32,6 +32,7 @@ private:
     static QByteArray getMimeType(const QByteArray& streamingFormat);
     void sendMediaEventErrorResponse(Qn::MediaStreamEvent mediaEvent);
     void sendJsonResponse(const QString& errorString);
+    QByteArray buildSignature();
 private:
     Q_DECLARE_PRIVATE(QnProgressiveDownloadingConsumer);
 };

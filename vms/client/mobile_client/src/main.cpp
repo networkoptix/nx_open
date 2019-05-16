@@ -1,6 +1,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QDir>
 #include <QtGui/QFont>
+#include <QtGui/QDesktopServices>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
 #include <QtQml/QQmlFileSelector>
@@ -69,8 +70,6 @@ using namespace nx::mobile_client;
 using namespace std::chrono;
 using namespace nx::media;
 
-const nx::utils::log::Tag kLogTag(QString("main"));
-
 int runUi(QtSingleGuiApplication* application)
 {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -80,11 +79,11 @@ int runUi(QtSingleGuiApplication* application)
     QnCameraThumbnailProvider *activeCameraThumbnailProvider = new QnCameraThumbnailProvider();
 
     // TODO: #dklychkov Detect fonts dir for iOS.
-    QString fontsDir = QDir(qApp->applicationDirPath()).absoluteFilePath(lit("fonts"));
+    QString fontsDir = QDir(qApp->applicationDirPath()).absoluteFilePath("fonts");
     nx::vms::client::core::FontLoader::loadFonts(fontsDir);
 
     QFont font;
-    font.setFamily(lit("Roboto"));
+    font.setFamily("Roboto");
     QGuiApplication::setFont(font);
 
     const auto context = qnMobileClientModule->context();
@@ -111,7 +110,7 @@ int runUi(QtSingleGuiApplication* application)
             auto webAdminController = commonModule->store(new controllers::WebAdminController());
             webAdminController->setUiController(context->uiController());
 
-            webChannel->registerObject(lit("liteClientController"), webAdminController);
+            webChannel->registerObject("liteClientController", webAdminController);
         }
     }
 
@@ -119,7 +118,7 @@ int runUi(QtSingleGuiApplication* application)
 
     if (context->liteMode())
     {
-        selectors.append(lit("lite"));
+        selectors.append("lite");
         qWarning() << "Starting in lite mode";
     }
 
@@ -130,11 +129,11 @@ int runUi(QtSingleGuiApplication* application)
     QQmlFileSelector qmlFileSelector(engine);
     qmlFileSelector.setSelector(&fileSelector);
 
-    engine->addImageProvider(lit("thumbnail"), thumbnailProvider);
-    engine->addImageProvider(lit("active"), activeCameraThumbnailProvider);
+    engine->addImageProvider("thumbnail", thumbnailProvider);
+    engine->addImageProvider("active", activeCameraThumbnailProvider);
     engine->rootContext()->setContextObject(context);
 
-    QQmlComponent mainComponent(engine, QUrl(lit("main.qml")));
+    QQmlComponent mainComponent(engine, QUrl("main.qml"));
     QScopedPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
 
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(
@@ -226,8 +225,7 @@ int runUi(QtSingleGuiApplication* application)
     QObject::connect(application, &QtSingleGuiApplication::messageReceived, mainWindow.data(),
         [&context, &mainWindow](const QString& serializedMessage)
         {
-            NX_DEBUG(kLogTag, lit("Processing application message BEGIN: %1")
-                .arg(serializedMessage));
+            NX_DEBUG(NX_SCOPE_TAG, "Processing application message BEGIN: %1", serializedMessage);
 
             using nx::client::mobile::InterClientMessage;
 
@@ -252,8 +250,7 @@ int runUi(QtSingleGuiApplication* application)
                 }
             }
 
-            NX_DEBUG(kLogTag, lit("Processing application message END: %1")
-                .arg(serializedMessage));
+            NX_DEBUG(NX_SCOPE_TAG, "Processing application message END: %1", serializedMessage);
         });
 
     return application->exec();
@@ -315,8 +312,8 @@ void initLog(const QString& logLevel)
     logSettings.loggers.front().logBaseName = *ini().logFile
         ? QString::fromUtf8(ini().logFile)
         : QnAppInfo::isAndroid()
-            ? lit("-")
-            : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("mobile_client"));
+            ? "-"
+            : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + "mobile_client");
 
     if (ini().enableLog)
     {
@@ -336,7 +333,7 @@ void initLog(const QString& logLevel)
         nx::utils::log::setMainLogger(
             nx::utils::log::buildLogger(
                 logSettings,
-                /*applicationName*/ lit("mobile_client"),
+                /*applicationName*/ "mobile_client",
                 QString(),
                 std::set<nx::utils::log::Filter>(),
                 std::move(logWriter)));
@@ -351,7 +348,7 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
 
     if (startupParameters.url.isValid())
-        NX_DEBUG(kLogTag, lit("--url: %1").arg(startupParameters.url.toString()));
+        NX_DEBUG(NX_SCOPE_TAG, "--url: %1", startupParameters.url);
 
     if (startupParameters.autoLoginMode != AutoLoginMode::Undefined)
         qnSettings->setAutoLoginMode(static_cast<int>(startupParameters.autoLoginMode));
@@ -387,13 +384,11 @@ int main(int argc, char *argv[])
         {
             const auto serializedMessage = message.toString();
 
-            NX_DEBUG(kLogTag, lit("BEGIN Sending application message: %1")
-                .arg(serializedMessage));
+            NX_DEBUG(NX_SCOPE_TAG, "BEGIN Sending application message: %1", serializedMessage);
 
             application.sendMessage(serializedMessage);
 
-            NX_DEBUG(kLogTag, lit("END Sending application message: %1")
-                .arg(serializedMessage));
+            NX_DEBUG(NX_SCOPE_TAG, "END Sending application message: %1", serializedMessage);
         };
 
     if (application.isRunning())
@@ -414,12 +409,10 @@ int main(int argc, char *argv[])
 
     QnStaticCommonModule staticModule(nx::vms::api::PeerType::mobileClient, QnAppInfo::brand(),
         QnAppInfo::customizationName());
-    Q_UNUSED(staticModule);
 
     QnMobileClientModule mobile_client(startupParams);
     mobile_client.initDesktopCamera();
     mobile_client.startLocalSearches();
-    Q_UNUSED(mobile_client);
 
     qnSettings->setStartupParameters(startupParams);
     processStartupParams(startupParams);

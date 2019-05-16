@@ -45,8 +45,10 @@ function(_generate_pch_parameters target parameters_file)
     set(definitions
         "$<$<BOOL:${definitions}>:-D$<JOIN:${definitions},\n-D>\n>")
 
-    file(GENERATE OUTPUT "${parameters_file}" CONTENT
-        "${flags}${include_directories}${framework_directories}${definitions}\n")
+    file(GENERATE
+        OUTPUT "${parameters_file}"
+        CONTENT "${flags}${include_directories}${framework_directories}${definitions}\n"
+    )
 endfunction()
 
 function(_get_cxx_standard target STANDARD_VAR)
@@ -125,39 +127,16 @@ function(_add_gcc_clang_precompiled_header target input)
         ${depfile_args}
         COMMENT "Precompiling ${pch_dir}")
 
+    set(pch_flags -Winvalid-pch)
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        set(pch_flags "-Xclang -include-pch -Xclang \"${pch_file}\" -Winvalid-pch")
+        list(APPEND pch_flags -Xclang -include-pch -Xclang ${pch_file})
     else()
-        set(pch_flags "-include \"${CMAKE_CURRENT_BINARY_DIR}/${target}\" -Winvalid-pch")
+        list(APPEND pch_flags -include ${CMAKE_CURRENT_BINARY_DIR}/${target})
     endif()
 
-    # This is not necessary, but it helps Clang based static analyzers (like on in Qt Creator)
-    # parse sources correctly.
-    string(APPEND pch_flags " -include ${input}")
-
-    get_target_property(sources ${target} SOURCES)
-    foreach(source ${sources})
-        if(NOT source MATCHES "\\.\(cpp|cxx|cc\)$")
-            continue()
-        endif()
-
-        get_source_file_property(flags "${source}" COMPILE_FLAGS)
-        if(NOT flags)
-            set(flags)
-        endif()
-        string(APPEND flags " ${pch_flags}")
-
-        get_source_file_property(depends "${source}" OBJECT_DEPENDS)
-        if(NOT depends)
-            set(depends)
-        endif()
-        list(APPEND depends "${input}" "${pch_file}")
-
-        set_source_files_properties("${source}"
-            PROPERTIES
-                COMPILE_FLAGS "${flags}"
-                OBJECT_DEPENDS "${depends}")
-    endforeach()
+    nx_get_target_cpp_sources(${target} sources)
+    set_property(SOURCE ${sources} APPEND PROPERTY OBJECT_DEPENDS ${input} ${pch_file})
+    set_property(SOURCE ${sources} APPEND PROPERTY COMPILE_OPTIONS ${pch_flags})
 endfunction()
 
 function(add_precompiled_header target input)

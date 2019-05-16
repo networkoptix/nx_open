@@ -3,6 +3,7 @@
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QDate>
+#include <QtCore/QLocale>
 
 class QnCalendarModelPrivate;
 class QnCameraChunkProvider;

@@ -5,6 +5,7 @@
 #include <list>
 #include <cstdint>
 
+#include <nx/utils/uuid.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QString>
 #include <QtCore/QQueue>

@@ -146,6 +146,11 @@ void OutgoingTunnelConnection::setControlConnectionClosedHandler(
     m_controlConnectionClosedHandler = std::move(handler);
 }
 
+ConnectType OutgoingTunnelConnection::connectType() const
+{
+    return ConnectType::udpHp;
+}
+
 std::string OutgoingTunnelConnection::toString() const
 {
     return lm("UDP hole punching from %1 to %2")

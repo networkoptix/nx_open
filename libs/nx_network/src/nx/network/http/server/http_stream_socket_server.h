@@ -32,6 +32,8 @@ public:
     {
     }
 
+    virtual ~HttpStreamSocketServer() override;
+
     void setPersistentConnectionEnabled(bool value);
 
 protected:

@@ -1,6 +1,9 @@
 #include "modbus.h"
+
 #include <QtCore/QIODevice>
 #include <QtCore/QDataStream>
+
+#include <nx/utils/log/assert.h>
 
 namespace nx
 {

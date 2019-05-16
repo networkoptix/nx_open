@@ -20,6 +20,7 @@
 
 #include <nx/utils/software_version.h>
 
+namespace applauncher {
 
 class ApplauncherProcess:
     public QObject,
@@ -106,3 +107,5 @@ private:
     std::condition_variable m_cond;
     std::map<qint64, KillProcessTask> m_killProcessTasks;
 };
+
+} // namespace applauncher

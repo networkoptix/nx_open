@@ -42,6 +42,7 @@
 #include <core/resource/avi/filetypesupport.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/help/help_topic_accessor.h>

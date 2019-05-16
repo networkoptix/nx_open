@@ -90,7 +90,7 @@ void SessionsMigrationHelper::Private::checkEndpoints()
 {
     for (auto it = m_migratedSessions.begin(); it != m_migratedSessions.end(); ++it)
     {
-        NX_VERBOSE(this, lm("Checkig url %1").arg(it.value()));
+        NX_VERBOSE(this, "Checkig url %1", it.value());
         m_moduleDiscoveryManager->checkEndpoint(it.value());
     }
 }

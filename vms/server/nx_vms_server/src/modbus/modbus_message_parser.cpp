@@ -1,5 +1,7 @@
 #include "modbus_message_parser.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace nx
 {
 namespace modbus

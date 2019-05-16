@@ -344,6 +344,8 @@ void CrossNatConnector::holePunchingDone(
     // After message has been sent - reporting result to client.
     m_connectResultReport.connectSessionId = m_connectSessionId.c_str();
     m_connectResultReport.resultCode = resultCode;
+    if (m_connection)
+        m_connectResultReport.connectType = m_connection->connectType();
 
     m_connectResultReportSender = std::make_unique<stun::UnreliableMessagePipeline>(this);
     m_connectResultReportSender->bindToAioThread(getAioThread());

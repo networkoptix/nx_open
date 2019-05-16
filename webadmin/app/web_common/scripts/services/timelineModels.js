@@ -913,6 +913,7 @@
         this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
     };
     window.ShortCache.prototype.init = function (start, isPlaying) {
+        this.isReady = false; // use a flag to indicate initialization end
         this.liveMode = false;
         if (!start) {
             this.liveMode = true;
@@ -939,6 +940,7 @@
         }
     };
     window.ShortCache.prototype.update = function (requestPosition, position) {
+        this.isReady = false;
         //Request from current moment to 1.5 minutes to future
         
         // Save them to this.currentDetailization
@@ -977,6 +979,7 @@
         this.currentRequest.then(function (data) {
             
             if (makeRequest !== self.currentRequest) {
+                self.isReady = undefined;
                 console.error('Unexpected response in ShortCache', data);
                 return;
             }
@@ -1009,8 +1012,10 @@
             }
             
             self.setPlayingPosition(self.played);
+            self.isReady = true;
         }, function (error) {
             if (!makeRequest.abortReason) { // If the request was aborted - no handling is needed
+                self.isReady = false;
                 console.error('Was not able to get records from server', error);
             }
         });
@@ -1140,7 +1145,7 @@
         });
     };
     window.ShortCache.prototype.isArchiveEmpty = function () {
-        return this.currentDetailization < 1;
+        return this.currentDetailization.length < 1;
     };
     
     window.ScaleManager = function (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs,

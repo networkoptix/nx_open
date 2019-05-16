@@ -44,6 +44,11 @@ int QnAspectRatio::height() const
     return m_height;
 }
 
+QnAspectRatio QnAspectRatio::inverted() const
+{
+    return QnAspectRatio(m_height, m_width);
+}
+
 float QnAspectRatio::toFloat() const
 {
     NX_ASSERT(isValid());
@@ -87,9 +92,7 @@ QnAspectRatio QnAspectRatio::closestStandardRatio(float aspectRatio)
 
 bool QnAspectRatio::isRotated90(qreal angle)
 {
-    while (angle > 180)
-        angle -= 180;
-    return qAbs(90 - qAbs(angle)) < 45;
+    return qAbs(90 - qAbs((int)angle % 180)) < 45;
 }
 
 bool QnAspectRatio::operator ==(const QnAspectRatio& other) const

@@ -547,7 +547,7 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
     if (!hasVideo())
         return;
 
-    m_areaSelectOverlayWidget = new AreaSelectOverlayWidget(m_compositeOverlay);
+    m_areaSelectOverlayWidget = new AreaSelectOverlayWidget(m_compositeOverlay, this);
     addOverlayWidget(m_areaSelectOverlayWidget, detail::OverlayParams(Visible, true, true));
 
     connect(m_areaSelectOverlayWidget, &AreaSelectOverlayWidget::selectedAreaChanged,
@@ -2743,6 +2743,10 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
     // We should be able to disable analytics if it is not supported anymore.
     if (analyticsEnabled && !isAnalyticsSupported())
         return;
+
+    NX_VERBOSE(this, "Setting analytics frames %1 for %2",
+        analyticsEnabled ? "enabled" : "disabled",
+        this);
 
     if (auto reader = display()->archiveReader())
     {

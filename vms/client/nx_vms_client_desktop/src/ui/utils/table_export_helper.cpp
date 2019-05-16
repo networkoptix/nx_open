@@ -11,6 +11,7 @@
 #include <client/client_settings.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
+#include <ui/dialogs/common/message_box.h>
 
 #include <utils/common/html.h>
 

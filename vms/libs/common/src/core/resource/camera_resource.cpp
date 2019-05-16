@@ -300,6 +300,8 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
     if (size.isEmpty())
         return QnAspectRatio();
 
+    // Following logic only applies to Entropix cameras that have video from two sensors
+    // in one video stream.
     const auto& sensor = combinedSensorsDescription().mainSensor();
     if (!sensor.isValid())
         return QnAspectRatio(size);
@@ -311,6 +313,13 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
         static_cast<int>(size.height() * sensorSize.height()));
 
     return QnAspectRatio(realSensorSize);
+}
+
+QnAspectRatio QnVirtualCameraResource::aspectRatioRotated() const
+{
+    return QnAspectRatio::isRotated90(defaultRotation())
+        ? aspectRatio().inverted()
+        : aspectRatio();
 }
 
 static bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const CameraMediaStreamInfo& oldParams)

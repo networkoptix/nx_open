@@ -210,6 +210,7 @@ private:
     void processRemoteInstalling();
 
     bool isChecking() const;
+    bool hasLatestVersion() const;
 
     bool processUploaderChanges(bool force = false);
 

@@ -67,7 +67,8 @@ const int kVersionLabelFontWeight = QFont::DemiBold;
 
 // Height limit for servers list in dialog box with update report
 static constexpr int kSectionHeight = 150;
-static constexpr int kSectionMinHeight = 30;
+static constexpr int kSectionWidth = 330;
+static constexpr int kSectionMinHeight = 40;
 
 constexpr auto kLatestVersionBannerLabelFontSizePixels = 22;
 constexpr auto kLatestVersionBannerLabelFontWeight = QFont::Light;
@@ -89,18 +90,18 @@ constexpr int kVersionInformationBlockMinHeight = 48;
 constexpr int kPreloaderHeight = 32;
 
 // Adds resource list to message box
-void injectResourceList(QnMessageBox& messageBox, const QnResourceList& resources)
+QTableView* injectResourceList(
+    QnMessageBox& messageBox, const QnResourceList& resources)
 {
     if (resources.empty())
-        return;
+        return nullptr;
 
-    auto resourceList = new QTableView();
+    auto resourceList = new nx::vms::client::desktop::TableView();
     resourceList->setShowGrid(false);
 
     auto resourceListModel = new QnResourceListModel(resourceList);
     resourceListModel->setHasStatus(false);
     resourceListModel->setResources(resources);
-
     resourceList->setModel(resourceListModel);
 
     auto horisontalHeader = resourceList->horizontalHeader();
@@ -111,9 +112,14 @@ void injectResourceList(QnMessageBox& messageBox, const QnResourceList& resource
     verticalHeader->hide();
     resourceList->setMinimumHeight(kSectionMinHeight);
     resourceList->setMaximumHeight(kSectionHeight);
+    resourceList->setMaximumWidth(kSectionWidth);
+    resourceList->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContentsOnFirstShow);
+    resourceList->resizeRowsToContents();
+
     // Adding this to QnMessageBox::Layout::Main looks ugly.
-    // Adding to Layout::Content (default value) looks much better.
-    messageBox.addCustomWidget(resourceList);
+    // Adding to Layout::BeforeAdditionalInfo (default value) looks much better.
+    messageBox.addCustomWidget(resourceList, QnMessageBox::Layout::BeforeAdditionalInfo);
+    return resourceList;
 }
 
 } // anonymous namespace
@@ -738,7 +744,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
 
     if (stateHasProgress(m_widgetState))
         syncProgress();
-    if (m_serverUpdateTool->hasRemoteChanges() || m_updateLocalStateChanged)
+    if (m_updateRemoteStateChanged || m_updateLocalStateChanged)
         loadDataToUi();
 
     syncDebugInfoToUi();
@@ -1354,6 +1360,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         ServerUpdateTool::RemoteStatus remoteStatus;
         m_serverUpdateTool->getServersStatusChanges(remoteStatus);
         m_stateTracker->setUpdateStatus(remoteStatus);
+        m_stateTracker->processUnknownStates();
 
         /*
          * TODO: We should deal with starting client update.
@@ -1484,17 +1491,16 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
         // 3. All other cases. Some servers have failed
         messageBox->setIcon(QnMessageBoxIcon::Critical);
-        messageBox->setText(tr("Failed to download update packages to some components"));
+        messageBox->setText(tr("Failed to download update packages to some servers"));
+
+        QString text = htmlParagraph(m_stateTracker->getErrorMessage());
+        text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
+        messageBox->setInformativeText(text);
 
         // TODO: Client can be here as well, but it would not be displayed.
         // Should we display it somehow?
         auto resourcesFailed = resourcePool()->getResourcesByIds(peersFailed.toList());
         injectResourceList(*messageBox, resourcesFailed);
-
-        QString text;
-        text += htmlParagraph(tr("Please make sure they have enough free storage space and stable network connection."));
-        text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
-        messageBox->setInformativeText(text);
 
         auto tryAgain = messageBox->addButton(tr("Try again"),
             QDialogButtonBox::AcceptRole);
@@ -1580,10 +1586,9 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
             QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
             // 1. Everything is complete
             messageBox->setIcon(QnMessageBoxIcon::Critical);
-            messageBox->setText(tr("Failed to install updates to servers:"));
+            messageBox->setText(tr("There was an error while installing updates:"));
             injectResourceList(*messageBox, resourcePool()->getResourcesByIds(peersFailed));
-            QString text;
-            text += htmlParagraph(tr("Please make sure there is enough free storage space and network connection is stable."));
+            QString text =  htmlParagraph(m_stateTracker->getErrorMessage());
             text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
             messageBox->setInformativeText(text);
             auto installNow = messageBox->addButton(tr("OK"),
@@ -1646,7 +1651,12 @@ bool MultiServerUpdatesWidget::processRemoteChanges()
     // TODO: It could be moved to UpdateTool
     ServerUpdateTool::RemoteStatus remoteStatus;
     if (m_serverUpdateTool->getServersStatusChanges(remoteStatus))
-        m_stateTracker->setUpdateStatus(remoteStatus);
+    {
+        if (m_stateTracker->setUpdateStatus(remoteStatus) > 0)
+            m_updateRemoteStateChanged = true;
+    }
+
+    m_stateTracker->processUnknownStates();
 
     m_clientUpdateTool->checkInternalState();
 
@@ -1670,7 +1680,7 @@ bool MultiServerUpdatesWidget::processRemoteChanges()
         auto idle = m_stateTracker->peersInState(StatusCode::idle);
         auto all = m_stateTracker->allPeers();
         auto downloading = m_stateTracker->peersInState(StatusCode::downloading);
-
+        downloading.subtract(m_stateTracker->offlineServers());
         if (!downloading.empty())
         {
             // We should go to downloading stage if we have merged
@@ -1746,17 +1756,14 @@ void MultiServerUpdatesWidget::setTargetState(
             case WidgetUpdateState::installingStalled:
                 break;
             case WidgetUpdateState::installing:
-                if (runCommands)
+                m_stateTracker->setPeersInstalling(targets, true);
+                if (runCommands && !targets.empty())
                 {
-                    if (!targets.empty())
-                    {
-                        m_stateTracker->setPeersInstalling(targets, true);
-                        QSet<QnUuid> servers = targets;
-                        servers.remove(m_stateTracker->getClientPeerId());
-                        if (!servers.empty())
-                            qnClientMessageProcessor->setHoldConnection(true);
-                        m_serverUpdateTool->requestInstallAction(servers);
-                    }
+                    QSet<QnUuid> servers = targets;
+                    servers.remove(m_stateTracker->getClientPeerId());
+                    if (!servers.empty())
+                        qnClientMessageProcessor->setHoldConnection(true);
+                    m_serverUpdateTool->requestInstallAction(servers);
                 }
 
                 m_installCheckTimer = std::make_unique<QTimer>(this);
@@ -1833,9 +1840,8 @@ bool MultiServerUpdatesWidget::isChecking() const
         || m_widgetState == WidgetUpdateState::initial;
 }
 
-void MultiServerUpdatesWidget::syncUpdateCheckToUi()
+bool MultiServerUpdatesWidget::hasLatestVersion() const
 {
-    const bool isChecking = this->isChecking();
     const bool hasEqualUpdateInfo = m_stateTracker->lowestInstalledVersion() >= m_updateInfo.getVersion();
     bool hasLatestVersion = false;
     if (m_updateInfo.isEmpty() || m_updateInfo.error == nx::update::InformationError::noNewVersion)
@@ -1853,9 +1859,20 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         && m_widgetState != WidgetUpdateState::initial
         && hasLatestVersion)
     {
-        NX_DEBUG(this) << "syncUpdateCheck() dropping hasLatestVersion flag";
         hasLatestVersion = false;
     }
+
+    if (isChecking())
+        hasLatestVersion = false;
+
+    return hasLatestVersion;
+}
+
+void MultiServerUpdatesWidget::syncUpdateCheckToUi()
+{
+    const bool isChecking = this->isChecking();
+
+    bool latestVersion = hasLatestVersion();
 
     ui->cancelProgressAction->setEnabled(m_widgetState != WidgetUpdateState::installing);
 
@@ -1869,38 +1886,42 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
     if (isChecking)
     {
         ui->versionStackedWidget->setCurrentWidget(ui->checkingPage);
-        ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
         ui->updateCheckMode->setVisible(false);
         ui->releaseDescriptionLabel->setText(QString());
         ui->errorLabel->setText(QString());
-        hasLatestVersion = false;
+        //hasLatestVersion = false;
     }
     else
     {
         ui->downloadButton->setVisible(m_haveValidUpdate);
-        if (hasLatestVersion)
+        if (latestVersion)
         {
             if (m_updateInfo.sourceType == UpdateSourceType::internet)
                 ui->latestVersionBannerLabel->setText(tr("The latest version is already installed"));
             else
                 ui->latestVersionBannerLabel->setText(tr("This version is already installed"));
-
             ui->versionStackedWidget->setCurrentWidget(ui->latestVersionPage);
-            ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
         }
         else
         {
             if (m_haveValidUpdate)
             {
-                if (m_updateSourceMode == UpdateSourceType::file)
+                if (m_widgetState == WidgetUpdateState::readyInstall)
                 {
-                    ui->downloadButton->setText(tr("Upload"));
-                    ui->downloadAndInstall->setText(tr("Upload && Install"));
+                    ui->downloadButton->setText(tr("Install update"));
                 }
-                else // LatestVersion or SpecificBuild)
+                else
                 {
-                    ui->downloadButton->setText(tr("Download"));
-                    ui->downloadAndInstall->setText(tr("Download && Install"));
+                    if (m_updateSourceMode == UpdateSourceType::file)
+                    {
+                        ui->downloadButton->setText(tr("Upload"));
+                        ui->downloadAndInstall->setText(tr("Upload && Install"));
+                    }
+                    else // LatestVersion or SpecificBuild)
+                    {
+                        ui->downloadButton->setText(tr("Download"));
+                        ui->downloadAndInstall->setText(tr("Download && Install"));
+                    }
                 }
 
                 ui->releaseDescriptionLabel->setText(m_updateInfo.info.description);
@@ -1908,7 +1929,6 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
             }
 
             ui->versionStackedWidget->setCurrentWidget(ui->versionPage);
-            ui->updateStackedWidget->setCurrentWidget(ui->updateControlsPage);
         }
 
         bool browseUpdateVisible = false;
@@ -1921,7 +1941,7 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
                     browseUpdateVisible = true;
                     ui->browseUpdate->setText(tr("Browse for Another File..."));
                 }
-                else if (m_updateSourceMode == UpdateSourceType::internetSpecific && hasLatestVersion)
+                else if (m_updateSourceMode == UpdateSourceType::internetSpecific && latestVersion)
                 {
                     browseUpdateVisible = true;
                     ui->browseUpdate->setText(tr("Select Another Build"));
@@ -1944,14 +1964,14 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
             }
         }
         ui->browseUpdate->setVisible(browseUpdateVisible);
-        ui->latestVersionIconLabel->setVisible(hasLatestVersion);
+        ui->latestVersionIconLabel->setVisible(latestVersion);
         ui->updateCheckMode->setVisible(m_updateSourceMode == UpdateSourceType::internet);
         m_updatesModel->setUpdateTarget(m_updateInfo.getVersion());
     }
 
     ui->selectUpdateTypeButton->setText(toString(m_updateSourceMode));
 
-    const bool showButton = !isChecking && !hasLatestVersion
+    const bool showButton = !isChecking && !latestVersion
         && m_updateSourceMode != UpdateSourceType::file
         && (m_widgetState == WidgetUpdateState::ready
             || m_widgetState != WidgetUpdateState::initial)
@@ -2011,8 +2031,6 @@ void MultiServerUpdatesWidget::syncProgress()
     if (!caption.isEmpty())
         ui->actionProgess->setFormat(caption + "\t");
 
-    ui->updateStackedWidget->setCurrentWidget(ui->updateProgressPage);
-
     if (!m_rightPanelDownloadProgress.isNull())
     {
         auto manager = context()->instance<WorkbenchProgressManager>();
@@ -2050,7 +2068,6 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
             break;
         case WidgetUpdateState::readyInstall:
             updateTitle = tr("Ready to update to");
-            ui->downloadButton->setText(tr("Install update"));
             break;
         case WidgetUpdateState::installing:
             updateTitle = tr("Updating to ...");
@@ -2059,7 +2076,6 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
             break;
         case WidgetUpdateState::complete:
             updateTitle = tr("System updated to");
-            ui->downloadButton->setText(tr("Install update"));
             break;
         default:
             break;
@@ -2088,15 +2104,30 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
         ui->titleStackedWidget->setCurrentWidget(selectedTitle);
     }
 
-    // Should we show progress for this UI state.
     if (isChecking())
         ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
     else if (stateHasProgress(m_widgetState))
-        syncProgress();
+        ui->updateStackedWidget->setCurrentWidget(ui->updateProgressPage);
     else if (m_widgetState == WidgetUpdateState::complete)
         ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
     else
         ui->updateStackedWidget->setCurrentWidget(ui->updateControlsPage);
+
+    if (stateHasProgress(m_widgetState))
+        syncProgress();
+
+    auto notVeryOffline = m_stateTracker->offlineNotTooLong();
+    if (m_widgetState == WidgetUpdateState::readyInstall && !notVeryOffline.empty())
+    {
+        ui->downloadButton->setEnabled(false);
+        ui->downloadButton->setToolTip(tr("Some servers have gone offline. "
+            "Please wait until they become online to continue."));
+    }
+    else
+    {
+        ui->downloadButton->setEnabled(true);
+        ui->downloadButton->setToolTip("");
+    }
 
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn, !m_showStorageSettings);
     QString icon = m_showStorageSettings
@@ -2180,9 +2211,6 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
         };
 
         debugState << QString("lowestVersion=%1").arg(m_stateTracker->lowestInstalledVersion().toString());
-        debugState << QString("size(peers)=%1").arg(m_stateTracker->peersCount());
-        debugState << QString("size(model)=%1").arg(m_updatesModel->rowCount());
-        debugState << QString("size(sorted)=%1").arg(m_sortedModel->rowCount());
 
         QStringList serversReport;
         for (auto server: m_serverUpdateTool->getServersInstalling())

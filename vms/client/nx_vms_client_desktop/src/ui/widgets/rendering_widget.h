@@ -11,6 +11,7 @@ typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 /**
  * Widget for displaying video from the given resource without constructing
  * the heavy graphics scene machinery.
+ * Currently used in login dialog only and should die some day.
  */
 class QnRenderingWidget: public QOpenGLWidget
 {

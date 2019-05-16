@@ -43,7 +43,7 @@ public:
 
 class NameHelper
 {
-    QSet<QString> camerasNames;
+    std::set<QString> m_camerasNames;
 
     NameHelper();
     NameHelper(const NameHelper&) = default;

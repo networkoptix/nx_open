@@ -243,7 +243,7 @@ void logOpenedHandleCount()
 
     GetProcessHandleCount(GetCurrentProcess(), &handlesCount);
     handlesCount *= 4;
-    for (DWORD handle = 0x4; handle < handlesCount; handle += 4)
+    for (std::ptrdiff_t handle = 0x4; handle < handlesCount; handle += 4)
     {
         switch (GetFileType((HANDLE)handle))
         {

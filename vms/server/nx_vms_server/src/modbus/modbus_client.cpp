@@ -1,6 +1,8 @@
 #include "modbus_client.h"
 #include "modbus.h"
 
+#include <QtCore/QDataStream>
+
 #include <nx/utils/scope_guard.h>
 
 namespace

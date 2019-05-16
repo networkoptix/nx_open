@@ -2,6 +2,7 @@
 
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/test_support/utils.h>
+#include <utils/common/id.h>
 
 #include "email_manager_mocked.h"
 #include "test_email_manager.h"

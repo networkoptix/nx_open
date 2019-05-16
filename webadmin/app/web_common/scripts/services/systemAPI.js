@@ -195,6 +195,8 @@ angular.module('nxCommon')
                                     self.currentUser.permissions = role.data[0].permissions;
                                     return self.currentUser;
                                 });
+                        } else {
+                            return self.currentUser;
                         }
                     })
                     .finally(function() {

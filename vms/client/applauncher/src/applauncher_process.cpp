@@ -2,6 +2,8 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QProcess>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QCoreApplication>
 
 #include <nx/utils/log/log.h>
 #include <utils/common/process.h>
@@ -24,9 +26,19 @@ const nx::utils::SoftwareVersion kRpathIncludedVersion(3, 0);
     to windows. */
 const nx::utils::SoftwareVersion kWindowClassFixedVersion(3, 0);
 
+/**
+ * Since 4.0 client uses GStreamer 1.0 and is compatible to Ubuntu 18.04. Previous clients require
+ * GStreamer 0.10 which is not available in Ubuntu 18.04. Previous Ubuntu versions had GStreamer
+ * 0.10 in repos but it didn't have to be installed. For such systems we have to provide GStreamer
+ * libraries manually. Applauncher stores them in a separate directory and brings them to client
+ * instances via LD_LIBRARY_PATH.
+ */
+const nx::utils::SoftwareVersion kNewGstreamerUsedVersion(4, 0);
+
 } // namespace
 
-using namespace applauncher;
+namespace applauncher {
+
 using namespace api;
 
 ApplauncherProcess::ApplauncherProcess(
@@ -180,7 +192,7 @@ bool ApplauncherProcess::startApplication(
     const std::shared_ptr<StartApplicationTask>& task,
     Response* const response)
 {
-    NX_VERBOSE(this, lm("Entered LaunchingApplication"));
+    NX_VERBOSE(this, "Entered LaunchingApplication");
 
     auto installation = m_installationManager->installationForVersion(task->version);
 
@@ -198,8 +210,7 @@ bool ApplauncherProcess::startApplication(
 
     if (installation.isNull())
     {
-        NX_DEBUG(this, lm("Failed to find installed version %1")
-            .arg(task->version.toString()));
+        NX_DEBUG(this, "Failed to find installed version %1", task->version);
         response->result = ResultType::versionNotInstalled;
         return false;
     }
@@ -211,38 +222,27 @@ bool ApplauncherProcess::startApplication(
     const QString binPath = installation->executableFilePath();
     QStringList environment = QProcess::systemEnvironment();
 
-
     auto arguments = task->appArgs;
 
     if (QnAppInfo::applicationPlatform() == "linux")
     {
+        const QString kLdLibraryPathVariable = "LD_LIBRARY_PATH";
+        QStringList ldLibraryPaths;
+
         if (installation->version() < kRpathIncludedVersion)
         {
-            QString ldLibraryPath = installation->libraryPath();
-            if (!ldLibraryPath.isEmpty() && QFile::exists(ldLibraryPath))
-            {
-                const QString kLdLibraryPathVariable = "LD_LIBRARY_PATH";
+            const QString clientLibPath = installation->libraryPath();
 
-                QRegExp varRegExp(QString("%1=(.+)").arg(kLdLibraryPathVariable));
+            if (!clientLibPath.isEmpty() && QFile::exists(clientLibPath))
+                ldLibraryPaths.append(clientLibPath);
+        }
 
-                auto it = environment.begin();
-                for (; it != environment.end(); ++it)
-                {
-                    if (varRegExp.exactMatch(*it))
-                    {
-                        *it = QString("%1=%2:%3").arg(
-                            kLdLibraryPathVariable,
-                            ldLibraryPath,
-                            varRegExp.cap(1));
-                        break;
-                    }
-                }
-                if (it == environment.end())
-                {
-                    environment.append(
-                        QString("%1=%2").arg(kLdLibraryPathVariable, ldLibraryPath));
-                }
-            }
+        if (installation->version() < kNewGstreamerUsedVersion)
+        {
+            const QString gstreamerLibsLibsPath =
+                QDir(qApp->applicationDirPath()).absoluteFilePath("../lib/gstreamer-0.10");
+
+            ldLibraryPaths.append(gstreamerLibsLibsPath);
         }
 
         if (installation->version() < kWindowClassFixedVersion)
@@ -250,10 +250,33 @@ bool ApplauncherProcess::startApplication(
             arguments.append("-name");
             arguments.append(QnAppInfo::productNameShort());
         }
+
+        if (!ldLibraryPaths.isEmpty())
+        {
+            const QString ldLibraryPath = ldLibraryPaths.join(':');
+
+            QRegularExpression varRegExp(QString("%1=(.+)").arg(kLdLibraryPathVariable));
+
+            auto it = environment.begin();
+            for (; it != environment.end(); ++it)
+            {
+                const QRegularExpressionMatch match = varRegExp.match(*it);
+                if (match.isValid())
+                {
+                    *it = QString("%1=%2:%3").arg(
+                        kLdLibraryPathVariable,
+                        ldLibraryPath,
+                        match.captured(1));
+                    break;
+                }
+            }
+
+            if (it == environment.end())
+                environment.append(QString("%1=%2").arg(kLdLibraryPathVariable, ldLibraryPath));
+        }
     }
 
-    NX_VERBOSE(this, lm("Launching version %1 (path %2)")
-        .args(task->version.toString(), binPath));
+    NX_VERBOSE(this, "Launching version %1 (path %2)", task->version, binPath);
 
     const QFileInfo info(binPath);
     if (ProcessUtils::startProcessDetached(
@@ -264,15 +287,13 @@ bool ApplauncherProcess::startApplication(
         info.absolutePath(),
         environment))
     {
-        NX_DEBUG(this, lm("Successfully launched version %1 (path %2)")
-            .args(task->version.toString(), binPath));
+        NX_DEBUG(this, "Successfully launched version %1 (path %2)", task->version, binPath);
         m_settings->sync();
         response->result = ResultType::ok;
         return true;
     }
 
-    NX_DEBUG(this, lm("Failed to launch version %1 (path %2)")
-        .args(task->version.toString(), binPath));
+    NX_DEBUG(this, "Failed to launch version %1 (path %2)", task->version, binPath);
     response->result = ResultType::ioError;
     return false;
 }
@@ -343,3 +364,5 @@ void ApplauncherProcess::onTimer(const quint64& timerID)
     const auto code = nx::killProcessByPid(task.processID);
     static_cast<void>(code);
 }
+
+} // namespace applauncher

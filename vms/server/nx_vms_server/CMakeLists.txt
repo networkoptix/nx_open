@@ -101,6 +101,11 @@ nx_add_target(nx_vms_server LIBRARY
         nx_speech_synthesizer
 )
 
+nx_force_include(nx_vms_server
+    ${CMAKE_SOURCE_DIR}/libs/nx_utils/src/nx/utils/literal.h
+    ${CMAKE_SOURCE_DIR}/libs/nx_utils/src/nx/utils/log/log_message.h
+)
+
 nx_add_vendor_macros(nx_vms_server)
 
 if(LINUX)

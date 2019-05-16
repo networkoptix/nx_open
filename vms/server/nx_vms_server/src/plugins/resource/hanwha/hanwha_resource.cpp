@@ -39,6 +39,7 @@
 
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <nx/vms/server/resource/multicast_parameters.h>
 
 namespace nx {
 namespace vms::server {
@@ -335,9 +336,6 @@ static const QString kFramePriorityProperty = lit("PriorityType");
 
 static const QString kHanwhaVideoSourceStateOn = lit("On");
 static const int kHanwhaInvalidInputValue = 604;
-static constexpr int kHanwhaDefaultMulticastPort = 5000;
-static const QString kHanwhaDefaultMulticastAddress = "239.0.0.1";
-static const QString kHanwhaDefaultSecondaryMulticastAddress = "239.0.0.2";
 
 
 // Taken from Hanwha metadata plugin manifest.json.
@@ -466,26 +464,27 @@ HanwhaResource::~HanwhaResource()
 }
 
 CameraDiagnostics::Result HanwhaResource::enableMulticast(
-    const HanwhaVideoProfile& profile, Qn::ConnectionRole role)
+    int profileNumber,
+    const nx::vms::server::resource::MulticastParameters& multicastParameters)
 {
-    int port = profile.rtpMulticastPort;
-    QString address = profile.rtpMulticastAddress;
-    if (address.isEmpty())
-    {
-        address = role == Qn::ConnectionRole::CR_LiveVideo ? kHanwhaDefaultMulticastAddress :
-            kHanwhaDefaultSecondaryMulticastAddress;
-    }
-    if (port <= 0)
-        port = kHanwhaDefaultMulticastPort;
+    if (!NX_ASSERT(multicastParameters.address))
+        return CameraDiagnostics::InternalServerErrorResult("Invalid multicast address");
+
+    if (!NX_ASSERT(multicastParameters.port))
+        return CameraDiagnostics::InternalServerErrorResult("Invalid multicast port");
+
+    if (!NX_ASSERT(multicastParameters.ttl))
+        return CameraDiagnostics::InternalServerErrorResult("Invalid multicast TTL");
 
     HanwhaRequestHelper helper(sharedContext());
     const auto response = helper.update(
         lit("media/videoprofile"),
         {
-            {kHanwhaProfileNumberProperty, QString::number(profile.number)},
+            {kHanwhaProfileNumberProperty, QString::number(profileNumber)},
             {kHanwhaRtpMulticastEnable, kHanwhaTrue},
-            {kHanwhaRtpMulticastAddress, address},
-            {kHanwhaRtpMulticastPort, QString::number(port)},
+            {kHanwhaRtpMulticastAddress, QString::fromStdString(*multicastParameters.address)},
+            {kHanwhaRtpMulticastPort, QString::number(*multicastParameters.port)},
+            {kHanwhaRtpMulticastTtl, QString::number(*multicastParameters.ttl)},
         });
 
     NX_DEBUG(this, "Enable multicast: [%1]", response.requestUrl());
@@ -506,12 +505,26 @@ CameraDiagnostics::Result HanwhaResource::ensureMulticastEnabled(Qn::ConnectionR
         role == Qn::ConnectionRole::CR_SecondaryLiveVideo ? &profile : nullptr,
         /*totalProfileNumber*/ nullptr,
         /*profilesToRemove*/ nullptr);
-    if (!result)
-        return result;
 
-    if (profile && !profile->rtpMulticastEnable)
+    const nx::vms::api::StreamIndex streamIndex = toStreamIndex(role);
+    if (!result || !profile)
     {
-        result = enableMulticast(profile.value(), role);
+        NX_DEBUG(this, "Unable to find profile for stream %1 while opening multicast stream",
+            streamIndex);
+        return result;
+    }
+
+    using nx::vms::server::resource::MulticastParameters;
+    MulticastParameters multicastParameters {
+        profile->rtpMulticastAddress.toStdString(),
+        profile->rtpMulticastPort,
+        profile->rtpMulticastTtl
+    };
+
+    const bool somethingIsFixed = fixMulticastParametersIfNeeded(&multicastParameters, streamIndex);
+    if (!profile->rtpMulticastEnable || somethingIsFixed)
+    {
+        result = enableMulticast(profile->number, multicastParameters);
         if (!result)
             return result;
     }

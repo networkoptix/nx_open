@@ -24,15 +24,19 @@ private:
 
     void updateAreaSelection();
     void updateTimelineDisplay();
+    void updateCachedDevices();
     void updateMediaResourceWidgetAnalyticsMode(QnMediaResourceWidget* widget);
     void updateAllMediaResourceWidgetsAnalyticsMode();
 
     void handleWidgetAnalyticsFilterRectChanged();
 
+    void setAreaSelectionActive(bool value);
+
 private:
     const QPointer<AnalyticsSearchWidget> m_analyticsSearchWidget;
     const QPointer<AnalyticsObjectsVisualizationManager> m_objectsVisualizationManager;
     QMetaObject::Connection m_activeMediaWidgetConnection;
+    bool m_areaSelectionActive = false;
 };
 
 } // namespace nx::vms::client::desktop

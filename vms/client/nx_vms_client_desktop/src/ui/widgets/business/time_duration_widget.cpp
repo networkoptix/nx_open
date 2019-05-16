@@ -1,6 +1,8 @@
 #include "time_duration_widget.h"
 #include "ui_time_duration_widget.h"
 
+#include <nx/utils/log/assert.h>
+
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx::vms::client::desktop {

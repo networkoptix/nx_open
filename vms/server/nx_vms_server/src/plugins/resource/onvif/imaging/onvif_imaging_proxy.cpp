@@ -137,7 +137,7 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
             [](ImagingSettingsResp* settings) -> int*
             {
                 if (auto expPtr = SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure))
-                    return reinterpret_cast<int*>(&expPtr->Priority);
+                    return reinterpret_cast<int*>(expPtr->Priority);
                 return nullptr;
             });
 
@@ -258,12 +258,14 @@ int QnOnvifImagingProxy::timeDrift() const
     return m_rangesSoapWrapper->timeDrift();
 }
 
-CameraDiagnostics::Result QnOnvifImagingProxy::loadRanges() {
+CameraDiagnostics::Result QnOnvifImagingProxy::loadRanges()
+{
     ImagingOptionsReq rangesRequest;
     rangesRequest.VideoSourceToken = m_videoSrcToken;
 
     int soapRes = m_rangesSoapWrapper->getOptions(rangesRequest, *m_ranges);
-    if (soapRes != SOAP_OK) {
+    if (soapRes != SOAP_OK)
+    {
         qWarning() << "QnOnvifImagingProxy::makeGetRequest: can't fetch imaging options."
             << "Reason: SOAP to endpoint " << m_rangesSoapWrapper->endpoint() << " failed. GSoap error code: "
             << soapRes << ". " << m_rangesSoapWrapper->getLastErrorDescription();
@@ -272,7 +274,8 @@ CameraDiagnostics::Result QnOnvifImagingProxy::loadRanges() {
     return CameraDiagnostics::NoErrorResult();
 }
 
-CameraDiagnostics::Result QnOnvifImagingProxy::loadValues(QnCameraAdvancedParamValueMap &values) {
+CameraDiagnostics::Result QnOnvifImagingProxy::loadValues(QnCameraAdvancedParamValueMap &values)
+{
     ImagingSettingsReq valsRequest;
     valsRequest.VideoSourceToken = m_videoSrcToken;
 
@@ -283,8 +286,15 @@ CameraDiagnostics::Result QnOnvifImagingProxy::loadValues(QnCameraAdvancedParamV
             << soapRes << ". " << m_valsSoapWrapper->getLastErrorDescription();
         return CameraDiagnostics::RequestFailedResult(lit("getImagingSettings"), m_valsSoapWrapper->getLastErrorDescription());
     }
+    if ((m_values->ImagingSettings) && (m_values->ImagingSettings->Exposure)
+        && (m_values->ImagingSettings->Exposure->Priority == nullptr))
+    {
+        auto soap = m_valsSoapWrapper->soap();
+        m_values->ImagingSettings->Exposure->Priority = soap_new_onvifXsd__ExposurePriority(soap);
+    }
 
-    for (auto iter = m_supportedOperations.cbegin(); iter != m_supportedOperations.cend(); ++iter) {
+    for (auto iter = m_supportedOperations.cbegin(); iter != m_supportedOperations.cend(); ++iter)
+    {
         const QString id = iter.key();
         QString value;
         if (iter.value()->get(value))
@@ -294,11 +304,13 @@ CameraDiagnostics::Result QnOnvifImagingProxy::loadValues(QnCameraAdvancedParamV
     return CameraDiagnostics::NoErrorResult();
 }
 
-QSet<QString> QnOnvifImagingProxy::supportedParameters() const {
+QSet<QString> QnOnvifImagingProxy::supportedParameters() const
+{
     return m_supportedOperations.keys().toSet();
 }
 
-bool QnOnvifImagingProxy::setValue(const QString &id, const QString &value) {
+bool QnOnvifImagingProxy::setValue(const QString &id, const QString &value)
+{
     if (!m_supportedOperations.contains(id))
         return false;
     QnAbstractOnvifImagingOperationPtr operation = m_supportedOperations[id];

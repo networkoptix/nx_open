@@ -58,8 +58,9 @@ static const char* IGNORE_VENDORS[][2] =
     {"Digital Watchdog", "XPM-FL72-48MP"}, //For some reasons we want to use ISD resource instead Onvif Digital Watchdog one.
     {"Network Optix", "*"}, // Nx Cameras
     #if defined(ENABLE_HANWHA)
-        {"Hanwha Techwin*", "*" },
-        {"Samsung Techwin*", "*" },
+        {"Hanwha*", "*" },
+        {"Samsung*", "*" },
+        {"*", "XNB-6000" },
     #endif
 };
 

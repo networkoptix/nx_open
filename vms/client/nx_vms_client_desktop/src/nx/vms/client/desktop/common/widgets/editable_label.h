@@ -1,8 +1,10 @@
 #pragma once
 
-#include <QtCore/QScopedPointer>
-#include <QtWidgets/QWidget>
 #include <functional>
+
+#include <QtCore/QScopedPointer>
+#include <QtGui/QIcon>
+#include <QtWidgets/QWidget>
 
 namespace nx::vms::client::desktop {
 

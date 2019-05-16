@@ -109,15 +109,15 @@ int CInfoBlock::getKey()
     return m_piIP[0] + m_piIP[1] + m_piIP[2] + m_piIP[3];
 }
 
-void CInfoBlock::convert(const sockaddr* addr, int ver, uint32_t ip[])
+void CInfoBlock::convert(const detail::SocketAddress& addr, uint32_t ip[])
 {
-    if (ver == AF_INET)
+    if (addr.family() == AF_INET)
     {
-        ip[0] = ((sockaddr_in*)addr)->sin_addr.s_addr;
+        ip[0] = addr.v4().sin_addr.s_addr;
         ip[1] = ip[2] = ip[3] = 0;
     }
     else
     {
-        memcpy((char*)ip, (char*)((sockaddr_in6*)addr)->sin6_addr.s6_addr, 16);
+        memcpy((char*)ip, (char*)addr.v6().sin6_addr.s6_addr, 16);
     }
 }

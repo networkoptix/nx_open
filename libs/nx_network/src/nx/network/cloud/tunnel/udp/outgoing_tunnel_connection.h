@@ -79,6 +79,8 @@ public:
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
+    virtual ConnectType connectType() const override;
+
     virtual std::string toString() const override;
 
 private:

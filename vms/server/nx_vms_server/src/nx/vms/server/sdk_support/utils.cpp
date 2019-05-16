@@ -309,8 +309,8 @@ nx::vms::api::EventLevel fromSdkPluginEventLevel(IPluginEvent::Level level)
 }
 
 nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
-    const nx::analytics::storage::DetectedObject& detectedObject,
-    const nx::analytics::storage::ObjectPosition& objectPosition)
+    const nx::analytics::db::DetectedObject& detectedObject,
+    const nx::analytics::db::ObjectPosition& objectPosition)
 {
     auto objectMetadata = nx::sdk::makePtr<TimestampedObjectMetadata>();
     objectMetadata->setId(
@@ -318,16 +318,15 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
     objectMetadata->setTypeId(detectedObject.objectTypeId.toStdString());
     objectMetadata->setTimestampUs(objectPosition.timestampUsec);
     const auto& boundingBox = objectPosition.boundingBox;
-    objectMetadata->setBoundingBox(
-        IObjectMetadata::Rect(
-            boundingBox.x(),
-            boundingBox.y(),
-            boundingBox.width(),
-            boundingBox.height()));
+    objectMetadata->setBoundingBox(Rect(
+        boundingBox.x(),
+        boundingBox.y(),
+        boundingBox.width(),
+        boundingBox.height()));
 
     for (const auto& attribute: detectedObject.attributes)
     {
-        Attribute sdkAttribute(
+        auto sdkAttribute = nx::sdk::makePtr<Attribute>(
             // Information about attribute types isn't stored in the database.
             nx::sdk::IAttribute::Type::undefined,
             attribute.name.toStdString(),
@@ -340,7 +339,7 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
 }
 
 nx::sdk::Ptr<nx::sdk::IList<ITimestampedObjectMetadata>> createObjectTrack(
-    const nx::analytics::storage::DetectedObject& detectedObject)
+    const nx::analytics::db::DetectedObject& detectedObject)
 {
     auto track = nx::sdk::makePtr<nx::sdk::List<ITimestampedObjectMetadata>>();
     for (const auto& objectPosition : detectedObject.track)

@@ -23,6 +23,7 @@ extern "C" {
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
+#include <nx/sdk/analytics/rect.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -113,7 +114,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
         }
 
         auto detectedObject = nx::sdk::makePtr<nx::sdk::analytics::ObjectMetadata>();
-        nx::sdk::analytics::IObjectMetadata::Rect rectangle;
+        nx::sdk::analytics::Rect rectangle;
 
         rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
         rectangle.y = roiMeta.rect_params.top / (double) frameHeight;
@@ -127,7 +128,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             << "width: " << rectangle.width << ", "
             << "height: " << rectangle.height;
 
-        std::deque<nx::sdk::analytics::Attribute> attributes;
+        std::deque<nx::sdk::Ptr<nx::sdk::analytics::Attribute>> attributes;
 
         auto encodedAttributes = split(displayText, '%');
         if (encodedAttributes.empty())
@@ -143,25 +144,28 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 case 0:
                 {
                     attributes.emplace_back(
-                        nx::sdk::IAttribute::Type::string,
-                        "Number",
-                        encodedAttributes[i]);
+                        nx::sdk::makePtr<nx::sdk::analytics::Attribute>(
+                            nx::sdk::IAttribute::Type::string,
+                            "Number",
+                            encodedAttributes[i]));
                     break;
                 }
                 case 1:
                 {
                     attributes.emplace_back(
-                        nx::sdk::IAttribute::Type::string,
-                        "Country",
-                        encodedAttributes[i]);
+                        nx::sdk::makePtr<nx::sdk::analytics::Attribute>(
+                            nx::sdk::IAttribute::Type::string,
+                            "Country",
+                            encodedAttributes[i]));
                     break;
                 }
                 case 2:
                 {
                     attributes.emplace_back(
-                        nx::sdk::IAttribute::Type::string,
-                        "Region",
-                        encodedAttributes[i]);
+                        nx::sdk::makePtr<nx::sdk::analytics::Attribute>(
+                            nx::sdk::IAttribute::Type::string,
+                            "Region",
+                            encodedAttributes[i]));
                     break;
 
                 }
@@ -181,13 +185,14 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
         if (ini().showGuids)
         {
             attributes.emplace_front(
-                nx::sdk::IAttribute::Type::string,
-                "GUID",
-                nx::sdk::UuidHelper::toStdString(info.uuid));
+                nx::sdk::makePtr<nx::sdk::analytics::Attribute>(
+                    nx::sdk::IAttribute::Type::string,
+                    "GUID",
+                    nx::sdk::UuidHelper::toStdString(info.uuid)));
         }
 
         detectedObject->addAttributes(
-            std::vector<nx::sdk::analytics::Attribute>(
+            std::vector<nx::sdk::Ptr<nx::sdk::analytics::Attribute>>(
                 attributes.begin(),
                 attributes.end()));
 
