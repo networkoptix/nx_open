@@ -175,6 +175,7 @@
             Directory="InstallDirRoot"
             ExeCommand="[InstallDirRoot]traytool.exe"/>
 
+        <!-- Custom error message is displayed in MSI only, so leaving it untranslated. -->
         <MajorUpgrade
             AllowSameVersionUpgrades="yes"
             AllowDowngrades="no"
