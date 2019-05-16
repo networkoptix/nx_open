@@ -1510,9 +1510,6 @@ private:
     {
         using namespace std::chrono;
 
-        *periods = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
-            std::move(*periods), kTrackAggregationPeriod);
-
         // Rounding to the aggregation period.
         for (auto& timePeriod: *periods)
         {
@@ -1520,6 +1517,9 @@ private:
             if (timePeriod.duration() < kTrackAggregationPeriod)
                 timePeriod.setDuration(kTrackAggregationPeriod);
         }
+
+        *periods = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+            std::move(*periods), kTrackAggregationPeriod);
     }
 
     QnTimePeriodList filterTimePeriods(
