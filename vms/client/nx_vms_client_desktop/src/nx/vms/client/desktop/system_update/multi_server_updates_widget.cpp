@@ -1640,6 +1640,7 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
         menu()->trigger(action::DisconnectAction, {Qn::ForceRole, true});
     }
 
+    setUpdateSourceMode(UpdateSourceType::internet);
     setTargetState(WidgetUpdateState::initial);
 }
 
