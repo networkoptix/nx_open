@@ -793,8 +793,11 @@
             "name": "name",
             "label": "Integration name",
             "value": "",
-            "description": "",
-            "type": "text"
+            "description": "Visible on the tile for the integrations page and the card header for the detailed view.",
+            "type": "text",
+            "meta": {
+              "char_limit": 64
+            }
           },
           {
             "name": "logo",
@@ -813,7 +816,7 @@
             "name": "contactEmail",
             "label": "Contact Email",
             "value": "",
-            "description": "Please provide an email which will be able to address all questions about this integration and support tickets. This email will not be visible on the Integration page, but will be used by us and our partners to address issues.",
+            "description": "Please provide an email which will be able to address all questions about this integration and support tickets. This email will not be visible in the Integration page, but will be used by us and our partners to address issues.",
             "type": "text",
             "optional": false,
             "public": false
@@ -822,30 +825,30 @@
             "name": "shortDescription",
             "label": "Description",
             "value": "",
-            "description": "A short description for the integration tile.",
+            "description": "A short description for the integration tile located on the integrations page. The short description should be no more than 300 characters because the space is limited.",
             "type": "long_text",
-            "mata": {
-              "char_limit": 250
+            "meta": {
+              "char_limit": 500
             }
           },
           {
             "name": "companyName",
             "label": "Company Name",
             "value": "",
-            "description": "A company name.",
+            "description": "A company name. The company's name is visible in the detailed view page for the integration in the rightmost column.",
             "type": "text",
-            "mata": {
-              "char_limit": 50
+            "meta": {
+              "char_limit": 64
             }
           },
           {
             "name": "companyInfo",
             "label": "Company Info",
             "value": "",
-            "description": "A short description for the company.",
+            "description": "A short description for the company. The company's info is visible in the detailed view page for the integration in the rightmost column. Recommended length 500 characters.",
             "type": "long_text",
-            "mata": {
-              "char_limit": 250
+            "meta": {
+              "char_limit": 1000
             }
           },
           {
@@ -989,8 +992,11 @@
             "name": "description",
             "label": "Full functionality overview",
             "value": "",
-            "description": "A description about what the integration does.",
-            "type": "html"
+            "description": "A description about what the integration does. The overview appears on the detailed view page for the integration in the leftmost column. Recommended length 1000 characters.",
+            "type": "html",
+            "meta": {
+              "char_limit": 2000
+            }
           }
         ]
       },
@@ -1163,15 +1169,21 @@
             "name": "downloadLinks",
             "label": "Download links or Instructions",
             "value": "",
-            "description": "",
-            "type": "html"
+            "description": "This section is visible in the detailed view page for the integration in the middle column.",
+            "type": "html",
+            "meta": {
+              "char_limit": 500
+            }
           },
           {
             "name": "installationInstructions",
             "label": "Installation Instructions",
             "value": "",
-            "description": "",
-            "type": "html"
+            "description": "This section is visible in the detailed view page for the integration in the middle column. Recommended length 1500 characters. If you need more text its recommended that you create a pdf and add it to the download files section.",
+            "type": "html",
+            "meta": {
+              "char_limit": 2000
+            }
           }
         ]
       },
@@ -1406,8 +1418,11 @@
             "name": "supportInformation",
             "label": "Support Information",
             "value": "",
-            "description": "",
-            "type": "html"
+            "description": "This section is visible in the detailed view page for the integration in the middle column.",
+            "type": "html",
+            "meta": {
+              "char_limit": 250
+            }
           }
         ]
       }
