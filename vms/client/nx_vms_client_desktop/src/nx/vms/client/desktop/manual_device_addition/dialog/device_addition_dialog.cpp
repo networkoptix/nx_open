@@ -107,19 +107,23 @@ void DeviceAdditionDialog::initializeControls()
     ui->foundDevicesTable->setFocusPolicy(Qt::StrongFocus);
 
     // Monitor focus and change accent button accodringly.
-    ui->searchButton->installEventFilter(this);
-    ui->startAddressEdit->installEventFilter(this);
-    ui->endAddressEdit->installEventFilter(this);
-    ui->addressEdit->lineEdit()->installEventFilter(this);
-    ui->knownAddressAutoPortCheckBox->installEventFilter(this);
-    ui->knownAddressPortSpinBox->installEventFilter(this);
-    ui->subnetScanAutoPortCheckBox->installEventFilter(this);
-    ui->subnetScanPortSpinBox->installEventFilter(this);
-    ui->loginEdit->installEventFilter(this);
-    ui->passwordEdit->installEventFilter(this);
-    ui->stopSearchButton->installEventFilter(this);
-    ui->foundDevicesTable->installEventFilter(this);
-    ui->addDevicesButton->installEventFilter(this);
+    QWidget* const filteredWidgets[] = {
+        ui->searchButton,
+        ui->startAddressEdit,
+        ui->endAddressEdit,
+        ui->addressEdit->lineEdit(),
+        ui->knownAddressAutoPortCheckBox,
+        ui->knownAddressPortSpinBox,
+        ui->subnetScanAutoPortCheckBox,
+        ui->subnetScanPortSpinBox,
+        ui->loginEdit,
+        ui->passwordEdit,
+        ui->stopSearchButton,
+        ui->foundDevicesTable,
+        ui->addDevicesButton
+    };
+    for (auto widget: filteredWidgets)
+        widget->installEventFilter(this);
 
     ui->searchButton->setAutoDefault(true);
     ui->stopSearchButton->setAutoDefault(true);
@@ -230,23 +234,14 @@ void DeviceAdditionDialog::initializeControls()
 
 void DeviceAdditionDialog::setSearchAccent(bool isEnabled)
 {
-    if (isEnabled)
-    {
-        ui->addDevicesButton->setDefault(false);
-        resetButtonStyle(ui->addDevicesButton);
+    const auto accentButton = isEnabled ? ui->searchButton : ui->addDevicesButton;
+    const auto regularButton = isEnabled ? ui->addDevicesButton : ui->searchButton;
 
-        ui->searchButton->setDefault(true);
-        setAccentStyle(ui->searchButton);
-    }
-    else
-    {
-        ui->searchButton->setDefault(false);
-        resetButtonStyle(ui->searchButton);
+    regularButton->setDefault(false);
+    resetButtonStyle(regularButton);
 
-        ui->addDevicesButton->setDefault(true);
-        setAccentStyle(ui->addDevicesButton);
-    }
-    
+    accentButton->setDefault(true);
+    setAccentStyle(accentButton);
 }
 
 bool DeviceAdditionDialog::eventFilter(QObject *object, QEvent *event)
