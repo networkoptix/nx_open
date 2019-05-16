@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/i_plugin_event.h>
 
@@ -15,7 +16,7 @@ namespace nx::vms::server::analytics {
 class DeviceAgentHandler:
     public QObject,
     public /*mixin*/ nx::vms::server::ServerModuleAware,
-    public nx::sdk::analytics::IDeviceAgent::IHandler
+    public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent::IHandler>
 {
     Q_OBJECT
 

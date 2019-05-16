@@ -66,7 +66,7 @@ private:
     int m_channelNumber = 0;
 
     MetadataMonitor* m_monitor = nullptr;
-    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 };
 
 } // namespace hanwha
