@@ -18,6 +18,14 @@ export class NxCloudApiService {
         return this.http.get(this.CONFIG.apiBase + '/integrations');
     }
 
+    getIntegrationBy(params: any = {}): Observable<any> {
+        let uri = this.CONFIG.apiBase + '/integration/' + params.plugin;
+        uri += (params.status) ? '/' + params.status : '' ;
+
+        return this.http.get(uri);
+    }
+
+
     getIPVD(): Observable<any> {
         return this.http.get(this.CONFIG.apiBase + '/ipvd');
     }

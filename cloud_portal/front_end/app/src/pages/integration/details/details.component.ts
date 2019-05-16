@@ -1,12 +1,12 @@
-import { Component, OnDestroy, AfterViewInit } from '@angular/core';
-import { ActivatedRoute }                      from '@angular/router';
-import { IntegrationService }        from '../integration.service';
-import { DomSanitizer }              from '@angular/platform-browser';
-import { NxRibbonService }           from '../../../components/ribbon/ribbon.service';
-import { NxConfigService }           from '../../../services/nx-config';
-import { NxModalMessageComponent }   from '../../../dialogs/message/message.component';
-import { NxLanguageProviderService } from '../../../services/nx-language-provider';
-import { TranslateService }          from '@ngx-translate/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute }               from '@angular/router';
+import { IntegrationService }           from '../integration.service';
+import { DomSanitizer }                 from '@angular/platform-browser';
+import { NxRibbonService }              from '../../../components/ribbon/ribbon.service';
+import { NxConfigService }              from '../../../services/nx-config';
+import { NxModalMessageComponent }      from '../../../dialogs/message/message.component';
+import { NxLanguageProviderService }    from '../../../services/nx-language-provider';
+import { TranslateService }             from '@ngx-translate/core';
 
 @Component({
     selector   : 'integration-detail-component',
@@ -14,7 +14,7 @@ import { TranslateService }          from '@ngx-translate/core';
     styleUrls  : ['details.component.scss']
 })
 
-export class NxIntegrationDetailsComponent implements AfterViewInit, OnDestroy {
+export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
 
     plugin: any;
     config: any = {};
@@ -42,31 +42,27 @@ export class NxIntegrationDetailsComponent implements AfterViewInit, OnDestroy {
         this.setupDefaults();
     }
 
-    ngAfterViewInit(): void {
-        setTimeout(() => {
-            this.integrationService
-                .pluginsSubject
-                .subscribe(res => {
-                    this._route.params.subscribe(params => {
-                        this.integrationService.getPluginBy(params.plugin);
-                        this.integrationService.selectedPluginSubject.subscribe(plugin => {
-                            this.plugin = plugin;
-
-                            if (this.plugin && this.plugin.pending) {
-                                this.ribbonService.show(
-                                        this.lang[this.translate.currentLang].integration.previewRibbonText,
-                                        this.lang[this.translate.currentLang].integration.backToEditText,
-                                        this.config.links.admin.product.replace('%ID%', this.plugin.id)
-                                );
-                            }
-                        });
-                    });
+    ngOnInit(): void {
+        this._route.params.subscribe(params => {
+            this.integrationService.getIntegrationBy(params)
+                .subscribe(result => {
+                    if (result.length) {
+                        this.plugin = this.integrationService.format(result[0]);
+                        if (this.plugin && (this.plugin.pending && this.plugin.draft)) {
+                            this.ribbonService.show(
+                                    this.lang[this.translate.currentLang].integration.previewRibbonText,
+                                    this.lang[this.translate.currentLang].integration.backToEditText,
+                                    this.config.links.admin.product.replace('%ID%', this.plugin.id)
+                            );
+                        }
+                    }
                 });
         });
     }
 
     ngOnDestroy() {
         this.ribbonService.hide();
+        this.plugin = undefined;
     }
 
     requestSupport() {

@@ -68,18 +68,21 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        let haveInReview = false;
+        let haveInReviewOrDraft = false;
         if (changes.list.currentValue) {
             // inject platform icons info
             changes.list.currentValue.forEach(plugin => {
                 plugin.information.platforms.icons = this.getPlatformIconsFor(plugin);
                 this.setPlugunLogo(plugin);
 
-                haveInReview = haveInReview || plugin.pending;
+                haveInReviewOrDraft = haveInReviewOrDraft || plugin.pending || plugin.draft;
                 plugin.status = (plugin.pending) ? 'pending' : (plugin.draft) ? 'draft' : undefined;
+
+                plugin.link = '/integrations/' + plugin.id;
+                plugin.link += (plugin.status) ? '/' + plugin.status : '';
             });
 
-            if (haveInReview) {
+            if (haveInReviewOrDraft) {
                 this.ribbonService.show(
                         this.lang[this.translate.currentLang].integration.previewRibbonText,
                         this.lang[this.translate.currentLang].integration.backToEditText,
