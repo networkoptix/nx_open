@@ -1041,8 +1041,11 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
         isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
 
     const QString raidEventLogName = system_log::ini().getLogName();
+    const QString raidEventProviderName = system_log::ini().getProviderName();
+    const int raidEventMaxLevel = system_log::ini().getMaxLevel();
 
-    m_raidEventLogReader.reset(new RaidEventLogReader(raidEventLogName));
+    m_raidEventLogReader.reset(new RaidEventLogReader(
+        raidEventLogName, raidEventProviderName, raidEventMaxLevel));
 }
 
 void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
@@ -1752,7 +1755,17 @@ void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& s
 {
     if (isStopping())
         return;
-    qnEventRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
+    qnEventRuleConnector->at_storageFailure(
+        m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
+}
+
+void MediaServerProcess::at_storageManager_raidStorageFailure(const QString& description,
+    nx::vms::event::EventReason reason)
+{
+    if (isStopping())
+        return;
+    qnEventRuleConnector->at_raidStorageFailure(
+        m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, description);
 }
 
 void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType) {
@@ -4328,9 +4341,9 @@ void MediaServerProcess::at_appStarted()
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
-    connect(m_raidEventLogReader.get(), &SystemEventLogReader::eventOccurred, this,
-        &MediaServerProcess::at_storageManager_storageFailure);
-    m_raidEventLogReader->subscribeRaidEvents();
+    connect(m_raidEventLogReader.get(), &RaidEventLogReader::eventOccurred, this,
+        &MediaServerProcess::at_storageManager_raidStorageFailure);
+    m_raidEventLogReader->subscribe();
 };
 
 void MediaServerProcess::at_timeChanged(qint64 newTime)

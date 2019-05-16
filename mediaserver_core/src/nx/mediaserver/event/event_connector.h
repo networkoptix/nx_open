@@ -52,6 +52,9 @@ public slots:
     void at_storageFailure(const QnResourcePtr& server, qint64 timeStamp,
         vms::event::EventReason reasonCode, const QString &storageUrl);
 
+    void at_raidStorageFailure(const QnResourcePtr& server, qint64 timeStamp,
+        vms::event::EventReason reasonCode, const QString &eventDescription);
+
     /*! Some problem with network
     */
     void at_networkIssue(const QnResourcePtr& resource, qint64 timeStamp,

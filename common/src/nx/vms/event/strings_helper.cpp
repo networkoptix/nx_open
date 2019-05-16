@@ -542,8 +542,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         }
         case EventReason::raidStorageError:
         {
-            QString storageUrl = reasonParamsEncoded;
-            result = tr("RAID error occurred on the server machine.");
+            result = tr("RAID error. %1.").arg(reasonParamsEncoded);
             break;
         }
         case EventReason::backupFailedNoBackupStorageError:

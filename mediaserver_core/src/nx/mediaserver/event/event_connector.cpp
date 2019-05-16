@@ -93,6 +93,15 @@ void EventConnector::at_storageFailure(const QnResourcePtr& server, qint64 timeS
     qnEventRuleProcessor->processEvent(event);
 }
 
+void EventConnector::at_raidStorageFailure(const QnResourcePtr& server, qint64 timeStamp,
+    vms::event::EventReason reasonCode, const QString &eventDescription)
+{
+    vms::event::StorageFailureEventPtr event(new vms::event::StorageFailureEvent(
+        server, timeStamp, reasonCode, eventDescription));
+
+    qnEventRuleProcessor->processEvent(event);
+}
+
 void EventConnector::at_serverFailure(const QnResourcePtr& resource, qint64 timeStamp,
     vms::event::EventReason reasonCode, const QString& reasonText)
 {

@@ -5,16 +5,15 @@
 #include <vector>
 
 #include <QString>
+#include <QtXml/QDomElement>
 
 #ifdef WIN32
-    #include <winevt.h>
     #pragma comment(lib, "wevtapi.lib")
 #endif
 
-namespace {
 #ifdef WIN32
 
-DWORD WINAPI SubscriptionCallback(
+DWORD WINAPI SystemEventLogReader::SubscriptionCallback(
     EVT_SUBSCRIBE_NOTIFY_ACTION action, PVOID context, EVT_HANDLE hEvent)
 {
     if (action != EvtSubscribeActionDeliver)
@@ -56,28 +55,34 @@ DWORD WINAPI SubscriptionCallback(
     NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
         "System event notification read: %1").arg(xmlMessage));
 
-    if (systemEventLogReader->messageIsSignificant(xmlMessage))
+    const notificationInfo info = systemEventLogReader->parseXmlMessage(xmlMessage);
+    NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
+        "Notification parameters: provider = %1, level = %2, event id = %3, message = %4")
+        .arg(info.providerName, QString::number(info.level), QString::number(info.eventId), info.data));
+
+    if (systemEventLogReader->messageIsSignificant(xmlMessage, info))
     {
-        emit systemEventLogReader->eventOccurred(QnResourcePtr(), systemEventLogReader->reason());
+        emit systemEventLogReader->eventOccurred(info.data, systemEventLogReader->reason());
     }
 
     return 0; // this value is ignored
 }
 #endif
 
-} // namespace
-
-SystemEventLogReader::SystemEventLogReader(QString logName, nx::vms::event::EventReason reason):
-    m_logName(std::move(logName)), m_reason(reason)
+SystemEventLogReader::SystemEventLogReader(QString logName, QString providerName, int maxLevel,
+    nx::vms::event::EventReason reason)
+    :
+    m_logName(std::move(logName)), m_providerName(std::move(providerName)), m_maxLevel(maxLevel),
+    m_reason(reason)
 {
 }
 
 SystemEventLogReader::~SystemEventLogReader()
 {
-    unsubscribeRaidEvents();
+    unsubscribe();
 }
 
-bool SystemEventLogReader::subscribeRaidEvents()
+bool SystemEventLogReader::subscribe()
 {
     // Currently implemented for Windows only.
 #ifdef WIN32
@@ -135,7 +140,7 @@ bool SystemEventLogReader::subscribeRaidEvents()
     return false;
 }
 
-void SystemEventLogReader::unsubscribeRaidEvents()
+void SystemEventLogReader::unsubscribe()
 {
 #ifdef WIN32
     if (m_hSubscription)
@@ -146,7 +151,104 @@ void SystemEventLogReader::unsubscribeRaidEvents()
 #endif
 }
 
+notificationInfo SystemEventLogReader::parseXmlMessage(const QString& xmlMessage)
+{
+    /*
+    The example of the incoming message:
+    <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+        <System>
+            <Provider Name="MR_MONITOR" />
+            <EventID Qualifiers="0">250</EventID>
+            <Level>3</Level>
+            <Task>1</Task>
+            <Keywords>0x80000000000000</Keywords>
+            <TimeCreated SystemTime="2019-05-14T22:29:54.592171200Z" />
+            <EventRecordID>2953</EventRecordID>
+            <Channel>Application</Channel>
+            <Computer>DESKTOP-VFFMHR7</Computer>
+            <Security />
+        </System>
+        <EventData>
+            <Data>Controller ID: 0 VD is now PARTIALLY DEGRADED VD 0 Event ID:250</Data>
+        </EventData>
+    </Event>
+
+    Important fields:
+    Event/System/Provider
+    Event/System/Level
+    Event/System/EventID
+    Event/EventData/Data
+
+    */
+
+    notificationInfo result;
+
+    QDomDocument doc;
+    doc.setContent(xmlMessage);
+    QDomElement root = doc.documentElement();
+    if (root.isNull() || root.tagName() != "Event")
+        return result;
+
+    QDomNode systemNode = root.firstChild();
+    if (systemNode.isNull() || systemNode.toElement().tagName() != "System")
+        return result;
+
+    QDomNode systemChild = systemNode.firstChild();
+    while (!systemChild.isNull())
+    {
+        if (systemChild.toElement().tagName() == "Provider")
+            result.providerName = systemChild.attributes().namedItem("Name").toAttr().value();
+
+        else if (systemChild.toElement().tagName() == "EventID")
+            result.eventId = systemChild.toElement().text().toInt();
+
+        else if (systemChild.toElement().tagName() == "Level")
+            result.level = systemChild.toElement().text().toInt();
+
+        systemChild = systemChild.nextSibling();
+    }
+
+    // EventData/Data information is not used for filtering, but contains useful information.
+    QDomNode dataNode = systemNode.nextSibling();
+    if (dataNode.isNull() || dataNode.toElement().tagName() != "EventData")
+        return result;
+
+    QDomNode dataChild = dataNode.firstChild();
+    while (!dataChild.isNull())
+    {
+        if (dataChild.toElement().tagName() == "Data")
+        {
+            result.data = dataChild.toElement().text();
+            break;
+        }
+        dataChild = dataChild.nextSibling();
+    }
+    return result;
+}
+
+bool SystemEventLogReader::messageIsSignificant(
+    const QString& xmlMessage, const notificationInfo& parsedMessage)
+{
+    return true;
+}
+
 QString SystemEventLogReader::makeDebugMessage(const QString& text)
 {
     return text + QString(" LogName = ") + m_logName;
+}
+
+RaidEventLogReader::RaidEventLogReader(QString logName, QString providerName, int maxLevel)
+    :
+    SystemEventLogReader(std::move(logName), std::move(providerName), maxLevel,
+        nx::vms::event::EventReason::raidStorageError)
+{
+}
+
+bool RaidEventLogReader::messageIsSignificant(
+    const QString& xmlMessage, const notificationInfo& parsedMessage)
+{
+    const bool ok =
+        parsedMessage.providerName == providerName() && parsedMessage.level <= maxLevel();
+
+    return ok;
 }

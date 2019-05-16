@@ -138,6 +138,8 @@ private slots:
     void at_storageManager_noStoragesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage,
         nx::vms::event::EventReason reason);
+    void at_storageManager_raidStorageFailure(const QString& description,
+        nx::vms::event::EventReason reason);
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
     void at_archiveBackupFinished(qint64 backedUpToMs, nx::vms::event::EventReason code);
     void at_timer();
@@ -229,5 +231,5 @@ private:
     const bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
     bool m_stopObjectsCalled = false;
-    std::unique_ptr<SystemEventLogReader> m_raidEventLogReader;
+    std::unique_ptr<RaidEventLogReader> m_raidEventLogReader;
 };
