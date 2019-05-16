@@ -116,7 +116,7 @@ void PluginManager::loadPluginsFromDirWithBlackList(
 
         if (disabledLibNames.contains(libName))
         {
-            NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (blacklisted by %2)")
+            NX_INFO(this) << lm("Skipped loading Nx plugin [%1] (blacklisted by %2)")
                 .args(fileInfo.absoluteFilePath(), pluginsIni().iniFile());
             continue;
         }
@@ -140,7 +140,7 @@ void PluginManager::loadPluginsFromDirWithWhiteList(
 
         if (!enabledLibNames.isEmpty() && !enabledLibNames.contains(libName))
         {
-            NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (not whitelisted by %2)")
+            NX_INFO(this) << lm("Skipped loading Nx plugin [%1] (not whitelisted by %2)")
                 .args(fileInfo.absoluteFilePath(), pluginsIni().iniFile());
             continue;
         }
@@ -181,7 +181,7 @@ void PluginManager::loadPlugins(const QSettings* settings)
     }
     else
     {
-        NX_WARNING(this) << lm("Skipped loading all non-optional Nx plugins (as per %2)")
+        NX_INFO(this) << lm("Skipped loading all non-optional Nx plugins (as per %2)")
             .args(pluginsIni().iniFile());
     }
 
@@ -190,7 +190,7 @@ void PluginManager::loadPlugins(const QSettings* settings)
         QString::fromLatin1(pluginsIni().enabledNxPluginsOptional).trimmed();
     if (!enabledNxPluginsOptional.isEmpty())
     {
-        NX_WARNING(this) << lm("Loading optional Nx plugins, if any (as per %2)")
+        NX_INFO(this) << lm("Loading optional Nx plugins, if any (as per %2)")
             .args(pluginsIni().iniFile());
 
         const QStringList disabledLibNames{};
@@ -234,7 +234,7 @@ bool PluginManager::loadNxPlugin(
             return false;
         }
         m_nxPlugins.emplace_back(reinterpret_cast<IRefCountable*>(plugin));
-        NX_WARNING(this, "Loaded Nx old SDK plugin [%1]", filename);
+        NX_INFO(this, "Loaded Nx old SDK plugin [%1]", filename);
 
         if (const auto plugin1 = queryInterfacePtr<nxpl::Plugin>(plugin, nxpl::IID_Plugin))
         {
@@ -263,7 +263,7 @@ bool PluginManager::loadNxPlugin(
             return false;
         }
         m_nxPlugins.emplace_back(plugin);
-        NX_WARNING(this, "Loaded Nx plugin [%1]", filename);
+        NX_INFO(this, "Loaded Nx plugin [%1]", filename);
 
         if (queryInterfacePtr<nx::sdk::analytics::IPlugin>(plugin))
         {
