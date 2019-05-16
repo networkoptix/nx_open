@@ -1174,9 +1174,7 @@ void WorkbenchUi::updateNotificationsGeometry()
 
 void WorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
 {
-    m_notifications = new NotificationsWorkbenchPanel(
-        settings, m_controlsWidget, qobject_cast<MainWindow*>(parent()), this);
-
+    m_notifications = new NotificationsWorkbenchPanel(settings, m_controlsWidget, this);
     connect(m_notifications, &AbstractWorkbenchPanel::openedChanged, this,
         [this](bool opened)
         {

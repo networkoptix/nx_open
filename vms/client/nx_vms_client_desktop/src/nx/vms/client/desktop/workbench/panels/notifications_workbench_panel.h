@@ -5,7 +5,6 @@
 
 #include "abstract_workbench_panel.h"
 
-class QGraphicsOpacityEffect;
 class QnControlBackgroundWidget;
 class QnNotificationToolTipWidget;
 class QnImageButtonWidget;
@@ -19,7 +18,6 @@ namespace nx::vms::client::desktop {
 class EventPanel;
 class EventTileToolTip;
 class EventTile;
-class MainWindow;
 
 class NotificationsWorkbenchPanel: public AbstractWorkbenchPanel
 {
@@ -30,7 +28,6 @@ public:
     NotificationsWorkbenchPanel(
         const QnPaneSettings& settings,
         QGraphicsWidget* parentWidget,
-        MainWindow* mainWindow,
         QObject* parent = nullptr);
 
     virtual ~NotificationsWorkbenchPanel() override;
@@ -65,7 +62,7 @@ private:
 private:
     void at_showingProcessor_hoverEntered();
 
-    void createEventPanel(QGraphicsWidget* parentWidget, MainWindow* mainWindow);
+    void createEventPanel(QGraphicsWidget* parentWidget);
 
     void at_eventTileHovered(const QModelIndex& index, EventTile* tile);
 
@@ -88,10 +85,9 @@ private:
     AnimatorGroup* m_opacityAnimatorGroup;
 
     /** New event panel. */
-    QGraphicsWidget* m_eventPanelPlacement = nullptr;
+    QGraphicsProxyWidget* m_eventPanelContainer = nullptr;
     QScopedPointer<EventPanel> m_eventPanel;
     QPointer<HoverFocusProcessor> m_eventPanelHoverProcessor;
-    QPointer<QGraphicsOpacityEffect> m_eventPanelOpacityEffect;
 
     // Required to correctly display tooltip.
     const EventTile* m_lastHoveredTile = nullptr;
