@@ -2,7 +2,9 @@
 
 #include "nx/utils/log/log.h"
 
+#include <array>
 #include <vector>
+#include <algorithm>
 
 #include <QString>
 #include <QtXml/QDomElement>
@@ -247,8 +249,36 @@ RaidEventLogReader::RaidEventLogReader(QString logName, QString providerName, in
 bool RaidEventLogReader::messageIsSignificant(
     const QString& xmlMessage, const notificationInfo& parsedMessage)
 {
-    const bool ok =
-        parsedMessage.providerName == providerName() && parsedMessage.level <= maxLevel();
+    if (parsedMessage.providerName != providerName())
+        return false;
+    // message level is ignored
 
-    return ok;
+    // These event identificators are selected by Daniel Gonzalez <d.gonzalez@hanwha.com>
+    const std::array<int, 11> significantIds = {
+        0x0044, //<  68
+        0x0070, //< 112
+        0x011a, //< 282
+        0x0191, //< 401
+        0x003d, //<  61
+        0x0065, //< 101
+        0x0066, //< 102
+        0x0096, //< 150
+        0x00fa, //< 250
+        0x00fb, //< 251
+        0x00f8 //< 248
+    };
+
+    bool ok = std::find(significantIds.cbegin(), significantIds.cend(), parsedMessage.eventId)
+        != significantIds.end();
+    if (ok)
+        return true;
+
+    // special case
+    if (parsedMessage.eventId == 114 //< State change
+        && parsedMessage.data.contains("Current = Failed"))
+    {
+        return true;
+    }
+
+    return false;
 }
