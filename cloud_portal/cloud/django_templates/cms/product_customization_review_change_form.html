@@ -25,7 +25,7 @@
                 <table class="table table-condensed">
                     <thead>
                         <tr>
-                            <td><strong>Customization{% if not product.product_type.single_customization %}s{% endif %}</strong></td>
+                            <td><strong>Portal name</strong></td>
                             <td><strong>Status</strong></td>
                             <td><strong>Reviewed by</strong></td>
                             <td><strong>Reviewed on</strong></td>
@@ -37,7 +37,13 @@
                         {% get_review_state review.state as state %}
                         {% has_customization_permission user review.customization.name 'cms.access_customization' as access_customization %}
                         <tr>
-                            <td> {{ review.customization }}</td>
+                            <td>
+                                {% if review == original %}
+                                <strong>{{ review.customization }}</strong>
+                                {% else %}
+                                <a href="{% url 'admin:cms_productcustomizationreview_change' review.id %}">{{ review.customization }}</a>
+                                {% endif %}
+                            </td>
                             <td><span class="label {% if state == 'Rejected' %} label-danger {% elif state == "Accepted" %} label-success {% else %} label-default{% endif %}">{{ state }}</span></td>
                             <td> {{ review.reviewed_by }}</td>
                             <td> {{ review.reviewed_date }}</td>
@@ -130,7 +136,6 @@
         {% if state == 'Pending' or state != 'Rejected' and can_preview and perms.cms.force_update or has_delete_permission %}
             <div class="submit-row">
                 {% if has_delete_permission %}
-                {% load admin_urls %}
                 <a href="{% url opts|admin_urlname:'delete' object_id %}" class="btn btn-sm btn-danger pull-left">{% trans "Delete" %}</a>
                 {% endif %}
 
