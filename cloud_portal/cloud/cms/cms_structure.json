@@ -240,18 +240,20 @@
               "height_ge": 220
             }
           },
-          [
-            "Subtitle",
-            "%SUBTITLE%",
-            "Welcome!",
-            "Text under product name on landing page. One line (50-100 symbols)"
-          ],
-          [
-            "Left block title",
-            "%BLOCK1_TITLE%",
-            "Connect",
-            "1-3 words"
-          ],
+          {
+            "label": "Subtitle",
+            "name": "%SUBTITLE%",
+            "value": "Welcome!",
+            "description": "Text under product name on landing page. One line (50-100 symbols)",
+            "type": "text"
+          },
+          {
+            "label": "Left block title",
+            "name": "%BLOCK1_TITLE%",
+            "value": "Connect",
+            "description": "1-3 words",
+            "type": "text"
+          },
           {
             "label": "Left block text",
             "name": "%BLOCK1_CONTENT%",
@@ -259,12 +261,13 @@
             "description": "8-10 words",
             "type": "long_text"
           },
-          [
-            "Middle block title",
-            "%BLOCK2_TITLE%",
-            "Share",
-            "1-3 words"
-          ],
+          {
+            "label": "Middle block title",
+            "name": "%BLOCK2_TITLE%",
+            "value": "Share",
+            "description": "1-3 words",
+            "type": "text"
+          },
           {
             "label": "Middle block text",
             "name": "%BLOCK2_CONTENT%",
@@ -272,12 +275,13 @@
             "description": "8-10 words",
             "type": "long_text"
           },
-          [
-            "Right block title",
-            "%BLOCK3_TITLE%",
-            "Access",
-            "1-3 words"
-          ],
+          {
+            "label": "Right block title",
+            "name": "%BLOCK3_TITLE%",
+            "value": "Access",
+            "description": "1-3 words",
+            "type": "text"
+          },
           {
             "label": "Right block text",
             "name": "%BLOCK3_CONTENT%",
@@ -364,30 +368,34 @@
             "type": "html",
             "advanced": true
           },
-          [
-            "Legal Company Name",
-            "%LEGAL_COMPANY_NAME%",
-            "Network Optix, Inc.",
-            "Legal name of the company (for EULA)"
-          ],
-          [
-            "Legal Company Location",
-            "%LEGAL_COMPANY_LOCATION%",
-            "California",
-            "Location of the company (for EULA)"
-          ],
-          [
-            "Legal Company Jurisdiction",
-            "%LEGAL_COMPANY_JURISDICTION%",
-            "State of California",
-            "Company's jurisdiction (for EULA)"
-          ],
-          [
-            "Legal Company Court",
-            "%LEGAL_COMPANY_COURT%",
-            "state and federal courts located in Los Angeles County, California",
-            "Court to handle disputes (for EULA)"
-          ]
+          {
+            "label": "Legal Company Name",
+            "name": "%LEGAL_COMPANY_NAME%",
+            "value": "Network Optix, Inc.",
+            "description": "Legal name of the company (for EULA)",
+            "type": "text"
+          },
+          {
+            "label": "Legal Company Location",
+            "name": "%LEGAL_COMPANY_LOCATION%",
+            "value": "California",
+            "description": "Location of the company (for EULA)",
+            "type": "text"
+          },
+          {
+            "label": "Legal Company Jurisdiction",
+            "name": "%LEGAL_COMPANY_JURISDICTION%",
+            "value": "State of California",
+            "description": "Company's jurisdiction (for EULA)",
+            "type": "text"
+          },
+          {
+            "name": "Legal Company Court",
+            "label": "%LEGAL_COMPANY_COURT%",
+            "value":"state and federal courts located in Los Angeles County, California",
+            "description": "Court to handle disputes (for EULA)",
+            "type": "text"
+          }
         ]
       },
       {
