@@ -998,11 +998,14 @@ void AsyncClient::processReceivedBytes(std::size_t bytesRead)
 
 void AsyncClient::stopReadingWhileInAioThread()
 {
+    NX_ASSERT(isInSelfAioThread());
     m_readingCeased = true;
 }
 
 void AsyncClient::resumeReadingWhileInAioThread()
 {
+    NX_ASSERT(isInSelfAioThread());
+    NX_ASSERT(!m_readInvoked);
     if (m_readingCeased && !m_readInvoked)
     {
         using namespace std::placeholders;
@@ -1017,6 +1020,7 @@ void AsyncClient::resumeReadingWhileInAioThread()
 
 bool AsyncClient::isReadingWhileInAioThread()
 {
+    NX_ASSERT(isInSelfAioThread());
     return !m_readingCeased;
 }
 
