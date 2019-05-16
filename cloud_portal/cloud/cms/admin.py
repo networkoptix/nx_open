@@ -372,7 +372,9 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
                         [field.name for field in obj._meta.many_to_many]))
 
     def has_delete_permission(self, request, obj=None):
-        if obj:
+        if request.user.is_superuser:
+            return True
+        elif obj:
             return request.user == obj.version.product.created_by
         return False
 

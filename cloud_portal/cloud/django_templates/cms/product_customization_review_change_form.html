@@ -127,11 +127,17 @@
         {% endblock %}
 
         {% get_review_state original.state as state %}
-        {% if state == 'Pending' or state != 'Rejected' and can_preview and perms.cms.force_update %}
+        {% if state == 'Pending' or state != 'Rejected' and can_preview and perms.cms.force_update or has_delete_permission %}
             <div class="submit-row">
-                {% if state == 'Accepted' %}
+                {% if has_delete_permission %}
+                {% load admin_urls %}
+                <a href="{% url opts|admin_urlname:'delete' object_id %}" class="btn btn-sm btn-danger pull-left">{% trans "Delete" %}</a>
+                {% endif %}
+
+                {% if state == 'Accepted' and can_preview and perms.cms.force_update %}
                 <button class="btn btn-sm btn-danger" type="submit" name="force_update">Force Update</button>
                 {% endif %}
+
                 {% if state == 'Pending' %}
                     {% if product and False %}
                     <button class="btn btn-sm btn-default">
@@ -149,8 +155,8 @@
                     <button class="btn btn-sm btn-success" type="submit" name="publish">
                             {% if can_preview %}Publish{% else %} Accept {% endif %}
                     </button>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
             </div>
         {% endif %}
         <div class="modal fade" id="addNotes" tabindex="-1" role="dialog">
