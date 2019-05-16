@@ -52,16 +52,8 @@ QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(
     // TODO: #ak If there are more than one device given we can apply map/reduce to speed things up.
 
     std::vector<QnTimePeriodList> timePeriods;
-    if (!deviceIds.empty())
-    {
-        for (const auto& deviceId: deviceIds)
-            timePeriods.push_back(matchPeriods(deviceId, filter));
-    }
-    else
-    {
-        for (const auto& [deviceId, archive]: m_deviceIdToArchive)
-            timePeriods.push_back(matchPeriods(deviceId, filter));
-    }
+    for (const auto& [deviceId, archive]: m_deviceIdToArchive)
+        timePeriods.push_back(matchPeriods(deviceId, filter));
 
     return QnTimePeriodList::mergeTimePeriods(timePeriods, filter.limit, filter.sortOrder);
 }
