@@ -49,24 +49,25 @@ func parseForwardedHeader(request *http.Request) string {
 		return ""
 	}
 
-	// ipv4: [\\d\\.]+
-	// ipv6: \"\\[(([a-fA-F0-9]*:*)+)\\], match includes  "[  and  ]
-	re := regexp.MustCompile("[fF]or=(([\\d\\.]+)|(\"\\[(([a-fA-F0-9]*:*)+)\\]))")
-	matches := re.FindAllStringSubmatch(header, 1)
-	if len(matches) == 0 || len(matches[0]) == 0 {
+	// ipv4: [fF]or=([\\d\\.]+)
+	// ipv6: [fF]or=\"?\\[([a-fA-F0-9:]*)\\][:\\d]*\"?
+	re := regexp.MustCompile("[fF]or=([\\d\\.]+)|[fF]or=\"?\\[([a-fA-F0-9:]*)\\][:\\d]*\"?")
+	matches := re.FindStringSubmatch(header)
+	if len(matches) < 2 {
+		log.Println("Invalid expression: ", header)
 		return ""
 	}
 
-	ipStr := matches[0][1]
-	if strings.HasPrefix(ipStr, "\"[") && strings.HasSuffix(ipStr, "]") {
-		ipStr = ipStr[2 : len(ipStr)-1]
+	ipStr := matches[1] //< ipv4 location
+	if ipStr == "" {
+		ipStr = matches[2] //< ipv6 location
 	}
 
 	if net.ParseIP(ipStr) != nil {
 		return ipStr
 	}
 
-	log.Printf("Failed to parse ip address from \"Forwarded\" header: %s", header)
+	log.Println("Failed to parse ip address from \"Forwarded\" header: ", header)
 	return ""
 }
 
