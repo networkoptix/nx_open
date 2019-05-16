@@ -609,7 +609,7 @@ private:
     template<typename T>
     bool satisfiesCommonConditions(const Filter& filter, const T& data)
     {
-        if (!filter.deviceIds.empty() && !nx::utils::contains(filter.deviceIds, data.deviceId))
+        if (!nx::utils::contains(filter.deviceIds, data.deviceId))
             return false;
 
         if (!filter.timePeriod.contains(data.timestampUsec / kUsecInMs))
