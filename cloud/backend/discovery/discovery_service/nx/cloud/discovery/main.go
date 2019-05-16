@@ -5,40 +5,10 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/akrylysov/algnhsa"
 	"github.com/julienschmidt/httprouter"
 )
-
-func calculateExpirationTime(request *http.Request) Date {
-	now := time.Now().UTC()
-	minutes := 5
-	date := Date{Time: now.Add(time.Minute * time.Duration(minutes))}
-
-	requestDate := request.Header.Get("Date")
-	if len(requestDate) == 0 {
-		log.Printf(
-			"Http request missing \"Date\" header, returning %d minute expire time",
-			minutes)
-		return date
-	}
-	requestTime, err := ParseDate(requestDate)
-	if err != nil {
-		log.Printf(
-			"Failed to parse \"Date\" header, returning %d minute expire time: %s",
-			minutes, err)
-		return date
-	}
-	travelTime := now.Sub(requestTime)
-	if travelTime < 0 {
-		const nsecToMsec = 1000000
-		log.Printf("Expected positive travel time, got: %d milliseconds", travelTime/nsecToMsec)
-		return date
-	}
-	date.Time = date.Time.Add(-travelTime)
-	return date
-}
 
 func writeError(httpStatusCode int, writer http.ResponseWriter, err error) {
 	writer.Header().Set("Content-Type", "text/plain; charset=UTF-8")
@@ -98,8 +68,8 @@ func postNode(writer http.ResponseWriter, request *http.Request, params httprout
 		NodeId:          nodeInfo.NodeId,
 		InfoJson:        nodeInfo.InfoJson,
 		Urls:            nodeInfo.Urls,
-		ExpirationTime:  calculateExpirationTime(request),
-		PublicIpAddress: parsePublicIpAddress(request),
+		ExpirationTime:  CalculateExpirationTime(request),
+		PublicIpAddress: ParsePublicIpAddress(request),
 	}
 
 	err = dao.InsertOrUpdate(node, params.ByName("clusterId"))
