@@ -82,7 +82,7 @@
         <CustomAction Id="LaunchNxtool" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
 
         <MajorUpgrade
-            AllowSameVersionUpgrades="yes"
+            AllowDowngrades="yes"
             Schedule="afterInstallInitialize"
             MigrateFeatures="yes" />
 
