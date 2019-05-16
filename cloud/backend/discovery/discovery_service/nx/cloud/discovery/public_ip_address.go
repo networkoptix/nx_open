@@ -13,16 +13,6 @@ var parseFunctions = []func(*http.Request) string{
 	parseForwardedHeader,
 	parseRemoteAddr}
 
-func ParsePublicIpAddress(request *http.Request) string {
-	for _, parseFunc := range parseFunctions {
-		if ipAddress := parseFunc(request); len(ipAddress) > 0 {
-			return ipAddress
-		}
-	}
-	log.Println("All ip address parse functions failed")
-	return ""
-}
-
 func parseXForwardedForHeader(request *http.Request) string {
 	header := request.Header.Get("X-Forwarded-For")
 	if len(header) == 0 {
@@ -89,5 +79,18 @@ func parseRemoteAddr(request *http.Request) string {
 	}
 
 	log.Println("Failed to parse http.RemoteAddr")
+	return ""
+}
+
+//-------------------------------------------------------------------------------------------------
+// public
+
+func ParsePublicIpAddress(request *http.Request) string {
+	for _, parseFunc := range parseFunctions {
+		if ipAddress := parseFunc(request); len(ipAddress) > 0 {
+			return ipAddress
+		}
+	}
+	log.Println("All ip address parse functions failed")
 	return ""
 }
