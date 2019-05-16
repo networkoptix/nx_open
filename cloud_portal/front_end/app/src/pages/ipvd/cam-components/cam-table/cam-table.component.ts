@@ -245,6 +245,8 @@ export class CamTableComponent implements OnChanges, OnInit {
         if (changes.activeCamera) {
             if (!changes.activeCamera.currentValue) {
                 this.selectedCamera = undefined;
+            } else {
+                this.selectedCamera = changes.activeCamera.currentValue.sortKey;
             }
         }
 
