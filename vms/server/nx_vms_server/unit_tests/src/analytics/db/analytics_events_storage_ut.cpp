@@ -1398,20 +1398,26 @@ protected:
     void givenAggregationPeriodEqualToTheWholeArchivePeriod()
     {
         const auto allTimePeriods = expectedLookupResult();
-        const auto archiveLength =
-            allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
+        if (!allTimePeriods.isEmpty())
+        {
+            const auto archiveLength =
+                allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
 
-        m_lookupOptions.detailLevel = archiveLength;
+            m_lookupOptions.detailLevel = archiveLength;
+        }
     }
 
     void givenFilterWithTimePeriod()
     {
         const auto allTimePeriods = expectedLookupResult();
-        const auto archiveLength =
-            allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
+        if (!allTimePeriods.isEmpty())
+        {
+            const auto archiveLength =
+                allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
 
-        filter().timePeriod.setStartTime(allTimePeriods.front().startTime() + archiveLength / 3);
-        filter().timePeriod.setDuration(archiveLength * 2 / 3);
+            filter().timePeriod.setStartTime(allTimePeriods.front().startTime() + archiveLength / 3);
+            filter().timePeriod.setDuration(archiveLength * 2 / 3);
+        }
     }
 
     void givenRandomLookupOptions()
@@ -1501,7 +1507,7 @@ private:
         }
 
         if (filter().maxObjectsToSelect > 0 && periods.size() > filter().maxObjectsToSelect)
-            periods.erase(periods.begin() + filter().maxObjectsToSelect);
+            periods.erase(periods.begin() + filter().maxObjectsToSelect, periods.end());
 
         return periods;
     }
