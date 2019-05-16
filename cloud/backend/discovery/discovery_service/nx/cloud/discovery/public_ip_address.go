@@ -40,8 +40,8 @@ func parseForwardedHeader(request *http.Request) string {
 	}
 
 	// ipv4: [fF]or=([\\d\\.]+)
-	// ipv6: [fF]or=\"?\\[([a-fA-F0-9:]*)\\][:\\d]*\"?
-	re := regexp.MustCompile("[fF]or=([\\d\\.]+)|[fF]or=\"?\\[([a-fA-F0-9:]*)\\][:\\d]*\"?")
+	// ipv6: [fF]or=\"\\[([a-fA-F0-9:]+)\\][:\\d]*\"
+	re := regexp.MustCompile("[fF]or=([\\d\\.]+)|[fF]or=\"\\[([a-fA-F0-9:]+)\\][:\\d]*\"")
 	matches := re.FindStringSubmatch(header)
 	if len(matches) < 2 {
 		log.Println("Invalid expression: ", header)
