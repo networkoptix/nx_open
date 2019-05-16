@@ -1020,7 +1020,7 @@ void AsyncClient::resumeReadingWhileInAioThread()
 
 bool AsyncClient::isReadingWhileInAioThread()
 {
-    return m_readingCeased;
+    return !m_readingCeased;
 }
 
 AsyncClient::Result AsyncClient::processResponseHeadersBytes(
