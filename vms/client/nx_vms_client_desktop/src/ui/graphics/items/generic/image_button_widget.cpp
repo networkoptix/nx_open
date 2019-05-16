@@ -301,6 +301,7 @@ bool QnImageButtonWidget::safeBindTexture(StateFlags flags)
 
     const auto texture = TexturePtr(new QOpenGLTexture(texturePixmap.toImage()));
     m_textures.insert(flags, texture);
+    texture->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
     texture->bind();
     return true;
 }
