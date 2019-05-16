@@ -44,14 +44,8 @@ bool assertFailure(
     bool isCritical, const char* file, int line, const char* condition, const Reason& message)
 {
     // NOTE: If message is empty, an extra space will appear before newline, which is hard to avoid.
-    #if defined(ANDROID) || defined(__ANDROID__)
-        const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4")
-            .arg(file).arg(line).arg(condition).arg(message);
-    #else
-        const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4")
-            .arg(file).arg(line).arg(condition).arg(message);
-    #endif
-
+    const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4")
+        .arg(file).arg(line).arg(condition).arg(message);
     return assertFailure(isCritical, out);
 }
 
