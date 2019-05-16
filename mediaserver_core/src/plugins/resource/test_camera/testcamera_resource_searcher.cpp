@@ -35,7 +35,8 @@ bool QnTestCameraResourceSearcher::updateSocketList()
     if (curretTime - m_sockUpdateTime > SOCK_UPDATE_INTERVAL)
     {
         clearSocketList();
-        for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
+        for (const QnInterfaceAndAddr& iface:
+            getAllIPv4Interfaces(InterfaceListPolicy::keepAllAddressesPerInterface))
         {
             DiscoveryInfo info(SocketFactory::createDatagramSocket().release(), iface.address);
             if (info.sock->bind(iface.address.toString(), 0))
