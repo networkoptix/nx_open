@@ -14,7 +14,7 @@ func nodeLifetime() time.Duration {
 
 	lifetimeStr := os.Getenv("NODE_LIFETIME")
 	if len(lifetimeStr) == 0 {
-		log.Println("Missing environment variable NODE_LIFETIME, using %s", defaultLifetime)
+		log.Printf("Missing environment variable NODE_LIFETIME, using %s", defaultLifetime)
 		return defaultLifetime
 	}
 
