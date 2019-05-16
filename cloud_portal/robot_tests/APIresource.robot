@@ -32,10 +32,11 @@ Save User Role
     Return From Keyword    ${resp.json()}
 
 Share
-    [Arguments]    ${auth}    ${cloud url}    ${system id}    ${access role}    ${account email}
+    [Arguments]    ${auth}    ${system id}    ${access role}    ${account email}
     &{data}=    Create Dictionary    systemId=${system id}    accessRole=${access role}    accountEmail=${account email}
-    Create Digest Session    Share session    ${cloud url}    auth=${auth}    disable_warnings=1
+    Create Digest Session    Share session    ${ENV}    auth=${auth}    disable_warnings=1
     ${resp}=    Post Request    Share session    /cdb/system/share    json=${data}
+    log    ${resp}
     Should Be Equal As Strings    ${resp.status_code}    200
     Return From Keyword    ${resp.json()}
 

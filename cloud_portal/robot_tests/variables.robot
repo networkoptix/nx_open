@@ -166,9 +166,9 @@ ${MERGE SYSTEM DROPDOWN}              ${MERGE DIALOG}//button[@id="genericSelect
 ${MERGE X BUTTON}                     ${MERGE DIALOG}//button[@class="close"]
 ${MERGE OK BUTTON}                    ${MERGE DIALOG}//button[@class="btn btn-primary" and contains(text(),"${OK TEXT}")]
 ${MERGE CANCEL BUTTON}                ${MERGE DIALOG}//button[@class="btn btn-default"]
-${MERGE BUTTON MODAL}                 ${MERGE DIALOG}//button[@class="btn btn-primary" and contains(text(),"${MERGE SYSTEMS TEXT}"]
-${MERGE PASSWORD INPUT}               ${MERGE DIALOG}//imput=[@id="mergePassword"]
-
+${MERGE BUTTON MODAL}                 ${MERGE DIALOG}//button[@class="btn btn-primary" and contains(text(),"${MERGE SYSTEMS TEXT}")]
+${MERGE PASSWORD INPUT}               ${MERGE DIALOG}//input[@id="mergePassword"]
+${CURRENTLY MERGING CARD}             //div[@ng-if="currentlyMerging"]
 
 
 #Disconnect from cloud portal

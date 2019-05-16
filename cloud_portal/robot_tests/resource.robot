@@ -207,8 +207,8 @@ Edit User Permissions In Systems
     Check For Alert    ${NEW PERMISSIONS SAVED}
 
 Check User Permissions
-    [arguments]    ${user email}    ${permissions}
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span[contains(text(),"${permissions}")]
+    [arguments]    ${user email}    ${permissions}    ${wait time}=20
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span[contains(text(),"${permissions}")]    ${wait time}
 
 Remove User Permissions
     [arguments]    ${user email}
@@ -223,8 +223,8 @@ Remove User Permissions
     Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
 
 Check For Alert
-    [arguments]    ${alert text}
-    Wait Until Element Is Visible    ${ALERT}
+    [arguments]    ${alert text}    ${timeout}=20
+    Wait Until Element Is Visible    ${ALERT}    ${timeout}
     Element Should Be Visible    ${ALERT}
     Element Text Should Be    ${ALERT}    ${alert text}
     Wait Until Page Does Not Contain Element    ${ALERT}

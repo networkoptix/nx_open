@@ -11,9 +11,65 @@ Force Tags        Threaded
 ${email}             ${EMAIL OWNER}
 ${password}          ${BASE PASSWORD}
 ${url}               ${ENV}
-${other packages}    //div[contains(@class,"card-body")]//div[contains(@class, "installers")]//a
+${email admin no reg}    noptixautoqa+adminunreg@gmail.com
+${email viewer no reg}    noptixautoqa+unregviewer@gmail.com
+${email client custom no reg}    noptixautoqa+clientcustomunreg@gmail.com
+&{users dict 1}      cloudAdmin=${EMAIL ADMIN}    Viewer=${EMAIL VIEWER}    Custom=${EMAIL CLIENT CUSTOM}
+&{users dict 2}      cloudAdmin=${email admin no reg}     Viewer=${email viewer no reg}    Custom=${email client custom no reg}
+&{all users dict}    Administrator=${EMAIL ADMIN}    Viewer=${EMAIL VIEWER}    ClientCustom=${EMAIL CLIENT CUSTOM}
+...                  Administrator=${email admin no reg}     Viewer=${email viewer no reg}    ClientCustom=${email client custom no reg}
 
 *** Keywords ***
+Prepare System
+    [arguments]    ${user}    ${auth}    ${image}    ${port}    ${system name}    ${users dict}    ${network}=bridge
+    ${system id}    Create system and attach to cloud    ${EMAIL MERGE OWNER 1}    ${image}    ${port}    ${system name}   network=${network}
+    Sleep    5
+    Add users to system    ${auth}    ${users dict}    ${system id}
+    &{Save User role json}=    Save User Role    ${auth}    https://localhost:${port}    ClientCustom    GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission
+    Set user to client custom    ${auth}    ${port}    ${Save User role json["id"]}
+
+
+Create system and attach to cloud
+    [arguments]    ${user}    ${image}    ${port}    ${system name}    ${network}=bridge
+    ${cont}    Run Container    ${image}    ${port}    ${network}
+    sleep    5
+    ${auth}=    Create List    ${user}    ${password}
+    ${default auth}=    Create List    admin    admin
+    &{bind json}=    bind system    ${auth}    ${ENV}    name=${system name}
+    &{Setup Cloud System json}=    Setup Cloud System    ${default auth}    https://localhost:${port}    ${bind json["authKey"]}    ${bind json["name"]}    ${bind json["id"]}    ${bind json["ownerAccountEmail"]}
+    [return]    ${bind json["id"]}
+
+Add users to system
+    [arguments]    ${auth}    ${users}    ${system id}
+    FOR     ${key}    IN    @{users.keys()}
+        Share    ${auth}    ${system id}    ${key}    ${users["${key}"]}
+    END
+
+Set user to client custom
+    [arguments]    ${auth}    ${port}    ${role id}
+    FOR    ${index}    IN RANGE    100
+        @{users list}=    Get Users    ${auth}    https://localhost:${port}
+        ${length}    Get Length     ${users list}
+        Exit For Loop If    ${length}>3
+        Sleep    2
+    END
+
+    FOR    ${user}    IN    @{users list}
+        ${user id}    Set Variable    ${user["id"]}
+        log    ${user["email"]}
+        Exit For Loop If    "${user["email"]}"=="${EMAIL CLIENT CUSTOM}" or "${user["email"]}"=="noptixautoqa+clientcustomunreg@gmail.com"
+    END
+    &{Save User json}=    Save User    ${auth}    https://localhost:${port}    ${user id}    ${role id}
+
+Radio Button
+    [arguments]    ${text}
+    [return]    //form[@name="mergeForm"]//input[@type="radio"]/parent::label[contains(text(), "${text}")]
+
+Remove containers
+    Stop Containers
+    Prune Containers
+    Remove Images
+
 Restart
     Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
@@ -21,23 +77,6 @@ Restart
     Run Keyword If    ${status}    Log Out
     Go To    ${url}
     Validate Log Out
-
-Remove containers
-    Stop Container
-    Stop Container
-    Prune Containers
-    Prune Images
-
-
-Create system and attach to cloud
-    [arguments]    ${user}    ${image}    ${port}    ${system name}
-
-    ${cont}    Run Container    ${image}    ${port}
-    sleep    5
-    ${auth}=    Create List    ${user}    ${password}
-    ${default auth}=    Create List    admin    admin
-    &{bind json}=    bind system    ${auth}    https://cloud-test.hdw.mx    name=${system name}
-    &{Setup Cloud System json}=    Setup Cloud System    ${default auth}    https://localhost:${port}    ${bind json["authKey"]}    ${bind json["name"]}    ${bind json["id"]}    ${bind json["ownerAccountEmail"]}
 
 *** Test Cases ***
 # Only one system connected to Cloud Account
@@ -54,16 +93,42 @@ Create system and attach to cloud
 
 From secondary system merge to primary with no other servers
     ${image}    Build Image
-    Create system and attach to cloud    ${EMAIL MERGE OWNER 1}    ${image}    7001    API made system 1
-    sleep    5
-    Create system and attach to cloud    ${EMAIL MERGE OWNER 1}    ${image}    7003    API made system 2
+    ${auth}=    Create List    ${EMAIL MERGE OWNER 1}    ${password}
+    Prepare System    ${EMAIL MERGE OWNER 1}    ${auth}    ${image}    7001    API made system 1    ${users dict 1}    network=host
+    Prepare System    ${EMAIL MERGE OWNER 1}    ${auth}    ${image}    7003    API made system 2    ${users dict 2}
+
     log in    ${EMAIL MERGE OWNER 1}    ${password}
     Validate Log in
     Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
     Verify In System    API made system 2
+    Capture Page Screenshot    system2.png
     Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    120
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+    Capture Page Screenshot    system2.png
+
     Wait Until Element Is Visible    ${MERGE BUTTON SYSTEM}
     Click Button    ${MERGE BUTTON SYSTEM}
     Wait Until Elements Are Visible    ${MERGE DIALOG}    ${MERGE X BUTTON}    ${MERGE OK BUTTON}    ${MERGE CANCEL BUTTON}
     Element Text Should Be    ${MERGE SYSTEM DROPDOWN}    API made system 1
+    ${radio button}    Radio Button    API made system 1
+    Wait Until Element Is Visible   ${radio button}
+    Click Element    ${radio button}
+    Wait Until Element Is Visible    ${radio button}/span[contains(@class, "checked")]
+    sleep    2
+    Click Button    ${MERGE OK BUTTON}
+    Wait Until Elements Are Visible    ${MERGE BUTTON MODAL}    ${MERGE PASSWORD INPUT}    ${MERGE CANCEL BUTTON}
+    Input Text    ${MERGE PASSWORD INPUT}    ${BASE PASSWORD}
+    Click Button    ${MERGE BUTTON MODAL}
+    Check For Alert    ${SYSTEM MERGING TEXT}
+    Element Should Not Be Visible    ${MERGE DIALOG}
+    Wait Until Element Is Visible    ${CURRENTLY MERGING CARD}
+    Check for alert    Connection to API made system 2 lost    timeout=40
+    Verify In System    API made system 1
+    Wait Until Element Is Not Visible    ${CURRENTLY MERGING CARD}    120
+    Sleep    5
+    Reload Page
+    Sleep    5
+
+    FOR    ${key}  IN  @{all users dict.keys()}
+        Check User Permissions    ${all users dict["${key}"]}    ${key}    wait time=120
+    END

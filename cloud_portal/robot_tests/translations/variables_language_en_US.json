@@ -105,5 +105,6 @@
     "IPVD ADVANCED SEARCH BUTTON TEXT"     :    "Advanced Search",
 
     "OK TEXT"                              :    "OK",
-    "MERGE SYSTEMS TEXT"                   :    "Merge Systems"
+    "MERGE SYSTEMS TEXT"                   :    "Merge Systems",
+    "SYSTEM MERGING TEXT"                  :    "Systems have started merging"
 }

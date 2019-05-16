@@ -185,15 +185,15 @@ class NoptixLibrary(object):
                             tag="mediaserver", 
                             buildargs={"mediaserver_deb":"nxwitness-server-4.0.0.28541-linux64-beta-test.deb"})
 
-    def run_container(self, image, port):
+    def run_container(self, image, port, network):
         tmp = {'/run':'', '/run/lock':''}
         vol = {'/sys/fs/cgroup': {
                     'bind':'/sys/fs/cgroup',
-                    'mode':'rw'},
+                    'mode':'rw'}
                 }
         prt = {7001:port}
         client = docker.from_env()
-        cont = client.containers.run(image[0].id, detach=True, tmpfs=tmp, volumes=vol, ports=prt, network_mode="bridge", name=time.time())
+        cont = client.containers.run(image[0].id, detach=True, tmpfs=tmp, volumes=vol, ports=prt, network_mode=network, name=time.time())
         return cont
 
     def stop_containers(self):
@@ -206,8 +206,8 @@ class NoptixLibrary(object):
         client = docker.from_env()
         client.containers.prune()
 
-    def remove_image(self):
+    def remove_images(self):
         client = docker.from_env()
         imgs = client.images.list()
         for img in imgs:
-            client.images.remove(img)
+            client.images.remove(img.id)
