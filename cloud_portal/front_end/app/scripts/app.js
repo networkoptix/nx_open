@@ -367,10 +367,10 @@ window.L = {};
                             .when('/sandbox', {
                                 template: ''
                             })
-                            .when('/integrations/:plugin?', {
+                            .when('/integrations/:pluginId?', {
                                 template: ''
                             })
-                            .when('/integrations/:plugin/:status', {
+                            .when('/integrations/:pluginId/:status', {
                                 template: ''
                             })
                             .when('/new-content', {
