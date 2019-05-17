@@ -88,8 +88,8 @@ export class IntegrationService implements OnDestroy {
         return plugin;
     }
 
-    getIntegrationBy(params): Observable<any> {
-        return this.api.getIntegrationBy(params);
+    getIntegrationBy(id: number, status: string): Observable<any> {
+        return this.api.getIntegrationBy(id, status);
     }
 
     ngOnDestroy() {

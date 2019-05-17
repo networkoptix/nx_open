@@ -44,7 +44,7 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this._route.params.subscribe(params => {
-            this.integrationService.getIntegrationBy(params)
+            this.integrationService.getIntegrationBy(params.pluginId, params.status)
                 .subscribe(result => {
                     if (result.length) {
                         this.plugin = this.integrationService.format(result[0]);
