@@ -109,7 +109,7 @@ void GenericTransport::sendTransaction(
         {
             if (m_closed)
             {
-                NX_VERBOSE(this, "An attempt tp send through a closed connection to %1",
+                NX_VERBOSE(this, "An attempt to send through a closed connection to %1",
                     m_commonTransportHeaderOfRemoteTransaction);
                 return;
             }
@@ -309,6 +309,13 @@ void GenericTransport::onTransactionsReadFromLog(
         "Posting them to the send queue to %4",
         m_systemId, serializedTransactions.size(), toString(resultCode),
             m_commonTransportHeaderOfRemoteTransaction);
+
+    if (m_closed)
+    {
+        NX_DEBUG(this, "An attempt to send through a closed connection to %1",
+            m_commonTransportHeaderOfRemoteTransaction);
+        return;
+    }
 
     sendTransactions(std::exchange(serializedTransactions, {}));
 
