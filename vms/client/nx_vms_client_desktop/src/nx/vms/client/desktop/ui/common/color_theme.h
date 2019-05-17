@@ -37,7 +37,7 @@ public:
     Q_INVOKABLE static bool isLight(const QColor& color);
 
 private:
-    class Private;
+    struct Private;
     QScopedPointer<Private> const d;
 };
 

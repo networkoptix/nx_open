@@ -16,11 +16,11 @@ static uint qHash(const QColor& color)
 
 namespace nx::vms::client::desktop {
 
-static const auto kSkinFileName = lit(":/skin/customization_common.json");
+static const auto kBaseSkinFileName = ":/skin/customization_common.json";
+static const auto kCustomSkinFileName = ":/skin/skin.json";
 
-class ColorTheme::Private
+struct ColorTheme::Private
 {
-public:
     QVariantMap colors;
 
     QHash<QString, QList<QColor>> groups;
@@ -36,18 +36,23 @@ public:
 
     QHash<QColor, ColorInfo> colorInfoByColor;
 
-public:
     void loadColors();
+    void loadColorsFromFile(const QString& filename);
 };
 
 void ColorTheme::Private::loadColors()
 {
-    QFile file(kSkinFileName);
-    if (!file.open(QFile::ReadOnly))
-    {
-        NX_ERROR(this, lm("Cannot read skin file %1").arg(kSkinFileName));
+    // Load base colors and override them with the actual skin values.
+    loadColorsFromFile(kBaseSkinFileName);
+    loadColorsFromFile(kCustomSkinFileName);
+}
+
+void ColorTheme::Private::loadColorsFromFile(const QString& filename)
+{
+    QFile file(filename);
+    const bool opened = file.open(QFile::ReadOnly);
+    if (!NX_ASSERT(opened, "Cannot read skin file %1", filename))
         return;
-    }
 
     const auto& jsonData = file.readAll();
 
