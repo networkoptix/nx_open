@@ -187,16 +187,11 @@ std::string Engine::manifest() const
                                 "range": ["value1", "value2", "value3"]
                             },
                             {
-                                "type": "Row",
-                                "items": [
-                                    {
-                                        "type": "CheckBox",
-                                        "caption": "CheckBox Parameter",
-                                        "name": "testCheckBox",
-                                        "defaultValue": true,
-                                        "value": true
-                                    }
-                                ]
+                                "type": "CheckBox",
+                                "caption": "CheckBox Parameter",
+                                "name": "testCheckBox",
+                                "defaultValue": true,
+                                "value": true
                             }
                         ]
                     }
@@ -249,16 +244,11 @@ std::string Engine::manifest() const
                         "range": ["value1", "value2", "value3"]
                     },
                     {
-                        "type": "Row",
-                        "items": [
-                            {
-                                "type": "CheckBox",
-                                "caption": "Device Agent CheckBox",
-                                "name": "testCheckBox",
-                                "defaultValue": true,
-                                "value": true
-                            }
-                        ]
+                        "type": "CheckBox",
+                        "caption": "Device Agent CheckBox",
+                        "name": "testCheckBox",
+                        "defaultValue": true,
+                        "value": true
                     }
                 ]
             }
@@ -442,6 +432,7 @@ static const std::string kPluginManifest = R"json(
                     {
                         "type": "SpinBox",
                         "name": "testSpinBox",
+                        "caption": "Spin Box",
                         "defaultValue": 42,
                         "minValue": 0,
                         "maxValue": 100
@@ -449,6 +440,7 @@ static const std::string kPluginManifest = R"json(
                     {
                         "type": "DoubleSpinBox",
                         "name": "testDoubleSpinBox",
+                        "caption": "Double Spin Box",
                         "defaultValue": 3.1415,
                         "minValue": 0.0,
                         "maxValue": 100.0
@@ -456,19 +448,16 @@ static const std::string kPluginManifest = R"json(
                     {
                         "type": "ComboBox",
                         "name": "testComboBox",
+                        "caption": "Combo Box",
                         "defaultValue": "value2",
                         "range": ["value1", "value2", "value3"]
                     },
                     {
-                        "type": "Row",
-                        "items": [
-                            {
-                                "type": "CheckBox",
-                                "name": "testCheckBox",
-                                "defaultValue": true,
-                                "value": true
-                            }
-                        ]
+                        "type": "CheckBox",
+                        "name": "testCheckBox",
+                        "caption": "Check Box",
+                        "defaultValue": true,
+                        "value": true
                     }
                 ]
             }
