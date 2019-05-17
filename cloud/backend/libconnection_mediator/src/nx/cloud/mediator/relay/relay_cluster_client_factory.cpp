@@ -1,6 +1,6 @@
 #include "relay_cluster_client_factory.h"
 
-#include "relay_cluster_client.h"
+#include "online_relays_cluster_client.h"
 
 namespace nx {
 namespace hpm {
@@ -20,7 +20,7 @@ RelayClusterClientFactory& RelayClusterClientFactory::instance()
 std::unique_ptr<AbstractRelayClusterClient>
     RelayClusterClientFactory::defaultFactoryFunction(const conf::Settings& settings)
 {
-    return std::make_unique<RelayClusterClient>(settings);
+	return std::make_unique<OnlineRelaysClusterClient>(settings);
 }
 
 } // namespace hpm
