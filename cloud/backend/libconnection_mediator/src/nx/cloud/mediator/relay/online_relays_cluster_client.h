@@ -46,7 +46,7 @@ private:
     std::vector<nx::utils::Url> findRelaysByContinent(
         nx::geo_ip::Continent continent) const;
 
-    std::vector<nx::utils::Url> findRelaysByDistance(
+    std::vector<nx::utils::Url> findClosestRelays(
         const nx::geo_ip::Geopoint& geopoint) const;
 
     std::vector<nx::utils::Url> getUnresolvedRelays() const;

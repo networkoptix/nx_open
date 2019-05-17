@@ -3,6 +3,7 @@
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/random.h>
 
 #include "nx/cloud/mediator/settings.h"
 #include "nx/cloud/mediator/geo_ip/resolver_factory.h"
@@ -15,7 +16,7 @@ static constexpr char kTrafficRelay[] = "traffic relay";
 static constexpr char kListeningPeer[] = "listening peer";
 static constexpr char kClient[] = "client";
 
-nx::utils::Url urlWithoutPath(nx::utils::Url url)
+nx::utils::Url baseUrl(nx::utils::Url url)
 {
     url.setPath({});
     return url;
@@ -90,11 +91,7 @@ void OnlineRelaysClusterClient::findRelayInstancePeerIsListeningOn(
                 nx::utils::Url());
         }
 
-        std::random_device randomDevice;
-        std::mt19937 engine(randomDevice());
-        std::uniform_int_distribution<> distribution(0, static_cast<int>(relayUrls.size()) - 1);
-
-        auto url = relayUrls[distribution(engine)];
+		auto& url = nx::utils::random::choice(relayUrls);
 
         NX_VERBOSE(this, "%1 reporting relay url: %2 for listening peer: %3 and client ip: %4",
             __func__, url, peerId, clientEndpoint.address);
@@ -158,13 +155,13 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByContinent(
         if (it->second.node.urls.empty())
             continue;
 
-        relayUrls.emplace_back(urlWithoutPath(it->second.node.urls.front()));
+        relayUrls.emplace_back(baseUrl(it->second.node.urls.front()));
     }
 
     return relayUrls;
 }
 
-std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByDistance(
+std::vector<nx::utils::Url> OnlineRelaysClusterClient::findClosestRelays(
     const nx::geo_ip::Geopoint& geopoint) const
 {
     std::vector<nx::utils::Url> urls;
@@ -183,9 +180,9 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByDistance(
     for (const auto& relay : relaysByDistance)
     {
         if (!relay.second.urls.empty())
-            urls.emplace_back(urlWithoutPath(relay.second.urls.front()));
+            urls.emplace_back(baseUrl(relay.second.urls.front()));
 
-        if (static_cast<int>(urls.size()) >= m_settings.geoIp().resolveErrorUrlCount)
+        if ((int)urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
             break;
     }
 
@@ -198,9 +195,9 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::getUnresolvedRelays() con
     for (const auto& relay: m_unresolvedRelays)
     {
         if (!relay.urls.empty())
-            urls.emplace_back(urlWithoutPath(relay.urls.front()));
+            urls.emplace_back(baseUrl(relay.urls.front()));
 
-        if (static_cast<int>(urls.size()) >= m_settings.geoIp().resolveErrorUrlCount)
+        if ((int)urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
             break;
     }
 
@@ -248,9 +245,9 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByLocation(
         return urls;
     }
 
-    NX_WARNING(this, "Found 0 relays in %1. Falling back to relays by distance",
+    NX_DEBUG(this, "Found 0 relays in %1. Falling back to relays by distance",
         location);
-    urls = findRelaysByDistance(location->geopoint);
+    urls = findClosestRelays(location->geopoint);
     if (!urls.empty())
     {
         NX_VERBOSE(this, "Found relays by distance: %1", containerString(urls));
