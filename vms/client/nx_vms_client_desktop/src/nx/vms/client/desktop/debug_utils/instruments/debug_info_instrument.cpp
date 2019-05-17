@@ -12,6 +12,7 @@
 
 #if defined(Q_OS_WIN)
     #include "windows.h"
+    #include <tlhelp32.h>
 #endif
 
 namespace nx::vms::client::desktop {
@@ -21,6 +22,7 @@ namespace {
 using namespace std::chrono;
 
 static constexpr milliseconds kHandlesInterval = 500ms;
+static constexpr milliseconds kThreadsInterval = 1000ms;
 static constexpr milliseconds kLogInterval = 1min;
 
 } // namespace
@@ -32,6 +34,7 @@ struct DebugInfoInstrument::Private
 
     QElapsedTimer fpsTimer;
     QElapsedTimer handlesTimer;
+    QElapsedTimer threadsTimer;
     QElapsedTimer logTimer;
     QElapsedTimer totalTimer;
 
@@ -42,6 +45,7 @@ struct DebugInfoInstrument::Private
     boost::circular_buffer<qint64> frameTimePoints{
         static_cast<std::size_t>(ini().storeFrameTimePoints)};
     QString handles;
+    QString threads;
 
     void updateHandles()
     {
@@ -51,6 +55,28 @@ struct DebugInfoInstrument::Private
             const auto userHandles = GetGuiResources(processHandle, GR_USEROBJECTS);
             handles = QString("\nGDI: %1").arg(gdiHandles);
             handles += QString("\nUser: %1").arg(userHandles);
+        #endif
+    }
+
+    void updateTreads()
+    {
+        #if defined(Q_OS_WIN)
+            const auto currentProcessId = GetCurrentProcessId();
+            const auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+            PROCESSENTRY32 entry = {};
+            entry.dwSize = sizeof(entry);
+
+            auto isOk = Process32First(snapshot, &entry);
+            while (isOk && entry.th32ProcessID != currentProcessId)
+                isOk = Process32Next(snapshot, &entry);
+
+            CloseHandle(snapshot);
+
+            const QString threadCountStr =
+                isOk ? QString::number(entry.cntThreads) : QString("N/A");
+
+            threads = QString("\nThreads: %1").arg(threadCountStr);
         #endif
     }
 
@@ -65,7 +91,7 @@ struct DebugInfoInstrument::Private
     QString debugInfoText() const
     {
         return profilerMode
-            ? QString("%1 (%2ms)").arg(fps).arg(frameTimeMs) + handles
+            ? QString("%1 (%2ms)").arg(fps).arg(frameTimeMs) + handles + threads
             : fps;
     }
 };
@@ -94,6 +120,7 @@ void DebugInfoInstrument::enabledNotify()
 {
     d->fpsTimer.restart();
     d->handlesTimer.restart();
+    d->threadsTimer.restart();
     d->logTimer.restart();
     d->frameCount = 0;
 }
@@ -102,6 +129,7 @@ void DebugInfoInstrument::aboutToBeDisabledNotify()
 {
     d->logTimer.invalidate();
     d->handlesTimer.invalidate();
+    d->threadsTimer.invalidate();
     d->fpsTimer.invalidate();
     d->frameCount = 0;
 }
@@ -126,6 +154,13 @@ bool DebugInfoInstrument::paintEvent(QWidget* /*viewport*/, QPaintEvent* /*event
     {
         d->updateHandles();
         d->handlesTimer.restart();
+        changed = true;
+    }
+
+    if (d->threadsTimer.hasExpired(kThreadsInterval.count()))
+    {
+        d->updateTreads();
+        d->threadsTimer.restart();
         changed = true;
     }
 
