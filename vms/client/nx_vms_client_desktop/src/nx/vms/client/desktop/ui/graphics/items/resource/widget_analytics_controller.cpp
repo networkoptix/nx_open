@@ -430,6 +430,9 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
 
             for (const auto& object: metadata->objects)
             {
+                if (object.bestShot)
+                    continue; //< Skip specialized best shot records.
+
                 auto& objectInfo = d->addOrUpdateObject(object);
                 objectInfo.startTimestamp = microseconds(metadata->timestampUsec);
                 objectInfo.endTimestamp = metadata->durationUsec > 0
