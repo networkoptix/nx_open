@@ -320,7 +320,9 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
 
 QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
 {
-    QnMediaServerResourceList result;
+    QnMediaServerResourceList result = {commonModule()->currentServer()};
+    /*
+     * Disabled for now, until 4.1 happens.
     auto items = m_stateTracker->allItems();
     for (const auto& record: items)
     {
@@ -335,7 +337,7 @@ QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
 
         if (isOurServer && online && record->storeUpdates)
             result.push_back(server);
-    }
+    }*/
     return result;
 }
 
