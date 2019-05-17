@@ -996,13 +996,13 @@ void AsyncClient::processReceivedBytes(std::size_t bytesRead)
     }
 }
 
-void AsyncClient::stopReadingWhileInAioThread()
+void AsyncClient::stopReading()
 {
     NX_ASSERT(isInSelfAioThread());
     m_readingCeased = true;
 }
 
-void AsyncClient::resumeReadingWhileInAioThread()
+void AsyncClient::resumeReading()
 {
     NX_ASSERT(isInSelfAioThread());
     NX_ASSERT(!m_readInvoked);
@@ -1018,7 +1018,7 @@ void AsyncClient::resumeReadingWhileInAioThread()
     m_readingCeased = false;
 }
 
-bool AsyncClient::isReadingWhileInAioThread()
+bool AsyncClient::isReading()
 {
     NX_ASSERT(isInSelfAioThread());
     return !m_readingCeased;

@@ -181,13 +181,13 @@ void P2PHttpClientTransport::stopOrResumeReaderWhileInAioThread()
         NX_DEBUG(
             this, "Incoming message queue overflow detected (%1 pending)",
             m_incomingMessageQueue.size());
-        m_readHttpClient->stopReadingWhileInAioThread();
+        m_readHttpClient->stopReading();
     }
     else if (
         m_incomingMessageQueue.size() < kMaxMessageQueueSize / 2
-        && !m_readHttpClient->isReadingWhileInAioThread())
+        && !m_readHttpClient->isReading())
     {
-        m_readHttpClient->resumeReadingWhileInAioThread();
+        m_readHttpClient->resumeReading();
     }
 }
 
