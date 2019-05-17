@@ -21,7 +21,7 @@ TransportManager::TransportManager(
     m_connectionManager(connectionManager),
     m_nodeId(nodeId)
 {
-    //registerTransport(std::make_unique<http_tunnel::Factory>());
+    registerTransport(std::make_unique<http_tunnel::Factory>());
 }
 
 void TransportManager::registerTransport(std::unique_ptr<AbstractFactory> transportFactory)

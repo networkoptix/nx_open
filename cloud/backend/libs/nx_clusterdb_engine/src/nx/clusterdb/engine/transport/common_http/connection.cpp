@@ -10,8 +10,8 @@
 
 namespace nx::clusterdb::engine::transport {
 
-constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
-constexpr static const int kKeepAliveProbeCount = 3;
+static constexpr std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
+static constexpr int kKeepAliveProbeCount = 3;
 
 CommonHttpConnection::CommonHttpConnection(
     const ProtocolVersionRange& protocolVersionRange,
