@@ -228,18 +228,18 @@ void VideoFrameProcessingDeviceAgent::assertEngineCasted(void* engine) const
 }
 
 void VideoFrameProcessingDeviceAgent::logMetadataPacketIfNeeded(
-    IMetadataPacket* metadataPacket,
+    const IMetadataPacket* metadataPacket,
     const std::string& packetIndexName) const
 {
     if (!NX_DEBUG_ENABLE_OUTPUT)
         return;
 
     std::string packetName;
-    if (queryInterfacePtr<IObjectMetadataPacket>(metadataPacket))
+    if (queryInterfacePtr<const IObjectMetadataPacket>(metadataPacket))
     {
         packetName = "Object";
     }
-    else if (queryInterfacePtr<IEventMetadataPacket>(metadataPacket))
+    else if (queryInterfacePtr<const IEventMetadataPacket>(metadataPacket))
     {
         packetName = "Event";
     }
@@ -251,7 +251,7 @@ void VideoFrameProcessingDeviceAgent::logMetadataPacketIfNeeded(
     }
     packetName += " metadata packet" + packetIndexName;
 
-    auto compoundMetadataPacket = queryInterfacePtr<ICompoundMetadataPacket>(metadataPacket);
+    auto compoundMetadataPacket = queryInterfacePtr<const ICompoundMetadataPacket>(metadataPacket);
     if (compoundMetadataPacket)
     {
         if (compoundMetadataPacket->count() == 0)

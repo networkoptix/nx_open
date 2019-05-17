@@ -342,7 +342,7 @@ static IObjectTrackBestShotPacket* makeObjectTrackBestShotPacket(
     return new ObjectTrackBestShotPacket(
         objectTrackId,
         timestampUs,
-        Rect(offset, offset, 0.1f, 0.1f));
+        Rect(offset, offset, 0.1F, 0.1F));
 }
 
 void DeviceAgent::generateObjectIds()
@@ -407,10 +407,10 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
         return {};
 
-    float dt = m_objectCounter / 32.0f;
+    float dt = m_objectCounter / 32.0F;
     ++m_objectCounter;
     double intPart;
-    dt = (float) modf(dt, &intPart) * 0.75f;
+    dt = (float) modf(dt, &intPart) * 0.75F;
     const int sequentialNumber = static_cast<int>(intPart);
     static const std::vector<std::string> kObjectTypes = {
         kCarObjectType,
