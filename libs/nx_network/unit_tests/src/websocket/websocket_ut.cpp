@@ -276,8 +276,8 @@ protected:
     }
 
     void givenServerClientWebSockets(
-        std::chrono::milliseconds clientTimeout,
-        std::chrono::milliseconds serverTimeout)
+        std::chrono::milliseconds clientTimeout, std::chrono::milliseconds serverTimeout,
+        bool noPongs = false)
     {
         clientWebSocket.reset(
             new TestWebSocket(
@@ -295,6 +295,13 @@ protected:
         clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
         clientWebSocket->setAliveTimeout(clientTimeout);
         serverWebSocket->setAliveTimeout(serverTimeout);
+
+        if (noPongs)
+        {
+            clientWebSocket->disablePingPong();
+            serverWebSocket->disablePingPong();
+        }
+
         clientWebSocket->start();
         serverWebSocket->start();
     }
@@ -304,11 +311,11 @@ protected:
         givenServerClientWebSockets(kAliveTimeout, kAliveTimeout);
     }
 
-    void givenServerClientWebSocketsWithShortTimeout()
+    void givenServerClientWebSocketsWithShortTimeout(bool noPongs)
     {
         givenClientModes(SendMode::singleMessage, ReceiveMode::message);
         givenServerModes(SendMode::singleMessage, ReceiveMode::message);
-        givenServerClientWebSockets(kShortTimeout, kShortTimeout);
+        givenServerClientWebSockets(kShortTimeout, kShortTimeout, noPongs);
     }
 
     void givenServerClientWebSocketsWithDifferentTimeouts()
@@ -893,12 +900,6 @@ protected:
             };
     }
 
-    void whenBothSocketSendNoPongs()
-    {
-        clientWebSocket->disablePingPong();
-        serverWebSocket->disablePingPong();
-    }
-
     void processError(SystemError::ErrorCode ecode)
     {
         if (ecode == SystemError::timedOut)
@@ -975,7 +976,7 @@ TEST_F(WebSocket_PingPong, PingPong_pingsBecauseOfNoData)
     isServerResponding = false;
     isClientSending = false;
 
-    givenServerClientWebSocketsWithShortTimeout();
+    givenServerClientWebSocketsWithShortTimeout(/*noPongs*/ false);
     whenConnectionIsIdleForSomeTime();
     thenItsBeenKeptAliveByThePings();
 }
@@ -985,8 +986,7 @@ TEST_F(WebSocket_PingPong, PingPong_abortIfNoPongs)
     isServerResponding = false;
     isClientSending = false;
 
-    givenServerClientWebSocketsWithShortTimeout();
-    whenBothSocketSendNoPongs();
+    givenServerClientWebSocketsWithShortTimeout(/*noPongs*/ true);
     whenConnectionIsIdleForSomeTime();
     thenConnectionShouldBeAbortedWithTimeout();
 }
