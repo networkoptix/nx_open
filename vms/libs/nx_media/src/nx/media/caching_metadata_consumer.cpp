@@ -3,7 +3,7 @@
 #include <queue>
 
 #include <QtCore/QVector>
-#include <QtCore/QMap>
+#include <QtCore/QMultiMap>
 #include <QtCore/QSharedPointer>
 
 #include <nx/utils/thread/mutex.h>
@@ -32,7 +32,7 @@ public:
             removeOldestMetadataItem();
 
         m_metadataCache.push(metadata);
-        m_metadataByTimestamp[metadata->timestamp] = metadata;
+        m_metadataByTimestamp.insert(metadata->timestamp, metadata);
     }
 
     QnAbstractCompressedMetadataPtr findMetadata(const qint64 timestamp) const
@@ -89,16 +89,22 @@ public:
     }
 
 private:
-    void removeOldestMetadataItem()
+    void removeOldestMetadataItem() //< The oldest by arrival, not by timestamp.
     {
         const auto metadata = m_metadataCache.front();
         m_metadataCache.pop();
 
-        const auto it = m_metadataByTimestamp.find(metadata->timestamp);
-        // Check the value equality is necessary because the stored value can be replaced by
-        // other metadata with the same timestamp.
-        if (NX_ASSERT(it != m_metadataByTimestamp.end()) && *it == metadata)
+        const auto range = m_metadataByTimestamp.equal_range(metadata->timestamp);
+        NX_ASSERT(range.first != range.second);
+
+        for (auto it = range.first; it != range.second; ++it)
+        {
+            if (*it != metadata)
+                continue;
+
             m_metadataByTimestamp.erase(it);
+            break;
+        }
     }
 
     void trimCacheToSize(size_t size)
@@ -110,7 +116,7 @@ private:
 private:
     mutable QnMutex m_mutex;
     std::queue<QnAbstractCompressedMetadataPtr> m_metadataCache;
-    QMap<qint64, QnAbstractCompressedMetadataPtr> m_metadataByTimestamp;
+    QMultiMap<qint64, QnAbstractCompressedMetadataPtr> m_metadataByTimestamp;
     size_t m_cacheSize;
 };
 
