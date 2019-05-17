@@ -14,22 +14,25 @@ func nodeLifetime() time.Duration {
 
 	lifetimeStr := os.Getenv("NODE_LIFETIME")
 	if len(lifetimeStr) == 0 {
-		log.Println("Missing environment variable NODE_LIFETIME, using %s", defaultLifetime)
+		log.Printf("Missing environment variable NODE_LIFETIME, using %s", defaultLifetime)
 		return defaultLifetime
 	}
 
 	duration := time.Minute
 	if strings.HasSuffix(lifetimeStr, "m") {
 		duration = time.Minute
+		lifetimeStr = lifetimeStr[:len(lifetimeStr)-1]
 	} else if strings.HasSuffix(lifetimeStr, "s") {
 		duration = time.Second
+		lifetimeStr = lifetimeStr[:len(lifetimeStr)-1]
 	}
 
-	lifetime, err := strconv.Atoi(lifetimeStr[:len(lifetimeStr)-1])
+	lifetime, err := strconv.Atoi(lifetimeStr)
 	if err != nil {
 		log.Println("Error parsing NODE_LIFETIME environment variable: ", err)
 		return defaultLifetime
 	}
+
 	return duration * time.Duration(lifetime)
 }
 
@@ -46,17 +49,20 @@ func CalculateExpirationTime(request *http.Request) Date {
 		log.Printf("Http request missing \"Date\" header, returning %s expire time", lifetime)
 		return date
 	}
+
 	requestTime, err := ParseDate(requestDate)
 	if err != nil {
 		log.Printf("Failed to parse \"Date\" header, returning %s expire time: %s",
 			lifetime, err)
 		return date
 	}
+
 	travelTime := now.Sub(requestTime)
 	if travelTime < 0 {
 		log.Printf("Expected positive travel time, got: %s", travelTime)
 		return date
 	}
+
 	date.Time = date.Time.Add(-travelTime)
 	return date
 }
