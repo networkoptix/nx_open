@@ -89,7 +89,13 @@ namespace ec2
             return errCode;
 
         auto commonModule = m_ec2Connection->commonModule();
+        if (!NX_ASSERT(commonModule, "Unable to access the common module"))
+            return ErrorCode::serverError;
+
         auto resourcePool = commonModule->resourcePool();
+        if (!NX_ASSERT(resourcePool, "Unable to access the resource pool"))
+            return ErrorCode::serverError;
+
         nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(commonModule);
         for (auto& camInfo: cameras)
         {
