@@ -15,6 +15,7 @@ from api.models import Account
 from ..models import *
 
 BYTES_TO_MEGABYTES = 1048576.0
+PENDING = ProductCustomizationReview.REVIEW_STATES[ProductCustomizationReview.REVIEW_STATES.pending].lower()
 
 
 def update_draft_state(review_id, target_state, user):
@@ -39,7 +40,7 @@ def notify_version_ready(product, version, exclude_user):
     users = Account.objects.filter(groups__permissions__in=perm).exclude(pk=exclude_user.pk).distinct()
 
     product_name = product.name
-    product_type = ProductType.PRODUCT_TYPES[product.product_type]
+    product_type = ProductType.PRODUCT_TYPES[product.product_type.type]
     product_customizations_set = set()
     product_is_integration = product.product_type.type == ProductType.PRODUCT_TYPES.integration
     for customization in product.customizations.values_list('name', flat=True):
@@ -278,11 +279,11 @@ def remove_unused_records(product):
             record.delete()
 
 
-def generate_preview_link(context=None, product=None):
+def generate_preview_link(context=None, product=None, state=""):
     if product and product.product_type.type == ProductType.PRODUCT_TYPES.integration:
-        return settings.INTEGRATION_STORE_PAGE
+        return f"{settings.INTEGRATION_STORE_PAGE}/{product.id}/{state}"
 
-    return context.url + "?preview" if context else "/content/about?preview"
+    return f"{context.url}?preview" if context else "/content/about?preview"
 
 
 def generate_preview(product, context=None, version_id=None, send_to_review=False):
@@ -292,7 +293,7 @@ def generate_preview(product, context=None, version_id=None, send_to_review=Fals
                  changed_context=context,
                  version_id=version_id,
                  send_to_review=send_to_review)
-    return generate_preview_link(context, product=product)
+    return generate_preview_link(context, product=product, state=PENDING)
 
 
 def publish_latest_version(product, review_id, user):

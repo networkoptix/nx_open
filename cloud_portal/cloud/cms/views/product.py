@@ -19,6 +19,8 @@ from cms.forms import *
 from django.contrib.admin import AdminSite
 
 
+DRAFT = Product.PREVIEW_STATUS[Product.PREVIEW_STATUS.draft]
+
 class MyAdminSite(AdminSite):
     pass
 
@@ -119,7 +121,7 @@ def context_editor_action(request, product, context_id, language_code):
         else:
             messages.success(request, saved_msg)
             if product.product_type.can_preview:
-                preview_link = modify_db.generate_preview_link(context, product)
+                preview_link = modify_db.generate_preview_link(context, product, state=DRAFT)
 
     return preview_link, upload_errors, product_errors
 

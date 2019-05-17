@@ -1,4 +1,5 @@
 import json
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -33,9 +34,17 @@ def make_integrations_json(integrations, contexts=None, show_pending=False, show
             current_version = integration.version_id()
 
             if show_pending:
-                current_version = ProductCustomizationReview.objects.filter(version__product=integration,
-                                                                            state=PENDING).latest('id').version.id
+                pending_version = ProductCustomizationReview.objects.filter(version__product=integration,
+                                                                            customization__name=settings.CUSTOMIZATION,
+                                                                            state=PENDING).last()
+
+                if not pending_version:
+                    continue
+                current_version = pending_version.version.id
+
             if show_drafts:
+                if integration.preview_status != Product.PREVIEW_STATUS.draft:
+                    continue
                 current_version = None
 
             if show_drafts or show_pending:
@@ -100,14 +109,28 @@ def check_integration_store_enabled():
 @api_view(("GET", ))
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
-def get_integration(request, product_id=None):
-    draft = "draft" in request.GET
-    review = "review" in request.GET
-    product_id = int(product_id)
-    products = Product.objects.filter(product_type__type=INTEGRATION,
-                                      customizations__name__in=[settings.CUSTOMIZATION])
+def get_integration(request, product_id=None, state=None):
+    draft = state == "draft"
+    review = state == "pending"
+    if not product_id:
+        return api_success("Integration not found.", status_code=status.HTTP_404_NOT_FOUND)
 
-    return api_success(make_integrations_json([products.get(id=product_id)], show_pending=review, show_drafts=draft))
+    product_id = int(product_id)
+    integration = Product.objects.filter(product_type__type=INTEGRATION,
+                                         customizations__name__in=[settings.CUSTOMIZATION],
+                                         id=product_id).last()
+
+    if not integration:
+        return api_success("Integration not found.", status_code=status.HTTP_404_NOT_FOUND)
+
+    if draft:
+        if integration.id not in request.user.products:
+            return api_success("You do not have permission to view this draft", status_code=status.HTTP_403_FORBIDDEN)
+
+        if integration.preview_status != Product.PREVIEW_STATUS.draft:
+            return api_success("Draft does not exist for this integration", status_code=status.HTTP_404_NOT_FOUND)
+
+    return api_success(make_integrations_json([integration], show_pending=review, show_drafts=draft))
 
 
 @api_view(("GET", ))
