@@ -68,8 +68,8 @@ void ColorTheme::Private::loadColorsFromFile(const QString& filename)
     if (!NX_ASSERT(json.isObject(), "Invalid JSON structure"))
         return;
 
-    const auto& globals = json.object().value(lit("globals")).toObject();
-    if (!NX_ASSERT(!globals.isEmpty(), "\"globals\" key is empty"))
+    const auto& globals = json.object().value("globals").toObject();
+    if (globals.isEmpty())
         return;
 
     QRegExp groupRegExp(lit("([^_\\d]+)[_\\d].*"));
