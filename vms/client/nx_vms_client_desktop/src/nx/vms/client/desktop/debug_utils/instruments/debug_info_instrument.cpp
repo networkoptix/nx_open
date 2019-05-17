@@ -58,7 +58,7 @@ struct DebugInfoInstrument::Private
         #endif
     }
 
-    void updateTreads()
+    void updateThreads()
     {
         #if defined(Q_OS_WIN)
             const auto currentProcessId = GetCurrentProcessId();
@@ -159,7 +159,7 @@ bool DebugInfoInstrument::paintEvent(QWidget* /*viewport*/, QPaintEvent* /*event
 
     if (d->threadsTimer.hasExpired(kThreadsInterval.count()))
     {
-        d->updateTreads();
+        d->updateThreads();
         d->threadsTimer.restart();
         changed = true;
     }
