@@ -16,9 +16,7 @@
             </header>
 
             <nx-section *ngIf="plugin.information.logo">
-                <div class="card--body-logo"
-                     [style.backgroundImage]="'url(' + plugin.information.logo + ')'">
-                </div>
+                <img src="{{plugin.information.logo}}" />
             </nx-section>
 
             <nx-section *ngIf="plugin.overview && plugin.overview.description">
