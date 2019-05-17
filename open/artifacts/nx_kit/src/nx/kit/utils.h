@@ -45,6 +45,11 @@ inline bool isAsciiPrintable(int c)
 NX_KIT_API std::string baseName(std::string path);
 
 /**
+ * @return Process name, without .exe in Windows. 
+ */
+NX_KIT_API std::string getProcessName();
+
+/**
  * Convert a value to its report-friendly text representation, e.g. a quoted and escaped string.
  */
 template<typename T>
