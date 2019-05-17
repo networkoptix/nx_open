@@ -175,11 +175,11 @@
             Directory="InstallDirRoot"
             ExeCommand="[InstallDirRoot]traytool.exe"/>
 
-        <CustomAction Id="NoDowngrade" Error="NoDowngrade" />
-
-
+        <!-- Custom error message is displayed in MSI only, so leaving it untranslated. -->
         <MajorUpgrade
-            AllowDowngrades="yes"
+            AllowSameVersionUpgrades="yes"
+            AllowDowngrades="no"
+            DowngradeErrorMessage="Newer version is already installed. Please uninstall it first."
             Schedule="afterInstallInitialize"
             MigrateFeatures="yes" />
 

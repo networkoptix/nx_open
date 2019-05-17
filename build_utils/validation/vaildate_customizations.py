@@ -153,9 +153,9 @@ def validate_skins(root_dir):
         other_skins[entry] = skin
 
     for name, skin in other_skins.iteritems():
-        for icon in default_skin - skin:
+        for icon in sorted(list(default_skin - skin)):
             warn('Icon {0} is not customized in the {1} skin'.format(icon, name))
-        for icon in skin - all_files:
+        for icon in sorted(list(skin - all_files)):
             warn('Icon {0} is not used in the {1} skin'.format(icon, name))
     return all_files
 

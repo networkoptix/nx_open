@@ -65,6 +65,12 @@ private:
     QString m_str;
 };
 
+inline
+Message makeMessage()
+{
+    return Message();
+}
+
 template<typename Format>
 Message makeMessage(const Format& format)
 {

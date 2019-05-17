@@ -27,6 +27,8 @@ enum Value
     isVersionInstalled,
     getInstalledVersions,
     addProcessKillTimer,
+    startZipInstallation,
+    checkZipProgress,
     invalidTaskType
 };
 
@@ -88,6 +90,36 @@ public:
     virtual bool deserialize(const QnByteArrayConstRef& data) override;
 };
 
+/**
+ * A command to start installation of a zip package. It will run asynchronously. Client should send
+ * InstallZipCheckStatus request to get status of zip installation.
+ */
+class NX_VMS_APPLAUNCHER_API_API InstallZipTaskAsync: public BaseTask
+{
+public:
+    nx::utils::SoftwareVersion version;
+    QString zipFileName;
+
+    InstallZipTaskAsync();
+    InstallZipTaskAsync(const nx::utils::SoftwareVersion& version, const QString& zipFileName);
+
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
+
+/**
+ * A command to chesk status of installation of a zip package.
+ */
+class NX_VMS_APPLAUNCHER_API_API InstallZipCheckStatus: public BaseTask
+{
+public:
+    InstallZipCheckStatus();
+    InstallZipCheckStatus(const nx::utils::SoftwareVersion& version, const QString& zipFileName);
+
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
+
 class NX_VMS_APPLAUNCHER_API_API IsVersionInstalledRequest: public BaseTask
 {
 public:
@@ -123,8 +155,12 @@ enum Value
     badResponse,
     ioError,
     notEnoughSpace,
-    // Zip with update data is broken and can not be installed.
+    /** Zip with update data is broken and can not be installed. */
     brokenPackage,
+    /** Applauncher is still unpacking zip file. */
+    unpackingZip,
+    /** Applauncher can not start another async task right now. */
+    busy,
     otherError
 };
 

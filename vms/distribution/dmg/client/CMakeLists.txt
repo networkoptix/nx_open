@@ -10,6 +10,12 @@ nx_configure_directory(
     OUTPUT_FILES_VARIABLE configured_files
 )
 
+set(app_icon ${customization_dir}/icons/macosx/logo.icns)
+set(installer_icon ${customization_dir}/icons/macosx/installer_icon.icns)
+if(NOT EXISTS ${installer_icon})
+    set(installer_icon ${app_icon})
+endif()
+
 nx_configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.conf.in
     ${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf
@@ -39,15 +45,13 @@ nx_copy(${CMAKE_SOURCE_DIR}/vms/libs/common/maven/bin-resources/resources/qt/etc
 add_custom_target(distribution_dmg_client ALL
     DEPENDS desktop_client applauncher
         ${configured_files} ${copied_files} ${customization_files}
-        ${customization_dir}/icons/macosx/logo.icns
+        ${app_icon} ${installer_icon}
     COMMENT "Creating ${distribution_output_dir}/${dmg_file_name}"
     BYPRODUCTS
         ${distribution_output_dir}/${dmg_file_name}
         ${distribution_output_dir}/${update_file_name}
 
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy
-        ${customization_dir}/icons/macosx/logo.icns ${CMAKE_CURRENT_BINARY_DIR}
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/dmg-folder
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${configured_files_dir} ${CMAKE_CURRENT_BINARY_DIR}
 

@@ -15,6 +15,9 @@ public:
     int width() const;
     int height() const;
 
+    /** @returns inverted (1/x) aspect ratio */
+    QnAspectRatio inverted() const;
+
     float toFloat() const;
     QString toString() const;
     QString toString(const QString &format) const;

@@ -25,6 +25,10 @@ class CounterWithSignal;
 } // namespace utils
 } // namespace nx
 
+/**
+ * Proxy class to route video data and metadata through it.
+ * Also allows media distribution between several receivers.
+ */
 class QnResourceDisplay: public Connective<QObject>, protected QnResourceConsumer {
     Q_OBJECT
 

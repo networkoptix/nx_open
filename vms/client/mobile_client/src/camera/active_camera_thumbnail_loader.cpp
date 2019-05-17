@@ -8,11 +8,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <ui/camera_thumbnail_provider.h>
 
-QnActiveCameraThumbnailLoader::QnActiveCameraThumbnailLoader(QObject *parent)
-    : QObject(parent)
-    , d_ptr(new QnActiveCameraThumbnailLoaderPrivate(this))
+QnActiveCameraThumbnailLoader::QnActiveCameraThumbnailLoader(QObject* parent):
+    QObject(parent),
+    d_ptr(new QnActiveCameraThumbnailLoaderPrivate(this))
 {
-    connect(this, &QnActiveCameraThumbnailLoader::thumbnailIdChanged, this, &QnActiveCameraThumbnailLoader::thumbnailUrlChanged);
+    connect(this, &QnActiveCameraThumbnailLoader::thumbnailIdChanged,
+        this, &QnActiveCameraThumbnailLoader::thumbnailUrlChanged);
 }
 
 QnActiveCameraThumbnailLoader::~QnActiveCameraThumbnailLoader() {
@@ -76,7 +77,7 @@ QUrl QnActiveCameraThumbnailLoader::thumbnailUrl() const {
     QString id = thumbnailId();
     if (id.isNull())
         return QUrl();
-    return QUrl(lit("image://%1/%2").arg(lit("active")).arg(id));
+    return QUrl(QStringLiteral("image://active/%2").arg(id));
 }
 
 void QnActiveCameraThumbnailLoader::forceLoadThumbnail(qint64 position) {
@@ -97,7 +98,7 @@ void QnActiveCameraThumbnailLoader::initialize(QObject *item) {
     if (!engine)
         return;
 
-    d->imageProvider = dynamic_cast<QnCameraThumbnailProvider*>(engine->imageProvider(lit("active")));
+    d->imageProvider = dynamic_cast<QnCameraThumbnailProvider*>(engine->imageProvider("active"));
     if (!d->imageProvider)
         return;
 

@@ -66,12 +66,12 @@ AbstractEngine::Error AbstractEngine::loadModelFromFile(const QString& fileName)
 
 Settings* AbstractEngine::settingsItem() const
 {
-    return m_settingsItem;
+    return m_settingsItem.data();
 }
 
 AbstractEngine::Error AbstractEngine::setSettingsItem(Settings* item)
 {
-    m_settingsItem = item;
+    m_settingsItem.reset(item);
     if (!item)
         return ErrorCode::ok;
 
@@ -114,7 +114,7 @@ QVariantMap AbstractEngine::values() const
         return {};
 
     QVariantMap result;
-    processValueItemsRecursively(m_settingsItem,
+    processValueItemsRecursively(m_settingsItem.data(),
         [&result](ValueItem* item)
         {
             result[item->name()] = item->value();
@@ -129,7 +129,7 @@ void AbstractEngine::applyValues(const QVariantMap& values) const
     if (!m_settingsItem)
         return;
 
-    processValueItemsRecursively(m_settingsItem,
+    processValueItemsRecursively(m_settingsItem.data(),
         [&values](ValueItem* item)
         {
             const auto it = values.find(item->name());

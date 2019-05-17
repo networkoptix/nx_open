@@ -79,7 +79,7 @@ QVariant QnCameraListModel::data(const QModelIndex& index, int role) const
     if (thumbnailId.isEmpty())
         return QUrl();
 
-    return QUrl(lit("image://thumbnail/") + thumbnailId);
+    return QUrl(QStringLiteral("image://thumbnail/") + thumbnailId);
 }
 
 QString QnCameraListModel::layoutId() const
@@ -258,9 +258,7 @@ QnCameraListModelPrivate::QnCameraListModelPrivate() :
 }
 
 void QnCameraListModelPrivate::at_thumbnailUpdated(
-    const QnUuid& resourceId, const QString& thumbnailId)
+    const QnUuid& resourceId, const QString& /*thumbnailId*/)
 {
-    Q_UNUSED(thumbnailId);
-
     model->refreshResource(model->resourcePool()->getResourceById(resourceId), Qn::ThumbnailRole);
 }

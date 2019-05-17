@@ -100,7 +100,7 @@ void DirectTcpEndpointTunnel::setControlConnectionClosedHandler(
 
 ConnectType DirectTcpEndpointTunnel::connectType() const
 {
-    return ConnectType::tcpHp;
+    return ConnectType::forwardedTcpPort;
 }
 
 std::string DirectTcpEndpointTunnel::toString() const

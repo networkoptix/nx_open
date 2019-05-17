@@ -714,6 +714,70 @@ TEST_F(DistributedFileDownloaderStorageTest, setChecksumsToDownloadedFile)
         ResultCode::fileAlreadyDownloaded);
 }
 
+TEST_F(DistributedFileDownloaderStorageTest, simpleFullPath)
+{
+    createDefaultTestFile();
+
+    FileInformation fileInfo(testFileName);
+    fileInfo.status = FileInformation::Status::downloaded;
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo), ResultCode::ok);
+
+    const QString filePath = downloaderStorage->filePath(kTestFileName);
+    ASSERT_EQ(filePath, testFilePath);
+}
+
+TEST_F(DistributedFileDownloaderStorageTest, foundFileFullPath)
+{
+    createDefaultTestFile();
+
+    FileInformation fileInfo(testFileName);
+    fileInfo.status = FileInformation::Status::downloaded;
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo), ResultCode::ok);
+
+    Storage storage(workingDirectory);
+    storage.findDownloads(true);
+
+    const QString filePath = storage.filePath(kTestFileName);
+    ASSERT_EQ(filePath, testFilePath);
+}
+
+TEST_F(DistributedFileDownloaderStorageTest, customDirectoryFullPath)
+{
+    FileInformation fileInfo(testFileName);
+    fileInfo.absoluteDirectoryPath = nx::utils::TestOptions::temporaryDirectoryPath();
+    fileInfo.status = FileInformation::Status::downloaded;
+
+    const QString testFilePath =
+        QDir(fileInfo.absoluteDirectoryPath).absoluteFilePath(kTestFileName);
+    utils::createRandomFile(testFilePath, kTestFileSize);
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo), ResultCode::ok);
+
+    const QString filePath = downloaderStorage->filePath(kTestFileName);
+    ASSERT_EQ(filePath, testFilePath);
+}
+
+TEST_F(DistributedFileDownloaderStorageTest, customDirectoryfoundFileFullPath)
+{
+    FileInformation fileInfo(testFileName);
+    fileInfo.absoluteDirectoryPath = nx::utils::TestOptions::temporaryDirectoryPath();
+    fileInfo.status = FileInformation::Status::downloaded;
+
+    const QString testFilePath =
+        QDir(fileInfo.absoluteDirectoryPath).absoluteFilePath(kTestFileName);
+    utils::createRandomFile(testFilePath, kTestFileSize);
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo), ResultCode::ok);
+
+    Storage storage(workingDirectory);
+    storage.findDownloads(true);
+
+    const QString filePath = storage.filePath(kTestFileName);
+    ASSERT_EQ(filePath, testFilePath);
+}
+
 } // namespace test
 } // namespace downloader
 } // namespace p2p

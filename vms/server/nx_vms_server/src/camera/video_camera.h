@@ -64,6 +64,7 @@ public:
 private:
     void createReader(QnServer::ChunksCatalog catalog);
     QnLiveStreamProviderPtr readerByQuality(MediaQuality streamQuality) const;
+    void resetCachesIfNeeded(MediaQuality streamQuality);
     void stop();
 
 private:

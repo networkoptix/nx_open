@@ -619,6 +619,16 @@ void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch,
                 stretch,
                 alignment);
             break;
+        case QnMessageBox::Layout::BeforeAdditionalInfo:
+            // It differs from Layout::AfterMainLabel for some reason. If we addCustomWidget and
+            // then setInformativeText, then customWidget will land before informative text in
+            // this case.
+            ui->verticalLayout->insertWidget(
+                /*index=*/1,
+                widget,
+                stretch,
+                alignment);
+            break;
         default:
             break;
     }

@@ -21,7 +21,8 @@ AnalyticsEnginesWatcher::AnalyticsEngineInfo engineInfoFromResource(
     return AnalyticsEnginesWatcher::AnalyticsEngineInfo {
         engine->getId(),
         engine->getName(),
-        plugin->manifest().engineSettingsModel
+        plugin->manifest().engineSettingsModel,
+        engine->isDeviceDependent()
     };
 }
 

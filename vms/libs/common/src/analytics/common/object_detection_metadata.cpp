@@ -55,6 +55,8 @@ QString toString(const DetectedObject& object)
         + ", typeId " + object.objectTypeId
         + ", attributes {";
 
+    const QRegularExpression kExpectedCharsOnlyRegex("\\A[A-Za-z_0-9.]+\\z");
+    
     bool isFirstAttribute = true;
     for (const auto& attribute: object.labels)
     {
@@ -65,7 +67,6 @@ QString toString(const DetectedObject& object)
 
         // If attribute.name is empty or contains chars other than letters, underscores, digits, or
         // dots, then properly enquote it with escaping.
-        static const QRegularExpression kExpectedCharsOnlyRegex("\\A[A-Za-z_0-9.]+\\z");
         if (kExpectedCharsOnlyRegex.match(attribute.name).hasMatch())
             s += attribute.name;
         else

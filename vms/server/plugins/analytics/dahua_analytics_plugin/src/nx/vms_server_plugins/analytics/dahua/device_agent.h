@@ -66,7 +66,7 @@ private:
     int m_channelNumber = 0;
 
     std::unique_ptr<MetadataMonitor> m_monitor;
-    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 };
 
 } // namespace nx::vms_server_plugins::analytics::dahua

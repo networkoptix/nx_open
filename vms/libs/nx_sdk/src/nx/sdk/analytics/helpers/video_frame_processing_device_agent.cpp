@@ -70,7 +70,8 @@ VideoFrameProcessingDeviceAgent::~VideoFrameProcessingDeviceAgent()
 Error VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_handler = handler;
+    handler->addRef();
+    m_handler.reset(handler);
     return Error::noError;
 }
 

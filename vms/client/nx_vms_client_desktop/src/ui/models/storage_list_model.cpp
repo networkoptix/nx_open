@@ -8,7 +8,6 @@
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
-#include <nx/analytics/utils.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/algorithm/index_of.h>
 
@@ -239,19 +238,13 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
             if (forcedText)
                 return tr("Use to store analytics data"); // Calculate predefined column width.
 
-            const bool analyticsEnabled = nx::analytics::hasActiveObjectEngines(
-                m_server->commonModule(), m_server->getId());
-
-            if (analyticsEnabled && storageData.id == m_metadataStorageId)
+            if (storageData.id == m_metadataStorageId)
                 return tr("Stores analytics data");
 
             if (canRemoveStorage(storageData))
                 return tr("Remove");
 
-            if (analyticsEnabled)
-                return tr("Use to store analytics data");
-
-            return QString();
+            return tr("Use to store analytics data");
         }
 
         default:
@@ -267,8 +260,9 @@ QVariant QnStorageListModel::mouseCursorData(const QModelIndex& index) const
         return QVariant();
 
     if (index.column() == ActionsColumn)
-        if (!index.data(Qt::DisplayRole).toString().isEmpty())
-            return QVariant::fromValue<int>(Qt::PointingHandCursor);
+        if (!index.data(Qt::DisplayRole).toString().isEmpty()
+            && m_storages.at(index.row()).id != m_metadataStorageId)
+                return QVariant::fromValue<int>(Qt::PointingHandCursor);
 
     return QVariant();
 }
@@ -464,6 +458,9 @@ bool QnStorageListModel::canRemoveStorage(const QnStorageModelInfo& data) const
         return false;
 
     if (isStoragePoolInRebuild(data))
+        return false;
+
+    if (data.id == m_metadataStorageId)
         return false;
 
     return data.isExternal || !data.isOnline;

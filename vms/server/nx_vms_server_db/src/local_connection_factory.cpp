@@ -866,6 +866,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value Offline
      *         %value Online
      *         %value Recording
+     *         %value Unauthorized
      *     %param addParams List of additional parameters for the camera. This list can contain
      *         such information as full ONVIF URL, camera maximum FPS, etc.
      * %// AbstractCameraManager::getCamerasEx

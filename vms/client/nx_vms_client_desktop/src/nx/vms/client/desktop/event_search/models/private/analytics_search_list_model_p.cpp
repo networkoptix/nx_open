@@ -534,6 +534,26 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     QHash<QnUuid, int> newObjectIndices;
 
+    struct FoundObject
+    {
+        DetectedObject* const object = nullptr;
+        const bool isNew = false;
+    };
+
+    const auto findObject =
+        [&](const QnUuid& objectId) -> FoundObject
+        {
+            auto index = newObjectIndices.value(objectId, -1);
+            if (index >= 0)
+                return {&newObjects[index], true};
+
+            index = indexOf(objectId);
+            if (index >= 0)
+                return {&m_data[index], false};
+
+            return {};
+        };
+
     for (const auto& packets: packetsBySource)
     {
         for (const auto& metadata: packets)
@@ -547,25 +567,33 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
             for (const auto& item: detectionMetadata->objects)
             {
+                const auto found = findObject(item.objectId);
+                if (item.bestShot)
+                {
+                    if (!found.object)
+                        continue; //< A valid situation - an object can be filtered out.
+
+                    found.object->bestShot.timestampUsec = detectionMetadata->timestampUsec;
+                    found.object->bestShot.rect = item.boundingBox;
+
+                    if (found.isNew)
+                        continue;
+
+                    m_dataChangedObjectIds.insert(found.object->objectAppearanceId);
+                    m_emitDataChanged->requestOperation();
+                    continue;
+                }
+
                 ObjectPosition pos;
                 pos.deviceId = detectionMetadata->deviceId;
                 pos.timestampUsec = detectionMetadata->timestampUsec;
                 pos.durationUsec = detectionMetadata->durationUsec;
                 pos.boundingBox = item.boundingBox;
 
-                auto index = newObjectIndices.value(item.objectId, -1);
-                if (index >= 0)
+                if (found.object)
                 {
                     pos.attributes = item.labels;
-                    advanceObject(newObjects[index], std::move(pos), false);
-                    continue;
-                }
-
-                index = indexOf(item.objectId);
-                if (index >= 0)
-                {
-                    pos.attributes = item.labels;
-                    advanceObject(m_data[index], std::move(pos));
+                    advanceObject(*found.object, std::move(pos), !found.isNew);
                     continue;
                 }
 
@@ -660,10 +688,12 @@ void AnalyticsSearchListModel::Private::advanceObject(DetectedObject& object,
     }
 
     object.lastAppearanceTimeUsec = position.timestampUsec;
-    m_dataChangedObjectIds.insert(object.objectAppearanceId);
 
     if (emitDataChanged)
+    {
+        m_dataChangedObjectIds.insert(object.objectAppearanceId);
         m_emitDataChanged->requestOperation();
+    }
 }
 
 int AnalyticsSearchListModel::Private::indexOf(const QnUuid& objectId) const
@@ -766,69 +796,14 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Private::previewParams(
     const analytics::db::DetectedObject& object)
 {
-    PreviewParams result;
-    result.timestamp = std::chrono::microseconds(object.firstAppearanceTimeUsec);
-    result.boundingBox = object.track.empty()
+    if (object.bestShot.initialized())
+        return {microseconds(object.bestShot.timestampUsec), object.bestShot.rect};
+
+    const auto rect = object.track.empty()
         ? QRectF()
         : object.track.front().boundingBox;
 
-    const auto attribute =
-        [&object](const QString& name)
-        {
-            const auto iter = std::find_if(object.attributes.cbegin(), object.attributes.cend(),
-                [&name](const nx::common::metadata::Attribute& attribute)
-                {
-                    return attribute.name == name;
-                });
-
-            return (iter != object.attributes.cend()) ? iter->value : QString();
-        };
-
-    const auto getRealAttribute =
-        [&attribute](const QString& name, qreal defaultValue)
-        {
-            bool ok = false;
-            QString valueStr = attribute(name);
-            if (valueStr.isNull())
-                return defaultValue; //< Attribute is missing.
-
-            valueStr.replace(',', '.'); //< Protection against localized decimal point.
-            const qreal value = valueStr.toDouble(&ok);
-            if (ok)
-                return value;
-
-            NX_WARNING(typeid(Private)) << lm("Invalid %1 value: \"%2\"").args(name, valueStr);
-            return defaultValue;
-        };
-
-    const QString previewTimestampStr = attribute("nx.sys.preview.timestampUs");
-    if (!previewTimestampStr.isNull())
-    {
-        const qint64 previewTimestampUs = previewTimestampStr.toLongLong();
-        if (previewTimestampUs > 0)
-        {
-            result.timestamp = std::chrono::microseconds(previewTimestampUs);
-        }
-        else
-        {
-            NX_WARNING(typeid(Private)) << lm("Invalid nx.sys.preview.timestampUs value: \"%1\"")
-                .arg(previewTimestampStr);
-        }
-    }
-
-    result.boundingBox.setLeft(getRealAttribute("nx.sys.preview.boundingBox.x",
-        result.boundingBox.left()));
-
-    result.boundingBox.setTop(getRealAttribute("nx.sys.preview.boundingBox.y",
-        result.boundingBox.top()));
-
-    result.boundingBox.setWidth(getRealAttribute("nx.sys.preview.boundingBox.width",
-        result.boundingBox.width()));
-
-    result.boundingBox.setHeight(getRealAttribute("nx.sys.preview.boundingBox.height",
-        result.boundingBox.height()));
-
-    return result;
+    return {microseconds(object.firstAppearanceTimeUsec), rect};
 }
 
 QnVirtualCameraResourcePtr AnalyticsSearchListModel::Private::camera(

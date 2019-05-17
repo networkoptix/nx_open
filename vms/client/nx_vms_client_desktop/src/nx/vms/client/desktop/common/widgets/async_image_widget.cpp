@@ -209,11 +209,10 @@ QTransform AsyncImageWidget::getAdjustment(QRectF target, QRectF image)
     if (image.left() < target.left() && image.right() < target.right())
     {
         dx = image.width() > target.width()
-            ? target.right() - image.right() //< Align left edges.
-            : target.left() - image.left(); //< Align right edges.
+            ? target.right() - image.right() //< Align right edges.
+            : target.left() - image.left(); //< Align left edges.
     }
-    else
-    if (image.right() > target.right() && image.left() > target.left())
+    else if (image.right() > target.right() && image.left() > target.left())
     {
         dx = image.width() > target.width()
             ? target.left() - image.left() //< Align left edges.
@@ -224,13 +223,12 @@ QTransform AsyncImageWidget::getAdjustment(QRectF target, QRectF image)
     {
         dy = image.height() > target.height()
             ? target.bottom() - image.bottom() //< Align bottom edges.
-            : target.top() - image.top(); //< Align bottom edges.
+            : target.top() - image.top(); //< Align top edges.
     }
-    else
-    if (image.bottom() > target.bottom() && image.top() > target.top())
+    else if (image.bottom() > target.bottom() && image.top() > target.top())
     {
         dy = image.height() > target.height()
-            ? target.top() - image.top() //< Align bottom edges.
+            ? target.top() - image.top() //< Align top edges.
             : target.bottom() - image.bottom(); //< Align bottom edges.
     }
     return QTransform::fromTranslate(dx, dy);
@@ -423,7 +421,10 @@ void AsyncImageWidget::updateSizeHint() const
             static_cast<qreal>(m_cachedSizeHint.width()) / maximumSize().width(),
             static_cast<qreal>(m_cachedSizeHint.height()) / maximumSize().height());
         if (oversizeCoefficient > 1.0)
-            m_cachedSizeHint = perfectSize / oversizeCoefficient;
+        {
+            m_cachedSizeHint.setWidth(qMax(1, perfectSize.width() / oversizeCoefficient));
+            m_cachedSizeHint.setHeight(qMax(1, perfectSize.height() / oversizeCoefficient));
+        }
     }
 }
 

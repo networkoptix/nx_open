@@ -571,12 +571,13 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& ur
         lit("WORKGROUP\\") + initialUserName,
     };
 
-    LPWSTR password = (LPWSTR) storageUrl.password().constData();
+    const auto password = storageUrl.password();
     bool wrongAuth = false;
 
     for (const auto& userName : userNamesToTest)
     {
-        auto result = updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes);
+        auto result = updatePermissionsHelper(
+            (LPWSTR) userName.constData(), (LPWSTR) password.constData(), &netRes);
         switch (result)
         {
             case Qn::StorageInit_Ok:

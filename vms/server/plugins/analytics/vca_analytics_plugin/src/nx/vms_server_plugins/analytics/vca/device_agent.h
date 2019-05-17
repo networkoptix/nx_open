@@ -95,7 +95,7 @@ private:
     QByteArray m_cameraManifest;
     ElapsedEvents m_eventsToCatch;
     QByteArray m_buffer;
-    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 
     std::unique_ptr<nx::network::TCPSocket> m_tcpSocket;
     nx::network::aio::Timer m_stopEventTimer;

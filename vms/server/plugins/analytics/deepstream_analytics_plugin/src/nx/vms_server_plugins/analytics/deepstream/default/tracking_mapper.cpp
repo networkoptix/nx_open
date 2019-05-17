@@ -48,7 +48,7 @@ void TrackingMapper::setLabelMapping(std::map<LabelMappingId, LabelMapping> labe
     m_labelMapping = labelMapping;
 }
 
-std::deque<nx::sdk::analytics::Attribute> TrackingMapper::attributes(
+std::deque<nx::sdk::Ptr<nx::sdk::analytics::Attribute>> TrackingMapper::attributes(
     const ROIMeta_Params& roiMeta)
 {
     NX_OUTPUT
@@ -57,12 +57,12 @@ std::deque<nx::sdk::analytics::Attribute> TrackingMapper::attributes(
 
     auto objectItr = m_trackingMap.find(roiMeta.tracking_id);
     if (objectItr == m_trackingMap.cend())
-        return std::deque<nx::sdk::analytics::Attribute>();
+        return {};
 
     if (!roiMeta.has_new_info)
         return objectItr->second.attributes;
 
-    std::deque<nx::sdk::analytics::Attribute> result;
+    std::deque<nx::sdk::Ptr<nx::sdk::analytics::Attribute>> result;
     for (const auto& entry: m_labelMapping)
     {
         const auto mappingId = entry.first;
@@ -91,9 +91,10 @@ std::deque<nx::sdk::analytics::Attribute> TrackingMapper::attributes(
                 << ", attribute value: " << labelValueStringItr->second;
 
             result.emplace_back(
-                nx::sdk::IAttribute::Type::string,
-                labelTypeMappingItr->second.labelTypeString,
-                labelValueStringItr->second);
+                nx::sdk::makePtr<nx::sdk::analytics::Attribute>(
+                    nx::sdk::IAttribute::Type::string,
+                    labelTypeMappingItr->second.labelTypeString,
+                    labelValueStringItr->second));
         }
     }
 

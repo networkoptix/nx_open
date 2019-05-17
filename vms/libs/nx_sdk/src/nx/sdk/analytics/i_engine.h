@@ -33,9 +33,11 @@ class IEngine: public Interface<IEngine>
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEngine"); }
 
-    class IHandler
+    class IHandler: public Interface<IHandler>
     {
     public:
+        static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEngine::IHandler"); }
+
         virtual ~IHandler() = default;
         virtual void handlePluginEvent(IPluginEvent* event) = 0;
     };

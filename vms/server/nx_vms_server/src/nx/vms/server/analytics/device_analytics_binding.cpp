@@ -362,12 +362,12 @@ Ptr<DeviceAnalyticsBinding::DeviceAgent> DeviceAnalyticsBinding::createDeviceAge
     return deviceAgent;
 }
 
-std::unique_ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
+nx::sdk::Ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
 {
     if (!NX_ASSERT(m_engine, "No analytics engine is set"))
         return nullptr;
 
-    auto handler = std::make_unique<DeviceAgentHandler>(
+    auto handler = nx::sdk::makePtr<DeviceAgentHandler>(
         serverModule(), m_engine->getId(), m_device);
     handler->setMetadataSink(m_metadataSink.get());
 

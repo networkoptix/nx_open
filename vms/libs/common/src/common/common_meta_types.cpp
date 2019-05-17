@@ -120,6 +120,7 @@ void QnCommonMetaTypes::initialize()
     nx::vms::api::Metatypes::initialize();
 
     qRegisterMetaType<uintptr_t>("uintptr_t");
+    qRegisterMetaType<QSet<QString>>();
 
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();

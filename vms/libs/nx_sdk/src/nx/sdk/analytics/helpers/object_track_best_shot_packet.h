@@ -23,7 +23,7 @@ public:
 
 private:
     Uuid m_trackId;
-    int64_t m_timestampUs = 0;
+    int64_t m_timestampUs = -1;
     Rect m_boundingBox;
 };
 

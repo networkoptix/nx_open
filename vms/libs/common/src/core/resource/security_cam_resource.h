@@ -118,6 +118,10 @@ public:
     /** Returns true if it is a analog encoder (described in resource_data.json) */
     bool isAnalogEncoder() const;
 
+    /**
+     * These 3 functions apply ONLY to Entropix cameras that have video from two sensors in one
+     * video stream. Main color sensor goes in left half-frame and B&W sensor in right half-frame.
+     */
     nx::vms::common::core::resource::CombinedSensorsDescription combinedSensorsDescription() const;
     void setCombinedSensorsDescription(
         const nx::vms::common::core::resource::CombinedSensorsDescription& sensorsDescription);

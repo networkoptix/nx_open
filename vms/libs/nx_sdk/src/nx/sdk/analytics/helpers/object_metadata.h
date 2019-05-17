@@ -3,7 +3,9 @@
 #include <string>
 #include <vector>
 
+#include <nx/sdk/analytics/helpers/attribute.h>
 #include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/i_object_metadata.h>
@@ -29,8 +31,8 @@ public:
     void setConfidence(float confidence);
     void setId(const Uuid& value);
     void setSubtype(const std::string& value);
-    void addAttribute(Attribute attribute);
-    void addAttributes(const std::vector<Attribute>& value);
+    void addAttribute(nx::sdk::Ptr<Attribute> attribute);
+    void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);
     void setAuxiliaryData(std::string value);
     void setBoundingBox(const Rect& rect);
 
@@ -39,7 +41,7 @@ private:
     float m_confidence = 1.0;
     Uuid m_id;
     std::string m_subtype;
-    std::vector<Attribute> m_attributes;
+    std::vector<nx::sdk::Ptr<Attribute>> m_attributes;
     std::string m_auxiliaryData;
     Rect m_rect;
 };

@@ -26,7 +26,7 @@
                 SuppressOptionsUI="no"
                 SuppressRepair="yes"
                 ShowFilesInUse="yes"
-                SuppressDowngradeFailure="yes"
+                SuppressDowngradeFailure="no"
                 ThemeFile="OptixTheme.xml"
                 LocalizationFile="theme_$(var.installerLanguage).wxl"
                 LicenseUrl="license.html"

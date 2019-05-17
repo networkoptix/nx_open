@@ -30,7 +30,7 @@
                 ShowFilesInUse="yes"
                 ThemeFile="OptixTheme.xml"
                 LocalizationFile="theme_$(var.installerLanguage).wxl"
-                SuppressDowngradeFailure="yes"
+                SuppressDowngradeFailure="no"
                 LicenseUrl="license.html" />
         </BootstrapperApplicationRef>
 

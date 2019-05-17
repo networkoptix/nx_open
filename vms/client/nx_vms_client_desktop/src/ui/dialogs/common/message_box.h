@@ -53,7 +53,8 @@ public:
     {
         Main,
         Content,
-        AfterMainLabel
+        AfterMainLabel,
+        BeforeAdditionalInfo,
     };
 
 public:

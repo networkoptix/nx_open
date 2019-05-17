@@ -30,9 +30,14 @@ class IDeviceAgent: public Interface<IDeviceAgent>
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IDeviceAgent"); }
 
-    class IHandler
+    class IHandler: public Interface<IHandler>
     {
     public:
+        static auto interfaceId()
+        {
+            return InterfaceId("nx::sdk::analytics::IDeviceAgent::IHandler");
+        }
+
         virtual ~IHandler() = default;
         virtual void handleMetadata(IMetadataPacket* metadataPacket) = 0;
         virtual void handlePluginEvent(IPluginEvent* event) = 0;

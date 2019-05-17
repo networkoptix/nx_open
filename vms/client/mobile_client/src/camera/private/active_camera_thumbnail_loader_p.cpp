@@ -37,7 +37,7 @@ QnActiveCameraThumbnailLoaderPrivate::QnActiveCameraThumbnailLoaderPrivate(
     screenshotQualityList.append(720);
     screenshotQualityList.append(1080);
 
-    decompressThread->setObjectName(lit("QnActiveCameraThumbnailLoader_decompressThread"));
+    decompressThread->setObjectName("QnActiveCameraThumbnailLoader_decompressThread");
     decompressThread->start();
 }
 
@@ -118,7 +118,8 @@ void QnActiveCameraThumbnailLoaderPrivate::refresh(bool force)
             Q_Q(QnActiveCameraThumbnailLoader);
             if (camera)
             {
-                thumbnailId = lit("%1/%2").arg(camera->getId().toString()).arg(position);
+                thumbnailId =
+                    QStringLiteral("%1/%2").arg(camera->getId().toString()).arg(position);
                 emit q->thumbnailIdChanged();
             }
         };

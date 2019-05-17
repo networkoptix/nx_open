@@ -290,7 +290,7 @@ EventTile::EventTile(QWidget* parent):
     ui->narrowHolder->hide();
     ui->wideHolder->hide();
 
-    ui->previewWidget->setAutoScaleDown(false);
+    ui->previewWidget->setAutoScaleUp(true);
     ui->previewWidget->setReloadMode(AsyncImageWidget::ReloadMode::showPreviousImage);
 
     ui->previewWidget->setCropMode(ini().rightPanelHoverPreviewCrop

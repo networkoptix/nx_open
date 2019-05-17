@@ -208,18 +208,18 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
         objectMetadata->setConfidence(1);
         objectMetadata->setTypeId(m_objectTypeId);
 
-        std::vector<nx::sdk::analytics::Attribute> attributes;
+        std::vector<nx::sdk::Ptr<nx::sdk::analytics::Attribute>> attributes;
         for (const auto& entry: cached.attributes)
         {
             const auto attributeName = entry.first;
             const auto attributeValue = entry.second;
 
-            nx::sdk::analytics::Attribute attribute(
+            auto attribute = nx::sdk::makePtr<nx::sdk::analytics::Attribute>(
                 nx::sdk::IAttribute::Type::string,
                 attributeName,
                 attributeValue);
 
-            attributes.push_back(attribute);
+            attributes.push_back(std::move(attribute));
         }
 
         objectMetadata->addAttributes(attributes);

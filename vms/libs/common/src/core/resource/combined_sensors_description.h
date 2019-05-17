@@ -24,7 +24,7 @@ public:
     Q_ENUM(Type)
 
     Type type;
-    QRectF geometry;
+    QRectF geometry; // For Entropix cameras one sensor may occupy fraction(!!) of a video frame.
 
     SensorDescription(const QRectF& geometry = QRectF(), Type type = Type::regular);
 

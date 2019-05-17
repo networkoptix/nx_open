@@ -23,6 +23,10 @@ Value fromString(const QnByteArrayConstRef& str)
         return quit;
     if (str == "installZip")
         return installZip;
+    if (str == "startZipInstallation")
+        return startZipInstallation;
+    if (str == "checkZipProgress")
+        return checkZipProgress;
     if (str == "isVersionInstalled")
         return isVersionInstalled;
     if (str == "getInstalledVersions")
@@ -42,6 +46,10 @@ QByteArray toString(Value val)
             return "quit";
         case installZip:
             return "installZip";
+        case startZipInstallation:
+            return "startZipInstallation";
+        case checkZipProgress:
+            return "checkZipProgress";
         case isVersionInstalled:
             return "isVersionInstalled";
         case getInstalledVersions:
@@ -90,6 +98,14 @@ bool deserializeTask(const QByteArray& str, BaseTask** ptr)
 
         case TaskType::installZip:
             *ptr = new InstallZipTask();
+            break;
+
+        case TaskType::startZipInstallation:
+            *ptr = new InstallZipTaskAsync();
+            break;
+
+        case TaskType::checkZipProgress:
+            *ptr = new InstallZipCheckStatus();
             break;
 
         case TaskType::isVersionInstalled:
@@ -233,6 +249,10 @@ Value fromString(const QnByteArrayConstRef& str)
         return notEnoughSpace;
     if (str == "brokenPackage")
         return brokenPackage;
+    if (str == "unpackingZip")
+        return unpackingZip;
+    if (str == "busy")
+        return busy;
     return otherError;
 }
 
@@ -258,6 +278,10 @@ QByteArray toString(Value val)
             return "notEnoughSpace";
         case brokenPackage:
             return "brokenPackage";
+        case unpackingZip:
+            return "unpackingZip";
+        case busy:
+            return "busy";
         default:
             return "otherError " + QByteArray::number(val);
     }
@@ -316,6 +340,64 @@ bool InstallZipTask::deserialize(const QnByteArrayConstRef& data)
     version = nx::utils::SoftwareVersion(list[1]);
     zipFileName = list[2];
     return true;
+}
+
+////////////////////////////////////////////////////////////
+//// class IsVersionInstalledResponse
+////////////////////////////////////////////////////////////
+
+InstallZipTaskAsync::InstallZipTaskAsync():
+    BaseTask(TaskType::startZipInstallation)
+{
+}
+
+InstallZipTaskAsync::InstallZipTaskAsync(
+    const nx::utils::SoftwareVersion& version,
+    const QString& zipFileName):
+    BaseTask(TaskType::startZipInstallation),
+    version(version),
+    zipFileName(zipFileName)
+{
+}
+
+QByteArray InstallZipTaskAsync::serialize() const
+{
+    return lm("%1\n%2\n%3\n\n").args(
+        QString::fromLatin1(TaskType::toString(type)),
+        version.toString(),
+        zipFileName
+    ).toUtf8();
+}
+
+bool InstallZipTaskAsync::deserialize(const QnByteArrayConstRef& data)
+{
+    QStringList list = QString::fromUtf8(data).split("\n", QString::SkipEmptyParts);
+    if (list.size() < 3)
+        return false;
+    if (TaskType::toString(type) != list[0].toLatin1())
+        return false;
+    version = nx::utils::SoftwareVersion(list[1]);
+    zipFileName = list[2];
+    return true;
+}
+
+////////////////////////////////////////////////////////////
+//// class InstallZipCheckStatus
+////////////////////////////////////////////////////////////
+
+InstallZipCheckStatus::InstallZipCheckStatus():
+    BaseTask(TaskType::checkZipProgress)
+{
+}
+
+QByteArray InstallZipCheckStatus::serialize() const
+{
+    return TaskType::toString(type) + "\n";
+}
+
+bool InstallZipCheckStatus::deserialize(const QnByteArrayConstRef& data)
+{
+    return data == serialize();
 }
 
 ////////////////////////////////////////////////////////////

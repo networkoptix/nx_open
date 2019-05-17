@@ -63,6 +63,12 @@ rest::Response QnCookieLoginRestHandler::executePost(const rest::Request& reques
         session.id = QnUuid::createUuid();
         auto auditManager = request.owner->commonModule()->auditManager();
         auditManager->addAuditRecord(auditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
+        NX_DEBUG(this, "Failure to authenticate request %1 with error %2. userName: %3",
+            request.path,
+            Qn::toErrorMessage(authResult),
+            session.userName);
+
+
         return errorResponse(authResult);
     }
 

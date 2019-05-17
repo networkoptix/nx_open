@@ -19,6 +19,15 @@ namespace nx::vms::server::analytics {
 
 using namespace nx::vms::server;
 
+namespace {
+
+bool isAliveStatus(Qn::ResourceStatus status)
+{
+    return status == Qn::ResourceStatus::Online || status == Qn::ResourceStatus::Recording;
+}
+
+} // namespace
+
 DeviceAnalyticsContext::DeviceAnalyticsContext(
     QnMediaServerModule* serverModule,
     const QnVirtualCameraResourcePtr& device)
@@ -221,14 +230,26 @@ void DeviceAnalyticsContext::putFrame(
     }
 }
 
+void DeviceAnalyticsContext::at_deviceStatusChanged(const QnResourcePtr& resource)
+{
+    auto device = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!NX_ASSERT(device, "Invalid device"))
+        return;
+
+    const auto currentDeviceStatus = device->getStatus();
+    const auto previousDeviceStatus = m_previousDeviceStatus;
+    m_previousDeviceStatus = currentDeviceStatus;
+    if (isAliveStatus(currentDeviceStatus) == isAliveStatus(previousDeviceStatus))
+        return;
+
+    at_deviceUpdated(resource);
+}
+
 void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
 {
     auto device = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!device)
-    {
-        NX_ASSERT(device, "Invalid device");
+    if (!NX_ASSERT(device, "Invalid device"))
         return;
-    }
 
     const auto isAlive = isDeviceAlive();
     for (auto& entry: m_bindings)
@@ -282,7 +303,7 @@ void DeviceAnalyticsContext::subscribeToDeviceChanges()
 {
     connect(
         m_device, &QnResource::statusChanged,
-        this, &DeviceAnalyticsContext::at_deviceUpdated);
+        this, &DeviceAnalyticsContext::at_deviceStatusChanged);
 
     connect(
         m_device, &QnResource::urlChanged,
@@ -311,7 +332,7 @@ bool DeviceAnalyticsContext::isDeviceAlive() const
         return false;
 
     const auto flags = m_device->flags();
-    return m_device->getStatus() >= Qn::Online
+    return isAliveStatus(m_device->getStatus())
         && !flags.testFlag(Qn::foreigner)
         && !flags.testFlag(Qn::desktop_camera);
 }

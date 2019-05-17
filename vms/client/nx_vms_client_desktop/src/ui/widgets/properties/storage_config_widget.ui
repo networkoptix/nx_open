@@ -27,13 +27,6 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="analyticsOnSystemDriveWarningLabel" native="true">
-     <property name="text" stdset="0">
-      <string>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QVBoxLayout" name="mainLayout">
      <property name="spacing">
       <number>24</number>
@@ -553,6 +546,13 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <widget class="nx::vms::client::desktop::AlertBar" name="analyticsOnSystemDriveWarningLabel" native="true">
+     <property name="text" stdset="0">
+      <string>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="nx::vms::client::desktop::AlertBar" name="analyticsOnDisabledStorageWarningLabel" native="true">

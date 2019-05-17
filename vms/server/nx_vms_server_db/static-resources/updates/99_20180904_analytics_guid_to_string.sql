@@ -1,4 +1,5 @@
--- Replace event type GUIDs with hierarchical strings in vms_businessrule::event_condition.
+-- Replace Analytics Event type GUIDs with hierarchical strings in
+-- vms_businessrule::event_condition.
 
 -- Metadata plugin "nx.stub".
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
@@ -24,7 +25,7 @@ UPDATE vms_businessrule SET event_condition = replace(event_condition,
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{2c218743-604c-475d-aed9-a848f40f13f9}', 'nx.hanwha.VideoAnalytics.Exiting');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{a452e49a-d1d8-44ea-84da-f581414e8153}', 'nx.hanwha.VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing');
+    '{a452e49a-d1d8-44ea-84da-f581414e8153}', 'nx.hanwha.VideoAnalytics.AppearDisappear');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{42d4994a-a267-4c39-98aa-cbc4d41ca42b}', 'nx.hanwha.VideoAnalytics.Intrusion');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
@@ -34,7 +35,7 @@ UPDATE vms_businessrule SET event_condition = replace(event_condition,
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{216668d9-ea9b-483a-a43e-9414ed760a01}', 'nx.hanwha.DefocusDetection');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{1bab8a57-5f19-4e3a-b73b-3641058d46b8}', 'nx.hanwha.AlarmInput.,NetworkAlarmInput');
+    '{1bab8a57-5f19-4e3a-b73b-3641058d46b8}', 'nx.hanwha.AlarmInput');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{f1f723bb-20c8-453a-afce-86f318cbf097}', 'nx.hanwha.MotionDetection');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
@@ -60,35 +61,23 @@ UPDATE vms_businessrule SET event_condition = replace(event_condition,
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{6f44b0fc-ed45-43e8-bc8b-f361d3f2c361}', 'nx.hanwha.Queue.3.Level.Medium');
 
--- Metadata plugin "nx.axis".
-UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{f83daede-7fae-6a51-2e90-69017dadfd62}', 'nx.axis.tns1:VideoSource/tnsaxis:Tampering');
-UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{b37730fe-3e2d-9eb7-bee0-7732877ec61f}', 'nx.axis.tns1:VideoSource/GlobalSceneChange/ImagingService');
-UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{7ef7f596-3831-201a-6093-da4ae8f70e08}', 'nx.axis.tns1:VideoSource/tnsaxis:DayNightVision');
-UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{0d50994b-0126-a437-3b7f-5bff70d14424}', 'nx.axis.tns1:RuleEngine/tnsaxis:CrossLineDetection/timer');
-UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{ed203a0c-2eae-9ce5-1022-87e993224816}', 'nx.axis.tns1:RuleEngine/tnsaxis:CrossLineDetection/linetouched');
-
--- Metadata plugin "nx.dw_mtt".
+-- Analytics plugin "nx.dw_mtt".
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{a5b9cc7c-6da5-4fe6-a2eb-19dd353fd724}', 'nx.dw_mtt.MOTION');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{6a34d742-9f83-47ba-93e2-811718fa49ac}', 'nx.dw_mtt.SENSOR');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{52764a47-bd7d-4447-bb4b-aaf0b0e7518f}', 'nx.dw_mtt.PEA');
+    '{52764a47-bd7d-4447-bb4b-aaf0b0e7518f}', 'nx.dw_mtt.PEA.perimeterAlarm');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{48b12142-f42d-4b13-9811-9e1329568dac}', 'nx.dw_mtt.PEA');
+    '{48b12142-f42d-4b13-9811-9e1329568dac}', 'nx.dw_mtt.PEA.tripwireAlarm');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{f01f9480-e3c2-4644-8d0c-092e7aa7898d}', 'nx.dw_mtt.OSC');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{7395066d-d870-4323-87aa-ca7ba2990d37}', 'nx.dw_mtt.AVD');
+    '{7395066d-d870-4323-87aa-ca7ba2990d37}', 'nx.dw_mtt.AVD.sceneChange');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{50108bc1-ed4d-4bde-a2d4-735614368026}', 'nx.dw_mtt.AVD');
+    '{50108bc1-ed4d-4bde-a2d4-735614368026}', 'nx.dw_mtt.AVD.clarityAbnormal');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{787550c4-35bb-4490-baed-0800e03c61a6}', 'nx.dw_mtt.AVD');
+    '{787550c4-35bb-4490-baed-0800e03c61a6}', 'nx.dw_mtt.AVD.colorAbnormal');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{2e149769-64d0-40ee-a79a-5d02962f0fe5}', 'nx.dw_mtt.CPC');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
@@ -98,7 +87,7 @@ UPDATE vms_businessrule SET event_condition = replace(event_condition,
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{12c841a0-33a4-429e-84de-810a43738d35}', 'nx.dw_mtt.VFD');
 
--- Metadata plugin "nx.hikvision".
+-- Analytics plugin "nx.hikvision".
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{98ff85dc-f4ca-4254-bea5-4204ad9e82bd}', 'nx.hikvision.loitering');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
@@ -114,7 +103,7 @@ UPDATE vms_businessrule SET event_condition = replace(event_condition,
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{97c0f367-854c-4b49-8cd5-36c38344d989}', 'nx.hikvision.Face');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{ba6a2683-d0df-4103-a7da-832f9bb635f9}', 'nx.hikvision.LineDetect,linedetection');
+    '{ba6a2683-d0df-4103-a7da-832f9bb635f9}', 'nx.hikvision.LineDetect');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{5574dd9e-ae30-4b84-9f20-a4da1a843f48}', 'nx.hikvision.RegionEntrance');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
@@ -122,11 +111,11 @@ UPDATE vms_businessrule SET event_condition = replace(event_condition,
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{278bbb2e-f3fa-4520-8a35-486e5af9569d}', 'nx.hikvision.AudioException');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{9d7df4c5-a0ad-43db-abf9-57e9a44b6bd1}', 'nx.hikvision.Tamper,shelteralarm');
+    '{9d7df4c5-a0ad-43db-abf9-57e9a44b6bd1}', 'nx.hikvision.Tamper');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{e1aeab1c-3d77-41aa-9d59-0ebe187b73a2}', 'nx.hikvision.Defocus');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{9dfc725a-723b-4666-8a73-a93ffac6b001}', 'nx.hikvision.Motion,VMD');
+    '{9dfc725a-723b-4666-8a73-a93ffac6b001}', 'nx.hikvision.Motion');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{be93937e-a24f-4cee-9c51-b588db672d4e}', 'nx.hikvision.UnattendedBaggage');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
@@ -144,13 +133,13 @@ UPDATE vms_businessrule SET event_condition = replace(event_condition,
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{4dae9597-7a81-4a48-aedc-37d5b184db11}', 'nx.hikvision.Vehicle');
 
--- Metadata plugin "nx.ssc".
+-- Analytics plugin "nx.ssc".
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{1558bdc5-3440-454e-93ed-0b34a05fedef}', 'nx.ssc.camera specify command');
+    '{1558bdc5-3440-454e-93ed-0b34a05fedef}', 'nx.ssc.gasGunPickedUp');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
-    '{e7ec745c-2ea3-43b6-9ea7-8108f47563f5}', 'nx.ssc.reset command');
+    '{e7ec745c-2ea3-43b6-9ea7-8108f47563f5}', 'nx.ssc.gasGunHungDown');
 
--- Metadata plugin "nx.vca".
+-- Analytics plugin "nx.vca".
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{d16b2cfb-4dca-4081-acb9-f4b454c6873f}', 'nx.vca.md');
 UPDATE vms_businessrule SET event_condition = replace(event_condition,

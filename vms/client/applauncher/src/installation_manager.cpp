@@ -101,8 +101,8 @@ void InstallationManager::updateInstalledVersionsInformation()
 
     QMap<nx::utils::SoftwareVersion, QnClientInstallationPtr> installations;
 
-    // detect current installation
-    NX_DEBUG(this, lm("Checking current version (%1)").arg(QnAppInfo::applicationVersion()));
+    // Detect current installation.
+    NX_DEBUG(this, "Checking current version (%1)", QnAppInfo::applicationVersion());
 
     const auto current = QnClientInstallation::installationForPath(applicationRootPath());
     if (current)
@@ -113,8 +113,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     }
     else
     {
-        NX_WARNING(this, lm("Can't find client binary in %1")
-            .arg(QCoreApplication::applicationDirPath()));
+        NX_WARNING(this, "Can't find client binary in %1", QCoreApplication::applicationDirPath());
     }
 
     const auto fillInstallationFromDir =
@@ -126,11 +125,11 @@ void InstallationManager::updateInstalledVersionsInformation()
 	        if (installation.isNull())
 	            return;
 
-	        NX_DEBUG(this, lm("Compatibility version %1 was not verified").arg(version));
+            NX_DEBUG(this, "Compatibility version %1 was not verified", version);
             installation->setVersion(nx::utils::SoftwareVersion(version));
 	        installations.insert(installation->version(), installation);
 
-	        NX_DEBUG(this, lm("Compatibility version %1 found").arg(version));
+            NX_DEBUG(this, "Compatibility version %1 found", version);
 	    };
 
     const auto fillInstallationsFromDir =
@@ -167,7 +166,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     lk.unlock();
 
     if (m_installationByVersion.empty())
-        NX_WARNING(this, lm("No client versions found"));
+        NX_WARNING(this, "No client versions found");
 
     createGhosts();
 }
@@ -392,14 +391,12 @@ InstallationManager::ResultType InstallationManager::installZip(
     const nx::utils::SoftwareVersion& version,
     const QString& fileName)
 {
-    NX_DEBUG(this, lm("InstallationManager: Installing update %1 from %2")
-        .arg(version.toString()).arg(fileName));
+    NX_DEBUG(this, "Installing update %1 from %2", version, fileName);
 
     QnClientInstallationPtr installation = installationForVersion(version, true);
     if (installation)
     {
-        NX_INFO(this, lm("InstallationManager: Version %1 is already installed")
-            .arg(version.toString()));
+        NX_INFO(this, "Version %1 is already installed", version);
         return ResultType::alreadyInstalled;
     }
 
@@ -410,8 +407,7 @@ InstallationManager::ResultType InstallationManager::installZip(
 
     if (!QDir().mkdir(targetDir.absolutePath()))
     {
-        NX_ERROR(this, lm("InstallationManager: Cannot create directory %1")
-            .arg(targetDir.absolutePath()));
+        NX_ERROR(this, "Cannot create directory %1", targetDir.absolutePath());
         return ResultType::ioError;
     }
 
@@ -419,14 +415,14 @@ InstallationManager::ResultType InstallationManager::installZip(
 
     if (!dummySpaceCheck(targetDir, (qint64) extractor.estimateUnpackedSize()))
     {
-        NX_ERROR(this, "InstallationManager: Not enough space to install %1.", fileName);
+        NX_ERROR(this, "Not enough space to install %1.", fileName);
         return ResultType::notEnoughSpace;
     }
 
     auto errorCode = extractor.extractZip();
     if (errorCode != QnZipExtractor::Ok)
     {
-        NX_ERROR(this, "InstallationManager: Cannot extract zip %1 to %2, errorCode = %3",
+        NX_ERROR(this, "Cannot extract zip %1 to %2, errorCode = %3",
             fileName, targetDir.absolutePath(), extractor.errorToString(errorCode));
         return ResultType::ioError;
     }
@@ -435,8 +431,7 @@ InstallationManager::ResultType InstallationManager::installZip(
     if (installation.isNull() || !installation->exists())
     {
         targetDir.removeRecursively();
-        NX_ERROR(this, lm("InstallationManager: Update package %1 (%2) is invalid")
-            .args(version.toString(), fileName));
+        NX_ERROR(this, "Update package %1 (%2) is invalid", version, fileName);
         return ResultType::brokenPackage;
     }
 
@@ -449,8 +444,8 @@ InstallationManager::ResultType InstallationManager::installZip(
 
     createGhosts();
 
-    NX_INFO(this, lm("InstallationManager: Version %1 has been installed successfully to %2")
-        .args(version.toString(), targetDir.absolutePath()));
+    NX_INFO(this, "Version %1 has been installed successfully to %2",
+        version, targetDir.absolutePath());
 
     return ResultType::ok;
 }

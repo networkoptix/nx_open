@@ -725,14 +725,14 @@ void Worker::handleDownloadChunkReply(
     NX_VERBOSE(m_logTag, "handleDownloadChunkReply(): Got chunk %1 from %2: %3",
         chunkIndex, requestContext.peer, statusString(success));
 
+    if (m_subsequentChunksToDownload > 0)
+        --m_subsequentChunksToDownload;
+
     if (!success)
     {
         decreasePeerRank(requestContext.peer);
         return;
     }
-
-    if (m_subsequentChunksToDownload > 0)
-        --m_subsequentChunksToDownload;
 
     const auto resultCode = m_storage->writeFileChunk(m_fileName, chunkIndex, data);
     if (resultCode != ResultCode::ok)

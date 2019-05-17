@@ -165,10 +165,13 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
 {
     nx::common::metadata::DetectionMetadataPacket bestShotPacket;
     bestShotPacket.timestampUsec = objectTrackBestShotPacket->timestampUs();
-    if (bestShotPacket.timestampUsec <= 0)
+    if (bestShotPacket.timestampUsec < 0)
     {
-        NX_WARNING(
-            this, "Invalid ObjectTrackBestShotPacket timestamp: %1", bestShotPacket.timestampUsec);
+        NX_WARNING(this,
+            "Invalid ObjectTrackBestShotPacket timestamp: %1, ignoring packet",
+            bestShotPacket.timestampUsec);
+
+        return;
     }
 
     bestShotPacket.durationUsec = 0;

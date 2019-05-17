@@ -67,7 +67,8 @@ const int kVersionLabelFontWeight = QFont::DemiBold;
 
 // Height limit for servers list in dialog box with update report
 static constexpr int kSectionHeight = 150;
-static constexpr int kSectionMinHeight = 30;
+static constexpr int kSectionWidth = 330;
+static constexpr int kSectionMinHeight = 40;
 
 constexpr auto kLatestVersionBannerLabelFontSizePixels = 22;
 constexpr auto kLatestVersionBannerLabelFontWeight = QFont::Light;
@@ -89,18 +90,18 @@ constexpr int kVersionInformationBlockMinHeight = 48;
 constexpr int kPreloaderHeight = 32;
 
 // Adds resource list to message box
-void injectResourceList(QnMessageBox& messageBox, const QnResourceList& resources)
+QTableView* injectResourceList(
+    QnMessageBox& messageBox, const QnResourceList& resources)
 {
     if (resources.empty())
-        return;
+        return nullptr;
 
-    auto resourceList = new QTableView();
+    auto resourceList = new nx::vms::client::desktop::TableView();
     resourceList->setShowGrid(false);
 
     auto resourceListModel = new QnResourceListModel(resourceList);
     resourceListModel->setHasStatus(false);
     resourceListModel->setResources(resources);
-
     resourceList->setModel(resourceListModel);
 
     auto horisontalHeader = resourceList->horizontalHeader();
@@ -111,9 +112,14 @@ void injectResourceList(QnMessageBox& messageBox, const QnResourceList& resource
     verticalHeader->hide();
     resourceList->setMinimumHeight(kSectionMinHeight);
     resourceList->setMaximumHeight(kSectionHeight);
+    resourceList->setMaximumWidth(kSectionWidth);
+    resourceList->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContentsOnFirstShow);
+    resourceList->resizeRowsToContents();
+
     // Adding this to QnMessageBox::Layout::Main looks ugly.
-    // Adding to Layout::Content (default value) looks much better.
-    messageBox.addCustomWidget(resourceList);
+    // Adding to Layout::BeforeAdditionalInfo (default value) looks much better.
+    messageBox.addCustomWidget(resourceList, QnMessageBox::Layout::BeforeAdditionalInfo);
+    return resourceList;
 }
 
 } // anonymous namespace
@@ -1485,17 +1491,16 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
         // 3. All other cases. Some servers have failed
         messageBox->setIcon(QnMessageBoxIcon::Critical);
-        messageBox->setText(tr("Failed to download update packages to some components"));
+        messageBox->setText(tr("Failed to download update packages to some servers"));
+
+        QString text = htmlParagraph(m_stateTracker->getErrorMessage());
+        text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
+        messageBox->setInformativeText(text);
 
         // TODO: Client can be here as well, but it would not be displayed.
         // Should we display it somehow?
         auto resourcesFailed = resourcePool()->getResourcesByIds(peersFailed.toList());
         injectResourceList(*messageBox, resourcesFailed);
-
-        QString text;
-        text += htmlParagraph(tr("Please make sure they have enough free storage space and stable network connection."));
-        text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
-        messageBox->setInformativeText(text);
 
         auto tryAgain = messageBox->addButton(tr("Try again"),
             QDialogButtonBox::AcceptRole);
@@ -1581,10 +1586,9 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
             QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
             // 1. Everything is complete
             messageBox->setIcon(QnMessageBoxIcon::Critical);
-            messageBox->setText(tr("Failed to install updates to servers:"));
+            messageBox->setText(tr("There was an error while installing updates:"));
             injectResourceList(*messageBox, resourcePool()->getResourcesByIds(peersFailed));
-            QString text;
-            text += htmlParagraph(tr("Please make sure there is enough free storage space and network connection is stable."));
+            QString text =  htmlParagraph(m_stateTracker->getErrorMessage());
             text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
             messageBox->setInformativeText(text);
             auto installNow = messageBox->addButton(tr("OK"),
@@ -1636,6 +1640,7 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
         menu()->trigger(action::DisconnectAction, {Qn::ForceRole, true});
     }
 
+    setUpdateSourceMode(UpdateSourceType::internet);
     setTargetState(WidgetUpdateState::initial);
 }
 

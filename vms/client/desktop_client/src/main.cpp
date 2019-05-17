@@ -5,7 +5,7 @@ int main(int argc, char** argv)
 {
     if (nx::utils::AppInfo::isMacOsX())
     {
-        // We do not rely on Mac Os oopen GL implementation-related throtling.
+        // We do not rely on Mac OS OpenGL implementation-related throttling.
         // Otherwise all animations go faster.
         qputenv("QSG_RENDER_LOOP", "basic");
     }

@@ -114,8 +114,6 @@
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="minilauncher.exe" ExeCommand=""/>
-        <CustomAction Id="NoDowngrade" Error="NoDowngrade" />
-
 
         <!-- Trying to kill old applauncher forcibly. It was named as minilaucher is named currently. Actual always. -->
         <CustomAction Id="CloseOldApplauncherAction_Cmd" Property="CloseOldApplauncherAction"
