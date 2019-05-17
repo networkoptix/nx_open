@@ -64,7 +64,19 @@ DWORD WINAPI SystemEventLogReader::SubscriptionCallback(
 
     if (systemEventLogReader->messageIsSignificant(xmlMessage, info))
     {
+        NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
+            "System event notification is significant and is retransmitted to server: "
+            "provider = %1, level = %2, event id = %3, message = %4")
+            .arg(info.providerName, QString::number(info.level), QString::number(info.eventId), info.data));
+
         emit systemEventLogReader->eventOccurred(info.data, systemEventLogReader->reason());
+    }
+    else
+    {
+        NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
+            "System event notification is not significant and ignored: "
+            "provider = %1, level = %2, event id = %3, message = %4")
+            .arg(info.providerName, QString::number(info.level), QString::number(info.eventId), info.data));
     }
 
     return 0; // this value is ignored
