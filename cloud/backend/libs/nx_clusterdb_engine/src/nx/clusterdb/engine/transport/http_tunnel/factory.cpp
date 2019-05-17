@@ -11,16 +11,19 @@ std::string Factory::key() const
 }
 
 std::unique_ptr<AbstractTransactionTransportConnector> Factory::createConnector(
-    const ProtocolVersionRange& /*protocolVersionRange*/,
-    CommandLog* /*commandLog*/,
-    const OutgoingCommandFilter& /*outgoingCommandFilter*/,
+    const ProtocolVersionRange& protocolVersionRange,
+    CommandLog* commandLog,
+    const OutgoingCommandFilter& outgoingCommandFilter,
     const std::string& clusterId,
-    const std::string& /*nodeId*/,
+    const std::string& nodeId,
     const nx::utils::Url& targetUrl)
 {
-    return std::make_unique<HttpTunnelTransportConnector>(
+    return std::make_unique<Connector>(
+        protocolVersionRange,
+        commandLog,
+        outgoingCommandFilter,
         clusterId,
-        QnUuid::createUuid().toSimpleString().toStdString(), // TODO
+        nodeId,
         targetUrl);
 }
 
@@ -31,7 +34,7 @@ std::unique_ptr<AbstractAcceptor> Factory::createAcceptor(
     ConnectionManager* connectionManager,
     const QnUuid& nodeId)
 {
-    return std::make_unique<HttpTunnelTransportAcceptor>(
+    return std::make_unique<Acceptor>(
         nodeId,
         protocolVersionRange,
         commandLog,

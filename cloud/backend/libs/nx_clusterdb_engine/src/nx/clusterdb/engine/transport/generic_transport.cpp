@@ -57,7 +57,7 @@ GenericTransport::~GenericTransport()
 {
     NX_DEBUG(this, lm("systemId %1. Closing connection to %2")
         .args(m_systemId, m_commonTransportHeaderOfRemoteTransaction));
-
+        
     if (isInSelfAioThread())
         stopWhileInAioThread();
 }
@@ -107,6 +107,13 @@ void GenericTransport::sendTransaction(
     post(
         [this, transportHeader = std::move(transportHeader), transactionSerializer]()
         {
+            if (m_closed)
+            {
+                NX_VERBOSE(this, "An attempt tp send through a closed connection to %1",
+                    m_commonTransportHeaderOfRemoteTransaction);
+                return;
+            }
+        
             if (peerAlreadyHasCommand(transactionSerializer->header()))
             {
                 NX_VERBOSE(this,
@@ -172,6 +179,7 @@ void GenericTransport::stopWhileInAioThread()
 void GenericTransport::processConnectionClosedEvent(
     SystemError::ErrorCode closeReason)
 {
+    m_closed = true;
     m_connectionClosedSubscription.notify(closeReason);
 }
 
@@ -188,9 +196,8 @@ void GenericTransport::processCommandData(
 
     if (!commandData)
     {
-        NX_DEBUG(this,
-            lm("Failed to deserialize %1 command received from (%2, %3)")
-            .args(dataFormat, transportHeader.systemId, transportHeader.endpoint.toString()));
+        NX_DEBUG(this, "Failed to deserialize %1 command received from (%2, %3)",
+            dataFormat, transportHeader.systemId, transportHeader.endpoint.toString());
         m_commandPipeline->closeConnection();
         return;
     }
@@ -292,18 +299,16 @@ void GenericTransport::onTransactionsReadFromLog(
     if ((resultCode != ResultCode::ok) && (resultCode != ResultCode::partialContent))
     {
         NX_DEBUG(this,
-            lm("systemId %1. Error reading transaction log (%2). Closing connection to the peer %3")
-                .args(m_systemId, toString(resultCode),
-                    m_commonTransportHeaderOfRemoteTransaction));
+            "systemId %1. Error reading transaction log (%2). Closing connection to the peer %3", 
+                m_systemId, toString(resultCode), m_commonTransportHeaderOfRemoteTransaction);
         m_commandPipeline->closeConnection();
         return;
     }
 
-    NX_DEBUG(this,
-        lm("systemId %1. Read %2 transactions from transaction log (result %3). "
-           "Posting them to the send queue to %4")
-            .args(m_systemId, serializedTransactions.size(), toString(resultCode),
-                m_commonTransportHeaderOfRemoteTransaction));
+    NX_DEBUG(this, "systemId %1. Read %2 transactions from transaction log (result %3). "
+        "Posting them to the send queue to %4",
+        m_systemId, serializedTransactions.size(), toString(resultCode),
+            m_commonTransportHeaderOfRemoteTransaction);
 
     sendTransactions(std::exchange(serializedTransactions, {}));
 

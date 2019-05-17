@@ -19,20 +19,20 @@ class CommandLog;
 
 } // namespace nx::clusterdb::engine
 
-namespace nx::clusterdb::engine::transport {
+namespace nx::clusterdb::engine::transport::http_tunnel {
 
 namespace detail {
 
 struct ConnectRequestContext
 {
-    std::string systemId;
+    std::string clusterId;
     ConnectionRequestAttributes attributes;
     std::string userAgent;
 };
 
 } // namespace detail
 
-class HttpTunnelTransportAcceptor:
+class Acceptor:
     public AbstractAcceptor,
     private network::http::tunneling::TunnelAuthorizer<detail::ConnectRequestContext>
 {
@@ -40,7 +40,7 @@ class HttpTunnelTransportAcceptor:
         network::http::tunneling::TunnelAuthorizer<detail::ConnectRequestContext>;
 
 public:
-    HttpTunnelTransportAcceptor(
+    Acceptor(
         const QnUuid& peerId,
         const ProtocolVersionRange& protocolVersionRange,
         CommandLog* transactionLog,
@@ -69,4 +69,4 @@ private:
         detail::ConnectRequestContext connectRequestContext);
 };
 
-} // namespace nx::clusterdb::engine::transport
+} // namespace nx::clusterdb::engine::transport::http_tunnel

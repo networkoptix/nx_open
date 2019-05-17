@@ -70,6 +70,7 @@ SynchronizationEngine::~SynchronizationEngine()
 void SynchronizationEngine::pleaseStopSync()
 {
     m_startedAsyncCallsCounter.wait();
+    m_connector.pleaseStopSync();
     m_connectionManager.pleaseStopSync();
     m_commandLog.pleaseStopSync();
     m_discoveryManager.pleaseStopSync();
