@@ -1709,12 +1709,14 @@ bool MultiServerUpdatesWidget::processUploaderChanges(bool force)
     {
         if (state == ServerUpdateTool::OfflineUpdateState::done)
         {
-            NX_INFO(this) << "processUploaderChanges seems to be done";
-            setTargetState(WidgetUpdateState::readyInstall, {});
+            // TODO: Should do the same checks as in 'downloading'
+            NX_INFO(this, "processUploaderChanges(%1) seems to be done.", force);
+            auto peersIssued = m_stateTracker->peersIssued();
+            setTargetState(WidgetUpdateState::downloading, peersIssued);
         }
         else if (state == ServerUpdateTool::OfflineUpdateState::error)
         {
-            NX_INFO(this) << "processUploaderChanges failed to upload all packages";
+            NX_INFO(this, "processUploaderChanges failed to upload all packages", force);
             setTargetState(WidgetUpdateState::ready, {});
         }
     }
