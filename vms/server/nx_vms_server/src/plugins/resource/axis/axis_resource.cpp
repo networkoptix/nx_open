@@ -296,14 +296,18 @@ void QnPlAxisResource::stopInputPortMonitoringSync()
     m_timer.cancelAsync(
         [this, &promise]()
         {
-            m_inputIoMonitor.httpClient->pleaseStopSync();
-            m_inputIoMonitor.httpClient.reset();
+            static const auto removeClient =
+                [](nx::network::http::AsyncHttpClientPtr* client)
+                {
+                    if (*client)
+                        (*client)->pleaseStopSync();
+                    client->reset();
+                };
 
-            m_outputIoMonitor.httpClient->pleaseStopSync();
-            m_outputIoMonitor.httpClient.reset();
-
-            m_inputPortStateReader->pleaseStopSync();
-            m_inputPortStateReader.reset();
+            removeClient(&m_inputIoMonitor.httpClient);
+            removeClient(&m_outputIoMonitor.httpClient);
+            removeClient(&m_inputPortStateReader);
+            promise.set_value();
         });
 
     promise.get_future().wait();
