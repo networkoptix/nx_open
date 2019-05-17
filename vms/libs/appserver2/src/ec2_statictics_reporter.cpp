@@ -373,7 +373,7 @@ namespace {
             if (!engineDescriptor)
             {
                 NX_WARNING(typeid(Ec2StaticticsReporter),
-                    "Unable to find an Engine descriptor for the Engine %1; %2",
+                    "Unable to find an Engine descriptor for the Engine %1; Device %2",
                     engineId, device);
                 continue;
             }
