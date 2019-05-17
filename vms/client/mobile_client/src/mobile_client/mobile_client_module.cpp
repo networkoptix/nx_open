@@ -63,7 +63,7 @@
 
 using namespace nx::mobile_client;
 
-static const QString kQmlRoot = QStringLiteral("qrc:///qml");
+static const QString kQmlRoot = "qrc:///qml";
 
 template<typename BaseType>
 BaseType extract(const QSharedPointer<BaseType>& pointer)
@@ -191,16 +191,14 @@ QnMobileClientModule::QnMobileClientModule(
     auto qmlRoot = startupParameters.qmlRoot.isEmpty() ? kQmlRoot : startupParameters.qmlRoot;
     if (!qmlRoot.endsWith(L'/'))
         qmlRoot.append(L'/');
-    NX_INFO(this, lm("Setting QML root to %1").arg(qmlRoot));
+    NX_INFO(this, "Setting QML root to %1", qmlRoot);
 
     m_clientCoreModule->mainQmlEngine()->setBaseUrl(
-        qmlRoot.startsWith(lit("qrc:"))
-            ? QUrl(qmlRoot)
-            : QUrl::fromLocalFile(qmlRoot));
+        qmlRoot.startsWith("qrc:") ? QUrl(qmlRoot) : QUrl::fromLocalFile(qmlRoot));
     m_clientCoreModule->mainQmlEngine()->addImportPath(qmlRoot);
 
-    if (QnAppInfo::applicationPlatform() == lit("ios"))
-        m_clientCoreModule->mainQmlEngine()->addImportPath(lit("qt_qml"));
+    if (QnAppInfo::applicationPlatform() == "ios")
+        m_clientCoreModule->mainQmlEngine()->addImportPath("qt_qml");
 
     m_context.reset(new QnContext());
     const auto eventRulesWatcher = commonModule->store(new nx::client::mobile::EventRulesWatcher());

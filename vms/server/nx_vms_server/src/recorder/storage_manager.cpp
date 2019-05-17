@@ -1229,7 +1229,7 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
 void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     int storageIndex = storageDbPool()->getStorageIndex(storage);
-    NX_INFO(this, "Adding storage. Path: %1", nx::utils::url::hidePassword(storage->getUrl()));
+    NX_DEBUG(this, "Adding storage. Path: %1", nx::utils::url::hidePassword(storage->getUrl()));
 
     removeStorage(storage); // remove existing storage record if exists
     storage->setStatus(Qn::Offline); // we will check status after
@@ -2508,7 +2508,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
     //QnMutexLocker lock( &m_mutexStorages );
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
-        NX_INFO(this,
+        NX_DEBUG(this,
             "Storage. Path: %1. Goes to the online state. SpaceLimit: %2MiB. Currently available: %3MiB",
             nx::utils::url::hidePassword(fileStorage->getUrl()),
             fileStorage->getSpaceLimit() / 1024 / 1024,

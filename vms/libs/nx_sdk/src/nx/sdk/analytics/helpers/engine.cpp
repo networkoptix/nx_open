@@ -167,7 +167,8 @@ void Engine::executeAction(IAction* action, Error* outError)
 Error Engine::setHandler(IEngine::IHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_handler = handler;
+    handler->addRef();
+    m_handler.reset(handler);
     return Error::noError;
 }
 

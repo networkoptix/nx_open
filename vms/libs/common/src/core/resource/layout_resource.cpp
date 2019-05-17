@@ -80,22 +80,33 @@ QnLayoutResourcePtr QnLayoutResource::createFromResource(const QnResourcePtr& re
     layout->setName(resource->getName());
     if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        const auto ar = camera->aspectRatio();
+        const auto ar = camera->aspectRatioRotated();
         if (ar.isValid())
             layout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(ar.toFloat()).toFloat());
+    }
+
+    QRect cellGeometry = QRect(0, 0, 1, 1);
+    qreal rotation = 0;
+    if (const auto media = resource.dynamicCast<QnMediaResource>())
+    {
+        // If video occupies several cells, remember this.
+        if (media->getVideoLayout() && media->getVideoLayout()->size().isValid())
+            cellGeometry.setSize(media->getVideoLayout()->size());
+        // Set rotation.
+        rotation = media->defaultRotation();
+        // Transpose cell configuration if 90 degree rotated.
+        if (QnAspectRatio::isRotated90(rotation))
+            cellGeometry = cellGeometry.transposed();
     }
 
     QnLayoutItemData item;
     item.flags = 0x1; // Layout data item flags is declared in client module. // TODO: #GDM move to api
     item.uuid = QnUuid::createUuid();
-    item.combinedGeometry = QRect(0, 0, 1, 1);
+    item.combinedGeometry = cellGeometry;
+    item.rotation = rotation;
     item.resource.id = resource->getId();
     if (resource->hasFlags(Qn::local_media))
         item.resource.uniqueId = resource->getUniqueId();
-
-    QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
-    if (!forcedRotation.isEmpty())
-        item.rotation = forcedRotation.toInt();
 
     layout->addItem(item);
 

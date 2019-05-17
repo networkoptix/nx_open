@@ -9,6 +9,13 @@
             "defaultValue": "a text"
         },
         {
+            "type": "TextArea",
+            "name": "textArea",
+            "caption": "Text Area",
+            "description": "A text area",
+            "defaultValue": "a text"
+        },
+        {
             "type": "GroupBox",
             "caption": "Group",
             "items": [

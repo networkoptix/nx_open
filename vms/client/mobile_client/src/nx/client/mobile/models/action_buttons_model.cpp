@@ -103,14 +103,14 @@ ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createPtzButton()
 {
     return ButtonPtr(new Button(
         QnUuid(), ActionButtonsModel::PtzButton,
-        lit("qrc:///images/ptz/ptz.png"), QString(), false, true, true));
+        "qrc:///images/ptz/ptz.png", QString(), false, true, true));
 }
 
 ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createTwoWayAudioButton()
 {
     return ButtonPtr(new Button(
         QnUuid(), ActionButtonsModel::TwoWayAudioButton,
-        lit("qrc:///images/two_way_audio/mic.png"),
+        "qrc:///images/two_way_audio/mic.png",
         ActionButtonsModel::twoWayButtonHint(), true, false, true));
 }
 

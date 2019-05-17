@@ -65,7 +65,7 @@ private:
     //friend qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size);
     AVIOContext* createFfmpegIOContext();
     void closeFfmpegContext();
-    int muxPacket(const AVPacket* packet);
+    int muxPacket(const QnConstAbstractMediaDataPtr& packet);
 
 private:
     Config m_config;

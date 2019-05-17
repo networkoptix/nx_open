@@ -305,14 +305,11 @@ void QnMediaServerResource::setUrl(const QString& url)
 {
     QnResource::setUrl(url);
 
-    QnMutexLocker lock(&m_mutex);
-    if (!m_primaryAddress.isNull())
-        return;
-
-    if (m_apiConnection)
-        m_apiConnection->setUrl(getApiUrl());
-
-    lock.unlock();
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (!m_primaryAddress.isNull())
+            return;
+    }
 
     emit primaryAddressChanged(toSharedPointer(this));
     emit apiUrlChanged(toSharedPointer(this));
@@ -354,9 +351,6 @@ void QnMediaServerResource::setPrimaryAddress(const nx::network::SocketAddress& 
 
         m_primaryAddress = primaryAddress;
         NX_ASSERT(!m_primaryAddress.address.toString().isEmpty());
-
-        if (m_apiConnection)
-            m_apiConnection->setUrl(buildApiUrl());
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
@@ -376,8 +370,6 @@ void QnMediaServerResource::setSslAllowed(bool sslAllowed)
             return;
 
         m_sslAllowed = sslAllowed;
-        if (m_apiConnection)
-            m_apiConnection->setUrl(buildApiUrl());
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
@@ -473,11 +465,7 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::Notif
 
     const auto currentAddress = getPrimaryAddress();
     if (oldPrimaryAddress != currentAddress)
-    {
-        if (m_apiConnection)
-            m_apiConnection->setUrl(getApiUrl());
         notifiers << [r = toSharedPointer(this)]{ emit r->primaryAddressChanged(r); };
-    }
 }
 
 nx::utils::SoftwareVersion QnMediaServerResource::getVersion() const
@@ -734,24 +722,4 @@ void QnMediaServerResource::setResourcePool(QnResourcePool *resourcePool)
         connect(settings, &QnGlobalSettings::cloudSettingsChanged,
             this, &QnMediaServerResource::at_cloudSettingsChanged, Qt::DirectConnection);
     }
-}
-
-nx::utils::Url QnMediaServerResource::buildApiUrl() const
-{
-    nx::utils::Url url;
-    if (m_primaryAddress.isNull())
-    {
-        url = m_apiConnection->url();
-        url.setScheme(nx::network::http::urlSheme(m_sslAllowed));
-    }
-    else
-    {
-        url = nx::network::url::Builder()
-            .setScheme(nx::network::http::urlSheme(m_sslAllowed))
-            .setEndpoint(m_primaryAddress).toUrl();
-    }
-    NX_ASSERT(!url.host().isEmpty());
-    NX_ASSERT(url.isValid());
-
-    return url;
 }

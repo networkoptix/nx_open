@@ -277,6 +277,7 @@
 #include <rest/handlers/sync_time_rest_handler.h>
 #include <rest/handlers/metrics_rest_handler.h>
 #include <nx/vms/server/event/event_connector.h>
+#include <nx/vms/server/event/extended_rule_processor.h>
 #include <nx/network/http/http_client.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/storage_plugin_factory.h>
@@ -3659,6 +3660,7 @@ void MediaServerProcess::stopObjects()
     commonModule()->resourceDiscoveryManager()->stop();
     serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
     serverModule()->pluginManager()->unloadPlugins();
+    serverModule()->eventRuleProcessor()->stop();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required

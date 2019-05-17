@@ -178,8 +178,8 @@ static std::string determineIniFilesDir()
 
 struct AbstractParam
 {
-    const char* const name;
-    const char* const description;
+    const std::string name;
+    const std::string description;
 
     AbstractParam(const char* name, const char* description):
         name(name), description(description)
@@ -205,9 +205,9 @@ struct AbstractParam
         {
             const char* const prefix = (error[0] != '\0') ? "!!! " : (eqDefault ? "    " : "  * ");
             std::string descriptionStr;
-            if (description[0])
+            if (!description.empty())
             {
-                descriptionStr = std::string(" # ") + description;
+                descriptionStr = " # " + description;
                 stringReplaceAllChars(&descriptionStr, '\n', ' ');
             }
             *output << prefix << value << valueNameSeparator << name << error << descriptionStr

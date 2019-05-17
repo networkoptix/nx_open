@@ -259,6 +259,12 @@ public:
     TextField(QObject* parent = nullptr);
 };
 
+class TextArea: public ValueItem
+{
+public:
+    TextArea(QObject* parent = nullptr);
+};
+
 class ComboBox: public EnumerationItem
 {
 public:

@@ -424,7 +424,8 @@ void DeviceAgent::reconnectSocket()
 
 Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
-    m_handler = handler;
+    handler->addRef();
+    m_handler.reset(handler);
     return Error::noError;
 }
 
@@ -449,7 +450,10 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
     if (error != Error::noError)
         return error;
 
-    const auto eventTypeIds = metadataTypes->eventTypeIds();
+    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
+    if (!NX_ASSERT(eventTypeIds, "Event type id list is nullptr"))
+        return Error::unknownError;
+
     for (int i = 0; i < eventTypeIds->count(); ++i)
     {
         QString id(eventTypeIds->at(i));
