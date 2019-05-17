@@ -61,24 +61,16 @@ void ColorTheme::Private::loadColorsFromFile(const QString& filename)
     QJsonParseError error;
     const auto& json = QJsonDocument::fromJson(jsonData, &error);
 
-    if (error.error != QJsonParseError::NoError)
-    {
-        NX_ERROR(this, lm("JSON parse error: %1").arg(error.errorString()));
+    const bool parsed = error.error == QJsonParseError::NoError;
+    if (!NX_ASSERT(parsed, "JSON parse error: %1", error.errorString()))
         return;
-    }
 
-    if (!json.isObject())
-    {
-        NX_ERROR(this, lm("Not an object"));
+    if (!NX_ASSERT(json.isObject(), "Invalid JSON structure"))
         return;
-    }
 
     const auto& globals = json.object().value(lit("globals")).toObject();
-    if (globals.isEmpty())
-    {
-        NX_ERROR(this, lm("\"globals\" key is empty"));
+    if (!NX_ASSERT(!globals.isEmpty(), "\"globals\" key is empty"))
         return;
-    }
 
     QRegExp groupRegExp(lit("([^_\\d]+)[_\\d].*"));
 
