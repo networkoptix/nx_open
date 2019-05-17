@@ -410,7 +410,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
         qDebug() << "URL of ONVIF device stream (UniqueId: " << m_onvifRes->getUniqueId()
             << ") successfully fetched: " << response.MediaUri->Uri.c_str();
     #endif
-
     QUrl relutUrl(m_onvifRes->fromOnvifDiscoveredUrl(response.MediaUri->Uri, false));
 
     if (relutUrl.host().size()==0)
@@ -423,6 +422,30 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
     }
 
     *mediaUrl = relutUrl.toString();
+
+    const bool fixWrongUri = m_onvifRes->resourceData().value<bool>(QString("fixWrongUri"));
+    if (!fixWrongUri)
+        return CameraDiagnostics::NoErrorResult();
+
+    // Try to detect the Profile index. Common profile name is something like "MediaProfile002".
+    const QString Profile = QString::fromStdString(request.ProfileToken);
+    bool isNumber = false;
+    int profileIndex = Profile.right(3).toInt(&isNumber);
+    if (!isNumber)
+        return CameraDiagnostics::NoErrorResult(); //< Failed to detect index => can not fix Uri.
+
+    if (profileIndex == 0)
+        return CameraDiagnostics::NoErrorResult(); //< Uri is always correct for zero profile.
+
+    const QString kBrokenSubstring("subtype=0");
+    int position = mediaUrl->indexOf(kBrokenSubstring);
+    if (position==-1)
+        return CameraDiagnostics::NoErrorResult(); //< No substring to fix found in Uri.
+
+    position += (kBrokenSubstring.length() - 1); // Position of the symbol to fix.
+
+    mediaUrl->replace(position, 1, QString::number(profileIndex));
+
     return CameraDiagnostics::NoErrorResult();
 }
 
