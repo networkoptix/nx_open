@@ -96,6 +96,20 @@ void ApplauncherProcess::processRequest(
                 *response);
             break;
 
+        case TaskType::startZipInstallation:
+            *response = new Response();
+            installZipAsync(
+                std::static_pointer_cast<InstallZipTaskAsync>(request),
+                *response);
+            break;
+
+        case TaskType::checkZipProgress:
+            *response = new Response();
+            checkInstallationProgress(
+                std::static_pointer_cast<InstallZipCheckStatus>(request),
+                *response);
+            break;
+
         case TaskType::isVersionInstalled:
             m_installationManager->updateInstalledVersionsInformation();
             *response = new IsVersionInstalledResponse();
@@ -306,6 +320,57 @@ bool ApplauncherProcess::installZip(
     return response->result == ResultType::ok;
 }
 
+bool ApplauncherProcess::installZipAsync(
+    const std::shared_ptr<InstallZipTaskAsync>& request,
+    Response* const response)
+{
+    if (!m_process.isEmpty())
+    {
+        // It is ok if we are already installing the same file and version.
+        if (m_process.equals(request->version, request->zipFileName))
+            response->result = ResultType::ok;
+        else
+            response->result = ResultType::busy;
+    }
+    else
+    {
+        m_process.result = std::async(std::launch::async,
+            [this, request]() -> ResultType::Value
+            {
+                {
+                    std::scoped_lock<std::mutex> lock(m_process.mutex);
+                    m_process.version = request->version;
+                    m_process.fileName = request->zipFileName;
+                }
+                auto result = m_installationManager->installZip(request->version, request->zipFileName);
+                m_process.reset();
+                return result;
+            });
+        response->result = ResultType::ok;
+    }
+
+    return response->result == ResultType::ok;
+}
+
+bool ApplauncherProcess::checkInstallationProgress(
+    const std::shared_ptr<applauncher::api::InstallZipCheckStatus>& /*request*/,
+    applauncher::api::Response* const response)
+{
+    if (!m_process.isEmpty())
+    {
+        if (m_process.result.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready)
+            response->result = m_process.result.get();
+        else
+            response->result = ResultType::unpackingZip;
+    }
+    else
+    {
+        response->result = ResultType::ok;
+    }
+
+    return response->result == ResultType::ok;
+}
+
 bool ApplauncherProcess::isVersionInstalled(
     const std::shared_ptr<IsVersionInstalledRequest>& request,
     IsVersionInstalledResponse* const response)
@@ -363,6 +428,25 @@ void ApplauncherProcess::onTimer(const quint64& timerID)
     // Stopping process if needed.
     const auto code = nx::killProcessByPid(task.processID);
     static_cast<void>(code);
+}
+
+void ApplauncherProcess::InstallationProcess::reset()
+{
+    std::scoped_lock<std::mutex> lock(mutex);
+    version = {};
+    fileName = "";
+}
+
+bool ApplauncherProcess::InstallationProcess::isEmpty() const
+{
+    return !result.valid();
+}
+
+bool ApplauncherProcess::InstallationProcess::equals(
+    const nx::utils::SoftwareVersion& version, const QString& fileName) const
+{
+    std::scoped_lock<std::mutex> lock(mutex);
+    return this->version == version && this->fileName == fileName;
 }
 
 } // namespace applauncher

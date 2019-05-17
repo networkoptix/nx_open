@@ -28,15 +28,31 @@ ResultType::Value restartClient(
 
 bool checkOnline(bool runWhenOffline = true);
 
-//!Installs client update from a zip file
-/*!
- * \param[in] version Version of the installation
- * \param[in] zipFileName Path to zip file
- * \return \a ResultType::ok if request has been performed successfully, otherwise - error code
+/**
+ * Installs client update from a zip file.
+ * @param version Version of the installation.
+ * @param zipFileName Path to zip file.
+ * @return ResultType::ok if request has been performed successfully, otherwise - error code.
  */
 ResultType::Value installZip(
     const nx::utils::SoftwareVersion& version,
     const QString& zipFileName);
+
+/**
+ * Installs client update from a zip file. It will run installation asynchronously.
+ * @param version Version of the installation.
+ * @param zipFileName Path to zip file.
+ * @return ResultType::ok if request has been performed successfully, otherwise - error code.
+ */
+ResultType::Value installZipAsync(
+    const nx::utils::SoftwareVersion& version,
+    const QString& zipFileName);
+
+/**
+ * Checks progress of an installation.
+ * @return ResultType::ok if request has been performed successfully, otherwise - error code.
+ */
+ResultType::Value checkInstallationProgress();
 
 //!Adds timer to kill process with pid \a processID in a \a timeoutMillis
 ResultType::Value scheduleProcessKill(qint64 processID, quint32 timeoutMillis);

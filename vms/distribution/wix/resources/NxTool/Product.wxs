@@ -80,11 +80,10 @@
         <!--CustomAction Id="LaunchNxtool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="nxtool.exe" ExeCommand=""/-->
         <Property Id="WixShellExecTarget" Value="[#nxtool.exe]" />
         <CustomAction Id="LaunchNxtool" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
-        <CustomAction Id="NoDowngrade" Error="NoDowngrade" />
 
-        <MajorUpgrade AllowSameVersionUpgrades="yes"
+        <MajorUpgrade
+            AllowDowngrades="yes"
             Schedule="afterInstallInitialize"
-            DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
             MigrateFeatures="yes" />
 
         <InstallUISequence>

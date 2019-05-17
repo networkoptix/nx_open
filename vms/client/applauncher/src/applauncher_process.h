@@ -4,6 +4,7 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
+#include <future>
 
 #include <QObject>
 #include <QSettings>
@@ -79,6 +80,12 @@ private:
     bool installZip(
         const std::shared_ptr<applauncher::api::InstallZipTask>& request,
         applauncher::api::Response* const response);
+    bool installZipAsync(
+        const std::shared_ptr<applauncher::api::InstallZipTaskAsync>& request,
+        applauncher::api::Response* const response);
+    bool checkInstallationProgress(
+        const std::shared_ptr<applauncher::api::InstallZipCheckStatus>& request,
+        applauncher::api::Response* const response);
     bool isVersionInstalled(
         const std::shared_ptr<applauncher::api::IsVersionInstalledRequest>& request,
         applauncher::api::IsVersionInstalledResponse* const response);
@@ -106,6 +113,28 @@ private:
     mutable std::mutex m_mutex;
     std::condition_variable m_cond;
     std::map<qint64, KillProcessTask> m_killProcessTasks;
+
+    /**
+     * Wraps up information about active installation process.
+     * Notice: We should not run another installation process until current one is finished.
+     */
+    struct InstallationProcess
+    {
+        /** Client version being installed. */
+        nx::utils::SoftwareVersion version;
+        /** Path to a zip file to be installed. */
+        QString fileName;
+
+        mutable std::mutex mutex;
+
+        std::future<applauncher::api::ResultType::Value> result;
+
+        void reset();
+        bool isEmpty() const;
+        bool equals(const nx::utils::SoftwareVersion& version, const QString& fileName) const;
+    };
+
+    InstallationProcess m_process;
 };
 
 } // namespace applauncher
