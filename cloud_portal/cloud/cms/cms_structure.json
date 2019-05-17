@@ -1479,7 +1479,7 @@
             "description": "This section is visible in the detailed view page for the integration in the middle column.",
             "type": "html",
             "meta": {
-              "char_limit": 250
+              "char_limit": 500
             }
           }
         ]
