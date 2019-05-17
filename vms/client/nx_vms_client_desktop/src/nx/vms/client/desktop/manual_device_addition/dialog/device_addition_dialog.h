@@ -34,6 +34,8 @@ public:
     void setServer(const QnMediaServerResourcePtr& server);
     void setMainPageActive();
 
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
+
 private:
     using SearcherPtr = QSharedPointer<ManualDeviceSearcher>;
 
@@ -42,6 +44,7 @@ private:
     void setupTableHeader();
     void setupPortStuff(QCheckBox* autoCheckbox, QStackedWidget* portStackedWidget);
     void setupSearchResultsPlaceholder();
+    void setSearchAccent(bool isEnabled);
 
     void updateProgress();
     void handleStartSearchClicked();
