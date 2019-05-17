@@ -7,6 +7,7 @@
       {
         "name": "Cloud maintenance page (503)",
         "old_name": "Service unavailable page (503)",
+        "label": "Cloud maintenance page (503)",
         "file_path": "static/503.html",
         "description": "This page is visible if Cloud service is unavailable",
         "url": "/503.html",
@@ -24,6 +25,7 @@
             "label": "Download Link",
             "name": "%DOWNLOAD_LINK%",
             "old_name": "{{downloadLink}}",
+            "type": "text",
             "value": "http://www.networkoptix.com/live-demo#fulltrial",
             "description": "Emergency link for downloading applications (in case if cloud is down)"
           },
@@ -49,6 +51,7 @@
       },
       {
         "name": "branding",
+        "label": "Branding",
         "is_global": true,
         "description": "Common branding information",
         "translatable": false,
@@ -57,6 +60,7 @@
             "label": "Product Name",
             "name": "%CLOUD_NAME%",
             "old_name": "%PRODUCT_NAME%",
+            "type": "text",
             "value": "VMS Demo Cloud",
             "description": "Name for cloud"
           },
@@ -80,6 +84,7 @@
             "label": "VMS Name",
             "name": "%VMS_NAME%",
             "old_name": "{{VMS_NAME}}",
+            "type": "text",
             "value": "VMS Demonstration",
             "description": "Name of the VMS customization. Must be short!"
           },
@@ -87,6 +92,7 @@
             "label": "Cloud tab name",
             "name": "%CLOUD_TAB_NAME%",
             "old_name": "{{CLOUD_TAB_NAME}}",
+            "type": "text",
             "value": "Cloud",
             "description": "Cloud tab name in thick client"
           },
@@ -94,6 +100,7 @@
             "label": "Support Link",
             "name": "%SUPPORT_LINK%",
             "old_name": "{{supportLink}}",
+            "type": "text",
             "value": "/content/support",
             "description": "Support link. Use https://{{CLOUD_ADDRESS}}/content/support to use embedded page. If you use phone number here - make sure you format the link correctly like 'tel:...'"
           },
@@ -101,6 +108,7 @@
             "label": "Support Link Text",
             "name": "%SUPPORT_LINK_TEXT%",
             "old_name": "{{supportLinkText}}",
+            "type": "text",
             "value": "http://support.networkoptix.com",
             "description": "Text to be shown on the support link in emails"
           },
@@ -108,6 +116,7 @@
             "label": "Privacy policy link",
             "name": "%PRIVACY_LINK%",
             "old_name": "{{supportLink}}",
+            "type": "text",
             "value": "/content/privacy",
             "description": "Privacy policy link. Use https://{{CLOUD_ADDRESS}}/content/privacy to use embedded page."
           },
@@ -115,6 +124,7 @@
             "label": "Company web site",
             "name": "%COMPANY_LINK%",
             "old_name": "{{companyUrl}}",
+            "type": "text",
             "value": "http://networkoptix.com",
             "description": "Company main web site"
           },
@@ -122,12 +132,14 @@
             "label": "Company Name",
             "name": "%COMPANY_NAME%",
             "old_name": "%COMPANY_NAME%",
+            "type": "text",
             "value": "Network Optix",
             "description": "The name of the company itself"
           },
           {
             "label": "Copyright Year",
             "name": "%COPYRIGHT_YEAR%",
+            "type": "text",
             "value": "2019",
             "description": "Copyright information"
           },
@@ -135,6 +147,7 @@
             "label": "Client Protocol",
             "name": "%CLIENT_PROTOCOL%",
             "old_name": "{{CLIENT_PROTOCOL}}",
+            "type": "text",
             "value": "demo-vms",
             "description": "URL protocol for calling native clients from browser",
             "advanced": true
@@ -143,6 +156,7 @@
             "label": "IOS application ID",
             "name": "%IOS_APPLICATION_ID%",
             "old_name": "{{iOSappID}}",
+            "type": "text",
             "value": "L6FE34GJWM.com.networkoptix.NxMobile",
             "description": "App ID for iOS mobile application",
             "advanced": true
@@ -151,6 +165,7 @@
             "label": "IOS application link",
             "name": "%IOS_APPLICATION_LINK%",
             "old_name": "{{IOS_APP_LINK}}",
+            "type": "text",
             "value": "disabled",
             "description": "Link for iOS application in Apple AppStore",
             "advanced": true
@@ -159,6 +174,7 @@
             "label": "Android application link",
             "name": "%ANDROID_APPLICATION_LINK%",
             "old_name": "{{ANDROID_APP_LINK}}",
+            "type": "text",
             "value": "disabled",
             "description": "Link for Android application in Google Play",
             "advanced": true
@@ -166,12 +182,14 @@
           {
             "label": "Mail from - name",
             "name": "%MAIL_FROM_NAME%",
+            "type": "text",
             "value": "VMS Demo Cloud",
             "description": "Sender name for emails from cloud portal"
           },
           {
             "label": "Mail from - email",
             "name": "%MAIL_FROM_EMAIL%",
+            "type": "text",
             "value": "service@networkoptix.com",
             "description": "Sender email for emails from cloud portal. Case sensitive. (Needs to be verified by Amazon, contact Nx support team for assistance)",
             "advanced": true
@@ -217,6 +235,7 @@
       },
       {
         "name": "Landing page",
+        "label": "Landing page",
         "file_path": "static/lang_{{language}}/views/static/landing.html",
         "url": "/content/about",
         "translatable": true,
@@ -293,6 +312,7 @@
       },
       {
         "name": "Support page",
+        "label": "Support page",
         "file_path": "static/lang_{{language}}/views/static/support.html",
         "url": "/content/support",
         "translatable": true,
@@ -308,6 +328,7 @@
       },
       {
         "name": "ARM support policy page",
+        "label": "ARM support policy page",
         "file_path": "static/lang_{{language}}/views/static/arm.html",
         "url": "/content/arm",
         "translatable": true,
@@ -332,6 +353,7 @@
       },
       {
         "name": "Privacy policy page",
+        "label": "Privacy policy page",
         "description": "Embedded privacy policy page",
         "file_path": "static/lang_{{language}}/views/static/privacy.html",
         "url": "/content/privacy",
@@ -340,6 +362,7 @@
           {
             "label": "Privacy policy header",
             "name": "%TITLE%",
+            "type": "text",
             "value": "Personal data and privacy policy",
             "description": "Title for privacy policy"
           },
@@ -354,6 +377,7 @@
       },
       {
         "name": "License Agreement",
+        "label": "License Agreement",
         "old_name": "Eula",
         "description": "End User License Agreement",
         "file_path": "static/lang_{{language}}/views/static/eula.html",
@@ -400,6 +424,7 @@
       },
       {
         "name": "SMTP Config",
+        "label": "SMTP Config",
         "is_global": true,
         "description": "Holds settings for smtp server",
         "translatable": false,
@@ -408,6 +433,7 @@
           {
             "label": "Host",
             "name": "%SMTP_HOST%",
+            "type": "text",
             "value": "email-smtp.us-east-1.amazonaws.com",
             "description": "Host url for smtp server",
             "advanced": true
@@ -415,6 +441,7 @@
           {
             "label": "User",
             "name": "%SMTP_USER%",
+            "type": "text",
             "value": "AKIAJ3DYMIZMDABS43UA",
             "description": "User for smtp server",
             "advanced": true
@@ -422,6 +449,7 @@
           {
             "label": "Password",
             "name": "%SMTP_PASSWORD%",
+            "type": "text",
             "value": "AnC4VkpbBKXPCbik/gBru508QaG8L86uu2cTzTg5yDkI",
             "description": "Password smtp server",
             "advanced": true
@@ -429,6 +457,7 @@
           {
             "label": "Port",
             "name": "%SMTP_PORT%",
+            "type": "text",
             "value": "587",
             "description": "Port for smtp server",
             "advanced": true
@@ -436,6 +465,7 @@
           {
             "label": "Tls",
             "name": "%SMTP_TLS%",
+            "type": "text",
             "value": true,
             "description": "Tls for smtp server",
             "advanced": true
@@ -444,6 +474,7 @@
       },
       {
         "name": "Settings",
+        "label": "Settings",
         "is_global": true,
         "description": "Settings for product",
         "hidden": true,
@@ -516,6 +547,7 @@
       },
       {
         "name": "Camera page",
+        "label": "Camera page",
         "is_global": true,
         "description": "Settings for camera page",
         "hidden": true,
@@ -629,6 +661,7 @@
           {
             "label": "Number of vendors shown",
             "name": "%VENDORS_SHOWN%",
+            "type": "text",
             "value": "30",
             "description": "How many vendors will be shown on IPVD landing page",
             "advanced": true,
@@ -684,6 +717,7 @@
       },
       {
         "name": "Footer Menu",
+        "label": "Footer Menu",
         "is_global": true,
         "description": "Footer Menu",
         "hidden": true,
@@ -745,6 +779,7 @@
       },
       {
         "name": "Integrations page",
+        "label": "Integrations page",
         "is_global": true,
         "description": "Customizing integrations page",
         "hidden": true,
@@ -794,7 +829,10 @@
     "single_customization": false,
     "contexts": [
       {
-        "name": "Information",
+        "name": "information",
+        "old_name": "Information",
+        "label": "Information",
+        "description": "General information for the integration.",
         "translatable": false,
         "values": [
           {
@@ -937,7 +975,10 @@
         ]
       },
       {
-        "name": "Overview",
+        "name": "overview",
+        "old_name": "Overview",
+        "label": "Overview",
+        "description": "Summary about the integration. Here you can include a video, images, and a text description.",
         "translatable": false,
         "values": [
           {
@@ -1009,7 +1050,10 @@
         ]
       },
       {
-        "name": "Instructions",
+        "name": "instructions",
+        "old_name": "Instructions",
+        "label": "Instructions",
+        "description": "Instructions for setting up and/or using your integration. Here you can include a video, images, and text.",
         "translatable": false,
         "values": [
           {
@@ -1196,7 +1240,10 @@
         ]
       },
       {
-        "name": "Download Files",
+        "name": "downloadFiles",
+        "old_name": "Download Files",
+        "label": "Download Files",
+        "description": "Downloadable files for the integration.",
         "translatable": false,
         "values":[
           {
@@ -1419,7 +1466,10 @@
         ]
       },
       {
-        "name": "Support",
+        "name": "support",
+        "old_name": "Support",
+        "label": "Support",
+        "description": "Support information for the integration.",
         "translatable": false,
         "values": [
           {

@@ -48,8 +48,6 @@ def make_integrations_json(integrations, contexts=None, show_pending=False, show
             for context in contexts:
                 # Make context json friendly
                 context_name = context.name
-                context_name = context_name[0].lower() + context_name[1:]
-                context_name = context_name.replace(' ', '')
 
                 context_dict = {}
                 for datastructure in context.datastructure_set.all():
@@ -76,11 +74,11 @@ def make_integrations_json(integrations, contexts=None, show_pending=False, show
 
                 if context_dict:
                     integration_dict[context_name] = context_dict
-                    if context.name == "Download Files":
+                    if context.name == "downloadFiles":
                         downloads_order = {}
                         for datastructure in context.datastructure_set.all():
                             downloads_order[datastructure.name] = datastructure.order
-                        integration_dict[context_name+'Order'] = downloads_order
+                        integration_dict[f"{context_name}Order"] = downloads_order
 
             if not integration_dict:
                 continue

@@ -349,7 +349,7 @@ def get_records_for_version(version):
     contexts = {}
 
     for record in data_records:
-        context_name = record.data_structure.context.name
+        context_name = record.data_structure.context.get_nice_name()
         if context_name in contexts:
             contexts[context_name].append(record)
         else:

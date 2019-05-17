@@ -300,6 +300,7 @@ class Context(models.Model):
     product = models.ForeignKey(Product, null=True, on_delete=models.CASCADE)
     product_type = models.ForeignKey(ProductType, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=1024)
+    label = models.CharField(max_length=1024, default="")
     description = models.TextField(blank=True, default="")
     translatable = models.BooleanField(default=True)
     is_global = models.BooleanField(default=False)
@@ -310,6 +311,9 @@ class Context(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_nice_name(self):
+        return self.label if self.label else self.name
 
     def template_for_language(self, language, default_language, skin):
 

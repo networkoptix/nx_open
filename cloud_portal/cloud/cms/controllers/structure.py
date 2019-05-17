@@ -95,36 +95,21 @@ def update_from_object(cms_structure):
             if "url" in context_data:
                 context.url = context_data["url"]
             context.is_global = is_global
+            context.label = context_data["label"] if "label" in context_data else ""
             context.hidden = context_data["hidden"] if "hidden" in context_data else False
             context.save()
 
             for record in context_data["values"]:
-                if not isinstance(record, dict):
-                    name = None
-                    old_name = None
-                    description = None
-                    record_type = "text"
-                    meta = None
-                    advanced = False
-                    optional = False
-                    public = True
-                    label = None
-                    value = None
-                    if len(record) == 3:
-                        label, name, value = record
-                    if len(record) == 4:
-                        label, name, value, description = record
-                else:
-                    name = record['name']
-                    value = record['value'] if 'value' in record else ""
-                    label = record['label'] if 'label' in record else ""
-                    old_name = record['old_name'] if 'old_name' in record else None
-                    description = record['description'] if 'description' in record else None
-                    record_type = record['type'] if 'type' in record else None
-                    meta = record['meta'] if 'meta' in record else None
-                    advanced = record['advanced'] if 'advanced' in record else False
-                    optional = record['optional'] if 'optional' in record else False
-                    public = record['public'] if 'public' in record else True
+                name = record['name']
+                value = record['value'] if 'value' in record else ""
+                label = record['label'] if 'label' in record else ""
+                old_name = record['old_name'] if 'old_name' in record else None
+                description = record['description'] if 'description' in record else None
+                record_type = record['type'] if 'type' in record else None
+                meta = record['meta'] if 'meta' in record else None
+                advanced = record['advanced'] if 'advanced' in record else False
+                optional = record['optional'] if 'optional' in record else False
+                public = record['public'] if 'public' in record else True
 
                 data_structure = find_or_add_data_structure(name, old_name, context.id, has_language)
 

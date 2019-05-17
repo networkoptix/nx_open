@@ -13,7 +13,7 @@
         &rsaquo; <a href="{% url 'admin:cms_product_changelist' %}">{{ product_opts.verbose_name_plural|capfirst }}</a>
         &rsaquo; <a href="{% url 'admin:cms_product_change' product.id %}"> {{ product.name }}</a>
         &rsaquo; <a href="{% url 'admin:pages' product.id %}"> Pages </a>
-        &rsaquo; {% trans 'Edit'%} <span>{{ original.name }}</span>
+        &rsaquo; {% trans 'Edit'%} <span>{{ original.get_nice_name }}</span>
     </div>
 {% endblock %}
 {% block content %}

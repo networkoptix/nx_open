@@ -198,7 +198,7 @@ class ProductAdmin(CMSAdmin):
         target_context = Context.objects.get(id=context_id)
         product = Product.objects.get(id=product_id)
 
-        context['title'] = "Edit {}".format(target_context.name)
+        context['title'] = f"Edit {target_context.get_nice_name()}"
         context['language_code'] = Customization.objects.get(name=settings.CUSTOMIZATION).default_language
         context['EXTERNAL_IMAGE'] = DataStructure.DATA_TYPES[
             DataStructure.DATA_TYPES.external_image]
@@ -332,7 +332,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         extra_context = extra_context or {}
         version = ProductCustomizationReview.objects.get(id=object_id).version
         extra_context['contexts'] = get_records_for_version(version)
-        extra_context['title'] = "Changes for {} - Version: {}".format(version.product.name, version.id)
+        extra_context['title'] = f"Changes for {version.product.name} - Version: {version.id}"
 
         extra_context['review_states'] = ProductCustomizationReview.REVIEW_STATES
         extra_context['customization_reviews'] = version.productcustomizationreview_set.\
