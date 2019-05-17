@@ -1027,11 +1027,11 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     {
         delete m_decoder;
         DecoderConfig config;
-        config.allowMtDecoding = nx::analytics::ini().allowMtDecoding;
         if (videoData && videoData->dataProvider)
             config = DecoderConfig::fromResource(videoData->dataProvider->getResource());
-        m_decoder = new QnFfmpegVideoDecoder(
-            config, videoData->compressionType, videoData, false);
+
+        config.allowMtDecoding = nx::analytics::ini().allowMtDecoding;
+        m_decoder = new QnFfmpegVideoDecoder(config, videoData->compressionType, videoData, false);
         m_decoder->getContext()->flags |= CODEC_FLAG_GRAY;
     }
 
