@@ -82,6 +82,14 @@ do
         build_frontend)
             build_frontend
             ;;
+
+        generate_cms_docs)
+            setup_env
+            pushd cloud
+            python manage.py json_to_table
+            popd
+            echo 'Generate files are in ./cloud/cms'
+            ;;
         setup_cms)
             . ./env/bin/activate
             setup_cms
@@ -102,6 +110,7 @@ do
             echo Usage: cloud_shortcuts '[init|build_frontend|setup_cms|setup_db|setup_env|start_docker|stop_docker]'
             echo 'init - Does everything. Only run this once'
             echo 'build_frontend - Builds the frontend'
+            echo 'generate_cms_docs - Creates an html file for each product in cms/cms_structure.json'
             echo 'setup_cms - Fills in the cms. Runs migrate, readstructure and filldata commands'
             echo 'setup_db - Loads local db with sql file in ~/develop/nx_vms/cloud_portal/'
             echo 'start_docker - Starts docker containers used by cloud'

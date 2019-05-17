@@ -3,7 +3,7 @@ customization: 'default'
 host: '$CLOUD_PORTAL_HOST'
 
 cloud_database:
-    host: 'localhost'
+    host: '0.0.0.0'
     port: '3306'
     username: 'root'
     password: ''
