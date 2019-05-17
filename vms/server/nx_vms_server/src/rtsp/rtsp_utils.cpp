@@ -27,17 +27,16 @@ QSize parseResolution(const QString& str)
     return resolution;
 }
 
-
 bool UrlParams::parse(const QUrlQuery& query)
 {
     const QString positionStr = query.queryItemValue(StreamingParams::START_POS_PARAM_NAME);
     if (!positionStr.isEmpty())
-        position = nx::utils::parseDateTime(positionStr);
+        position = utils::parseDateTime(positionStr);
 
     QString codecStr = query.queryItemValue("codec");
     if (!codecStr.isEmpty())
     {
-        codec = nx::rtsp::findEncoderCodecId(codecStr);
+        codec = findEncoderCodecId(codecStr);
         if (codec == AV_CODEC_ID_NONE)
         {
             error = QString("Requested codec is not supported: [%1]").arg(codecStr);
@@ -48,7 +47,7 @@ bool UrlParams::parse(const QUrlQuery& query)
     QString resolutionStr = query.queryItemValue("resolution");
     if (!resolutionStr.isEmpty())
     {
-        resolution = nx::rtsp::parseResolution(resolutionStr);
+        resolution = parseResolution(resolutionStr);
         if (!resolution->isValid())
         {
             error = QString("Invalid resolution specified: [%1]").arg(resolutionStr);
