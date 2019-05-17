@@ -292,7 +292,6 @@ static IObjectMetadata* makeObjectMetadata(
     const Uuid& objectId,
     double offset,
     int64_t lastVideoFrameTimestampUs,
-    bool generatePreviewAttributes,
     int objectIndex)
 {
     auto objectMetadata = new ObjectMetadata();
@@ -301,33 +300,6 @@ static IObjectMetadata* makeObjectMetadata(
     objectMetadata->setId(objectId);
     objectMetadata->setBoundingBox(
 		Rect((float) offset, (float) offset + 0.05F * (float) objectIndex, 0.25F, 0.25F));
-
-    if (generatePreviewAttributes && ini().useOldStylePreviewAttributes)
-    {
-        // Make a box smaller than the one in setBoundingBox() to make the change visible.
-        objectMetadata->addAttributes({
-            nx::sdk::makePtr<Attribute>(
-                IAttribute::Type::number,
-                "nx.sys.preview.timestampUs",
-                std::to_string(lastVideoFrameTimestampUs)),
-            nx::sdk::makePtr<Attribute>(
-                IAttribute::Type::number,
-                "nx.sys.preview.boundingBox.x",
-                std::to_string(offset)),
-            nx::sdk::makePtr<Attribute>(
-                IAttribute::Type::number,
-                "nx.sys.preview.boundingBox.y",
-                std::to_string(offset)),
-            nx::sdk::makePtr<Attribute>(
-                IAttribute::Type::number,
-                "nx.sys.preview.boundingBox.width",
-                "0.1"),
-            nx::sdk::makePtr<Attribute>(
-                IAttribute::Type::number,
-                "nx.sys.preview.boundingBox.height",
-                "0.1")
-        });
-    }
 
     const std::map<std::string, std::vector<nx::sdk::Ptr<Attribute>>> kObjectAttributes = {
         {kCarObjectType, {
@@ -370,7 +342,7 @@ static IObjectTrackBestShotPacket* makeObjectTrackBestShotPacket(
     return new ObjectTrackBestShotPacket(
         objectTrackId,
         timestampUs,
-        Rect(offset, offset, 0.1, 0.1));
+        Rect(offset, offset, 0.1f, 0.1f));
 }
 
 void DeviceAgent::generateObjectIds()
@@ -435,10 +407,10 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
         return {};
 
-    double dt = m_objectCounter / 32.0;
+    float dt = m_objectCounter / 32.0f;
     ++m_objectCounter;
     double intPart;
-    dt = modf(dt, &intPart) * 0.75;
+    dt = (float) modf(dt, &intPart) * 0.75f;
     const int sequentialNumber = static_cast<int>(intPart);
     static const std::vector<std::string> kObjectTypes = {
         kCarObjectType,
@@ -459,15 +431,15 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
             m_currentObjectTypeIndex = 0;
     }
 
-    bool generatePreviewAttributes = false;
+    bool generatePreviewPacket = false;
     if (dt < 0.5)
     {
         m_previewAttributesGenerated = false;
     }
-    else if (dt > 0.5 && !m_previewAttributesGenerated && ini().generatePreviewAttributes)
+    else if (dt > 0.5 && !m_previewAttributesGenerated && ini().generatePreviewPacket)
     {
         m_previewAttributesGenerated = true;
-        generatePreviewAttributes = true;
+        generatePreviewPacket = true;
     }
 
     auto objectMetadataPacket = new ObjectMetadataPacket();
@@ -479,12 +451,11 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
             m_objectIds[i],
             dt,
             m_lastVideoFrameTimestampUs,
-            generatePreviewAttributes,
             i));
 
         objectMetadataPacket->addItem(objectMetadata.get());
 
-        if (generatePreviewAttributes && !ini().useOldStylePreviewAttributes)
+        if (generatePreviewPacket)
         {
             auto bestShotMetadataPacket = makeObjectTrackBestShotPacket(
                 m_objectIds[i],
