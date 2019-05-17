@@ -44,7 +44,6 @@
 #include <utils/common/synctime.h>
 #include <utils/math/color_transformations.h>
 
-#include <nx/analytics/utils.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
@@ -558,10 +557,7 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
         else
         {
             // Local storage, may be used to store analytics.
-            const bool analyticsEnabled = nx::analytics::hasActiveObjectEngines(
-                m_server->commonModule(), m_server->getId());
-
-            if (analyticsEnabled && record.id != m_model->metadataStorageId())
+            if (record.id != m_model->metadataStorageId())
             {
                 const auto storageId = record.id;
                 if (storageId == m_server->metadataStorageId())
@@ -1035,16 +1031,13 @@ void QnStorageConfigWidget::updateWarnings()
     bool hasDisabledStorage = false;
     bool hasUsbStorage = false;
 
-    const bool analyticsEnabled = nx::analytics::hasActiveObjectEngines(
-        m_server->commonModule(), m_server->getId());
-
     for (const auto& storageData: m_model->storages())
     {
         const auto storage = resourcePool()->getResourceById<QnStorageResource>(storageData.id);
         if (!storage || storage->getParentId() != m_server->getId())
             continue;
 
-        if (analyticsEnabled && storageData.id == m_model->metadataStorageId())
+        if (storageData.id == m_model->metadataStorageId())
         {
             if (storage->statusFlag() & Qn::StorageStatus::system)
                 analyticsIsOnSystemDrive = true;

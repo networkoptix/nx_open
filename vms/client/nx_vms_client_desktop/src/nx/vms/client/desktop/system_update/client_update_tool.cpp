@@ -224,7 +224,7 @@ std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledVersions(
 
 bool ClientUpdateTool::isVersionInstalled(const nx::utils::SoftwareVersion& version) const
 {
-    auto versions = getInstalledVersions();
+    auto versions = getInstalledVersions(/*includeCurrentVersion=*/true);
     return versions.count(version) != 0;
 }
 

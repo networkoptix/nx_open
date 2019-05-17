@@ -149,7 +149,7 @@ struct Ini: nx::kit::IniConfig
         "Cache live video to obtain right panel previews without querying the server.");
     NX_INI_INT(0, globalLiveVideoCacheLength,
         "Global live video cache length, in seconds. Set to zero to use built-in value.");
-    NX_INI_INT(0, connectTimeoutMs,
+    NX_INI_INT(180000, connectTimeoutMs,
         "Timeout (in milliseconds) for waiting initial resources message from the server.\n"
         "If exceeded then connections is dropped to avoid infinite UI \"Loading...\" state. 0 means disabled.");
 };
