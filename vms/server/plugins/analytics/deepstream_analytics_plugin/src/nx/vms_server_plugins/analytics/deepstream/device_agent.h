@@ -4,6 +4,7 @@
 #include <memory>
 #include <mutex>
 
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/ref_countable.h>
 
 #include <nx/vms_server_plugins/analytics/deepstream/engine.h>
@@ -48,7 +49,7 @@ private:
 
 private:
     Engine* const m_engine;
-    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler;
+    nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
     std::unique_ptr<nx::gstreamer::Pipeline> m_pipeline;
     mutable std::mutex m_mutex;
     mutable std::string m_manifest;

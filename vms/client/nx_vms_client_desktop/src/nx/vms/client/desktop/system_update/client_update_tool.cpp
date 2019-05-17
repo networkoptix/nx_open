@@ -303,7 +303,6 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
 
         const auto code = m_downloader->addFile(info);
         NX_VERBOSE(this, "setUpdateTarget(%1) m_downloader->addFile code=%2", contents.info.version, code);
-        m_updateFile = m_downloader->filePath(m_clientPackage.file);
 
         if (code == common::p2p::downloader::ResultCode::fileAlreadyExists
             || code == common::p2p::downloader::ResultCode::fileAlreadyDownloaded)
@@ -362,8 +361,10 @@ void ClientUpdateTool::atDownloadFinished(const QString& fileName)
     if (fileName != m_clientPackage.file)
         return;
 
+    m_updateFile = m_downloader->filePath(fileName);
+
     NX_VERBOSE(this, "atDownloadFinished(%1) - finally downloaded file to %2",
-        fileName, m_downloader->filePath(fileName));
+        fileName, m_updateFile);
     setState(State::readyInstall);
 }
 
@@ -473,12 +474,23 @@ bool ClientUpdateTool::installUpdateAsync()
             nx::utils::SoftwareVersion updateVersion) -> int
         {
             using Result = applauncher::api::ResultType::Value;
-            static const int kMaxTries = 5;
+
             QString absolutePath = QFileInfo(updateFile).absoluteFilePath();
 
+            Result result = applauncher::api::installZipAsync(updateVersion, absolutePath);
+            if (result != Result::ok)
+            {
+                QString message = applauncherErrorToString(result);
+                NX_VERBOSE(NX_SCOPE_TAG, "failed to run zip installation: %1", message);
+                // Other variants can be fixed by retrying installation, do they?
+                return result;
+            }
+
+            // Checking state if installation, until it goes to Result::ok
+            static const int kMaxTries = 10;
             for (int retries = 0; retries < kMaxTries; ++retries)
             {
-                Result result = applauncher::api::installZip(updateVersion, absolutePath);
+                Result result = applauncher::api::checkInstallationProgress();
                 QString message = applauncherErrorToString(result);
 
                 switch (result)
@@ -491,15 +503,15 @@ bool ClientUpdateTool::installUpdateAsync()
                     case Result::notFound:
                     case Result::ok:
                         return result;
+                    case Result::unpackingZip:
+                        break;
                     case Result::connectError:
                     case Result::ioError:
                     default:
-                        NX_VERBOSE(NX_SCOPE_TAG, "failed to run zip installation: %1", message);
-                        // Other variants can be fixed by retrying installation, do they?
+                        NX_VERBOSE(NX_SCOPE_TAG, "failed to check zip installation status: %1", message);
                         break;
                 }
-
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                std::this_thread::sleep_for(std::chrono::seconds(2));
             }
 
             return Result::otherError;

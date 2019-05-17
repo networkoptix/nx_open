@@ -90,8 +90,8 @@ buildDistribution()
 
     mv "$SRC/client.app" "$APP_DIR"
     mkdir -p "$APP_DIR/Contents/Resources"
-    cp logo.icns "$APP_DIR/Contents/Resources/appIcon.icns"
-    cp logo.icns "$SRC/.VolumeIcon.icns"
+    cp "$APP_ICON" "$APP_DIR/Contents/Resources/appIcon.icns"
+    cp "$INSTALLER_ICON" "$SRC/.VolumeIcon.icns"
     cp -r "$PACKAGES_DIR/any/roboto-fonts/bin/fonts" "$APP_DIR/Contents/Resources/"
 
     copyMacOsSpecificApplauncherStuff

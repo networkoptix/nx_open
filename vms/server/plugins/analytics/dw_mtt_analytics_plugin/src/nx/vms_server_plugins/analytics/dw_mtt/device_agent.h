@@ -98,7 +98,7 @@ private:
     QByteArray m_cameraManifest;
     ElapsedEvents m_eventsToCatch;
     QByteArray m_buffer;
-    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
     nx::network::aio::Timer m_reconnectTimer;
     mutable uint64_t m_packetId = 0; //< autoincrement packet number for log and debug
     nx::dw_mtt::CameraController m_cameraController;

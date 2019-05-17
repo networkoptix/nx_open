@@ -37,7 +37,8 @@ const nx::utils::SoftwareVersion kNewGstreamerUsedVersion(4, 0);
 
 } // namespace
 
-using namespace applauncher;
+namespace applauncher {
+
 using namespace api;
 
 ApplauncherProcess::ApplauncherProcess(
@@ -92,6 +93,20 @@ void ApplauncherProcess::processRequest(
             *response = new Response();
             installZip(
                 std::static_pointer_cast<InstallZipTask>(request),
+                *response);
+            break;
+
+        case TaskType::startZipInstallation:
+            *response = new Response();
+            installZipAsync(
+                std::static_pointer_cast<InstallZipTaskAsync>(request),
+                *response);
+            break;
+
+        case TaskType::checkZipProgress:
+            *response = new Response();
+            checkInstallationProgress(
+                std::static_pointer_cast<InstallZipCheckStatus>(request),
                 *response);
             break;
 
@@ -191,7 +206,7 @@ bool ApplauncherProcess::startApplication(
     const std::shared_ptr<StartApplicationTask>& task,
     Response* const response)
 {
-    NX_VERBOSE(this, lm("Entered LaunchingApplication"));
+    NX_VERBOSE(this, "Entered LaunchingApplication");
 
     auto installation = m_installationManager->installationForVersion(task->version);
 
@@ -209,8 +224,7 @@ bool ApplauncherProcess::startApplication(
 
     if (installation.isNull())
     {
-        NX_DEBUG(this, lm("Failed to find installed version %1")
-            .arg(task->version.toString()));
+        NX_DEBUG(this, "Failed to find installed version %1", task->version);
         response->result = ResultType::versionNotInstalled;
         return false;
     }
@@ -276,8 +290,7 @@ bool ApplauncherProcess::startApplication(
         }
     }
 
-    NX_VERBOSE(this, lm("Launching version %1 (path %2)")
-        .args(task->version.toString(), binPath));
+    NX_VERBOSE(this, "Launching version %1 (path %2)", task->version, binPath);
 
     const QFileInfo info(binPath);
     if (ProcessUtils::startProcessDetached(
@@ -288,15 +301,13 @@ bool ApplauncherProcess::startApplication(
         info.absolutePath(),
         environment))
     {
-        NX_DEBUG(this, lm("Successfully launched version %1 (path %2)")
-            .args(task->version.toString(), binPath));
+        NX_DEBUG(this, "Successfully launched version %1 (path %2)", task->version, binPath);
         m_settings->sync();
         response->result = ResultType::ok;
         return true;
     }
 
-    NX_DEBUG(this, lm("Failed to launch version %1 (path %2)")
-        .args(task->version.toString(), binPath));
+    NX_DEBUG(this, "Failed to launch version %1 (path %2)", task->version, binPath);
     response->result = ResultType::ioError;
     return false;
 }
@@ -306,6 +317,57 @@ bool ApplauncherProcess::installZip(
     Response* const response)
 {
     response->result = m_installationManager->installZip(request->version, request->zipFileName);
+    return response->result == ResultType::ok;
+}
+
+bool ApplauncherProcess::installZipAsync(
+    const std::shared_ptr<InstallZipTaskAsync>& request,
+    Response* const response)
+{
+    if (!m_process.isEmpty())
+    {
+        // It is ok if we are already installing the same file and version.
+        if (m_process.equals(request->version, request->zipFileName))
+            response->result = ResultType::ok;
+        else
+            response->result = ResultType::busy;
+    }
+    else
+    {
+        m_process.result = std::async(std::launch::async,
+            [this, request]() -> ResultType::Value
+            {
+                {
+                    std::scoped_lock<std::mutex> lock(m_process.mutex);
+                    m_process.version = request->version;
+                    m_process.fileName = request->zipFileName;
+                }
+                auto result = m_installationManager->installZip(request->version, request->zipFileName);
+                m_process.reset();
+                return result;
+            });
+        response->result = ResultType::ok;
+    }
+
+    return response->result == ResultType::ok;
+}
+
+bool ApplauncherProcess::checkInstallationProgress(
+    const std::shared_ptr<applauncher::api::InstallZipCheckStatus>& /*request*/,
+    applauncher::api::Response* const response)
+{
+    if (!m_process.isEmpty())
+    {
+        if (m_process.result.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready)
+            response->result = m_process.result.get();
+        else
+            response->result = ResultType::unpackingZip;
+    }
+    else
+    {
+        response->result = ResultType::ok;
+    }
+
     return response->result == ResultType::ok;
 }
 
@@ -367,3 +429,24 @@ void ApplauncherProcess::onTimer(const quint64& timerID)
     const auto code = nx::killProcessByPid(task.processID);
     static_cast<void>(code);
 }
+
+void ApplauncherProcess::InstallationProcess::reset()
+{
+    std::scoped_lock<std::mutex> lock(mutex);
+    version = {};
+    fileName = "";
+}
+
+bool ApplauncherProcess::InstallationProcess::isEmpty() const
+{
+    return !result.valid();
+}
+
+bool ApplauncherProcess::InstallationProcess::equals(
+    const nx::utils::SoftwareVersion& version, const QString& fileName) const
+{
+    std::scoped_lock<std::mutex> lock(mutex);
+    return this->version == version && this->fileName == fileName;
+}
+
+} // namespace applauncher
