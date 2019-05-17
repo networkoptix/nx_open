@@ -4,6 +4,7 @@ COPY stage/connection_mediator /opt/networkoptix/connection_mediator
 
 COPY etc/connection_mediator.conf /opt/networkoptix/connection_mediator/etc/connection_mediator.conf
 COPY docker/entrypoint.sh /opt/networkoptix/connection_mediator/bin
+COPY var/GeoLite2-City.mmdb /opt/networkoptix/connection_mediator/var/
 
 EXPOSE 3345
 

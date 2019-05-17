@@ -31,6 +31,7 @@ def determine_package_versions(
         "clang": "8.0.0",
         "qt": "5.11.3",
         "boost": "1.67.0",
+	"geolite":"2",
         "openssl": "1.0.2q",
         "ffmpeg": "3.1.1",
         "sigar": "1.7",
@@ -130,6 +131,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
 
     sync("qt", path_variable="QT_DIR")
     sync("any/boost")
+    sync("any/geolite")
 
     sync("any/detection_plugin_interface")
 
