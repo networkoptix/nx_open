@@ -174,17 +174,22 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-row">
-                            <div>
-                                <label for="id_add">Note</label>
-                                <div id="add">
-                                    <textarea id="id_add" rows="5" style="width:100%" name="addedNote" type="text" required></textarea>
-                                </div>
-                                <label for="access_customization">Can View Customization (If selected the user will be able to see this customization)</label>
-                                <div>
-                                    <input id="access_customization" name="access_customization" type="checkbox">
-                                </div>
+                            <label for="id_add">Note</label>
+                            <div id="add">
+                                <textarea id="id_add" rows="5" style="width:100%" name="addedNote" type="text" required></textarea>
                             </div>
                         </div>
+
+                        {% has_customization_permission version.created_by original.customization.name 'cms.access_customization' as developer_access_customization %}
+                        {% if not developer_access_customization %}
+                        <div class="form-row">
+                            <div class="checbox">
+                                <label>
+                                    <input id="access_customization" name="access_customization" type="checkbox" style="margin-right: 3px;">
+                                    Let developer contact me (he will get permanent permissions to see the email and real customization name)
+                                </label>
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>

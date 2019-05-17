@@ -195,12 +195,19 @@ def review(request):
         elif 'reject' in request.POST:
             raise PermissionDenied
 
-        message = "\n{}: {}\n".format(request.user.email, request.POST['addedNote'])
-        product_review.notes += message
-        product_review.save()
         if 'access_customization' in request.POST:
             make_customization_visible_to_user(get_cloud_portal_product(product_review.customization),
                                                product_review.version.created_by)
+
+        if not UserGroupsToProductPermissions.check_customization_permission(
+                product_review.version.created_by, product_review.customization, 'cms.access_customization'
+        ):
+            message = '\n{}\n'.format(request.POST['addedNote'])
+        else:
+            message = "\n{}: {}\n".format(request.user.email, request.POST['addedNote'])
+        product_review.notes += message
+        product_review.save()
+
     elif any(action in request.POST for action in ['publish', 'force_update']):
         raise PermissionDenied
     else:
