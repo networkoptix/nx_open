@@ -2,7 +2,7 @@
 
 namespace nx::vms::rules {
 
-class Rule
+class NX_VMS_RULES_API Rule
 {
 
 };

@@ -6,7 +6,7 @@
 
 namespace nx::vms::rules {
 
-class BasicEvent
+class NX_VMS_RULES_API BasicEvent
 {
 public:
     BasicEvent(nx::vms::api::rules::EventInfo &info);
