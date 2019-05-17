@@ -275,10 +275,13 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>
                     NX_INFO(this, "setUpdateStatus() - changing status %1->%2 for peer %3: %4",
                         toString(item->state), toString(status.second.code), name, item->id);
                     item->state = status.second.code;
-
-                    if (status.second.code == StatusCode::error)
-                        item->statusMessage = errorString(status.second.errorCode);
                     changed = true;
+                }
+
+                if (status.second.code == StatusCode::error)
+                {
+                    item->statusMessage = errorString(status.second.errorCode);
+                    NX_ASSERT(status.second.errorCode != nx::update::Status::ErrorCode::noError);
                 }
 
                 changed |= compareAndSet(status.second.progress, item->progress);
@@ -807,7 +810,7 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
     switch (code)
     {
         case Code::noError:
-            return "";
+            return "No error. Really. There is a bug if you see this message.";
         case Code::updatePackageNotFound:
             return tr("Update package can't be not found.");
         case Code::noFreeSpaceToDownload:
