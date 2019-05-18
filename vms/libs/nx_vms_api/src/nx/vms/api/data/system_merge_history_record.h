@@ -7,6 +7,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 
+#include <nx/utils/latin1_array.h>
+
 namespace nx {
 namespace vms {
 namespace api {
@@ -16,8 +18,8 @@ struct NX_VMS_API SystemMergeHistoryRecord: Data
     /** Milliseconds since epoch. */
     qint64 timestamp = 0;
 
-    QByteArray mergedSystemLocalId;
-    QByteArray mergedSystemCloudId;
+    QnLatin1Array mergedSystemLocalId;
+    QnLatin1Array mergedSystemCloudId;
 
     /** User who started merge. */
     QString username;

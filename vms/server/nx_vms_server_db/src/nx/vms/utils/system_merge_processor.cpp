@@ -101,10 +101,13 @@ QnJsonRestResult SystemMergeProcessor::merge(
     if (result.error)
         return makeError("Systems cannot be merged");
 
-
-    result = mergeSystems(accessRights, data);
+    QnUuid mergeId = QnUuid::createUuid();
+    result = mergeSystems(accessRights, data, mergeId);
     if (result.error)
         return makeError(lm("Failed to merge systems. %1").args(toString(result.error)));
+
+    m_commonModule->globalSettings()->setLastMergeMasterId(mergeId);
+    m_commonModule->globalSettings()->synchronizeNowSync();
 
     nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
     if (!addMergeHistoryRecord(data, &mergeHistoryRecord))
@@ -347,7 +350,8 @@ QnJsonRestResult SystemMergeProcessor::checkIfCloudSystemsMergeIsPossible(
 
 QnJsonRestResult SystemMergeProcessor::mergeSystems(
     Qn::UserAccessData accessRights,
-    MergeSystemData data)
+    MergeSystemData data,
+    const QnUuid& mergeId)
 {
     QnJsonRestResult result;
     if (m_dbBackupEnabled)
@@ -374,7 +378,8 @@ QnJsonRestResult SystemMergeProcessor::mergeSystems(
                 m_remoteModuleInformation.localSystemId,
                 m_remoteModuleInformation.systemName,
                 data.getKey,
-                data.postKey);
+                data.postKey,
+                mergeId);
         if (result.error)
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply remote settings")
@@ -386,7 +391,7 @@ QnJsonRestResult SystemMergeProcessor::mergeSystems(
     {
         NX_DEBUG(this, "Applying local settings to a remote peer");
 
-        result = applyCurrentSettings(data.url, data.postKey, data.mergeOneServer);
+        result = applyCurrentSettings(data.url, data.postKey, data.mergeOneServer, mergeId);
         if (result.error)
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply current settings")
@@ -427,7 +432,8 @@ void SystemMergeProcessor::setMergeError(
 QnJsonRestResult SystemMergeProcessor::applyCurrentSettings(
     const nx::utils::Url& remoteUrl,
     const QString& postKey,
-    bool oneServer)
+    bool oneServer,
+    const QnUuid& mergeId)
 {
     auto server = m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
         m_commonModule->moduleGUID());
@@ -445,6 +451,7 @@ QnJsonRestResult SystemMergeProcessor::applyCurrentSettings(
     ec2::AbstractECConnectionPtr ec2Connection = m_commonModule->ec2Connection();
     data.tranLogTime = ec2Connection->getTransactionLogTime();
     data.wholeSystem = !oneServer;
+    data.mergeId = mergeId;
 
     /**
      * Save current server to the foreign system.
@@ -585,7 +592,8 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     const QnUuid& systemId,
     const QString& systemName,
     const QString& getKey,
-    const QString& postKey)
+    const QString& postKey,
+    const QnUuid& mergeId)
 {
     ConfigureSystemData remoteSystemData;
     remoteSystemData.localSystemId = systemId;
@@ -618,6 +626,7 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
         ec2::AbstractECConnectionPtr ec2Connection = m_commonModule->ec2Connection();
         data.tranLogTime = ec2Connection->getTransactionLogTime();
         data.rewriteLocalSettings = true;
+        data.mergeId = mergeId;
 
         result = executeRemoteConfigure(
             data,
