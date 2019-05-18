@@ -49,6 +49,8 @@ struct DebugInfoInstrument::Private
 
     void updateHandles()
     {
+        if (!profilerMode)
+            return;
         #if defined(Q_OS_WIN)
             const auto processHandle = GetCurrentProcess();
             const auto gdiHandles = GetGuiResources(processHandle, GR_GDIOBJECTS);
@@ -60,6 +62,8 @@ struct DebugInfoInstrument::Private
 
     void updateThreads()
     {
+        if (!profilerMode)
+            return;
         #if defined(Q_OS_WIN)
             const auto currentProcessId = GetCurrentProcessId();
             const auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -73,10 +77,25 @@ struct DebugInfoInstrument::Private
 
             CloseHandle(snapshot);
 
-            const QString threadCountStr =
-                isOk ? QString::number(entry.cntThreads) : QString("N/A");
+            const auto threadCountStr = isOk ? QString::number(entry.cntThreads) : QString("N/A");
 
             threads = QString("\nThreads: %1").arg(threadCountStr);
+        #endif
+        #if defined(Q_OS_MACOS) || defined (Q_OS_LINUX)
+            const auto command = QString("ps -M -p %1 | wc -l").arg(getpid());
+            QString output;
+            if (auto pipe = popen(command.toStdString().c_str(), "r"))
+            {
+                std::array<char, 256> buffer;
+                while (fgets(buffer.data(), buffer.size(), pipe))
+                    output += buffer.data();
+                pclose(pipe);
+            }
+            bool isOk = false;
+            const auto threadCount = output.trimmed().toInt(&isOk) - 1;
+            const auto threadCountStr = isOk ? QString::number(threadCount) : QString("N/A");
+
+            threads = QString("\nThreads: %1").arg(threadCount);
         #endif
     }
 
