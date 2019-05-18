@@ -1599,10 +1599,13 @@ UDPSocket::UDPSocket(int ipVersion):
     {
         // Ignoring for now.
     }
+
+    ++SocketGlobals::instance().debugCounters().udpSocketCount;
 }
 
 UDPSocket::~UDPSocket()
 {
+    --SocketGlobals::instance().debugCounters().udpSocketCount;
 }
 
 bool UDPSocket::getProtocol(int* protocol) const
