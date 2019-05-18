@@ -31,7 +31,7 @@ def determine_package_versions(
         "clang": "8.0.0",
         "qt": "5.11.3",
         "boost": "1.67.0",
-	"geolite":"2",
+	"geolite": "2",
         "openssl": "1.0.2q",
         "ffmpeg": "3.1.1",
         "sigar": "1.7",
