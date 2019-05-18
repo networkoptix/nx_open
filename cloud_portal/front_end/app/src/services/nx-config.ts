@@ -254,11 +254,10 @@ export class NxConfigService {
             defaultPlatformNames                 : {
                 'arm-file'        : 'Arm',
                 'linux-x64-file'  : 'Linux x64',
-                'linux-x86-file'  : 'Linux x86',
                 'macos-file'      : 'Mac OS',
                 'rpi-file'        : 'Raspberry Pi',
                 'windows-x64-file': 'Windows x64',
-                'windows-x86-file': 'Windows x86'
+                'downloadableInstructions': 'Instructions / Manual'
             },
             animation: {
                 carouselImageEnter: '0.25s ease-in',

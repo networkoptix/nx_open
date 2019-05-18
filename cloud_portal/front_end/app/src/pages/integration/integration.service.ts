@@ -8,6 +8,7 @@ interface Platform {
     name: string;
     order: string;
     url: string;
+    noFollow: boolean;
 }
 
 @Injectable({
@@ -50,15 +51,18 @@ export class IntegrationService implements OnDestroy {
                 // If there is no file url or its the name for an additional field skip
                 if (typeof downloadPlatforms[platformName] !== 'string' ||
                     !downloadPlatforms[platformName] ||
-                    platformName.match(/-file-[\d]+-name/)) {
-
+                    platformName.match(/-file-[\d]+-name/) ||
+                    platformName.match(/external-link-name/)) {
                     continue;
                 }
 
-                const platform: Platform = { file: '', name: '', order: '', url: '' };
+                const platform: Platform = { file: '', name: '', order: '', url: '', noFollow: false };
                 // If the platformName is additional file we replace it with the correct name
-                if (platformName.match(/-file-[\d]+/)) {
+                if (platformName.match(/-file-[\d]+/) || platformName.match(/external-link/)) {
                     platform.name = downloadPlatforms[`${platformName}-name`];
+                    if (platformName.match(/external-link/)) {
+                        platform.noFollow = true;
+                    }
                 } else {
                     platform.name = this.config.config.defaultPlatformNames[platformName];
                 }

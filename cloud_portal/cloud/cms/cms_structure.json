@@ -945,13 +945,11 @@
             "meta": {
               "multi": true,
               "options": [
-                "ARM",
-                "Linux - x86",
+                "Windows - x64",
                 "Linux - x64",
-                "MacOS",
-                "RPI",
-                "Windows - x86",
-                "Windows - x64"
+                "ARM 64bit / Nvidia Jetson",
+                "ARM 32bit / Raspberry PI",
+                "MacOS"
               ]
             }
           },
@@ -1247,20 +1245,8 @@
         "translatable": false,
         "values":[
           {
-            "name": "arm-file",
-            "label": "Download for ARM",
-            "value": "",
-            "description": "",
-            "type": "external_file",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "size": 1073741824
-            }
-          },
-          {
-            "name": "linux-x86-file",
-            "label": "Download for Linux - x86",
+            "name": "windows-x64-file",
+            "label": "Package for Windows x64",
             "value": "",
             "description": "",
             "type": "external_file",
@@ -1272,7 +1258,33 @@
           },
           {
             "name": "linux-x64-file",
-            "label": "Download for Linux - x64",
+            "label": "Package for Linux - x64",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "arm-64-file",
+            "old_name": "arm-file",
+            "label": "Package for ARM 64bit / Nvidia Jetson",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "arm-32-file",
+            "old_name": "rpi-file",
+            "label": "Package for ARM 32bit/ Raspberry PI",
             "value": "",
             "description": "",
             "type": "external_file",
@@ -1284,43 +1296,7 @@
           },
           {
             "name": "macos-file",
-            "label": "Download for MacOs",
-            "value": "",
-            "description": "",
-            "type": "external_file",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "size": 1073741824
-            }
-          },
-          {
-            "name": "rpi-file",
-            "label": "Download for RPI",
-            "value": "",
-            "description": "",
-            "type": "external_file",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "size": 1073741824
-            }
-          },
-          {
-            "name": "windows-x86-file",
-            "label": "Download for Windows - x86",
-            "value": "",
-            "description": "",
-            "type": "external_file",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "size": 1073741824
-            }
-          },
-          {
-            "name": "windows-x64-file",
-            "label": "Download for Windows x64",
+            "label": "Package for MacOs",
             "value": "",
             "description": "",
             "type": "external_file",
@@ -1342,7 +1318,7 @@
             "name": "additional-file-1",
             "label": "Additional file 1",
             "value": "",
-            "description": "Upload any other necessary files.",
+            "description": "Upload any other necessary files. Shows up in the downloads section under the supported platform files.",
             "type": "external_file",
             "optional": true,
             "public": true,
@@ -1362,7 +1338,7 @@
             "name": "additional-file-2",
             "label": "Additional file 2",
             "value": "",
-            "description": "Upload any other necessary files.",
+            "description": "Upload any other necessary files. Shows up in the downloads section under the first additional file.",
             "type": "external_file",
             "optional": true,
             "public": true,
@@ -1382,7 +1358,7 @@
             "name": "additional-file-3",
             "label": "Additional file 3",
             "value": "",
-            "description": "Upload any other necessary files.",
+            "description": "Upload any other necessary files. Shows up in the downloads section under the second additional file.",
             "type": "external_file",
             "optional": true,
             "public": true,
@@ -1391,59 +1367,20 @@
             }
           },
           {
-            "name": "url-file-1-name",
-            "label": "Url To File 1 Name",
+            "name": "external-link-name",
+            "label": "External link name",
             "value": "",
-            "description": "Name for downloadable url file 1.",
+            "description": "Name for external link.",
             "type": "text",
             "optional": true
           },
           {
-            "name": "url-file-1",
-            "label": "Url To File 1",
+            "name": "external-link",
+            "label": "External link",
             "value": "",
-            "description": "Provide a download url for your files.",
+            "description": "External link. Use of this field is discouraged. If you do want to use it contact a superuser to change it.",
             "type": "text",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "regex": "(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?"
-            }
-          },
-          {
-            "name": "url-file-2-name",
-            "label": "Url To File 2 Name",
-            "value": "",
-            "description": "Name for downloadable url file 2.",
-            "type": "text",
-            "optional": true
-          },
-          {
-            "name": "url-file-2",
-            "label": "Url To File 2",
-            "value": "",
-            "description": "Provide a download url for your files.",
-            "type": "text",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "regex": "(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?"
-            }
-          },
-          {
-            "name": "url-file-3-name",
-            "label": "Url To File 3 Name",
-            "value": "",
-            "description": "Name for downloadable url file 3.",
-            "type": "text",
-            "optional": true
-          },
-          {
-            "name": "url-file-3",
-            "label": "Url To File 3",
-            "value": "",
-            "description": "Provide a download url for your files.",
-            "type": "text",
+            "advanced": true,
             "optional": true,
             "public": true,
             "meta": {
