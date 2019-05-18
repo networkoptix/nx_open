@@ -18,7 +18,6 @@ public:
 private:
     class ResolverImpl;
 
-    std::string m_mmdbPath;
     std::unique_ptr<ResolverImpl> m_impl;
 };
 

@@ -266,7 +266,7 @@ private:
 // Resolver
 
 Resolver::Resolver(const std::string& mmdbPath):
-    m_mmdbPath(mmdbPath)
+	m_impl(std::make_unique<ResolverImpl>(mmdbPath))
 {
 }
 
@@ -274,9 +274,6 @@ Resolver::~Resolver() = default;
 
 Location Resolver::resolve(const std::string& ipAddress)
 {
-    if (!m_impl)
-        m_impl = std::make_unique<ResolverImpl>(m_mmdbPath);
-
     return m_impl->resolve(ipAddress);
 }
 
