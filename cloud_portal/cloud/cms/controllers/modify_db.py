@@ -346,7 +346,7 @@ def send_version_for_review(product, user):
 
 def get_records_for_version(version):
     data_records = version.datarecord_set.all()\
-        .order_by('data_structure__context__name', 'language__code')
+        .order_by('data_structure__context__name', 'language__code', 'data_structure__order')
     contexts = {}
 
     for record in data_records:
