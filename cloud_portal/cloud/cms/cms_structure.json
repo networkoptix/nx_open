@@ -829,6 +829,71 @@
     "single_customization": false,
     "contexts": [
       {
+        "name": "company",
+        "label": "Company",
+        "description": "General information for the company.",
+        "translatable": false,
+        "values": [
+          {
+            "name": "companyName",
+            "label": "Company Name",
+            "value": "",
+            "description": "A company name. The company's name is visible in the detailed view page for the integration in the rightmost column.",
+            "type": "text",
+            "optional": false,
+            "meta": {
+              "char_limit": 64
+            }
+          },
+          {
+            "name": "companyInfo",
+            "label": "Company Info",
+            "value": "",
+            "description": "A short description for the company. The company's info is visible in the detailed view page for the integration in the rightmost column. Recommended length 500 characters.",
+            "type": "long_text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "companyLogo",
+            "label": "Company Logo",
+            "value": "",
+            "description": "Company logo.<br>Must have a transparent background.",
+            "type": "external_image",
+            "optional": true,
+            "meta": {
+              "size": 512000,
+              "format": "png",
+              "height_ge": 128
+            }
+          },
+          {
+            "name": "companyWeb",
+            "label": "Company url",
+            "value": "",
+            "description": "Company web address.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "regex": "^(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?$"
+            }
+          },
+          {
+            "name": "companyWebTitle",
+            "label": "Company Web Title",
+            "value": "",
+            "description": "Human friendly title for company's web address.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 64
+            }
+          }
+        ]
+      },
+      {
         "name": "information",
         "old_name": "Information",
         "label": "Information",
@@ -875,26 +940,6 @@
             "type": "long_text",
             "meta": {
               "char_limit": 500
-            }
-          },
-          {
-            "name": "companyName",
-            "label": "Company Name",
-            "value": "",
-            "description": "A company name. The company's name is visible in the detailed view page for the integration in the rightmost column.",
-            "type": "text",
-            "meta": {
-              "char_limit": 64
-            }
-          },
-          {
-            "name": "companyInfo",
-            "label": "Company Info",
-            "value": "",
-            "description": "A short description for the company. The company's info is visible in the detailed view page for the integration in the rightmost column. Recommended length 500 characters.",
-            "type": "long_text",
-            "meta": {
-              "char_limit": 1000
             }
           },
           {
