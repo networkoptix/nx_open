@@ -7,25 +7,25 @@ WITH_ROOT_TOOL="@withRootTool@"
 osBasename() {
     local -r NAME=$(cat /etc/os-release |grep -e '^ID=' |sed 's/^ID=\(.*\)$/\1/')
 
-    local -rA BASENAMES=(
+    local -rA BASE_LINUX_DISTRO_NAME_BY_DISTRO_NAME=(
         [debian]=debian
         [ubuntu]=ubuntu
         [raspbian]=debian
     )
 
-    echo ${BASENAMES[$NAME]}
+    echo "${BASE_LINUX_DISTRO_NAME_BY_DISTRO_NAME[$NAME]}"
 }
 
 osVersion() {
     local -r VERSION=$(cat /etc/os-release |grep -e '^VERSION_ID=' |sed 's/^VERSION_ID="\(.*\)"/\1/')
 
-    echo $VERSION
+    echo "$VERSION"
 }
 
 osMajorVersion() {
     local -r VERSION=$(osVersion)
 
-    echo ${VERSION%%.*}
+    echo "${VERSION%%.*}"
 }
 
 installDeb()
@@ -55,6 +55,8 @@ deleteObsoleteFiles()
     rm "$DIR/installation_info.json" &>/dev/null #< Will be generated on first Server start.
 }
 
+# Install dependencies by names if corresponding installation files exist and they hadn't been
+# already installed.
 ensureDependencyInstalled()
 {
     local -r OS_DIRNAME=$(osBasename)$(osMajorVersion)
@@ -63,9 +65,13 @@ ensureDependencyInstalled()
     do
         local NAME=$1;shift
 
+        # List packages and filter them by full package name matching and by 'i' (installed) flag
+        # to check, that whether such package had been already installed.
         [[ $(dpkg -l |grep -e "${NAME}\s" |grep -e '^.i' |awk '{print $2}') ]] && continue
 
-        [[ -d "dependencies/${OS_DIRNAME}/${NAME}" ]] || continue
+        if [[ ! -d "dependencies/${OS_DIRNAME}/${NAME}" ]]; then
+            continue
+        fi
 
         installDeb "dependencies/${OS_DIRNAME}/${NAME}"/*.deb
     done
@@ -80,8 +86,6 @@ update()
     ensureDependencyInstalled cifs-utils
     installDeb "$SERVER_DEB_FILE"
 
-    # TODO: #alevenkov Consider moving this block to postinst to enable rpi camera after a clean
-    # installation (this script works only when upgrading). Note the reboot command.
     if grep '^Hardware.*:.*BCM2835[[:space:]]*$' /proc/cpuinfo &>/dev/null
     then
         bash nx_rpi_cam_setup.sh
