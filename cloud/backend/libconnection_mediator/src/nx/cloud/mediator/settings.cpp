@@ -493,7 +493,7 @@ void Settings::loadTrafficRelay()
     m_trafficRelay.clusterId = settings().value(
         group + traffic_relay::kClusterId).toString().toStdString();
 
-    m_trafficRelay.discovery.load(settings(), (group + "discovery").toStdString());
+    m_trafficRelay.discovery.load(settings(), (group + "cluster/discovery").toStdString());
 }
 
 void Settings::loadGeoIp()

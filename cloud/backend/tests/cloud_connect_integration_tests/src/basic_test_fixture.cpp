@@ -248,11 +248,11 @@ void BasicTestFixture::addMediator()
             "-stun/addrToListenList", "127.0.0.1:0",
             "-http/addrToListenList", "127.0.0.1:0",
             "-trafficRelay/clusterId", m_relays->clusterId().c_str(),
-            "-trafficRelay/discovery/enabled", "true",
-            "-trafficRelay/discovery/discoveryServiceUrl", m_discoveryServiceUrl.c_str(),
-            "-trafficRelay/discovery/roundTripPadding", "1ms",
-            "-trafficRelay/discovery/registrationErrorDelay", "1ms",
-            "-trafficRelay/discovery/onlineNodesRequestDelay", "1ms"
+            "-trafficRelay/cluster/discovery/enabled", "true",
+            "-trafficRelay/cluster/discovery/discoveryServiceUrl", m_discoveryServiceUrl.c_str(),
+            "-trafficRelay/cluster/discovery/roundTripPadding", "1ms",
+            "-trafficRelay/cluster/discovery/registrationErrorDelay", "1ms",
+            "-trafficRelay/cluster/discovery/onlineNodesRequestDelay", "1ms"
         },
         nx::hpm::MediatorInstance::allFlags &
             ~nx::hpm::MediatorInstance::initializeConnectivity,
