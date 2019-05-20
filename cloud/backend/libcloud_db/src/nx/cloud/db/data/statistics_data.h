@@ -4,36 +4,14 @@
 
 #include <nx/sql/db_statistics_collector.h>
 
-namespace nx {
-namespace sql {
-
-#define DurationStatistics_Fields (min)(max)(average)
-
-#define QueryStatistics_Fields \
-    (statisticalPeriod)(requestsSucceeded)(requestsFailed) \
-    (requestsCancelled)(requestExecutionTimes)(waitingForExecutionTimes)
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (DurationStatistics)(QueryStatistics),
-    (json))
-
-} // namespace sql
-} // namespace nx
-
 namespace nx::cloud::db {
 namespace data {
 
 struct Statistics
 {
-    int onlineServerCount;
+    int onlineServerCount = 0;
     nx::sql::QueryStatistics dbQueryStatistics;
-    std::size_t pendingSqlQueryCount;
-
-    Statistics():
-        onlineServerCount(0),
-        pendingSqlQueryCount(0)
-    {
-    }
+    std::size_t pendingSqlQueryCount = 0;
 };
 
 #define Statistics_data_Fields (onlineServerCount)(dbQueryStatistics)(pendingSqlQueryCount)
