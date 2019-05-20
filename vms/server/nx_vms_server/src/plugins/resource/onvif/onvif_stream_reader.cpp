@@ -365,8 +365,7 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
     return true;
 }
 
-void QnOnvifStreamReader::fixStreamUrl(
-QString* mediaUrl, const std::string& profileToken) const
+void QnOnvifStreamReader::fixStreamUrl(QString* mediaUrl, const std::string& profileToken) const
 {
     // Try to detect the Profile index. Common profile name is something like "MediaProfile002".
     const QString token = QString::fromStdString(profileToken);
