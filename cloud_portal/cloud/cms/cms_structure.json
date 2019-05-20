@@ -1410,13 +1410,36 @@
         "translatable": false,
         "values": [
           {
-            "name": "supportInformation",
-            "label": "Support Information",
+            "name": "supportEmail",
+            "label": "Support e-mail",
             "value": "",
-            "description": "This section is visible in the detailed view page for the integration in the middle column.",
-            "type": "html",
+            "description": "E-mail customers should use for support.",
+            "type": "text",
+            "optional": false,
             "meta": {
-              "char_limit": 500
+              "regex": "[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*?"
+            }
+          },
+          {
+            "name": "supportPhone",
+            "label": "Support phone",
+            "value": "",
+            "description": "Phone number customers should use for support. (Ex. +44 (314) 1234-1234, 314-1234-1234)",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "regex": "(\\(?\\+?[0-9]*\\)?)?[0-9_\\- \\(\\)]*?"
+            }
+          },
+          {
+            "name": "supportWeb",
+            "label": "Support url",
+            "value": "",
+            "description": "Web address customers should use for support.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "regex": "(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?"
             }
           }
         ]
