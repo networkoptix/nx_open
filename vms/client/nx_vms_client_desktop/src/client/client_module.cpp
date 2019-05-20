@@ -586,28 +586,15 @@ bool QnClientModule::initLogFromFile(const QString& filename, const QString& suf
     if (!QFileInfo(logConfigFile).exists())
         return false;
 
-    using namespace nx::utils::log;
-
     NX_ALWAYS(this, "Log is initialized from the %1", logConfigFile);
     NX_ALWAYS(this, "Log options from settings are ignored!");
-    QSettings logConfig(logConfigFile, QSettings::IniFormat);
-    Settings logSettings(&logConfig);
-    logSettings.updateDirectoryIfEmpty(
-        QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
-    if (!suffix.isEmpty())
-    {
-        for (auto& logger: logSettings.loggers)
-        {
-            if (const auto target = logger.logBaseName; target != '-')
-                logger.logBaseName = target + suffix;
-        }
-    }
-
-    setMainLogger(
-        buildLogger(logSettings, qApp->applicationName(),qApp->applicationFilePath()));
-
-    return true;
+    return nx::utils::log::initializeFromConfigFile(
+        logConfigFile,
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+        qApp->applicationName(),
+        qApp->applicationFilePath(),
+        suffix);
 }
 
 void QnClientModule::initNetwork()

@@ -24,6 +24,13 @@ NX_UTILS_API std::unique_ptr<AbstractLogger> buildLogger(
 
 void NX_UTILS_API initializeGlobally(const nx::utils::ArgumentParser& arguments);
 
+bool initializeFromConfigFile(
+    const QString& configFileName,
+    const QString& logsDirectory,
+    const QString& applicationName,
+    const QString& binaryPath = QString(),
+    const QString& logFileNameSuffix = QString());
+
 } // namespace log
 } // namespace utils
 } // namespace nx
