@@ -24,6 +24,12 @@ NX_UTILS_API std::unique_ptr<AbstractLogger> buildLogger(
 
 void NX_UTILS_API initializeGlobally(const nx::utils::ArgumentParser& arguments);
 
+/*
+ * Initializes loggers according to the contents of a given INI file.
+ * @param logFileNameSuffix could be used to distinguish logs from different instances of the same
+ *     application. E.g. Client could use videowall GUID as a suffix.
+ * @return True if the config file exists.
+ */
 bool initializeFromConfigFile(
     const QString& configFileName,
     const QString& logsDirectory,
