@@ -10,7 +10,7 @@ function stage_cmake_extra()
 	echo "TRYING cp -l $environment/packages/any/geolite-2/GeoLite2-City.mmdb stage/${moduleName}/var/"
     cp -l $environment/packages/any/geolite-2/GeoLite2-City.mmdb stage/${moduleName}/var/
 	echo "return code: $?"
-	echo "current dir: `pwd`"
+	echo "current dir: `pwd`
 	test -f "stage/${moduleName}/var/GeoLite2-City.mmdb" && echo "stage/${moduleName}/var/GeoLite2-City.mmdb exists"
 }
 
