@@ -17,6 +17,7 @@
 #include "../mediator_process_public.h"
 #include "local_cloud_data_provider.h"
 #include "mediaserver_emulator.h"
+#include "override_relay_cluster_client_factory.h"
 
 namespace nx {
 namespace hpm {
@@ -124,6 +125,7 @@ protected:
     void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
 
 private:
+	nx::hpm::test::OverrideRelayClusterClientFactory m_overrideRelayClusterClientFactory;
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
     LocalCloudDataProvider m_cloudDataProvider;
 };

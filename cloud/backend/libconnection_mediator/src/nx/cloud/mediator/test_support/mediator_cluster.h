@@ -4,6 +4,7 @@
 #include <nx/cloud/mediator/listening_peer_db.h>
 #include <nx/cloud/mediator/test_support/mediator_functional_test.h>
 #include <nx/cloud/discovery/test_support/discovery_server.h>
+#include "override_relay_cluster_client_factory.h"
 
 namespace nx::hpm::test {
 /**
@@ -71,7 +72,9 @@ private:
     void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
 
 private:
-    std::vector<std::unique_ptr<MediatorInstance>> m_mediators;
+	OverrideRelayClusterClientFactory m_overrideRelayClusterClientFactory;
+
+	std::vector<std::unique_ptr<MediatorInstance>> m_mediators;
     nx::utils::Url m_discoveryServiceUrl;
 
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
