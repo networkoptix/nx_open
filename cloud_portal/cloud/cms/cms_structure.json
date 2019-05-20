@@ -1417,18 +1417,18 @@
             "type": "text",
             "optional": false,
             "meta": {
-              "regex": "[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*?"
+              "regex": "^[a-zA-Z0-9\\.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$"
             }
           },
           {
             "name": "supportPhone",
             "label": "Support phone",
             "value": "",
-            "description": "Phone number customers should use for support. (Ex. +44 (314) 1234-1234, 314-1234-1234)",
+            "description": "Phone number customers should use for support. (Ex. (573) 884-1878 | 573-884-1234 | 573 234 1256)",
             "type": "text",
             "optional": true,
             "meta": {
-              "regex": "(\\(?\\+?[0-9]*\\)?)?[0-9_\\- \\(\\)]*?"
+              "regex": "^(?[\\d]{3})?[\\s-]?[\\d]{3}[\\s-]?[\\d]{4}$"
             }
           },
           {
@@ -1439,7 +1439,7 @@
             "type": "text",
             "optional": true,
             "meta": {
-              "regex": "(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?"
+              "regex": "^(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?$"
             }
           }
         ]
