@@ -1,4 +1,5 @@
 #include <QtCore/QDir>
+#include <QtCore/QStandardPaths>
 
 #include <qtsinglecoreapplication.h>
 
@@ -7,6 +8,7 @@
 
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/file_system.h>
 
 #include <applauncher_app_info.h>
 #include "applauncher_process.h"
@@ -31,15 +33,42 @@ static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
 
 #endif // defined(Q_OS_WIN)
 
+static void initLogFromArgs(const QString& logLevel, const QString& logFileBaseName)
+{
+    nx::utils::log::Settings settings;
+    settings.loggers.resize(1);
+    settings.loggers.front().level.parse(logLevel);
+    settings.loggers.front().maxFileSize = 1024 * 1024 * 10;
+    settings.loggers.front().maxBackupCount = 5;
+    settings.loggers.front().logBaseName = logFileBaseName;
+
+    nx::utils::log::setMainLogger(
+        nx::utils::log::buildLogger(
+            settings, QnApplauncherAppInfo::applicationName()));
+}
+
+static bool initLogsFromConfigFile(const QString& logsDirectory)
+{
+    const QDir iniFilesDir(nx::kit::IniConfig::iniFilesDir());
+    const QString logConfigFile(iniFilesDir.absoluteFilePath("applauncher_log.ini"));
+
+    if (!QFile::exists(logConfigFile))
+        return false;
+
+    return nx::utils::log::initializeFromConfigFile(
+        logConfigFile,
+        logsDirectory,
+        qApp->applicationName(),
+        qApp->applicationFilePath());
+}
 
 ApplauncherProcess::StartupParameters parseCommandLineParameters(int argc, char* argv[])
 {
-    QString installationsDir = InstallationManager::defaultDirectoryForInstallations();
-    if (!QDir(installationsDir).exists())
-        QDir().mkpath(installationsDir);
+    const QDir logsDirectory(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+    nx::utils::file_system::ensureDir(logsDirectory);
 
-    QString logLevel = "warning";
-    QString logFilePath = installationsDir + "/applauncher";
+    QString logLevel;
+    QString logFileBaseName;
     bool quitMode = false;
     bool backgroundMode = false;
     QString version;
@@ -49,7 +78,7 @@ ApplauncherProcess::StartupParameters parseCommandLineParameters(int argc, char*
     QnCommandLineParser commandLineParser;
     commandLineParser.storeUnparsed(&startupParameters.clientCommandLineParameters);
     commandLineParser.addParameter(&logLevel, "--log-level", QString(), QString());
-    commandLineParser.addParameter(&logFilePath, "--log-file", QString(), QString());
+    commandLineParser.addParameter(&logFileBaseName, "--log-file", QString(), QString());
     commandLineParser.addParameter(&quitMode, "--quit", QString(), QString(), true);
     commandLineParser.addParameter(&backgroundMode, "--exec", QString(), QString(), true);
     commandLineParser.addParameter(&startupParameters.targetProtoVersion, "--proto",
@@ -57,20 +86,10 @@ ApplauncherProcess::StartupParameters parseCommandLineParameters(int argc, char*
     commandLineParser.addParameter(&version, "--version", QString(), QString(), 0);
     commandLineParser.parse(argc, (const char**)argv, stderr);
 
-    //initialize logging based on args
-    if (!logFilePath.isEmpty() && !logLevel.isEmpty())
-    {
-        nx::utils::log::Settings settings;
-        settings.loggers.resize(1);
-        settings.loggers.front().level.parse(logLevel);
-        settings.loggers.front().maxFileSize = 1024 * 1024 * 10;
-        settings.loggers.front().maxBackupCount = 5;
-        settings.loggers.front().logBaseName = logFilePath;
-
-        nx::utils::log::setMainLogger(
-            nx::utils::log::buildLogger(
-                settings, QnApplauncherAppInfo::applicationName()));
-    }
+    if (!logFileBaseName.isEmpty() && !logLevel.isEmpty())
+        initLogFromArgs(logLevel, logFileBaseName);
+    else if (!initLogsFromConfigFile(logsDirectory.absolutePath()))
+        initLogFromArgs("warning", logsDirectory.absoluteFilePath("log/applauncher"));
 
     if (quitMode)
         startupParameters.mode = ApplauncherProcess::StartupParameters::Mode::Quit;
