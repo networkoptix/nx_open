@@ -163,19 +163,17 @@ def read_customized_file(filename, product, language_code=None,
     # 1. try to find context for this file
 
     clean_name = filename.replace(language_code, "{{language}}") if language_code else filename
-    context = Context.objects.filter(file_path=clean_name, product_type=product.product_type)
-    if context.exists():
+    context = Context.objects.filter(file_path=clean_name, product_type=product.product_type).first()
+    if context:
         # success -> return process_context
-        context = context.first()
         global_contexts = Context.objects.filter(is_global=True, product_type=product.product_type)
         return process_context(product, context, language_code, preview, version_id, global_contexts)
 
     # 2. try to find datastructure for this file
     # TODO: name is not unique
-    data_structure = DataStructure.objects.filter(name=clean_name)
-    if data_structure.exists():
+    data_structure = DataStructure.objects.filter(name=clean_name).first()
+    if data_structure:
         # success -> return actual value
-        data_structure = data_structure.first()
         value = data_structure.find_actual_value(product, Language.by_code(language_code), version_id)
         return base64.b64decode(value)
 
@@ -288,10 +286,10 @@ def fill_content(product,
             raise Exception(
                 'Only latest accepted version can be published\
                  without preview flag, version_id id forbidden')
-        versions = ContentVersion.objects.filter(
-            product_id=product.id, accepted_date__isnull=False)
-        if versions.exists():
-            version_id = versions.latest('accepted_date').id
+        version = ContentVersion.objects.filter(
+            product_id=product.id, accepted_date__isnull=False).order_by('accepted_date').last()
+        if version:
+            version_id = version.id
         else:
             version_id = 0
             incremental = False  # no version - do full update using default values

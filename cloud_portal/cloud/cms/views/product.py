@@ -62,14 +62,14 @@ def add_upload_error_messages(request, message, errors):
 # Used to make sure users without advanced permission don't modify advanced DataStructures
 def advanced_touched_without_permission(request_data, data_structures, product):
     for ds_name in request_data:
-        data_structure = data_structures.filter(name=ds_name)
-        if data_structure.exists() and data_structure[0].advanced:
-            data_record = data_structure[0].datarecord_set.filter(product=product)
+        data_structure = data_structures.filter(name=ds_name).first()
+        if data_structure and data_structure.advanced:
+            data_record = data_structure.datarecord_set.filter(product=product).order_by('created_date').last()
 
-            if data_record.exists():
-                db_record_value = data_record.latest('created_date').value
+            if data_record:
+                db_record_value = data_record.value
             else:
-                db_record_value = data_structure[0].default
+                db_record_value = data_structure.default
 
             if request_data[ds_name] != db_record_value:
                 return True
@@ -160,11 +160,11 @@ def page_editor(request):
 @permission_required("cms.change_productcustomizationreview")
 def review(request):
     review_id = request.POST['review_id'] if 'review_id' in request.POST else None
+    product_review = ProductCustomizationReview.objects.filter(id=review_id).first()
 
-    if not ProductCustomizationReview.objects.filter(id=review_id).exists():
+    if not product_review:
         return HttpResponseBadRequest("Version does not exist")
 
-    product_review = ProductCustomizationReview.objects.get(id=review_id)
     product = product_review.version.product
 
     if 'force_update' in request.POST and UserGroupsToProductPermissions.\

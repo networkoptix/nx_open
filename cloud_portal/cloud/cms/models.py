@@ -130,9 +130,8 @@ class Language(models.Model):
     @staticmethod
     def by_code(language_code, default_language=None):
         if language_code:
-            language = Language.objects.filter(code=language_code)
-            if language.exists():
-                return language.first()
+            language = Language.objects.filter(code=language_code).first()
+            return language or default_language
         return default_language
 
 
@@ -259,9 +258,9 @@ class Product(models.Model):
         accepted_review = ProductCustomizationReview.objects. \
             filter(customization__name=customization,
                    state=ProductCustomizationReview.REVIEW_STATES.accepted,
-                   version__product=self)
+                   version__product=self).last()
 
-        return accepted_review.latest('id').version.id if accepted_review.exists() else 0
+        return accepted_review.version.id if accepted_review else 0
 
     def change_preview_status(self, new_status):
         self.preview_status = new_status
@@ -433,11 +432,12 @@ class DataStructure(models.Model):
                                REVIEW_STATES.accepted)
                     # If new versions or records dont exist use old vay of getting records
                     if new_review_records.exists():
-                        content_record = new_review_records
+                        content_record = new_review_records.last()
                     else:
-                        content_record = content_record.filter(version__accepted_by__isnull=False)
-                if content_record.exists():
-                    content_value = content_record.last().value
+                        content_record = content_record.filter(version__accepted_by__isnull=False).last()
+
+                if content_record:
+                    content_value = content_record.value
 
         # if no value or optional and type file - use default value from structure
         if not content_value and (not self.optional or

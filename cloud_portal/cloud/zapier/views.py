@@ -173,16 +173,16 @@ def make_or_increment_rule(action, email, system_id, caption, password=None,
     rules_query = GeneratedRule.objects.filter(email=email, system_id=system_id, caption=caption)
 
     if action == 'Generic Event':
-        rules_query = rules_query.filter(source=source, direction="Zapier to Nx")
+        rules_query = rules_query.filter(source=source, direction="Zapier to Nx").first()
 
-        if not rules_query.exists():
+        if not rules_query:
             make_rule(action, email, password, system_id,
                       caption=caption, source=source, description=description)
             GeneratedRule(email=email, system_id=system_id, caption=caption,
                           source=source, direction="Zapier to Nx").save()
 
         else:
-            increment_rule(rules_query[0])
+            increment_rule(rules_query)
 
     elif action == 'Http Action':
         rules_query = rules_query.filter(direction="Nx to Zapier")
@@ -192,10 +192,10 @@ def make_or_increment_rule(action, email, system_id, caption, password=None,
                           times_used=0).save()
 
     elif action == 'Hook Fired':
-        rules_query = rules_query.filter(direction="Nx to Zapier")
+        rules_query = rules_query.filter(direction="Nx to Zapier").first()
 
-        if rules_query.exists():
-            increment_rule(rules_query[0])
+        if rules_query:
+            increment_rule(rules_query)
 
 
 @api_view(['GET'])
@@ -300,12 +300,12 @@ def unsubscribe_webhook(request):
     user, email, password = authenticate(request)
     target = request.data['target_url']
 
-    user_hooks = ZapHook.objects.filter(user=user, target=target)
-    if not user_hooks.exists():
+    user_hook = ZapHook.objects.filter(user=user, target=target).first()
+    if not user_hook:
         return Response({'message': "Webhook for " + target + " does not exist"}, status=500)
 
-    event = user_hooks[0].event
-    user_hooks.delete()
+    event = user_hook.event
+    user_hook.delete()
     return Response({'message': 'Webhook deleted for ' + event}, status=200)
 
 
