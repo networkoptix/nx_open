@@ -469,10 +469,23 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, const QString& path)
 {
     NX_VERBOSE(kLogTag, lm("Attempting to create storage %1").arg(path));
-    QnStorageResourcePtr storage(serverModule()->storagePluginFactory()->createStorage(commonModule(), path));
+    QnStorageResourcePtr storage(
+        serverModule()->storagePluginFactory()->createStorage(commonModule(), path));
+    NX_ASSERT(storage, "Failed to create to storage: %1", path);
+
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
+
+    if (!QnStorageManager::canStorageBeUsedByVms(storage))
+    {
+        NX_DEBUG(
+            kLogTag,
+            "Storage with this path (%1) won't be used by MediaServer because total space is"
+            " unknown or total space < space limit. Total space: %2, space limit: %3",
+            path, storage->getTotalSpace(), storage->getSpaceLimit());
+        return QnStorageResourcePtr();
+    }
 
     const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
     const auto partitions = m_platform->monitor()->totalPartitionSpaceInfo();
@@ -484,24 +497,6 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
         ? it->type
         : QnPlatformMonitor::NetworkPartition;
     storage->setStorageType(QnLexical::serialized(storageType));
-
-    if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
-    {
-        if (!QnStorageManager::canStorageBeUsedByVms(fileStorage))
-        {
-            NX_DEBUG(
-                kLogTag,
-                "Storage with this path %1 total space is unknown or totalSpace < spaceLimit. "
-                "Total space: %2, Space limit: %3",
-                path, fileStorage->getTotalSpace(), storage->getSpaceLimit());
-            return QnStorageResourcePtr();
-        }
-    }
-    else
-    {
-        NX_ASSERT(false, lm("Failed to create to storage: %1").arg(path));
-        return QnStorageResourcePtr();
-    }
 
     storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
     NX_DEBUG(kLogTag, lm("Storage %1 is operational: %2").args(path, storage->isUsedForWriting()));
