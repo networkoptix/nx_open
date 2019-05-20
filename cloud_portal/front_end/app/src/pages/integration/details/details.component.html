@@ -48,8 +48,14 @@
                 Support
             </header>
 
-            <nx-section *ngIf="plugin.support.supportInformation">
-                <div [innerHtml]="plugin.support.supportInformation"></div>
+            <nx-section *ngIf="plugin.support.supportEmail">
+                <div>
+                    <a *ngIf="plugin.support.supportWeb" href="{{plugin.support.supportWeb}}" target="_blank" [innerHtml]="plugin.support.supportWeb"></a>
+                </div>
+                <div>
+                    <a href="mailto:{{plugin.support.supportEmail}}" target="_blank" [innerHtml]="plugin.support.supportEmail"></a>
+                </div>
+                <div *ngIf="plugin.support.supportPhone" [innerHtml]="plugin.support.supportPhone"></div>
             </nx-section>
         </nx-block>
 
