@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.54",
+    "version": "1.0.1.55",
     "data": [
         {
             "keys": [
@@ -3128,14 +3128,6 @@
             ],
             "onvifPtzDigitsAfterDecimalPoint": 2,
             "onvifPtzSpeedBroken": true
-        },
-        {
-            "keys": [
-                "HIKVISION|DS-2CD6A64F-IHS/NFC"
-            ],
-            "disableMultiThreadDecoding": [
-                "hevc"
-            ]
         },
         {
             "keys": ["UNIVIEW|*"],

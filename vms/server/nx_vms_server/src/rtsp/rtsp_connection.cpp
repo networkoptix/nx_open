@@ -571,7 +571,6 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createRtpEncoder(
         rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
     QnUniversalRtpEncoder::Config config;
-    config.transcoderConfig.decoderConfig = DecoderConfig::fromResource(res);
     config.absoluteRtcpTimestamps = d->serverModule->settings().absoluteRtcpTimestamps();
     config.useRealTimeOptimization = d->serverModule->settings().ffmpegRealTimeOptimization();
     QString require = nx::network::http::getHeaderValue(d->request.headers, "Require");
@@ -1067,7 +1066,8 @@ QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isV
 {
     Q_D(const QnRtspConnectionProcessor);
 
-    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(DecoderConfig::fromMediaResource(d->mediaRes), commonModule()->metrics());
+    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(
+        DecoderConfig(), commonModule()->metrics());
     if (isVideo && !d->transcodeParams.empty())
         result->setDstResolution(d->transcodeParams.resolution, d->transcodeParams.codecId);
     return result;
@@ -1113,7 +1113,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
 
     RtspServerTrackInfoPtr aTrack(new RtspServerTrackInfo());
     aTrack->setEncoder(AbstractRtspEncoderPtr(new QnRtspFfmpegEncoder(
-        DecoderConfig::fromMediaResource(d->mediaRes),
+        DecoderConfig(),
         commonModule()->metrics())));
     aTrack->clientPort = trackNum*2;
     aTrack->clientRtcpPort = trackNum*2+1;

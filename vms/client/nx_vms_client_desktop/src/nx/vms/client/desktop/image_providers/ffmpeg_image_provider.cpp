@@ -155,8 +155,8 @@ void FfmpegImageProvider::load(bool sync)
                         | QnAbstractMediaData::MediaFlags_StillImage;
 
                     QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
-                    QnFfmpegVideoDecoder decoder(DecoderConfig::fromResource(resource),
-                        frame->compressionType, frame, false);
+                    QnFfmpegVideoDecoder decoder(DecoderConfig(),
+                        frame->compressionType, frame);
 
                     if (!decoder.decode(frame, &outFrame))
                         return {};

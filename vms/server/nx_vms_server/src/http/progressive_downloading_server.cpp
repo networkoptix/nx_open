@@ -619,7 +619,6 @@ void QnProgressiveDownloadingConsumer::run()
 
         QnFfmpegTranscoder::Config config;
         config.computeSignatureHash = true;
-        config.decoderConfig = DecoderConfig::fromResource(resource);
         d->transcoder = std::make_unique<QnFfmpegTranscoder>(config, commonModule()->metrics());
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();

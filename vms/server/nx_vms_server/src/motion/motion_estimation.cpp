@@ -1033,9 +1033,8 @@ CLConstVideoDecoderOutputPtr QnMotionEstimation::decodeFrame(const QnCompressedV
             .arg(!m_decoder ? -1 : m_decoder->getContext()->codec_id);
         delete m_decoder;
         DecoderConfig config;
-        if (frame && frame->dataProvider)
-            config = DecoderConfig::fromResource(frame->dataProvider->getResource());
-        m_decoder = new QnFfmpegVideoDecoder(config, frame->compressionType, frame, /*mtDecoding*/ false);
+        config.mtDecodePolicy = ini().allowMtDecoding ? MultiThreadDecodePolicy::autoDetect : MultiThreadDecodePolicy::disabled;
+        m_decoder = new QnFfmpegVideoDecoder(config, frame->compressionType, frame);
     }
 
     m_decoder->getContext()->flags &= ~CODEC_FLAG_GRAY; //< Turn off Y-only mode.
@@ -1059,10 +1058,8 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     {
         delete m_decoder;
         DecoderConfig config;
-        config.allowMtDecoding = ini().allowMtDecoding;
-        if (frame && frame->dataProvider)
-            config = DecoderConfig::fromResource(frame->dataProvider->getResource());
-        m_decoder = new QnFfmpegVideoDecoder(config, frame->compressionType, frame, /*mtDecoding*/ false);
+        config.mtDecodePolicy = ini().allowMtDecoding ? MultiThreadDecodePolicy::autoDetect : MultiThreadDecodePolicy::disabled;
+        m_decoder = new QnFfmpegVideoDecoder(config, frame->compressionType, frame);
     }
 
     // Turn on Y-only mode if the decoded frame was not requested from this function.
