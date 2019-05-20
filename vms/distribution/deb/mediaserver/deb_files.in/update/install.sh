@@ -66,10 +66,11 @@ ensureDependencyInstalled()
         local NAME=$1;shift
 
         # List packages and filter them by full package name matching and by 'i' (installed) flag
-        # to check, that whether such package had been already installed.
+        # to check whether such package had been already installed.
         [[ $(dpkg -l |grep -e "${NAME}\s" |grep -e '^.i' |awk '{print $2}') ]] && continue
 
-        if [[ ! -d "dependencies/${OS_DIRNAME}/${NAME}" ]]; then
+        if [[ ! -d "dependencies/${OS_DIRNAME}/${NAME}" ]]
+        then
             continue
         fi
 
