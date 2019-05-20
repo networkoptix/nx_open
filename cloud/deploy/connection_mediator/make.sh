@@ -4,16 +4,11 @@
 
 MODULE=connection_mediator
 
-function copy_geolite_db()
+function stage_cmake_extra()
 {
     mkdir -p stage/${moduleName}/var
-    cp -rl $environment/packages/any/geolite-2/GeoLite2-City.mmdb stage/${moduleName}/var/
+    cp -l $environment/packages/any/geolite-2/GeoLite2-City.mmdb stage/${moduleName}/var/
 }
 
-function stage()
-{
-    stage_cpp
-    copy_geolite_db
-}
 
 main $@
