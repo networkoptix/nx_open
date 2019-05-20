@@ -136,8 +136,10 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
 
 QnUuid PeerStateTracker::getClientPeerId() const
 {
-    NX_ASSERT(m_clientItem);
-    return m_clientItem->id;
+    // This ID is much more easy to distinguish.
+    if (ini().massSystemUpdateDebugInfo)
+        return QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+    return commonModule()->globalSettings()->localSystemId();
 }
 
 nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
@@ -1030,11 +1032,7 @@ UpdateItemPtr PeerStateTracker::addItemForClient()
 {
     UpdateItemPtr item = std::make_shared<UpdateItem>();
 
-    // This ID is much more easy to distinguish.
-    if (ini().massSystemUpdateDebugInfo)
-        item->id = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
-    else
-        item->id = commonModule()->globalSettings()->localSystemId();
+    item->id = getClientPeerId();
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
     item->protocol = nx_ec::EC2_PROTO_VERSION;
