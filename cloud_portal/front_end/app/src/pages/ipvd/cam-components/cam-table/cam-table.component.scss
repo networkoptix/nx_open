@@ -108,7 +108,7 @@
       display : table-cell;
       
       tr {
-        height : rem(26px);
+        height : rem(24px);
         
         &:hover {
           color      : $dark9;
@@ -132,7 +132,7 @@
           font-family  : $font-family-regular;
           font-size    : $font-size-base;
           color        : $dark9;
-          line-height  : rem(26px);
+          line-height  : 1rem;
           border       : none;
           
           &:first-of-type {
