@@ -16,7 +16,7 @@
 #include <windows.h>
 #endif
 
-using namespace applauncher;
+using namespace nx::applauncher;
 
 #if defined(Q_OS_WIN)
 
