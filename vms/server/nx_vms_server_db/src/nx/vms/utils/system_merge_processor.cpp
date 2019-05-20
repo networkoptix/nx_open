@@ -391,7 +391,8 @@ QnJsonRestResult SystemMergeProcessor::mergeSystems(
     {
         NX_DEBUG(this, "Applying local settings to a remote peer");
 
-        result = applyCurrentSettings(data.url, data.postKey, data.mergeOneServer, mergeId);
+        result = applyCurrentSettings(
+            data.url, data.getKey, data.postKey, data.mergeOneServer, mergeId);
         if (result.error)
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply current settings")
@@ -431,6 +432,7 @@ void SystemMergeProcessor::setMergeError(
 
 QnJsonRestResult SystemMergeProcessor::applyCurrentSettings(
     const nx::utils::Url& remoteUrl,
+    const QString& getKey,
     const QString& postKey,
     bool oneServer,
     const QnUuid& mergeId)
@@ -478,14 +480,36 @@ QnJsonRestResult SystemMergeProcessor::applyCurrentSettings(
     /**
      * Save current system settings to the foreign system.
      */
-    const auto& settings = m_commonModule->globalSettings()->allSettings();
+    auto settings = m_commonModule->globalSettings()->allSettings();
+    nx::utils::remove_if(settings,
+        [](const auto& adaptor)
+        {
+            return adaptor->key() == nx::settings_names::kNameLastMergeMasterId
+                || adaptor->key() == nx::settings_names::kNameLastMergeSlaveId;
+        });
+
     for (QnAbstractResourcePropertyAdaptor* setting: settings)
     {
         nx::vms::api::ResourceParamData param(setting->key(), setting->serializedValue());
         data.foreignSettings.push_back(param);
     }
 
-    return executeRemoteConfigure(data, remoteUrl, postKey);
+    ConfigureSystemData remoteSystemData;
+    QnJsonRestResult result;
+    if (!fetchRemoteData(remoteUrl, getKey, &remoteSystemData))
+    {
+        setMergeError(&result, MergeStatus::configurationFailed);
+        return result;
+    }
+
+    result =  executeRemoteConfigure(data, remoteUrl, postKey);
+    if (result.error)
+        return result;
+
+    if (!shiftSynchronizationTimestamp(remoteSystemData))
+        NX_WARNING(this, lit("applyRemoteSettings. Failed to shift local system timestamp"));
+
+    return result;
 }
 
 bool SystemMergeProcessor::shiftSynchronizationTimestamp(

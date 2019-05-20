@@ -71,6 +71,7 @@ private:
 
     QnJsonRestResult applyCurrentSettings(
         const nx::utils::Url& remoteUrl,
+        const QString& getKey,
         const QString& postKey,
         bool oneServer,
         const QnUuid& mergeId);
