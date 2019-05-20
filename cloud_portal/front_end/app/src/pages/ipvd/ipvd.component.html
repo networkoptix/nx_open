@@ -11,10 +11,15 @@
         </nx-search>
     </div>
 
-    <div class="row pl-3 pr-3 m-0 d-flex"
-         *ngIf="camerasTable.length">
+    <div class="row pl-3 pr-3 m-0 d-flex">
+
+        <div class="text-placeholder order-1 order-md-0 m-0 p-0 pr-2 col-md-7 col-xl-9"
+             *ngIf="!camerasTable.length && activeCamera" translate>
+            Nothing Found
+        </div>
 
         <div class="order-1 order-md-0 m-0 p-0"
+             *ngIf="camerasTable.length"
              [ngClass]="{'toggle': toggleCamview, 'pr-2' : toggleCamview, 'col-12': !toggleCamview, 'col-md-7 col-xl-9' : toggleCamview}"
              [style.display]="mobileDetailMode ? 'none' : 'block'">
 
@@ -28,6 +33,7 @@
         </div>
 
         <div class="row m-0 pt-3 pb-3 pl-0"
+             *ngIf="camerasTable.length"
              [style.display]="!mobileDetailMode ? 'none' : 'block'">
 
             <button class="btn btn-default btn-back" (click)="resetActiveCamera()">
@@ -48,7 +54,7 @@
     </div>
 
     <div class="row pl-3 pr-3 m-0 mb-3 text-placeholder d-flex align-items-center"
-         *ngIf="noResult" translate>
+         *ngIf="noResult && !activeCamera" translate>
         Nothing Found
     </div>
 
