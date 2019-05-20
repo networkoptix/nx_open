@@ -60,6 +60,7 @@ int InternetOnlyPeerManager::distanceTo(const QnUuid& /*peerId*/) const
 rest::Handle InternetOnlyPeerManager::requestFileInfo(
     const QnUuid& peerId,
     const QString& fileName,
+    const nx::utils::Url& url,
     AbstractPeerManager::FileInfoCallback callback)
 {
     if (!peerId.isNull() || !callback)
@@ -75,7 +76,7 @@ rest::Handle InternetOnlyPeerManager::requestFileInfo(
     ++d->nextRequestId;
 
     std::async(std::launch::async,
-        [this, fileName, callback, requestId, thread = thread()]()
+        [this, fileName, url, callback, requestId, thread = thread()]()
         {
             {
                 NX_MUTEX_LOCKER lock(&d->mutex);
@@ -84,9 +85,9 @@ rest::Handle InternetOnlyPeerManager::requestFileInfo(
             }
 
             executeInThread(thread,
-                [fileName, callback, requestId]()
+                [fileName, url, callback, requestId]()
                 {
-                    callback(true, requestId, FileInformation(fileName));
+                    callback(url.isValid(), requestId, FileInformation(fileName));
                 });
         });
 

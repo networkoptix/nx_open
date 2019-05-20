@@ -21,6 +21,9 @@ public:
 public:
     virtual void setModel(QAbstractItemModel* newModel) override;
 
+protected:
+    virtual void keyPressEvent(QKeyEvent* event) override;
+
 private:
     void setupHeader();
     void handleHeaderCheckedStateChanged(Qt::CheckState state);

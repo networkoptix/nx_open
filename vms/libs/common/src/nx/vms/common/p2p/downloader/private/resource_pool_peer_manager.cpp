@@ -172,7 +172,10 @@ void ResourcePoolPeerManager::setIndirectInternetRequestsAllowed(bool allow)
 }
 
 rest::Handle ResourcePoolPeerManager::requestFileInfo(
-    const QnUuid& peerId, const QString& fileName, FileInfoCallback callback)
+    const QnUuid& peerId,
+    const QString& fileName,
+    const nx::utils::Url& url,
+    FileInfoCallback callback)
 {
     const auto& connection = getConnection(peerId);
     if (!connection)
@@ -185,7 +188,7 @@ rest::Handle ResourcePoolPeerManager::requestFileInfo(
         d->saveCanceller(localRequestId, nullptr);
 
         std::async(std::launch::async,
-            [this, fileName, peerId, callback, localRequestId, thread = thread()]()
+            [this, fileName, url, peerId, callback, localRequestId, thread = thread()]()
             {
                 if (!d->removeCanceller(localRequestId))
                     return;
@@ -196,9 +199,9 @@ rest::Handle ResourcePoolPeerManager::requestFileInfo(
                     !server || server->getServerFlags().testFlag(vms::api::SF_HasPublicIP);
 
                 executeInThread(thread,
-                    [fileName, hasInternet, callback, localRequestId]()
+                    [fileName, url, hasInternet, callback, localRequestId]()
                     {
-                        if (hasInternet)
+                        if (hasInternet && url.isValid())
                             callback(true, localRequestId, FileInformation(fileName));
                         else
                             callback(false, localRequestId, FileInformation());

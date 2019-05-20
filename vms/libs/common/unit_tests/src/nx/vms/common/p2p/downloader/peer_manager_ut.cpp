@@ -50,7 +50,7 @@ protected:
 TEST_F(DistributedFileDownloaderPeerManagerTest, invalidPeerRequest)
 {
     const auto& peer = QnUuid::createUuid();
-    const auto handle = peerManager->requestFileInfo(peer, "test",
+    const auto handle = peerManager->requestFileInfo(peer, "test", nx::utils::Url(),
         [&](bool, rest::Handle, const FileInformation&)
     {
         FAIL() << "Should not be called.";
@@ -65,7 +65,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, cancellingRequest)
     const auto& peer = peerManager->addPeer();
     peerManager->setDelayBeforeRequest(1000);
 
-    const auto handle = peerManager->requestFileInfo(peer, "test",
+    const auto handle = peerManager->requestFileInfo(peer, "test", nx::utils::Url(),
         [&](bool, rest::Handle, const FileInformation&)
     {
         FAIL() << "Should not be called.";
@@ -86,7 +86,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, fileInfo)
     nx::utils::promise<bool> readyPromise;
     auto readyFuture = readyPromise.get_future();
 
-    peerManager->requestFileInfo(peer, fileInformation.name,
+    peerManager->requestFileInfo(peer, fileInformation.name, fileInformation.url,
         [&](bool success, rest::Handle /*handle*/, const FileInformation& fileInfo)
         {
             readyPromise.set_value(success && fileInfo.name == fileInformation.name);
@@ -103,7 +103,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, emptyFileInfo)
     nx::utils::promise<bool> readyPromise;
     auto readyFuture = readyPromise.get_future();
 
-    peerManager->requestFileInfo(peer, "test",
+    peerManager->requestFileInfo(peer, "test", nx::utils::Url(),
         [&](bool success, rest::Handle /*handle*/, const FileInformation& fileInfo)
     {
         readyPromise.set_value(!success && fileInfo.status == FileInformation::Status::notFound);
@@ -158,7 +158,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     nx::utils::promise<bool> fileInfoPromise;
     auto fileInfoFuture = fileInfoPromise.get_future();
 
-    peerManager->requestFileInfo(peer, fileName,
+    peerManager->requestFileInfo(peer, fileName, nx::utils::Url(),
         [&](bool success, rest::Handle /*handle*/, const FileInformation& peerFileInfo)
         {
             fileInfo = peerFileInfo;

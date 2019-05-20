@@ -288,7 +288,7 @@ void QnSearchBookmarksDialogPrivate::openInNewLayout(const action::Parameters &p
         , window.durationMs + offset * 2);
     setFirstLayoutItemPeriod(extendedWindow, Qn::ItemSliderWindowRole);
 
-    menu()->trigger(action::BookmarksModeAction);
+    menu()->trigger(action::BookmarksTabAction);
 }
 
 void QnSearchBookmarksDialogPrivate::cancelUpdateOperation()
