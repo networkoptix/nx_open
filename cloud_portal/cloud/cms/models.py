@@ -481,6 +481,10 @@ class UserGroupsToProductPermissions(models.Model):
         return UserGroupsToProductPermissions.\
             check_permission(user, get_cloud_portal_product(customization), permission)
 
+    @staticmethod
+    def check_customization_change_account(user, customization):
+        return UserGroupsToProductPermissions.check_customization_permission(user, customization, 'api.change_account')
+
 
 # CMS data. Partners can change that
 

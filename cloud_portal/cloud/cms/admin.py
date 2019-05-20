@@ -90,14 +90,6 @@ class CMSAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
 
-    def get_queryset(self, request):
-        qs = super(CMSAdmin, self).get_queryset(request)
-        if not UserGroupsToProductPermissions.check_customization_permission(request.user, settings.CUSTOMIZATION):
-            # return empty dataset, only superuser can watch content in other
-            # customizations
-            return qs.filter(pk=-1)
-        return qs
-
 
 class ProductTypeAdmin(CMSAdmin):
     list_display = ('type', 'can_preview', 'single_customization',)

@@ -90,14 +90,23 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
     def get_queryset(self, request):  # show only users for current customization
         qs = super(AccountAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
         if not request.user.is_superuser:  # only superuser can watch full accounts list
-            qs = qs.filter(customization=settings.CUSTOMIZATION)
+            show_customizations = request.user.customizations_with_permission(permission='api.change_account')
+            qs = qs.filter(customization__in=show_customizations).distinct()
         return qs
 
     def has_add_permission(self, request):  # Only superuser can add users
         return False
 
+    def has_change_permission(self, request, obj=None):
+        return UserGroupsToProductPermissions.\
+            check_customization_change_account(request.user, settings.CUSTOMIZATION)
+
     def has_delete_permission(self, request, obj=None):  # No deleting users at all
         return False
+
+    def has_view_permission(self, request, obj=None):
+        return UserGroupsToProductPermissions.\
+            check_customization_change_account(request.user, settings.CUSTOMIZATION)
 
     def get_urls(self):
         urls = super(AccountAdmin, self).get_urls()
