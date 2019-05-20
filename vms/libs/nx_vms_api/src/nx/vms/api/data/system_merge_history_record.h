@@ -18,8 +18,8 @@ struct NX_VMS_API SystemMergeHistoryRecord: Data
     /** Milliseconds since epoch. */
     qint64 timestamp = 0;
 
-    QnLatin1Array mergedSystemLocalId;
-    QnLatin1Array mergedSystemCloudId;
+    QByteArray mergedSystemLocalId;
+    QByteArray mergedSystemCloudId;
 
     /** User who started merge. */
     QString username;
