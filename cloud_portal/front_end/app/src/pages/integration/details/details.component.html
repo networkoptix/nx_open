@@ -48,24 +48,38 @@
                 Support
             </header>
 
-            <nx-section *ngIf="plugin.support.supportEmail">
-                <div>
-                    <a *ngIf="plugin.support.supportWeb" href="{{plugin.support.supportWeb}}" target="_blank" [innerHtml]="plugin.support.supportWeb"></a>
+            <nx-section *ngIf="plugin.support.supportEmail || plugin.support.supportWeb || plugin.support.supportPhone">
+                <div *ngIf="plugin.support.supportWeb">
+                    <a href="{{plugin.support.supportWeb}}" target="_blank" [innerHtml]="plugin.support.supportWeb"></a>
                 </div>
-                <div>
+                <div *ngIf="plugin.support.supportEmail">
                     <a href="mailto:{{plugin.support.supportEmail}}" target="_blank" [innerHtml]="plugin.support.supportEmail"></a>
                 </div>
                 <div *ngIf="plugin.support.supportPhone" [innerHtml]="plugin.support.supportPhone"></div>
             </nx-section>
         </nx-block>
 
-        <nx-block side-element type="gray" *ngIf="plugin && plugin.information.companyName">
+        <nx-block side-element type="gray" *ngIf="plugin && plugin.company.companyName">
             <header>
-                {{plugin.information.companyName}}
+                {{plugin.company.companyName}}
             </header>
 
-            <nx-section *ngIf="plugin.information.companyInfo">
-                <div [innerHtml]="plugin.information.companyInfo"></div>
+            <nx-section *ngIf="plugin.company.companyInfo || plugin.company.companyLogo || plugin.company.companyWeb">
+                <div class="card--body-logo mb-2" *ngIf="plugin.company.companyLogo"
+                     [style.backgroundImage]="'url(' + plugin.company.companyLogo + ')'"
+                     [style.maxWidth]="'100%'">
+                </div>
+<!--                <div *ngIf="plugin.company.companyLogo">-->
+<!--                    <img class="w-100" [src]="plugin.company.companyLogo"/>-->
+<!--                    <div class="card&#45;&#45;body-spacer"></div>-->
+<!--                </div>-->
+                <div *ngIf="plugin.company.companyInfo" [innerHtml]="plugin.company.companyInfo"></div>
+                <div>
+                    <a *ngIf="plugin.company.companyWeb"
+                       [href]="url"
+                       target="_blank"
+                       [innerHtml]="plugin.company.companyWebTitle || plugin.company.companyWeb"></a>
+                </div>
             </nx-section>
         </nx-block>
 
