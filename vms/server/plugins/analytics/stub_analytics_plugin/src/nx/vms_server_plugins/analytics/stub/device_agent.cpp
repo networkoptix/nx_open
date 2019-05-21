@@ -159,7 +159,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     const char* logMessage = "";
     if (ini().generateObjects)
     {
-        std::vector<IMetadataPacket*> result = cookSomeObjects();
+        const std::vector<IMetadataPacket*> result = cookSomeObjects();
         if (!result.empty())
         {
             *metadataPackets = result;
