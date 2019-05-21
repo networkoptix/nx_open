@@ -105,8 +105,6 @@ void Peer::addRandomDataAsync(
         customer,
         [customer, handler = std::move(completionHandler)](ResultCode resultCode)
         {
-            if (resultCode != ResultCode::ok)
-                std::cout << "Failed! " << (int)resultCode << std::endl;
             handler(resultCode, customer);
         });
 }

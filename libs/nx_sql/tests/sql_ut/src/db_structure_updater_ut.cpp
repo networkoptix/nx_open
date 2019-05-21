@@ -41,6 +41,10 @@ public:
         m_delegate->setQueryPriority(queryType, newPriority);
     }
 
+    virtual void setConcurrentModificationQueryLimit(int /*limit*/) override
+    {
+    }
+
     virtual int pendingQueryCount() const override
     {
         return m_delegate->pendingQueryCount();

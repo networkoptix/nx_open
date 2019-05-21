@@ -31,7 +31,15 @@ public:
 
     virtual const ConnectionOptions& connectionOptions() const = 0;
 
+    /**
+     * By default, each query type has same priority of kDefaultQueryPriority.
+     */
     virtual void setQueryPriority(QueryType queryType, int newPriority) = 0;
+
+    /**
+     * @param value Zero - no limit. By default, zero.
+     */
+    virtual void setConcurrentModificationQueryLimit(int value) = 0;
 
     //---------------------------------------------------------------------------------------------
     // Asynchronous operations.
@@ -193,6 +201,10 @@ public:
 
     virtual const ConnectionOptions& connectionOptions() const override;
 
+    virtual void setQueryPriority(QueryType queryType, int newPriority) override;
+
+    virtual void setConcurrentModificationQueryLimit(int value) override;
+
     /**
      * Overload for updates with no input data.
      */
@@ -213,24 +225,14 @@ public:
         const QByteArray& script,
         nx::sql::QueryContext* const queryContext) override;
 
+    virtual int pendingQueryCount() const override;
+
     /** Have to introduce this method because we do not use exceptions. */
     bool init();
 
     void setStatisticsCollector(StatisticsCollector* statisticsCollector);
 
     void reserveConnections(int count);
-
-    /**
-     * @param value Zero - no limit. By default, zero.
-     */
-    void setConcurrentModificationQueryLimit(int value);
-
-    /**
-     * By default, each query type has same priority of kDefaultQueryPriority.
-     */
-    virtual void setQueryPriority(QueryType queryType, int newPriority) override;
-
-    virtual int pendingQueryCount() const override;
 
     /**
      * Executes data modification request that spawns some output data.

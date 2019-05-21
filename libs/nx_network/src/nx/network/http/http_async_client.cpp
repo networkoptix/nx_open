@@ -672,8 +672,9 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
         processReceivedBytes(m_responseBuffer.size());
     }
-    else
+    else if (!m_readingCeased)
     {
+        m_readInvoked = true;
         m_socket->readSomeAsync(
             &m_responseBuffer,
             std::bind(&AsyncClient::onSomeBytesReadAsync, this, _1, _2));
@@ -688,6 +689,8 @@ void AsyncClient::onSomeBytesReadAsync(
 
     if (m_terminated)
         return;
+
+    m_readInvoked = false;
 
     if (errorCode != SystemError::noError)
     {
@@ -976,9 +979,13 @@ void AsyncClient::processReceivedBytes(std::size_t bytesRead)
         if (m_receivedBytesLeft.isEmpty())
         {
             NX_ASSERT(m_responseBuffer.size() == 0);
-            m_socket->readSomeAsync(
-                &m_responseBuffer,
-                std::bind(&AsyncClient::onSomeBytesReadAsync, this, _1, _2));
+            if (!m_readingCeased)
+            {
+                m_readInvoked = true;
+                m_socket->readSomeAsync(
+                    &m_responseBuffer,
+                    std::bind(&AsyncClient::onSomeBytesReadAsync, this, _1, _2));
+            }
             return;
         }
 
@@ -990,6 +997,34 @@ void AsyncClient::processReceivedBytes(std::size_t bytesRead)
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
         bytesRead = m_responseBuffer.size();
     }
+}
+
+void AsyncClient::stopReadingWhileInAioThread()
+{
+    NX_ASSERT(isInSelfAioThread());
+    m_readingCeased = true;
+}
+
+void AsyncClient::resumeReadingWhileInAioThread()
+{
+    NX_ASSERT(isInSelfAioThread());
+    NX_ASSERT(!m_readInvoked);
+    if (m_readingCeased && !m_readInvoked)
+    {
+        using namespace std::placeholders;
+        m_readInvoked = true;
+        m_socket->readSomeAsync(
+            &m_responseBuffer,
+            std::bind(&AsyncClient::onSomeBytesReadAsync, this, _1, _2));
+    }
+
+    m_readingCeased = false;
+}
+
+bool AsyncClient::isReadingWhileInAioThread()
+{
+    NX_ASSERT(isInSelfAioThread());
+    return !m_readingCeased;
 }
 
 AsyncClient::Result AsyncClient::processResponseHeadersBytes(
