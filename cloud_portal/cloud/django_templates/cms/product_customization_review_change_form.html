@@ -119,18 +119,14 @@
         {% else %}
         <div>There are no changes to review</div>
         {% endif %}
-        <h2>Review</h2>
+        <h2>Review Notes for {{ original.customization }}</h2>
+        {{ original.notes|linebreaks }}
     </div>
-    <h1 style="text-align: center">Review for {{ original.customization }}</h1>
+
     <form action="" enctype="multipart/form-data" method="post" novalidate>
         {% csrf_token %}
         <input name="version_id" value="{{ version.id }}" hidden/>
         <input name="review_id" value="{{ original.id }}" hidden/>
-        {% block field_sets %}
-            {% for fieldset in adminform %}
-                {% include "admin/includes/fieldset.html" %}
-            {% endfor %}
-        {% endblock %}
 
         {% get_review_state original.state as state %}
         {% if state == 'Pending' or state != 'Rejected' and can_preview and perms.cms.force_update or has_delete_permission %}
@@ -164,6 +160,7 @@
                 {% endif %}
             </div>
         {% endif %}
+
         <div class="modal fade" id="addNotes" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
