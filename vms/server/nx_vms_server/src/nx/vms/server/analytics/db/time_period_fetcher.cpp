@@ -37,23 +37,10 @@ nx::sql::DBResult TimePeriodFetcher::selectTimePeriods(
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
-    Filter localFilter = filter;
-    localFilter.deviceIds.clear();
-    localFilter.timePeriod.clear();
-
     if (!filter.objectAppearanceId.isNull())
-    {
         *result = selectTimePeriodsByObject(queryContext, filter, options);
-    }
-    else if (!m_analyticsArchive || localFilter.empty())
-    {
-        *result = selectFullTimePeriods(
-            queryContext, filter.deviceIds, filter.timePeriod, options);
-    }
     else
-    {
         *result = selectTimePeriodsFiltered(queryContext, filter, options);
-    }
 
     return nx::sql::DBResult::ok;
 }
@@ -153,7 +140,7 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
     AnalyticsArchive::Filter archiveFilter = prepareArchiveFilter(filter, options);
 
     nx::utils::ElapsedTimer timer;
-    
+
     if (!filter.freeText.isEmpty())
     {
         timer.restart();
@@ -173,9 +160,6 @@ AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
 {
     AnalyticsArchive::Filter archiveFilter;
 
-    if (!filter.boundingBox.isEmpty())
-        archiveFilter.region.push_back(filter.boundingBox);
-
     if (!filter.objectTypeId.empty())
     {
         std::transform(
@@ -184,6 +168,7 @@ AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
             [this](const auto& objectTypeName) { return m_objectTypeDao.objectTypeIdFromName(objectTypeName); });
     }
 
+    archiveFilter.region = options.region;
     archiveFilter.timePeriod = filter.timePeriod;
     archiveFilter.sortOrder = filter.sortOrder;
     if (filter.maxObjectsToSelect > 0)
@@ -193,7 +178,7 @@ AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
     return archiveFilter;
 }
 
-std::set<int> TimePeriodFetcher::lookupCombinedAttributes(
+std::set<int64_t> TimePeriodFetcher::lookupCombinedAttributes(
     nx::sql::QueryContext* queryContext,
     const QString& text)
 {
@@ -208,9 +193,9 @@ std::set<int> TimePeriodFetcher::lookupCombinedAttributes(
     query->addBindValue(text);
     query->exec();
 
-    std::set<int> attributesIds;
+    std::set<int64_t> attributesIds;
     while (query->next())
-        attributesIds.insert(query->value(0).toInt());
+        attributesIds.insert(query->value(0).toLongLong());
 
     return attributesIds;
 }

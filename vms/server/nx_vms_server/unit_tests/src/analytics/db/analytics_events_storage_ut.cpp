@@ -1,4 +1,5 @@
 #include <memory>
+#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -66,7 +67,7 @@ protected:
     {
         std::vector<nx::common::metadata::DetectionMetadataPacketPtr> packets;
 
-        packets.push_back(generateRandomPacket(1));
+        packets.push_back(generateRandomPacket());
         packets.push_back(std::make_shared<nx::common::metadata::DetectionMetadataPacket>(
             *packets.back()));
 
@@ -300,7 +301,7 @@ protected:
         {
             for (int i = 0; i < eventsPerDevice; ++i)
             {
-                auto packet = generateRandomPacket(1, &m_attributeDictionary);
+                auto packet = generateRandomPacket(&m_attributeDictionary);
                 packet->deviceId = deviceId;
                 if (m_allowedTimeRange.second > m_allowedTimeRange.first)
                 {
@@ -318,7 +319,7 @@ protected:
         if (analyticsDataPackets.empty())
         {
             for (int i = 0; i < 101; ++i)
-                analyticsDataPackets.push_back(generateRandomPacket(1));
+                analyticsDataPackets.push_back(generateRandomPacket());
         }
 
         std::sort(
@@ -387,6 +388,34 @@ protected:
         }
     }
 
+    common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
+        AttributeDictionary* attributeDictionary = nullptr)
+    {
+        auto packet = test::generateRandomPacket(1, attributeDictionary);
+        if (m_lastTimestamp)
+        {
+            packet->timestampUsec =
+                *m_lastTimestamp + nx::utils::random::number<qint64>(1, 60000000);
+        }
+
+        m_lastTimestamp = packet->timestampUsec;
+
+        return packet;
+    }
+
+    void generateRandomPackets(int count)
+    {
+        for (int i = 0; i < count; ++i)
+            m_analyticsDataPackets.push_back(generateRandomPacket());
+
+        std::sort(
+            m_analyticsDataPackets.begin(), m_analyticsDataPackets.end(),
+            [](const auto& left, const auto& right)
+            {
+                return left->timestampUsec < right->timestampUsec;
+            });
+    }
+
 private:
     struct LookupResult
     {
@@ -398,7 +427,8 @@ private:
     Settings m_settings;
     std::vector<common::metadata::DetectionMetadataPacketPtr> m_analyticsDataPackets;
     nx::utils::SyncQueue<LookupResult> m_lookupResultQueue;
-    boost::optional<LookupResult> m_prevLookupResult;
+    std::optional<LookupResult> m_prevLookupResult;
+    std::optional<qint64> m_lastTimestamp;
 
     std::vector<QnUuid> m_allowedDeviceIds;
     std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>
@@ -407,21 +437,8 @@ private:
 
     bool initializeStorage()
     {
-        m_eventsStorage = std::make_unique<EventsStorage>();
+        m_eventsStorage = std::make_unique<EventsStorage>(nullptr);
         return m_eventsStorage->initialize(m_settings);
-    }
-
-    void generateRandomPackets(int count)
-    {
-        for (int i = 0; i < count; ++i)
-            m_analyticsDataPackets.push_back(generateRandomPacket(1));
-
-        std::sort(
-            m_analyticsDataPackets.begin(), m_analyticsDataPackets.end(),
-            [](const auto& left, const auto& right)
-            {
-                return left->timestampUsec < right->timestampUsec;
-            });
     }
 
     void flushData()
@@ -525,24 +542,19 @@ private:
         if (!satisfiesCommonConditions(filter, data))
             return false;
 
-        if (filter.boundingBox.isNull())
+        if (!filter.boundingBox)
             return true;
 
         if (kUseTrackAggregation)
-            return rectsIntersectToPrecision(filter.boundingBox, data.boundingBox);
+            return rectsIntersectToPrecision(*filter.boundingBox, data.boundingBox);
         else
-            return filter.boundingBox.intersects(data.boundingBox);
+            return filter.boundingBox->intersects(data.boundingBox);
     }
 
     bool rectsIntersectToPrecision(const QRectF& one, const QRectF& two)
     {
-        const auto translatedOne = translate(
-            one,
-            QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
-
-        const auto translatedTwo = translate(
-            two,
-            QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+        const auto translatedOne = translateToSearchGrid(one);
+        const auto translatedTwo = translateToSearchGrid(two);
 
         return translatedOne.intersects(translatedTwo);
     }
@@ -560,11 +572,11 @@ private:
                 return false;
         }
 
-        if (!filter.boundingBox.isNull())
+        if (filter.boundingBox)
         {
             bool intersects = false;
             for (const auto& object: data.objects)
-                intersects |= rectsIntersectToPrecision(filter.boundingBox, object.boundingBox);
+                intersects |= rectsIntersectToPrecision(*filter.boundingBox, object.boundingBox);
             if (!intersects)
                 return false;
         }
@@ -597,14 +609,11 @@ private:
     template<typename T>
     bool satisfiesCommonConditions(const Filter& filter, const T& data)
     {
-        if (!filter.deviceIds.empty() && !nx::utils::contains(filter.deviceIds, data.deviceId))
+        if (!nx::utils::contains(filter.deviceIds, data.deviceId))
             return false;
 
-        if (!filter.timePeriod.isNull() &&
-            !filter.timePeriod.contains(data.timestampUsec / kUsecInMs))
-        {
+        if (!filter.timePeriod.contains(data.timestampUsec / kUsecInMs))
             return false;
-        }
 
         return true;
     }
@@ -715,9 +724,9 @@ private:
             if (!detectedObject.track.empty())
             {
                 detectedObject.firstAppearanceTimeUsec =
-                    detectedObject.track.begin()->timestampUsec;
+                    (detectedObject.track.begin()->timestampUsec / kUsecInMs) * kUsecInMs;
                 detectedObject.lastAppearanceTimeUsec =
-                    detectedObject.track.rbegin()->timestampUsec;
+                    (detectedObject.track.rbegin()->timestampUsec / kUsecInMs) * kUsecInMs;
             }
         }
     }
@@ -850,6 +859,14 @@ protected:
             nx::utils::random::number<float>(0, 1),
             nx::utils::random::number<float>(0, 1),
             nx::utils::random::number<float>(0, 1));
+
+        auto bottomRight = m_filter.boundingBox->bottomRight();
+        if (bottomRight.x() > 1.0)
+            bottomRight.setX(1.0);
+        if (bottomRight.y() > 1.0)
+            bottomRight.setY(1.0);
+
+        m_filter.boundingBox->setBottomRight(bottomRight);
     }
 
     void givenEmptyFilter()
@@ -889,10 +906,10 @@ protected:
         if (nx::utils::random::number<bool>())
         {
             addRandomBoundingBoxToFilter();
-            if (!m_filter.boundingBox.intersects(randomPacket->objects.front().boundingBox))
+            if (!m_filter.boundingBox->intersects(randomPacket->objects.front().boundingBox))
             {
                 m_filter.boundingBox =
-                    m_filter.boundingBox.united(randomPacket->objects.front().boundingBox);
+                    m_filter.boundingBox->united(randomPacket->objects.front().boundingBox);
             }
         }
 
@@ -1245,11 +1262,9 @@ protected:
 
     void whenCreateCursor()
     {
-        using namespace std::placeholders;
-
         eventsStorage().createLookupCursor(
             filter(),
-            std::bind(&AnalyticsDbCursor::saveCursor, this, _1, _2));
+            [this](auto&&... args) { saveCursor(std::forward<decltype(args)>(args)...); });
     }
 
     void thenCursorIsCreated()
@@ -1383,20 +1398,26 @@ protected:
     void givenAggregationPeriodEqualToTheWholeArchivePeriod()
     {
         const auto allTimePeriods = expectedLookupResult();
-        const auto archiveLength =
-            allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
+        if (!allTimePeriods.isEmpty())
+        {
+            const auto archiveLength =
+                allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
 
-        m_lookupOptions.detailLevel = archiveLength;
+            m_lookupOptions.detailLevel = archiveLength;
+        }
     }
 
     void givenFilterWithTimePeriod()
     {
         const auto allTimePeriods = expectedLookupResult();
-        const auto archiveLength =
-            allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
+        if (!allTimePeriods.isEmpty())
+        {
+            const auto archiveLength =
+                allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
 
-        filter().timePeriod.setStartTime(allTimePeriods.front().startTime() + archiveLength / 3);
-        filter().timePeriod.setDuration(archiveLength * 2 / 3);
+            filter().timePeriod.setStartTime(allTimePeriods.front().startTime() + archiveLength / 3);
+            filter().timePeriod.setDuration(archiveLength * 2 / 3);
+        }
     }
 
     void givenRandomLookupOptions()
@@ -1407,7 +1428,10 @@ protected:
 
     void whenLookupTimePeriods()
     {
-        using namespace std::placeholders;
+        if (filter().boundingBox)
+            m_lookupOptions.region += translateToSearchGrid(*filter().boundingBox);
+
+        filter().sortOrder = Qt::AscendingOrder;
 
         eventsStorage().lookupTimePeriods(
             filter(),
@@ -1434,17 +1458,12 @@ protected:
         auto expected = expectedLookupResult();
         auto actualTimePeriods = std::get<1>(m_prevLookupResult);
 
-        if (kUseTrackAggregation &&
-            (!filter().boundingBox.isEmpty() || !filter().freeText.isEmpty() ||
-             !filter().objectAppearanceId.isNull() || !filter().objectTypeId.empty()))
-        {
-            // NOTE: For this type of filters supported precision is the following:
-            // start time - a second
-            // duration - kTrackAggregationPeriod.
+        // NOTE: Time period fetch precision is the following:
+        // start time - a second
+        // duration - kTrackAggregationPeriod.
 
-            roundTimePeriods(&expected);
-            roundTimePeriods(&actualTimePeriods);
-        }
+        roundTimePeriods(&expected);
+        roundTimePeriods(&actualTimePeriods);
 
         assertTimePeriodsMatchUpToAggregationPeriod(expected, actualTimePeriods);
     }
@@ -1456,7 +1475,7 @@ protected:
 
         for (int i = 0; i < left.size(); ++i)
         {
-            ASSERT_LT(
+            ASSERT_LE(
                 std::chrono::abs(left[i].startTime() - right[i].startTime()),
                 kTrackAggregationPeriod);
         }
@@ -1474,19 +1493,28 @@ private:
 
     QnTimePeriodList expectedLookupResult()
     {
-        return filterTimePeriods(
+        auto periods = filterTimePeriods(
             filter(),
             toTimePeriods(
                 filterPackets(filter(), analyticsDataPackets()),
                 m_lookupOptions));
+
+        if (filter().sortOrder == Qt::SortOrder::DescendingOrder)
+        {
+            std::sort(
+                periods.begin(), periods.end(),
+                [](const auto& left, const auto& right) { return left.startTime() > right.startTime(); });
+        }
+
+        if (filter().maxObjectsToSelect > 0 && periods.size() > filter().maxObjectsToSelect)
+            periods.erase(periods.begin() + filter().maxObjectsToSelect, periods.end());
+
+        return periods;
     }
 
     void roundTimePeriods(QnTimePeriodList* periods)
     {
         using namespace std::chrono;
-
-        *periods = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
-            std::move(*periods), kTrackAggregationPeriod);
 
         // Rounding to the aggregation period.
         for (auto& timePeriod: *periods)
@@ -1495,15 +1523,15 @@ private:
             if (timePeriod.duration() < kTrackAggregationPeriod)
                 timePeriod.setDuration(kTrackAggregationPeriod);
         }
+
+        *periods = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+            std::move(*periods), kTrackAggregationPeriod);
     }
 
     QnTimePeriodList filterTimePeriods(
         const Filter& filter,
         const QnTimePeriodList& timePeriods)
     {
-        if (filter.timePeriod.isEmpty())
-            return timePeriods;
-
         QnTimePeriodList result;
         for (const auto& timePeriod: timePeriods)
         {
@@ -1556,7 +1584,7 @@ TEST_F(AnalyticsDbTimePeriodsLookup, selecting_all_periods_by_device)
 {
     givenEmptyFilter();
     addRandomKnownDeviceIdToFilter();
-    
+
     whenLookupTimePeriods();
     thenResultMatchesExpectations();
 }
@@ -1579,12 +1607,25 @@ TEST_F(
 
 TEST_F(AnalyticsDbTimePeriodsLookup, with_aggregation_period)
 {
+    addRandomKnownDeviceIdToFilter();
     givenRandomLookupOptions();
+
     whenLookupTimePeriods();
+
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsDbTimePeriodsLookup, DISABLED_with_random_filter)
+TEST_F(AnalyticsDbTimePeriodsLookup, with_region)
+{
+    givenEmptyFilter();
+    addRandomBoundingBoxToFilter();
+
+    whenLookupTimePeriods();
+
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbTimePeriodsLookup, with_random_filter)
 {
     givenRandomFilter();
     whenLookupTimePeriods();

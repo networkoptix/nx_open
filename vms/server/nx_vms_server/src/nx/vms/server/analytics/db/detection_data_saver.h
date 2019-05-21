@@ -53,14 +53,14 @@ private:
          * This region is given with object search grid resolution.
          */
         QRegion region;
-        long long combinedAttributesId = -1;
+        int64_t combinedAttributesId = -1;
     };
 
     struct ObjectDbAttributes
     {
         QnUuid deviceId;
         int objectTypeId = -1;
-        long long attributesDbId = -1;
+        int64_t attributesDbId = -1;
     };
 
     AttributesDao* m_attributesDao = nullptr;
@@ -72,7 +72,7 @@ private:
     std::vector<DetectedObject> m_objectsToInsert;
     std::vector<ObjectUpdate> m_objectsToUpdate;
     std::vector<AggregatedTrackData> m_objectSearchData;
-    std::map<QnUuid, long long> m_objectGuidToId;
+    std::map<QnUuid, int64_t> m_objectGuidToId;
 
     void resolveObjectIds();
 
@@ -88,10 +88,10 @@ private:
     void saveToAnalyticsArchive(nx::sql::QueryContext* queryContext);
     std::vector<AnalArchiveItem> prepareArchiveData(nx::sql::QueryContext* queryContext);
     ObjectDbAttributes getObjectDbDataById(const QnUuid& objectId);
-    
-    long long combineAttributes(
+
+    int64_t combineAttributes(
         nx::sql::QueryContext* queryContext,
-        const std::vector<long long>& attributesIds);
+        const std::vector<int64_t>& attributesIds);
 };
 
 } // namespace nx::analytics::db
