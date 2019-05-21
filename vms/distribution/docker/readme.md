@@ -61,6 +61,36 @@ OR
 You can use the docker-compose file which has the run parameters set, and will provide volumes for persistent database and video storage.
 Note that the video storage location, if modified, needs to be short. Changing the name is fine but changing the path may result in no valid storage location.
 
+## Networking ##
+
+Networking
+The network setting of a dockerized media server is very important.  Here are the network types you can use, and the results you can expect.
+
+Host (recommended)
+Licenses in this mode will always have the MAC of the host and the MAC can't be modified in "host" mode.
+
+Pros:
+    * You don't have to do any network configuration
+    * You can see cameras on the network of your host machine
+    * Other systems on the network can see your server
+Cons:
+    * You won't be able to run multiple servers on the same host without conflict as they use the IP of the host
+    
+Bridge
+Licenses are set to the container's MAC.  The MAC can change if you start up servers in a different order invalidating the license.  Or you need to specify the MAC address for each container and keep them the same.  This can be easier with docker compose files.  Bridge networking creates an isolated network you will not be able to see cameras in your network.
+
+Macvlan
+Licenses are set to the range specified in the macvlan network command.  If the IP changes, it invalidates the license unless you specify MAC address when running the container.
+
+Pros:
+    * Other systems on your network can see your server
+    * You can see cameras on the network of your host
+    * You can run multiple servers on your host
+Cons:
+    * Requires  modification to DHCP on your network
+    * Requires your network adapter to be in "Promiscuous" mode which can be a security risk
+    * Requires creation of a docker network
+
 ## Useful commands ##
 
 Entering bash inside named container:
