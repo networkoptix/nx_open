@@ -143,9 +143,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     @property
     def products(self):
-        return set(UserGroupsToProductPermissions.objects.filter(group__in=self.groups.all(),
-                                                                 group__permissions__codename='access_product').
-                   values_list('product_id', flat=True))
+        return self.products_with_permission('cms.edit_content')
 
     @property
     def customizations(self):
@@ -170,6 +168,13 @@ class Account(AbstractBaseUser, PermissionsMixin):
             if UserGroupsToProductPermissions.check_customization_permission(self, customization, permission):
                 customizations.append(customization)
         return customizations
+
+    def products_with_permission(self, permission):
+        products = []
+        for product in Product.objects.filter(customizations__name__in=self.customizations).distinct():
+            if UserGroupsToProductPermissions.check_permission(self, product, permission):
+                products.append(product.id)
+        return products
 
     def short_email(self):
         return format_html("<div class='truncate-email'><span>{}</span></div>", self.email)
