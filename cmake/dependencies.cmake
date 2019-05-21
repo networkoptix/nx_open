@@ -21,6 +21,10 @@ set(sync_command ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
     --cmake-include-file=${cmake_include_file}
 )
 
+if(NOT rdepSync)
+    list(APPEND sync_command "--use-local")
+endif()
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     list(APPEND sync_command "--debug")
 endif()

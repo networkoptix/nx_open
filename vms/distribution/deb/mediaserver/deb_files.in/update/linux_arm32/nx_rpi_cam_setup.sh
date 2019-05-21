@@ -174,5 +174,5 @@ main()
     configureV4L2 
 }
 
-main
+main "$@"
 

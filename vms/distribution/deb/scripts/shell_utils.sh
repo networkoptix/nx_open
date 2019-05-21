@@ -36,7 +36,7 @@ function crash_gdb_bt() {
             mkdir -p "$CRASH_DIR" && mv "/tmp/$REPORT" "$CRASH_DIR/$REPORT" &
 
         chmod -R 777 "$CRASH_DIR"
-        ls "$CORE_ORIG.*" | grep -v "$CORE" | xargs rm 2>/dev/null
+        ls "$CORE_ORIG".* | grep -v "$CORE" | xargs rm 2>/dev/null
     fi
 }
 

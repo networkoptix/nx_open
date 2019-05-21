@@ -292,10 +292,25 @@ void QnPlAxisResource::stopInputPortStatesMonitoring()
 
 void QnPlAxisResource::stopInputPortMonitoringSync()
 {
-    m_inputIoMonitor.httpClient.reset();
-    m_outputIoMonitor.httpClient.reset();
-    m_inputPortStateReader.reset();
-    m_timer.cancelSync();
+    std::promise<void> promise;
+    m_timer.cancelAsync(
+        [this, &promise]()
+        {
+            static const auto removeClient =
+                [](nx::network::http::AsyncHttpClientPtr* client)
+                {
+                    if (*client)
+                        (*client)->pleaseStopSync();
+                    client->reset();
+                };
+
+            removeClient(&m_inputIoMonitor.httpClient);
+            removeClient(&m_outputIoMonitor.httpClient);
+            removeClient(&m_inputPortStateReader);
+            promise.set_value();
+        });
+
+    promise.get_future().wait();
 
     auto timeMs = qnSyncTime->currentMSecsSinceEpoch();
     for (const auto& state: ioPortStates())
@@ -1105,6 +1120,7 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx::network::http::Asyn
         }
     }
 
+    m_inputPortStateReader->pleaseStopSync();
     m_inputPortStateReader.reset();
 }
 
@@ -1134,9 +1150,12 @@ void QnPlAxisResource::onMonitorConnectionClosed( nx::network::http::AsyncHttpCl
 {
     if (getParentId() != commonModule()->moduleGUID() || !isInitialized())
         return;
+
     auto ioMonitor = ioMonitorByHttpClient(httpClient);
     if (!ioMonitor)
         return;
+
+    ioMonitor->httpClient->pleaseStopSync();
     ioMonitor->httpClient.reset();
     restartIOMonitorWithDelay();
 }

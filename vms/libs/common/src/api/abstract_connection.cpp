@@ -56,17 +56,6 @@ void QnAbstractConnection::setExtraQueryParameters(const QnRequestParamList &ext
     m_extraQueryParameters = extraQueryParameters;
 }
 
-nx::utils::Url QnAbstractConnection::url() const {
-    return m_url;
-}
-
-void QnAbstractConnection::setUrl(const nx::utils::Url& url)
-{
-    m_url = url;
-    NX_ASSERT(!url.host().isEmpty());
-    NX_ASSERT(url.isValid());
-}
-
 QnLexicalSerializer *QnAbstractConnection::serializer() const {
     return m_serializer.data() ? m_serializer.data() : qn_abstractConnection_emptySerializer();
 }
@@ -96,7 +85,9 @@ int QnAbstractConnection::sendAsyncRequest(
 {
     if (!isReady())
         return -1;
-    if (!m_url.isValid() || m_url.host().isEmpty())
+
+    auto requestUrl = url();
+    if (!requestUrl.isValid() || requestUrl.host().isEmpty())
         return -1;
 
     NX_ASSERT(commonModule(), "Session manager object must exist here");
@@ -123,15 +114,14 @@ int QnAbstractConnection::sendAsyncRequest(
             m_extraHeaders.end(),
             std::inserter(actualHeaders, actualHeaders.end()));
 
-    QUrlQuery urlQuery(m_url.toQUrl());
+    QUrlQuery urlQuery(requestUrl.toQUrl());
     for (auto it = m_extraQueryParameters.begin(); it != m_extraQueryParameters.end(); ++it)
         urlQuery.addQueryItem(it->first, it->second);
-    nx::utils::Url url = m_url;
-    url.setQuery(urlQuery);
+    requestUrl.setQuery(urlQuery);
 
     return commonModule()->sessionManager()->sendAsyncRequest(
         std::move(method),
-        url,
+        requestUrl,
         objectName(object),
         std::move(actualHeaders),
         params,
@@ -204,7 +194,7 @@ int QnAbstractConnection::sendSyncRequest(
     QnHTTPRawResponse response;
     int status = commonModule()->sessionManager()->sendSyncRequest(
         method,
-        m_url,
+        url(),
         objectName(object),
         std::move(actualHeaders),
         params,

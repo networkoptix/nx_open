@@ -303,7 +303,7 @@
                 <function>
                     <name>Cookie-based authentication</name>
                     <description>
-                        <b>This method should only be used in browser javascript applications which share the origin with server (e.g. application and server are accessible by the single gateway).</b>
+                        <b>This method should only be used in browser javascript applications which share the origin with the Server (e.g. application and the Server are accessible by the a single gateway).</b>
                         <br/>
                         Cookie authorization scheme allows to avoid standard login/password dialog in web-applications.<br/>
                         It provides you a way to replace it with your own dialog.<br/>

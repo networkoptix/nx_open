@@ -272,7 +272,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     bool gotFrame = false;
     QnFfmpegVideoDecoder decoder(
-        DecoderConfig::fromResource(resource), video->compressionType, video, false);
+        DecoderConfig(), video->compressionType, video);
 
     if (!isArchiveVideoPacket)
     {
@@ -653,8 +653,8 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnFfmpegVideoDecoder decoder(
-        DecoderConfig::fromResource(resource),
-        firstFrame->compressionType, firstFrame, false);
+        DecoderConfig(),
+        firstFrame->compressionType, firstFrame);
     for (int i = 0; i < randomAccess.size(); ++i)
     {
         auto frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(i));

@@ -467,8 +467,8 @@ void QnThumbnailsLoader::process() {
         if (frame)
         {
             QnFfmpegVideoDecoder decoder(
-                DecoderConfig::fromMediaResource(m_resource),
-                frame->compressionType, frame, false);
+                DecoderConfig(),
+                frame->compressionType, frame);
             QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
             outFrame->setUseExternalData(false);
 

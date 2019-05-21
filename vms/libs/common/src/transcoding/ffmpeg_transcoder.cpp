@@ -10,7 +10,6 @@ extern "C"
 #include <QtCore/QDebug>
 
 #include <nx/utils/log/log.h>
-#include <export/sign_helper.h>
 
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
@@ -71,7 +70,6 @@ QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metrics::Storag
 :
     QnTranscoder(metrics),
     m_config(config),
-    m_signatureHash(EXPORT_SIGN_METHOD),
     m_videoEncoderCodecCtx(0),
     m_audioEncoderCodecCtx(0),
     m_videoBitrate(0),
@@ -82,8 +80,6 @@ QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metrics::Storag
 {
     NX_DEBUG(this, lit("Created new ffmpeg transcoder. Total transcoder count %1").
         arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1));
-    m_signatureHash.reset();
-    m_signatureHash.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
 }
 
 QnFfmpegTranscoder::~QnFfmpegTranscoder()
@@ -182,7 +178,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             int videoHeight = video->height;
             if (!video || video->width < 1 || video->height < 1)
             {
-                QnFfmpegVideoDecoder decoder(m_config.decoderConfig, video->compressionType, video, false);
+                QnFfmpegVideoDecoder decoder(m_config.decoderConfig, video->compressionType, video);
                 QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
                 decoder.decode(video, &decodedVideoFrame);
                 videoWidth = decoder.getWidth();
@@ -294,10 +290,29 @@ bool QnFfmpegTranscoder::addTag( const QString& name, const QString& value )
     return av_dict_set( &m_formatCtx->metadata, name.toUtf8().constData(), value.toUtf8().constData(), 0 ) >= 0;
 }
 
-
-int QnFfmpegTranscoder::muxPacket(const AVPacket* packet)
+int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket)
 {
-    int status = av_write_frame(m_formatCtx, (AVPacket*)packet);
+    int streamIndex = 0;
+    if (m_videoCodec != AV_CODEC_ID_NONE && mediaPacket->dataType == QnAbstractMediaData::AUDIO)
+       streamIndex = 1;
+
+    AVStream* stream = m_formatCtx->streams[streamIndex];
+    AVRational srcRate = {1, 1000000};
+    AVPacket packet;
+    av_init_packet(&packet);
+
+    packet.pts = av_rescale_q(mediaPacket->timestamp - m_baseTime, srcRate, stream->time_base);
+    packet.data = (uint8_t*)mediaPacket->data();
+    packet.size = static_cast<int>(mediaPacket->dataSize());
+    if (mediaPacket->dataType == QnAbstractMediaData::AUDIO || mediaPacket->flags & AV_PKT_FLAG_KEY)
+        packet.flags |= AV_PKT_FLAG_KEY;
+
+    packet.stream_index = streamIndex;
+    packet.dts = packet.pts;
+    m_lastPacketTimestamp.ntpTimestamp = mediaPacket->timestamp;
+    m_lastPacketTimestamp.rtpTimestamp = packet.pts;
+
+    int status = av_write_frame(m_formatCtx, &packet);
     if (status < 0)
     {
         NX_WARNING(this, "Muxing packet error: can't write AV packet, error: %1",
@@ -305,15 +320,18 @@ int QnFfmpegTranscoder::muxPacket(const AVPacket* packet)
         return status;
     }
 
-    if (m_config.computeSignatureHash)
+    if (m_config.computeSignature)
     {
-        QnSignHelper::updateDigest(
-            m_videoEncoderCodecCtx, m_signatureHash, packet->data, packet->size);
+        auto context = mediaPacket->dataType == QnAbstractMediaData::VIDEO ?
+            m_videoEncoderCodecCtx : m_audioEncoderCodecCtx;
+        m_mediaSigner.processMedia(
+            context, packet.data, packet.size, mediaPacket->dataType);
     }
     return 0;
 }
 
-int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
+int QnFfmpegTranscoder::transcodePacketInternal(
+    const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
 {
     if (m_baseTime == AV_NOPTS_VALUE)
         m_baseTime = media->timestamp - m_startTimeOffset;
@@ -323,19 +341,6 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
     else if (m_videoCodec == AV_CODEC_ID_NONE && media->dataType == QnAbstractMediaData::VIDEO)
         return 0;
 
-    AVRational srcRate = {1, 1000000};
-    int streamIndex = 0;
-    if (m_videoCodec != AV_CODEC_ID_NONE &&
-        media->dataType == QnAbstractMediaData::AUDIO)
-    {
-        streamIndex = 1;
-    }
-
-    AVStream* stream = m_formatCtx->streams[streamIndex];
-    AVPacket packet;
-    av_init_packet(&packet);
-    QnAbstractMediaDataPtr transcodedData;
-
     QnCodecTranscoderPtr transcoder;
     if (dynamic_cast<const QnCompressedVideoData*>(media.get()))
         transcoder = m_vTranscoder;
@@ -344,42 +349,24 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
 
     bool doTranscoding = true;
     do {
-        packet.data = 0;
-        packet.size = 0;
-
+        QnAbstractMediaDataPtr transcodedPacket;
+        QnConstAbstractMediaDataPtr mediaPacket;
         if (transcoder)
         {
             // transcode media
-            int errCode = transcoder->transcodePacket(doTranscoding ? media : QnConstAbstractMediaDataPtr(), result ? &transcodedData : NULL);
+            int errCode = transcoder->transcodePacket(doTranscoding ? media : QnConstAbstractMediaDataPtr(), result ? &transcodedPacket : NULL);
             if (errCode != 0)
                 return errCode;
-            if (transcodedData) {
-                packet.data = const_cast<quint8*>((const quint8*) transcodedData->data());  //const_cast is here because av_write_frame accepts
-                                                                                            //non-const pointer, but does not modifiy packet buffer
-                packet.size = static_cast<int>(transcodedData->dataSize());
-                packet.pts = av_rescale_q(transcodedData->timestamp - m_baseTime, srcRate, stream->time_base);
-                if(transcodedData->flags & AV_PKT_FLAG_KEY)
-                    packet.flags |= AV_PKT_FLAG_KEY;
-                m_lastPacketTimestamp.ntpTimestamp = transcodedData->timestamp;
-            }
+            mediaPacket = transcodedPacket;
         }
-        else {
-            m_lastPacketTimestamp.ntpTimestamp = media->timestamp;
-            // direct stream copy
-            packet.pts = av_rescale_q(media->timestamp - m_baseTime, srcRate, stream->time_base);
-            packet.data = const_cast<quint8*>((const quint8*) media->data());
-            packet.size = static_cast<int>(media->dataSize());
-            if((media->dataType == QnAbstractMediaData::AUDIO) || (media->flags & AV_PKT_FLAG_KEY))
-                packet.flags |= AV_PKT_FLAG_KEY;
-        }
-        packet.stream_index = streamIndex;
-        packet.dts = packet.pts;
-
-        if (packet.size > 0)
+        else
         {
-            m_lastPacketTimestamp.rtpTimestamp = packet.pts;
-            muxPacket(&packet);
+            // direct stream copy
+            mediaPacket = media;
         }
+        if (mediaPacket && mediaPacket->dataSize() > 0)
+            muxPacket(mediaPacket);
+
         doTranscoding = false;
     } while (transcoder && transcoder->existMoreData());
     return 0;
@@ -387,11 +374,8 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
 
 int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
 {
-
     for (int streamIndex = 0; streamIndex < 2; ++streamIndex)
     {
-        AVRational srcRate = { 1, 1000000 };
-
         //finalizing codec transcoder
         QnCodecTranscoderPtr transcoder;
         if (streamIndex == 0)
@@ -400,8 +384,6 @@ int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
             transcoder = m_aTranscoder;
         if (!transcoder)
             continue;
-
-        AVStream* stream = m_formatCtx->streams[streamIndex];
 
         QnAbstractMediaDataPtr transcodedData;
         do
@@ -413,21 +395,8 @@ int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
             int errCode = transcoder->transcodePacket(QnConstAbstractMediaDataPtr(), &transcodedData);
             if (errCode != 0)
                 return errCode;
-            if (transcodedData)
-            {
-                packet.data = const_cast<quint8*>((const quint8*)transcodedData->data());  //const_cast is here because av_write_frame accepts
-                                                                                            //non-const pointer, but does not modifiy packet buffer
-                packet.size = static_cast<int>(transcodedData->dataSize());
-                packet.pts = av_rescale_q(transcodedData->timestamp - m_baseTime, srcRate, stream->time_base);
-                if (transcodedData->flags & AV_PKT_FLAG_KEY)
-                    packet.flags |= AV_PKT_FLAG_KEY;
-            }
-
-            packet.stream_index = streamIndex;
-            packet.dts = packet.pts;
-
-            if (packet.size > 0)
-                muxPacket(&packet);
+            if (transcodedData && transcodedData->dataSize() > 0)
+                muxPacket(QnConstAbstractMediaDataPtr(transcodedData));
 
         } while (transcodedData);
     }
@@ -438,14 +407,9 @@ int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
     return 0;
 }
 
-void QnFfmpegTranscoder::updateSignatureHash(uint8_t* data, int size)
+QByteArray QnFfmpegTranscoder::getSignature(QnLicensePool* licensePool)
 {
-    QnSignHelper::updateDigest(nullptr, m_signatureHash, data, size);
-}
-
-QByteArray QnFfmpegTranscoder::getSignatureHash()
-{
-    return m_signatureHash.result();
+    return m_mediaSigner.buildSignature(licensePool);
 }
 
 AVCodecContext* QnFfmpegTranscoder::getVideoCodecContext() const

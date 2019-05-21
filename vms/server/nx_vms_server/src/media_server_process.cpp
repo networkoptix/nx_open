@@ -70,6 +70,7 @@
 
 #include <nx/vms/auth/time_based_nonce_provider.h>
 #include <nx/vms/server/authenticator.h>
+#include <nx/vms/server/rest/get_merge_status_handler.h>
 #include <network/connection_validator.h>
 #include <network/default_tcp_connection_processor.h>
 #include <network/system_helpers.h>
@@ -277,6 +278,7 @@
 #include <rest/handlers/sync_time_rest_handler.h>
 #include <rest/handlers/metrics_rest_handler.h>
 #include <nx/vms/server/event/event_connector.h>
+#include <nx/vms/server/event/extended_rule_processor.h>
 #include <nx/network/http/http_client.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/storage_plugin_factory.h>
@@ -1473,6 +1475,17 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg(nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1),
         new ::rest::handlers::SyncTimeRestHandler());
+
+    /**%apidoc GET /ec2/mergeStatus
+     * Return information if the last merge request still is in progress.
+     * If merge is not in progress it means all data that belongs to servers on the moment when merge was requested
+     * are synchronized. This functions is a system wide and can be called from any server in the system to check merge status.
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string unique id of the last merge operation.
+     *     %param:boolean true if last merge operation is in progress.
+     */
+    reg(nx::vms::server::rest::GetMergeStatusHandler::kUrlPath,
+        new nx::vms::server::rest::GetMergeStatusHandler(serverModule()));
 
     /**%apidoc POST /ec2/forcePrimaryTimeServer
      * Set primary time server. Requires a JSON object with optional "id" field in the message
@@ -3659,6 +3672,7 @@ void MediaServerProcess::stopObjects()
     commonModule()->resourceDiscoveryManager()->stop();
     serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
     serverModule()->pluginManager()->unloadPlugins();
+    serverModule()->eventRuleProcessor()->stop();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required

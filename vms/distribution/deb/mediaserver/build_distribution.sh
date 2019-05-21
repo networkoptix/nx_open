@@ -9,6 +9,11 @@ distrib_loadConfig "build_distribution.conf"
 WORK_DIR="server_build_distribution_tmp"
 LOG_FILE="$LOGS_DIR/server_build_distribution.log"
 
+filesCountInDir()
+{
+    ls -Aq "$1" |wc -w
+}
+
 # Strip binaries and remove rpath.
 stripIfNeeded() # dir
 {
@@ -123,7 +128,7 @@ copyFiles()
     echo "Copying generic files"
 
     if [[ -d $FILES_DIR/$TARGET_DEVICE ]] \
-        && (( $(ls -Aq "$FILES_DIR/$TARGET_DEVICE" |wc -w) > 0 ))
+        && (( $(filesCountInDir "$FILES_DIR/$TARGET_DEVICE") > 0 ))
     then
        cp -r "$FILES_DIR/$TARGET_DEVICE/"* "$STAGE_MODULE/"
     fi
@@ -290,7 +295,7 @@ createUpdateZip() # file.deb
         cp -r "$FILE" "$ZIP_DIR/"
     fi
 
-    if [[ -d update/$TARGET_DEVICE ]] && (( $(ls -Aq "update/$TARGET_DEVICE" |wc -w) > 0 ))
+    if [[ -d update/$TARGET_DEVICE ]] && (( $(filesCountInDir "update/$TARGET_DEVICE") > 0 ))
     then
         for FILE in "update/$TARGET_DEVICE/"*
         do

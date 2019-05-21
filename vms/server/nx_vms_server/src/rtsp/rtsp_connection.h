@@ -119,7 +119,6 @@ private:
     nx::network::rtsp::StatusCodeValue composeTeardown();
     nx::network::rtsp::StatusCodeValue composeSetParameter();
     nx::network::rtsp::StatusCodeValue composeGetParameter();
-    void processRangeHeader();
     void createDataProvider();
     void putLastIFrameToQueue();
     //QnAbstractMediaStreamDataProvider* getLiveDp();

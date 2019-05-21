@@ -16,14 +16,16 @@ extern "C"
 
 class QGLContext;
 
+enum class MultiThreadDecodePolicy
+{
+    autoDetect, //< off for small resolution, on for large resolution
+    disabled,
+    enabled
+};
+
 struct DecoderConfig
 {
-
-    static DecoderConfig fromResource(QnResourcePtr resource);
-    static DecoderConfig fromMediaResource(QnMediaResourcePtr resource);
-
-    bool allowMtDecoding = true;
-    QStringList disabledCodecsForMtDecoding;
+    MultiThreadDecodePolicy mtDecodePolicy = MultiThreadDecodePolicy::disabled;
 };
 
 //!Abstract interface. Every video decoder MUST implement this interface.
@@ -79,15 +81,7 @@ public:
     virtual void setLightCpuMode( DecodeMode val ) = 0;
 
     //!Use ulti-threaded decoding (if supported by implementation)
-    virtual void setMTDecoding( bool value )
-    {
-        if (m_mtDecoding != value)
-            m_needRecreate = true;
-
-        m_mtDecoding = value;
-    }
-    //!Returns true if decoder uses multiple threads
-    virtual bool isMultiThreadedDecoding() const { return m_mtDecoding; }
+    virtual void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy) = 0;
 
     void setTryHardwareAcceleration(bool tryHardwareAcceleration);
     //!Returns true if hardware acceleration enabled
@@ -125,9 +119,6 @@ private:
 protected:
     bool m_tryHardwareAcceleration;
     bool m_hardwareAccelerationEnabled;
-
-    bool m_mtDecoding;
-    bool m_needRecreate;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

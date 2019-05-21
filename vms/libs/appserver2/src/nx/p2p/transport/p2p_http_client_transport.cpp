@@ -9,7 +9,11 @@ namespace nx::p2p {
 
 namespace {
 
-static const int kMaxMessageQueueSize = 500;
+#if defined (_DEBUG)
+    static const int kMaxMessageQueueSize = 5;
+#else
+    static const int kMaxMessageQueueSize = 500;
+#endif
 
 } // namespace
 
@@ -80,6 +84,7 @@ void P2PHttpClientTransport::readSomeAsync(
 
                 const auto queueBuffer = m_incomingMessageQueue.front();
                 m_incomingMessageQueue.pop();
+                stopOrResumeReaderWhileInAioThread();
                 buffer->append(QByteArray::fromBase64(queueBuffer));
                 handler(SystemError::noError, queueBuffer.size());
                 return;
@@ -169,6 +174,23 @@ network::SocketAddress P2PHttpClientTransport::getForeignAddress() const
     return f.get();
 }
 
+void P2PHttpClientTransport::stopOrResumeReaderWhileInAioThread()
+{
+    if (m_incomingMessageQueue.size() > kMaxMessageQueueSize)
+    {
+        NX_DEBUG(
+            this, "Incoming message queue overflow detected (%1 pending)",
+            m_incomingMessageQueue.size());
+        m_readHttpClient->stopReading();
+    }
+    else if (
+        m_incomingMessageQueue.size() < kMaxMessageQueueSize / 2
+        && !m_readHttpClient->isReading())
+    {
+        m_readHttpClient->resumeReading();
+    }
+}
+
 void P2PHttpClientTransport::startReading()
 {
     m_readHttpClient->setOnResponseReceived(
@@ -177,27 +199,21 @@ void P2PHttpClientTransport::startReading()
             auto nextFilter = nx::utils::bstream::makeCustomOutputStream(
                 [this](const QnByteArrayConstRef& data)
                 {
-                    if (m_incomingMessageQueue.size() < kMaxMessageQueueSize)
+                    stopOrResumeReaderWhileInAioThread();
+                    if (!m_userReadHandlerPair)
                     {
-                        if (!m_userReadHandlerPair)
-                        {
-                            m_incomingMessageQueue.push(data);
-                        }
-                        else
-                        {
-                            m_userReadHandlerPair->first->append(QByteArray::fromBase64(data));
-
-                            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-                            m_userReadHandlerPair->second(SystemError::noError, data.size());
-                            if (watcher.objectDestroyed())
-                                return;
-
-                            m_userReadHandlerPair.reset();
-                        }
+                        m_incomingMessageQueue.push(data);
                     }
                     else
                     {
-                        NX_WARNING(this, lm("Incoming message queue overflow"));
+                        m_userReadHandlerPair->first->append(QByteArray::fromBase64(data));
+
+                        utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                        m_userReadHandlerPair->second(SystemError::noError, data.size());
+                        if (watcher.objectDestroyed())
+                            return;
+
+                        m_userReadHandlerPair.reset();
                     }
                 });
 
