@@ -88,7 +88,7 @@ do
             pushd cloud
             python manage.py json_to_table
             popd
-            echo 'Generate files are in ./cloud/cms'
+            echo 'Generated files are created in ./cloud/cms'
             ;;
         setup_cms)
             . ./env/bin/activate
