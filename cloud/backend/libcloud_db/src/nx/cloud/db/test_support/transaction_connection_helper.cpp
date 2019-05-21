@@ -21,6 +21,7 @@ TransactionConnectionHelper::TransactionConnectionHelper():
     m_removeConnectionAfterClosure(false),
     m_maxDelayBeforeConnect(std::chrono::milliseconds::zero())
 {
+    m_syncPath = api::kEc2EventsPath;
 }
 
 TransactionConnectionHelper::~TransactionConnectionHelper()
@@ -38,6 +39,11 @@ void TransactionConnectionHelper::setMaxDelayBeforeConnect(
     std::chrono::milliseconds delay)
 {
     m_maxDelayBeforeConnect = delay;
+}
+
+void TransactionConnectionHelper::setSyncPath(const std::string& path)
+{
+    m_syncPath = path;
 }
 
 TransactionConnectionHelper::ConnectionId
@@ -299,7 +305,7 @@ nx::utils::Url TransactionConnectionHelper::prepareTargetUrl(
     QUrlQuery urlQuery(url.query());
     urlQuery.addQueryItem("guid", localPeerId.toString());
     url.setQuery(urlQuery);
-    url.setPath(api::kEc2EventsPath);
+    url.setPath(m_syncPath.c_str());
     return url;
 }
 
