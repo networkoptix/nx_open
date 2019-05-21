@@ -30,7 +30,7 @@ void NX_UTILS_API initializeGlobally(const nx::utils::ArgumentParser& arguments)
  *     application. E.g. Client could use videowall GUID as a suffix.
  * @return True if the config file exists.
  */
-bool initializeFromConfigFile(
+bool NX_UTILS_API initializeFromConfigFile(
     const QString& configFileName,
     const QString& logsDirectory,
     const QString& applicationName,
