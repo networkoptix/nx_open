@@ -84,8 +84,8 @@ Menu
             if (orientation !== Qt.Vertical)
                 return
 
-            for (var i = 0; i < listView.contentItem.children.length; ++i)
-                listView.contentItem.children[i].width = width
+            for (var i = 0; i < control.count; ++i)
+                control.itemAt(i).width = width
         }
     }
 }
