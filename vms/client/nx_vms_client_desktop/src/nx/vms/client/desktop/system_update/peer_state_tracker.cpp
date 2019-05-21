@@ -839,7 +839,7 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
             return tr("Unknown error.");
     }
     NX_ASSERT(false);
-    return tr("Unhandled error code.");
+    return tr("Unexpected error code.");
 }
 
 void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
