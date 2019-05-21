@@ -192,7 +192,7 @@ bool Worker::haveChunksToDownloadUnsafe()
 
     for (const PeerInformation& peer: m_peerInfoByPeer)
     {
-        if (peer.isInternet)
+        if (peer.isInternet && peer.rank > kMinAutoRank)
             return true;
     }
 
@@ -376,6 +376,8 @@ void Worker::requestFileInformationInternal()
         return;
     }
 
+    const nx::utils::Url& url = fileInformation().url;
+
     for (const auto& peer: peers)
     {
         NX_VERBOSE(m_logTag, "Requesting %1 from server %2.",
@@ -384,6 +386,7 @@ void Worker::requestFileInformationInternal()
         const rest::Handle handle = peer.manager->requestFileInfo(
             peer.id,
             m_fileName,
+            url,
             nx::utils::guarded(this,
                 [this, peer](bool success, rest::Handle handle, const FileInformation& fileInfo)
                 {
@@ -499,7 +502,19 @@ void Worker::handleFileInformationReply(
 
     increasePeerRank(requestContext.peer);
     if (m_state == State::requestingAvailableChunks)
-        setState(State::foundAvailableChunks);
+    {
+        if (haveChunksToDownloadUnsafe())
+        {
+            setState(State::foundAvailableChunks);
+        }
+        else
+        {
+            if (m_contextByHandle.isEmpty())
+                setShouldWait(true);
+            else
+                setShouldWaitForAsyncOperationCompletion();
+        }
+    }
 }
 
 void Worker::requestChecksums()

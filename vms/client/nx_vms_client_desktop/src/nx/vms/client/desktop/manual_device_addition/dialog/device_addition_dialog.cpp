@@ -102,6 +102,32 @@ void DeviceAdditionDialog::initializeControls()
 
     ui->searchButton->setFocusPolicy(Qt::StrongFocus);
     ui->stopSearchButton->setFocusPolicy(Qt::StrongFocus);
+    ui->addDevicesButton->setFocusPolicy(Qt::StrongFocus);
+    ui->knownAddressAutoPortCheckBox->setFocusPolicy(Qt::StrongFocus);
+    ui->foundDevicesTable->setFocusPolicy(Qt::StrongFocus);
+
+    // Monitor focus and change accent button accodringly.
+    QWidget* const filteredWidgets[] = {
+        ui->searchButton,
+        ui->startAddressEdit,
+        ui->endAddressEdit,
+        ui->addressEdit->lineEdit(),
+        ui->knownAddressAutoPortCheckBox,
+        ui->knownAddressPortSpinBox,
+        ui->subnetScanAutoPortCheckBox,
+        ui->subnetScanPortSpinBox,
+        ui->loginEdit,
+        ui->passwordEdit,
+        ui->stopSearchButton,
+        ui->foundDevicesTable,
+        ui->addDevicesButton
+    };
+    for (auto widget: filteredWidgets)
+        widget->installEventFilter(this);
+
+    ui->searchButton->setAutoDefault(true);
+    ui->stopSearchButton->setAutoDefault(true);
+    ui->addDevicesButton->setAutoDefault(false);
 
     connect(ui->searchButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleStartSearchClicked);
@@ -185,8 +211,7 @@ void DeviceAdditionDialog::initializeControls()
     setupPortStuff(ui->knownAddressAutoPortCheckBox, ui->knownAddressPortSpinWidget);
     setupPortStuff(ui->subnetScanAutoPortCheckBox, ui->subnetScanPortSpinWidget);
 
-    setAccentStyle(ui->searchButton);
-    setAccentStyle(ui->addDevicesButton);
+    setSearchAccent(true);
 
     PasswordPreviewButton::createInline(ui->passwordEdit);
 
@@ -205,6 +230,28 @@ void DeviceAdditionDialog::initializeControls()
 
     setPaletteColor(ui->knownAddressPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
     setPaletteColor(ui->subnetScanPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
+}
+
+void DeviceAdditionDialog::setSearchAccent(bool isEnabled)
+{
+    const auto accentButton = isEnabled ? ui->searchButton : ui->addDevicesButton;
+    const auto regularButton = isEnabled ? ui->addDevicesButton : ui->searchButton;
+
+    regularButton->setDefault(false);
+    resetButtonStyle(regularButton);
+
+    accentButton->setDefault(true);
+    setAccentStyle(accentButton);
+}
+
+bool DeviceAdditionDialog::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::FocusIn)
+    {
+        const bool isSearchAccent = object != ui->foundDevicesTable && object != ui->addDevicesButton;
+        setSearchAccent(isSearchAccent);
+    }
+    return base_type::eventFilter(object, event);
 }
 
 void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& value)
@@ -655,11 +702,6 @@ void DeviceAdditionDialog::updateResultsWidgetState()
         ui->placeholderLabel->setText(text.toUpper());
     }
 
-    if (empty)
-        setAccentStyle(ui->searchButton);
-    else
-        resetButtonStyle(ui->searchButton);
-
     const bool showSearchProgressControls = m_currentSearch && m_currentSearch->searching();
     ui->searchControls->setCurrentIndex(showSearchProgressControls ? 1 : 0);
     ui->searchButton->setVisible(!showSearchProgressControls);
@@ -719,12 +761,14 @@ void DeviceAdditionDialog::showAddDevicesButton(const QString& buttonText)
 {
     ui->addDevicesStackedWidget->setCurrentWidget(ui->addDevicesButtonPage);
     ui->addDevicesButton->setText(buttonText);
+    ui->foundDevicesTable->setFocus();
 }
 
 void DeviceAdditionDialog::showAddDevicesPlaceholder(const QString& placeholderText)
 {
     ui->addDevicesStackedWidget->setCurrentWidget(ui->addDevicesPlaceholderPage);
     ui->addDevicesPlaceholder->setText(placeholderText);
+    setSearchAccent(true);
 }
 
 } // namespace nx::vms::client::desktop

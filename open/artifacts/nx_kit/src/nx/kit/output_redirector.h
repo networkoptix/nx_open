@@ -50,8 +50,6 @@ protected: //< Intended for unit tests.
     OutputRedirector();
 
     static void redirectStdoutAndStderrIfNeeded(const char* overridingLogFilesDir = nullptr);
-
-    static std::string getProcessName();
 };
 
 } // namespace kit

@@ -14,6 +14,7 @@
 #include <string>
 #include <cstring>
 
+#include <nx/kit/utils.h>
 #include <nx/kit/test.h>
 #include <nx/kit/output_redirector.h>
 
@@ -25,11 +26,6 @@ public:
     static void redirectStdoutAndStderrIfNeeded(const char *overridingLogFilesDir)
     {
         OutputRedirector::redirectStdoutAndStderrIfNeeded(overridingLogFilesDir);
-    }
-
-    static std::string getProcessName()
-    {
-        return OutputRedirector::getProcessName();
     }
 };
 
@@ -67,7 +63,7 @@ public:
     }
 
     const std::string testDir = nx::kit::test::staticTempDir();
-    const std::string processName = OutputRedirectorAdapter::getProcessName();
+    const std::string processName = nx::kit::utils::getProcessName();
     const std::string stdoutFilePath = testDir + processName + std::string("_stdout.log");
     const std::string stderrFilePath = testDir + processName + std::string("_stderr.log");
 };

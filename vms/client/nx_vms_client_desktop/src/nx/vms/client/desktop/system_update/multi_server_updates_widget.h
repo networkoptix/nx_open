@@ -59,7 +59,9 @@ public:
     virtual bool canDiscardChanges() const override;
 
     /**
-     * Describes all possible display modes for update version.
+     * Report for picked update version. Describes all possible display modes for update version.
+     * It contains all data necessary to show at the top panel of the dialog.
+     *
      * Variations for build number:
      *  - Full build number, "4.0.0.20000".
      *  - Specific build number "10821". Appears when we waiting for response for specific build.
@@ -96,11 +98,16 @@ public:
         HighlightMode statusHighlight = HighlightMode::regular;
     };
 
+    /** Generates update report for a picked update contents. */
     static VersionReport calculateUpdateVersionReport(const nx::update::UpdateContents& contents, QnUuid clientId);
 
 protected:
-    /** This one is called by timer periodically. */
+    /**
+     * This one is called by timer periodically.
+     * It checks changes in remote and local state, and calls update for UI if there are any.
+     */
     void atUpdateCurrentState();
+
     /** Handler for a separate timer for checking installation status. We check it less often. */
     void atCheckInstallState();
     void atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);

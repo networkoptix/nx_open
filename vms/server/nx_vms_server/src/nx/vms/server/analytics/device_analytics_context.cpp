@@ -19,14 +19,10 @@ namespace nx::vms::server::analytics {
 
 using namespace nx::vms::server;
 
-namespace {
-
-bool isAliveStatus(Qn::ResourceStatus status)
+static bool isAliveStatus(Qn::ResourceStatus status)
 {
     return status == Qn::ResourceStatus::Online || status == Qn::ResourceStatus::Recording;
 }
-
-} // namespace
 
 DeviceAnalyticsContext::DeviceAnalyticsContext(
     QnMediaServerModule* serverModule,

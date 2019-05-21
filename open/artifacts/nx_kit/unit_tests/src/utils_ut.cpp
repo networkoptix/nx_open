@@ -34,6 +34,16 @@ TEST(utils, baseName)
     #endif
 }
 
+TEST(utils, getProcessName)
+{
+    const std::string processName = getProcessName();
+
+    ASSERT_FALSE(processName.empty());
+    ASSERT_TRUE(processName.find(".exe") == std::string::npos);
+    ASSERT_TRUE(processName.find('/') == std::string::npos);
+    ASSERT_TRUE(processName.find('\\') == std::string::npos);
+}
+
 TEST(utils, alignUp)
 {
     ASSERT_EQ(0U, alignUp(0, 0));

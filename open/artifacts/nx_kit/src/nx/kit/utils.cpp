@@ -46,6 +46,23 @@ std::string baseName(std::string path)
     #endif
 }
 
+std::string getProcessName()
+{
+    std::string processName =
+        nx::kit::utils::baseName(nx::kit::utils::getProcessCmdLineArgs()[0]);
+
+    #if defined(_WIN32)
+        const std::string exeExt = ".exe";
+        if (processName.size() > exeExt.size()
+            && processName.substr(processName.size() - exeExt.size()) == exeExt)
+        {
+            processName = processName.substr(0, processName.size() - exeExt.size());
+        }
+    #endif
+
+    return processName;
+}
+
 const std::vector<std::string>& getProcessCmdLineArgs()
 {
     static std::vector<std::string> args;

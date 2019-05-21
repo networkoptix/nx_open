@@ -78,6 +78,9 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         {
             updateCachedDevices();
             updateTimelineDisplay();
+
+            if (m_analyticsSearchWidget->selectedCameras() != AbstractSearchWidget::Cameras::current)
+                setAreaSelectionActive(false);
         });
 
     connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::textFilterChanged,

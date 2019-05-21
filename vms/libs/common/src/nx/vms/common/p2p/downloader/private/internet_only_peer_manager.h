@@ -19,6 +19,7 @@ public:
     virtual rest::Handle requestFileInfo(
         const QnUuid& peerId,
         const QString& fileName,
+        const nx::utils::Url& url,
         FileInfoCallback callback) override;
 
     virtual rest::Handle requestChecksums(

@@ -188,7 +188,6 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 if (file.exists())
                 {
                     contents.filesToUpload.push_back(pkg.file);
-                    pkg.url = "";
                     pkg.localFile = file.fileName();
                     pkg.file = uploadDestination + file.fileName();
                     checked.push_back(pkg);

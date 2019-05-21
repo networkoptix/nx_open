@@ -121,6 +121,7 @@ int TestPeerManager::distanceTo(const QnUuid& /*peerId*/) const
 rest::Handle TestPeerManager::requestFileInfo(
     const QnUuid& peerId,
     const QString& fileName,
+    const nx::utils::Url& url,
     AbstractPeerManager::FileInfoCallback callback)
 {
     m_requestCounter.incrementCounters(peerId, RequestCounter::FileInfoRequest);
@@ -129,13 +130,14 @@ rest::Handle TestPeerManager::requestFileInfo(
         return 0;
 
     return enqueueRequest(peerId, kDefaultRequestTime,
-        [this, fileInfo = fileInformation(peerId, fileName), peerId, callback](rest::Handle handle)
+        [this, fileInfo = fileInformation(peerId, fileName), url, peerId, callback](
+            rest::Handle handle)
         {
             if (m_allowIndirectInternetRequests && m_peers[peerId].hasInternetConnection)
             {
                 auto info = fileInfo;
                 info.downloadedChunks.clear();
-                callback(true, handle, info);
+                callback(url.isValid(), handle, info);
             }
             else
             {
@@ -437,10 +439,11 @@ int ProxyTestPeerManager::distanceTo(const QnUuid& peerId) const
 rest::Handle ProxyTestPeerManager::requestFileInfo(
     const QnUuid& peer,
     const QString& fileName,
+    const nx::utils::Url& url,
     AbstractPeerManager::FileInfoCallback callback)
 {
     m_requestCounter.incrementCounters(peer, RequestCounter::FileInfoRequest);
-    return m_peerManager->requestFileInfo(peer, fileName, callback);
+    return m_peerManager->requestFileInfo(peer, fileName, url, callback);
 }
 
 rest::Handle ProxyTestPeerManager::requestChecksums(

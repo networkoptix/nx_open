@@ -89,7 +89,7 @@ function(set_distribution_names)
     set(mobile_client_distribution_name
         "${prefix}-client-${mobileClientVersion.full}-${suffix}" PARENT_SCOPE)
     set(analytics_sdk_distribution_name
-        "${prefix}-analytics_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
+        "nx-analytics_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
     set(ssc_analytics_plugin_distribution_name
         "${prefix}-ssc_analytics_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(product_distribution_name

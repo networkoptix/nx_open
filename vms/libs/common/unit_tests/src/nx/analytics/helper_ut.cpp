@@ -192,16 +192,11 @@ const char* kBasicEngineManifest = R"json(
                                 "range": ["value1", "value2", "value3"]
                             },
                             {
-                                "type": "Row",
-                                "items": [
-                                    {
-                                        "type": "CheckBox",
-                                        "caption": "CheckBox Parameter",
-                                        "name": "test_check_box",
-                                        "defaultValue": true,
-                                        "value": true
-                                    }
-                                ]
+                                "type": "CheckBox",
+                                "caption": "CheckBox Parameter",
+                                "name": "test_check_box",
+                                "defaultValue": true,
+                                "value": true
                             }
                         ]
                     }
