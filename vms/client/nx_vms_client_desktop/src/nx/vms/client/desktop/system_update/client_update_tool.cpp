@@ -7,6 +7,7 @@
 #include <utils/common/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/update/update_check.h>
 #include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>
@@ -16,16 +17,15 @@
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::common::p2p::downloader;
+using namespace nx::applauncher::api;
 
 bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 {
-    using namespace applauncher::api;
-
-    /* Try to run applauncher if it is not running. */
+    // Try to run applauncher if it is not running.
     if (!checkOnline())
         return false;
 
-    const auto result = applauncher::api::getInstalledVersions(versions);
+    const auto result = getInstalledVersions(versions);
     if (result == ResultType::ok)
         return true;
 
@@ -34,7 +34,7 @@ bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
     {
         QThread::msleep(100);
         qApp->processEvents();
-        if (applauncher::api::getInstalledVersions(versions) == ResultType::ok)
+        if (getInstalledVersions(versions) == ResultType::ok)
             return true;
     }
     return false;
@@ -413,30 +413,31 @@ bool ClientUpdateTool::isDownloadComplete() const
 
 void ClientUpdateTool::checkInternalState()
 {
+    using nx::applauncher::api::ResultType;
+
     auto kWaitTime = std::chrono::milliseconds(1);
     if (m_applauncherTask.valid()
         && m_applauncherTask.wait_for(kWaitTime) == std::future_status::ready)
     {
-        using Result = applauncher::api::ResultType::Value;
-        Result result = static_cast<Result>(m_applauncherTask.get());
+        const ResultType result = m_applauncherTask.get();
         bool shouldRestart = shouldRestartTo(m_updateVersion);
 
         switch (result)
         {
-            case Result::alreadyInstalled:
-            case Result::ok:
+            case ResultType::alreadyInstalled:
+            case ResultType::ok:
                 if (shouldRestart)
                     setState(readyRestart);
                 else
                     setState(complete);
                 break;
 
-            case Result::otherError:
-            case Result::versionNotInstalled:
-            case Result::invalidVersionFormat:
-            case Result::notEnoughSpace:
-            case Result::notFound:
-            case Result::ioError:
+            case ResultType::otherError:
+            case ResultType::versionNotInstalled:
+            case ResultType::invalidVersionFormat:
+            case ResultType::notEnoughSpace:
+            case ResultType::notFound:
+            case ResultType::ioError:
             {
                 QString error = applauncherErrorToString(result);
                 NX_ERROR(this) << "Failed to run installation:" << error;
@@ -471,42 +472,40 @@ bool ClientUpdateTool::installUpdateAsync()
     m_applauncherTask = std::async(std::launch::async,
         [tool = QPointer(this)](
             QString updateFile,
-            nx::utils::SoftwareVersion updateVersion) -> int
+            nx::utils::SoftwareVersion updateVersion) -> applauncher::api::ResultType
         {
-            using Result = applauncher::api::ResultType::Value;
-
             QString absolutePath = QFileInfo(updateFile).absoluteFilePath();
 
-            Result result = applauncher::api::installZipAsync(updateVersion, absolutePath);
-            if (result != Result::ok)
+            const ResultType result = installZipAsync(updateVersion, absolutePath);
+            if (result != ResultType::ok)
             {
-                QString message = applauncherErrorToString(result);
-                NX_VERBOSE(NX_SCOPE_TAG, "failed to run zip installation: %1", message);
+                const QString message = applauncherErrorToString(result);
+                NX_VERBOSE(NX_SCOPE_TAG, "Failed to run zip installation: %1", message);
                 // Other variants can be fixed by retrying installation, do they?
                 return result;
             }
 
             // Checking state if installation, until it goes to Result::ok
-            static const int kMaxTries = 10;
+            constexpr int kMaxTries = 10;
             for (int retries = 0; retries < kMaxTries; ++retries)
             {
-                Result result = applauncher::api::checkInstallationProgress();
+                const ResultType result = applauncher::api::checkInstallationProgress();
                 QString message = applauncherErrorToString(result);
 
                 switch (result)
                 {
-                    case Result::alreadyInstalled:
-                    case Result::otherError:
-                    case Result::versionNotInstalled:
-                    case Result::invalidVersionFormat:
-                    case Result::notEnoughSpace:
-                    case Result::notFound:
-                    case Result::ok:
+                    case ResultType::alreadyInstalled:
+                    case ResultType::otherError:
+                    case ResultType::versionNotInstalled:
+                    case ResultType::invalidVersionFormat:
+                    case ResultType::notEnoughSpace:
+                    case ResultType::notFound:
+                    case ResultType::ok:
                         return result;
-                    case Result::unpackingZip:
+                    case ResultType::unpackingZip:
                         break;
-                    case Result::connectError:
-                    case Result::ioError:
+                    case ResultType::connectError:
+                    case ResultType::ioError:
                     default:
                         NX_VERBOSE(NX_SCOPE_TAG, "failed to check zip installation status: %1", message);
                         break;
@@ -514,7 +513,7 @@ bool ClientUpdateTool::installUpdateAsync()
                 std::this_thread::sleep_for(std::chrono::seconds(2));
             }
 
-            return Result::otherError;
+            return ResultType::otherError;
         }, m_updateFile, m_updateVersion);
     return false;
 }
@@ -541,21 +540,20 @@ bool ClientUpdateTool::isInstallComplete() const
     }
 
     bool installed = false;
-    using Result = applauncher::api::ResultType::Value;
-    Result result = applauncher::api::isVersionInstalled(
+    const ResultType result = applauncher::api::isVersionInstalled(
         m_updateVersion,
         &installed);
 
     switch (result)
     {
-        case Result::alreadyInstalled:
+        case ResultType::alreadyInstalled:
             break;
-        case Result::ok:
+        case ResultType::ok:
             return true;
 
-        case Result::otherError:
-        case Result::versionNotInstalled:
-        case Result::invalidVersionFormat:
+        case ResultType::otherError:
+        case ResultType::versionNotInstalled:
+        case ResultType::invalidVersionFormat:
         {
             QString error = applauncherErrorToString(result);
             NX_ERROR(this) << "Failed to check installation:" << error;
@@ -582,17 +580,16 @@ bool ClientUpdateTool::restartClient(QString authString)
     if (!applauncher::api::checkOnline())
         return false;
 
-    using Result = applauncher::api::ResultType::Value;
-    Result result = applauncher::api::restartClient(m_updateVersion, authString);
-    if (result == Result::ok)
+    const ResultType result = applauncher::api::restartClient(m_updateVersion, authString);
+    if (result == ResultType::ok)
         return true;
 
-    static const int kMaxTries = 5;
+    constexpr int kMaxTries = 5;
     for (int i = 0; i < kMaxTries; ++i)
     {
         QThread::msleep(200);
         qApp->processEvents();
-        if (applauncher::api::restartClient(m_updateVersion, authString) == Result::ok)
+        if (applauncher::api::restartClient(m_updateVersion, authString) == ResultType::ok)
             return true;
     }
     return false;
@@ -672,29 +669,28 @@ QString ClientUpdateTool::toString(State state)
     return QString();
 }
 
-QString ClientUpdateTool::applauncherErrorToString(int value)
+QString ClientUpdateTool::applauncherErrorToString(ResultType value)
 {
-    using Result = applauncher::api::ResultType::Value;
-    switch ((Result) value)
+    switch (value)
     {
-        case Result::alreadyInstalled:
+        case ResultType::alreadyInstalled:
             return tr("This update is already installed.");
-        case Result::otherError:
+        case ResultType::otherError:
             return tr("Internal error.");
-        case Result::versionNotInstalled:
+        case ResultType::versionNotInstalled:
             return tr("This version is not installed.");
-        case Result::invalidVersionFormat:
+        case ResultType::invalidVersionFormat:
             return tr("Invalid version format.");
-        case Result::brokenPackage:
+        case ResultType::brokenPackage:
             return tr("Broken update package.");
-        case Result::notEnoughSpace:
+        case ResultType::notEnoughSpace:
             return tr("Not enough space on disk to install the client update.");
-        case Result::notFound:
+        case ResultType::notFound:
             // Installed package does not exists. Either we have broken the code and asking
             // for a wrong file, or this file had been removed somehow.
             return tr("Installation package has been lost.");
         default:
-            return applauncher::api::ResultType::toString((Result) value);
+            return nx::applauncher::api::toString(value);
     }
 }
 

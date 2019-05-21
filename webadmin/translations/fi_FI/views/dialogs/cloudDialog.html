@@ -1,6 +1,6 @@
 
 <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+    <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"> <span aria-hidden="true">&times;</span> <span class="sr-only"> Sulje</span></button>
     <h3 class="modal-title" ng-bind-html="title"></h3>
 </div>
 
@@ -9,8 +9,8 @@
 
     <uib-alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></uib-alert>
 
-    <uib-alert type="info" ng-if="connecting">Connecting System to... <span class="product-name">{{Config.cloud.productName}}</span> ... <br>
-        This may last about a minute.</uib-alert>
+    <uib-alert type="info" ng-if="connecting">Yhdistä järjestelmään... <span class="product-name">{{Config.cloud.productName}}</span> ... <br>
+        Tämä voi kestää muutamia minuutteja.</uib-alert>
 
     <form name="cloudForm" disable-autocomplete>
         <div class="form-group" validate-field>
@@ -19,14 +19,14 @@
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" required placeholder="Cloud Password" autocomplete="new-password">
+                   type="password" required placeholder="Cloud-salasana" autocomplete="new-password">
         </div>
     </form>
 
 </div>
 
 <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-default" ng-click="cancel()"> Peruuta </button>
 
     <button class="btn btn-primary" ng-click="action()" ng-disabled="cloudForm.$invalid || succeed">{{actionLabel}}</button>
 </div>

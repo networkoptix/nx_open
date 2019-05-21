@@ -1,13 +1,17 @@
 #include "commands.h"
 
-#include "nx/utils/ipc/named_pipe_socket.h"
-
+#include <nx/utils/ipc/named_pipe_socket.h>
 #include <nx/utils/log/log.h>
 
-namespace applauncher {
-namespace api {
+namespace nx::applauncher::api {
 
-ResultType::Value sendCommandToApplauncher(
+namespace {
+
+constexpr int kMaxMessageLengthBytes = 1024 * 64;
+
+} // namespace
+
+ResultType sendCommandToApplauncher(
     const BaseTask& commandToSend,
     Response* const response,
     int timeoutMs)
@@ -54,5 +58,4 @@ ResultType::Value sendCommandToApplauncher(
     return ResultType::ok;
 }
 
-} // namespace api
-} // namespace applauncher
+} // namespace nx::applauncher::api

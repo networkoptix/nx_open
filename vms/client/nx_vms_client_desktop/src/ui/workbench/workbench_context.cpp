@@ -376,7 +376,7 @@ QnWorkbenchContext::StartupParametersCode
     const bool showBetaWarning = QnAppInfo::beta()
         && !startupParams.allowMultipleClientInstances
         && qnRuntime->isDesktopMode()
-        && !qnRuntime->isDevMode()
+        && !ini().developerMode
         && startupParams.customUri.isNull();
 
     if (showBetaWarning)

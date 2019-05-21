@@ -43,6 +43,7 @@
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
 #include <nx/network/app_info.h>
+#include <nx/utils/app_info.h>
 
 #include <nx/vms/client/desktop/ini.h>
 #include <utils/common/html.h>

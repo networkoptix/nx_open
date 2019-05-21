@@ -38,6 +38,7 @@
 #include <nx_ec/dummy_handler.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/resources/search_helper.h>
+#include <nx/vms/client/desktop/ini.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -202,7 +203,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
-    ui->testRuleButton->setVisible(qnRuntime->isDevMode());
+    ui->testRuleButton->setVisible(ini().developerMode);
 
     retranslateUi();
 

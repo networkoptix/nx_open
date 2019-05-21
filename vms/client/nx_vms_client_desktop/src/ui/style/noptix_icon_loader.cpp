@@ -1,6 +1,8 @@
 #include "noptix_icon_loader.h"
 
 #include <QtCore/QFileInfo>
+#include <QtCore/QDir>
+#include <QtCore/QString>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 #include <QtSvg/QSvgRenderer>
@@ -8,9 +10,12 @@
 #include "skin.h"
 #include "icon_pixmap_accessor.h"
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/ini.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/string.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -21,6 +26,8 @@ static const QnIcon::SuffixesList kDefaultSuffixes({
     {QnIcon::Pressed,  "pressed"},
     {QnIcon::Error,    "error"}
 });
+
+static const QString kSvgExtension(".svg");
 
 static constexpr QSize kBaseIconSize(20, 20);
 
@@ -119,7 +126,7 @@ void loadCustomIcons(
         }
         else
         {
-            path = prefix + lit("_") + suffix.second + extension;
+            path = prefix + "_" + suffix.second + extension;
             auto image = getImageFromSkin(skin, path);
             if (!image.isNull())
                 builder->add(image, suffix.first, QnIcon::Off);
@@ -127,7 +134,7 @@ void loadCustomIcons(
     }
 
     decompose(checkedName.isEmpty()
-        ? prefix + lit("_checked") + extension
+        ? prefix + "_checked" + extension
         : checkedName,
         &prefix, &extension);
 
@@ -152,6 +159,83 @@ void loadCustomIcons(
         }
     }
 }
+
+class SvgIconColorer
+{
+public:
+    SvgIconColorer(const QByteArray& sourceIconData, const QString& iconName):
+        m_sourceIconData(sourceIconData),
+        m_iconName(iconName)
+    {
+        initializeDump();
+        dumpIconIfNeeded(sourceIconData);
+    }
+
+    QByteArray makeDisabledIcon() const { return makeIcon("dark14", "dark17", "_disabled"); }
+    QByteArray makeSelectedIcon() const { return makeIcon("light4", "light1", "_selected"); }
+    QByteArray makeActiveIcon() const { return makeIcon("brand_core", "brand_l2", "_active"); }
+    QByteArray makeErrorIcon() const { return makeIcon("red_l2", "red_l3", "_error"); }
+
+private:
+    void initializeDump()
+    {
+        const QString directoryPath(ini().dumpGeneratedIconsTo);
+        if (directoryPath.isEmpty())
+            return;
+
+        const QFileInfo basePath = QDir(directoryPath).absoluteFilePath(m_iconName);
+
+        m_dumpDirectory = basePath.absoluteDir();
+        m_iconName = basePath.baseName();
+        m_dump = m_dumpDirectory.mkpath(m_dumpDirectory.path());
+    }
+
+    void dumpIconIfNeeded(const QByteArray& data, const QString& suffix = QString()) const
+    {
+        if (!m_dump)
+            return;
+
+        QString filename = m_dumpDirectory.absoluteFilePath(m_iconName + suffix + kSvgExtension);
+        QFile f(filename);
+		if (!f.open(QIODevice::WriteOnly))
+            return;
+
+        f.write(data);
+		f.close();
+    }
+
+    QString colorName(const QString& name) const
+    {
+        return colorTheme()->color(name).name();
+    };
+
+    QByteArray colorized(const QString& primary, const QString& secondary) const
+    {
+        static const QString primaryColor = "#A5B7C0"; //< Value of light10 in default customization.
+        static const QString secondaryColor = "#E1E7EA"; //< Value of light4 in default customization.
+
+        return nx::utils::replaceStrings(m_sourceIconData,
+            {
+                {primaryColor, colorName(primary)},
+                {secondaryColor, colorName(secondary)},
+            }).toLatin1();
+    };
+
+    QByteArray makeIcon(const QString& primary, const QString& secondary, const QString& suffix) const
+    {
+        auto result = colorized(primary, secondary);
+        dumpIconIfNeeded(result, suffix);
+        return result;
+    }
+
+private:
+    bool m_dump = false;
+    QDir m_dumpDirectory;
+    QByteArray m_sourceIconData;
+    QString m_iconName;
+};
+
+
 
 } //namespace
 
@@ -266,27 +350,12 @@ QIcon QnNoptixIconLoader::loadSvgIconInternal(
     IconBuilder builder(QnSkin::isHiDpi());
     builder.addSvg(baseData, QnIcon::Normal, QnIcon::Off);
 
-    auto color =
-        [theme = nx::vms::client::desktop::colorTheme()](const QString& name)
-        {
-            return theme->color(name).name();
-        };
-    const QString primaryColor = "#A5B7C0"; //< Value of light10 in default customization.
-    const QString secondaryColor = "#E1E7EA"; //< Value of light4 in default customization.
+    SvgIconColorer colorer(baseData, name);
 
-    const auto colorized =
-        [&](const QString& primary, const QString& secondary)
-        {
-            return nx::utils::replaceStrings(baseData, {
-                {primaryColor, color(primary)},
-                {secondaryColor, color(secondary)},
-                }).toLatin1();
-        };
-
-    builder.addSvg(colorized("dark14", "dark17"), QnIcon::Disabled, QnIcon::Off);
-    builder.addSvg(colorized("light4", "light1"), QnIcon::Selected, QnIcon::Off);
-    builder.addSvg(colorized("brand_core", "brand_l2"), QnIcon::Active, QnIcon::Off);
-    builder.addSvg(colorized("red_l2", "red_l3"), QnIcon::Error, QnIcon::Off);
+    builder.addSvg(colorer.makeDisabledIcon(), QnIcon::Disabled, QnIcon::Off);
+    builder.addSvg(colorer.makeSelectedIcon(), QnIcon::Selected, QnIcon::Off);
+    builder.addSvg(colorer.makeActiveIcon(), QnIcon::Active, QnIcon::Off);
+    builder.addSvg(colorer.makeErrorIcon(), QnIcon::Error, QnIcon::Off);
 
     // This can be enabled if we will need to override some icons
     //loadCustomIcons(skin, &builder, basePath, name, checkedName, suffixes);
