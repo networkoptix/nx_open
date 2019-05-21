@@ -1228,14 +1228,7 @@ void EventRibbon::Private::doUpdateView()
     updateHighlightedTiles();
 
     if (!m_animations.empty())
-    {
-        // Sometimes in Mac OS animation has running state but never starts actually.
-        // Looks like processEvents() calls gives a chance to start animations actually.
-        if (nx::utils::AppInfo::isMacOsX())
-            qApp->processEvents();
-
         qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest));
-    }
 }
 
 void EventRibbon::Private::fadeIn(EventTile* widget)
