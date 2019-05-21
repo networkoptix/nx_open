@@ -88,17 +88,8 @@ namespace ec2
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        auto commonModule = m_ec2Connection->commonModule();
-        auto resourcePool = commonModule->resourcePool();
-        nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(commonModule);
         for (auto& camInfo: cameras)
-        {
-            auto cameraResource =
-                resourcePool->getResourceById<QnVirtualCameraResource>(camInfo.id);
-
-            if (cameraResource)
-                outData->cameras.emplace_back(fullDeviceStatistics(std::move(camInfo)));
-        }
+            outData->cameras.emplace_back(fullDeviceStatistics(std::move(camInfo)));
 
         QnLicenseList licenses;
         errCode = m_ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);
@@ -352,9 +343,13 @@ namespace {
     template<typename Descriptor>
     std::vector<ApiDeviceAnalyticsTypeInfo> deviceAnalyticsTypeInfo(
         QnCommonModule* commonModule,
+        const QnVirtualCameraResourcePtr device,
         const std::map<QnUuid, std::set<QString>>& supportedItemsByEngineId,
         std::function<std::optional<Descriptor>(const QString& itemId)> descriptorRetriever)
     {
+        if (!NX_ASSERT(device, "device is null"))
+            return {};
+
         nx::analytics::EngineDescriptorManager engineDescriptorManager(commonModule);
         nx::analytics::PluginDescriptorManager pluginDescriptorManager(commonModule);
 
@@ -378,14 +373,17 @@ namespace {
             if (!engineDescriptor)
             {
                 NX_WARNING(typeid(Ec2StaticticsReporter),
-                    "Unable to find an Engine descriptor for the Engine %1", engineId);
+                    "Unable to find an Engine descriptor for the Engine %1; Device %2",
+                    engineId, device);
                 continue;
             }
 
             if (!engineDescriptor->capabilities.testFlag(
                 nx::vms::api::analytics::EngineManifest::Capability::deviceDependent))
             {
-                NX_DEBUG(typeid(Ec2StaticticsReporter), "Ignoring device independent engine");
+                NX_DEBUG(typeid(Ec2StaticticsReporter),
+                    "Ignoring device independent Engine %1 (%2); Device: %3",
+                    engineDescriptor->name, engineDescriptor->id, device);
                 continue;
             }
 
@@ -433,11 +431,11 @@ namespace {
         using namespace nx::vms::api::analytics;
         const auto commonModule = m_ec2Connection->commonModule();
         if (!NX_ASSERT(commonModule, "Unable to access common module"))
-            return {};
+            return ApiCameraDataStatistics(std::move(deviceInfo));
 
         const auto resourcePool = commonModule->resourcePool();
         if (!NX_ASSERT(resourcePool, "Unable to access resource pool"))
-            return {};
+            return ApiCameraDataStatistics(std::move(deviceInfo));
 
         const auto device = resourcePool->getResourceById<QnVirtualCameraResource>(deviceInfo.id);
         ApiCameraDataStatistics result{ std::move(deviceInfo) };
@@ -446,6 +444,7 @@ namespace {
 
         result.analyticsInfo.supportedEventTypes = deviceAnalyticsTypeInfo<EventTypeDescriptor>(
             commonModule,
+            device,
             device->supportedEventTypes(),
             [commonModule](const QString& eventTypeId)
             {
@@ -456,6 +455,7 @@ namespace {
 
         result.analyticsInfo.supportedObjectTypes = deviceAnalyticsTypeInfo<ObjectTypeDescriptor>(
             commonModule,
+            device,
             device->supportedObjectTypes(),
             [commonModule](const QString& objectTypeId)
             {

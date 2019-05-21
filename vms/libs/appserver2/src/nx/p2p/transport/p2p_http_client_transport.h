@@ -70,6 +70,7 @@ private:
     nx::Buffer m_connectionGuid;
 
     void startReading();
+	void stopOrResumeReaderWhileInAioThread();
     virtual void stopWhileInAioThread() override;
 };
 

@@ -325,7 +325,7 @@ nx::utils::Url QnMediaServerResource::getApiUrl() const
 QString QnMediaServerResource::getUrl() const
 {
     return nx::network::url::Builder()
-        .setScheme(isSslAllowed() ? "https" : "http")
+        .setScheme(nx::network::http::urlSheme(isSslAllowed()))
         .setEndpoint(getPrimaryAddress()).toUrl().toString();
 }
 
@@ -359,17 +359,20 @@ void QnMediaServerResource::setPrimaryAddress(const nx::network::SocketAddress& 
 bool QnMediaServerResource::isSslAllowed() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_sslAllowed || commonModule()->globalSettings()->isTrafficEncriptionForced();
+    return nx::utils::Url(m_url).scheme() != nx::network::http::urlSheme(false)
+        || commonModule()->globalSettings()->isTrafficEncriptionForced();
 }
 
 void QnMediaServerResource::setSslAllowed(bool sslAllowed)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        if (sslAllowed == m_sslAllowed)
+        if (sslAllowed == isSslAllowed())
             return;
 
-        m_sslAllowed = sslAllowed;
+        nx::utils::Url url(m_url);
+        url.setScheme(nx::network::http::urlSheme(sslAllowed));
+        m_url = url.toString();
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
@@ -573,7 +576,7 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     nx::vms::api::ModuleInformation moduleInformation;
     moduleInformation.type = nx::vms::api::ModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
-    moduleInformation.sslAllowed = m_sslAllowed;
+    moduleInformation.sslAllowed = isSslAllowed();
     moduleInformation.realm = nx::network::AppInfo::realm();
     moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     moduleInformation.name = getName();

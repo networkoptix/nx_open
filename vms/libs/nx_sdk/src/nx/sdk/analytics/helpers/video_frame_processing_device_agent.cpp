@@ -160,49 +160,8 @@ void VideoFrameProcessingDeviceAgent::processMetadataPacket(
         return;
     }
 
-    if (NX_DEBUG_ENABLE_OUTPUT)
-    {
-        std::string packetName;
-        if (queryInterfacePtr<IObjectMetadataPacket>(metadataPacket))
-        {
-            packetName = "Object";
-        }
-        else if (queryInterfacePtr<IEventMetadataPacket>(metadataPacket))
-        {
-            packetName = "Event";
-        }
-        else
-        {
-            NX_OUTPUT << __func__ << "(): WARNING: Metadata packet" << packetIndexName
-                << " has unknown type.";
-            packetName = "Unknown";
-        }
-        packetName += " metadata packet" + packetIndexName;
-
-        auto compoundMetadataPacket = queryInterfacePtr<ICompoundMetadataPacket>(metadataPacket);
-        if (compoundMetadataPacket)
-        {
-
-            if (compoundMetadataPacket->count() == 0)
-            {
-                NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " is empty.";
-                return;
-            }
-
-            const std::string itemsName = (compoundMetadataPacket->count() == 1)
-                ? (std::string("item of type ") + compoundMetadataPacket->at(0)->typeId())
-                : "item(s)";
-
-            NX_OUTPUT << __func__ << "(): " << packetName << " contains "
-                << compoundMetadataPacket->count() << " " << itemsName << ".";
-
-            if (metadataPacket->timestampUs() == 0)
-                NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " has timestamp 0.";
-        }
-    }
-
+    logMetadataPacketIfNeeded(metadataPacket, packetIndexName);
     NX_KIT_ASSERT(metadataPacket->timestampUs() >= 0);
-
     m_handler->handleMetadata(metadataPacket);
 }
 
@@ -266,6 +225,51 @@ void VideoFrameProcessingDeviceAgent::assertEngineCasted(void* engine) const
         "nx::sdk::analytics::VideoFrameProcessingDeviceAgent "
         + nx::kit::utils::toString(this)
         + " has m_engine of incorrect runtime type " + typeid(*m_engine).name());
+}
+
+void VideoFrameProcessingDeviceAgent::logMetadataPacketIfNeeded(
+    const IMetadataPacket* metadataPacket,
+    const std::string& packetIndexName) const
+{
+    if (!NX_DEBUG_ENABLE_OUTPUT)
+        return;
+
+    std::string packetName;
+    if (queryInterfacePtr<const IObjectMetadataPacket>(metadataPacket))
+    {
+        packetName = "Object";
+    }
+    else if (queryInterfacePtr<const IEventMetadataPacket>(metadataPacket))
+    {
+        packetName = "Event";
+    }
+    else
+    {
+        NX_OUTPUT << __func__ << "(): WARNING: Metadata packet" << packetIndexName
+            << " has unknown type.";
+        packetName = "Unknown";
+    }
+    packetName += " metadata packet" + packetIndexName;
+
+    auto compoundMetadataPacket = queryInterfacePtr<const ICompoundMetadataPacket>(metadataPacket);
+    if (compoundMetadataPacket)
+    {
+        if (compoundMetadataPacket->count() == 0)
+        {
+            NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " is empty.";
+            return;
+        }
+
+        const std::string itemsName = (compoundMetadataPacket->count() == 1)
+            ? (std::string("item of type ") + compoundMetadataPacket->at(0)->typeId())
+            : "item(s)";
+
+        NX_OUTPUT << __func__ << "(): " << packetName << " contains "
+            << compoundMetadataPacket->count() << " " << itemsName << ".";
+
+        if (metadataPacket->timestampUs() == 0)
+            NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " has timestamp 0.";
+    }
 }
 
 } // namespace analytics

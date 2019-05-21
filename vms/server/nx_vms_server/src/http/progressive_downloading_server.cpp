@@ -452,7 +452,7 @@ QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& strea
 {
     if (streamingFormat == "webm")
         return "video/webm";
-    else if (streamingFormat == "mpegts" || streamingFormat == "ts")
+    else if (streamingFormat == "mpegts")
         return "video/mp2t";
     else if (streamingFormat == "mp4")
         return "video/mp4";
@@ -495,16 +495,6 @@ void QnProgressiveDownloadingConsumer::sendJsonResponse(const QString& errorStri
     sendResponse(
         nx::network::http::StatusCode::ok,
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat));
-}
-
-QByteArray QnProgressiveDownloadingConsumer::buildSignature()
-{
-    Q_D(QnProgressiveDownloadingConsumer);
-    QByteArray signature = QnSignHelper::getSignPattern(licensePool());
-    d->transcoder->updateSignatureHash((uint8_t*)signature.data(), signature.size());
-    signature.replace(QnSignHelper::getSignMagic(),
-        QnSignHelper::getSignFromDigest(d->transcoder->getSignatureHash()));
-    return QnSignHelper::buildSignatureFileEnd(signature);
 }
 
 void QnProgressiveDownloadingConsumer::run()
@@ -618,8 +608,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         QnFfmpegTranscoder::Config config;
-        config.computeSignatureHash = true;
-        config.decoderConfig = DecoderConfig::fromResource(resource);
+        config.computeSignature = true;
         d->transcoder = std::make_unique<QnFfmpegTranscoder>(config, commonModule()->metrics());
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
@@ -887,7 +876,8 @@ void QnProgressiveDownloadingConsumer::run()
 
         dataConsumer.pleaseStop();
 
-        sendChunk(buildSignature());
+        auto signature = d->transcoder->getSignature(licensePool());
+        sendChunk(QnSignHelper::buildSignatureFileEnd(signature));
 
         QnByteArray emptyChunk((unsigned)0,0);
         sendChunk(emptyChunk);

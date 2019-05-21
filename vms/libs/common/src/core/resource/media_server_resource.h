@@ -162,7 +162,6 @@ private:
     QList<nx::network::SocketAddress> m_netAddrList;
     QList<nx::utils::Url> m_additionalUrls;
     QList<nx::utils::Url> m_ignoredUrls;
-    bool m_sslAllowed = false;
     nx::vms::api::ServerFlags m_serverFlags;
     nx::utils::SoftwareVersion m_version;
     nx::vms::api::SystemInformation m_systemInfo;

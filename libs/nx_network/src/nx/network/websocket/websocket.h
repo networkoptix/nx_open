@@ -69,6 +69,13 @@ public:
     AbstractStreamSocket* socket() { return m_socket.get(); }
     const AbstractStreamSocket* socket() const { return m_socket.get(); }
 
+    /**
+     * Disable PONG responses.
+     * NOTE: Don't call it unless you are completely sure what you are doing.
+     * NOTE: Should be called before start().
+     */
+    void disablePingPong();
+
 private:
     struct UserReadContext
     {
@@ -95,11 +102,13 @@ private:
     nx::Buffer m_controlBuffer;
     nx::Buffer m_readBuffer;
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
+    std::unique_ptr<nx::network::aio::Timer> m_pongTimer;
     std::chrono::milliseconds m_aliveTimeout;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     bool m_failed = false;
     FrameType m_frameType;
     bool m_readingCeased = false;
+    bool m_pingPongDisabled = false;
 
     virtual void stopWhileInAioThread() override;
 
@@ -111,18 +120,13 @@ private:
     virtual void handleError(Error err) override;
 
     /** Own helper functions*/
-    void processReadData();
     bool isDataFrame() const;
     void sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler);
     void sendControlResponse(FrameType type);
     void sendControlRequest(FrameType type);
-    void readWithoutAddingToQueueSync();
-    void readWithoutAddingToQueue();
     void onPingTimer();
     void onRead(SystemError::ErrorCode ecode, size_t transferred);
     void onWrite(SystemError::ErrorCode ecode, size_t transferred);
-    void handleSocketWrite(SystemError::ErrorCode ecode, size_t bytesSent);
-    std::chrono::milliseconds pingTimeout() const;
     void callOnReadhandler(SystemError::ErrorCode error, size_t transferred);
     void callOnWriteHandler(SystemError::ErrorCode error, size_t transferred);
 };

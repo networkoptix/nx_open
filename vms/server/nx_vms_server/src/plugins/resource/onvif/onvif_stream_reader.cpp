@@ -365,8 +365,30 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
     return true;
 }
 
+void QnOnvifStreamReader::fixStreamUrl(QString* mediaUrl, const std::string& profileToken) const
+{
+    // Try to detect the Profile index. Common profile name is something like "MediaProfile002".
+    const QString token = QString::fromStdString(profileToken);
+    bool isNumber = false;
+    int profileIndex = token.right(3).toInt(&isNumber);
+    if (!isNumber)
+        return; //< Failed to detect index => can not fix Uri.
+
+    if (profileIndex == 0)
+        return; //< Uri is always correct for zero profile.
+
+    const QString kBrokenSubstring("subtype=0");
+    int position = mediaUrl->indexOf(kBrokenSubstring);
+    if (position == -1)
+        return; //< No substring to fix found in Uri.
+
+    position += (kBrokenSubstring.length() - 1); // Position of the symbol to fix.
+
+    mediaUrl->replace(position, 1, QString::number(profileIndex));
+}
+
 CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper,
-    const std::string& profileToken, bool isPrimary, QString* const mediaUrl) const
+    const std::string& profileToken, bool isPrimary, QString* mediaUrl) const
 {
     Q_UNUSED(isPrimary);
 
@@ -410,7 +432,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
         qDebug() << "URL of ONVIF device stream (UniqueId: " << m_onvifRes->getUniqueId()
             << ") successfully fetched: " << response.MediaUri->Uri.c_str();
     #endif
-
     QUrl relutUrl(m_onvifRes->fromOnvifDiscoveredUrl(response.MediaUri->Uri, false));
 
     if (relutUrl.host().size()==0)
@@ -423,6 +444,11 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
     }
 
     *mediaUrl = relutUrl.toString();
+
+    const bool fixWrongUri = m_onvifRes->resourceData().value<bool>(QString("fixWrongUri"));
+    if (fixWrongUri)
+        fixStreamUrl(mediaUrl, request.ProfileToken);
+
     return CameraDiagnostics::NoErrorResult();
 }
 

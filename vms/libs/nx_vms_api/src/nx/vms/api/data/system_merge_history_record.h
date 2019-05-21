@@ -7,6 +7,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 
+#include <nx/utils/latin1_array.h>
+
 namespace nx {
 namespace vms {
 namespace api {
