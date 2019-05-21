@@ -2,7 +2,8 @@
 
 #include <limits>
 
-#include <QtOpenGL/QGLContext>
+#include <QtGui/QPainter>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
@@ -29,10 +30,12 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     QRectF viewportRect = painter->transform().inverted().mapRect(QRectF(widget->rect()));
     painter->fillRect(viewportRect, m_color);
 #else
-    QnGlNativePainting::begin(QGLContext::currentContext(), painter);
+    const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
+    QnGlNativePainting::begin(glWidget, painter);
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->pushModelViewMatrix();
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setModelViewMatrix(QMatrix4x4());
+    const auto renderer = QnOpenGLRendererManager::instance(glWidget);
+    renderer->pushModelViewMatrix();
+    renderer->setModelViewMatrix(QMatrix4x4());
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -40,12 +43,12 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     const auto widgetRect = widget->geometry();
     const qreal ratio = painter->device()->devicePixelRatio();
     const auto rect = QRectF(widgetRect.topLeft() * ratio, widgetRect.size() * ratio);
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(m_color);
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawColoredQuad(rect);
+    renderer->setColor(m_color);
+    renderer->drawColoredQuad(rect);
 
     glDisable(GL_BLEND);
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->popModelViewMatrix();
+    renderer->popModelViewMatrix();
 
     QnGlNativePainting::end(painter);
 #endif //  Q_OS_WIN

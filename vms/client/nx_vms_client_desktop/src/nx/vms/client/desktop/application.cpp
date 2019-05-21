@@ -34,11 +34,10 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 
-#include <QtOpenGL/QGLWidget>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <QtSingleApplication>
 
@@ -270,7 +269,7 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
             &MainWindow::handleOpenFile);
     }
 
-    client.initDesktopCamera(dynamic_cast<QGLWidget*>(mainWindow->viewport()));
+    client.initDesktopCamera(qobject_cast<QOpenGLWidget*>(mainWindow->viewport()));
     client.startLocalSearchers();
 
     const auto code = context->handleStartupParameters(startupParams);

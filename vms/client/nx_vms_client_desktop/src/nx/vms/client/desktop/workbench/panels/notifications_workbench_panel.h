@@ -5,7 +5,6 @@
 
 #include "abstract_workbench_panel.h"
 
-class QGraphicsProxyWidget;
 class QnControlBackgroundWidget;
 class QnNotificationToolTipWidget;
 class QnImageButtonWidget;

@@ -20,6 +20,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/delayed.h>
 #include <utils/math/color_transformations.h>
 
 #include <nx/api/mediaserver/image_request.h>
