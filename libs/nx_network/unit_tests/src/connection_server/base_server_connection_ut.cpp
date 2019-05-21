@@ -66,19 +66,33 @@ class TestConnection:
 
 public:
     TestConnection(
-        std::unique_ptr<AbstractStreamSocket> streamSocket)
+        std::unique_ptr<AbstractStreamSocket> streamSocket,
+        nx::utils::SyncQueue<std::string>* receivedDataQueue)
         :
-        base_type(std::move(streamSocket))
+        base_type(std::move(streamSocket)),
+        m_receivedDataQueue(receivedDataQueue)
     {
     }
 
-    void bytesReceived(nx::Buffer& /*buffer*/)
+    void bytesReceived(nx::Buffer& buffer)
     {
+        m_receivedDataQueue->push(buffer.toStdString());
+        if (m_handler)
+            m_handler();
     }
 
     void readyToSendData()
     {
     }
+
+    void setAuxiliaryMessageHandler(std::function<void()> handler)
+    {
+        m_handler = std::move(handler);
+    }
+
+private:
+    nx::utils::SyncQueue<std::string>* m_receivedDataQueue = nullptr;
+    std::function<void()> m_handler;
 };
 
 } // namespace
@@ -155,6 +169,19 @@ protected:
         m_connection->closeConnection(SystemError::connectionReset);
     }
 
+    void whenSendRandomData()
+    {
+        m_expectedData = std::string(129, 'x');
+        ASSERT_EQ(
+            m_expectedData.size(),
+            m_clientConnections.front()->send(m_expectedData.data(), m_expectedData.size()));
+    }
+
+    void thenConnectionReportedExpectedData()
+    {
+        ASSERT_EQ(m_expectedData, m_receivedDataQueue.pop());
+    }
+
     void thenFailureIsReportedDelayed()
     {
         m_connectionCloseEvents.pop();
@@ -179,6 +206,11 @@ protected:
         ASSERT_NE(SystemError::noError, m_connectionCloseEvents.pop());
     }
 
+    void setAuxiliaryMessageHandler(std::function<void()> handler)
+    {
+        m_connection->setAuxiliaryMessageHandler(std::move(handler));
+    }
+
 private:
     std::unique_ptr<TestConnection> m_connection;
     bool m_invokingConnectionMethod = false;
@@ -188,6 +220,9 @@ private:
     TCPServerSocket m_serverSocket;
     std::vector<std::unique_ptr<TCPSocket>> m_clientConnections;
     std::atomic<int> m_socketCounter{0};
+    std::string m_expectedData;
+    nx::utils::SyncQueue<std::string> m_receivedDataQueue;
+    std::function<void()> m_auxiliaryMessageHandler;
 
     virtual void SetUp() override
     {
@@ -197,7 +232,9 @@ private:
 
     void initializeConnection(std::unique_ptr<AbstractStreamSocket> socket)
     {
-        m_connection = std::make_unique<TestConnection>(std::move(socket));
+        m_connection = std::make_unique<TestConnection>(
+            std::move(socket),
+            &m_receivedDataQueue);
         m_connection->registerCloseHandler(
             [this](auto... args) { saveConnectionClosedEvent(args...); });
     }
@@ -242,6 +279,19 @@ TEST_F(ConnectionServerBaseServerConnection, connection_close_works_properly)
 
     thenTcpConnectionIsClosed();
     andConnectionCloseEventIsReported();
+}
+
+TEST_F(ConnectionServerBaseServerConnection, connection_can_be_closed_in_message_handler)
+{
+    givenStartedConnection();
+    setAuxiliaryMessageHandler([this]()
+    {
+        whenCloseConnection();
+    });
+
+    whenSendRandomData();
+
+    thenConnectionReportedExpectedData();
 }
 
 } // namespace test
