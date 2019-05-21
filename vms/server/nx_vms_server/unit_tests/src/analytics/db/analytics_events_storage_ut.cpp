@@ -1276,6 +1276,10 @@ protected:
         // NOTE: Currently, the cursor is forward only.
         setSortOrder(Qt::AscendingOrder);
 
+        // NOTE: Limiting object's track when using cursor does not make any sense.
+        // It will just skip data.
+        filter().maxTrackSize = 0;
+
         whenCreateCursor();
         thenCursorIsCreated();
 
