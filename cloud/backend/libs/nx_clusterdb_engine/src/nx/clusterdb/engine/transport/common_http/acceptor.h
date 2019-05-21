@@ -46,7 +46,7 @@ public:
         nx::network::http::server::rest::MessageDispatcher* messageDispatcher) override;
 
 private:
-    const ProtocolVersionRange& m_protocolVersionRange;
+    const ProtocolVersionRange m_protocolVersionRange;
     CommandLog* m_commandLog = nullptr;
     ConnectionManager* m_connectionManager = nullptr;
     const OutgoingCommandFilter& m_outgoingCommandFilter;
