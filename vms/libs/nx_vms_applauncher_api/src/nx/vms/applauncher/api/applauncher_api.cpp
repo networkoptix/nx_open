@@ -7,7 +7,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 
-namespace nx::applauncher::api {
+namespace nx::vms::applauncher::api {
 
 namespace {
 
@@ -395,4 +395,4 @@ bool GetInstalledVersionsResponse::deserialize(const QByteArray& data)
     return false;
 }
 
-} // namespace nx::applauncher::api
+} // namespace nx::vms::applauncher::api

@@ -13,7 +13,7 @@
 
 #include <nx/utils/log/log.h>
 
-namespace nx::applauncher::api {
+namespace nx::vms::applauncher::api {
 
 namespace {
 
@@ -179,4 +179,4 @@ bool checkOnline(bool runWhenOffline)
         && nx::vms::client::SelfUpdater::runMinilaucher());
 }
 
-} // namespace nx::applauncher::api
+} // namespace nx::vms::applauncher::api

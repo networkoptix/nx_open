@@ -11,7 +11,7 @@ QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
 {
     ui->setupUi(this);
 
-    using namespace nx::applauncher::api;
+    using namespace nx::vms::applauncher::api;
 
     connect(ui->checkVersionButton, &QPushButton::clicked, this,
         [this]

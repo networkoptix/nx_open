@@ -21,7 +21,7 @@
 
 #include <nx/utils/software_version.h>
 
-namespace nx::applauncher {
+namespace nx::vms::applauncher {
 
 class ApplauncherProcess:
     public QObject,
@@ -137,4 +137,4 @@ private:
     InstallationProcess m_process;
 };
 
-} // namespace nx::applauncher
+} // namespace nx::vms::applauncher

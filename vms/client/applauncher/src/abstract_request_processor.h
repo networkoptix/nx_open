@@ -4,7 +4,7 @@
 
 #include <nx/vms/applauncher/api/applauncher_api.h>
 
-namespace nx::applauncher {
+namespace nx::vms::applauncher {
 
 class AbstractRequestProcessor
 {
@@ -17,4 +17,4 @@ public:
         api::Response** const response) = 0;
 };
 
-} // namespace nx::applauncher
+} // namespace nx::vms::applauncher

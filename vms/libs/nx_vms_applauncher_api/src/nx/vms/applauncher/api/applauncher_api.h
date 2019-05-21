@@ -4,7 +4,7 @@
 
 #include <nx/utils/software_version.h>
 
-namespace nx::applauncher::api {
+namespace nx::vms::applauncher::api {
 
 /**
  * Name of named pipe, used by applauncher to post tasks to the queue and by client to use the
@@ -223,4 +223,4 @@ class NX_VMS_APPLAUNCHER_API_API AddProcessKillTimerResponse: public Response
 {
 };
 
-} // namespace nx::applauncher::api
+} // namespace nx::vms::applauncher::api
