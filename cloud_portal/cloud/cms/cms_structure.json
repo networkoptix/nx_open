@@ -1020,7 +1020,7 @@
       {
         "name": "overview",
         "old_name": "Overview",
-        "label": "Overview",
+        "label": "How does it work?",
         "description": "Summary about the integration. Here you can include a video, images, and a text description.",
         "translatable": false,
         "values": [
@@ -1033,6 +1033,17 @@
             "optional": true,
             "meta": {
               "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
+            }
+          },
+          {
+            "name": "description",
+            "label": "Full functionality overview",
+            "value": "",
+            "description": "A description about what the integration does. The overview appears on the detailed view page for the integration in the leftmost column. Recommended length 1000 characters.",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 2000
             }
           },
           {
@@ -1051,6 +1062,17 @@
             }
           },
           {
+            "name": "overviewScreenshot1caption",
+            "label": "Screenshot 1 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
+            }
+          },
+          {
             "name": "overviewScreenshot2",
             "label": "Screenshot 2",
             "value": "",
@@ -1063,6 +1085,17 @@
               "height_le": 1080,
               "width_le": 1920,
               "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot2caption",
+            "label": "Screenshot 2 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
             }
           },
           {
@@ -1081,13 +1114,327 @@
             }
           },
           {
-            "name": "description",
-            "label": "Full functionality overview",
+            "name": "overviewScreenshot3caption",
+            "label": "Screenshot 3 caption",
             "value": "",
-            "description": "A description about what the integration does. The overview appears on the detailed view page for the integration in the leftmost column. Recommended length 1000 characters.",
+            "description": "Screenshot caption (max. 100 characters).",
             "type": "html",
+            "optional": true,
             "meta": {
-              "char_limit": 2000
+              "char_limit": 100
+            }
+          },
+          {
+            "name": "overviewScreenshot4",
+            "label": "Screenshot 4",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot4caption",
+            "label": "Screenshot 4 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
+            }
+          },
+          {
+            "name": "overviewScreenshot5",
+            "label": "Screenshot 5",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot5caption",
+            "label": "Screenshot 5 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
+            }
+          },
+          {
+            "name": "overviewScreenshot6",
+            "label": "Screenshot 6",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot6caption",
+            "label": "Screenshot 6 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
+            }
+          },
+          {
+            "name": "overviewScreenshot7",
+            "label": "Screenshot 7",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot7caption",
+            "label": "Screenshot 7 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
+            }
+          },
+          {
+            "name": "overviewScreenshot8",
+            "label": "Screenshot 8",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot8caption",
+            "label": "Screenshot 8 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
+            }
+          },
+          {
+            "name": "overviewScreenshot9",
+            "label": "Screenshot 9",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot9caption",
+            "label": "Screenshot 9 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
+            }
+          },
+          {
+            "name": "overviewScreenshot10",
+            "label": "Screenshot 10",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot10caption",
+            "label": "Screenshot 10 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
+            }
+          },
+          {
+            "name": "overviewScreenshot11",
+            "label": "Screenshot 11",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot11caption",
+            "label": "Screenshot 11 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
+            }
+          },
+          {
+            "name": "overviewScreenshot12",
+            "label": "Screenshot 12",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot12caption",
+            "label": "Screenshot 12 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
+            }
+          },
+          {
+            "name": "overviewScreenshot13",
+            "label": "Screenshot 13",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot13caption",
+            "label": "Screenshot 13 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
+            }
+            }
+          },
+          {
+            "name": "overviewScreenshot14",
+            "label": "Screenshot 14",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot14caption",
+            "label": "Screenshot 14 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
+            }
+          },
+          {
+            "name": "overviewScreenshot15",
+            "label": "Screenshot 15",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot15caption",
+            "label": "Screenshot 15 caption",
+            "value": "",
+            "description": "Screenshot caption (max. 100 characters).",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 100
             }
           }
         ]
