@@ -53,7 +53,9 @@ DWORD WINAPI SystemEventLogReader::SubscriptionCallback(
     }
 
     NX_ASSERT(sizeof(TCHAR) == 2);
-    const QString xmlMessage = QString::fromUtf16(reinterpret_cast<ushort*>(&buffer.front()));
+    QString xmlMessage = QString::fromUtf16(reinterpret_cast<ushort*>(&buffer.front()));
+    xmlMessage.replace(QRegExp("\\s+"), " "); //< removing space sequences
+
     NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
         "System event notification read: %1").arg(xmlMessage));
 
@@ -112,6 +114,7 @@ bool SystemEventLogReader::subscribe()
         nullptr /*session*/, nullptr /*signal*/, (const wchar_t*) m_logName.utf16(), kXpathQuery,
         nullptr /*bookmark*/, this /*context*/,
         (EVT_SUBSCRIBE_CALLBACK)SubscriptionCallback, EvtSubscribeToFutureEvents);
+
     if (m_hSubscription != nullptr)
     {
         NX_INFO(this, makeDebugMessage(
@@ -266,18 +269,20 @@ bool RaidEventLogReader::messageIsSignificant(
     // message level is ignored
 
     // These event identificators are selected by Daniel Gonzalez <d.gonzalez@hanwha.com>
-    const std::array<int, 11> significantIds = {
-        0x0044, //<  68
-        0x0070, //< 112
-        0x011a, //< 282
-        0x0191, //< 401
-        0x003d, //<  61
-        0x0065, //< 101
-        0x0066, //< 102
-        0x0096, //< 150
-        0x00fa, //< 250
-        0x00fb, //< 251
-        0x00f8 //< 248
+    const std::vector<int> significantIds = {
+        0x003d, //<  61: Consistency Check failed on %s
+        0x0044, //<  68: Initialization failed on %s
+        0x0051, //<  81: State change on %s from %s to %s
+        0x0065, //< 101: Rebuild failed on %s due to source drive error
+        0x0066, //< 102: Rebuild failed on %s due to target drive error
+        0x0070, //< 112: Drive removed: %s
+        0x0096, //< 150: Battery has failed and cannot support data retention.Please replace the battery.
+        0x00f8, //< 248: Removed PD: %s Info: %s
+        0x00fa, //< 250: VD %s is now PARTIALLY DEGRADED
+        0x00fb, //< 251: VD %s is now DEGRADED
+        0x010c, //< 268: PD %s reset (Type %02x)
+        0x011a, //< 282: Replace Drive failed on PD %s due to source %s error
+        0x0191, //< 401: Diagnostics failed for %s
     };
 
     bool ok = std::find(significantIds.cbegin(), significantIds.cend(), parsedMessage.eventId)
@@ -287,7 +292,7 @@ bool RaidEventLogReader::messageIsSignificant(
 
     // special case
     if (parsedMessage.eventId == 114 //< State change
-        && parsedMessage.data.contains("Current = Failed"))
+        && parsedMessage.data.contains("Current = Failed", Qt::CaseInsensitive))
     {
         return true;
     }
