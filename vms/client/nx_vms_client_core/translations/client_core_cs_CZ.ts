@@ -21,11 +21,11 @@
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kilobajtů</numerusform>
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
+        <numerusform>Kilobajtů</numerusform>
+        <numerusform>Kilobajtů</numerusform>
+        <numerusform>Kilobajtů</numerusform>
       </translation>
     </message>
     <message>
@@ -36,11 +36,11 @@
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Megabajtů</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
+        <numerusform>Megabajtů</numerusform>
+        <numerusform>Megabajtů</numerusform>
+        <numerusform>Megabajtů</numerusform>
       </translation>
     </message>
     <message>
@@ -51,11 +51,11 @@
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gigabajtů</numerusform>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
+        <numerusform>Gigabajtů</numerusform>
+        <numerusform>Gigabajtů</numerusform>
+        <numerusform>Gigabajtů</numerusform>
       </translation>
     </message>
     <message>
@@ -66,11 +66,11 @@
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Terabajtů</numerusform>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
+        <numerusform>Terabajtů</numerusform>
+        <numerusform>Terabajtů</numerusform>
+        <numerusform>Terabajtů</numerusform>
       </translation>
     </message>
     <message>
@@ -81,11 +81,11 @@
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Petabajtů</numerusform>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
+        <numerusform>Petabajtů</numerusform>
+        <numerusform>Petabajtů</numerusform>
+        <numerusform>Petabajtů</numerusform>
       </translation>
     </message>
     <message>
@@ -309,11 +309,11 @@
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hodiny</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>hodin</numerusform>
+        <numerusform>hodin</numerusform>
+        <numerusform>hodin</numerusform>
+        <numerusform>hodin</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -329,31 +329,31 @@
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>týdny</numerusform>
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
+        <numerusform>týdny</numerusform>
+        <numerusform>týdny</numerusform>
+        <numerusform>týdny</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>měsíce</numerusform>
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
+        <numerusform>měsíce</numerusform>
+        <numerusform>měsíce</numerusform>
+        <numerusform>měsíce</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>roky</numerusform>
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
+        <numerusform>roky</numerusform>
+        <numerusform>roky</numerusform>
+        <numerusform>roky</numerusform>
       </translation>
     </message>
   </context>

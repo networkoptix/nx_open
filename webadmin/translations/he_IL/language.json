@@ -125,7 +125,7 @@
         "watermarkSettings": "Watermark settings",
         "maxWebMTranscoders": "כמות מקסימלית של חיבורי WEBM עבור השרת. Chrome פותח 2 חיבורים בו-זמנית, ולאחר מכן סוגר את הראשון. לכן, מומלץ להגדיר ערך> = 2 לפרמטר זה.",
         "maxEventLogRecords": "המספר המרבי של רשומות יומן האירועים שיש לשמור במסד הנתונים. הכמות האמיתית של רשומות שלא נמחקו עשויה להיות גבוהה בעד 20% מהערך שצוין.",
-        "forceLiveCacheForPrimaryStream": "Whether to cache some frames for the primary stream. Values: \"yes\" - always enabled (may use a lot of RAM), \"no\" - always disabled except when required by the playback (e.g. HLS), \"auto\" - similar to \"no\", but turned on when improves the user experience (e.g. when some Analytics plugin is working on the camera)."
+        "forceLiveCacheForPrimaryStream": "האם לשמור במטמון כמה מסגרות עבור הזרם הראשי. ערכים: \"כן\" - מאופשר תמיד (יכול להשתמש בהרבה RAM), \"לא\" - תמיד מושבת למעט כאשר נדרש על ידי הקלטה(למשל HLS), \"אוטומטי\" - דומה \"לא\", אבל מופעלת כאשר משפרת את חוויית המשתמש (לדוגמה, כאשר תוסף כלשהו של Analytics פועל על המצלמה)."
     },
     "info": {
         "tabs": {

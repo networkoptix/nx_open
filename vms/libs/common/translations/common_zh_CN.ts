@@ -5,11 +5,11 @@
     <name>DateTimeFormats</name>
     <message>
       <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
+      <translation>月/日</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -104,12 +104,12 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>至少有一个具有相同ID的服务器, 所以无法合并系统。请删除此服务器, 然后重试</translation>
     </message>
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+      <translation>云系统属于不同的拥有者, 所以不允许合并。</translation>
     </message>
   </context>
   <context>
@@ -336,15 +336,15 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>插件错误。%1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>插件失效</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>内部服务器错误。 %1</translation>
     </message>
   </context>
   <context>
@@ -383,7 +383,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>不能分配样本缓冲区</translation>
     </message>
   </context>
   <context>
@@ -586,12 +586,12 @@
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>免费授权</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n 免费授权</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -660,8 +660,8 @@
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 免费授权</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -738,11 +738,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>每個系統只允許一組Starter license。</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>您已有一组正启用中的Starter license。</translation>
     </message>
   </context>
   <context>
@@ -804,38 +804,38 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n 支摄像机</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n 支摄像机</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n I/O 组模块</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n I/O 组模块</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n 个设备</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n 个设备</numerusform>
       </translation>
     </message>
   </context>
@@ -994,19 +994,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>Zip文件已损坏。</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>未找到目标目录。</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>无法打开文件进行写入。</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>硬盘上没有可用空间。</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1014,22 +1014,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>解压缩中止。</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>解压缩工具忙碌中。</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>错误的加密串流量。</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>损坏的加密串流表头。</translation>
     </message>
   </context>
   <context>
@@ -1505,11 +1505,11 @@
     </message>
     <message>
       <source>Plugin Event</source>
-      <translation type="unfinished">Plugin Event</translation>
+      <translation>插件事件</translation>
     </message>
     <message>
       <source>Unknown plugin event</source>
-      <translation type="unfinished">Unknown plugin event</translation>
+      <translation>未知的插件事件</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
@@ -1522,6 +1522,22 @@
     <message>
       <source>Multiple %1 events have occurred</source>
       <translation type="unfinished">Multiple %1 events have occurred</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address</source>
+      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
     </message>
   </context>
   <context>
