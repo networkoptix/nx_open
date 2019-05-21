@@ -51,17 +51,11 @@ public:
         /** Current locale. */
         LOCALE,
 
-        /** Enable profiler mode with some additional logs and vsync workaround disabled. */
-        PROFILER_MODE,
-
         /** Maximum simultaneous scene items overridden value. 0 means default. */
         MAX_SCENE_ITEMS_OVERRIDE,
 
         /** Allow client updates. */
         ALLOW_CLIENT_UPDATE,
-
-        /** Enable V-sync for OpenGL widgets. */
-        GL_VSYNC,
 
         VARIABLE_COUNT
     };
@@ -93,12 +87,10 @@ private:
         QN_DECLARE_RW_PROPERTY(bool, showFullInfo, setShowFullInfo, SHOW_FULL_INFO, false)
         QN_DECLARE_RW_PROPERTY(bool, isGlDoubleBuffer, setGLDoubleBuffer, GL_DOUBLE_BUFFER, true)
         QN_DECLARE_RW_PROPERTY(QString, locale, setLocale, LOCALE, QString())
-        QN_DECLARE_RW_PROPERTY(bool, isProfilerMode, setProfilerMode, PROFILER_MODE, false)
         QN_DECLARE_RW_PROPERTY(int, maxSceneItemsOverride, setMaxSceneItemsOverride,
             MAX_SCENE_ITEMS_OVERRIDE, 0)
         QN_DECLARE_RW_PROPERTY(bool, isClientUpdateAllowed, setClientUpdateAllowed,
             ALLOW_CLIENT_UPDATE, true)
-        QN_DECLARE_RW_PROPERTY(bool, isVSyncEnabled, setVSyncEnabled, GL_VSYNC, true)
     QN_END_PROPERTY_STORAGE()
 };
 

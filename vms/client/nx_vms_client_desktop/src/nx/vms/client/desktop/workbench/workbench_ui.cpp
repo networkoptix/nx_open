@@ -1449,7 +1449,7 @@ void WorkbenchUi::createFpsWidget()
 
     connect(action(action::ShowFpsAction), &QAction::toggled, this, &WorkbenchUi::setFpsVisible);
     connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::updateFpsGeometry);
-    setFpsVisible(qnRuntime->isProfilerMode());
+    setFpsVisible(ini().profilerMode);
 
     connect(display()->debugInfoInstrument(), &DebugInfoInstrument::debugInfoChanged, this,
         [this](const QString& richText)

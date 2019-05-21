@@ -12,6 +12,10 @@ struct Ini: nx::kit::IniConfig
         "Overrides the current Client's Cloud Host. Allows to connect to the Server that uses\n"
         "the specified Cloud Host.");
     NX_INI_FLAG(0, developerMode, "");
+    NX_INI_FLAG(0, profilerMode, "Enables client profiling panel.");
+    NX_INI_FLAG(1, limitFrameRate,
+        "Limits client frame rate to the maximum of 60 fps. Forces VSync on the video drivers.");
+
     NX_INI_FLAG(0, developerGuiPanel, "Enables developer GUI panel (WARNING: can be very slow).");
 
     NX_INI_FLAG(0, ignoreBetaWarning, "Hides beta version warning.");

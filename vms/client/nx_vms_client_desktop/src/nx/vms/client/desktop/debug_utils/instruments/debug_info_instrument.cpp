@@ -31,7 +31,7 @@ static constexpr int kMaxThreadCount = 250; //< More is considered as suspicious
 
 struct DebugInfoInstrument::Private
 {
-    const bool profilerMode = qnRuntime->isProfilerMode();
+    const bool profilerMode = ini().profilerMode;
     const int updateIntervalMs = profilerMode ? 10000 : 1000;
 
     QElapsedTimer fpsTimer;

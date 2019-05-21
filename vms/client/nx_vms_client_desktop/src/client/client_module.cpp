@@ -345,7 +345,7 @@ void QnClientModule::initSurfaceFormat()
     format.setSwapBehavior(qnSettings->isGlDoubleBuffer()
         ? QSurfaceFormat::DoubleBuffer
         : QSurfaceFormat::SingleBuffer);
-    format.setSwapInterval(qnRuntime->isVSyncEnabled() ? 1 : 0);
+    format.setSwapInterval(ini().limitFrameRate ? 1 : 0);
 
     QSurfaceFormat::setDefaultFormat(format);
     QGLFormat::setDefaultFormat(QGLFormat::fromSurfaceFormat(format));

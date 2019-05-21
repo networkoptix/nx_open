@@ -69,6 +69,7 @@
 #include <ui/workbench/handlers/startup_actions_handler.h>
 #include <nx/vms/client/desktop/analytics/analytics_menu_action_handler.h>
 #include <nx/vms/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
+#include <nx/vms/client/desktop/ini.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -150,7 +151,6 @@ void enable_animations(void* qnmainwindow)
 }
 #endif
 
-using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
@@ -385,13 +385,12 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (nx::utils::AppInfo::isMacOsX())
         menu()->newMenu(action::MainScope);
 
-    if (!qnRuntime->isAcsMode() && !qnRuntime->isProfilerMode())
+    if (ini().limitFrameRate)
     {
         /* VSync workaround must always be enabled to limit fps usage in following cases:
          * * VSync is not supported by drivers
          * * VSync is disabled in drivers
          * * double buffering is disabled in drivers or in our program
-         * Workaround must be disabled in activeX mode.
          */
         auto vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
         Q_UNUSED(vsyncWorkaround);
