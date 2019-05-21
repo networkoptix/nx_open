@@ -215,7 +215,8 @@ void SignDialog::at_gotImageSize(int width, int height)
     ui->signInfoLabel->setImageSize(width, height);
 }
 
-void SignDialog::at_gotSignature(QByteArray calculatedSign, QByteArray signFromFrame)
+void SignDialog::at_gotSignature(
+    QByteArray calculatedSign, QByteArray calculatedSign2, QByteArray signFromFrame)
 {
 #ifndef SIGN_FRAME_ENABLED
     m_layout->addWidget(m_srcVideoInfo);
@@ -223,6 +224,6 @@ void SignDialog::at_gotSignature(QByteArray calculatedSign, QByteArray signFromF
     m_srcVideoInfo->setDrawDetailTextMode(true);
 
     // It is correct. Set parameters vise versa here.
-    m_srcVideoInfo->at_gotSignature(signFromFrame, calculatedSign);
+    m_srcVideoInfo->at_gotSignature(calculatedSign2, calculatedSign, signFromFrame);
 #endif
 }

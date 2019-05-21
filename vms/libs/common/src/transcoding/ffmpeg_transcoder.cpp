@@ -10,7 +10,6 @@ extern "C"
 #include <QtCore/QDebug>
 
 #include <nx/utils/log/log.h>
-#include <export/sign_helper.h>
 
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
@@ -71,7 +70,6 @@ QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metrics::Storag
 :
     QnTranscoder(metrics),
     m_config(config),
-    m_signatureHash(EXPORT_SIGN_METHOD),
     m_videoEncoderCodecCtx(0),
     m_audioEncoderCodecCtx(0),
     m_videoBitrate(0),
@@ -82,8 +80,6 @@ QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metrics::Storag
 {
     NX_DEBUG(this, lit("Created new ffmpeg transcoder. Total transcoder count %1").
         arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1));
-    m_signatureHash.reset();
-    m_signatureHash.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
 }
 
 QnFfmpegTranscoder::~QnFfmpegTranscoder()
@@ -324,11 +320,12 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
         return status;
     }
 
-    if (m_config.computeSignatureHash)
+    if (m_config.computeSignature)
     {
         auto context = mediaPacket->dataType == QnAbstractMediaData::VIDEO ?
             m_videoEncoderCodecCtx : m_audioEncoderCodecCtx;
-        QnSignHelper::updateDigest(context, m_signatureHash, packet.data, packet.size);
+        m_mediaSigner.processMedia(
+            context, packet.data, packet.size, mediaPacket->dataType);
     }
     return 0;
 }
@@ -410,14 +407,9 @@ int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
     return 0;
 }
 
-void QnFfmpegTranscoder::updateSignatureHash(uint8_t* data, int size)
+QByteArray QnFfmpegTranscoder::getSignature(QnLicensePool* licensePool)
 {
-    QnSignHelper::updateDigest(nullptr, m_signatureHash, data, size);
-}
-
-QByteArray QnFfmpegTranscoder::getSignatureHash()
-{
-    return m_signatureHash.result();
+    return m_mediaSigner.buildSignature(licensePool);
 }
 
 AVCodecContext* QnFfmpegTranscoder::getVideoCodecContext() const
