@@ -170,16 +170,16 @@ void PluginManager::loadNonOptionalPluginsIfNeeded(
                 {
                     if (!disabledLibNames.contains(libNameFromFileInfo(pluginFileInfo)))
                         return true;
-                    NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (blacklisted by %2)")
-                        .args(pluginFileInfo.absoluteFilePath(), pluginsIni().iniFile());
+                    NX_INFO(this, "Skipped loading Nx plugin [%1] (blacklisted by %2)",
+                        pluginFileInfo.absoluteFilePath(), pluginsIni().iniFile());
                     return false;
                 });
         }
     }
     else
     {
-        NX_WARNING(this) << lm("Skipped loading all non-optional Nx plugins (as per %2)")
-            .args(pluginsIni().iniFile());
+        NX_INFO(this, "Skipped loading all non-optional Nx plugins (as per %1)",
+            pluginsIni().iniFile());
     }
 }
 
@@ -191,8 +191,8 @@ void PluginManager::loadOptionalPluginsIfNeeded(
         QString::fromLatin1(pluginsIni().enabledNxPluginsOptional).trimmed();
     if (!enabledNxPluginsOptional.isEmpty())
     {
-        NX_WARNING(this) << lm("Loading optional Nx plugins, if any (as per %2)")
-            .args(pluginsIni().iniFile());
+        NX_INFO(this, "Loading optional Nx plugins, if any (as per %1)",
+            pluginsIni().iniFile());
 
         const QString optionalPluginsDir = binPath + lit("/plugins_optional/");
         const QStringList enabledLibNames = (enabledNxPluginsOptional == lit("*"))
@@ -207,8 +207,8 @@ void PluginManager::loadOptionalPluginsIfNeeded(
                 {
                     return true;
                 }
-                NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (not whitelisted by %2)")
-                    .args(pluginFileInfo.absoluteFilePath(), pluginsIni().iniFile());
+                NX_INFO(this, "Skipped loading Nx plugin [%1] (not whitelisted by %2)",
+                    pluginFileInfo.absoluteFilePath(), pluginsIni().iniFile());
                 return false;
             });
     }
@@ -286,7 +286,7 @@ bool PluginManager::loadNxPlugin(
             return false;
         }
         m_nxPlugins.emplace_back(reinterpret_cast<IRefCountable*>(plugin));
-        NX_WARNING(this, "Loaded Nx old SDK plugin [%1]", libFilename);
+        NX_INFO(this, "Loaded Nx old SDK plugin [%1]", libFilename);
 
         if (const auto plugin1 = queryInterfacePtr<nxpl::Plugin>(plugin, nxpl::IID_Plugin))
         {
@@ -315,13 +315,13 @@ bool PluginManager::loadNxPlugin(
             return false;
         }
         m_nxPlugins.emplace_back(plugin);
-        NX_WARNING(this, "Loaded Nx plugin [%1]", libFilename);
+        NX_INFO(this, "Loaded Nx plugin [%1]", libFilename);
 
         if (queryInterfacePtr<nx::sdk::analytics::IPlugin>(plugin))
         {
             if (plugin->name() != libName)
             {
-                NX_WARNING(this, "Analytics plugin name [%1] does not equal library name [%2]",
+                NX_INFO(this, "Analytics plugin name [%1] does not equal library name [%2]",
                     plugin->name(), libName);
             }
         }

@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
 #include <utils/common/synctime.h>
 #include <utils/common/app_info.h>
 #include <licensing/license_validator.h>
@@ -19,6 +20,14 @@
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+
+#include <nx/analytics/event_type_descriptor_manager.h>
+#include <nx/analytics/object_type_descriptor_manager.h>
+#include <nx/analytics/engine_descriptor_manager.h>
+#include <nx/analytics/plugin_descriptor_manager.h>
+
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
 
 static const std::chrono::hours kDefaultSendCycleTime(30 * 24); //< About a month.
 static const std::chrono::hours kSendAfterUpdateTime(3);
@@ -79,8 +88,8 @@ namespace ec2
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        for (auto& cam: cameras)
-            outData->cameras.emplace_back(std::move(cam));
+        for (auto& camInfo: cameras)
+            outData->cameras.emplace_back(fullDeviceStatistics(std::move(camInfo)));
 
         QnLicenseList licenses;
         errCode = m_ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);
@@ -327,5 +336,134 @@ namespace ec2
         }
 
         setupTimer();
+    }
+
+namespace {
+
+    template<typename Descriptor>
+    std::vector<ApiDeviceAnalyticsTypeInfo> deviceAnalyticsTypeInfo(
+        QnCommonModule* commonModule,
+        const QnVirtualCameraResourcePtr device,
+        const std::map<QnUuid, std::set<QString>>& supportedItemsByEngineId,
+        std::function<std::optional<Descriptor>(const QString& itemId)> descriptorRetriever)
+    {
+        if (!NX_ASSERT(device, "device is null"))
+            return {};
+
+        nx::analytics::EngineDescriptorManager engineDescriptorManager(commonModule);
+        nx::analytics::PluginDescriptorManager pluginDescriptorManager(commonModule);
+
+        auto providerFromItemDescriptor =
+            [](const auto& itemDescriptor,
+                const QnUuid& engineId,
+                const QString& pluginName)
+            {
+                for (const auto& scope: itemDescriptor.scopes)
+                {
+                    if (scope.engineId == engineId && !scope.provider.isEmpty())
+                        return scope.provider;
+                }
+                return pluginName;
+            };
+
+        std::vector<ApiDeviceAnalyticsTypeInfo> result;
+        for (const auto& [engineId, supportedItemIds] : supportedItemsByEngineId)
+        {
+            const auto engineDescriptor = engineDescriptorManager.descriptor(engineId);
+            if (!engineDescriptor)
+            {
+                NX_WARNING(typeid(Ec2StaticticsReporter),
+                    "Unable to find an Engine descriptor for the Engine %1; Device %2",
+                    engineId, device);
+                continue;
+            }
+
+            if (!engineDescriptor->capabilities.testFlag(
+                nx::vms::api::analytics::EngineManifest::Capability::deviceDependent))
+            {
+                NX_DEBUG(typeid(Ec2StaticticsReporter),
+                    "Ignoring device independent Engine %1 (%2); Device: %3",
+                    engineDescriptor->name, engineDescriptor->id, device);
+                continue;
+            }
+
+            const auto pluginDescriptor = pluginDescriptorManager.descriptor(
+                engineDescriptor->pluginId);
+
+            if (!pluginDescriptor)
+            {
+                NX_WARNING(typeid(Ec2StaticticsReporter),
+                    "Unable to find a Plugin descriptor for the plugin %1",
+                    engineDescriptor->pluginId);
+                continue;
+            }
+
+            for (const auto& itemId: supportedItemIds)
+            {
+                const auto descriptor = descriptorRetriever(itemId);
+                if (!descriptor)
+                {
+                    NX_WARNING(typeid(Ec2StaticticsReporter),
+                        "Unable to find a descriptor for an item %1", itemId);
+                    continue;
+                }
+
+                ApiDeviceAnalyticsTypeInfo itemInfo;
+                itemInfo.id = itemId;
+                itemInfo.name = descriptor->name;
+                itemInfo.provider = providerFromItemDescriptor(
+                    *descriptor,
+                    engineDescriptor->id,
+                    pluginDescriptor->name);
+
+                result.push_back(itemInfo);
+            }
+        }
+
+        return result;
+    }
+
+} // namespace
+
+    ApiCameraDataStatistics Ec2StaticticsReporter::fullDeviceStatistics(
+        nx::vms::api::CameraDataEx&& deviceInfo)
+    {
+        using namespace nx::vms::api::analytics;
+        const auto commonModule = m_ec2Connection->commonModule();
+        if (!NX_ASSERT(commonModule, "Unable to access common module"))
+            return ApiCameraDataStatistics(std::move(deviceInfo));
+
+        const auto resourcePool = commonModule->resourcePool();
+        if (!NX_ASSERT(resourcePool, "Unable to access resource pool"))
+            return ApiCameraDataStatistics(std::move(deviceInfo));
+
+        const auto device = resourcePool->getResourceById<QnVirtualCameraResource>(deviceInfo.id);
+        ApiCameraDataStatistics result{ std::move(deviceInfo) };
+        if (!device)
+            return result;
+
+        result.analyticsInfo.supportedEventTypes = deviceAnalyticsTypeInfo<EventTypeDescriptor>(
+            commonModule,
+            device,
+            device->supportedEventTypes(),
+            [commonModule](const QString& eventTypeId)
+            {
+                nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(commonModule);
+                return eventTypeDescriptorManager.descriptor(eventTypeId);
+            });
+
+
+        result.analyticsInfo.supportedObjectTypes = deviceAnalyticsTypeInfo<ObjectTypeDescriptor>(
+            commonModule,
+            device,
+            device->supportedObjectTypes(),
+            [commonModule](const QString& objectTypeId)
+            {
+                nx::analytics::ObjectTypeDescriptorManager objectTypeDescriptorManager(
+                    commonModule);
+                return objectTypeDescriptorManager.descriptor(objectTypeId);
+            });
+
+        return result;
     }
 }

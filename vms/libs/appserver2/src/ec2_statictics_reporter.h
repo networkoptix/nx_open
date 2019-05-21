@@ -44,6 +44,7 @@ namespace ec2
 
     private:
         void finishReport(nx::network::http::AsyncHttpClientPtr httpClient);
+        ApiCameraDataStatistics fullDeviceStatistics(nx::vms::api::CameraDataEx&& deviceInfo);
 
     private:
         ec2::AbstractECConnection* m_ec2Connection;

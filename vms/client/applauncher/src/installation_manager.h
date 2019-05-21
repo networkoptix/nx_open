@@ -12,17 +12,16 @@
 #include <client_installation.h>
 #include <nx/vms/applauncher/api/applauncher_api.h>
 
-//!Provides access to installed versions information
-/*!
-    \todo installation API MUST be asynchronous
-*/
+namespace nx::applauncher {
+
+// TODO: installation API MUST be asynchronous
+/**
+ * Provides access to installed versions information.
+ */
 class InstallationManager: public QObject
 {
     Q_OBJECT
-
-    //!Number of installed application versions
     Q_PROPERTY(int count READ count)
-    using ResultType = applauncher::api::ResultType::Value;
 
 public:
     InstallationManager(QObject* parent = nullptr);
@@ -31,12 +30,15 @@ public:
 
     void updateInstalledVersionsInformation();
 
-    /*! Create an empty directory with name as the latest version is.
-     *  It is needed to signalize client <= 2.1 about version installed in a standard way (not in compatibility folder). */
+    /**
+     * Create an empty directory with name as the latest version is.
+     * It is needed to signalize client <= 2.1 about version installed in a standard way (not in
+     * compatibility folder).
+     */
     void createGhosts();
-    void createGhostsForVersion(const nx::utils::SoftwareVersion &version);
+    void createGhostsForVersion(const nx::utils::SoftwareVersion& version);
 
-    //!Returns number of installed versions
+    /** Number of installed application versions. */
     int count() const;
 
     /**
@@ -48,17 +50,18 @@ public:
     bool isVersionInstalled(const nx::utils::SoftwareVersion &version, bool strict = false) const;
     QList<nx::utils::SoftwareVersion> installedVersions() const;
     nx::utils::SoftwareVersion nearestInstalledVersion(const nx::utils::SoftwareVersion &version) const;
-    /*!
-        \return false, if \a version not found. Otherwise, true and \a *appData filled
+    /**
+     * @return false, if version is not found. Otherwise, true and fill *appData.
     */
-    QnClientInstallationPtr installationForVersion(const nx::utils::SoftwareVersion &version, bool strict = false) const;
+    QnClientInstallationPtr installationForVersion(
+        const nx::utils::SoftwareVersion& version, bool strict = false) const;
 
     //!Returns path to "{program files dir}/Network Optix" on windows and "/opt/Network Optix" on unix
     QString rootInstallationDirectory() const;
     //!Returns path to install \a version to or empty string writable paths for installations is not known
     QString installationDirForVersion(const nx::utils::SoftwareVersion &version) const;
 
-    ResultType installZip(const nx::utils::SoftwareVersion &version, const QString &fileName);
+    api::ResultType installZip(const nx::utils::SoftwareVersion &version, const QString &fileName);
 
     static bool isValidVersionName(const QString &version);
 
@@ -71,3 +74,5 @@ private:
     QDir m_installationsDir;
     mutable std::mutex m_mutex;
 };
+
+} // namespace nx::applauncher

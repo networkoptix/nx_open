@@ -325,30 +325,22 @@ QDir QnMediaServerModule::downloadsDirectory() const
 {
     static const QString kDownloads("downloads");
     QDir dir(settings().dataDir());
-    const auto downloadsPath = dir.absoluteFilePath(kDownloads);
+    const auto downloadsDir = QDir(dir.absoluteFilePath(kDownloads));
+    if (downloadsDir.exists())
+        return downloadsDir;
+
     if (!dir.mkdir(kDownloads))
     {
-        auto err = strerror(errno);
-        const auto basePath = dir.absolutePath();
-
-        if (!dir.exists())
-        {
-            NX_ERROR(this, "downloadsDirectory() - failed to create directory %1 for downloads. "
-                "Base dir=%2 does not exists as well, err=%3", downloadsPath, basePath, err);
-        }
-        else
-        {
-            NX_ERROR(this, "downloadsDirectory() - failed to create directory %1 for downloads. "
-                "Base dir=%2, err=%3", downloadsPath, basePath, err);
-        }
+        NX_ERROR(this, "%1() - failed to create directory %2, base dir %3: %4",
+            __func__, downloadsDir.absolutePath(),
+            dir.exists() ? "exists" : "does not exist", strerror(errno));
     }
     else
     {
-        NX_VERBOSE(this, "downloadsDirectory() - created directory %1 for downloads.",
-            downloadsPath);
+        NX_VERBOSE(this, "%1() - created directory %2", __func__, downloadsDir.absolutePath());
     }
 
-    return downloadsPath;
+    return downloadsDir;
 }
 
 void QnMediaServerModule::stopStorages()

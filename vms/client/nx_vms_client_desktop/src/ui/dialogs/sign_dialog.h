@@ -38,7 +38,8 @@ public:
 private:
     void at_calcSignInProgress(QByteArray sign, int progress);
     void at_gotImageSize(int width, int height);
-    void at_gotSignature(QByteArray calculatedSign, QByteArray signFromFrame);
+    void at_gotSignature(
+        QByteArray calculatedSign, QByteArray calculatedSign2, QByteArray signFromFrame);
 
 protected:
     virtual void changeEvent(QEvent *event) override;

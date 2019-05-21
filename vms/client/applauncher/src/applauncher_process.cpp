@@ -37,7 +37,7 @@ const nx::utils::SoftwareVersion kNewGstreamerUsedVersion(4, 0);
 
 } // namespace
 
-namespace applauncher {
+namespace nx::applauncher {
 
 using namespace api;
 
@@ -236,7 +236,7 @@ bool ApplauncherProcess::startApplication(
     const QString binPath = installation->executableFilePath();
     QStringList environment = QProcess::systemEnvironment();
 
-    auto arguments = task->appArgs;
+    auto arguments = task->arguments;
 
     if (QnAppInfo::applicationPlatform() == "linux")
     {
@@ -335,7 +335,7 @@ bool ApplauncherProcess::installZipAsync(
     else
     {
         m_process.result = std::async(std::launch::async,
-            [this, request]() -> ResultType::Value
+            [this, request]() -> ResultType
             {
                 {
                     std::scoped_lock<std::mutex> lock(m_process.mutex);
@@ -353,7 +353,7 @@ bool ApplauncherProcess::installZipAsync(
 }
 
 bool ApplauncherProcess::checkInstallationProgress(
-    const std::shared_ptr<applauncher::api::InstallZipCheckStatus>& /*request*/,
+    const std::shared_ptr<nx::applauncher::api::InstallZipCheckStatus>& /*request*/,
     applauncher::api::Response* const response)
 {
     if (!m_process.isEmpty())
@@ -392,7 +392,7 @@ bool ApplauncherProcess::addProcessKillTimer(
     AddProcessKillTimerResponse* const response)
 {
     KillProcessTask task;
-    task.processID = request->processID;
+    task.processID = request->processId;
     {
         std::lock_guard<std::mutex> lk(m_mutex);
         if (m_terminated)
@@ -449,4 +449,4 @@ bool ApplauncherProcess::InstallationProcess::equals(
     return this->version == version && this->fileName == fileName;
 }
 
-} // namespace applauncher
+} // namespace nx::applauncher

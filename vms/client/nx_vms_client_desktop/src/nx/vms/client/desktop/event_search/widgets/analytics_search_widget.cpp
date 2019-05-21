@@ -362,6 +362,8 @@ void AnalyticsSearchWidget::Private::setupAreaSelection()
         [this](const QnVirtualCameraResourceSet& cameras)
         {
             setAreaSelectionEnabled(!cameras.empty());
+            if (q->selectedCameras() != Cameras::current)
+                m_areaSelectionButton->deactivate();
         });
 
     connect(m_areaSelectionButton, &SelectableTextButton::stateChanged,

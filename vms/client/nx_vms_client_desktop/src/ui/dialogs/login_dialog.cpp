@@ -42,6 +42,7 @@
 #include <core/resource/avi/filetypesupport.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
@@ -56,6 +57,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <helpers/system_helpers.h>
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
@@ -499,7 +501,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
         auto compatibilityCode = QnConnectionValidator::validateConnection(data.info);
 
         /* Do not show servers with incompatible customization or cloud host */
-        if (!qnRuntime->isDevMode()
+        if (!ini().developerMode
             && compatibilityCode == Qn::IncompatibleInternalConnectionResult)
         {
             continue;

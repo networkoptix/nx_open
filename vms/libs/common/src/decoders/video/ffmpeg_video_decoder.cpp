@@ -77,8 +77,8 @@ struct FffmpegLog
 QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     const DecoderConfig& config,
     AVCodecID codec_id,
-    const QnConstCompressedVideoDataPtr& data,
-    bool mtDecoding, QAtomicInt* const swDecoderCount):
+    const QnConstCompressedVideoDataPtr& data)
+    :
     m_passedContext(0),
     m_context(0),
     //m_width(0),
@@ -96,28 +96,15 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     m_checkH264ResolutionChange(false),
     m_forceSliceDecoding(-1),
     m_prevSampleAspectRatio( 1.0 ),
-    m_forcedMtDecoding(ForceMtDecodingType::none),
     m_prevTimestamp(AV_NOPTS_VALUE),
-    m_spsFound(false)
+    m_spsFound(false),
+    m_mtDecodingPolicy(config.mtDecodePolicy),
+    m_useMtDecoding(false),
+    m_needRecreate(false)
+
 {
-    if (!config.allowMtDecoding)
-    {
-        m_forcedMtDecoding = ForceMtDecodingType::forcedOff;
-    }
-    else
-    {
-        for (auto& codecName: config.disabledCodecsForMtDecoding)
-        {
-            const AVCodecDescriptor* codecDescr =
-                avcodec_descriptor_get_by_name(codecName.toLatin1().data());
-            if (codecDescr && codecDescr->id == m_codecId)
-            {
-                m_forcedMtDecoding = ForceMtDecodingType::forcedOff;
-                break;
-            }
-        }
-    }
-    setMTDecoding(mtDecoding);
+
+    setMultiThreadDecoding(m_mtDecodingPolicy == MultiThreadDecodePolicy::enabled);
 
     if (data->context)
     {
@@ -172,19 +159,9 @@ void QnFfmpegVideoDecoder::closeDecoder()
     delete m_frameTypeExtractor;
 }
 
-bool QnFfmpegVideoDecoder::needToUseMtDecoding(bool userDefinedMtDecoding, ForceMtDecodingType forcedValue)
-{
-    if (forcedValue == ForceMtDecodingType::forcedOn)
-        return true;
-    else if (forcedValue == ForceMtDecodingType::forcedOff)
-        return false;
-    else
-        return userDefinedMtDecoding;
-}
-
 void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
 {
-    if (needToUseMtDecoding(m_mtDecoding, m_forcedMtDecoding))
+    if (m_useMtDecoding)
         m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
     else
         m_context->thread_count = 1; //< Turn off multi thread decoding.
@@ -375,14 +352,12 @@ void QnFfmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressed
     }
 }
 
-void QnFfmpegVideoDecoder::setForceMtDecoding(ForceMtDecodingType value)
+void QnFfmpegVideoDecoder::setMultiThreadDecoding(bool value)
 {
-    if (value != m_forcedMtDecoding)
+    if (value != m_useMtDecoding)
     {
-        bool oldMtDecoding = needToUseMtDecoding(m_mtDecoding, m_forcedMtDecoding);
-        bool newMtDecoding = needToUseMtDecoding(m_mtDecoding, value);
-        m_forcedMtDecoding = value;
-        m_needRecreate = oldMtDecoding != newMtDecoding;
+        m_useMtDecoding = value;
+        m_needRecreate = true;
     }
 }
 
@@ -554,15 +529,15 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
         if (got_picture)
         {
-            if (m_forcedMtDecoding != ForceMtDecodingType::forcedOff)
+            if (m_mtDecodingPolicy == MultiThreadDecodePolicy::autoDetect)
             {
                 if (m_context->width <= 3500)
-                    setForceMtDecoding(ForceMtDecodingType::none);
+                    setMultiThreadDecoding(false);
                 else
                 {
                     qint64 frameDistance = data->timestamp - m_prevTimestamp;
                     if (frameDistance > 0 && frameDistance < 50000)
-                        setForceMtDecoding(ForceMtDecodingType::forcedOn); // high fps and high resolution
+                        setMultiThreadDecoding(true); // high fps and high resolution
                 }
             }
             m_prevTimestamp = data->timestamp;
@@ -731,16 +706,18 @@ void QnFfmpegVideoDecoder::showMotion(bool show)
         m_showmotion = show;
 }
 
-void QnFfmpegVideoDecoder::setMTDecoding(bool value)
-{
-    if (m_mtDecoding != value)
-        m_needRecreate = true;
-    m_mtDecoding = value;
-}
-
 AVCodecContext* QnFfmpegVideoDecoder::getContext() const
 {
     return m_context;
+}
+
+void QnFfmpegVideoDecoder::setMultiThreadDecodePolicy(MultiThreadDecodePolicy value)
+{
+    if (m_mtDecodingPolicy != value)
+    {
+        m_mtDecodingPolicy = value;
+        setMultiThreadDecoding(m_mtDecodingPolicy == MultiThreadDecodePolicy::enabled);
+    }
 }
 
 #endif // ENABLE_DATA_PROVIDERS

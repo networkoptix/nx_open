@@ -52,12 +52,6 @@ public:
      */
     void waitAll();
 
-    /**
-     * Enables relaxed mode when child QnLongRunnables are allowed to exist
-     * after destruction of this class. In strict mode it will lead to deadlock.
-     */
-    void setRelaxedChecking(bool relaxed);
-
 private:
     friend class QnLongRunnable;
     QSharedPointer<QnLongRunnablePoolPrivate> d;

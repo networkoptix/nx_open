@@ -23,9 +23,6 @@ public:
         /** Debug value. */
         DEBUG_COUNTER,
 
-        /** Developers mode with additional options */
-        DEV_MODE,
-
         /** Light client mode - no animations, no background, no opacity, no notifications, 1 camera only allowed. */
         LIGHT_MODE,
 
@@ -39,7 +36,7 @@ public:
         /** Allow timeline to be displayed on the Video Wall. */
         VIDEO_WALL_WITH_TIMELINE,
 
-        /** ActiveX library mode - client is embedded to another window. */
+        /** ACS mode - client is run as a separate camera view-only window. */
         ACS_MODE,
 
         /** Always display full info on cameras. */
@@ -51,17 +48,11 @@ public:
         /** Current locale. */
         LOCALE,
 
-        /** Enable profiler mode with some additional logs and vsync workaround disabled. */
-        PROFILER_MODE,
-
         /** Maximum simultaneous scene items overridden value. 0 means default. */
         MAX_SCENE_ITEMS_OVERRIDE,
 
         /** Allow client updates. */
         ALLOW_CLIENT_UPDATE,
-
-        /** Enable V-sync for OpenGL widgets. */
-        GL_VSYNC,
 
         VARIABLE_COUNT
     };
@@ -82,7 +73,6 @@ private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(bool, isSoftwareYuv, setSoftwareYuv, SOFTWARE_YUV, false)
         QN_DECLARE_RW_PROPERTY(int, debugCounter, setDebugCounter, DEBUG_COUNTER, 0)
-        QN_DECLARE_RW_PROPERTY(bool, isDevMode, setDevMode, DEV_MODE, false)
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags, lightMode, setLightMode, LIGHT_MODE, {})
         QN_DECLARE_RW_PROPERTY(int, lightModeOverride, setLightModeOverride, LIGHT_MODE_OVERRIDE,
             -1)
@@ -93,12 +83,10 @@ private:
         QN_DECLARE_RW_PROPERTY(bool, showFullInfo, setShowFullInfo, SHOW_FULL_INFO, false)
         QN_DECLARE_RW_PROPERTY(bool, isGlDoubleBuffer, setGLDoubleBuffer, GL_DOUBLE_BUFFER, true)
         QN_DECLARE_RW_PROPERTY(QString, locale, setLocale, LOCALE, QString())
-        QN_DECLARE_RW_PROPERTY(bool, isProfilerMode, setProfilerMode, PROFILER_MODE, false)
         QN_DECLARE_RW_PROPERTY(int, maxSceneItemsOverride, setMaxSceneItemsOverride,
             MAX_SCENE_ITEMS_OVERRIDE, 0)
         QN_DECLARE_RW_PROPERTY(bool, isClientUpdateAllowed, setClientUpdateAllowed,
             ALLOW_CLIENT_UPDATE, true)
-        QN_DECLARE_RW_PROPERTY(bool, isVSyncEnabled, setVSyncEnabled, GL_VSYNC, true)
     QN_END_PROPERTY_STORAGE()
 };
 

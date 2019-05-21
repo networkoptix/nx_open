@@ -43,6 +43,7 @@
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
 #include <nx/network/app_info.h>
+#include <nx/utils/app_info.h>
 
 #include <nx/vms/client/desktop/ini.h>
 #include <utils/common/html.h>
@@ -1709,12 +1710,14 @@ bool MultiServerUpdatesWidget::processUploaderChanges(bool force)
     {
         if (state == ServerUpdateTool::OfflineUpdateState::done)
         {
-            NX_INFO(this) << "processUploaderChanges seems to be done";
-            setTargetState(WidgetUpdateState::readyInstall, {});
+            // TODO: Should do the same checks as in 'downloading'
+            NX_INFO(this, "processUploaderChanges(%1) seems to be done.", force);
+            auto peersIssued = m_stateTracker->peersIssued();
+            setTargetState(WidgetUpdateState::downloading, peersIssued);
         }
         else if (state == ServerUpdateTool::OfflineUpdateState::error)
         {
-            NX_INFO(this) << "processUploaderChanges failed to upload all packages";
+            NX_INFO(this, "processUploaderChanges failed to upload all packages", force);
             setTargetState(WidgetUpdateState::ready, {});
         }
     }

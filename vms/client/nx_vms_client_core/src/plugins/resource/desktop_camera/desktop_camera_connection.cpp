@@ -30,10 +30,9 @@ public:
         m_owner(owner),
         m_needVideoData(false)
     {
-        auto config = DecoderConfig::fromResource(owner->getResource()->toSharedPointer());
         for (int i = 0; i < 2; ++i)
         {
-            m_serializers[i].reset(new QnRtspFfmpegEncoder(config, owner->commonModule()->metrics()));
+            m_serializers[i].reset(new QnRtspFfmpegEncoder(DecoderConfig(), owner->commonModule()->metrics()));
             m_serializers[i]->setAdditionFlags(0);
             m_serializers[i]->setLiveMarker(true);
         }

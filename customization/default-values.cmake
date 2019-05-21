@@ -44,6 +44,7 @@ set(translations
     fr_FR
     cs_CZ
     de_DE
+    fi_FI
     ru_RU
     es_ES
     it_IT

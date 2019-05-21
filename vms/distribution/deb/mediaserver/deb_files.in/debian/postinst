@@ -33,11 +33,13 @@ SYSTEM_USER=$COMPANY_NAME
 TARGET_DEVICE='@targetDevice@'
 WITH_ROOT_TOOL='@withRootTool@'
 
-is_systemd_used() {
+is_systemd_used()
+{
     [[ $(readlink -m /sbin/init) =~ .*systemd$ ]]
 }
 
-is_rpi() {
+is_rpi()
+{
     if [[ $TARGET_DEVICE == "linux_arm32" ]]
     then
         grep '^Hardware.*:.*BCM2835[[:space:]]*$' /proc/cpuinfo &>/dev/null
@@ -103,8 +105,7 @@ function display_complete_setup_hint {
 
 install_modification_specific_config()
 {
-    local -r target_device='@targetDevice@'
-    local -r config_file_path="${BASE_DIR}/share/configs/mediaserver.conf.$target_device.template"
+    local -r config_file_path="${BASE_DIR}/share/configs/mediaserver.conf.$TARGET_DEVICE.template"
 
     if [[ -f ${config_file_path} ]]
     then

@@ -108,7 +108,10 @@ void QnDesktopCameraResourceSearcher::registerCamera(
     discoveryManager->addResourcesImmediatly(resources);
     // discovery manager could delay init a bit but this call for Desktop Camera does nothing anyway (empty function)
     // So, do init immediately as well
-    if (auto addedCamera = serverModule()->resourcePool()->getResourceById(desktopCamera->getId()))
+
+    auto addedCamera =
+        serverModule()->resourcePool()->getResourceByUniqueId(desktopCamera->getUniqueId());
+    if (NX_ASSERT(addedCamera))
         addedCamera->init();
     log("register desktop camera", info);
 }

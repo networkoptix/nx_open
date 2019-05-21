@@ -697,6 +697,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="stopSearchButton">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="text">
              <string>Stop</string>
             </property>
@@ -845,7 +848,7 @@
               <item>
                <widget class="QPushButton" name="addDevicesButton">
                 <property name="focusPolicy">
-                 <enum>Qt::NoFocus</enum>
+                 <enum>Qt::StrongFocus</enum>
                 </property>
                 <property name="text">
                  <string>Add all Devices</string>
@@ -1006,8 +1009,9 @@
   <tabstop>loginEdit</tabstop>
   <tabstop>passwordEdit</tabstop>
   <tabstop>searchButton</tabstop>
-  <tabstop>foundDevicesTable</tabstop>
   <tabstop>stopSearchButton</tabstop>
+  <tabstop>foundDevicesTable</tabstop>
+  <tabstop>addDevicesButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>
