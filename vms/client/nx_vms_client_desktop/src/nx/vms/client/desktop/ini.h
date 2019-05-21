@@ -152,6 +152,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(0, connectTimeoutMs,
         "Timeout (in milliseconds) for waiting initial resources message from the server.\n"
         "If exceeded then connections is dropped to avoid infinite UI \"Loading...\" state. 0 means disabled.");
+    NX_INI_FLAG(0, enableVSyncWorkaround,
+        "Always limit frame rate to approximately 60 fps, even if VSync is disabled.");
 };
 
 inline Ini& ini()

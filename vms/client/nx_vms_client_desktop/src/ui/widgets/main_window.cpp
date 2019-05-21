@@ -41,6 +41,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/workbench/handlers/layout_tours_handler.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
@@ -378,7 +379,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (nx::utils::AppInfo::isMacOsX())
         menu()->newMenu(action::MainScope);
 
-    if (!qnRuntime->isProfilerMode())
+    if (!qnRuntime->isProfilerMode() && ini().enableVSyncWorkaround)
     {
         // VSync workaround must always be enabled to limit fps usage in following cases:
         // * VSync is not supported by drivers.
