@@ -3076,6 +3076,26 @@
         <source>Backup Settings...</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Analytics data will continue to be stored on the disabled storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Recording was enabled on the USB storage</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StorageRebuildWidget</name>
