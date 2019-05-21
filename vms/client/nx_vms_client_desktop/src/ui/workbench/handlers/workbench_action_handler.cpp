@@ -545,9 +545,6 @@ void ActionHandler::openNewWindow(const QStringList &args) {
         arguments << QnStartupParameters::kScreenKey << QString::number(screen);
     }
 
-    if (qnRuntime->isDevMode())
-        arguments << lit("--dev-mode-key=razrazraz");
-
 #ifdef Q_OS_MACX
     mac_startDetached(qApp->applicationFilePath(), arguments);
 #else

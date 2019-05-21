@@ -844,7 +844,7 @@ void QnMediaResourceWidget::createButtons()
         titleBar()->rightButtonsBar()->addButton(Qn::IoModuleButton, ioModuleButton);
     }
 
-    if (qnRuntime->isDevMode())
+    if (ini().developerMode)
     {
         QnImageButtonWidget *debugScreenshotButton = createStatisticAwareButton(lit("media_widget_debug_screenshot"));
         debugScreenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
@@ -2041,7 +2041,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 {
     int result = base_type::calculateButtonsVisibility();
 
-    if (qnRuntime->isDevMode())
+    if (ini().developerMode)
         result |= Qn::DbgScreenshotButton;
 
     if (d->hasVideo && !base_type::resource()->hasFlags(Qn::still_image))

@@ -80,7 +80,7 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
 
     addRow(tr("Client version: %1.").arg(engineVersion.toString()));
 
-    if (qnRuntime->isDevMode())
+    if (ini().developerMode)
     {
         addRow(lit("Protocol: %1, Cloud: %2")
             .arg(QnAppInfo::ec2ProtoVersion())
@@ -89,7 +89,7 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
 
     addRow(tr("Server version: %1.").arg(connectionInfo.version.toString()));
 
-    if (qnRuntime->isDevMode())
+    if (ini().developerMode)
     {
         addRow(lit("Brand: %1, Customization: %2")
             .arg(connectionInfo.brand)
@@ -217,7 +217,7 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
         case Qn::IncompatibleInternalConnectionResult:
         {
             QString message = tr("Incompatible Server");
-            if (qnRuntime->isDevMode())
+            if (ini().developerMode)
                 message += L'\n' + lit("Protocol: %1").arg(connectionInfo.nxClusterProtoVersion);
             QnMessageBox::warning(parentWidget, message);
             break;
@@ -225,7 +225,7 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
         case Qn::IncompatibleCloudHostConnectionResult:
         {
             QString message = tr("Incompatible Server");
-            if (qnRuntime->isDevMode())
+            if (ini().developerMode)
                 message += L'\n' + lit("Cloud host: %1").arg(connectionInfo.cloudHost);
             QnMessageBox::warning(parentWidget, message);
             break;
@@ -318,7 +318,7 @@ QString QnConnectionDiagnosticsHelper::getDiffVersionFullExtras(
     const QString serverVersion = serverInfo.version.toString();
 
     QString devModeText;
-    if (qnRuntime->isDevMode())
+    if (ini().developerMode)
     {
         devModeText += L'\n' + lit("Client Protocol: %1").arg(QnAppInfo::ec2ProtoVersion());
         devModeText += L'\n' + lit("Server Protocol: %1").arg(serverInfo.nxClusterProtoVersion);

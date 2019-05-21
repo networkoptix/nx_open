@@ -23,9 +23,6 @@ public:
         /** Debug value. */
         DEBUG_COUNTER,
 
-        /** Developers mode with additional options */
-        DEV_MODE,
-
         /** Light client mode - no animations, no background, no opacity, no notifications, 1 camera only allowed. */
         LIGHT_MODE,
 
@@ -39,7 +36,7 @@ public:
         /** Allow timeline to be displayed on the Video Wall. */
         VIDEO_WALL_WITH_TIMELINE,
 
-        /** ActiveX library mode - client is embedded to another window. */
+        /** ACS mode - client is run as a separate camera view-only window. */
         ACS_MODE,
 
         /** Always display full info on cameras. */
@@ -76,7 +73,6 @@ private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(bool, isSoftwareYuv, setSoftwareYuv, SOFTWARE_YUV, false)
         QN_DECLARE_RW_PROPERTY(int, debugCounter, setDebugCounter, DEBUG_COUNTER, 0)
-        QN_DECLARE_RW_PROPERTY(bool, isDevMode, setDevMode, DEV_MODE, false)
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags, lightMode, setLightMode, LIGHT_MODE, {})
         QN_DECLARE_RW_PROPERTY(int, lightModeOverride, setLightModeOverride, LIGHT_MODE_OVERRIDE,
             -1)

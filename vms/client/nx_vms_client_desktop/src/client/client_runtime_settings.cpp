@@ -12,7 +12,6 @@ QnClientRuntimeSettings::QnClientRuntimeSettings(
     init();
     setThreadSafe(true);
 
-    setDevMode(startupParameters.isDevMode());
     setSoftwareYuv(startupParameters.softwareYuv);
     setShowFullInfo(startupParameters.showFullInfo);
 

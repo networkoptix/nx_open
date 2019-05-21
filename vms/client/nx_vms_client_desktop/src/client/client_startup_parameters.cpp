@@ -72,7 +72,6 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
 
     /* Development options */
     addParserParam(commandLineParser, &result.dynamicCustomizationPath,"--customization");
-    addParserParam(commandLineParser, &result.devModeKey,           "--dev-mode-key");
     addParserParam(commandLineParser, &result.softwareYuv,          "--soft-yuv");
     addParserParam(commandLineParser, &result.forceLocalSettings,   "--local-settings");
     addParserParam(commandLineParser, &result.fullScreenDisabled,   "--no-fullscreen");
@@ -164,17 +163,6 @@ nx::utils::Url QnStartupParameters::parseAuthenticationString(QString string)
 nx::utils::Url QnStartupParameters::parseAuthenticationString() const
 {
     return parseAuthenticationString(authenticationString);
-}
-
-bool QnStartupParameters::isDevMode() const
-{
-    // MD5("razrazraz").
-    const auto developerKey =
-        QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f");
-
-    using Hash = nx::utils::QnCryptographicHash;
-    return nx::vms::client::desktop::ini().developerMode
-        || Hash::hash(devModeKey.toLatin1(), Hash::Md5) == developerKey;
 }
 
 bool QnStartupParameters::isVideoWallMode() const

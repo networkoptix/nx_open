@@ -375,10 +375,8 @@ void QnClientModule::initSingletons()
     const auto clientPeerType = m_startupParameters.videoWallGuid.isNull()
         ? nx::vms::api::PeerType::desktopClient
         : nx::vms::api::PeerType::videowallClient;
-    const auto brand = m_startupParameters.isDevMode() ? QString() : QnAppInfo::productNameShort();
-    const auto customization = m_startupParameters.isDevMode()
-        ? QString()
-        : QnAppInfo::customizationName();
+    const auto brand = ini().developerMode ? QString() : QnAppInfo::productNameShort();
+    const auto customization = ini().developerMode ? QString() : QnAppInfo::customizationName();
 
     m_staticCommon.reset(new QnStaticCommonModule(
         clientPeerType,
@@ -753,8 +751,8 @@ void QnClientModule::initLocalInfo()
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;
-    runtimeData.brand = qnRuntime->isDevMode() ? QString() : QnAppInfo::productNameShort();
-    runtimeData.customization = qnRuntime->isDevMode() ? QString() : QnAppInfo::customizationName();
+    runtimeData.brand = ini().developerMode ? QString() : QnAppInfo::productNameShort();
+    runtimeData.customization = ini().developerMode ? QString() : QnAppInfo::customizationName();
     runtimeData.videoWallInstanceGuid = m_startupParameters.videoWallItemGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData); // initializing localInfo
 }

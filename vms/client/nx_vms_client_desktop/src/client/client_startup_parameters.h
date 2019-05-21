@@ -26,7 +26,6 @@ struct QnStartupParameters
 
     nx::utils::Url parseAuthenticationString() const;
 
-    bool isDevMode() const;
     bool isVideoWallMode() const;
 
     int screen = kInvalidScreen;
@@ -53,7 +52,6 @@ struct QnStartupParameters
      */
     bool acsMode = false;
 
-    QString devModeKey;
     QString authenticationString;
     QString delayedDrop;
     QString instantDrop;
