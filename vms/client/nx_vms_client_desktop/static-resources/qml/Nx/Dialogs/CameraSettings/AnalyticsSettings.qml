@@ -15,7 +15,7 @@ Item
     property var analyticsEngines: []
     property var enabledAnalyticsEngines: []
 
-    readonly property alias currentEngineId: menu.currentItemId
+    property var currentEngineId
     property bool loading: false
 
     Connections
@@ -26,35 +26,43 @@ Item
             loading = store.analyticsSettingsLoading()
             analyticsEngines = store.analyticsEngines()
             enabledAnalyticsEngines = store.enabledAnalyticsEngines()
+            var engineId = store.currentAnalyticsEngineId()
 
-            if (store.currentAnalyticsEngineId() === currentEngineId)
+            if (engineId === currentEngineId)
             {
                 settingsView.setValues(store.deviceAgentSettingsValues(currentEngineId))
             }
             else if (analyticsEngines.length > 0)
             {
-                var engineFound = false
+                var engineInfo = undefined
                 for (var i = 0; i < analyticsEngines.length; ++i)
                 {
-                    var engineInfo = analyticsEngines[i]
-                    if (engineInfo.id === currentEngineId)
+                    var info = analyticsEngines[i]
+                    if (info.id === engineId)
                     {
-                        engineFound = true
-                        settingsView.loadModel(
-                            engineInfo.settingsModel,
-                            store.deviceAgentSettingsValues(currentEngineId))
+                        engineInfo = info
+                        break
                     }
                 }
 
                 // Select first engine in the list if nothing selected.
-                if (!engineFound)
+                if (!engineInfo)
                 {
                     engineInfo = analyticsEngines[0]
-                    menu.currentItemId = engineInfo.id
-                    settingsView.loadModel(
-                        engineInfo.settingsModel,
-                        store.deviceAgentSettingsValues(currentEngineId))
+                    engineId = engineInfo.id
                 }
+
+                currentEngineId = engineId
+                menu.currentItemId = engineId
+                settingsView.loadModel(
+                    engineInfo.settingsModel,
+                    store.deviceAgentSettingsValues(engineInfo.id))
+            }
+            else
+            {
+                currentEngineId = undefined
+                menu.currentItemId = undefined
+                settingsView.loadModel({}, {})
             }
 
             alertBar.visible = !store.recordingEnabled() && enabledAnalyticsEngines.length !== 0
@@ -97,7 +105,7 @@ Item
             id: enableSwitch
             text: qsTr("Enable")
             Layout.preferredWidth: Math.max(implicitWidth, 120)
-            visible: menu.currentItemId
+            visible: currentEngineId !== undefined
 
             Binding
             {
