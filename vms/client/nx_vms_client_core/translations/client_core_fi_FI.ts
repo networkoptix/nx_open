@@ -118,20 +118,20 @@
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
+      <translation>Sisäinen %1 virhe. Ota yhteyttä tekniseen tukeen.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Liian monta yritystä. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1 on väliaikaisesti poissa käytöstä. Yritä uudelleen myöhemmin.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>Verkkovirhe. Tarkista Internet-yhteys ja yritä uudelleen.</translation>
     </message>
   </context>
   <context>
@@ -274,17 +274,17 @@
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>millisekuntia</numerusform>
-        <numerusform>milliseconds</numerusform>
+        <numerusform>millisekuntia</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>sekuntia</numerusform>
-        <numerusform>seconds</numerusform>
+        <numerusform>sekuntia</numerusform>
       </translation>
     </message>
     <message numerus="yes">
