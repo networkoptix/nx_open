@@ -2,6 +2,7 @@
 #define __SIGN_DIALOG_DISPLAY_H__
 
 #include <nx/utils/cryptographic_hash.h>
+#include <export/signer.h>
 
 #include <camera/cam_display.h>
 
@@ -14,7 +15,8 @@ public:
     QnSignDialogDisplay(QnMediaResourcePtr resource);
     virtual ~QnSignDialogDisplay();
 signals:
-    void gotSignature(QByteArray calculatedSign, QByteArray signFromPicture);
+    void gotSignature(
+        QByteArray calculatedSign, QByteArray calculatedSign2, QByteArray signFromPicture);
     void gotSignatureDescription(QString version, QString hwId, QString licensedTo);
     void calcSignInProgress(QByteArray calculatedSign, int progress);
     void gotImageSize(int width, int height);
@@ -24,6 +26,7 @@ protected:
     void finalizeSign();
 private:
     nx::utils::QnCryptographicHash m_mdctx;
+    MediaSigner m_mediaSigner;
     QnAbstractMediaDataPtr m_prevFrame;
     QnCompressedVideoDataPtr m_lastKeyFrame;
     bool m_eofProcessed;

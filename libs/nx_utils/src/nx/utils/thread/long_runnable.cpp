@@ -62,31 +62,39 @@ public:
         m_waitCondition.wakeAll();
     }
 
-    // Deadlocks if some QnLongRunnables are dangling.
-    // Set m_relaxedChecking to cancel this behaviour.
-    void waitForDestruction()
+    void verifyCreated()
     {
         QnMutexLocker lock(&m_mutex);
-        while (!m_created.isEmpty())
-        {
-            for (const auto created: m_created)
-                NX_DEBUG(this, lm("Still created: %1").args(created));
-            if (m_relaxedChecking)
-                break;
-			m_waitCondition.wait(&m_mutex);
-        }
-    }
-
-    void setRelaxedChecking(bool relaxed)
-    {
-        m_relaxedChecking = relaxed;
+        if (!m_created.isEmpty())
+            NX_WARNING(this, "Still created: %1", containerString(m_created));
     }
 
 private:
     void waitAllLocked()
     {
+        using namespace std::chrono;
+        static const seconds kStopTimeout(60);
+        const auto start = system_clock::now();
+
         while (!m_running.isEmpty())
-            m_waitCondition.wait(&m_mutex);
+        {
+            const auto timeFromStart = duration_cast<milliseconds>((system_clock::now() - start));
+            const milliseconds timeToWait = kStopTimeout - timeFromStart;
+            if (timeToWait.count() > 0)
+                m_waitCondition.wait(&m_mutex, timeToWait);
+
+            if (system_clock::now() - start >= kStopTimeout)
+            {
+                for (const auto runnable: m_running)
+                {
+                    NX_WARNING(
+                        this, "A long runnable %1 hasn't stopped in %2 seconds", runnable,
+                        kStopTimeout);
+                }
+
+                return;
+            }
+        }
     }
 
 private:
@@ -94,7 +102,6 @@ private:
     QnWaitCondition m_waitCondition;
     QSet<QnLongRunnable*> m_created;
     QSet<QnLongRunnable*> m_running;
-    bool m_relaxedChecking = false;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -151,7 +158,7 @@ QnLongRunnablePool::QnLongRunnablePool(QObject *parent):
 QnLongRunnablePool::~QnLongRunnablePool()
 {
     stopAll();
-    d->waitForDestruction();
+    d->verifyCreated();
 }
 
 void QnLongRunnablePool::stopAll()
@@ -162,9 +169,4 @@ void QnLongRunnablePool::stopAll()
 void QnLongRunnablePool::waitAll()
 {
     d->waitAll();
-}
-
-void QnLongRunnablePool::setRelaxedChecking(bool relaxed)
-{
-    d->setRelaxedChecking(relaxed);
 }

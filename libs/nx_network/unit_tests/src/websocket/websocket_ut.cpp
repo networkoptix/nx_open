@@ -276,8 +276,8 @@ protected:
     }
 
     void givenServerClientWebSockets(
-        std::chrono::milliseconds clientTimeout,
-        std::chrono::milliseconds serverTimeout)
+        std::chrono::milliseconds clientTimeout, std::chrono::milliseconds serverTimeout,
+        bool noPongs = false)
     {
         clientWebSocket.reset(
             new TestWebSocket(
@@ -295,6 +295,13 @@ protected:
         clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
         clientWebSocket->setAliveTimeout(clientTimeout);
         serverWebSocket->setAliveTimeout(serverTimeout);
+
+        if (noPongs)
+        {
+            clientWebSocket->disablePingPong();
+            serverWebSocket->disablePingPong();
+        }
+
         clientWebSocket->start();
         serverWebSocket->start();
     }
@@ -304,11 +311,11 @@ protected:
         givenServerClientWebSockets(kAliveTimeout, kAliveTimeout);
     }
 
-    void givenServerClientWebSocketsWithShortTimeout()
+    void givenServerClientWebSocketsWithShortTimeout(bool noPongs)
     {
         givenClientModes(SendMode::singleMessage, ReceiveMode::message);
         givenServerModes(SendMode::singleMessage, ReceiveMode::message);
-        givenServerClientWebSockets(kShortTimeout, kShortTimeout * 100);
+        givenServerClientWebSockets(kShortTimeout, kShortTimeout, noPongs);
     }
 
     void givenServerClientWebSocketsWithDifferentTimeouts()
@@ -354,8 +361,7 @@ protected:
             [this](SystemError::ErrorCode ecode, size_t)
             {
                 ASSERT_EQ(ecode, SystemError::noError);
-                doneCount++;
-                if (doneCount == kIterations)
+                if (++doneCount == kIterations)
                 {
                     readyPromise.set_value();
                     return;
@@ -369,18 +375,20 @@ protected:
         serverSendCb =
             [this](SystemError::ErrorCode ecode, size_t)
             {
-                ASSERT_EQ(ecode, SystemError::noError);
                 if (doneCount == kIterations)
                     return;
+
+                ASSERT_EQ(ecode, SystemError::noError);
                 serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
             };
 
         serverReadCb =
-            [this](SystemError::ErrorCode, size_t)
+            [this](SystemError::ErrorCode error, size_t)
             {
                 if (doneCount == kIterations)
                     return;
 
+                ASSERT_EQ(error, SystemError::noError);
                 ASSERT_EQ(serverReadBuf, clientSendBuf);
                 serverReadBuf.clear();
                 serverWebSocket->sendAsync(serverSendBuf, serverSendCb);
@@ -925,18 +933,25 @@ protected:
         std::thread(
             [this]()
             {
-                std::this_thread::sleep_for(kShortTimeout * 2);
+                std::this_thread::sleep_for(kShortTimeout * 4);
                 try { readyPromise.set_value(); } catch (...) {}
             }).detach();
 
         start();
-        clientWebSocket->pleaseStopSync();
+        readyFuture.wait();
+        if (clientWebSocket)
+            clientWebSocket->pleaseStopSync();
         waitForServerSocketDestroyed();
     }
 
     void thenItsBeenKeptAliveByThePings()
     {
         ASSERT_FALSE(isTimeoutError);
+    }
+
+    void thenConnectionShouldBeAbortedWithTimeout()
+    {
+        ASSERT_TRUE(isTimeoutError);
     }
 
     std::function<void()> beforeWaitAction;
@@ -961,11 +976,20 @@ TEST_F(WebSocket_PingPong, PingPong_pingsBecauseOfNoData)
     isServerResponding = false;
     isClientSending = false;
 
-    givenServerClientWebSocketsWithShortTimeout();
+    givenServerClientWebSocketsWithShortTimeout(/*noPongs*/ false);
     whenConnectionIsIdleForSomeTime();
     thenItsBeenKeptAliveByThePings();
 }
 
+TEST_F(WebSocket_PingPong, PingPong_abortIfNoPongs)
+{
+    isServerResponding = false;
+    isClientSending = false;
+
+    givenServerClientWebSocketsWithShortTimeout(/*noPongs*/ true);
+    whenConnectionIsIdleForSomeTime();
+    thenConnectionShouldBeAbortedWithTimeout();
+}
 
 TEST_F(WebSocket_PingPong, Close)
 {

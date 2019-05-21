@@ -89,8 +89,10 @@ private:
     CameraDiagnostics::Result sendAudioEncoderToCamera(
         onvifXsd__AudioEncoderConfiguration& encoderConfig) const;
 
+    void fixStreamUrl(QString* mediaUrl, const std::string& profileToken) const;
+
     CameraDiagnostics::Result fetchStreamUrl(MediaSoapWrapper& soapWrapper,
-        const std::string& profileToken, bool isPrimary, QString* const mediaUrl) const;
+        const std::string& profileToken, bool isPrimary, QString* mediaUrl) const;
 
     void printProfile(const onvifXsd__Profile& profile, bool isPrimary) const;
 

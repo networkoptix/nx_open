@@ -198,6 +198,10 @@ bool OnvifMulticastParametersProxy::setMulticastParameters(MulticastParameters p
     // address for audio. We does not care here if setAudioEncoder fails' cause it most probably
     // will not affect behavior of most of the cameras.
     setAudioEncoderMulticastParameters(parameters);
+
+    NX_DEBUG(this, "Camera [%1], change multicast parameters, reopen stream: %2",
+        m_resource->getId(), m_streamIndex);
+    m_resource->reopenStream(m_streamIndex);
     return true;
 }
 
@@ -244,9 +248,6 @@ bool OnvifMulticastParametersProxy::setVideoEncoderMulticastParameters(
         return false;
     }
 
-    NX_DEBUG(this, "Camera [%1], change multicast parameters, reopen stream: %2",
-        m_resource->getId(), m_streamIndex);
-    m_resource->reopenStream(m_streamIndex);
     return true;
 }
 

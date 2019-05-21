@@ -34,11 +34,9 @@ class QnMediaServerConnection: public QnAbstractConnection
 public:
     QnMediaServerConnection(
         QnCommonModule* commonModule,
-        const QnMediaServerResourcePtr& mserver,
+        const QnMediaServerResourcePtr& server,
         const QnUuid& videowallGuid = QnUuid(),
         bool enableOfflineRequests = false);
-
-    virtual ~QnMediaServerConnection();
 
     int getTimePeriodsAsync(
         const QnVirtualCameraResourcePtr& camera,
@@ -331,6 +329,7 @@ public:
         const QnGetBookmarkTagsRequestData& request, QObject* target, const char* slot);
 
 protected:
+    virtual nx::utils::Url url() const override;
     virtual QnAbstractReplyProcessor* newReplyProcessor(int object, const QString& serverId) override;
     virtual bool isReady() const override;
 
@@ -358,6 +357,7 @@ private:
     void addOldVersionPtzParams(const QnNetworkResourcePtr& camera, QnRequestParamList& params);
 
 private:
+    QWeakPointer<QnMediaServerResource> m_server;
     nx::vms::api::SoftwareVersion m_serverVersion;
     QString m_serverId; // for debug purposes so storing in string to avoid conversions
     QString m_proxyAddr;

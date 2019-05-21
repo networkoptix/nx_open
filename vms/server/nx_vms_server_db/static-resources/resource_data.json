@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.53",
+    "version": "1.0.1.55",
     "data": [
         {
             "keys": [
@@ -1274,23 +1274,23 @@
         },
         {
             "keys": [
-            	"DW|DWC-PF5M1TIR",
-            	"DW|DWC-MB45DiA",
-            	"DW|DWC-MV85DiA",
-            	"DW|DWC-PB6M4T"
+                "DW|DWC-PF5M1TIR",
+                "DW|DWC-MB45DiA",
+                "DW|DWC-MV85DiA",
+                "DW|DWC-PB6M4T"
             ],
             "fixWrongInputPortNumber": true
         },
         {
             "keys": [
-            	"DW|DWC-MV85DiA"
+                "DW|DWC-MV85DiA"
             ],
             "repeatIntervalForSendVideoEncoderMS": 1000
         },
         {
             "keys": [
-            	"DW|DWC-MD421D",
-            	"DW|DWC-MV421D"
+                "DW|DWC-MD421D",
+                "DW|DWC-MV421D"
             ],
             "fixWrongOutputPortToken": true
         },
@@ -2039,11 +2039,16 @@
         {
             "keys": ["Dahua|22204TNI"],
             "_comment": "The camera returns the same URI for all videoencoders, so we switch them off.",
-            "forcedOnvifParams": 
+            "forcedOnvifParams":
             {
                 "videoEncoders": ["000"],
                 "profiles": ["MediaProfile000"]
             }
+        },
+        {
+            "keys": ["Dahua|IPC-HDBW8241E*"],
+            "_comment": "The camera returns the same URI for all videoencoders, so we fix it.",
+            "fixWrongUri": true
         },
         {
             "keys": [
@@ -2846,7 +2851,7 @@
             }
         },
         {
-            "keys": 
+            "keys":
             [
                 "DW|DWC-MPZ20XFM",
                 "DW|DWC-MD421D"
@@ -3125,14 +3130,6 @@
             "onvifPtzSpeedBroken": true
         },
         {
-            "keys": [
-                "HIKVISION|DS-2CD6A64F-IHS/NFC"
-            ],
-            "disableMultiThreadDecoding": [
-                "hevc"
-            ]
-        },
-        {
             "keys": ["UNIVIEW|*"],
             "needToReloadAllAdvancedParametersAfterApply": true
         },
@@ -3233,7 +3230,7 @@
                 }
             }
         },
-		{
+        {
             "keys": [
                 "VIVOTEK|SD9366*"
             ],
@@ -3343,8 +3340,8 @@
                 }
             }
         },
-		{
-			"_comment1": "Mapping for firmware: IPC_HCMN2108-B0006P10D1711",
+        {
+            "_comment1": "Mapping for firmware: IPC_HCMN2108-B0006P10D1711",
             "keys": [
                 "UNIVIEW|IPC6322SR-X22*"
             ],
@@ -3427,7 +3424,7 @@
                 }
             }
         },
-		{
+        {
             "_comment1": "Mapped for 2.600.Dahua 00.0.R, build: 2017-06-01",
             "keys": [
                 "Dahua|PDN6CT230*"

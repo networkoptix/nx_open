@@ -149,7 +149,6 @@ namespace ResourceDataKey
     static const QString kAdvancedParameterOverloads("advancedParameterOverloads");
     static const QString kShouldAppearAsSingleChannel("shouldAppearAsSingleChannel");
     static const QString kPreStreamConfigureRequests("preStreamConfigureRequests");
-    static const QString kDisableMultiThreadDecoding("disableMultiThreadDecoding");
     static const QString kConfigureAllStitchedSensors("configureAllStitchedSensors");
     static const QString kTwoWayAudio("2WayAudio");
 

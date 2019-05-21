@@ -21,12 +21,14 @@ QnSignInfo::QnSignInfo(QWidget* parent):
     m_DrawDetailText = false;
 }
 
-void QnSignInfo::at_gotSignature(QByteArray calculatedSign, QByteArray signFromFrame)
+void QnSignInfo::at_gotSignature(
+    QByteArray calculatedSign, QByteArray calculatedSign2, QByteArray signFromFrame)
 {
     {
         QnMutexLocker lock(&m_mutex);
         m_finished = true;
         m_sign = calculatedSign;
+        m_sign2 = calculatedSign2;
         m_signFromFrame = signFromFrame;
     }
     update();
@@ -55,6 +57,7 @@ void QnSignInfo::paintEvent(QPaintEvent*)
     float opacity = qAbs(sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI))*0.5 + 0.5;
     bool finished = false;
     QByteArray sign;
+    QByteArray sign2;
     QByteArray signFromFrame;
 
     // We gather a copy of all thread-shared data.
@@ -63,10 +66,16 @@ void QnSignInfo::paintEvent(QPaintEvent*)
         QnMutexLocker lock(&m_mutex);
         finished = m_finished;
         sign = m_sign;
+        sign2 = m_sign2;
         signFromFrame = m_signFromFrame;
     }
 
     bool signIsMatched = (sign == signFromFrame);
+    if (!signIsMatched)
+    {
+        signIsMatched = (sign2 == signFromFrame);
+        sign = sign2;
+    }
 
     m_signHelper.setSign(sign);
     QPainter painter(this);

@@ -97,7 +97,6 @@ nx::utils::Url QnFakeMediaServerResource::getApiUrl() const
 void QnFakeMediaServerResource::setAuthenticator(const QAuthenticator& authenticator)
 {
     m_authenticator = authenticator;
-    apiConnection()->setUrl(getApiUrl());
 }
 
 void QnFakeMediaServerResource::updateInternal(const QnResourcePtr& /*other*/, Qn::NotifierList& /*notifiers*/)

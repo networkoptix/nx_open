@@ -143,6 +143,9 @@ public:
 
 private:
     void assertEngineCasted(void* engine) const;
+    void logMetadataPacketIfNeeded(
+        const IMetadataPacket* metadataPacket,
+        const std::string& packetIndexName) const;
     void processMetadataPackets(const std::vector<IMetadataPacket*>& metadataPackets);
     void processMetadataPacket(IMetadataPacket* metadataPacket, int packetIndex /*= -1*/);
 

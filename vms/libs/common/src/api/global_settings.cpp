@@ -489,6 +489,15 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         QString(),
         this);
 
+    m_lastMergeMasterIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        kNameLastMergeMasterId,
+        QString(),
+        this);
+    m_lastMergeSlaveIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        kNameLastMergeSlaveId,
+        QString(),
+        this);
+
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         kNameDisabledVendors,
         QString(),
@@ -877,6 +886,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     result
         << m_systemNameAdaptor
         << m_localSystemIdAdaptor
+        << m_lastMergeMasterIdAdaptor
+        << m_lastMergeSlaveIdAdaptor
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_autoUpdateThumbnailsAdaptor
@@ -1349,6 +1360,26 @@ void QnGlobalSettings::setLocalSystemId(const QnUuid& value)
         .args(m_localSystemIdAdaptor->value(), value));
 
     m_localSystemIdAdaptor->setValue(value.toString());
+}
+
+QnUuid QnGlobalSettings::LastMergeMasterId() const
+{
+    return QnUuid(m_lastMergeMasterIdAdaptor->value());
+}
+
+void QnGlobalSettings::setLastMergeMasterId(const QnUuid& value)
+{
+    m_lastMergeMasterIdAdaptor->setValue(value.toString());
+}
+
+QnUuid QnGlobalSettings::LastMergeSlaveId() const
+{
+    return QnUuid(m_lastMergeSlaveIdAdaptor->value());
+}
+
+void QnGlobalSettings::setLastMergeSlaveId(const QnUuid& value)
+{
+    m_lastMergeSlaveIdAdaptor->setValue(value.toString());
 }
 
 QString QnGlobalSettings::clientStatisticsSettingsUrl() const

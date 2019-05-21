@@ -317,6 +317,22 @@ public:
 
     int totalRequestsSentViaCurrentConnection() const;
     int totalRequestsSent() const;
+
+    /**
+     * After this function has been called no new socket::read() will be invoked by HttpClient
+     * until HttpClient::resumeReading() is called.
+     * NOTE: Should be called only within the same AIO thread with the HttpClient socket.
+     */
+    void stopReading();
+
+    /**
+     * Resume reading stopped by the HttpClient::stopReading() function. If
+     * HttpClient::stopReading() hasn't been called this function will have no effect.
+     * NOTE: Should be called only within the same AIO thread with the HttpClient socket.
+     */
+    void resumeReading();
+    bool isReading();
+
 private:
     enum class Result
     {
@@ -370,6 +386,8 @@ private:
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_expectOnlyBody = false;
     int m_maxNumberOfRedirects = 5;
+    bool m_readingCeased = false;
+    bool m_readInvoked = false;
 
     virtual void stopWhileInAioThread() override;
 
