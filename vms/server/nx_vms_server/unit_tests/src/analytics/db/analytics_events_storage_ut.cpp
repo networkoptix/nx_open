@@ -36,6 +36,9 @@ public:
         m_settings.dbConnectionOptions.maxConnectionCount = 17;
 
         m_attributeDictionary.initialize(5, 2);
+
+        for (int i = 0; i < 3; ++i)
+            m_allowedDeviceIds.push_back(QnUuid::createUuid());
     }
 
 protected:
@@ -102,10 +105,12 @@ protected:
 
     void thenAllEventsCanBeRead()
     {
-        whenLookupObjects(Filter());
+        auto filter = buildEmptyFilter();
+
+        whenLookupObjects(filter);
 
         thenLookupSucceded();
-        andLookupResultMatches(Filter(), m_analyticsDataPackets);
+        andLookupResultMatches(filter, m_analyticsDataPackets);
     }
 
     void andLookupResultMatches(
@@ -398,6 +403,9 @@ protected:
                 *m_lastTimestamp + nx::utils::random::number<qint64>(1, 60000000);
         }
 
+        NX_ASSERT(!m_allowedDeviceIds.empty());
+        packet->deviceId = nx::utils::random::choice(m_allowedDeviceIds);
+
         m_lastTimestamp = packet->timestampUsec;
 
         return packet;
@@ -414,6 +422,13 @@ protected:
             {
                 return left->timestampUsec < right->timestampUsec;
             });
+    }
+
+    Filter buildEmptyFilter()
+    {
+        Filter filter;
+        filter.deviceIds = allowedDeviceIds();
+        return filter;
     }
 
 private:
@@ -787,11 +802,15 @@ protected:
             return;
 
         generateVariousEvents();
+
+        m_filter = buildEmptyFilter();
     }
 
     void addRandomKnownDeviceIdToFilter()
     {
         ASSERT_FALSE(allowedDeviceIds().empty());
+        
+        m_filter.deviceIds.clear();
         m_filter.deviceIds.push_back(
             nx::utils::random::choice(allowedDeviceIds()));
     }
@@ -871,7 +890,7 @@ protected:
 
     void givenEmptyFilter()
     {
-        m_filter = Filter();
+        m_filter = buildEmptyFilter();
     }
 
     void givenRandomFilter()
@@ -1254,6 +1273,9 @@ protected:
 
     void whenReadDataUsingCursor()
     {
+        // NOTE: Currently, the cursor is forward only.
+        setSortOrder(Qt::AscendingOrder);
+
         whenCreateCursor();
         thenCursorIsCreated();
 
@@ -1360,8 +1382,6 @@ TEST_F(AnalyticsDbCursor, reads_all_available_data)
 TEST_F(AnalyticsDbCursor, reads_all_matched_data)
 {
     givenRandomFilter();
-    // NOTE: Currently, the cursor is forward only.
-    setSortOrder(Qt::AscendingOrder);
 
     whenReadDataUsingCursor();
     thenResultMatchesExpectations();
@@ -1690,20 +1710,22 @@ protected:
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        whenLookupObjects(Filter());
+        const auto filter = buildEmptyFilter();
+
+        whenLookupObjects(filter);
         thenLookupSucceded();
-        andLookupResultMatches(Filter(), analyticsDataPackets());
+        andLookupResultMatches(filter, analyticsDataPackets());
     }
 
     void thenDataIsExpected()
     {
-        Filter filter;
+        auto filter = buildEmptyFilter();
         filter.timePeriod.setStartTime(m_oldestAvailableDataTimestamp);
         filter.timePeriod.durationMs = QnTimePeriod::kInfiniteDuration;
 
         for (;;)
         {
-            whenLookupObjects(Filter());
+            whenLookupObjects(buildEmptyFilter());
             thenLookupSucceded();
             if (isLookupResultEquals(filter, analyticsDataPackets()))
                 return;
