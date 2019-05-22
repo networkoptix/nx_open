@@ -5,7 +5,7 @@ import Nx.Core 1.0
 MultiVideoLayout
 {
     property MediaPlayer mediaPlayer: null
-    property Component channelOverlay: null
+    property Component channelOverlayComponent: null
 
     function clear()
     {
@@ -38,7 +38,7 @@ MultiVideoLayout
         Loader
         {
             anchors.fill: parent
-            sourceComponent: channelOverlay
+            sourceComponent: channelOverlayComponent
 
             onLoaded:
             {
