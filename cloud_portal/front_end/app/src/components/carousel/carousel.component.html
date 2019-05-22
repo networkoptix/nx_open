@@ -6,7 +6,7 @@
                  [ngClass]=" { 'active': i == currentIndex }"
                  [@visibilityChange]="i == currentIndex ? 'enter' : 'leave'">
                 <div class="d-flex justify-content-center align-items-center h-100">
-                    <img class="img-fluid" [src]="screenshot">
+                    <img class="img-fluid" [src]="screenshot.value">
                 </div>
             </div>
         </div>
