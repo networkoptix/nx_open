@@ -14,6 +14,7 @@
 #include "recorder/storage_manager.h"
 #include "media_server/media_server_module.h"
 #include <nx/vms/server/metadata/analytics_helper.h>
+#include <nx/utils/log/log_main.h>
 
 static const auto kAllArchive = QList<QnServer::ChunksCatalog>()
     << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog;
@@ -35,7 +36,13 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
         case Qn::MotionContent:
         {
             const auto motionPeriods = serverModule()->motionHelper()->matchImage(request);
-            return QnTimePeriodList::intersection(motionPeriods, archivePeriods);
+            auto result = QnTimePeriodList::intersection(motionPeriods, archivePeriods);
+            NX_VERBOSE(this,
+                lm("Find motion periods for camera(s) %1. "
+                    "Before filtering %2, after filtering %3 record(s). Archive periods: %4")
+                .args(request.resList, motionPeriods.size(), result.size()), archivePeriods.size());
+
+            return result;
         }
 
         case Qn::AnalyticsContent:

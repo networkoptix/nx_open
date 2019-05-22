@@ -3,6 +3,7 @@
 #include <nx/vms/server/metadata/metadata_helper.h>
 #include "utils/media/sse_helper.h"
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/log/log_main.h>
 
 namespace nx::vms::server::metadata {
 
@@ -406,6 +407,8 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(const Filter& filter)
         QVector<IndexRecord> index;
         IndexHeader indexHeader;
         fillFileNames(timePointMs, &metadataFile, 0);
+        NX_VERBOSE(this, lm("Matching motion periods for camera %1 for month %2")
+            .args(m_uniqueId, metadataFile.fileName()));
         bool isFileExists = metadataFile.open(QFile::ReadOnly)
             && loadIndexFile(index, indexHeader, timePointMs);
         if (isFileExists)
@@ -447,7 +450,8 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(const Filter& filter)
         else
             msStartTime = maxTime + 1;
     }
-
+    NX_VERBOSE(this, lm("Found %1 motion period(s) for camera %2 for range %3-%4")
+        .args(rez.size(), m_uniqueId, filter.startTime, filter.endTime));
     return rez;
 }
 
