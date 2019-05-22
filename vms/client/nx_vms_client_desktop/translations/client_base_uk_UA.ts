@@ -3667,7 +3667,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Каналів</translation>
     </message>
   </context>
   <context>
@@ -5236,7 +5236,7 @@ to %1</source>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Плагіни</translation>
     </message>
   </context>
   <context>
@@ -5715,13 +5715,13 @@ to %1</source>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>Що робити з поточними даними аналізу?</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Поточні дані аналітики не будуть автоматично переміщені в інше місце і стануть недоступними. Ви можете зберегти його та перемістити вручну пізніше, або видалити назавжди.
+Якщо ви плануєте перенести аналітичні дані в інше місце зберігання, зверніться до служби підтримки, перш ніж продовжити.</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5784,11 +5784,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation type="unfinished">Use to store analytics data</translation>
+      <translation>Використовується для зберігання аналітичних даних</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation type="unfinished">Stores analytics data</translation>
+      <translation>Зберігає дані аналітики</translation>
     </message>
   </context>
   <context>
@@ -7732,7 +7732,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Мультикаст</translation>
     </message>
   </context>
   <context>
@@ -8954,15 +8954,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages to some servers</source>
-      <translation type="unfinished">Failed to download update packages to some servers</translation>
+      <translation>Не вдалося завантажити пакети оновлення для деяких серверів</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
+      <translation>Відбулася помилка при встановленні:</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+      <translation>Деякі сервери перейшли в офлайн. Будь ласка, зачекайте, поки вони стануть онлайн, щоб продовжити.</translation>
     </message>
   </context>
   <context>
@@ -9086,47 +9086,47 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>Очікування однорангових даних</translation>
     </message>
     <message>
       <source>Update package can&apos;t be not found.</source>
-      <translation type="unfinished">Update package can&apos;t be not found.</translation>
+      <translation>Пакет оновлення &apos;не знайдено.</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>Не вистачає місця для завантаження файлів оновлення.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>Не вистачає місця для видобування файлів оновлень.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>Не вдалося завантажити пакети оновлень.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>Вміст оновлення недійсний.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>Архів оновлення пошкоджено.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>Неможливо витягти файли оновлення.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>Внутрішня помилка завантажувача.</translation>
     </message>
     <message>
       <source>Iternal server error.</source>
-      <translation type="unfinished">Iternal server error.</translation>
+      <translation>Внутрішня помилка сервера.</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>Внутрішня помилка клієнта.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -9134,11 +9134,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>Сталася неочікувана помилка.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>Готовий до встановлення оновлення</translation>
     </message>
   </context>
   <context>
@@ -9301,11 +9301,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>Бібліотека</translation>
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Версія</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -10097,7 +10097,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location to store analytics data</source>
-      <translation type="unfinished">Confirm storage location to store analytics data</translation>
+      <translation>Підтвердьте місце зберігання, щоб зберігати дані аналітики</translation>
     </message>
     <message>
       <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
@@ -10105,15 +10105,15 @@ If you intended to move analytics data to another storage location, please conta
 Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
 
 You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+      <translation>База даних Analytics повинна зберігатися на локальному сховищі і може займати до ста гігабайт.
 
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+Після вибору розташування для зберігання аналітичних даних його не можна легко змінити, не втрачаючи вихідних даних. Ми рекомендуємо ретельно вибрати місце розташування та не використовувати системний розділ, щоб уникнути серйозних несправностей системи.
 
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+Ви можете змінити місце зберігання на вкладці &quot;Storage Management&quot; у діалоговому вікні Параметри сервера.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Відкрити Налаштування Серверу</translation>
     </message>
     <message>
       <source>OK</source>

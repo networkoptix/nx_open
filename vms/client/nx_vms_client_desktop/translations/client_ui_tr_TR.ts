@@ -3094,7 +3094,7 @@
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>USB depolamada kayıt etkinleştirildi</translation>
     </message>
   </context>
   <context>
