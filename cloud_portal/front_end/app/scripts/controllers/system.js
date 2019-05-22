@@ -197,10 +197,7 @@ angular.module('cloudApp')
                         var dialogBody = '<p>' + commonErrorMsg + '</p>';
                         var responseError = L.errorCodes[error.errorText] || L.errorCodes[error.responseCode];
                         if (!responseError) {
-                            delete error.failedSystemName;
-                            delete error.primarySystemName;
-                            delete error.secondarySystemName;
-                            responseError = L.errorCodes.unknownError + ':<br><pre>' + JSON.stringify(error, null, 2) + '</pre>';
+                            responseError = L.errorCodes.unknownMergeError;
                         } else {
                             responseError = responseError.replace('{{failedSystem}}', error.failedSystemName);
                         }
