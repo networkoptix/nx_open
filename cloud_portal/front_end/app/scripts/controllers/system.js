@@ -84,6 +84,10 @@ angular.module('cloudApp')
             var pollingSystemUpdate = null;
 
             function delayedUpdateSystemInfo() {
+                // An extra measure to prevent more intervals from being created.
+                if (pollingSystemUpdate) {
+                    $poll.cancel(pollingSystemUpdate);
+                }
                 pollingSystemUpdate = $poll(function () {
                     return $scope.system
                         .update()
@@ -95,7 +99,6 @@ angular.module('cloudApp')
                 }, Config.updateInterval);
 
                 $scope.$on('$destroy', function (event) {
-                    // $poll.cancel(pollingSystemUpdate);
                     $poll.cancel(pollingSystemUpdate);
                 });
             }
@@ -257,18 +260,16 @@ angular.module('cloudApp')
                                 delayedUpdateSystemInfo();
                             }, function () {
                                 $scope.locked[ user.email ] = false;
+                                $scope.system.getUsers();
+                                delayedUpdateSystemInfo();
                             });
 
                             $scope.unsharing.run();
                         } else {
                             $scope.locked[ user.email ] = false;
-                            $scope.system.getUsers();
-                            delayedUpdateSystemInfo();
                         }
                     }, function () {
                         $scope.locked[ user.email ] = false;
-                        $scope.system.getUsers();
-                        delayedUpdateSystemInfo();
                     });
             };
 
