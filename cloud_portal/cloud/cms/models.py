@@ -518,8 +518,15 @@ class ContentVersion(models.Model):
         blocked = ProductCustomizationReview.REVIEW_STATES.blocked
         pending = ProductCustomizationReview.REVIEW_STATES.pending
 
+        if self.product.product_type.single_customization:
+            ProductCustomizationReview(customization=self.product.customizations.first(),
+                                       version=self,
+                                       state=pending).save()
+            return
+
         for customization in self.product.customizations.all():
-            if customization.parent:
+            parent_in_review = self.product.customizations.filter(customization.parent).exists()
+            if customization.parent and parent_in_review:
                 ProductCustomizationReview(customization=customization, version=self, state=blocked).save()
             else:
                 ProductCustomizationReview(customization=customization, version=self, state=pending).save()
