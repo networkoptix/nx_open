@@ -1335,6 +1335,8 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
     if (!m_serverStatusCheck.valid())
         m_serverStatusCheck = m_serverUpdateTool->requestRemoteUpdateState();
 
+    m_offlineUpdateCheck = m_serverUpdateTool->takeUpdateCheckFromFile();
+
     setTargetState(WidgetUpdateState::checkingServers, {});
     // Maybe we should call loadDataToUi instead.
     syncUpdateCheckToUi();
@@ -1351,12 +1353,33 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         return;
     }
 
-    if (m_serverUpdateCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready
-        && m_serverStatusCheck.valid()
-        && m_serverStatusCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready)
+    bool mediaserverUpdateCheckReady =
+        m_serverUpdateCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready;
+    bool mediaserverStatusCheckReady = m_serverStatusCheck.valid()
+        && m_serverStatusCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready;
+
+    bool offlineCheckReady = !m_offlineUpdateCheck.valid()
+        || m_offlineUpdateCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready;
+
+    if (mediaserverUpdateCheckReady && mediaserverStatusCheckReady && offlineCheckReady)
     {
         auto updateInfo = m_serverUpdateCheck.get();
         auto serverStatus = m_serverStatusCheck.get();
+
+        // Update info for offline update package is already verified.
+        if (m_offlineUpdateCheck.valid())
+        {
+            auto offlineUpdateInfo = m_offlineUpdateCheck.get();
+            if (!offlineUpdateInfo.isEmpty())
+            {
+                NX_INFO(NX_SCOPE_TAG, "picking update contents from offline update.");
+                updateInfo = offlineUpdateInfo;
+            }
+            else
+            {
+                NX_DEBUG(NX_SCOPE_TAG, "offline update contents are empty.");
+            }
+        }
 
         ServerUpdateTool::RemoteStatus remoteStatus;
         m_serverUpdateTool->getServersStatusChanges(remoteStatus);
@@ -1431,7 +1454,19 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
             NX_INFO(this)
                 << "processRemoteUpdateInformation() - servers"
                 << targets << "are in downloading or error state";
-            setTargetState(WidgetUpdateState::downloading, targets);
+
+            auto uploaderState = m_serverUpdateTool->getUploaderState();
+            if (uploaderState == ServerUpdateTool::OfflineUpdateState::push ||
+                uploaderState == ServerUpdateTool::OfflineUpdateState::ready)
+            {
+                m_serverUpdateTool->startUpload(m_updateInfo);
+                setTargetState(WidgetUpdateState::pushing, targets);
+            }
+            else
+            {
+                setTargetState(WidgetUpdateState::downloading, targets);
+            }
+
             if (!m_updateInfo.manualPackages.empty())
                 m_serverUpdateTool->startManualDownloads(m_updateInfo);
         }
