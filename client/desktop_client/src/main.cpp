@@ -76,6 +76,11 @@
 
 #include <plugins/io_device/joystick/joystick_manager.h>
 
+#ifdef Q_OS_WIN
+    #include <ini.h>
+    #include <nx_gdi_detours/gdi_detours.h>
+#endif
+
 namespace {
 
 const int kSuccessCode = 0;
@@ -255,7 +260,24 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     if (code != QnWorkbenchContext::success)
         return code == QnWorkbenchContext::forcedExit ? kSuccessCode : kInvalidParametersCode;
 
+    #ifdef Q_OS_WIN
+        if (ini().enableGdiTrace)
+        {
+            const auto reportPathString =
+                QStandardPaths::writableLocation(QStandardPaths::DataLocation) + lit("/log")
+                + lit("/gdi_handles_report.txt");
+            const auto reportPath = std::filesystem::path(reportPathString.toStdWString());
+            gdi_detours::GdiHandleTracer::getInstance()->setReportPath(reportPath);
+            gdi_detours::GdiHandleTracer::getInstance()->attachGdiDetours();
+        }
+    #endif
+
     int result = application->exec();
+
+    #ifdef Q_OS_WIN
+        if (ini().enableGdiTrace)
+            gdi_detours::GdiHandleTracer::getInstance()->detachGdiDetours();
+    #endif
 
     /* Write out settings. */
     qnSettings->setAudioVolume(nx::audio::AudioDevice::instance()->volume());

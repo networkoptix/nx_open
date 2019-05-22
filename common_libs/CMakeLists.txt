@@ -21,3 +21,7 @@ endif()
 if(withMediaServer)
     add_subdirectory(nx_onvif)
 endif()
+
+if(WINDOWS)
+    add_subdirectory(nx_gdi_detours)
+endif()
