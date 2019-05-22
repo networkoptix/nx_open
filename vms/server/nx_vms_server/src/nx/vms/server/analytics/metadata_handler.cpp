@@ -186,7 +186,8 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
     if (m_metadataSink)
         m_metadataSink->putData(nx::common::metadata::toMetadataPacket(bestShotPacket));
 
-	// TODO: #dmishin pass best shots to the metadata logger.
+    if (nx::analytics::loggingIni().isLoggingEnabled())
+        m_metadataLogger.pushObjectMetadata(bestShotPacket);
 }
 
 void MetadataHandler::handleEventMetadata(
