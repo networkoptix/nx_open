@@ -1,6 +1,6 @@
 #include "types.h"
 
-#include <math.h>
+#include <cmath>
 
 namespace nx::geo_ip {
 
