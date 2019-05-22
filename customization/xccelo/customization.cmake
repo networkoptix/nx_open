@@ -3,6 +3,7 @@ set(defaultSkin "dark_orange")
 # Components Namings
 set(product.name "Xstream")
 set(display.product.name "Xstream")
+set(display_mobile_name "Xstream")
 set(product.name.short "xccelo")
 set(product.appName "xstream")
 set(company.name "Xccelo GmbH")
