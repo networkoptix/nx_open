@@ -334,6 +334,8 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
 
         extra_context['DataStructureTypes'] = DataStructure.DATA_TYPES
 
+        extra_context['current_portal_customization'] = Customization.objects.get(name=settings.CUSTOMIZATION)
+
         return super(ProductCustomizationReviewAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
         )
