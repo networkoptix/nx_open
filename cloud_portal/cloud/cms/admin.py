@@ -329,8 +329,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         extra_context['title'] = f"Changes for {version.product.name} - Version: {version.id}"
 
         extra_context['review_states'] = ProductCustomizationReview.REVIEW_STATES
-        extra_context['customization_reviews'] = version.productcustomizationreview_set.\
-            filter(customization__name__in=request.user.customizations)
+        extra_context['customization_reviews'] = version.productcustomizationreview_set.all()
 
         extra_context['DataStructureTypes'] = DataStructure.DATA_TYPES
 
