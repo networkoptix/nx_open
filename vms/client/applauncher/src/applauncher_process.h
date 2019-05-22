@@ -21,7 +21,7 @@
 
 #include <nx/utils/software_version.h>
 
-namespace applauncher {
+namespace nx::vms::applauncher {
 
 class ApplauncherProcess:
     public QObject,
@@ -127,7 +127,7 @@ private:
 
         mutable std::mutex mutex;
 
-        std::future<applauncher::api::ResultType::Value> result;
+        std::future<api::ResultType> result;
 
         void reset();
         bool isEmpty() const;
@@ -137,4 +137,4 @@ private:
     InstallationProcess m_process;
 };
 
-} // namespace applauncher
+} // namespace nx::vms::applauncher

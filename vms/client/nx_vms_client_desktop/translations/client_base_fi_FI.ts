@@ -5,27 +5,27 @@
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
-      <translation type="unfinished">Backup newly added devices</translation>
+      <translation>Varmuuskopioi äskettäin lisätty laitteet</translation>
     </message>
     <message>
       <source>Backup newly added cameras</source>
-      <translation type="unfinished">Backup newly added cameras</translation>
+      <translation>Varmuuskopioi äskettäin lisätyt kamerat</translation>
     </message>
     <message>
       <source>Cannot add new devices while backup process is running.</source>
-      <translation type="unfinished">Cannot add new devices while backup process is running.</translation>
+      <translation>Uusia laitteita ei voi lisätä varmuuskopioinnin aikana.</translation>
     </message>
     <message>
       <source>Cannot add new cameras while backup process is running.</source>
-      <translation type="unfinished">Cannot add new cameras while backup process is running.</translation>
+      <translation>Uusia kameroita ei voi lisätä, kun varmuuskopiointi on käynnissä.</translation>
     </message>
     <message>
       <source>Cannot add new devices because they store archive on external storage.</source>
-      <translation type="unfinished">Cannot add new devices because they store archive on external storage.</translation>
+      <translation>Uusia laitteita ei voi lisätä, koska ne tallentavat arkiston ulkoiseen tallennustilaan.</translation>
     </message>
     <message>
       <source>Cannot add new cameras because they store archive on external storage.</source>
-      <translation type="unfinished">Cannot add new cameras because they store archive on external storage.</translation>
+      <translation>Uusia kameroita ei voi lisätä, koska ne tallentavat arkiston ulkoiseen tallennustilaan.</translation>
     </message>
   </context>
   <context>
@@ -34,994 +34,994 @@
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation type="unfinished">Zoom timeline
-to view more bookmarks</translation>
+      <translation>Zoomaa aikajanaa
+nähdäksesi lisää kirjanmerkkejä</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>Toista kirjanmerkki alusta</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>Muokkaa kirjanmerkkiä</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>Poista kirjanmerkki</translation>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation type="unfinished">Export bookmark</translation>
+      <translation>Vie kirjanmerkki</translation>
     </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
       <source>No connection to Server %1.</source>
-      <translation type="unfinished">No connection to Server %1.</translation>
+      <translation>Ei yhteyttä palvelimeen %1.</translation>
     </message>
   </context>
   <context>
     <name>ComboBoxUtils</name>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>useita arvoja</translation>
     </message>
   </context>
   <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing version %1</source>
-      <translation type="unfinished">Installing version %1</translation>
+      <translation>Version %1 asentaminen</translation>
     </message>
     <message>
       <source>Installation failed</source>
-      <translation type="unfinished">Installation failed</translation>
+      <translation>Asennus epäonnistui</translation>
     </message>
     <message>
       <source>Installation completed</source>
-      <translation type="unfinished">Installation completed</translation>
+      <translation>Asennus on valmis</translation>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Päivitystietoja haetaan palvelimelta</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Päivityspaketin lataaminen</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Asennetaan</translation>
     </message>
   </context>
   <context>
     <name>ContextMenu</name>
     <message>
       <source>Filter...</source>
-      <translation type="unfinished">Filter...</translation>
+      <translation>Suodata...</translation>
     </message>
     <message>
       <source>Connect to System</source>
-      <translation type="unfinished">Connect to System</translation>
+      <translation>Yhdistä järjestelmään</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Ohje</translation>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>Tapahtumaloki...</translation>
     </message>
     <message>
       <source>Cameras to Backup...</source>
-      <translation type="unfinished">Cameras to Backup...</translation>
+      <translation>Kamerat varmuuskopiointiin...</translation>
     </message>
     <message>
       <source>Control Video Wall</source>
-      <translation type="unfinished">Control Video Wall</translation>
+      <translation>Hallitse Videoseinää</translation>
     </message>
     <message>
       <source>Push my screen</source>
-      <translation type="unfinished">Push my screen</translation>
+      <translation>Lähetä Push-viesti näytölleni</translation>
     </message>
     <message>
       <source>Select Time Server</source>
-      <translation type="unfinished">Select Time Server</translation>
+      <translation>Valitse Aika Palvelin</translation>
     </message>
     <message>
       <source>Fit in View</source>
-      <translation type="unfinished">Fit in View</translation>
+      <translation>Sovita näkymään</translation>
     </message>
     <message>
       <source>Main Menu</source>
-      <translation type="unfinished">Main Menu</translation>
+      <translation>Päävalikko</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Yhdistä palvelimeen...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>Katkaise yhteys palvelimeen</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation type="unfinished">Browse Local Files</translation>
+      <translation>Selaa paikallisia tiedostoja</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
-      <translation type="unfinished">Show Welcome Screen</translation>
+      <translation>Näytä tervetuloa-näyttö</translation>
     </message>
     <message>
       <source>New...</source>
-      <translation type="unfinished">New...</translation>
+      <translation>Uusi...</translation>
     </message>
     <message>
       <source>Tab</source>
-      <translation type="unfinished">Tab</translation>
+      <translation>Välilehti</translation>
     </message>
     <message>
       <source>New Tab</source>
-      <translation type="unfinished">New Tab</translation>
+      <translation>Uusi välilehti</translation>
     </message>
     <message>
       <source>Window</source>
-      <translation type="unfinished">Window</translation>
+      <translation>Ikkuna</translation>
     </message>
     <message>
       <source>New Window</source>
-      <translation type="unfinished">New Window</translation>
+      <translation>Uusi ikkuna</translation>
     </message>
     <message>
       <source>User...</source>
-      <translation type="unfinished">User...</translation>
+      <translation>Käyttäjä...</translation>
     </message>
     <message>
       <source>New User...</source>
-      <translation type="unfinished">New User...</translation>
+      <translation>Uusi käyttäjä...</translation>
     </message>
     <message>
       <source>Video Wall...</source>
-      <translation type="unfinished">Video Wall...</translation>
+      <translation>Videoseinä...</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation type="unfinished">New Video Wall...</translation>
+      <translation>Uusi videoseinä...</translation>
     </message>
     <message>
       <source>Web Page...</source>
-      <translation type="unfinished">Web Page...</translation>
+      <translation>Nettisivu...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
-      <translation type="unfinished">New Web Page...</translation>
+      <translation>Uusi Web-sivu...</translation>
     </message>
     <message>
       <source>New Layout...</source>
-      <translation type="unfinished">New Layout...</translation>
+      <translation>Uusi asettelu...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation type="unfinished">Open Layout...</translation>
+      <translation>Avaa asettelu...</translation>
     </message>
     <message>
       <source>Open...</source>
-      <translation type="unfinished">Open...</translation>
+      <translation>Avaa...</translation>
     </message>
     <message>
       <source>Folder...</source>
-      <translation type="unfinished">Folder...</translation>
+      <translation>Kansio...</translation>
     </message>
     <message>
       <source>Web Client...</source>
-      <translation type="unfinished">Web Client...</translation>
+      <translation>Web Client...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation type="unfinished">Open Web Client...</translation>
+      <translation>Avaa Web Client...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation type="unfinished">Save Current Layout</translation>
+      <translation>Tallenna nykyinen asettelu</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation type="unfinished">Save Current Layout As...</translation>
+      <translation>Tallenna nykyinen asettelu...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation type="unfinished">Save Video Wall View</translation>
+      <translation>Tallenna videoseinä</translation>
     </message>
     <message>
       <source>Drop Resources</source>
-      <translation type="unfinished">Drop Resources</translation>
+      <translation>Poista resursseja</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
-      <translation type="unfinished">Start Screen Recording</translation>
+      <translation>Aloita näytön tallennus</translation>
     </message>
     <message>
       <source>Stop Screen Recording</source>
-      <translation type="unfinished">Stop Screen Recording</translation>
+      <translation>Pysäytä näytön tallennus</translation>
     </message>
     <message>
       <source>Stop current action</source>
-      <translation type="unfinished">Stop current action</translation>
+      <translation>Lopeta nykyinen toiminta</translation>
     </message>
     <message>
       <source>Go to Fullscreen</source>
-      <translation type="unfinished">Go to Fullscreen</translation>
+      <translation>Siirry koko näyttöön</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation type="unfinished">Exit Fullscreen</translation>
+      <translation>Poistu kokoruudun tilasta</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Pienennä</translation>
     </message>
     <message>
       <source>Maximize</source>
-      <translation type="unfinished">Maximize</translation>
+      <translation>Suurenna</translation>
     </message>
     <message>
       <source>Restore Down</source>
-      <translation type="unfinished">Restore Down</translation>
+      <translation>Palauta alas</translation>
     </message>
     <message>
       <source>Open in Browser...</source>
-      <translation type="unfinished">Open in Browser...</translation>
+      <translation>Avaa selaimessa...</translation>
     </message>
     <message>
       <source>System Administration...</source>
-      <translation type="unfinished">System Administration...</translation>
+      <translation>Järjestelmän hallinta...</translation>
     </message>
     <message>
       <source>System Update...</source>
-      <translation type="unfinished">System Update...</translation>
+      <translation>Järjestelmän päivitys...</translation>
     </message>
     <message>
       <source>User Management...</source>
-      <translation type="unfinished">User Management...</translation>
+      <translation>Käyttäjähallinta...</translation>
     </message>
     <message>
       <source>Local Settings...</source>
-      <translation type="unfinished">Local Settings...</translation>
+      <translation>Paikalliset Asetukset...</translation>
     </message>
     <message>
       <source>Audit Trail...</source>
-      <translation type="unfinished">Audit Trail...</translation>
+      <translation>Tarkistushistoria...</translation>
     </message>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation type="unfinished">Log in to %1...</translation>
+      <translation>Kirjaudu sisään %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
       <comment>Log out from Nx Cloud</comment>
-      <translation type="unfinished">Log out from %1</translation>
+      <translation>Kirjaudu ulos %1</translation>
     </message>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation type="unfinished">Open %1 Portal...</translation>
+      <translation>Avaa %1 portaali...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
-      <translation type="unfinished">Account Settings...</translation>
+      <translation>Tilin asetukset...</translation>
     </message>
     <message>
       <source>Create Account...</source>
-      <translation type="unfinished">Create Account...</translation>
+      <translation>Luo tili...</translation>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Tapahtumien säännöt...</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Laitteiden luettelo</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Kameraluettelo</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Yhdistä järjestelmät...</translation>
     </message>
     <message>
       <source>About...</source>
-      <translation type="unfinished">About...</translation>
+      <translation>Tietoja...</translation>
     </message>
     <message>
       <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
+      <translation>Poistu</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
-      <translation type="unfinished">Mark Selection Start</translation>
+      <translation>Merkitse aloituksen kohta</translation>
     </message>
     <message>
       <source>Mark Selection End</source>
-      <translation type="unfinished">Mark Selection End</translation>
+      <translation>Merkitse lopetuksen kohta</translation>
     </message>
     <message>
       <source>Clear Selection</source>
-      <translation type="unfinished">Clear Selection</translation>
+      <translation>Poista Valinta</translation>
     </message>
     <message>
       <source>Zoom to Selection</source>
-      <translation type="unfinished">Zoom to Selection</translation>
+      <translation>Tarkenna valintaan</translation>
     </message>
     <message>
       <source>Add Bookmark...</source>
-      <translation type="unfinished">Add Bookmark...</translation>
+      <translation>Lisää kirjanmerkki...</translation>
     </message>
     <message>
       <source>Edit Bookmark...</source>
-      <translation type="unfinished">Edit Bookmark...</translation>
+      <translation>Muokkaa kirjanmerkkiä...</translation>
     </message>
     <message>
       <source>Remove Bookmark...</source>
-      <translation type="unfinished">Remove Bookmark...</translation>
+      <translation>Poista kirjanmerkki...</translation>
     </message>
     <message>
       <source>Remove Bookmarks...</source>
-      <translation type="unfinished">Remove Bookmarks...</translation>
+      <translation>Poista kirjanmerkit...</translation>
     </message>
     <message>
       <source>Preview Search...</source>
-      <translation type="unfinished">Preview Search...</translation>
+      <translation>Esikatsele haku...</translation>
     </message>
     <message>
       <source>Server...</source>
-      <translation type="unfinished">Server...</translation>
+      <translation>Palvelin...</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Avaa</translation>
     </message>
     <message>
       <source>Monitor</source>
-      <translation type="unfinished">Monitor</translation>
+      <translation>Valvonta</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation type="unfinished">Open in New Tab</translation>
+      <translation>Avaa uudessa välilehdessä</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation type="unfinished">Monitor in New Tab</translation>
+      <translation>Valvonta uudessa välilehdessä</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
-      <translation type="unfinished">Open in Alarm Layout</translation>
+      <translation>Näytä hälytysasettelussa</translation>
     </message>
     <message>
       <source>Open in New Window</source>
-      <translation type="unfinished">Open in New Window</translation>
+      <translation>Avaa uudessa ikkunassa</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
-      <translation type="unfinished">Monitor in New Window</translation>
+      <translation>Valvonta uudessa ikkunassa</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>Avaa videoseinä</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Avaa kansio</translation>
     </message>
     <message>
       <source>Identify</source>
-      <translation type="unfinished">Identify</translation>
+      <translation>Tunnista</translation>
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation type="unfinished">Attach to Video Wall...</translation>
+      <translation>Liitä videoseinään...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
-      <translation type="unfinished">Switch to Video Wall mode...</translation>
+      <translation>Vaihda Video Wall -tilaan...</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation type="unfinished">Save Video Wall</translation>
+      <translation>Tallenna videoseinä</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
-      <translation type="unfinished">Save Current Matrix</translation>
+      <translation>Tallenna nykyinen matriisi</translation>
     </message>
     <message>
       <source>Load Matrix</source>
-      <translation type="unfinished">Load Matrix</translation>
+      <translation>Lataa matriisi</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Poista</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation type="unfinished">Stop Video Wall</translation>
+      <translation>Pysäytä videoseinä</translation>
     </message>
     <message>
       <source>Clear Screen</source>
-      <translation type="unfinished">Clear Screen</translation>
+      <translation>Tyhjennä näyttö</translation>
     </message>
     <message>
       <source>Save Layout</source>
-      <translation type="unfinished">Save Layout</translation>
+      <translation>Tallenna asettelu</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation type="unfinished">Save Layout As...</translation>
+      <translation>Tallenna asettelu nimellä...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation type="unfinished">Maximize Item</translation>
+      <translation>Suurenna kohde</translation>
     </message>
     <message>
       <source>Restore Item</source>
-      <translation type="unfinished">Restore Item</translation>
+      <translation>Palauta kohde</translation>
     </message>
     <message>
       <source>Show Info</source>
-      <translation type="unfinished">Show Info</translation>
+      <translation>Näytä tiedot</translation>
     </message>
     <message>
       <source>Hide Info</source>
-      <translation type="unfinished">Hide Info</translation>
+      <translation>Piilota tiedot</translation>
     </message>
     <message>
       <source>PTZ...</source>
-      <translation type="unfinished">PTZ...</translation>
+      <translation>PTZ...</translation>
     </message>
     <message>
       <source>Save Current Position...</source>
-      <translation type="unfinished">Save Current Position...</translation>
+      <translation>Tallenna nykyinen sijainti...</translation>
     </message>
     <message>
       <source>Manage...</source>
-      <translation type="unfinished">Manage...</translation>
+      <translation>Hallitse...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
-      <translation type="unfinished">Show Motion/Smart Search</translation>
+      <translation>Näytä liike / älykäs haku</translation>
     </message>
     <message>
       <source>Show Motion</source>
-      <translation type="unfinished">Show Motion</translation>
+      <translation>Näytä liike</translation>
     </message>
     <message>
       <source>Hide Motion/Smart Search</source>
-      <translation type="unfinished">Hide Motion/Smart Search</translation>
+      <translation>Piilota liike / älykäs haku</translation>
     </message>
     <message>
       <source>Hide Motion</source>
-      <translation type="unfinished">Hide Motion</translation>
+      <translation>Piilota liike</translation>
     </message>
     <message>
       <source>Clear Motion Selection</source>
-      <translation type="unfinished">Clear Motion Selection</translation>
+      <translation>Poista Liike valinta</translation>
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation type="unfinished">Check File Watermark</translation>
+      <translation>Tarkista tiedoston vesileima</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
-      <translation type="unfinished">Image Enhancement...</translation>
+      <translation>Kuvanparannus...</translation>
     </message>
     <message>
       <source>Rotate to...</source>
-      <translation type="unfinished">Rotate to...</translation>
+      <translation>Kierrä...</translation>
     </message>
     <message>
       <source>0 degrees</source>
-      <translation type="unfinished">0 degrees</translation>
+      <translation>0 astetta</translation>
     </message>
     <message>
       <source>90 degrees</source>
-      <translation type="unfinished">90 degrees</translation>
+      <translation>90 astetta</translation>
     </message>
     <message>
       <source>180 degrees</source>
-      <translation type="unfinished">180 degrees</translation>
+      <translation>180 astetta</translation>
     </message>
     <message>
       <source>270 degrees</source>
-      <translation type="unfinished">270 degrees</translation>
+      <translation>270 astetta</translation>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation type="unfinished">Remove from Layout</translation>
+      <translation>Poista asettelusta</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation type="unfinished">Stop Sharing Layout</translation>
+      <translation>Lopeta asettelun jakaminen</translation>
     </message>
     <message>
       <source>Edit...</source>
-      <translation type="unfinished">Edit...</translation>
+      <translation>Muokkaa...</translation>
     </message>
     <message>
       <source>Rename</source>
-      <translation type="unfinished">Rename</translation>
+      <translation>Nimeä uudelleen</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
-      <translation type="unfinished">Delete from Disk</translation>
+      <translation>Poista levyltä</translation>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation type="unfinished">Set as Layout Background</translation>
+      <translation>Aseta Asettelun taustaksi</translation>
     </message>
     <message>
       <source>User Settings...</source>
-      <translation type="unfinished">User Settings...</translation>
+      <translation>Käyttäjäasetukset...</translation>
     </message>
     <message>
       <source>User Roles...</source>
-      <translation type="unfinished">User Roles...</translation>
+      <translation>Käyttäjän roolit...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation type="unfinished">Role Settings...</translation>
+      <translation>Roolin Asetukset...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
-      <translation type="unfinished">Check Device Issues...</translation>
+      <translation>Tarkista laitteen ongelmat...</translation>
     </message>
     <message>
       <source>Check Devices Issues...</source>
-      <translation type="unfinished">Check Devices Issues...</translation>
+      <translation>Tarkista laitteen ongelmat...</translation>
     </message>
     <message>
       <source>Check Camera Issues...</source>
-      <translation type="unfinished">Check Camera Issues...</translation>
+      <translation>Tarkista kameran ongelmat...</translation>
     </message>
     <message>
       <source>Check Cameras Issues...</source>
-      <translation type="unfinished">Check Cameras Issues...</translation>
+      <translation>Tarkista kameran ongelmat...</translation>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation type="unfinished">Check I/O Module Issues...</translation>
+      <translation>Tarkista I / O-moduulin ongelmat...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
-      <translation type="unfinished">Check I/O Modules Issues...</translation>
+      <translation>Tarkista I / O-moduulin ongelmat...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
-      <translation type="unfinished">Device Rules...</translation>
+      <translation>Laitteen säännöt...</translation>
     </message>
     <message>
       <source>Devices Rules...</source>
-      <translation type="unfinished">Devices Rules...</translation>
+      <translation>Laitteen säännöt...</translation>
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation type="unfinished">Camera Rules...</translation>
+      <translation>Kameran säännöt...</translation>
     </message>
     <message>
       <source>Cameras Rules...</source>
-      <translation type="unfinished">Cameras Rules...</translation>
+      <translation>Kameroiden säännöt...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation type="unfinished">I/O Module Rules...</translation>
+      <translation>I / O-moduulin säännöt...</translation>
     </message>
     <message>
       <source>I/O Modules Rules...</source>
-      <translation type="unfinished">I/O Modules Rules...</translation>
+      <translation>I / O-moduulin säännöt...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
-      <translation type="unfinished">Device Settings...</translation>
+      <translation>Laitteen asetukset...</translation>
     </message>
     <message>
       <source>Devices Settings...</source>
-      <translation type="unfinished">Devices Settings...</translation>
+      <translation>Laitteen asetukset...</translation>
     </message>
     <message>
       <source>Camera Settings...</source>
-      <translation type="unfinished">Camera Settings...</translation>
+      <translation>Kameran asetukset...</translation>
     </message>
     <message>
       <source>Cameras Settings...</source>
-      <translation type="unfinished">Cameras Settings...</translation>
+      <translation>Kameroiden asetukset...</translation>
     </message>
     <message>
       <source>I/O Module Settings...</source>
-      <translation type="unfinished">I/O Module Settings...</translation>
+      <translation>I/O-moduulin asetukset...</translation>
     </message>
     <message>
       <source>I/O Modules Settings...</source>
-      <translation type="unfinished">I/O Modules Settings...</translation>
+      <translation>I/O-moduulien asetukset...</translation>
     </message>
     <message>
       <source>File Settings...</source>
-      <translation type="unfinished">File Settings...</translation>
+      <translation>Tiedoston asetukset...</translation>
     </message>
     <message>
       <source>Layout Settings...</source>
-      <translation type="unfinished">Layout Settings...</translation>
+      <translation>Asettelun asetukset...</translation>
     </message>
     <message>
       <source>Video Wall Settings...</source>
-      <translation type="unfinished">Video Wall Settings...</translation>
+      <translation>Videoseinän asetukset...</translation>
     </message>
     <message>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>Lisää laite...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
-      <translation type="unfinished">Devices List by Server...</translation>
+      <translation>Laitteiden luettelo palvelimen mukaan...</translation>
     </message>
     <message>
       <source>Cameras List by Server...</source>
-      <translation type="unfinished">Cameras List by Server...</translation>
+      <translation>Kameraluettelo palvelimien mukaan...</translation>
     </message>
     <message>
       <source>Server Logs...</source>
-      <translation type="unfinished">Server Logs...</translation>
+      <translation>Palvelimen lokit...</translation>
     </message>
     <message>
       <source>Server Diagnostics...</source>
-      <translation type="unfinished">Server Diagnostics...</translation>
+      <translation>Palvelimen diagnostiikka...</translation>
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation type="unfinished">Server Web Page...</translation>
+      <translation>Palvelimen Web-sivu...</translation>
     </message>
     <message>
       <source>Server Settings...</source>
-      <translation type="unfinished">Server Settings...</translation>
+      <translation>Palvelimen asetukset...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected System...</source>
-      <translation type="unfinished">Merge to Currently Connected System...</translation>
+      <translation>Yhdistä nykyiseen yhdistettyyn järjestelmään...</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Ei mitään</translation>
     </message>
     <message>
       <source>Small</source>
-      <translation type="unfinished">Small</translation>
+      <translation>Pieni</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Keskikokoinen</translation>
     </message>
     <message>
       <source>Large</source>
-      <translation type="unfinished">Large</translation>
+      <translation>Suuri</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Asetukset</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Sulje</translation>
     </message>
     <message>
       <source>Close All But This</source>
-      <translation type="unfinished">Close All But This</translation>
+      <translation>Sulje kaikki, paitsi tämä</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Toista</translation>
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>Tauko</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Edellinen kuva</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation type="unfinished">Next Frame</translation>
+      <translation>Seuraava kuva</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Alkuun</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Loppuun</translation>
     </message>
     <message>
       <source>Volume Down</source>
-      <translation type="unfinished">Volume Down</translation>
+      <translation>Äänenvoimakkuutta pienemmälle</translation>
     </message>
     <message>
       <source>Volume Up</source>
-      <translation type="unfinished">Volume Up</translation>
+      <translation>Äänenvoimakkuus suuremmalle</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Mykistä</translation>
     </message>
     <message>
       <source>Jump to Live</source>
-      <translation type="unfinished">Jump to Live</translation>
+      <translation>Siirry reaaliaikaiseen kuvaan</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation type="unfinished">Synchronize Streams</translation>
+      <translation>Synkronoi streamit</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
-      <translation type="unfinished">Disable Stream Synchronization</translation>
+      <translation>Poista streamien synkronointi käytöstä</translation>
     </message>
     <message>
       <source>Show Bookmarks</source>
-      <translation type="unfinished">Show Bookmarks</translation>
+      <translation>Näytä kirjanmerkit</translation>
     </message>
     <message>
       <source>Hide Bookmarks</source>
-      <translation type="unfinished">Hide Bookmarks</translation>
+      <translation>Piilota kirjanmerkit</translation>
     </message>
     <message>
       <source>Show Calendar</source>
-      <translation type="unfinished">Show Calendar</translation>
+      <translation>Näytä kalenteri</translation>
     </message>
     <message>
       <source>Hide Calendar</source>
-      <translation type="unfinished">Hide Calendar</translation>
+      <translation>Piilota kalenteri</translation>
     </message>
     <message>
       <source>Show Title Bar</source>
-      <translation type="unfinished">Show Title Bar</translation>
+      <translation>Näytä otsikkorivi</translation>
     </message>
     <message>
       <source>Hide Title Bar</source>
-      <translation type="unfinished">Hide Title Bar</translation>
+      <translation>Piilota otsikkorivi</translation>
     </message>
     <message>
       <source>Pin Tree</source>
-      <translation type="unfinished">Pin Tree</translation>
+      <translation>Kiinnitä valikko</translation>
     </message>
     <message>
       <source>Unpin Tree</source>
-      <translation type="unfinished">Unpin Tree</translation>
+      <translation>Irroita valikko</translation>
     </message>
     <message>
       <source>Show Timeline</source>
-      <translation type="unfinished">Show Timeline</translation>
+      <translation>Näytä aikajana</translation>
     </message>
     <message>
       <source>Hide Timeline</source>
-      <translation type="unfinished">Hide Timeline</translation>
+      <translation>Piilota aikajana</translation>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>Kirjanmerkkiloki...</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>Showreel...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation type="unfinished">New Showreel...</translation>
+      <translation>Uusi Showreel...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
+      <translation>Poista Showreelistä</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>Luo Showreel</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Lähetä tiedosto...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Lähetä Kansio...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Jotkin kamerat edellyttävät salasanojen asettamista</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation type="unfinished">Export Video...</translation>
+      <translation>Vie video...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
-      <translation type="unfinished">Export Bookmark...</translation>
+      <translation>Vie kirjanmerkki...</translation>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation type="unfinished">Resolution...</translation>
+      <translation>Resoluutio...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation type="unfinished">Cell Aspect Ratio...</translation>
+      <translation>Solun kuvasuhde...</translation>
     </message>
     <message>
       <source>Cell Spacing...</source>
-      <translation type="unfinished">Cell Spacing...</translation>
+      <translation>Solun tila...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>Näytön asetukset...</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Vie kirjanmerkki...</translation>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Unohditko salasanasi</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation type="unfinished">Cancel Upload...</translation>
+      <translation>Peruuta lataaminen...</translation>
     </message>
     <message>
       <source>Copy Schedule...</source>
-      <translation type="unfinished">Copy Schedule...</translation>
+      <translation>Kopioi aikataulu...</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Analytiikka alustan asetukset...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation type="unfinished">Show Thumbnails</translation>
+      <translation>Näytä näytekuvat</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation type="unfinished">Hide Thumbnails</translation>
+      <translation>Piilota näytekuvat</translation>
     </message>
     <message>
       <source>Pin Panel</source>
-      <translation type="unfinished">Pin Panel</translation>
+      <translation>Kiinnitä Paneeli</translation>
     </message>
     <message>
       <source>Unpin Panel</source>
-      <translation type="unfinished">Unpin Panel</translation>
+      <translation>Irrota Paneeli</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Virtuaalikamera...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Uusi virtuaalikamera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
-      <translation type="unfinished">Show Tree</translation>
+      <translation>Näytä valikko</translation>
     </message>
     <message>
       <source>Hide Tree</source>
-      <translation type="unfinished">Hide Tree</translation>
+      <translation>Piilota valikko</translation>
     </message>
     <message>
       <source>Show Notifications</source>
-      <translation type="unfinished">Show Notifications</translation>
+      <translation>Näytä ilmoitukset</translation>
     </message>
     <message>
       <source>Hide Notifications</source>
-      <translation type="unfinished">Hide Notifications</translation>
+      <translation>Piilota ilmoitukset</translation>
     </message>
     <message>
       <source>Files...</source>
-      <translation type="unfinished">Files...</translation>
+      <translation>Tiedostot...</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Vaihda Ilmoitukset-välilehdelle</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Siirry Liike-välilehdelle</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Vaihda Kirjanmerkit-välilehdelle</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Vaihda Tapahtumat-välilehdelle</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Vaihda Objektit-välilehdelle</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>Objektien kuvat ja tiedot...</translation>
     </message>
   </context>
   <context>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Tuntematon virhe.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation type="unfinished">License does not exist.</translation>
+      <translation>Lisenssiä ei löydy.</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation type="unfinished">License is disabled.</translation>
+      <translation>Lisenssi on poistettu käytöstä.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation type="unfinished">License is inactive.</translation>
+      <translation>Lisenssi ei ole käytössä.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation type="unfinished">Invalid license.</translation>
+      <translation>Virheellinen lisenssi.</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation type="unfinished">License is trial.</translation>
+      <translation>Lisenssi on kokeiluversio.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
+      <translation>Lisenssi on odottamassa deaktivointitilassa, mutta sitä ei ole vielä poistettu käytöstä.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+      <translation>Lisenssin deaktivointien määrä on ylittynyt.</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
+      <translation>Palvelimen laitteiston ID-tunnus, jolla on tämä lisenssi, ei vastaa laitteiston tunnusta, jolla lisenssi on aktivoitu.</translation>
     </message>
   </context>
   <context>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Syötä kelvollinen salasana</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Salasana ei kelpaa.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Salattu asettelu</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>Tiedosto %1 on salattu. Anna salasana:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Anna salasana uudelleen asettelulle %1:</translation>
     </message>
   </context>
   <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Valitse asettelu...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n asettelut</numerusform>
+        <numerusform>%n asettelut</numerusform>
       </translation>
     </message>
   </context>
@@ -1029,165 +1029,165 @@ to view more bookmarks</translation>
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Kuvat</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>Kaikki tiedostot</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>Ääni Video Lomitus</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4-osa 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>%1 Mediatiedosto</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
-      <translation type="unfinished">Executable %1 Media File (x64)</translation>
+      <translation>Suoritettava %1 mediatiedosto (x64)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86)</source>
-      <translation type="unfinished">Executable %1 Media File (x86)</translation>
+      <translation>Suoritettava %1 mediatiedosto (x86)</translation>
     </message>
   </context>
   <context>
     <name>FullscreenActionHelper</name>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Lähdekamera</translation>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>Valitse Laite...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>Valitse kamera...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Valitse asettelu...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n asettelut</numerusform>
+        <numerusform>%n asettelut</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>%1 kohdassa %2</translation>
     </message>
   </context>
   <context>
     <name>GraphicsScrollBar</name>
     <message>
       <source>Scroll Here</source>
-      <translation type="unfinished">Scroll Here</translation>
+      <translation>Vieritä tähän</translation>
     </message>
     <message>
       <source>Left Edge</source>
-      <translation type="unfinished">Left Edge</translation>
+      <translation>Vasen reuna</translation>
     </message>
     <message>
       <source>Top</source>
-      <translation type="unfinished">Top</translation>
+      <translation>Yläreuna</translation>
     </message>
     <message>
       <source>Right Edge</source>
-      <translation type="unfinished">Right Edge</translation>
+      <translation>Oikea reuna</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation type="unfinished">Bottom</translation>
+      <translation>Alaosa</translation>
     </message>
     <message>
       <source>Page Left</source>
-      <translation type="unfinished">Page Left</translation>
+      <translation>Sivu vasemmalle</translation>
     </message>
     <message>
       <source>Page Up</source>
-      <translation type="unfinished">Page Up</translation>
+      <translation>Sivu ylös</translation>
     </message>
     <message>
       <source>Page Right</source>
-      <translation type="unfinished">Page Right</translation>
+      <translation>Sivu oikealle</translation>
     </message>
     <message>
       <source>Page Down</source>
-      <translation type="unfinished">Page Down</translation>
+      <translation>Sivu alas</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Vieritä vasemmalle</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation type="unfinished">Scroll Up</translation>
+      <translation>Vieritä ylös</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Vieritä oikealle</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation type="unfinished">Scroll Down</translation>
+      <translation>Vieritä alas</translation>
     </message>
   </context>
   <context>
     <name>LayoutTourTextFactory</name>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>Käynnistä Showreel</translation>
     </message>
   </context>
   <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation>Polku &quot;%1&quot; on virheellinen. Kokeile toista polkua.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>Tiedosto &quot;%1&quot; jo olemassa. Kokeile toista nimeä.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>Toinen prosessi käyttää tiedostoa &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>Tiedostoa &quot;%1&quot; ei voi kirjoittaa. Kokeile toista nimeä.</translation>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Tiedostonimi &quot;%1&quot; on varattu käyttöjärjestelmällä. Kokeile toista nimeä.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Tiedostonimi ei saa sisältää seuraavia varattuja merkkejä:</numerusform>
+        <numerusform>Tiedostonimi ei saa sisältää seuraavia varattuja merkkejä:</numerusform>
       </translation>
     </message>
   </context>
@@ -1195,243 +1195,243 @@ to view more bookmarks</translation>
     <name>PasswordInformation</name>
     <message>
       <source>Good</source>
-      <translation type="unfinished">Good</translation>
+      <translation>Hyvä</translation>
     </message>
     <message>
       <source>Fair</source>
-      <translation type="unfinished">Fair</translation>
+      <translation>Kohtalainen</translation>
     </message>
     <message>
       <source>Weak</source>
-      <translation type="unfinished">Weak</translation>
+      <translation>Heikko</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols.</source>
-      <translation type="unfinished">Password should contain different types of symbols.</translation>
+      <translation>Salasanan tulisi sisältää erilaisia symboleja.</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+      <translation>
+        <numerusform>Salasanan tulee sisältää %n eri merkkiä, symbolia tai numeroa</numerusform>
+        <numerusform>Salasanan tulee sisältää %n eri merkkiä, symbolia tai numeroa</numerusform>
       </translation>
     </message>
     <message>
       <source>Short</source>
-      <translation type="unfinished">Short</translation>
+      <translation>Lyhyt</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long.</numerusform>
-        <numerusform>Password must be at least %n characters long.</numerusform>
+      <translation>
+        <numerusform>Salasanan tulee olla ainakin %n merkkiä pitkä.</numerusform>
+        <numerusform>Salasanan tulee olla ainakin %n merkkiä pitkä.</numerusform>
       </translation>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Pitkä</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+      <translation>
+        <numerusform>Salana ei saa olla pidempi kuin %n merkkiä.</numerusform>
+        <numerusform>Salana ei saa olla pidempi kuin %n merkkiä.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+      <translation>
+        <numerusform>Salasanassa ei saa olla %n tai useampia peräkkäisiä merkkejä.</numerusform>
+        <numerusform>Salasanassa ei saa olla %n tai useampia peräkkäisiä merkkejä.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+      <translation>
+        <numerusform>Salasanassa ei saa olla %n tai useampia toistuvia merkkejä.</numerusform>
+        <numerusform>Salasanassa ei saa olla %n tai useampia toistuvia merkkejä.</numerusform>
       </translation>
     </message>
     <message>
       <source>Common</source>
-      <translation type="unfinished">Common</translation>
+      <translation>Yleinen</translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords.</source>
-      <translation type="unfinished">This password is in list of the most popular passwords.</translation>
+      <translation>Tämä salasana on suosituimpien salasanojen listassa.</translation>
     </message>
     <message>
       <source>Incorrect</source>
-      <translation type="unfinished">Incorrect</translation>
+      <translation>Virheellinen</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
+      <translation>Vain latinalaiset kirjaimet, numerot ja näppäimistösymbolit ovat sallittuja.</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols are allowed.</translation>
+      <translation>Vain latinalaiset kirjaimet, numerot ja näppäimistösymbolit ovat sallittuja.</translation>
     </message>
   </context>
   <context>
     <name>PermissionsInfoTable</name>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation type="unfinished">Cameras &amp; Resources</translation>
+      <translation>Kamerat ja resurssit</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation type="unfinished">Shared Layouts</translation>
+      <translation>Jaetut asettelut</translation>
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Kaikki</translation>
     </message>
     <message>
       <source>Permissions</source>
-      <translation type="unfinished">Permissions</translation>
+      <translation>Käyttöoikeudet</translation>
     </message>
   </context>
   <context>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+      <translation>Nykyistä sijaintia ei saada kamerasta &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
-      <translation type="unfinished">Please wait for the camera to go online.</translation>
+      <translation>Odota, kunnes kameraan on saatu yhteyttä.</translation>
     </message>
     <message>
       <source>Failed to get current position</source>
-      <translation type="unfinished">Failed to get current position</translation>
+      <translation>Nykyisen sijainnin hakeminen epäonnistui</translation>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+      <translation>Kameran nykyistä sijaintia ei saatu &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
-      <translation type="unfinished">Failed to set current position</translation>
+      <translation>Nykyisen sijainnin hakeminen epäonnistui</translation>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation type="unfinished">Preset used by some tours. Delete it anyway?</translation>
+      <translation>Esiasetuksia on käytössä kierroissa. Haluatko poistaa ne silti?</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
-      <translation type="unfinished">These tours will become invalid.</translation>
+      <translation>Nämä kierrot eivät ole enää käytettävissä.</translation>
     </message>
   </context>
   <context>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Asettelu on lukittu</translation>
     </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
-      <translation type="unfinished">Zoom In</translation>
+      <translation>Lähennä</translation>
     </message>
     <message>
       <source>Zoom Out</source>
-      <translation type="unfinished">Zoom Out</translation>
+      <translation>Loitonna</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation type="unfinished">Focus Far</translation>
+      <translation>Tarkenna kauas</translation>
     </message>
     <message>
       <source>Focus Near</source>
-      <translation type="unfinished">Focus Near</translation>
+      <translation>Tarkenna lähelle</translation>
     </message>
     <message>
       <source>Auto Focus</source>
-      <translation type="unfinished">Auto Focus</translation>
+      <translation>Automaattinen tarkennus</translation>
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation type="unfinished">Change Dewarping Mode</translation>
+      <translation>Muuta Dewarping-tilaa</translation>
     </message>
   </context>
   <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
-      <translation type="unfinished">Parameter 1 is null.</translation>
+      <translation>Parametri 1 on nolla.</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation type="unfinished">Executable %1 Media File (x64) (*.exe)</translation>
+      <translation>Suoritettava %1 mediatiedosto (x64)(*.exe)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation type="unfinished">Executable %1 Media File (x86) (*.exe)</translation>
+      <translation>Suoritettava %1 mediatiedosto (x86)(*.exe)</translation>
     </message>
   </context>
   <context>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
     <name>QnAboutDialog</name>
     <message>
       <source>%1 uses the following external libraries:</source>
-      <translation type="unfinished">%1 uses the following external libraries:</translation>
+      <translation>%1 käyttää seuraavia ulkoisia kirjastoja:</translation>
     </message>
     <message>
       <source>OpenGL version</source>
-      <translation type="unfinished">OpenGL version</translation>
+      <translation>OpenGL versio</translation>
     </message>
     <message>
       <source>OpenGL renderer</source>
-      <translation type="unfinished">OpenGL renderer</translation>
+      <translation>OpenGL-renderöinti</translation>
     </message>
     <message>
       <source>OpenGL vendor</source>
-      <translation type="unfinished">OpenGL vendor</translation>
+      <translation>OpenGL vendor</translation>
     </message>
     <message>
       <source>OpenGL max texture size</source>
-      <translation type="unfinished">OpenGL max texture size</translation>
+      <translation>OpenGL max tekstuurin koko</translation>
     </message>
     <message>
       <source>%1 version %2 (%3).</source>
-      <translation type="unfinished">%1 version %2 (%3).</translation>
+      <translation>%1 versio %2 (%3).</translation>
     </message>
     <message>
       <source>Built for %1-%2 with %3.</source>
-      <translation type="unfinished">Built for %1-%2 with %3.</translation>
+      <translation>Rakennettu %1-%2: ksi %3.</translation>
     </message>
   </context>
   <context>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Ladataan...</translation>
     </message>
     <message>
       <source>Saving...</source>
-      <translation type="unfinished">Saving...</translation>
+      <translation>Tallennetaan...</translation>
     </message>
   </context>
   <context>
     <name>QnAccessibleResourcesModel</name>
     <message>
       <source>Access granted by:</source>
-      <translation type="unfinished">Access granted by:</translation>
+      <translation>Pääsy sallittu:</translation>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>... ja %n lisää</numerusform>
+        <numerusform>... ja %n lisää</numerusform>
       </translation>
     </message>
   </context>
@@ -1439,165 +1439,165 @@ to view more bookmarks</translation>
     <name>QnAccessibleResourcesWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation type="unfinished">Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</translation>
+      <translation>Pääsy joihinkin asetteluihin antaa oikeuden kaikkiin kameroihin, jotka on käytössä asetteluissa. Käyttäjä saa myös pääsyn kaikkiin uusiin kameroihin noissa asetteluissa.</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation type="unfinished">All Cameras &amp; Resources</translation>
+      <translation>Kaikki kamerat ja resurssit</translation>
     </message>
   </context>
   <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Kuvanparannus</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
-      <translation type="unfinished">Image Enhancement - %1</translation>
+      <translation>Kuvanparannus - %1</translation>
     </message>
   </context>
   <context>
     <name>QnAdvancedSettingsWidget</name>
     <message>
       <source>Folder not found</source>
-      <translation type="unfinished">Folder not found</translation>
+      <translation>Kansiota ei löytynyt</translation>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+      <translation>Auttaa välttämään ongelmia OpenGL-piirtämisessä, joka johtaa 100%: n CPU-kuormitukseen.</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+      <translation>Säädä pienimmälle arvolle, joka ei heikennä reaaliaikaista näkymää. Suurempi puskuri tekee toiston tasaisemmaksi, mutta lisää reaaliaikaisennäkymän viivettä; pienempi puskuri pienentää viivettä, mutta voi aiheuttaa kuvan pysähtelyä.</translation>
     </message>
   </context>
   <context>
     <name>QnAuditItemDelegate</name>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Toista</translation>
     </message>
     <message>
       <source>User settings...</source>
-      <translation type="unfinished">User settings...</translation>
+      <translation>Käyttäjäasetukset...</translation>
     </message>
     <message>
       <source>Server settings...</source>
-      <translation type="unfinished">Server settings...</translation>
+      <translation>Palvelimen asetukset...</translation>
     </message>
     <message>
       <source>Camera settings...</source>
-      <translation type="unfinished">Camera settings...</translation>
+      <translation>Kameran asetukset...</translation>
     </message>
   </context>
   <context>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Kopioi valinta leikepöydälle</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Vie valinta tiedostoon...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Valitse kaikki</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
-      <translation type="unfinished">Export selected records to a file</translation>
+      <translation>Vie valitut tietueet tiedostoon</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Laitteet</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Kamerat</translation>
     </message>
     <message>
       <source>Device actions</source>
-      <translation type="unfinished">Device actions</translation>
+      <translation>Laitteen toimet</translation>
     </message>
     <message>
       <source>Camera actions</source>
-      <translation type="unfinished">Camera actions</translation>
+      <translation>Kameran toiminnot</translation>
     </message>
     <message>
       <source>No sessions</source>
-      <translation type="unfinished">No sessions</translation>
+      <translation>Ei istuntoja</translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation type="unfinished">No cameras</translation>
+      <translation>Ei kameroita</translation>
     </message>
     <message>
       <source>Select sessions to see their details</source>
-      <translation type="unfinished">Select sessions to see their details</translation>
+      <translation>Valitse istunnot nähdäksesi niiden tiedot</translation>
     </message>
     <message>
       <source>Select cameras to see their details</source>
-      <translation type="unfinished">Select cameras to see their details</translation>
+      <translation>Valitse kamerat nähdäksesi niiden tiedot</translation>
     </message>
     <message>
       <source>No archive for this position</source>
-      <translation type="unfinished">No archive for this position</translation>
+      <translation>Ei arkistoa tähän sijaintiin</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from System</numerusform>
-        <numerusform>These devices are removed from System</numerusform>
+      <translation>
+        <numerusform>Nämä laitteet poistetaan järjestelmästä</numerusform>
+        <numerusform>Nämä laitteet poistetaan järjestelmästä</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from System</numerusform>
-        <numerusform>These cameras are removed from System</numerusform>
+      <translation>
+        <numerusform>Nämä laitteet poistetaan järjestelmästä</numerusform>
+        <numerusform>Nämä laitteet poistetaan järjestelmästä</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from System</numerusform>
-        <numerusform>These servers are removed from System</numerusform>
+      <translation>
+        <numerusform>Nämä palvelimet poistetaan järjestelmästä</numerusform>
+        <numerusform>Nämä palvelimet poistetaan järjestelmästä</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from System</numerusform>
-        <numerusform>These users are removed from System</numerusform>
+      <translation>
+        <numerusform>Nämä käyttäjät poistetaan järjestelmästä</numerusform>
+        <numerusform>Nämä käyttäjät poistetaan järjestelmästä</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from System</numerusform>
-        <numerusform>These resources are removed from System</numerusform>
+      <translation>
+        <numerusform>Nämä resurssit poistetaan järjestelmästä</numerusform>
+        <numerusform>Nämä resurssit poistetaan järjestelmästä</numerusform>
       </translation>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation type="unfinished">Audit trail replay</translation>
+      <translation>Tarkistushistorian toistaminen</translation>
     </message>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Lisätietoja: %n istunnosta %1</numerusform>
+        <numerusform>Lisätietoja: %n istunnosta %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Lisätietoja: %n kamerasta %1</numerusform>
+        <numerusform>Lisätietoja: %n kamerasta %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1605,161 +1605,161 @@ to view more bookmarks</translation>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Tuntematon</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
-      <translation type="unfinished">Unsuccessful login</translation>
+      <translation>Virheellinen sisäänkirjautuminen</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Kirjaudu sisään</translation>
     </message>
     <message>
       <source>User updated</source>
-      <translation type="unfinished">User updated</translation>
+      <translation>Käyttäjä päivitetty</translation>
     </message>
     <message>
       <source>Watching live</source>
-      <translation type="unfinished">Watching live</translation>
+      <translation>Reaaliaikaisen kuvan katselu</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation type="unfinished">Watching archive</translation>
+      <translation>Arkistojen katselu</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Vie video</translation>
     </message>
     <message>
       <source>System name changed</source>
-      <translation type="unfinished">System name changed</translation>
+      <translation>Järjestelmän nimi muutettu</translation>
     </message>
     <message>
       <source>System merge</source>
-      <translation type="unfinished">System merge</translation>
+      <translation>Järjestelmän yhdistäminen</translation>
     </message>
     <message>
       <source>General settings updated</source>
-      <translation type="unfinished">General settings updated</translation>
+      <translation>Yleiset asetukset päivitetty</translation>
     </message>
     <message>
       <source>Server updated</source>
-      <translation type="unfinished">Server updated</translation>
+      <translation>Palvelin päivitetty</translation>
     </message>
     <message>
       <source>Business rule updated</source>
-      <translation type="unfinished">Business rule updated</translation>
+      <translation>Liiketoimintasääntö päivitetty</translation>
     </message>
     <message>
       <source>Server removed</source>
-      <translation type="unfinished">Server removed</translation>
+      <translation>Palvelin poistettu</translation>
     </message>
     <message>
       <source>Business rule removed</source>
-      <translation type="unfinished">Business rule removed</translation>
+      <translation>Liiketoimintasääntö poistettu</translation>
     </message>
     <message>
       <source>User removed</source>
-      <translation type="unfinished">User removed</translation>
+      <translation>Käyttäjä poistettu</translation>
     </message>
     <message>
       <source>Business rule reseted</source>
-      <translation type="unfinished">Business rule reseted</translation>
+      <translation>Liiketoimintasääntö palautettu</translation>
     </message>
     <message>
       <source>Database restored</source>
-      <translation type="unfinished">Database restored</translation>
+      <translation>Tietokanta on palautettu</translation>
     </message>
     <message>
       <source>Session begins</source>
-      <translation type="unfinished">Session begins</translation>
+      <translation>Istunto alkaa</translation>
     </message>
     <message>
       <source>Session ends</source>
-      <translation type="unfinished">Session ends</translation>
+      <translation>Istunto päättyy</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Kesto</translation>
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Käyttäjä</translation>
     </message>
     <message>
       <source>IP</source>
-      <translation type="unfinished">IP</translation>
+      <translation>IP-osoite</translation>
     </message>
     <message>
       <source>Activity</source>
-      <translation type="unfinished">Activity</translation>
+      <translation>Aktiviteetti</translation>
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Päivämäärä</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Aika</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Kuvaus</translation>
     </message>
     <message>
       <source>Click to expand</source>
-      <translation type="unfinished">Click to expand</translation>
+      <translation>Laajenna napsauttamalla</translation>
     </message>
     <message>
       <source>Device updated</source>
-      <translation type="unfinished">Device updated</translation>
+      <translation>Laite päivitetty</translation>
     </message>
     <message>
       <source>Camera updated</source>
-      <translation type="unfinished">Camera updated</translation>
+      <translation>Kamera päivitetty</translation>
     </message>
     <message>
       <source>Device added</source>
-      <translation type="unfinished">Device added</translation>
+      <translation>Laite päivitetty</translation>
     </message>
     <message>
       <source>Camera added</source>
-      <translation type="unfinished">Camera added</translation>
+      <translation>Kamera lisätty</translation>
     </message>
     <message>
       <source>Device removed</source>
-      <translation type="unfinished">Device removed</translation>
+      <translation>Laite on poistettu</translation>
     </message>
     <message>
       <source>Camera removed</source>
-      <translation type="unfinished">Camera removed</translation>
+      <translation>Kamera poistettu</translation>
     </message>
     <message>
       <source>Device name</source>
-      <translation type="unfinished">Device name</translation>
+      <translation>Laitteen nimi</translation>
     </message>
     <message>
       <source>Camera name</source>
-      <translation type="unfinished">Camera name</translation>
+      <translation>Kameran nimi</translation>
     </message>
     <message>
       <source>Email settings changed</source>
-      <translation type="unfinished">Email settings changed</translation>
+      <translation>Sähköpostiasetukset muuttuneet</translation>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
-      <translation type="unfinished">Filled circle mark means the archive is still available</translation>
+      <translation>Täytetty ympyrämerkki tarkoittaa, että arkisto on edelleen käytettävissä</translation>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Päivitys asennettu</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n toimintoa</numerusform>
+        <numerusform>%n toimintoa</numerusform>
       </translation>
     </message>
   </context>
@@ -1767,70 +1767,70 @@ to view more bookmarks</translation>
     <name>QnBackupCamerasDialog</name>
     <message>
       <source>Select Devices to Backup...</source>
-      <translation type="unfinished">Select Devices to Backup...</translation>
+      <translation>Valitse varmuuskopioitavat laitteet...</translation>
     </message>
     <message>
       <source>Select Cameras to Backup...</source>
-      <translation type="unfinished">Select Cameras to Backup...</translation>
+      <translation>Valitse varmuuskopioitavat kamerat...</translation>
     </message>
     <message>
       <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
-      <translation type="unfinished">If the backup is not set up on the current server of the cameras, their archive will not be backed up.</translation>
+      <translation>Jos varmuuskopiota ei ole asetettu kameran nykyiselle palvelimelle, niiden arkistoa ei varmuuskopioida.</translation>
     </message>
   </context>
   <context>
     <name>QnBackupScheduleDialog</name>
     <message>
       <source>Until finished</source>
-      <translation type="unfinished">Until finished</translation>
+      <translation>Kunnes valmis</translation>
     </message>
   </context>
   <context>
     <name>QnBackupSettingsDialog</name>
     <message>
       <source>By Schedule</source>
-      <translation type="unfinished">By Schedule</translation>
+      <translation>Aikataulun mukaan</translation>
     </message>
     <message>
       <source>Realtime</source>
-      <translation type="unfinished">Realtime</translation>
+      <translation>Reaaliaikainen</translation>
     </message>
     <message>
       <source>On Demand</source>
-      <translation type="unfinished">On Demand</translation>
+      <translation>Tarpeen vaatiessa</translation>
     </message>
     <message>
       <source>Hi-Res Streams</source>
       <comment>Cameras Backup</comment>
-      <translation type="unfinished">Hi-Res Streams</translation>
+      <translation>Korkean resoluution Streamit</translation>
     </message>
     <message>
       <source>All Streams</source>
       <comment>Cameras Backup</comment>
-      <translation type="unfinished">All Streams</translation>
+      <translation>Kaikki streamit</translation>
     </message>
     <message>
       <source>Global Settings</source>
-      <translation type="unfinished">Global Settings</translation>
+      <translation>Yleisasetukset</translation>
     </message>
     <message>
       <source>Lo-Res Streams</source>
       <comment>Cameras Backup</comment>
-      <translation type="unfinished">Lo-Res Streams</translation>
+      <translation>Matalan resoluution streamit</translation>
     </message>
     <message>
       <source>affect all servers in System</source>
       <comment>Relates to &apos;Global Settings&apos; subject</comment>
-      <translation type="unfinished">affect all servers in System</translation>
+      <translation>vaikuttaa kaikkiin järjestelmän palvelimiin</translation>
     </message>
   </context>
   <context>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
-        <numerusform>You have %n notifications</numerusform>
-        <numerusform>You have %n notifications</numerusform>
+      <translation>
+        <numerusform>Sinulla on %n ilmoitusta</numerusform>
+        <numerusform>Sinulla on %n ilmoitusta</numerusform>
       </translation>
     </message>
   </context>
@@ -1838,169 +1838,169 @@ to view more bookmarks</translation>
     <name>QnBookmarkWidget</name>
     <message>
       <source>Do not lock archive</source>
-      <translation type="unfinished">Do not lock archive</translation>
+      <translation>Älä lukitse arkistoa</translation>
     </message>
     <message>
       <source>1 month</source>
-      <translation type="unfinished">1 month</translation>
+      <translation>1 kuukausi</translation>
     </message>
     <message>
       <source>3 month</source>
-      <translation type="unfinished">3 month</translation>
+      <translation>3 kuukautta</translation>
     </message>
     <message>
       <source>6 month</source>
-      <translation type="unfinished">6 month</translation>
+      <translation>6 kuukautta</translation>
     </message>
     <message>
       <source>year</source>
-      <translation type="unfinished">year</translation>
+      <translation>vuosi</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation type="unfinished">Name cannot be empty.</translation>
+      <translation>Nimi ei voi olla tyhjä.</translation>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation type="unfinished">Description cannot be empty</translation>
+      <translation>Kuvaus ei voi olla tyhjä</translation>
     </message>
   </context>
   <context>
     <name>QnBuildNumberDialog</name>
     <message>
       <source>Build Number</source>
-      <translation type="unfinished">Build Number</translation>
+      <translation>Ohjelmistoversion numero</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Salasana</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation type="unfinished">The password is incorrect.</translation>
+      <translation>Tämä sanasana on väärä.</translation>
     </message>
     <message>
       <source>Select Build</source>
-      <translation type="unfinished">Select Build</translation>
+      <translation>Valitse versio</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n devices</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
+      <translation>
+        <numerusform>%1 %n laitteesta</numerusform>
+        <numerusform>%1 %n laitteesta</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n cameras</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
+      <translation>
+        <numerusform>%1 %n kamerasta</numerusform>
+        <numerusform>%1 %n kamerasta</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Valitse vähintään yksi laite</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Valitse vähintään yksi kamera</translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n I/O modules</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
+      <translation>
+        <numerusform>%1 %n I / O-moduulista</numerusform>
+        <numerusform>%1 %n I / O-moduulista</numerusform>
       </translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Mikä tahansa laite</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Mikä tahansa kamera</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Hallitse kirjanmerkkejä</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
-      <translation type="unfinished">Error: %1</translation>
+      <translation>Virhe %1</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Välitön</translation>
     </message>
     <message>
       <source>Stops</source>
-      <translation type="unfinished">Stops</translation>
+      <translation>Pysäytä</translation>
     </message>
     <message>
       <source>Starts</source>
-      <translation type="unfinished">Starts</translation>
+      <translation>Käynnistä</translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Valitse vähintään yksi laite</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Valitse vähintään yksi kamera</translation>
     </message>
     <message>
       <source>Occurs</source>
-      <translation type="unfinished">Occurs</translation>
+      <translation>Tapahtuu</translation>
     </message>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Lähdekamera</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more cameras</numerusform>
-        <numerusform>Source and %n more cameras</numerusform>
+      <translation>
+        <numerusform>Lähde ja %n muuta kameraa</numerusform>
+        <numerusform>Lähde ja %n muuta kameraa</numerusform>
       </translation>
     </message>
     <message>
       <source>N/A</source>
-      <translation type="unfinished">N/A</translation>
+      <translation>Ei saatavilla</translation>
     </message>
     <message>
       <source>Every %1</source>
-      <translation type="unfinished">Every %1</translation>
+      <translation>Joka %1</translation>
     </message>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Järjestelmä</translation>
     </message>
     <message>
       <source>Any Server</source>
-      <translation type="unfinished">Any Server</translation>
+      <translation>Mikä tahansa palvelin</translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Mikä tahansa laite</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Mikä tahansa kamera</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>%n palvelinta</numerusform>
+        <numerusform>%n palvelinta</numerusform>
       </translation>
     </message>
   </context>
@@ -2009,146 +2009,146 @@ to view more bookmarks</translation>
     <message>
       <source>to</source>
       <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-      <translation type="unfinished">to</translation>
+      <translation>vastaanottaja</translation>
     </message>
     <message>
       <source>at</source>
       <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation type="unfinished">at</translation>
+      <translation>nämä</translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Valitse ainakin yksi laite</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Valitse ainakin yksi kamera</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Laitteet</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Kamerat</translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Mikä tahansa laite</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Mikä tahansa kamera</translation>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <translation>Pakotettu kuittaus toimii vain yleisissä tapahtumissa, jos kameran modifikaattoreita käytetään yleisessä tapahtuman URL-osoitteessa</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRulesDialog</name>
     <message>
       <source>&amp;New...</source>
-      <translation type="unfinished">&amp;New...</translation>
+      <translation>&amp;Uusi...</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation type="unfinished">&amp;Delete</translation>
+      <translation>&amp;Poista</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
-      <translation type="unfinished">&amp;Schedule...</translation>
+      <translation>&amp;Aikataulu...</translation>
     </message>
     <message>
       <source>Restore All Rules to Default</source>
-      <translation type="unfinished">Restore All Rules to Default</translation>
+      <translation>Palauta kaikki säännöt oletusarvoksi</translation>
     </message>
     <message>
       <source>No event rules</source>
-      <translation type="unfinished">No event rules</translation>
+      <translation>Ei tapahtuman sääntöjä</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
-      <translation type="unfinished">Filter by devices...</translation>
+      <translation>Suodata laitteet...</translation>
     </message>
     <message>
       <source>Filter by cameras...</source>
-      <translation type="unfinished">Filter by cameras...</translation>
+      <translation>Suodata kamerat...</translation>
     </message>
     <message>
       <source>Failed to retrieve rules</source>
-      <translation type="unfinished">Failed to retrieve rules</translation>
+      <translation>Sääntöjen noutaminen epäonnistui</translation>
     </message>
     <message>
       <source>Failed to save rule</source>
-      <translation type="unfinished">Failed to save rule</translation>
+      <translation>Sääntöjen tallennus epäonnistui</translation>
     </message>
     <message>
       <source>Some rules are not valid. Disable them?</source>
-      <translation type="unfinished">Some rules are not valid. Disable them?</translation>
+      <translation>Jotkut säännöt eivät ole voimassa. Poista ne käytöstä?</translation>
     </message>
     <message>
       <source>Apply changes before exit?</source>
-      <translation type="unfinished">Apply changes before exit?</translation>
+      <translation>Vahvista muutokset ennen poistumista?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Tätä toimintoa ei voi peruuttaa.</translation>
     </message>
     <message>
       <source>Restore all rules to default?</source>
-      <translation type="unfinished">Restore all rules to default?</translation>
+      <translation>Palauta kaikki säännöt oletusarvoksi?</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRulesViewModel</name>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Käytössä</translation>
     </message>
     <message>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Tapahtuma</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Lähde</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Toiminto</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation type="unfinished">Target</translation>
+      <translation>Kohde</translation>
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Toimintaväli</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>Analytiikkaa ei ole käytettävissä %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
-      <translation type="unfinished">Select device</translation>
+      <translation>Valitse Laite</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Valitse kamera</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
-        <numerusform>%1 does not support two-way audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
+      <translation>
+        <numerusform>%1 ei tue kaksisuuntaista ääntä</numerusform>
+        <numerusform>%1 ei tue kaksisuuntaista ääntä</numerusform>
       </translation>
     </message>
   </context>
@@ -2156,87 +2156,87 @@ to view more bookmarks</translation>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
-      <translation type="unfinished">FAILED: %1</translation>
+      <translation>VIKA: %1</translation>
     </message>
     <message>
       <source>Confirming server availability.</source>
-      <translation type="unfinished">Confirming server availability.</translation>
+      <translation>Palvelimen saatavuuden vahvistaminen.</translation>
     </message>
     <message>
       <source>Evaluating media stream for errors.</source>
-      <translation type="unfinished">Evaluating media stream for errors.</translation>
+      <translation>Mediastreamin arviointi virheiden varalta.</translation>
     </message>
     <message>
       <source>Diagnostics for device %1</source>
-      <translation type="unfinished">Diagnostics for device %1</translation>
+      <translation>Laitteen %1 diagnostiikka</translation>
     </message>
     <message>
       <source>Diagnostics for camera %1</source>
-      <translation type="unfinished">Diagnostics for camera %1</translation>
+      <translation>Kameran %1 diagnostiikka</translation>
     </message>
     <message>
       <source>Device Diagnostics</source>
-      <translation type="unfinished">Device Diagnostics</translation>
+      <translation>Laitteen diagnostiikka</translation>
     </message>
     <message>
       <source>Camera Diagnostics</source>
-      <translation type="unfinished">Camera Diagnostics</translation>
+      <translation>Kameran diagnostiikka</translation>
     </message>
     <message>
       <source>Confirming device is accessible.</source>
-      <translation type="unfinished">Confirming device is accessible.</translation>
+      <translation>Vahvistetaan, että laite on käytettävissä.</translation>
     </message>
     <message>
       <source>Confirming camera is accessible.</source>
-      <translation type="unfinished">Confirming camera is accessible.</translation>
+      <translation>Vahvistetetaan, että kamera on käytettävissä.</translation>
     </message>
     <message>
       <source>Confirming target device provides media stream.</source>
-      <translation type="unfinished">Confirming target device provides media stream.</translation>
+      <translation>Vahvistetaan, että kohde laite lähettää mediastreamia.</translation>
     </message>
     <message>
       <source>Confirming target camera provides media stream.</source>
-      <translation type="unfinished">Confirming target camera provides media stream.</translation>
+      <translation>Vahvistetaan, että kohde kamera lähettää mediastreamia.</translation>
     </message>
     <message>
       <source>Diagnostics for I/O module %1</source>
-      <translation type="unfinished">Diagnostics for I/O module %1</translation>
+      <translation>I/O-moduulin %1 diagnostiikka</translation>
     </message>
     <message>
       <source>I/O Module Diagnostics</source>
-      <translation type="unfinished">I/O Module Diagnostics</translation>
+      <translation>I/O-moduulin diagnostiikka</translation>
     </message>
     <message>
       <source>Confirming I/O module is accessible.</source>
-      <translation type="unfinished">Confirming I/O module is accessible.</translation>
+      <translation>Vahvistetaan, että I/O-moduuli on käytettävissä.</translation>
     </message>
     <message>
       <source>Confirming target I/O module provides media stream.</source>
-      <translation type="unfinished">Confirming target I/O module provides media stream.</translation>
+      <translation>Vahvistetaan, että I/O-moduuli lähettää mediastreamia.</translation>
     </message>
     <message>
       <source>Diagnostics complete</source>
-      <translation type="unfinished">Diagnostics complete</translation>
+      <translation>Diagnostiikka on valmis</translation>
     </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
       <source>automatic</source>
-      <translation type="unfinished">automatic</translation>
+      <translation>automaattinen</translation>
     </message>
   </context>
   <context>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
-        <numerusform>%1 have no input ports</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
+      <translation>
+        <numerusform>%1 ei ole tuloportteja</numerusform>
+        <numerusform>%1 ei ole tuloportteja</numerusform>
       </translation>
     </message>
   </context>
@@ -2244,101 +2244,101 @@ to view more bookmarks</translation>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Kopioi valinta leikepöydälle</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Vie valinta tiedostoon...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Valitse kaikki</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Laitteiden luettelo</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Kameraluettelo</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
+      <translation>
+        <numerusform>%n laitetta löytyi</numerusform>
+        <numerusform>%n laitetta löytyi</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras found</numerusform>
-        <numerusform>%n cameras found</numerusform>
+      <translation>
+        <numerusform>%n kameraa löytyi</numerusform>
+        <numerusform>%n kameraa löytyi</numerusform>
       </translation>
     </message>
     <message>
       <source>Export selected devices to a file.</source>
-      <translation type="unfinished">Export selected devices to a file.</translation>
+      <translation>Vie valitut laitteet tiedostoon.</translation>
     </message>
     <message>
       <source>Export selected cameras to a file.</source>
-      <translation type="unfinished">Export selected cameras to a file.</translation>
+      <translation>Vie valitut kamerat tiedostoon.</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules found</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
+      <translation>
+        <numerusform>%n löytynyt I / O-moduuli</numerusform>
+        <numerusform>%n löytynyt I / O-moduuli</numerusform>
       </translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation type="unfinished">No cameras</translation>
+      <translation>Ei kameroita</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation type="unfinished">Devices List for %1</translation>
+      <translation>Laitteiden luettelo %1</translation>
     </message>
     <message>
       <source>Cameras List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation type="unfinished">Cameras List for %1</translation>
+      <translation>Kameraluettelo %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Tallennus</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nimi</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Toimittaja</translation>
     </message>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Malli</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation type="unfinished">Firmware</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <source>IP/Name</source>
-      <translation type="unfinished">IP/Name</translation>
+      <translation>IP / Nimi</translation>
     </message>
     <message>
       <source>MAC address</source>
-      <translation type="unfinished">MAC address</translation>
+      <translation>MAC-osoite</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Palvelin</translation>
     </message>
     <message>
       <source>ID</source>
@@ -2346,30 +2346,30 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Looginen tunnus</translation>
     </message>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>Tallennus tai liiketunnistus ei ole käytössä %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
       <source>automatic</source>
-      <translation type="unfinished">automatic</translation>
+      <translation>automaattinen</translation>
     </message>
   </context>
   <context>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
-        <numerusform>%1 have no output relays</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
+      <translation>
+        <numerusform>%1 ei ole ulostuloja</numerusform>
+        <numerusform>%1 ei ole ulostuloja</numerusform>
       </translation>
     </message>
   </context>
@@ -2377,68 +2377,68 @@ to view more bookmarks</translation>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Uusi Salasana</translation>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Toista salasana</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Salasanat eivät täsmää.</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>Salasanan tulee olla vähintään 8 symbolia ja sisältää erilaisia merkkejä.</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>Salasanan ei pitäisi olla sama kuin kameran&apos;käyttäjänimi</translation>
     </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>Tallennus ei ole käytössä %1</translation>
     </message>
   </context>
   <context>
     <name>QnChangeUserPasswordDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Uusi Salasana</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Vahvista salasanasi</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Salasanat eivät täsmää.</translation>
     </message>
     <message>
       <source>Current Password</source>
-      <translation type="unfinished">Current Password</translation>
+      <translation>Nykyinen salasana</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation type="unfinished">To modify your password please enter the existing one.</translation>
+      <translation>Salasanan muokkaamiseksi kirjoita nykyinen salasana.</translation>
     </message>
     <message>
       <source>Invalid current password.</source>
-      <translation type="unfinished">Invalid current password.</translation>
+      <translation>Virheellinen nykyinen salasana.</translation>
     </message>
   </context>
   <context>
     <name>QnClockLabel</name>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Palvelimen aika</translation>
     </message>
     <message>
       <source>Local System Time</source>
-      <translation type="unfinished">Local System Time</translation>
+      <translation>Paikallisen järjestelmän aika</translation>
     </message>
   </context>
   <context>
@@ -2447,583 +2447,580 @@ to view more bookmarks</translation>
       <source>Connect to your Systems
 from anywhere with any
 devices</source>
-      <translation type="unfinished">Connect to your Systems
-from anywhere with any
-devices</translation>
+      <translation>Yhdistä järjestelmiin
+mistä tahansa kaikkien laitteiden kanssa</translation>
     </message>
     <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect System from %1</translation>
+      <translation>Irrota järjestelmä %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Open %1 Portal</translation>
+      <translation>Avaa %1 portaali</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Create %1 Account</translation>
+      <translation>Luo %1 tili</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect System to %1...</translation>
+      <translation>Yhdistä järjestelmä %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Create %1
-account</translation>
+      <translation>Luo %1 tili</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect System
-to %1</translation>
+      <translation>Yhdistä järjestelmä %1</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>Lisätietoja %1</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Tiliä ei löytynyt</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>Tili ei ole aktivoitu.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>Ole hyvä ja kirjaudu sisään %1 ja noudata annettuja ohjeita.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>Virheellinen salasana</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Liian monta yritystä. Yritä myöhemmin uudelleen.</translation>
     </message>
   </context>
   <context>
     <name>QnCloudStatusPanel</name>
     <message>
       <source>Logging in...</source>
-      <translation type="unfinished">Logging in...</translation>
+      <translation>Kirjaudutaan sisään...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Yhdistä palvelimeen...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Ei voi muodostaa yhteyttä %1</translation>
     </message>
   </context>
   <context>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
-      <translation type="unfinished">Account Settings</translation>
+      <translation>Tilin asetukset</translation>
     </message>
   </context>
   <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Sähköposti</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Salasana</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Luo tili</translation>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation type="unfinished">Forgot password?</translation>
+      <translation>Unohditko salasanan?</translation>
     </message>
     <message>
       <source>Connect to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect to %1</translation>
+      <translation>Yhdistä %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter %1 Account</translation>
+      <translation>Anna %1 tili</translation>
     </message>
   </context>
   <context>
     <name>QnConnectToCloudDialogPrivate</name>
     <message>
       <source>None of your servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your servers is connected to the Internet.</translation>
+      <translation>Mikään palvelimesi ei ole yhteydessä Internetiin.</translation>
     </message>
     <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System connected to %1</translation>
+      <translation>Järjestelmä on kytketty %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to connect System to %1</translation>
+      <translation>Yhteyden muodostaminen epäonnistui järjestelmään %1</translation>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>Sisäinen palvelinvirhe. Yritä uudelleen myöhemmin.</translation>
     </message>
   </context>
   <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
-      <translation type="unfinished">You are trying to connect to incompatible Server.</translation>
+      <translation>Yrität muodostaa yhteyden yhteensopimattomaan palvelimeen.</translation>
     </message>
     <message>
       <source>Connection details that you have entered are incorrect, please try again.</source>
-      <translation type="unfinished">Connection details that you have entered are incorrect, please try again.</translation>
+      <translation>Antamasi yhteystiedot ovat virheellisiä. Yritä uudelleen.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your VMS administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your VMS administrator.</translation>
+      <translation>Jos tämä virhe toistuu, ota yhteyttä VMS-järjestelmänvalvojaan.</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
-      <translation type="unfinished">Compatibility mode for versions lower than %1 is not supported.</translation>
+      <translation>Yhteensopivuutta ei ole tuettu vanhemman kuin %1 version kanssa.</translation>
     </message>
     <message>
       <source>Please close the application and start it again using the shortcut in the start menu.</source>
-      <translation type="unfinished">Please close the application and start it again using the shortcut in the start menu.</translation>
+      <translation>Sulje sovellus ja käynnistä se uudelleen käynnistysvalikon pikakuvakkeella.</translation>
     </message>
     <message>
       <source>Server has a different version:</source>
-      <translation type="unfinished">Server has a different version:</translation>
+      <translation>Palvelimella on eri versio:</translation>
     </message>
     <message>
       <source>You will be asked to restart the client in compatibility mode.</source>
-      <translation type="unfinished">You will be asked to restart the client in compatibility mode.</translation>
+      <translation>Sinua pyydetään käynnistämään Client-sovellus uudelleen yhteensopivuustilassa.</translation>
     </message>
     <message>
       <source>The username or password you have entered is incorrect. Please try again.</source>
-      <translation type="unfinished">The username or password you have entered is incorrect. Please try again.</translation>
+      <translation>Antamasi käyttäjätunnus tai salasana on virheellinen. Yritä uudelleen.</translation>
     </message>
     <message>
       <source>Unable to connect to the server</source>
-      <translation type="unfinished">Unable to connect to the server</translation>
+      <translation>Palvelimeen ei saada yhteyttä</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out.</source>
-      <translation type="unfinished">LDAP Server connection timed out.</translation>
+      <translation>LDAP-palvelimen yhteys aikakatkaistiin.</translation>
     </message>
     <message>
       <source>Failed to connect to Server</source>
-      <translation type="unfinished">Failed to connect to Server</translation>
+      <translation>Yhteyden muodostaminen palvelimeen epäonnistui</translation>
     </message>
     <message>
       <source>Incorrect username or password</source>
-      <translation type="unfinished">Incorrect username or password</translation>
+      <translation>Virheellinen käyttäjätunnus tai salasana</translation>
     </message>
     <message>
       <source>Server may be restarting now. Please try again later.</source>
-      <translation type="unfinished">Server may be restarting now. Please try again later.</translation>
+      <translation>Palvelin saattaa käynnistyä uudelleen. Yritä uudelleen myöhemmin.</translation>
     </message>
     <message>
       <source>Please check access credentials and try again.</source>
-      <translation type="unfinished">Please check access credentials and try again.</translation>
+      <translation>Tarkista käyttöoikeustiedot ja yritä uudelleen.</translation>
     </message>
     <message>
       <source>Incompatible Server</source>
-      <translation type="unfinished">Incompatible Server</translation>
+      <translation>Yhteensopimaton palvelin</translation>
     </message>
     <message>
       <source>Client and Server have different versions</source>
-      <translation type="unfinished">Client and Server have different versions</translation>
+      <translation>Client-sovellus ja palvelin ovat eri versiota</translation>
     </message>
     <message>
       <source>Client - %1</source>
       <comment>%1 is version</comment>
-      <translation type="unfinished">Client - %1</translation>
+      <translation>Client-sovellus %1</translation>
     </message>
     <message>
       <source>Server - %1</source>
       <comment>%1 is version</comment>
-      <translation type="unfinished">Server - %1</translation>
+      <translation>Palvelin - %1</translation>
     </message>
     <message>
       <source>Download Client version %1?</source>
-      <translation type="unfinished">Download Client version %1?</translation>
+      <translation>Lataa Client-sovelluksen versio %1?</translation>
     </message>
     <message>
       <source>Restart</source>
-      <translation type="unfinished">Restart</translation>
+      <translation>Käynnistä uudelleen</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
-      <translation type="unfinished">Failed to download and launch version %1</translation>
+      <translation>Version %1 lataaminen ja käynnistäminen epäonnistui</translation>
     </message>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Yritä uudelleen</translation>
     </message>
     <message>
       <source>Restart %1 in compatibility mode will be required.</source>
-      <translation type="unfinished">Restart %1 in compatibility mode will be required.</translation>
+      <translation>Uudelleenkäynnistys %1 yhteensopivuustilassa vaaditaan.</translation>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
-      <translation type="unfinished">Failed to restart %1 in compatibility mode</translation>
+      <translation>%1: n uudelleenkäynnistys epäonnistui yhteensopivuustilassa</translation>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-      <translation type="unfinished">Please close %1 and start it again using the shortcut in the start menu.</translation>
+      <translation>Sulje sovellus %1 ja käynnistä se uudelleen käynnistysvalikon pikakuvakkeella.</translation>
     </message>
     <message>
       <source>You have to download another version of %1 to connect to this Server.</source>
-      <translation type="unfinished">You have to download another version of %1 to connect to this Server.</translation>
+      <translation>Sinun on ladattava toinen %1 versio, muodostaaksesi yhteyden tähän palvelimeen.</translation>
     </message>
     <message>
       <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
-      <translation type="unfinished">You have to restart %1 in compatibility mode to connect to this Server.</translation>
+      <translation>Joudut käynnistämään %1 yhteensopivuustilassa muodostaaksesi yhteyden tähän palvelimeen.</translation>
     </message>
     <message>
       <source>Restart %1 in compatibility mode?</source>
-      <translation type="unfinished">Restart %1 in compatibility mode?</translation>
+      <translation>Käynnistä %1 uudelleen yhteensopivuustilassa?</translation>
     </message>
     <message>
       <source>Failed to restart %1</source>
-      <translation type="unfinished">Failed to restart %1</translation>
+      <translation>%1 käynnistäminen epäonnistui</translation>
     </message>
     <message>
       <source>Client version: %1.</source>
-      <translation type="unfinished">Client version: %1.</translation>
+      <translation>Client-sovelluksen versio.</translation>
     </message>
     <message>
       <source>Server version: %1.</source>
-      <translation type="unfinished">Server version: %1.</translation>
+      <translation>Palvelimen versio %1.</translation>
     </message>
     <message>
       <source>Operation is not permitted now. It could happen due to server is restarting now. Please try again later.</source>
-      <translation type="unfinished">Operation is not permitted now. It could happen due to server is restarting now. Please try again later.</translation>
+      <translation>Käyttö ei ole nyt sallittua. Se voi johtua palvelimen uudelleenkäynnistyksestä Yritä uudelleen myöhemmin.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established.</source>
-      <translation type="unfinished">Connection to Server could not be established.</translation>
+      <translation>Yhteyttä palvelimeen ei voitu muodostaa.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
-      <translation type="unfinished">This user is disabled by system administrator.</translation>
+      <translation>Järjestelmänvalvoja on poistanut tämän käyttäjän käytöstä.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check server Internet connection or try again later.</translation>
+      <translation>Yhteys %1 ei ole vielä valmis. Tarkista palvelimen Internet-yhteys tai yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Liian monta yritystä. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Lataa ja asenna</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Yhteensopivuustilaan siirtyminen ei onnistunut %1</translation>
     </message>
   </context>
   <context>
     <name>QnConnectionTestingDialog</name>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Onnistunut</translation>
     </message>
     <message>
       <source>Request timeout</source>
-      <translation type="unfinished">Request timeout</translation>
+      <translation>Pyynnön aikakatkaisu</translation>
     </message>
     <message>
       <source>Test Failed</source>
-      <translation type="unfinished">Test Failed</translation>
+      <translation>Testi epäonnistui</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Yhdistä</translation>
     </message>
   </context>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Jos kenttä on tyhjä, tapahtuma käynnistyy aina.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+      <translation>Tapahtuma käynnistyy vain, jos lähde sisältää yhtään syötettyä avainsanaa.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Tapahtuma käynnistyy vain, jos otsikko sisältää yhtään syötettyä avainsanaa.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
+      <translation>Tapahtuma käynnistyy vain, jos kuvaus sisältää yhtään syötettyä avainsanaa.</translation>
     </message>
     <message>
       <source>Server API</source>
-      <translation type="unfinished">Server API</translation>
+      <translation>Palvelin API</translation>
     </message>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
-      <translation type="unfinished">To generate Generic Event, please refer to %1.</translation>
+      <translation>Generic Eventin tuottamiseksi katso %1.</translation>
     </message>
   </context>
   <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
-      <translation type="unfinished">Save Database Backup...</translation>
+      <translation>Tallenna tietokannan varmuuskopio...</translation>
     </message>
     <message>
       <source>Downloading Database Backup</source>
-      <translation type="unfinished">Downloading Database Backup</translation>
+      <translation>Tietokannan varmuuskopion lataaminen</translation>
     </message>
     <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
-      <translation type="unfinished">Database backup is being downloaded from the server. Please wait.</translation>
+      <translation>Tietokannan varmuuskopiointi ladataan palvelimelta. Odota.</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
-      <translation type="unfinished">Open Database Backup...</translation>
+      <translation>Avaa tietokannan varmuuskopio...</translation>
     </message>
     <message>
       <source>Restoring Database Backup</source>
-      <translation type="unfinished">Restoring Database Backup</translation>
+      <translation>Tietokannan varmuuskopioinnin palauttaminen</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
-      <translation type="unfinished">Database backup is being uploaded to the server. Please wait.</translation>
+      <translation>Tietokannan varmuuskopio on ladattu palvelimeen. Odota.</translation>
     </message>
     <message>
       <source>You need to connect to a server prior to backup start.</source>
-      <translation type="unfinished">You need to connect to a server prior to backup start.</translation>
+      <translation>Sinun täytyy muodostaa yhteys palvelimeen ennen varmuuskopiointia.</translation>
     </message>
     <message>
       <source>Failed to back up database</source>
-      <translation type="unfinished">Failed to back up database</translation>
+      <translation>Tietokannan varmuuskopiointi epäonnistui</translation>
     </message>
     <message>
       <source>Database backed up to file</source>
-      <translation type="unfinished">Database backed up to file</translation>
+      <translation>Tietokanta varmuuskopioitu tiedostoon</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation type="unfinished">Failed to open file</translation>
+      <translation>Tiedoston avaaminen epäonnistui</translation>
     </message>
     <message>
       <source>Restore database?</source>
-      <translation type="unfinished">Restore database?</translation>
+      <translation>Palauta tietokanta?</translation>
     </message>
     <message>
       <source>Database successfully restored</source>
-      <translation type="unfinished">Database successfully restored</translation>
+      <translation>Tietokanta on palautettu onnistuneesti</translation>
     </message>
     <message>
       <source>Server application will restart shortly.</source>
-      <translation type="unfinished">Server application will restart shortly.</translation>
+      <translation>Palvelinsovellus käynnistyy pian.</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
-      <translation type="unfinished">Failed to restore database</translation>
+      <translation>Tietokannan palauttaminen epäonnistui</translation>
     </message>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">System configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>Järjestelmän kokoonpano palautetaan varmuuskopiosta, palvelinohjelma käynnistetään uudelleen.</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>Tietokannan varmuuskopiotiedostot</translation>
     </message>
   </context>
   <context>
     <name>QnDesktopDataProvider</name>
     <message>
       <source>Could not find video encoder %1.</source>
-      <translation type="unfinished">Could not find video encoder %1.</translation>
+      <translation>Videoenkooderia %1 ei löytynyt.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation type="unfinished">Could not initialize video encoder.</translation>
+      <translation>Videoenkooderia ei voitu alustaa.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Äänienkooderia ei voitu alustaa.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
-      <translation type="unfinished">Could not start primary audio device.</translation>
+      <translation>Ensisijaisen äänilaitteen käynnistäminen ei onnistunut.</translation>
     </message>
     <message>
       <source>Screen width must be a multiple of 8.</source>
-      <translation type="unfinished">Screen width must be a multiple of 8.</translation>
+      <translation>Näytön leveyden on oltava 8-lla jaollinen.</translation>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
+      <translation>Äänienkooderia ei löytynyt &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
+      <translation>Äänilaitetta ei voitu alustaa &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>Äänen kaappauslaite ei tue 44,1 kHz: n ja 48 kHz: n äänimuotoja. Valitse toinen äänilaite tai &quot;mitään&quot; näytön tallennusasetuksissa.</translation>
     </message>
     <message>
       <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
+      <translation>Määritettyä koodekkia: %1 ei löydy, h263p käytetään</translation>
     </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Seuraava</translation>
     </message>
     <message>
       <source>Enter password to continue.</source>
-      <translation type="unfinished">Enter password to continue.</translation>
+      <translation>Syötä salasanasi jatkaaksesi.</translation>
     </message>
     <message>
       <source>Set local owner password</source>
-      <translation type="unfinished">Set local owner password</translation>
+      <translation>Aseta paikallisen omistajan salasana</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Kirjaudu sisään</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Salasana</translation>
     </message>
     <message>
       <source>Internal Error</source>
-      <translation type="unfinished">Internal Error</translation>
+      <translation>Sisäinen virhe</translation>
     </message>
     <message>
       <source>Wrong Password</source>
-      <translation type="unfinished">Wrong Password</translation>
+      <translation>Väärä salasana</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Vahvista salasanasi</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Salasanat eivät täsmää.</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Katkaise yhteys</translation>
     </message>
     <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
-      <translation type="unfinished">You will be disconnected from this System and able to login again through local network with local account</translation>
+      <translation>Sinut irrotetaan tästä järjestelmästä ja voit kirjautua uudelleen paikallisen verkon kautta paikallisen tilin kautta</translation>
     </message>
     <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to disconnect System from %1</translation>
+      <translation>Yhteyden muodostaminen epäonnistui järjestelmään %1</translation>
     </message>
     <message>
       <source>Disconnect System from %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect System from %1?</translation>
+      <translation>Irrota järjestelmä %1?</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>Kaikki %1 käyttäjät poistetaan.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</translation>
+      <translation>Et voi muodostaa yhteyttä tähän järjestelmään %1 tililläsi sen jälkeen, kun olet irrottanut tämän järjestelmän %1.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Liian monta yritystä. Yritä myöhemmin uudelleen.</translation>
     </message>
   </context>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>Pakkotallennus -tila vaihtaa kaikkiin kameroihin maksimi tallennusasetukset FPS- ja laatu-asetuksiin.</translation>
     </message>
   </context>
   <context>
     <name>QnEventLogDialog</name>
     <message>
       <source>Filter Similar Rows</source>
-      <translation type="unfinished">Filter Similar Rows</translation>
+      <translation>Suodata samanlaisia rivejä</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Kopioi valinta leikepöydälle</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Vie valinta tiedostoon...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Valitse kaikki</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Tyhjennä suodatin</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Vie valitut tapahtumat tiedostoon</translation>
     </message>
     <message>
       <source>Any Action</source>
-      <translation type="unfinished">Any Action</translation>
+      <translation>Kaikki toimet</translation>
     </message>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Ei tapahtumia</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>Tapahtumaloki ajanjaksolta %1 - %2 - %n tapahtumaa</numerusform>
+        <numerusform>Tapahtumaloki ajanjaksolta %1 - %2 - %n tapahtumaa</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>Tapahtumalokista %1 - %n löytyi tapahtuma(t)</numerusform>
+        <numerusform>Tapahtumalokista %1 - %n löytyi tapahtuma(t)</numerusform>
       </translation>
     </message>
   </context>
@@ -3031,79 +3028,79 @@ to %1</translation>
     <name>QnEventLogModel</name>
     <message>
       <source>Motion video</source>
-      <translation type="unfinished">Motion video</translation>
+      <translation>Liike video</translation>
     </message>
     <message>
       <source>Date/Time</source>
-      <translation type="unfinished">Date/Time</translation>
+      <translation>Päivämäärä/aika</translation>
     </message>
     <message>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Tapahtuma</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Lähde</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Toiminto</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation type="unfinished">Target</translation>
+      <translation>Kohde</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Kuvaus</translation>
     </message>
     <message>
       <source>All users</source>
-      <translation type="unfinished">All users</translation>
+      <translation>Kaikki käyttäjät</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n kertaa)</numerusform>
+        <numerusform>%1 (%n kertaa)</numerusform>
       </translation>
     </message>
     <message>
       <source>Open camera</source>
-      <translation type="unfinished">Open camera</translation>
+      <translation>Avaa kamera</translation>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation type="unfinished">
-        <numerusform>and %n users more...</numerusform>
-        <numerusform>and %n users more...</numerusform>
+      <translation>
+        <numerusform>ja %n käyttäjää enemmän...</numerusform>
+        <numerusform>ja %n käyttäjää enemmän...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
-        <numerusform>and %n more...</numerusform>
-        <numerusform>and %n more...</numerusform>
+      <translation>
+        <numerusform>ja %n lisää...</numerusform>
+        <numerusform>ja %n lisää...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
+      <translation>
+        <numerusform>%n Poistetut aiheet</numerusform>
+        <numerusform>%n Poistetut aiheet</numerusform>
       </translation>
     </message>
     <message>
       <source>Subject removed</source>
-      <translation type="unfinished">Subject removed</translation>
+      <translation>Aihe poistettiin</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n kamerat)</numerusform>
+        <numerusform>%1 (%n kamerat)</numerusform>
       </translation>
     </message>
   </context>
@@ -3111,270 +3108,270 @@ to %1</translation>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automaattinen</translation>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>Perus</translation>
     </message>
   </context>
   <context>
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Valitse täsmälleen yksi kamera</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
-      <translation type="unfinished">%1 has no PTZ presets</translation>
+      <translation>%1 ei ole PTZ-esiasetuksia</translation>
     </message>
   </context>
   <context>
     <name>QnFailoverPriorityDialog</name>
     <message>
       <source>Failover Priority</source>
-      <translation type="unfinished">Failover Priority</translation>
+      <translation>Failover Prioriteetti</translation>
     </message>
     <message>
       <source>Never</source>
       <comment>Failover priority</comment>
-      <translation type="unfinished">Never</translation>
+      <translation>Ei koskaan</translation>
     </message>
     <message>
       <source>Low</source>
       <comment>Failover priority</comment>
-      <translation type="unfinished">Low</translation>
+      <translation>Matala</translation>
     </message>
     <message>
       <source>Medium</source>
       <comment>Failover priority</comment>
-      <translation type="unfinished">Medium</translation>
+      <translation>Keskitaso</translation>
     </message>
     <message>
       <source>High</source>
       <comment>Failover priority</comment>
-      <translation type="unfinished">High</translation>
+      <translation>Korkea</translation>
     </message>
   </context>
   <context>
     <name>QnFailoverPriorityDialogDelegate</name>
     <message>
       <source>Set Priority:</source>
-      <translation type="unfinished">Set Priority:</translation>
+      <translation>Määritä prioriteetti:</translation>
     </message>
     <message>
       <source>Select devices to setup failover priority</source>
-      <translation type="unfinished">Select devices to setup failover priority</translation>
+      <translation>Valitse laitteet määrittääksesi failover-prioriteetin</translation>
     </message>
     <message>
       <source>Select cameras to setup failover priority</source>
-      <translation type="unfinished">Select cameras to setup failover priority</translation>
+      <translation>Valitse kamerat määrittääksesi failover-priorireetin</translation>
     </message>
   </context>
   <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
-      <translation type="unfinished">Overwrite existing file?</translation>
+      <translation>Korvaa olemassa oleva tiedosto?</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Tiedoston korvaaminen epäonnistui</translation>
     </message>
   </context>
   <context>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Tämä kamera ei ole tällä hetkellä valituissa asetteluissa. Toiminto toimii, jos kamera lisätään asetteluun ennen toiminnan käynnistämistä.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Tämä kamera ei ole tällä hetkellä joissakin valituissa asetteluissa. Toiminto toimii, jos kamera lisätään ennen toiminnan käynnistämistä.</translation>
     </message>
   </context>
   <context>
     <name>QnFullscreenCameraPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Valitse täsmälleen yksi kamera</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation type="unfinished">Select folder...</translation>
+      <translation>Valitse kansio...</translation>
     </message>
     <message>
       <source>Folder already added</source>
-      <translation type="unfinished">Folder already added</translation>
+      <translation>Kansio on jo lisätty</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Ei mitään</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Auto (%1)</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
       <source>Open Event Log</source>
-      <translation type="unfinished">Open Event Log</translation>
+      <translation>Avaa tapahtumaloki</translation>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation type="unfinished">Open Bookmarks List</translation>
+      <translation>Avaa kirjanmerkkiluettelo</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Tapahtumien säännöt</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Tapahtumaloki</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Tarkistushistoria</translation>
     </message>
     <message>
       <source>Health Monitoring</source>
-      <translation type="unfinished">Health Monitoring</translation>
+      <translation>Laitteiden valvonta</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Kirjanmerkit</translation>
     </message>
     <message>
       <source>Device List</source>
-      <translation type="unfinished">Device List</translation>
+      <translation>Laiteluettelo</translation>
     </message>
     <message>
       <source>Camera List</source>
-      <translation type="unfinished">Camera List</translation>
+      <translation>Kameraluettelo</translation>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation type="unfinished">Open Event Rules Management</translation>
+      <translation>Avaa tapahtuman sääntöjen hallinta</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation type="unfinished">Open Audit Trail Log</translation>
+      <translation>Avaa Tarkistushistorian loki</translation>
     </message>
     <message>
       <source>Monitor All Servers on a Single Layout</source>
-      <translation type="unfinished">Monitor All Servers on a Single Layout</translation>
+      <translation>Seuraa kaikkia palvelimia yhdellä asettelulla</translation>
     </message>
     <message>
       <source>Open Device List</source>
-      <translation type="unfinished">Open Device List</translation>
+      <translation>Avaa Laiteluettelo</translation>
     </message>
     <message>
       <source>Open Camera List</source>
-      <translation type="unfinished">Open Camera List</translation>
+      <translation>Avaa kameraluettelo</translation>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+      <translation>Varmuuskopiointi sisältää palvelinten ja kameroiden asetukset, käyttäjät, verkkosivut, tapahtuman säännöt jne. Videota ei tallenneta.</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>Luo järjestelmän kokoonpanon varmuuskopion, joka voidaan palauttaa vian sattuessa.</translation>
     </message>
   </context>
   <context>
     <name>QnGlHardwareChecker</name>
     <message>
       <source>Video card drivers are outdated or not installed</source>
-      <translation type="unfinished">Video card drivers are outdated or not installed</translation>
+      <translation>Näytönohjaimen ajurit ovat vanhentuneita tai niitä ei ole asennettu</translation>
     </message>
     <message>
       <source>%1 may not work properly.</source>
-      <translation type="unfinished">%1 may not work properly.</translation>
+      <translation>%1 ei ehkä toimi oikein.</translation>
     </message>
   </context>
   <context>
     <name>QnHistogramWidget</name>
     <message>
       <source>Gamma %1</source>
-      <translation type="unfinished">Gamma %1</translation>
+      <translation>Gamma %1</translation>
     </message>
   </context>
   <context>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tyyppi</translation>
     </message>
     <message>
       <source>Default state</source>
-      <translation type="unfinished">Default state</translation>
+      <translation>Oletustila</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nimi</translation>
     </message>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Tuntematon</translation>
     </message>
     <message>
       <source>Disabled</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Poistettu käytöstä</translation>
     </message>
     <message>
       <source>Input</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Input</translation>
+      <translation>Tulo</translation>
     </message>
     <message>
       <source>Output</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Output</translation>
+      <translation>Lähtö</translation>
     </message>
     <message>
       <source>Invalid</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Virheellinen</translation>
     </message>
     <message>
       <source>Grounded circuit</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Grounded circuit</translation>
+      <translation>Maadoitettu piiri</translation>
     </message>
     <message>
       <source>Invalid state</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Invalid state</translation>
+      <translation>Virheellinen tila</translation>
     </message>
     <message>
       <source>On click</source>
-      <translation type="unfinished">On click</translation>
+      <translation>Klikkaamalla</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Kesto</translation>
     </message>
     <message>
       <source>Open circuit</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Open circuit</translation>
+      <translation>Avoin piiri</translation>
     </message>
     <message>
       <source>Toggle state</source>
       <comment>IO Output Port Action</comment>
-      <translation type="unfinished">Toggle state</translation>
+      <translation>Vaihda tila</translation>
     </message>
     <message>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
-      <translation type="unfinished">Impulse</translation>
+      <translation>Impulssi</translation>
     </message>
     <message>
       <source>ID</source>
@@ -3385,425 +3382,425 @@ to %1</translation>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Syötä arvo.</translation>
     </message>
   </context>
   <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
       <source>Failed to turn off I/O port %1</source>
-      <translation type="unfinished">Failed to turn off I/O port %1</translation>
+      <translation>I/O-portin %1 poiskytkentä epäonnistui</translation>
     </message>
     <message>
       <source>Failed to turn on I/O port %1</source>
-      <translation type="unfinished">Failed to turn on I/O port %1</translation>
+      <translation>I/O-portin %1 päällekytkentä ei onnistunut</translation>
     </message>
   </context>
   <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Testi</translation>
     </message>
     <message>
       <source>Test failed</source>
-      <translation type="unfinished">Test failed</translation>
+      <translation>Testi epäonnistui</translation>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation type="unfinished">
-        <numerusform>Test completed successfully: %n users found.</numerusform>
-        <numerusform>Test completed successfully: %n users found.</numerusform>
+      <translation>
+        <numerusform>Testi suoritettu onnistuneesti: %n käyttäjää löytynyt.</numerusform>
+        <numerusform>Testi suoritettu onnistuneesti: %n käyttäjää löytynyt.</numerusform>
       </translation>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
+      <translation>Muiden LDAP-asetusten muuttaminen kuin &quot;hakusuodatin&quot; johtaa kaikkien LDAP-haettujen käyttäjien yhteyden katoamiseen.</translation>
     </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation type="unfinished">The provided settings are not valid.</translation>
+      <translation>Asetukset eivät kelpaa.</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation type="unfinished">Could not perform a test.</translation>
+      <translation>Testiä ei voitu suorittaa.</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation type="unfinished">Timed Out</translation>
+      <translation>Aikakatkaisu</translation>
     </message>
   </context>
   <context>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Kirjaudu sisään</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Sähköposti</translation>
     </message>
     <message>
       <source>DN</source>
-      <translation type="unfinished">DN</translation>
+      <translation>DN</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nimi</translation>
     </message>
   </context>
   <context>
     <name>QnLdapUsersDialog</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation type="unfinished">The provided settings are not valid.</translation>
+      <translation>Asetukset eivät kelpaa.</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation type="unfinished">Could not perform a test.</translation>
+      <translation>Testiä ei voitu suorittaa.</translation>
     </message>
     <message>
       <source>Could not load users.</source>
-      <translation type="unfinished">Could not load users.</translation>
+      <translation>Käyttäjiä ei voitu ladata.</translation>
     </message>
     <message>
       <source>Error while loading users.</source>
-      <translation type="unfinished">Error while loading users.</translation>
+      <translation>Virhe ladattaessa käyttäjiä.</translation>
     </message>
     <message>
       <source>No new users found.</source>
-      <translation type="unfinished">No new users found.</translation>
+      <translation>Uusia käyttäjiä ei löytynyt.</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation type="unfinished">Timed Out</translation>
+      <translation>Aikakatkaisu</translation>
     </message>
     <message>
       <source>Import Selected</source>
-      <translation type="unfinished">Import Selected</translation>
+      <translation>Tuo valitut</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
-      <translation type="unfinished">Screens Allowed:</translation>
+      <translation>Näytöt sallittu:</translation>
     </message>
     <message>
       <source>Control Sessions Allowed:</source>
-      <translation type="unfinished">Control Sessions Allowed:</translation>
+      <translation>Ohjausistunnot sallitaan:</translation>
     </message>
     <message>
       <source>Archive Streams Allowed:</source>
-      <translation type="unfinished">Archive Streams Allowed:</translation>
+      <translation>Arkistostreamit sallittu:</translation>
     </message>
     <message>
       <source>Generic:</source>
-      <translation type="unfinished">Generic:</translation>
+      <translation>Yleinen:</translation>
     </message>
     <message>
       <source>License Type</source>
-      <translation type="unfinished">License Type</translation>
+      <translation>Lisenssityyppi</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Lisenssiavain</translation>
     </message>
     <message>
       <source>Features:</source>
-      <translation type="unfinished">Features:</translation>
+      <translation>Ominaisuudet:</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation type="unfinished">Locked to Hardware ID</translation>
+      <translation>Lukittu laitteiston tunnukseen</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tyyppi</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Lisenssiavain</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Tila</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Palvelin</translation>
     </message>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Ei koskaan</translation>
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Vanhentunut</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Virhe</translation>
     </message>
     <message>
       <source>Server not found</source>
-      <translation type="unfinished">Server not found</translation>
+      <translation>Palvelinta ei löydy</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Päättyy</translation>
     </message>
     <message>
       <source>License is active</source>
-      <translation type="unfinished">License is active</translation>
+      <translation>Lisenssi on aktiivinen</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>Lisenssi on vanhentunut</translation>
     </message>
     <message>
       <source>Expires soon</source>
-      <translation type="unfinished">Expires soon</translation>
+      <translation>Vanhenee pian</translation>
     </message>
     <message>
       <source>License expires today</source>
-      <translation type="unfinished">License expires today</translation>
+      <translation>Lisenssi vanhenee tänään</translation>
     </message>
     <message>
       <source>License expires tomorrow</source>
-      <translation type="unfinished">License expires tomorrow</translation>
+      <translation>Lisenssi päättyy huomenna</translation>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
+      <translation>
+        <numerusform>Lisenssi päättyy %n päivän kuluessa</numerusform>
+        <numerusform>Lisenssi päättyy %n päivän kuluessa</numerusform>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation type="unfinished">Qty</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseManagerWidget</name>
     <message>
       <source>You do not have a valid license installed.</source>
-      <translation type="unfinished">You do not have a valid license installed.</translation>
+      <translation>Sinulla ei ole voimassa olevaa lisenssiä.</translation>
     </message>
     <message>
       <source>Please activate your commercial or trial license.</source>
-      <translation type="unfinished">Please activate your commercial or trial license.</translation>
+      <translation>Aktivoi kaupallinen tai kokeiluversio.</translation>
     </message>
     <message>
       <source>Please activate your commercial license.</source>
-      <translation type="unfinished">Please activate your commercial license.</translation>
+      <translation>Aktivoi kaupallinen lisenssi.</translation>
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Vie</translation>
     </message>
     <message>
       <source>Export licenses to a file</source>
-      <translation type="unfinished">Export licenses to a file</translation>
+      <translation>Vie lisenssit tiedostoon</translation>
     </message>
     <message>
       <source>Copy To Clipboard</source>
-      <translation type="unfinished">Copy To Clipboard</translation>
+      <translation>Kopioi leikepöydälle</translation>
     </message>
     <message>
       <source>Incompatible license</source>
-      <translation type="unfinished">Incompatible license</translation>
+      <translation>Yhteensopimaton lisenssi</translation>
     </message>
     <message>
       <source>License you are trying to activate is incompatible with your software.</source>
-      <translation type="unfinished">License you are trying to activate is incompatible with your software.</translation>
+      <translation>Lisenssi, jonka yrität aktivoida, ei ole yhteensopiva ohjelmiston kanssa.</translation>
     </message>
     <message>
       <source>You already activated this license</source>
-      <translation type="unfinished">You already activated this license</translation>
+      <translation>Olet jo aktivoinut tämän lisenssin</translation>
     </message>
     <message>
       <source>License activated</source>
-      <translation type="unfinished">License activated</translation>
+      <translation>Lisenssi aktivoitu</translation>
     </message>
     <message>
       <source>Failed to remove license from Server</source>
-      <translation type="unfinished">Failed to remove license from Server</translation>
+      <translation>Lisenssin poistaminen palvelimelta epäonnistui</translation>
     </message>
     <message>
       <source>Invalid activation key file</source>
-      <translation type="unfinished">Invalid activation key file</translation>
+      <translation>Virheellinen aktivointitiedosto</translation>
     </message>
     <message>
       <source>Select a valid activation key file to continue.</source>
-      <translation type="unfinished">Select a valid activation key file to continue.</translation>
+      <translation>Valitse voimassa oleva aktivointitiedosto jatkaaksesi.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
-      <translation type="unfinished">Database error occurred.</translation>
+      <translation>Tapahtui tietokantavirhe.</translation>
     </message>
     <message>
       <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-      <translation type="unfinished">Invalid data received. Please contact Customer Support to report the issue.</translation>
+      <translation>Virheelliset tiedot vastaanotettu. Ilmoita ongelmasta ottamalla yhteyttä asiakastukeen.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
-      <translation type="unfinished">Failed to activate license</translation>
+      <translation>Lisenssin aktivointi epäonnistui</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Verkkovirhe</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
-      <translation type="unfinished">If the problem persists, please contact Customer Support.</translation>
+      <translation>Jos ongelma jatkuu, ota yhteyttä asiakastukeen.</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
-      <translation type="unfinished">License already activated on another server</translation>
+      <translation>Lisenssi on jo aktivoitu toisessa palvelimessa</translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
-      <translation type="unfinished">Please make sure it is entered correctly.</translation>
+      <translation>Varmista, että se on kirjoitettu oikein.</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>Deaktivoi lisenssit?</numerusform>
+        <numerusform>Poista lisenssit käytöstä?</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to deactivate license</source>
-      <translation type="unfinished">Failed to deactivate license</translation>
+      <translation>Lisenssin poistaminen käytöstä ei onnistunut</translation>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
-        <numerusform>Failed to deactivate %n licenses</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+      <translation>
+        <numerusform>%n lisenssien deaktivointi ei onnistunut</numerusform>
+        <numerusform>%n lisenssien poistaminen käytöstä ei onnistunut</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      <translation>
+        <numerusform>%1: sta %n lisensseistä ei voitu deaktivoida</numerusform>
+        <numerusform>%1: sta %n lisensseistä ei voi poistaa käytöstä</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>Lisenssejä ei voitu deaktivoida</numerusform>
+        <numerusform>Lisenssejä ei voi poistaa käytöstä</numerusform>
       </translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
-      <translation type="unfinished">Cannot connect to the License Server</translation>
+      <translation>Lisenssipalvelimeen ei voi muodostaa yhteyttä</translation>
     </message>
     <message>
       <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
+      <translation>Varmista, että palvelimella on aktiivinen Internet-yhteys tai tarkista palomuuriasetukset.</translation>
     </message>
     <message>
       <source>License Server error</source>
-      <translation type="unfinished">License Server error</translation>
+      <translation>Lisenssipalvelimen virhe</translation>
     </message>
     <message>
       <source>License deactivated</source>
-      <translation type="unfinished">License deactivated</translation>
+      <translation>Lisenssi deaktivoitu</translation>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%n licenses deactivated</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
+      <translation>
+        <numerusform>%n lisenssiä deaktivoitu</numerusform>
+        <numerusform>%n lisenssiä deaktivoitu</numerusform>
       </translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Poista</translation>
     </message>
     <message>
       <source>Deactivate</source>
-      <translation type="unfinished">Deactivate</translation>
+      <translation>Deaktivoi</translation>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
+      <translation>
+        <numerusform>%n kanavaa.</numerusform>
+        <numerusform>%n kanavaa.</numerusform>
       </translation>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>Ota yhteyttä asiakastukeen.</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>Deaktivoi %n Muu</numerusform>
+        <numerusform>Deaktivoi %n Muu</numerusform>
       </translation>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>Virheellinen lisenssiavain</translation>
     </message>
     <message>
       <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation type="unfinished">Please contact Customer Support to obtain a valid License Key.</translation>
+      <translation>Ota yhteyttä asiakastukeen saadaksesi kelvollisen lisenssiavaimen.</translation>
     </message>
     <message>
       <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation type="unfinished">Please contact Customer Support to activate License Key manually.</translation>
+      <translation>Ota yhteyttä asiakastukeen aktivoidaksesi lisenssiavain manuaalisesti.</translation>
     </message>
     <message>
       <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation type="unfinished">Please contact Customer Support to get a valid License Key.</translation>
+      <translation>Ota yhteyttä asiakastukeen saadaksesi kelvollisen lisenssiavaimen.</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
-      <translation type="unfinished">If the problem persists please contact Customer Support.</translation>
+      <translation>Jos ongelma jatkuu, ota yhteyttä asiakastukeen.</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1</translation>
+      <translation>Tämä lisenssi on jo aktivoitu ja liitetty laitteiston tunnukseen %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1 on %2</translation>
+      <translation>Tämä lisenssi on jo aktivoitu ja yhdistetty laitteiston tunnukseen %1 on %2</translation>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>Jokainen lisenssi voidaan poistaa käytöstä vain muutaman kerran.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 ovat käytössä</numerusform>
+        <numerusform>%1 ovat käytössä</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>Tarvitaan vähintään %1</numerusform>
+        <numerusform>Tarvitaan vähintään %1</numerusform>
       </translation>
     </message>
   </context>
@@ -3811,27 +3808,27 @@ to %1</translation>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation type="unfinished">Activate Trial License</translation>
+      <translation>Aktivoi kokeiluversio</translation>
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation type="unfinished">Activate Free License</translation>
+      <translation>Aktivoi ilmainen lisenssi</translation>
     </message>
     <message>
       <source>Open License File</source>
-      <translation type="unfinished">Open License File</translation>
+      <translation>Avaa lisenssitiedosto</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation type="unfinished">Failed to open file</translation>
+      <translation>Tiedoston avaaminen epäonnistui</translation>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</translation>
+      <translation>Lähetä sähköpostitse -lisenssiavain ja Laitteistotunnus järjestelmästä %1 saadaksesi aktivointitiedoston.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</translation>
+      <translation>Lähetä sähköpostitse -lisenssiavain ja Laitteistotunnus järjestelmästä %1 saadaksesi aktivointitiedoston.</translation>
     </message>
   </context>
   <context>
@@ -3839,646 +3836,646 @@ to %1</translation>
     <message>
       <source>Failed to login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to login to %1</translation>
+      <translation>Kirjautuminen epäonnistui %1</translation>
     </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Yleiset</translation>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation type="unfinished">Look and Feel</translation>
+      <translation>Ulkonäkö</translation>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation type="unfinished">Screen Recording</translation>
+      <translation>Näytön tallennus</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Ilmoitukset</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Lisäasetukset</translation>
     </message>
     <message>
       <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</translation>
+      <translation>Asetutustiedostoon on sallittu vain luku. Ota yhteyttä järjestlemänvalvojaan. Kaikki muutokset menetetään ohjelmasta poistumisen jälkeen.</translation>
     </message>
     <message>
       <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</translation>
+      <translation>Asetuksia ei voi tallentaa. Ota yhteyttä järjestelmänvalvojaan. Kaikki muutokset menetetään ohjelmasta poistumisen jälkeen.</translation>
     </message>
     <message>
       <source>Restart required</source>
-      <translation type="unfinished">Restart required</translation>
+      <translation>Uudelleenkäynnistys vaaditaan</translation>
     </message>
     <message>
       <source>Restart Now</source>
-      <translation type="unfinished">Restart Now</translation>
+      <translation>Käynnistä uudelleen nyt</translation>
     </message>
     <message>
       <source>Restart Later</source>
-      <translation type="unfinished">Restart Later</translation>
+      <translation>Käynnistä uudelleen myöhemmin</translation>
     </message>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
-      <translation type="unfinished">Some changes will take effect only after %1 restart</translation>
+      <translation>Jotkut muutokset tulevat voimaan vasta %1 uudelleenkäynnistyksen jälkeen</translation>
     </message>
   </context>
   <context>
     <name>QnLoginDialog</name>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Yhdistä palvelimeen...</translation>
     </message>
     <message>
       <source>Version %1</source>
-      <translation type="unfinished">Version %1</translation>
+      <translation>Versio %1</translation>
     </message>
     <message>
       <source>Saved Sessions</source>
-      <translation type="unfinished">Saved Sessions</translation>
+      <translation>Tallennetut istunnot</translation>
     </message>
     <message>
       <source>Auto-Discovered Servers</source>
-      <translation type="unfinished">Auto-Discovered Servers</translation>
+      <translation>Automaattisesti havaitut palvelimet</translation>
     </message>
     <message>
       <source>* Last used connection *</source>
-      <translation type="unfinished">* Last used connection *</translation>
+      <translation>* Viimeksi käytetty yhteys *</translation>
     </message>
     <message>
       <source>%1 at %2</source>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 kohdassa %2</translation>
     </message>
     <message>
       <source>Overwrite existing connection?</source>
-      <translation type="unfinished">Overwrite existing connection?</translation>
+      <translation>Korvaa olemassa oleva yhteys?</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>Poista yhteys?</translation>
     </message>
     <message>
       <source>There is another connection with the same name.</source>
-      <translation type="unfinished">There is another connection with the same name.</translation>
+      <translation>Samanniminen yhteys on jo olemassa.</translation>
     </message>
     <message>
       <source>none</source>
-      <translation type="unfinished">none</translation>
+      <translation>ei mitään</translation>
     </message>
   </context>
   <context>
     <name>QnLoginToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Sähköposti</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Salasana</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Luo tili</translation>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation type="unfinished">Forgot password?</translation>
+      <translation>Unohditko salasanan?</translation>
     </message>
     <message>
       <source>Learn more about</source>
-      <translation type="unfinished">Learn more about</translation>
+      <translation>Lisätietoja</translation>
     </message>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Kirjaudu sisään %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Welcome to %1!</translation>
+      <translation>Tervetuloa %1!</translation>
     </message>
   </context>
   <context>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
       <source>Preparing Image...</source>
-      <translation type="unfinished">Preparing Image...</translation>
+      <translation>Kuvan valmistelu...</translation>
     </message>
     <message>
       <source>Please wait while image is being prepared...</source>
-      <translation type="unfinished">Please wait while image is being prepared...</translation>
+      <translation>Odota hetki, kun kuvaa valmistellaan...</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Palvelimen aika</translation>
     </message>
     <message>
       <source>Client Time</source>
-      <translation type="unfinished">Client Time</translation>
+      <translation>Client-sovelluksen aika</translation>
     </message>
     <message>
       <source>Stretch</source>
-      <translation type="unfinished">Stretch</translation>
+      <translation>Venytä</translation>
     </message>
     <message>
       <source>Fit</source>
-      <translation type="unfinished">Fit</translation>
+      <translation>Sovita</translation>
     </message>
     <message>
       <source>Crop</source>
-      <translation type="unfinished">Crop</translation>
+      <translation>Rajaa</translation>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-      <translation type="unfinished">This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</translation>
+      <translation>Tämä vaihtoehto ei vaikuta tallennusaikatauluun. Tallennusaikataulu perustuu aina palvelimen aikaan.</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation type="unfinished">Select File...</translation>
+      <translation>Valitse Tiedosto...</translation>
     </message>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Ei kuvaa</translation>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
+      <translation>Asettaa Client-sovellukselle (aikajana, aikaleimat jne.) käytettävän ajan, kun Client-sovellus- ja palvelinkoneet ovat eri aikavyöhykkeillä.</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
+      <translation>Näyttää kameroiden ja palvelimien IP-osoitteet sekä käyttäjien roolit.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
+      <translation>Kameran esilläolon aika näytetään jokaisen kameran kohdalla, kun aloitat kierron.</translation>
     </message>
   </context>
   <context>
     <name>QnMediaResourceWidget</name>
     <message>
       <source>Screenshot</source>
-      <translation type="unfinished">Screenshot</translation>
+      <translation>Kuvakaappaus</translation>
     </message>
     <message>
       <source>Smart Search</source>
-      <translation type="unfinished">Smart Search</translation>
+      <translation>Älykäs haku</translation>
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Dewarppaus</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
-      <translation type="unfinished">Create Zoom Window</translation>
+      <translation>Luo zoomausikkuna</translation>
     </message>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Kuvanparannus</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Korkea resoluutio</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>Reaaliaikainen</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation type="unfinished">%1 (Tour &quot;%2&quot; is active)</translation>
+      <translation>%1 (Tour &quot;%2&quot; on aktiivinen)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
-      <translation type="unfinished">Zoom Window</translation>
+      <translation>Zoom-ikkuna</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>I/O-moduuli</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Matala resoluutio</translation>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
-      <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+      <translation>Liipaisun %1 (%2) kutsuminen epäonnistui</translation>
     </message>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
-      <translation type="unfinished">press and hold</translation>
+      <translation>pidä -näppäintä alhaalla</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Ei käytössä aikataulun mukaan</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Aseta kaikille %n kameroille</numerusform>
+        <numerusform>Aseta kaikille %n kameroille</numerusform>
       </translation>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Alue Zoom</translation>
     </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>%1 (current)</source>
-      <translation type="unfinished">%1 (current)</translation>
+      <translation>%1 (nykyinen)</translation>
     </message>
     <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
-      <translation type="unfinished">Use a specific hostname or IP address rather than %1.</translation>
+      <translation>Käytä tiettyä isäntänimeä tai IP-osoitetta %1 sijaan.</translation>
     </message>
     <message>
       <source>Merge with %1</source>
-      <translation type="unfinished">Merge with %1</translation>
+      <translation>Yhdistä %1</translation>
     </message>
     <message>
       <source>Testing...</source>
-      <translation type="unfinished">Testing...</translation>
+      <translation>Testataan...</translation>
     </message>
     <message>
       <source>Merging Systems...</source>
-      <translation type="unfinished">Merging Systems...</translation>
+      <translation>Järjestelmien yhdistäminen...</translation>
     </message>
     <message>
       <source>The login cannot be empty.</source>
-      <translation type="unfinished">The login cannot be empty.</translation>
+      <translation>Kirjautumistunnus ei voi olla tyhjä.</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Uusi palvelin</translation>
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation type="unfinished">Failed to merge Systems</translation>
+      <translation>Järjestelmien yhdistäminen epäonnistui</translation>
     </message>
     <message>
       <source>URL is invalid.</source>
-      <translation type="unfinished">URL is invalid.</translation>
+      <translation>URL-osoite on virheellinen.</translation>
     </message>
     <message>
       <source>You are about to merge the current System %1 with System</source>
-      <translation type="unfinished">You are about to merge the current System %1 with System</translation>
+      <translation>Olet yhdistämässä nykyisen järjestelmän %1 järjestelmään</translation>
     </message>
     <message>
       <source>This is the current System URL.</source>
-      <translation type="unfinished">This is the current System URL.</translation>
+      <translation>Tämä on nykyinen järjestelmän URL-osoite.</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>Toisen järjestelmän palvelimet näkyvät resurssipuussa, kun tietokannan synkronointi on valmis.</translation>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation type="unfinished">Systems will be merged shortly</translation>
+      <translation>Järjestelmät yhdistetään pian</translation>
     </message>
     <message>
       <source>You will be reconnected.</source>
-      <translation type="unfinished">You will be reconnected.</translation>
+      <translation>Sinut yhdistetään uudelleen.</translation>
     </message>
   </context>
   <context>
     <name>QnMessageBox</name>
     <message>
       <source>Overwrite</source>
-      <translation type="unfinished">Overwrite</translation>
+      <translation>Korvaa</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Poista</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Palauta</translation>
     </message>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Ohita</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Sulje</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Pysäytä</translation>
     </message>
   </context>
   <context>
     <name>QnNavigationItem</name>
     <message>
       <source>Speed Down</source>
-      <translation type="unfinished">Speed Down</translation>
+      <translation>Hidasta</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Edellinen kuva</translation>
     </message>
     <message>
       <source>Speed Up</source>
-      <translation type="unfinished">Speed Up</translation>
+      <translation>Nopeuta</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation type="unfinished">Next Frame</translation>
+      <translation>Seuraava kuva</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Alkuun</translation>
     </message>
     <message>
       <source>Next Chunk</source>
-      <translation type="unfinished">Next Chunk</translation>
+      <translation>Uusi lohko</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Loppuun</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
-      <translation type="unfinished">Previous Chunk</translation>
+      <translation>Edellinen jakso</translation>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation type="unfinished">NVR cameras do not support not-synchronized playback</translation>
+      <translation>NVR-kamerat eivät tue synkronoimatonta toistoa</translation>
     </message>
   </context>
   <context>
     <name>QnNetworkSpeedStrings</name>
     <message>
       <source>B/s</source>
-      <translation type="unfinished">B/s</translation>
+      <translation>T/s</translation>
     </message>
     <message>
       <source>MB/s</source>
-      <translation type="unfinished">MB/s</translation>
+      <translation>Mt/s</translation>
     </message>
     <message>
       <source>KB/s</source>
-      <translation type="unfinished">KB/s</translation>
+      <translation>KT/s</translation>
     </message>
   </context>
   <context>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nimi</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation type="unfinished">Name cannot be empty</translation>
+      <translation>Nimi ei voi olla tyhjä</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Virtuaalikamera</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Virtuaalikamera %1</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <source>Clip sound up to %1 seconds</source>
-      <translation type="unfinished">Clip sound up to %1 seconds</translation>
+      <translation>Leikkeen ääni on enintään %1 sekuntia</translation>
     </message>
     <message>
       <source>Rename sound</source>
-      <translation type="unfinished">Rename sound</translation>
+      <translation>Nimeä ääni uudelleen</translation>
     </message>
     <message>
       <source>Custom title:</source>
-      <translation type="unfinished">Custom title:</translation>
+      <translation>Mukautettu otsikko:</translation>
     </message>
     <message>
       <source>Sound Files</source>
-      <translation type="unfinished">Sound Files</translation>
+      <translation>Äänitiedostot</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation type="unfinished">Select File...</translation>
+      <translation>Valitse Tiedosto...</translation>
     </message>
     <message>
       <source>Enter New Title:</source>
-      <translation type="unfinished">Enter New Title:</translation>
+      <translation>Anna uusi otsikko:</translation>
     </message>
     <message>
       <source>Failed to add file</source>
-      <translation type="unfinished">Failed to add file</translation>
+      <translation>Tiedoston lisääminen epäonnistui</translation>
     </message>
     <message>
       <source>Failed to set new title</source>
-      <translation type="unfinished">Failed to set new title</translation>
+      <translation>Uuden otsikon asettaminen epäonnistui</translation>
     </message>
     <message>
       <source>Delete sound?</source>
-      <translation type="unfinished">Delete sound?</translation>
+      <translation>Poista ääni?</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundModel</name>
     <message>
       <source>Downloading sound list...</source>
-      <translation type="unfinished">Downloading sound list...</translation>
+      <translation>Ääniluettelon lataaminen...</translation>
     </message>
     <message>
       <source>No Sound</source>
-      <translation type="unfinished">No Sound</translation>
+      <translation>Ei ääntä</translation>
     </message>
     <message>
       <source>Downloading sound...</source>
-      <translation type="unfinished">Downloading sound...</translation>
+      <translation>Äänen lataaminen...</translation>
     </message>
     <message>
       <source>Uploading sound...</source>
-      <translation type="unfinished">Uploading sound...</translation>
+      <translation>Äänen siirtäminen...</translation>
     </message>
   </context>
   <context>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Kierto</translation>
     </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
     <message>
       <source>%1 can work in configuration mode only</source>
-      <translation type="unfinished">%1 can work in configuration mode only</translation>
+      <translation>%1 voi toimia vain konfigurointitilassa</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
-      <translation type="unfinished">Performance of this computer allows running %1 in configuration mode only.</translation>
+      <translation>Tämän tietokoneen suorituskyky mahdollistaa järjestelmän %1 toiminnan vain kokoonpanotilassa.</translation>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
+      <translation>Käyttääksesi kaikkia ominaisuuksia, käytä toista tietokonetta</translation>
     </message>
   </context>
   <context>
     <name>QnPermissionsWidget</name>
     <message>
       <source>Edit camera settings</source>
-      <translation type="unfinished">Edit camera settings</translation>
+      <translation>Muokkaa kameran asetuksia</translation>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation type="unfinished">This is also required to create/edit PTZ presets and tours.</translation>
+      <translation>Tätä tarvitaan myös PTZ-esiasetusten ja kiertojen luomiseen / muokkaamiseen.</translation>
     </message>
     <message>
       <source>Control video walls</source>
-      <translation type="unfinished">Control video walls</translation>
+      <translation>Hallitse Videoseinää</translation>
     </message>
     <message>
       <source>View event log</source>
-      <translation type="unfinished">View event log</translation>
+      <translation>Katso tapahtumaloki</translation>
     </message>
     <message>
       <source>View archive</source>
-      <translation type="unfinished">View archive</translation>
+      <translation>Näytä arkisto</translation>
     </message>
     <message>
       <source>Export archive</source>
-      <translation type="unfinished">Export archive</translation>
+      <translation>Vie arkisto</translation>
     </message>
     <message>
       <source>View bookmarks</source>
-      <translation type="unfinished">View bookmarks</translation>
+      <translation>Näytä kirjanmerkit</translation>
     </message>
     <message>
       <source>Modify bookmarks</source>
-      <translation type="unfinished">Modify bookmarks</translation>
+      <translation>Muokkaa kirjanmerkkejä</translation>
     </message>
     <message>
       <source>User Input</source>
-      <translation type="unfinished">User Input</translation>
+      <translation>Käyttäjän kommentit</translation>
     </message>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
+      <translation>PTZ, Laitteen lähdöt, 2-suuntainen ääni, ohjelmistolliset käynnistimet.</translation>
     </message>
   </context>
   <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Hallitse kirjanmerkkejä</translation>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>Ilmoitus näytetään, kunnes yksi käyttäjistä, jotka näkevät sen, luo kirjanmerkin tapahtumien kuvauksella</translation>
     </message>
   </context>
   <context>
     <name>QnProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Peruuta</translation>
     </message>
   </context>
   <context>
     <name>QnPtzManageDialog</name>
     <message>
       <source>Manage PTZ for %1...</source>
-      <translation type="unfinished">Manage PTZ for %1...</translation>
+      <translation>Hallitse PTZ: tä %1...</translation>
     </message>
     <message>
       <source>Apply changes before exit?</source>
-      <translation type="unfinished">Apply changes before exit?</translation>
+      <translation>Vahvista muutokset ennen poistumista?</translation>
     </message>
   </context>
   <context>
     <name>QnPtzManageModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nimi</translation>
     </message>
     <message>
       <source>Hotkey</source>
-      <translation type="unfinished">Hotkey</translation>
+      <translation>Pikanäppäin</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Koti</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Tarkemmat tiedot</translation>
     </message>
     <message>
       <source>Tours</source>
-      <translation type="unfinished">Tours</translation>
+      <translation>Kierrot</translation>
     </message>
     <message>
       <source>Positions</source>
-      <translation type="unfinished">Positions</translation>
+      <translation>Asennot</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Ei mitään</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+      <translation>
+        <numerusform>Tämä esiasetus aktivoituu %n minuutin käyttämättömyyden jälkeen</numerusform>
+        <numerusform>Tämä esiasetus aktivoituu %n minuutin käyttämättömyyden jälkeen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
-        <numerusform>Tour has %n identical positions</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
+      <translation>
+        <numerusform>Kierrossa on %n samanlaista paikkaa</numerusform>
+        <numerusform>Kierrossa on %n samanlaista paikkaa</numerusform>
       </translation>
     </message>
     <message>
       <source>less than a minute</source>
-      <translation type="unfinished">less than a minute</translation>
+      <translation>alle minuutti sitten</translation>
     </message>
     <message>
       <source>Invalid tour</source>
-      <translation type="unfinished">Invalid tour</translation>
+      <translation>Virheellinen kierros</translation>
     </message>
     <message>
       <source>New Tour %1</source>
-      <translation type="unfinished">New Tour %1</translation>
+      <translation>Uusi kierros %1</translation>
     </message>
     <message>
       <source>Saved Position %1</source>
-      <translation type="unfinished">Saved Position %1</translation>
+      <translation>Tallennettu asento %1</translation>
     </message>
     <message>
       <source>Tour should contain at least 2 positions.</source>
-      <translation type="unfinished">Tour should contain at least 2 positions.</translation>
+      <translation>Kierroksen tulee sisältää vähintään 2 asentoa.</translation>
     </message>
     <message>
       <source>Tour Time: %1.</source>
-      <translation type="unfinished">Tour Time: %1.</translation>
+      <translation>Kierroksen aika %1.</translation>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>noin %n minuuttia</numerusform>
+        <numerusform>noin %n minuuttia</numerusform>
       </translation>
     </message>
   </context>
@@ -4486,138 +4483,138 @@ to %1</translation>
     <name>QnPtzPresetDialog</name>
     <message>
       <source>Saved Position %1</source>
-      <translation type="unfinished">Saved Position %1</translation>
+      <translation>Tallennettu asento %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Ei mitään</translation>
     </message>
   </context>
   <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Ei mitään</translation>
     </message>
     <message>
       <source>Reassign</source>
-      <translation type="unfinished">Reassign</translation>
+      <translation>Määritä uudelleen</translation>
     </message>
     <message>
       <source>Hotkey used by preset &quot;%1&quot;</source>
-      <translation type="unfinished">Hotkey used by preset &quot;%1&quot;</translation>
+      <translation>Pikavalintanäppäin, jota käyttää esiasetukset &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
-      <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
+      <translation>Pikavalintanäppäin, jota käyttää kierrot &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>QnPtzTourSpotsModel</name>
     <message>
       <source>Lowest</source>
-      <translation type="unfinished">Lowest</translation>
+      <translation>Matalin</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Matala</translation>
     </message>
     <message>
       <source>Normal</source>
-      <translation type="unfinished">Normal</translation>
+      <translation>Normaali</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Korkea</translation>
     </message>
     <message>
       <source>Highest</source>
-      <translation type="unfinished">Highest</translation>
+      <translation>Korkein</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Välitön</translation>
     </message>
     <message>
       <source>Position</source>
-      <translation type="unfinished">Position</translation>
+      <translation>Sijainti</translation>
     </message>
     <message>
       <source>Stay Time</source>
-      <translation type="unfinished">Stay Time</translation>
+      <translation>Läsnäolon aika</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Nopeus</translation>
     </message>
     <message>
       <source>Invalid</source>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Virheellinen</translation>
     </message>
   </context>
   <context>
     <name>QnRecordingSettingsWidget</name>
     <message>
       <source>Screen %1 - %2x%3</source>
-      <translation type="unfinished">Screen %1 - %2x%3</translation>
+      <translation>Näyttö %1 - %2x%3</translation>
     </message>
     <message>
       <source>%1 (Primary)</source>
-      <translation type="unfinished">%1 (Primary)</translation>
+      <translation>%1 (ensisijainen)</translation>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation type="unfinished">Select folder...</translation>
+      <translation>Valitse kansio...</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Paras</translation>
     </message>
     <message>
       <source>Average</source>
-      <translation type="unfinished">Average</translation>
+      <translation>Keskiverto</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Suorituskyky</translation>
     </message>
     <message>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Natiivi</translation>
     </message>
     <message>
       <source>Quarter Native</source>
-      <translation type="unfinished">Quarter Native</translation>
+      <translation>Neljännes natiivi</translation>
     </message>
   </context>
   <context>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation type="unfinished">Cameras from other servers and removed cameras</translation>
+      <translation>Muiden palvelimien kamerat ja poistetut kamerat</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n devices</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
+      <translation>
+        <numerusform>Yhteensä %1 %n laitetta</numerusform>
+        <numerusform>Yhteensä %1 %n laitetta</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n cameras</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
+      <translation>
+        <numerusform>Yhteensä %1 %n kameraa</numerusform>
+        <numerusform>Yhteensä %1 %n kameraa</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n I/O modules</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
+      <translation>
+        <numerusform>Yhteensä %1 %n I / O-moduulia</numerusform>
+        <numerusform>Yhteensä %1 %n I /O-moduulia</numerusform>
       </translation>
     </message>
   </context>
@@ -4625,47 +4622,47 @@ to %1</translation>
     <name>QnRecordingStatsModel</name>
     <message>
       <source>Space</source>
-      <translation type="unfinished">Space</translation>
+      <translation>Tila</translation>
     </message>
     <message>
       <source>Calendar Days</source>
-      <translation type="unfinished">Calendar Days</translation>
+      <translation>Kalenteripäivät</translation>
     </message>
     <message>
       <source>less than an hour</source>
-      <translation type="unfinished">less than an hour</translation>
+      <translation>alle tunnin</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>empty</source>
-      <translation type="unfinished">empty</translation>
+      <translation>tyhjä</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Laite</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 Gt</translation>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Nykyinen bittinopeus</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>tietoja ei ole ennustettavissa</translation>
     </message>
   </context>
   <context>
@@ -4673,37 +4670,37 @@ to %1</translation>
     <message>
       <source>Role %1 has no %2 permission</source>
       <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation type="unfinished">Role %1 has no %2 permission</translation>
+      <translation>Roolilla %1 ei ole %2 lupaa</translation>
     </message>
     <message>
       <source>Selected roles have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected roles have no %1 permission</translation>
+      <translation>Valituilla rooleilla ei ole %1 lupaa</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%n: sta %1 valituista rooleista ei ole %2 lupaa</numerusform>
+        <numerusform>%n: sta %1 valituista rooleista ei ole %2 lupaa</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permission</translation>
+      <translation>Käyttäjällä %1 ei ole %2 lupaa</translation>
     </message>
     <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected users have no %1 permission</translation>
+      <translation>Valituilla käyttäjillä ei ole %1 lupaa</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%n: sta %1 valituista käyttäjistä ei ole %2 lupaa</numerusform>
+        <numerusform>%n: sta %1 valituista käyttäjistä ei ole %2 lupaa</numerusform>
       </translation>
     </message>
   </context>
@@ -4711,291 +4708,291 @@ to %1</translation>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>Paikalliset tiedostot</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Ei paikallisia tiedostoja</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Mitään ei löytynyt</translation>
     </message>
     <message>
       <source>add to current layout</source>
-      <translation type="unfinished">add to current layout</translation>
+      <translation>lisää nykyiseen asetteluun</translation>
     </message>
     <message>
       <source>open all at a new layout</source>
-      <translation type="unfinished">open all at a new layout</translation>
+      <translation>avaa kaikki uudessa asettelussa</translation>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>avaa kaikki</translation>
     </message>
     <message>
       <source>All types</source>
-      <translation type="unfinished">All types</translation>
+      <translation>Kaikki tyypit</translation>
     </message>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Palvelimet</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Asettelut</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreels</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Videoseinät</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Verkkosivut</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Käyttäjät</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Paikalliset tiedostot</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Etsi</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kamerat ja laitteet</translation>
     </message>
   </context>
   <context>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
-      <translation type="unfinished">Health Monitor</translation>
+      <translation>Laitteiden valvonta</translation>
     </message>
   </context>
   <context>
     <name>QnResourceSelectionDialog</name>
     <message>
       <source>Select Devices...</source>
-      <translation type="unfinished">Select Devices...</translation>
+      <translation>Valitse Laitteet...</translation>
     </message>
     <message>
       <source>Select Cameras...</source>
-      <translation type="unfinished">Select Cameras...</translation>
+      <translation>Valitse kamerat...</translation>
     </message>
   </context>
   <context>
     <name>QnResourceTreeModelNode</name>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Palvelimet</translation>
     </message>
     <message>
       <source>Other Systems</source>
-      <translation type="unfinished">Other Systems</translation>
+      <translation>Muut järjestelmät</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Käyttäjät</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Verkkosivut</translation>
     </message>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation type="unfinished">Cameras &amp; Resources</translation>
+      <translation>Kamerat ja resurssit</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Asettelut</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation type="unfinished">All Cameras &amp; Resources</translation>
+      <translation>Kaikki kamerat ja resurssit</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
-      <translation type="unfinished">All Shared Layouts</translation>
+      <translation>Kaikki jaetut asettelut</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation type="unfinished">Shared Layouts</translation>
+      <translation>Jaetut asettelut</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Paikalliset tiedostot</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreels</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Showreel</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kamerat ja laitteet</translation>
     </message>
     <message>
       <source>Videowalls</source>
-      <translation type="unfinished">Videowalls</translation>
+      <translation>Videoseinät</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>Analytiikka alustat</translation>
     </message>
   </context>
   <context>
     <name>QnResourceTreeModelOtherSystemsNode</name>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Uusi järjestelmä</translation>
     </message>
   </context>
   <context>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Sulje</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Tiedot</translation>
     </message>
     <message>
       <source>Rotate</source>
-      <translation type="unfinished">Rotate</translation>
+      <translation>Kierrä</translation>
     </message>
   </context>
   <context>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation type="unfinished">Enter URL</translation>
+      <translation>Kirjoita URL-osoite</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Palvelin</translation>
     </message>
     <message>
       <source>Invalid URL</source>
-      <translation type="unfinished">Invalid URL</translation>
+      <translation>Virheellinen URL</translation>
     </message>
     <message>
       <source>URL already added</source>
-      <translation type="unfinished">URL already added</translation>
+      <translation>URL-osoite on jo lisätty</translation>
     </message>
   </context>
   <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
-      <translation type="unfinished">Export Bookmark...</translation>
+      <translation>Vie kirjanmerkki...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Ei kirjanmerkkejä</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Etsi</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Vie kirjanmerkit...</translation>
     </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nimi</translation>
     </message>
     <message>
       <source>Start time</source>
-      <translation type="unfinished">Start time</translation>
+      <translation>Aloitusaika</translation>
     </message>
     <message>
       <source>Length</source>
-      <translation type="unfinished">Length</translation>
+      <translation>Pituus</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Tunnisteet</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Luotu</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation type="unfinished">Creator</translation>
+      <translation>Tekijä</translation>
     </message>
   </context>
   <context>
     <name>QnSelectDevicesButton</name>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Mikä tahansa laite</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Mikä tahansa kamera</translation>
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Kaikki laitteet</translation>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Kaikki kamerat</translation>
     </message>
     <message>
       <source>Select devices...</source>
-      <translation type="unfinished">Select devices...</translation>
+      <translation>Valitse Laitteet...</translation>
     </message>
     <message>
       <source>Select cameras...</source>
-      <translation type="unfinished">Select cameras...</translation>
+      <translation>Valitse kamerat...</translation>
     </message>
   </context>
   <context>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation type="unfinished">Any Server</translation>
+      <translation>Mikä tahansa palvelin</translation>
     </message>
     <message>
       <source>All Servers</source>
-      <translation type="unfinished">All Servers</translation>
+      <translation>Kaikki palvelimet</translation>
     </message>
     <message>
       <source>Select Servers...</source>
-      <translation type="unfinished">Select Servers...</translation>
+      <translation>Valitse palvelimet...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>%n palvelinta</numerusform>
+        <numerusform>%n palvelinta</numerusform>
       </translation>
     </message>
   </context>
@@ -5003,21 +5000,21 @@ to %1</translation>
     <name>QnSelectUsersButton</name>
     <message>
       <source>Any User</source>
-      <translation type="unfinished">Any User</translation>
+      <translation>Mikä tahansa käyttäjä</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Kaikki käyttäjät</translation>
     </message>
     <message>
       <source>Select Users...</source>
-      <translation type="unfinished">Select Users...</translation>
+      <translation>Valitse käyttäjät...</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n käyttäjät</numerusform>
+        <numerusform>%n käyttäjät</numerusform>
       </translation>
     </message>
   </context>
@@ -5025,143 +5022,147 @@ to %1</translation>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
+      <translation>
+        <numerusform>%n lisää</numerusform>
+        <numerusform>%n lisää</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has invalid email address</source>
-      <translation type="unfinished">User %1 has invalid email address</translation>
+      <translation>Käyttäjällä %1 on virheellinen sähköpostiosoite</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 users have invalid email address</numerusform>
-        <numerusform>%n of %1 users have invalid email address</numerusform>
+      <translation>
+        <numerusform>%n käyttäjällä %1 on virheellinen sähköpostiosoite</numerusform>
+        <numerusform>%n käyttäjällä %1 on virheellinen sähköpostiosoite</numerusform>
       </translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation type="unfinished">Invalid email address %1</translation>
+      <translation>Virheellinen sähköpostiosoite %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>%n %1 ylimääräisestä sähköpostisosoitteesta on virheellinen</numerusform>
+        <numerusform>%n %1 ylimääräisestä sähköpostisosoitteesta on virheellinen</numerusform>
       </translation>
     </message>
     <message>
       <source>Send email to %1</source>
-      <translation type="unfinished">Send email to %1</translation>
+      <translation>Lähetä sähköpostia osoitteeseen %1</translation>
     </message>
   </context>
   <context>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Osoite</translation>
     </message>
   </context>
   <context>
     <name>QnServerResourceWidget</name>
     <message>
       <source>Show Log</source>
-      <translation type="unfinished">Show Log</translation>
+      <translation>Näytä loki</translation>
     </message>
     <message>
       <source>Check Issues</source>
-      <translation type="unfinished">Check Issues</translation>
+      <translation>Tarkista ongelmat</translation>
     </message>
     <message>
       <source>%1 (up %2)</source>
-      <translation type="unfinished">%1 (up %2)</translation>
+      <translation>%1 (enintään %2)</translation>
     </message>
   </context>
   <context>
     <name>QnServerSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Yleiset</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
-      <translation type="unfinished">Storage Analytics</translation>
+      <translation>Tallennustilan analytiikka</translation>
     </message>
     <message>
       <source>Server Settings - %1 (readonly)</source>
-      <translation type="unfinished">Server Settings - %1 (readonly)</translation>
+      <translation>Palvelimen asetukset - %1 (vain luku)</translation>
     </message>
     <message>
       <source>Server Settings - %1</source>
-      <translation type="unfinished">Server Settings - %1</translation>
+      <translation>Palvelimen asetukset - %1</translation>
     </message>
     <message>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>Palvelimen asetukset</translation>
     </message>
     <message>
       <source>Storage Management</source>
-      <translation type="unfinished">Storage Management</translation>
+      <translation>Tallennustilan hallinta</translation>
     </message>
     <message>
       <source>Apply changes before switching to another server?</source>
-      <translation type="unfinished">Apply changes before switching to another server?</translation>
+      <translation>Vahvista muutokset ennen kuin siirryt toiseen palvelimeen?</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Palvelimen verkkosivu</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
     <message>
       <source>At least two servers are required for this feature.</source>
-      <translation type="unfinished">At least two servers are required for this feature.</translation>
+      <translation>Tähän ominaisuuteen tarvitaan vähintään kaksi palvelinta.</translation>
     </message>
     <message>
       <source>Max devices on this server:</source>
-      <translation type="unfinished">Max devices on this server:</translation>
+      <translation>Tämän palvelimen laitteiden maksimimäärä:</translation>
     </message>
     <message>
       <source>Max cameras on this server:</source>
-      <translation type="unfinished">Max cameras on this server:</translation>
+      <translation>Tämän palvelimen kameroiden maksimimäärä:</translation>
     </message>
     <message>
       <source>This server already has more than max devices</source>
-      <translation type="unfinished">This server already has more than max devices</translation>
+      <translation>Tällä palvelimella on jo maksimimäärä laitteita</translation>
     </message>
     <message>
       <source>This server already has more than max cameras</source>
-      <translation type="unfinished">This server already has more than max cameras</translation>
+      <translation>Tällä palvelimella on jo maksimimäärä kameroita</translation>
     </message>
     <message>
       <source>To avoid issues adjust max number of devices</source>
-      <translation type="unfinished">To avoid issues adjust max number of devices</translation>
+      <translation>Ongelmien välttämiseksi säädä laitteiden enimmäismäärää</translation>
     </message>
     <message>
       <source>To avoid issues adjust max number of cameras</source>
-      <translation type="unfinished">To avoid issues adjust max number of cameras</translation>
+      <translation>Ongelmien välttämiseksi säädä kameran enimmäismäärää</translation>
     </message>
     <message>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Failover</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline servers.</translation>
+      <translation>Palvelimet, joissa on failover käytössä, ottavat automaattisesti kamerat offline-palvelimilta.</translation>
     </message>
   </context>
   <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
       <source>Unsaved changes:</source>
-      <translation type="unfinished">Unsaved changes:</translation>
+      <translation>Tallentamattomat muutokset:</translation>
     </message>
     <message>
       <source>Save changes before exit?</source>
-      <translation type="unfinished">Save changes before exit?</translation>
+      <translation>Vahvista muutokset ennen poistumista?</translation>
     </message>
   </context>
   <context>
@@ -5171,281 +5172,281 @@ to %1</translation>
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
       <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
 &apos; sequence</comment>
-      <translation type="unfinished">Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
+      <translation>Html-tunnisteita voidaan käyttää mukautetun tekstin sisällä:
+&lt;h4&gt;Otsikot (h1-h6)&lt;/h4&gt;Myös eri &lt;font color=&quot;red&quot;&gt;väriä&lt;/font&gt; ja &lt;font size=&quot;18&quot;&gt;kokoa&lt;/font&gt; voidaan käyttää. Teksti voisi olla &lt;s&gt;&lt;/s&gt;, &lt;u&gt;alleviivattu&lt;/u&gt;, &lt;b&gt;lihavoitu&lt;/b&gt; tai &lt;i&gt;kursivoitu&lt;/i&gt;</translation>
     </message>
   </context>
   <context>
     <name>QnSignInfo</name>
     <message>
       <source>Analyzing: %1%</source>
-      <translation type="unfinished">Analyzing: %1%</translation>
+      <translation>Analysoidaan: %1%</translation>
     </message>
     <message>
       <source>Invalid watermark</source>
-      <translation type="unfinished">Invalid watermark</translation>
+      <translation>Virheellinen vesileima</translation>
     </message>
     <message>
       <source>Watermark Not Found</source>
-      <translation type="unfinished">Watermark Not Found</translation>
+      <translation>Vesileimaa ei löydy</translation>
     </message>
     <message>
       <source>Watermark Matched</source>
-      <translation type="unfinished">Watermark Matched</translation>
+      <translation>Vesileima täsmää</translation>
     </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automaattinen</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Sähköposti</translation>
     </message>
     <message>
       <source>SMTP Server</source>
-      <translation type="unfinished">SMTP Server</translation>
+      <translation>SMTP-palvelin</translation>
     </message>
     <message>
       <source>Server cannot be empty.</source>
-      <translation type="unfinished">Server cannot be empty.</translation>
+      <translation>Palvelin ei voi olla tyhjä.</translation>
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Käyttäjä</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Salasana</translation>
     </message>
     <message>
       <source>System Signature</source>
-      <translation type="unfinished">System Signature</translation>
+      <translation>Järjestelmän allekirjoitus</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>Teknisen tuen Allekirjoitus</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation type="unfinished">Enter a short System description here.</translation>
+      <translation>Syötä lyhyt Järjestelmän kuvaus tähän.</translation>
     </message>
   </context>
   <context>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Sähköposti</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation type="unfinished">Email is not valid.</translation>
+      <translation>Sähköpostiosoite on virheellinen.</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Salasana</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation type="unfinished">Password cannot be empty.</translation>
+      <translation>Salasana ei voi olla tyhjä.</translation>
     </message>
     <message>
       <source>System Signature</source>
-      <translation type="unfinished">System Signature</translation>
+      <translation>Järjestelmän allekirjoitus</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>Teknisen tuen Allekirjoitus</translation>
     </message>
     <message>
       <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation type="unfinished">No preset found. Use &quot;Advanced&quot; option.</translation>
+      <translation>Ei esiasentoa. Käytä &quot;Edistynyt&quot; -vaihtoehtoa.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation type="unfinished">Enter a short System description here.</translation>
+      <translation>Syötä lyhyt Järjestelmän kuvaus tähän.</translation>
     </message>
   </context>
   <context>
     <name>QnSmtpTestConnectionWidget</name>
     <message>
       <source>Timed Out</source>
-      <translation type="unfinished">Timed Out</translation>
+      <translation>Aikakatkaisu</translation>
     </message>
     <message>
       <source>TLS</source>
-      <translation type="unfinished">TLS</translation>
+      <translation>TLS</translation>
     </message>
     <message>
       <source>SSL</source>
-      <translation type="unfinished">SSL</translation>
+      <translation>SSL</translation>
     </message>
     <message>
       <source>Unsecured</source>
-      <translation type="unfinished">Unsecured</translation>
+      <translation>Suojaamaton</translation>
     </message>
     <message>
       <source>In Progress...</source>
-      <translation type="unfinished">In Progress...</translation>
+      <translation>Käynnissä...</translation>
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Onnistunut</translation>
     </message>
     <message>
       <source>Connection timed out</source>
-      <translation type="unfinished">Connection timed out</translation>
+      <translation>Yhteys aikakatkaistiin</translation>
     </message>
     <message>
       <source>Authentication failed</source>
-      <translation type="unfinished">Authentication failed</translation>
+      <translation>Todennus epäonnistui</translation>
     </message>
     <message>
       <source>SMTP Error %1</source>
-      <translation type="unfinished">SMTP Error %1</translation>
+      <translation>SMTP-virhe %1</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Verkkovirhe</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
-      <translation type="unfinished">Invalid parameters</translation>
+      <translation>Virheelliset parametrit</translation>
     </message>
     <message>
       <source>Cannot perform the test.</source>
-      <translation type="unfinished">Cannot perform the test.</translation>
+      <translation>Testiä ei voi suorittaa.</translation>
     </message>
     <message>
       <source>No Servers connected to Internet</source>
-      <translation type="unfinished">No Servers connected to Internet</translation>
+      <translation>Palvelimilla ei Internet yhteyttä</translation>
     </message>
   </context>
   <context>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
       <source>User Input</source>
-      <translation type="unfinished">User Input</translation>
+      <translation>Käyttäjän kommentit</translation>
     </message>
   </context>
   <context>
     <name>QnSpeedSlider</name>
     <message>
       <source>%1x</source>
-      <translation type="unfinished">%1x</translation>
+      <translation>%1x</translation>
     </message>
     <message>
       <source>Paused</source>
-      <translation type="unfinished">Paused</translation>
+      <translation>Keskeytetty</translation>
     </message>
   </context>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>EI DATAA</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation type="unfinished">UNAUTHORIZED</translation>
+      <translation>LUVATON</translation>
     </message>
     <message>
       <source>NO SIGNAL</source>
-      <translation type="unfinished">NO SIGNAL</translation>
+      <translation>EI SIGNAALIA</translation>
     </message>
     <message>
       <source>SERVER UNAVAILABLE</source>
-      <translation type="unfinished">SERVER UNAVAILABLE</translation>
+      <translation>PALVELIN EI OLE SAATAVILLA</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>EI PÄÄSYÄ</translation>
     </message>
     <message>
       <source>DEVICE DISABLED</source>
-      <translation type="unfinished">DEVICE DISABLED</translation>
+      <translation>LAITE POISTETTU KÄYTÖSTÄ</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Laitteen asetukset</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kameran asetukset</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>I/O-moduulin asetukset</translation>
     </message>
     <message>
       <source>Diagnostics</source>
-      <translation type="unfinished">Diagnostics</translation>
+      <translation>Diagnostiikka</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Ota käyttöön</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Aktivoi lisenssi</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
-      <translation type="unfinished">Please check authentication information</translation>
+      <translation>Tarkista todennustiedot</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>EI REAALIAIKAISTA KUVAA</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
+      <translation>LIIKAA YHTEYKSIÄ</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>SALASANA VAADITAAN</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Aseta tähän kameraan</translation>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>FIRMWARE VERSIOTA EI TUETA</translation>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>EI TARPEEKSI LISENSSEJÄ</translation>
     </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Valitse kaikki</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Vie valinta tiedostoon...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Kopioi valinta leikepöydälle</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Päivitä</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Vie valitut tapahtumat tiedostoon</translation>
     </message>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -5453,702 +5454,724 @@ to %1</translation>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Viimeiset 5 minuuttia</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Viimeiset 60 minuuttia</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Viimeiset 24 tuntia</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Pisin saatavilla oleva aika</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Ennuste on käytettävissä vain kameroissa, joissa on tallennus käytössä.</translation>
     </message>
   </context>
   <context>
     <name>QnStorageConfigWidget</name>
     <message>
       <source>Backup is already in progress.</source>
-      <translation type="unfinished">Backup is already in progress.</translation>
+      <translation>Varmuuskopiointi on jo käynnissä.</translation>
     </message>
     <message>
       <source>Cannot start backup while archive index rebuild is in progress.</source>
-      <translation type="unfinished">Cannot start backup while archive index rebuild is in progress.</translation>
+      <translation>Varmuuskopiointia ei voi käynnistää, kun arkiston indeksin uudelleenrakentaminen on käynnissä.</translation>
     </message>
     <message>
       <source>Backup is in progress...</source>
-      <translation type="unfinished">Backup is in progress...</translation>
+      <translation>Varmuuskopiointi on käynnissä...</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>Ensisijainen</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Varmuuskopio</translation>
     </message>
     <message>
       <source>Add more drives to use them as backup storage.</source>
-      <translation type="unfinished">Add more drives to use them as backup storage.</translation>
+      <translation>Lisää asemia käytettäväksi varmuuskopioinnissa.</translation>
     </message>
     <message>
       <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
-      <translation type="unfinished">Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</translation>
+      <translation>Vaihda &quot;Ensisijainen&quot; - &quot;Varmuuskopio&quot;, jos haluat ottaa varmuuskopioinnin käyttöön.</translation>
     </message>
     <message>
       <source>Apply changes to start backup.</source>
-      <translation type="unfinished">Apply changes to start backup.</translation>
+      <translation>Ota muutokset käyttöön varmuuskopioinnin aloittamiseksi.</translation>
     </message>
     <message>
       <source>in %1</source>
-      <translation type="unfinished">in %1</translation>
+      <translation>%1</translation>
     </message>
     <message>
       <source>%1 before now</source>
-      <translation type="unfinished">%1 before now</translation>
+      <translation>%1 tehty</translation>
     </message>
     <message>
       <source>Realtime backup is active...</source>
-      <translation type="unfinished">Realtime backup is active...</translation>
+      <translation>Reaaliaikainen varmuuskopiointi on aktiivinen...</translation>
     </message>
     <message>
       <source>Realtime backup is set up.</source>
-      <translation type="unfinished">Realtime backup is set up.</translation>
+      <translation>Reaaliaikainen varmuuskopiointi on määritetty.</translation>
     </message>
     <message>
       <source>There is no backup yet.</source>
-      <translation type="unfinished">There is no backup yet.</translation>
+      <translation>Varmuukopiointia ei ole suoritettu.</translation>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation type="unfinished">Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>Arkiston varmuuskopioinnin tila &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation type="unfinished">Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>Seuraava varmuuskopiointi suoritetaan &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
-      <translation type="unfinished">Next backup is not scheduled.</translation>
+      <translation>Seuraavaa varmuuskopiointia ei ole ajastettu.</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
-      <translation type="unfinished">Depending on the total size of the archive, reindexing can take up to several hours.</translation>
+      <translation>Arkiston kokonaismäärästä riippuen uudelleenindeksointi voi kestää useita tunteja.</translation>
     </message>
     <message>
       <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
-      <translation type="unfinished">Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</translation>
+      <translation>Uudelleenindeksointi on tarpeen vain, jos arkistokansiot on siirretty, nimetty uudelleen tai poistettu.</translation>
     </message>
     <message>
       <source>You can cancel this operation at any moment without data loss.</source>
-      <translation type="unfinished">You can cancel this operation at any moment without data loss.</translation>
+      <translation>Voit peruuttaa tämän toiminnon milloin tahansa ilman tietojen häviämistä.</translation>
     </message>
     <message>
       <source>Continue anyway?</source>
-      <translation type="unfinished">Continue anyway?</translation>
+      <translation>Jatka joka tapauksessa?</translation>
     </message>
     <message>
       <source>Hard disk load will increase significantly</source>
-      <translation type="unfinished">Hard disk load will increase significantly</translation>
+      <translation>Kiintolevyn kuormitus kasvaa merkittävästi</translation>
     </message>
     <message>
       <source>Select at least one device in the Backup Settings to start backup.</source>
-      <translation type="unfinished">Select at least one device in the Backup Settings to start backup.</translation>
+      <translation>Valitse ainakin yksi laite Varmuuskopiointiasetuksista aloittaaksesi varmuuskopioinnin.</translation>
     </message>
     <message>
       <source>Select at least one camera in the Backup Settings to start backup.</source>
-      <translation type="unfinished">Select at least one camera in the Backup Settings to start backup.</translation>
+      <translation>Valitse ainakin yksi kamera Varmuuskopiointiasetuksista aloittaaksesi varmuuskopioinnin.</translation>
     </message>
     <message>
       <source>Archive reindexing completed</source>
-      <translation type="unfinished">Archive reindexing completed</translation>
+      <translation>Arkiston uudelleenindeksointi on valmis</translation>
     </message>
     <message>
       <source>Backup reindexing completed</source>
-      <translation type="unfinished">Backup reindexing completed</translation>
+      <translation>Varmuuskopion uudelleenindeksointi on valmis</translation>
     </message>
     <message>
       <source>Backup completed</source>
-      <translation type="unfinished">Backup completed</translation>
-    </message>
-    <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Varmuuskopiointi valmis</translation>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
+      <translation>Uudelleenindeksointi voi korjata arkiston tai varmuuskopioinnin ongelmat, jos tiedostot ovat kadonneet tai vahingoittuneet tai jos jokin laitteisto on vaihdettu.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Poista</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Säilytä</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Peruuta</translation>
     </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
     <message>
       <source>Invalid storage</source>
-      <translation type="unfinished">Invalid storage</translation>
+      <translation>Virheellinen tallennustila</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Poista</translation>
     </message>
     <message>
       <source>Inaccessible</source>
-      <translation type="unfinished">Inaccessible</translation>
+      <translation>Ei pääsyä</translation>
     </message>
     <message>
       <source>%1 (Checking...)</source>
-      <translation type="unfinished">%1 (Checking...)</translation>
+      <translation>%1 (Tarkistetaan...)</translation>
     </message>
     <message>
       <source>%1 (Scanning... %2%)</source>
-      <translation type="unfinished">%1 (Scanning... %2%)</translation>
+      <translation>%1 (Skannataan... %2%)</translation>
     </message>
     <message>
       <source>%1 (Rebuilding... %2%)</source>
-      <translation type="unfinished">%1 (Rebuilding... %2%)</translation>
+      <translation>%1 (uudelleenrakentaminen... %2%)</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Ladataan...</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Varmuuskopio</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>Ensisijainen</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 Gt</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
-      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+      <translation>Liian pienet ja järjestelmän osiot on varattu ja niitä ei käytetä kirjoitukseen, jos käytettävissä on riittävästi muuta tallennustilaa.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
     <message>
       <source>Fast Backup Scan...</source>
-      <translation type="unfinished">Fast Backup Scan...</translation>
+      <translation>Nopean varmuuskopioinnin tarkistus...</translation>
     </message>
     <message>
       <source>Fast Archive Scan...</source>
-      <translation type="unfinished">Fast Archive Scan...</translation>
+      <translation>Nopean arkistoinnin tarkistus...</translation>
     </message>
     <message>
       <source>Reindexing Backup...</source>
-      <translation type="unfinished">Reindexing Backup...</translation>
+      <translation>Arkistoa indeksoidaan uudelleen...</translation>
     </message>
     <message>
       <source>Reindexing Archive...</source>
-      <translation type="unfinished">Reindexing Archive...</translation>
+      <translation>Arkistoa indeksoidaan uudelleen...</translation>
     </message>
   </context>
   <context>
     <name>QnStorageUrlDialog</name>
     <message>
       <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-      <translation type="unfinished">\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
+      <translation>\\&lt;Tietokoneen nimi&gt;\&lt;Kansio&gt;</translation>
     </message>
     <message>
       <source>Network Shared Resource</source>
-      <translation type="unfinished">Network Shared Resource</translation>
+      <translation>Verkon jaettu resurssi</translation>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
-      <translation type="unfinished">Invalid credentials for external storage</translation>
+      <translation>Virheelliset käyttäjätunnukset ulkoiselle tallennustilalle</translation>
     </message>
     <message>
       <source>Invalid storage path</source>
-      <translation type="unfinished">Invalid storage path</translation>
+      <translation>Virheellinen tallennustilan polku</translation>
     </message>
     <message>
       <source>Add this storage anyway?</source>
-      <translation type="unfinished">Add this storage anyway?</translation>
+      <translation>Lisää tämä tallennustila joka tapauksessa?</translation>
     </message>
     <message>
       <source>Storage path used by another server</source>
-      <translation type="unfinished">Storage path used by another server</translation>
+      <translation>Toinen palvelin käyttää tätä tallennustilaa</translation>
     </message>
     <message>
       <source>Add Storage</source>
-      <translation type="unfinished">Add Storage</translation>
+      <translation>Lisää tallennustila</translation>
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
-      <translation type="unfinished">It is not recommended to use one recording location for different servers.</translation>
+      <translation>Ei ole suositeltavaa käyttää yhtä tallennuspaikkaa eri palvelimille.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Yleiset</translation>
     </message>
     <message>
       <source>Licenses</source>
-      <translation type="unfinished">Licenses</translation>
+      <translation>Lisenssit</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Sähköposti</translation>
     </message>
     <message>
       <source>Updates</source>
-      <translation type="unfinished">Updates</translation>
+      <translation>Päivitykset</translation>
     </message>
     <message>
       <source>Routing Management</source>
-      <translation type="unfinished">Routing Management</translation>
+      <translation>Reitityksen hallinta</translation>
     </message>
     <message>
       <source>Time Synchronization</source>
-      <translation type="unfinished">Time Synchronization</translation>
+      <translation>Ajan synkronointi</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Käyttäjät</translation>
     </message>
     <message>
       <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
+      <translation>Analytiikka</translation>
     </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
     <message>
       <source>Email address is not set</source>
-      <translation type="unfinished">Email address is not set</translation>
+      <translation>Sähköpostiosoitetta ei ole asetettu</translation>
     </message>
     <message>
       <source>No licenses</source>
-      <translation type="unfinished">No licenses</translation>
+      <translation>Ei lisenssejä</translation>
     </message>
     <message>
       <source>Email server is not set</source>
-      <translation type="unfinished">Email server is not set</translation>
+      <translation>Sähköpostipalvelinta ei ole asetettu</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
-      <translation type="unfinished">Storage is not configured</translation>
+      <translation>Tallennustilaa ei ole määritetty</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed</source>
-      <translation type="unfinished">Rebuilding archive index is completed</translation>
+      <translation>Arkiston indeksoinnin uudelleen rakentaminen on valmis</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user</source>
-      <translation type="unfinished">Rebuilding archive index is canceled by user</translation>
+      <translation>Käyttäjä on keskeyttänyt arkiston indeksoinnin uudelleen rakentamisen</translation>
     </message>
     <message>
       <source>Email address is not set for user %1</source>
-      <translation type="unfinished">Email address is not set for user %1</translation>
+      <translation>Sähköpostiosoitetta ei ole asetettu käyttäjälle %1</translation>
     </message>
     <message>
       <source>Email address is not set.</source>
-      <translation type="unfinished">Email address is not set.</translation>
+      <translation>Sähköpostiosoitetta ei ole asetettu.</translation>
     </message>
     <message>
       <source>Email server is not set.</source>
-      <translation type="unfinished">Email server is not set.</translation>
+      <translation>Sähköpostipalvelinta ei ole asetettu.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
-      <translation type="unfinished">Any configuration changes except license activation are impossible.</translation>
+      <translation>Kaikki kokoonpanomuutokset, lukuun ottamatta lisenssin aktivointia, ei voida suorittaa.</translation>
     </message>
     <message>
       <source>You have no licenses.</source>
-      <translation type="unfinished">You have no licenses.</translation>
+      <translation>Sinulla ei ole lisenssejä.</translation>
     </message>
     <message>
       <source>You cannot record video from cameras.</source>
-      <translation type="unfinished">You cannot record video from cameras.</translation>
+      <translation>Et voi tallentaa videoita kameroista.</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed on the following Server:</source>
-      <translation type="unfinished">Rebuilding archive index is completed on the following Server:</translation>
+      <translation>Arkistoinnin uudelleenindeksointi on valmis seuraavissa palvelimissa:</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
-      <translation type="unfinished">Rebuilding archive index is canceled by user on the following Server:</translation>
+      <translation>Käyttäjä on keskeyttänyt arkistoinnin uudelleenindeksoinnin seuraavissa palvelimissa:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>
-      <translation type="unfinished">Storage is not configured on the following Server:</translation>
+      <translation>Tallennustilaa ei ole määritetty seuraavissa palvelimissa:</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Lue lisää</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Yhdistä</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation type="unfinished">Some users have not set their email addresses</translation>
+      <translation>Jotkut käyttäjät eivät ole määrittäneet sähköpostiosoitteitaan</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
-      <translation type="unfinished">You cannot receive System notifications by email.</translation>
+      <translation>Et voi vastaanottaa järjestelmän ilmoituksia sähköpostitse.</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation type="unfinished">Some users have not set their email addresses.</translation>
+      <translation>Jotkut käyttäjät eivät ole määrittäneet sähköpostiosoitteitaan.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
-      <translation type="unfinished">They cannot receive System notifications by email.</translation>
+      <translation>He eivät voi vastaanottaa järjestelmän ilmoituksia sähköpostitse.</translation>
     </message>
     <message>
       <source>Error while sending email</source>
-      <translation type="unfinished">Error while sending email</translation>
+      <translation>Virhe lähetettäessä sähköpostia</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started</source>
-      <translation type="unfinished">Remote archive synchronization has been started</translation>
+      <translation>Etäarkistojen synkronointi on aloitettu</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished</source>
-      <translation type="unfinished">Remote archive synchronization has been finished</translation>
+      <translation>Etäarkistojen synkronointi on päättynyt</translation>
     </message>
     <message>
       <source>Remote archive synchronization is in progress</source>
-      <translation type="unfinished">Remote archive synchronization is in progress</translation>
+      <translation>Etäarkistojen synkronointi on käynnissä</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been started for the following device:</translation>
+      <translation>Etäarkistojen synkronointi on aloitettu seuraavien laitteiden osalta:</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
+      <translation>Etäarkistojen synkronointi on päättynyt seuraavien laitteiden osalta:</translation>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>Etäarkistojen synkronointi</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation type="unfinished">Archive integrity problem detected</translation>
+      <translation>Arkiston eheysongelma havaittu</translation>
     </message>
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect your System to %1 &amp;mdash; make it accessible from anywhere!</translation>
+      <translation>Liitä System %1 &amp;mdash; jotta siihen voidaan muodostaa yhteys mistä tahansa!</translation>
     </message>
     <message>
       <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Check out %1 &amp;mdash; connect to your System from anywhere!</translation>
+      <translation>Tarkista %1 &amp;mdash; muodosta yhteys järjestelmään mistä tahansa!</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Jotkin kamerat edellyttävät salasanojen asettamista</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Palvelimilla ei ole internet yhteyttä ajan synkronointiin</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>Järjestelmä on vikasietotilassa</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>Järjestelmällä ei ole internet yhteyttä ajan synkronointiin</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>Yhteydessä olevilla palvelimilla järjestelmässä ei ole internet yhteyttä ajan synkronoimiseen.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>Järjestelmä toimii vikasietotilassa.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>Etäarkistojen synkronoinnin aikana tapahtui virhe</translation>
     </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
     <message>
       <source>Allow System to optimize device settings</source>
-      <translation type="unfinished">Allow System to optimize device settings</translation>
+      <translation>Salli järjestelmän optimoida laitteen asetukset</translation>
     </message>
     <message>
       <source>Allow System to optimize camera settings</source>
-      <translation type="unfinished">Allow System to optimize camera settings</translation>
+      <translation>Salli järjestelmän optimoida kameran asetukset</translation>
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about system, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>Sisältää tietoja järjestelmästä, kuten kameramalleista ja laiteohjelmistoversioista, palvelimien määrästä jne.</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
+      <translation>Ei sisällä henkilökohtaisia tietoja ja on täysin nimetöntä.</translation>
     </message>
     <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+      <translation>Failover-palvelimen toimenpiteet saattavat silti pyytää kameran tilapäivityksiä tästä asetuksesta riippumatta.</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>Ota käyttöön laitteiden ja palvelinten automaattinen havaitseminen ja automaattinen laitteen tilan tarkistus</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>Ota käyttöön kameroiden ja palvelinten automaattinen etsintä ja automattinen kameroiden tilan tarkistus</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>Kun se on käytössä, järjestelmä havaitsee jatkuvasti uusia kameroita ja palvelimia ja lähettää etsintäpyynnöt kameroille tilapäivitykseen.</translation>
     </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
     <message>
       <source>Close all programs which may use this file and try again</source>
-      <translation type="unfinished">Close all programs which may use this file and try again</translation>
+      <translation>Sulje kaikki ohjelmat, jotka voivat käyttää tätä tiedostoa, ja yritä uudelleen</translation>
     </message>
     <message>
       <source>File used by another process</source>
-      <translation type="unfinished">File used by another process</translation>
+      <translation>Toinen prosessi käyttää tiedostoa</translation>
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>HTML-tiedosto</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>Taulukon (CSV) tiedosto</translation>
     </message>
   </context>
   <context>
     <name>QnTimeServerSelectionModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Palvelin</translation>
     </message>
     <message>
       <source>Offset</source>
-      <translation type="unfinished">Offset</translation>
+      <translation>Siirtymä</translation>
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Päivämäärä</translation>
     </message>
     <message>
       <source>Timezone</source>
-      <translation type="unfinished">Timezone</translation>
+      <translation>Aikavyöhyke</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Aika</translation>
     </message>
   </context>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation type="unfinished">No server has Internet access. Time is not being synchronized.</translation>
+      <translation>Palvelimella ei ole Internet-yhteyttä. Aikaa ei synkronoida.</translation>
     </message>
     <message>
       <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>Järjestelmäaika synkronoidaan Internetin kanssa, eikä se riipu palvelimien paikallisesta ajasta.</translation>
     </message>
     <message>
       <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>Järjestelmäaika synkronoidaan paikallisen ajan kanssa valitulta palvelimelta eikä se ole riippuvainen paikallisesta ajasta muissa palvelimissa.</translation>
     </message>
   </context>
   <context>
     <name>QnTimeSlider</name>
     <message>
       <source>No thumbnails available</source>
-      <translation type="unfinished">No thumbnails available</translation>
+      <translation>Esikatselukuvia ei käytössä</translation>
     </message>
   </context>
   <context>
     <name>QnTwoWayAudioWidget::Private</name>
     <message>
       <source>Input device is not selected</source>
-      <translation type="unfinished">Input device is not selected</translation>
+      <translation>Syöttölaitetta ei ole valittu</translation>
     </message>
     <message>
       <source>Streaming is not ready yet</source>
-      <translation type="unfinished">Streaming is not ready yet</translation>
+      <translation>Streamaus ei ole vielä valmis</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Verkkovirhe</translation>
     </message>
     <message>
       <source>Hold to Speak</source>
-      <translation type="unfinished">Hold to Speak</translation>
+      <translation>Pidä pohjassa puhuaksesi</translation>
     </message>
   </context>
   <context>
     <name>QnUserListModel</name>
     <message>
       <source>LDAP user</source>
-      <translation type="unfinished">LDAP user</translation>
+      <translation>LDAP-käyttäjä</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Käytössä</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Poistettu käytöstä</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nimi</translation>
     </message>
     <message>
       <source>Local user</source>
-      <translation type="unfinished">Local user</translation>
+      <translation>Paikallinen käyttäjä</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Kirjaudu sisään</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Rooli</translation>
     </message>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 käyttäjä</translation>
     </message>
   </context>
   <context>
     <name>QnUserListModelPrivate</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Omistaja</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Järjestelmänvalvoja</translation>
     </message>
     <message>
       <source>View live video</source>
-      <translation type="unfinished">View live video</translation>
+      <translation>Näytä reaaliaikainen video</translation>
     </message>
     <message>
       <source>Use PTZ controls</source>
-      <translation type="unfinished">Use PTZ controls</translation>
+      <translation>Käytä PTZ-ohjaimia</translation>
     </message>
     <message>
       <source>View video archives</source>
-      <translation type="unfinished">View video archives</translation>
+      <translation>Katso videoarkistoja</translation>
     </message>
     <message>
       <source>Export video</source>
-      <translation type="unfinished">Export video</translation>
+      <translation>Vie video</translation>
     </message>
     <message>
       <source>Adjust device settings</source>
-      <translation type="unfinished">Adjust device settings</translation>
+      <translation>Säädä laitteen asetuksia</translation>
     </message>
     <message>
       <source>Adjust camera settings</source>
-      <translation type="unfinished">Adjust camera settings</translation>
+      <translation>Säädä kameran asetuksia</translation>
     </message>
     <message>
       <source>Control Video Walls</source>
-      <translation type="unfinished">Control Video Walls</translation>
+      <translation>Hallitse Videoseinää</translation>
     </message>
   </context>
   <context>
     <name>QnUserManagementWidget</name>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Muokkaa</translation>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
+      <translation>Käyttäjät voidaan tuoda LDAP-palvelimelta. He voivat kirjautua sisään vain, jos LDAP-palvelin on verkossa ja niiden tilit ovat aktiivisia.</translation>
     </message>
   </context>
   <context>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Kirjaudu sisään</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nimi</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Rooli</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Sähköposti</translation>
     </message>
   </context>
   <context>
     <name>QnUserRoleSettingsWidget</name>
     <message>
       <source>Role name cannot be empty.</source>
-      <translation type="unfinished">Role name cannot be empty.</translation>
+      <translation>Roolin nimi ei voi olla tyhjä.</translation>
     </message>
     <message>
       <source>Role with same name already exists.</source>
-      <translation type="unfinished">Role with same name already exists.</translation>
+      <translation>Sama nimi on jo olemassa.</translation>
     </message>
   </context>
   <context>
     <name>QnUserRoleSettingsWidgetPrivate</name>
     <message>
       <source>No users have this role</source>
-      <translation type="unfinished">No users have this role</translation>
+      <translation>Käyttäjillä ei ole tätä roolia</translation>
     </message>
     <message>
       <source>Custom with no permissions</source>
-      <translation type="unfinished">Custom with no permissions</translation>
+      <translation>Mukautettu ilman oikeuksia</translation>
     </message>
     <message>
       <source>Users will have no permissions unless changed later.</source>
-      <translation type="unfinished">Users will have no permissions unless changed later.</translation>
+      <translation>Käyttäjillä ei ole oikeuksia, ellei niitä myöhemmin muuteta.</translation>
     </message>
     <message>
       <source>Assign a new role</source>
-      <translation type="unfinished">Assign a new role</translation>
+      <translation>Määritä uusi rooli</translation>
     </message>
     <message>
       <source>Delete such users</source>
-      <translation type="unfinished">Delete such users</translation>
+      <translation>Poista tällaiset käyttäjät</translation>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation type="unfinished">
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+      <translation>
+        <numerusform>Valitse toiminto, joka suoritetaan %n käyttäjällä, joilla on tämä rooli</numerusform>
+        <numerusform>Valitse toiminto, joka suoritetaan %n käyttäjällä, joilla on tämä rooli</numerusform>
       </translation>
     </message>
   </context>
@@ -6156,210 +6179,210 @@ to %1</translation>
     <name>QnUserRolesDialog</name>
     <message>
       <source>Role Info</source>
-      <translation type="unfinished">Role Info</translation>
+      <translation>Roolin tiedot</translation>
     </message>
     <message>
       <source>Permissions</source>
-      <translation type="unfinished">Permissions</translation>
+      <translation>Käyttöoikeudet</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
-      <translation type="unfinished">Cameras &amp;&amp; Resources</translation>
+      <translation>Kamerat ja resurssit</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Asettelut</translation>
     </message>
     <message>
       <source>New Role</source>
-      <translation type="unfinished">New Role</translation>
+      <translation>Uusi rooli</translation>
     </message>
     <message>
       <source>New Role %1</source>
-      <translation type="unfinished">New Role %1</translation>
+      <translation>Uusi rooli %1</translation>
     </message>
   </context>
   <context>
     <name>QnUserSettingsDialog</name>
     <message>
       <source>User Information</source>
-      <translation type="unfinished">User Information</translation>
+      <translation>Käyttäjän tiedot</translation>
     </message>
     <message>
       <source>Permissions</source>
-      <translation type="unfinished">Permissions</translation>
+      <translation>Käyttöoikeudet</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
-      <translation type="unfinished">Cameras &amp;&amp; Resources</translation>
+      <translation>Kamerat ja resurssit</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Asettelut</translation>
     </message>
     <message>
       <source>Send Invite</source>
-      <translation type="unfinished">Send Invite</translation>
+      <translation>Lähetä kutsu</translation>
     </message>
     <message>
       <source>New User...</source>
-      <translation type="unfinished">New User...</translation>
+      <translation>Uusi käyttäjä...</translation>
     </message>
     <message>
       <source>User Settings - %1 (readonly)</source>
-      <translation type="unfinished">User Settings - %1 (readonly)</translation>
+      <translation>Käyttäjän asetukset - %1 (vain luku)</translation>
     </message>
     <message>
       <source>User Settings - %1</source>
-      <translation type="unfinished">User Settings - %1</translation>
+      <translation>Käyttäjän asetukset - %1</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Käytössä</translation>
     </message>
     <message>
       <source>User is disabled</source>
-      <translation type="unfinished">User is disabled</translation>
+      <translation>Käyttäjä on poistettu käytöstä</translation>
     </message>
     <message>
       <source>Apply changes before switching to another user?</source>
-      <translation type="unfinished">Apply changes before switching to another user?</translation>
+      <translation>Vahvista muutokset ennen kuin siirryt toiseen käyttäjään?</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">This user has not yet signed up for %1</translation>
+      <translation>Tämä käyttäjä ei ole vielä kirjautunut sisään %1</translation>
     </message>
   </context>
   <context>
     <name>QnUserSettingsWidget</name>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>Paikallinen</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Kirjaudu sisään</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
-      <translation type="unfinished">Login cannot be empty.</translation>
+      <translation>Kirjautumistunnus ei voi olla tyhjä.</translation>
     </message>
     <message>
       <source>User with specified login already exists.</source>
-      <translation type="unfinished">User with specified login already exists.</translation>
+      <translation>Käyttäjä on jo olemassa.</translation>
     </message>
     <message>
       <source>User has been renamed. Password must be updated.</source>
-      <translation type="unfinished">User has been renamed. Password must be updated.</translation>
+      <translation>Käyttäjä on nimetty uudelleen. Salasana on päivitettävä.</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nimi</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Sähköposti</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
-      <translation type="unfinished">Email cannot be empty.</translation>
+      <translation>Sähköposti ei voi olla tyhjä.</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Salasana</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Vahvista salasanasi</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Salasanat eivät täsmää.</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 käyttäjää, jolla on määritetty sähköposti, on jo olemassa.</translation>
     </message>
     <message>
       <source>Local users</source>
-      <translation type="unfinished">Local users</translation>
+      <translation>Paikalliset käyttäjät</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 käyttäjät</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation type="unfinished">%1 belong to this system only and are fully managed by system administrators.</translation>
+      <translation>%1 kuuluvat vain tähän järjestelmään, ja järjestelmän ylläpitäjät hallinnoivat niitä täysin.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation type="unfinished">%1 can have access to many Systems. Administrators can manage their rights only.</translation>
+      <translation>%1 voi käyttää monia järjestelmiä. Järjestelmänvalvojat voivat hallita vain oikeuksiaan.</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
     <message>
       <source>Email cannot be empty.</source>
-      <translation type="unfinished">Email cannot be empty.</translation>
+      <translation>Sähköposti ei voi olla tyhjä.</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation type="unfinished">Email is not valid.</translation>
+      <translation>Sähköpostiosoite on virheellinen.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation type="unfinished">Password cannot be empty.</translation>
+      <translation>Salasana ei voi olla tyhjä.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
-      <translation type="unfinished">Avoid leading and trailing spaces.</translation>
+      <translation>Vältä rivivälejä ja tyhjiä merkkejä tekstin perässä.</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallManageWidgetPrivate</name>
     <message>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Näyttö</translation>
     </message>
     <message>
       <source>Screen %1</source>
-      <translation type="unfinished">Screen %1</translation>
+      <translation>Näyttö %1</translation>
     </message>
     <message>
       <source>New Item</source>
-      <translation type="unfinished">New Item</translation>
+      <translation>Uusi kohde</translation>
     </message>
     <message>
       <source>Display %1</source>
-      <translation type="unfinished">Display %1</translation>
+      <translation>Näyttö %1</translation>
     </message>
     <message>
       <source>Delete &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete &quot;%1&quot;?</translation>
+      <translation>Poista &quot;%1&quot;?</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallScreenWidget</name>
     <message>
       <source>PC %1</source>
-      <translation type="unfinished">PC %1</translation>
+      <translation>PC %1</translation>
     </message>
     <message>
       <source>PC %1 - Display %2</source>
-      <translation type="unfinished">PC %1 - Display %2</translation>
+      <translation>PC %1 - Näyttö %2</translation>
     </message>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>PC %1 - Näytöt %2</numerusform>
+        <numerusform>PC %1 - Näytöt %2</numerusform>
       </translation>
     </message>
   </context>
@@ -6367,73 +6390,73 @@ to %1</translation>
     <name>QnVolumeSlider</name>
     <message>
       <source>Muted</source>
-      <translation type="unfinished">Muted</translation>
+      <translation>Mykistetty</translation>
     </message>
   </context>
   <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
-      <translation type="unfinished">Fullscreen mode</translation>
+      <translation>Koko näytön tila</translation>
     </message>
   </context>
   <context>
     <name>QnWebpageDialog</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nimi</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
-      <translation type="unfinished">URL cannot be empty.</translation>
+      <translation>URL ei voi olla tyhjä.</translation>
     </message>
     <message>
       <source>Wrong URL format.</source>
-      <translation type="unfinished">Wrong URL format.</translation>
+      <translation>Väärä URL-muoto.</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Verkkosivu</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
       <source>Alarms</source>
-      <translation type="unfinished">Alarms</translation>
+      <translation>Hälytykset</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Kirjanmerkki</translation>
     </message>
     <message>
       <source>Bookmarks can only be added to an online server.</source>
-      <translation type="unfinished">Bookmarks can only be added to an online server.</translation>
+      <translation>Kirjanmerkit voidaan lisätä vain palvelimeen, johon on yhteys.</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Palvelin offline-tilassa</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
-      <translation type="unfinished">Bookmarks can only be edited on an online Server.</translation>
+      <translation>Kirjanmerkkejä voidaan muokata vain palvelimella, johon on yhteys.</translation>
     </message>
     <message>
       <source>Delete bookmark?</source>
-      <translation type="unfinished">Delete bookmark?</translation>
+      <translation>Poista kirjanmerkki?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n bookmarks?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
+      <translation>
+        <numerusform>Poista %n kirjanmerkkiä?</numerusform>
+        <numerusform>Poista %n kirjanmerkkiä?</numerusform>
       </translation>
     </message>
   </context>
@@ -6441,662 +6464,662 @@ to %1</translation>
     <name>QnWorkbenchConnectHandler</name>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Yhdistä toiseen palvelimeen...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Yhdistä palvelimeen...</translation>
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Video Wall will be closed.</translation>
+      <translation>Palvelimeen ei saatu yhteyttä. Videoseinä suljetaan.</translation>
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>Videseinä poistetaan palvelimesta ja suljetaan.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation type="unfinished">Systems will be merged shortly</translation>
+      <translation>Järjestelmät yhdistetään pian</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
-      <translation type="unfinished">Servers from the other System will appear in the resource tree.</translation>
+      <translation>Toisen järjestelmän palvelimet näkyvät resurssipuussa.</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
-      <translation type="unfinished">Total amount of licenses will decrease</translation>
+      <translation>Lisenssien kokonaismäärä vähenee</translation>
     </message>
     <message>
       <source>Connecting to the current System...</source>
-      <translation type="unfinished">Connecting to the current System...</translation>
+      <translation>Yhteyden muodostaminen nykyiseen järjestelmään...</translation>
     </message>
     <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>Se näkyy resurssipuussa, kun tietokannan synkronointi on valmis.</translation>
     </message>
     <message>
       <source>Server will be connected to System shortly</source>
-      <translation type="unfinished">Server will be connected to System shortly</translation>
+      <translation>Palvelin liitetään järjestelmään pian</translation>
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Anna salasana...</translation>
     </message>
     <message>
       <source>Administrator password</source>
-      <translation type="unfinished">Administrator password</translation>
+      <translation>Järjestelmänvalvojan salasana</translation>
     </message>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 Järjestelmiä ei voida yhdistää</translation>
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
-      <translation type="unfinished">%1 has been successfully configured.</translation>
+      <translation>%1 on määritetty onnistuneesti.</translation>
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+      <translation>Jotta prosessi saataisiin päätökseen, ota yhteys siihen Client-sovelluksella ja päivitä se versioon %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation type="unfinished">Failed to merge %1 to our system.</translation>
+      <translation>%1 yhdistäminen järjestelmään epäonnistui.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>The following %n items are not saved:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
+      <translation>
+        <numerusform>Seuraavia %n kohdetta ei tallenneta:</numerusform>
+        <numerusform>Seuraavia %n kohdetta ei tallenneta:</numerusform>
       </translation>
     </message>
     <message>
       <source>Changing System configuration not allowed in Safe Mode</source>
-      <translation type="unfinished">Changing System configuration not allowed in Safe Mode</translation>
+      <translation>Järjestelmän kokoonpanon muuttaminen ei ole sallittu vikasietotilassa</translation>
     </message>
     <message>
       <source>Failed to save changes</source>
-      <translation type="unfinished">Failed to save changes</translation>
+      <translation>Muutoksien tallentaminen epäonnistui</translation>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
-        <numerusform>The following %n items are not deleted:</numerusform>
-        <numerusform>The following %n items are not deleted:</numerusform>
+      <translation>
+        <numerusform>Seuraavia %n kohdetta ei poisteta:</numerusform>
+        <numerusform>Seuraavia %n kohdetta ei poisteta:</numerusform>
       </translation>
     </message>
     <message>
       <source>Deleting objects not allowed in Safe Mode</source>
-      <translation type="unfinished">Deleting objects not allowed in Safe Mode</translation>
+      <translation>Kohteiden poisto ei ole sallittua vikasietotilassa</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n items:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
+      <translation>
+        <numerusform>%n kohteen poistaminen epäonnistui:</numerusform>
+        <numerusform>%n kohteen poistaminen epäonnistui:</numerusform>
       </translation>
     </message>
     <message>
       <source>System is in Safe Mode. It is not allowed to make any changes except license activation.</source>
-      <translation type="unfinished">System is in Safe Mode. It is not allowed to make any changes except license activation.</translation>
+      <translation>Järjestelmä on vikasietotilassa. Ei ole sallittua tehdä muutoksia lukuun ottamatta lisenssin aktivointia.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchSafeModeWatcher</name>
     <message>
       <source>System is in safe mode</source>
-      <translation type="unfinished">System is in safe mode</translation>
+      <translation>Järjestelmä on vikasietotilassa</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
       <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation type="unfinished">Screen capturing subsystem is not initialized yet. Please try again later.</translation>
+      <translation>Näytönkaappausta ei ole vielä alustettu. Yritä uudelleen myöhemmin.</translation>
     </message>
     <message>
       <source>Recording in %1...</source>
-      <translation type="unfinished">Recording in %1...</translation>
+      <translation>Tallennus %1...</translation>
     </message>
     <message>
       <source>Recorded Video</source>
-      <translation type="unfinished">Recorded Video</translation>
+      <translation>Tallennettu video</translation>
     </message>
     <message>
       <source>Save Recording As...</source>
-      <translation type="unfinished">Save Recording As...</translation>
+      <translation>Tallenna tallennus nimellä...</translation>
     </message>
     <message>
       <source>Failed to start recording</source>
-      <translation type="unfinished">Failed to start recording</translation>
+      <translation>Tallennuksen aloittaminen epäonnistui</translation>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (Audio / Video Interleaved)</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
       <source>Save Screenshot As...</source>
-      <translation type="unfinished">Save Screenshot As...</translation>
+      <translation>Tallenna kuvakaappaus nimellä...</translation>
     </message>
     <message>
       <source>Timestamp:</source>
-      <translation type="unfinished">Timestamp:</translation>
+      <translation>Aikaleima:</translation>
     </message>
     <message>
       <source>Saving %1</source>
-      <translation type="unfinished">Saving %1</translation>
+      <translation>Tallenna %1</translation>
     </message>
     <message>
       <source>Saving Screenshot...</source>
-      <translation type="unfinished">Saving Screenshot...</translation>
+      <translation>Tallennetaan ruudunkaappaus...</translation>
     </message>
     <message>
       <source>No Timestamp</source>
-      <translation type="unfinished">No Timestamp</translation>
+      <translation>Ei aikaleimaa</translation>
     </message>
     <message>
       <source>Top Left Corner</source>
-      <translation type="unfinished">Top Left Corner</translation>
+      <translation>Vasen yläkulma</translation>
     </message>
     <message>
       <source>Top Right Corner</source>
-      <translation type="unfinished">Top Right Corner</translation>
+      <translation>Oikea yläkulma</translation>
     </message>
     <message>
       <source>Bottom Left Corner</source>
-      <translation type="unfinished">Bottom Left Corner</translation>
+      <translation>Vasen alakulma</translation>
     </message>
     <message>
       <source>Bottom Right Corner</source>
-      <translation type="unfinished">Bottom Right Corner</translation>
+      <translation>Oikea alakulma</translation>
     </message>
     <message>
       <source>Failed to save screenshot</source>
-      <translation type="unfinished">Failed to save screenshot</translation>
+      <translation>Ruudunkaappauksen tallentaminen epäonnistui</translation>
     </message>
     <message>
       <source>Failed to take screenshot</source>
-      <translation type="unfinished">Failed to take screenshot</translation>
+      <translation>Ruudunkaappaus epäonnistui</translation>
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>PNG-kuva</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>JPEG-kuva</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Videoseinä</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
-      <translation type="unfinished">Video Wall %1</translation>
+      <translation>Videoseinä %1</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation type="unfinished">New Video Wall...</translation>
+      <translation>Uusi videoseinä...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
-      <translation type="unfinished">New Matrix %1</translation>
+      <translation>Uusi matriisi %1</translation>
     </message>
     <message>
       <source>Video Wall license required</source>
-      <translation type="unfinished">Video Wall license required</translation>
+      <translation>Videoseinä -lisenssi vaaditaan</translation>
     </message>
     <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
-      <translation type="unfinished">To enable this feature, please activate a Video Wall license.</translation>
+      <translation>Ota tämä ominaisuus käyttöön ottamalla käyttöön Videoseinä -lisenssi.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Muutoksien tallentaminen epäonnistui</translation>
     </message>
     <message>
       <source>To enable Video Wall, please activate a Video Wall license.</source>
-      <translation type="unfinished">To enable Video Wall, please activate a Video Wall license.</translation>
+      <translation>Ota tämä ominaisuus käyttöön ottamalla käyttöön Videoseinä -lisenssi.</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+      <translation>
+        <numerusform>Poista %n kohdetta?</numerusform>
+        <numerusform>Poista %n kohdetta?</numerusform>
       </translation>
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation type="unfinished">Stop Video Wall?</translation>
+      <translation>Pysäytä videoseinä?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
-      <translation type="unfinished">To start it again, you should have physical access to its computer.</translation>
+      <translation>Jos haluat käynnistää sen uudelleen, sinun pitäisi olla fyysinen pääsy tietokoneeseen.</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Pysäytä</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n matrices?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
+      <translation>
+        <numerusform>Poista %n matriisia?</numerusform>
+        <numerusform>Poista %n matriisia?</numerusform>
       </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
-      <translation type="unfinished">More Video Wall licenses required</translation>
+      <translation>Lisää Videoseinä -lisenssejä tarvitaan</translation>
     </message>
     <message>
       <source>Control session cannot be started.</source>
-      <translation type="unfinished">Control session cannot be started.</translation>
+      <translation>Ohjausistuntoa ei voi käynnistää.</translation>
     </message>
     <message>
       <source>Cannot save empty matrix</source>
-      <translation type="unfinished">Cannot save empty matrix</translation>
+      <translation>Tyhjää matriisia ei voi tallentaa</translation>
     </message>
     <message>
       <source>Screen is being controlled by another user</source>
-      <translation type="unfinished">Screen is being controlled by another user</translation>
+      <translation>Toinen käyttäjä ohjaa näyttöä</translation>
     </message>
     <message>
       <source>Activate one more license to start Video Wall control session.</source>
-      <translation type="unfinished">Activate one more license to start Video Wall control session.</translation>
+      <translation>Aktivoi lisää lisenssejä käynnistääksesi Videoseinä -ohjausistunnon.</translation>
     </message>
     <message>
       <source>Enter the name of Video Wall to create:</source>
-      <translation type="unfinished">Enter the name of Video Wall to create:</translation>
+      <translation>Nimeä luomasi Videoseinä:</translation>
     </message>
     <message>
       <source>Activate one more license to start Video Wall.</source>
-      <translation type="unfinished">Activate one more license to start Video Wall.</translation>
+      <translation>Aktivoi lisää lisenssejä käynnistääksesi Videoseinä.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchWearableHandler</name>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+      <translation>Vain videotiedostot, joilla on oikea aikaleima, tuetaan.</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Ei voitu aloittaa lataamista käyttäjänä &quot;%1&quot; lähettää tällä hetkellä videokuvaa tähän kameraan.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>Lähetystä ei voitu aloittaa, koska toinen käyttäjä lähettää tällä hetkellä videokuvaa tähän kameraan.</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>Valitusta kansiosta ei löydy videotiedostoja</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>Valittuja tiedostomuotoja ei tueta</numerusform>
+        <numerusform>Valittuja tiedostomuotoja ei tueta</numerusform>
       </translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>Käytä .MKV, .AVI, .MP4 tai muita videotiedostoja.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>Valituilla tiedostoilla ei ole aikaleimoja</numerusform>
+        <numerusform>Valituilla tiedostoilla ei ole aikaleimoja</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Valitut tiedostot kattavat aikajaksoja, joiden videoita on jo ladattu</numerusform>
+        <numerusform>Valitut tiedostot kattavat aikajaksoja, joiden videoita on jo ladattu</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Valitut tiedostot kattavat aikajaksoja, joiden videoita on jo ladattu</numerusform>
+        <numerusform>Valitut tiedostot kattavat aikajaksoja, joiden videoita on jo ladattu</numerusform>
       </translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>Valittuja tiedostoja ei ladata</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>Joitakin tiedostoja ei ladata</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
+      <translation>Ei ladattavia tiedostoja valitussa kansiossa</translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>Valitut tiedostot ovat liian vanhoja</numerusform>
+        <numerusform>Valitut tiedostot ovat liian vanhoja</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      <translation>
+        <numerusform>Valittu tiedosto tallennettiin %1, mutta vain viimeisten %n päivän aikana tallennetut tiedostot voidaan ladata. Voit muuttaa tätä kameran arkistoasetuksissa.</numerusform>
+        <numerusform>Valittu tiedosto tallennettiin %1, mutta vain viimeisten %n päivän aikana tallennetut tiedostot voidaan ladata. Voit muuttaa tätä kameran arkistoasetuksissa.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      <translation>
+        <numerusform>Valitut tiedostot tallennettiin välillä %1 ja %2, mutta vain viimeisten %n päivän aikana tallennetut tiedostot voidaan ladata. Voit muuttaa tätä kameran arkistoasetuksissa.</numerusform>
+        <numerusform>Valitut tiedostot tallennettiin välillä %1 ja %2, mutta vain viimeisten %n päivän aikana tallennetut tiedostot voidaan ladata. Voit muuttaa tätä kameran arkistoasetuksissa.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>Jotkin videot voidaan poistaa näiden tiedostojen lataamisen jälkeen</numerusform>
+        <numerusform>Jotkin videot voidaan poistaa näiden tiedostojen lataamisen jälkeen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>Palvelimen tallennuksessa ei ole paljon vapaata tilaa. Joitakin vanhoja materiaaleja voidaan poistaa vapauttamalla tilaa. Huomaa, että jos valitut tiedostot ovat palvelimen vanhimpia, ne poistetaan heti lataamisen jälkeen.</numerusform>
+        <numerusform>Palvelimen tallennuksessa ei ole paljon vapaata tilaa. Joitakin vanhoja materiaaleja voidaan poistaa vapauttamalla tilaa. Huomaa, että jos valitut tiedostot ovat palvelimen vanhimpia, ne poistetaan heti lataamisen jälkeen.</numerusform>
       </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
+      <translation>Tämän estämiseksi voit lisätä lisää tallennustilaa. Voit myös säätää, mitä videokuvaa poistetaan ensin muuttamalla arkiston säilytysaikaa kameran asetuksissa.</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation type="unfinished">Upload anyway?</translation>
+      <translation>Lähetetään joka tapauksessa?</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
-      <translation type="unfinished">Could not finish upload to %1</translation>
+      <translation>Lähetystä ei voitu viimeistellä %1</translation>
     </message>
     <message>
       <source>Make sure there is enough space on server storage.</source>
-      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
+      <translation>Varmista, että palvelimessa on riittävästi tallennustilaa.</translation>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Palvelimen tallennustilaa ei ole riittävästi</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Lopeta lataaminen?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
+      <translation>Jo ladatut tiedostot säilytetään.</translation>
     </message>
     <message>
       <source>Uploading footage</source>
-      <translation type="unfinished">Uploading footage</translation>
+      <translation>Kuvamateriaalia ladataan</translation>
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>Virtuaalikameran lisääminen epäonnistui</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>Avaa Virtuaalisen kameran tallenteet...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Voit ladata nämä tiedostot virtuaalikameran toiseen instanssiin.</numerusform>
+        <numerusform>Voit ladata nämä tiedostot virtuaalikameran toiseen instanssiin.</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 on muodossa, jota ei tueta.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 ei ole aikaleimaa.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 on vanhempi kuin kameran arkistoasetuksissa sallittu.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 sisältää aikajaksoja, joiden videoita on jo ladattu.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 sisältää aikajaksoja, joiden videoita on jo ladattu.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
       <source>New Web Page</source>
-      <translation type="unfinished">New Web Page</translation>
+      <translation>Uusi verkkosivu</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
-      <translation type="unfinished">Edit Web Page</translation>
+      <translation>Muokkaa verkkosivua</translation>
     </message>
   </context>
   <context>
     <name>Resources</name>
     <message>
       <source>There is another layout with the same name</source>
-      <translation type="unfinished">There is another layout with the same name</translation>
+      <translation>Samanniminen asettelu on jo käytössä</translation>
     </message>
     <message>
       <source>You do not have permission to overwrite it.</source>
-      <translation type="unfinished">You do not have permission to overwrite it.</translation>
+      <translation>Sinulla ei ole muokkausoikeuksia.</translation>
     </message>
     <message>
       <source>Overwrite existing layout?</source>
-      <translation type="unfinished">Overwrite existing layout?</translation>
+      <translation>Korvaa olemassa oleva asettelu?</translation>
     </message>
     <message>
       <source>There is another layout with the same name.</source>
-      <translation type="unfinished">There is another layout with the same name.</translation>
+      <translation>Samanniminen asettelu on jo käytössä.</translation>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation type="unfinished">
-        <numerusform>User will still have access to %n removed resources:</numerusform>
-        <numerusform>User will still have access to %n removed resources:</numerusform>
+      <translation>
+        <numerusform>Käyttäjällä on vielä pääsy %n poistettuun resurssiin:</numerusform>
+        <numerusform>Käyttäjällä on vielä pääsy %n poistettuun resurssiin:</numerusform>
       </translation>
     </message>
     <message>
       <source>To remove access, please go to User Settings.</source>
-      <translation type="unfinished">To remove access, please go to User Settings.</translation>
+      <translation>Poistaaksesi pääsyn, siirry Käyttäjäasetukset.</translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation type="unfinished">
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
+      <translation>
+        <numerusform>Kaikki käyttäjät, joilla on tämä rooli, saavat käyttöönsä %n resurssit:</numerusform>
+        <numerusform>Kaikki käyttäjät, joilla on tämä rooli, saavat käyttöönsä %n resurssit:</numerusform>
       </translation>
     </message>
     <message>
       <source>To remove access, please go to Role Settings.</source>
-      <translation type="unfinished">To remove access, please go to Role Settings.</translation>
+      <translation>Poistaaksesi pääsyn, siirry Rooli-asetuksiin.</translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation type="unfinished">
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+      <translation>
+        <numerusform>Kaikki käyttäjät, joilla on tämä rooli, saavat käyttöönsä %n resurssit:</numerusform>
+        <numerusform>Kaikki käyttäjät, joilla on tämä rooli, saavat käyttöönsä %n resurssit:</numerusform>
       </translation>
     </message>
     <message>
       <source>Changes will affect other users</source>
-      <translation type="unfinished">Changes will affect other users</translation>
+      <translation>Muutokset vaikuttavat muihin käyttäjiin</translation>
     </message>
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
-      <translation type="unfinished">This layout is shared with other users, so you change it for them too.</translation>
+      <translation>Tämä asettelu on jaettu muiden käyttäjien kanssa, joten muutokset näkyvät myös heillä.</translation>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation type="unfinished">
-        <numerusform>User will lose access to %n resources:</numerusform>
-        <numerusform>User will lose access to %n resources:</numerusform>
+      <translation>
+        <numerusform>Käyttäjä menettää pääsyn %n resurssiin:</numerusform>
+        <numerusform>Käyttäjä menettää pääsyn %n resurssiin:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation type="unfinished">
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
+      <translation>
+        <numerusform>Kaikki käyttäjät, joilla on tämä rooli, menettävät pääsynsä %n resurssiin:</numerusform>
+        <numerusform>Kaikki käyttäjät, joilla on tämä rooli, menettävät pääsynsä %n resurssiin:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n shared layouts?</numerusform>
-        <numerusform>Delete %n shared layouts?</numerusform>
+      <translation>
+        <numerusform>Poista %n jaetut asettelut?</numerusform>
+        <numerusform>Poista %n jaetut asettelut?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation type="unfinished">
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+      <translation>
+        <numerusform>Nämä %n asettelua jaetaan muiden käyttäjien kanssa, joten poistat ne myös heidän osalta.</numerusform>
+        <numerusform>Nämä %n asettelua jaetaan muiden käyttäjien kanssa, joten poistat ne myös heidän osalta.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from layout?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
+      <translation>
+        <numerusform>Poista %n kohdetta asettelusta?</numerusform>
+        <numerusform>Poista %n kohdetta asettelusta?</numerusform>
       </translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Poista</translation>
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation type="unfinished">You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
+      <translation>Olet poistamassa joitakin resursseja, joihin sinulla on pääsy vain Videoseinästä. Et näe niitä resurssien luettelossa sen jälkeen, eikä niitä voi lisätä uudelleen Videoseinään.</translation>
     </message>
     <message>
       <source>You will lose access to following resources:</source>
-      <translation type="unfinished">You will lose access to following resources:</translation>
+      <translation>Menetät pääsyn seuraaviin resursseihin:</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
+      <translation>
+        <numerusform>Poista %n käyttäjät?</numerusform>
+        <numerusform>Poista %n käyttäjät?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n devices?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
+      <translation>
+        <numerusform>Poista %n laitetta?</numerusform>
+        <numerusform>Poista %n laitetta?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n cameras?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
+      <translation>
+        <numerusform>Poista %n kamerat?</numerusform>
+        <numerusform>Poista %n kamerat?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n I/O Modules?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
+      <translation>
+        <numerusform>Poista %n I/O-moduulit?</numerusform>
+        <numerusform>Poista %n I/O-moduulit?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+      <translation>
+        <numerusform>Poista %n kohdetta?</numerusform>
+        <numerusform>Poista %n kohdetta?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n of them are auto-discovered.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n löytynyt automaattisesti.</numerusform>
+        <numerusform>%n löytynyt automaattisesti.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras are auto-discovered.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n kameraa löytynyt automaattisesti.</numerusform>
+        <numerusform>%n kameraa löytynyt automaattisesti.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n I/O-moduulia löytynyt automaattisesti.</numerusform>
+        <numerusform>%n I/O-moduulia löytynyt automaattisesti.</numerusform>
       </translation>
     </message>
     <message>
       <source>They may be auto-discovered again after removing.</source>
-      <translation type="unfinished">They may be auto-discovered again after removing.</translation>
+      <translation>Ne voidaan löytää automaattisesti uudelleen poistamisen jälkeen.</translation>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation type="unfinished">Overwrite existing showreel?</translation>
+      <translation>Korvaa olemassa oleva showreeli?</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation type="unfinished">There is another showreel with the same name.</translation>
+      <translation>Samaniminen Showreel on jo olemassa.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+      <translation>
+        <numerusform>Poista %n kohdetta showreelistä?</numerusform>
+        <numerusform>Poista %n kohdetta showreelistä?</numerusform>
       </translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Lopeta lataaminen?</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Pysäytä</translation>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>Joitakin videotiedostoja ladataan edelleen %n virtuaalikameraan:</numerusform>
+        <numerusform>Joitakin videotiedostoja ladataan edelleen %n virtuaalikameraan:</numerusform>
       </translation>
     </message>
   </context>
@@ -7104,81 +7127,81 @@ to %1</translation>
     <name>SessionExpiredDialog</name>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Istuntosi on vanhentunut</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by the system administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+      <translation>Järjestelmänvalvojat voivat muuttaa istunnon keston rajoitusta</translation>
     </message>
   </context>
   <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation type="unfinished">Lowest</translation>
+      <translation>Matalin</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Matala</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Keskikokoinen</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Korkea</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Paras</translation>
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Esiasento</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Määrittelemätön</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation type="unfinished">Lo</translation>
+      <translation>Ma</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
+      <translation>Ke</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
+      <translation>Ko</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
+      <translation>Par</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
+      <translation>Ps</translation>
     </message>
   </context>
   <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
+      <translation>
+        <numerusform>%n käyttäjät</numerusform>
+        <numerusform>%n käyttäjät</numerusform>
       </translation>
     </message>
   </context>
@@ -7186,234 +7209,234 @@ to %1</translation>
     <name>TimelineCursorLayout</name>
     <message>
       <source>Live</source>
-      <translation type="unfinished">Live</translation>
+      <translation>Reaaliaikainen</translation>
     </message>
   </context>
   <context>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>Tätä Linux-alustaa ei enää tueta</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Tätä käyttöjärjestelmän versiota ei enää tueta</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>Tätä %1 versiota ei enää tueta</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 ei ole enää tuettu</translation>
     </message>
   </context>
   <context>
     <name>Videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
-      <translation type="unfinished">There is another video wall with the same name</translation>
+      <translation>Samanniminen Videoseinä on jo olemassa</translation>
     </message>
     <message>
       <source>Close %1 before starting Video Wall?</source>
-      <translation type="unfinished">Close %1 before starting Video Wall?</translation>
+      <translation>Sulje %1 ennen Videoseinän käynnistämistä?</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Sulje</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Säilytä</translation>
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation type="unfinished">Local files cannot be placed on Video Wall Screen attached to another computer</translation>
+      <translation>Paikallisia tiedostoja ei voi asettaa toiseen tietokoneeseen liitettyyn Videoseinä-näyttöön</translation>
     </message>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation type="unfinished">To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</translation>
+      <translation>Jos haluat näyttää paikalliset tiedostot videoseinässä, liitä ne tietokoneella, jossa Videoseinä on hallittu.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
     <message>
       <source>Hide information</source>
-      <translation type="unfinished">Hide information</translation>
+      <translation>Piilota tiedot</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation type="unfinished">Show information</translation>
+      <translation>Näytä tiedot</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation type="unfinished">Hide thumbnails</translation>
+      <translation>Piilota pikkukuvat</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation type="unfinished">Show thumbnails</translation>
+      <translation>Näytä pikkukuvat</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Viimeinen päivä</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>Viimeiset 7 päivää</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>Viimeiset 30 päivää</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation type="unfinished">Selected on Timeline</translation>
+      <translation>Valittu aikajanalla</translation>
     </message>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>Milloin tahansa</translation>
     </message>
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>ei mitään</translation>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Laitteet asettelussa</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Kamerat asettelussa</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Mikä tahansa laite</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Mikä tahansa kamera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Valitut laitteet</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Valittu kamera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>Näytä aina</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>Näytä vain &quot;objektilla&quot; välilehti</translation>
     </message>
     <message>
       <source>Show</source>
-      <translation type="unfinished">Show</translation>
+      <translation>Näytä</translation>
     </message>
     <message>
       <source>Do Not Show</source>
-      <translation type="unfinished">Do Not Show</translation>
+      <translation>Älä näytä</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>Unknown object</source>
-      <translation type="unfinished">Unknown object</translation>
+      <translation>Tuntematon kohde</translation>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>poistettu kamera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Ei kohteita</translation>
     </message>
     <message>
       <source>No objects detected</source>
-      <translation type="unfinished">No objects detected</translation>
+      <translation>Mitään kohteita ei havaittu</translation>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n kohdetta</numerusform>
+        <numerusform>%n kohdetta</numerusform>
       </translation>
     </message>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Minkä tahansa tyyppinen</translation>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Valitse alue</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Valitse jokin alue videosta...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Valitulla alueella</translation>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>nimettömän analytiikan alusta</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
-      <translation type="unfinished">Failed to execute plugin action</translation>
+      <translation>Plugin-toiminnon suorittaminen epäonnistui</translation>
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Anna parametrit</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+      <translation>Toimenpide vaatii joitakin parametreja.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>EI DATAA</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>poistettu kamera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Ei kirjanmerkkejä</translation>
     </message>
     <message>
       <source>Select some period on timeline and click with right mouse button on it to create a bookmark.</source>
-      <translation type="unfinished">Select some period on timeline and click with right mouse button on it to create a bookmark.</translation>
+      <translation>Valitse jonkin ajanjakso aikajanalta ja paina hiiren oikealla painikkeella luodaksesi kirjanmerkki.</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>%n kirjanmerkit</numerusform>
+        <numerusform>%n kirjanmerkkiä</numerusform>
       </translation>
     </message>
   </context>
@@ -7421,33 +7444,33 @@ to %1</translation>
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
-      <translation type="unfinished">Loading values...</translation>
+      <translation>Arvojen lataaminen...</translation>
     </message>
     <message>
       <source>Applying changes...</source>
-      <translation type="unfinished">Applying changes...</translation>
+      <translation>Toteutaan muutoksia...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
     <message>
       <source>This I/O module has no advanced settings</source>
-      <translation type="unfinished">This I/O module has no advanced settings</translation>
+      <translation>Tässä I/O-moduulissa ei ole lisäasetuksia</translation>
     </message>
     <message>
       <source>This camera has no advanced settings</source>
-      <translation type="unfinished">This camera has no advanced settings</translation>
+      <translation>Tässä kamerassa ei ole lisäasetuksia</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Kirjaudu sisään</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Salasana</translation>
     </message>
   </context>
   <context>
@@ -7455,87 +7478,87 @@ to %1</translation>
     <message>
       <source>Auto</source>
       <comment>Automatic RTP transport type</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automaattinen</translation>
     </message>
     <message>
       <source>Auto</source>
       <comment>Automatic PTZ preset type</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automaattinen</translation>
     </message>
     <message>
       <source>System</source>
       <comment>System PTZ preset type</comment>
-      <translation type="unfinished">System</translation>
+      <translation>Järjestelmä</translation>
     </message>
     <message>
       <source>Native</source>
       <comment>Native PTZ preset type</comment>
-      <translation type="unfinished">Native</translation>
+      <translation>Natiivi</translation>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+      <translation>Auttaa korjaamaan kuvanlaadun ongelmia joissakin kameroissa; toiset saattavat aiheuttaa merkittävää bittinopeuden kasvua.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+      <translation>Mukautettu numero voidaan määrittää kameralle, joka mahdollistaa nopean tunnnistuksen ja käytön</translation>
     </message>
     <message>
       <source>Primary</source>
       <comment>Primary stream for motion detection</comment>
-      <translation type="unfinished">Primary</translation>
+      <translation>Ensisijainen</translation>
     </message>
     <message>
       <source>Secondary</source>
       <comment>Secondary stream for motion detection</comment>
-      <translation type="unfinished">Secondary</translation>
+      <translation>Toissijainen</translation>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
-      <translation type="unfinished">
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
+      <translation>
+        <numerusform>Tätä tunnusta käytetään jo seuraavissa %n kamerassa:</numerusform>
+        <numerusform>Tätä tunnusta käytetään jo seuraavissa %n kamerassa:</numerusform>
       </translation>
     </message>
     <message>
-      <source>UDP Multicast</source>
-      <translation type="unfinished">UDP Multicast</translation>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Palvelin ei muuta kameran asetuksia, se vastaanottaa ja käyttää kamerastreamia sellaisena kuin se on.</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation type="unfinished">Device Rules</translation>
+      <translation>Laitteen säännöt</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation type="unfinished">Camera Rules</translation>
+      <translation>Kameran säännöt</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation type="unfinished">I/O Module Rules</translation>
+      <translation>I / O-moduulin säännöt</translation>
     </message>
     <message>
       <source>More Info</source>
-      <translation type="unfinished">More Info</translation>
+      <translation>Lisätietoja</translation>
     </message>
     <message>
       <source>Less Info</source>
-      <translation type="unfinished">Less Info</translation>
+      <translation>Vähemmän tietoa</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
       <source>Use License</source>
-      <translation type="unfinished">
-        <numerusform>Use License</numerusform>
-        <numerusform>Use License</numerusform>
+      <translation>
+        <numerusform>Käytä lisenssiä</numerusform>
+        <numerusform>Käytä lisenssiä</numerusform>
       </translation>
     </message>
   </context>
@@ -7543,164 +7566,164 @@ to %1</translation>
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
     <message>
       <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Liikkeentunnistus toimii vain, kun kameraa tarkastellaan. Ota tallennus käyttöön, jotta se toimii koko ajan.</translation>
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of motion detection rectangles for current camera is reached</translation>
+      <translation>Liikkeentunnistuksen suorakulmioiden enimmäismäärä nykyiselle kameralle on saavutettu</translation>
     </message>
     <message>
       <source>Maximum number of ignore motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of ignore motion rectangles for current camera is reached</translation>
+      <translation>Liikkeentunnistuksen sivuuttamisen suorakulmioiden enimmäismäärä nykyiselle kameralle on saavutettu</translation>
     </message>
     <message>
       <source>Maximum number of detect motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of detect motion rectangles for current camera is reached</translation>
+      <translation>Liikkeentunnistuksen suorakulmioiden enimmäismäärä nykyiselle kameralle on saavutettu</translation>
     </message>
     <message>
       <source>Reset motion regions to default?</source>
-      <translation type="unfinished">Reset motion regions to default?</translation>
+      <translation>Palauta liikealueet oletusarvoiksi?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Tätä toimintoa ei voi peruuttaa.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
     <message>
       <source>License limit exceeded, recording will not be enabled.</source>
-      <translation type="unfinished">License limit exceeded, recording will not be enabled.</translation>
+      <translation>Lisenssin raja ylittyi, tallennusta ei oteta käyttöön.</translation>
     </message>
     <message>
       <source>Recording Schedule</source>
-      <translation type="unfinished">Recording Schedule</translation>
+      <translation>Tallennusaikataulu</translation>
     </message>
     <message>
       <source>based on server time</source>
-      <translation type="unfinished">based on server time</translation>
+      <translation>palvelimen ajan perusteella</translation>
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation type="unfinished">Select areas on the schedule to apply chosen parameters to.</translation>
+      <translation>Valitse alueet aikataulusta valitaksesi määritetyt parametrit.</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation type="unfinished">Set recording parameters and select areas on the schedule grid to apply them to.</translation>
+      <translation>Aseta tallennusparametrit ja määritä aktiiviset ajakohdat ajastimesta.</translation>
     </message>
     <message>
       <source>Turn on selector at the top of the window to enable recording.</source>
-      <translation type="unfinished">Turn on selector at the top of the window to enable recording.</translation>
+      <translation>Ota tallennus käyttöön ikkunan yläosassa olevalla painikkeella.</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation type="unfinished">High minimum value can lead to archive length decrease on other devices.</translation>
+      <translation>Korkea vähimmäisarvo voi johtaa arkiston pituuden pienenemiseen muissa laitteissa.</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation type="unfinished">High minimum value can lead to archive length decrease on other cameras.</translation>
+      <translation>Korkea vähimmäisarvo voi johtaa arkiston pituuden pienenemiseen muissa kameroissa.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n kamerat</numerusform>
+        <numerusform>%n kamerat</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>Sinulla ei ole kameroita</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Yleiset</translation>
     </message>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Tallennus</translation>
     </message>
     <message>
       <source>I/O Ports</source>
-      <translation type="unfinished">I/O Ports</translation>
+      <translation>I/O-portit</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Liike</translation>
     </message>
     <message>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>360-kamera</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Lisäasetukset</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Verkkosivu</translation>
     </message>
     <message>
       <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
+      <translation>Analytiikka</translation>
     </message>
     <message>
       <source>Expert</source>
-      <translation type="unfinished">Expert</translation>
+      <translation>Asiantuntija</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+      <translation>
+        <numerusform>Seuraavien %n laitteiden muutoksia ei tallenneta:</numerusform>
+        <numerusform>Seuraavien %n laitteiden muutoksia ei tallenneta:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+      <translation>
+        <numerusform>Seuraavien %n kameroiden muutoksia ei tallenneta:</numerusform>
+        <numerusform>Seuraavien %n kameroiden muutoksia ei tallenneta:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+      <translation>
+        <numerusform>Seuraavien %n I / O-moduulien muutoksia ei tallenneta:</numerusform>
+        <numerusform>Seuraavien %n I/O-moduulien muutoksia ei tallenneta:</numerusform>
       </translation>
     </message>
     <message>
       <source>Apply changes before switching to another camera?</source>
-      <translation type="unfinished">Apply changes before switching to another camera?</translation>
+      <translation>Vahvista muutokset ennen kuin siirryt toiseen kameraan?</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Laitteen asetukset</translation>
     </message>
     <message>
       <source>Devices Settings</source>
-      <translation type="unfinished">Devices Settings</translation>
+      <translation>Laitteen asetukset</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kameran asetukset</translation>
     </message>
     <message>
       <source>Cameras Settings</source>
-      <translation type="unfinished">Cameras Settings</translation>
+      <translation>Kameroiden asetukset</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>I/O-moduulin asetukset</translation>
     </message>
     <message>
       <source>I/O Modules Settings</source>
-      <translation type="unfinished">I/O Modules Settings</translation>
+      <translation>I/O-moduulien asetukset</translation>
     </message>
   </context>
   <context>
@@ -7708,16 +7731,16 @@ to %1</translation>
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 käytetään</numerusform>
+        <numerusform>%1 käytetään</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more required</source>
-      <translation type="unfinished">
-        <numerusform>%n more required</numerusform>
-        <numerusform>%n more required</numerusform>
+      <translation>
+        <numerusform>%n enemmän tarvitaan</numerusform>
+        <numerusform>%n enemmän tarvitaan</numerusform>
       </translation>
     </message>
   </context>
@@ -7725,62 +7748,62 @@ to %1</translation>
     <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Ensisijainen streami</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Toissijainen streami</translation>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>Ei toissijaista streamia</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Päivitä tiedostoa ei löydy</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>Päivityspaketti on vioittunut</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>Päivityspaketin lataaminen epäonnistui: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>Päivityspaketti on vioittunut: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Tämä päivitys on jo asennettu.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Tätä versiota ei ole asennettu.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Virheellinen version muoto.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>Viallinen päivitystiedosto.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Sisäinen virhe.</translation>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>Levyllä ei ole tarpeeksi tilaa asentaa Client-sovelluksen päivitystä.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>Asennuspaketti on kadonnut.</translation>
     </message>
   </context>
   <context>
@@ -7788,167 +7811,167 @@ to %1</translation>
     <message>
       <source>Copy</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopioi</translation>
     </message>
     <message>
       <source>Copy to Clipboard</source>
-      <translation type="unfinished">Copy to Clipboard</translation>
+      <translation>Kopioi leikepöydälle</translation>
     </message>
     <message>
       <source>Paste</source>
       <comment>from Clipboard</comment>
-      <translation type="unfinished">Paste</translation>
+      <translation>Liitä</translation>
     </message>
     <message>
       <source>Paste from Clipboard</source>
-      <translation type="unfinished">Paste from Clipboard</translation>
+      <translation>Liitä leikepöydältä</translation>
     </message>
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Kopioitu</translation>
     </message>
     <message>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
-      <translation type="unfinished">Pasted</translation>
+      <translation>Liitetty</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
     <message>
       <source>Configuring Server</source>
-      <translation type="unfinished">Configuring Server</translation>
+      <translation>Palvelimen määrittäminen</translation>
     </message>
     <message>
       <source>Updating Server</source>
-      <translation type="unfinished">Updating Server</translation>
+      <translation>Palvelimen päivittäminen</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation type="unfinished">This camera requires password to be set up.</translation>
+      <translation>Tämä kamera vaatii salasanan asettamisen.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>Jotkin valituista kameroista edellyttävät salasanan asettamista.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>Pyydä järjestelmänvalvojaa tekemään se.</translation>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>Aseta salasana</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::DeviceAdditionDialog</name>
     <message>
       <source>Start address</source>
-      <translation type="unfinished">Start address</translation>
+      <translation>Aloitusosoite</translation>
     </message>
     <message>
       <source>End address</source>
-      <translation type="unfinished">End address</translation>
+      <translation>Loppu-osoite</translation>
     </message>
     <message>
       <source>IP / Hostname / RTSP link / UDP link</source>
-      <translation type="unfinished">IP / Hostname / RTSP link / UDP link</translation>
+      <translation>IP / Hostname / RTSP-linkki / UDP-linkki</translation>
     </message>
     <message>
       <source>Examples:</source>
-      <translation type="unfinished">Examples:</translation>
+      <translation>Esimerkkejä:</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Ei yhteyttä palvelimeen</translation>
     </message>
     <message>
       <source>Device search failed</source>
-      <translation type="unfinished">Device search failed</translation>
+      <translation>Laitteen haku epäonnistui</translation>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to add %n devices</numerusform>
-        <numerusform>Failed to add %n devices</numerusform>
+      <translation>
+        <numerusform>%n laitteen lisääminen epäonnistui</numerusform>
+        <numerusform>%n laitteen lisääminen epäonnistui</numerusform>
       </translation>
     </message>
     <message>
       <source>Scan</source>
-      <translation type="unfinished">Scan</translation>
+      <translation>Skannaa</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Etsi</translation>
     </message>
     <message>
       <source>Initializing scan...</source>
-      <translation type="unfinished">Initializing scan...</translation>
+      <translation>Valmistellaan...</translation>
     </message>
     <message>
       <source>Scanning online hosts...</source>
-      <translation type="unfinished">Scanning online hosts...</translation>
+      <translation>Haetaan yhteydessä olevia palvelimia...</translation>
     </message>
     <message>
       <source>Checking host...</source>
-      <translation type="unfinished">Checking host...</translation>
+      <translation>Vastaanottimen tarkistaminen...</translation>
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Valmis</translation>
     </message>
     <message>
       <source>Aborted</source>
-      <translation type="unfinished">Aborted</translation>
+      <translation>Keskeytettiin</translation>
     </message>
     <message>
       <source>Searching...</source>
-      <translation type="unfinished">Searching...</translation>
+      <translation>Etsitään...</translation>
     </message>
     <message>
       <source>No devices found</source>
-      <translation type="unfinished">No devices found</translation>
+      <translation>Laitteita ei löytynyt</translation>
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>Kaikki laitteet on jo lisätty</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>%n laitetta lisätty. Voit sulkea tämän dialogin tai aloittaa uuden haun</numerusform>
+        <numerusform>%n laitetta lisätty. Voit sulkea tämän dialogin tai aloittaa uuden haun</numerusform>
       </translation>
     </message>
     <message>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>Lisää kaikki laitteet</translation>
     </message>
     <message numerus="yes">
       <source>Add %n Devices</source>
-      <translation type="unfinished">
-        <numerusform>Add %n Devices</numerusform>
-        <numerusform>Add %n Devices</numerusform>
+      <translation>
+        <numerusform>Lisää %n laitetta</numerusform>
+        <numerusform>Lisää %n laitetta</numerusform>
       </translation>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>Osoitekentät ei voi olla tyhjiä</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Tarkista ja hyväksy %1, jotta voit jatkaa</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>Ohjelmiston käyttämiseksi sinun on hyväksyttävä loppukäyttäjän lisenssisopimus</translation>
     </message>
   </context>
   <context>
@@ -7956,22 +7979,22 @@ to %1</translation>
     <message>
       <source>Notifications</source>
       <comment>Notifications tab title</comment>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Ilmoitukset</translation>
     </message>
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation type="unfinished">Motion</translation>
+      <translation>Liike</translation>
     </message>
     <message>
       <source>Bookmarks</source>
       <comment>Bookmarks tab title</comment>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Kirjanmerkit</translation>
     </message>
     <message>
       <source>Events</source>
       <comment>Events tab title</comment>
-      <translation type="unfinished">Events</translation>
+      <translation>Tapahtumat</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -7983,67 +8006,67 @@ to %1</translation>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Palvelimen tapahtumat</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Analytiikka-tapahtumat</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Kaikki laitteen ongelmat</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Kaikki kameran ongelmat</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Mikä tahansa palvelintapahtuma</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Laitteen ongelmat</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Kameran ongelmat</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Mikä tahansa tapahtuma</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Kaikki analyytiikan tapahtumat</translation>
     </message>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Ei tapahtumia</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
-      <translation type="unfinished">
-        <numerusform>%n events</numerusform>
-        <numerusform>%n events</numerusform>
+      <translation>
+        <numerusform>%n tapahtumaa</numerusform>
+        <numerusform>%n tapahtumaa</numerusform>
       </translation>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>nimettömän analytiikan alusta</translation>
     </message>
     <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>Ei tapahtumia</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventTile</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>... ja %n lisää</numerusform>
+        <numerusform>... ja %n lisää</numerusform>
       </translation>
     </message>
   </context>
@@ -8051,237 +8074,237 @@ to %1</translation>
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>Kirjoita salasana.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
-      <translation type="unfinished">Unsupported media for data export.</translation>
+      <translation>Tietojen viennissä tukematon media.</translation>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation type="unfinished">Selected format is not supported by FFMPEG library.</translation>
+      <translation>FFMPEG-kirjasto ei tue valittua muotoa.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation type="unfinished">FFMPEG library error.</translation>
+      <translation>FFMPEG-kirjaston virhe.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with selected format.</translation>
+      <translation>Video- tai äänikoodekki ei ole yhteensopiva valitun formaatin kanssa.</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Tiedoston kirjoitusvirhe.</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Tietoja ei viety.</translation>
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Sisäinen virhe</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
     <message>
       <source>Copy archive length settings</source>
-      <translation type="unfinished">Copy archive length settings</translation>
+      <translation>Kopioi arkiston pituuden asetukset</translation>
     </message>
     <message>
       <source>Schedule motion type is not supported by some cameras.</source>
-      <translation type="unfinished">Schedule motion type is not supported by some cameras.</translation>
+      <translation>Jotkut kamerat eivät tue aikataulun liiketyyppiä.</translation>
     </message>
     <message>
       <source>Recording cannot be enabled for some cameras.</source>
-      <translation type="unfinished">Recording cannot be enabled for some cameras.</translation>
+      <translation>Tallennusta ei voi ottaa käyttöön joissakin kameroissa.</translation>
     </message>
     <message>
       <source>Schedule settings are not compatible with some devices.</source>
-      <translation type="unfinished">Schedule settings are not compatible with some devices.</translation>
+      <translation>Aikataulun asetukset eivät ole yhteensopivia joidenkin laitteiden kanssa.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog</name>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Vie</translation>
     </message>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Pikainen katselu</translation>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Vientiasetukset</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
-      <translation type="unfinished">Add Timestamp</translation>
+      <translation>Lisää aikaleima</translation>
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation type="unfinished">Delete Timestamp</translation>
+      <translation>Poista Aikaleima</translation>
     </message>
     <message>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Aikaleima</translation>
     </message>
     <message>
       <source>Add Image</source>
-      <translation type="unfinished">Add Image</translation>
+      <translation>Lisää kuva</translation>
     </message>
     <message>
       <source>Delete Image</source>
-      <translation type="unfinished">Delete Image</translation>
+      <translation>Poista Kuva</translation>
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Kuva</translation>
     </message>
     <message>
       <source>Add Text</source>
-      <translation type="unfinished">Add Text</translation>
+      <translation>Lisää teksti</translation>
     </message>
     <message>
       <source>Delete Text</source>
-      <translation type="unfinished">Delete Text</translation>
+      <translation>Poista teksti</translation>
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Teksti</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Nollaa nopeus</translation>
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation type="unfinished">Add Bookmark Info</translation>
+      <translation>Lisää kirjanmerkkitiedot</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation type="unfinished">Delete Bookmark Info</translation>
+      <translation>Poista kirjanmerkkitiedot</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>Kirjanmerkkitiedot</translation>
     </message>
     <message>
       <source>exported</source>
-      <translation type="unfinished">exported</translation>
+      <translation>viety</translation>
     </message>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Chosen settings require transcoding. It will increase CPU usage and may take significant time.</translation>
+      <translation>Valitut asetukset edellyttävät transkoodausta. Se lisää suorittimen käyttöä ja voi kestää huomattavan paljon aikaa.</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a non-continuous recording with audio track.</translation>
+      <translation>AVI-muotoa ei suositella ei-jatkuvan tallennuksen viemiseksi äänen kanssa.</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation type="unfinished">We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</translation>
+      <translation>Suosittelemme videon viemistä tältä kameralta &quot;monivideoksi&quot; jotta vältät resoluution muuttamisen pienemmäksi.</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>EXE-tiedoston koko on yli 4 Gt ja sitä ei voi avata kaksoisnapsauttamalla Windowsissa. Sitä voi toistaa vain %1 Client-sovelluksessa.</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>Asetukset eivät ole käytettävissä .NOV ja. EXE-tiedostoille.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+      <translation>Paikallisia tiedostoja, palvelinmonitorointi-pienohjelmia ja verkkosivuja ei viedä.</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>Olet viemässä kestoltaan pitkän videon. Se voi vaatia paljon tallennustilaa ja vie paljon aikaa.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation type="unfinished">Folder</translation>
+      <translation>Kansio</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nimi</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation type="unfinished">Name cannot be empty.</translation>
+      <translation>Nimi ei voi olla tyhjä.</translation>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation type="unfinished">Select folder...</translation>
+      <translation>Valitse kansio...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FisheyeCalibrationWidget</name>
     <message>
       <source>Loading preview, please wait...</source>
-      <translation type="unfinished">Loading preview, please wait...</translation>
+      <translation>Esikatselun lataaminen, odota...</translation>
     </message>
     <message>
       <source>Auto calibration failed</source>
-      <translation type="unfinished">Auto calibration failed</translation>
+      <translation>Automaattinen kalibrointi epäonnistui</translation>
     </message>
     <message>
       <source>Image is not round</source>
-      <translation type="unfinished">Image is not round</translation>
+      <translation>Kuva ei ole pyöreä</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
-      <translation type="unfinished">Image might be too dim</translation>
+      <translation>Kuva saattaa olla liian himmeä</translation>
     </message>
     <message>
       <source>Invalid input image</source>
-      <translation type="unfinished">Invalid input image</translation>
+      <translation>Virheellinen syötekuva</translation>
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Sisäinen virhe</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation type="unfinished">Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</translation>
+      <translation>Käytä tätä asetusta vääristymisen kompensoimiseksi, jos kameraa ei ole asennettu täysin pystysuoraan tai vaakasuoraan.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
-      <translation type="unfinished">Brand</translation>
+      <translation>Merkki</translation>
     </message>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Malli</translation>
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Osoite</translation>
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n uusi</numerusform>
+        <numerusform>%n uusi</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>%n laitetta yhteensä</numerusform>
+        <numerusform>%n laitetta yhteensä</numerusform>
       </translation>
     </message>
   </context>
@@ -8289,589 +8312,641 @@ to %1</translation>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>Lue lisää napsauttamalla</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ImageControlWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automaattinen</translation>
     </message>
     <message>
       <source>%1 degrees</source>
-      <translation type="unfinished">%1 degrees</translation>
+      <translation>%1 astetta</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
-      <translation type="unfinished">Select file...</translation>
+      <translation>Valitse tiedosto...</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Virhe</translation>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation type="unfinished">Image cannot be loaded.</translation>
+      <translation>Kuvaa ei voi ladata.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopioi</translation>
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>Kopioi linkin sijainti</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutBackgroundSettingsWidget</name>
     <message>
       <source>cells</source>
-      <translation type="unfinished">cells</translation>
+      <translation>solua</translation>
     </message>
     <message>
       <source>No picture</source>
-      <translation type="unfinished">No picture</translation>
+      <translation>Ei kuvaa</translation>
     </message>
     <message>
       <source>Error while loading picture</source>
-      <translation type="unfinished">Error while loading picture</translation>
+      <translation>Virhe ladattaessa kuvaa</translation>
     </message>
     <message>
       <source>Error while uploading picture</source>
-      <translation type="unfinished">Error while uploading picture</translation>
+      <translation>Virhe kuvan lähettämisessä</translation>
     </message>
     <message>
       <source>Select file...</source>
-      <translation type="unfinished">Select file...</translation>
+      <translation>Valitse tiedosto...</translation>
     </message>
     <message>
       <source>Picture cannot be read</source>
-      <translation type="unfinished">Picture cannot be read</translation>
+      <translation>Kuvaa ei voi lukea</translation>
     </message>
     <message>
       <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation type="unfinished">Picture is too big. Maximum size is %1 MB</translation>
+      <translation>Kuva on liian suuri. Suurin koko on %1 Mt</translation>
     </message>
     <message>
       <source>Picture cannot be loaded</source>
-      <translation type="unfinished">Picture cannot be loaded</translation>
+      <translation>Kuvaa ei voi ladata</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutGeneralSettingsWidget</name>
     <message>
       <source>cells</source>
-      <translation type="unfinished">cells</translation>
+      <translation>solua</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>Mukautettu numero, joka voidaan määrittää asettelua varten, jotta se voidaan tunnistaa ja käyttää nopeasti</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Yleiset</translation>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Tausta</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>EI DATAA</translation>
     </message>
     <message>
       <source>NOT A CAMERA</source>
-      <translation type="unfinished">NOT A CAMERA</translation>
+      <translation>EI KAMERA</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ManualDeviceSearcher</name>
     <message>
       <source>Server is not specified</source>
-      <translation type="unfinished">Server is not specified</translation>
+      <translation>Palvelinta ei ole määritetty</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Ei yhteyttä palvelimeen</translation>
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-      <translation type="unfinished">Device address field must contain a valid URL, IP address, or RTSP link.</translation>
+      <translation>Laitteen osoitekentässä on oltava kelvollinen URL, IP-osoite tai RTSP-linkki.</translation>
     </message>
     <message>
       <source>First address in range is greater than the last one.</source>
-      <translation type="unfinished">First address in range is greater than the last one.</translation>
+      <translation>Alueen ensimmäinen osoite on suurempi kuin viimeinen.</translation>
     </message>
     <message>
       <source>The specified IP address range has more than 255 addresses.</source>
-      <translation type="unfinished">The specified IP address range has more than 255 addresses.</translation>
+      <translation>Määritetyllä IP-osoitealueella on yli 255 osoitetta.</translation>
     </message>
     <message>
       <source>Can&apos;t start searching process</source>
-      <translation type="unfinished">Can&apos;t start searching process</translation>
+      <translation>Voiko&apos;t aloittaa hakuprosessin</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Liike</translation>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>poistettu kamera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation type="unfinished">Bookmark it...</translation>
+      <translation>Merkitse se...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultiServerUpdatesWidget</name>
     <message>
       <source>Release notes</source>
-      <translation type="unfinished">Release notes</translation>
+      <translation>Julkaisutiedot</translation>
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>Tarkista päivitykset automaattisesti</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Tarkista päivitykset</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>Pakota tarkistus</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>Poista automaattinen tarkistus käytöstä</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>Tarkista kerran</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>Tarkista automaattisesti</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
-      <translation type="unfinished">Download in External Browser</translation>
+      <translation>Lataa ulkoisesta selaimesta</translation>
     </message>
     <message>
       <source>Copy Link to Clipboard</source>
-      <translation type="unfinished">Copy Link to Clipboard</translation>
+      <translation>Kopioi linkki leikepöydälle</translation>
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>Olet jo asentanut tämän version.</translation>
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation type="unfinished">Unable to check updates on the internet</translation>
+      <translation>Päivityksiä ei voi tarkistaa Internetistä</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>Versiota ei löydy</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>Päivitystä ei voida suorittaa tiedostosta</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>Virheelliset päivitystiedot</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>Päivitys aiempiin versioihin ei ole mahdollista</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Päivitä tiedostoa ei löydy</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>Päivityspaketti on viallinen</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>Joidenkin palvelimien päivityspaketti puuttuu</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">Incompatible %1 instance. To update disconnect System from %1 first.</translation>
+      <translation>Yhteensopimaton %1 instanssi. Jos haluat päivittää, katkaise yhteys järjestelmään %1 ensin.</translation>
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>Päivityspakettia ei ole saatavilla</translation>
     </message>
     <message>
       <source>Select Update File...</source>
-      <translation type="unfinished">Select Update File...</translation>
+      <translation>Valitse päivitystiedosto...</translation>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>Päivitys tiedostot</translation>
     </message>
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
-      <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
-    </message>
-    <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation type="unfinished">Please make sure there is enough free storage space and network connection is stable.</translation>
+      <translation>Jotkin palvelimet ovat offline-tilassa ja niitä ei päivitetä. Ohita ne?</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
-      <translation type="unfinished">If the problem persists, please contact Customer Support.</translation>
+      <translation>Jos ongelma jatkuu, ota yhteyttä asiakastukeen.</translation>
     </message>
     <message>
       <source>Try again</source>
-      <translation type="unfinished">Try again</translation>
+      <translation>Yritä uudelleen</translation>
     </message>
     <message>
       <source>Cancel Update</source>
-      <translation type="unfinished">Cancel Update</translation>
-    </message>
-    <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation type="unfinished">Please make sure they have enough free storage space and stable network connection.</translation>
+      <translation>Peruuta päivitys</translation>
     </message>
     <message>
       <source>Update completed</source>
-      <translation type="unfinished">Update completed</translation>
+      <translation>Päivitys suoritettu</translation>
     </message>
     <message>
       <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
+      <translation>Päivitys on valmis, mutta jotkin palvelimet eivät ole päivittyneet</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+      <translation>Nx Witness Client käynnistetään uudelleen päivitetyllä versiolla.</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
-    </message>
-    <message>
-      <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
-      <translation type="unfinished">Downloading updates...</translation>
+      <translation>Ladataan päivityksiä...</translation>
     </message>
     <message>
       <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
+      <translation>Päivitysten siirtäminen...</translation>
     </message>
     <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>Lähetä</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>Lähetä ja asenna</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Lataa</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Lataa ja asenna</translation>
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>Valitse Toinen Versio</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
+      <translation>Selaa toista tiedostoa...</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
-      <translation type="unfinished">Update to Specific Build</translation>
+      <translation>Päivitä tiettyyn versioon</translation>
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>Siirretään päivityksiä...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>Asiakaspaketin lataaminen...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
-      <translation type="unfinished">Installing updates...</translation>
+      <translation>Asennetaan päivityksiä...</translation>
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>Client-sovellusta päivitetään...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
-      <translation type="unfinished">Updating to ...</translation>
+      <translation>Päivitetään ...</translation>
     </message>
     <message>
       <source>Ready to update to</source>
-      <translation type="unfinished">Ready to update to</translation>
+      <translation>Valmis päivittämään</translation>
     </message>
     <message>
       <source>Install update</source>
-      <translation type="unfinished">Install update</translation>
+      <translation>Asenna päivitys</translation>
     </message>
     <message>
       <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <translation>Järjestelmä päivitetty</translation>
     </message>
     <message>
       <source>System update in process</source>
-      <translation type="unfinished">System update in process</translation>
+      <translation>Järjestelmän päivitys prosessissa</translation>
     </message>
     <message>
       <source>Continue in Background</source>
-      <translation type="unfinished">Continue in Background</translation>
+      <translation>Jatka taustalla</translation>
     </message>
     <message>
       <source>Specific Build</source>
-      <translation type="unfinished">Specific Build</translation>
+      <translation>Erityinen versio</translation>
     </message>
     <message>
       <source>Browse for Update File</source>
-      <translation type="unfinished">Browse for Update File</translation>
+      <translation>Selaa päivitystiedostoa</translation>
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
+      <translation>Päivitä mediapalvelimista</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
-      <translation type="unfinished">Latest Available Update</translation>
+      <translation>Viimeisin saatavilla oleva päivitys</translation>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>Client-sovelluksen ja %n palvelimen päivityspaketti puuttuu</numerusform>
+        <numerusform>Client-sovelluksen ja %n palvelimen päivityspaketti puuttuu</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>Client-sovelluksen päivityspaketti puuttuu</translation>
     </message>
     <message>
       <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
+      <translation>Viimeistele päivitys</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Peruuta</translation>
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
+      <translation>Viimeisin versio on jo asennettu</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
+      <translation>Tämä versio on jo asennettu</translation>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
+      <translation>Ei yhteydessä olevia palvelimia päivitettäväksi.</translation>
     </message>
     <message>
       <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+      <translation>Joidenkin palvelinten&apos;t päivitykset eivät ole valmiit. Viimeistele se joka tapauksessa?</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>Peruuta päivitys ja poista kaikki ladatut tiedot?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <source>Failed to download update packages to some servers</source>
+      <translation type="unfinished">Failed to download update packages to some servers</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n asettelut</numerusform>
+        <numerusform>%n asettelut</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>Sinulla ei ole asetteluja</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
-      <translation type="unfinished">Alarm: %1</translation>
+      <translation>Hälytys: %1</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Kuittaa</translation>
     </message>
     <message>
       <source>Generic Event</source>
-      <translation type="unfinished">Generic Event</translation>
+      <translation>Yleinen tapahtuma</translation>
     </message>
     <message>
       <source>Unknown Plugin Event</source>
-      <translation type="unfinished">Unknown Plugin Event</translation>
+      <translation>Tuntematon Plugin-tapahtuma</translation>
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Yhteys laitteeseen katkaistu</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>Yhteys kameraan katkaistu</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>Yhteys I/O-moduuliin katkaistu</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Ei uusia ilmoituksia</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
       <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users don&apos;t have access to the selected layout. Action will not work for them.</translation>
+      <translation>Joillakin käyttäjillä &apos;1 ei pääsyä valittuun asetteluun. Toiminto ei ole mahdollista.</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
+      <translation>Yksikään valituista käyttäjistä ei pääse valittuun asetteluun. Toiminto ei toimi.</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Valitse asettelu...</translation>
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>Valitse jokin yksittäinen käyttäjä &quot;Näytä&quot; -riville näyttääksesi paikalliset asettelut tässä luettelossa</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation type="unfinished">Local layouts can only be shown to their owners.</translation>
+      <translation>Paikalliset asettelut voidaan näyttää vain omistajilleen.</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>Yksikään valituista käyttäjärooleista ei sisällä käyttäjiä. Toiminto ei toimi.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>Palvelin vastaus kestää liian kauan</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>Ei päivitystoimintoa</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>Valmis lataamaan päivitystä</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>Ladataan päivitystä</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>Valmiina käynnistymään uudelle versiolle</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>Asennetaan päivitystä</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Asennettu</translation>
     </message>
     <message>
       <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
+      <translation>Päivityksen lataaminen epäonnistui</translation>
     </message>
     <message>
       <source>Failed to install update</source>
-      <translation type="unfinished">Failed to install update</translation>
+      <translation>Päivityksen asentaminen epäonnistui</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>Update package can&apos;t be not found.</source>
+      <translation type="unfinished">Update package can&apos;t be not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Iternal server error.</source>
+      <translation type="unfinished">Iternal server error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Tuntematon virhe.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PresentedStateDelegate</name>
     <message>
       <source>Added</source>
-      <translation type="unfinished">Added</translation>
+      <translation>Lisätty</translation>
     </message>
     <message>
       <source>Adding</source>
-      <translation type="unfinished">Adding</translation>
+      <translation>Lisätään</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automaattinen</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Matala</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Korkea</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Asiakassuhde</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation type="unfinished">Set layout resolution to &quot;Auto&quot; to increase performance.</translation>
+      <translation>Aseta asettelun tarkkuus arvoon &quot;Auto&quot; jos haluat lisätä suorituskykyä.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+      <translation>
+        <numerusform>Nopean katselun-videon pituuden tulisi olla vähintään %n sekuntia.</numerusform>
+        <numerusform>Nopean katselun-videon pituuden tulisi olla vähintään %n sekuntia.</numerusform>
       </translation>
     </message>
   </context>
@@ -8879,617 +8954,632 @@ to %1</translation>
     <name>nx::vms::client::desktop::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation type="unfinished">Not recording</translation>
+      <translation>Ei tallennusta</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation type="unfinished">Recording everything</translation>
+      <translation>Kaikki tallennetaan</translation>
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation type="unfinished">Recording motion only</translation>
+      <translation>Tallennus vain liikkeeestä</translation>
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation type="unfinished">Recording motion and low quality</translation>
+      <translation>Tallennus liikkeestä ja alhaisella laadulla</translation>
     </message>
     <message>
       <source>Continuous</source>
-      <translation type="unfinished">Continuous</translation>
+      <translation>Jatkuva</translation>
     </message>
     <message>
       <source>Motion only</source>
-      <translation type="unfinished">Motion only</translation>
+      <translation>Vain liike</translation>
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>Liike + alhainen resoluutio</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Kaikki</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
+      <translation>Laatuasetus määrittää vain pakkauksen tason eikä vaikuta resoluutioon. Matala, keskitaso, korkea ja paras ovat ennalta asetettuja bittinopeusarvoja.</translation>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit / s</translation>
     </message>
     <message>
       <source>Less Settings</source>
-      <translation type="unfinished">Less Settings</translation>
+      <translation>Vähemmän asetuksia</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation type="unfinished">More Settings</translation>
+      <translation>Lisää asetuksia</translation>
     </message>
     <message>
       <source>Dual-Streaming not supported for this camera</source>
-      <translation type="unfinished">Dual-Streaming not supported for this camera</translation>
+      <translation>Tämä kamera ei tue Dual-Streamingia</translation>
     </message>
     <message>
       <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation type="unfinished">Dual-Streaming and motion detection not supported for this camera</translation>
+      <translation>Dual-Streaming- ja liikkeentunnistus ei ole tuettu tässä kamerassa</translation>
     </message>
     <message>
       <source>Motion detection disabled</source>
-      <translation type="unfinished">Motion detection disabled</translation>
+      <translation>Liikkeentunnistus on poistettu käytöstä</translation>
     </message>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation type="unfinished">To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</translation>
+      <translation>Jos haluat ottaa sen käyttöön tai muuttaa sitä, siirry kameran asetuksiin &quot;Liike&quot; -välilehdelle</translation>
     </message>
     <message>
       <source>Motion detection disabled or not supported</source>
-      <translation type="unfinished">Motion detection disabled or not supported</translation>
+      <translation>Liikkeentunnistus on poistettu käytöstä tai sitä ei tueta</translation>
     </message>
     <message>
       <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation type="unfinished">To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</translation>
+      <translation>Varmista, että se on tuettu ja otettu käyttöön, siirry kameran asetuksiin &quot;Motion&quot; -välilehdelle.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Etsi</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <translation>Seuraa ja kirjaa kaikki käyttäjätoiminnot.</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation type="unfinished">minutes</translation>
+      <translation>minuuttia</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>tuntia</translation>
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Käyttäjät kirjautuvat automaattisesti ulos, jos istunnon kesto ylittää määrätyn ajan.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Toimittaja</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
     <message>
       <source>Skipped</source>
-      <translation type="unfinished">Skipped</translation>
+      <translation>Ohitetaan</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Asennettu</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Asennetaan...</translation>
     </message>
     <message>
       <source>Downloaded</source>
-      <translation type="unfinished">Downloaded</translation>
+      <translation>Ladattu</translation>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>Odotetaan vastausta palvelimelta...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Tila</translation>
     </message>
     <message>
       <source>Message</source>
-      <translation type="unfinished">Message</translation>
+      <translation>Viesti</translation>
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Tallenna päivitystiedostot</translation>
     </message>
     <message>
       <source>Client</source>
-      <translation type="unfinished">Client</translation>
+      <translation>Client-sovellus</translation>
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Komponentti</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>Asennettu versio</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Liike</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation type="unfinished">Bookmark it...</translation>
+      <translation>Merkitse se...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>Valitse videosta alue suodattamaan tuloksia</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Valitulla alueella</translation>
     </message>
     <message>
       <source>No motion</source>
-      <translation type="unfinished">No motion</translation>
+      <translation>Ei liikettä</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Liikettä ei havaittu</translation>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
-      <translation type="unfinished">
-        <numerusform>%n motion events</numerusform>
-        <numerusform>%n motion events</numerusform>
+      <translation>
+        <numerusform>%n liiketapahtumaa</numerusform>
+        <numerusform>%n liiketapahtumaa</numerusform>
       </translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Valittu kamera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Valittu laite</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>Valittu media</translation>
     </message>
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>ei mitään</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
     <message>
       <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
+      <translation>Siirry Reaaliaikaiseen-tilaan</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>Sähköpostiosoitetta ei ole asetettu käyttäjälle %1</numerusform>
+        <numerusform>Sähköpostiosoitetta ei ole asetettu käyttäjälle %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Set Passwords</source>
-      <translation type="unfinished">Set Passwords</translation>
+      <translation>Aseta salasana</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... ja %n lisää</numerusform>
+        <numerusform>... ja %n lisää</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Lisää kamerat nykyiseen asetteluun kaksoisnapsauttamalla tai avataksesi uuden välilehden ctrl + napsauttamalla</numerusform>
+        <numerusform>Lisää kamerat nykyiseen asetteluun kaksoisnapsauttamalla tai avataksesi uuden välilehden ctrl + napsauttamalla</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Ei arkistoa</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationServersModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Palvelin</translation>
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Aikavyöhyke</translation>
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Päivämäärä</translation>
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Palvelimen käyttöjärjestelmän aika</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS-aika</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Aika on yhteinen ja synkronoidaan kaikkien palvelinten välillä. Voi olla eri aika kuin käyttöjärjestelmässä missä tahansa palvelimella.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Synkronoitu Internetin kanssa</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Synkronoitu valitun palvelimen paikallisen ajan kanssa</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Ei synkronoitu. Jokainen palvelin käyttää omaa paikallista aikaa.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Sama kuin palvelimen paikallinen aika</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Ei Internet-yhteyttä. Aikaa ei synkronoida.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Time Server on offline-tilassa. Aikaa ei synkronoida.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Pitkä</translation>
     </message>
     <message>
       <source>Short</source>
-      <translation type="unfinished">Short</translation>
+      <translation>Lyhyt</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>Tiedostoa ei voitu avata &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>Tiedostoa &quot;%1&quot; ei voitu laskea md5</translation>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Lähetystä ei voitu luoda palvelimen puolella: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>Tiedostoja ei voitu ladata palvelimelle</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>Lähetettyä tiedostoa ei voitu tarkistaa palvelimelta</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>Tiedosto oli vioittunut palvelimeen ladattaessa</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Liikettä havaitaan vain videon lataamisen aikana.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Tämän asetuksen ottaminen käyttöön tai poistaminen käytöstä ei muuta mitään nykyisessä arkistossa.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraUploadWidget</name>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>Toinen käyttäjä lähettää tällä hetkellä videokuvaa tähän kameraan.</translation>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User %1 is currently uploading footage to this camera.</translation>
+      <translation>Käyttäjä %1 lähettää tällä hetkellä videokuvaa tähän kameraan.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
       <comment>Uploaded and total number of files will be substituted</comment>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1/%2)</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">Finalizing %1...</translation>
+      <translation>Viimeistely %1...</translation>
     </message>
     <message>
       <source>Uploading %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">Uploading %1...</translation>
+      <translation>Lataaminen %1...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>Pyynnön lähettäminen palvelimelle epäonnistui.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WebWidget</name>
     <message>
       <source>Failed to load page</source>
-      <translation type="unfinished">Failed to load page</translation>
+      <translation>Sivua ei voitu ladata</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>%n kirjanmerkit</numerusform>
+        <numerusform>%n kirjanmerkkiä</numerusform>
       </translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Vie video</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation type="unfinished">Stop Export</translation>
+      <translation>Lopeta vienti</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Pienennä</translation>
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Tiedoston kirjoittaminen epäonnistui</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 on toisen viennin käytössä.</translation>
     </message>
     <message>
       <source>Export completed</source>
-      <translation type="unfinished">Export completed</translation>
+      <translation>Vienti valmis</translation>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Vienti epäonnistui</translation>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>Valittua jaksoa ei voi viedä nykyiselle kameralle.</translation>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Useita kirjanmerkkejä voidaan viedä vain asetteluna.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
-      <translation type="unfinished">Local files not allowed for Multi-Video export</translation>
+      <translation>Paikalliset tiedostot eivät ole sallittuja Multi-Video-viennissä</translation>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
-      <translation type="unfinished">Please remove all local files from the layout and try again.</translation>
+      <translation>Poista kaikki paikalliset tiedostot asettelusta ja yritä uudelleen.</translation>
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Vientiä aloitetaan...</translation>
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Asettelun tallentaminen</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>Lopeta tallennus</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>Tallennus epäonnistui</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>Tallennuksen aloittaminen...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>Valmistelemme tiedostoja vientiprosessille. Odota muutama sekunti.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
     <message>
       <source>%1 version available</source>
-      <translation type="unfinished">%1 version available</translation>
+      <translation>%1 versio saatavilla</translation>
     </message>
     <message>
       <source>Release Notes</source>
-      <translation type="unfinished">Release Notes</translation>
+      <translation>Julkaisutiedot</translation>
     </message>
     <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation type="unfinished">Major issues have been fixed. Update is strongly recommended.</translation>
+      <translation>Isoja korjauksia tehty. Päivitys on erittäin suositeltavaa.</translation>
     </message>
     <message>
       <source>Update...</source>
-      <translation type="unfinished">Update...</translation>
+      <translation>Päivittää...</translation>
     </message>
     <message>
       <source>Do not notify again about this update</source>
-      <translation type="unfinished">Do not notify again about this update</translation>
+      <translation>Älä ilmoita tästä päivityksestä uudelleen</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>useita arvoja</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Rekonstruoi resoluutio</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
+      <translation>Analytiikka-tapahtumat voidaan määrittää tietyille kameroille.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
+      <translation>Valitse kamerat painikkeesta nähdäksesi tuotetut tapahtumat.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Tapahtuma käynnistyy vain, jos otsikko sisältää yhtään syötettyä avainsanaa.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Jos kenttä on tyhjä, tapahtuma käynnistyy aina.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Tämä kenttä on merkkikokoriippuvainen.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Tapahtuma käynnistyy vain, jos kuvaus sisältää yhtään syötettyä avainsanaa.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
+      <translation>Vedä asettelu tai kamera tähän, jos haluat lisätä sen showreeliin</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Kaikki laajennukset</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Tapahtuma käynnistyy vain, jos otsikko sisältää yhtään syötettyä avainsanaa.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Jos kenttä on tyhjä, tapahtuma käynnistyy aina.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Tämä kenttä on merkkikokoriippuvainen.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Tapahtuma käynnistyy vain, jos kuvaus sisältää yhtään syötettyä avainsanaa.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Kaikki käyttäjät</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Käyttäjät</translation>
     </message>
     <message>
       <source>Custom Users</source>
-      <translation type="unfinished">Custom Users</translation>
+      <translation>Mukautetut käyttäjät</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
     <message>
       <source>Switch with Hotkeys</source>
-      <translation type="unfinished">Switch with Hotkeys</translation>
+      <translation>Vaihda pikanäppäimillä</translation>
     </message>
     <message>
       <source>Switch on Timer</source>
-      <translation type="unfinished">Switch on Timer</translation>
+      <translation>Kytke ajastin päälle</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Lopeta kierros</translation>
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
+      <translation>Pysäytä Showreel</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Aloita kierto</translation>
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>Käynnistä Showreel</translation>
     </message>
   </context>
   <context>
@@ -9497,124 +9587,124 @@ to %1</translation>
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ preset</comment>
-      <translation type="unfinished">%1 (active)</translation>
+      <translation>%1 (aktiivinen)</translation>
     </message>
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
-      <translation type="unfinished">%1 (active)</translation>
+      <translation>%1 (aktiivinen)</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Please fill up information about yourself and reason for license deactivation</source>
-      <translation type="unfinished">Please fill up information about yourself and reason for license deactivation</translation>
+      <translation>Täytä tietot itsestäsi ja syy lisenssin deaktivointiin</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Seuraava</translation>
     </message>
     <message>
       <source>Name is necessary</source>
-      <translation type="unfinished">Name is necessary</translation>
+      <translation>Nimi on tarpeellinen</translation>
     </message>
     <message>
       <source>Reason is necessary</source>
-      <translation type="unfinished">Reason is necessary</translation>
+      <translation>Syy on tarpeellinen</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nimi</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Sähköposti</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
-      <translation type="unfinished">Reason for deactivation</translation>
+      <translation>Deaktivoinnin syy</translation>
     </message>
     <message>
       <source>- Choose one -</source>
-      <translation type="unfinished">- Choose one -</translation>
+      <translation>- Valitse yksi -</translation>
     </message>
     <message>
       <source>I am upgrading my machine</source>
-      <translation type="unfinished">I am upgrading my machine</translation>
+      <translation>Olen päivittämässä konettani</translation>
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+      <translation>Annoin vahingossa lisenssin väärälle koneelle</translation>
     </message>
     <message>
       <source>Other Reason</source>
-      <translation type="unfinished">Other Reason</translation>
+      <translation>Muu syy</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Asettelu on täynnä</translation>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation type="unfinished">Failed to change password</translation>
+      <translation>Salasanan vaihtaminen epäonnistui</translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n devices</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
+      <translation>
+        <numerusform>%n laitteen siirtäminen epäonnistui</numerusform>
+        <numerusform>%n laitteen siirtäminen epäonnistui</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n cameras</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
+      <translation>
+        <numerusform>%n kameran siirtäminen epäonnistui</numerusform>
+        <numerusform>%n kameran siirtäminen epäonnistui</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n I/O Modules</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n I/O-moduulin siirtäminen epäonnistui</numerusform>
+        <numerusform>%n I/O-moduulin siirtäminen epäonnistui</numerusform>
       </translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
+      <translation>Palvelin &quot;%1&quot; ei vastaa.</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>Palvelin &quot;%1&quot; ei voi käyttää %n laitetta. Siirrä ne joka tapauksessa?</numerusform>
+        <numerusform>Palvelin &quot;%1&quot; ei voi käyttää %n laitetta. Siirrä ne joka tapauksessa?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>Palvelin &quot;%1&quot; ei voi käyttää %n kameraa. Siirrä ne joka tapauksessa?</numerusform>
+        <numerusform>Palvelin &quot;%1&quot; ei voi käyttää %n kameraa. Siirrä ne joka tapauksessa?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>Palvelin &quot;%1&quot; ei voi käyttää %n I/O-moduulia. Siirrä ne joka tapauksessa?</numerusform>
+        <numerusform>Palvelin &quot;%1&quot; ei voi käyttää %n I/O-moduulia. Siirrä ne joka tapauksessa?</numerusform>
       </translation>
     </message>
     <message>
       <source>Move</source>
-      <translation type="unfinished">Move</translation>
+      <translation>Siirrä</translation>
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Virtuaalikameroita ei voi siirtää palvelimien välillä</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -9622,7 +9712,7 @@ to %1</translation>
     </message>
     <message>
       <source>Open File</source>
-      <translation type="unfinished">Open File</translation>
+      <translation>Avaa tiedosto</translation>
     </message>
     <message>
       <source>All Supported</source>
@@ -9630,102 +9720,102 @@ to %1</translation>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation type="unfinished">Select folder...</translation>
+      <translation>Valitse kansio...</translation>
     </message>
     <message>
       <source>Too short period selected</source>
-      <translation type="unfinished">Too short period selected</translation>
+      <translation>Liian lyhyt ajanjakso valittu</translation>
     </message>
     <message>
       <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation type="unfinished">Cannot perform Preview Search. Please select a period of 15 seconds or longer.</translation>
+      <translation>Esikatselu ei onnistu. Valitse pidempi aika kuin 15 sekuntia.</translation>
     </message>
     <message>
       <source>Preview Search for %1</source>
-      <translation type="unfinished">Preview Search for %1</translation>
+      <translation>Esikatselun haku %1</translation>
     </message>
     <message>
       <source>Confirm files deleting</source>
-      <translation type="unfinished">Confirm files deleting</translation>
+      <translation>Vahvista tiedoston tuhoaminen</translation>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation type="unfinished">
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+      <translation>
+        <numerusform>Haluatko varmasti poistaa nämä %n tiedostoa pysyvästi?</numerusform>
+        <numerusform>Haluatko varmasti poistaa nämä %n tiedostoa pysyvästi?</numerusform>
       </translation>
     </message>
     <message>
       <source>There is another user with the same name</source>
-      <translation type="unfinished">There is another user with the same name</translation>
+      <translation>Samaniminen käyttäjä on jo olemassa</translation>
     </message>
     <message>
       <source>Rename</source>
-      <translation type="unfinished">Rename</translation>
+      <translation>Nimeä uudelleen</translation>
     </message>
     <message>
       <source>Enter new name for the selected item:</source>
-      <translation type="unfinished">Enter new name for the selected item:</translation>
+      <translation>Anna valitun kohteen uusi nimi:</translation>
     </message>
     <message>
       <source>Updating Background...</source>
-      <translation type="unfinished">Updating Background...</translation>
+      <translation>Taustan päivittäminen...</translation>
     </message>
     <message>
       <source>Image processing may take a few moments. Please be patient.</source>
-      <translation type="unfinished">Image processing may take a few moments. Please be patient.</translation>
+      <translation>Kuvan käsittely voi kestää hetken. Olkaa kärsivällisiä.</translation>
     </message>
     <message>
       <source>Image too big</source>
-      <translation type="unfinished">Image too big</translation>
+      <translation>Kuva liian suuri</translation>
     </message>
     <message>
       <source>Maximum size is %1 MB.</source>
-      <translation type="unfinished">Maximum size is %1 MB.</translation>
+      <translation>Suurin koko on %1 Mt.</translation>
     </message>
     <message>
       <source>Failed to upload image</source>
-      <translation type="unfinished">Failed to upload image</translation>
+      <translation>Kuvan lataaminen epäonnistui</translation>
     </message>
     <message>
       <source>Components of System have different versions:</source>
-      <translation type="unfinished">Components of System have different versions:</translation>
+      <translation>Järjestelmän komponenteilla on eri versioita:</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
-      <translation type="unfinished">Please update all components to the version %1</translation>
+      <translation>Päivitä kaikki komponentit versioon %1</translation>
     </message>
     <message>
       <source>Update...</source>
-      <translation type="unfinished">Update...</translation>
+      <translation>Päivittää...</translation>
     </message>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Ohita</translation>
     </message>
     <message>
       <source>Beta version %1</source>
-      <translation type="unfinished">Beta version %1</translation>
+      <translation>Beta-versio %1</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Päivitä seuraavaan käytettävissä olevaan korjaustiedostoon tai viimeisimpään versioon, kun se on käytettävissä.</translation>
     </message>
     <message>
       <source>System sends anonymous usage statistics</source>
-      <translation type="unfinished">System sends anonymous usage statistics</translation>
+      <translation>Järjestelmä lähettää anonyymejä käyttötilastoja</translation>
     </message>
     <message>
       <source>It will be used by software development team to improve your user experience.</source>
-      <translation type="unfinished">It will be used by software development team to improve your user experience.</translation>
+      <translation>Ohjelmistokehitystiimi käyttää palautetta parantamaan käyttäjäkokemustasi.</translation>
     </message>
     <message>
       <source>To disable it, go to System Administration dialog.</source>
-      <translation type="unfinished">To disable it, go to System Administration dialog.</translation>
+      <translation>Voit poistaa sen käytöstä valitsemalla Järjestelmänvalvonta-valintaikkunan.</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>
-      <translation type="unfinished">Failed to open server web page</translation>
+      <translation>Palvelimen verkkosivun avaaminen epäonnistui</translation>
     </message>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
@@ -9739,16 +9829,40 @@ to %1</translation>
       <source>This build is for testing purposes only.</source>
       <translation type="unfinished">This build is for testing purposes only.</translation>
     </message>
+    <message>
+      <source>Confirm storage location to store analytics data</source>
+      <translation type="unfinished">Confirm storage location to store analytics data</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
+      <translation>Käytä näppäimistön nuolia vaihtaaksesi asetteluja. Poistu esitystavasta painamalla Esc.</translation>
     </message>
     <message>
       <source>Press any key to stop the tour.</source>
-      <translation type="unfinished">Press any key to stop the tour.</translation>
+      <translation>Pysäytä kierros painamalla mitä tahansa näppäintä.</translation>
     </message>
   </context>
   <context>
@@ -9761,50 +9875,50 @@ to %1</translation>
     <message>
       <source>Display for</source>
       <comment>Time selector will follow</comment>
-      <translation type="unfinished">Display for</translation>
+      <translation>Näyttö</translation>
     </message>
     <message>
       <source>Display selected for</source>
       <comment>Time will follow</comment>
-      <translation type="unfinished">Display selected for</translation>
+      <translation>Näyttö valitaan</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation type="unfinished">Showreel %1</translation>
+      <translation>Showreel %1</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Poista Showreel %1?</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutsHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation type="unfinished">Save Layout As</translation>
+      <translation>Tallenna asettelu nimellä</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
-      <translation type="unfinished">Enter Layout Name:</translation>
+      <translation>Anna asettelun nimi:</translation>
     </message>
     <message>
       <source>New Layout</source>
-      <translation type="unfinished">New Layout</translation>
+      <translation>Uusi asettelu</translation>
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
-      <translation type="unfinished">Enter the name of the layout to create:</translation>
+      <translation>Anna luomasi asettelun nimi:</translation>
     </message>
     <message>
       <source>New Layout %1</source>
-      <translation type="unfinished">New Layout %1</translation>
+      <translation>Uusi asettelu %1</translation>
     </message>
   </context>
 </TS>

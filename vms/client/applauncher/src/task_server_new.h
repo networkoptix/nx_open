@@ -5,7 +5,7 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/ipc/named_pipe_server.h>
 
-namespace applauncher {
+namespace nx::vms::applauncher {
 
 class AbstractRequestProcessor;
 
@@ -42,4 +42,4 @@ private:
     bool m_terminated = false;
 };
 
-} // namespace applauncher
+} // namespace nx::vms::applauncher

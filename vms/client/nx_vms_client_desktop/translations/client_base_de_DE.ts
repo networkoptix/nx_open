@@ -3586,8 +3586,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>Stückzahl</translation>
+      <source>Channels</source>
+      <translation>Kanäle</translation>
     </message>
   </context>
   <context>
@@ -5108,6 +5108,10 @@ to %1</source>
       <source>Server Web Page</source>
       <translation>Serverwebseite</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5578,16 +5582,30 @@ to %1</source>
       <translation>Sicherung abgeschlossen</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Aufnahme auf deaktivierten Speicher wird angehalten. Veraltete Aufnahmen werden weiterhin gelöscht.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Die Aufnahme wurde auf dem USB-Speicher aktiviert</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Eine Neuindizierung kann Probleme mit dem Archiv oder der Sicherung beheben, wenn sie verloren gegangen sind, beschädigt wurden oder wenn eine Hardware ersetzt wurde.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation>Was tun mit aktuellen Analysedaten?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Aktuelle Analysedaten werden nicht automatisch an einen anderen Speicherort verschoben und sind nicht mehr verfügbar. Sie können es behalten und später manuell verschieben oder dauerhaft löschen.
+Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden Sie sich an den Support, bevor Sie fortfahren.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Löschen</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Behalten</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Abbrechen</translation>
     </message>
   </context>
   <context>
@@ -5635,6 +5653,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>Zu kleine und Systempartitionen sind reserviert und werden nicht zum Schreiben verwendet, wenn genügend Speicherplatz vorhanden ist.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation>Verwendung zur Speicherung von Analysedaten</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation>Speichert Analysedaten</translation>
     </message>
   </context>
   <context>
@@ -7493,12 +7519,12 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>UDP Multicast</source>
-      <translation>UDP Multicast</translation>
-    </message>
-    <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
       <translation>Der Server ändert keine Kameraeinstellungen, er empfängt und verwendet den Kamerastream wie er ist.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation>Multicast</translation>
     </message>
   </context>
   <context>
@@ -8530,10 +8556,6 @@ to %1</source>
       <translation>Einige Server sind offline und werden nicht aktualisiert. Überspringen?</translation>
     </message>
     <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation>Bitte stellen Sie sicher, dass genügend freier Speicherplatz vorhanden ist und die Netzwerkverbindung stabil ist.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Wenn das Problem weiterhin besteht, kontaktieren Sie den Kundensupport.</translation>
     </message>
@@ -8544,10 +8566,6 @@ to %1</source>
     <message>
       <source>Cancel Update</source>
       <translation>Update abbrechen</translation>
-    </message>
-    <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation>Bitte stellen Sie sicher, dass sie genügend freien Speicherplatz und eine stabile Netzwerkverbindung haben.</translation>
     </message>
     <message>
       <source>Update completed</source>
@@ -8564,10 +8582,6 @@ to %1</source>
     <message>
       <source>OK</source>
       <translation>Ok</translation>
-    </message>
-    <message>
-      <source>Failed to install updates to servers:</source>
-      <translation>Updates für Server konnten nicht installiert werden:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -8701,8 +8715,16 @@ to %1</source>
       <translation>Update abbrechen und alle heruntergeladenen Daten löschen?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Aktualisierungspakete für einige Komponenten konnten nicht heruntergeladen werden</translation>
+      <source>Failed to download update packages to some servers</source>
+      <translation>Aktualisierungspakete konnten nicht auf einige Server heruntergeladen werden</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Beim Installieren der Updates ist ein Fehler aufgetreten:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Einige Server sind offline gegangen. Bitte warten Sie, bis sie online sind, um fortzufahren.</translation>
     </message>
   </context>
   <context>
@@ -8821,6 +8843,62 @@ to %1</source>
     <message>
       <source>Failed to install update</source>
       <translation>Das Update konnte nicht installiert werden</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation>Warten auf Peer-Daten</translation>
+    </message>
+    <message>
+      <source>Update package can&apos;t be not found.</source>
+      <translation>Das Aktualisierungspaket kann nicht gefunden werden.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation>Es ist nicht genügend Speicherplatz zum Herunterladen der Aktualisierungsdateien vorhanden.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation>Es ist nicht genügend Speicherplatz vorhanden, um Aktualisierungsdateien zu extrahieren.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation>Aktualisierungspakete konnten nicht heruntergeladen werden.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation>Aktualisierungsinhalte sind ungültig.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation>Updatearchiv ist beschädigt.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation>Updatedateien können nicht extrahiert werden.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation>Interner Downloadfehler.</translation>
+    </message>
+    <message>
+      <source>Iternal server error.</source>
+      <translation>Interner Serverfehler.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation>Interner Clientfehler.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Unbekannter Fehler.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation>Unerwarteter Fehlercode.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation>Bereit zum Installieren des Updates</translation>
     </message>
   </context>
   <context>
@@ -8975,6 +9053,21 @@ to %1</source>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Benutzer werden automatisch abgemeldet, wenn ihre Sitzung die angegebene Dauer überschreitet.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation>Bibliothek</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation>Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Hersteller</translation>
     </message>
   </context>
   <context>
@@ -9733,6 +9826,30 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation>Dieser Build dient nur zu Testzwecken.</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data</source>
+      <translation>Bestätigen Sie den Speicherort, um die Analysedaten zu speichern</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation>Die Analytics-Datenbank sollte lokal gespeichert werden und kann bis zu hundert Gigabyte belegen.
+
+Sobald der Speicherort für Analysedaten ausgewählt ist, kann dieser nicht einfach geändert werden, ohne dass die vorhandenen Daten verloren gehen. Wir empfehlen, den Speicherort sorgfältig auszuwählen und keine Systempartition zu verwenden, um schwerwiegende Systemstörungen zu vermeiden.
+
+Sie können den Speicherort auf der Registerkarte &quot;Speicherverwaltung&quot; im Dialogfeld Servereinstellungen ändern.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation>Öffnen Sie die Servereinstellungen</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>Ok</translation>
     </message>
   </context>
   <context>

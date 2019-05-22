@@ -42,10 +42,10 @@
 #include <core/resource/avi/filetypesupport.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
-#include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -56,6 +56,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <helpers/system_helpers.h>
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
@@ -216,7 +217,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_renderingWidget);
-    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(m_renderingWidget);
 
     ui->connectionsComboBox->setModel(m_connectionsModel);
 
@@ -499,7 +499,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
         auto compatibilityCode = QnConnectionValidator::validateConnection(data.info);
 
         /* Do not show servers with incompatible customization or cloud host */
-        if (!qnRuntime->isDevMode()
+        if (!ini().developerMode
             && compatibilityCode == Qn::IncompatibleInternalConnectionResult)
         {
             continue;

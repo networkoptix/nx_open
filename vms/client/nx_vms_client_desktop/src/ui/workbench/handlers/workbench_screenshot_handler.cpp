@@ -27,6 +27,7 @@
 #include <platform/environment.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
@@ -370,7 +371,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         return;
     }
 
-    if (qnRuntime->isDevMode() && filename == lit("_DEBUG_SCREENSHOT_KEY_")) {
+    if (ini().developerMode && filename == lit("_DEBUG_SCREENSHOT_KEY_")) {
         takeDebugScreenshotsSet(widget);
         return;
     }

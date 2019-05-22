@@ -11,6 +11,7 @@
 
 // TODO: #Elric get rid of shape provider, inherit from PathItem.
 
+class QOpenGLWidget;
 /**
  * An item that draws a polygonal shadow.
  */
@@ -54,7 +55,7 @@ protected:
     void invalidateShadowShape();
     void ensureShadowShape() const;
     void ensureShadowParameters() const;
-    void initializeVao();
+    void initializeVao(QOpenGLWidget* openGLWidget);
 
 private:
     QColor m_color;

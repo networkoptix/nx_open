@@ -48,7 +48,8 @@ public:
     virtual ~QnResourceDisplay();
 
     /**
-     * Called while corresponding QGLWidget and QGLContext are still alive to OGL resources to be properly removed
+     * Called while corresponding QOpenGLWidget and QOpenGLContext are still alive
+     * to properly release OGL resources.
      */
     void beforeDestroy();
 

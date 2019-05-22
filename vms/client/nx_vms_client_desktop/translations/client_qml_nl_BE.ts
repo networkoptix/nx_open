@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Camera-analyse werkt alleen als de camera wordt bekeken. Schakel opnemen in om het altijd te laten werken.</translation>
     </message>
   </context>
   <context>
@@ -65,6 +65,17 @@
     </message>
   </context>
   <context>
+    <name>PluginsInformation</name>
+    <message>
+      <source>No plugins installed</source>
+      <translation type="unfinished">No plugins installed</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation type="unfinished">Server is offline</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
@@ -85,6 +96,14 @@
     <message>
       <source>New Server</source>
       <translation>Nieuwe server</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Aanpassen</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Verbergen</translation>
     </message>
   </context>
   <context>

@@ -21,8 +21,8 @@
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
             <small>{{param.type}}</small>
-            <small ng-if="param.optional=='false'">(required)</small>
-            <small ng-if="param.proprietary">(proprietary)</small>
+            <small ng-if="param.optional=='false'"> (จำเป็น) </small>
+            <small ng-if="param.proprietary"> (เป็นกรรมสิทธิ์) </small>
         </label>
         <div class="col-sm-10">
             <p class="form-control-static" ng-if="param.description.xml"
@@ -67,8 +67,8 @@
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
             <small>{{param.type}}</small>
-            <small ng-if="!param.optional">(required)</small>
-            <small ng-if="param.proprietary">(proprietary)</small>
+            <small ng-if="!param.optional"> (จำเป็น) </small>
+            <small ng-if="param.proprietary"> (เป็นกรรมสิทธิ์) </small>
         </label>
         <div class="col-sm-10">
             <div ng-switch on="param.formType">
@@ -142,7 +142,7 @@
                                id="{{param.name}}_empty"
                                ng-value="null"
                                ng-checked="true">
-                        leave empty
+                        เว้นว่างไว้
                     </label>
                 </div>
                 <div ng-switch-when="boolean" ng-if="param.optional" class="radio">

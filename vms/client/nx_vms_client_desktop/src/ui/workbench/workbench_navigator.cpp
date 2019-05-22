@@ -536,7 +536,7 @@ bool QnWorkbenchNavigator::isLive() const
     return isLiveSupported()
         && speed() > 0
         && m_timeSlider
-        && m_timeSlider->isLive();
+        && (!m_timeSlider->isVisible() || m_timeSlider->isLive());
 }
 
 bool QnWorkbenchNavigator::setLive(bool live)

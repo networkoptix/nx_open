@@ -12,6 +12,10 @@ struct Ini: nx::kit::IniConfig
         "Overrides the current Client's Cloud Host. Allows to connect to the Server that uses\n"
         "the specified Cloud Host.");
     NX_INI_FLAG(0, developerMode, "");
+    NX_INI_FLAG(0, profilerMode, "Enables client profiling panel.");
+    NX_INI_FLAG(1, limitFrameRate,
+        "Limits client frame rate to the maximum of 60 fps. Forces VSync on the video drivers.");
+
     NX_INI_FLAG(0, developerGuiPanel, "Enables developer GUI panel (WARNING: can be very slow).");
 
     NX_INI_FLAG(0, ignoreBetaWarning, "Hides beta version warning.");
@@ -149,9 +153,13 @@ struct Ini: nx::kit::IniConfig
         "Cache live video to obtain right panel previews without querying the server.");
     NX_INI_INT(0, globalLiveVideoCacheLength,
         "Global live video cache length, in seconds. Set to zero to use built-in value.");
-    NX_INI_INT(0, connectTimeoutMs,
+    NX_INI_INT(180000, connectTimeoutMs,
         "Timeout (in milliseconds) for waiting initial resources message from the server.\n"
         "If exceeded then connections is dropped to avoid infinite UI \"Loading...\" state. 0 means disabled.");
+    NX_INI_STRING("", dumpGeneratedIconsTo,
+        "Dump icons, generated from svg, to a given folder.");
+    NX_INI_FLAG(0, enableVSyncWorkaround,
+        "Always limit frame rate to approximately 60 fps, even if VSync is disabled.");
 };
 
 inline Ini& ini()

@@ -92,7 +92,7 @@ om du vill visa fler bokmärken</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Installerar</translation>
     </message>
   </context>
   <context>
@@ -866,7 +866,7 @@ om du vill visa fler bokmärken</translation>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Glömt lösenord</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -878,15 +878,15 @@ om du vill visa fler bokmärken</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Analysinställningar...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation type="unfinished">Show Thumbnails</translation>
+      <translation>Visa miniatyrer</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation type="unfinished">Hide Thumbnails</translation>
+      <translation>Dölj miniatyrer</translation>
     </message>
     <message>
       <source>Pin Panel</source>
@@ -894,15 +894,15 @@ om du vill visa fler bokmärken</translation>
     </message>
     <message>
       <source>Unpin Panel</source>
-      <translation type="unfinished">Unpin Panel</translation>
+      <translation>Lossa panelen</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Virtuell kamera...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Ny virtuell kamera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -926,27 +926,27 @@ om du vill visa fler bokmärken</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Växla till fliken aviseringar</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Växla till fliken rörelse</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Växla till fliken bokmärken</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Växla till fliken händelser</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Växla till objektfliken</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>Objektramar och Info...</translation>
     </message>
   </context>
   <context>
@@ -992,23 +992,23 @@ om du vill visa fler bokmärken</translation>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Vänligen ange ett giltigt lösenord</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Angivet lösenord är inte giltigt.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Krypterad layout</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>Filen %1 är krypterad. Vänligen ange lösenordet:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Vänligen skriv in lösenordet för layout %1:</translation>
     </message>
   </context>
   <context>
@@ -1327,7 +1327,7 @@ om du vill visa fler bokmärken</translation>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Layouten är låst</translation>
     </message>
   </context>
   <context>
@@ -1587,17 +1587,17 @@ om du vill visa fler bokmärken</translation>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Detaljer för %n sessioner av %1</numerusform>
+        <numerusform>Detaljer för %n sessioner av %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Detaljer för %n kameror av %1</numerusform>
+        <numerusform>Detaljer för %n kameror av %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1753,13 +1753,13 @@ om du vill visa fler bokmärken</translation>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Uppdatering installerad</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n åtgärder</numerusform>
+        <numerusform>%n åtgärder</numerusform>
       </translation>
     </message>
   </context>
@@ -2042,7 +2042,7 @@ om du vill visa fler bokmärken</translation>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <translation>Forcerad kvittering fungerar bara för generiska händelser om kamerans modifierare används i generiska händelse URL-er</translation>
     </message>
   </context>
   <context>
@@ -2585,7 +2585,7 @@ till %1</translation>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>Internt serverfel. Vänligen försök igen senare.</translation>
     </message>
   </context>
   <context>
@@ -2739,11 +2739,11 @@ till %1</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Ladda ner &amp;&amp; installera</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Det gick inte att ange kompatibilitetsläge för version %1</translation>
     </message>
   </context>
   <context>
@@ -2789,7 +2789,7 @@ till %1</translation>
     </message>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
-      <translation type="unfinished">To generate Generic Event, please refer to %1.</translation>
+      <translation>För att generera generisk händelse, se %1.</translation>
     </message>
   </context>
   <context>
@@ -2895,7 +2895,7 @@ till %1</translation>
     </message>
     <message>
       <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
+      <translation>Konfigurerade codec: %1 hittades inte, h263p kommer att användas</translation>
     </message>
   </context>
   <context>
@@ -3013,17 +3013,17 @@ till %1</translation>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>Händelselogg för perioden från %1 till %2 - %n händelser hittades</numerusform>
+        <numerusform>Händelselogg för perioden från %1 till %2 - %n händelser hittades</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>Händelselogg för %1 - %n händelser hittades</numerusform>
+        <numerusform>Händelselogg för %1 - %n händelser hittades</numerusform>
       </translation>
     </message>
   </context>
@@ -3101,9 +3101,9 @@ till %1</translation>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n kameror)</numerusform>
+        <numerusform>%1 (%n kameror)</numerusform>
       </translation>
     </message>
   </context>
@@ -3186,11 +3186,11 @@ till %1</translation>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Kameran är för närvarande inte på några av de valda vyerna. Åtgärd fungerar om kameran läggs till innan åtgärden triggas.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Kameran är för närvarande inte på några av de valda vyerna. Åtgärd fungerar om kameran läggs till innan åtgärden triggas.</translation>
     </message>
   </context>
   <context>
@@ -3216,7 +3216,7 @@ till %1</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3385,7 +3385,7 @@ till %1</translation>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Vänligen ange ett värde.</translation>
     </message>
   </context>
   <context>
@@ -3591,8 +3591,8 @@ till %1</translation>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>Antal</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
@@ -3788,22 +3788,22 @@ till %1</translation>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>Varje licens kan avaktiveras endast några få gånger.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 används för närvarande</numerusform>
+        <numerusform>%1 används för närvarande</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>Åtminstone %1 krävs</numerusform>
+        <numerusform>Åtminstone %1 krävs</numerusform>
       </translation>
     </message>
   </context>
@@ -4092,7 +4092,7 @@ till %1</translation>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Områdeszoom</translation>
     </message>
   </context>
   <context>
@@ -4247,11 +4247,11 @@ till %1</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Virtuell kamera</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Virtuell kamera %1</translation>
     </message>
   </context>
   <context>
@@ -4476,9 +4476,9 @@ till %1</translation>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>ca %n minuter</numerusform>
+        <numerusform>ca %n minuter</numerusform>
       </translation>
     </message>
   </context>
@@ -4661,11 +4661,11 @@ till %1</translation>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Nuvarande bithastighet</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>ingen data för prognos</translation>
     </message>
   </context>
   <context>
@@ -4711,11 +4711,11 @@ till %1</translation>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>Lokala filer</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Inga lokala filer</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4723,19 +4723,19 @@ till %1</translation>
     </message>
     <message>
       <source>add to current layout</source>
-      <translation type="unfinished">add to current layout</translation>
+      <translation>lägg till i nuvarande layout</translation>
     </message>
     <message>
       <source>open all at a new layout</source>
-      <translation type="unfinished">open all at a new layout</translation>
+      <translation>öppna alla på en ny layout</translation>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>öppna alla</translation>
     </message>
     <message>
       <source>All types</source>
-      <translation type="unfinished">All types</translation>
+      <translation>Alla typer</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -4751,7 +4751,7 @@ till %1</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Videoväggar</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -4771,7 +4771,7 @@ till %1</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kameror &amp; resurser</translation>
     </message>
   </context>
   <context>
@@ -4844,15 +4844,15 @@ till %1</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kameror &amp; enheter</translation>
     </message>
     <message>
       <source>Videowalls</source>
-      <translation type="unfinished">Videowalls</translation>
+      <translation>Videoväggar</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>Analysmotorer</translation>
     </message>
   </context>
   <context>
@@ -5112,6 +5112,10 @@ till %1</translation>
     <message>
       <source>Server Web Page</source>
       <translation>Serverns webbsida</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -5457,23 +5461,23 @@ till %1</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Senaste 5 minuter</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Senaste 60 minuter</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Senaste dygnet</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Längsta tillgängliga perioden</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Prognos tillgänglig endast för kameror med aktiverad inspelning.</translation>
     </message>
   </context>
   <context>
@@ -5583,16 +5587,30 @@ till %1</translation>
       <translation>Säkerhetskopiering slutförd</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Inspelning till avaktiverad lagring stoppas. Men det kommer att fortsätta att radera utdaterat material från det.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Inspelningen aktiverades på USB-minnet</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Reindexing kan fixa problem med arkiv eller backup om det har förlorats eller skadats, eller om någon maskinvara har ersatts.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Radera</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Behåll</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>
@@ -5640,6 +5658,14 @@ till %1</translation>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>För små och systempartitioner reserveras och används inte för skrivning om det finns tillräckligt med annat lagringsutrymme tillgängligt.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
@@ -5865,27 +5891,27 @@ till %1</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Ingen server har tillgång till internet för tidssynkronisering</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>Systemet är i felsäkert läge</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>Systemet har ingen internetåtkomst för tidssynkronisering</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>Ingen online server i systemet har tillgång till internet för tidssynkronisering.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>Systemet körs i felsäkert läge.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>Ett fel uppstod vid synkronisering av fjärrarkiv</translation>
     </message>
   </context>
   <context>
@@ -5908,19 +5934,19 @@ till %1</translation>
     </message>
     <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+      <translation>Failover-serveråtgärder kan fortfarande kräva statusuppdateringar för kameror oavsett inställningen.</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>Aktivera autodiscovery för enheter och servrar och automatisk kontroll av enhetsstatus</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>Aktivera autodiscovery för enheter och servrar och automatisk kontroll av enhetsstatus</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>När den är aktiverad upptäcker systemet kontinuerligt nya kameror och servrar och skickar funktionsförfrågningar till kameror för statusuppdatering.</translation>
     </message>
   </context>
   <context>
@@ -5935,11 +5961,11 @@ till %1</translation>
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>HTML fil</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>Kalkylblad (CSV) -fil</translation>
     </message>
   </context>
   <context>
@@ -5973,11 +5999,11 @@ till %1</translation>
     </message>
     <message>
       <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>Systemtiden synkroniseras med Internet och beror inte på lokal tid på servrar.</translation>
     </message>
     <message>
       <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>Systemtiden synkroniseras med lokal tid på den valda servern och beror inte på lokal tid på andra servrar.</translation>
     </message>
   </context>
   <context>
@@ -6497,15 +6523,15 @@ till %1</translation>
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
-      <translation type="unfinished">%1 has been successfully configured.</translation>
+      <translation>%1 har lyckats konfigureras.</translation>
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+      <translation>För att slutföra processen, vänligen anslut till den med en klient och uppdatera till version %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation type="unfinished">Failed to merge %1 to our system.</translation>
+      <translation>Misslyckades att slå samman %1 till vårt system.</translation>
     </message>
   </context>
   <context>
@@ -6579,7 +6605,7 @@ till %1</translation>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (Audio/Video Interleaved)</translation>
     </message>
   </context>
   <context>
@@ -6630,11 +6656,11 @@ till %1</translation>
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>PNG-bild</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>JPEG-bild</translation>
     </message>
   </context>
   <context>
@@ -6853,21 +6879,21 @@ till %1</translation>
     </message>
     <message>
       <source>Uploading footage</source>
-      <translation type="unfinished">Uploading footage</translation>
+      <translation>Ladda upp bilder</translation>
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>Kunde inte lägga till virtuell kamera</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>Öppna virtuella kamerainspelningar...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Du kan ladda upp dessa filer till en annan instans av en kroppsburen kamera.</numerusform>
+        <numerusform>Du kan ladda upp dessa filer till en annan instans av en kroppsburen kamera.</numerusform>
       </translation>
     </message>
     <message>
@@ -7094,9 +7120,9 @@ till %1</translation>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>Vissa videofiler laddas fortfarande upp till %n virtuella kameror:</numerusform>
+        <numerusform>Vissa videofiler laddas fortfarande upp till %n virtuella kameror:</numerusform>
       </translation>
     </message>
   </context>
@@ -7104,11 +7130,11 @@ till %1</translation>
     <name>SessionExpiredDialog</name>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Din session har upphört att gälla</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by the system administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+      <translation>Tidsgränsen för varaktighet kan ändras av systemadministratörer</translation>
     </message>
   </context>
   <context>
@@ -7193,21 +7219,21 @@ till %1</translation>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>Denna Linuxplattform stöds inte längre</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Den här OS-versionen stöds inte längre</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>Denna %1 version stöds inte längre</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 stöds inte längre</translation>
     </message>
   </context>
   <context>
@@ -7241,39 +7267,39 @@ till %1</translation>
     <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
     <message>
       <source>Hide information</source>
-      <translation type="unfinished">Hide information</translation>
+      <translation>Dölj information</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation type="unfinished">Show information</translation>
+      <translation>Visa information</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation type="unfinished">Hide thumbnails</translation>
+      <translation>Dölj miniatyrer</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation type="unfinished">Show thumbnails</translation>
+      <translation>Visa miniatyrer</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Sista dagen</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>Senaste 7 Dagarna</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>Senaste 30 dagarna</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation type="unfinished">Selected on Timeline</translation>
+      <translation>Markerade på tidslinjen</translation>
     </message>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>När som helst</translation>
     </message>
     <message>
       <source>none</source>
@@ -7282,23 +7308,23 @@ till %1</translation>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Enheter på layout</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Kameror på layout</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Valfri enhet</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Valfri kamera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Vald enhet</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7309,11 +7335,11 @@ till %1</translation>
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>Visa alltid</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>Visa endast med &quot;objekt&quot; fliken</translation>
     </message>
     <message>
       <source>Show</source>
@@ -7321,68 +7347,68 @@ till %1</translation>
     </message>
     <message>
       <source>Do Not Show</source>
-      <translation type="unfinished">Do Not Show</translation>
+      <translation>Visa inte</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>Unknown object</source>
-      <translation type="unfinished">Unknown object</translation>
+      <translation>Okänt objekt</translation>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>borttagen kamera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Inga objekt</translation>
     </message>
     <message>
       <source>No objects detected</source>
-      <translation type="unfinished">No objects detected</translation>
+      <translation>Inga objekt upptäckta</translation>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n objekt</numerusform>
+        <numerusform>%n objekt</numerusform>
       </translation>
     </message>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Någon typ</translation>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Välj område</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Välj ett område i videon...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>I markerat område</translation>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>namnlös analysmotor</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
-      <translation type="unfinished">Failed to execute plugin action</translation>
+      <translation>Kunde inte köra plugin åtgärd</translation>
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Ange parametrar</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+      <translation>Åtgärden kräver att vissa parametrar ska fyllas i.</translation>
     </message>
   </context>
   <context>
@@ -7396,7 +7422,7 @@ till %1</translation>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>borttagen kamera</translation>
     </message>
   </context>
   <context>
@@ -7407,7 +7433,7 @@ till %1</translation>
     </message>
     <message>
       <source>Select some period on timeline and click with right mouse button on it to create a bookmark.</source>
-      <translation type="unfinished">Select some period on timeline and click with right mouse button on it to create a bookmark.</translation>
+      <translation>Välj en period på tidslinjen och klicka med höger musknapp på den för att skapa ett bokmärke.</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -7498,12 +7524,12 @@ till %1</translation>
       </translation>
     </message>
     <message>
-      <source>UDP Multicast</source>
-      <translation type="unfinished">UDP Multicast</translation>
-    </message>
-    <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
       <translation>Servern kommer inte att ändra några inställningar för kameror, det kommer att ta emot och använda kameran ström som den är.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -7522,20 +7548,20 @@ till %1</translation>
     </message>
     <message>
       <source>More Info</source>
-      <translation type="unfinished">More Info</translation>
+      <translation>Mer info</translation>
     </message>
     <message>
       <source>Less Info</source>
-      <translation type="unfinished">Less Info</translation>
+      <translation>Mindre info</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
       <source>Use License</source>
-      <translation type="unfinished">
-        <numerusform>Use License</numerusform>
-        <numerusform>Use License</numerusform>
+      <translation>
+        <numerusform>Använd licens</numerusform>
+        <numerusform>Använd licens</numerusform>
       </translation>
     </message>
   </context>
@@ -7547,15 +7573,15 @@ till %1</translation>
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of motion detection rectangles for current camera is reached</translation>
+      <translation>Maximalt antal rörelsedetekteringsrektanglar för nuvarande kamera har uppnåtts</translation>
     </message>
     <message>
       <source>Maximum number of ignore motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of ignore motion rectangles for current camera is reached</translation>
+      <translation>Maximalt antal ignorationsrörelser för nuvarande kamera har uppnåtts</translation>
     </message>
     <message>
       <source>Maximum number of detect motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of detect motion rectangles for current camera is reached</translation>
+      <translation>Maximalt antal ignorationsrörelser för nuvarande kamera har uppnåtts</translation>
     </message>
     <message>
       <source>Reset motion regions to default?</source>
@@ -7605,14 +7631,14 @@ till %1</translation>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n kameror</numerusform>
+        <numerusform>%n kameror</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>Du har inga kameror</translation>
     </message>
   </context>
   <context>
@@ -7627,7 +7653,7 @@ till %1</translation>
     </message>
     <message>
       <source>I/O Ports</source>
-      <translation type="unfinished">I/O Ports</translation>
+      <translation>I/O-portar</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -7708,16 +7734,16 @@ till %1</translation>
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 används</numerusform>
+        <numerusform>%1 används</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more required</source>
-      <translation type="unfinished">
-        <numerusform>%n more required</numerusform>
-        <numerusform>%n more required</numerusform>
+      <translation>
+        <numerusform>%n mer krävs</numerusform>
+        <numerusform>%n mer krävs</numerusform>
       </translation>
     </message>
   </context>
@@ -7740,35 +7766,35 @@ till %1</translation>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Uppdateringsfilen hittades inte</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>Uppdateringsfilen är skadad</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>Det gick inte att hämta uppdateringspaketet: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>Uppdateringspaketet är skadat: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Den här uppdateringen är redan installerad.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Den här versionen är inte installerad.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Ogiltigt versionsformat.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>Trasigt uppdateringspaket.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7776,11 +7802,11 @@ till %1</translation>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>Det finns inte tillräckligt med plats på disken för att installera klientuppdateringen.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>Installationspaketet har förlorats.</translation>
     </message>
   </context>
   <context>
@@ -7833,7 +7859,7 @@ till %1</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>Vissa av de valda kamerorna kräver att lösenord anges.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -7848,15 +7874,15 @@ till %1</translation>
     <name>nx::vms::client::desktop::DeviceAdditionDialog</name>
     <message>
       <source>Start address</source>
-      <translation type="unfinished">Start address</translation>
+      <translation>Startadress</translation>
     </message>
     <message>
       <source>End address</source>
-      <translation type="unfinished">End address</translation>
+      <translation>Slutadress</translation>
     </message>
     <message>
       <source>IP / Hostname / RTSP link / UDP link</source>
-      <translation type="unfinished">IP / Hostname / RTSP link / UDP link</translation>
+      <translation>IP / värdnamn / RTSP-länk / UDP-länk</translation>
     </message>
     <message>
       <source>Examples:</source>
@@ -7895,19 +7921,19 @@ till %1</translation>
     </message>
     <message>
       <source>Checking host...</source>
-      <translation type="unfinished">Checking host...</translation>
+      <translation>Kontrollerar värd...</translation>
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Slutförd</translation>
     </message>
     <message>
       <source>Aborted</source>
-      <translation type="unfinished">Aborted</translation>
+      <translation>Avbruten</translation>
     </message>
     <message>
       <source>Searching...</source>
-      <translation type="unfinished">Searching...</translation>
+      <translation>Söker...</translation>
     </message>
     <message>
       <source>No devices found</source>
@@ -7915,40 +7941,40 @@ till %1</translation>
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>Alla enheter har redan lagts till</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>%n enheter läggs till. Du kan stänga den här dialogrutan eller starta en ny sökning</numerusform>
+        <numerusform>%n enheter läggs till. Du kan stänga den här dialogrutan eller starta en ny sökning</numerusform>
       </translation>
     </message>
     <message>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>Lägg till alla enheter</translation>
     </message>
     <message numerus="yes">
       <source>Add %n Devices</source>
-      <translation type="unfinished">
-        <numerusform>Add %n Devices</numerusform>
-        <numerusform>Add %n Devices</numerusform>
+      <translation>
+        <numerusform>Lägg till %n enheter</numerusform>
+        <numerusform>Lägg till %n enheter</numerusform>
       </translation>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>Adressfältet kan inte vara tomt</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Vänligen granska och godkänn %1 för att kunna fortsätta</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>För att använda programvaran måste du acceptera licensavtal för slutanvändare</translation>
     </message>
   </context>
   <context>
@@ -7976,46 +8002,46 @@ till %1</translation>
     <message>
       <source>Objects</source>
       <comment>Analytics tab title</comment>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objekt</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Serverhändelser</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Analyshändelse</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Någon enhet har problem</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Någon kamera har problem</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Någon serverhändelse</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Enhetsproblem</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Kameraproblem</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Någon händelse</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>En analyshändelse</translation>
     </message>
     <message>
       <source>No events</source>
@@ -8023,18 +8049,18 @@ till %1</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
-      <translation type="unfinished">
-        <numerusform>%n events</numerusform>
-        <numerusform>%n events</numerusform>
+      <translation>
+        <numerusform>%n händelser</numerusform>
+        <numerusform>%n händelser</numerusform>
       </translation>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>namnlös analysmotor</translation>
     </message>
     <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>Inga händelser inträffade</translation>
     </message>
   </context>
   <context>
@@ -8051,7 +8077,7 @@ till %1</translation>
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>Vänligen ange lösenordet.</translation>
     </message>
   </context>
   <context>
@@ -8200,7 +8226,7 @@ till %1</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>Du håller på att exportera en lång video. Det kan kräva mycket lagringsutrymme och ta betydande tid.</translation>
     </message>
   </context>
   <context>
@@ -8272,16 +8298,16 @@ till %1</translation>
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n ny</numerusform>
+        <numerusform>%n ny</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>%n enheter hittades</numerusform>
+        <numerusform>%n enheter hittades</numerusform>
       </translation>
     </message>
   </context>
@@ -8326,7 +8352,7 @@ till %1</translation>
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>Kopiera länkadress</translation>
     </message>
   </context>
   <context>
@@ -8401,7 +8427,7 @@ till %1</translation>
     <name>nx::vms::client::desktop::ManualDeviceSearcher</name>
     <message>
       <source>Server is not specified</source>
-      <translation type="unfinished">Server is not specified</translation>
+      <translation>Servernamn har inte angetts</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -8421,7 +8447,7 @@ till %1</translation>
     </message>
     <message>
       <source>Can&apos;t start searching process</source>
-      <translation type="unfinished">Can&apos;t start searching process</translation>
+      <translation>Kan&apos;t börja sökprocessen</translation>
     </message>
   </context>
   <context>
@@ -8432,11 +8458,11 @@ till %1</translation>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>borttagen kamera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation type="unfinished">Bookmark it...</translation>
+      <translation>Bokmärk det...</translation>
     </message>
   </context>
   <context>
@@ -8447,27 +8473,27 @@ till %1</translation>
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>Leta efter uppdateringar automatiskt</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Leta efter uppdateringar</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>Tvinga en check</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>Inaktivera automatisk kontroll</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>Kontrollera en gång</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>Kontrollera automatiskt</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -8479,39 +8505,39 @@ till %1</translation>
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>Du har redan installerat den här versionen.</translation>
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation type="unfinished">Unable to check updates on the internet</translation>
+      <translation>Det gick inte att kontrollera uppdateringar på internet</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>Uppdateringen hittades inte</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>Kan inte uppdatera från den valda filen</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>Ogiltig uppdateringsinformation</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>Nedgradering till tidigare versioner är inte möjligt</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Uppdateringsfilen hittades inte</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>Uppgraderingspaketet är trasigt</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>Saknar uppdateringspaket för vissa servrar</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -8520,7 +8546,7 @@ till %1</translation>
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>Inga uppdateringar tillgängliga</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -8532,11 +8558,7 @@ till %1</translation>
     </message>
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
-      <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
-    </message>
-    <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation type="unfinished">Please make sure there is enough free storage space and network connection is stable.</translation>
+      <translation>Vissa servrar är offline och uppdateras inte. Hoppa över dem?</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -8551,28 +8573,20 @@ till %1</translation>
       <translation>Avbryt uppdatering</translation>
     </message>
     <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation type="unfinished">Please make sure they have enough free storage space and stable network connection.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>Uppdatering slutförd</translation>
     </message>
     <message>
       <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
+      <translation>Uppdatering slutförd, men vissa servrar har misslyckats med en uppdatering</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+      <translation>Nx Witness Client startas om till den uppdaterade versionen.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
-    </message>
-    <message>
-      <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -8580,15 +8594,15 @@ till %1</translation>
     </message>
     <message>
       <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
+      <translation>Pushar uppdateringar...</translation>
     </message>
     <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>Ladda upp</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>Ladda upp &amp;&amp; Installera</translation>
     </message>
     <message>
       <source>Download</source>
@@ -8596,15 +8610,15 @@ till %1</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Hämta &amp;&amp; Installera</translation>
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>Välj en annan uppdatering</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
+      <translation>Bläddra efter en annan fil...</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8612,11 +8626,11 @@ till %1</translation>
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>Överför uppdateringar...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>Hämtar klientpaketet...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -8624,7 +8638,7 @@ till %1</translation>
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>Installera klientuppdateringar...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -8632,15 +8646,15 @@ till %1</translation>
     </message>
     <message>
       <source>Ready to update to</source>
-      <translation type="unfinished">Ready to update to</translation>
+      <translation>Klar att uppdatera till</translation>
     </message>
     <message>
       <source>Install update</source>
-      <translation type="unfinished">Install update</translation>
+      <translation>Installera uppdatering</translation>
     </message>
     <message>
       <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <translation>System uppdaterat till</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8660,7 +8674,7 @@ till %1</translation>
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
+      <translation>Uppdatering från mediaservers</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
@@ -8668,14 +8682,14 @@ till %1</translation>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>Saknar uppdateringspaket för klienten och %n servrar</numerusform>
+        <numerusform>Saknar uppdateringspaket för klienten och %n servrar</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>Saknar uppdateringspaket för klienten</translation>
     </message>
     <message>
       <source>Finish Update</source>
@@ -8706,8 +8720,16 @@ till %1</translation>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <source>Failed to download update packages to some servers</source>
+      <translation type="unfinished">Failed to download update packages to some servers</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
   </context>
   <context>
@@ -8826,6 +8848,62 @@ till %1</translation>
     <message>
       <source>Failed to install update</source>
       <translation type="unfinished">Failed to install update</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>Update package can&apos;t be not found.</source>
+      <translation type="unfinished">Update package can&apos;t be not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Iternal server error.</source>
+      <translation type="unfinished">Iternal server error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Okänt fel.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
     </message>
   </context>
   <context>
@@ -8980,6 +9058,21 @@ till %1</translation>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Leverantör</translation>
     </message>
   </context>
   <context>
@@ -9738,6 +9831,30 @@ till %1</translation>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation type="unfinished">This build is for testing purposes only.</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data</source>
+      <translation type="unfinished">Confirm storage location to store analytics data</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
     </message>
   </context>
   <context>

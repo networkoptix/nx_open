@@ -8,7 +8,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWebKit/QWebSettings>
 #include <QtQml/QQmlEngine>
-#include <QtOpenGL/QtOpenGL>
 #include <QtGui/QSurfaceFormat>
 
 #include <api/app_server_connection.h>
@@ -305,7 +304,7 @@ void QnClientModule::initApplication()
         QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 }
 
-void QnClientModule::initDesktopCamera(QGLWidget* window)
+void QnClientModule::initDesktopCamera(QOpenGLWidget* window)
 {
     /* Initialize desktop camera searcher. */
     auto commonModule = m_clientCoreModule->commonModule();
@@ -345,10 +344,9 @@ void QnClientModule::initSurfaceFormat()
     format.setSwapBehavior(qnSettings->isGlDoubleBuffer()
         ? QSurfaceFormat::DoubleBuffer
         : QSurfaceFormat::SingleBuffer);
-    format.setSwapInterval(qnRuntime->isVSyncEnabled() ? 1 : 0);
+    format.setSwapInterval(ini().limitFrameRate ? 1 : 0);
 
     QSurfaceFormat::setDefaultFormat(format);
-    QGLFormat::setDefaultFormat(QGLFormat::fromSurfaceFormat(format));
 }
 
 void QnClientModule::initSingletons()
@@ -375,10 +373,8 @@ void QnClientModule::initSingletons()
     const auto clientPeerType = m_startupParameters.videoWallGuid.isNull()
         ? nx::vms::api::PeerType::desktopClient
         : nx::vms::api::PeerType::videowallClient;
-    const auto brand = m_startupParameters.isDevMode() ? QString() : QnAppInfo::productNameShort();
-    const auto customization = m_startupParameters.isDevMode()
-        ? QString()
-        : QnAppInfo::customizationName();
+    const auto brand = ini().developerMode ? QString() : QnAppInfo::productNameShort();
+    const auto customization = ini().developerMode ? QString() : QnAppInfo::customizationName();
 
     m_staticCommon.reset(new QnStaticCommonModule(
         clientPeerType,
@@ -582,28 +578,15 @@ bool QnClientModule::initLogFromFile(const QString& filename, const QString& suf
     if (!QFileInfo(logConfigFile).exists())
         return false;
 
-    using namespace nx::utils::log;
-
     NX_ALWAYS(this, "Log is initialized from the %1", logConfigFile);
     NX_ALWAYS(this, "Log options from settings are ignored!");
-    QSettings logConfig(logConfigFile, QSettings::IniFormat);
-    Settings logSettings(&logConfig);
-    logSettings.updateDirectoryIfEmpty(
-        QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
-    if (!suffix.isEmpty())
-    {
-        for (auto& logger: logSettings.loggers)
-        {
-            if (const auto target = logger.logBaseName; target != '-')
-                logger.logBaseName = target + suffix;
-        }
-    }
-
-    setMainLogger(
-        buildLogger(logSettings, qApp->applicationName(),qApp->applicationFilePath()));
-
-    return true;
+    return nx::utils::log::initializeFromConfigFile(
+        logConfigFile,
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+        qApp->applicationName(),
+        qApp->applicationFilePath(),
+        suffix);
 }
 
 void QnClientModule::initNetwork()
@@ -762,8 +745,8 @@ void QnClientModule::initLocalInfo()
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;
-    runtimeData.brand = qnRuntime->isDevMode() ? QString() : QnAppInfo::productNameShort();
-    runtimeData.customization = qnRuntime->isDevMode() ? QString() : QnAppInfo::customizationName();
+    runtimeData.brand = ini().developerMode ? QString() : QnAppInfo::productNameShort();
+    runtimeData.customization = ini().developerMode ? QString() : QnAppInfo::customizationName();
     runtimeData.videoWallInstanceGuid = m_startupParameters.videoWallItemGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData); // initializing localInfo
 }

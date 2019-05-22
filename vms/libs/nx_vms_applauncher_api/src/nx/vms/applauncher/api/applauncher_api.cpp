@@ -1,91 +1,202 @@
 #include "applauncher_api.h"
 
-#include <QtCore/QList>
+#include <optional>
 
-#include <nx/utils/log/log_message.h>
+#include <QtCore/QHash>
+
+#include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
+
+namespace nx::vms::applauncher::api {
 
 namespace {
 
 const auto kArgumentsDelimiter = "@#$%^delim";
 
-} // namespace
-
-namespace applauncher {
-namespace api {
-
-namespace TaskType {
-
-Value fromString(const QnByteArrayConstRef& str)
+QByteArray serializeParameters(const QByteArray& type, const QStringList& parameters)
 {
-    if (str == "run")
-        return startApplication;
-    if (str == "quit")
-        return quit;
-    if (str == "installZip")
-        return installZip;
-    if (str == "startZipInstallation")
-        return startZipInstallation;
-    if (str == "checkZipProgress")
-        return checkZipProgress;
-    if (str == "isVersionInstalled")
-        return isVersionInstalled;
-    if (str == "getInstalledVersions")
-        return getInstalledVersions;
-    if (str == "addProcessKillTimer")
-        return addProcessKillTimer;
-    return invalidTaskType;
+    QByteArray result = type + '\n';
+
+    for (const QString& param: parameters)
+    {
+        result += param.toUtf8();
+        result += '\n';
+    }
+    result += '\n';
+
+    return result;
 }
 
-QByteArray toString(Value val)
+std::optional<QStringList> deserializeParameters(
+    const QByteArray& type, int parametersCount, const QByteArray& data, bool verifyType)
 {
-    switch (val)
+    QList<QByteArray> lines = data.split('\n');
+    if (lines.size() < parametersCount + 1)
+        return {};
+    if (verifyType && lines.takeFirst() != type)
+        return {};
+
+    QStringList result;
+    for (const QByteArray& line: lines)
+        result.append(QString::fromUtf8(line));
+    return std::make_optional(result);
+}
+
+
+QByteArray serializeTaskParameters(TaskType type, const QStringList& parameters)
+{
+    return serializeParameters(serializeTaskType(type), parameters);
+}
+
+std::optional<QStringList> deserializeTaskParameters(
+    TaskType type, int parametersCount, const QByteArray& data)
+{
+    return deserializeParameters(serializeTaskType(type), parametersCount, data, true);
+}
+
+QByteArray serializeResponseParameters(ResultType type, const QStringList& parameters)
+{
+    return serializeParameters(serializeResultType(type), parameters);
+}
+
+std::optional<QStringList> deserializeResponseParameters(
+    ResultType* type, int parametersCount, const QByteArray& data)
+{
+    auto result = deserializeParameters(QByteArray(), parametersCount, data, false);
+    if (result)
     {
-        case startApplication:
+        const QString typeString = result->takeFirst();
+        if (type)
+            *type = deserializeResultType(typeString.toUtf8());
+    }
+    return result;
+}
+
+} // namespace
+
+TaskType deserializeTaskType(const QByteArray& data)
+{
+    static QHash<QByteArray, TaskType> kStringToTaskType{
+        {"run", TaskType::startApplication},
+        {"quit", TaskType::quit},
+        {"installZip", TaskType::installZip},
+        {"startZipInstallation", TaskType::startZipInstallation},
+        {"checkZipProgress", TaskType::checkZipProgress},
+        {"isVersionInstalled", TaskType::isVersionInstalled},
+        {"getInstalledVersions", TaskType::getInstalledVersions},
+        {"addProcessKillTimer", TaskType::addProcessKillTimer},
+    };
+
+    return kStringToTaskType.value(data, TaskType::invalidTaskType);
+}
+
+QByteArray serializeTaskType(TaskType value)
+{
+    switch (value)
+    {
+        case TaskType::startApplication:
             return "run";
-        case quit:
+        case TaskType::quit:
             return "quit";
-        case installZip:
+        case TaskType::installZip:
             return "installZip";
-        case startZipInstallation:
+        case TaskType::startZipInstallation:
             return "startZipInstallation";
-        case checkZipProgress:
+        case TaskType::checkZipProgress:
             return "checkZipProgress";
-        case isVersionInstalled:
+        case TaskType::isVersionInstalled:
             return "isVersionInstalled";
-        case getInstalledVersions:
+        case TaskType::getInstalledVersions:
             return "getInstalledVersions";
-        case addProcessKillTimer:
+        case TaskType::addProcessKillTimer:
             return "addProcessKillTimer";
         default:
             return "unknown";
     }
 }
 
-} // namespace TaskType
+QString toString(TaskType value)
+{
+    return QString::fromLatin1(serializeTaskType(value));
+}
+
+ResultType deserializeResultType(const QByteArray& string)
+{
+    static QHash<QByteArray, ResultType> kStringToTaskType{
+        {"ok", ResultType::ok},
+        {"connectError", ResultType::connectError},
+        {"versionNotInstalled", ResultType::versionNotInstalled},
+        {"alreadyInstalled", ResultType::alreadyInstalled},
+        {"invalidVersionFormat", ResultType::invalidVersionFormat},
+        {"notFound", ResultType::notFound},
+        {"ioError", ResultType::ioError},
+        {"notEnoughSpace", ResultType::notEnoughSpace},
+        {"brokenPackage", ResultType::brokenPackage},
+        {"unpackingZip", ResultType::unpackingZip},
+        {"busy", ResultType::busy}
+    };
+    return kStringToTaskType.value(string, ResultType::otherError);
+}
+
+QByteArray serializeResultType(ResultType value)
+{
+    switch (value)
+    {
+        case ResultType::ok:
+            return "ok";
+        case ResultType::connectError:
+            return "connectError";
+        case ResultType::versionNotInstalled:
+            return "versionNotInstalled";
+        case ResultType::alreadyInstalled:
+            return "alreadyInstalled";
+        case ResultType::invalidVersionFormat:
+            return "invalidVersionFormat";
+        case ResultType::notFound:
+            return "notFound";
+        case ResultType::ioError:
+            return "ioError";
+        case ResultType::notEnoughSpace:
+            return "notEnoughSpace";
+        case ResultType::brokenPackage:
+            return "brokenPackage";
+        case ResultType::unpackingZip:
+            return "unpackingZip";
+        case ResultType::busy:
+            return "busy";
+        default:
+            return "otherError " + QByteArray::number((int) value);
+    }
+}
+
+QString toString(ResultType value)
+{
+    return QString::fromLatin1(serializeResultType(value));
+}
 
 QString launcherPipeName()
 {
-    const auto baseName = nx::utils::AppInfo::customizationName()
+    QString baseName = nx::utils::AppInfo::customizationName()
         + "EC4C367A-FEF0-4fa9-B33D-DF5B0C767788";
 
-    return nx::utils::AppInfo::isMacOsX()
-        ? baseName + QString::fromLatin1(qgetenv("USER").toBase64())
-        : baseName;
+    if (nx::utils::AppInfo::isMacOsX())
+        baseName += QString::fromLatin1(qgetenv("USER").toBase64());
+
+    return baseName;
 }
 
-BaseTask::BaseTask(TaskType::Value _type)
-    :
-    type(_type)
+bool deserializeTask(const QByteArray& data, BaseTask** ptr)
 {
-}
-
-bool deserializeTask(const QByteArray& str, BaseTask** ptr)
-{
-    const int taskNameEnd = str.indexOf('\n');
+    const int taskNameEnd = data.indexOf('\n');
     if (taskNameEnd == -1)
+    {
+        NX_ERROR(NX_SCOPE_TAG, "deserializeTask(): Cannot deserialize task name:\n%1",
+            QString::fromUtf8(data));
         return false;
-    const TaskType::Value taskType = TaskType::fromString(
-        QnByteArrayConstRef(str, 0, taskNameEnd));
+    }
+
+    const QByteArray taskName(data.constData(), taskNameEnd);
+    const TaskType taskType = deserializeTaskType(taskName);
     switch (taskType)
     {
         case TaskType::startApplication:
@@ -121,382 +232,167 @@ bool deserializeTask(const QByteArray& str, BaseTask** ptr)
             break;
 
         case TaskType::invalidTaskType:
+            NX_ERROR(NX_SCOPE_TAG, "deserializeTask(): Invalid task type: %1",
+                QString::fromUtf8(taskName));
             return false;
     }
 
-    if (!(*ptr)->deserialize(str))
+    if (!(*ptr)->deserialize(data))
     {
+        NX_ERROR(NX_SCOPE_TAG, "deserializeTask(): Cannot deserialize task:\n%1",
+            QString::fromUtf8(data));
+
         delete *ptr;
-        *ptr = NULL;
+        *ptr = nullptr;
         return false;
     }
 
     return true;
 }
 
-////////////////////////////////////////////////////////////
-//// class StartApplicationTask
-////////////////////////////////////////////////////////////
-StartApplicationTask::StartApplicationTask()
-    :
-    BaseTask(TaskType::startApplication)
+QByteArray BaseTask::serialize() const
 {
+    return serializeTaskParameters(type, {});
 }
 
-StartApplicationTask::StartApplicationTask(
-    const nx::utils::SoftwareVersion& _version,
-    const QStringList& _appParams)
-    :
-    BaseTask(TaskType::startApplication),
-    version(_version),
-    appArgs( _appParams )
+bool BaseTask::deserialize(const QByteArray& data)
 {
-}
-
-QByteArray StartApplicationTask::serialize() const
-{
-    const auto res = lm("%1\n%2\n%3\n\n").args(
-        QLatin1String(TaskType::toString(type)),
-        version.toString(),
-        appArgs.join(kArgumentsDelimiter)).toQString().toLatin1();
-    return res;
-}
-
-bool StartApplicationTask::deserialize(const QnByteArrayConstRef& data)
-{
-    const QList<QnByteArrayConstRef>& lines = data.split('\n');
-    if (lines.size() < 3)
-        return false;
-    if (lines[0] != TaskType::toString(type))
-        return false;
-    version = nx::utils::SoftwareVersion(lines[1].toByteArrayWithRawData());
-    const auto stringArguments = QString::fromLatin1(lines[2].toByteArrayWithRawData());
-    appArgs = stringArguments.split(kArgumentsDelimiter, QString::SkipEmptyParts);
-
-    return true;
-}
-
-////////////////////////////////////////////////////////////
-//// class QuitTask
-////////////////////////////////////////////////////////////
-QuitTask::QuitTask():
-    BaseTask(TaskType::quit)
-{
-}
-
-QByteArray QuitTask::serialize() const
-{
-    return lm("%1\n\n").arg(QLatin1String(TaskType::toString(type))).toQString().toLatin1();
-}
-
-bool QuitTask::deserialize(const QnByteArrayConstRef& data)
-{
-    const QList<QnByteArrayConstRef>& lines = data.split('\n');
-    if (lines.empty())
-        return false;
-    if (lines[0] != TaskType::toString(type))
-        return false;
-    return true;
-}
-
-////////////////////////////////////////////////////////////
-//// class Response
-////////////////////////////////////////////////////////////
-IsVersionInstalledRequest::IsVersionInstalledRequest()
-    :
-    BaseTask(TaskType::isVersionInstalled)
-{
-}
-
-QByteArray IsVersionInstalledRequest::serialize() const
-{
-    return lm("%1\n%2\n\n").args(
-        QLatin1String(TaskType::toString(type)), version.toString()).toQString().toLatin1();
-}
-
-bool IsVersionInstalledRequest::deserialize(const QnByteArrayConstRef& data)
-{
-    const QList<QnByteArrayConstRef>& lines = data.split('\n');
-    if (lines.size() < 2)
-        return false;
-    if (lines[0] != TaskType::toString(type))
-        return false;
-    version = nx::utils::SoftwareVersion(lines[1].toByteArrayWithRawData());
-    return true;
-}
-
-////////////////////////////////////////////////////////////
-//// class Response
-////////////////////////////////////////////////////////////
-namespace ResultType {
-Value fromString(const QnByteArrayConstRef& str)
-{
-    if (str == "ok")
-        return ok;
-    if (str == "connectError")
-        return connectError;
-    if (str == "versionNotInstalled")
-        return versionNotInstalled;
-    if (str == "alreadyInstalled")
-        return alreadyInstalled;
-    if (str == "invalidVersionFormat")
-        return invalidVersionFormat;
-    if (str == "notFound")
-        return notFound;
-    if (str == "ioError")
-        return ioError;
-    if (str == "notEnoughSpace")
-        return notEnoughSpace;
-    if (str == "brokenPackage")
-        return brokenPackage;
-    if (str == "unpackingZip")
-        return unpackingZip;
-    if (str == "busy")
-        return busy;
-    return otherError;
-}
-
-QByteArray toString(Value val)
-{
-    switch (val)
-    {
-        case ok:
-            return "ok";
-        case connectError:
-            return "connectError";
-        case versionNotInstalled:
-            return "versionNotInstalled";
-        case alreadyInstalled:
-            return "alreadyInstalled";
-        case invalidVersionFormat:
-            return "invalidVersionFormat";
-        case notFound:
-            return "notFound";
-        case ioError:
-            return "ioError";
-        case notEnoughSpace:
-            return "notEnoughSpace";
-        case brokenPackage:
-            return "brokenPackage";
-        case unpackingZip:
-            return "unpackingZip";
-        case busy:
-            return "busy";
-        default:
-            return "otherError " + QByteArray::number(val);
-    }
-}
+    return deserializeTaskParameters(type, 0, data).has_value();
 }
 
 QByteArray Response::serialize() const
 {
-    return ResultType::toString(result) + "\n";
+    return serializeResponseParameters(result, {});
 }
 
-bool Response::deserialize(const QnByteArrayConstRef& data)
+bool Response::deserialize(const QByteArray& data)
 {
-    int sepPos = data.indexOf('\n');
-    if (sepPos == -1)
-        return false;
-    result = ResultType::fromString(data.mid(0, sepPos));
-    return true;
+    return deserializeResponseParameters(&result, 0, data).has_value();
 }
 
-////////////////////////////////////////////////////////////
-//// class InstallationDirRequest
-////////////////////////////////////////////////////////////
-InstallZipTask::InstallZipTask()
-    :
-    BaseTask(TaskType::installZip)
+QByteArray StartApplicationTask::serialize() const
 {
+    return serializeTaskParameters(
+        type, {version.toString(), arguments.join(kArgumentsDelimiter)});
 }
 
-InstallZipTask::InstallZipTask(
-    const nx::utils::SoftwareVersion& version,
-    const QString& zipFileName)
-    :
-    BaseTask(TaskType::installZip),
-    version(version),
-    zipFileName(zipFileName)
+bool StartApplicationTask::deserialize(const QByteArray& data)
 {
+    if (const auto& parameters = deserializeTaskParameters(type, 2, data))
+    {
+        version = nx::utils::SoftwareVersion(parameters->at(0));
+        arguments = parameters->at(1).split(kArgumentsDelimiter, QString::SkipEmptyParts);
+        return true;
+    }
+    return false;
+}
+
+QByteArray IsVersionInstalledRequest::serialize() const
+{
+    return serializeTaskParameters(type, {version.toString()});
+}
+
+bool IsVersionInstalledRequest::deserialize(const QByteArray& data)
+{
+    if (const auto& parameters = deserializeTaskParameters(type, 1, data))
+    {
+        version = nx::utils::SoftwareVersion(parameters->at(0));
+        return true;
+    }
+    return false;
+}
+
+QByteArray IsVersionInstalledResponse::serialize() const
+{
+    return serializeResponseParameters(result, {QString::number(installed ? 1 : 0)});
+}
+
+bool IsVersionInstalledResponse::deserialize(const QByteArray& data)
+{
+    if (const auto& parameters = deserializeResponseParameters(&result, 0, data))
+    {
+        installed = parameters->at(0).toUInt() > 0;
+        return true;
+    }
+    return false;
 }
 
 QByteArray InstallZipTask::serialize() const
 {
-    return lm("%1\n%2\n%3\n\n").args(
-        QString::fromLatin1(TaskType::toString(type)),
-        version.toString(),
-        zipFileName
-    ).toUtf8();
+    return serializeTaskParameters(type, {version.toString(), zipFileName});
 }
 
-bool InstallZipTask::deserialize(const QnByteArrayConstRef& data)
+bool InstallZipTask::deserialize(const QByteArray& data)
 {
-    QStringList list = QString::fromUtf8(data).split("\n", QString::SkipEmptyParts);
-    if (list.size() < 3)
-        return false;
-    if (TaskType::toString(type) != list[0].toLatin1())
-        return false;
-    version = nx::utils::SoftwareVersion(list[1]);
-    zipFileName = list[2];
-    return true;
-}
-
-////////////////////////////////////////////////////////////
-//// class IsVersionInstalledResponse
-////////////////////////////////////////////////////////////
-
-InstallZipTaskAsync::InstallZipTaskAsync():
-    BaseTask(TaskType::startZipInstallation)
-{
-}
-
-InstallZipTaskAsync::InstallZipTaskAsync(
-    const nx::utils::SoftwareVersion& version,
-    const QString& zipFileName):
-    BaseTask(TaskType::startZipInstallation),
-    version(version),
-    zipFileName(zipFileName)
-{
+    if (const auto& parameters = deserializeTaskParameters(type, 2, data))
+    {
+        version = nx::utils::SoftwareVersion(parameters->at(0));
+        zipFileName = parameters->at(1);
+        return true;
+    }
+    return false;
 }
 
 QByteArray InstallZipTaskAsync::serialize() const
 {
-    return lm("%1\n%2\n%3\n\n").args(
-        QString::fromLatin1(TaskType::toString(type)),
-        version.toString(),
-        zipFileName
-    ).toUtf8();
+    return serializeTaskParameters(type, {version.toString(), zipFileName});
 }
 
-bool InstallZipTaskAsync::deserialize(const QnByteArrayConstRef& data)
+bool InstallZipTaskAsync::deserialize(const QByteArray& data)
 {
-    QStringList list = QString::fromUtf8(data).split("\n", QString::SkipEmptyParts);
-    if (list.size() < 3)
-        return false;
-    if (TaskType::toString(type) != list[0].toLatin1())
-        return false;
-    version = nx::utils::SoftwareVersion(list[1]);
-    zipFileName = list[2];
-    return true;
-}
-
-////////////////////////////////////////////////////////////
-//// class InstallZipCheckStatus
-////////////////////////////////////////////////////////////
-
-InstallZipCheckStatus::InstallZipCheckStatus():
-    BaseTask(TaskType::checkZipProgress)
-{
-}
-
-QByteArray InstallZipCheckStatus::serialize() const
-{
-    return TaskType::toString(type) + "\n";
-}
-
-bool InstallZipCheckStatus::deserialize(const QnByteArrayConstRef& data)
-{
-    return data == serialize();
-}
-
-////////////////////////////////////////////////////////////
-//// class IsVersionInstalledResponse
-////////////////////////////////////////////////////////////
-QByteArray IsVersionInstalledResponse::serialize() const
-{
-    return Response::serialize() + QByteArray::number(installed ? 1 : 0) + "\n\n";
-}
-
-bool IsVersionInstalledResponse::deserialize(const QnByteArrayConstRef& data)
-{
-    if (!Response::deserialize(data))
-        return false;
-
-    const QList<QnByteArrayConstRef>& lines = data.split('\n');
-    if (lines.size() < 2)
-        return false;
-    //line 0 - is a error code
-    installed = lines[1].toUInt() > 0;
-    return true;
-}
-
-////////////////////////////////////////////////////////////
-//// class AddProcessKillTimerRequest
-////////////////////////////////////////////////////////////
-AddProcessKillTimerRequest::AddProcessKillTimerRequest():
-    BaseTask(TaskType::addProcessKillTimer)
-{
+    if (const auto& parameters = deserializeTaskParameters(type, 2, data))
+    {
+        version = nx::utils::SoftwareVersion(parameters->at(0));
+        zipFileName = parameters->at(1);
+        return true;
+    }
+    return false;
 }
 
 QByteArray AddProcessKillTimerRequest::serialize() const
 {
-    return lm("%1\n%2\n%3\n\n").args(QLatin1String(TaskType::toString(type)), processID,
-        timeoutMillis).toQString().toLatin1();
+    return serializeTaskParameters(type,
+        {QString::number(processId), QString::number(timeoutMillis)});
 }
 
-bool AddProcessKillTimerRequest::deserialize(const QnByteArrayConstRef& data)
+bool AddProcessKillTimerRequest::deserialize(const QByteArray& data)
 {
-    const QList<QnByteArrayConstRef>& lines = data.split('\n');
-    if (lines.size() < 3)
-        return false;
-    if (lines[0] != TaskType::toString(type))
-        return false;
-    processID = lines[1].toByteArrayWithRawData().toUInt();
-    timeoutMillis = lines[2].toByteArrayWithRawData().toUInt();
-    return true;
-}
-
-////////////////////////////////////////////////////////////
-//// class GetInstalledVersionsRequest
-////////////////////////////////////////////////////////////
-GetInstalledVersionsRequest::GetInstalledVersionsRequest()
-    :
-    BaseTask(TaskType::getInstalledVersions)
-{
+    if (const auto& parameters = deserializeTaskParameters(type, 2, data))
+    {
+        processId = parameters->at(0).toLongLong();
+        timeoutMillis = (quint32) parameters->at(1).toInt();
+        return true;
+    }
+    return false;
 }
 
 QByteArray GetInstalledVersionsRequest::serialize() const
 {
-    return TaskType::toString(type) + "\n";
+    return serializeTaskParameters(type, {});
 }
 
-bool GetInstalledVersionsRequest::deserialize(const QnByteArrayConstRef& data)
+bool GetInstalledVersionsRequest::deserialize(const QByteArray& data)
 {
-    return data == serialize();
+    return deserializeTaskParameters(type, 0, data).has_value();
 }
-
-////////////////////////////////////////////////////////////
-//// class GetInstalledVersionsResponse
-////////////////////////////////////////////////////////////
 
 QByteArray GetInstalledVersionsResponse::serialize() const
 {
-    QByteArray result = Response::serialize();
+    QStringList versionStrings;
     for (const auto& version: versions)
-    {
-        result.append(version.toString().toLatin1());
-        result.append(',');
-    }
-    result[result.size() - 1] = '\n';
-    return result;
+        versionStrings.append(version.toString());
+    return serializeResponseParameters(result, {versionStrings.join(L',')});
 }
 
-bool GetInstalledVersionsResponse::deserialize(const QnByteArrayConstRef& data)
+bool GetInstalledVersionsResponse::deserialize(const QByteArray& data)
 {
-    if (!Response::deserialize(data))
-        return false;
-
-    const QList<QnByteArrayConstRef>& lines = data.split('\n');
-    if (lines.size() < 2)
-        return false;
-
-    const QList<QnByteArrayConstRef>& versions = lines[1].split(',');
-    for (const QnByteArrayConstRef& version: versions)
-        this->versions.append(nx::utils::SoftwareVersion(version.toByteArrayWithRawData()));
-
-    return true;
+    if (const auto& parameters = deserializeResponseParameters(&result, 1, data))
+    {
+        for (const QString& versionString: parameters->at(0).split(L','))
+            versions.append(nx::utils::SoftwareVersion(versionString));
+        return true;
+    }
+    return false;
 }
 
-} // namespace api
-} // namespace applauncher
+} // namespace nx::vms::applauncher::api

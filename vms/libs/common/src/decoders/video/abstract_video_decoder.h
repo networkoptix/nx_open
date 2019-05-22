@@ -3,8 +3,6 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-//#include <QtOpenGL/QGLContext>
-
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
 #include <utils/media/frame_info.h>

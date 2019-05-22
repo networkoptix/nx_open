@@ -83,20 +83,25 @@ signals:
     void pluginLoaded();
 
 private:
-    void loadPluginsFromDirWithBlackList(
-        const QStringList& disabledLibNames,
-        const nx::plugins::SettingsHolder& settingsHolder,
-        const QString& dirToSearchIn);
+    void loadNonOptionalPluginsIfNeeded(
+        const QString& binPath, const nx::plugins::SettingsHolder& settingsHolder);
 
-    void loadPluginsFromDirWithWhiteList(
-        const QStringList& enabledLibNames,
+    void loadOptionalPluginsIfNeeded(
+        const QString& binPath, const nx::plugins::SettingsHolder& settingsHolder);
+
+    void loadPluginsFromDir(
         const nx::plugins::SettingsHolder& settingsHolder,
-        const QString& dirToSearchIn);
+        const QDir& dirToSearchIn,
+        std::function<bool(const QFileInfo& pluginFileInfo)> allowPlugin);
 
     bool loadNxPlugin(
         const nx::plugins::SettingsHolder& settingsHolder,
-        const QString& filename,
+        const QString& linkedLibsDirectory,
+        const QString& libFilename,
         const QString& libName);
+
+    std::unique_ptr<QLibrary> loadPluginLibrary(
+        const QString& linkedLibsDir, const QString& libFilename);
 
 private:
     const nx::sdk::Ptr<nx::sdk::IUtilityProvider> m_utilityProvider;

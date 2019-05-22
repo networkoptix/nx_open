@@ -7,6 +7,7 @@
 #include <QtCore/QFile>
 
 #include <QtGui/QFileOpenEvent>
+#include <QtGui/QWindowStateChangeEvent>
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
@@ -40,6 +41,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/workbench/handlers/layout_tours_handler.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
@@ -69,6 +71,7 @@
 #include <ui/workbench/handlers/startup_actions_handler.h>
 #include <nx/vms/client/desktop/analytics/analytics_menu_action_handler.h>
 #include <nx/vms/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
+#include <nx/vms/client/desktop/ini.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -150,7 +153,6 @@ void enable_animations(void* qnmainwindow)
 }
 #endif
 
-using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
@@ -159,9 +161,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     m_welcomeScreen(qnRuntime->isDesktopMode() ? new QnWorkbenchWelcomeScreen(this) : nullptr),
     m_titleBar(new QnMainWindowTitleBarWidget(this, context))
 {
-    if (!m_welcomeScreen)
-        m_welcomeScreenVisible = false;
-
     QnHiDpiWorkarounds::init();
 #ifdef Q_OS_MACX
     // TODO: #ivigasin check the neccesarity of this line. In Maveric fullscreen animation works fine without it.
@@ -365,11 +364,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     setLayout(m_globalLayout);
 
-    // TODO: #ynikitenkov Remove this workaround when we integrate QOpenGLWidget.
-    // We have to use the trick below to prevent blinks on start.
-    if (nx::utils::AppInfo::isMacOsX())
-        m_viewLayout->setStackingMode(QStackedLayout::StackAll);
-
     if (m_welcomeScreen)
         m_viewLayout->addWidget(m_welcomeScreen);
 
@@ -385,17 +379,26 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (nx::utils::AppInfo::isMacOsX())
         menu()->newMenu(action::MainScope);
 
-    if (!qnRuntime->isAcsMode() && !qnRuntime->isProfilerMode())
+    if (ini().limitFrameRate && ini().enableVSyncWorkaround)
     {
         /* VSync workaround must always be enabled to limit fps usage in following cases:
          * * VSync is not supported by drivers
          * * VSync is disabled in drivers
          * * double buffering is disabled in drivers or in our program
-         * Workaround must be disabled in activeX mode.
          */
         auto vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
         Q_UNUSED(vsyncWorkaround);
     }
+
+    installEventHandler(m_view->viewport(), QEvent::Show, this,
+            [this]()
+            {
+                if (m_initialized)
+                    return;
+
+                m_initialized = true;
+                setWelcomeScreenVisible(true);
+            });
 
     updateWidgetsVisibility();
 }
@@ -432,36 +435,11 @@ void MainWindow::updateWidgetsVisibility()
                 ? static_cast<QWidget*>(m_welcomeScreen)
                 : static_cast<QWidget*>(m_view.data());
 
-            if (currentWidget == m_viewLayout->currentWidget())
-                return;
-
-            // TODO: #ynikitenkov Remove this workaround when we integrate QOpenGLWidget.
-            // We have to use the trick below to prevent blinks on start.
-            if (nx::utils::AppInfo::isMacOsX())
-                m_viewLayout->setStackingMode(QStackedLayout::StackOne);
-
-            m_viewLayout->setCurrentWidget(currentWidget);
-
-            // TODO: #ynikitenkov Remove this workaround when we integrate QOpenGLWidget.
-            // For some reason when we switch widgets visibility we start to loose paint events.
-            // This results to hangs until you resize or hide/show main window in MacOs.
-            // Workaround below fixes it.
-            if (nx::utils::AppInfo::isMacOsX())
-            {
-                static const QSize kSizeChange(100, 100);
-                const auto currentGeometry = geometry();
-                setGeometry(QRect(currentGeometry.topLeft(), currentGeometry.size() + kSizeChange));
-                setGeometry(currentGeometry);
-            }
+            if (currentWidget != m_viewLayout->currentWidget())
+                m_viewLayout->setCurrentWidget(currentWidget);
         };
 
-    // TODO: #ynikitenkov Remove this workaround when we integrate QOpenGLWidget.
-    // For some reason mouse events don't go to the QGraphicsView if we change visibility
-    // under some circumstances in MacOs. This ugly workaround fixes it.
-    if (nx::utils::AppInfo::isMacOsX())
-        executeLater(switchWidgetsCallback, this);
-    else
-        switchWidgetsCallback();
+    switchWidgetsCallback();
 
     // Always show title bar for welcome screen (it does not matter if it is fullscreen).
     m_titleBar->setVisible(isTitleVisible());
@@ -553,8 +531,8 @@ void MainWindow::setFullScreen(bool fullScreen)
     if (m_inFullscreenTransition)
         return;
 
-    QScopedValueRollback<bool> guard(m_inFullscreenTransition, true);
 
+    QScopedValueRollback<bool> guard(m_inFullscreenTransition, true);
 
     if(fullScreen)
     {
@@ -758,21 +736,9 @@ void MainWindow::updateContentsMargins()
 // -------------------------------------------------------------------------- //
 bool MainWindow::event(QEvent* event)
 {
-    bool result = base_type::event(event);
-
-    if (event->type() == QEvent::WindowActivate)
-    {
-        // Workaround for QTBUG-34414
-        if (m_welcomeScreen && m_welcomeScreenVisible)
-        {
-            activateWindow();
-            m_welcomeScreen->activateView();
-        }
-    }
-    else if (event->type() == QnEvent::WinSystemMenu)
-    {
+    const bool result = base_type::event(event);
+    if (event->type() == QnEvent::WinSystemMenu)
         action(action::MainMenuAction)->trigger();
-    }
 
     return result;
 }
@@ -783,9 +749,18 @@ void MainWindow::closeEvent(QCloseEvent* event)
     menu()->trigger(action::ExitAction);
 }
 
-void MainWindow::changeEvent(QEvent *event) {
-    if(event->type() == QEvent::WindowStateChange)
+void MainWindow::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::WindowStateChange)
+    {
+#if defined(Q_OS_WIN) // An additional hack for our custom WM_NCCALCSIZE working correctly.
+        const auto wscEvent = static_cast<QWindowStateChangeEvent*>(event);
+        if (wscEvent->oldState().testFlag(Qt::WindowMinimized) && m_inFullscreen)
+            base_type::showFullScreen();
+#endif
+        m_inFullscreen = windowState().testFlag(Qt::WindowFullScreen);
         updateDecorationsState();
+    }
 
     base_type::changeEvent(event);
 }
@@ -862,6 +837,17 @@ void MainWindow::at_fileOpenSignalizer_activated(QObject*, QEvent* event)
 bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
 {
     const auto msg = static_cast<MSG*>(message);
+    const auto isMinimized =
+        [wnd = msg->hwnd]()
+        {
+            WINDOWPLACEMENT p{};
+            p.length = sizeof(p);
+            GetWindowPlacement(wnd, &p);
+            return p.showCmd == SW_MINIMIZE
+                || p.showCmd == SW_SHOWMINIMIZED
+                || p.showCmd == SW_SHOWMINNOACTIVE;
+        };
+
     switch (msg->message)
     {
         // Under Windows, fullscreen OpenGL widgets on the primary screen cause Windows DWM to

@@ -545,9 +545,6 @@ void ActionHandler::openNewWindow(const QStringList &args) {
         arguments << QnStartupParameters::kScreenKey << QString::number(screen);
     }
 
-    if (qnRuntime->isDevMode())
-        arguments << lit("--dev-mode-key=razrazraz");
-
 #ifdef Q_OS_MACX
     mac_startDetached(qApp->applicationFilePath(), arguments);
 #else
@@ -2605,14 +2602,14 @@ void ActionHandler::at_queueAppRestartAction_triggered()
 
     auto tryToRestartClient = [this]
         {
-            using namespace applauncher::api;
+            using namespace nx::vms::applauncher::api;
 
             /* Try to run applauncher if it is not running. */
             if (!checkOnline())
                 return false;
 
             const auto result = restartClient();
-            if (result == ResultType::Value::ok)
+            if (result == ResultType::ok)
                 return true;
 
             static const int kMaxTries = 5;

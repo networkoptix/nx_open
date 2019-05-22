@@ -113,5 +113,9 @@
       <source>pausing</source>
       <translation>暫停中</translation>
     </message>
+    <message>
+      <source>Unknown error: %1</source>
+      <translation type="unfinished">Unknown error: %1</translation>
+    </message>
   </context>
 </TS>

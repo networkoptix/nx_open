@@ -14,7 +14,7 @@ InstrumentPaintSyncer::InstrumentPaintSyncer(QObject *parent):
 }
 
 bool InstrumentPaintSyncer::eventFilter(QObject *watched, QEvent *event) {
-    if(event->type() != QEvent::UpdateRequest)
+    if(event->type() != QEvent::Paint)
         return false;
 
     if(currentWatched() != watched) {
@@ -28,7 +28,7 @@ bool InstrumentPaintSyncer::eventFilter(QObject *watched, QEvent *event) {
 
 void InstrumentPaintSyncer::tick(int /*deltaTime*/) {
     if(currentWatched() && m_currentWidget)
-        m_currentWidget->update(); 
+        m_currentWidget->update();
 }
 
 void InstrumentPaintSyncer::activatedNotify() {

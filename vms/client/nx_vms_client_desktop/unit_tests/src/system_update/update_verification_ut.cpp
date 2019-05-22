@@ -95,12 +95,14 @@ public:
         return data;
     }
 
-    QnMediaServerResourcePtr makeServer(nx::utils::SoftwareVersion version)
+    QnMediaServerResourcePtr makeServer(nx::utils::SoftwareVersion version, bool online = true)
     {
         QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
         server->setVersion(version);
         server->setId(QnUuid::createUuid());
         server->setSystemInfo(makeSystemInfo());
+        server->setStatus(online ? Qn::ResourceStatus::Online : Qn::ResourceStatus::Offline);
+
         resourcePool()->addResource(server);
         return server;
     }
@@ -131,7 +133,7 @@ public:
     QnUserResourcePtr m_currentUser;
 };
 
-TEST_F(UpdateVerificationTest, testSpecificBuild)
+TEST_F(UpdateVerificationTest, testAlreadyInstalled)
 {
     nx::update::UpdateContents contents;
     contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
@@ -143,11 +145,12 @@ TEST_F(UpdateVerificationTest, testSpecificBuild)
     // Update to 4.0.0.28524
     // client = 4.0.0.28524
     // server = 4.0.0.28525
-    // showing version + 'You have already installed this version' message
+    // Showing version + 'You have already installed this version' message.
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
     clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28524"));
 
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
+    EXPECT_EQ(contents.alreadyInstalled, true);
     EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
     {
         const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
@@ -159,7 +162,7 @@ TEST_F(UpdateVerificationTest, testSpecificBuild)
     // Update to 4.0.0.28524
     // client = 4.0.0.28525
     // server = 4.0.0.28524
-    // showing page 'This version is already installed'
+    // Showing page 'This version is already installed'.
     makeServer(nx::utils::SoftwareVersion("4.0.0.28524"));
     clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28525"));
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
@@ -169,6 +172,24 @@ TEST_F(UpdateVerificationTest, testSpecificBuild)
             contents, clientData.clientId);
         EXPECT_TRUE(report.hasLatestVersion);
     }
+    removeAllServers();
+
+    // Update to 4.0.0.28524
+    // client = 4.0.0.28524
+    // server = 4.0.0.28524
+    // server = 4.0.0.28523 offline
+    // Showing page 'This version is already installed', even when we have offline server with
+    // lower version.
+    makeServer(nx::utils::SoftwareVersion("4.0.0.28524"));
+    makeServer(nx::utils::SoftwareVersion("4.0.0.28523"), false);
+    clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28524"));
+    verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
+    EXPECT_EQ(contents.alreadyInstalled, true);
+    {
+        const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(contents, clientData.clientId);
+        EXPECT_TRUE(report.hasLatestVersion);
+    }
+    removeAllServers();
 }
 
 } // namespace nx::vms::client::desktop

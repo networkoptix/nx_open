@@ -8,6 +8,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <boost/algorithm/cxx11/all_of.hpp>
 
@@ -469,8 +470,8 @@ void QnMediaResourceWidget::initRenderer()
     // Strictly speaking, this is a hack.
     // We shouldn't be using OpenGL context in class constructor.
     QGraphicsView *view = QnWorkbenchContextAware::display()->view();
-    const auto viewport = qobject_cast<const QGLWidget*>(view ? view->viewport() : nullptr);
-    m_renderer = new QnResourceWidgetRenderer(nullptr, viewport ? viewport->context() : nullptr);
+    const auto viewport = dynamic_cast<QOpenGLWidget*>(view ? view->viewport() : nullptr);
+    m_renderer = new QnResourceWidgetRenderer(nullptr, viewport);
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QnMediaResourceWidget::updateAspectRatio);
     m_renderer->inUse();
@@ -844,7 +845,7 @@ void QnMediaResourceWidget::createButtons()
         titleBar()->rightButtonsBar()->addButton(Qn::IoModuleButton, ioModuleButton);
     }
 
-    if (qnRuntime->isDevMode())
+    if (ini().developerMode)
     {
         QnImageButtonWidget *debugScreenshotButton = createStatisticAwareButton(lit("media_widget_debug_screenshot"));
         debugScreenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
@@ -984,7 +985,7 @@ QnResourceWidgetRenderer* QnMediaResourceWidget::renderer() const
 
 int QnMediaResourceWidget::defaultRotation() const
 {
-    return d->resource->getProperty(QnMediaResource::rotationKey()).toInt();
+    return resource()->defaultRotation();
 }
 
 int QnMediaResourceWidget::defaultFullRotation() const
@@ -1068,15 +1069,18 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
     const QRectF& sourceSubRect,
     const QRectF& targetRect)
 {
-    QnGlNativePainting::begin(m_renderer->glContext(), painter);
+    const auto glWidget = m_renderer->openGLWidget();
+    QnGlNativePainting::begin(glWidget, painter);
+
+    const auto functions = glWidget->context()->functions();
 
     const qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);
     // always use blending for images --gdm
     if (!opaque || (base_type::resource()->flags() & Qn::still_image))
     {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        functions->glEnable(GL_BLEND);
+        functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     m_renderer->setBlurFactor(m_statusOverlay->opacity());
@@ -2041,7 +2045,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 {
     int result = base_type::calculateButtonsVisibility();
 
-    if (qnRuntime->isDevMode())
+    if (ini().developerMode)
         result |= Qn::DbgScreenshotButton;
 
     if (d->hasVideo && !base_type::resource()->hasFlags(Qn::still_image))

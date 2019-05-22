@@ -202,7 +202,7 @@ bool copyApplauncherInstance(const QDir& sourceDir, const QDir& targetDir)
 
 bool SelfUpdater::updateApplauncher()
 {
-    using namespace applauncher::api;
+    using namespace nx::vms::applauncher::api;
     using namespace nx::utils::file_system;
 
     if (!canBeRunFromTheCurrentDirectory())
@@ -268,19 +268,19 @@ bool SelfUpdater::updateApplauncher()
     static const int kWaitProcessDeathMs = 100;
 
     /* Check if no applauncher instance is running. If there is, try to kill it. */
-    auto killApplauncherResult = applauncher::api::quitApplauncher();
+    ResultType killApplauncherResult = quitApplauncher();
     int retriesLeft = kKillApplauncherRetries;
     while (retriesLeft > 0 && killApplauncherResult != ResultType::connectError) // Not running.
     {
         QThread::msleep(kRetryMs);
-        killApplauncherResult = applauncher::api::quitApplauncher();
+        killApplauncherResult = quitApplauncher();
         --retriesLeft;
     }
 
     if (killApplauncherResult != ResultType::connectError)  // Applauncher is still running.
     {
-        NX_ERROR(this, lit("Could not kill running applauncher instance. Error code %1")
-            .arg(QString::fromUtf8(ResultType::toString(killApplauncherResult))));
+        NX_ERROR(this, "Could not kill running applauncher instance. Error code %1",
+            killApplauncherResult);
         return false;
     }
 

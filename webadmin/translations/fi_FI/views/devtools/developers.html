@@ -1,75 +1,67 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>Kehitystyökalut</h2>
         <p>
-            Have an idea on how to improve our developer tools or just want to start a conversation?
+            Onko sinulla ajatusta siitä, miten voimme parantaa kehittäjätyökaluja tai haluatko aloittaa keskustelun aiheesta?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Anna palautetta</a></p>
     </div>
 
     <div>
-        <h3>Generic Events Generator</h3>
+        <h3>Generic Events -generaattori</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party systems to a System
-            which can be used to trigger System actions in the Events & Rules engine.
-            The Generic Event Generator is a tool which helps developers and integrators build
-            and test HTTP Generic Event calls.
+            Generic Event on tapa lähettää tapahtumia kolmannen osapuolen järjestelmistä järjestelmään,
+            jonka avulla voidaan käynnistää System-toimintoja Events & Rule-enginessä.
+            Generic Event Generator on työkalu, jonka avulla kehittäjät ja integraattorit voivat rakentaa
+            ja testata HTTP-geneerisiä tapahtumia.
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events">Generic Events -generaattori</a></p>
     </div>
     <div>
-        <h3>Server API</h3>
+        <h3>Palvelin API</h3>
         <p>
-            A REST API that gives developers the ability to access almost every system feature available in the regular
-            client: query/manage system resources (servers, cameras, users, permissions), pull live or recorded video
-            out of System, generate events, create rules, control PTZ cameras, and more.
+            REST-sovellusliittymä antaa kehittäjille mahdollisuuden käyttää lähes jokaista järjestelmän ominaisuutta Client-sovelluksella lähettää kyselyitä / hallita järjestelmän resursseja (palvelimet, kamerat, käyttäjät, oikeudet), hakea/reaaliaikaista tai tallennettua videota järjestelmästä, luoda tapahtumia, luoda sääntöjä, hallita PTZ-kameroita ja paljon muuta.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation and tools for testing API calls<br>
-            <a href="#/developers/changelog">API Changelog</a>
-            - a list of breaking changes in API since the last release<br>
-            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
-            - a full list of available Server API calls
+            <a href="#/developers/api"><b> API-testaustyökalu (uusi) </b></a>
+            - interaktiivinen dokumentointi, jossa on työkaluja API-puhelujen testaukseen <br>
+            <a href="#/developers/changelog"> API Changelog </a>
+            - luettelo muutoksista API: ssa <br>
+            <a id="api-doc" href="api.xml" target="_blank"> API-dokumentaatio </a>
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>Kameran tiedot -paneeli</h3>
         <p>
-            Displays additional developer-friendly information for individual cameras in the Web Admin Interface’s View tab:
+            Näyttää lisää kehittäjäystävällisiä tietoja yksittäisille kameroille Web-ylläpitäjän käyttöliittymän Näytä-välilehdessä:
         </p>
         <ul>
-            <li>Camera ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>Kameran tunnus</li>
+            <li>Linkit kaikkiin saatavilla oleviin videostreameihin</li>
+            <li>Suora videon vienti selaimen kautta</li>
         </ul>
         <p>
-            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
-            select the target camera, click on the settings icon (gear), then choose "Camera Details"
+            Avataksensi Kameran tiedot-paneelin - siirry Web-Admin käyttöliittymään, valitse <a href="#/view"> Näytä </a>,
+            valitse kamera, paina asetus-kuvaketta (rattaan-kuva) ja valitse sitten "Kameran tiedot"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">kameran tiedot -paneeli</a></p>
     </div>
     <div>
-        <h3>Video Source SDK</h3>
+        <h3>Videolähteen SDK</h3>
         <p>
-            The Video Source SDK provides the ability to integrate almost any live or recorded video source (IP Cameras,
-            NVRs, DVRs, etc) into System and makes it possible to create methods for discovering, displaying, analyzing
-            and recording video. It also allows integrating I/O ports and devices, as well as pulling motion detection
-            information from 3rd party devices.
+            Video Source SDK tarjoaa mahdollisuuden integroida lähes minkä tahansa reaaliaikaisen tai tallennetun videolähteen (IP-kamerat, NVR, DVR, jne) järjestelmään ja tekee mahdolliseksi luoda menetelmiä löytää, näyttää, analysoida ja tallennettua kuvamateriaalia. Se mahdollistaa myös I/O-porttien ja -laitteiden integroinnin sekä liiketunnistuksen tietojen hakemisen kolmannen osapuolen laitteista.
         </p>
-        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >get SDK</a></p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >hae SDK</a></p>
     </div>
 
     <div>
         <h3>Storage SDK</h3>
         <p>
-            The Storage SDK allows developers to read from or write to any storage location: local, remote, and even
-            cloud one. Creating a storage plugin requires implementing standard functions such as: I/O stream, if file
-            exist, delete file, list of files in the folder, etc. The Storage SDK contains an example for using an FTP
-            server as a storage location.
+            Tallennus SDK: n avulla kehittäjät voivat lukea tai kirjoittaa mihin tahansa tallennuspaikkaan: paikallisesti, etäkohteeseen ja jopa pilvi-palveluun. Tallennuslaajennuksen luominen edellyttää standarditoimintojen, kuten I/O-streamin, toteuttamista, jos tiedosto on jo olemassa, poista tiedosto, luettelo kansiossa olevista tiedostoista jne. Tallennus SDK sisältää esimerkin FTP
+            -palvelimen käyttämisestä tallennuspaikkana.
         </p>
-        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >get SDK</a></p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >hae SDK</a></p>
     </div>
 </div>

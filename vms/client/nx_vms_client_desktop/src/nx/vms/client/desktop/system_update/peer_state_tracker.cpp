@@ -136,8 +136,10 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
 
 QnUuid PeerStateTracker::getClientPeerId() const
 {
-    NX_ASSERT(m_clientItem);
-    return m_clientItem->id;
+    // This ID is much more easy to distinguish.
+    if (ini().massSystemUpdateDebugInfo)
+        return QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+    return commonModule()->globalSettings()->localSystemId();
 }
 
 nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
@@ -275,16 +277,21 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>
                     NX_INFO(this, "setUpdateStatus() - changing status %1->%2 for peer %3: %4",
                         toString(item->state), toString(status.second.code), name, item->id);
                     item->state = status.second.code;
-
-                    if (status.second.code == StatusCode::error)
-                        item->statusMessage = errorString(status.second.errorCode);
                     changed = true;
                 }
 
                 changed |= compareAndSet(status.second.progress, item->progress);
                 changed |= compareAndSet(status.second.message, item->debugMessage);
                 changed |= compareAndSet(status.second.errorCode, item->errorCode);
-                //changed |= compareAndSet(status.second.code, item->state);
+
+                if (status.second.code == StatusCode::error)
+                {
+                    NX_ASSERT(status.second.errorCode != nx::update::Status::ErrorCode::noError);
+                    // Fix for the cases when server does not report error code properly.
+                    if (item->errorCode == nx::update::Status::ErrorCode::noError)
+                        item->errorCode = nx::update::Status::ErrorCode::unknownError;
+                    item->statusMessage = errorString(status.second.errorCode);
+                }
 
                 if (item->state == StatusCode::latestUpdateInstalled && item->installing)
                 {
@@ -807,7 +814,7 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
     switch (code)
     {
         case Code::noError:
-            return "";
+            return "No error. It is a bug if you see this message.";
         case Code::updatePackageNotFound:
             return tr("Update package can't be not found.");
         case Code::noFreeSpaceToDownload:
@@ -819,19 +826,20 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
         case Code::invalidUpdateContents:
             return tr("Update contents are invalid.");
         case Code::corruptedArchive:
-            return tr("Update archive is invalid.");
+            return tr("Update archive is corrupted.");
         case Code::extractionError:
             return tr("Update files cannot be extracted.");
         case Code::internalDownloaderError:
             return tr("Internal downloader error.");
         case Code::internalError:
             return tr("Iternal server error.");
-        case Code::unknownError:
-            return tr("Unknown error.");
         case Code::applauncherError:
             return tr("Internal client error.");
+        case Code::unknownError:
+            return tr("Unknown error.");
     }
-    return tr("Unknown error.");
+    NX_ASSERT(false);
+    return tr("Unexpected error code.");
 }
 
 void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
@@ -1024,11 +1032,7 @@ UpdateItemPtr PeerStateTracker::addItemForClient()
 {
     UpdateItemPtr item = std::make_shared<UpdateItem>();
 
-    // This ID is much more easy to distinguish.
-    if (ini().massSystemUpdateDebugInfo)
-        item->id = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
-    else
-        item->id = commonModule()->globalSettings()->localSystemId();
+    item->id = getClientPeerId();
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
     item->protocol = nx_ec::EC2_PROTO_VERSION;

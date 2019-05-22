@@ -1,24 +1,24 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QElapsedTimer>
+
+class QWidget;
 
 /**
  *  This class ensures that update() events are passed to widget
  *  no more often than once in a 16ms (~60 fps)
   **/
-class QnVSyncWorkaround : public QObject {
+class QnVSyncWorkaround: public QObject
+{
     Q_OBJECT
+
 public:
-    QnVSyncWorkaround(QObject *watched, QObject *parent = NULL);
+    QnVSyncWorkaround(QWidget* watched, QObject* parent = nullptr);
 
-    bool eventFilter(QObject *object, QEvent *event);
-
-private slots:
-    void updateWatchedWidget();
+protected:
+    virtual bool eventFilter(QObject* object, QEvent* vent) override;
 
 private:
-    QObject *m_watched;
-    QEvent *m_updateEventToPass;
-    QElapsedTimer m_elapsedTimer;
+    QWidget* const m_watched;
+    bool m_paintAllowed = false;
 };
