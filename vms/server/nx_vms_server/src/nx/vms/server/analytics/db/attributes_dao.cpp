@@ -13,7 +13,7 @@ AttributesDao::AttributesDao()
     m_attributesCache.setMaxCost(kCacheSize);
 }
 
-long long AttributesDao::insertOrFetchAttributes(
+int64_t AttributesDao::insertOrFetchAttributes(
     sql::QueryContext* queryContext,
     const std::vector<common::metadata::Attribute>& eventAttributes)
 {
@@ -76,10 +76,10 @@ std::vector<common::metadata::Attribute> AttributesDao::deserialize(
 }
 
 void AttributesDao::addToAttributesCache(
-    long long id,
+    int64_t id,
     const QByteArray& content)
 {
-    auto cachedValue = std::make_unique<long long>(id);
+    auto cachedValue = std::make_unique<int64_t>(id);
     if (m_attributesCache.insert(
             QCryptographicHash::hash(content, QCryptographicHash::Md5),
             cachedValue.get()))
@@ -88,12 +88,12 @@ void AttributesDao::addToAttributesCache(
     }
 }
 
-long long AttributesDao::findAttributesIdInCache(
+int64_t AttributesDao::findAttributesIdInCache(
     const QByteArray& content)
 {
     const auto md5 = QCryptographicHash::hash(content, QCryptographicHash::Md5);
 
-    long long* id = m_attributesCache.object(md5);
+    int64_t* id = m_attributesCache.object(md5);
     if (id == nullptr)
         return -1;
     return *id;

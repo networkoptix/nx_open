@@ -44,7 +44,7 @@ TimePeriodDao::TimePeriodDao(DeviceDao* deviceDao):
 {
 }
 
-long long TimePeriodDao::insertOrUpdateTimePeriod(
+int64_t TimePeriodDao::insertOrUpdateTimePeriod(
     nx::sql::QueryContext* queryContext,
     const common::metadata::DetectionMetadataPacket& packet)
 {
@@ -80,7 +80,7 @@ long long TimePeriodDao::insertOrUpdateTimePeriod(
 
 detail::TimePeriod* TimePeriodDao::insertOrFetchCurrentTimePeriod(
     nx::sql::QueryContext* queryContext,
-    long long deviceId,
+    int64_t deviceId,
     std::chrono::milliseconds packetTimestamp,
     std::chrono::milliseconds packetDuration)
 {
@@ -103,10 +103,10 @@ detail::TimePeriod* TimePeriodDao::insertOrFetchCurrentTimePeriod(
         INSERT INTO time_period_full(device_id, period_start_ms, period_end_ms)
         VALUES (:deviceId, :periodStartMs, :periodEndMs)
     )sql");
-    query->bindValue(":deviceId", deviceId);
-    query->bindValue(":periodStartMs", (long long)packetTimestamp.count());
+    query->bindValue(":deviceId", (long long) deviceId);
+    query->bindValue(":periodStartMs", (long long) packetTimestamp.count());
     // Filling period end so that this period is used in queries.
-    query->bindValue(":periodEndMs", (long long)(timePeriod.endTime + kTimePeriodPreemptiveLength).count());
+    query->bindValue(":periodEndMs", (long long) (timePeriod.endTime + kTimePeriodPreemptiveLength).count());
 
     query->exec();
 
@@ -126,7 +126,7 @@ detail::TimePeriod* TimePeriodDao::insertOrFetchCurrentTimePeriod(
 
 void TimePeriodDao::closeCurrentTimePeriod(
     nx::sql::QueryContext* queryContext,
-    long long deviceId)
+    int64_t deviceId)
 {
     auto periodIter = m_deviceIdToCurrentTimePeriod.find(deviceId);
     NX_ASSERT(periodIter != m_deviceIdToCurrentTimePeriod.end());
@@ -149,15 +149,15 @@ void TimePeriodDao::closeCurrentTimePeriod(
 
 void TimePeriodDao::saveTimePeriodEnd(
     nx::sql::QueryContext* queryContext,
-    long long id,
+    int64_t id,
     std::chrono::milliseconds endTime)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(
         "UPDATE time_period_full SET period_end_ms=:periodEndMs WHERE id=:id");
 
-    query->bindValue(":id", id);
-    query->bindValue(":periodEndMs", (long long)endTime.count());
+    query->bindValue(":id", (long long) id);
+    query->bindValue(":periodEndMs", (long long) endTime.count());
     query->exec();
 
     NX_VERBOSE(this, "Updated end of time period %1 to %2", id, endTime);
@@ -190,7 +190,7 @@ void TimePeriodDao::fillCurrentTimePeriodsCache(
     }
 }
 
-std::optional<detail::TimePeriod> TimePeriodDao::getTimePeriodById(long long id) const
+std::optional<detail::TimePeriod> TimePeriodDao::getTimePeriodById(int64_t id) const
 {
     QnMutexLocker lock(&m_mutex);
 

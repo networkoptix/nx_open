@@ -1,7 +1,10 @@
 #pragma once
 
 #include <chrono>
+#include <optional>
 #include <vector>
+
+#include <QtGui/QRegion>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/http_types.h>
@@ -81,7 +84,7 @@ struct Filter
     /**
      * Coordinates are in range [0;1].
      */
-    QRectF boundingBox;
+    std::optional<QRectF> boundingBox;
 
     /**
      * Set of words separated by spaces, commas, etc...
@@ -101,6 +104,8 @@ struct Filter
      */
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
+    Filter();
+
     bool empty() const;
 
     bool operator==(const Filter& right) const;
@@ -115,7 +120,7 @@ QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
     (deviceIds)(objectTypeId)(objectAppearanceId)(timePeriod)(boundingBox)(freeText)
-QN_FUSION_DECLARE_FUNCTIONS(Filter, (json)(ubjson));
+QN_FUSION_DECLARE_FUNCTIONS(Filter, (json));
 
 //-------------------------------------------------------------------------------------------------
 
@@ -125,6 +130,14 @@ using LookupResult = std::vector<DetectedObject>;
 
 struct TimePeriodsLookupOptions
 {
+    /**
+     * This is a time periods search region. Filter::boundingBox is ignored!
+     * This region is in search resolution coordinates (not [0; 1]!).
+     * NOTE: Introduced as an AnalyticsArchive requirement.
+     * TODO: #ak Refactor it out when AnalyticsArchive::save/match are symmetric.
+     */
+    QRegion region;
+
     /**
      * If distance between two time periods less than this value,
      * then those periods SHOULD be merged ignoring gap.

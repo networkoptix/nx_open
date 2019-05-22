@@ -54,7 +54,7 @@ void ObjectTrackAggregator::add(
     std::chrono::milliseconds timestamp,
     const QRectF& box)
 {
-    const auto translatedBox = translate(box, m_resolution);
+    const auto translatedBox = translateToSearchGrid(box);
 
     context->rectAggregator.add(translatedBox, objectId);
 

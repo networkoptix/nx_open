@@ -26,13 +26,15 @@
 #include "object_type_dao.h"
 #include "time_period_dao.h"
 
+class QnMediaServerModule;
+
 namespace nx::analytics::db {
 
 class EventsStorage:
     public AbstractEventsStorage
 {
 public:
-    EventsStorage();
+    EventsStorage(QnMediaServerModule* mediaServerModule);
     virtual ~EventsStorage();
 
     virtual bool initialize(const Settings& settings) override;
@@ -61,6 +63,7 @@ public:
     virtual void flush(StoreCompletionHandler completionHandler) override;
 
 private:
+    QnMediaServerModule* m_mediaServerModule = nullptr;
     std::unique_ptr<DbController> m_dbController;
     std::list<std::shared_ptr<AbstractCursor>> m_openedCursors;
     QnMutex m_dbControllerMutex;
@@ -73,7 +76,6 @@ private:
     DeviceDao m_deviceDao;
     TimePeriodDao m_timePeriodDao;
     std::unique_ptr<AnalyticsArchiveDirectory> m_analyticsArchiveDirectory;
-
     ObjectCache m_objectCache;
     ObjectTrackAggregator m_trackAggregator;
 
@@ -93,8 +95,8 @@ private:
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject,
-        long long attributesId,
-        long long timePeriodId);
+        int64_t attributesId,
+        int64_t timePeriodId);
 
     void updateDictionariesIfNeeded(
         nx::sql::QueryContext* queryContext,
@@ -193,7 +195,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 using EventsStorageFactoryFunction =
-    std::unique_ptr<AbstractEventsStorage>();
+    std::unique_ptr<AbstractEventsStorage>(QnMediaServerModule*);
 
 class EventsStorageFactory:
     public nx::utils::BasicFactory<EventsStorageFactoryFunction>
@@ -206,7 +208,7 @@ public:
     static EventsStorageFactory& instance();
 
 private:
-    std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction();
+    std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction(QnMediaServerModule*);
 };
 
 } // namespace nx::analytics::db

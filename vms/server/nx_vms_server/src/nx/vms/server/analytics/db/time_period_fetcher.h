@@ -65,7 +65,7 @@ private:
         const Filter& filter,
         const TimePeriodsLookupOptions& options);
 
-    std::set<int> lookupCombinedAttributes(
+    std::set<int64_t> lookupCombinedAttributes(
         nx::sql::QueryContext* queryContext,
         const QString& text);
 

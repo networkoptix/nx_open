@@ -162,6 +162,7 @@ public:
 
     void initializeP2PDownloader();
 
+    QString metadataDatabaseDir() const;
 private:
     void registerResourceDataProviders();
     /**
