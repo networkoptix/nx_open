@@ -571,16 +571,24 @@ class ProductCustomizationReview(models.Model):
             review.reviewed_date = self.reviewed_date
             review.state = self.state
 
+            can_show_customization = UserGroupsToProductPermissions.\
+                check_customization_access(review.version.created_by, review.customization)
+
             if review.state == ProductCustomizationReview.REVIEW_STATES.accepted:
                 if review.customization.trust_parent:
-                    review.notes = "Automatically accepted by {}".format(self.customization)
+                    if can_show_customization:
+                        review.notes = f"Automatically accepted by {self.customization}"
+                    else:
+                        review.notes = "Automatically accepted"
                 else:
                     review.state = ProductCustomizationReview.REVIEW_STATES.pending
                     # If the child customization does not trust its parent we need to set reviewed by and date to blank.
                     review.reviewed_by = None
                     review.reviewed_date = None
-            else:
+            elif can_show_customization:
                 review.notes = "Automatically rejected by {}".format(self.customization)
+            else:
+                review.notes = "automatically rejected"
 
             review.save()
             if review.state == ProductCustomizationReview.REVIEW_STATES.rejected or review.customization.trust_parent:

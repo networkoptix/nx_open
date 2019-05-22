@@ -35,7 +35,7 @@
                     <tbody>
                     {% for review in customization_reviews %}
                         {% get_review_state review.state as state %}
-                        {% has_customization_permission user review.customization.name 'cms.access_customization' as access_customization %}
+                        {% has_customization_permission review.version.created_by review.customization.name 'cms.access_customization' as access_customization %}
                         <tr>
                             <td>
                             {% if access_customization %}
