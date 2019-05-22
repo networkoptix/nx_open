@@ -21,6 +21,7 @@ from django.contrib.admin import AdminSite
 
 DRAFT = Product.PREVIEW_STATUS[Product.PREVIEW_STATUS.draft]
 
+
 class MyAdminSite(AdminSite):
     pass
 
@@ -169,7 +170,7 @@ def review(request):
 
     if 'force_update' in request.POST and UserGroupsToProductPermissions.\
             check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.force_update'):
-        if product.product_type.can_preview:
+        if product.product_type.single_customization:
             filldata.init_skin(product, preview=False)
             filldata.init_skin(product, preview=True)
             messages.success(request, "Version {} was force updated ".format(product_review.version.id))
@@ -178,7 +179,7 @@ def review(request):
 
     elif 'publish' in request.POST and UserGroupsToProductPermissions.\
             check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
-        if product.product_type.can_preview:
+        if product.product_type.single_customization:
             publishing_errors = modify_db.publish_latest_version(product, review_id, request.user)
             if publishing_errors:
                 messages.error(request, "Version {} {}".format(product_review.version.id, publishing_errors))

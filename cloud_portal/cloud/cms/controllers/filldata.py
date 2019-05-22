@@ -12,6 +12,7 @@ from io import StringIO
 from concurrent.futures import ThreadPoolExecutor
 
 from cloud.debug import timer
+from api.helpers.exceptions import APIForbiddenException
 
 import logging
 logger = logging.getLogger(__name__)
@@ -215,6 +216,8 @@ def generate_languages_json(save_location, language_codes, preview):
 
 
 def init_skin(product, preview=False):
+    if not product.product_type.single_customization:
+        return
     # 1. read skin for this customization
     customization_name = product.customizations.first().name
     skin = product.read_global_value('%SKIN%')
@@ -249,8 +252,12 @@ def fill_content(product,
     # else
     #   if version_id is None - preview latest available datarecords
     #   else - preview specific version
-    if not product.product_type.can_preview:
+    if not product.product_type.single_customization:
         return
+
+    if product.customizations.first().name != settings.CUSTOMIZATION:
+        raise APIForbiddenException(f"Cannot filldata for products with different customizations"
+                                    f"than this instance's customization")
 
     if preview:  # Here we decide, if we need to change preview state
         # if incremental was false initially - we keep it as false
