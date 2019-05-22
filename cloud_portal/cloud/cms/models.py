@@ -566,13 +566,13 @@ class ProductCustomizationReview(models.Model):
         reviews = self.version.productcustomizationreview_set.\
             filter(customization__in=self.customization.children_customizations.all())
 
+        can_show_customization = UserGroupsToProductPermissions. \
+            check_customization_access(self.version.created_by, self.customization)
+
         for review in reviews:
             review.reviewed_by = self.reviewed_by
             review.reviewed_date = self.reviewed_date
             review.state = self.state
-
-            can_show_customization = UserGroupsToProductPermissions.\
-                check_customization_access(review.version.created_by, review.customization)
 
             if review.state == ProductCustomizationReview.REVIEW_STATES.accepted:
                 if review.customization.trust_parent:
