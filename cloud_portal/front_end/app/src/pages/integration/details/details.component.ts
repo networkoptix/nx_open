@@ -60,6 +60,10 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                         this.url = (this.plugin.company.companyWeb.indexOf('http') === -1) ?
                                 'http://' + this.plugin.company.companyWeb :
                                 this.plugin.company.companyWeb;
+
+                        if (this.plugin.overview) {
+                            this.plugin.overview.screenshots = this.integrationService.formatScreenshots(this.plugin.overview);
+                        }
                     }
                 });
         });

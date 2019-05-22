@@ -42,6 +42,32 @@ export class IntegrationService implements OnDestroy {
         }
     }
 
+    formatScreenshots(screenshots) {
+        const processed: any = [];
+
+        Object.entries(screenshots).forEach((item) => {
+            const matchScreenshot = item[0].match(/Screenshot[\d]+$/);
+
+            if (matchScreenshot) {
+                processed.push({ id: item[0].replace('overview', ''), value: item[1] });
+            }
+        });
+
+        Object.entries(screenshots).forEach((item) => {
+            const matchCaption = item[0].match(/Screenshot[\d]+caption$/);
+
+            if (matchCaption) {
+                processed.find((i) => {
+                    if (i.id === matchCaption[0].replace('caption', '')) {
+                        i.caption = item[1];
+                    }
+                });
+            }
+        });
+
+        return processed;
+    }
+
     format(plugin) {
         if (plugin.downloadFiles) {
             const downloadPlatforms = plugin.downloadFiles;

@@ -31,8 +31,10 @@ const config = new NxConfigService().config;
 export class NxCarouselComponent implements OnInit {
     @Input() screenshots: any;
 
+    images: any = [];
     private currentIndex = 0;
     private imageCount: number;
+
     constructor() {}
 
     ngOnInit() {
@@ -44,7 +46,7 @@ export class NxCarouselComponent implements OnInit {
     }
 
     previousElement() {
-        this.currentIndex = this.mod((this.currentIndex-1), this.screenshots.length);
+        this.currentIndex = this.mod((this.currentIndex - 1), this.screenshots.length);
     }
 
     nextElement() {

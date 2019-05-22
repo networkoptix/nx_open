@@ -19,13 +19,14 @@
                 <img src="{{plugin.information.logo}}" />
             </nx-section>
 
+            <nx-section *ngIf="plugin.overview && plugin.overview.overviewVideo">
+                <nx-external-video [src]="plugin.overview.overviewVideo"></nx-external-video>
+            </nx-section>
+
             <nx-section *ngIf="plugin.overview && plugin.overview.description">
                 <div [innerHtml]="plugin.overview.description"></div>
             </nx-section>
 
-            <nx-section *ngIf="plugin.overview && plugin.overview.overviewVideo">
-                <nx-external-video [src]="plugin.overview.overviewVideo"></nx-external-video>
-            </nx-section>
             <nx-section *ngIf="plugin.overview && plugin.overview.screenshots">
                 <nx-carousel [screenshots]="plugin.overview.screenshots"></nx-carousel>
             </nx-section>
@@ -69,10 +70,6 @@
                      [style.backgroundImage]="'url(' + plugin.company.companyLogo + ')'"
                      [style.maxWidth]="'100%'">
                 </div>
-<!--                <div *ngIf="plugin.company.companyLogo">-->
-<!--                    <img class="w-100" [src]="plugin.company.companyLogo"/>-->
-<!--                    <div class="card&#45;&#45;body-spacer"></div>-->
-<!--                </div>-->
                 <div *ngIf="plugin.company.companyInfo" [innerHtml]="plugin.company.companyInfo"></div>
                 <div>
                     <a *ngIf="plugin.company.companyWeb"

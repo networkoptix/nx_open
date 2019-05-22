@@ -1066,7 +1066,7 @@
             "label": "Screenshot 1 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1092,7 +1092,7 @@
             "label": "Screenshot 2 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1118,7 +1118,7 @@
             "label": "Screenshot 3 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1144,7 +1144,7 @@
             "label": "Screenshot 4 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1170,7 +1170,7 @@
             "label": "Screenshot 5 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1196,7 +1196,7 @@
             "label": "Screenshot 6 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1222,7 +1222,7 @@
             "label": "Screenshot 7 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1248,7 +1248,7 @@
             "label": "Screenshot 8 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1274,7 +1274,7 @@
             "label": "Screenshot 9 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1300,7 +1300,7 @@
             "label": "Screenshot 10 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1326,7 +1326,7 @@
             "label": "Screenshot 11 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1352,7 +1352,7 @@
             "label": "Screenshot 12 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1378,7 +1378,7 @@
             "label": "Screenshot 13 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1404,7 +1404,7 @@
             "label": "Screenshot 14 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
@@ -1430,7 +1430,7 @@
             "label": "Screenshot 15 caption",
             "value": "",
             "description": "Screenshot caption (max. 100 characters).",
-            "type": "html",
+            "type": "text",
             "optional": true,
             "meta": {
               "char_limit": 100
