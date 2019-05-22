@@ -4094,11 +4094,7 @@ QnUuid MediaServerProcess::selectDefaultStorageForAnalyticsEvents(QnMediaServerR
 
 QString MediaServerProcess::getMetadataDatabaseName() const
 {
-    auto storageResource = commonModule()->resourcePool()->getResourceById<QnStorageResource>(
-        m_mediaServer->metadataStorageId());
-    const auto pathBase = storageResource ? storageResource->getPath()
-        : nx::network::url::normalizePath(serverModule()->settings().dataDir());
-    return closeDirPath(pathBase) + "object_detection.sqlite";
+    return serverModule()->metadataDatabaseDir() + "object_detection.sqlite";
 }
 
 bool MediaServerProcess::initializeAnalyticsEvents()

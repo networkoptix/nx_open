@@ -17,8 +17,8 @@ namespace detail {
 class TimePeriod
 {
 public:
-    long long id = -1;
-    long long deviceId = -1;
+    int64_t id = -1;
+    int64_t deviceId = -1;
     std::chrono::milliseconds startTime = std::chrono::milliseconds::zero();
     std::chrono::milliseconds endTime = std::chrono::milliseconds::zero();
     std::chrono::milliseconds lastSavedEndTime = std::chrono::milliseconds::zero();
@@ -46,7 +46,7 @@ public:
     /**
      * @return Id of the current time period.
      */
-    long long insertOrUpdateTimePeriod(
+    int64_t insertOrUpdateTimePeriod(
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet);
 
@@ -55,11 +55,11 @@ public:
     /**
      * NOTE: Can be safely called from any thread.
      */
-    std::optional<detail::TimePeriod> getTimePeriodById(long long id) const;
+    std::optional<detail::TimePeriod> getTimePeriodById(int64_t id) const;
 
 private:
-    using DeviceIdToCurrentTimePeriod = std::map<long long, detail::TimePeriod>;
-    using IdToTimePeriod = std::map<long long, DeviceIdToCurrentTimePeriod::iterator>;
+    using DeviceIdToCurrentTimePeriod = std::map<int64_t, detail::TimePeriod>;
+    using IdToTimePeriod = std::map<int64_t, DeviceIdToCurrentTimePeriod::iterator>;
 
     DeviceDao* m_deviceDao = nullptr;
     DeviceIdToCurrentTimePeriod m_deviceIdToCurrentTimePeriod;
@@ -68,17 +68,17 @@ private:
 
     detail::TimePeriod* insertOrFetchCurrentTimePeriod(
         nx::sql::QueryContext* queryContext,
-        long long deviceId,
+        int64_t deviceId,
         std::chrono::milliseconds packetTimestamp,
         std::chrono::milliseconds packetDuration);
 
     void closeCurrentTimePeriod(
         nx::sql::QueryContext* queryContext,
-        long long deviceId);
+        int64_t deviceId);
 
     void saveTimePeriodEnd(
         nx::sql::QueryContext* queryContext,
-        long long id,
+        int64_t id,
         std::chrono::milliseconds endTime);
 };
 

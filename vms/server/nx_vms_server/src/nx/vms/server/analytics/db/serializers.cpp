@@ -5,6 +5,7 @@
 #include <nx/utils/compact_int.h>
 
 #include <analytics/db/config.h>
+#include <nx/streaming/media_data_packet.h>
 
 namespace nx::analytics::db {
 
@@ -141,6 +142,11 @@ QRect translate(const QRectF& box, const QSize& resolution)
             lround(box.bottomRight().x() * resolution.width()),
             lround(box.bottomRight().y() * resolution.height()))
     );
+}
+
+QRect translateToSearchGrid(const QRectF& box)
+{
+    return QnMetaDataV1::rectFromNormalizedRect(box);
 }
 
 QRect restore(const QRectF& box, const QSize& resolution)

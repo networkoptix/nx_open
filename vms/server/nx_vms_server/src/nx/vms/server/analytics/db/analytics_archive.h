@@ -1,11 +1,13 @@
 #pragma once
 
 #include <chrono>
+#include <limits>
 #include <set>
 #include <vector>
 
 #include <QtCore/QRectF>
 #include <QtCore/QString>
+#include <QtGui/QRegion>
 
 #include <nx/utils/uuid.h>
 
@@ -18,23 +20,27 @@ class AnalyticsArchive
 public:
     struct Filter
     {
-        std::vector<QRectF> region;
+        // Region with the search grid resolution.
+        QRegion region;
         QnTimePeriod timePeriod;
         std::chrono::milliseconds detailLevel = std::chrono::milliseconds::zero();
         Qt::SortOrder sortOrder = Qt::AscendingOrder;
-        int limit = -1;
-        std::set<int> objectTypes;
-        std::set<int> allAttributesHash;
+        int limit = std::numeric_limits<int>::max();
+        std::set<int64_t> objectTypes;
+        std::set<int64_t> allAttributesHash;
     };
 
     AnalyticsArchive(const QString& dataDir, const QnUuid& resourceId);
     virtual ~AnalyticsArchive();
 
+    /**
+     * @param region Region on the search grid. (Qn::kMotionGridWidth * Qn::kMotionGridHeight).
+     */
     bool saveToArchive(
         std::chrono::milliseconds timestamp,
-        const std::vector<QRectF>& region,
-        int objectType,
-        long long allAttributesHash);
+        const std::vector<QRect>& region,
+        int64_t objectType,
+        int64_t allAttributesHash);
 
     QnTimePeriodList matchPeriod(const Filter& filter);
 
@@ -43,8 +49,8 @@ private:
     {
         std::chrono::milliseconds timestamp = std::chrono::milliseconds::zero();
         QRect rect;
-        int objectType = -1;
-        long long allAttributesId = -1;
+        int64_t objectType = -1;
+        int64_t allAttributesId = -1;
     };
 
     const QString m_dataDir;
