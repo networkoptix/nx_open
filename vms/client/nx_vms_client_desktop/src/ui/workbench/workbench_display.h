@@ -4,7 +4,6 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
-#include <QtOpenGL/QGLWidget>
 
 #include <nx/vms/event/event_fwd.h>
 

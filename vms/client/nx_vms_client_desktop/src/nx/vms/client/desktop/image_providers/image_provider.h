@@ -19,6 +19,8 @@ public:
     virtual QSize sizeHint() const = 0;
     virtual Qn::ThumbnailStatus status() const = 0;
 
+    virtual bool tryLoad(); //< Returns false if slow asynchronous load is required.
+
 public slots:
     void loadAsync();
 
@@ -34,6 +36,7 @@ protected:
 class BasicImageProvider: public ImageProvider
 {
     Q_OBJECT
+
 public:
     BasicImageProvider(const QImage& image, QObject* parent = nullptr);
     virtual ~BasicImageProvider() override = default;
@@ -41,6 +44,8 @@ public:
     virtual QImage image() const override;
     virtual QSize sizeHint() const override;
     virtual Qn::ThumbnailStatus status() const override;
+
+    virtual bool tryLoad() override;
 
 protected:
     virtual void doLoadAsync() override;

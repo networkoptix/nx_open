@@ -9,7 +9,7 @@
 
 #include <nx/utils/singleton.h>
 
-class QGLWidget;
+class QOpenGLWidget;
 class QnClientCoreModule;
 class QnNetworkProxyFactory;
 class QnStaticCommonModule;
@@ -34,7 +34,7 @@ public:
     explicit QnClientModule(const QnStartupParameters& startupParams, QObject* parent = nullptr);
     virtual ~QnClientModule();
 
-    void initDesktopCamera(QGLWidget* window);
+    void initDesktopCamera(QOpenGLWidget* window);
     void startLocalSearchers();
 
     QnNetworkProxyFactory* networkProxyFactory() const;

@@ -8,7 +8,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWebKit/QWebSettings>
 #include <QtQml/QQmlEngine>
-#include <QtOpenGL/QtOpenGL>
 #include <QtGui/QSurfaceFormat>
 
 #include <api/app_server_connection.h>
@@ -305,7 +304,7 @@ void QnClientModule::initApplication()
         QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 }
 
-void QnClientModule::initDesktopCamera(QGLWidget* window)
+void QnClientModule::initDesktopCamera(QOpenGLWidget* window)
 {
     /* Initialize desktop camera searcher. */
     auto commonModule = m_clientCoreModule->commonModule();
@@ -348,7 +347,6 @@ void QnClientModule::initSurfaceFormat()
     format.setSwapInterval(ini().limitFrameRate ? 1 : 0);
 
     QSurfaceFormat::setDefaultFormat(format);
-    QGLFormat::setDefaultFormat(QGLFormat::fromSurfaceFormat(format));
 }
 
 void QnClientModule::initSingletons()

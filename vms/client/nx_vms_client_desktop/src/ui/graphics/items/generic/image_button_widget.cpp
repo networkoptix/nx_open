@@ -3,11 +3,15 @@
 
 #include <cassert>
 
+#include <QtCore/QPointer>
 #include <QtGui/QPainter>
 #include <QtGui/QIcon>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QStyle>
-#include <QtOpenGL/QGLContext>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
@@ -17,7 +21,6 @@
 
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
 
-#include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>
 #include <nx/vms/client/desktop/common/utils/accessor.h>
@@ -48,16 +51,6 @@ namespace {
             result = false;
         }
 
-        return result;
-    }
-
-    GLuint checkedBindTexture(QGLWidget *widget, const QPixmap &pixmap, GLenum target, GLint format, QGLContext::BindOptions options)
-    {
-        GLint result = widget->bindTexture(pixmap, target, format, options);
-#ifdef QN_IMAGE_BUTTON_WIDGET_DEBUG
-        if (!glIsTexture(result))
-            qnWarning("OpenGL texture %1 was unexpectedly released, rendering glitches may ensue.", result);
-#endif
         return result;
     }
 
@@ -151,6 +144,8 @@ void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap)
         return;
 
     m_pixmaps[flags] = pixmap;
+
+    m_textures.remove(flags); //< This will force update of texture on repaint.
 
     update();
 }
@@ -287,60 +282,61 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
             StateFlags hoverState = m_state | Hovered;
             StateFlags normalState = m_state & ~Hovered;
             paint(painter, normalState, hoverState, m_hoverProgress,
-                checked_cast<QGLWidget *>(widget), rect());
+                checked_cast<QOpenGLWidget *>(widget), rect());
         });
 }
 
-void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect)
+bool QnImageButtonWidget::safeBindTexture(StateFlags flags)
 {
+    const auto it = m_textures.find(flags);
+    if (it != m_textures.end())
+    {
+        (*it)->bind();
+        return true;
+    }
 
+    const auto& texturePixmap = pixmap(flags);
+    if (texturePixmap.isNull())
+        return false;
+
+    const auto texture = TexturePtr(new QOpenGLTexture(texturePixmap.toImage()));
+    m_textures.insert(flags, texture);
+    texture->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
+    texture->bind();
+    return true;
+}
+
+void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QOpenGLWidget *glWidget, const QRectF &rect)
+{
     QRectF imageRect(rect);
     if (!m_imageMargins.isNull())
         imageRect = nx::vms::client::core::Geometry::eroded(imageRect, m_imageMargins);
 
     if (!m_initialized)
-        initializeVao(imageRect);
+        initializeVao(imageRect, glWidget);
     else if (m_dynamic)
         updateVao(imageRect);
 
-    bool isZero = qFuzzyIsNull(progress);
-    bool isOne = qFuzzyCompare(progress, 1.0);
+    const bool isZero = qFuzzyIsNull(progress);
+    const bool isOne = qFuzzyCompare(progress, 1.0);
 
-    const QPixmap &startPixmap = pixmap(startState);
-    const QPixmap &endPixmap = pixmap(endState);
-
-    if (isZero && startPixmap.isNull())
-    {
-        return;
-    }
-    else if (isOne && endPixmap.isNull())
-    {
-        return;
-    }
-    else if (startPixmap.isNull() && endPixmap.isNull())
-    {
-        return;
-    }
-
-    QnGlNativePainting::begin(QGLContext::currentContext(), painter);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    QnGlNativePainting::begin(glWidget, painter);
 
     QVector4D shaderColor = QVector4D(1.0, 1.0, 1.0, painter->opacity());
 
-    auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
+    auto renderer = QnOpenGLRendererManager::instance(glWidget);
+
+    glWidget->makeCurrent();
+
+    const auto functions = glWidget->context()->functions();
+    functions->glEnable(GL_BLEND);
+    functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if (isOne || isZero)
     {
-        if (isZero)
-        {
-            checkedBindTexture(widget, startPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
-        }
-        else
-        {
-            checkedBindTexture(widget, endPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
-        }
+        if (!safeBindTexture(isZero ? startState : endState))
+            return;
+
         auto shader = renderer->getTextureShader();
         shader->bind();
         shader->setColor(shaderColor);
@@ -353,9 +349,13 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         auto shader = renderer->getTextureTransitionShader();
 
         renderer->glActiveTexture(GL_TEXTURE1);
-        checkedBindTexture(widget, endPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
+        if (!safeBindTexture(endState))
+            return;
+
         renderer->glActiveTexture(GL_TEXTURE0);
-        checkedBindTexture(widget, startPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
+        if (!safeBindTexture(startState))
+            return;
+
         shader->bind();
         shader->setProgress(progress);
         shader->setTexture1(1);
@@ -365,7 +365,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         shader->release();
     }
 
-    glDisable(GL_BLEND);
+    functions->glDisable(GL_BLEND);
     QnGlNativePainting::end(painter);
 }
 
@@ -668,7 +668,7 @@ QnImageButtonWidget::StateFlags QnImageButtonWidget::validPixmapState(StateFlags
     return findValidState(flags, m_pixmaps, [](const QPixmap &pixmap) { return !pixmap.isNull(); });
 }
 
-void QnImageButtonWidget::initializeVao(const QRectF &rect)
+void QnImageButtonWidget::initializeVao(const QRectF &rect, QOpenGLWidget* glWidget)
 {
 
     GLfloat vertices[] = {
@@ -697,9 +697,10 @@ void QnImageButtonWidget::initializeVao(const QRectF &rect)
     const int VERTEX_POS_SIZE = 2; // x, y
     const int VERTEX_TEXCOORD0_SIZE = 2; // s and t
 
+    const auto renderer = QnOpenGLRendererManager::instance(glWidget);
                                          /* Init static VAO */
     {
-        auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getTextureShader();
+        auto shader = renderer->getTextureShader();
         m_verticesStatic.create();
         m_verticesStatic.bind();
 
@@ -731,7 +732,7 @@ void QnImageButtonWidget::initializeVao(const QRectF &rect)
 
     /* Init transition VAO */
     {
-        auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getTextureTransitionShader();
+        auto shader = renderer->getTextureTransitionShader();
         m_verticesTransition.create();
         m_verticesTransition.bind();
 
@@ -811,8 +812,9 @@ void QnRotatingImageButtonWidget::setRotationSpeed(qreal rotationSpeed)
     m_rotationSpeed = rotationSpeed;
 }
 
-void QnRotatingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect)
+void QnRotatingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QOpenGLWidget *widget, const QRectF &rect)
 {
+    return;
     QnScopedPainterTransformRollback guard(painter);
     painter->translate(rect.center());
     painter->rotate(m_rotation);

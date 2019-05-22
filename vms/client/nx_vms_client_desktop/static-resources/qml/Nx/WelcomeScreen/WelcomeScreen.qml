@@ -208,6 +208,7 @@ Item
                 {
                     id: modelLoader;
 
+
                     active: (control.active && screenHolder.visible);
 
                     sourceComponent: Component
