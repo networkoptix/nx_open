@@ -75,7 +75,11 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
 
     view.start();
 
-    return runMainLoop();
+    int result = runMainLoop();
+
+    model.stop();
+
+    return result;
 }
 
 bool RelayService::registerThisInstanceNameInCluster(const conf::Settings& settings)

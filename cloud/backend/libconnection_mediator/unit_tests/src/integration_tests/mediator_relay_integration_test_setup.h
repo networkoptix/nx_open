@@ -34,11 +34,11 @@ protected:
 
 private:
     void assertUrlsEquality(
-        const std::vector<QUrl>& expected,
+        const std::vector<nx::utils::Url>& expected,
         const std::vector<nx::String>& test);
 
 private:
-    std::vector<QUrl> m_relayUrls;
+    std::vector<nx::utils::Url> m_relayUrls;
     api::ResultCode m_lastRequestResult = api::ResultCode::ok;
     boost::optional<api::ListenResponse> m_listenResponse;
     boost::optional<api::ConnectResponse> m_connectResponse;

@@ -1,10 +1,10 @@
 #include "mediator_cluster.h"
 
-#include <nx/utils/thread/sync_queue.h>
-
-#include <nx/cloud/mediator/mediator_service.h>
-
 #include <nx/cloud/discovery/test_support/discovery_server.h>
+#include <nx/cloud/mediator/mediator_service.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx::hpm::test {
 
@@ -13,7 +13,7 @@ namespace {
 static constexpr char kClusterId[] = "mediator_test_cluster";
 
 static MediatorEndpoint lookupMediatorEndpointSync(
-    MediatorFunctionalTest* mediator,
+    MediatorInstance* mediator,
     const std::string& peerDomainName)
 {
     nx::utils::SyncQueue<MediatorEndpoint> hasEndpoint;
@@ -29,21 +29,51 @@ static MediatorEndpoint lookupMediatorEndpointSync(
 } //namespace
 
 MediatorCluster::MediatorCluster(const nx::utils::Url& discoveryServiceUrl):
+    base_type("hpm_mediator_cluster", QString()),
     m_discoveryServiceUrl(discoveryServiceUrl)
 {
 }
 
-MediatorFunctionalTest& MediatorCluster::addMediator(int flags, const QString& testDir)
+MediatorCluster::~MediatorCluster()
 {
-    m_mediators.emplace_back(std::make_unique<MediatorFunctionalTest>(flags, testDir));
-    addClusterArgs(m_mediators.back().get());
+    stop();
+    if (m_factoryFuncToRestore)
+    {
+        AbstractCloudDataProviderFactory::setFactoryFunc(
+            std::move(*m_factoryFuncToRestore));
+        m_factoryFuncToRestore.reset();
+    }
+}
+
+void MediatorCluster::stop()
+{
+    for (auto& mediator : m_mediators)
+        mediator->stop();
+}
+
+MediatorInstance& MediatorCluster::addMediator(int flags, QString testDir)
+{
+    int index = size();
+
+    if (testDir.isEmpty())
+        testDir = testDataDir() + QString("/mediator_%1").arg(index);
+
+    if (flags & MediatorInstance::initializeSocketGlobals)
+        nx::network::SocketGlobals::cloud().reinitialize();
+
+    if (flags & MediatorInstance::useTestCloudDataProvider)
+        registerCloudDataProvider(&m_cloudDataProvider);
+
+
+    m_mediators.emplace_back(std::make_unique<MediatorInstance>(flags, testDir));
+    addClusterArgs(index, m_mediators.back().get());
     return *m_mediators.back();
 }
 
-MediatorFunctionalTest& MediatorCluster::addMediator(
+MediatorInstance& MediatorCluster::addMediator(
     std::vector<const char*> args,
     int flags,
-    const QString& testDir)
+    QString testDir)
 {
     auto& mediator = addMediator(flags, testDir);
     for (const char* arg : args)
@@ -51,17 +81,29 @@ MediatorFunctionalTest& MediatorCluster::addMediator(
     return mediator;
 }
 
+AbstractCloudDataProvider::System MediatorCluster::addRandomSystem()
+{
+    AbstractCloudDataProvider::System system(
+        QnUuid::createUuid().toSimpleString().toUtf8(),
+        nx::utils::generateRandomName(16),
+        true);
+    m_cloudDataProvider.addSystem(
+        system.id,
+        system);
+    return system;
+}
+
 int MediatorCluster::size() const
 {
     return static_cast<int>(m_mediators.size());
 }
 
-MediatorFunctionalTest& MediatorCluster::mediator(int index)
+MediatorInstance& MediatorCluster::mediator(int index)
 {
     return *m_mediators[index];
 }
 
-const MediatorFunctionalTest& MediatorCluster::mediator(int index) const
+const MediatorInstance& MediatorCluster::mediator(int index) const
 {
     return *m_mediators[index];
 }
@@ -100,9 +142,9 @@ std::optional<MediatorEndpoint> MediatorCluster::lookupMediatorEndpoint(
     return std::nullopt;
 }
 
-void MediatorCluster::addClusterArgs(MediatorFunctionalTest* mediator)
+void MediatorCluster::addClusterArgs(int index, MediatorInstance* mediator)
 {
-    std::string nodeId = lm("mediator_%1").arg(m_mediators.size()).toStdString();
+    std::string nodeId = lm("mediator_%1").arg(index).toStdString();
 
     mediator->addArg("-server/name", "127.0.0.1");
     mediator->addArg("-listeningPeerDb/connectionRetryDelay", "100ms");
@@ -116,6 +158,21 @@ void MediatorCluster::addClusterArgs(MediatorFunctionalTest* mediator)
     mediator->addArg("-listeningPeerDb/cluster/nodeConnectRetryTimeout", "100ms");
     mediator->addArg("-listeningPeerDb/cluster/clusterId", kClusterId);
     mediator->addArg("-listeningPeerDb/cluster/nodeId", nodeId.c_str());
+}
+
+void MediatorCluster::registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider)
+{
+    if (m_factoryFuncToRestore)
+        return;
+
+    auto oldFactoryFunc =
+        AbstractCloudDataProviderFactory::setFactoryFunc(
+            [cloudDataProvider](auto&&...)
+    {
+        return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
+    });
+
+    m_factoryFuncToRestore = std::move(oldFactoryFunc);
 }
 
 } // namespace nx::hpm::test

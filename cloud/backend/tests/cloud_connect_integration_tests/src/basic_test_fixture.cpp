@@ -107,7 +107,7 @@ void MemoryRemoteRelayPeerPool::removePeer(
 
 
 MediatorConnectorCluster::Context::Context(
-    nx::hpm::MediatorFunctionalTest& mediator,
+    nx::hpm::MediatorInstance& mediator,
     const QString& cloudHost)
     :
     mediator(mediator),
@@ -141,6 +141,11 @@ MediatorConnectorCluster::Context& MediatorConnectorCluster::context(int index)
     return *m_mediators[index];
 }
 
+nx::hpm::test::MediatorCluster& MediatorConnectorCluster::cluster()
+{
+    return m_cluster;
+}
+
 const nx::hpm::test::MediatorCluster& MediatorConnectorCluster::cluster() const
 {
     return m_cluster;
@@ -159,9 +164,12 @@ BasicTestFixture::BasicTestFixture(
     m_disconnectedPeerTimeout(disconnectedPeerTimeout)
 {
     NX_ASSERT(m_discoveryServer.bindAndListen());
+    m_discoveryServiceUrl = m_discoveryServer.url().toStdString();
+
     m_mediatorCluster = std::make_unique<MediatorConnectorCluster>(m_discoveryServer.url());
     m_relays =
         std::make_unique<nx::cloud::relay::test::TrafficRelayCluster>(m_discoveryServer.url());
+
     addMediator();
 }
 
@@ -226,6 +234,11 @@ void BasicTestFixture::SetUp()
     startCloudModulesXmlProvider();
 }
 
+nx::cloud::discovery::test::DiscoveryServer& BasicTestFixture::discoveryServer()
+{
+    return m_discoveryServer;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Mediator.
 
@@ -233,11 +246,17 @@ void BasicTestFixture::addMediator()
 {
     auto& mediatorContext = m_mediatorCluster->addContext({
             "-stun/addrToListenList", "127.0.0.1:0",
-            "-http/addrToListenList", "127.0.0.1:0"
+            "-http/addrToListenList", "127.0.0.1:0",
+            "-trafficRelay/clusterId", m_relays->clusterId().c_str(),
+            "-trafficRelay/cluster/discovery/enabled", "true",
+            "-trafficRelay/cluster/discovery/discoveryServiceUrl", m_discoveryServiceUrl.c_str(),
+            "-trafficRelay/cluster/discovery/roundTripPadding", "1ms",
+            "-trafficRelay/cluster/discovery/registrationErrorDelay", "1ms",
+            "-trafficRelay/cluster/discovery/onlineNodesRequestDelay", "1ms"
         },
-        nx::hpm::MediatorFunctionalTest::allFlags &
-            ~nx::hpm::MediatorFunctionalTest::initializeConnectivity,
-        testDataDir() + "/mediator");
+        nx::hpm::MediatorInstance::allFlags &
+            ~nx::hpm::MediatorInstance::initializeConnectivity,
+        testDataDir() + QString("/mediator_%1").arg(mediatorCluster().size()));
     mediatorContext.mediator.setUseProxy(true);
 }
 
@@ -290,7 +309,7 @@ const nx::hpm::test::MediatorCluster& BasicTestFixture::mediatorCluster() const
     return m_mediatorCluster->cluster();
 }
 
-nx::hpm::MediatorFunctionalTest& BasicTestFixture::mediator(int index)
+nx::hpm::MediatorInstance& BasicTestFixture::mediator(int index)
 {
     return m_mediatorCluster->context(index).mediator;
 }
@@ -432,12 +451,17 @@ nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
     return nx::utils::Url();
 }
 
+std::string nx::network::cloud::test::BasicTestFixture::relayClusterId() const
+{
+    return m_relays->clusterId();
+}
+
 //-------------------------------------------------------------------------------------------------
 // Listening server.
 
 void BasicTestFixture::startServer(int mediatorIndex)
 {
-    auto cloudSystemCredentials = mediator(mediatorIndex).addRandomSystem();
+    auto cloudSystemCredentials = m_mediatorCluster->cluster().addRandomSystem();
 
     m_cloudSystemCredentials.systemId = cloudSystemCredentials.id;
     m_cloudSystemCredentials.serverId = QnUuid::createUuid().toSimpleByteArray();

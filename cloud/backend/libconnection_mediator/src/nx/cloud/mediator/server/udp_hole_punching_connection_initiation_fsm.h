@@ -142,21 +142,25 @@ private:
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 
-    bool initiateCloudConnect(api::ConnectionAckRequest connectionAck);
+    bool initiateCloudConnect(
+        const RequestSourceDescriptor& requestSourceDescriptor,
+        api::ConnectionAckRequest connectionAck);
 
-    void initiateRelayInstanceSearch();
+    void initiateRelayInstanceSearch(
+        const RequestSourceDescriptor& requestSourceDescriptor);
 
     void findRelayInstance(
+        const RequestSourceDescriptor& requestSourceDescriptor,
         RelayInstanceSearchCompletionHandler handler);
 
     void finishConnect();
 
-    void onRelayInstanceSearchCompletion(std::optional<QUrl> relayInstanceUrl);
+    void onRelayInstanceSearchCompletion(std::optional<nx::utils::Url> relayInstanceUrl);
 
     api::ConnectResponse prepareConnectResponse(
         const api::ConnectionAckRequest& connectionAckRequest,
         std::list<network::SocketAddress> tcpEndpoints,
-        std::optional<QUrl> relayInstanceUrl);
+        std::optional<nx::utils::Url> relayInstanceUrl);
 
     void sendConnectResponse(
         api::ResultCode resultCode,

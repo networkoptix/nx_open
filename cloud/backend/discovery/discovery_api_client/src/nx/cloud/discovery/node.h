@@ -30,20 +30,18 @@ struct NX_DISCOVERY_CLIENT_API Node
     using time_point = std::chrono::system_clock::time_point;
 
     std::string nodeId;
+    /* The public ip address of this node as reported by the discovery service */
+    std::string publicIpAddress;
     std::vector<std::string> urls;
     time_point expirationTime;
-    /* The object under "info" key */
+    /* A string containing discovery client specific json. */
     std::string infoJson;
 
-    bool operator==(const Node& right) const
-    {
-        return nodeId == right.nodeId;
-    }
+    bool operator==(const Node& right) const;
 
-    bool operator<(const Node& right)const
-    {
-        return nodeId < right.nodeId;
-    }
+    bool operator<(const Node& right)const;
+
+    std::string toString() const;
 };
 
 //-------------------------------------------------------------------------------------------------

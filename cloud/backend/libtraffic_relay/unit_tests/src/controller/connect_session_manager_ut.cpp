@@ -66,6 +66,11 @@ public:
     }
 
     virtual void setPublicUrl(const nx::utils::Url& /*publicUrl*/) override {}
+
+    virtual void registerHttpApi(
+        nx::network::http::server::rest::MessageDispatcher* /*messageDispatcher*/) override {}
+
+    virtual void pleaseStopSync() override {}
 };
 
 class TrafficRelayStub:

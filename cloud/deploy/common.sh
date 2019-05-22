@@ -66,6 +66,11 @@ function stage_cpp()
 	cp -rl $NX_VMS_DIR/build_environment/target/lib/$BUILD_CONFIGURATION/* $libdir
 }
 
+function stage_cmake_extra()
+{
+    true
+}
+
 function stage_cmake()
 {
     local cmakeBuildDirectory=$1
@@ -82,6 +87,8 @@ function stage_cmake()
     copy_deps stage/$moduleName/bin/$moduleName $cmakeBuildDirectory/lib stage/$moduleName/lib
     copy_deps stage/$moduleName/bin/sqldrivers/libqsqlmysql.so $cmakeBuildDirectory/lib stage/$moduleName/lib
     copy_deps stage/$moduleName/bin/sqldrivers/libqsqlite.so $cmakeBuildDirectory/lib stage/$moduleName/lib
+
+    stage_cmake_extra
 }
 
 function pack()

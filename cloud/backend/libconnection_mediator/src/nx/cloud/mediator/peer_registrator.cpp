@@ -139,11 +139,12 @@ void PeerRegistrator::listen(
 
     m_relayClusterClient->selectRelayInstanceForListeningPeer(
         lm("%1.%2").arg(requestData.serverId).arg(requestData.systemId).toStdString(),
+        serverConnection->getSourceAddress(),
         [this, serverConnectionAioThread = serverConnection->getAioThread(),
             completionHandler = std::move(completionHandler), mediaserverConnectionKey,
             asyncCallLocker = m_counter.getScopedIncrement()](
                 nx::cloud::relay::api::ResultCode resultCode,
-                std::vector<QUrl> relayInstanceUrls) mutable
+                std::vector<nx::utils::Url> relayInstanceUrls) mutable
         {
             // Sending response from connection's aio thread.
             auto aioCaller = std::make_unique<nx::network::aio::BasicPollable>();
@@ -328,7 +329,7 @@ int PeerRegistrator::boundClientCount() const
 }
 
 void PeerRegistrator::sendListenResponse(
-    boost::optional<std::vector<QUrl>> trafficRelayInstanceUrls,
+    boost::optional<std::vector <nx::utils::Url>> trafficRelayInstanceUrls,
     std::function<void(api::ResultCode, api::ListenResponse)> responseSender)
 {
     api::ListenResponse response;
@@ -348,7 +349,7 @@ void PeerRegistrator::sendListenResponse(
                 trafficRelayInstanceUrls->begin(),
                 trafficRelayInstanceUrls->end(),
                 std::back_inserter(response.trafficRelayUrls),
-                [](const QUrl& url) { return url.toString().toUtf8(); });
+                [](const nx::utils::Url& url) { return url.toString().toUtf8(); });
         }
     }
     response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;

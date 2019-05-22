@@ -77,11 +77,11 @@ class MediatorConnectorCluster
 public:
     struct Context
     {
-        nx::hpm::MediatorFunctionalTest& mediator;
+        nx::hpm::MediatorInstance& mediator;
         nx::hpm::api::MediatorConnector connector;
 
         Context(
-            nx::hpm::MediatorFunctionalTest& mediator,
+            nx::hpm::MediatorInstance& mediator,
             const QString& cloudHost);
 
         Context(const Context&) = delete;
@@ -97,6 +97,7 @@ public:
 
     Context& context(int index);
 
+    nx::hpm::test::MediatorCluster& cluster();
     const nx::hpm::test::MediatorCluster& cluster() const;
 
 private:
@@ -135,6 +136,8 @@ public:
 protected:
     void SetUp();
 
+    nx::cloud::discovery::test::DiscoveryServer& discoveryServer();
+
     /**
      * Mediator.
      */
@@ -144,7 +147,7 @@ protected:
     void startMediator(int index = 0);
     void restartMediator(int index = 0);
     const nx::hpm::test::MediatorCluster& mediatorCluster() const;
-    nx::hpm::MediatorFunctionalTest& mediator(int index = 0);
+    nx::hpm::MediatorInstance& mediator(int index = 0);
     MediatorConnectorCluster::Context& mediatorContext(int index = 0);
     void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
     void configureProxyBeforeMediator();
@@ -166,6 +169,7 @@ protected:
     void startRelay(int index);
     nx::cloud::relay::test::TrafficRelay& trafficRelay(int index = 0);
     nx::utils::Url relayUrl(int relayNum = 0) const;
+    std::string relayClusterId() const;
 
     /**
      * Listening server.
@@ -239,6 +243,7 @@ private:
     QnMutex m_mutex;
     const nx::network::http::BufferType m_staticMsgBody;
     nx::cloud::discovery::test::DiscoveryServer m_discoveryServer;
+    std::string m_discoveryServiceUrl;
     std::unique_ptr<MediatorConnectorCluster> m_mediatorCluster;
     hpm::api::SystemCredentials m_cloudSystemCredentials;
     std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
@@ -270,6 +275,7 @@ private:
 
     virtual void peerAdded(const std::string& /*serverName*/) {}
     virtual void peerRemoved(const std::string& /*serverName*/) {}
+
     void setUpRemoteRelayPeerPoolFactoryFunc();
     void setUpPublicIpFactoryFunc();
 };

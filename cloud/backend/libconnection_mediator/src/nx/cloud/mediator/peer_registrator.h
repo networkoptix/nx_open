@@ -94,7 +94,7 @@ private:
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
 
     void sendListenResponse(
-        boost::optional<std::vector<QUrl>> trafficRelayInstanceUrls,
+        boost::optional<std::vector<nx::utils::Url>> trafficRelayInstanceUrls,
         std::function<void(api::ResultCode, api::ListenResponse)> responseSender);
 
     void reportClientBind(const MediaserverData& mediaserverConnectionKey);
