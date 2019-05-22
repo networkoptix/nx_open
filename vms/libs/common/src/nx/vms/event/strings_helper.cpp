@@ -103,7 +103,7 @@ QString StringsHelper::eventName(EventType value, int count) const
         case EventType::licenseIssueEvent:    return tr("License Issue");
         case EventType::backupFinishedEvent:  return tr("Archive backup finished");
         case EventType::analyticsSdkEvent:    return tr("Analytics Event");
-        case EventType::pluginEvent:          return tr("Plugin Event");
+        case EventType::pluginEvent:          return tr("Plugin Diagnostic Event");
 
         case EventType::anyServerEvent:       return tr("Any Server Issue");
         case EventType::anyEvent:             return tr("Any Event");
@@ -221,7 +221,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
         case EventType::pluginEvent:
         {
             const QString caption = params.caption.isEmpty()
-                ? tr("Unknown plugin event")
+                ? tr("Unknown plugin diagnostic event")
                 : params.caption;
 
             return lm("%1 - %2").args(resourceName, caption);
