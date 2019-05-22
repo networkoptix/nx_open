@@ -167,7 +167,8 @@ public:
     QSet<QnUuid> peersInState(StatusCode state) const;
     QSet<QnUuid> legacyServers() const;
     QSet<QnUuid> offlineServers() const;
-    QSet<QnUuid> offlineNotTooLong() const;
+    QSet<QnUuid> offlineAndInState(StatusCode state) const;
+    QSet<QnUuid> onlineAndInState(StatusCode state) const;
     QSet<QnUuid> peersInstalling() const;
     QSet<QnUuid> peersCompleteInstall() const;
     QSet<QnUuid> serversWithChangedProtocol() const;

@@ -2155,8 +2155,8 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     if (stateHasProgress(m_widgetState))
         syncProgress();
 
-    auto notVeryOffline = m_stateTracker->offlineNotTooLong();
-    if (m_widgetState == WidgetUpdateState::readyInstall && !notVeryOffline.empty())
+    auto readyAndOffline = m_stateTracker->offlineAndInState(LocalStatusCode::readyToInstall);
+    if (m_widgetState == WidgetUpdateState::readyInstall && !readyAndOffline.empty())
     {
         ui->downloadButton->setEnabled(false);
         ui->downloadButton->setToolTip(tr("Some servers have gone offline. "
