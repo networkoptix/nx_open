@@ -212,11 +212,7 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'asset'
         verbose_name_plural = 'assets'
-        # The can_access_product gives users the ability to see the product in product lists.
-        # In combination with other permission it allows them to edit the product and send reviews for their product
-        permissions = (
-            ('access_product', 'Can access product'),
-        )
+
     name = models.CharField(max_length=255)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
@@ -480,6 +476,16 @@ class UserGroupsToProductPermissions(models.Model):
     def check_customization_permission(user, customization, permission=None):
         return UserGroupsToProductPermissions.\
             check_permission(user, get_cloud_portal_product(customization), permission)
+
+    @staticmethod
+    def check_customization_change_account(user, customization):
+        return UserGroupsToProductPermissions.\
+            check_customization_permission(user, customization, 'api.change_account')
+
+    @staticmethod
+    def check_customization_access(user, customization):
+        return UserGroupsToProductPermissions.\
+            check_customization_permission(user, customization, 'cms.access_customization')
 
 
 # CMS data. Partners can change that

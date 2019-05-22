@@ -172,9 +172,9 @@ export class NxIpvdComponent implements OnInit {
     }
 
     setActiveCamera() {
-        if (this.params.camera && this.camerasTable.length) {
+        if (this.params.camera) {
             this.uri.pageOffset = window.pageYOffset;
-            const selectedCamera = this.camerasTable.find((camera) => camera.model === this.params.camera);
+            const selectedCamera = this.cameras.find((camera) => camera.model === this.params.camera);
             this.activateCamera(selectedCamera);
         }
     }
@@ -294,15 +294,13 @@ export class NxIpvdComponent implements OnInit {
                 this.cameraSearchService
                     .ipvdSearch(this.cameras, this.filterModel)
                     .subscribe(cameras => {
-                        this.activeCamera = undefined;
-
                         this.noResult = (cameras.length === 0);
                         if (!this.noResult) {
                             this.camerasTable = this.preFilterCameraTable(cameras);
-                            this.setActiveCamera();
                         } else {
                             this.camerasTable = [];
                         }
+                        this.setActiveCamera();
                     });
             } else {
                 this.hasNoSearch = true;

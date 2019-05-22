@@ -119,27 +119,25 @@
         {% else %}
         <div>There are no changes to review</div>
         {% endif %}
-        <h2>Review</h2>
+        <h2>Review Notes for {{ original.customization }}</h2>
+        {{ original.notes|linebreaks }}
     </div>
-    <h1 style="text-align: center">Review for {{ original.customization }}</h1>
+
     <form action="" enctype="multipart/form-data" method="post" novalidate>
         {% csrf_token %}
         <input name="version_id" value="{{ version.id }}" hidden/>
         <input name="review_id" value="{{ original.id }}" hidden/>
-        {% block field_sets %}
-            {% for fieldset in adminform %}
-                {% include "admin/includes/fieldset.html" %}
-            {% endfor %}
-        {% endblock %}
 
         {% get_review_state original.state as state %}
-        {% if state == 'Pending' or state != 'Rejected' and can_preview and perms.cms.force_update or has_delete_permission %}
+        {% has_customization_permission user current_portal_customization.name 'cms.force_update' as portal_force_update %}
+        {% has_customization_permission user original.customization.name 'cms.force_update' as customization_force_update %}
+        {% if state == 'Pending' or state != 'Rejected' and can_preview and portal_force_update and customization_force_update or has_delete_permission %}
             <div class="submit-row">
                 {% if has_delete_permission %}
                 <a href="{% url opts|admin_urlname:'delete' object_id %}" class="btn btn-sm btn-danger pull-left">{% trans "Delete" %}</a>
                 {% endif %}
 
-                {% if state == 'Accepted' and can_preview and perms.cms.force_update %}
+                {% if state == 'Accepted' and can_preview and portal_force_update and customization_force_update %}
                 <button class="btn btn-sm btn-danger" type="submit" name="force_update">Force Update</button>
                 {% endif %}
 
@@ -150,13 +148,15 @@
                            download>Download</a>
                     </button>
                     {% endif %}
-                    {% if perms.cms.publish_version %}
+                    {% has_customization_permission user current_portal_customization.name 'cms.publish_version' as portal_publish_customization_version %}
+                    {% has_customization_permission user original.customization.name 'cms.publish_version' as customization_publish_customization_version %}
+                    {% if portal_publish_customization_version and customization_publish_customization_version %}
                     <button class="btn btn-sm btn-danger" data-action="reject" data-name="Reject"
                             data-toggle="modal" data-target="#addNotes" onclick="return false;">Reject</button>
                     {% endif %}
                     <button class="btn btn-sm btn-default" data-action="ask_question" data-name="Ask a question"
                             data-toggle="modal" data-target="#addNotes" onclick="return false;">Ask a question</button>
-                    {% if perms.cms.publish_version %}
+                    {% if portal_publish_customization_version and customization_publish_customization_version %}
                     <button class="btn btn-sm btn-success" type="submit" name="publish">
                             {% if can_preview %}Publish{% else %} Accept {% endif %}
                     </button>
@@ -164,6 +164,7 @@
                 {% endif %}
             </div>
         {% endif %}
+
         <div class="modal fade" id="addNotes" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">

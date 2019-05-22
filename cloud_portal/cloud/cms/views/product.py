@@ -204,7 +204,7 @@ def review(request):
         if not UserGroupsToProductPermissions.check_customization_permission(
                 product_review.version.created_by, product_review.customization, 'cms.access_customization'
         ):
-            message = '\n{}\n'.format(request.POST['addedNote'])
+            message = '\nMessage: {}\n'.format(request.POST['addedNote'])
         else:
             message = "\n{}: {}\n".format(request.user.email, request.POST['addedNote'])
         product_review.notes += message

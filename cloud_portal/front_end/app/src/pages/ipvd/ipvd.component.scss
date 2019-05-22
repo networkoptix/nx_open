@@ -57,7 +57,7 @@
                 }
     
                 &:nth-child(1) {
-                    padding-left : .75rem;
+                    padding-left : 1rem;
                     width : 175px;
                 }
     
@@ -145,7 +145,7 @@
             td {
                 display : inline-block;
                 vertical-align : middle;
-                padding : 5px 0;
+                padding : rem(4px) 1rem rem(4px) 0;
     
                 &:nth-child(n+1) > div {
                     white-space : normal;
@@ -153,7 +153,7 @@
                 }
     
                 &:nth-child(1) {
-                    padding-left : .75rem;
+                    padding-left : 1rem;
                     width : 175px;
                 }
                 

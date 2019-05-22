@@ -19,6 +19,7 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
     plugin: any;
     config: any = {};
     lang: any = {};
+    url: string;
 
     private setupDefaults() {
         this.config = this.configService.getConfig();
@@ -55,6 +56,10 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                                     this.config.links.admin.product.replace('%ID%', this.plugin.id)
                             );
                         }
+
+                        this.url = (this.plugin.company.companyWeb.indexOf('http') === -1) ?
+                                'http://' + this.plugin.company.companyWeb :
+                                this.plugin.company.companyWeb;
                     }
                 });
         });

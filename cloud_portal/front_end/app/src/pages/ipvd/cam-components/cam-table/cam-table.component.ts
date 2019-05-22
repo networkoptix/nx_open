@@ -111,6 +111,14 @@ export class CamTableComponent implements OnChanges, OnInit {
 
         this.sortOrderASC = (this.lang.ipvd[filter] === this.selectedHeader) ? !this.sortOrderASC : true;
         this.toggleSort(filter, false /* reset camera and page params in uri */);
+
+        const queryParams: Params = {};
+
+        queryParams.page = undefined;
+        queryParams.sortBy = filter;
+        queryParams.sortBy += (this.sortOrderASC) ? ',ASC' : ',DESC';
+
+        this.uri.updateURI('/ipvd', queryParams);
     }
 
     toggleSort(param, keepURI) {
@@ -216,11 +224,19 @@ export class CamTableComponent implements OnChanges, OnInit {
     }
 
     private sortElements(keepURI) {
-        // If sort by popularity is set in CMS or default sorting 'Vendor-Model'
-        const sortBy = (this.CONFIG.ipvd.sortSupportedDevicesByPopularity) ? 'count' : 'sortKey';
-        let pageNum;
-        this.toggleSort(sortBy, keepURI);
+        let sortByColumn;
+        if (this.params.sortBy) {
+            const sortBy = this.params.sortBy.split(',');
+            this.sortOrderASC = (sortBy[1] === 'ASC');
+            sortByColumn = sortBy[0];
+        } else {
+            // If sort by popularity is set in CMS or default sorting 'Vendor-Model'
+            sortByColumn = (this.CONFIG.ipvd.sortSupportedDevicesByPopularity) ? 'count' : 'sortKey';
+        }
 
+        this.toggleSort(sortByColumn, keepURI);
+
+        let pageNum;
         if (this.params && this.params.page) {
             pageNum = +this.params.page;
         } else {
@@ -260,8 +276,35 @@ export class CamTableComponent implements OnChanges, OnInit {
 
             this.showHeaders = this.cameraHeaders;
 
-            if (this.params.page) {
-                this.setPage(+this.params.page, true);
+            if (!changes.params.firstChange &&
+                    changes.params.currentValue.page === changes.params.previousValue.page &&
+                    changes.params.currentValue.camera === changes.params.previousValue.camera) {
+                // Params changed - reset the pagination
+                this.setPage(1, true);
+
+            } else if (changes.params.currentValue.page) {
+                this.setPage(+changes.params.currentValue.page, true);
+            }
+
+            if (this.params.sortBy) {
+                const sortBy = this.params.sortBy.split(',');
+                const direction = (sortBy[1] === 'ASC');
+                const column = this.cameraHeaders.find(x => {
+                    return x === this.lang.ipvd[sortBy[0]];
+                });
+
+                if (this.sortOrderASC === direction && column === this.selectedHeader) {
+                    return; // do not sort if sorted
+                }
+
+                this.sortOrderASC = direction;
+                this.toggleSort(sortBy[0], true);
+
+                if (this.params.page) {
+                    this.setPage(+this.params.page, true);
+                } else {
+                    this.setPage(1, true);
+                }
             }
 
             if (this.params.camera) {
