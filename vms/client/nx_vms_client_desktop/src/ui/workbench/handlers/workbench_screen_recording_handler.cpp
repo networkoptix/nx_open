@@ -4,8 +4,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
-#include <QtOpenGL/QGLWidget>
-
 #include <client_core/client_core_module.h>
 
 #include <client/client_settings.h>

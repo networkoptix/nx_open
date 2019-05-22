@@ -9,6 +9,7 @@
 #include <QtCore/QDir>
 
 #include <nx/utils/log/log.h>
+#include <nx/kit/utils.h>
 
 #include <plugins/plugin_api.h>
 #include <nx/sdk/helpers/ptr.h>
@@ -20,7 +21,7 @@
 
 using namespace nx::sdk;
 
-static QStringList stringToList(const QString& s)
+static QStringList stringToListViaComma(const QString& s)
 {
     QStringList list = s.split(lit(","));
     for (auto& item: list)
@@ -59,16 +60,15 @@ static QString libNameFromFileInfo(const QFileInfo& fileInfo)
     return libName;
 }
 
-static QFileInfoList pluginFileInfoList(const QString& dirToSearchIn, bool searchInnerDirs = true)
+static QFileInfoList pluginFileInfoList(const QDir& dirToSearchIn, bool searchInnerDirs = true)
 {
-    QDir pluginDir(dirToSearchIn);
     QDir::Filters filters = QDir::Files | QDir::Readable;
     QFileInfoList filteredEntries;
 
     if (searchInnerDirs)
         filters |= QDir::Dirs | QDir::NoDotAndDotDot;
 
-    const auto entries = pluginDir.entryInfoList(/*nameFilters*/ QStringList(), filters);
+    const auto entries = dirToSearchIn.entryInfoList(/*nameFilters*/ QStringList(), filters);
 
     for (const auto& entry: entries)
     {
@@ -105,47 +105,30 @@ static QFileInfoList pluginFileInfoList(const QString& dirToSearchIn, bool searc
     return filteredEntries;
 }
 
-void PluginManager::loadPluginsFromDirWithBlackList(
-    const QStringList& disabledLibNames,
+void PluginManager::loadPluginsFromDir(
     const nx::plugins::SettingsHolder& settingsHolder,
-    const QString& dirToSearchIn)
+    const QDir& dirToSearchIn,
+    std::function<bool(const QFileInfo& pluginFileInfo)> allowPlugin)
 {
     for (const auto& fileInfo: pluginFileInfoList(dirToSearchIn))
     {
         const QString& libName = libNameFromFileInfo(fileInfo);
 
-        if (disabledLibNames.contains(libName))
-        {
-            NX_INFO(this) << lm("Skipped loading Nx plugin [%1] (blacklisted by %2)")
-                .args(fileInfo.absoluteFilePath(), pluginsIni().iniFile());
+        if (!allowPlugin(fileInfo))
             continue;
-        }
 
-        loadNxPlugin(settingsHolder, fileInfo.absoluteFilePath(), libName);
-        // Ignore return value - an error is already logged.
-    }
-}
+        // If the plugin is located in its dedicated directory, then use this directory for plugin
+        // dependencies lookup, otherwise do not perform the dependencies lookup.
+        const QString linkedLibsDirectory =
+            (fileInfo.dir() != dirToSearchIn) // The plugin resides in its dedicated dir.
+                ? fileInfo.dir().absolutePath()
+                : "";
 
-/**
- * @param enabledLibNames If empty, all plugins are loaded.
- */
-void PluginManager::loadPluginsFromDirWithWhiteList(
-    const QStringList& enabledLibNames,
-    const nx::plugins::SettingsHolder& settingsHolder,
-    const QString& dirToSearchIn)
-{
-    for (const auto& fileInfo: pluginFileInfoList(dirToSearchIn))
-    {
-        const QString& libName = libNameFromFileInfo(fileInfo);
-
-        if (!enabledLibNames.isEmpty() && !enabledLibNames.contains(libName))
-        {
-            NX_INFO(this) << lm("Skipped loading Nx plugin [%1] (not whitelisted by %2)")
-                .args(fileInfo.absoluteFilePath(), pluginsIni().iniFile());
-            continue;
-        }
-
-        loadNxPlugin(settingsHolder, fileInfo.absoluteFilePath(), libName);
+        loadNxPlugin(
+            settingsHolder,
+            linkedLibsDirectory,
+            fileInfo.absoluteFilePath(),
+            libName);
         // Ignore return value - an error is already logged.
     }
 }
@@ -154,74 +137,143 @@ void PluginManager::loadPlugins(const QSettings* settings)
 {
     QnMutexLocker lock(&m_mutex);
 
-    std::set<QString> directoriesToSearchForPlugins;
-
-    const char* const vmsPluginDir = getenv("VMS_PLUGIN_DIR");
-    if (vmsPluginDir)
-        directoriesToSearchForPlugins.insert(QString::fromLatin1(vmsPluginDir));
+    const nx::plugins::SettingsHolder settingsHolder{settings};
+    if (!NX_ASSERT(settingsHolder.isValid()))
+        return;
 
     const QString binPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
-    directoriesToSearchForPlugins.insert(binPath + lit("/plugins/"));
 
-    const QString optionalPluginsDir = binPath + lit("/plugins_optional/");
+    loadNonOptionalPluginsIfNeeded(binPath, settingsHolder);
+    loadOptionalPluginsIfNeeded(binPath, settingsHolder);
+}
 
-    const nx::plugins::SettingsHolder settingsHolder{settings};
-    NX_ASSERT(settingsHolder.isValid());
-
-    // Load regular plugins, if not prohibited by .ini.
+void PluginManager::loadNonOptionalPluginsIfNeeded(
+    const QString& binPath, const nx::plugins::SettingsHolder& settingsHolder)
+{
     const QString disabledNxPlugins =
         QString::fromLatin1(pluginsIni().disabledNxPlugins).trimmed();
     if (disabledNxPlugins != lit("*"))
     {
-        const QStringList disabledLibNames = stringToList(disabledNxPlugins);
-        const QStringList enabledLibNames{};
+        std::set<QString> directoriesToSearchForPlugins;
 
+        const char* const vmsPluginDir = getenv("VMS_PLUGIN_DIR");
+        if (vmsPluginDir)
+            directoriesToSearchForPlugins.insert(QString::fromLatin1(vmsPluginDir));
+
+        directoriesToSearchForPlugins.insert(binPath + lit("/plugins/"));
+
+        const QStringList disabledLibNames = stringToListViaComma(disabledNxPlugins);
         for (const QString& dir: directoriesToSearchForPlugins)
-            loadPluginsFromDirWithBlackList(disabledLibNames, settingsHolder, dir);
+        {
+            loadPluginsFromDir(settingsHolder, dir,
+                [this, disabledLibNames](const QFileInfo& pluginFileInfo)
+                {
+                    if (!disabledLibNames.contains(libNameFromFileInfo(pluginFileInfo)))
+                        return true;
+                    NX_INFO(this, "Skipped loading Nx plugin [%1] (blacklisted by %2)",
+                        pluginFileInfo.absoluteFilePath(), pluginsIni().iniFile());
+                    return false;
+                });
+        }
     }
     else
     {
-        NX_INFO(this) << lm("Skipped loading all non-optional Nx plugins (as per %2)")
-            .args(pluginsIni().iniFile());
+        NX_INFO(this, "Skipped loading all non-optional Nx plugins (as per %1)",
+            pluginsIni().iniFile());
     }
+}
 
+void PluginManager::loadOptionalPluginsIfNeeded(
+    const QString& binPath, const nx::plugins::SettingsHolder& settingsHolder)
+{
     // Load optional plugins, if demanded by .ini.
     const QString enabledNxPluginsOptional =
         QString::fromLatin1(pluginsIni().enabledNxPluginsOptional).trimmed();
     if (!enabledNxPluginsOptional.isEmpty())
     {
-        NX_INFO(this) << lm("Loading optional Nx plugins, if any (as per %2)")
-            .args(pluginsIni().iniFile());
+        NX_INFO(this, "Loading optional Nx plugins, if any (as per %1)",
+            pluginsIni().iniFile());
 
-        const QStringList disabledLibNames{};
+        const QString optionalPluginsDir = binPath + lit("/plugins_optional/");
         const QStringList enabledLibNames = (enabledNxPluginsOptional == lit("*"))
             ? QStringList()
-            : stringToList(enabledNxPluginsOptional);
+            : stringToListViaComma(enabledNxPluginsOptional);
 
-        loadPluginsFromDirWithWhiteList(enabledLibNames, settingsHolder, optionalPluginsDir);
+        loadPluginsFromDir(settingsHolder, optionalPluginsDir,
+            [this, enabledLibNames](const QFileInfo& pluginFileInfo)
+            {
+                if (enabledLibNames.isEmpty()
+                    || enabledLibNames.contains(libNameFromFileInfo(pluginFileInfo)))
+                {
+                    return true;
+                }
+                NX_INFO(this, "Skipped loading Nx plugin [%1] (not whitelisted by %2)",
+                    pluginFileInfo.absoluteFilePath(), pluginsIni().iniFile());
+                return false;
+            });
     }
+}
+
+/**
+ * @param linkedLibsDirectory Can be empty if the plugin is not contained in its dedicated dir.
+ */
+std::unique_ptr<QLibrary> PluginManager::loadPluginLibrary(
+    const QString& linkedLibsDirectory,
+    const QString& libFilename)
+{
+    #if defined(_WIN32)
+        if (!pluginsIni().disablePluginLinkedDllLookup && !linkedLibsDirectory.isEmpty())
+        {
+            NX_DEBUG(this, "Calling SetDllDirectoryW(%1)",
+                nx::kit::utils::toString(linkedLibsDirectory));
+            if (!SetDllDirectoryW(linkedLibsDirectory.toStdWString().c_str()))
+            {
+                NX_ERROR(this, "SetDllDirectoryW(%1) failed",
+                    nx::kit::utils::toString(linkedLibsDirectory));
+            }
+        }
+    #endif
+
+    auto lib = std::make_unique<QLibrary>(libFilename);
+
+    // Flag DeepBindHint forces plugin (the loaded side) to use its functions instead of the same
+    // named functions of the Server (the loading side). In Linux it is not so by default.
+    QLibrary::LoadHints hints = lib->loadHints();
+    hints |= QLibrary::DeepBindHint;
+    lib->setLoadHints(hints);
+
+    const bool libLoaded = lib->load();
+
+    #if defined(_WIN32)
+        if (!pluginsIni().disablePluginLinkedDllLookup && !linkedLibsDirectory.isEmpty())
+        {
+            NX_DEBUG(this, "Calling SetDllDirectoryW(nullptr)");
+            if (!SetDllDirectoryW(nullptr))
+                NX_ERROR(this, "SetDllDirectoryW(nullptr) failed");
+        }
+    #endif
+
+    if (!libLoaded)
+    {
+        NX_ERROR(this, "Failed to load Nx plugin [%1]: %2", libFilename, lib->errorString());
+        return nullptr;
+    }
+
+    return lib;
 }
 
 bool PluginManager::loadNxPlugin(
     const nx::plugins::SettingsHolder& settingsHolder,
-    const QString& filename,
+    const QString& linkedLibsDirectory,
+    const QString& libFilename,
     const QString& libName)
 {
-    QLibrary lib(filename);
-    // Flag DeepBindHint forces plugin (the loaded side) to use its functions instead of the same
-    // named functions of the Server (the loading side). In Linux it is not so by default.
-    QLibrary::LoadHints hints = lib.loadHints();
-    hints |= QLibrary::DeepBindHint;
-    lib.setLoadHints(hints);
-    if (!lib.load())
-    {
-        NX_ERROR(this) << lit("Failed to load Nx plugin [%1]: %2")
-            .arg(filename).arg(lib.errorString());
+    const auto lib = loadPluginLibrary(linkedLibsDirectory, libFilename);
+    if (!lib)
         return false;
-    }
 
     if (const auto entryPointFunc = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
-        lib.resolve(nxpl::Plugin::kEntryPointFuncName)))
+        lib->resolve(nxpl::Plugin::kEntryPointFuncName)))
     {
         // Old entry point found: currently, this is a Storage or Camera plugin.
 
@@ -229,12 +281,12 @@ bool PluginManager::loadNxPlugin(
         if (!plugin)
         {
             NX_ERROR(this, "Failed to load Nx old SDK plugin [%1]: entry function returned null",
-                filename);
-            lib.unload();
+                libFilename);
+            lib->unload();
             return false;
         }
         m_nxPlugins.emplace_back(reinterpret_cast<IRefCountable*>(plugin));
-        NX_INFO(this, "Loaded Nx old SDK plugin [%1]", filename);
+        NX_INFO(this, "Loaded Nx old SDK plugin [%1]", libFilename);
 
         if (const auto plugin1 = queryInterfacePtr<nxpl::Plugin>(plugin, nxpl::IID_Plugin))
         {
@@ -250,7 +302,7 @@ bool PluginManager::loadNxPlugin(
         }
     }
     else if (const auto entryPointFunc = reinterpret_cast<IPlugin::EntryPointFunc>(
-        lib.resolve(IPlugin::kEntryPointFuncName)))
+        lib->resolve(IPlugin::kEntryPointFuncName)))
     {
         // New entry point found: currently, this is an Analytics plugin.
 
@@ -258,18 +310,18 @@ bool PluginManager::loadNxPlugin(
         if (!plugin)
         {
             NX_ERROR(this, "Failed to load Nx plugin [%1]: entry function returned null",
-                filename);
-            lib.unload();
+                libFilename);
+            lib->unload();
             return false;
         }
         m_nxPlugins.emplace_back(plugin);
-        NX_INFO(this, "Loaded Nx plugin [%1]", filename);
+        NX_INFO(this, "Loaded Nx plugin [%1]", libFilename);
 
         if (queryInterfacePtr<nx::sdk::analytics::IPlugin>(plugin))
         {
             if (plugin->name() != libName)
             {
-                NX_WARNING(this, "Analytics plugin name [%1] does not equal library name [%2]",
+                NX_INFO(this, "Analytics plugin name [%1] does not equal library name [%2]",
                     plugin->name(), libName);
             }
         }
@@ -280,8 +332,8 @@ bool PluginManager::loadNxPlugin(
     {
         NX_ERROR(this, "Failed to load Nx plugin [%1]: "
             "Neither %2(), nor the old SDK's %3() functions found",
-            filename, IPlugin::kEntryPointFuncName, nxpl::Plugin::kEntryPointFuncName);
-        lib.unload();
+            libFilename, IPlugin::kEntryPointFuncName, nxpl::Plugin::kEntryPointFuncName);
+        lib->unload();
         return false;
     }
 

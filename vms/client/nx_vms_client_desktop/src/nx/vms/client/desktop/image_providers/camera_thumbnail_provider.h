@@ -32,6 +32,8 @@ public:
 
     qint64 timestampUs() const;
 
+    virtual bool tryLoad() override;
+
 signals:
     /** Internal signal to implement thread-safety. */
     void imageDataLoadedInternal(const QByteArray &data, Qn::ThumbnailStatus nextStatus,

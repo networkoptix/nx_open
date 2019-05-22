@@ -282,6 +282,11 @@ Qn::ThumbnailStatus ResourceThumbnailProvider::status() const
     return d->baseProvider ? d->baseProvider->status() : Qn::ThumbnailStatus::Invalid;
 }
 
+bool ResourceThumbnailProvider::tryLoad()
+{
+    return d->baseProvider ? d->baseProvider->tryLoad() : false;
+}
+
 void ResourceThumbnailProvider::doLoadAsync()
 {
     if (d->baseProvider)

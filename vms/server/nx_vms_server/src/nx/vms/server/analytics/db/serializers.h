@@ -80,6 +80,8 @@ private:
  */
 QRect translate(const QRectF& box, const QSize& resolution);
 
+QRect translateToSearchGrid(const QRectF& box);
+
 /**
  * Used to restore QRect translated to QRectF.
  * The difference from translate is that translate always makes sure the resulting QRect contains

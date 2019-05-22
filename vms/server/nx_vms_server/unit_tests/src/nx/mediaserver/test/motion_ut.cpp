@@ -107,7 +107,7 @@ TEST_F(MotionArchive, findMotionDesc)
     ASSERT_EQ(1, result.size());
     ASSERT_EQ(m_numericDates[m_numericDates.size()-1], result[0].startTimeMs);
     auto deltaMs = m_numericDates[0] - m_numericDates[m_numericDates.size() - 1]
-        + QnMotionArchive::kMinimalMotionDurationMs;
+        + QnMotionArchive::kMinimalDurationMs;
     ASSERT_EQ(deltaMs,result[0].durationMs);
 }
 
@@ -134,6 +134,51 @@ TEST_F(MotionArchive, findMotionWithFilter)
     checkData(serverModule().motionHelper()->matchImage(request), 0);
     request.sortOrder = Qt::SortOrder::DescendingOrder;
     checkData(serverModule().motionHelper()->matchImage(request), 0);
+}
+
+TEST_F(MotionArchive, rectFromNormalizedRect)
+{
+    ASSERT_EQ(
+        QRect(0, 0, 44, 32),
+        QnMetaDataV1::rectFromNormalizedRect(QRectF(0.0, 0.0, 1.0, 1.0)));
+
+    ASSERT_EQ(
+        QRect(0, 0, 22, 16),
+        QnMetaDataV1::rectFromNormalizedRect(QRectF(0.0, 0.0, 0.5, 0.5)));
+
+    ASSERT_EQ(
+        QRect(0, 0, 23, 17),
+        QnMetaDataV1::rectFromNormalizedRect(QRectF(1/44.0 * 0.8, 1/32.0 * 0.8, 0.5, 0.5)));
+
+    ASSERT_EQ(
+        QRect(0, 0, 23, 17),
+        QnMetaDataV1::rectFromNormalizedRect(QRectF(1 / 44.0 * 0.8, 1 / 32.0 * 0.8, 0.501, 0.501)));
+}
+
+TEST_F(MotionArchive, addMotion)
+{
+    auto checkMotion = [](const QRectF& rectF)
+    {
+        QnMetaDataV1 packet;
+        packet.addMotion(rectF);
+
+        QRect rect = QnMetaDataV1::rectFromNormalizedRect(rectF);
+        for (int x = 0; x < Qn::kMotionGridWidth; ++x)
+        {
+            for (int y = 0; y < Qn::kMotionGridHeight; ++y)
+            {
+                bool isInsideRect = qBetween(rect.left(), x, rect.right() + 1) && qBetween(rect.top(), y, rect.bottom() + 1);
+                ASSERT_EQ(isInsideRect, packet.isMotionAt(x, y));
+            }
+        }
+    };
+
+    checkMotion(QRectF(0, 0, 0.25, 0.25*1.5));
+    checkMotion(QRectF(1/40.0, 0, 0.25, 0.25*1.5));
+    checkMotion(QRectF(0.5, 0.5, 0.25, 0.25));
+    checkMotion(QRectF(0, 0, 1.0, 1.0));
+    checkMotion(QRectF(0, 0, 0, 0));
+    checkMotion(QRectF(0.2, 0.15, 0.8, 0.54));
 }
 
 } // nx::vms::server::test

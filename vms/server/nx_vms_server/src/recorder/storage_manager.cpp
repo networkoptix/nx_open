@@ -57,6 +57,7 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/analytics/utils.h>
+#include <nx/vms/server/metadata/analytics_helper.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -1912,7 +1913,7 @@ void QnStorageManager::clearSpace(bool forced)
     {
         if (m_clearMotionTimer.elapsed() > MOTION_CLEANUP_INTERVAL) {
             m_clearMotionTimer.restart();
-            clearUnusedMotion();
+            clearUnusedMetadata();
         }
     }
     else {
@@ -2149,15 +2150,21 @@ void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
     }
 }
 
-void QnStorageManager::clearUnusedMotion()
+void QnStorageManager::clearUnusedMetadata()
 {
     UsedMonthsMap usedMonths;
 
     serverModule()->normalStorageManager()->updateRecordedMonths(usedMonths);
     serverModule()->backupStorageManager()->updateRecordedMonths(usedMonths);
+
     QDir baseDir = serverModule()->motionHelper()->getBaseDir();
     for( const QString& dir: baseDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
         serverModule()->motionHelper()->deleteUnusedFiles(usedMonths.value(dir).toList(), dir);
+
+    baseDir = serverModule()->metadataDatabaseDir();
+    nx::vms::server::metadata::AnalyticsHelper helper(serverModule()->metadataDatabaseDir());
+    for (const QString& dir: baseDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+        helper.deleteUnusedFiles(usedMonths.value(dir).toList(), dir);
 }
 
 void QnStorageManager::updateRecordedMonths(UsedMonthsMap& usedMonths)

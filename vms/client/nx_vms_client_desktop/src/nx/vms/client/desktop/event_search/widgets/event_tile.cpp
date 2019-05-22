@@ -538,7 +538,7 @@ void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
     ui->previewWidget->parentWidget()->setHidden(!value);
 
     d->isPreviewLoadNeeded = false;
-    d->forceNextPreviewUpdate = true;
+    d->forceNextPreviewUpdate = forceUpdate;
     d->updatePreview(previewLoadDelay());
 
     if (ini().showDebugTimeInformationInRibbon)

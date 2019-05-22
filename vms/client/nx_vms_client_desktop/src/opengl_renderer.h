@@ -8,14 +8,14 @@
 
 #include <QtGui/QOpenGLFunctions>
 
-#include <QtOpenGL/QGLShaderProgram>
+class QOpenGLWidget;
+class QOpenGLVertexArrayObject;
 
 class QnGLShaderProgram;
 class QnColorGLShaderProgram;
 class QnColorPerVertexGLShaderProgram;
 class QnTextureGLShaderProgram;
 class QnTextureTransitionShaderProgram;
-class QOpenGLVertexArrayObject;
 
 class QnOpenGLRenderer: public QOpenGLFunctions
 {
@@ -63,17 +63,26 @@ private:
     QScopedPointer<QnTextureTransitionShaderProgram> m_textureTransitionShader;
 };
 
-class QnOpenGLRendererManager: public QObject {
-    Q_OBJECT;
+class QnOpenGLRendererManager: public QObject
+{
+    Q_OBJECT
+
 public:
-    QnOpenGLRendererManager(QObject* parent = NULL);
+    QnOpenGLRendererManager(QObject* parent = nullptr);
     ~QnOpenGLRendererManager();
 
-    static QnOpenGLRenderer* instance(const QGLContext* a_context);
+    static QnOpenGLRenderer* instance(QOpenGLWidget* widget);
 
-    //QHash<const QGLContext*,QnOpenGLRenderer>& getContainer(){ return m_container; };
 private:
-    QHash<const QGLContext*, QnOpenGLRenderer*> m_container;
+    QHash<QOpenGLWidget*, QnOpenGLRenderer*> m_container;
 };
 
-void loadImageData( int texture_wigth , int texture_height , int image_width , int image_heigth , int gl_bytes_per_pixel , int gl_format , const uchar* pixels );
+void loadImageData(
+    QOpenGLFunctions* renderer,
+    int texture_wigth,
+    int texture_height,
+    int image_width,
+    int image_heigth,
+    int gl_bytes_per_pixel,
+    int gl_format,
+    const uchar* pixels);
