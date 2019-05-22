@@ -831,7 +831,7 @@
       {
         "name": "company",
         "label": "Company",
-        "description": "General information for the company.",
+        "description": "General information for the company that appears in the rightmost column of the integration's page.",
         "translatable": false,
         "values": [
           {
@@ -897,7 +897,7 @@
         "name": "information",
         "old_name": "Information",
         "label": "Information",
-        "description": "General information for the integration.",
+        "description": "General information for the integration. This information will appear primarily on the integration's tile on the /integrations page.",
         "translatable": false,
         "values": [
           {
@@ -1021,7 +1021,7 @@
         "name": "overview",
         "old_name": "Overview",
         "label": "How does it work?",
-        "description": "Summary about the integration. Here you can include a video, images, and a text description.",
+        "description": "Summary about the integration. Here you can include a video, images, and a text description. Overview information is located in the leftmost column of the integration's page.",
         "translatable": false,
         "values": [
           {
@@ -1442,7 +1442,7 @@
         "name": "instructions",
         "old_name": "Instructions",
         "label": "Instructions",
-        "description": "Instructions for setting up and/or using your integration. Here you can include a video, images, and text.",
+        "description": "Instructions for setting up and/or using your integration. Here you can include a video, images, and text. The instructions block will appear either in the middle column of the integrations's page.",
         "translatable": false,
         "values": [
           {
@@ -1632,7 +1632,7 @@
         "name": "downloadFiles",
         "old_name": "Download Files",
         "label": "Download Files",
-        "description": "Downloadable files for the integration.",
+        "description": "Downloadable files for the integration that appear on the rightmost column of the integration's page.",
         "translatable": false,
         "values":[
           {
@@ -1797,7 +1797,7 @@
         "name": "support",
         "old_name": "Support",
         "label": "Support",
-        "description": "Support information for the integration.",
+        "description": "Support information for the integration that appear on the rightmost column of the integration's page.",
         "translatable": false,
         "values": [
           {

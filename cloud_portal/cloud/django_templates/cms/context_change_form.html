@@ -17,6 +17,8 @@
     </div>
 {% endblock %}
 {% block content %}
+{% autoescape off %}{{ original.description }}{% endautoescape %}
+<hr>
 <form id="context_form" class="aligned" action="" enctype="multipart/form-data" method="post" novalidate>
     {% csrf_token %}
     <input type="hidden" name="context_id" value="{{ original.id }}">
