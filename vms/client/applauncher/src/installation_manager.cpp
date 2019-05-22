@@ -61,7 +61,7 @@ QString extractVersion(const QString& fullPath)
 
 } // namespace
 
-namespace nx::applauncher {
+namespace nx::vms::applauncher {
 
 QString InstallationManager::defaultDirectoryForInstallations()
 {
@@ -457,4 +457,4 @@ bool InstallationManager::isValidVersionName(const QString& version)
     return kVersionDirRegExp.exactMatch(version);
 }
 
-} // namespace nx::applauncher
+} // namespace nx::vms::applauncher

@@ -17,7 +17,7 @@
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::common::p2p::downloader;
-using namespace nx::applauncher::api;
+using namespace nx::vms::applauncher::api;
 
 bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 {
@@ -413,7 +413,7 @@ bool ClientUpdateTool::isDownloadComplete() const
 
 void ClientUpdateTool::checkInternalState()
 {
-    using nx::applauncher::api::ResultType;
+    using nx::vms::applauncher::api::ResultType;
 
     auto kWaitTime = std::chrono::milliseconds(1);
     if (m_applauncherTask.valid()
@@ -690,7 +690,7 @@ QString ClientUpdateTool::applauncherErrorToString(ResultType value)
             // for a wrong file, or this file had been removed somehow.
             return tr("Installation package has been lost.");
         default:
-            return nx::applauncher::api::toString(value);
+            return nx::vms::applauncher::api::toString(value);
     }
 }
 

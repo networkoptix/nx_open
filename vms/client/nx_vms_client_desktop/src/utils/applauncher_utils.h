@@ -5,7 +5,7 @@
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/data/software_version.h>
 
-namespace nx::applauncher::api {
+namespace nx::vms::applauncher::api {
 
 /**
  * @returns true if required version is installed and can be launched.
@@ -54,4 +54,4 @@ ResultType scheduleProcessKill(qint64 processId, quint32 timeoutMillis);
 /** Quits currently running applauncher if any. */
 ResultType quitApplauncher();
 
-} // namespace nx::applauncher::api
+} // namespace nx::vms::applauncher::api

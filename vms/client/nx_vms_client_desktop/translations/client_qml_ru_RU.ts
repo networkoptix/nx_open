@@ -65,6 +65,17 @@
     </message>
   </context>
   <context>
+    <name>PluginsInformation</name>
+    <message>
+      <source>No plugins installed</source>
+      <translation type="unfinished">No plugins installed</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation type="unfinished">Server is offline</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
@@ -85,6 +96,14 @@
     <message>
       <source>New Server</source>
       <translation>Новый сервер</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Изменить</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Скрыть</translation>
     </message>
   </context>
   <context>

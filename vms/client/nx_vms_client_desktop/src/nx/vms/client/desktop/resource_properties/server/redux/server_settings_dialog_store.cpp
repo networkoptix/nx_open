@@ -35,12 +35,10 @@ QVariant pluginData(const std::optional<const nx::vms::api::PluginModuleData>& p
 
 QVariantList pluginDetails(const nx::vms::api::PluginModuleData& plugin)
 {
-    using Store = ServerSettingsDialogStore;
-
     return QVariantList({
-        QVariantMap({{"name", Store::tr("Library")}, {"value", plugin.libraryName}}),
-        QVariantMap({{"name", Store::tr("Version")}, {"value", plugin.version}}),
-        QVariantMap({{"name", Store::tr("Vendor")}, {"value", plugin.vendor}}) });
+        QVariantMap({{"name", ServerSettingsDialogStore::tr("Library")}, {"value", plugin.libraryName}}),
+        QVariantMap({{"name", ServerSettingsDialogStore::tr("Version")}, {"value", plugin.version}}),
+        QVariantMap({{"name", ServerSettingsDialogStore::tr("Vendor")}, {"value", plugin.vendor}}) });
 }
 
 QVariantList pluginDetails(const std::optional<const nx::vms::api::PluginModuleData>& plugin)

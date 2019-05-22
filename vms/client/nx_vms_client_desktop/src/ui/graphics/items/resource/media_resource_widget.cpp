@@ -984,7 +984,7 @@ QnResourceWidgetRenderer* QnMediaResourceWidget::renderer() const
 
 int QnMediaResourceWidget::defaultRotation() const
 {
-    return d->resource->getProperty(QnMediaResource::rotationKey()).toInt();
+    return resource()->defaultRotation();
 }
 
 int QnMediaResourceWidget::defaultFullRotation() const

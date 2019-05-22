@@ -120,11 +120,11 @@
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1 is tijdelijk niet beschikbaar. Probeer het later opnieuw.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>Netwerkfout. Controleer uw internetverbinding en probeer het opnieuw.</translation>
     </message>
   </context>
   <context>

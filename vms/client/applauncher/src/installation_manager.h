@@ -12,7 +12,7 @@
 #include <client_installation.h>
 #include <nx/vms/applauncher/api/applauncher_api.h>
 
-namespace nx::applauncher {
+namespace nx::vms::applauncher {
 
 // TODO: installation API MUST be asynchronous
 /**
@@ -75,4 +75,4 @@ private:
     mutable std::mutex m_mutex;
 };
 
-} // namespace nx::applauncher
+} // namespace nx::vms::applauncher

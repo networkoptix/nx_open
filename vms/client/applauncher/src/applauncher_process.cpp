@@ -37,7 +37,7 @@ const nx::utils::SoftwareVersion kNewGstreamerUsedVersion(4, 0);
 
 } // namespace
 
-namespace nx::applauncher {
+namespace nx::vms::applauncher {
 
 using namespace api;
 
@@ -353,7 +353,7 @@ bool ApplauncherProcess::installZipAsync(
 }
 
 bool ApplauncherProcess::checkInstallationProgress(
-    const std::shared_ptr<nx::applauncher::api::InstallZipCheckStatus>& /*request*/,
+    const std::shared_ptr<nx::vms::applauncher::api::InstallZipCheckStatus>& /*request*/,
     applauncher::api::Response* const response)
 {
     if (!m_process.isEmpty())
@@ -449,4 +449,4 @@ bool ApplauncherProcess::InstallationProcess::equals(
     return this->version == version && this->fileName == fileName;
 }
 
-} // namespace nx::applauncher
+} // namespace nx::vms::applauncher

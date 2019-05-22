@@ -35,6 +35,7 @@ void QnWorkbenchLayoutAspectRatioWatcher::setAppropriateAspectRatio(QnResourceWi
     {
         float aspectRatio = widget->visualAspectRatio();
 
+        // Only current Widget geometry is relevant.
         QRect geometry = widget->item()->geometry();
         if (!geometry.isEmpty())
             aspectRatio /= nx::vms::client::core::Geometry::aspectRatio(geometry);
@@ -51,7 +52,7 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged(QnResou
     if (!m_renderWatcher->isDisplaying(widget))
         return;
 
-    if (!m_watchedLayout ||m_watchedLayout->items().size() != 1 || m_watchedLayout->resource()->hasBackground())
+    if (!m_watchedLayout || !m_watchedLayout->canAutoAdjustAspectRatio())
         return;
 
     setAppropriateAspectRatio(widget);
@@ -66,7 +67,7 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged(QnResou
 
 void QnWorkbenchLayoutAspectRatioWatcher::at_resourceWidget_aspectRatioChanged()
 {
-    if (m_watchedLayout->items().size() != 1)
+    if (!m_watchedLayout->canAutoAdjustAspectRatio())
         return;
 
     QnResourceWidget *widget = qobject_cast<QnResourceWidget*>(sender());

@@ -113,5 +113,9 @@
       <source>pausing</source>
       <translation>duraklatılıyor</translation>
     </message>
+    <message>
+      <source>Unknown error: %1</source>
+      <translation>Bilinmeyen hata:%1</translation>
+    </message>
   </context>
 </TS>

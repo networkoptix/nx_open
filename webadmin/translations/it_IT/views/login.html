@@ -26,6 +26,6 @@
 
     <div class="modal-footer" >
         <button class="btn btn-primary pull-left" name="button" type="submit" ng-if="!authorized"
-                ng-disabled="loginForm.password.$touched && loginForm.$invalid || authorizing" ng-click="login()" enter-button>Accesso</button>
+                ng-disabled="loginForm.password.$touched && loginForm.$invalid || authorizing" ng-click="login(loginForm)" enter-button>Accesso</button>
     </div>
 </form>
