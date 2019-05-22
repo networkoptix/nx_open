@@ -123,8 +123,10 @@ public:
     bool isStorageAvailable(int storage_index) const;
     bool isStorageAvailable(const QnStorageResourcePtr& storage) const;
 
-    DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
-    DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix);
+    DeviceFileCatalogPtr getFileCatalog(
+        const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
+    DeviceFileCatalogPtr getFileCatalog(
+        const QString& cameraUniqueId, const QString &catalogPrefix);
 
     static QnTimePeriodList getRecordedPeriods(
         QnMediaServerModule* serverModule,
@@ -200,12 +202,15 @@ signals:
     void storageFailure(const QnResourcePtr &storageRes, nx::vms::api::EventReason reason);
     void rebuildFinished(QnSystemHealth::MessageType msgType);
     void backupFinished(qint64 backedUpToMs, nx::vms::api::EventReason);
+    void newCatalogCreated(const QString& cameraUniqueId, QnServer::ChunksCatalog quality);
+
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);
     void onDelResource(const QnResourcePtr &resource);
     void at_storageRoleChanged(const QnResourcePtr &storage);
     void testOfflineStorages();
+
 private:
     friend class TestStorageThread;
 

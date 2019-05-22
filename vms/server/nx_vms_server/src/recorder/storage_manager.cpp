@@ -784,6 +784,18 @@ QnStorageManager::QnStorageManager(
     m_removeEmtyDirTimer.invalidate();
 
     startAuxTimerTasks();
+
+    connect(
+        this, &QnStorageManager::newCatalogCreated,
+        [this](const QString& cameraUniqueId, QnServer::ChunksCatalog quality)
+        {
+            m_auxTasksTimerManager.addTimer(
+                [this, cameraUniqueId, quality](nx::utils::TimerId)
+                {
+                    m_camInfoWriter.writeFile(cameraUniqueId, quality);
+                },
+                std::chrono::milliseconds(0));
+        });
 }
 
 QMap<DeviceFileCatalogPtr, qint64> QnStorageManager::catalogsToScan(int storageIndex)
@@ -1425,6 +1437,7 @@ void QnStorageManager::removeAbsentStorages(const QnStorageResourceList &newStor
 
 QnStorageManager::~QnStorageManager()
 {
+    this->disconnect();
     // These threads below should've been stopped and destroyed manually by this moment.
     {
         QnMutexLocker lock(&m_testStorageThreadMutex);
@@ -2441,11 +2454,10 @@ void QnStorageManager::startAuxTimerTasks()
             kCheckStoragesAvailableInterval);
     }
 
-    static const std::chrono::minutes kWriteInfoFilesInterval(5);
+    static const std::chrono::minutes kCameraInfoUpdateInterval(5);
     m_auxTasksTimerManager.addNonStopTimer(
-        [this](nx::utils::TimerId) { m_camInfoWriter.write(); },
-        kWriteInfoFilesInterval,
-        kWriteInfoFilesInterval);
+        [this](nx::utils::TimerId) { m_camInfoWriter.writeAll(); },
+        kCameraInfoUpdateInterval, kCameraInfoUpdateInterval);
 
     static const std::chrono::minutes kCheckSystemStorageSpace(1);
     m_auxTasksTimerManager.addNonStopTimer(
@@ -2608,17 +2620,27 @@ void QnStorageManager::replaceChunks(
         sdb->replaceChunks(cameraUniqueId, catalog, newCatalog->m_chunks);
 }
 
-DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog)
+DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(
+    const QString& cameraUniqueId, QnServer::ChunksCatalog catalog)
 {
-    QnMutexLocker lock( &m_mutexCatalog );
-    FileCatalogMap& catalogMap = m_devFileCatalog[catalog];
-    DeviceFileCatalogPtr fileCatalog = catalogMap[cameraUniqueId];
-    if (fileCatalog == 0)
+    DeviceFileCatalogPtr fileCatalog;
+    bool exists = true;
     {
-        fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(
-            serverModule(), cameraUniqueId, catalog, m_role));
-        catalogMap[cameraUniqueId] = fileCatalog;
+        QnMutexLocker lock( &m_mutexCatalog );
+        FileCatalogMap& catalogMap = m_devFileCatalog[catalog];
+        fileCatalog = catalogMap[cameraUniqueId];
+        if (fileCatalog == 0)
+        {
+            exists = false;
+            fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(
+                serverModule(), cameraUniqueId, catalog, m_role));
+            catalogMap[cameraUniqueId] = fileCatalog;
+        }
     }
+
+    if (!exists)
+        emit newCatalogCreated(cameraUniqueId, catalog);
+
     return fileCatalog;
 }
 

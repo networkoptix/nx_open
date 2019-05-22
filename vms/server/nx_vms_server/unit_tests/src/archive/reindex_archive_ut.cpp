@@ -34,6 +34,7 @@ TEST_F(FtReindex, FastArchiveScan_PartialDataRetrieved)
 
 TEST_F(FtReindex, FullArchiveScan_AllDataRetrieved)
 {
+    givenSomeArchiveOnHdd();
     whenServerStarted();
     thenArchiveShouldBeScannedCorreclty();
 
