@@ -135,7 +135,6 @@
     "wrongParameters": "Some parameters on the form are incorrect",
     "wrongCode": "Account is already activated or confirmation code is incorrect",
     "wrongCodeRestore": "Confirmation code is already used or incorrect",
-    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "You do not have permissions to perform this action",
     "accountNotActivated": "This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
     "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
@@ -165,7 +164,6 @@
   "passwordRequirements": {
     "good": "good",
     "fair": "fair",
-    "fairMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
     "minLength": "too short",
     "minLengthMessage": "Password must contain at least 8 characters",
     "required": "incorrect",

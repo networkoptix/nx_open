@@ -1,0 +1,16 @@
+<h1>Hei, {{message.userFullName}}</h1>
+
+{{#message.sharer_name}}
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> on jakanut pääsyn videonhallintajärjestelmään "{{message.system_name}}" kanssasi.
+
+Jos haluat tarkastella ja hallita sitä, luo tili <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> käytämällä nykyistä sähköpostiosoitettasi ja noudata muita ohjeita.</p>
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+<p>Sinulle on myönnetty pääsy videonhallintajärjestelmään "{{message.system_name}}".
+
+Jos haluat tarkastella ja hallita sitä, luo tili <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> käytämällä nykyistä sähköpostiosoitettasi ja noudata muita ohjeita.</p>
+{{/message.sharer_name}}
+
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}"> Luo tili </a>
+
