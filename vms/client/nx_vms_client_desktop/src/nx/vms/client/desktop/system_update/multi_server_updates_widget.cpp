@@ -1633,6 +1633,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
             messageBox->exec();
             m_serverUpdateTool->requestStopAction();
             setTargetState(WidgetUpdateState::initial);
+            setUpdateSourceMode(UpdateSourceType::internet);
             loadDataToUi();
         }
     }
