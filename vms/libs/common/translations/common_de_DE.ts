@@ -1569,6 +1569,22 @@
       <source>Multiple %1 events have occurred</source>
       <translation>Mehrere %1 Ereignisse sind aufgetreten</translation>
     </message>
+    <message>
+      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+      <translation>Multicast-Adresskonflikt erkannt. Adresse %1 wird bereits von %2 auf %3 Stream verwendet</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address</source>
+      <translation>Die Netzwerkadresse %1 ist keine Multicast-Adresse</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Analytics-Speicher &quot;%1&quot; ist offline.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Analytics-Speicher &quot;%1&quot; ist fast voll.</translation>
+    </message>
   </context>
   <context>
     <name>utils::QnCameraNamesWatcher</name>

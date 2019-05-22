@@ -5,11 +5,11 @@
     <name>DateTimeFormats</name>
     <message>
       <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
+      <translation>MM/jj</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>MMMM aaaa</translation>
     </message>
   </context>
   <context>
@@ -104,12 +104,12 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Impossible de fusionner des systèmes car ils ont au moins un serveur avec le même ID. Supprimez ce serveur et réessayez.</translation>
     </message>
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+      <translation>Systèmes en nuage ont des propriétaires différents. La fusion n'est pas autorisée.</translation>
     </message>
   </context>
   <context>
@@ -336,15 +336,15 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>Erreur plugin. %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>Plugin indisponible</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>Erreur Interne du Serveur. %1</translation>
     </message>
   </context>
   <context>
@@ -383,7 +383,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>Ne peut pas allouer tampons d'échantillions</translation>
     </message>
   </context>
   <context>
@@ -597,13 +597,13 @@
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Licences Gratuites</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licence gratuite</numerusform>
+        <numerusform>%n Licences gratuites</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -681,9 +681,9 @@
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licence gratuite</numerusform>
+        <numerusform>%n/%1 Licences gratuites</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -766,11 +766,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>Une seule licence de démarrage est autorisée par système.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>Vous avez déjà une licence de démarrage active.</translation>
     </message>
   </context>
   <context>
@@ -832,44 +832,44 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n Caméra</numerusform>
+        <numerusform>%n Caméras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n caméra</numerusform>
+        <numerusform>%n caméras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n Module I/O</numerusform>
+        <numerusform>%n Modules I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n module I/O</numerusform>
+        <numerusform>%n modules I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n Périphérique</numerusform>
+        <numerusform>%n Périphériques</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n périphérique</numerusform>
+        <numerusform>%n périphériques</numerusform>
       </translation>
     </message>
   </context>
@@ -1028,19 +1028,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>Fichier Zip corrompu.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>Ne peut pas trouver le répertoire cible.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>Ne peut pas ouvrir le fichier pour écriture.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>Il n'y a pas d'espace libre sur le disque.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1048,22 +1048,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>Extraction a été annulée.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>Extracteur occupé.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>Mauvaise taille de flux crypté.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>En-tête de flux crypté endommagé.</translation>
     </message>
   </context>
   <context>
@@ -1551,23 +1551,39 @@
     </message>
     <message>
       <source>Plugin Event</source>
-      <translation type="unfinished">Plugin Event</translation>
+      <translation>Événement plugin</translation>
     </message>
     <message>
       <source>Unknown plugin event</source>
-      <translation type="unfinished">Unknown plugin event</translation>
+      <translation>Evénement plugin inconnu</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>Échec de l’utilisation du temps de caméra, trop de lags, temps système sera utilisé</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>Heure de caméra revenue à la normale</translation>
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>Plusieurs événements %1 survenus</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address</source>
+      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
     </message>
   </context>
   <context>

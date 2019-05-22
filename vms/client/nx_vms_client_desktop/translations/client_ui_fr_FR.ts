@@ -41,7 +41,7 @@
     <message>
       <location/>
       <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
+      <translation>Politique de support ARM</translation>
     </message>
   </context>
   <context>
@@ -320,7 +320,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>le jour suivant</translation>
     </message>
   </context>
   <context>
@@ -665,47 +665,47 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>Port Média personnalisé</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>Confiance d'horodatage de la caméra</translation>
     </message>
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Type de préréglage PTZ préféré:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Système</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Natif</translation>
     </message>
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>Préréglages de caméras natifs ne seront pas disponibles.</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Cette caméra prend en charge le panoramique et l'inclinaison</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Cette caméra prend en charge le zoom</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Détecter le mouvement lors de l'importation d'archive</translation>
     </message>
   </context>
   <context>
@@ -1044,7 +1044,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>Astuce</translation>
     </message>
     <message>
       <location/>
@@ -1089,7 +1089,7 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Ajouter périphériques</translation>
     </message>
     <message>
       <location/>
@@ -1107,12 +1107,12 @@
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>Je n'accepte pas</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>J''accepte</translation>
     </message>
   </context>
   <context>
@@ -1248,7 +1248,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>Protéger avec mot de passe</translation>
     </message>
     <message>
       <location/>
@@ -1612,7 +1612,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Taille minimale de grille</translation>
     </message>
   </context>
   <context>
@@ -1673,12 +1673,12 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Délai de recherche (s)</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>Admin DN ou CN</translation>
     </message>
   </context>
   <context>
@@ -1986,7 +1986,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>Vérifier mise à jour</translation>
     </message>
     <message>
       <location/>
@@ -2011,7 +2011,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Télécharger et installer</translation>
     </message>
     <message>
       <location/>
@@ -2026,7 +2026,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Paramètres Système Avancés</translation>
     </message>
     <message>
       <location/>
@@ -2039,12 +2039,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>Afficher toutes les mises en page</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Sélectionner les mises en page</translation>
     </message>
   </context>
   <context>
@@ -2057,12 +2057,12 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Nouvelle caméra virtuelle...</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Caméra Virtuelle&quot; est un stockage virtuel pour les fichiers vidéo, qui peut être envoyer sur n'importe quel serveur de votre Système et accessible à tout utilisateur.</translation>
     </message>
   </context>
   <context>
@@ -2131,22 +2131,22 @@
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>Niveau:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>ERREUR</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>ATTENTION</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>INFO</translation>
     </message>
   </context>
   <context>
@@ -2295,7 +2295,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>Redémarrer vers la version màj lorsque vous êtes prêt</translation>
     </message>
   </context>
   <context>
@@ -2652,7 +2652,7 @@
     <message>
       <location/>
       <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
+      <translation>Filtre TEST</translation>
     </message>
     <message>
       <location/>
@@ -2662,7 +2662,7 @@
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>Glissez n'importe quel fichier image ou vidéo dans la fenêtre de l'application pour lire</translation>
     </message>
   </context>
   <context>
@@ -2781,12 +2781,12 @@
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>Limiter la durée de la session</translation>
     </message>
     <message>
       <location/>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Les filigranes seront affichés sur des vidéos en direct, archivées et exportées pour les utilisateurs non-administrateurs uniquement. Vous et les autres administrateurs ne les verrons pas.</translation>
     </message>
   </context>
   <context>
@@ -3031,7 +3031,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>Prévision de base sur les données enregistrées pendant</translation>
     </message>
   </context>
   <context>
@@ -3075,6 +3075,26 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>Paramétrages Sauvegarde...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording was enabled on the USB storage</source>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
     </message>
   </context>
   <context>
@@ -3192,7 +3212,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Temps VMS</translation>
     </message>
   </context>
   <context>
@@ -3200,17 +3220,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>Synchroniser le temps avec Internet</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Temps VMS</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>Ne pas synchroniser le temps entre les serveurs</translation>
     </message>
   </context>
   <context>
@@ -3318,7 +3338,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>Détection de Mouvement</translation>
     </message>
   </context>
   <context>

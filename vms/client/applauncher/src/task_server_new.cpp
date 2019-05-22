@@ -11,7 +11,7 @@
 
 #include "abstract_request_processor.h"
 
-namespace nx::applauncher {
+namespace nx::vms::applauncher {
 
 TaskServerNew::TaskServerNew(AbstractRequestProcessor* const requestProcessor):
     m_requestProcessor(requestProcessor)
@@ -132,4 +132,4 @@ void TaskServerNew::processNewConnection(NamedPipeSocket* clientConnection)
     clientConnection->flush();
 }
 
-} // namespace nx::applauncher
+} // namespace nx::vms::applauncher

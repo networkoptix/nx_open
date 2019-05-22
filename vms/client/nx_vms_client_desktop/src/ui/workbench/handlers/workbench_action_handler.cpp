@@ -2602,7 +2602,7 @@ void ActionHandler::at_queueAppRestartAction_triggered()
 
     auto tryToRestartClient = [this]
         {
-            using namespace nx::applauncher::api;
+            using namespace nx::vms::applauncher::api;
 
             /* Try to run applauncher if it is not running. */
             if (!checkOnline())

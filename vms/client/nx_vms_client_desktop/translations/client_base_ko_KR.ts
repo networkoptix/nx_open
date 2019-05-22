@@ -857,11 +857,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>화면 설정</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>북마크 내보내기</translation>
     </message>
     <message>
       <source>Forget password</source>
@@ -3548,8 +3548,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>수량</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
@@ -4855,7 +4855,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>북마크 내보내기</translation>
     </message>
   </context>
   <context>
@@ -5046,6 +5046,10 @@ to %1</source>
     <message>
       <source>Server Web Page</source>
       <translation>서버 웹 페이지</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -5516,16 +5520,30 @@ to %1</source>
       <translation>백업 완료</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>사용 중지 된 저장 공간에 대한 녹음이 중지됩니다. 그러나 오래된 장면을 삭제하면 계속됩니다.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>USB 저장소에서 저장이 활성화되었습니다.</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>색인 재생성은 아카이브 또는 백업이 손실되거나 손상된 경우 또는 일부 하드웨어가 교체 된 경우 문제를 해결할 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>삭제</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>유지</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>취소</translation>
     </message>
   </context>
   <context>
@@ -5573,6 +5591,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>충분한 다른 저장 공간이 있으면 너무 작거나 시스템 파티션은 저장하는 용도로 사용되지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
@@ -7306,8 +7332,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>북마크 %n</numerusform>
       </translation>
     </message>
   </context>
@@ -7391,12 +7417,12 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>UDP Multicast</source>
-      <translation type="unfinished">UDP Multicast</translation>
-    </message>
-    <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
       <translation>서버는 어떤 카메라 설정도 변경하지 않고 그대로 카메라 스트림을 수신하여 사용합니다.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -8414,10 +8440,6 @@ to %1</source>
       <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
     </message>
     <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation type="unfinished">Please make sure there is enough free storage space and network connection is stable.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>문제가 계속 되 면 고객 지원에 문의 하시기 바랍니다.</translation>
     </message>
@@ -8428,10 +8450,6 @@ to %1</source>
     <message>
       <source>Cancel Update</source>
       <translation>업데이트 취소</translation>
-    </message>
-    <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation type="unfinished">Please make sure they have enough free storage space and stable network connection.</translation>
     </message>
     <message>
       <source>Update completed</source>
@@ -8448,10 +8466,6 @@ to %1</source>
     <message>
       <source>OK</source>
       <translation>확인</translation>
-    </message>
-    <message>
-      <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -8584,8 +8598,16 @@ to %1</source>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <source>Failed to download update packages to some servers</source>
+      <translation type="unfinished">Failed to download update packages to some servers</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
   </context>
   <context>
@@ -8703,6 +8725,62 @@ to %1</source>
     <message>
       <source>Failed to install update</source>
       <translation type="unfinished">Failed to install update</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>Update package can&apos;t be not found.</source>
+      <translation type="unfinished">Update package can&apos;t be not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Iternal server error.</source>
+      <translation type="unfinished">Iternal server error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>알수없는 오류</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
     </message>
   </context>
   <context>
@@ -8856,6 +8934,21 @@ to %1</source>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>수요자</translation>
     </message>
   </context>
   <context>
@@ -9147,8 +9240,8 @@ to %1</source>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>북마크 %n</numerusform>
       </translation>
     </message>
     <message>
@@ -9186,7 +9279,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>여러 북마크들은 레이아웃으로 만 내보낼 수 있습니다.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
@@ -9601,6 +9694,30 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation type="unfinished">This build is for testing purposes only.</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data</source>
+      <translation type="unfinished">Confirm storage location to store analytics data</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>확인</translation>
     </message>
   </context>
   <context>

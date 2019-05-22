@@ -3663,8 +3663,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>כמות</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
@@ -5231,6 +5231,10 @@ to %1</source>
       <source>Server Web Page</source>
       <translation>דף אינטרנט של השרת</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5703,16 +5707,30 @@ to %1</source>
       <translation>הגיבוי הושלם</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>ההקלטה לאחסון המושבת תיפסק. עם זאת, מחיקת צילומים מיושנים ממנו תמשיך.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>ההקלטה אופשרה באחסון ה- USB</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Reindexing יכול לתקן בעיות עם ארכיון או גיבוי אם הם אבדו או ניזוקו, או אם כמה חומרה הוחלף.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>מחק</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>שמור</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>ביטול</translation>
     </message>
   </context>
   <context>
@@ -5760,6 +5778,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>מחיצות קטנות מדי ומחיצות מערכת שמורות ולא משמשות לכתיבה אם יש מספיק שטח אחסון זמין.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
@@ -7698,12 +7724,12 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>UDP Multicast</source>
-      <translation type="unfinished">UDP Multicast</translation>
-    </message>
-    <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
       <translation>השרת לא ישנה הגדרות מצלמה, השרת ישתמש בזרם המצלמה כפי שהוא.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -8763,10 +8789,6 @@ to %1</source>
       <translation>חלק מהשרתים אינם מקוונים ולא יעודכנו. לדלג עליהם?</translation>
     </message>
     <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation>ודא שיש מספיק שטח אחסון פנוי וחיבור הרשת יציב.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>אם הבעיה נמשכת, פנה אל שירות הלקוחות.</translation>
     </message>
@@ -8777,10 +8799,6 @@ to %1</source>
     <message>
       <source>Cancel Update</source>
       <translation>בטל עדכון</translation>
-    </message>
-    <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation>ודא שיש מספיק שטח אחסון פנוי וחיבור הרשת יציב.</translation>
     </message>
     <message>
       <source>Update completed</source>
@@ -8797,10 +8815,6 @@ to %1</source>
     <message>
       <source>OK</source>
       <translation>אישור</translation>
-    </message>
-    <message>
-      <source>Failed to install updates to servers:</source>
-      <translation>התקנת עדכונים נכשלה לשרתים:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -8936,8 +8950,16 @@ to %1</source>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <source>Failed to download update packages to some servers</source>
+      <translation type="unfinished">Failed to download update packages to some servers</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
   </context>
   <context>
@@ -9058,6 +9080,62 @@ to %1</source>
     <message>
       <source>Failed to install update</source>
       <translation type="unfinished">Failed to install update</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>Update package can&apos;t be not found.</source>
+      <translation type="unfinished">Update package can&apos;t be not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Iternal server error.</source>
+      <translation type="unfinished">Iternal server error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>שגיאה לא ידועה.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
     </message>
   </context>
   <context>
@@ -9214,6 +9292,21 @@ to %1</source>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>ספק:</translation>
     </message>
   </context>
   <context>
@@ -9998,6 +10091,30 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation>גרסה זו היא למטרות בדיקה בלבד.</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data</source>
+      <translation type="unfinished">Confirm storage location to store analytics data</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>אישור</translation>
     </message>
   </context>
   <context>

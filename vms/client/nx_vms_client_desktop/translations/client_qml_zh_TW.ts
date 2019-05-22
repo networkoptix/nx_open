@@ -65,6 +65,17 @@
     </message>
   </context>
   <context>
+    <name>PluginsInformation</name>
+    <message>
+      <source>No plugins installed</source>
+      <translation type="unfinished">No plugins installed</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation type="unfinished">Server is offline</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
@@ -85,6 +96,14 @@
     <message>
       <source>New Server</source>
       <translation>新的伺服器</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>編輯</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>隱藏</translation>
     </message>
   </context>
   <context>

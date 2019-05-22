@@ -121,12 +121,12 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
 
 
                     <div>
-                        <h3>Traffic encryption</h3>
+                        <h3>Forgalom titkosítás</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
-                                           ng-change="checkTrafficEncryption()"> Force Traffic Encryption
+                                           ng-change="checkTrafficEncryption()"> Kényszerített forgalom titkosítás
                                 </label>
                             </div>
                             <div class="checkbox">
@@ -134,7 +134,7 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
                                            ng-model="trafficSettings.videoTrafficEncryptionForced">
-                                    Force Video Traffic Encryption
+                                    Kényszerített videó forgalom titkosítás
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Mentés</button>

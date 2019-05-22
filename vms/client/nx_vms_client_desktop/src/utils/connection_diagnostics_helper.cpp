@@ -277,13 +277,13 @@ QnConnectionDiagnosticsHelper::validateConnectionTest(
 bool QnConnectionDiagnosticsHelper::getInstalledVersions(
     QList<nx::utils::SoftwareVersion>* versions)
 {
-    using nx::applauncher::api::ResultType;
+    using nx::vms::applauncher::api::ResultType;
 
     /* Try to run applauncher if it is not running. */
-    if (!nx::applauncher::api::checkOnline())
+    if (!nx::vms::applauncher::api::checkOnline())
         return false;
 
-    const auto result = nx::applauncher::api::getInstalledVersions(versions);
+    const auto result = nx::vms::applauncher::api::getInstalledVersions(versions);
     if (result == ResultType::ok)
         return true;
 
@@ -292,7 +292,7 @@ bool QnConnectionDiagnosticsHelper::getInstalledVersions(
     {
         QThread::msleep(100);
         qApp->processEvents();
-        if (nx::applauncher::api::getInstalledVersions(versions) == ResultType::ok)
+        if (nx::vms::applauncher::api::getInstalledVersions(versions) == ResultType::ok)
             return true;
     }
     return false;
@@ -357,7 +357,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     const nx::vms::api::SoftwareVersion& engineVersion)
 {
     using namespace Qn;
-    using namespace nx::applauncher::api;
+    using namespace nx::vms::applauncher::api;
 
     using Dialog = CompatibilityVersionInstallationDialog;
     QList<nx::utils::SoftwareVersion> versions;

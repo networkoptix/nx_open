@@ -3,7 +3,7 @@
 #include <nx/utils/ipc/named_pipe_socket.h>
 #include <nx/utils/log/log.h>
 
-namespace nx::applauncher::api {
+namespace nx::vms::applauncher::api {
 
 namespace {
 
@@ -58,4 +58,4 @@ ResultType sendCommandToApplauncher(
     return ResultType::ok;
 }
 
-} // namespace nx::applauncher::api
+} // namespace nx::vms::applauncher::api

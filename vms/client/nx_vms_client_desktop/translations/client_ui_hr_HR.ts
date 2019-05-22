@@ -680,12 +680,12 @@
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>System</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Native</translation>
     </message>
     <message>
       <location/>
@@ -1358,12 +1358,12 @@
     <message>
       <location/>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Camera</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Source camera</translation>
     </message>
   </context>
   <context>
@@ -1587,12 +1587,12 @@
     <message>
       <location/>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>Width</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>Height</translation>
     </message>
     <message>
       <location/>
@@ -3075,6 +3075,26 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>Backup Settings...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording was enabled on the USB storage</source>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
     </message>
   </context>
   <context>

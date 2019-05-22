@@ -675,17 +675,17 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>ประเภทที่กำหนดไว้ล่วงหน้า PTZ ที่ต้องการ:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>ระบบ</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>พื้นเมือง</translation>
     </message>
     <message>
       <location/>
@@ -695,12 +695,12 @@
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>กล้องนี้รองรับการแพนและเอียง</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>กล้องนี้รองรับการซูม</translation>
     </message>
     <message>
       <location/>
@@ -1673,7 +1673,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>ค้นหาหมดเวลา (s)</translation>
     </message>
     <message>
       <location/>
@@ -2062,7 +2062,7 @@
     <message>
       <location/>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Wearable Camera&quot; เป็นที่เก็บข้อมูลเสมือนจริงสำหรับไฟล์วิดีโอซึ่งสามารถอัพโหลดไปยังเซิร์ฟเวอร์ใดก็ได้ในระบบของคุณและเข้าถึงได้โดยผู้ใช้รายใด</translation>
     </message>
   </context>
   <context>
@@ -2131,22 +2131,22 @@
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>ระดับ</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>ข้อผิดพลาด</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>คำเตือน</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>ข้อมูล</translation>
     </message>
   </context>
   <context>
@@ -2295,7 +2295,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>รีสตาร์ทเป็นเวอร์ชั่นที่อัพเดตแล้วเมื่อพร้อม</translation>
     </message>
   </context>
   <context>
@@ -2652,7 +2652,7 @@
     <message>
       <location/>
       <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
+      <translation>กรองการทดสอบ</translation>
     </message>
     <message>
       <location/>
@@ -2662,7 +2662,7 @@
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>ลากไฟล์รูปภาพหรือวิดีโอใด ๆ ไปที่หน้าต่างแอปพลิเคชั่นเพื่อเล่น</translation>
     </message>
   </context>
   <context>
@@ -2781,12 +2781,12 @@
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>จำกัด ระยะเวลาเซสชัน</translation>
     </message>
     <message>
       <location/>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>ลายน้ำจะปรากฏบนวิดีโอสดที่เก็บถาวรและส่งออกสำหรับผู้ใช้ที่ไม่ใช่ผู้ดูแลระบบเท่านั้น คุณและผู้ดูแลระบบคนอื่นจะไม่เห็นพวกเขา</translation>
     </message>
   </context>
   <context>
@@ -3031,7 +3031,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>การคาดการณ์จากข้อมูลที่บันทึกในระหว่างฐาน</translation>
     </message>
   </context>
   <context>
@@ -3075,6 +3075,26 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>การตั้งค่าสำรอง...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording was enabled on the USB storage</source>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
     </message>
   </context>
   <context>
@@ -3192,7 +3212,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>เวลา VMS</translation>
     </message>
   </context>
   <context>
@@ -3200,17 +3220,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>ซิงค์เวลากับอินเทอร์เน็ต</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>เวลา VMS</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>อย่าซิงค์เวลาระหว่างเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -3318,7 +3338,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>ตรวจจับการเคลื่อนไหว</translation>
     </message>
   </context>
   <context>

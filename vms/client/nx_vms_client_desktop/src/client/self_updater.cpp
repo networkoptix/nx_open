@@ -202,7 +202,7 @@ bool copyApplauncherInstance(const QDir& sourceDir, const QDir& targetDir)
 
 bool SelfUpdater::updateApplauncher()
 {
-    using namespace nx::applauncher::api;
+    using namespace nx::vms::applauncher::api;
     using namespace nx::utils::file_system;
 
     if (!canBeRunFromTheCurrentDirectory())

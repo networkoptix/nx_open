@@ -83,15 +83,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Update informatie van de server ophalen</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Update pakket downloaden</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Installeren</translation>
     </message>
   </context>
   <context>
@@ -861,11 +861,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Exporteer bladwijzer...</translation>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Wachtwoord vergeten</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -877,7 +877,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Analytics Engine instellingen...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -897,11 +897,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Virtuele camera...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Nieuwe virtuele camera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -925,27 +925,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Overschakelen naar het tabblad meldingen</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Overschakelen naar bewegingstabblad</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Overschakelen naar bladwijzer tabblad</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Overschakelen naar gebeurtenis tabblad</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Overschakelen naar objects tabblad</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>Objectframe en Info...</translation>
     </message>
   </context>
   <context>
@@ -991,23 +991,23 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Voer een geldig wachtwoord in</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Het wachtwoord is niet geldig.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Versleutelde lay-out</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>Het bestand %1 is versleuteld. Voer het wachtwoord in:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Voer wachtwoord opnieuw in voor lay-out %1:</translation>
     </message>
   </context>
   <context>
@@ -1326,7 +1326,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Layout is vergrendeld</translation>
     </message>
   </context>
   <context>
@@ -1586,17 +1586,17 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Details voor %n sessies van %1</numerusform>
+        <numerusform>Details voor %n sessies van %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Details voor %n camera's van %1</numerusform>
+        <numerusform>Details voor %n camera's van %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1752,13 +1752,13 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Update geïnstalleerd</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n acties</numerusform>
+        <numerusform>%n acties</numerusform>
       </translation>
     </message>
   </context>
@@ -2041,7 +2041,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <translation>Forceer erkenning werkt alleen voor algemene gebeurtenissen als camera modifiers worden gebruikt in de Generieke Event URL</translation>
     </message>
   </context>
   <context>
@@ -2580,7 +2580,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>Interne serverfout. Probeer het later opnieuw.</translation>
     </message>
   </context>
   <context>
@@ -2734,11 +2734,11 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Downloaden &amp;&amp; installeren</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Kan compatibiliteitsmodus voor versie %1 niet invoeren</translation>
     </message>
   </context>
   <context>
@@ -2890,7 +2890,7 @@ to %1</source>
     </message>
     <message>
       <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
+      <translation>Ingestelde codec: %1 niet gevonden, h263p zal worden gebruikt</translation>
     </message>
   </context>
   <context>
@@ -3008,17 +3008,17 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
       </translation>
     </message>
   </context>
@@ -3096,9 +3096,9 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n camera's)</numerusform>
+        <numerusform>%1 (%n camera's)</numerusform>
       </translation>
     </message>
   </context>
@@ -3181,11 +3181,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Deze camera staat momenteel niet op de geselecteerde lay-out. Actie werkt als de camera wordt toegevoegd voordat de actie triggers worden gestart.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Deze camera staat momenteel niet op een aantal van de geselecteerde lay-outs. Actie werkt als camera wordt toegevoegd voordat de actie activeert.</translation>
     </message>
   </context>
   <context>
@@ -3211,7 +3211,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3380,7 +3380,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Voer een waarde in.</translation>
     </message>
   </context>
   <context>
@@ -3586,8 +3586,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>Aantal</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
@@ -3783,7 +3783,7 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>Elke licentie kan slechts een paar keer worden gedeactiveerd.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -4087,7 +4087,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Zoom gebied</translation>
     </message>
   </context>
   <context>
@@ -4242,11 +4242,11 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Virtuele camera</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Virtuele camera %1</translation>
     </message>
   </context>
   <context>
@@ -4471,9 +4471,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>ongeveer %n minuten</numerusform>
+        <numerusform>ongeveer %n minuten</numerusform>
       </translation>
     </message>
   </context>
@@ -4656,11 +4656,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Huidige Bitrate</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>geen gegevens voor voorspelling</translation>
     </message>
   </context>
   <context>
@@ -4706,11 +4706,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>Lokale bestanden</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Geen lokale bestanden</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4726,7 +4726,7 @@ to %1</source>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>open alles</translation>
     </message>
     <message>
       <source>All types</source>
@@ -4847,7 +4847,7 @@ to %1</source>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>Analytics Engines</translation>
     </message>
   </context>
   <context>
@@ -4911,7 +4911,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Exporteer bladwijzer...</translation>
     </message>
   </context>
   <context>
@@ -5107,6 +5107,10 @@ to %1</source>
     <message>
       <source>Server Web Page</source>
       <translation>Server webpagina</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -5452,23 +5456,23 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Laatste 5 minuten</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Laatste 60 minuten</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Laatste 24 uur</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Langste beschikbare periode</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Voorspelling alleen beschikbaar voor camera's met actieve opname.</translation>
     </message>
   </context>
   <context>
@@ -5578,16 +5582,30 @@ to %1</source>
       <translation>Back-up voltooid</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Opname van de uitgeschakelde opslag zal stoppen. Echter, het overschrijven dan de oudste beelden gaat gewoon door.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Opname is ingeschakeld op de USB-opslag</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Door opnieuw te indexeren kunnen problemen met het archief of de back-up worden opgelost als deze verloren of beschadigd zijn geraakt of als er hardware is vervangen.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Bewaar</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuleren</translation>
     </message>
   </context>
   <context>
@@ -5635,6 +5653,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>Te kleine en systeempartities zijn gereserveerd en worden niet gebruikt voor het schrijven als er genoeg andere opslagruimte beschikbaar is.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
@@ -5860,23 +5886,23 @@ to %1</source>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Geen enkele server heeft internettoegang voor tijdsynchronisatie</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>Het systeem bevindt zich in de veilige modus</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>Het systeem heeft geen internettoegang voor tijdsynchronisatie</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>Geen enkele online server in het systeem heeft internettoegang voor tijdsynchronisatie.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>Het systeem bevindt zich in de veilige modus.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
@@ -5903,15 +5929,15 @@ to %1</source>
     </message>
     <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+      <translation>Failover-servermaatregelen vragen mogelijk nog steeds om statusupdates van de camera, ongeacht deze instelling.</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>Schakel autodiscovery van apparaten en servers en geautomatiseerde apparaatstatuscontrole in</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>Schakel autodiscovery van apparaten en servers en geautomatiseerde camera statuscontrole in</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
@@ -5930,11 +5956,11 @@ to %1</source>
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>HTML-bestand</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>Spread Sheet (CSV) -bestand</translation>
     </message>
   </context>
   <context>
@@ -5968,11 +5994,11 @@ to %1</source>
     </message>
     <message>
       <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>VMS-tijd wordt gesynchroniseerd met internet en is niet afhankelijk van de lokale tijd op servers.</translation>
     </message>
     <message>
       <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>VMS tijd wordt gesynchroniseerd met lokale tijd op de geselecteerde server en is niet afhankelijk van lokale tijd op andere servers.</translation>
     </message>
   </context>
   <context>
@@ -6492,15 +6518,15 @@ to %1</source>
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
-      <translation type="unfinished">%1 has been successfully configured.</translation>
+      <translation>%1 is succesvol geconfigureerd.</translation>
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+      <translation>Om het proces te voltooien, maak er verbinding mee met Client en update naar versie %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation type="unfinished">Failed to merge %1 to our system.</translation>
+      <translation>Kan %1 niet samenvoegen met ons systeem.</translation>
     </message>
   </context>
   <context>
@@ -6574,7 +6600,7 @@ to %1</source>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (Audio / Video Interleaved)</translation>
     </message>
   </context>
   <context>
@@ -6625,11 +6651,11 @@ to %1</source>
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>PNG Afbeelding</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>JPEG Afbeelding</translation>
     </message>
   </context>
   <context>
@@ -6852,17 +6878,17 @@ to %1</source>
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>Toevoegen van virtuele camera mislukt</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>Open opnames van virtuele camera...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>U kunt deze bestanden uploaden naar een ander exemplaar van een virtuele camera.</numerusform>
+        <numerusform>U kunt deze bestanden uploaden naar een ander exemplaar van een virtuele camera.</numerusform>
       </translation>
     </message>
     <message>
@@ -7089,9 +7115,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>Sommige videobestanden worden nog steeds geüpload naar %n virtuele camera's:</numerusform>
+        <numerusform>Sommige videobestanden worden nog steeds geüpload naar %n virtuele camera's:</numerusform>
       </translation>
     </message>
   </context>
@@ -7099,11 +7125,11 @@ to %1</source>
     <name>SessionExpiredDialog</name>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Uw sessie is verlopen</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by the system administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+      <translation>Sessie duur limiet kan worden gewijzigd door de systeembeheerders</translation>
     </message>
   </context>
   <context>
@@ -7188,21 +7214,21 @@ to %1</source>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>Dit Linux-platform wordt niet langer ondersteund</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Deze OS-versie wordt niet langer ondersteund</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>Deze %1 versie wordt niet langer ondersteund</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 wordt niet langer ondersteund</translation>
     </message>
   </context>
   <context>
@@ -7277,23 +7303,23 @@ to %1</source>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Apparaten op lay-out</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Camera's op lay-out</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Elk apparaat</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Elke Camera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Geselecteerd apparaat</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7304,11 +7330,11 @@ to %1</source>
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>Altijd tonen</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>Toon alleen met &quot;objecten&quot; Tabblad</translation>
     </message>
     <message>
       <source>Show</source>
@@ -7316,7 +7342,7 @@ to %1</source>
     </message>
     <message>
       <source>Do Not Show</source>
-      <translation type="unfinished">Do Not Show</translation>
+      <translation>Niet tonen</translation>
     </message>
   </context>
   <context>
@@ -7327,7 +7353,7 @@ to %1</source>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>verwijderde camera</translation>
     </message>
   </context>
   <context>
@@ -7342,9 +7368,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n objecten</numerusform>
+        <numerusform>%n objecten</numerusform>
       </translation>
     </message>
     <message>
@@ -7353,11 +7379,11 @@ to %1</source>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Selecteer gebied</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Selecteer een gebied op de video...</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -7365,19 +7391,19 @@ to %1</source>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>naamloze analytics engine</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
-      <translation>Kan de plugin niet uitvoeren</translation>
+      <translation>Kan plugin actie niet uitvoeren</translation>
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Voer parameters in</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+      <translation>Actie vereist dat sommige parameters worden ingevuld.</translation>
     </message>
   </context>
   <context>
@@ -7391,7 +7417,7 @@ to %1</source>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>verwijderde camera</translation>
     </message>
   </context>
   <context>
@@ -7493,12 +7519,12 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>UDP Multicast</source>
-      <translation type="unfinished">UDP Multicast</translation>
-    </message>
-    <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
       <translation>De server zal geen camera-instellingen veranderen, deze zal de camerastream zoals aangeleverd ontvangen en gebruiken.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -7600,14 +7626,14 @@ to %1</source>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n camera's</numerusform>
+        <numerusform>%n camera's</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>Je hebt geen camera's</translation>
     </message>
   </context>
   <context>
@@ -7735,35 +7761,35 @@ to %1</source>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Update bestand kan niet gevonden worden</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>Updatepakket is beschadigd</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>Downloaden van updatepakket mislukt: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>Updatepakket is beschadigd: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Deze update is al geïnstalleerd.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Deze versie is niet geïnstalleerd.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Ongeldige versie-indeling.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>Defect updatepakket.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7828,7 +7854,7 @@ to %1</source>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>Voor sommige geselecteerde camera's moet een wachtwoord worden ingesteld.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -7910,13 +7936,13 @@ to %1</source>
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>Alle apparaten zijn al toegevoegd</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>%n apparaten toegevoegd. U kunt dit dialoogvenster sluiten of een nieuwe zoekopdracht starten</numerusform>
+        <numerusform>%n apparaten toegevoegd. U kunt dit dialoogvenster sluiten of een nieuwe zoekopdracht starten</numerusform>
       </translation>
     </message>
     <message>
@@ -7932,7 +7958,7 @@ to %1</source>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>Adresveld kan niet leeg zijn</translation>
     </message>
   </context>
   <context>
@@ -7978,39 +8004,39 @@ to %1</source>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Server evenementen</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Analytics evenementen</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Elk apparaatprobleem</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Elk camera probleem</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Elke servergebeurtenis</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Apparaatproblemen</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Camera problemen</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Elke gebeurtenis</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Elke analytics gebeurtenis</translation>
     </message>
     <message>
       <source>No events</source>
@@ -8025,7 +8051,7 @@ to %1</source>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>naamloze analytics engine</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8046,7 +8072,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>Voer een geldig wachtwoord in.</translation>
     </message>
   </context>
   <context>
@@ -8195,7 +8221,7 @@ to %1</source>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>U staat op het punt een lange video te exporteren. Het vereist mogelijk veel opslagruimte en neemt veel tijd in beslag.</translation>
     </message>
   </context>
   <context>
@@ -8267,16 +8293,16 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n nieuw</numerusform>
+        <numerusform>%n nieuw</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>%n apparaten in totaal</numerusform>
+        <numerusform>%n apparaten in totaal</numerusform>
       </translation>
     </message>
   </context>
@@ -8321,7 +8347,7 @@ to %1</source>
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>Kopieer link locatie</translation>
     </message>
   </context>
   <context>
@@ -8427,7 +8453,7 @@ to %1</source>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>verwijderde camera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8442,27 +8468,27 @@ to %1</source>
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>Automatisch controleren op updates</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Controleren op updates</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>Forceer controle</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>Automatisch controleren uitschakelen</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>Eenmaal controleren</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>Automatisch controleren</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -8474,39 +8500,39 @@ to %1</source>
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>U heeft deze versie al geïnstalleerd.</translation>
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation type="unfinished">Unable to check updates on the internet</translation>
+      <translation>Kan updates niet controleren op het internet</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>Bestand niet gevonden</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>Kan niet bijwerken uit het geselecteerde bestand</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>Ongeldige update informatie</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>Downgrade naar eerdere versies is niet mogelijk</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Update bestand kan niet gevonden worden</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>Upgrade pakket is beschadigd</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>Update pakket voor sommige servers ontbreekt</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -8515,7 +8541,7 @@ to %1</source>
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>Geen updatepakket beschikbaar</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -8530,10 +8556,6 @@ to %1</source>
       <translation>Sommige servers zijn offline en zullen niet worden bijgewerkt. Deze overslaan?</translation>
     </message>
     <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation>Zorg ervoor dat er voldoende vrije opslagruimte is en dat de netwerkverbinding stabiel is.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Als het probleem aanhoudt, neem contact op met customer support.</translation>
     </message>
@@ -8546,28 +8568,20 @@ to %1</source>
       <translation>Update annuleren</translation>
     </message>
     <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation>Zorg ervoor dat er voldoende vrije opslagruimte is en dat de netwerkverbinding stabiel is.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>Update voltooid</translation>
     </message>
     <message>
       <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
+      <translation>Update voltooid, maar sommige servers hebben een mislukte update</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+      <translation>Nx Witness Client zal opnieuw worden gestart naar de bijgewerkte versie.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>Oké</translation>
-    </message>
-    <message>
-      <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -8575,15 +8589,15 @@ to %1</source>
     </message>
     <message>
       <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
+      <translation>Updates verzenden...</translation>
     </message>
     <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>Uploaden</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>Upload &amp;&amp; installeren</translation>
     </message>
     <message>
       <source>Download</source>
@@ -8591,15 +8605,15 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Download &amp;&amp; Installeren</translation>
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>Selecteer een andere Build</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
+      <translation>Bladeren naar een ander bestand...</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8607,11 +8621,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>Updates uploaden...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>Client pakket downloaden...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -8619,7 +8633,7 @@ to %1</source>
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>Installeren van client updates...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -8635,7 +8649,7 @@ to %1</source>
     </message>
     <message>
       <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <translation>Systeem bijgewerkt naar</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8655,7 +8669,7 @@ to %1</source>
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
+      <translation>Update van mediaservers</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
@@ -8663,18 +8677,18 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>Update pakket ontbreekt voor de client en %n servers</numerusform>
+        <numerusform>Update pakket ontbreekt voor de client en %n servers</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>Update pakket voor de client ontbreekt</translation>
     </message>
     <message>
       <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
+      <translation>Update voltooien</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -8682,15 +8696,15 @@ to %1</source>
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
+      <translation>De nieuwste versie is al geïnstalleerd</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
+      <translation>Deze versie is al geïnstalleerd</translation>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
+      <translation>Er zijn geen online servers om bij te werken.</translation>
     </message>
     <message>
       <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
@@ -8701,8 +8715,16 @@ to %1</source>
       <translation>Update annuleren en alle gedownloade gegevens verwijderen?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <source>Failed to download update packages to some servers</source>
+      <translation type="unfinished">Failed to download update packages to some servers</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
   </context>
   <context>
@@ -8716,7 +8738,7 @@ to %1</source>
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>U heeft geen lay-outs</translation>
     </message>
   </context>
   <context>
@@ -8735,19 +8757,19 @@ to %1</source>
     </message>
     <message>
       <source>Unknown Plugin Event</source>
-      <translation type="unfinished">Unknown Plugin Event</translation>
+      <translation>Onbekende Plugin Evenement</translation>
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Apparaat is losgekoppeld</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>Camera is losgekoppeld</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>I / O-module is losgekoppeld</translation>
     </message>
   </context>
   <context>
@@ -8781,46 +8803,102 @@ to %1</source>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>Geen van de geselecteerde gebruikersrollen bevatten gebruikers. Actie zal niet werken.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>Het duurt te lang voordat de server reageert</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>Geen update taak</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>Klaar om update te downloaden</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>Updates aan het downloaden</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>Klaar om opnieuw te starten naar de nieuwe versie</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>Updates installeren</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Geïnstalleerd</translation>
     </message>
     <message>
       <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
+      <translation>Update downloaden mislukt</translation>
     </message>
     <message>
       <source>Failed to install update</source>
-      <translation type="unfinished">Failed to install update</translation>
+      <translation>Update installeren mislukt</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>Update package can&apos;t be not found.</source>
+      <translation type="unfinished">Update package can&apos;t be not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Iternal server error.</source>
+      <translation type="unfinished">Iternal server error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Onbekende fout.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
     </message>
   </context>
   <context>
@@ -8898,7 +8976,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>Beweging + Lage-Res</translation>
     </message>
   </context>
   <context>
@@ -8974,7 +9052,22 @@ to %1</source>
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Gebruikers worden automatisch afgemeld als hun sessie de opgegeven duur overschrijdt.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Fabrikant</translation>
     </message>
   </context>
   <context>
@@ -8985,11 +9078,11 @@ to %1</source>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Geïnstalleerd</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Installeren...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -8997,7 +9090,7 @@ to %1</source>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>Wacht tot de server reageert...</translation>
     </message>
   </context>
   <context>
@@ -9012,7 +9105,7 @@ to %1</source>
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Update bestanden opslaan</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9020,11 +9113,11 @@ to %1</source>
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Component</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>Geïnstalleerde versie</translation>
     </message>
   </context>
   <context>
@@ -9042,7 +9135,7 @@ to %1</source>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>Selecteer gebied op de video om resultaten te filteren</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -9069,11 +9162,11 @@ to %1</source>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Geselecteerd apparaat</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>Geselecteerde media</translation>
     </message>
     <message>
       <source>none</source>
@@ -9092,9 +9185,9 @@ to %1</source>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>E-mailadres is niet ingesteld voor gebruiker %n</numerusform>
+        <numerusform>E-mailadres is niet ingesteld voor gebruiker %n</numerusform>
       </translation>
     </message>
     <message>
@@ -9113,14 +9206,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Dubbelklik om camera's toe te voegen aan de huidige lay-out of ctrl + klik om te openen in een nieuw tabblad</numerusform>
+        <numerusform>Dubbelklik om camera's toe te voegen aan de huidige lay-out of ctrl + klik om te openen in een nieuw tabblad</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Geen beschikbaar archief</translation>
     </message>
   </context>
   <context>
@@ -9131,7 +9224,7 @@ to %1</source>
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Tijdzone</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9139,42 +9232,42 @@ to %1</source>
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Server OS Tijd</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS tijd</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Tijd, algemeen en gesynchroniseerd tussen alle servers. Kan anders zijn met OS-tijd op een bepaalde server.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Tijdsynchronisatie met het internet</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Gesynchroniseerd met de lokale tijd op de geselecteerde server</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Niet gesynchroniseerd. Elke server gebruikt zijn eigen lokale tijd.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Gelijk aan de lokale tijd van de server</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Geen internet verbinding. De tijd wordt niet gesynchroniseerd.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Tijdserver is offline. De tijd wordt niet gesynchroniseerd.</translation>
     </message>
   </context>
   <context>
@@ -9200,7 +9293,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Kan upload aan de serverkant niet maken: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9219,11 +9312,11 @@ to %1</source>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Beweging wordt alleen gedetecteerd tijdens het uploaden van video.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Het inschakelen of uitschakelen van deze instelling verandert niets in het bestaande archief.</translation>
     </message>
   </context>
   <context>
@@ -9310,7 +9403,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Verschillende bladwijzers kunnen alleen als layout worden geëxporteerd.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
@@ -9322,27 +9415,27 @@ to %1</source>
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Export starten...</translation>
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Lay-out opslaan</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>Stop opslaan</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>Opslaan mislukt</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>Beginnen met opslaan...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>We bereiden bestanden voor op het exportproces. Wacht een paar seconden.</translation>
     </message>
   </context>
   <context>
@@ -9420,7 +9513,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::PluginEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Elke Plugin</translation>
     </message>
   </context>
   <context>
@@ -9551,7 +9644,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Layout is vol</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9609,7 +9702,7 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Virtuele camera's kunnen niet worden verplaatst tussen servers</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -9621,7 +9714,7 @@ to %1</source>
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Alle ondersteund</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9725,14 +9818,38 @@ to %1</source>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Wijzigen van wachtwoorden op %n van %1 camera's mislukt</numerusform>
+        <numerusform>Wijzigen van wachtwoorden op %n van %1 camera's mislukt</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Deze versie is alleen voor testdoeleinden.</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data</source>
+      <translation type="unfinished">Confirm storage location to store analytics data</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>Oké</translation>
     </message>
   </context>
   <context>
