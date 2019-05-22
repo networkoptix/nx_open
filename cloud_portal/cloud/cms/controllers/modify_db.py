@@ -19,11 +19,9 @@ PENDING = ProductCustomizationReview.REVIEW_STATES[ProductCustomizationReview.RE
 
 
 def update_draft_state(review_id, target_state, user):
-    review = ProductCustomizationReview.objects.filter(id=review_id, reviewed_by=None)
-    if not review.exists():
+    review = ProductCustomizationReview.objects.filter(id=review_id, reviewed_by=None).last()
+    if not review:
         return " is currently publishing or has already been published"
-
-    review = review.latest('id')
 
     if not review.version.accepted_by:
         review.version.accepted_by = user
@@ -320,10 +318,9 @@ def integration_has_required_data(product):
 
 
 def send_version_for_review(product, user):
-    old_versions = ContentVersion.objects.filter(product=product, accepted_date=None)
+    old_version = ContentVersion.objects.filter(product=product, accepted_date=None).order_by('created_date').last()
 
-    if old_versions.exists():
-        old_version = old_versions.latest('created_date')
+    if old_version:
         strip_version_from_records(old_version, product)
         old_version.delete()
 

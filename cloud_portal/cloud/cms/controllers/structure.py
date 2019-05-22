@@ -21,9 +21,8 @@ def find_or_add_product_type(product_type):
 
 def find_or_add_product(name, customization, product_type_name='cloud_portal'):
     product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_name))
-    if Product.objects.filter(name=name, customizations__in=[customization], product_type=product_type).exists():
-        product = Product.objects.get(name=name, customizations__in=[customization], product_type=product_type)
-    else:
+    product = Product.objects.filter(name=name, customizations__in=[customization], product_type=product_type).first()
+    if not product:
         product = Product(name=name)
         product.product_type = product_type
         product.save()
@@ -33,33 +32,34 @@ def find_or_add_product(name, customization, product_type_name='cloud_portal'):
 
 
 def find_or_add_context(context_name, old_name, product_type, has_language, is_global):
-    if old_name and Context.objects.filter(name=old_name, product_type=product_type).exists():
-        context = Context.objects.get(name=old_name, product_type=product_type)
-        context.name = context_name
+    if old_name:
+        context = Context.objects.filter(name=old_name, product_type=product_type).first()
+        if context:
+            context.name = context_name
+            context.save()
+            return context
+
+    context = Context.objects.filter(name=context_name, product_type=product_type).first()
+    if not context:
+        context = Context(name=context_name, file_path=context_name, product_type=product_type,
+                          translatable=has_language, is_global=is_global)
         context.save()
-        return context
-
-    if Context.objects.filter(name=context_name, product_type=product_type).exists():
-        return Context.objects.get(name=context_name, product_type=product_type)
-
-    context = Context(name=context_name, file_path=context_name, product_type=product_type,
-                      translatable=has_language, is_global=is_global)
-    context.save()
     return context
 
 
 def find_or_add_data_structure(name, old_name, context_id, has_language):
-    if old_name and DataStructure.objects.filter(name=old_name, context_id=context_id).exists():
-        record = DataStructure.objects.get(name=old_name, context_id=context_id)
-        record.name = name
-        record.save()
-        return record
+    if old_name:
+        record = DataStructure.objects.filter(name=old_name, context_id=context_id).first()
+        if record:
+            record.name = name
+            record.save()
+            return record
 
-    if DataStructure.objects.filter(name=name, context_id=context_id).exists():
-        return DataStructure.objects.get(name=name, context_id=context_id)
-    data = DataStructure(name=name, context_id=context_id,
-                         translatable=has_language, default=name)
-    data.save()
+    data = DataStructure.objects.filter(name=name, context_id=context_id).first()
+    if not data:
+        data = DataStructure(name=name, context_id=context_id,
+                             translatable=has_language, default=name)
+        data.save()
     return data
 
 
@@ -184,21 +184,19 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
             continue
 
         # try to find relevant context
-        context = Context.objects.filter(file_path=name)
-        if context.exists():
+        context = Context.objects.filter(file_path=name).first()
+        if context:
             try:
                 file_content = zip_file.read(name).decode("utf-8")
             except UnicodeDecodeError:
                 log_messages.append(('error', 'Ignored:  %s (file is not UTF-encoded)' % name))
                 continue
 
-            context = context.first()
             if update_structure:
                 # Here we assume that there is only one template here
 
-                if context.contexttemplate_set.exists():
-                    context_template = context.contexttemplate_set.first()
-                else:
+                context_template = context.contexttemplate_set.first()
+                if not context_template:
                     context_template = ContextTemplate(context=context)
 
                 if context_template.template != file_content:
@@ -261,11 +259,10 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
             continue
 
         # try to find relevant data structure and update its default (maybe)
-        structure = DataStructure.objects.filter(name=name)
-        if not structure.exists():
+        structure = DataStructure.objects.filter(name=name).first()
+        if not structure:
             log_messages.append(('warning', 'Ignored: %s (data structure %s does not exist)' % (name, name)))
             continue
-        structure = structure.first()
 
         # if data structure is not FILE or IMAGE - print to log and ignore
         if structure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):

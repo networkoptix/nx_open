@@ -172,8 +172,8 @@ def activate(request):
         code = request.data['code']
 
         tmp_pass, email = Account.extract_temp_credentials(code)
-        account_query = models.Account.objects.filter(email=email)
-        if account_query.exists() and account_query.first().activated_date:
+        account_query = models.Account.objects.filter(email=email).first()
+        if account_query and account_query.activated_date:
             raise APIRequestException('Account has already been activated', ErrorCodes.account_activated)
 
         user_data = Account.activate(code)

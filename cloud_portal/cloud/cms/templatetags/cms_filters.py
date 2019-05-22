@@ -16,27 +16,22 @@ def is_FileField(field):
 
 @register.simple_tag
 def get_data_structure(data_structure_name, context):
-    query = DataStructure.objects.filter(context=context, name=data_structure_name)
-    if query.exists():
-        return query[0]
-    return None
+    return DataStructure.objects.filter(context=context, name=data_structure_name).first()
 
 
 @register.simple_tag
 def is_external_file_or_image(data_structure_name, context):
-    query = DataStructure.objects.filter(context=context, name=data_structure_name)
-    if query.exists():
-        return query[0].type in [DataStructure.DATA_TYPES.external_file, DataStructure.DATA_TYPES.external_image]
+    query = DataStructure.objects.filter(context=context, name=data_structure_name).first()
+    if query:
+        return query.type in [DataStructure.DATA_TYPES.external_file, DataStructure.DATA_TYPES.external_image]
     return False
 
 
 @register.simple_tag
 def has_value(data_structure_name, product, context, language):
-    query = DataStructure.objects.filter(context=context, name=data_structure_name)
+    data_structure = DataStructure.objects.filter(context=context, name=data_structure_name).first()
 
-    if query.exists():
-        data_structure = query[0]
-    else:
+    if not data_structure:
         return False
 
     if not data_structure.translatable:

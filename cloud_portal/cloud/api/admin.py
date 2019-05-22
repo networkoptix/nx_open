@@ -34,9 +34,9 @@ class CustomizationFilter(SimpleListFilter):
             }
 
     def queryset(self, request, queryset):
-        customization_name = Customization.objects.filter(id=self.value())
-        if self.value() and customization_name.exists():
-            return queryset.filter(customization=customization_name[0].name)
+        customization_name = Customization.objects.filter(id=self.value()).first()
+        if self.value() and customization_name:
+            return queryset.filter(customization=customization_name.name)
 
         if self.value() is None:
             return queryset.filter(customization=self.default_customization.name)

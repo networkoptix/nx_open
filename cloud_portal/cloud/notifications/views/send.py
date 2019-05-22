@@ -96,10 +96,10 @@ def send_event(request):
 
         product_id = ''
         if request.data['type'] != 'ipvd_feedback_page' and request.data['type'] != 'ipvd_feedback_device':
-            product = Product.objects.filter(id=request.data['productId'])
-            if product.exists():
-                request.data['product'] = product.first().name
-                product_id = product.first().id
+            product = Product.objects.filter(id=request.data['productId']).first()
+            if product:
+                request.data['product'] = product.name
+                product_id = product.id
         else:
             request.data['product'] = request.data['productId']
 
@@ -156,9 +156,9 @@ def send_notification(request):
 
         # Clouddb doesn't always return a full name so try to get it from cloud portal
         if 'userFullName' not in request.data['message'] or not request.data['message']['userFullName']:
-            user_account = Account.objects.filter(email=request.data['user_email'])
-            if user_account.exists():
-                request.data['message']['userFullName'] = user_account[0].get_full_name()
+            user_account = Account.objects.filter(email=request.data['user_email']).first()
+            if user_account:
+                request.data['message']['userFullName'] = user_account.get_full_name()
 
         notifications_api.send(request.data['user_email'],
                                request.data['type'],

@@ -25,12 +25,11 @@ def find_context(name, file_path, structure, product_name):
     context = next((context for context in structure["contexts"]
                    if context["name"] == name or file_path and context["file_path"] == file_path), None)
     if not context:
-        db_context = Context.objects.filter(file_path=file_path, product__name=product_name)
+        db_context = Context.objects.filter(file_path=file_path, product__name=product_name).first()
         translatable = False
         hidden = True
         description = ""
-        if db_context.exists():
-            db_context = db_context.first()
+        if db_context:
             name = db_context.name
             description = db_context.description
             translatable = db_context.translatable
@@ -52,11 +51,10 @@ def find_structure(name, context, structure_type, meta=None, description=""):
     data_structure = next((structure for structure in context["values"] if structure["name"] == name), None)
     if not data_structure:
         # try to populate structure from database
-        db_structure = DataStructure.objects.filter(name=name)
+        db_structure = DataStructure.objects.filter(name=name).first()
         label = ''
         value = ''
-        if db_structure.exists():
-            db_structure = db_structure.first()
+        if db_structure:
             label = db_structure.label if db_structure.label != name else ''
             value = db_structure.default
             if db_structure.description:

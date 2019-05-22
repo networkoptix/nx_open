@@ -24,9 +24,9 @@ def create_new_cloudportals_for_each_customization(logger):
     for customization in customizations:
         records_with_name = DataRecord.objects.filter(data_structure__name="%CLOUD_NAME%",
                                                       customization=customization) \
-            .exclude(version=None)
-        if records_with_name.exists():
-            product_name = records_with_name.latest('id').value
+            .exclude(version=None).last()
+        if records_with_name:
+            product_name = records_with_name.value
             logger.stdout.write(logger.style.SUCCESS("\tProduct name for {} is {}".
                                                      format(customization.name, product_name)))
         else:
@@ -124,19 +124,21 @@ def iterate_cms_files(skin_name, ignore_not_english):
 
 
 def find_or_add_context_by_file(file_path, product_type, has_language):
-    if Context.objects.filter(file_path=file_path, product_type=product_type).exists():
-        return Context.objects.get(file_path=file_path, product_type=product_type)
-    context = Context(name=file_path, file_path=file_path, product_type=product_type,
-                      translatable=has_language, hidden=True, is_global=False)
-    context.save()
+    context = Context.objects.filter(file_path=file_path, product_type=product_type).first()
+    if not context:
+        context = Context(name=file_path, file_path=file_path, product_type=product_type,
+                          translatable=has_language, hidden=True, is_global=False)
+        context.save()
     return context
 
 
 def find_or_add_context_template(context, language_code, skin):
-    if ContextTemplate.objects.filter(context__id=context.id, language__code=language_code, skin=skin).exists():
-        return ContextTemplate.objects.get(context__id=context.id, language__code=language_code, skin=skin)
-    context_template = ContextTemplate(context=context, language=Language.by_code(language_code), skin=skin)
-    context_template.save()
+    context_template = ContextTemplate.objects.filter(
+        context__id=context.id, language__code=language_code, skin=skin
+    ).first()
+    if not context_template:
+        context_template = ContextTemplate(context=context, language=Language.by_code(language_code), skin=skin)
+        context_template.save()
     return context_template
 
 

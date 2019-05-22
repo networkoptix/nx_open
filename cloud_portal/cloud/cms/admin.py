@@ -118,9 +118,9 @@ class ProductAdmin(CMSAdmin):
         product_customizations = ProductCustomizationReview.objects.filter(version__product=product)
 
         for customization in product.customizations.filter(name__in=request.user.customizations):
-            approved_versions = product_customizations.filter(customization=customization, state=approved)
-            if approved_versions.exists():
-                extra_context['current_versions'].append(approved_versions.latest('id'))
+            approved_version = product_customizations.filter(customization=customization, state=approved).last()
+            if approved_version:
+                extra_context['current_versions'].append(approved_version)
             else:
                 extra_context['current_versions'].append({'customization': customization.name,
                                                           'id': "No Current Version"})
