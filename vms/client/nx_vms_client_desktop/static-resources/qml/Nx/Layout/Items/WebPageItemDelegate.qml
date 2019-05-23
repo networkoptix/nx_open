@@ -6,12 +6,12 @@ ResourceItemDelegate
     [
         TitleBarButton
         {
-            icon: "qrc:/skin/item/back.png"
+            iconUrl: "qrc:/skin/item/back.png"
         },
 
         TitleBarButton
         {
-            icon: "qrc:/skin/item/refresh.png"
+            iconUrl: "qrc:/skin/item/refresh.png"
         }
     ]
 
@@ -19,8 +19,8 @@ ResourceItemDelegate
     [
         TitleBarButton
         {
-            icon: "qrc:/skin/item/fullscreen.png"
-            checkedIcon: "qrc:/skin/item/exit_fullscreen.png"
+            iconUrl: "qrc:/skin/item/fullscreen.png"
+            checkedIconUrl: "qrc:/skin/item/exit_fullscreen.png"
             checkable: true
         },
 
@@ -28,7 +28,7 @@ ResourceItemDelegate
         {
             id: infoButton
 
-            icon: "qrc:/skin/item/info.png"
+            iconUrl: "qrc:/skin/item/info.png"
             checkable: true
 
             Binding
@@ -43,7 +43,7 @@ ResourceItemDelegate
 
         TitleBarButton
         {
-            icon: "qrc:/skin/item/close.png"
+            iconUrl: "qrc:/skin/item/close.png"
             onClicked: layoutItemData.layout.removeItem(layoutItemData.itemId)
         }
     ]
