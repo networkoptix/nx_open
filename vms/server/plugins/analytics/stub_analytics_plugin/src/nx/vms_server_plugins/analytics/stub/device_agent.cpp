@@ -28,12 +28,18 @@ using namespace nx::sdk::analytics;
 
 namespace {
 
+enum class EventContinuityType
+{
+    impulse,
+    prolonged,
+};
+
 struct EventDescriptor
 {
     std::string eventTypeId;
     std::string caption;
     std::string description;
-    bool isProlonged = false;
+    EventContinuityType continuityType = EventContinuityType::impulse;
 };
 
 static const std::vector<EventDescriptor> kEventsToFire = {
@@ -41,25 +47,25 @@ static const std::vector<EventDescriptor> kEventsToFire = {
         kObjectInTheAreaEventType,
         "Object in the Area - prolonged event (caption)",
         "Object in the Area - prolonged event (description)",
-        /*isProlonged*/ true
+        EventContinuityType::prolonged
     },
     {
         kLineCrossingEventType,
         "Line crossing - impulse event (caption)",
         "Line crossing - impulse event (description)",
-        /*isProlonged*/ false
+        EventContinuityType::impulse
     },
     {
         kSuspiciousNoiseEventType,
         "Suspicious noise - group impulse event (caption)",
         "Suspicious noise - group impulse event (description)",
-        /*isProlonged*/ false
+        EventContinuityType::impulse
     },
     {
         kGunshotEventType,
         "Gunshot - group impulse event (caption)",
         "Gunshot - group impulse event (description)",
-        /*isProlonged*/ false
+        EventContinuityType::impulse
     }
 };
 
@@ -407,19 +413,19 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
     auto eventMetadata = makePtr<EventMetadata>();
     eventMetadata->setTypeId(descriptor.eventTypeId);
 
-    auto nextEventIndex =
+    auto nextEventTypeIndex =
         [this]()
         {
-            return m_eventContext.currentEventTypeIndex == kEventsToFire.size() - 1
+            return (m_eventContext.currentEventTypeIndex == kEventsToFire.size() - 1)
                 ? 0
-                : m_eventContext.currentEventTypeIndex + 1;
+                : (m_eventContext.currentEventTypeIndex + 1);
         };
 
     bool isActive = false;
     auto caption = descriptor.caption;
     auto description = descriptor.description;
 
-    if (descriptor.isProlonged)
+    if (descriptor.continuityType == EventContinuityType::prolonged)
     {
         static const std::string kStartedSuffix{" STARTED"};
         static const std::string kFinishedSuffix{" FINISHED"};
@@ -430,7 +436,7 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
 
         eventMetadata->setIsActive(isActive);
         if (m_eventContext.isCurrentEventActive)
-            m_eventContext.currentEventTypeIndex = nextEventIndex();
+            m_eventContext.currentEventTypeIndex = nextEventTypeIndex();
 
         m_eventContext.isCurrentEventActive = isActive;
     }
@@ -439,7 +445,7 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
         isActive = true;
         eventMetadata->setIsActive(isActive);
         m_eventContext.isCurrentEventActive = false;
-        m_eventContext.currentEventTypeIndex = nextEventIndex();
+        m_eventContext.currentEventTypeIndex = nextEventTypeIndex();
     }
 
     eventMetadata->setCaption(std::move(caption));
