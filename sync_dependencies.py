@@ -21,7 +21,9 @@ def determine_package_versions():
         "libjpeg-turbo": "1.4.2",
         "festival": "2.4",
         "directx": "JUN2010",
-        "pandoc": "2.2.1"
+        "pandoc": "2.2.1",
+        "detours": "4.0.1",
+        "stackwalker": "1.0"
     }
 
     if platform == "windows":
@@ -139,6 +141,10 @@ def sync_dependencies(syncher):
 
     if withDesktopClient:
         sync("any/help-{}-3.2".format(customization), path_variable="help_directory")
+
+    if (platform == "windows") and withDesktopClient:
+        sync("detours")
+        sync("stackwalker")
 
     if withDesktopClient or withMobileClient:
         sync("any/roboto-fonts", path_variable="fonts_directory")

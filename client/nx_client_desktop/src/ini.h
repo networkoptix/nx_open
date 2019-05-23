@@ -29,6 +29,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, modalServerSetupWizard, "Server setup wizard dialog is a modal window.");
     NX_INI_FLAG(0, enableWatermark, "Enable watermarks preview and setup.");
     NX_INI_FLAG(0, enableCaseExport, "Enable case export.");
+    NX_INI_FLAG(0, enableGdiTrace, "Enable tracing of GDI object allocation.");
 };
 
 inline Ini& ini()

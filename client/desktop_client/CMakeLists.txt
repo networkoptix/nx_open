@@ -4,6 +4,10 @@ nx_add_target(desktop_client EXECUTABLE SIGNED
     PUBLIC_LIBS
         qtsingleapplication nx_kit nx_client_desktop)
 
+if(WINDOWS)
+    target_link_libraries(desktop_client PUBLIC nx_gdi_tracer)
+endif()
+
 if(LINUX)
     # Security requirement (see hardening-check).
     string(APPEND CMAKE_EXE_LINKER_FLAGS " -pie")
