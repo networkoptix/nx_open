@@ -117,7 +117,7 @@ void OnlineRelaysClusterClient::onRelayDiscovered(nx::cloud::discovery::Node tra
     auto location = resolve(kTrafficRelay, trafficRelayNode.publicIpAddress);
     if (location)
     {
-        NX_VERBOSE(this, "Discovered resolve traffic relay: %1, location: %2",
+        NX_VERBOSE(this, "Discovered resolved traffic relay: %1, location: %2",
             trafficRelayNode, location);
         QnMutexLocker lock(&m_mutex);
         m_resolvedRelays.emplace(
