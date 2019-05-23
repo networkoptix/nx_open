@@ -118,6 +118,10 @@ protected:
             {
                 if (clusterId == relayClusterId())
                 {
+                    std::lock_guard<std::mutex> lock(m_mutex);
+
+                    NX_DEBUG(this, "Discovery server found a traffic relay: %1", nodeInfo);
+
                     auto publicIpAddress = lm("10.10.10.%1").arg(++m_relayIpHostPart).toStdString();
 
                     discoveryServer().mockupClientPublicIpAddress(
@@ -296,18 +300,17 @@ private:
 
     void mockupRelayRegions()
     {
+        const auto needToWaitForRelayMockup =
+            [this]()
+            {
+                std::lock_guard<std::mutex> lock(m_mutex);
+                return (int)m_relaysMockedUp.size() < m_relayClusterSize;
+            };
+
         ASSERT_NE(m_geoIpResolver, nullptr);
 
-        while ((int)m_relaysMockedUp.size() < m_relayClusterSize)
+        while (needToWaitForRelayMockup())
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
-
-
-        ASSERT_EQ(m_relayClusterSize, relayClusterSize());
-        for (int i = 0; i < m_relayClusterSize; ++i)
-        {
-            NX_DEBUG(this, "relayUrl(%1): %2", i, relayUrl(i));
-        }
-
 
         using namespace nx::geo_ip;
         m_geoIpResolver->add(
@@ -321,6 +324,15 @@ private:
         m_geoIpResolver->add(
             m_relaysMockedUp.at(relayUrl(2)),
             Location(Continent::australia));
+
+        ASSERT_EQ(m_relayClusterSize, relayClusterSize());
+        for (int i = 0; i < m_relayClusterSize; ++i)
+        {
+            auto url = relayUrl(i);
+            auto publicIp = m_relaysMockedUp.at(url);
+            NX_DEBUG(this, "relayUrl(%1): %2 mocked up to public ip: %3, location: %4",
+                i, url, publicIp, m_geoIpResolver->resolve(publicIp));
+        }
 
         m_expectedRelayUrlForClient = relayUrl(2);
         m_expectedRelayUrlsForServer = { relayUrl(0), relayUrl(1) };
