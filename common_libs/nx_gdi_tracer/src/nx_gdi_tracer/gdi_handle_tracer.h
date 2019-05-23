@@ -18,6 +18,7 @@ public:
     void attachGdiDetours();
     void detachGdiDetours();
     void setReportPath(const std::filesystem::path& path);
+    void setGdiTraceLimit(int handleCount);
 
     void traceBitmap(HBITMAP handle);
     void traceBrush(HBRUSH handle);
@@ -42,7 +43,6 @@ private:
 
 private:
     static constexpr unsigned int kTopEntriesStripCount = 3;
-    static constexpr unsigned int kReportTriggerGdiCount = 5000;
 
     static GdiHandleTracer* m_instance;
 
@@ -55,7 +55,9 @@ private:
     std::unordered_map<HDC, std::string> m_metafileHandles;
     std::unordered_map<HRGN, std::string> m_regionHandles;
     std::filesystem::path m_reportPath;
+    int m_gdiTraceLimit = 5000;
     bool m_reportCreated = false;
+
 };
 
 } // namespace gdi_tracer

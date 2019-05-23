@@ -635,7 +635,7 @@ BOOL __stdcall Detour_DeleteEnhMetaFile(HENHMETAFILE a0)
 void GdiHandleTracer::checkGdiHandlesCount()
 {
     auto gdiHandlesCount = GetGuiResources(GetCurrentProcess(), GR_GDIOBJECTS);
-    if (gdiHandlesCount >= kReportTriggerGdiCount)
+    if (gdiHandlesCount >= m_gdiTraceLimit)
     {
         saveReportToFile(m_reportPath);
         m_reportCreated = true;
@@ -792,6 +792,11 @@ void GdiHandleTracer::detachGdiDetours()
 void GdiHandleTracer::setReportPath(const std::filesystem::path& path)
 {
     m_reportPath = path;
+}
+
+void GdiHandleTracer::setGdiTraceLimit(int handleCount)
+{
+    m_gdiTraceLimit = handleCount;
 }
 
 std::string GdiHandleTracer::getReport() const

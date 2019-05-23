@@ -30,6 +30,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableWatermark, "Enable watermarks preview and setup.");
     NX_INI_FLAG(0, enableCaseExport, "Enable case export.");
     NX_INI_FLAG(0, enableGdiTrace, "Enable tracing of GDI object allocation.");
+    NX_INI_INT(5000, gdiTraceLimit, "Number of GDI handles in use which triggers report creation.");
 };
 
 inline Ini& ini()
