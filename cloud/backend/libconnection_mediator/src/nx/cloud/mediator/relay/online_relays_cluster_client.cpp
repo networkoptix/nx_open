@@ -57,8 +57,8 @@ void OnlineRelaysClusterClient::selectRelayInstanceForListeningPeer(
     m_aioThreadBinder.post(
         [this, peerId, serverEndpoint, completionHandler = std::move(completionHandler)]()
     {
-        auto location = resolve(kListeningPeer, serverEndpoint.address.toStdString());
         std::string listeningPeer = std::string(kListeningPeer) + ": " + peerId;
+        auto location = resolve(listeningPeer, serverEndpoint.address.toStdString());
         auto relayUrls = findRelaysByLocation(listeningPeer, location);
         if (relayUrls.empty())
         {
@@ -67,10 +67,11 @@ void OnlineRelaysClusterClient::selectRelayInstanceForListeningPeer(
                 std::vector<nx::utils::Url>());
         }
 
-        NX_VERBOSE(this, "%1 reporting relay urls: %2 for listening peer: %3",
-            __func__, containerString(relayUrls), peerId);
+        NX_VERBOSE(this,
+            "selectRelayInstanceForListeningPeer() reporting relay urls: %1 for %2",
+            containerString(relayUrls), listeningPeer);
 
-        return completionHandler(nx::cloud::relay::api::ResultCode::ok, std::move(relayUrls));
+        completionHandler(nx::cloud::relay::api::ResultCode::ok, std::move(relayUrls));
     });
 }
 
@@ -93,10 +94,12 @@ void OnlineRelaysClusterClient::findRelayInstancePeerIsListeningOn(
 
 		auto& url = nx::utils::random::choice(relayUrls);
 
-        NX_VERBOSE(this, "%1 reporting relay url: %2 for listening peer: %3 and client ip: %4",
-            __func__, url, peerId, clientEndpoint.address);
+        NX_VERBOSE(this,
+            "findRelayInstancePeerIsListeningOn() reporting relay url: %1 for listening peer: %2"
+            "and client ip: %3",
+            url, peerId, clientEndpoint.address);
 
-        return completionHandler(
+        completionHandler(
             nx::cloud::relay::api::ResultCode::ok,
             std::move(url));
     });
@@ -240,7 +243,7 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByLocation(
     auto urls = findRelaysByContinent(location->continent);
     if (!urls.empty())
     {
-        NX_VERBOSE(this, "Found relays by location: %1, reporting urls: %2",
+        NX_VERBOSE(this, "Found relays by continent: %1, reporting urls: %2",
             location, containerString(urls));
         return urls;
     }

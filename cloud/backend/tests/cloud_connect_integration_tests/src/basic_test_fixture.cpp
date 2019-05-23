@@ -167,7 +167,7 @@ BasicTestFixture::BasicTestFixture(
     m_discoveryServiceUrl = m_discoveryServer.url().toStdString();
 
     m_mediatorCluster = std::make_unique<MediatorConnectorCluster>(m_discoveryServer.url());
-    m_relays =
+    m_relayCluster =
         std::make_unique<nx::cloud::relay::test::TrafficRelayCluster>(m_discoveryServer.url());
 
     addMediator();
@@ -211,7 +211,7 @@ void BasicTestFixture::setInitFlags(int flags)
 
 network::SocketAddress BasicTestFixture::relayInstanceEndpoint(int index) const
 {
-    return m_relays->relay(index).httpEndpoint(0);
+    return m_relayCluster->relay(index).httpEndpoint(0);
 }
 
 void BasicTestFixture::addRelayStartupArgument(
@@ -227,7 +227,7 @@ void BasicTestFixture::SetUp()
     setUpRemoteRelayPeerPoolFactoryFunc();
     startRelays();
 
-    ASSERT_EQ(m_relayCount, m_relays->size());
+    ASSERT_EQ(m_relayCount, m_relayCluster->size());
 
     startMediator();
 
@@ -247,7 +247,7 @@ void BasicTestFixture::addMediator()
     auto& mediatorContext = m_mediatorCluster->addContext({
             "-stun/addrToListenList", "127.0.0.1:0",
             "-http/addrToListenList", "127.0.0.1:0",
-            "-trafficRelay/clusterId", m_relays->clusterId().c_str(),
+            "-trafficRelay/clusterId", m_relayCluster->clusterId().c_str(),
             "-trafficRelay/cluster/discovery/enabled", "true",
             "-trafficRelay/cluster/discovery/discoveryServiceUrl", m_discoveryServiceUrl.c_str(),
             "-trafficRelay/cluster/discovery/roundTripPadding", "1ms",
@@ -267,10 +267,10 @@ int BasicTestFixture::mediatorCount() const
 
 void BasicTestFixture::startMediator(int index)
 {
-    if (!m_relays->empty())
+    if (!m_relayCluster->empty())
     {
         std::string relayUrls;
-        for (int i = 0; i < m_relays->size(); ++i)
+        for (int i = 0; i < m_relayCluster->size(); ++i)
             relayUrls.append(relayUrl(i).toStdString()).append(",");
         relayUrls.pop_back(); //< dropping final comma
 
@@ -401,7 +401,7 @@ void BasicTestFixture::startRelays()
 
 void BasicTestFixture::startRelay(int index)
 {
-    auto& newRelay = m_relays->addRelay();
+    auto& newRelay = m_relayCluster->addRelay();
 
     const auto dataDirString = lm("%1/relay_%2").args(testDataDir(), index).toStdString();
     newRelay.addArg("-dataDir", dataDirString.c_str());
@@ -425,15 +425,15 @@ void BasicTestFixture::startRelay(int index)
 
 nx::cloud::relay::test::TrafficRelay& BasicTestFixture::trafficRelay(int index)
 {
-    return m_relays->relay(index);
+    return m_relayCluster->relay(index);
 }
 
 nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
 {
-    NX_ASSERT(relayNum < (int)m_relays->size());
+    NX_ASSERT(relayNum < (int)m_relayCluster->size());
 
-    const auto& httpEndpoints = m_relays->relay(relayNum).moduleInstance()->httpEndpoints();
-    const auto& httpsEndpoints = m_relays->relay(relayNum).moduleInstance()->httpsEndpoints();
+    const auto& httpEndpoints = m_relayCluster->relay(relayNum).moduleInstance()->httpEndpoints();
+    const auto& httpsEndpoints = m_relayCluster->relay(relayNum).moduleInstance()->httpsEndpoints();
 
     if (!httpEndpoints.empty())
     {
@@ -451,9 +451,14 @@ nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
     return nx::utils::Url();
 }
 
-std::string nx::network::cloud::test::BasicTestFixture::relayClusterId() const
+std::string BasicTestFixture::relayClusterId() const
 {
-    return m_relays->clusterId();
+    return m_relayCluster->clusterId();
+}
+
+int BasicTestFixture::relayClusterSize() const
+{
+    return m_relayCluster->size();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -498,7 +503,7 @@ void BasicTestFixture::stopCloud()
 {
     m_cloudModulesXmlProvider.httpMessageDispatcher().clear();
     mediator().stop();
-    m_relays->clear();
+    m_relayCluster->clear();
 }
 
 void BasicTestFixture::startCloud()
@@ -597,7 +602,7 @@ void BasicTestFixture::waitUntilServerIsUnRegisteredOnTrafficRelay()
 
 void BasicTestFixture::waitForServerStatusOnRelay(ServerRelayStatus status)
 {
-    const auto& listeningPool = m_relays->relay(0).moduleInstance()->listeningPeerPool();
+    const auto& listeningPool = m_relayCluster->relay(0).moduleInstance()->listeningPeerPool();
     auto serverId = m_cloudSystemCredentials.systemId.toStdString();
     auto getServerStatus = [&]() { return listeningPool.isPeerOnline(serverId); };
 
@@ -662,7 +667,7 @@ void BasicTestFixture::startHttpServer(nx::hpm::api::MediatorConnector* connecto
 
     ASSERT_TRUE(m_httpServer->bindAndListen());
 
-    if (!m_relays->empty())
+    if (!m_relayCluster->empty())
         waitUntilServerIsRegisteredOnTrafficRelay();
 }
 

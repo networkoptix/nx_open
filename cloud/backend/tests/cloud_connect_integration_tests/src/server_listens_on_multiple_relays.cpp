@@ -39,7 +39,7 @@ public:
         nx::hpm::RelayInstanceSearchCompletionHandler completionHandler) override;
 
 private:
-    MultipleRelays * m_testFixture = nullptr;
+    MultipleRelays* m_testFixture = nullptr;
 };
 
 } // namespace
@@ -134,7 +134,7 @@ protected:
                     m_relaysMockedUp.emplace(std::move(url), publicIpAddress);
                 }
             });
-        ASSERT_NE(m_nodeDiscoveredSubscriptionId, nx::utils::kInvalidSubscriptionId);
+        ASSERT_NE(nx::utils::kInvalidSubscriptionId, m_nodeDiscoveredSubscriptionId);
 
         m_geoIpFactoryFuncBak = nx::hpm::geo_ip::ResolverFactory::instance().setCustomFunc(
             [this](const conf::Settings& /*settings*/)
@@ -175,7 +175,7 @@ protected:
 
     void andClientAndReportedRelayAreInTheSameRegion()
     {
-        ASSERT_EQ(m_reportedRelayUrlForClient, m_expectedRelayUrlForClient);
+        ASSERT_EQ(m_expectedRelayUrlForClient, m_reportedRelayUrlForClient);
     }
 
     void thenClientCanConnectToServerViaReportedRelays()
@@ -300,6 +300,14 @@ private:
 
         while ((int)m_relaysMockedUp.size() < m_relayClusterSize)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+
+        ASSERT_EQ(m_relayClusterSize, relayClusterSize());
+        for (int i = 0; i < m_relayClusterSize; ++i)
+        {
+            NX_DEBUG(this, "relayUrl(%1): %2", i, relayUrl(i));
+        }
+
 
         using namespace nx::geo_ip;
         m_geoIpResolver->add(

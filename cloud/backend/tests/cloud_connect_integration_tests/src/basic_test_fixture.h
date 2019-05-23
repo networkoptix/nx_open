@@ -170,6 +170,7 @@ protected:
     nx::cloud::relay::test::TrafficRelay& trafficRelay(int index = 0);
     nx::utils::Url relayUrl(int relayNum = 0) const;
     std::string relayClusterId() const;
+    int relayClusterSize() const;
 
     /**
      * Listening server.
@@ -262,7 +263,7 @@ private:
 
     std::unique_ptr<ProxyContext> m_proxyBeforeMediator;
 
-    std::unique_ptr<nx::cloud::relay::test::TrafficRelayCluster> m_relays;
+    std::unique_ptr<nx::cloud::relay::test::TrafficRelayCluster> m_relayCluster;
     int m_relayCount;
     std::optional<std::chrono::seconds> m_disconnectedPeerTimeout;
 
