@@ -1599,12 +1599,28 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
             else
             {
                 NX_ERROR(this) << "processRemoteInstalling() - servers" << peersFailed << " have failed to install update";
-                messageBox->setText(tr("Update completed, but some servers have failed an update"));
+                messageBox->setText(tr("Update completed, but some components have failed an update"));
                 injectResourceList(*messageBox, resourcePool()->getResourcesByIds(peersFailed));
             }
 
+            QStringList informativeText;
             if (m_clientUpdateTool->shouldRestartTo(m_updateInfo.getVersion()))
-                messageBox->setInformativeText(tr("Nx Witness Client will be restarted to the updated version."));
+            {
+                QString appName = QnClientAppInfo::applicationDisplayName();
+                if (peersFailed.contains(m_stateTracker->getClientPeerId()))
+                {
+                    informativeText += tr(
+                        "Please update %1 manually using an installation package.").arg(appName);
+                }
+                else
+                {
+                    informativeText += tr("%1 will be restarted to the updated version.").arg(
+                        appName);
+                }
+            }
+
+            if (!informativeText.isEmpty())
+                messageBox->setInformativeText(informativeText.join("\n"));
 
             messageBox->addButton(tr("OK"),
                 QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
