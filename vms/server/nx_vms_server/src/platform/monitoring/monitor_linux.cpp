@@ -523,6 +523,8 @@ static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
         return QnPlatformMonitor::LocalDiskPartition;
     else if( fsName == "ext4" )
         return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "zfs" )
+        return QnPlatformMonitor::LocalDiskPartition;
     else if( fsName == "exfat" )
         return QnPlatformMonitor::LocalDiskPartition;
     else if( fsName == "hugetlbfs" )
