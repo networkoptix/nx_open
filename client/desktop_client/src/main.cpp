@@ -76,7 +76,7 @@
 
 #include <plugins/io_device/joystick/joystick_manager.h>
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN64)
     #include <ini.h>
     #include <nx_gdi_tracer/gdi_handle_tracer.h>
 #endif
@@ -260,7 +260,7 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     if (code != QnWorkbenchContext::success)
         return code == QnWorkbenchContext::forcedExit ? kSuccessCode : kInvalidParametersCode;
 
-    #ifdef Q_OS_WIN
+    #if defined(Q_OS_WIN64)
         if (ini().enableGdiTrace)
         {
             const auto reportPathString =
@@ -274,7 +274,7 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
 
     int result = application->exec();
 
-    #ifdef Q_OS_WIN
+    #if defined(Q_OS_WIN64)
         if (ini().enableGdiTrace)
             gdi_tracer::GdiHandleTracer::getInstance()->detachGdiDetours();
     #endif
