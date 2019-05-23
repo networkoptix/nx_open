@@ -117,6 +117,8 @@ void OnlineRelaysClusterClient::onRelayDiscovered(nx::cloud::discovery::Node tra
     auto location = resolve(kTrafficRelay, trafficRelayNode.publicIpAddress);
     if (location)
     {
+        NX_VERBOSE(this, "Discovered resolve traffic relay: %1, location: %2",
+            trafficRelayNode, location);
         QnMutexLocker lock(&m_mutex);
         m_resolvedRelays.emplace(
             location->continent,
@@ -124,6 +126,8 @@ void OnlineRelaysClusterClient::onRelayDiscovered(nx::cloud::discovery::Node tra
     }
     else
     {
+        NX_WARNING(this, "Discoverd traffic relay: %1 but location resolution failed",
+            trafficRelayNode);
         QnMutexLocker lock(&m_mutex);
         m_unresolvedRelays.emplace(std::move(trafficRelayNode));
     }
