@@ -3201,6 +3201,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Pilotes de carte vidéo sont obsolètes ou non installés</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 peut ne pas fonctionner correctement.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3284,17 +3295,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Crée une sauvegarde de la configuration du système qui peut être restaurée en cas d'échec.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Pilotes de carte vidéo sont obsolètes ou non installés</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 peut ne pas fonctionner correctement.</translation>
     </message>
   </context>
   <context>
@@ -8577,10 +8577,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Mise à jour terminée</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>Mise à jour terminée, mais certains serveurs ont échoué</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>Nx Witness Client sera redémarré à la version mis à jour.</translation>
     </message>
@@ -8731,6 +8727,18 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Veuillez mettre à jour %1 manuellement à l’aide d’un paquet d'installation.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 sera redémarré à la version mise à jour.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8761,10 +8769,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Événement Générique</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation>Événement du plugin inconnu</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation>Périphérique a été déconnecté</translation>
     </message>
@@ -8775,6 +8779,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Module was disconnected</source>
       <translation>Module E/S a été déconnecté</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

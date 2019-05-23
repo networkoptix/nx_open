@@ -3160,6 +3160,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>ไดรเวอร์การ์ดแสดงผลล้าสมัยหรือไม่ได้ติดตั้ง</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 อาจทำงานไม่ถูกต้อง</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3243,17 +3254,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>สร้างการสำรองข้อมูลของการกำหนดค่าระบบที่สามารถเรียกคืนได้ในกรณีที่เกิดความล้มเหลว</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>ไดรเวอร์การ์ดแสดงผลล้าสมัยหรือไม่ได้ติดตั้ง</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 อาจทำงานไม่ถูกต้อง</translation>
     </message>
   </context>
   <context>
@@ -8455,10 +8455,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>อัปเดตเสร็จสมบูรณ์แล้ว</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>Nx Witness Client จะถูกรีสตาร์ทเป็นเวอร์ชั่นที่อัพเดต</translation>
     </message>
@@ -8608,6 +8604,18 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>โปรดอัปเดต %1 ด้วยตนเองโดยใช้แพ็คเกจการติดตั้ง</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 จะเริ่มต้นใหม่เป็นเวอร์ชันที่ได้รับการปรับปรุง</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8637,10 +8645,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>เหตุการณ์ทั่วไป</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation>เหตุการณ์ปลั๊กอินที่ไม่รู้จัก</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation>อุปกรณ์ถูกตัดการเชื่อมต่อ</translation>
     </message>
@@ -8651,6 +8655,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Module was disconnected</source>
       <translation>โมดูล I / O ถูกตัดการเชื่อมต่อ</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

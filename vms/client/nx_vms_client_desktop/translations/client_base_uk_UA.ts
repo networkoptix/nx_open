@@ -3272,6 +3272,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Драйвери відеокарти застаріли або не встановлені</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 може не працювати належним чином.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3355,17 +3366,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Створює резервну копію системних налаштувань для відновлення в разі краху системи.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Драйвери відеокарти застаріли або не встановлені</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 може не працювати належним чином.</translation>
     </message>
   </context>
   <context>
@@ -8808,10 +8808,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Оновлення завершено</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>Оновлення завершено, але деякі сервери не отримали оновлення</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>Nx Witness Client буде перезапущено до оновленої версії.</translation>
     </message>
@@ -8964,6 +8960,18 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation>Деякі сервери перейшли в офлайн. Будь ласка, зачекайте, поки вони стануть онлайн, щоб продовжити.</translation>
     </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Будь ласка, оновіть %1 вручну за допомогою інсталятора.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 буде перезапущено до оновленої версії.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8996,10 +9004,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Загальні події</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation>Невідомий плагін події</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation>Пристрій було відключено</translation>
     </message>
@@ -9010,6 +9014,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Module was disconnected</source>
       <translation>Модуль вводу-виводу був відключений</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

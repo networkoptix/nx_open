@@ -1504,14 +1504,6 @@
       <translation>เปิดในหน้าต่างใหม่</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>เหตุการณ์ปลั๊กอิน</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>เหตุการณ์ปลั๊กอินที่ไม่รู้จัก</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>ล้มเหลวในการบังคับใช้เวลาของกล้องมันล่าช้ามากเกินไปเวลาของระบบจะถูกใช้</translation>
     </message>
@@ -1538,6 +1530,14 @@
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
       <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

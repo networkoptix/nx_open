@@ -3268,6 +3268,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Sterowniki karty wideo są przestarzałe lub nie są zainstalowane</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 może nie działać poprawnie.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3351,17 +3362,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Tworzy kopię zapasową konfiguracji systemu, którą można przywrócić w przypadku awarii.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Sterowniki karty wideo są przestarzałe lub nie są zainstalowane</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 może nie działać poprawnie.</translation>
     </message>
   </context>
   <context>
@@ -8804,10 +8804,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Aktualizacja zakończona</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>Aktualizacja zakończona, ale niektóre serwery nie zostały zaktualizowane</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>Klient Nx Witness zostanie ponownie uruchomiony do zaktualizowanej wersji.</translation>
     </message>
@@ -8960,6 +8956,18 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Proszę zaktualizować %1 ręcznie przy użyciu pakietu instalacyjnego.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 zostanie uruchomiony ponownie w zaktualizowanej wersji.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8992,10 +9000,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Zdarzenie generowane</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation>Nieznane zdarzenie wtyczki</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation>Urządzenie zostało odłączone</translation>
     </message>
@@ -9006,6 +9010,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Module was disconnected</source>
       <translation>Moduł I/O został odłączony</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

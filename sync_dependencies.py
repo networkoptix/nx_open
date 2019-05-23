@@ -32,7 +32,7 @@ def determine_package_versions(
         "qt": "5.11.3",
         "boost": "1.67.0",
         "openssl": "1.0.2q",
-        "ffmpeg": "3.1.1",
+        "ffmpeg": "3.1.9-3",
         "sigar": "1.7",
         "sasl2": "2.1.26",
         "openal": "1.16",
@@ -52,38 +52,31 @@ def determine_package_versions(
         "certificates": customization,
     }
 
-    if platform == "windows":
-        v["ffmpeg"] = "3.1.9"
-
     if platform == "linux" and box == "none" and target not in ("linux_arm32", "linux_arm64"):
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial-1"
-        v["ffmpeg"] = "3.1.9-2"
 
     if platform == "macosx":
-        v["ffmpeg"] = "3.1.9"
         v["festival"] = "2.1"
 
     if platform == "android":
         v["openal"] = "1.17.2"
+        v["ffmpeg"] = "3.1.1"
 
     if platform == "ios":
         v["libjpeg-turbo"] = "1.4.1"
+        v["ffmpeg"] = "3.1.1"
 
     if box == "bpi":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "wheezy"
-        # Bpi original version is build with vdpau support which is no longer needed since lite
-        # client is disasbled for bpi.
-        v["ffmpeg"] = "3.1.1-bananapi"
 
     if target == "linux_arm32":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "jessie"
-        v["ffmpeg-arm32"] = v["ffmpeg-rpi"] = "3.1.9"
 
     if box == "edge1":
         v["sysroot"] = "jessie"
@@ -92,7 +85,6 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
-        v["ffmpeg"] = "3.1.9"
 
     if "festival-vox" not in v:
         v["festival-vox"] = v["festival"]
@@ -138,11 +130,9 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     else:
         sync("openssl")
 
+    sync("ffmpeg")
     if (platform, arch) == ("linux", "arm") and box == "none":
-        sync("ffmpeg-arm32")
-        sync("ffmpeg-rpi")
-    else:
-        sync("ffmpeg")
+        sync("rpi/ffmpeg", do_not_include=True)
 
     if platform == "linux":
         sync("sysroot", path_variable="sysroot_directory")

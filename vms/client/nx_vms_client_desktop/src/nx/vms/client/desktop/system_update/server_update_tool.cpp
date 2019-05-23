@@ -91,10 +91,6 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
 
     connect(m_downloader.get(), &Downloader::downloadFailed,
         this, &ServerUpdateTool::atDownloadFailed);
-
-    m_downloader->startDownloads();
-
-    loadInternalState();
 }
 
 ServerUpdateTool::~ServerUpdateTool()
@@ -103,6 +99,12 @@ ServerUpdateTool::~ServerUpdateTool()
     m_downloader->disconnect(this);
     m_serverConnection.reset();
     NX_VERBOSE(this) << "~ServerUpdateTool() done";
+}
+
+void ServerUpdateTool::resumeTasks()
+{
+    m_downloader->startDownloads();
+    loadInternalState();
 }
 
 // We serialize state of the uploader using this struct.
@@ -118,27 +120,38 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(StoredState, (json), StoredState_Fields)
 
 void ServerUpdateTool::loadInternalState()
 {
+    if (m_offlineUpdaterState != OfflineUpdateState::initial)
+        return;
+
     QString raw = qnSettings->systemUpdaterState();
     StoredState stored;
     if (QJson::deserialize(raw, &stored))
     {
-        switch((OfflineUpdateState)stored.state)
+        auto state = (OfflineUpdateState)stored.state;
+        switch(state)
         {
             case OfflineUpdateState::ready:
             case OfflineUpdateState::push:
                 // We have no idea whether update files are still good on server.
                 // The most simple solution - to restart upload process.
                 // TODO: Check if we really need more robust state restoration.
+                NX_DEBUG(this, "loadInternalState() - restoring offline update from %1", stored.file);
                 m_checkFileUpdate = checkUpdateFromFile(stored.file);
                 break;
             default:
+                NX_DEBUG(this, "loadInternalState() - got state %1, going to 'initial'", state);
                 m_offlineUpdaterState = OfflineUpdateState::initial;
         }
+    }
+    else
+    {
+        NX_DEBUG(this, "loadInternalState() - no uploader state to restore");
     }
 }
 
 void ServerUpdateTool::saveInternalState()
 {
+    NX_VERBOSE(this, "saveInternalState(%1)", m_offlineUpdaterState);
     StoredState stored;
     stored.file = m_localUpdateFile;
     stored.state = (int)m_offlineUpdaterState;
@@ -150,7 +163,7 @@ void ServerUpdateTool::saveInternalState()
 
 std::future<nx::update::UpdateContents> ServerUpdateTool::checkUpdateFromFile(const QString& file)
 {
-    NX_VERBOSE(this) << "checkUpdateFromFile(" << file << ")";
+    NX_VERBOSE(this, "checkUpdateFromFile(%1)", file);
 
     // Clean up existing folder for updates.
     m_outputDir.removeRecursively();
@@ -212,6 +225,12 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkMediaserverUpdate
         return result;
     }
 }
+
+std::future<nx::update::UpdateContents> ServerUpdateTool::takeUpdateCheckFromFile()
+{
+    return std::move(m_checkFileUpdate);
+}
+
 
 void ServerUpdateTool::changeUploadState(OfflineUpdateState newState)
 {
@@ -321,8 +340,7 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
 QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
 {
     QnMediaServerResourceList result = {commonModule()->currentServer()};
-    /*
-     * Disabled for now, until 4.1 happens.
+#if 0 // Disabled for now, until 4.1 happens.
     auto items = m_stateTracker->allItems();
     for (const auto& record: items)
     {
@@ -337,7 +355,8 @@ QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
 
         if (isOurServer && online && record->storeUpdates)
             result.push_back(server);
-    }*/
+    }
+#endif
     return result;
 }
 

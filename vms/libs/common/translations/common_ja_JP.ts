@@ -1504,14 +1504,6 @@
       <translation>レイアウトを開く</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>プラグインイベント</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>不明なプラグインイベント</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>カメラ時間が使用できませんでした、時間がかかりすぎます　システム時間が使用されます</translation>
     </message>
@@ -1538,6 +1530,14 @@
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
       <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>
