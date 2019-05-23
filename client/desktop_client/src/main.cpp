@@ -78,7 +78,7 @@
 
 #if defined(Q_OS_WIN64)
     #include <ini.h>
-    #include <nx_gdi_tracer/gdi_handle_tracer.h>
+    #include <nx/gdi_tracer/gdi_handle_tracer.h>
 #endif
 
 namespace {
@@ -264,8 +264,8 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
         if (ini().enableGdiTrace)
         {
             const auto reportPathString =
-                QStandardPaths::writableLocation(QStandardPaths::DataLocation) + lit("/log")
-                + lit("/gdi_handles_report%1.txt").arg(QnUuid::createUuid().toString());
+                QStandardPaths::writableLocation(QStandardPaths::DataLocation)
+                    + lit("/log/gdi_handles_report%1.txt").arg(QnUuid::createUuid().toString());
             const auto reportPath = std::filesystem::path(reportPathString.toStdWString());
             auto gdiTracer = gdi_tracer::GdiHandleTracer::getInstance();
             gdiTracer->setGdiTraceLimit(ini().gdiTraceLimit);
