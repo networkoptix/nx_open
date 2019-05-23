@@ -3,7 +3,7 @@ Resource          resource.robot
 Resource          APIresource.robot
 Test Setup        Restart
 Test Teardown     Remove containers
-Suite Setup       Open Browser and go to URL    ${url}
+Suite Setup       Startup
 Suite Teardown    Close All Browsers
 Force Tags        Threaded
 
@@ -12,7 +12,7 @@ ${email}             ${EMAIL OWNER}
 ${password}          ${BASE PASSWORD}
 ${url}               ${ENV}
 ${email admin no reg}    noptixautoqa+adminunreg@gmail.com
-${email viewer no reg}    noptixautoqa+unregviewer@gmail.com
+${email viewer no reg}    noptixautoqa+viewerunreg@gmail.com
 ${email client custom no reg}    noptixautoqa+clientcustomunreg@gmail.com
 &{users dict 1}      cloudAdmin=${EMAIL ADMIN}    Viewer=${EMAIL VIEWER}    Custom=${EMAIL CLIENT CUSTOM}
 &{users dict 2}      cloudAdmin=${email admin no reg}     Viewer=${email viewer no reg}    Custom=${email client custom no reg}
@@ -20,14 +20,36 @@ ${email client custom no reg}    noptixautoqa+clientcustomunreg@gmail.com
 ...                  Administrator=${email admin no reg}     Viewer=${email viewer no reg}    ClientCustom=${email client custom no reg}
 
 *** Keywords ***
+Merge
+    [arguments]    ${primary}    ${target}    ${expected dropdown}
+    Wait Until Element Is Visible    ${MERGE BUTTON SYSTEM}
+    Click Button    ${MERGE BUTTON SYSTEM}
+    Wait Until Elements Are Visible    ${MERGE DIALOG}    ${MERGE X BUTTON}    ${MERGE OK BUTTON}    ${MERGE CANCEL BUTTON}
+    Element Text Should Be    ${MERGE SYSTEM DROPDOWN}    ${expected dropdown}
+    Click Element    ${MERGE SYSTEM DROPDOWN}
+    Wait Until Element Is Visible    ${MERGE FORM}//li/a//span[text()="${target}"]
+    Click Element    ${MERGE FORM}//li/a//span[text()="${target}"]
+    ${radio button}    Radio Button    ${primary}
+    Wait Until Element Is Visible   ${radio button}
+    Click Element    ${radio button}
+    Wait Until Element Is Visible    ${radio button}/span[contains(@class, "checked")]
+    sleep    5
+    Click Button    ${MERGE OK BUTTON}
+    Wait Until Elements Are Visible    ${MERGE BUTTON MODAL}    ${MERGE PASSWORD INPUT}    ${MERGE CANCEL BUTTON}    timeout=60
+    Input Text    ${MERGE PASSWORD INPUT}    ${BASE PASSWORD}
+    Click Button    ${MERGE BUTTON MODAL}
+    sleep    1
+    Check For Alert    ${SYSTEM MERGING TEXT}
+    Element Should Not Be Visible    ${MERGE DIALOG}
+    Wait Until Element Is Visible    ${CURRENTLY MERGING CARD}
+
 Prepare System
     [arguments]    ${user}    ${auth}    ${image}    ${port}    ${system name}    ${users dict}    ${network}=bridge
-    ${system id}    Create system and attach to cloud    ${EMAIL MERGE OWNER 1}    ${image}    ${port}    ${system name}   network=${network}
+    ${system id}    Create system and attach to cloud    ${user}    ${image}    ${port}    ${system name}   network=${network}
     Sleep    5
     Add users to system    ${auth}    ${users dict}    ${system id}
     &{Save User role json}=    Save User Role    ${auth}    https://localhost:${port}    ClientCustom    GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission
     Set user to client custom    ${auth}    ${port}    ${Save User role json["id"]}
-
 
 Create system and attach to cloud
     [arguments]    ${user}    ${image}    ${port}    ${system name}    ${network}=bridge
@@ -70,6 +92,11 @@ Remove containers
     Prune Containers
     Remove Images
 
+Startup
+    Open Browser and go to URL    ${url}
+    ${image}    Build Image
+    Set Suite Variable    ${image}    ${image}
+
 Restart
     Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
@@ -91,44 +118,36 @@ Restart
 #     Create system and attach to cloud    ${EMAIL MERGE OWNER 2}    image1
 #     Create system and attach to cloud    ${EMAIL MERGE OWNER 1}    image2
 
-From secondary system merge to primary with no other servers
-    ${image}    Build Image
-    ${auth}=    Create List    ${EMAIL MERGE OWNER 1}    ${password}
-    Prepare System    ${EMAIL MERGE OWNER 1}    ${auth}    ${image}    7001    API made system 1    ${users dict 1}    network=host
-    Prepare System    ${EMAIL MERGE OWNER 1}    ${auth}    ${image}    7003    API made system 2    ${users dict 2}
-
-    log in    ${EMAIL MERGE OWNER 1}    ${password}
+From secondary system merge to primary with no other systems
+    ${user}    Set Variable    ${EMAIL MERGE OWNER 2}
+    ${auth}=    Create List    ${user}    ${password}
+    Prepare System    ${user}    ${auth}    ${image}    7001    API made system 1    ${users dict 1}    network=host
+    Prepare System    ${user}    ${auth}    ${image}    7003    API made system 2    ${users dict 2}
+    log in    ${user}    ${password}
     Validate Log in
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+    Go To    ${url}/systems
+    Validate Log In
     Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
     Verify In System    API made system 2
     Capture Page Screenshot    system2.png
     Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
-    Capture Page Screenshot    system2.png
 
-    Wait Until Element Is Visible    ${MERGE BUTTON SYSTEM}
-    Click Button    ${MERGE BUTTON SYSTEM}
-    Wait Until Elements Are Visible    ${MERGE DIALOG}    ${MERGE X BUTTON}    ${MERGE OK BUTTON}    ${MERGE CANCEL BUTTON}
-    Element Text Should Be    ${MERGE SYSTEM DROPDOWN}    API made system 1
-    ${radio button}    Radio Button    API made system 1
-    Wait Until Element Is Visible   ${radio button}
-    Click Element    ${radio button}
-    Wait Until Element Is Visible    ${radio button}/span[contains(@class, "checked")]
-    sleep    2
-    Click Button    ${MERGE OK BUTTON}
-    Wait Until Elements Are Visible    ${MERGE BUTTON MODAL}    ${MERGE PASSWORD INPUT}    ${MERGE CANCEL BUTTON}
-    Input Text    ${MERGE PASSWORD INPUT}    ${BASE PASSWORD}
-    Click Button    ${MERGE BUTTON MODAL}
-    Check For Alert    ${SYSTEM MERGING TEXT}
-    Element Should Not Be Visible    ${MERGE DIALOG}
-    Wait Until Element Is Visible    ${CURRENTLY MERGING CARD}
-    Check for alert    Connection to API made system 2 lost    timeout=40
+    Merge    API made system 1    API made system 1    API made system 1
+
+    Check for alert    Connection to API made system 2 lost    timeout=120
     Verify In System    API made system 1
+    Wait Until Element Is Visible    ${USERS LIST}
     Wait Until Element Is Not Visible    ${CURRENTLY MERGING CARD}    120
-    Sleep    5
-    Reload Page
-    Sleep    5
-
-    FOR    ${key}  IN  @{all users dict.keys()}
-        Check User Permissions    ${all users dict["${key}"]}    ${key}    wait time=120
+    FOR     ${idx}  IN RANGE  50
+        ${result}    Run Keyword And Ignore Error    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${email admin no reg}')]
+        Reload Page
+        Exit For Loop If    '${result[0]}'=='PASS'
     END
+    FOR    ${key}  IN  @{all users dict.keys()}
+        Check User Permissions    ${all users dict["${key}"]}    ${key}    timeout=120
+    END
+    Disconnect from cloud

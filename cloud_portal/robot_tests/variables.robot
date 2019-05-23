@@ -162,6 +162,7 @@ ${SYSTEM SEARCH X BUTTON}             //a[@ng-click="search.value=''"]
 #Merge
 ${MERGE BUTTON SYSTEM}                //button[@ng-click="mergeSystems()"]
 ${MERGE DIALOG}                       //nx-modal-merge-content
+${MERGE FORM}                         //form[@name="mergeForm"]
 ${MERGE SYSTEM DROPDOWN}              ${MERGE DIALOG}//button[@id="genericSelect"]
 ${MERGE X BUTTON}                     ${MERGE DIALOG}//button[@class="close"]
 ${MERGE OK BUTTON}                    ${MERGE DIALOG}//button[@class="btn btn-primary" and contains(text(),"${OK TEXT}")]
@@ -173,13 +174,15 @@ ${CURRENTLY MERGING CARD}             //div[@ng-if="currentlyMerging"]
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
-${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[text()='${CANCEL BUTTON TEXT}']
+${DISCONNECT FORM CANCEL}             ${DISCONNECT FORM}//button[text()='${CANCEL BUTTON TEXT}']
 ${DISCONNECT FORM HEADER}             //h1["${DISCONNECT FORM HEADER TEXT}"]
+${DISCONNECT PASSWORD INPUT}          ${DISCONNECT FORM}//input[@id="password"]
+${DISCONNECT FORM DISCONNECT BUTTON}    ${DISCONNECT FORM}//button[contains(text(), "${DISCONNECT BUTTON TEXT}")]
 
 #Disconnect from my account
 ${DISCONNECT MODAL WARNING}              //p[contains(text(), "${DISCONNECT MODAL WARNING TEXT}")]
 # extra spaces here temporarily
-${DISCONNECT MODAL CANCEL}               //button[text()='Cancel ']
+${DISCONNECT MODAL CANCEL}               //button[text()='${CANCEL BUTTON TEXT}']
 ${DISCONNECT MODAL DISCONNECT BUTTON}    //button[text()='${DISCONNECT BUTTON TEXT} ']
 
 ${JUMBOTRON}                          //div[@class='jumbotron']

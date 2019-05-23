@@ -16,6 +16,7 @@ ${headless}    true
 @{chrome_arguments}    --disable-gpu    --no-sandbox    --log-level=3    --start-maximized
 @{chrome_arguments_headless}    --disable-infobars    --headless    --disable-gpu    --no-sandbox    --log-level=3
 ${speed}    0
+${selenium_timeout}    20
 
 *** Keywords ***
 Open Browser and go to URL
@@ -23,7 +24,7 @@ Open Browser and go to URL
     Run Keyword If    "${options}"=="false" or "${headless}"=="false"    Regular Open Browser
     ...          ELSE    Open Browser With Options
     Set Selenium Speed    ${speed}
-    Set Selenium Timeout    20
+    Set Selenium Timeout    ${selenium_timeout}
     Check Language
     Go To    ${url}
 
@@ -64,7 +65,7 @@ Check Language
 
 Set Language
     [arguments]    ${lang}=${LANGUAGE}
-    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}    20
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
     Click Button    ${LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
     Click Element    ${LANGUAGE TO SELECT}
@@ -207,8 +208,8 @@ Edit User Permissions In Systems
     Check For Alert    ${NEW PERMISSIONS SAVED}
 
 Check User Permissions
-    [arguments]    ${user email}    ${permissions}    ${wait time}=20
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span[contains(text(),"${permissions}")]    ${wait time}
+    [arguments]    ${user email}    ${permissions}    ${timeout}=${selenium_timeout}
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span[contains(text(),"${permissions}")]    ${timeout}
 
 Remove User Permissions
     [arguments]    ${user email}
@@ -223,7 +224,7 @@ Remove User Permissions
     Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
 
 Check For Alert
-    [arguments]    ${alert text}    ${timeout}=20
+    [arguments]    ${alert text}    ${timeout}=${selenium_timeout}
     Wait Until Element Is Visible    ${ALERT}    ${timeout}
     Element Should Be Visible    ${ALERT}
     Element Text Should Be    ${ALERT}    ${alert text}
@@ -240,6 +241,13 @@ Verify In System
     [arguments]    ${system name}
     Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
 
+Disconnect from cloud
+    Click Element    ${DISCONNECT FROM NX}
+    Wait Until Elements Are Visible    ${DISCONNECT FORM CANCEL}    ${DISCONNECT FORM DISCONNECT BUTTON}    ${DISCONNECT PASSWORD INPUT}
+    Input Text    ${DISCONNECT PASSWORD INPUT}    ${BASE PASSWORD}
+    Click Button    ${DISCONNECT FORM DISCONNECT BUTTON}
+    Check For Alert    ${SUCCESSFULLY DISCONNECTED}
+
 Failure Tasks
     [timeout]    5 minutes
     ${console}    Get Browser Log
@@ -250,9 +258,9 @@ Failure Tasks
     Close Mailbox
 
 Wait Until Elements Are Visible
-    [arguments]    @{elements}
+    [arguments]    @{elements}    ${timeout}=${selenium_timeout}
     :FOR     ${element}  IN  @{elements}
-    \  Wait Until Element Is Visible    ${element}
+    \  Wait Until Element Is Visible    ${element}    ${timeout}
 
 Elements Should Not Be Visible
     [arguments]    @{elements}
