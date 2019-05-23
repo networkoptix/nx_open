@@ -221,7 +221,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
         case EventType::pluginEvent:
         {
             const QString caption = params.caption.isEmpty()
-                ? tr("Unknown plugin diagnostic event")
+                ? tr("Unknown Plugin Diagnostic Event")
                 : params.caption;
 
             return lm("%1 - %2").args(resourceName, caption);
