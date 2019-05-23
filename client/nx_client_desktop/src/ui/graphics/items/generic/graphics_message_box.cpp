@@ -169,8 +169,8 @@ void QnGraphicsMessageBox::hideAnimated()
     auto animator = opacityAnimator(this);
     animator->stop();
     animator->setEasingCurve(QEasingCurve::OutQuad);
-    animator->animateTo(0.0);
     connect(animator, &VariantAnimator::finished, this, &QnGraphicsMessageBox::hideImmideately);
+    animator->animateTo(0.0);
 
     //animator->setTimeLimit(200);
 }
