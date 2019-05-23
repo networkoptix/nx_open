@@ -66,7 +66,16 @@ http {
         error_page 503 /static/503.html;
         error_page 502 /static/503.html;
 
+        set ${DOLLAR}r "";
+
         if (${DOLLAR}http_x_forwarded_proto != "https") {
+            set ${DOLLAR}r A;
+        }
+        if (${DOLLAR}request_uri != "/health/") {
+            set ${DOLLAR}r "${DOLLAR}{r}B";
+        }
+
+        if (${DOLLAR}r = AB) {
             return 301 https://${DOLLAR}host${DOLLAR}request_uri;
         }
 
@@ -147,17 +156,17 @@ http {
 
         location /static/admin_tools/ {
             root /app/app/static/common;
-            error_page 404 /static/index.html;   
+            error_page 404 /static/index.html;
         }
 
         location /static/css/ {
             root /app/app/static/common;
-            error_page 404 /static/index.html;   
+            error_page 404 /static/index.html;
         }
 
         location /static/cms_images/ {
             root /app/app/static/common;
-            error_page 404 /static/index.html;   
+            error_page 404 /static/index.html;
         }
 
         location /static/bootstrap {
