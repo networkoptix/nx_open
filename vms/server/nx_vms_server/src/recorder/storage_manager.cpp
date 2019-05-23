@@ -1630,7 +1630,7 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     qint64 lowTime = itrLowLeft < itrLowRight ? itrLowLeft->startTimeMs : DATETIME_NOW;
     qint64 currentTime = qMin(hiTime, lowTime);
 
-    while (itrHiLeft < itrHiRight || itrLowLeft < itrLowLeft)
+    while (itrHiLeft < itrHiRight || itrLowLeft < itrLowRight)
     {
         qint64 nextHiTime = DATETIME_NOW;
         qint64 nextLowTime = DATETIME_NOW;
