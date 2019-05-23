@@ -1,9 +1,48 @@
 import QtQuick 2.6
+
+import Nx.Core 1.0
 import Nx.Items 1.0
+import Nx.Motion 1.0
+
+import nx.client.core 1.0
 
 ResourceItemDelegate
 {
+    property alias motionAllowed: motionSearchButton.checked
+
     rotationAllowed: true
+
+    contentItem: CameraDisplay
+    {
+        id: cameraDisplay
+        anchors.fill: parent
+        cameraResourceId: layoutItemData ? layoutItemData.resourceId.toString() : null
+        audioEnabled: true
+
+        maxTextureSize: 4096 // TODO: #vkutin FIXME!
+
+        channelOverlayComponent: Item
+        {
+            id: channelOverlay
+            property int index: 0
+
+            MotionOverlay
+            {
+                visible: motionAllowed
+                anchors.fill: parent
+                channelIndex: channelOverlay.index
+                motionProvider: mediaPlayerMotionProvider
+            }
+        }
+
+        MediaPlayerMotionProvider
+        {
+            id: mediaPlayerMotionProvider
+            mediaPlayer: cameraDisplay.mediaPlayer
+        }
+
+        Component.onCompleted: mediaPlayer.playLive()
+    }
 
     titleBar.leftContent.children:
     [
@@ -42,6 +81,7 @@ ResourceItemDelegate
 
         TitleBarButton
         {
+            id: motionSearchButton
             iconUrl: "qrc:/skin/item/search.png"
             checkable: true
         },

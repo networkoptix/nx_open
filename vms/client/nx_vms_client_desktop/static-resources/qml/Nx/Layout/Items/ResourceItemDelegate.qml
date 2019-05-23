@@ -1,7 +1,8 @@
 import QtQuick 2.6
+import QtQuick.Controls 2.4
 import Nx 1.0
 
-Item
+Control
 {
     property var layoutItemData
     property var resourceItem: null
@@ -12,15 +13,15 @@ Item
 
     readonly property real parentRotation: parent ? parent.rotation : 0
 
-    Rectangle
+    background: Rectangle
     {
-        anchors.fill: parent
         color: ColorTheme.colors.dark5
     }
 
     Item
     {
         id: ui
+        z: 10
 
         anchors.centerIn: parent
 
