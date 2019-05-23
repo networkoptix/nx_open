@@ -117,7 +117,7 @@ protected:
             systemId,
             &system);
         NX_GTEST_ASSERT_EQ(api::ResultCode::ok, resultCode);
-        return system;
+        return std::move(system);
     }
 
 private:
