@@ -1,4 +1,4 @@
-#include "gdi_detours.h"
+#include "gdi_handle_tracer.h"
 
 #include "call_stack_provider.h"
 #include <windows.h>
@@ -8,7 +8,7 @@
 #include <fstream>
 
 namespace nx {
-namespace gdi_detours {
+namespace gdi_tracer {
 
 GdiHandleTracer* GdiHandleTracer::m_instance = nullptr;
 
@@ -935,5 +935,5 @@ void GdiHandleTracer::removeDc(HDC handle)
         m_dcHandles.erase(handle);
 }
 
-} // namespace gdi_detours
+} // namespace gdi_tracer
 } // namespace nx

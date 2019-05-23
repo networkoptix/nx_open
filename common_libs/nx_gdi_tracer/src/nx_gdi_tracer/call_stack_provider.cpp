@@ -2,7 +2,7 @@
 #include <numeric>
 
 namespace nx {
-namespace gdi_detours {
+namespace gdi_tracer {
 
 CallStackProvider::CallStackProvider():
     StackWalker()
@@ -36,5 +36,5 @@ void CallStackProvider::OnCallstackEntry(CallstackEntryType eType, CallstackEntr
         + " (" + std::to_string(entry.lineNumber) + ")" );
 }
 
-} // namespace gdi_detours
+} // namespace gdi_tracer
 } // namespace nx

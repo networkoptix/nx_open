@@ -78,7 +78,7 @@
 
 #ifdef Q_OS_WIN
     #include <ini.h>
-    #include <nx_gdi_detours/gdi_detours.h>
+    #include <nx_gdi_tracer/gdi_handle_tracer.h>
 #endif
 
 namespace {
@@ -267,8 +267,8 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
                 QStandardPaths::writableLocation(QStandardPaths::DataLocation) + lit("/log")
                 + lit("/gdi_handles_report.txt");
             const auto reportPath = std::filesystem::path(reportPathString.toStdWString());
-            gdi_detours::GdiHandleTracer::getInstance()->setReportPath(reportPath);
-            gdi_detours::GdiHandleTracer::getInstance()->attachGdiDetours();
+            gdi_tracer::GdiHandleTracer::getInstance()->setReportPath(reportPath);
+            gdi_tracer::GdiHandleTracer::getInstance()->attachGdiDetours();
         }
     #endif
 
@@ -276,7 +276,7 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
 
     #ifdef Q_OS_WIN
         if (ini().enableGdiTrace)
-            gdi_detours::GdiHandleTracer::getInstance()->detachGdiDetours();
+            gdi_tracer::GdiHandleTracer::getInstance()->detachGdiDetours();
     #endif
 
     /* Write out settings. */

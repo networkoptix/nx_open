@@ -6,7 +6,7 @@
 #include <windows.h>
 
 namespace nx {
-namespace gdi_detours {
+namespace gdi_tracer {
 
 class CallStackProvider;
 
@@ -18,7 +18,6 @@ public:
     void attachGdiDetours();
     void detachGdiDetours();
     void setReportPath(const std::filesystem::path& path);
-
 
     void traceBitmap(HBITMAP handle);
     void traceBrush(HBRUSH handle);
@@ -59,5 +58,5 @@ private:
     bool m_reportCreated = false;
 };
 
-} // namespace gdi_detours
+} // namespace gdi_tracer
 } // namespace nx

@@ -23,5 +23,5 @@ if(withMediaServer)
 endif()
 
 if(WINDOWS)
-    add_subdirectory(nx_gdi_detours)
+    add_subdirectory(nx_gdi_tracer)
 endif()

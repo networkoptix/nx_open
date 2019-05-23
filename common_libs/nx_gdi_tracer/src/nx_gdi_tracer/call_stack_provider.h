@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace nx {
-namespace gdi_detours {
+namespace gdi_tracer {
 
 class CallStackProvider: public StackWalker
 {
@@ -21,5 +21,5 @@ private:
     std::vector<std::string> m_callStackEntries;
 };
 
-} // namespace gdi_detours
+} // namespace gdi_tracer
 } // namespace nx

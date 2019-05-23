@@ -5,7 +5,7 @@ nx_add_target(desktop_client EXECUTABLE SIGNED
         qtsingleapplication nx_kit nx_client_desktop)
 
 if(WINDOWS)
-    target_link_libraries(desktop_client PUBLIC nx_gdi_detours)
+    target_link_libraries(desktop_client PUBLIC nx_gdi_tracer)
 endif()
 
 if(LINUX)
