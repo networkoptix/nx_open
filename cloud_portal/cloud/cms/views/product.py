@@ -120,8 +120,7 @@ def context_editor_action(request, product, context_id, language_code):
                 if product.can_preview_on_portal:
                     saved_msg += " Preview has been created."
                     product.change_preview_status(product.PREVIEW_STATUS.draft)
-                    if not product.is_cloud_portal:
-                        preview_link = modify_db.generate_preview_link(context, product, state=DRAFT)
+                    preview_link = modify_db.generate_preview_link(context, product, state=DRAFT)
                 else:
                     add_upload_error_messages(request, "{}", [
                         ("Cannot create preview for this product on this portal.", "")
@@ -184,7 +183,7 @@ def review(request):
 
     elif 'publish' in request.POST and UserGroupsToProductPermissions.\
             check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
-        if product.is_cloud_portal:
+        if product.is_cloud_portal and product.can_preview_on_portal:
             publishing_errors = modify_db.publish_latest_version(product, review_id, request.user)
             if publishing_errors:
                 messages.error(request, "Version {} {}".format(product_review.version.id, publishing_errors))
@@ -230,7 +229,7 @@ def make_preview(request):
     version_id = request.POST['version_id'] if 'version_id' in request.POST else None
     context = Context.objects.filter(id=request.POST['context_id']).first()
     product = get_product_by_revision(version_id)
-    if product.product_type.can_preview:
+    if product.can_preview_on_portal:
         redirect_url = modify_db.generate_preview(product, context, version_id=version_id, send_to_review=True)
         product.change_preview_status(product.PREVIEW_STATUS.review)
     else:

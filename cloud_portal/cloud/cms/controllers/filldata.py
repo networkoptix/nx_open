@@ -255,7 +255,7 @@ def fill_content(product,
     if not product.is_cloud_portal:
         raise APIForbiddenException("Can not run update static files on non cloud_portal products.")
 
-    if product.customizations.first().name != settings.CUSTOMIZATION:
+    if product.can_preview_on_portal:
         raise APIForbiddenException("Can not update static files for cloud portal on other customizations.")
 
     if preview:  # Here we decide, if we need to change preview state

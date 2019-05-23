@@ -625,7 +625,7 @@ class ProductCustomizationReview(models.Model):
         self.update_children_reviews()
 
     @property
-    def can_preview(self):
+    def can_preview_customization(self):
         return self.customization.name == settings.CUSTOMIZATION
 
     @staticmethod
