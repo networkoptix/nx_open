@@ -447,6 +447,8 @@ class DataStructure(models.Model):
                         content_record = new_review_records.last()
                     else:
                         content_record = content_record.filter(version__accepted_by__isnull=False).last()
+                else:
+                    content_record = content_record.last()
 
                 if content_record:
                     content_value = content_record.value

@@ -326,7 +326,7 @@ def send_version_for_review(product, user):
         old_version.delete()
 
     # We only check for integrations because its the only product type that non staff have access to.
-    if product.is_.integration:
+    if product.is_integration:
         errors = integration_has_required_data(product)
         if len(errors) > 0:
             return errors
