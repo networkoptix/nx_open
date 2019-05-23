@@ -8570,10 +8570,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Update completed, but some servers have failed an update</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Nx Witness Client will be restarted to the updated version.</source>
         <translation></translation>
     </message>
@@ -8722,6 +8718,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update completed, but some components have failed an update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please update %1 manually using an installation package.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 will be restarted to the updated version.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
