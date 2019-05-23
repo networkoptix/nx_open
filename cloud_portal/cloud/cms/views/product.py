@@ -174,7 +174,7 @@ def review(request):
 
     if 'force_update' in request.POST and UserGroupsToProductPermissions.\
             check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.force_update'):
-        if product.is_cloud_portal:
+        if product.is_cloud_portal and product.can_preview_on_portal:
             filldata.init_skin(product, preview=False)
             filldata.init_skin(product, preview=True)
             messages.success(request, "Version {} was force updated ".format(product_review.version.id))
