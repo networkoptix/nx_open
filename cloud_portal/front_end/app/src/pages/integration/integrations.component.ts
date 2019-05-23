@@ -67,6 +67,8 @@ export class NxIntegrationsComponent implements OnInit {
                             this.allElements = result;
                             this.setTags();
                             this.setFilter();
+                        } else {
+                            this.elements = [];
                         }
                     },
                     error => {

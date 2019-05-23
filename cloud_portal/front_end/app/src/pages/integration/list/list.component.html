@@ -1,5 +1,5 @@
 
-<nx-pre-loader type="page" *ngIf="!list"></nx-pre-loader>
+<nx-pre-loader type="page" *ngIf="list == undefined"></nx-pre-loader>
 
 <div class="col text-placeholder d-flex align-items-center"
      *ngIf="list && !list.length"

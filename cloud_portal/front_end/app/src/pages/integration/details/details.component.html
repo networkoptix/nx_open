@@ -51,7 +51,9 @@
 
             <nx-section *ngIf="plugin.support.supportEmail || plugin.support.supportWeb || plugin.support.supportPhone">
                 <div *ngIf="plugin.support.supportWeb">
-                    <a href="{{plugin.support.supportWeb}}" target="_blank" [innerHtml]="plugin.support.supportWeb"></a>
+                    <a [href]="urlSupport"
+                       target="_blank"
+                       [innerHtml]="plugin.support.supportWeb"></a>
                 </div>
                 <div *ngIf="plugin.support.supportEmail">
                     <a href="mailto:{{plugin.support.supportEmail}}" target="_blank" [innerHtml]="plugin.support.supportEmail"></a>
@@ -60,7 +62,7 @@
             </nx-section>
         </nx-block>
 
-        <nx-block side-element type="gray" *ngIf="plugin && plugin.company.companyName">
+        <nx-block side-element type="gray" *ngIf="plugin && plugin.company && plugin.company.companyName">
             <header>
                 {{plugin.company.companyName}}
             </header>
@@ -71,9 +73,8 @@
                      [style.maxWidth]="'100%'">
                 </div>
                 <div *ngIf="plugin.company.companyInfo" [innerHtml]="plugin.company.companyInfo"></div>
-                <div>
-                    <a *ngIf="plugin.company.companyWeb"
-                       [href]="url"
+                <div *ngIf="plugin.company.companyWeb">
+                    <a [href]="urlCompany"
                        target="_blank"
                        [innerHtml]="plugin.company.companyWebTitle || plugin.company.companyWeb"></a>
                 </div>
