@@ -65,13 +65,13 @@ private:
 private:
     const std::chrono::milliseconds m_nodeLifetime;
 
-    nx::network::http::TestHttpServer m_httpServer;
-
     mutable QnMutex m_mutex;
     std::map<std::string /*clusterId*/, std::map<std::string /*nodeId*/, Node>> m_onlineNodes;
     std::map<std::string/*nodeId*/, std::string/*publcIpAddress*/> m_clientPublicIpAddresses;
 
     nx::utils::Subscription<std::string/*clusterId*/, NodeInfo> m_nodeDiscoveredSubscription;
+
+    nx::network::http::TestHttpServer m_httpServer;
 };
 
 } // namespace nx::cloud::discovery::test
