@@ -420,8 +420,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
     def template_allowed(self, request, customization_review):
         customization_name = customization_review.customization.name
         matching_portal = customization_name == settings.CUSTOMIZATION
-        is_cloud_portal = \
-            customization_review.version.product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal
+        is_cloud_portal = customization_review.version.product.is_cloud_portal
         state = customization_review.state
 
         can_access_customization = UserGroupsToProductPermissions.check_customization_permission(

@@ -626,7 +626,7 @@ class ProductCustomizationReview(models.Model):
 
     @property
     def can_preview_customization(self):
-        return self.customization.name == settings.CUSTOMIZATION
+        return self.customization.name == settings.CUSTOMIZATION and self.version.product.product_type.can_preview
 
     @staticmethod
     def anon_notes(notes):

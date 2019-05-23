@@ -8,7 +8,7 @@
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 {% endblock %}
 {% block content %}
-    {% with can_preview=original.version.product.product_type.can_preview version=original.version product=original.version.product %}
+    {% with can_preview=original.can_preview_customization version=original.version product=original.version.product %}
     <div id="alert" style="display:none" class="alert alert-warning"
          title="Preview being generated">Currently making the preview for you. A new tab
         will open shortly.
