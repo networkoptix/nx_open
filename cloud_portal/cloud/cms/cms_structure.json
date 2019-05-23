@@ -831,7 +831,7 @@
       {
         "name": "company",
         "label": "Company",
-        "description": "General information for the company that appears in the rightmost column of the integration's page.",
+        "description": "General information about the company that appears in the rightmost column of the integration's page.",
         "translatable": false,
         "values": [
           {
@@ -849,7 +849,7 @@
             "name": "companyInfo",
             "label": "Company Info",
             "value": "",
-            "description": "A short description for the company. The company's info is visible in the detailed view page for the integration in the rightmost column. Maximum length 250 characters.",
+            "description": "A short description about the company. The company's info is visible in the detailed view page for the integration in the rightmost column. Maximum length 250 characters.",
             "type": "long_text",
             "optional": true,
             "meta": {
@@ -865,13 +865,12 @@
             "optional": true,
             "meta": {
               "size": 512000,
-              "format": "png",
-              "height_ge": 128
+              "format": "png"
             }
           },
           {
             "name": "companyWeb",
-            "label": "Company url",
+            "label": "Company URL",
             "value": "",
             "description": "Company web address.",
             "type": "text",
@@ -882,7 +881,7 @@
           },
           {
             "name": "companyWebTitle",
-            "label": "Company Web Title",
+            "label": "Company URL Title",
             "value": "",
             "description": "Human friendly title for company's web address.",
             "type": "text",
