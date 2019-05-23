@@ -865,7 +865,9 @@
             "optional": true,
             "meta": {
               "size": 512000,
-              "format": "png"
+              "format": "png",
+              "height_le": 250,
+              "width_le": 500
             }
           },
           {
