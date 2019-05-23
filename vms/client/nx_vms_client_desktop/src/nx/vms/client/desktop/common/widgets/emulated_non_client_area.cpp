@@ -5,11 +5,14 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QEvent>
 #include <QtCore/QPointer>
+#include <QtCore/QVariant>
 #include <QtGui/QPainter>
 #include <QtGui/QPen>
+#include <QtWidgets/QAbstractButton>
 
 #include <ui/style/helper.h>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 
 namespace nx::vms::client::desktop {
