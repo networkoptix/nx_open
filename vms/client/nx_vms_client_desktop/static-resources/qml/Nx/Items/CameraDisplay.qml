@@ -11,7 +11,6 @@ Rectangle
     color: ColorTheme.window
 
     property alias cameraResourceId: player.resourceId
-    property alias maxTextureSize: player.maxTextureSize
     property alias audioEnabled: player.audioEnabled
 
     property alias videoOverlayComponent: videoOverlayLoader.sourceComponent
@@ -20,11 +19,14 @@ Rectangle
     property alias videoOverlay: videoOverlayLoader.item
     readonly property MediaPlayer mediaPlayer: player
 
+    readonly property int maximumTextureSize: maxTextureSize //< Global context property.
+
     MediaPlayer
     {
         id: player
         readonly property bool loaded: mediaStatus == MediaPlayer.MediaStatus.Loaded
         onResourceIdChanged: multiVideoOutput.clear()
+        maxTextureSize: cameraDisplay.maximumTextureSize
     }
 
     MediaResourceHelper

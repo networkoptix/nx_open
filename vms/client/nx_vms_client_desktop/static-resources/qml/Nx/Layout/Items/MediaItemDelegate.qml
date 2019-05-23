@@ -19,8 +19,6 @@ ResourceItemDelegate
         cameraResourceId: layoutItemData ? layoutItemData.resourceId.toString() : null
         audioEnabled: true
 
-        maxTextureSize: 4096 // TODO: #vkutin FIXME!
-
         channelOverlayComponent: Item
         {
             id: channelOverlay
