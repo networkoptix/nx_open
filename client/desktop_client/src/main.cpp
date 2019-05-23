@@ -265,7 +265,7 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
         {
             const auto reportPathString =
                 QStandardPaths::writableLocation(QStandardPaths::DataLocation) + lit("/log")
-                + lit("/gdi_handles_report.txt");
+                + lit("/gdi_handles_report%1.txt").arg(QnUuid::createUuid().toString());
             const auto reportPath = std::filesystem::path(reportPathString.toStdWString());
             auto gdiTracer = gdi_tracer::GdiHandleTracer::getInstance();
             gdiTracer->setGdiTraceLimit(ini().gdiTraceLimit);
