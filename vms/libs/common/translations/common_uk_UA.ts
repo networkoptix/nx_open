@@ -1642,14 +1642,6 @@
       <translation>Відкрити розкладку</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Плагін події</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Невідомий плагін події</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Не вдалося застосувати час камери, затримка занадто висока, буде використано системний час</translation>
     </message>
@@ -1676,6 +1668,14 @@
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
       <translation>Analytics storage &quot;%1&quot; майже заповнена.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

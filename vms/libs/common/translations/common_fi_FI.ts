@@ -1550,14 +1550,6 @@
       <translation>Avaa asettelu</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Plugin-tapahtuma</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Tuntematon Plugin-tapahtuma</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Kameran aikaa ei voitu pakottaa käyttöön, aikaero liian suuri, järjestelmäaikaa käytetään</translation>
     </message>
@@ -1584,6 +1576,14 @@
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
       <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

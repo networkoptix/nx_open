@@ -1550,14 +1550,6 @@
       <translation>Apri il layout</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Evento Plugin</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Evento plugin sconosciuto</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Impossibile forzare l'uso dell'orario della telecamera, la differenza è troppa, l'orario di sistema verrà utilizzato</translation>
     </message>
@@ -1584,6 +1576,14 @@
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
       <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

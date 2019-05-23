@@ -1550,14 +1550,6 @@
       <translation>Ekranı Aç</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Eklenti Etkinliği</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Bilinmeyen eklenti olayı</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Kamera saati kullanmaya zorlanırken hata oluştu, çok fazla lag var, sistem saati kullanılacak</translation>
     </message>
@@ -1584,6 +1576,14 @@
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
       <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

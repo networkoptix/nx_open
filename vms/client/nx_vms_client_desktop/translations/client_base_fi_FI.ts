@@ -3198,6 +3198,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Näytönohjaimen ajurit ovat vanhentuneita tai niitä ei ole asennettu</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 ei ehkä toimi oikein.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3281,17 +3292,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Luo järjestelmän kokoonpanon varmuuskopion, joka voidaan palauttaa vian sattuessa.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Näytönohjaimen ajurit ovat vanhentuneita tai niitä ei ole asennettu</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 ei ehkä toimi oikein.</translation>
     </message>
   </context>
   <context>
@@ -8758,10 +8758,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Yleinen tapahtuma</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation>Tuntematon Plugin-tapahtuma</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation>Yhteys laitteeseen katkaistu</translation>
     </message>
@@ -8772,6 +8768,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Module was disconnected</source>
       <translation>Yhteys I/O-moduuliin katkaistu</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

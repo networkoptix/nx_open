@@ -3160,6 +3160,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>비디오 카드 드라이버가 오래 된 또는 설치 되어 있지 않은</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 제대로 작동 하지 않을 수 있습니다.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3243,17 +3254,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>오류가 발생할 경우 복원할 수 있는 시스템 구성에 대 한 백업을 만듭니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>비디오 카드 드라이버가 오래 된 또는 설치 되어 있지 않은</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 제대로 작동 하지 않을 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -8638,10 +8638,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>일반 이벤트</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation type="unfinished">Unknown Plugin Event</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation type="unfinished">Device was disconnected</translation>
     </message>
@@ -8652,6 +8648,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Module was disconnected</source>
       <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

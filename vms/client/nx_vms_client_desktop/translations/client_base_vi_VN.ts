@@ -3160,6 +3160,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Trình điều khiển card màn hình chưa cập nhật hoặc không được cài đặt</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 có thể không hoạt động đúng.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3243,17 +3254,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Bạn có thể tạo một bản sao lưu cho cấu hình Hệ thống để khôi phục trong trường hợp lỗi.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Trình điều khiển card màn hình chưa cập nhật hoặc không được cài đặt</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 có thể không hoạt động đúng.</translation>
     </message>
   </context>
   <context>
@@ -8637,10 +8637,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>sự kiện chung</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation type="unfinished">Unknown Plugin Event</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation type="unfinished">Device was disconnected</translation>
     </message>
@@ -8651,6 +8647,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Module was disconnected</source>
       <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>
