@@ -248,9 +248,17 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
                 nx::network::NatTraversalSupport::enabled,
                 ipVersion);
 
-            if (!socket->setReuseAddrFlag(true) ||
-                !socket->setReusePortFlag(true) ||
-                !socket->bind(localAddress) ||
+            if (!socket->setReuseAddrFlag(true))
+            {
+                NX_DEBUG(typeid(QnUniversalTcpListener), "setReuseAddrFlag(true) unexpectedly failed.");
+            }
+
+            if (!socket->setReusePortFlag(true))
+            {
+                NX_DEBUG(typeid(QnUniversalTcpListener), "setReusePortFlag(true) failed, probably because of unsupported.");
+            }
+
+            if (!socket->bind(localAddress) ||
                 !socket->listen())
             {
                 NX_WARNING(
