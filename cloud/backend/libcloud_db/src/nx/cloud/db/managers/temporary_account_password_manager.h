@@ -82,7 +82,7 @@ public:
     TemporaryAccountPasswordManager(
         const conf::AccountManager& settings,
         const nx::utils::stree::ResourceNameSet& attributeNameset,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager,
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
         dao::AbstractTemporaryCredentialsDao* const dao) noexcept(false);
     virtual ~TemporaryAccountPasswordManager();
 
@@ -159,7 +159,7 @@ private:
 
     const conf::AccountManager m_settings;
     const nx::utils::stree::ResourceNameSet& m_attributeNameset;
-    nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::sql::AbstractAsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
     TemporaryCredentialsDictionary m_temporaryCredentials;
     mutable QnMutex m_mutex;

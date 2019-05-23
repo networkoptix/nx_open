@@ -31,7 +31,7 @@ AccountManager::AccountManager(
     const conf::Settings& settings,
     const StreeManager& streeManager,
     AbstractTemporaryAccountPasswordManager* const tempPasswordManager,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager,
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
     AbstractEmailManager* const emailManager) noexcept(false)
 :
     m_settings(settings),
@@ -133,21 +133,21 @@ void AccountManager::registerAccount(
     bool requestSourceSecured = false;
     authzInfo.get(attr::secureSource, &requestSourceSecured);
 
-    using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::AccountData, data::AccountConfirmationCode>(
-        std::bind(&AccountManager::registerNewAccountInDb, this, _1, _2, _3),
-        std::move(account),
-        [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
-            completionHandler = std::move(completionHandler),
-            requestSourceSecured](
-                nx::sql::DBResult dbResult,
-                data::AccountData /*account*/,
-                data::AccountConfirmationCode confirmationCode)
+    auto confirmationCode = std::make_shared<data::AccountConfirmationCode>();
+
+    m_dbManager->executeUpdate(
+        [this, account = std::move(account), confirmationCode](nx::sql::QueryContext* queryContext)
+        {
+            return registerNewAccountInDb(queryContext, account, confirmationCode.get());
+        },
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement(), requestSourceSecured,
+            confirmationCode, completionHandler = std::move(completionHandler)](
+                nx::sql::DBResult dbResult)
         {
             completionHandler(
                 dbResultToApiResult(dbResult),
                 requestSourceSecured
-                    ? std::move(confirmationCode)
+                    ? std::move(*confirmationCode)
                     : data::AccountConfirmationCode());
         });
 }
@@ -155,15 +155,22 @@ void AccountManager::registerAccount(
 void AccountManager::activate(
     const AuthorizationInfo& /*authzInfo*/,
     data::AccountConfirmationCode emailVerificationCode,
-    std::function<void(api::Result, api::AccountEmail)> completionHandler )
+    std::function<void(api::Result, api::AccountEmail)> completionHandler)
 {
-    using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::AccountConfirmationCode, std::string>(
-        std::bind(&AccountManager::verifyAccount, this, _1, _2, _3),
-        std::move(emailVerificationCode),
-        std::bind(&AccountManager::sendActivateAccountResponse, this,
-                    m_startedAsyncCallsCounter.getScopedIncrement(),
-                    _1, _2, _3, std::move(completionHandler)));
+    auto accountEmail = std::make_shared<std::string>();
+
+    m_dbManager->executeUpdate(
+        [this, emailVerificationCode = std::move(emailVerificationCode), accountEmail](
+            nx::sql::QueryContext* queryContext)
+        {
+            return verifyAccount(queryContext, emailVerificationCode, accountEmail.get());
+        },
+        [this, accountEmail, completionHandler = std::move(completionHandler),
+            locker = m_startedAsyncCallsCounter.getScopedIncrement()](
+                nx::sql::DBResult dbResult) mutable
+        {
+            sendActivateAccountResponse(dbResult, *accountEmail, std::move(completionHandler));
+        });
 }
 
 void AccountManager::getAccount(
@@ -202,26 +209,27 @@ void AccountManager::updateAccount(
     bool authenticatedByEmailCode = false;
     authzInfo.get(attr::authenticatedByEmailCode, &authenticatedByEmailCode);
 
-    data::AccountUpdateDataWithEmail updateDataWithEmail(std::move(accountData));
-    updateDataWithEmail.email = accountEmail;
+    auto updateDataWithEmail = std::make_shared<data::AccountUpdateDataWithEmail>(
+        std::move(accountData));
+    updateDataWithEmail->email = accountEmail;
 
     auto onUpdateCompletion =
         [this,
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
-            authenticatedByEmailCode,
+            authenticatedByEmailCode, updateDataWithEmail,
             completionHandler = std::move(completionHandler)](
-                nx::sql::DBResult resultCode,
-                data::AccountUpdateDataWithEmail accountData)
+                nx::sql::DBResult resultCode)
         {
             if (resultCode == nx::sql::DBResult::ok)
-                updateAccountCache(std::move(accountData));
+                updateAccountCache(std::move(*updateDataWithEmail));
             completionHandler(dbResultToApiResult(resultCode));
         };
 
-    using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::AccountUpdateDataWithEmail>(
-        std::bind(&AccountManager::updateAccountInDb, this, authenticatedByEmailCode, _1, _2),
-        std::move(updateDataWithEmail),
+    m_dbManager->executeUpdate(
+        [this, authenticatedByEmailCode, updateDataWithEmail](nx::sql::QueryContext* queryContext)
+        {
+            return updateAccountInDb(authenticatedByEmailCode, queryContext, *updateDataWithEmail);
+        },
         std::move(onUpdateCompletion));
 }
 
@@ -245,20 +253,23 @@ void AccountManager::resetPassword(
     bool hasRequestCameFromSecureSource = false;
     authzInfo.get(attr::secureSource, &hasRequestCameFromSecureSource);
 
-    m_dbManager->executeUpdate<std::string, data::AccountConfirmationCode>(
-        std::bind(&AccountManager::issueRestorePasswordCode, this, _1, _2, _3),
-        accountEmail.email,
-        [this, hasRequestCameFromSecureSource,
+    auto confirmationCode = std::make_shared<data::AccountConfirmationCode>();
+
+    m_dbManager->executeUpdate(
+        [this, accountEmail = accountEmail.email, confirmationCode](
+            nx::sql::QueryContext* queryContext)
+        {
+            return issueRestorePasswordCode(queryContext, accountEmail, confirmationCode.get());
+        },
+        [this, hasRequestCameFromSecureSource, confirmationCode,
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
-                nx::sql::DBResult dbResultCode,
-                std::string /*accountEmail*/,
-                data::AccountConfirmationCode confirmationCode)
+                nx::sql::DBResult dbResultCode)
         {
             return completionHandler(
                 dbResultToApiResult(dbResultCode),
                 hasRequestCameFromSecureSource
-                    ? std::move(confirmationCode)
+                    ? std::move(*confirmationCode)
                     : data::AccountConfirmationCode());
         });
 }
@@ -294,24 +305,28 @@ void AccountManager::reactivateAccount(
     auto notification = std::make_unique<ActivateAccountNotification>();
     notification->customization = existingAccount->customization;
 
-    using namespace std::placeholders;
-    m_dbManager->executeUpdate<std::string, data::AccountConfirmationCode>(
-        [this, notification = std::move(notification), account = *existingAccount](
-            nx::sql::QueryContext* const queryContext,
-            const std::string& /*accountEmail*/,
-            data::AccountConfirmationCode* const resultData) mutable
+    auto confirmationCode = std::make_shared<data::AccountConfirmationCode>();
+
+    m_dbManager->executeUpdate(
+        [this, notification = std::move(notification), account = *existingAccount, confirmationCode](
+            nx::sql::QueryContext* const queryContext) mutable
         {
             return issueAccountActivationCode(
                 queryContext,
                 account,
                 std::move(notification),
-                resultData);
+                confirmationCode.get());
         },
-        std::move(accountEmail.email),
-        std::bind(&AccountManager::accountReactivated, this,
-            m_startedAsyncCallsCounter.getScopedIncrement(),
-            requestSourceSecured,
-            _1, _2, _3, std::move(completionHandler)));
+        [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(), requestSourceSecured,
+            confirmationCode, completionHandler = std::move(completionHandler)](
+                nx::sql::DBResult resultCode) mutable
+        {
+            accountReactivated(
+                requestSourceSecured,
+                resultCode,
+                std::move(*confirmationCode),
+                std::move(completionHandler));
+        });
 }
 
 void AccountManager::createTemporaryCredentials(
@@ -713,10 +728,8 @@ std::string AccountManager::generateAccountActivationCode(
 }
 
 void AccountManager::accountReactivated(
-    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
     nx::sql::DBResult resultCode,
-    std::string /*email*/,
     data::AccountConfirmationCode resultData,
     std::function<void(api::Result, data::AccountConfirmationCode)> completionHandler)
 {
@@ -786,10 +799,8 @@ nx::sql::DBResult AccountManager::verifyAccount(
 }
 
 void AccountManager::sendActivateAccountResponse(
-    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::sql::DBResult resultCode,
-    data::AccountConfirmationCode /*verificationCode*/,
-    std::string accountEmail,
+    const std::string& accountEmail,
     std::function<void(api::Result, api::AccountEmail)> completionHandler)
 {
     if (resultCode != nx::sql::DBResult::ok)
