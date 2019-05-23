@@ -189,9 +189,9 @@
 #endif
 #include <nx/vms/server/rest/device_analytics_settings_handler.h>
 #include <nx/vms/server/rest/analytics_engine_settings_handler.h>
-
 #include <nx/vms/server/rest/get_time_handler.h>
 #include <nx/vms/server/rest/server_time_handler.h>
+#include <nx/vms/server/rest/plugin_module_information_handler.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -2714,6 +2714,23 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/executeEventAction",
         new nx::vms::server::rest::QnExecuteEventActionRestHandler(serverModule()));
+
+    /**%apidoc GET /api/pluginModuleInformation
+     * %return:object JSON object with an error code, error string, and a list with information about Server plugins on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:array reply a list of JSON objects with the following structure:
+     *         %param reply[].name Name of the plugin.
+     *         %param reply[].description Description of the plugin.
+     *         %param reply[].vendor Vendor of the plugin.
+     *         %param reply[].version Version of the plugin.
+     *         %param reply[].libraryName Absolute path to the plugin library.
+     *         %param reply[].loadingType Type of the plugin loading process.
+     *         %param reply[].status Status of the plugin after a loading attempt.
+     *         %param reply[].statusMessage Message with details about the plugin loading attempt.
+     */
+    reg("api/pluginModuleInformation",
+        new nx::vms::server::rest::PluginModuleInformationHandler(serverModule()));
 
     /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system

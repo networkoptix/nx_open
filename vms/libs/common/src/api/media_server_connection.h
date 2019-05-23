@@ -328,6 +328,8 @@ public:
     int getBookmarkTagsAsync(
         const QnGetBookmarkTagsRequestData& request, QObject* target, const char* slot);
 
+    int pluginModuleInformation(QObject* target, const char* slot);
+
 protected:
     virtual nx::utils::Url url() const override;
     virtual QnAbstractReplyProcessor* newReplyProcessor(int object, const QString& serverId) override;
