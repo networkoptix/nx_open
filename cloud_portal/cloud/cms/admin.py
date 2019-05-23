@@ -324,7 +324,8 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
-        version = ProductCustomizationReview.objects.get(id=object_id).version
+        customization_review = ProductCustomizationReview.objects.get(id=object_id)
+        version = customization_review.version
         extra_context['contexts'] = get_records_for_version(version)
         extra_context['title'] = f"Changes for {version.product.name} - Version: {version.id}"
 
@@ -337,7 +338,12 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
 
         extra_context['DataStructureTypes'] = DataStructure.DATA_TYPES
 
-        extra_context['current_portal_customization'] = Customization.objects.get(name=settings.CUSTOMIZATION)
+        extra_context['allowed'] = self.template_allowed(request, customization_review)
+
+        # Customization name should be visible in notes heading if developer has access or user has access
+        if UserGroupsToProductPermissions.check_customization_permission(request.user, customization_review.customization.name, 'cms.access_customization') or \
+                UserGroupsToProductPermissions.check_customization_permission(version.created_by, customization_review.customization.name, 'cms.access_cusomization'):
+            extra_context['customization_name'] = customization_review.customization.name
 
         return super(ProductCustomizationReviewAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
@@ -410,6 +416,44 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         return obj.reviewed_by if obj.show_customization else "-"
 
     reviewer_email.short_description = "Reviewed By"
+
+    def template_allowed(self, request, customization_review):
+        customization_name = customization_review.customization.name
+        matching_portal = customization_name == settings.CUSTOMIZATION
+        is_cloud_portal = \
+            customization_review.version.product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal
+        state = customization_review.state
+
+        can_access_customization = UserGroupsToProductPermissions.check_customization_permission(
+            request.user, customization_name, 'cms.access_customization'
+        )
+        can_force_update = UserGroupsToProductPermissions.check_customization_permission(
+            request.user, customization_name, 'cms.force_update'
+        )
+        can_publish_or_accept = UserGroupsToProductPermissions.check_customization_permission(
+            request.user, customization_name, 'cms.publish_version'
+        )
+        developer_access_customization = UserGroupsToProductPermissions.check_customization_permission(
+            customization_review.version.created_by, customization_name, 'cms.publish_version')
+        can_delete = self.has_delete_permission(request, customization_review)
+
+        allowed = dict()
+        allowed['force_update'] = \
+            is_cloud_portal and state == ProductCustomizationReview.REVIEW_STATES.accepted and matching_portal \
+            and can_force_update
+        allowed['publish'] = \
+            is_cloud_portal and state == ProductCustomizationReview.REVIEW_STATES.pending and matching_portal \
+            and can_publish_or_accept
+        allowed['accept'] = \
+            not is_cloud_portal and state == ProductCustomizationReview.REVIEW_STATES.pending \
+            and can_publish_or_accept
+        allowed['question'] = state == ProductCustomizationReview.REVIEW_STATES.pending and can_access_customization
+        allowed['delete'] = can_delete
+        allowed['submit_row'] = True in allowed.values()
+
+        allowed['access_customization_checkbox'] = not developer_access_customization
+
+        return allowed
 
 
 admin.site.register(ProductCustomizationReview, ProductCustomizationReviewAdmin)

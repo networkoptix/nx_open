@@ -121,7 +121,7 @@
         {% else %}
         <div>There are no changes to review</div>
         {% endif %}
-        <h2>Review Notes for {{ original.customization }}</h2>
+        <h2>Review Notes {% if customization_name %}for {{ customization_name }}{% endif %}</h2>
         {{ original.notes|linebreaks }}
     </div>
 
@@ -130,39 +130,37 @@
         <input name="version_id" value="{{ version.id }}" hidden/>
         <input name="review_id" value="{{ original.id }}" hidden/>
 
-        {% get_review_state original.state as state %}
-        {% has_customization_permission user current_portal_customization.name 'cms.force_update' as portal_force_update %}
-        {% has_customization_permission user original.customization.name 'cms.force_update' as customization_force_update %}
-        {% if state == 'Pending' or state != 'Rejected' and can_preview and portal_force_update and customization_force_update or has_delete_permission %}
+        {% if allowed.submit_row %}
             <div class="submit-row">
-                {% if has_delete_permission %}
+                {% if allowed.delete %}
                 <a href="{% url opts|admin_urlname:'delete' object_id %}" class="btn btn-sm btn-danger pull-left">{% trans "Delete" %}</a>
                 {% endif %}
 
-                {% if state == 'Accepted' and can_preview and portal_force_update and customization_force_update %}
+                {% if allowed.force_update %}
                 <button class="btn btn-sm btn-danger" type="submit" name="force_update">Force Update</button>
                 {% endif %}
 
-                {% if state == 'Pending' %}
-                    {% if product and False %}
-                    <button class="btn btn-sm btn-default">
-                        <a href="{% url 'download_package' product.id %}?version_id={{ version.id }}"
-                           download>Download</a>
-                    </button>
-                    {% endif %}
-                    {% has_customization_permission user current_portal_customization.name 'cms.publish_version' as portal_publish_customization_version %}
-                    {% has_customization_permission user original.customization.name 'cms.publish_version' as customization_publish_customization_version %}
-                    {% if portal_publish_customization_version and customization_publish_customization_version %}
-                    <button class="btn btn-sm btn-danger" data-action="reject" data-name="Reject"
-                            data-toggle="modal" data-target="#addNotes" onclick="return false;">Reject</button>
-                    {% endif %}
-                    <button class="btn btn-sm btn-default" data-action="ask_question" data-name="Ask a question"
-                            data-toggle="modal" data-target="#addNotes" onclick="return false;">Ask a question</button>
-                    {% if portal_publish_customization_version and customization_publish_customization_version %}
-                    <button class="btn btn-sm btn-success" type="submit" name="publish">
-                            {% if can_preview %}Publish{% else %} Accept {% endif %}
-                    </button>
-                    {% endif %}
+                {% if product and False %}
+                <button class="btn btn-sm btn-default">
+                    <a href="{% url 'download_package' product.id %}?version_id={{ version.id }}"
+                       download>Download</a>
+                </button>
+                {% endif %}
+
+                {% if allowed.publish or allowed.accept %}
+                <button class="btn btn-sm btn-danger" data-action="reject" data-name="Reject"
+                        data-toggle="modal" data-target="#addNotes" onclick="return false;">Reject</button>
+                {% endif %}
+
+                {% if allowed.question %}
+                <button class="btn btn-sm btn-default" data-action="ask_question" data-name="Ask a question"
+                        data-toggle="modal" data-target="#addNotes" onclick="return false;">Ask a question</button>
+                {% endif %}
+
+                {% if allowed.publish or allowed.accept %}
+                <button class="btn btn-sm btn-success" type="submit" name="publish">
+                        {% if allowed.publish %}Publish{% elif allowed.accept %} Accept {% endif %}
+                </button>
                 {% endif %}
             </div>
         {% endif %}
@@ -183,8 +181,7 @@
                             </div>
                         </div>
 
-                        {% has_customization_permission version.created_by original.customization.name 'cms.access_customization' as developer_access_customization %}
-                        {% if not developer_access_customization %}
+                        {% if allowed.access_customization_checkbox %}
                         <div class="form-row">
                             <div class="checbox">
                                 <label>
