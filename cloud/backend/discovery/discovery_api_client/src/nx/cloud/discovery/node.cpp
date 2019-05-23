@@ -16,6 +16,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 //-------------------------------------------------------------------------------------------------
 
+std::string NodeInfo::toString() const
+{
+    return QJson::serialized(this).constData();
+}
+
+
 bool Node::operator==(const Node& right) const
 {
     return nodeId == right.nodeId;

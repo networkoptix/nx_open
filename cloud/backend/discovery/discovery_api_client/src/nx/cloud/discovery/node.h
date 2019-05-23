@@ -17,6 +17,8 @@ struct NX_DISCOVERY_CLIENT_API NodeInfo
     std::vector<std::string> urls;
     /* The object under "info" key */
     std::string infoJson;
+
+    std::string toString() const;
 };
 
 #define NodeInfo_Fields (nodeId)(urls)(infoJson)
