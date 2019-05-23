@@ -8,17 +8,14 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/stoppable.h>
 #include <nx/utils/thread/wait_condition.h>
 
 #include <common/static_common_module.h>
 #include <common/common_module.h>
-#include <network/http_connection_listener.h>
 #include <nx_ec/ec_api.h>
-
-#include "appserver2_http_server.h"
-#include <nx/utils/test_support/module_instance_launcher.h>
 
 namespace nx { namespace vms { namespace cloud_integration { class CloudManagerGroup; } } }
 

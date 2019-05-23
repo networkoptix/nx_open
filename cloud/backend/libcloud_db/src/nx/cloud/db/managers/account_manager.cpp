@@ -216,8 +216,7 @@ void AccountManager::updateAccount(
     auto onUpdateCompletion =
         [this,
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
-            authenticatedByEmailCode, updateDataWithEmail,
-            completionHandler = std::move(completionHandler)](
+            updateDataWithEmail, completionHandler = std::move(completionHandler)](
                 nx::sql::DBResult resultCode)
         {
             if (resultCode == nx::sql::DBResult::ok)
@@ -261,12 +260,12 @@ void AccountManager::resetPassword(
         {
             return issueRestorePasswordCode(queryContext, accountEmail, confirmationCode.get());
         },
-        [this, hasRequestCameFromSecureSource, confirmationCode,
+        [hasRequestCameFromSecureSource, confirmationCode,
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 nx::sql::DBResult dbResultCode)
         {
-            return completionHandler(
+            completionHandler(
                 dbResultToApiResult(dbResultCode),
                 hasRequestCameFromSecureSource
                     ? std::move(*confirmationCode)

@@ -54,7 +54,6 @@ private:
     };
 
     const conf::Settings& m_settings;
-    bool m_terminated;
     mutable QnMutex m_mutex;
     nx::utils::Url m_notificationModuleUrl;
     std::set<nx::network::http::AsyncHttpClientPtr> m_ongoingRequests;

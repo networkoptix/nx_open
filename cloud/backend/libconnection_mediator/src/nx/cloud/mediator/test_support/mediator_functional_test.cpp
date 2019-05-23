@@ -32,8 +32,6 @@
 namespace nx {
 namespace hpm {
 
-static constexpr size_t kMaxBindRetryCount = 10;
-
 MediatorInstance::MediatorInstance(int flags, const QString& dataDir):
     m_testFlags(flags)
 {

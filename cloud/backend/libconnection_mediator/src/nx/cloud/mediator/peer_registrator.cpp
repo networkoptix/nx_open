@@ -372,7 +372,7 @@ void PeerRegistrator::reportClientBind(
 
     auto clientBindIndications = prepareClientBindIndications();
     peerConnection->dispatch(
-        [this, clientBindIndications = std::move(clientBindIndications),
+        [clientBindIndications = std::move(clientBindIndications),
             peerConnectionPtr = peerConnection.get()]() mutable
         {
             for (auto& indication: clientBindIndications)

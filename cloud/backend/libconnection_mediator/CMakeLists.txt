@@ -3,6 +3,7 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR})
 
 nx_add_target(libconnection_mediator LIBRARY NO_MOC
+    WERROR_IF NOT WINDOWS
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/libconnection_mediator_app_info_impl.cpp"
     PRIVATE_LIBS

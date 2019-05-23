@@ -238,7 +238,7 @@ std::vector<MediaserverData> ListeningPeerPool::findPeersBySystemId(
         foundPeers.push_back(it->first);
     }
 
-    return std::move(foundPeers);
+    return foundPeers;
 }
 
 api::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const

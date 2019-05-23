@@ -10,8 +10,6 @@ namespace nx::cloud::db {
 
 AccessBlocker::AccessBlocker(
     const conf::Settings& settings)
-    :
-    m_settings(settings)
 {
     if (auto userLockerSettings = settings.security().loginLockout)
         m_userLocker = std::make_unique<CloudUserLockerPool>(*userLockerSettings);

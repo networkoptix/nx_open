@@ -7,13 +7,6 @@ namespace nx::cloud::db {
 namespace dao {
 namespace rdb {
 
-SystemMergeDao::SystemMergeDao(
-    sql::AbstractAsyncSqlQueryExecutor* queryExecutor)
-    :
-    m_queryExecutor(queryExecutor)
-{
-}
-
 std::vector<MergeInfo> SystemMergeDao::fetchAll(
     sql::QueryContext* queryContext)
 {

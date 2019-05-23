@@ -228,7 +228,7 @@ void SystemManager::unbindSystem(
 
     m_dbManager->executeUpdate(
         std::bind(&SystemManager::markSystemForDeletion, this, _1, systemId.systemId),
-        [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 nx::sql::DBResult dbResult)
         {
@@ -336,8 +336,7 @@ void SystemManager::shareSystem(
         };
 
     auto onDbUpdateCompletedFunc =
-        [this,
-            locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 nx::sql::DBResult dbResult)
         {
@@ -485,8 +484,7 @@ void SystemManager::updateSystem(
     };
 
     auto onDbUpdateCompletedFunc =
-        [this,
-            locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 nx::sql::DBResult dbResult)
         {
