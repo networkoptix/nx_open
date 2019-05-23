@@ -216,7 +216,8 @@ bool Socket<SocketInterfaceToImplement>::getReuseAddrFlag(bool* val) const
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::setReusePortFlag(bool value)
+bool Socket<SocketInterfaceToImplement>::setReusePortFlag(
+    [[maybe_unused]] bool value)
 {
 #if defined(_WIN32)
     return setReuseAddrFlag(value);
@@ -230,7 +231,8 @@ bool Socket<SocketInterfaceToImplement>::setReusePortFlag(bool value)
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::getReusePortFlag(bool* value) const
+bool Socket<SocketInterfaceToImplement>::getReusePortFlag(
+    [[maybe_unused]] bool* value) const
 {
 #if defined(_WIN32)
     return getReuseAddrFlag(value);
