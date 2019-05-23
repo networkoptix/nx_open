@@ -172,7 +172,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def products_with_permission(self, permission):
         products = []
         permission_product_ids = UserGroupsToProductPermissions.objects.filter(group__in=self.groups.all())\
-            .distinct().values_list('product__id', flat=True)
+            .values_list('product__id', flat=True).distinct()
         for product in Product.objects.filter(id__in=permission_product_ids):
             if UserGroupsToProductPermissions.check_permission(self, product, permission):
                 products.append(product.id)
