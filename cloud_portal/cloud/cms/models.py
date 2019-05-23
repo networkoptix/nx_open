@@ -224,7 +224,7 @@ class Product(models.Model):
     preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
 
     def __str__(self):
-        if self.product_type and self.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal):
+        if self.product_type and self.is_cloud_portal:
             return "{} - {}".format(self.name, self.customizations.first())
         return self.name
 
@@ -251,9 +251,17 @@ class Product(models.Model):
 
     @property
     def product_root(self):
-        if self.product_type and self.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal):
+        if self.product_type and self.is_cloud_portal:
             return self.customizations.first().name
         return ""
+
+    @property
+    def is_cloud_portal(self):
+        return self.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal)
+
+    @property
+    def is_integration(self):
+        return self.is_product_type(ProductType.PRODUCT_TYPES.integration)
 
     def is_product_type(self, product_type):
         return self.product_type.type == product_type
@@ -286,7 +294,7 @@ class Product(models.Model):
                 need_update = self.preview_status == orig.preview_status
 
         super(Product, self).save(*args, **kwargs)
-        if need_update and self.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal)\
+        if need_update and self.is_cloud_portal \
                 and len(self.customizations.all()) == 1:
             cloud_portal_customization_cache(self.customizations.first().name, force=True)  # invalidate cache
             # TODO: need to update all static right here
@@ -420,7 +428,7 @@ class DataStructure(models.Model):
         if self.translatable:
             if language:
                 content_record = content_record.filter(language=language)
-            elif product.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal):
+            elif product.is_cloud_portal:
                 content_record = content_record.filter(language=product.customizations.first().default_language)
 
         if content_record.exists():
@@ -615,6 +623,10 @@ class ProductCustomizationReview(models.Model):
         self.state = state
         self.save()
         self.update_children_reviews()
+
+    @property
+    def can_preview(self):
+        return self.customization.name == settings.CUSTOMIZATION
 
     @staticmethod
     def anon_notes(notes):

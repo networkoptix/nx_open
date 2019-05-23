@@ -120,7 +120,7 @@ def context_editor_action(request, product, context_id, language_code):
                 if product.can_preview_on_portal:
                     saved_msg += " Preview has been created."
                     product.change_preview_status(product.PREVIEW_STATUS.draft)
-                    if not product.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal):
+                    if not product.is_cloud_portal:
                         preview_link = modify_db.generate_preview_link(context, product, state=DRAFT)
                 else:
                     add_upload_error_messages(request, "{}", [
@@ -175,7 +175,7 @@ def review(request):
 
     if 'force_update' in request.POST and UserGroupsToProductPermissions.\
             check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.force_update'):
-        if product.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal):
+        if product.is_cloud_portal:
             filldata.init_skin(product, preview=False)
             filldata.init_skin(product, preview=True)
             messages.success(request, "Version {} was force updated ".format(product_review.version.id))
@@ -184,7 +184,7 @@ def review(request):
 
     elif 'publish' in request.POST and UserGroupsToProductPermissions.\
             check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
-        if product.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal):
+        if product.is_cloud_portal:
             publishing_errors = modify_db.publish_latest_version(product, review_id, request.user)
             if publishing_errors:
                 messages.error(request, "Version {} {}".format(product_review.version.id, publishing_errors))
