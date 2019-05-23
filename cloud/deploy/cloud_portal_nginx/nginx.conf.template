@@ -72,9 +72,18 @@ http {
         error_page 503 /static/503.html;
         error_page 502 /static/503.html;
 
+        set ${DOLLAR}r "";
+
         if (${DOLLAR}http_x_forwarded_proto != "https") {
-            return 301 https://${DOLLAR}host${DOLLAR}request_uri;
+            set ${DOLLAR}r A;
         }
+        if (${DOLLAR}request_uri != "/health/") {
+            set ${DOLLAR}r "${DOLLAR}{r}B";
+        }
+
+        if (${DOLLAR}r = AB) {
+            return 301 https://${DOLLAR}host${DOLLAR}request_uri;
+        }        
 
         location @proxy_to_app {
             proxy_set_header X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
