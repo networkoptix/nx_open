@@ -224,9 +224,14 @@ class Product(models.Model):
     preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
 
     def __str__(self):
-        if self.product_type and self.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+        if self.product_type and self.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal):
             return "{} - {}".format(self.name, self.customizations.first())
         return self.name
+
+    @property
+    def can_preview_on_portal(self):
+        return self.product_type.can_preview and \
+               self.customizations.filter(name=settings.CUSTOMIZATION).exists()
 
     @property
     def default_language(self):
@@ -246,9 +251,12 @@ class Product(models.Model):
 
     @property
     def product_root(self):
-        if self.product_type and self.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+        if self.product_type and self.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal):
             return self.customizations.first().name
         return ""
+
+    def is_product_type(self, product_type):
+        return self.product_type.type == product_type
 
     def version_id(self, customization=settings.CUSTOMIZATION):
         accepted_review = ProductCustomizationReview.objects. \
@@ -278,7 +286,7 @@ class Product(models.Model):
                 need_update = self.preview_status == orig.preview_status
 
         super(Product, self).save(*args, **kwargs)
-        if need_update and self.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal\
+        if need_update and self.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal)\
                 and len(self.customizations.all()) == 1:
             cloud_portal_customization_cache(self.customizations.first().name, force=True)  # invalidate cache
             # TODO: need to update all static right here
@@ -412,7 +420,7 @@ class DataStructure(models.Model):
         if self.translatable:
             if language:
                 content_record = content_record.filter(language=language)
-            elif product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+            elif product.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal):
                 content_record = content_record.filter(language=product.customizations.first().default_language)
 
         if content_record.exists():

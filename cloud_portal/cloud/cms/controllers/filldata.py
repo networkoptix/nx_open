@@ -216,7 +216,7 @@ def generate_languages_json(save_location, language_codes, preview):
 
 
 def init_skin(product, preview=False):
-    if product.product_type.type != ProductType.PRODUCT_TYPES.cloud_portal:
+    if not product.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal):
         raise APIForbiddenException("Can not run update static files on non cloud_portal products")
     # 1. read skin for this customization
     customization_name = product.customizations.first().name
@@ -252,11 +252,11 @@ def fill_content(product,
     # else
     #   if version_id is None - preview latest available datarecords
     #   else - preview specific version
-    if product.product_type.type != ProductType.PRODUCT_TYPES.cloud_portal:
-        return
+    if not product.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal):
+        raise APIForbiddenException("Can not run update static files on non cloud_portal products.")
 
     if product.customizations.first().name != settings.CUSTOMIZATION:
-        raise APIForbiddenException("Can not run update static files on non cloud_portal products")
+        raise APIForbiddenException("Can not update static files for cloud portal on other customizations.")
 
     if preview:  # Here we decide, if we need to change preview state
         # if incremental was false initially - we keep it as false
@@ -299,7 +299,7 @@ def fill_content(product,
         else:
             version_id = 0
             incremental = False  # no version - do full update using default values
-        if product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+        if product.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal):
             cloud_portal_customization_cache(product.product_root, force=True)
 
     if incremental and not changed_context:

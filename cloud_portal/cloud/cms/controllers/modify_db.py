@@ -40,7 +40,7 @@ def notify_version_ready(product, version, exclude_user):
     product_name = product.name
     product_type = ProductType.PRODUCT_TYPES[product.product_type.type]
     product_customizations_set = set()
-    product_is_integration = product.product_type.type == ProductType.PRODUCT_TYPES.integration
+    product_is_integration = product.is_product_type(ProductType.PRODUCT_TYPES.integration)
     for customization in product.customizations.values_list('name', flat=True):
         cloud_capabilities = cloud_portal_customization_cache(customization, 'cloud_capabilities')
         # Ignore integrations if the integration store is disabled.
@@ -228,11 +228,13 @@ def save_unrevisioned_records(product, context, language, data_structures,
             record.external_file = external_file
             record.save()
 
-    fill_content(product,
-                 preview=True,
-                 incremental=True,
-                 version_id=version_id,
-                 changed_context=context)
+    if product.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal) and \
+            product.can_preview_on_portal:
+        fill_content(product,
+                     preview=True,
+                     incremental=True,
+                     version_id=version_id,
+                     changed_context=context)
 
     return upload_errors
 
@@ -278,19 +280,21 @@ def remove_unused_records(product):
 
 
 def generate_preview_link(context=None, product=None, state=""):
-    if product and product.product_type.type == ProductType.PRODUCT_TYPES.integration:
+    if product and product.is_product_type(ProductType.PRODUCT_TYPES.integration):
         return f"{settings.INTEGRATION_STORE_PAGE}/{product.id}/{state}"
 
     return f"{context.url}?preview" if context else "/content/about?preview"
 
 
 def generate_preview(product, context=None, version_id=None, send_to_review=False):
-    fill_content(product,
-                 preview=True,
-                 incremental=True,
-                 changed_context=context,
-                 version_id=version_id,
-                 send_to_review=send_to_review)
+    if product.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal) and \
+            product.can_preview_on_portal:
+        fill_content(product,
+                     preview=True,
+                     incremental=True,
+                     changed_context=context,
+                     version_id=version_id,
+                     send_to_review=send_to_review)
     return generate_preview_link(context, product=product, state=PENDING)
 
 
@@ -325,7 +329,7 @@ def send_version_for_review(product, user):
         old_version.delete()
 
     # We only check for integrations because its the only product type that non staff have access to.
-    if product.product_type.type == ProductType.PRODUCT_TYPES.integration:
+    if product.is_product_type(ProductType.PRODUCT_TYPES.integration):
         errors = integration_has_required_data(product)
         if len(errors) > 0:
             return errors
