@@ -68,11 +68,11 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Yüklenen eklenti bulunmamaktadır</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Sunucu Çevrimdışı</translation>
     </message>
   </context>
   <context>

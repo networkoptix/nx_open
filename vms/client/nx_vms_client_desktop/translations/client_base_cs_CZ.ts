@@ -8806,10 +8806,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Aktualizace byla dokončena</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
     </message>
@@ -8961,6 +8957,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Aktualizujte prosím %1 ručně pomocí instalačního balíčku.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 bude restartován za účelem aktualizace verze.</translation>
     </message>
   </context>
   <context>

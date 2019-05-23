@@ -8455,10 +8455,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>อัปเดตเสร็จสมบูรณ์แล้ว</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>Nx Witness Client จะถูกรีสตาร์ทเป็นเวอร์ชั่นที่อัพเดต</translation>
     </message>
@@ -8607,6 +8603,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>โปรดอัปเดต %1 ด้วยตนเองโดยใช้แพ็คเกจการติดตั้ง</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 จะเริ่มต้นใหม่เป็นเวอร์ชันที่ได้รับการปรับปรุง</translation>
     </message>
   </context>
   <context>

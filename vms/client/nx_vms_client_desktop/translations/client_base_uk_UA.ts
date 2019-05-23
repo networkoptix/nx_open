@@ -8808,10 +8808,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Оновлення завершено</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>Оновлення завершено, але деякі сервери не отримали оновлення</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>Nx Witness Client буде перезапущено до оновленої версії.</translation>
     </message>
@@ -8963,6 +8959,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation>Деякі сервери перейшли в офлайн. Будь ласка, зачекайте, поки вони стануть онлайн, щоб продовжити.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Будь ласка, оновіть %1 вручну за допомогою інсталятора.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 буде перезапущено до оновленої версії.</translation>
     </message>
   </context>
   <context>

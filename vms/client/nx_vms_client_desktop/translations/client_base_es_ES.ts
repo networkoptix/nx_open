@@ -8574,10 +8574,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Actualización completada</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>Actualización completada, pero algunos servidores han fallado una actualización</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>Nx Witness Client se reiniciará a la versión actualizada.</translation>
     </message>
@@ -8727,6 +8723,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Actualice %1 manualmente utilizando un paquete de instalación.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 se reiniciará a la versión actualizada.</translation>
     </message>
   </context>
   <context>

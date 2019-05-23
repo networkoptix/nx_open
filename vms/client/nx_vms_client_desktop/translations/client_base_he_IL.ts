@@ -8805,10 +8805,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>העדכון הושלם</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>העדכון הושלם, אך חלק מהשרתים נכשלו בעדכון</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>תוכנת הקליינט תופעל מחדש לגרסה המעודכנת.</translation>
     </message>
@@ -8960,6 +8956,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>אנא עדכן את %1 ידנית באמצעות חבילת התקנה.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 יופעל מחדש לגרסה המעודכנת.</translation>
     </message>
   </context>
   <context>

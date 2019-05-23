@@ -8456,10 +8456,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更新が完了しました</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>更新は完了しましたが、一部のサーバーは更新に失敗しました</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>Nx Witness Clientがアップデートされたバージョンに再起動されます</translation>
     </message>
@@ -8608,6 +8604,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>インストール パッケージを使用して手動で %1 を更新してください</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 は、更新されたバージョンで再起動します</translation>
     </message>
   </context>
   <context>
