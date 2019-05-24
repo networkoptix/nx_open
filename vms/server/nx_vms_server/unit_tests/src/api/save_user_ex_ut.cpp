@@ -58,7 +58,7 @@ protected:
         NX_TEST_API_GET(m_server.get(), "/ec2/getUsers", &m_userDataList);
         auto testUserIt = std::find_if(m_userDataList.cbegin(), m_userDataList.cend(),
             [&expectedUser](const auto& userData) { return userData.name == expectedUser.name; });
-        ASSERT_NE(testUserIt, m_userDataList.cend());
+        ASSERT_TRUE(testUserIt != m_userDataList.cend());
         ASSERT_FALSE(testUserIt->realm.isEmpty());
     }
 

@@ -135,8 +135,6 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
     const Filter& filter,
     const TimePeriodsLookupOptions& options)
 {
-    NX_DEBUG(this, "Selecting time periods by filter %1", filter);
-
     AnalyticsArchive::Filter archiveFilter = prepareArchiveFilter(filter, options);
 
     nx::utils::ElapsedTimer timer;

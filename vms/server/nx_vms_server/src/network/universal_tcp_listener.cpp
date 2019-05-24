@@ -250,12 +250,18 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
 
             if (!socket->setReuseAddrFlag(true))
             {
-                NX_DEBUG(typeid(QnUniversalTcpListener), "setReuseAddrFlag(true) unexpectedly failed.");
+                NX_DEBUG(
+                    typeid(QnUniversalTcpListener),
+                    "setReuseAddrFlag(true) unexpectedly failed. %1",
+                    SystemError::getLastOSErrorText());
             }
 
             if (!socket->setReusePortFlag(true))
             {
-                NX_DEBUG(typeid(QnUniversalTcpListener), "setReusePortFlag(true) failed, probably because of unsupported.");
+                NX_DEBUG(
+                    typeid(QnUniversalTcpListener),
+                    "setReusePortFlag(true) failed, probably because of unsupported. %1",
+                    SystemError::getLastOSErrorText());
             }
 
             if (!socket->bind(localAddress) ||
