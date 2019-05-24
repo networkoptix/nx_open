@@ -414,7 +414,9 @@ static const std::string kPluginManifest = R"json(
 {
     "id": "nx.stub",
     "name": "Stub analytics plugin",
+    "description": "A plugin for testing and debugging purposes",
     "version": "1.0.0",
+    "vendor": "Plugin vendor",
     "engineSettingsModel": {
         "type": "Settings",
         "items": [

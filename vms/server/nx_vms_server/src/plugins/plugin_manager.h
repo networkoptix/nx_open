@@ -89,7 +89,7 @@ public:
 
     void unloadPlugins();
 
-    nx::vms::api::PluginModuleDataList pluginInformation() const;
+    nx::vms::api::PluginInfoList pluginInformation() const;
 signals:
     /** Emitted just after new plugin has been loaded. */
     void pluginLoaded();
@@ -104,7 +104,7 @@ private:
     void loadPluginsFromDir(
         const nx::plugins::SettingsHolder& settingsHolder,
         const QDir& dirToSearchIn,
-        nx::vms::api::PluginModuleData::LoadingType pluginLoadingType,
+        nx::vms::api::PluginInfo::Optionality pluginLoadingType,
         std::function<bool(const QFileInfo& pluginFileInfo)> allowPlugin);
 
     bool loadNxPlugin(
@@ -112,14 +112,14 @@ private:
         const QString& linkedLibsDirectory,
         const QString& libFilename,
         const QString& libName,
-        nx::vms::api::PluginModuleData pluginInfo);
+        nx::vms::api::PluginInfo pluginInfo);
 
     std::unique_ptr<QLibrary> loadPluginLibrary(
         const QString& linkedLibsDir, const QString& libFilename);
 
     void storeInfoAboutLoadingError(
-        nx::vms::api::PluginModuleData,
-        nx::vms::api::PluginModuleData::Status loadingStatus,
+        nx::vms::api::PluginInfo,
+        nx::vms::api::PluginInfo::Status loadingStatus,
         QString statusMessage);
 
 private:
@@ -128,14 +128,15 @@ private:
 
     struct PluginContext
     {
+        nx::vms::api::PluginInfo pluginInformation;
+
         // For compatibility with the old-SDK-based plugins, we store pointers to the base interface
         // rather than nx::sdk::IPlugin.
-        nx::vms::api::PluginModuleData pluginInformation;
         nx::sdk::Ptr<nx::sdk::IRefCountable> plugin;
     };
 
     std::vector<PluginContext> m_nxPlugins;
-    mutable std::vector<nx::vms::api::PluginModuleData> m_cachedPluginInfo;
+    mutable std::vector<nx::vms::api::PluginInfo> m_cachedPluginInfo;
 
     mutable QnMutex m_mutex;
 };

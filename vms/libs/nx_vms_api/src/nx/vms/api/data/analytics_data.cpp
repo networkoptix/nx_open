@@ -13,17 +13,18 @@ const QnUuid AnalyticsEngineData::kResourceTypeId =
     ResourceData::getFixedTypeId(AnalyticsEngineData::kResourceTypeName);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (AnalyticsPluginData)(AnalyticsEngineData)(PluginModuleData),
+    (AnalyticsPluginData)(AnalyticsEngineData)(PluginInfo),
     (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
     _Fields)
+
 } // namespace nx::vms::api
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginModuleData, LoadingType,
-    (nx::vms::api::PluginModuleData::LoadingType::normal, "normal")
-    (nx::vms::api::PluginModuleData::LoadingType::optional, "optional"))
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginInfo, Optionality,
+    (nx::vms::api::PluginInfo::Optionality::nonOptional, "nonOptional")
+    (nx::vms::api::PluginInfo::Optionality::optional, "optional"))
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginModuleData, Status,
-    (nx::vms::api::PluginModuleData::Status::loadedNormally, "loadedNormally")
-    (nx::vms::api::PluginModuleData::Status::notLoadedBecauseOfError, "notLoadedBecauseOfError")
-    (nx::vms::api::PluginModuleData::Status::notLoadedBecauseOfBlackList, "notLoadedBecauseOfBlackList")
-    (nx::vms::api::PluginModuleData::Status::notLoadedBecausePluginIsOptional, "notLoadedBecausePluginIsOptional"))
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginInfo, Status,
+    (nx::vms::api::PluginInfo::Status::loaded, "loaded")
+    (nx::vms::api::PluginInfo::Status::notLoadedBecauseOfError, "notLoadedBecauseOfError")
+    (nx::vms::api::PluginInfo::Status::notLoadedBecauseOfBlackList, "notLoadedBecauseOfBlackList")
+    (nx::vms::api::PluginInfo::Status::notLoadedBecauseOptional, "notLoadedBecauseOptional"))

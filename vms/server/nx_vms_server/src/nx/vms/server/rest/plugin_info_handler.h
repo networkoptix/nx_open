@@ -5,10 +5,10 @@
 
 namespace nx::vms::server::rest {
 
-class PluginModuleInformationHandler: public QnJsonRestHandler, public ServerModuleAware
+class PluginInfoHandler: public QnJsonRestHandler, public ServerModuleAware
 {
 public:
-    PluginModuleInformationHandler(QnMediaServerModule* serverModule);
+    PluginInfoHandler(QnMediaServerModule* serverModule);
     virtual JsonRestResponse executeGet(const JsonRestRequest& request) override;
 };
 

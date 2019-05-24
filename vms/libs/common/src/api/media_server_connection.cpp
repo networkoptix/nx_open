@@ -1358,12 +1358,12 @@ int QnMediaServerConnection::getBookmarkTagsAsync(
         request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkTagList), target, slot);
 }
 
-int QnMediaServerConnection::pluginModuleInformation(QObject* target, const char* slot)
+int QnMediaServerConnection::pluginInfo(QObject* target, const char* slot)
 {
     return sendAsyncGetRequestLogged(
         PluginModuleInformationObject,
         QnRequestParamList(),
-        QN_STRINGIZE_TYPE(nx::vms::api::PluginModuleDataList),
+        QN_STRINGIZE_TYPE(nx::vms::api::PluginInfoList),
         target,
         slot);
 }

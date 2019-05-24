@@ -111,29 +111,29 @@ static QFileInfoList pluginFileInfoList(const QDir& dirToSearchIn, bool searchIn
 void PluginManager::loadPluginsFromDir(
     const nx::plugins::SettingsHolder& settingsHolder,
     const QDir& dirToSearchIn,
-    nx::vms::api::PluginModuleData::LoadingType pluginLoadingType,
+    nx::vms::api::PluginInfo::Optionality optionality,
     std::function<bool(const QFileInfo& pluginFileInfo)> allowPlugin)
 {
-    using nx::vms::api::PluginModuleData;
+    using nx::vms::api::PluginInfo;
     for (const auto& fileInfo: pluginFileInfoList(dirToSearchIn))
     {
         const QString& libName = libNameFromFileInfo(fileInfo);
 
-        PluginModuleData pluginInfo;
-        pluginInfo.loadingType = pluginLoadingType;
+        PluginInfo pluginInfo;
+        pluginInfo.optionality = optionality;
         pluginInfo.libraryName = fileInfo.absoluteFilePath();
 
         if (!allowPlugin(fileInfo))
         {
-            pluginInfo.status = (pluginLoadingType == PluginModuleData::LoadingType::normal)
-                ? PluginModuleData::Status::notLoadedBecauseOfBlackList
-                : PluginModuleData::Status::notLoadedBecausePluginIsOptional;
+            pluginInfo.status = (optionality == PluginInfo::Optionality::nonOptional)
+                ? PluginInfo::Status::notLoadedBecauseOfBlackList
+                : PluginInfo::Status::notLoadedBecauseOptional;
 
-            pluginInfo.statusMessage = (pluginLoadingType == PluginModuleData::LoadingType::normal)
+            pluginInfo.statusMessage = (optionality == PluginInfo::Optionality::nonOptional)
                 ? "Plugin is in the black list"
                 : "Optional plugin is not loaded because it is not in the white list";
 
-            m_nxPlugins.push_back({std::move(pluginInfo), nullptr});
+            m_nxPlugins.push_back({std::move(pluginInfo), /*plugin*/ nullptr});
             continue;
         }
 
@@ -190,7 +190,7 @@ void PluginManager::loadNonOptionalPluginsIfNeeded(
             loadPluginsFromDir(
                 settingsHolder,
                 dir,
-                nx::vms::api::PluginModuleData::LoadingType::normal,
+                nx::vms::api::PluginInfo::Optionality::nonOptional,
                 [this, disabledLibNames](const QFileInfo& pluginFileInfo)
                 {
                     if (!disabledLibNames.contains(libNameFromFileInfo(pluginFileInfo)))
@@ -227,7 +227,7 @@ void PluginManager::loadOptionalPluginsIfNeeded(
         loadPluginsFromDir(
             settingsHolder,
             optionalPluginsDir,
-            nx::vms::api::PluginModuleData::LoadingType::optional,
+            nx::vms::api::PluginInfo::Optionality::optional,
             [this, enabledLibNames](const QFileInfo& pluginFileInfo)
             {
                 if (enabledLibNames.isEmpty()
@@ -291,13 +291,13 @@ std::unique_ptr<QLibrary> PluginManager::loadPluginLibrary(
 }
 
 void PluginManager::storeInfoAboutLoadingError(
-    nx::vms::api::PluginModuleData pluginInfo,
-    nx::vms::api::PluginModuleData::Status loadingStatus,
+    nx::vms::api::PluginInfo pluginInfo,
+    nx::vms::api::PluginInfo::Status loadingStatus,
     QString statusMessage)
 {
     pluginInfo.status = loadingStatus;
     pluginInfo.statusMessage = std::move(statusMessage);
-    m_nxPlugins.push_back({std::move(pluginInfo), nullptr});
+    m_nxPlugins.push_back({std::move(pluginInfo), /*plugin*/ nullptr});
 }
 
 bool PluginManager::loadNxPlugin(
@@ -305,7 +305,7 @@ bool PluginManager::loadNxPlugin(
     const QString& linkedLibsDirectory,
     const QString& libFilename,
     const QString& libName,
-    nx::vms::api::PluginModuleData pluginInfo)
+    nx::vms::api::PluginInfo pluginInfo)
 {
     using namespace nx::sdk;
     using namespace nx::vms::api;
@@ -325,7 +325,7 @@ bool PluginManager::loadNxPlugin(
         {
             storeInfoAboutLoadingError(
                 std::move(pluginInfo),
-                PluginModuleData::Status::notLoadedBecauseOfError,
+                PluginInfo::Status::notLoadedBecauseOfError,
                 "Failed to load Nx old SDK plugin: entry function returned null");
 
             NX_ERROR(this, "Failed to load Nx old SDK plugin [%1]: entry function returned null",
@@ -334,16 +334,17 @@ bool PluginManager::loadNxPlugin(
             return false;
         }
 
-        static const QString kOldPluginLoadedMessagePrefix = "Loaded Nx old SDK plugin. Supported interface: ";
+        static const QString kOldPluginLoadedMessagePrefix =
+            "Loaded Nx old SDK plugin. Supported interface: ";
 
-        pluginInfo.status = PluginModuleData::Status::loadedNormally;
+        pluginInfo.status = PluginInfo::Status::loaded;
         pluginInfo.statusMessage = kOldPluginLoadedMessagePrefix + "nxpl::PluginInterface";
         NX_INFO(this, "Loaded Nx old SDK plugin [%1]", libFilename);
 
         if (const auto plugin1 = queryInterfacePtr<nxpl::Plugin>(plugin, nxpl::IID_Plugin))
         {
             pluginInfo.name = plugin1->name();
-            pluginInfo.statusMessage += pluginInfo.statusMessage = kOldPluginLoadedMessagePrefix + "nxpl::Plugin";
+            pluginInfo.statusMessage += kOldPluginLoadedMessagePrefix + "nxpl::Plugin";
 
             // Pass Mediaserver settings (aka "roSettings") to the plugin.
             if (!settingsHolder.isEmpty())
@@ -372,7 +373,7 @@ bool PluginManager::loadNxPlugin(
         {
             storeInfoAboutLoadingError(
                 std::move(pluginInfo),
-                PluginModuleData::Status::notLoadedBecauseOfError,
+                PluginInfo::Status::notLoadedBecauseOfError,
                 "Failed to load Nx plugin: entry function returned null");
 
             NX_ERROR(this, "Failed to load Nx plugin [%1]: entry function returned null",
@@ -382,7 +383,7 @@ bool PluginManager::loadNxPlugin(
         }
 
         pluginInfo.name = plugin->name();
-        pluginInfo.status = PluginModuleData::Status::loadedNormally;
+        pluginInfo.status = PluginInfo::Status::loaded;
         pluginInfo.statusMessage = "Plugin has been successfully loaded";
 
         NX_INFO(this, "Loaded Nx plugin [%1]", libFilename);
@@ -395,16 +396,16 @@ bool PluginManager::loadNxPlugin(
                     plugin->name(), libName);
             }
 
-            const auto manifest = sdk_support::manifestFromSdkObject<PluginManifest>(analyticsPlugin);
+            const auto manifest =
+                sdk_support::manifestFromSdkObject<PluginManifest>(analyticsPlugin);
+
             if (manifest)
             {
                 pluginInfo.name = manifest->name;
+                pluginInfo.description = manifest->description;
+                pluginInfo.version = manifest->version;
+                pluginInfo.vendor = manifest->vendor;
 
-                #if 0 //< TODO: uncomment this section when correspondent fields are in the manifest schema.
-                    pluginInfo.description = manifest->description;
-                    pluginInfo.version = manifest->version;
-                    pluginInfo.vendor = manifest->vendor;
-                #endif
             }
         }
 
@@ -416,7 +417,7 @@ bool PluginManager::loadNxPlugin(
 
         storeInfoAboutLoadingError(
             std::move(pluginInfo),
-            PluginModuleData::Status::notLoadedBecauseOfError,
+            PluginInfo::Status::notLoadedBecauseOfError,
             lm("Failed to load Nx plugin: Neither %1(), nor the old SDK's %2() functions found")
                 .args(IPlugin::kEntryPointFuncName, nxpl::Plugin::kEntryPointFuncName));
 
@@ -431,11 +432,11 @@ bool PluginManager::loadNxPlugin(
     return true;
 }
 
-nx::vms::api::PluginModuleDataList PluginManager::pluginInformation() const
+nx::vms::api::PluginInfoList PluginManager::pluginInformation() const
 {
     if (m_cachedPluginInfo.empty())
     {
-        for (const auto& pluginContext : m_nxPlugins)
+        for (const auto& pluginContext: m_nxPlugins)
             m_cachedPluginInfo.push_back(pluginContext.pluginInformation);
     }
 

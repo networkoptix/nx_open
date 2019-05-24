@@ -1,4 +1,4 @@
-#include "plugin_module_information_handler.h"
+#include "plugin_info_handler.h"
 
 #include <media_server/media_server_module.h>
 #include <plugins/plugin_manager.h>
@@ -7,12 +7,12 @@
 
 namespace nx::vms::server::rest {
 
-PluginModuleInformationHandler::PluginModuleInformationHandler(QnMediaServerModule* serverModule):
+PluginInfoHandler::PluginInfoHandler(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule)
 {
 }
 
-JsonRestResponse PluginModuleInformationHandler::executeGet(const JsonRestRequest& request)
+JsonRestResponse PluginInfoHandler::executeGet(const JsonRestRequest& request)
 {
     using namespace nx::network::http;
 

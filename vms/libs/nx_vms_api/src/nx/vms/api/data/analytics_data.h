@@ -26,20 +26,20 @@ struct NX_VMS_API AnalyticsEngineData: ResourceData
 /**
  * Information about plugin module.
  */
-struct NX_VMS_API PluginModuleData: Data
+struct NX_VMS_API PluginInfo: Data
 {
-    enum class LoadingType
+    enum class Optionality
     {
-        normal,
+        nonOptional,
         optional,
     };
 
     enum class Status
     {
-        loadedNormally,
+        loaded,
         notLoadedBecauseOfError,
         notLoadedBecauseOfBlackList,
-        notLoadedBecausePluginIsOptional,
+        notLoadedBecauseOptional,
     };
 
     QString name;
@@ -47,20 +47,20 @@ struct NX_VMS_API PluginModuleData: Data
     QString libraryName;
     QString vendor;
     QString version;
-    LoadingType loadingType = LoadingType::normal;
-    Status status = Status::loadedNormally;
+    Optionality optionality = Optionality::nonOptional;
+    Status status = Status::loaded;
     QString statusMessage;
 
     // TODO: #vkutin #mschevchenko Add library loaded status, most probably as an enumeration.
 };
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginModuleData::LoadingType)
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginModuleData::Status)
-#define PluginModuleData_Fields (name) \
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Optionality)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Status)
+#define PluginInfo_Fields (name) \
     (description) \
     (libraryName) \
     (vendor) \
     (version) \
-    (loadingType) \
+    (optionality) \
     (status) \
     (statusMessage)
 
@@ -68,7 +68,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginModuleData::Status)
 
 Q_DECLARE_METATYPE(nx::vms::api::AnalyticsPluginData)
 Q_DECLARE_METATYPE(nx::vms::api::AnalyticsEngineData)
-Q_DECLARE_METATYPE(nx::vms::api::PluginModuleData)
-Q_DECLARE_METATYPE(nx::vms::api::PluginModuleDataList)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginModuleData::LoadingType, (lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginModuleData::Status, (lexical), NX_VMS_API)
+Q_DECLARE_METATYPE(nx::vms::api::PluginInfo)
+Q_DECLARE_METATYPE(nx::vms::api::PluginInfoList)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginInfo::Optionality, (lexical), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginInfo::Status, (lexical), NX_VMS_API)
