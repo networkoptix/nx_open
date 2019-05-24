@@ -115,7 +115,7 @@
                         Codec and stream format can be specified in URL parameters. Live stream and
                         archive can be downloaded. If required and possible, media stream
                         transcoding is performed on-the-fly. Stream format can be one of the
-                        following: webm, mpegts, mpjpeg (multipart jpeg), mp4.
+                        following: webm, mpegts, mpjpeg (multipart jpeg), mp4. For formats webm and mp4 a watermark is added to the end of stream.
                         Example:
                         http://&lt;server_ip&gt;:&lt;port&gt;/media/12AB42FD5912.webm</description>
                     <method>GET</method>

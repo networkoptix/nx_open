@@ -80,7 +80,7 @@ bool StreamParams::parseResolution(
     return true;
 }
 
-bool StreamParams::processRequest(
+bool StreamParams::parseRequest(
     const network::http::Request& request, const QString& defaultVideoCodec)
 {
     QString method = request.requestLine.method;
@@ -104,12 +104,10 @@ bool StreamParams::processRequest(
             return false;
         if (!parseResolution(request.headers, m_urlParams))
             return false;
+
         // Setup codec if resolution configured
         if (m_resolution.isValid() && m_codec == AV_CODEC_ID_NONE)
-        {
-            QString defaultCodec = defaultVideoCodec;
             m_codec = findVideoEncoder(defaultVideoCodec);
-        }
     }
     return true;
 }

@@ -77,7 +77,7 @@ protected:
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, qint64 msTime) const;
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, QFile& indexFile) const;
 protected:
-    virtual bool matchAdditionData(const Filter& filter, const quint8* data, int size) { return true; }
+    virtual bool matchAdditionData(const Filter& /*filter*/, const quint8* /*data*/, int /*size*/) { return true; }
 private:
     int getSizeForTime(qint64 timeMs, bool reloadIndex);
 
