@@ -1,8 +1,7 @@
-#include <nx/sdk/analytics/helpers/attribute.h>
+#include "attribute.h"
 
 namespace nx {
 namespace sdk {
-namespace analytics {
 
 Attribute::Attribute(
     Type type,
@@ -37,6 +36,5 @@ float Attribute::confidence() const
     return m_confidence;
 }
 
-} // namespace analytics
 } // namespace sdk
 } // namespace nx

@@ -5,7 +5,7 @@
 
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
-#include <nx/sdk/analytics/helpers/attribute.h>
+#include <nx/sdk/helpers/attribute.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/network/system_socket.h>
 
