@@ -1483,7 +1483,7 @@ bool QnRtspConnectionProcessor::processRequest()
         d->dataProcessor->pauseNetwork();
 
     QString method = d->request.requestLine.method;
-    if (!d->params.processRequest(d->request, commonModule()->globalSettings()->defaultVideoCodec()))
+    if (!d->params.parseRequest(d->request, commonModule()->globalSettings()->defaultVideoCodec()))
     {
         NX_DEBUG(this, "Request parsing failed: [%1], [%2]",
             d->request.requestLine.toString().trimmed(), d->params.getParseError());
