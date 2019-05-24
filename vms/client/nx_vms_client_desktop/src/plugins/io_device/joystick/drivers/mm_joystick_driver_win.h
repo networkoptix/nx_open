@@ -4,9 +4,9 @@
 
 #if defined(Q_OS_WIN)
 
-#include "abstract_joystick_driver.h"
+#include <Windows.h>
 
-#include <WinUser.h>
+#include "abstract_joystick_driver.h"
 
 #include <boost/optional/optional.hpp>
 
