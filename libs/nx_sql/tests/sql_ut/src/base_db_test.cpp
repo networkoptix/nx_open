@@ -1,5 +1,7 @@
 #include "base_db_test.h"
 
+#include <QtCore/QDir>
+
 #include <nx/sql/query.h>
 #include <nx/utils/test_support/utils.h>
 
@@ -9,14 +11,14 @@ BasicFixture::BasicFixture(const std::string& testModuleName):
     nx::utils::test::TestWithTemporaryDirectory(testModuleName.c_str(), "")
 {
     m_tmpDir = testDataDir().toStdString() + "/db_test";
-    std::filesystem::remove_all(m_tmpDir);
-    [this]() { ASSERT_TRUE(std::filesystem::create_directories(m_tmpDir)); }();
+    QDir(m_tmpDir.c_str()).removeRecursively();
+    [this]() { ASSERT_TRUE(QDir().mkpath(m_tmpDir.c_str())); }();
     
     m_dbFilePath = m_tmpDir;
     m_dbFilePath += "/db.sqlite";
 
     m_connectionOptions.driverType = RdbmsDriverType::sqlite;
-    m_connectionOptions.dbName = QString::fromStdString(m_dbFilePath.string());
+    m_connectionOptions.dbName = QString::fromStdString(m_dbFilePath);
 }
 
 ConnectionOptions& BasicFixture::connectionOptions()

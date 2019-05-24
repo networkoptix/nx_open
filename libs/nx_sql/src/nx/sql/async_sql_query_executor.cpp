@@ -224,7 +224,7 @@ void AsyncSqlQueryExecutor::openNewConnection(const QnMutexLockerBase& lock)
 }
 
 void AsyncSqlQueryExecutor::saveOpenedConnection(
-    const QnMutexLockerBase& lock,
+    const QnMutexLockerBase& /*lock*/,
     std::unique_ptr<detail::BaseQueryExecutor> connection)
 {
     connection->setOnClosedHandler(
@@ -289,7 +289,7 @@ void AsyncSqlQueryExecutor::dropConnectionAsync(
     m_dbThreadList.erase(it);
 }
 
-void AsyncSqlQueryExecutor::addCursorProcessingThread(const QnMutexLockerBase& lock)
+void AsyncSqlQueryExecutor::addCursorProcessingThread(const QnMutexLockerBase& /*lock*/)
 {
     m_cursorProcessorContexts.push_back(std::make_unique<CursorProcessorContext>());
     // Disabling inactivity timer.

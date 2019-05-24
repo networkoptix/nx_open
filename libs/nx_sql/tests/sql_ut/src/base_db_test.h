@@ -1,7 +1,5 @@
 #pragma once
 
-#include <filesystem>
-
 #include <gtest/gtest.h>
 
 #include <QtCore/QString>
@@ -90,9 +88,9 @@ protected:
     std::filesystem::path dbFilePath() const;
 
 private:
-    std::filesystem::path m_tmpDir;
+    std::string m_tmpDir;
     ConnectionOptions m_connectionOptions;
-    std::filesystem::path m_dbFilePath;
+    std::string m_dbFilePath;
 };
 
 //-------------------------------------------------------------------------------------------------
