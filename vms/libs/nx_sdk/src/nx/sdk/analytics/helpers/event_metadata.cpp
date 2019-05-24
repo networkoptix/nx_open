@@ -77,9 +77,9 @@ void EventMetadata::addAttribute(nx::sdk::Ptr<Attribute> attribute)
 
     auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
         [attributeName = attribute->name()](const nx::sdk::Ptr<Attribute>& attribute)
-    {
-        return strcmp(attribute->name(), attributeName) == 0;
-    });
+        {
+            return strcmp(attribute->name(), attributeName) == 0;
+        });
 
     if (existingAttribute != m_attributes.end())
     {
