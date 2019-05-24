@@ -206,7 +206,7 @@ struct RadassController::Private
 
     Private(const TimerFactoryPtr& timerFactory):
         mutex(QnMutex::Recursive),
-        lastAutoSwitchTimer(timerFactory->createElapsedTimer()),
+        lastAutoSwitchTimer((NX_ASSERT(timerFactory), timerFactory->createElapsedTimer())),
         lastSystemRtspDrop(timerFactory->createElapsedTimer()),
         lastModeChangeTimer(timerFactory->createElapsedTimer())
     {
@@ -724,18 +724,21 @@ struct RadassController::Private
 
 };
 
-RadassController::RadassController(QObject* parent, TimerFactoryPtr timerFactory):
-    base_type(parent)
+// If no timer factory is provided, use default qt-based one (production mode).
+RadassController::RadassController(QObject* parent):
+    RadassController(TimerFactoryPtr(new QtTimerFactory()), parent)
 {
-    // If no timer factory is provided, use default qt-based one (production mode).
-    if (timerFactory == nullptr)
-        timerFactory.reset(new QtTimerFactory());
+}
 
-    d.reset(new Private(timerFactory));
+RadassController::RadassController(TimerFactoryPtr timerFactory, QObject* parent):
+    base_type(parent),
+    d(new Private(timerFactory))
+{
     auto timer = timerFactory->createTimer(this);
     connect(timer, &AbstractTimer::timeout, this, &RadassController::onTimer);
     timer->start(kTimerInterval);
 }
+
 
 RadassController::~RadassController()
 {

@@ -43,14 +43,12 @@ typedef QSharedPointer<AbstractTimer> TimerPtr;
 /**
 * The class essentially defines interface equivalent to QElapsedTimer, but using std::chrono.
 */
-class AbstractElapsedTimer: public QObject
+class AbstractElapsedTimer
 {
-    Q_OBJECT
-
 public:
     using milliseconds = std::chrono::milliseconds;
 
-    AbstractElapsedTimer(QObject* parent = nullptr) : QObject(parent) {}
+    virtual ~AbstractElapsedTimer() = default;
     virtual bool hasExpired(milliseconds value) const = 0;
     virtual milliseconds restart() = 0;
     virtual void invalidate() = 0;
@@ -72,7 +70,7 @@ public:
     virtual ~AbstractTimerFactory() = default;
 
     virtual AbstractTimer* createTimer(QObject* parent = nullptr) = 0;
-    virtual AbstractElapsedTimer* createElapsedTimer(QObject* parent = nullptr) = 0;
+    virtual AbstractElapsedTimer* createElapsedTimer() = 0;
 };
 
 typedef QSharedPointer<AbstractTimerFactory> TimerFactoryPtr;

@@ -66,10 +66,7 @@ private:
 
 class QtBasedElapsedTimer: public AbstractElapsedTimer
 {
-    // Cannot use Q_OBJECT because in anonymous namespace.
 public:
-    QtBasedElapsedTimer(QObject* parent = nullptr): AbstractElapsedTimer(parent) {}
-
     virtual bool hasExpired(milliseconds value) const override
     {
         return m_timer.hasExpired(value.count());
@@ -120,9 +117,9 @@ AbstractTimer* QtTimerFactory::createTimer(QObject* parent)
     return new QtBasedTimer(parent);
 }
 
-AbstractElapsedTimer* QtTimerFactory::createElapsedTimer(QObject* parent)
+AbstractElapsedTimer* QtTimerFactory::createElapsedTimer()
 {
-    return new QtBasedElapsedTimer(parent);
+    return new QtBasedElapsedTimer();
 }
 
 } // namespace nx::vms::client::desktop
