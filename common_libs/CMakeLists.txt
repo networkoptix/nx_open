@@ -22,6 +22,6 @@ if(withMediaServer)
     add_subdirectory(nx_onvif)
 endif()
 
-if(WINDOWS AND arch STREQUAL x64)
+if(WINDOWS)
     add_subdirectory(nx_gdi_tracer)
 endif()
