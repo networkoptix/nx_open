@@ -18,7 +18,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 std::string NodeInfo::toString() const
 {
-    return QJson::serialized(this).constData();
+    return QJson::serialized(*this).constData();
 }
 
 
