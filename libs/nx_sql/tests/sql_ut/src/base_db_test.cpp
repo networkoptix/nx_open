@@ -1,8 +1,5 @@
 #include "base_db_test.h"
 
-#include <QtCore/QDir>
-#include <QtSql/QSqlQuery>
-
 #include <nx/sql/query.h>
 #include <nx/utils/test_support/utils.h>
 
@@ -11,11 +8,15 @@ namespace nx::sql::test {
 BasicFixture::BasicFixture(const std::string& testModuleName):
     nx::utils::test::TestWithTemporaryDirectory(testModuleName.c_str(), "")
 {
-    init();
-}
+    m_tmpDir = testDataDir().toStdString() + "/db_test";
+    std::filesystem::remove_all(m_tmpDir);
+    [this]() { ASSERT_TRUE(std::filesystem::create_directories(m_tmpDir)); }();
+    
+    m_dbFilePath = m_tmpDir;
+    m_dbFilePath += "/db.sqlite";
 
-BasicFixture::~BasicFixture()
-{
+    m_connectionOptions.driverType = RdbmsDriverType::sqlite;
+    m_connectionOptions.dbName = QString::fromStdString(m_dbFilePath.string());
 }
 
 ConnectionOptions& BasicFixture::connectionOptions()
@@ -30,10 +31,7 @@ const ConnectionOptions& BasicFixture::connectionOptions() const
 
 void BasicFixture::initializeDatabase()
 {
-    m_connectionOptions.driverType = RdbmsDriverType::sqlite;
-    m_connectionOptions.dbName = m_tmpDir + "/db.sqlite";
-
-    initializeQueryExecutor(m_connectionOptions);
+    ASSERT_TRUE(initializeQueryExecutor(m_connectionOptions));
 }
 
 void BasicFixture::executeUpdate(const QString& queryText)
@@ -49,19 +47,17 @@ void BasicFixture::executeUpdate(const QString& queryText)
     NX_GTEST_ASSERT_EQ(DBResult::ok, dbResult);
 }
 
-void BasicFixture::init()
+std::filesystem::path BasicFixture::dbFilePath() const
 {
-    m_tmpDir = testDataDir() + "/db_test/";
-    QDir(m_tmpDir).removeRecursively();
-    ASSERT_TRUE(QDir().mkpath(m_tmpDir));
+    return m_dbFilePath;
 }
 
 //-------------------------------------------------------------------------------------------------
 
-void BaseDbTest::initializeQueryExecutor(const ConnectionOptions& connectionOptions)
+bool BaseDbTest::initializeQueryExecutor(const ConnectionOptions& connectionOptions)
 {
     m_dbInstanceController = std::make_unique<InstanceController>(connectionOptions);
-    ASSERT_TRUE(m_dbInstanceController->initialize());
+    return m_dbInstanceController->initialize();
 }
 
 void BaseDbTest::closeDatabase()
@@ -76,11 +72,11 @@ AsyncSqlQueryExecutor& BaseDbTest::asyncSqlQueryExecutor()
 
 //-------------------------------------------------------------------------------------------------
 
-void FixtureWithQueryExecutorOnly::initializeQueryExecutor(
+bool FixtureWithQueryExecutorOnly::initializeQueryExecutor(
     const ConnectionOptions& connectionOptions)
 {
     m_queryExecutor = std::make_unique<AsyncSqlQueryExecutor>(connectionOptions);
-    ASSERT_TRUE(m_queryExecutor->init());
+    return m_queryExecutor->init();
 }
 
 void FixtureWithQueryExecutorOnly::closeDatabase()
