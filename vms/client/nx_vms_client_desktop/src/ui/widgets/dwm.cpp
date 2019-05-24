@@ -78,10 +78,12 @@ typedef HRESULT (WINAPI *PtrDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute,
 
 namespace {
 
+#ifdef QN_HAS_DWM
 HWND widToHwnd(WId id)
 {
     return reinterpret_cast<HWND>(id);
 }
+#endif
 
 } // namespace
 
