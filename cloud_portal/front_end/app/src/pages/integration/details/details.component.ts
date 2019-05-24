@@ -19,8 +19,6 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
     plugin: any;
     config: any = {};
     lang: any = {};
-    urlCompany: string;
-    urlSupport: string;
 
     private setupDefaults() {
         this.config = this.configService.getConfig();
@@ -56,18 +54,6 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                                     this.lang[this.translate.currentLang].integration.backToEditText,
                                     this.config.links.admin.product.replace('%ID%', this.plugin.id)
                             );
-                        }
-
-                        if (this.plugin.company && this.plugin.company.companyWeb) {
-                            this.urlCompany = (this.plugin.company.companyWeb.indexOf('http') === -1) ?
-                                    '//' + this.plugin.company.companyWeb :
-                                    this.plugin.company.companyWeb;
-                        }
-
-                        if (this.plugin.support && this.plugin.support.supportWeb) {
-                            this.urlSupport = (this.plugin.support.supportWeb.indexOf('http') === -1) ?
-                                    '//' + this.plugin.support.supportWeb :
-                                    this.plugin.support.supportWeb;
                         }
 
                         if (this.plugin.overview) {

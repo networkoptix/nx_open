@@ -849,7 +849,7 @@
             "name": "companyInfo",
             "label": "Company Info",
             "value": "",
-            "description": "A short description about the company. The company's info is visible in the detailed view page for the integration in the rightmost column. Maximum length 250 characters.",
+            "description": "A short description about the company. The company's info is visible in the detailed view page for the integration in the rightmost column.",
             "type": "long_text",
             "optional": true,
             "meta": {
@@ -878,7 +878,7 @@
             "type": "text",
             "optional": true,
             "meta": {
-              "regex": "^(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?$"
+              "regex": "^https?:\\/\\/([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$"
             }
           },
           {
@@ -1831,7 +1831,7 @@
             "type": "text",
             "optional": true,
             "meta": {
-              "regex": "^(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?$"
+              "regex": "^https?:\\/\\/([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$"
             }
           }
         ]

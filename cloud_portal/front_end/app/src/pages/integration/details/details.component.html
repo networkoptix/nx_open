@@ -51,7 +51,7 @@
 
             <nx-section *ngIf="plugin.support.supportEmail || plugin.support.supportWeb || plugin.support.supportPhone">
                 <div *ngIf="plugin.support.supportWeb">
-                    <a [href]="urlSupport"
+                    <a [href]="plugin.support.supportWeb"
                        target="_blank"
                        [innerHtml]="plugin.support.supportWeb"></a>
                 </div>
@@ -74,7 +74,7 @@
                 </div>
                 <div *ngIf="plugin.company.companyInfo" [innerHtml]="plugin.company.companyInfo"></div>
                 <div *ngIf="plugin.company.companyWeb">
-                    <a [href]="urlCompany"
+                    <a [href]="plugin.company.companyWeb"
                        target="_blank"
                        [innerHtml]="plugin.company.companyWebTitle || plugin.company.companyWeb"></a>
                 </div>
