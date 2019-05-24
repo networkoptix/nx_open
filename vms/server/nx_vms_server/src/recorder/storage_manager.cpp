@@ -1676,16 +1676,16 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
             totalRecordedBytes += itrLowLeft->getFileSize() * percentUsage;
             if (storage)
                 result.recordedBytesPerStorage[storage->getId()] += itrLowLeft->getFileSize() * percentUsage;
-            if (hasHi)
-            {
-                // do not include bitrate calculation if only LQ quality
-                if (itrLowLeft->startTimeMs >= averagingStartTime)
-                    recordedBytesForPeriod += itrLowLeft->getFileSize() * percentUsage;
-            }
-            else
+
+            if (itrLowLeft->startTimeMs >= averagingStartTime)
+                recordedBytesForPeriod += itrLowLeft->getFileSize() * percentUsage;
+
+            if (!hasHi)
             {
                 // inc time if no HQ
                 totalRecordedMs += itrLowLeft->durationMs * percentUsage;
+                if (itrLowLeft->startTimeMs >= averagingStartTime)
+                    recordedMsForPeriod += itrLowLeft->durationMs * percentUsage;
             }
         }
 
