@@ -1233,7 +1233,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     int lineSizes[],
     bool /*isVideoMemory*/ )
 {
-    if (m_initializedContext) // TODO: #vkutin #ynikitenkov What?..
+    if (!m_initializedContext) // TODO: #vkutin #ynikitenkov Why here?
     {
         m_initializedContext = QOpenGLContext::currentContext();
         m_initializedSurface = m_initializedContext->surface();

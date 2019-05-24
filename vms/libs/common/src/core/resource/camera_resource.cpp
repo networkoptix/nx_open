@@ -499,6 +499,8 @@ void QnVirtualCameraResource::emitPropertyChanged(const QString& key)
 {
     if (key == ResourcePropertyKey::kPtzCapabilities)
         emit ptzCapabilitiesChanged(::toSharedPointer(this));
+    else if (key == ResourcePropertyKey::kIoConfigCapability)
+        emit isIOModuleChanged(::toSharedPointer(this));
     base_type::emitPropertyChanged(key);
 }
 

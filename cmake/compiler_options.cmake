@@ -37,6 +37,20 @@ add_definitions(
 set(enableSpeechSynthesizer "true")
 set(isEdgeServer "false")
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    set(enabledSanitizers "" CACHE STRING "A semicolon-separated list of enabled sanitizers")
+
+    foreach(sanitizer ${enabledSanitizers})
+        add_compile_options(-fsanitize=${sanitizer})
+
+        if(sanitizer STREQUAL "address")
+            add_compile_options(-fno-omit-frame-pointer)
+            string(APPEND CMAKE_SHARED_LINKER_FLAGS " -fsanitize=address")
+            string(APPEND CMAKE_EXE_LINKER_FLAGS " -fsanitize=address")
+        endif()
+    endforeach()
+endif()
+
 if(WINDOWS)
     add_definitions(
         -D_CRT_RAND_S
