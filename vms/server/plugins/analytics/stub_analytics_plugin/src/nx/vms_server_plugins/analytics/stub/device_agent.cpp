@@ -40,6 +40,19 @@ struct EventDescriptor
     std::string caption;
     std::string description;
     EventContinuityType continuityType = EventContinuityType::impulse;
+
+    EventDescriptor(
+        std::string eventTypeId,
+        std::string caption,
+        std::string description,
+        EventContinuityType continuityType)
+        :
+        eventTypeId(std::move(eventTypeId)),
+        caption(std::move(caption)),
+        description(std::move(description)),
+        continuityType(continuityType)
+    {
+    }
 };
 
 static const std::vector<EventDescriptor> kEventsToFire = {
