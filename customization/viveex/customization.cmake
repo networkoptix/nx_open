@@ -7,9 +7,9 @@ set(company.name "DAEKYO CNS")
 set(uri.protocol "viveex-vms")
 set(cloudName "VIVEex-Link")
 set(installer.name "viveex")
-set(android.alias "")
-set(android.storepass "")
-set(android.keypass "")
+set(android.alias "viveex")
+set(android.storepass "hYCmvTDu")
+set(android.keypass "31O2zNNy")
 set(android.packageName "com.daekyocns.viveex")
 
 # Support section
