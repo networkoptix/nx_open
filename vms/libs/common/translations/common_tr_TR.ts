@@ -1550,14 +1550,6 @@
       <translation>Ekranı Aç</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Eklenti Etkinliği</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Bilinmeyen eklenti olayı</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Kamera saati kullanmaya zorlanırken hata oluştu, çok fazla lag var, sistem saati kullanılacak</translation>
     </message>
@@ -1571,19 +1563,27 @@
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>Çok noktaya yayın adres çakışması algılandı. %1 adresi zaten %3 akışta %2 tarafından kullanılıyor</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>Ağ adresi %1 çok noktaya yayın adresi değil</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Analytics depolama &quot;%1&quot; çevrimdışı.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Analytics depolama &quot;%1&quot; çevrimdışı.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation>Bilinmeyen Eklenti Teşhis Olayı</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Bilinmeyen Eklenti Teşhis Olayı</translation>
     </message>
   </context>
   <context>

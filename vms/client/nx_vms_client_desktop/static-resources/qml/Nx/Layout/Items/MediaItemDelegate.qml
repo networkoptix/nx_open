@@ -18,42 +18,42 @@ ResourceItemDelegate
     [
         TitleBarButton
         {
-            icon: "qrc:/skin/item/image_enhancement.png"
+            iconUrl: "qrc:/skin/item/image_enhancement.png"
             checkable: true
         },
 
         TitleBarButton
         {
-            icon: "qrc:/skin/item/zoom_window.png"
+            iconUrl: "qrc:/skin/item/zoom_window.png"
             checkable: true
         },
 
         TitleBarButton
         {
-            icon: "qrc:/skin/item/ptz.png"
+            iconUrl: "qrc:/skin/item/ptz.png"
             checkable: true
         },
 
         TitleBarButton
         {
-            icon: "qrc:/skin/item/fisheye.png"
+            iconUrl: "qrc:/skin/item/fisheye.png"
             checkable: true
         },
 
         TitleBarButton
         {
-            icon: "qrc:/skin/item/search.png"
+            iconUrl: "qrc:/skin/item/search.png"
             checkable: true
         },
 
         TitleBarButton
         {
-            icon: "qrc:/skin/item/screenshot.png"
+            iconUrl: "qrc:/skin/item/screenshot.png"
         },
 
         TitleBarButton
         {
-            icon: "qrc:/skin/item/rotate.png"
+            iconUrl: "qrc:/skin/item/rotate.png"
 
             onPressed: resourceItem.rotationInstrument.start(mousePosition, this)
             onMousePositionChanged: resourceItem.rotationInstrument.move(mousePosition, this)
@@ -65,7 +65,7 @@ ResourceItemDelegate
         {
             id: infoButton
 
-            icon: "qrc:/skin/item/info.png"
+            iconUrl: "qrc:/skin/item/info.png"
             checkable: true
 
             Binding
@@ -80,7 +80,7 @@ ResourceItemDelegate
 
         TitleBarButton
         {
-            icon: "qrc:/skin/item/close.png"
+            iconUrl: "qrc:/skin/item/close.png"
             onClicked: layoutItemData.layout.removeItem(layoutItemData.itemId)
         }
     ]

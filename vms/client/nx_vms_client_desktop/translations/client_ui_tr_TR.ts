@@ -3079,17 +3079,17 @@
     <message>
       <location/>
       <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</translation>
+      <translation>Analytics verileri, onlarca gigabaytlık depolama alanını kaplayabilir. Sistem bölümü yerine başka bir yer seçmenizi öneririz.</translation>
     </message>
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>Analytics verileri, engelli deposunda depolanmaya devam edecek.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>Kayıt depolama durduralacaktır. Hedef dışı kayıtlar silinmeye devam edecektir.</translation>
     </message>
     <message>
       <location/>

@@ -1,5 +1,7 @@
 #include "metadata_archive.h"
 
+#include <QtCore/QDir>
+
 #include <nx/vms/server/metadata/metadata_helper.h>
 #include "utils/media/sse_helper.h"
 #include <nx/utils/scope_guard.h>

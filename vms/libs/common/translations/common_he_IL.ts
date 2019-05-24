@@ -1642,14 +1642,6 @@
       <translation>פתח את הפריסה</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>אירוע תוסף</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>אירוע תוסף לא ידוע</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>נכשל השימוש בשעת המצלמה, הפרש זמן גדול מדי, יעשה שימוש בזמן המערכת</translation>
     </message>
@@ -1676,6 +1668,14 @@
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
       <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

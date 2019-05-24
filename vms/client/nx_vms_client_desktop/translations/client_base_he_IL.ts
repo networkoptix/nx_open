@@ -3269,6 +3269,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>מנהלי כרטיס המסך מיושנים או שאינם מותקנים</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>ייתכן ש- %1 לא יפעל כראוי.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3352,17 +3363,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>יוצר גיבוי של תצורת המערכת שניתן לשחזר במקרה של כשל.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>מנהלי כרטיס המסך מיושנים או שאינם מותקנים</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>ייתכן ש- %1 לא יפעל כראוי.</translation>
     </message>
   </context>
   <context>
@@ -8805,10 +8805,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>העדכון הושלם</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>העדכון הושלם, אך חלק מהשרתים נכשלו בעדכון</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>תוכנת הקליינט תופעל מחדש לגרסה המעודכנת.</translation>
     </message>
@@ -8961,6 +8957,18 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>אנא עדכן את %1 ידנית באמצעות חבילת התקנה.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 יופעל מחדש לגרסה המעודכנת.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8993,10 +9001,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>אירוע כללי</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation type="unfinished">Unknown Plugin Event</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation type="unfinished">Device was disconnected</translation>
     </message>
@@ -9007,6 +9011,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Module was disconnected</source>
       <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

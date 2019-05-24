@@ -958,9 +958,9 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
         pic = m_renderedPictures.back();
 
         m_renderedPictures.pop_back();
-        NX_VERBOSE(this,
-            lm("Taking previously shown uploaded picture (pts %1, seq %2) for rendering.")
-                .arg(pic->pts()).arg(pic->m_sequence));
+        // NX_VERBOSE(this,
+        //    lm("Taking previously shown uploaded picture (pts %1, seq %2) for rendering.")
+        //        .arg(pic->pts()).arg(pic->m_sequence));
     }
     else
     {
@@ -1091,7 +1091,7 @@ void DecodedPictureToOpenGLUploader::pictureDrawingFinished( UploadedPicture* co
 {
     QnMutexLocker lk( &m_mutex );
 
-    NX_VERBOSE(this, lm("Finished rendering of picture (pts %1).").arg(picture->pts()));
+    // NX_VERBOSE(this, lm("Finished rendering of picture (pts %1).").arg(picture->pts()));
 
     //m_picturesBeingRendered holds only one picture
     std::deque<UploadedPicture*>::iterator it = std::find( m_picturesBeingRendered.begin(), m_picturesBeingRendered.end(), picture );

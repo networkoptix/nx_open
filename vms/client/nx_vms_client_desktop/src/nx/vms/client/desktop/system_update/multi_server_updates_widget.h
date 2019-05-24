@@ -263,9 +263,13 @@ private:
 
     /** ServerUpdateTool promises this. */
     std::future<nx::update::UpdateContents> m_updateCheck;
-
     /** This promise is used to get update info from mediaservers. */
     std::future<nx::update::UpdateContents> m_serverUpdateCheck;
+    /**
+     * This promise is used to wait until ServerUpdateTool restores the state
+     * for offline update package.
+     */
+    std::future<nx::update::UpdateContents> m_offlineUpdateCheck;
 
     std::future<std::vector<nx::update::Status>> m_serverStatusCheck;
 

@@ -1550,14 +1550,6 @@
       <translation>Öppna layout</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Plugin Event</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Okänd plugin-händelse</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Misslyckades med att använda kameratid, det ligger efter för mycket, systemtiden kommer att användas</translation>
     </message>
@@ -1584,6 +1576,14 @@
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
       <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

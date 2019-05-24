@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>攝影機分析功能將只在觀看影像時有作用. 請啟用錄影來使其全時運作.</translation>
     </message>
   </context>
   <context>
@@ -68,11 +68,11 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>未安裝任何外掛程式</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>伺服器已離線</translation>
     </message>
   </context>
   <context>

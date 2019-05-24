@@ -59,6 +59,7 @@ public:
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
     bool hasOfflineUpdateChanges() const;
+    void resumeTasks();
 
     /**
      * Sends GET https://localhost:7001/ec2/updateInformation and stores response in an internal
@@ -124,6 +125,8 @@ public:
         error,
     };
 
+    Q_ENUM(OfflineUpdateState);
+
     /**
      * Checks latest update in the internet. It will reqest mediaserver for updates if client
      * has no connection to the internet. GET /ec2/updateInformation?version=latest
@@ -135,6 +138,7 @@ public:
 
     std::future<UpdateContents> checkUpdateFromFile(const QString& file);
     std::future<UpdateContents> checkMediaserverUpdateInfo();
+    std::future<UpdateContents> takeUpdateCheckFromFile();
 
     /**
      * Check if update info contains all the packages necessary to update the system.

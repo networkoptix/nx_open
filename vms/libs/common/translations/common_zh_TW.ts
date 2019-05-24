@@ -1504,40 +1504,40 @@
       <translation>開啟佈局</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>插件事件</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>未知的插件事件</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>無法強制使用攝影機時間，會延遲過久，將採用系統時間</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>攝影機時間將恢復正常</translation>
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>發生了多個%1事件</translation>
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>檢測到多播地址衝突。地址 %1 已被 %2 對 %3 串流使用</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>網址 %1 不是多播地址</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>儲存空間 &quot;%1&quot; 處於離線狀態。</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>儲存空間 &quot;%1&quot; 容量即將不足。</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>

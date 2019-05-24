@@ -1,5 +1,8 @@
 #pragma once
 
+#include <QtCore/QObject>
+#include <QtCore/QDate>
+
 namespace nx::vms::server::metadata {
 
 static const int kMetadataIndexHeaderSize = 16;
