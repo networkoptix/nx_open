@@ -5,6 +5,7 @@
 #include <utils/common/connective.h>
 
 #include "radass_fwd.h"
+#include "utils/abstract_timers.h"
 
 class QnCamDisplay;
 class QnArchiveStreamReader;
@@ -17,7 +18,7 @@ class RadassController: public Connective<QObject>
     using base_type = Connective<QObject>;
 
 public:
-    explicit RadassController(QObject* parent = nullptr);
+    explicit RadassController(QObject* parent = nullptr, TimerFactoryPtr timerFactory = nullptr);
     virtual ~RadassController() override;
 
     void registerConsumer(QnCamDisplay* display);

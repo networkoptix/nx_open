@@ -17,31 +17,37 @@
 
 #include "radass_types.h"
 #include "radass_support.h"
+#include "utils/qt_timers.h"
+
+using namespace std::chrono;
+
 
 //#define TRACE_RADASS
 
 namespace {
 
+using namespace nx::vms::client::desktop;
+
 // Time to ignore recently added cameras.
-static constexpr int kRecentlyAddedIntervalMs = 1000;
+static constexpr auto kRecentlyAddedInterval = 1s;
 
 // Delay between quality switching attempts.
-static constexpr int kQualitySwitchIntervalMs = 1000 * 5;
+static constexpr auto kQualitySwitchInterval = 5s;
 
 // Delay between checks if performance can be improved.
-static constexpr int kPerformanceLossCheckIntervalMs = 1000 * 5;
+static constexpr auto kPerformanceLossCheckInterval = 5s;
 
 // Put item to LQ if visual size is small.
-static const QSize kLowQualityScreenSize(320 / 1.4, 240 / 1.4);
+static const QSize kLowQualityScreenSize(320.0 / 1.4, 240.0 / 1.4);
 
 // Put item back to HQ if visual size increased to kLowQualityScreenSize * kLqToHqSizeThreshold.
 static constexpr double kLqToHqSizeThreshold = 1.34;
 
 // Try to balance every 500ms
-static constexpr int kTimerIntervalMs = 500;
+static constexpr auto kTimerInterval = 500ms;
 
 // Every 10 minutes try to raise quality. Value in counter ticks.
-static constexpr int kAdditionalHQRetryCounter = 10 * 60 * 1000 / kTimerIntervalMs;
+static constexpr int kAdditionalHQRetryCounter = 10 * 60 * 1000 / static_cast<milliseconds>(kTimerInterval).count();
 
 // Ignore cameras which are on Fast Forward
 static constexpr double kSpeedValueEpsilon = 0.0001;
@@ -53,7 +59,7 @@ static constexpr int kMaximumConsumersCount = 16;
 static constexpr int kSlowNetworkFrameLimit = 3;
 
 // Item will go to LQ if it is small for this period of time already.
-static constexpr int kLowerSmallItemQualityIntervalMs = 1000;
+static constexpr auto kLowerSmallItemQualityInterval = 1s;
 
 static constexpr int kAutomaticSpeed = std::numeric_limits<int>::max();
 
@@ -135,17 +141,17 @@ enum class FindMethod
 
 struct ConsumerInfo
 {
-    using Mode = nx::vms::client::desktop::RadassMode;
+    using Mode = RadassMode;
 
     QnCamDisplay* display = nullptr;
 
     float toLqSpeed = 0.0;
     LqReason lqReason = LqReason::none;
-    QElapsedTimer initialTime;
-    QElapsedTimer awaitingLqTime;
+    ElapsedTimerPtr initialTime;
+    ElapsedTimerPtr awaitingLqTime;
 
     // Item will go to LQ if it is small for this period of time already.
-    QElapsedTimer itemIsSmallInHq;
+    ElapsedTimerPtr itemIsSmallInHq;
 
     // Custom mode means unsupported consumer.
     Mode mode = Mode::Auto;
@@ -153,11 +159,14 @@ struct ConsumerInfo
     // Required for std::vector resize.
     ConsumerInfo() = default;
 
-    ConsumerInfo(QnCamDisplay* display):
+    ConsumerInfo(QnCamDisplay* display, const TimerFactoryPtr& timerFactory):
         display(display),
+        initialTime(timerFactory->createElapsedTimer()),
+        awaitingLqTime(timerFactory->createElapsedTimer()),
+        itemIsSmallInHq(timerFactory->createElapsedTimer()),
         m_name(display->resource()->toResourcePtr()->getName())
     {
-        initialTime.start();
+        initialTime->start();
         if (!isSupportedDisplay(display))
             mode = Mode::Custom;
     }
@@ -178,26 +187,32 @@ namespace nx::vms::client::desktop {
 struct RadassController::Private
 {
     mutable QnMutex mutex;
-    QElapsedTimer lastAutoSwitchTimer; //< Latest automatic HQ->LQ or LQ->HQ switch.
+    ElapsedTimerPtr lastAutoSwitchTimer; //< Latest automatic HQ->LQ or LQ->HQ switch.
     int timerTicks = 0;    //< onTimer ticks count
-    QElapsedTimer lastSystemRtspDrop; //< Time since last RTSP drop in the system.
+    ElapsedTimerPtr lastSystemRtspDrop; //< Time since last RTSP drop in the system.
 
     // If some item has performance problems second time, block auto-hq transition for all cameras.
     bool autoHqTransitionAllowed = true;
 
     // When something actually changed the last time (for performance warning only).
-    QElapsedTimer lastModeChangeTimer;
+    ElapsedTimerPtr lastModeChangeTimer;
 
     std::vector<ConsumerInfo> consumers;
     using Consumer = decltype(consumers)::iterator;
 
     QnCounterHash<QnVirtualCameraResourcePtr> cameras;
 
-    Private():
-        mutex(QnMutex::Recursive)
+    TimerFactoryPtr timerFactory;
+
+    Private(const TimerFactoryPtr& timerFactory):
+        mutex(QnMutex::Recursive),
+        lastAutoSwitchTimer(timerFactory->createElapsedTimer()),
+        lastSystemRtspDrop(timerFactory->createElapsedTimer()),
+        lastModeChangeTimer(timerFactory->createElapsedTimer())
     {
-        lastAutoSwitchTimer.start();
-        lastModeChangeTimer.start();
+        this->timerFactory = timerFactory;
+        lastAutoSwitchTimer->start();
+        lastModeChangeTimer->start();
     }
 
     template<typename T>
@@ -354,17 +369,17 @@ struct RadassController::Private
             }
 
             trace(lit("Switching High->Low, %1 ms since last automatic change, reason %2")
-                .arg(lastAutoSwitchTimer.elapsed())
+                .arg(lastAutoSwitchTimer->elapsedMs())
                 .arg(lQReasonString()));
 
             // Last actual change time (for performance warning only).
-            lastModeChangeTimer.restart();
+            lastModeChangeTimer->restart();
         }
 
         reader->setQuality(MEDIA_Quality_Low, true);
         consumer->lqReason = reason;
         consumer->toLqSpeed = consumerSpeed;
-        consumer->awaitingLqTime.invalidate();
+        consumer->awaitingLqTime->invalidate();
     }
 
     void gotoHighQuality(Consumer consumer)
@@ -373,10 +388,10 @@ struct RadassController::Private
         if (reader->getQuality() != MEDIA_Quality_High)
         {
             trace(lit("Switching Low->High, %1 ms since last automatic change")
-                .arg(lastAutoSwitchTimer.elapsed()));
+                .arg(lastAutoSwitchTimer->elapsedMs()));
 
             // Last actual change time (for performance warning only).
-            lastModeChangeTimer.restart();
+            lastModeChangeTimer->restart();
         }
 
         reader->setQuality(MEDIA_Quality_High, true);
@@ -403,7 +418,7 @@ struct RadassController::Private
     {
         NX_ASSERT(consumer->mode == RadassMode::Auto);
         // Do not handle recently added items, some start animation can be in progress.
-        if (!consumer->initialTime.hasExpired(kRecentlyAddedIntervalMs))
+        if (!consumer->initialTime->hasExpired(kRecentlyAddedInterval))
             return;
 
         const auto display = consumer->display;
@@ -423,10 +438,10 @@ struct RadassController::Private
             && !reader->isMediaPaused())
         {
             // Run timer for the small items.
-            if (!consumer->itemIsSmallInHq.isValid())
-                consumer->itemIsSmallInHq.restart();
+            if (!consumer->itemIsSmallInHq->isValid())
+                consumer->itemIsSmallInHq->restart();
 
-            if (consumer->itemIsSmallInHq.hasExpired(kLowerSmallItemQualityIntervalMs))
+            if (consumer->itemIsSmallInHq->hasExpired(kLowerSmallItemQualityInterval))
             {
                 trace("Consumer was small in HQ for 1 second", consumer);
                 gotoLowQuality(consumer, LqReason::smallItem);
@@ -436,7 +451,7 @@ struct RadassController::Private
         else
         {
             // Item is not small or not in HQ or not playing anymore.
-            consumer->itemIsSmallInHq.invalidate();
+            consumer->itemIsSmallInHq->invalidate();
         }
 
         // switch LQ->HQ for LIVE here.
@@ -450,15 +465,15 @@ struct RadassController::Private
             // Check if camera is not paused
             && !reader->isMediaPaused()
             // No recently slow report by any camera.
-            && lastSystemRtspDrop.hasExpired(kQualitySwitchIntervalMs)
+            && lastSystemRtspDrop->hasExpired(kQualitySwitchInterval)
             // Is big enough item for HQ.
             && isBigItem(display))
         {
             streamBackToNormal(consumer);
         }
 
-        if (consumer->awaitingLqTime.isValid()
-            && consumer->awaitingLqTime.hasExpired(kQualitySwitchIntervalMs))
+        if (consumer->awaitingLqTime->isValid()
+            && consumer->awaitingLqTime->hasExpired(kQualitySwitchInterval))
         {
             trace("Consumer had slow stream for 5 seconds", consumer);
             gotoLowQuality(consumer, LqReason::performance);
@@ -500,7 +515,7 @@ struct RadassController::Private
     void onSlowStream(Consumer consumer)
     {
         trace("Slow stream detected.", consumer);
-        lastSystemRtspDrop.restart();
+        lastSystemRtspDrop->restart();
 
         // Skip unsupported cameras and cameras with manual stream control.
         if (consumer->mode != RadassMode::Auto)
@@ -530,10 +545,10 @@ struct RadassController::Private
         }
 
         // Do not go to LQ if recently switch occurred.
-        if (!lastAutoSwitchTimer.hasExpired(kQualitySwitchIntervalMs))
+        if (!lastAutoSwitchTimer->hasExpired(kQualitySwitchInterval))
         {
             trace("Quality switch was less than 5 seconds ago, leaving as is.", consumer);
-            consumer->awaitingLqTime.restart();
+            consumer->awaitingLqTime->restart();
             return;
         }
 
@@ -549,13 +564,13 @@ struct RadassController::Private
         }
         trace("Finding smallest HQ camera and switching it to LQ.", smallestConsumer);
         gotoLowQuality(smallestConsumer, LqReason::performance);
-        lastAutoSwitchTimer.restart();
+        lastAutoSwitchTimer->restart();
     }
 
     void streamBackToNormal(Consumer consumer)
     {
         // Camera do not have slow stream anymore.
-        consumer->awaitingLqTime.invalidate();
+        consumer->awaitingLqTime->invalidate();
 
         // Skip unsupported cameras and cameras with manual stream control.
         if (consumer->mode != RadassMode::Auto)
@@ -607,14 +622,14 @@ struct RadassController::Private
         // Try one more LQ->HQ switch.
 
         // Recently LQ->HQ or HQ->LQ
-        if (!lastAutoSwitchTimer.hasExpired(kQualitySwitchIntervalMs))
+        if (!lastAutoSwitchTimer->hasExpired(kQualitySwitchInterval))
         {
             trace("Quality switch was less than 5 seconds ago, leaving as is.", consumer);
             return;
         }
 
         // Recently slow report received (not all reports affect d->lastAutoSwitchTimer).
-        if (lastSystemRtspDrop.isValid() && !lastSystemRtspDrop.hasExpired(kQualitySwitchIntervalMs))
+        if (lastSystemRtspDrop->isValid() && !lastSystemRtspDrop->hasExpired(kQualitySwitchInterval))
         {
             trace("RTSP drop was less than 5 seconds ago, leaving as is.", consumer);
             return;
@@ -629,7 +644,7 @@ struct RadassController::Private
 
         trace("Switching to hi quality", consumer);
         gotoHighQuality(consumer);
-        lastAutoSwitchTimer.restart();
+        lastAutoSwitchTimer->restart();
     }
 
     // Try LQ->HQ once more for all cameras.
@@ -643,7 +658,7 @@ struct RadassController::Private
     void optimizeItemsQualityBySize()
     {
         // Do not optimize quality if recently switch occurred.
-        if (!lastAutoSwitchTimer.hasExpired(kQualitySwitchIntervalMs))
+        if (!lastAutoSwitchTimer->hasExpired(kQualitySwitchInterval))
             return;
 
         // Do not rearrange items if any item is in FF/REW mode right now.
@@ -679,7 +694,7 @@ struct RadassController::Private
             gotoLowQuality(smallConsumer, largeConsumer->lqReason);
             trace("Bigger item goes to HQ", largeConsumer);
             gotoHighQuality(largeConsumer);
-            lastAutoSwitchTimer.restart();
+            lastAutoSwitchTimer->restart();
         }
     }
 
@@ -709,13 +724,17 @@ struct RadassController::Private
 
 };
 
-RadassController::RadassController(QObject* parent):
-    base_type(parent),
-    d(new Private())
+RadassController::RadassController(QObject* parent, TimerFactoryPtr timerFactory):
+    base_type(parent)
 {
-    auto timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &RadassController::onTimer);
-    timer->start(kTimerIntervalMs);
+    // If no timer factory is provided, use default qt-based one (production mode).
+    if (timerFactory == nullptr)
+        timerFactory.reset(new QtTimerFactory());
+
+    d.reset(new Private(timerFactory));
+    auto timer = timerFactory->createTimer(this);
+    connect(timer, &AbstractTimer::timeout, this, &RadassController::onTimer);
+    timer->start(kTimerInterval);
 }
 
 RadassController::~RadassController()
@@ -756,7 +775,7 @@ void RadassController::onTimer()
     {
         // Sometimes allow addition LQ->HQ switch.
         // Check if there were no slow stream reports lately.
-        if (d->lastSystemRtspDrop.hasExpired(kQualitySwitchIntervalMs))
+        if (d->lastSystemRtspDrop->hasExpired(kQualitySwitchInterval))
         {
             d->addHqTry();
             d->timerTicks = 0;
@@ -797,12 +816,12 @@ void RadassController::onTimer()
 
     d->optimizeItemsQualityBySize();
 
-    if (d->lastModeChangeTimer.hasExpired(kPerformanceLossCheckIntervalMs))
+    if (d->lastModeChangeTimer->hasExpired(kPerformanceLossCheckInterval))
     {
         // Recently slow report received or there is a slow consumer.
         const auto performanceLoss =
-            (d->lastSystemRtspDrop.isValid()
-            && !d->lastSystemRtspDrop.hasExpired(kPerformanceLossCheckIntervalMs))
+            (d->lastSystemRtspDrop->isValid()
+            && !d->lastSystemRtspDrop->hasExpired(kPerformanceLossCheckInterval))
             || d->isValid(d->slowConsumer());
 
         const auto hasHq = std::any_of(d->consumers.cbegin(), d->consumers.cend(),
@@ -811,7 +830,7 @@ void RadassController::onTimer()
         if (hasHq && performanceLoss && !d->existsBufferingDisplay())
             emit performanceCanBeImproved();
 
-        d->lastModeChangeTimer.restart();
+        d->lastModeChangeTimer->restart();
     }
 }
 
@@ -831,12 +850,12 @@ void RadassController::registerConsumer(QnCamDisplay* display)
     if (!reader)
         return;
 
-    d->consumers.push_back(ConsumerInfo(display));
+    d->consumers.push_back(ConsumerInfo(display, d->timerFactory));
     auto consumer = d->consumers.end() - 1;
     NX_ASSERT(consumer->display == display);
 
     d->setupNewConsumer(consumer);
-    d->lastModeChangeTimer.restart();
+    d->lastModeChangeTimer->restart();
 
     // Listen to camera changes to make sure second stream will start working as soon as possible.
     if (const auto camera = getCamera(display))
@@ -875,7 +894,7 @@ void RadassController::unregisterConsumer(QnCamDisplay* display)
 
     d->consumers.erase(consumer);
     d->addHqTry();
-    d->lastModeChangeTimer.restart();
+    d->lastModeChangeTimer->restart();
 
     if (const auto camera = getCamera(display))
     {
@@ -929,7 +948,7 @@ void RadassController::setMode(QnCamDisplay* display, RadassMode mode)
             NX_ASSERT(false, "Should never get here");
             break;
     }
-    d->lastModeChangeTimer.restart();
+    d->lastModeChangeTimer->restart();
 }
 
 } // namespace nx::vms::client::desktop
