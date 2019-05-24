@@ -46,23 +46,17 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
         }
         QString simplifiedGUID = moduleGUID().toSimpleString();
         QString dbPath = storage->getUrl();
-        QString fileName =
-            closeDirPath(dbPath) +
-            QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
 
-        sdb = QnStorageDbPtr(
-            new QnStorageDb(
-                serverModule(),
-                storage,
-                getStorageIndex(storage),
-                serverModule()->settings().vacuumIntervalSec()));
-        if (sdb->open(fileName)) {
+        sdb = QnStorageDbPtr(new QnStorageDb(
+            serverModule(), storage, getStorageIndex(storage),
+            serverModule()->settings().vacuumIntervalSec()));
+        if (sdb->open(dbPath))
+        {
             m_chunksDB[storage->getUrl()] = sdb;
         }
-        else {
-            NX_WARNING(this, lit("%1 Storage DB file %2 open failed.")
-                    .arg(Q_FUNC_INFO)
-                    .arg(fileName));
+        else
+        {
+            NX_WARNING(this, "Storage DB file open failed. Db folder path: %2", dbPath);
             return QnStorageDbPtr();
         }
     }
