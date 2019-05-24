@@ -251,7 +251,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
             NX_INFO(this)
                 << "setUpdateTarget(" << contents.info.version
                 << ") client already has this version installed"
-                << m_clientPackage.file;
+                << m_clientPackage.localFile;
             setState(State::readyRestart);
         }
         else
@@ -259,7 +259,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
             NX_INFO(this)
                 << "setUpdateTarget(" << contents.info.version
                 << ") client is already at this version"
-                << m_clientPackage.file;
+                << m_clientPackage.localFile;
             setState(State::complete);
         }
     }
@@ -485,6 +485,9 @@ bool ClientUpdateTool::installUpdateAsync()
                 return result;
             }
 
+            NX_VERBOSE(NX_SCOPE_TAG,
+                "Started client installation from file %2. Waiting for completion", absolutePath);
+
             // Checking state if installation, until it goes to Result::ok
             constexpr int kMaxTries = 10;
             for (int retries = 0; retries < kMaxTries; ++retries)
@@ -495,7 +498,6 @@ bool ClientUpdateTool::installUpdateAsync()
                 switch (result)
                 {
                     case ResultType::alreadyInstalled:
-                    case ResultType::otherError:
                     case ResultType::versionNotInstalled:
                     case ResultType::invalidVersionFormat:
                     case ResultType::notEnoughSpace:
@@ -504,6 +506,7 @@ bool ClientUpdateTool::installUpdateAsync()
                         return result;
                     case ResultType::unpackingZip:
                         break;
+                    case ResultType::otherError:
                     case ResultType::connectError:
                     case ResultType::ioError:
                     default:

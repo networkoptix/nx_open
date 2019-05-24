@@ -32,14 +32,18 @@ NX_VMS_APPLAUNCHER_API_API QString toString(TaskType value);
 enum class ResultType
 {
     ok,
-    //* Failed to connect to applauncher. */
+    /** Failed to connect to applauncher. */
     connectError,
+    /** Requested client version is not installed. */
     versionNotInstalled,
+    /** Requested client version is installed. */
     alreadyInstalled,
+    /** Requested version has invalid format. */
     invalidVersionFormat,
     notFound,
     badResponse,
     ioError,
+    /** Not enough space to install client package. */
     notEnoughSpace,
     /** Zip with update data is broken and can not be installed. */
     brokenPackage,
@@ -47,6 +51,7 @@ enum class ResultType
     unpackingZip,
     /** Applauncher can not start another async task right now. */
     busy,
+    /** Unknown error. */
     otherError
 };
 
