@@ -14,6 +14,8 @@ static constexpr char kLanguage[] = "en";
 static constexpr char kLocation[] = "location";
 static constexpr char kLatitude[] = "latitude";
 static constexpr char kLongitude[] = "longitude";
+static constexpr char kSubdivisions[] = "subdivisions";
+static constexpr char kCity[] = "city";
 
 bool isNormal(ResultCode resultCode)
 {
@@ -49,7 +51,7 @@ std::optional<Continent> toContinent(const std::string& continent)
     // using Australia as continent but maxmind calls it Oceania and calls the country Australia
     if (continent == "OC" || continent == "Oceania" || continent == "Australia")
         return Continent::australia;
-    if (continent == "EU" || "Europe")
+    if (continent == "EU" || continent == "Europe")
         return Continent::europe;
     if (continent == "NA" || continent == "North America")
         return Continent::northAmerica;
@@ -151,16 +153,20 @@ public:
 
         Location location(*continent);
 
-        // Not every ip has an associated country, for example: "2.16.126.1", which contains
-        // continent and geopoint, but no country.
-        // If not found, it should not be an error.
-        result = getString(&location.country, lookupResult, kCountry, kNames, kLanguage);
+        Country country;
+        result = getCountry(&country, lookupResult);
         if (!isNormal(result.code))
             throw Exception(result.code, result.error);
 
-        // Not every ip has a geopoint, If not found, it should not be an error
         Geopoint geopoint;
         result = getGeopoint(&geopoint, lookupResult);
+        if (!isNormal(result.code))
+            throw Exception(result.code, result.error);
+
+        if (result.code == ResultCode::ok)
+            location.country = std::move(country);
+
+        result = getString(&location.city, lookupResult, kCity, kNames, kLanguage);
         if (!isNormal(result.code))
             throw Exception(result.code, result.error);
 
@@ -227,7 +233,10 @@ private:
     }
 
     template<typename ...ConstCharPtrs>
-    Result getString(std::string* outString, MMDB_lookup_result_s& lookupResult, ConstCharPtrs... strings)
+    Result getString(
+        std::string* outString,
+        MMDB_lookup_result_s& lookupResult,
+        ConstCharPtrs... strings)
     {
         outString->clear();
         MMDB_entry_data_s entryData;
@@ -235,6 +244,22 @@ private:
         auto result = validate(mmdbResult, entryData, MMDB_DATA_TYPE_UTF8_STRING);
         if (result.code == ResultCode::ok)
             *outString = std::string(entryData.utf8_string, entryData.data_size);
+        return result;
+    }
+
+    /** Looks up a value along lookup path: "subdivisions", std::to_string(index), strings...; */
+    template<typename ...ConstCharPtrs>
+    Result getSubdivision(
+        std::string* outSubdivision,
+        MMDB_lookup_result_s& lookupResult,
+        int index,
+        ConstCharPtrs... strings)
+    {
+        outSubdivision->clear();
+        auto result = getString(
+            outSubdivision,
+            lookupResult,
+            kSubdivisions, std::to_string(index).c_str(), strings...);
         return result;
     }
 
@@ -247,6 +272,19 @@ private:
         auto result = validate(mmdbResult, entryData, MMDB_DATA_TYPE_DOUBLE);
         if (result.code == ResultCode::ok)
             *outDouble = entryData.double_value;
+        return result;
+    }
+
+    Result getCountry(Country* outCountry, MMDB_lookup_result_s& lookupResult)
+    {
+        auto result = getString(&outCountry->name, lookupResult, kCountry, kNames, kLanguage);
+        if (!isNormal(result.code))
+            throw Exception(result.code, result.error);
+
+        result = getSubdivision(&outCountry->subdivision, lookupResult, 0, kNames, kLanguage);
+        if (!isNormal(result.code))
+            throw Exception(result.code, result.error);
+
         return result;
     }
 

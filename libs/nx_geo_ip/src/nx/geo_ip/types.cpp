@@ -86,20 +86,32 @@ Location::Location(Continent continent):
 {
 }
 
+std::string Country::toString() const
+{
+    if (name.empty() && subdivision.empty())
+        return {};
+
+    std::string s;
+    s.reserve(name.size() + subdivision.size() + 6);
+    return s.append("{ ")
+        .append(name)
+        .append(!name.empty() && !subdivision.empty() ?  ", " : "")
+        .append(subdivision).append(" }");
+}
+
 std::string Location::toString() const
 {
-    std::string s;
     std::string geopointStr = geopoint.toString();
-    // 22 == number of format characters + length of longest continent name
-    s.reserve(country.size() + geopointStr.size() + 22);
-    s += "{ ";
-    s += continentString(continent);
-    s += ", ";
-    s += std::move(geopointStr);
-    if (!country.empty())
-        s += ", " + country;
-    s += " }";
-    return s;
+    std::string countryStr = country.toString();
+
+    //22 == length of all formatting characters + size of longest continent name
+    std::string s;
+    s.reserve(geopointStr.size() + countryStr.size() + city.size() + 22);
+    return s.append("{ ")
+        .append(continentString(continent)).append(", ")
+        .append(geopointStr).append((!countryStr.empty() ? ", " : ""))
+        .append(countryStr).append(!city.empty() ? ", " : "")
+        .append(city).append(" }");
 }
 
 } // namespace nx::geo_ip

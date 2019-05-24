@@ -3,6 +3,7 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace nx::geo_ip {
 
@@ -56,11 +57,22 @@ static std::map<Continent, Geopoint> kContinentalCenters = {
     {Continent::southAmerica, {-20.719, -58.061}}
 };
 
+struct NX_GEO_IP_API Country
+{
+    /** United States, United Kingdom, etc*/
+    std::string name;
+    /** State in the case of U.S., "London" or "Ireland" in the case of the U.K>, etc. */
+    std::string subdivision;
+
+    std::string toString() const;
+};
+
 struct NX_GEO_IP_API Location
 {
     Continent continent = Continent::africa;
     Geopoint geopoint = kContinentalCenters[continent];
-    std::string country;
+    Country country;
+    std::string city;
 
     Location() = default;
     /**
@@ -72,7 +84,7 @@ struct NX_GEO_IP_API Location
     std::string toString() const;
 };
 
-class Exception:public std::runtime_error
+class Exception: public std::runtime_error
 {
     using base_type = std::runtime_error;
 public:
