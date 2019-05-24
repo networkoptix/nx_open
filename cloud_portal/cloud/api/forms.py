@@ -106,7 +106,7 @@ class UserInviteFrom(forms.Form):
         user = Account(email=email, customization=customization, language=language_code, is_active=False)
         user.save()
         # Password in the encoded email doesnt matter its just a place holder.
-        encode_email = base64.b64encode("password:{}".format(email))
+        encode_email = base64.b64encode(f"password:{email}".encode('utf-8')).decode('utf-8')
         notifications_api.send(email, 'cloud_invite', {"message": message, "code": encode_email}, customization)
 
         return user.id
