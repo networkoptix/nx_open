@@ -38,14 +38,19 @@ class CustomizationFilter(SimpleListFilter):
             }
 
     def queryset(self, request, queryset):
+        field_names = [f.name for f in queryset.model._meta.get_fields()]
+        if 'customizations' in field_names:
+            field_name = 'customizations'
+        else:
+            field_name = 'customization'
+
         if self.value():
             if self.value() == self.OTHER_CUSTOMIZATIONS:
-                return queryset.exclude(customization__name__in=request.user.customizations)
+                return queryset.exclude(**{field_name + '__name__in': request.user.customizations})
             elif self.value() != self.ALL_CUSTOMIZATIONS:
-                return queryset.filter(customization__id=self.value())
-
+                return queryset.filter(**{field_name + '__id': self.value()})
         else:
-            return queryset.filter(customization__id=self.default_customization)
+            return queryset.filter(**{field_name + '__id': self.default_customization})
         return queryset
 
 
@@ -100,7 +105,8 @@ admin.site.register(ProductType, ProductTypeAdmin)
 class ProductAdmin(CMSAdmin):
     list_display = ('product_settings', 'edit_product_button', 'name', 'product_type', 'customizations_list', )
     list_display_links = ('name',)
-    list_filter = ('product_type', )
+    list_filter = ('product_type', CustomizationFilter,)
+    search_fields = ('name', 'created_by__email',)
     form = ProductForm
     change_form_template = 'cms/product_change_form.html'
 
@@ -145,6 +151,14 @@ class ProductAdmin(CMSAdmin):
             editable_products = request.user.products_with_permission('cms.edit_content')
             queryset = Product.objects.filter(Q(id__in=editable_products))
         return queryset
+
+    def get_list_filter(self, request):
+        list_display = self.get_list_display(request)
+        if 'customizations_list' not in list_display:
+            list_filter = list(self.list_filter)
+            list_filter.remove(CustomizationFilter)
+            return list_filter
+        return self.list_filter
 
     def get_urls(self):
         urls = super(ProductAdmin, self).get_urls()
