@@ -512,7 +512,8 @@ void MainWindow::setWelcomeScreenVisible(bool visible)
 
 bool MainWindow::isWorkbenchVisible() const
 {
-    return m_view->isVisibleTo(this);
+    NX_ASSERT(m_viewLayout->count() > 0 && m_viewLayout->count() <= 2);
+    return !m_welcomeScreenVisible;
 }
 
 bool MainWindow::isWelcomeScreenVisible() const
