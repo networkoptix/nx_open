@@ -255,7 +255,6 @@ private:
         int index,
         ConstCharPtrs... strings)
     {
-        outSubdivision->clear();
         auto result = getString(
             outSubdivision,
             lookupResult,
