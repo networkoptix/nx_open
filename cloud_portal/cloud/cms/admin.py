@@ -129,7 +129,7 @@ class ProductAdmin(CMSAdmin):
                 extra_context['current_versions'].append(approved_version)
             else:
                 extra_context['current_versions'].append({'customization': customization.name,
-                                                          'id': "No Current Version"})
+                                                          'id': "Not published"})
 
         return super(ProductAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
