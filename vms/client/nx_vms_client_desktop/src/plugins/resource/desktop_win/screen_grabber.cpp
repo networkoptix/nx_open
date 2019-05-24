@@ -3,6 +3,7 @@
 #include <emmintrin.h>
 
 #include <QtCore/QLibrary>
+#include <QtCore/QtMath>
 
 #include <QtGui/QImage>
 #include <QtGui/QOpenGLContext>
@@ -23,6 +24,7 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 #include <libavutil/imgutils.h>
+#include <libswscale/swscale.h>
 }
 
 static const int LOGO_CORNER_OFFSET = 8;

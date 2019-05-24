@@ -4,6 +4,7 @@
 #include <cmath> /* For std::fmod, std::floor. */
 #include <limits>
 
+#include <QtCore/QtMath>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QGraphicsWidget>
 #include <QtWidgets/QApplication>

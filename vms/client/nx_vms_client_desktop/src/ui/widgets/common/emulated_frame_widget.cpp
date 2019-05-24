@@ -1,5 +1,7 @@
 #include "emulated_frame_widget.h"
 
+#include <Windows.h>
+
 #include <QtGui/QWindow>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QScreen>
