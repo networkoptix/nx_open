@@ -29,7 +29,7 @@
  */
 class QnResourcePool: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
 {
-Q_OBJECT
+    Q_OBJECT
     using base_type = Connective<QObject>;
 
 public:
@@ -294,6 +294,7 @@ public:
     static void markLayoutLiteClient(const QnLayoutResourcePtr& layout);
 
     QThreadPool* threadPool() const;
+
 signals:
     void resourceAdded(const QnResourcePtr& resource);
     void resourceRemoved(const QnResourcePtr& resource);
@@ -301,17 +302,8 @@ signals:
     void statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason reason);
 
 private:
-    mutable struct Cache
-    {
-        void resourceRemoved(const QnResourcePtr& res);
-        void resourceAdded(const QnResourcePtr& res);
-
-        int ioModulesCount = 0;
-        QMap<QnUuid, QnMediaServerResourcePtr> mediaServers;
-        QMap<QString, QnResourcePtr> resourcesByUniqueId;
-    private:
-        bool isIoModule(const QnResourcePtr& res) const;
-    } m_cache;
+    struct Private;
+    QScopedPointer<Private> d;
 
     mutable QnMutex m_resourcesMtx;
     bool m_tranInProgress;
