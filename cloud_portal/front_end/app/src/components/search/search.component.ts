@@ -175,8 +175,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                 });
         }
 
-        // Update was based on URI params - propagate the model change
-
+        this.numberOfOptionsSelected();
         this.onChangeCallback(this.localFilter);
 
     }
@@ -196,9 +195,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             // Update model with query params
             this.updateFilter();
         }
-
-
-        this.numberOfOptionsSelected();
     }
 
     // From ControlValueAccessor interface
