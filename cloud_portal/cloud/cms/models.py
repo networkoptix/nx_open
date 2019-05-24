@@ -546,7 +546,7 @@ class ContentVersion(models.Model):
             parent_in_review = False
             if customization.parent:
                 parent_in_review = self.product.customizations.filter(id=customization.parent.id).exists()
-            if customization.parent and parent_in_review:
+            if parent_in_review:
                 ProductCustomizationReview(customization=customization, version=self, state=blocked).save()
             else:
                 ProductCustomizationReview(customization=customization, version=self, state=pending).save()
