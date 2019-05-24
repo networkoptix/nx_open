@@ -55,7 +55,7 @@ public:
     {
         discoveryServer().unsubscribeFromNodeDiscovered(m_nodeDiscoveredSubscriptionId);
 
-        for (int i = 0; i < m_relayClusterSize; ++i)
+        for (int i = 0; i < relayClusterSize(); ++i)
             trafficRelay(i).stop();
 
         if (m_geoIpFactoryFuncBak)
@@ -108,10 +108,9 @@ protected:
 
         using namespace nx::hpm;
 
-        m_relayClusterSize = 3;
+        setRelayCount(3);
         m_clientRelayIndex = 2; //< Client connects to Australia relay.
 
-        setRelayCount(m_relayClusterSize);
 
         m_nodeDiscoveredSubscriptionId = discoveryServer().subscribeToNodeDiscovered(
             [this](std::string clusterId, nx::cloud::discovery::NodeInfo nodeInfo)
@@ -135,7 +134,7 @@ protected:
                     nx::utils::Url url(nodeInfo.urls.front());
                     url.setPath({});
 
-                    m_relaysMockedUp.emplace(std::move(url), publicIpAddress);
+                    m_relayIpMockup.emplace(std::move(url), publicIpAddress);
                 }
             });
         ASSERT_NE(nx::utils::kInvalidSubscriptionId, m_nodeDiscoveredSubscriptionId);
@@ -145,6 +144,7 @@ protected:
             {
                 auto geoIpResolver = std::make_unique<nx::geo_ip::test::MemoryResolver>();
                 m_geoIpResolver = geoIpResolver.get();
+                mockupRelayRegions();
                 return geoIpResolver;
             });
 
@@ -155,7 +155,6 @@ protected:
                     settings,
                     this);
                 m_relayClusterClient = relayClusterClient.get();
-                mockupRelayRegions();
                 return relayClusterClient;
             });
 
@@ -300,36 +299,35 @@ private:
 
     void mockupRelayRegions()
     {
-        const auto needToWaitForRelayMockup =
+        const auto needToWaitForRelayIpMockup =
             [this]()
             {
                 std::lock_guard<std::mutex> lock(m_mutex);
-                return (int)m_relaysMockedUp.size() < m_relayClusterSize;
+                return (int)m_relayIpMockup.size() < relayClusterSize();
             };
 
         ASSERT_NE(m_geoIpResolver, nullptr);
 
-        while (needToWaitForRelayMockup())
+        while (needToWaitForRelayIpMockup())
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         using namespace nx::geo_ip;
         m_geoIpResolver->add(
-            m_relaysMockedUp.at(relayUrl(0)),
+            m_relayIpMockup.at(relayUrl(0)),
             Location(Continent::northAmerica));
 
         m_geoIpResolver->add(
-            m_relaysMockedUp.at(relayUrl(1)),
+            m_relayIpMockup.at(relayUrl(1)),
             Location(Continent::northAmerica));
 
         m_geoIpResolver->add(
-            m_relaysMockedUp.at(relayUrl(2)),
+            m_relayIpMockup.at(relayUrl(2)),
             Location(Continent::australia));
 
-        ASSERT_EQ(m_relayClusterSize, relayClusterSize());
-        for (int i = 0; i < m_relayClusterSize; ++i)
+        for (int i = 0; i < relayClusterSize(); ++i)
         {
             auto url = relayUrl(i);
-            auto publicIp = m_relaysMockedUp.at(url);
+            auto publicIp = m_relayIpMockup.at(url);
             NX_DEBUG(this, "relayUrl(%1): %2 mocked up to public ip: %3, location: %4",
                 i, url, publicIp, m_geoIpResolver->resolve(publicIp));
         }
@@ -339,7 +337,6 @@ private:
     }
 
 private:
-    int m_relayClusterSize;
     int m_clientRelayIndex;
     nx::utils::SubscriptionId m_nodeDiscoveredSubscriptionId =
         nx::utils::kInvalidSubscriptionId;
@@ -360,7 +357,7 @@ private:
 
     nx::geo_ip::test::MemoryResolver* m_geoIpResolver = nullptr;
 
-    std::map<nx::utils::Url, std::string/*publicIpAddress*/> m_relaysMockedUp;
+    std::map<nx::utils::Url, std::string/*publicIpAddress*/> m_relayIpMockup;
     int m_relayIpHostPart = 0;
     NotifyingRelayClusterClient* m_relayClusterClient = nullptr;
 
