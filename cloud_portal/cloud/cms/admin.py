@@ -341,9 +341,10 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         extra_context['allowed'] = self.template_allowed(request, customization_review)
 
         # Customization name should be visible in notes heading if developer has access or user has access
-        if UserGroupsToProductPermissions.check_customization_permission(request.user, customization_review.customization.name, 'cms.access_customization') or \
-                UserGroupsToProductPermissions.check_customization_permission(version.created_by, customization_review.customization.name, 'cms.access_cusomization'):
-            extra_context['customization_name'] = customization_review.customization.name
+        customization_name = customization_review.customization.name
+        if UserGroupsToProductPermissions.check_customization_access(request.user, customization_name) or \
+                UserGroupsToProductPermissions.check_customization_access(version.created_by, customization_name):
+            extra_context['customization_name'] = customization_name
 
         return super(ProductCustomizationReviewAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
@@ -351,10 +352,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
 
     def get_object(self, request, object_id, from_field=None):
         review = self.get_queryset(request).get(id=object_id)
-        if not UserGroupsToProductPermissions.check_customization_permission(request.user,
-                                                                             review.customization.name,
-                                                                             'cms.access_customization'):
-            review.notes = review.anon_notes(review.notes)
+        if not UserGroupsToProductPermissions.check_customization_access(request.user, review.customization.name):
             review.customization = None
         return review
 
@@ -423,8 +421,8 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         is_cloud_portal = customization_review.version.product.is_cloud_portal
         state = customization_review.state
 
-        can_access_customization = UserGroupsToProductPermissions.check_customization_permission(
-            request.user, customization_name, 'cms.access_customization'
+        can_access_customization = UserGroupsToProductPermissions.check_customization_access(
+            request.user, customization_name
         )
         can_force_update = UserGroupsToProductPermissions.check_customization_permission(
             request.user, customization_name, 'cms.force_update'
@@ -446,7 +444,9 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         allowed['accept'] = \
             not is_cloud_portal and state == ProductCustomizationReview.REVIEW_STATES.pending \
             and can_publish_or_accept
-        allowed['question'] = state == ProductCustomizationReview.REVIEW_STATES.pending and can_access_customization
+        allowed['question'] = \
+            (state == ProductCustomizationReview.REVIEW_STATES.pending or
+             state == ProductCustomizationReview.REVIEW_STATES.rejected) and can_access_customization
         allowed['delete'] = can_delete
         allowed['submit_row'] = True in allowed.values()
 

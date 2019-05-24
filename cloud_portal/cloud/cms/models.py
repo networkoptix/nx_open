@@ -632,13 +632,6 @@ class ProductCustomizationReview(models.Model):
     def can_preview_customization(self):
         return self.customization.name == settings.CUSTOMIZATION and self.version.product.product_type.can_preview
 
-    @staticmethod
-    def anon_notes(notes):
-        if notes:
-            for i, email in enumerate(list(set(re.findall('(.*@*):', notes)))):
-                notes = notes.replace(email, 'User {}'.format(i+1))
-        return notes
-
 
 class ExternalFile(models.Model):
     data_structure = models.ForeignKey(DataStructure, default=None, null=True, on_delete=models.CASCADE)

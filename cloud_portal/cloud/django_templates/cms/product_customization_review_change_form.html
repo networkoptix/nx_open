@@ -49,11 +49,7 @@
                             <td><span class="label {% if state == 'Rejected' %} label-danger {% elif state == "Accepted" %} label-success {% else %} label-default{% endif %}">{{ state }}</span></td>
                             <td> {% if access_customization %}{{ review.reviewed_by }}{% endif %}</td>
                             <td> {{ review.reviewed_date }}</td>
-                            {% if access_customization %}
                             <td> {{ review.notes | linebreaks }}</td>
-                            {% else %}
-                            <td> {{ review.notes | anon_notes | linebreaks }} </td>
-                            {% endif %}
                         </tr>
                     {% endfor %}
                     </tbody>

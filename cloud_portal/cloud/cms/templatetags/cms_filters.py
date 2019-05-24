@@ -73,9 +73,3 @@ def has_customization_permission(user, customization, permission):
 @register.filter
 def modulo(value, arg):
     return int(value) % int(arg)
-
-
-@register.filter
-def anon_notes(notes):
-    return ProductCustomizationReview.anon_notes(notes)
-
