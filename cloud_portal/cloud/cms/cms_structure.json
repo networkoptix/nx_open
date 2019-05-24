@@ -1044,7 +1044,7 @@
             "type": "html",
             "optional": true,
             "meta": {
-              "char_limit": 2000
+              "char_limit": 10000
             }
           },
           {
@@ -1066,11 +1066,11 @@
             "name": "overviewScreenshot1caption",
             "label": "Screenshot 1 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1092,11 +1092,11 @@
             "name": "overviewScreenshot2caption",
             "label": "Screenshot 2 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1118,11 +1118,11 @@
             "name": "overviewScreenshot3caption",
             "label": "Screenshot 3 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1144,11 +1144,11 @@
             "name": "overviewScreenshot4caption",
             "label": "Screenshot 4 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1170,11 +1170,11 @@
             "name": "overviewScreenshot5caption",
             "label": "Screenshot 5 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1196,11 +1196,11 @@
             "name": "overviewScreenshot6caption",
             "label": "Screenshot 6 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1222,11 +1222,11 @@
             "name": "overviewScreenshot7caption",
             "label": "Screenshot 7 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1248,11 +1248,11 @@
             "name": "overviewScreenshot8caption",
             "label": "Screenshot 8 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1274,11 +1274,11 @@
             "name": "overviewScreenshot9caption",
             "label": "Screenshot 9 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1300,11 +1300,11 @@
             "name": "overviewScreenshot10caption",
             "label": "Screenshot 10 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1326,11 +1326,11 @@
             "name": "overviewScreenshot11caption",
             "label": "Screenshot 11 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1352,11 +1352,11 @@
             "name": "overviewScreenshot12caption",
             "label": "Screenshot 12 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1378,11 +1378,11 @@
             "name": "overviewScreenshot13caption",
             "label": "Screenshot 13 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1404,11 +1404,11 @@
             "name": "overviewScreenshot14caption",
             "label": "Screenshot 14 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           },
           {
@@ -1430,11 +1430,11 @@
             "name": "overviewScreenshot15caption",
             "label": "Screenshot 15 caption",
             "value": "",
-            "description": "Screenshot caption (max. 100 characters).",
+            "description": "Screenshot caption.",
             "type": "text",
             "optional": true,
             "meta": {
-              "char_limit": 100
+              "char_limit": 1000
             }
           }
         ]
