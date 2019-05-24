@@ -26,8 +26,6 @@ public:
 
     virtual int attributeCount() const override;
 
-    virtual const char* auxiliaryData() const override;
-
     virtual Rect boundingBox() const override;
 
     virtual int64_t timestampUs() const override;
@@ -42,7 +40,6 @@ public:
     void setSubtype(const std::string& value);
     void addAttribute(nx::sdk::Ptr<Attribute> attribute);
     void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);
-    void setAuxiliaryData(std::string value);
     void setBoundingBox(const Rect& rect);
     void setTimestampUs(int64_t timestampUs);
 

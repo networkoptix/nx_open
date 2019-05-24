@@ -353,7 +353,6 @@ static IObjectMetadata* makeObjectMetadata(
     int objectIndex)
 {
     auto objectMetadata = new ObjectMetadata();
-    objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
     objectMetadata->setTypeId(objectTypeId);
     objectMetadata->setId(objectId);
     objectMetadata->setBoundingBox(

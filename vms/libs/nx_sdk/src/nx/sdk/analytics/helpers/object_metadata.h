@@ -24,7 +24,6 @@ public:
     virtual const char* subtype() const override;
     virtual const IAttribute* attribute(int index) const override;
     virtual int attributeCount() const override;
-    virtual const char* auxiliaryData() const override;
     virtual Rect boundingBox() const override;
 
     void setTypeId(std::string typeId);
@@ -33,7 +32,6 @@ public:
     void setSubtype(const std::string& value);
     void addAttribute(nx::sdk::Ptr<Attribute> attribute);
     void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);
-    void setAuxiliaryData(std::string value);
     void setBoundingBox(const Rect& rect);
 
 private:
@@ -42,7 +40,6 @@ private:
     Uuid m_id;
     std::string m_subtype;
     std::vector<nx::sdk::Ptr<Attribute>> m_attributes;
-    std::string m_auxiliaryData;
     Rect m_rect;
 };
 

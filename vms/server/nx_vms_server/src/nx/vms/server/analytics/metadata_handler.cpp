@@ -11,6 +11,7 @@
 
 #include <core/resource/security_cam_resource.h>
 #include <nx/vms/server/event/event_connector.h>
+#include <nx/vms/server/sdk_support/utils.h>
 #include <analytics/common/object_detection_metadata.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <media_server/media_server_module.h>
@@ -228,7 +229,7 @@ void MetadataHandler::handleEventMetadata(
         eventState,
         eventMetadata->caption(),
         eventMetadata->description(),
-        eventMetadata->auxiliaryData(),
+        nx::vms::server::sdk_support::attributesMap(eventMetadata),
         timestampUsec);
 
     if (m_resource->captureEvent(sdkEvent))

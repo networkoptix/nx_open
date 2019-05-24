@@ -28,21 +28,21 @@ bool belongsToGroup(const EventTypeDescriptor& descriptor, const QString& groupI
 } // namespace
 
 AnalyticsSdkEvent::AnalyticsSdkEvent(
-    const QnResourcePtr& resource,
-    const QnUuid& engineId,
-    const QString& eventTypeId,
+    QnResourcePtr resource,
+    QnUuid engineId,
+    QString eventTypeId,
     EventState toggleState,
-    const QString& caption,
-    const QString& description,
-    const QString& auxiliaryData,
+    QString caption,
+    QString description,
+    std::map<QString, QString> attributes,
     qint64 timeStampUsec)
     :
     base_type(EventType::analyticsSdkEvent, resource, toggleState, timeStampUsec),
     m_engineId(engineId),
-    m_eventTypeId(eventTypeId),
-    m_caption(caption),
-    m_description(description),
-    m_auxiliaryData(auxiliaryData)
+    m_eventTypeId(std::move(eventTypeId)),
+    m_caption(std::move(caption)),
+    m_description(std::move(description)),
+    m_attributes(std::move(attributes))
 {
 }
 
@@ -93,9 +93,17 @@ bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
         && checkForKeywords(m_description, params.description);
 }
 
-QString AnalyticsSdkEvent::auxiliaryData() const
+const std::map<QString, QString>& AnalyticsSdkEvent::attributes() const
 {
-    return m_auxiliaryData;
+    return m_attributes;
+}
+
+const std::optional<QString> AnalyticsSdkEvent::attribute(const QString& attributeName) const
+{
+    if (auto it = m_attributes.find(attributeName); it != m_attributes.cend())
+        return it->second;
+
+    return std::nullopt;
 }
 
 } // namespace event
