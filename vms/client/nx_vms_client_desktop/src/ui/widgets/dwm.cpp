@@ -15,7 +15,6 @@
 #include <QtWidgets/private/qwidget_p.h>
 
 #include <qt_windows.h>
-#include <utils/qt5port_win.h>
 
 #define NOMINMAX
 #include <Windows.h>
@@ -76,6 +75,15 @@ typedef HRESULT (WINAPI *PtrDwmGetColorizationColor)(DWORD *pcrColorization, BOO
 typedef BOOL (WINAPI *PtrDwmDefWindowProc)(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT *plResult);
 typedef HRESULT (WINAPI *PtrDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
 #endif // QN_HAS_DWM
+
+namespace {
+
+HWND widToHwnd(WId id)
+{
+    return reinterpret_cast<HWND>(id);
+}
+
+} // namespace
 
 enum QnDwmInvocation {
     AdjustPositionInvocation = 0x7591
