@@ -742,9 +742,6 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         for(const QnStorageResourcePtr &storage: modifiedStorages)
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
 
-        serverModule()->normalStorageManager()->initDone();
-        serverModule()->backupStorageManager()->initDone();
-
         if (m_mediaServer->metadataStorageId().isNull() && !QFile::exists(getMetadataDatabaseName()))
         {
             m_mediaServer->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(m_mediaServer));
@@ -753,6 +750,9 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             saveMediaServerUserAttributes(ec2Connection, userAttrsData);
         }
         initializeAnalyticsEvents();
+
+        serverModule()->normalStorageManager()->initDone();
+        serverModule()->backupStorageManager()->initDone();
     });
 }
 
@@ -4081,6 +4081,8 @@ QnUuid MediaServerProcess::selectDefaultStorageForAnalyticsEvents(QnMediaServerR
             if (fileStorage->isLocal()
                 && !fileStorage->isSystem()
                 && fileStorage->isUsedForWriting()
+                && storage->initOrUpdate() == Qn::StorageInit_Ok
+                && fileStorage->isWritable()
                 && fileStorage->getTotalSpace() > maxTotalSpace)
             {
                 maxTotalSpace = fileStorage->getTotalSpace();
