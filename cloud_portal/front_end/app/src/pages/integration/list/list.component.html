@@ -19,7 +19,7 @@
                          [style.backgroundImage]="'url(' + plugin.information.logo + ')'">
                     </div>
                     <div class="card--header-info">
-                        <div class="version">v. {{ plugin.information.version }}</div>
+                        <div class="version">v. {{ plugin.versionDetails.version }}</div>
                         <div class="platforms">
                             <div *ngFor="let icon of plugin.information.platforms.icons">
                                 <img [src]="icon.src">

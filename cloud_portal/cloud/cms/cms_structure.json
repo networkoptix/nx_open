@@ -829,72 +829,6 @@
     "single_customization": false,
     "contexts": [
       {
-        "name": "company",
-        "label": "Company",
-        "description": "General information about the company that appears in the rightmost column of the integration's page.",
-        "translatable": false,
-        "values": [
-          {
-            "name": "companyName",
-            "label": "Company Name",
-            "value": "",
-            "description": "A company name. The company's name is visible in the detailed view page for the integration in the rightmost column.",
-            "type": "text",
-            "optional": false,
-            "meta": {
-              "char_limit": 64
-            }
-          },
-          {
-            "name": "companyInfo",
-            "label": "Company Info",
-            "value": "",
-            "description": "A short description about the company. The company's info is visible in the detailed view page for the integration in the rightmost column.",
-            "type": "long_text",
-            "optional": true,
-            "meta": {
-              "char_limit": 250
-            }
-          },
-          {
-            "name": "companyLogo",
-            "label": "Company Logo",
-            "value": "",
-            "description": "Company logo.<br>Must have a transparent background.",
-            "type": "external_image",
-            "optional": true,
-            "meta": {
-              "size": 512000,
-              "format": "png",
-              "height_le": 250,
-              "width_le": 500
-            }
-          },
-          {
-            "name": "companyWeb",
-            "label": "Company URL",
-            "value": "",
-            "description": "Company web address.",
-            "type": "text",
-            "optional": true,
-            "meta": {
-              "regex": "^https?:\\/\\/([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$"
-            }
-          },
-          {
-            "name": "companyWebTitle",
-            "label": "Company URL Title",
-            "value": "",
-            "description": "Human friendly title for company's web address.",
-            "type": "text",
-            "optional": true,
-            "meta": {
-              "char_limit": 64
-            }
-          }
-        ]
-      },
-      {
         "name": "information",
         "old_name": "Information",
         "label": "Information",
@@ -944,20 +878,6 @@
             }
           },
           {
-            "name": "testedVersions",
-            "label": "Tested software (VMS) versions",
-            "value": "",
-            "description": "Latest supported version",
-            "type": "select",
-            "meta": {
-              "multi": true,
-              "options": [
-                "4.0.0",
-                "3.2"
-              ]
-            }
-          },
-          {
             "name": "tags",
             "label": "Tags",
             "value": "",
@@ -998,23 +918,6 @@
                 "MacOS"
               ]
             }
-          },
-          {
-            "name": "version",
-            "label": "Integration version",
-            "value": "",
-            "description": "",
-            "type": "text",
-            "optional": true
-          },
-          {
-            "name": "changelog",
-            "label": "Version Changelog",
-            "value": "",
-            "description": "This information is only visible to reviews and not users.",
-            "type": "html",
-            "optional": true,
-            "public": false
           }
         ]
       },
@@ -1442,7 +1345,7 @@
       {
         "name": "instructions",
         "old_name": "Instructions",
-        "label": "Instructions",
+        "label": "How to install?",
         "description": "Instructions for setting up and/or using your integration. Here you can include a video, images, and text. The instructions block will appear either in the middle column of the integrations's page.",
         "translatable": false,
         "values": [
@@ -1630,6 +1533,114 @@
         ]
       },
       {
+        "name": "company",
+        "label": "Company",
+        "description": "General information about the company that appears in the rightmost column of the integration's page.",
+        "translatable": false,
+        "values": [
+          {
+            "name": "companyName",
+            "label": "Company Name",
+            "value": "",
+            "description": "A company name. The company's name is visible in the detailed view page for the integration in the rightmost column.",
+            "type": "text",
+            "optional": false,
+            "meta": {
+              "char_limit": 64
+            }
+          },
+          {
+            "name": "companyInfo",
+            "label": "Company Info",
+            "value": "",
+            "description": "A short description about the company. The company's info is visible in the detailed view page for the integration in the rightmost column.",
+            "type": "long_text",
+            "optional": true,
+            "meta": {
+              "char_limit": 250
+            }
+          },
+          {
+            "name": "companyLogo",
+            "label": "Company Logo",
+            "value": "",
+            "description": "Company logo.<br>Must have a transparent background.",
+            "type": "external_image",
+            "optional": true,
+            "meta": {
+              "size": 512000,
+              "format": "png",
+              "height_le": 250,
+              "width_le": 500
+            }
+          },
+          {
+            "name": "companyWeb",
+            "label": "Company URL",
+            "value": "",
+            "description": "Company web address.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "regex": "^https?:\\/\\/([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$"
+            }
+          },
+          {
+            "name": "companyWebTitle",
+            "label": "Company URL Title",
+            "value": "",
+            "description": "Human friendly title for company's web address.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 64
+            }
+          }
+        ]
+      },
+      {
+        "name": "support",
+        "old_name": "Support",
+        "label": "Support",
+        "description": "Support information for the integration that appear on the rightmost column of the integration's page.",
+        "translatable": false,
+        "values": [
+          {
+            "name": "supportEmail",
+            "label": "Support E-mail",
+            "value": "",
+            "description": "E-mail customers should use for support.",
+            "type": "text",
+            "optional": false,
+            "meta": {
+              "regex": "^[a-zA-Z0-9\\.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$"
+            }
+          },
+          {
+            "name": "supportPhone",
+            "label": "Support phone",
+            "value": "",
+            "description": "Phone number customers should use for support. (Ex. (573) 884-1878 | +1 (573) 884-1878 | +(591) 7433433 | 0591 74339296 | +1 555 555 5554)",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "regex": "^(([+]?[(]?[0-9]{1,3}[)]?)|([(]?[0-9]{4}[)]?))\\s*[)]?[-\\s\\.]?[(]?[0-9]{1,3}[)]?([-\\s\\.]?[0-9]{3})([-\\s\\.]?[0-9]{3,4})$"
+            }
+          },
+          {
+            "name": "supportWeb",
+            "label": "Support URL",
+            "value": "",
+            "description": "Web address customers should use for support.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "regex": "^https?:\\/\\/([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$"
+            }
+          }
+        ]
+      },
+      {
         "name": "downloadFiles",
         "old_name": "Download Files",
         "label": "Download Files",
@@ -1794,45 +1805,42 @@
           }
         ]
       },
-      {
-        "name": "support",
-        "old_name": "Support",
-        "label": "Support",
-        "description": "Support information for the integration that appear on the rightmost column of the integration's page.",
+      {"name":  "versionDetails",
+        "old_name": "Version Details",
+        "label": "Version Details",
+        "description": "Details about supported software version, plugin version and changelog.",
         "translatable": false,
         "values": [
           {
-            "name": "supportEmail",
-            "label": "Support e-mail",
+            "name": "testedVersions",
+            "label": "Tested software (VMS) versions",
             "value": "",
-            "description": "E-mail customers should use for support.",
-            "type": "text",
-            "optional": false,
+            "description": "Latest supported version",
+            "type": "select",
             "meta": {
-              "regex": "^[a-zA-Z0-9\\.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$"
+              "multi": true,
+              "options": [
+                "4.0.0",
+                "3.2"
+              ]
             }
           },
           {
-            "name": "supportPhone",
-            "label": "Support phone",
+            "name": "version",
+            "label": "Integration version",
             "value": "",
-            "description": "Phone number customers should use for support. (Ex. (573) 884-1878 | +1 (573) 884-1878 | +(591) 7433433 | 0591 74339296 | +1 555 555 5554)",
+            "description": "",
             "type": "text",
-            "optional": true,
-            "meta": {
-              "regex": "^(([+]?[(]?[0-9]{1,3}[)]?)|([(]?[0-9]{4}[)]?))\\s*[)]?[-\\s\\.]?[(]?[0-9]{1,3}[)]?([-\\s\\.]?[0-9]{3})([-\\s\\.]?[0-9]{3,4})$"
-            }
+            "optional": true
           },
           {
-            "name": "supportWeb",
-            "label": "Support url",
+            "name": "changelog",
+            "label": "Version Changelog",
             "value": "",
-            "description": "Web address customers should use for support.",
-            "type": "text",
+            "description": "This information is only visible to reviews and not users.",
+            "type": "html",
             "optional": true,
-            "meta": {
-              "regex": "^https?:\\/\\/([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$"
-            }
+            "public": false
           }
         ]
       }
