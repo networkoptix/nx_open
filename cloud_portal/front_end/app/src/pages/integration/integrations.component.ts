@@ -131,6 +131,7 @@ export class NxIntegrationsComponent implements OnInit {
     }
 
     modelChanged(searchModel): void {
+        this.filterModel.query = searchModel.query;
         this.setFilter();
     }
 
