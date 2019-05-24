@@ -13,6 +13,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/common/read_only.h>
+#include <ui/style/custom_style.h>
 #include <utils/common/html.h>
 #include <utils/common/event_processors.h>
 #include <utils/license_usage_helper.h>
@@ -307,6 +308,9 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         int(CameraSettingsTab::expert),
         new CameraExpertSettingsWidget(d->store, ui->tabWidget),
         tr("Expert"));
+
+    autoResizePagesToContents(ui->tabWidget, QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred),
+        true);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(
