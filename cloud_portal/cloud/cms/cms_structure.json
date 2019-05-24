@@ -1816,11 +1816,11 @@
             "name": "supportPhone",
             "label": "Support phone",
             "value": "",
-            "description": "Phone number customers should use for support. (Ex. (573) 884-1878 | 573-884-1234 | 573 234 1256)",
+            "description": "Phone number customers should use for support. (Ex. (573) 884-1878 | +1 (573) 884-1878 | +(591) 7433433 | 0591 74339296 | +1 555 555 5554)",
             "type": "text",
             "optional": true,
             "meta": {
-              "regex": "^(?[\\d]{3})?[\\s-]?[\\d]{3}[\\s-]?[\\d]{4}$"
+              "regex": "^(([+]?[(]?[0-9]{1,3}[)]?)|([(]?[0-9]{4}[)]?))\\s*[)]?[-\\s\\.]?[(]?[0-9]{1,3}[)]?([-\\s\\.]?[0-9]{3})([-\\s\\.]?[0-9]{3,4})$"
             }
           },
           {
