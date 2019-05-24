@@ -119,6 +119,13 @@ def rename_file(instance, filename):
     return os.path.join(product_name, file_info, filename)
 
 
+def get_integration_type():
+    integration = ProductType.objects.filter(type=ProductType.PRODUCT_TYPES.integration).first()
+    if integration:
+        return integration.id
+    return None
+
+
 # CMS structure (data structure). Only developers can change that
 class Language(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -218,7 +225,7 @@ class Product(models.Model):
         settings.AUTH_USER_MODEL, null=True,
         blank=True, related_name='created_%(class)s', on_delete=models.CASCADE)
     customizations = models.ManyToManyField(Customization, default=None, blank=True)
-    product_type = models.ForeignKey(ProductType, default=None, null=True, on_delete=models.CASCADE)
+    product_type = models.ForeignKey(ProductType, default=get_integration_type, null=True, on_delete=models.CASCADE)
 
     PREVIEW_STATUS = Choices((0, 'draft', 'draft'), (1, 'review', 'review'))
     preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
