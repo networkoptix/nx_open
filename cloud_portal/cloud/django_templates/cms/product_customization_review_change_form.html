@@ -99,6 +99,8 @@
                                    download>Download</a>
                             {% elif data_structure.type == DataStructureTypes.external_file %}
                                 <a href="{{ record }}">Download</a>
+                            {% elif data_structure.type == DataStructureTypes.select and 'multi' in data_structure.meta_settings and data_structure.meta_settings.multi %}
+                                <div class="show-html">{{ record|nice_multiselect }}</div>
                             {% else %}
                                 <div class="show-html">{{ record|safe }}</div>
                             {% endif %}

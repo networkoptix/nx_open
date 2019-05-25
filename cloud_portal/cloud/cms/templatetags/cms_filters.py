@@ -1,6 +1,8 @@
 from django import template
 from ..models import *
 
+import json
+
 register = template.Library()
 
 
@@ -73,3 +75,8 @@ def has_customization_permission(user, customization, permission):
 @register.filter
 def modulo(value, arg):
     return int(value) % int(arg)
+
+
+@register.filter
+def nice_multiselect(multiselect_record):
+    return ', '.join(json.loads(multiselect_record.value))
