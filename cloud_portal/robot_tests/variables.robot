@@ -165,11 +165,12 @@ ${MERGE DIALOG}                       //nx-modal-merge-content
 ${MERGE FORM}                         //form[@name="mergeForm"]
 ${MERGE SYSTEM DROPDOWN}              ${MERGE DIALOG}//button[@id="genericSelect"]
 ${MERGE X BUTTON}                     ${MERGE DIALOG}//button[@class="close"]
-${MERGE OK BUTTON}                    ${MERGE DIALOG}//button[@class="btn btn-primary" and contains(text(),"${OK TEXT}")]
+${MERGE OK BUTTON}                    ${MERGE DIALOG}//button[contains(@class,"btn btn-primary") and contains(text(),"${OK TEXT}")]
 ${MERGE CANCEL BUTTON}                ${MERGE DIALOG}//button[@class="btn btn-default"]
 ${MERGE BUTTON MODAL}                 ${MERGE DIALOG}//button[@class="btn btn-primary" and contains(text(),"${MERGE SYSTEMS TEXT}")]
 ${MERGE PASSWORD INPUT}               ${MERGE DIALOG}//input[@id="mergePassword"]
 ${CURRENTLY MERGING CARD}             //div[@ng-if="currentlyMerging"]
+${MERGE NOT OWNER MESSAGE 2}          ${MERGE DIALOG}//p[@class='help-block-no-height'][2]
 
 
 #Disconnect from cloud portal

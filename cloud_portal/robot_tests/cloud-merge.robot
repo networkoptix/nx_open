@@ -2,9 +2,9 @@
 Resource          resource.robot
 Resource          APIresource.robot
 Test Setup        Restart
-Test Teardown     Remove containers
+Test Teardown     Run Keyword If Test Failed    reset state
 Suite Setup       Startup
-Suite Teardown    Close All Browsers
+Suite Teardown    Remove Containers
 Force Tags        Threaded
 
 *** Variables ***
@@ -91,6 +91,7 @@ Remove containers
     Stop Containers
     Prune Containers
     Remove Images
+    Close All Browsers
 
 Startup
     Open Browser and go to URL    ${url}
@@ -98,6 +99,8 @@ Startup
     Set Suite Variable    ${image}    ${image}
 
 Restart
+    Stop containers
+    Prune Containers
     Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
     Register Keyword To Run On Failure    Failure Tasks
@@ -105,21 +108,110 @@ Restart
     Go To    ${url}
     Validate Log Out
 
-*** Test Cases ***
-# Only one system connected to Cloud Account
-#     Create system and attach to cloud    ${EMAIL MERGE OWNER 1}
-#     log in    ${EMAIL MERGE OWNER 1}    ${password}
-#     Validate Log in
-#     Run keyword and expect error    *    Wait until element is visible    ${MERGE BUTTON SYSTEM}    5
-#     Stop Container
+Reset state
+    Stop Containers
+    Prune Containers
+    Close Browser
+    Open Browser and go to URL    ${url}
+    Log In    ${EMAIL MERGE OWNER 1}    ${password}
+    Validate Log In
+    ${count}    Run Keyword And Ignore Error    Get Element Count    ${SYSTEMS TILE}
+    FOR    ${idx}    IN RANGE   ${count}[1]-1
+        Click Element    ${SYSTEMS TILE}
+        Disconnect from cloud
+    END
+    Disconnect from cloud
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL MERGE OWNER 2}    ${password}
+    Validate Log In
+    ${count}    Run Keyword And Ignore Error    Get Element Count    ${SYSTEMS TILE}
+    FOR    ${idx}    IN RANGE   ${count}[1]-1
+        Click Element    ${SYSTEMS TILE}
+        Disconnect from cloud
+    END
+    Disconnect from cloud
 
-# 2 Systems: 1 as Owner & 1 as non-Owner
-#     Build Image    image1
-#     Create system and attach to cloud    ${EMAIL MERGE OWNER 2}    image1
-#     Create system and attach to cloud    ${EMAIL MERGE OWNER 1}    image2
+
+*** Test Cases ***
+Only one system connected to Cloud Account
+    ${user}    Set Variable    ${EMAIL MERGE OWNER 1}
+    ${auth}=    Create List    ${user}    ${password}
+    Prepare System    ${user}    ${auth}    ${image}    7001    API made system 1    ${users dict 1}
+    log in    ${EMAIL MERGE OWNER 1}    ${password}
+    Validate Log in
+    Run keyword and expect error    *    Wait until element is visible    ${MERGE BUTTON SYSTEM}    5
+    Disconnect from cloud
+
+2 Systems: 1 as Owner & 1 as non-Owner
+    ${auth1}=    Create List    ${EMAIL MERGE OWNER 1}    ${password}
+    Prepare System    ${EMAIL MERGE OWNER 1}    ${auth1}    ${image}    7001    API made system 1    ${users dict 1}
+    ${auth2}=    Create List    ${EMAIL MERGE OWNER 2}    ${password}
+    Prepare System    ${EMAIL MERGE OWNER 2}    ${auth2}    ${image}    7003    API made system 2    ${users dict 2}
+    log in    ${EMAIL MERGE OWNER 1}    ${password}
+    Validate Log in
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+    Share To    ${EMAIL MERGE OWNER 2}    Administrator
+    Log Out
+    Log In    ${EMAIL MERGE OWNER 2}    ${password}
+    Validate Log In
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
+    Wait Until Element Is Visible    ${MERGE BUTTON SYSTEM}
+    Wait Until Element Is Enabled    ${MERGE BUTTON SYSTEM}    180
+    Click Button    ${MERGE BUTTON SYSTEM}
+    Sleep    2
+    Get Text    ${MERGE DIALOG}//p[contains(text(),"Connect System you want to merge with this one to")]
+    Wait Until Elements Are Visible    ${MERGE NOT OWNER MESSAGE 2}    ${MERGE DIALOG}//p[contains(text(),'${MERGE NOT OWNER MESSAGE 1 TEXT}')]    ${MERGE OK BUTTON}    ${MERGE X BUTTON}
+    Element Text Should Be    ${MERGE NOT OWNER MESSAGE 2}    ${MERGE NOT OWNER MESSAGE 2 TEXT}
+    Click Button    ${MERGE OK BUTTON}
+    Wait Until Element Is Not Visible    ${MERGE DIALOG}
+
+    Click Button    ${MERGE BUTTON SYSTEM}
+    Sleep    2
+    Wait Until Elements Are Visible    ${MERGE NOT OWNER MESSAGE 2}    ${MERGE DIALOG}//p[contains(text(),'${MERGE NOT OWNER MESSAGE 1 TEXT}')]    ${MERGE OK BUTTON}    ${MERGE X BUTTON}
+    Click Button    ${MERGE X BUTTON}
+    Wait Until Element Is Not Visible    ${MERGE DIALOG}
+
+    Click Button    ${MERGE BUTTON SYSTEM}
+    Sleep    2
+    Wait Until Elements Are Visible    ${MERGE NOT OWNER MESSAGE 2}    ${MERGE DIALOG}//p[contains(text(),'${MERGE NOT OWNER MESSAGE 1 TEXT}')]    ${MERGE OK BUTTON}    ${MERGE X BUTTON}
+    Press Key    ${MERGE OK BUTTON}    ${ESCAPE}
+    Wait Until Element Is Not Visible    ${MERGE DIALOG}
+
+    Disconnect from cloud
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL MERGE OWNER 1}    ${password}
+    Validate Log In
+    Disconnect from cloud
+
+2 Systems: 1 online and 1 offline
+    ${user}    Set Variable    ${EMAIL MERGE OWNER 1}
+    ${auth}=    Create List    ${user}    ${password}
+    Prepare System    ${user}    ${auth}    ${image}    7001    API made system 1    ${users dict 1}
+    Stop Containers
+    Prune Containers
+    Prepare System    ${user}    ${auth}    ${image}    7003    API made system 2    ${users dict 2}
+    log in    ${user}    ${password}
+    Validate Log in
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
+    Verify In System    API made system 2
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+    Wait Until Element Is Visible    ${MERGE BUTTON SYSTEM}
+    Wait Until Element Is Enabled    ${MERGE BUTTON SYSTEM}    180
+    Click Button    ${MERGE BUTTON SYSTEM}
+    Wait until elements are visible    ${MERGE FORM}    ${MERGE SYSTEM DROPDOWN}    ${MERGE OK BUTTON}    ${MERGE CANCEL BUTTON}
+    Click Button    ${MERGE OK BUTTON}
+    ${error message}    Replace String    ${CANNOT MERGE WITH OFFLINE SYSTEM TEXT}    %SYSTEM NAME%    API made system 1
+    Wait Until Element Is Visible    ${MERGE FORM}//p[contains(@class,"warning-label") and contains(text(),"${error message}")]
+    Click Button    ${MERGE CANCEL BUTTON}
+    Disconnect from cloud
+    Disconnect from cloud
 
 From secondary system merge to primary with no other systems
-    ${user}    Set Variable    ${EMAIL MERGE OWNER 2}
+    ${user}    Set Variable    ${EMAIL MERGE OWNER 1}
     ${auth}=    Create List    ${user}    ${password}
     Prepare System    ${user}    ${auth}    ${image}    7001    API made system 1    ${users dict 1}    network=host
     Prepare System    ${user}    ${auth}    ${image}    7003    API made system 2    ${users dict 2}
@@ -132,7 +224,6 @@ From secondary system merge to primary with no other systems
     Validate Log In
     Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
     Verify In System    API made system 2
-    Capture Page Screenshot    system2.png
     Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
 
