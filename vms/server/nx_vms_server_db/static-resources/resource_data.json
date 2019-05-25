@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.55",
+    "version": "1.0.1.56",
     "data": [
         {
             "keys": [
@@ -2123,6 +2123,13 @@
                 "Pelco|IMM12036"
             ],
             "onvifVendorSubtype": "PelcoOptera"
+        },
+        {
+            "keys": [
+                "DigitalWatchdog|*",
+                "Digital_Watchdog|*"
+            ],
+            "onvifVendorSubtype": "Digital Watchdog"
         },
         {
             "keys": [
