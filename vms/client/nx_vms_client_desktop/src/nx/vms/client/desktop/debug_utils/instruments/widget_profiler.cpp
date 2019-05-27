@@ -1,7 +1,8 @@
 #include "widget_profiler.h"
 
-#include <QtWidgets/QApplication>
 #include <QtCore/QFile>
+#include <QtCore/QTextStream>
+#include <QtWidgets/QApplication>
 
 namespace nx::vms::client::desktop {
 

@@ -207,8 +207,6 @@ bool DebugInfoInstrument::paintEvent(QWidget* /*viewport*/, QPaintEvent* /*event
         if (d->gdiHandleCount || d->userHandleCount || d->threadCount)
         {
             QStringList logMessageLines;
-            logMessageLines.append("Client profiling info:");
-
             if (d->gdiHandleCount)
                 logMessageLines.append(QString("GDI: %1").arg(*d->gdiHandleCount));
             if (d->userHandleCount)
@@ -216,7 +214,8 @@ bool DebugInfoInstrument::paintEvent(QWidget* /*viewport*/, QPaintEvent* /*event
             if (d->threadCount)
                 logMessageLines.append(QString("Threads: %1").arg(*d->threadCount));
 
-            NX_INFO(this, lm(logMessageLines.join("\n")));
+            NX_INFO(this, lm(QString("Client profiling info: %1")
+                .arg(logMessageLines.join(", "))));
             d->logTimer.restart();
         }
     }

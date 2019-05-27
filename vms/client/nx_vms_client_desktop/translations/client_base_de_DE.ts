@@ -2888,10 +2888,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>44,1 kHz und 48 kHz Audioformate werden vom Tonaufnahmegerät nicht unterstützt! Bitte wählen Sie ein anderes Audiogerät oder &quot;Keine&quot; in den Aufnahmeeinstellungen.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation>Konfigurierter Codec: %1 nicht gefunden, h263p wird verwendet</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -8711,10 +8707,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Update abbrechen und alle heruntergeladenen Daten löschen?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Aktualisierungspakete konnten nicht auf einige Server heruntergeladen werden</translation>
-    </message>
-    <message>
       <source>There was an error while installing updates:</source>
       <translation>Beim Installieren der Updates ist ein Fehler aufgetreten:</translation>
     </message>
@@ -8724,7 +8716,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+      <translation>Update abgeschlossen, aber einige Komponenten haben ein Update nicht bestanden</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
@@ -8733,6 +8725,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>%1 will be restarted to the updated version.</source>
       <translation>%1 wird auf die aktualisierte Version neu gestartet werden.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
     </message>
   </context>
   <context>
@@ -8777,7 +8773,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Unbekanntes Plugin-Diagnoseereignis</translation>
     </message>
   </context>
   <context>
@@ -9836,28 +9832,26 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Dieser Build dient nur zu Testzwecken.</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data</source>
-      <translation>Bestätigen Sie den Speicherort, um die Analysedaten zu speichern</translation>
-    </message>
-    <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>Die Analytics-Datenbank sollte lokal gespeichert werden und kann bis zu hundert Gigabyte belegen.
-
-Sobald der Speicherort für Analysedaten ausgewählt ist, kann dieser nicht einfach geändert werden, ohne dass die vorhandenen Daten verloren gehen. Wir empfehlen, den Speicherort sorgfältig auszuwählen und keine Systempartition zu verwenden, um schwerwiegende Systemstörungen zu vermeiden.
-
-Sie können den Speicherort auf der Registerkarte &quot;Speicherverwaltung&quot; im Dialogfeld Servereinstellungen ändern.</translation>
-    </message>
-    <message>
       <source>Open Server Settings</source>
       <translation>Öffnen Sie die Servereinstellungen</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>Ok</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>
