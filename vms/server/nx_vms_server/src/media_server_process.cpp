@@ -4337,6 +4337,7 @@ static QByteArray loadDataFromUrl(nx::utils::Url url)
 {
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setResponseReadTimeout(kResourceDataReadingTimeout);
+    httpClient->setMessageBodyReadTimeout(kResourceDataReadingTimeout);
     if (httpClient->doGet(url)
         && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
     {
