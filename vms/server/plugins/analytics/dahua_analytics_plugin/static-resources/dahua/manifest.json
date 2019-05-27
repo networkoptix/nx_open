@@ -199,7 +199,7 @@
     "ignoredEventTypes": [
         {
             "id": "nx.dahua.CrowdDetection",
-            "name": "Crowd detection (Crowd dencity overrun detection)",
+            "name": "Crowd detection (Crowd density overrun detection)",
             "internalName": "CrowdDetection",
             "description": "Crowd dencity overrun %1",
             "positiveState": "has been detected",
