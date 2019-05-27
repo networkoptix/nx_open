@@ -1,6 +1,7 @@
 #include "analytics_search_widget.h"
 
 #include <algorithm>
+#include <chrono>
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QPointer>
@@ -35,9 +36,12 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/utils/pending_operation.h>
 #include <nx/utils/string.h>
 
 namespace nx::vms::client::desktop {
+
+using namespace std::chrono;
 
 // ------------------------------------------------------------------------------------------------
 // AnalyticsSearchWidget::Private
@@ -84,6 +88,7 @@ private:
     QMenu* const m_objectTypeMenu;
     QPointer<QAction> m_defaultAction;
     bool m_areaSelectionEnabled = false;
+    nx::utils::PendingOperation m_updateObjectTypesOperation;
 
     using ObjectTypeDescriptors = std::map<QString, nx::vms::api::analytics::ObjectTypeDescriptor>;
     struct EngineInfo
@@ -178,6 +183,15 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
 {
     NX_CRITICAL(m_model);
 
+    m_updateObjectTypesOperation.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
+    m_updateObjectTypesOperation.setInterval(1ms);
+    m_updateObjectTypesOperation.setCallback(
+        [this]()
+        {
+            this->q->updateAllowance();
+            updateTypeMenu();
+        });
+
     setupTypeSelection();
     setupAreaSelection();
 
@@ -246,8 +260,7 @@ void AnalyticsSearchWidget::Private::resetFilters()
 
 void AnalyticsSearchWidget::Private::updateAvailableObjectTypes()
 {
-    q->updateAllowance();
-    updateTypeMenu();
+    m_updateObjectTypesOperation.requestOperation();
 }
 
 void AnalyticsSearchWidget::Private::setupTypeSelection()
