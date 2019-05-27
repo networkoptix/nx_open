@@ -301,11 +301,13 @@ static void fixServerUrlSchemeSecurity(nx::utils::Url* url, const QnGlobalSettin
     namespace http = nx::network::http;
     namespace rtsp = nx::network::rtsp;
 
-    // TODO: Set always to ssl?
-    if (settings->isTrafficEncriptionForced() && url->scheme() == http::kUrlSchemeName)
+    // NOTE: ssl should be always used between servers.
+    if (url->scheme() == http::kUrlSchemeName)
         url->setScheme(http::kSecureUrlSchemeName);
     else if (settings->isVideoTrafficEncriptionForced() && url->scheme() == rtsp::kUrlSchemeName)
         url->setScheme(rtsp::kSecureUrlSchemeName);
+    else
+        NX_DEBUG(typeid(ProxyConnectionProcessor), "Got unexpected scheme in URL [%1]", *url);
 }
 
 bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRoute& dstRoute)
