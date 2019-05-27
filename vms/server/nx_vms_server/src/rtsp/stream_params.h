@@ -7,7 +7,7 @@ namespace nx::rtsp {
 
 class StreamParams {
 public:
-    bool processRequest(const network::http::Request& request, const QString& defaultVideoCodec);
+    bool parseRequest(const network::http::Request& request, const QString& defaultVideoCodec);
     QString getParseError() { return m_error; }
 
     QSize resolution() { return m_resolution; }

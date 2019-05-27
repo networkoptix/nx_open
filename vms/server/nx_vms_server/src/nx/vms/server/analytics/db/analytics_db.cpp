@@ -205,6 +205,8 @@ void EventsStorage::lookup(
 {
     QnMutexLocker lock(&m_dbControllerMutex);
 
+    NX_DEBUG(this, "Selecting objects. Filter %1", filter);
+
     if (!m_dbController)
     {
         NX_DEBUG(this, "Attempt to look up objects in non-initialized analytics DB");
@@ -234,6 +236,8 @@ void EventsStorage::lookup(
         [this, result, completionHandler = std::move(completionHandler)](
             sql::DBResult resultCode)
         {
+            NX_DEBUG(this, "%1 objects selected. Result code %2", result->size(), resultCode);
+
             completionHandler(
                 dbResultToResultCode(resultCode),
                 std::move(*result));
@@ -246,6 +250,9 @@ void EventsStorage::lookupTimePeriods(
     TimePeriodsLookupCompletionHandler completionHandler)
 {
     QnMutexLocker lock(&m_dbControllerMutex);
+
+    NX_DEBUG(this, "Selecting time periods. Filter %1, detail level %2",
+        filter, options.detailLevel);
 
     if (!m_dbController)
     {
@@ -279,6 +286,8 @@ void EventsStorage::lookupTimePeriods(
         [this, result, completionHandler = std::move(completionHandler)](
             sql::DBResult resultCode)
         {
+            NX_DEBUG(this, "%1 time periods selected. Result code %2", result->size(), resultCode);
+
             completionHandler(
                 dbResultToResultCode(resultCode),
                 std::move(*result));
