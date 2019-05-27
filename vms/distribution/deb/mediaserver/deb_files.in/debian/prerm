@@ -53,7 +53,11 @@ then
     db_go || true
     db_get @deb.customization.company.name@-mediaserver/removeDatabase
 
-    $CFG_HELPER sysIdTime -d
+    # the following check is needed for the correct uninstallation
+    # when the media server folder or some files were removed manually
+    if [ -f "$CFG_HELPER" ]; then
+        $CFG_HELPER sysIdTime -d
+    fi
 
     if [ "$RET" = "$REMOVE" ]
     then
