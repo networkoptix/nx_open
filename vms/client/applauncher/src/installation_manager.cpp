@@ -127,7 +127,6 @@ void InstallationManager::updateInstalledVersionsInformation()
 	        if (installation.isNull())
 	            return;
 
-            NX_DEBUG(this, "Compatibility version %1 was not verified", version);
             installation->setVersion(nx::utils::SoftwareVersion(version));
 	        installations.insert(installation->version(), installation);
 
