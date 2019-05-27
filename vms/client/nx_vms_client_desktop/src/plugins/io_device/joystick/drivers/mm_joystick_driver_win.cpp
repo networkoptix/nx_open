@@ -1,6 +1,7 @@
+#include "mm_joystick_driver_win.h"
+
 #if defined(Q_OS_WIN)
 
-#include "mm_joystick_driver_win.h"
 #include <plugins/io_device/joystick/joystick_manager.h>
 
 #include <plugins/io_device/joystick/generic_joystick.h>

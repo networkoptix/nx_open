@@ -2,6 +2,7 @@
 
 #include <future>
 #include <set>
+#include <map>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>

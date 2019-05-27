@@ -15,6 +15,7 @@
 
 #define NOMINMAX
 #include <Windows.h>
+#include <iphlpapi.h>
 #include <pdh.h>
 #include <pdhmsg.h>
 

@@ -5,8 +5,8 @@
 #include <vector>
 
 // Windows Header Files:
-#include <VersionHelpers.h>
 #include <windows.h>
+#include <VersionHelpers.h>
 
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS // some CString constructors will be explicit
 

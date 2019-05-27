@@ -1,6 +1,9 @@
 #include "images_win.h"
 
 #include <QtGui/QGuiApplication>
+#include <QtGui/QPixmap>
+
+#include "Windows.h"
 
 // TODO: #Elric use public interface QtWin::imageFromHBITMAP
 extern QImage qt_imageFromWinHBITMAP(HDC hdc, HBITMAP bitmap, int w, int h);
