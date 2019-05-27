@@ -279,7 +279,11 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     nx::analytics::EngineDescriptorManager engineDescriptorManager(q->commonModule());
     const auto objectTypeDescriptors = objectTypeDescriptorManager.descriptors();
     const auto engineDescriptors = engineDescriptorManager.descriptors();
+
     m_objectTypeMenu->clear();
+    for (auto menu: m_objectTypeMenu->findChildren<QMenu*>(QString(), Qt::FindChildrenRecursively))
+        menu->deleteLater();
+
     m_defaultAction = addMenuAction(m_objectTypeMenu, tr("Any type"), {});
 
     const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
