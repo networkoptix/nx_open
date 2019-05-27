@@ -301,10 +301,10 @@ static void fixServerUrlSchemeSecurity(nx::utils::Url* url, const QnGlobalSettin
     namespace http = nx::network::http;
     namespace rtsp = nx::network::rtsp;
 
-    // TODO: Set always to ssl?
     if (settings->isTrafficEncriptionForced() && url->scheme() == http::kUrlSchemeName)
         url->setScheme(http::kSecureUrlSchemeName);
-    else if (settings->isVideoTrafficEncriptionForced() && url->scheme() == rtsp::kUrlSchemeName)
+    else
+    if (settings->isVideoTrafficEncriptionForced() && url->scheme() == rtsp::kUrlSchemeName)
         url->setScheme(rtsp::kSecureUrlSchemeName);
 }
 
@@ -376,9 +376,9 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
         d->request.requestLine.url = updatedUrl;
     }
 
+    nx::network::http::HttpHeaders::const_iterator xCameraGuidIter = d->request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
     QnUuid cameraGuid;
-    const auto xCameraGuidIter = d->request.headers.find(Qn::CAMERA_GUID_HEADER_NAME);
-    if (xCameraGuidIter != d->request.headers.end())
+    if( xCameraGuidIter != d->request.headers.end() )
         cameraGuid = QnUuid::fromStringSafe(xCameraGuidIter->second);
     else
         cameraGuid = QnUuid::fromStringSafe(d->request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME));
@@ -394,6 +394,9 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
         d->request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, dstRoute.id.toByteArray());
     else
         dstRoute.id = commonModule()->moduleGUID();
+
+    if (!dstRoute.id.isNull()) //< Means dstUrl targets another server in the system.
+        fixServerUrlSchemeSecurity(&dstUrl, commonModule()->globalSettings());
 
     if (dstRoute.id == commonModule()->moduleGUID())
     {
@@ -417,11 +420,6 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
     }
     else if (!dstRoute.id.isNull())
     {
-        // dstUrl targets another server in the system.
-        if (dstUrl.scheme().isEmpty())
-            dstUrl.setScheme(d->protocol.toLower());
-        fixServerUrlSchemeSecurity(&dstUrl, commonModule()->globalSettings());
-
         dstRoute = commonModule()->router()->routeTo(dstRoute.id);
     }
     else
