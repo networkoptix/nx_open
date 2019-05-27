@@ -120,6 +120,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         if "ANDROID_NDK" not in os.environ:
             sync("android/android-ndk")
 
+    sync("any/cloud_hosts")
     sync("qt", path_variable="QT_DIR")
     sync("any/boost")
 
