@@ -47,6 +47,12 @@ struct UploadState
     // from the server when TTL passes. -1 means infinite.
     qint64 ttl = -1;
 
+    /** Upload all chunks independently on which chunks are already available on the target. */
+    bool uploadAllChunks = false;
+
+    /** Recreate file if it exists. */
+    bool recreateFile = false;
+
     // Error message, if any.
     QString errorMessage;
 };
