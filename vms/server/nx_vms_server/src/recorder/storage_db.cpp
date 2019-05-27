@@ -371,16 +371,16 @@ void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
     }
 }
 
-QString QnStorageDb::baseFileName(int seqId)
+QString QnStorageDb::baseFileName(int64_t seqId)
 {
-    return moduleGUID().toSimpleString() + kSeparator + seqId;
+    return moduleGUID().toSimpleString() + kSeparator + QString::number((long long) seqId) + ".nxdb";
 }
 
 bool QnStorageDb::startDbFile(const QString& basePath, bool incVersion)
 {
     m_ioDevice.reset();
     const auto dbFiles = allDbFiles(basePath);
-    int newSeqId = 1;
+    int64_t newSeqId = 1;
 
     if (!incVersion)
     {
