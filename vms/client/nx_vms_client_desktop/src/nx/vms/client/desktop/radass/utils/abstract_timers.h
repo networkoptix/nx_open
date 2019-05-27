@@ -2,7 +2,6 @@
 
 #include <chrono>
 #include <QtCore/QObject>
-#include <QtCore/QSharedPointer>
 
 /**
  * The purpose of this unit is to define abstract timer classes and abstract timer factory.
@@ -15,7 +14,7 @@ namespace nx::vms::client::desktop {
 /**
 * The class essentially defines interface similar to QTimer, but using std::chrono.
 */
-class AbstractTimer: public QObject
+class NX_VMS_CLIENT_DESKTOP_API AbstractTimer: public QObject
 {
     Q_OBJECT
 
@@ -43,7 +42,7 @@ typedef QSharedPointer<AbstractTimer> TimerPtr;
 /**
 * The class essentially defines interface equivalent to QElapsedTimer, but using std::chrono.
 */
-class AbstractElapsedTimer
+class NX_VMS_CLIENT_DESKTOP_API AbstractElapsedTimer
 {
 public:
     using milliseconds = std::chrono::milliseconds;
@@ -64,7 +63,7 @@ typedef QSharedPointer<AbstractElapsedTimer> ElapsedTimerPtr;
 * The class defines abstract factory for providing timers.
 * There are implementations to provide Qt-based timers and
 */
-class AbstractTimerFactory
+class NX_VMS_CLIENT_DESKTOP_API AbstractTimerFactory
 {
 public:
     virtual ~AbstractTimerFactory() = default;
