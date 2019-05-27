@@ -101,6 +101,7 @@ private:
     void onVacuumFinished(bool success);
     bool readDbHeader() const;
     QStringList allDbFiles(const QString& basePath) const;
+    QString baseFileName(int seqId);
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;

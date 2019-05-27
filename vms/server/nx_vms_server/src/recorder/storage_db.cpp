@@ -292,32 +292,10 @@ bool QnStorageDb::openDbFile()
 
 QStringList QnStorageDb::allDbFiles(const QString& basePath) const
 {
-    auto candidates = QDir(basePath).entryInfoList(QDir::Files);
-    NX_DEBUG(this, "Gathering DB files. Candidates are: %1", candidates);
     const auto moduleGuid = moduleGUID().toSimpleString();
-
-    candidates.erase(
-        std::remove_if(
-            candidates.begin(), candidates.end(),
-            [&moduleGuid](const QFileInfo& fileInfo)
-            {
-                const auto suffix = fileInfo.completeSuffix();
-                const auto baseName = fileInfo.completeBaseName();
-                if (suffix != "nxdb" || !baseName.contains(moduleGuid))
-                    return true;
-
-                if (baseName.contains(kSeparator))
-                {
-                    const auto splits = baseName.split(kSeparator);
-                    if (splits.size() != 2 || splits[0] != moduleGuid || splits[1].toLongLong() <= 0)
-                        return true;
-
-                    return false;
-                }
-
-                return baseName != moduleGuid + "_media";
-            }),
-        candidates.end());
+    QStringList filters = {moduleGuid + "_media.nxdb", moduleGuid + "--*.nxdb"};
+    auto candidates = QDir(basePath).entryInfoList(filters, QDir::Files);
+    NX_DEBUG(this, "Gathering DB files. Candidates are: %1", candidates);
 
     QStringList result;
     std::transform(
@@ -393,52 +371,42 @@ void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
     }
 }
 
+QString QnStorageDb::baseFileName(int seqId)
+{
+    return moduleGUID().toSimpleString() + kSeparator + seqId;
+}
+
 bool QnStorageDb::startDbFile(const QString& basePath, bool incVersion)
 {
     m_ioDevice.reset();
     const auto dbFiles = allDbFiles(basePath);
-    QString baseName;
+    int newSeqId = 1;
+
     if (!incVersion)
     {
         removeFiles(dbFiles, "");
-        baseName = QString("%01%021.nxdb").arg(moduleGUID().toSimpleString()).arg(kSeparator);
     }
-    else
+    else if (!dbFiles.isEmpty())
     {
-        if (dbFiles.isEmpty())
+        removeFiles(dbFiles, dbFiles[dbFiles.size() - 1]);
+        const int64_t prevSeqId = sequenceIdFromFilePath(dbFiles[dbFiles.size() - 1]);
+        newSeqId = prevSeqId + 1;
+        if (prevSeqId == std::numeric_limits<int64_t>::max())
         {
-            const auto fileName =
-                QString("%01%021.nxdb").arg(moduleGUID().toSimpleString()).arg(kSeparator);
-        }
-        else
-        {
-            removeFiles(dbFiles, dbFiles[dbFiles.size() - 1]);
-            const int64_t prevSeqId = sequenceIdFromFilePath(dbFiles[dbFiles.size() - 1]);
-            int newSeqId = prevSeqId + 1;
-            if (prevSeqId == std::numeric_limits<int64_t>::max())
+            const auto newPrevFileName = QDir(basePath).absoluteFilePath(baseFileName(/*seqId*/ 1));
+            if (!QFile(dbFiles[dbFiles.size() - 1]).rename(newPrevFileName))
             {
-                const auto newFileName =  QDir(basePath).absoluteFilePath(
-                    QString("%01%021.nxdb").arg(moduleGUID().toSimpleString()).arg(kSeparator));
-
-                if (!QFile(dbFiles[dbFiles.size() - 1]).rename(newFileName))
-                {
-                    NX_WARNING(
-                        this, "Failed to rename the DB file with max sequence id (%1)",
-                        dbFiles[dbFiles.size() - 1]);
-                    return false;
-                }
-
-                newSeqId = 2;
+                NX_WARNING(
+                    this, "Failed to rename the DB file with max sequence id (%1)",
+                    dbFiles[dbFiles.size() - 1]);
+                return false;
             }
 
-            baseName = QString("%1%2%3.nxdb")
-                .arg(moduleGUID().toSimpleString())
-                .arg(kSeparator)
-                .arg(newSeqId);
+            newSeqId = 2;
         }
     }
 
-    m_dbFileName = QDir(basePath).absoluteFilePath(baseName);
+    m_dbFileName = QDir(basePath).absoluteFilePath(baseFileName(newSeqId));
     NX_DEBUG(this, "Creating a new DB file (%1)", m_dbFileName);
     if (!openDbFile())
         return false;
