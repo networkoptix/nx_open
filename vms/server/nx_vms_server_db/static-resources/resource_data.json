@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.56",
+    "version": "1.0.1.71",
     "data": [
         {
             "keys": [
@@ -2126,10 +2126,10 @@
         },
         {
             "keys": [
-                "DigitalWatchdog|*",
-                "Digital_Watchdog|*"
+                "DW|*"
             ],
-            "onvifVendorSubtype": "Digital Watchdog"
+            "onvifVendorSubtype": "Digital Watchdog",
+            "_comment": "Used to set typeId of 'Digital Watchdog' for all manufectures that are resolved to 'DW'."
         },
         {
             "keys": [
