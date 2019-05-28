@@ -235,6 +235,7 @@ public:
         qint64 chunkSize,
         const QByteArray& md5,
         qint64 ttl,
+        bool recreateIfExists,
         AddUploadCallback callback,
         QThread* targetThread = nullptr);
 

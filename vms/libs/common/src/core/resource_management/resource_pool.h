@@ -7,6 +7,8 @@
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 
+#include <api/helpers/camera_id_helper.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <common/common_globals.h>
@@ -16,7 +18,7 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
-#include <api/helpers/camera_id_helper.h>
+#include <nx/utils/impl_ptr.h>
 
 /**
  * This class holds all resources in the system that are READY TO BE USED (as long as resource is
@@ -303,7 +305,7 @@ signals:
 
 private:
     struct Private;
-    QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 
     mutable QnMutex m_resourcesMtx;
     bool m_tranInProgress;
