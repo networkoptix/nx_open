@@ -511,6 +511,7 @@ public:
 
     Handle ptzCommand(
         const QnRequestParamList& params,
+        const nx::Buffer& body,
         std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
         QThread* targetThread = nullptr);
 

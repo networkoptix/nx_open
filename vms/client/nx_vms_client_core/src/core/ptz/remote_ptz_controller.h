@@ -110,13 +110,14 @@ public:
      * Helper method to send request and get a proper response.
      * @param command - PTZ command.
      * @param params - all ptz parameters are stored there.
+     * @param body - request body
      * @param options - additional options.
      * @param responseHelper - lambda to help deserialize QJsonValue to desired datatype.
      * @return true if request was sent.
      *
      * PtzController will "emit finish(command, response)" signal when server responds.
      */
-    bool sendRequest(Qn::PtzCommand command, const QnRequestParamList& params,
+    bool sendRequest(Qn::PtzCommand command, const QnRequestParamList& params, const nx::Buffer& body,
         const nx::core::ptz::Options& options,
         PtzDeserializationHelper responseHelper = {}) const;
 

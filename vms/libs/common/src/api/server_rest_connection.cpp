@@ -1020,6 +1020,7 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
 
 Handle ServerConnection::ptzCommand(
     const QnRequestParamList& params,
+    const nx::Buffer& body,
     std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
     QThread* targetThread)
 {
@@ -1027,7 +1028,7 @@ Handle ServerConnection::ptzCommand(
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     return executePost<QnJsonRestResult>("/api/ptz",
         params,
-        contentType, QByteArray(),
+        contentType, body,
         callback,
         targetThread);
 }

@@ -80,7 +80,8 @@ QnRemotePtzController::PtzDeserializationHelper makeDeserializationHelper()
         };
 }
 
-// Some PTZ functions embed request arguments to a response.
+// Some PTZ functions embed request arguments to a response. This function helps to store this
+// input argument and return it instead of server response.
 template<class T>
 QnRemotePtzController::PtzDeserializationHelper makeInputHelper(const T& data)
 {
@@ -102,6 +103,7 @@ nx::network::http::HttpHeaders makeDefaultHeaders()
 bool QnRemotePtzController::sendRequest(
     Qn::PtzCommand command,
     const QnRequestParamList& baseParams,
+    const nx::Buffer& body,
     const nx::core::ptz::Options& options,
     PtzDeserializationHelper helper) const
 {
@@ -139,7 +141,7 @@ bool QnRemotePtzController::sendRequest(
                 auto notConstThis = const_cast<QnRemotePtzController*>(this);
                 emit notConstThis->finished(command, value);
             };
-        auto handle = connection->ptzCommand(params, std::move(callback));
+        auto handle = connection->ptzCommand(params, body, std::move(callback));
         Q_UNUSED(handle);
     }
     return true;
@@ -157,7 +159,7 @@ bool QnRemotePtzController::continuousMove(
     params.insert("type", QnLexical::serialized(options.type));
     params.insert("sequenceId", m_sequenceId);
     params.insert("sequenceNumber", nextSequenceNumber());
-    return sendRequest(Qn::ContinuousMovePtzCommand, params, options);
+    return sendRequest(Qn::ContinuousMovePtzCommand, params, nx::Buffer(), options);
 }
 
 bool QnRemotePtzController::continuousFocus(
@@ -167,7 +169,7 @@ bool QnRemotePtzController::continuousFocus(
     QnRequestParamList params;
     params.insert("speed", QnLexical::serialized(speed));
     params.insert("type", QnLexical::serialized(options.type));
-    return sendRequest(Qn::ContinuousFocusPtzCommand, params, options);
+    return sendRequest(Qn::ContinuousFocusPtzCommand, params, nx::Buffer(), options);
 }
 
 bool QnRemotePtzController::absoluteMove(
@@ -185,7 +187,8 @@ bool QnRemotePtzController::absoluteMove(
     params.insert("type", QnLexical::serialized(options.type));
     params.insert("sequenceId", m_sequenceId);
     params.insert("sequenceNumber", nextSequenceNumber());
-    return sendRequest(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), params, options);
+    return sendRequest(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), params,
+        nx::Buffer(), options);
 }
 
 bool QnRemotePtzController::viewportMove(
@@ -204,7 +207,7 @@ bool QnRemotePtzController::viewportMove(
     params.insert("type", QnLexical::serialized(options.type));
     params.insert("sequenceId", m_sequenceId);
     params.insert("sequenceNumber", nextSequenceNumber());
-    return sendRequest(Qn::ViewportMovePtzCommand, params, options);
+    return sendRequest(Qn::ViewportMovePtzCommand, params, nx::Buffer(), options);
 }
 
 bool QnRemotePtzController::relativeMove(
@@ -219,7 +222,7 @@ bool QnRemotePtzController::relativeMove(
     params.insert("type", QnLexical::serialized(options.type));
     params.insert("sequenceId", m_sequenceId);
     params.insert("sequenceNumber", nextSequenceNumber());
-    return sendRequest(Qn::RelativeMovePtzCommand, params, options);
+    return sendRequest(Qn::RelativeMovePtzCommand, params, nx::Buffer(), options);
 }
 
 bool QnRemotePtzController::relativeFocus(qreal direction, const ptz::Options& options)
@@ -227,7 +230,7 @@ bool QnRemotePtzController::relativeFocus(qreal direction, const ptz::Options& o
     QnRequestParamList params;
     params.insert("focus", QnLexical::serialized(direction));
     params.insert("type", QnLexical::serialized(options.type));
-    return sendRequest(Qn::RelativeFocusPtzCommand, params, options);
+    return sendRequest(Qn::RelativeFocusPtzCommand, params, nx::Buffer(), options);
 }
 
 bool QnRemotePtzController::getPosition(
@@ -240,7 +243,7 @@ bool QnRemotePtzController::getPosition(
 
     auto helper = makeDeserializationHelper<QVector3D>();
     auto command = spaceCommand(Qn::GetDevicePositionPtzCommand, space);
-    return sendRequest(command, params, options, helper);
+    return sendRequest(command, params, nx::Buffer(), options, helper);
 }
 
 bool QnRemotePtzController::getLimits(
@@ -263,7 +266,7 @@ bool QnRemotePtzController::createPreset(const QnPtzPreset& preset)
     QnRequestParamList params;
     params.insert("presetName", preset.name);
     params.insert("presetId", preset.id);
-    return sendRequest(Qn::CreatePresetPtzCommand, params, kDefaultOptions);
+    return sendRequest(Qn::CreatePresetPtzCommand, params, nx::Buffer(), kDefaultOptions);
 }
 
 bool QnRemotePtzController::updatePreset(const QnPtzPreset& preset)
@@ -272,7 +275,7 @@ bool QnRemotePtzController::updatePreset(const QnPtzPreset& preset)
     params.insert("presetName", preset.name);
     params.insert("presetId", preset.id);
     auto helper = makeInputHelper(preset);
-    return sendRequest(Qn::UpdatePresetPtzCommand, params, kDefaultOptions, helper);
+    return sendRequest(Qn::UpdatePresetPtzCommand, params, nx::Buffer(), kDefaultOptions, helper);
 }
 
 bool QnRemotePtzController::removePreset(const QString& presetId)
@@ -280,7 +283,7 @@ bool QnRemotePtzController::removePreset(const QString& presetId)
     QnRequestParamList params;
     params.insert("presetId", presetId);
     auto helper = makeInputHelper(presetId);
-    return sendRequest(Qn::RemovePresetPtzCommand, params, kDefaultOptions, helper);
+    return sendRequest(Qn::RemovePresetPtzCommand, params, nx::Buffer(), kDefaultOptions, helper);
 }
 
 bool QnRemotePtzController::activatePreset(const QString& presetId, qreal speed)
@@ -289,14 +292,15 @@ bool QnRemotePtzController::activatePreset(const QString& presetId, qreal speed)
     params.insert("presetId", presetId);
     params.insert("speed", QnLexical::serialized(speed));
     auto helper = makeInputHelper(presetId);
-    return sendRequest(Qn::ActivatePresetPtzCommand, params, kDefaultOptions, helper);
+    return sendRequest(Qn::ActivatePresetPtzCommand, params, nx::Buffer(), kDefaultOptions,
+        helper);
 }
 
 bool QnRemotePtzController::getPresets(QnPtzPresetList* /*presets*/) const
 {
     QnRequestParamList params;
     auto helper = makeDeserializationHelper<QnPtzPresetList>();
-    return sendRequest(Qn::GetPresetsPtzCommand, params, kDefaultOptions, helper);
+    return sendRequest(Qn::GetPresetsPtzCommand, params, nx::Buffer(), kDefaultOptions, helper);
 }
 
 bool QnRemotePtzController::createTour(
@@ -304,7 +308,8 @@ bool QnRemotePtzController::createTour(
 {
     QnRequestParamList params;
     auto helper = makeInputHelper(tour);
-    return sendRequest(Qn::CreateTourPtzCommand, params, kDefaultOptions, helper);
+    return sendRequest(Qn::CreateTourPtzCommand, params, QJson::serialized(tour), kDefaultOptions,
+        helper);
 }
 
 bool QnRemotePtzController::removeTour(const QString& tourId)
@@ -312,7 +317,7 @@ bool QnRemotePtzController::removeTour(const QString& tourId)
     QnRequestParamList params;
     params.insert("tourId", tourId);
     auto helper = makeInputHelper(tourId);
-    return sendRequest(Qn::RemoveTourPtzCommand, params, kDefaultOptions, helper);
+    return sendRequest(Qn::RemoveTourPtzCommand, params, nx::Buffer(), kDefaultOptions, helper);
 }
 
 bool QnRemotePtzController::activateTour(const QString& tourId)
@@ -320,21 +325,22 @@ bool QnRemotePtzController::activateTour(const QString& tourId)
     QnRequestParamList params;
     params.insert("tourId", tourId);
     auto helper = makeInputHelper(tourId);
-    return sendRequest(Qn::ActivateTourPtzCommand, params, kDefaultOptions, helper);
+    return sendRequest(Qn::ActivateTourPtzCommand, params, nx::Buffer(), kDefaultOptions, helper);
 }
 
 bool QnRemotePtzController::getTours(QnPtzTourList* /*tours*/) const
 {
     QnRequestParamList params;
     auto helper = makeDeserializationHelper<QnPtzTourList>();
-    return sendRequest(Qn::GetToursPtzCommand, params, kDefaultOptions);
+    return sendRequest(Qn::GetToursPtzCommand, params, nx::Buffer(), kDefaultOptions);
 }
 
 bool QnRemotePtzController::getActiveObject(QnPtzObject* /*object*/) const
 {
     QnRequestParamList params;
     auto helper = makeDeserializationHelper<QnPtzObject>();
-    return sendRequest(Qn::GetActiveObjectPtzCommand, params, kDefaultOptions, helper);
+    return sendRequest(Qn::GetActiveObjectPtzCommand, params, nx::Buffer(), kDefaultOptions,
+        helper);
 }
 
 bool QnRemotePtzController::updateHomeObject(const QnPtzObject& homePosition)
@@ -343,14 +349,16 @@ bool QnRemotePtzController::updateHomeObject(const QnPtzObject& homePosition)
     params.insert("objectType", QnLexical::serialized(homePosition.type));
     params.insert("objectId", homePosition.id);
     auto helper = makeInputHelper(homePosition);
-    return sendRequest(Qn::UpdateHomeObjectPtzCommand, params, kDefaultOptions, helper);
+    return sendRequest(Qn::UpdateHomeObjectPtzCommand, params, nx::Buffer(), kDefaultOptions,
+        helper);
 }
 
 bool QnRemotePtzController::getHomeObject(QnPtzObject* /*object*/) const
 {
     QnRequestParamList params;
     auto helper = makeDeserializationHelper<QnPtzObject>();
-    return sendRequest(Qn::GetHomeObjectPtzCommand, params, kDefaultOptions, helper);
+    return sendRequest(Qn::GetHomeObjectPtzCommand, params, nx::Buffer(), kDefaultOptions,
+        helper);
 }
 
 bool QnRemotePtzController::getAuxiliaryTraits(
@@ -360,7 +368,7 @@ bool QnRemotePtzController::getAuxiliaryTraits(
     QnRequestParamList params;
     params.insert("type", QnLexical::serialized(options.type));
     auto helper = makeDeserializationHelper<QnPtzObject>();
-    return sendRequest(Qn::GetAuxiliaryTraitsPtzCommand, params, options, helper);
+    return sendRequest(Qn::GetAuxiliaryTraitsPtzCommand, params, nx::Buffer(), options, helper);
 }
 
 bool QnRemotePtzController::runAuxiliaryCommand(
@@ -373,7 +381,7 @@ bool QnRemotePtzController::runAuxiliaryCommand(
     params.insert("data", data);
     params.insert("type", QnLexical::serialized(options.type));
     auto helper = makeInputHelper(trait);
-    return sendRequest(Qn::RunAuxiliaryCommandPtzCommand, params, options, helper);
+    return sendRequest(Qn::RunAuxiliaryCommandPtzCommand, params, nx::Buffer(), options, helper);
 }
 
 bool QnRemotePtzController::getData(
@@ -385,5 +393,5 @@ bool QnRemotePtzController::getData(
     params.insert("query", QnLexical::serialized(query));
     params.insert("type", QnLexical::serialized(options.type));
     auto helper = makeDeserializationHelper<QnPtzData>();
-    return sendRequest(Qn::GetDataPtzCommand, params, options);
+    return sendRequest(Qn::GetDataPtzCommand, params, nx::Buffer(), options);
 }
