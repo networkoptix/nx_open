@@ -4,6 +4,8 @@
 
 #include <analytics/db/config.h>
 
+namespace std {
+
 uint qHash(const std::set<int64_t>& value)
 {
     return std::accumulate(
@@ -11,6 +13,8 @@ uint qHash(const std::set<int64_t>& value)
         (uint)0,
         [](uint hash, int64_t id) { return hash + ::qHash((long long)id); });
 }
+
+} // namespace std
 
 //-------------------------------------------------------------------------------------------------
 

@@ -8,7 +8,7 @@
 
 #include <analytics/db/analytics_db_types.h>
 
-uint qHash(const std::set<int64_t>& value);
+namespace std { uint qHash(const std::set<int64_t>& value); }
 
 namespace nx::analytics::db {
 
