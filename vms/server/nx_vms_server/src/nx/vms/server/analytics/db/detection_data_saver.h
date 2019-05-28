@@ -90,10 +90,6 @@ private:
     void saveToAnalyticsArchive(nx::sql::QueryContext* queryContext);
     std::vector<AnalArchiveItem> prepareArchiveData(nx::sql::QueryContext* queryContext);
     ObjectDbAttributes getObjectDbDataById(const QnUuid& objectId);
-
-    int64_t combineAttributes(
-        nx::sql::QueryContext* queryContext,
-        const std::set<int64_t>& attributesIds);
 };
 
 } // namespace nx::analytics::db
