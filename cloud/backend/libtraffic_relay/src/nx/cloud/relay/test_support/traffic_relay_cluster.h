@@ -39,6 +39,8 @@ class TrafficRelayCluster
 public:
     TrafficRelayCluster(const nx::utils::Url& discoveryServiceUrl);
 
+    const std::string& clusterId() const;
+
     void stopAllRelays();
 
     int size() const;
@@ -55,7 +57,8 @@ private:
     void addClusterArgs(int index, TrafficRelay* relay);
 
 private:
-    nx::utils::Url m_discoveryServiceUrl;
+    const nx::utils::Url m_discoveryServiceUrl;
+    const std::string m_clusterId;
     std::vector <std::unique_ptr<TrafficRelay>> m_relays;
 };
 

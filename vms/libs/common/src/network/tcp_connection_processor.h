@@ -51,7 +51,7 @@ public:
     bool sendChunk(const char* data, int size);
 
     void execute(QnMutexLockerBase& mutex);
-    virtual void pleaseStop();
+    virtual void pleaseStop() override;
     nx::network::SocketAddress getForeignAddress() const;
     nx::utils::Url getDecodedUrl() const;
 

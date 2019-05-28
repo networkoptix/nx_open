@@ -45,7 +45,7 @@ SystemManager::SystemManager(
     nx::utils::StandaloneTimerManager* const timerManager,
     AbstractAccountManager* const accountManager,
     const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager,
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
     AbstractEmailManager* const emailManager,
     clusterdb::engine::SynchronizationEngine* const ec2SynchronizationEngine) noexcept(false)
 :
@@ -225,13 +225,12 @@ void SystemManager::unbindSystem(
     std::function<void(api::Result)> completionHandler)
 {
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<std::string>(
-        std::bind(&SystemManager::markSystemForDeletion, this, _1, _2),
-        std::move(systemId.systemId),
-        [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+
+    m_dbManager->executeUpdate(
+        std::bind(&SystemManager::markSystemForDeletion, this, _1, systemId.systemId),
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
-                nx::sql::DBResult dbResult,
-                std::string /*systemId*/)
+                nx::sql::DBResult dbResult)
         {
             completionHandler(dbResultToApiResult(dbResult));
         });
@@ -337,8 +336,7 @@ void SystemManager::shareSystem(
         };
 
     auto onDbUpdateCompletedFunc =
-        [this,
-            locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 nx::sql::DBResult dbResult)
         {
@@ -486,8 +484,7 @@ void SystemManager::updateSystem(
     };
 
     auto onDbUpdateCompletedFunc =
-        [this,
-            locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 nx::sql::DBResult dbResult)
         {
@@ -532,15 +529,16 @@ void SystemManager::recordUserSessionStart(
         }
     }
 
-    using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::UserSessionDescriptor, SaveUserSessionResult>(
-        std::bind(&SystemManager::saveUserSessionStart, this, _1, _2, _3),
-        std::move(userSessionDescriptor),
+    m_dbManager->executeUpdate(
+        [this, userSessionDescriptor = std::move(userSessionDescriptor)](
+            nx::sql::QueryContext* queryContext)
+        {
+            SaveUserSessionResult result;
+            return saveUserSessionStart(queryContext, userSessionDescriptor, &result);
+        },
         [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
-                nx::sql::DBResult dbResult,
-                data::UserSessionDescriptor /*userSessionDescriptor*/,
-                SaveUserSessionResult /*result*/)
+                nx::sql::DBResult dbResult)
         {
             completionHandler(dbResultToApiResult(dbResult));
         });
@@ -1577,6 +1575,8 @@ void SystemManager::activateSystemIfNeeded(
     SystemDictionary& systemByIdIndex,
     typename SystemDictionary::iterator systemIter)
 {
+    using namespace std::placeholders;
+
     if (systemIter->status == api::SystemStatus::activated &&
         !systemIter->activationInDbNeeded)
     {
@@ -1591,14 +1591,10 @@ void SystemManager::activateSystemIfNeeded(
             system.activationInDbNeeded = false;
         });
 
-    using namespace std::placeholders;
-
-    m_dbManager->executeUpdate<std::string /*systemId*/>(
-        std::bind(&SystemManager::updateSystemStatus, this, _1, _2, api::SystemStatus::activated),
-        systemIter->id,
-        [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-            nx::sql::DBResult dbResult,
-            std::string systemId)
+    m_dbManager->executeUpdate(
+        std::bind(&SystemManager::updateSystemStatus, this, _1, systemIter->id, api::SystemStatus::activated),
+        [this, systemId = systemIter->id, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
+            nx::sql::DBResult dbResult)
         {
             updateSystemInCache(
                 systemId,

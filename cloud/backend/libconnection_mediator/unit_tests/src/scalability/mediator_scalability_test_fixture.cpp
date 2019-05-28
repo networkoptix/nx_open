@@ -1,11 +1,16 @@
 #include "mediator_scalability_test_fixture.h"
 
+#include <nx/cloud/mediator/relay/relay_cluster_client_factory.h>
+#include <nx/cloud/mediator/relay/online_relays_cluster_client.h>
+
 namespace nx::hpm::test {
 
 MediatorScalabilityTestFixture::~MediatorScalabilityTestFixture()
 {
     for (auto& connection : m_serverConnections)
         connection->pleaseStopSync();
+
+    m_mediatorCluster->stop();
 }
 
 std::optional<nx::hpm::api::SystemCredentials> MediatorScalabilityTestFixture::getSystemCredentials() const
@@ -49,7 +54,7 @@ void MediatorScalabilityTestFixture::givenSynchronizedClusterWithListeningServer
 
 void MediatorScalabilityTestFixture::whenAddServer()
 {
-    m_system = m_mediatorCluster->mediator(0).addRandomSystem();
+    m_system = m_mediatorCluster->addRandomSystem();
     m_mediaServer = m_mediatorCluster->mediator(0).addRandomServer(m_system);
     m_mediaServerFullName = m_mediaServer->fullName().toStdString();
 

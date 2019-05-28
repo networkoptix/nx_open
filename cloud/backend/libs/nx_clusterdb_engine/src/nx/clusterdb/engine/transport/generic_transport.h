@@ -83,6 +83,7 @@ private:
     CommandTransportHeader m_commonTransportHeaderOfRemoteTransaction;
     ConnectionClosedSubscription m_connectionClosedSubscription;
     CommandHandler m_gotCommandHandler;
+    bool m_closed = false;
 
     void processConnectionClosedEvent(SystemError::ErrorCode closeReason);
 

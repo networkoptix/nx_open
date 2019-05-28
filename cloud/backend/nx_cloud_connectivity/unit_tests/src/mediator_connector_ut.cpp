@@ -22,6 +22,7 @@
 #include <nx/cloud/mediator/mediator_process_public.h>
 #include <nx/cloud/mediator/mediator_service.h>
 #include <nx/cloud/mediator/test_support/local_cloud_data_provider.h>
+#include <nx/cloud/mediator/test_support/override_relay_cluster_client_factory.h>
 
 namespace nx {
 namespace hpm {
@@ -209,6 +210,7 @@ private:
     using Mediator = nx::utils::test::ModuleLauncher<MediatorProcessPublic>;
 
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
+    nx::hpm::test::OverrideRelayClusterClientFactory m_overrideRelayClusterClientFactory;
     nx::utils::AtomicUniquePtr<Mediator> m_mediator;
     std::unique_ptr<api::MediatorConnector> m_mediatorConnector;
     SystemCredentials m_cloudSystemCredentials;

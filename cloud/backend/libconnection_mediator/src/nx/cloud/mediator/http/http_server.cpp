@@ -192,7 +192,7 @@ void Server::registerApiHandler(
 {
     m_httpMessageDispatcher.registerRequestProcessor<Handler>(
         path,
-        [this, arg]() -> std::unique_ptr<Handler>
+        [arg]() -> std::unique_ptr<Handler>
         {
             return std::make_unique<Handler>(arg);
         },
@@ -235,7 +235,6 @@ void InitiateConnectionRequestHandler::processRequest(
                 return redirectToRemoteMediator(
                     std::move(cachedRequestContext),
                     targetServer,
-                    std::move(resultCode),
                     std::move(response));
             }
 
@@ -274,15 +273,13 @@ void InitiateConnectionRequestHandler::reportResult(
 void InitiateConnectionRequestHandler::redirectToRemoteMediator(
     CachedRequestContext requestContext,
     const nx::String& targetServer,
-    api::ResultCode resultCode,
     api::ConnectResponse response)
 {
     m_listeningPeerDb->findMediatorByPeerDomain(
         targetServer.toStdString(),
-        [this, requestContext = std::move(requestContext),
-            resultCode, response = std::move(response)](
-                MediatorEndpoint endpoint)
-    {
+        [this, requestContext = std::move(requestContext), response = std::move(response)](
+            MediatorEndpoint endpoint)
+        {
             if (!validateMediatorEndpoint(endpoint, requestContext.isSsl))
                 return reportResult(api::ResultCode::notFound, std::move(response));
 

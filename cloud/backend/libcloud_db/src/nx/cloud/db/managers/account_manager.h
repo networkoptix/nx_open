@@ -97,7 +97,7 @@ public:
         const conf::Settings& settings,
         const StreeManager& streeManager,
         AbstractTemporaryAccountPasswordManager* const tempPasswordManager,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager,
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager) noexcept(false);
     virtual ~AccountManager();
 
@@ -187,7 +187,7 @@ private:
     const conf::Settings& m_settings;
     const StreeManager& m_streeManager;
     AbstractTemporaryAccountPasswordManager* const m_tempPasswordManager;
-    nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::sql::AbstractAsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
     /** map<email, account>. */
     Cache<std::string, data::AccountData> m_cache;
@@ -218,10 +218,8 @@ private:
         const std::chrono::seconds& codeExpirationTime);
 
     void accountReactivated(
-        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
         nx::sql::DBResult resultCode,
-        std::string email,
         data::AccountConfirmationCode resultData,
         std::function<void(api::Result, data::AccountConfirmationCode)> completionHandler);
 
@@ -231,10 +229,8 @@ private:
         std::string* const accountEmail);
 
     void sendActivateAccountResponse(
-        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::sql::DBResult resultCode,
-        data::AccountConfirmationCode verificationCode,
-        std::string accountEmail,
+        const std::string& accountEmail,
         std::function<void(api::Result, api::AccountEmail)> completionHandler);
 
     void activateAccountInCache(

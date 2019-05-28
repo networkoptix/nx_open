@@ -116,7 +116,7 @@ public:
         nx::utils::StandaloneTimerManager* const timerManager,
         AbstractAccountManager* const accountManager,
         const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager,
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager,
         clusterdb::engine::SynchronizationEngine* const ec2SynchronizationEngine) noexcept(false);
     virtual ~SystemManager();
@@ -288,7 +288,7 @@ private:
     nx::utils::StandaloneTimerManager* const m_timerManager;
     AbstractAccountManager* const m_accountManager;
     const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
-    nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::sql::AbstractAsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
     clusterdb::engine::SynchronizationEngine* const m_ec2SynchronizationEngine;
     SystemsDict m_systems;

@@ -10,12 +10,6 @@
 
 namespace nx::cloud::relay::test {
 
-namespace {
-
-static constexpr char kClusterId[] = "traffic_relay_test_cluster";
-
-} // namespace
-
 //-------------------------------------------------------------------------------------------------
 // TrafficRelay
 
@@ -55,10 +49,16 @@ nx::utils::Url TrafficRelay::httpsUrl(int index) const
 // TrafficRelayCluster
 
 TrafficRelayCluster::TrafficRelayCluster(const nx::utils::Url& discoveryServiceUrl):
-    m_discoveryServiceUrl(discoveryServiceUrl)
+    m_discoveryServiceUrl(discoveryServiceUrl),
+    m_clusterId("traffic_relay_cluster_test")
 {
     controller::PublicIpDiscoveryService::setDiscoverFunc(
         []() { return network::HostAddress("127.0.0.1"); });
+}
+
+const std::string& TrafficRelayCluster::clusterId() const
+{
+    return m_clusterId;
 }
 
 void TrafficRelayCluster::stopAllRelays()
@@ -133,7 +133,7 @@ void TrafficRelayCluster::addClusterArgs(int index, TrafficRelay* relay)
     relay->addArg(
         "-listeningPeerDb/cluster/discovery/discoveryServiceUrl",
         m_discoveryServiceUrl.toStdString().c_str());
-    relay->addArg("-listeningPeerDb/cluster/clusterId", kClusterId);
+    relay->addArg("-listeningPeerDb/cluster/clusterId", m_clusterId.c_str());
     relay->addArg(
         "-listeningPeerDb/cluster/nodeId",
         lm("traffic_relay_node_%1").arg(index).toStdString().c_str());

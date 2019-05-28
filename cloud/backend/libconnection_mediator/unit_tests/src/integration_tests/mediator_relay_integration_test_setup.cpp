@@ -14,13 +14,14 @@ class RelayClusterClientStub:
     public AbstractRelayClusterClient
 {
 public:
-    RelayClusterClientStub(const std::vector<QUrl>& relayUrls):
+    RelayClusterClientStub(const std::vector<nx::utils::Url>& relayUrls):
         m_relayUrls(relayUrls)
     {
     }
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& /*peerId*/,
+        const nx::network::SocketAddress& /*serverEndpoint*/,
         RelayInstanceSelectCompletionHandler completionHandler) override
     {
         m_aioThreadBinder.post(
@@ -34,6 +35,7 @@ public:
 
     virtual void findRelayInstancePeerIsListeningOn(
         const std::string& /*peerId*/,
+        const nx::network::SocketAddress& /*clientEndpoint*/,
         RelayInstanceSearchCompletionHandler completionHandler) override
     {
         m_aioThreadBinder.post(
@@ -51,7 +53,7 @@ public:
 
 private:
     network::aio::BasicPollable m_aioThreadBinder;
-    std::vector<QUrl> m_relayUrls;
+    std::vector<nx::utils::Url> m_relayUrls;
 };
 
 } // namespace detail
@@ -210,7 +212,7 @@ std::optional<nx::String> MediatorRelayIntegrationTestSetup::reportedTrafficRela
 }
 
 void MediatorRelayIntegrationTestSetup::assertUrlsEquality(
-    const std::vector<QUrl>& expected,
+    const std::vector<nx::utils::Url>& expected,
     const std::vector<nx::String>& test)
 {
     ASSERT_EQ(expected.size(), test.size());

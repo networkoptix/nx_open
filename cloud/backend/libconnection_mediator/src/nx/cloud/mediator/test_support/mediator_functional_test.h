@@ -17,6 +17,7 @@
 #include "../mediator_process_public.h"
 #include "local_cloud_data_provider.h"
 #include "mediaserver_emulator.h"
+#include "override_relay_cluster_client_factory.h"
 
 namespace nx {
 namespace hpm {
@@ -30,9 +31,8 @@ enum Value
 };
 } // namespace ServerBehavior
 
-class MediatorFunctionalTest:
-    public utils::test::ModuleLauncher<MediatorProcessPublic>,
-    public utils::test::TestWithTemporaryDirectory
+class MediatorInstance:
+    public utils::test::ModuleLauncher<MediatorProcessPublic>
 {
 public:
     enum MediatorTestFlags
@@ -45,8 +45,8 @@ public:
     };
 
     //!Calls \a start
-    MediatorFunctionalTest(int flags = allFlags, const QString& testDir = QString());
-    ~MediatorFunctionalTest();
+    MediatorInstance(int flags, const QString& dataDir);
+    ~MediatorInstance();
 
     /**
      * Use it to make restart reliable.
@@ -66,10 +66,6 @@ public:
 
     std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
     std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
-
-    void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
-
-    AbstractCloudDataProvider::System addRandomSystem();
 
     std::unique_ptr<MediaServerEmulator> addServer(
         const AbstractCloudDataProvider::System& system,
@@ -99,8 +95,6 @@ private:
     };
 
     const int m_testFlags;
-    LocalCloudDataProvider m_cloudDataProvider;
-    boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
     std::optional<network::SocketAddress> m_stunUdpEndpoint;
     network::SocketAddress m_stunTcpEndpoint;
     network::SocketAddress m_httpEndpoint;
@@ -114,6 +108,26 @@ private:
 
     bool startProxy();
     bool allocateTcpPorts();
+};
+
+
+class MediatorFunctionalTest:
+    public utils::test::TestWithTemporaryDirectory,
+    public MediatorInstance
+{
+public:
+    MediatorFunctionalTest(int flags = allFlags, const QString& testDir = QString());
+    ~MediatorFunctionalTest();
+
+    AbstractCloudDataProvider::System addRandomSystem();
+
+protected:
+    void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
+
+private:
+	nx::hpm::test::OverrideRelayClusterClientFactory m_overrideRelayClusterClientFactory;
+    boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
+    LocalCloudDataProvider m_cloudDataProvider;
 };
 
 } // namespace hpm

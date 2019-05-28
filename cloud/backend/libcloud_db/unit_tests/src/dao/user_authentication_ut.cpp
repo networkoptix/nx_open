@@ -309,7 +309,7 @@ private:
     {
         assertConditionInSystemAuthRecords(
             systemId,
-            [this](const api::AuthInfo& authInfo)
+            [](const api::AuthInfo& authInfo)
             {
                 ASSERT_TRUE(authInfo.records.empty());
             });
@@ -319,7 +319,7 @@ private:
     {
         assertConditionInSystemAuthRecords(
             systemId,
-            [this](const api::AuthInfo& authInfo)
+            [](const api::AuthInfo& authInfo)
             {
                 ASSERT_FALSE(authInfo.records.empty());
             });
@@ -340,7 +340,7 @@ private:
         bool isExpired = false;
         assertConditionInSystemAuthRecords(
             systemId,
-            [this, &isExpired](const api::AuthInfo& authInfo)
+            [&isExpired](const api::AuthInfo& authInfo)
             {
                 for (const auto& record: authInfo.records)
                 {

@@ -5,21 +5,26 @@
 
 #include <nx/network/connection_server/fixed_size_message_pipeline.h>
 
+#include <nx/vms/api/data/peer_data.h>
+
 #include "../abstract_command_transport.h"
 #include "../../compatible_ec2_protocol_version.h"
 
-namespace nx::clusterdb::engine::transport {
+namespace nx::clusterdb::engine::transport::http_tunnel {
 
-class HttpTunnelTransportConnection:
+class CommandPipeline:
     public AbstractCommandPipeline
 {
     using base_type = AbstractCommandPipeline;
 
 public:
-    HttpTunnelTransportConnection(
+    CommandPipeline(
         const ProtocolVersionRange& protocolVersionRange,
         const ConnectionRequestAttributes& connectionRequestAttributes,
+        const std::string& clusterId,
         std::unique_ptr<network::AbstractStreamSocket> tunnelConnection);
+
+    virtual ~CommandPipeline();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -45,14 +50,16 @@ protected:
 private:
     const ProtocolVersionRange m_protocolVersionRange;
     const ConnectionRequestAttributes m_connectionRequestAttributes;
+    const std::string m_clusterId;
     const network::SocketAddress m_remoteEndpoint;
     nx::network::server::FixedSizeMessagePipeline m_messagePipeline;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     CommandDataHandler m_gotTransactionEventHandler;
+    bool m_closed = false;
 
     void processMessage(nx::network::server::FixedSizeMessage message);
-
     int highestProtocolVersionCompatibleWithRemotePeer() const;
+    void onConnectionClosed(SystemError::ErrorCode errCode);
 };
 
-} // namespace nx::clusterdb::engine::transport
+} // namespace nx::clusterdb::engine::transport::http_tunnel

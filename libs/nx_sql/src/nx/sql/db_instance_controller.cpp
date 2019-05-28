@@ -49,12 +49,12 @@ bool InstanceController::initialize()
     return true;
 }
 
-AsyncSqlQueryExecutor& InstanceController::queryExecutor()
+AbstractAsyncSqlQueryExecutor& InstanceController::queryExecutor()
 {
     return *m_queryExecutor;
 }
 
-const AsyncSqlQueryExecutor& InstanceController::queryExecutor() const
+const AbstractAsyncSqlQueryExecutor& InstanceController::queryExecutor() const
 {
     return *m_queryExecutor;
 }

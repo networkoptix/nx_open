@@ -145,7 +145,19 @@ const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
 
 // Traffic Relay - related settings.
 
-const QLatin1String kTrafficRelayUrl("trafficRelay/url");
+namespace traffic_relay {
+
+const QLatin1String kGroupName("trafficRelay");
+const QLatin1String kUrl("url");
+const QLatin1String kClusterId("clusterId");
+
+} //namespace traffic_relay
+
+// GeoIp - related settings.
+
+const QLatin1String kGeoIpDbPath("geoIp/dbPath");
+const QLatin1String kGeoIpResolveErrorUrlCount("geoIp/resolveErrorUrlCount");
+static constexpr int kDefaultGeoIpResolveErrorUrlCount = 2;
 
 const QLatin1String kListeningPeerConnectionInactivityTimeout(
     "listeningPeer/connectionInactivityTimeout");
@@ -244,6 +256,11 @@ const Statistics& Settings::statistics() const
 const TrafficRelay& Settings::trafficRelay() const
 {
     return m_trafficRelay;
+}
+
+const GeoIp& Settings::geoIp() const
+{
+    return m_geoIp;
 }
 
 const nx::cloud::discovery::conf::Discovery& Settings::discovery() const
@@ -358,6 +375,8 @@ void Settings::loadSettings()
 
     loadTrafficRelay();
 
+    loadGeoIp();
+
     m_discovery.load(settings());
 
     loadListeningPeer();
@@ -464,9 +483,25 @@ void Settings::loadConnectionParameters()
 
 void Settings::loadTrafficRelay()
 {
-    auto urls = settings().value(kTrafficRelayUrl).toString().split(',', QString::SkipEmptyParts);
+    QString group = traffic_relay::kGroupName + "/";
+
+    auto urls = settings().value(
+        group + traffic_relay::kUrl).toString().split(',', QString::SkipEmptyParts);
     std::transform(urls.begin(), urls.end(), std::back_inserter(m_trafficRelay.urls),
         [](const QString& url) { return url.trimmed(); });
+
+    m_trafficRelay.clusterId = settings().value(
+        group + traffic_relay::kClusterId).toString().toStdString();
+
+    m_trafficRelay.discovery.load(settings(), (group + "cluster/discovery").toStdString());
+}
+
+void Settings::loadGeoIp()
+{
+    m_geoIp.dbPath = settings().value(kGeoIpDbPath).toString().toStdString();
+    m_geoIp.resolveErrorUrlCount = settings().value(
+        kGeoIpResolveErrorUrlCount,
+        kDefaultGeoIpResolveErrorUrlCount).toInt();
 }
 
 void Settings::loadListeningPeer()
