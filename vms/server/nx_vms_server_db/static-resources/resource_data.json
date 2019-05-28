@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.55",
+    "version": "1.0.1.71",
     "data": [
         {
             "keys": [
@@ -2123,6 +2123,13 @@
                 "Pelco|IMM12036"
             ],
             "onvifVendorSubtype": "PelcoOptera"
+        },
+        {
+            "keys": [
+                "DW|*"
+            ],
+            "onvifVendorSubtype": "Digital Watchdog",
+            "_comment": "Used to set typeId of 'Digital Watchdog' for all manufectures that are resolved to 'DW'."
         },
         {
             "keys": [

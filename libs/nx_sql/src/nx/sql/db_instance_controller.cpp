@@ -35,7 +35,7 @@ bool InstanceController::initialize()
     NX_DEBUG(this, lm("Updating DB structure"));
     if (!updateDbStructure())
     {
-        NX_ERROR(this, "Could not update DB to current vesion");
+        NX_ERROR(this, "Could not update DB to current version");
         return false;
     }
 

@@ -238,10 +238,10 @@ public:
      *
      * Last merge operation id. It set same value for master and slave hosts during merge
      */
-    QnUuid LastMergeMasterId() const;
+    QnUuid lastMergeMasterId() const;
     void setLastMergeMasterId(const QnUuid& value);
 
-    QnUuid LastMergeSlaveId() const;
+    QnUuid lastMergeSlaveId() const;
     void setLastMergeSlaveId(const QnUuid& value);
 
     QString clientStatisticsSettingsUrl() const;

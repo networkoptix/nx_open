@@ -92,7 +92,7 @@ public:
     static LicenseTypeInfo licenseTypeInfo(Qn::LicenseType licenseType);
 
 protected:
-    void setClass(const QString &xclass);
+    void setClass(const QString& xclass);
 
 private:
     void parseLicenseBlock(

@@ -1362,7 +1362,7 @@ void QnGlobalSettings::setLocalSystemId(const QnUuid& value)
     m_localSystemIdAdaptor->setValue(value.toString());
 }
 
-QnUuid QnGlobalSettings::LastMergeMasterId() const
+QnUuid QnGlobalSettings::lastMergeMasterId() const
 {
     return QnUuid(m_lastMergeMasterIdAdaptor->value());
 }
@@ -1372,7 +1372,7 @@ void QnGlobalSettings::setLastMergeMasterId(const QnUuid& value)
     m_lastMergeMasterIdAdaptor->setValue(value.toString());
 }
 
-QnUuid QnGlobalSettings::LastMergeSlaveId() const
+QnUuid QnGlobalSettings::lastMergeSlaveId() const
 {
     return QnUuid(m_lastMergeSlaveIdAdaptor->value());
 }

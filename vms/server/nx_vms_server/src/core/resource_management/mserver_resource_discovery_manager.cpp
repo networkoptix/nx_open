@@ -308,9 +308,17 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     if (updateTypeId)
                         newNetRes->setTypeId(newTypeId);
 
-                    NX_VERBOSE(this, "Add foreign resource [%1] to search list",
-                        netResourceString(rpNetRes));
-
+                    if (isForeign)
+                    {
+                        NX_VERBOSE(this, "Add foreign resource [%1] to search list",
+                            netResourceString(rpNetRes));
+                    }
+                    if (updateTypeId)
+                    {
+                        NX_VERBOSE(this, "Resource [%1] TypeId changed (Old value = %2, new value = %3)."
+                            " Resource will be reinited",
+                            netResourceString(rpNetRes), existCamRes->getTypeId(), newNetRes->getTypeId());
+                    }
                     extraResources << newNetRes;
                 }
                 else

@@ -1487,6 +1487,10 @@ protected:
         // duration - kTrackAggregationPeriod.
 
         roundTimePeriods(&expected);
+        expected = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+            std::move(expected),
+            std::max<milliseconds>(m_lookupOptions.detailLevel, kMinTimePeriodAggregationPeriod));
+
         roundTimePeriods(&actualTimePeriods);
 
         assertTimePeriodsMatchUpToAggregationPeriod(expected, actualTimePeriods);

@@ -43,6 +43,7 @@ enum class EventReason
     systemStorageFull = 9,
     metadataStorageOffline = 1010,
     metadataStorageFull = 1011,
+    raidStorageError = 1012,
 
     // License Issue event
     licenseRemoved = 10,
@@ -57,7 +58,7 @@ enum class EventReason
     backupDone = 17,
     backupCancelled = 18,
 
-    // last number is 23, see networkMulticastAddressIsInvalid
+    // Last number is 23, see networkMulticastAddressIsInvalid. Some numbers are 1000+.
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 
