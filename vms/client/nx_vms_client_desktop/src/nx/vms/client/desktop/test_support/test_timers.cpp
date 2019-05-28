@@ -162,7 +162,6 @@ private:
     bool m_active = false;
 };
 
-
 AbstractTimer* TestTimerFactory::createTimer(QObject* parent)
 {
     return new TestTimer(this, parent);

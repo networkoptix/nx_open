@@ -79,5 +79,34 @@ TEST(TestTimersTest, BasicTimerTest)
     ASSERT_EQ(timerFactory.currentTime(), 80ms);
 }
 
+
+TEST(TestTimersTest, BasicElapsedTimerTest)
+{
+    TestTimerFactory timerFactory;
+
+    ElapsedTimerPtr timer1(timerFactory.createElapsedTimer());
+    ElapsedTimerPtr timer2(timerFactory.createElapsedTimer());
+
+    ASSERT_FALSE(timer1->isValid());
+    timer1->start();
+    ASSERT_TRUE(timer1->isValid());
+
+    timerFactory.advanceToTime(5ms);
+    timer2->start();
+
+    timerFactory.passTime(5ms);
+
+    ASSERT_TRUE(timer1->hasExpired(8ms));
+    ASSERT_FALSE(timer2->hasExpired(8ms));
+    ASSERT_EQ(timerFactory.currentTime(), 10ms);
+
+    timer2->restart();
+
+    timerFactory.passTime(10ms);
+    ASSERT_TRUE(timer2->hasExpired(8ms));
+    ASSERT_FALSE(timer2->hasExpired(15ms));
+    ASSERT_TRUE(timer1->hasExpired(19ms));
+}
+
 } // namespace test
 } // namespace nx::vms::client::desktop
