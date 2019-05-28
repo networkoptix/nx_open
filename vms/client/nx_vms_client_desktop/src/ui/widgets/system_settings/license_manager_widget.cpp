@@ -18,6 +18,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
+#include <nx_ec/ec_api.h>
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
 

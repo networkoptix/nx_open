@@ -3,8 +3,6 @@
 #include <QtCore/QObject>
 #include <QtGui/QRegion>
 
-#include <api/media_server_connection.h>
-
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 

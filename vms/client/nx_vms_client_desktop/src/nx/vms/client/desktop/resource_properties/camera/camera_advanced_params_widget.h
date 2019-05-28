@@ -14,6 +14,7 @@ class CameraAdvancedParamsWidget;
 }
 
 class QnCachingCameraAdvancedParamsReader;
+class QnRemotePtzController;
 
 namespace nx::vms::client::desktop {
 
@@ -80,16 +81,13 @@ private:
     QScopedPointer<Ui::CameraAdvancedParamsWidget> ui;
     QScopedPointer<QnCachingCameraAdvancedParamsReader> m_advancedParamsReader;
     QScopedPointer<CameraAdvancedParamWidgetsManager> m_advancedParamWidgetsManager;
+    QScopedPointer<QnRemotePtzController> m_ptzController;
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraAvailable;
     int m_paramRequestHandle;
     State m_state;
     QnCameraAdvancedParamValueMap m_loadedValues;
     QnCameraAdvancedParamValueMap m_currentValues;
-
-    // Special crutch for pan-tilt-zoom-lens control
-    QnUuid m_ptzSequenceId;
-    int m_ptzSequenceNumber = 1;
 };
 
 } // namespace nx::vms::client::desktop

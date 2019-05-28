@@ -4,6 +4,7 @@
 #include <QtCore/QUrl>
 #include <QtWidgets/QButtonGroup>
 
+#include <nx_ec/ec_api.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 

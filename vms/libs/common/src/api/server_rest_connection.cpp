@@ -1018,6 +1018,20 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
         targetThread);
 }
 
+Handle ServerConnection::ptzCommand(
+    const QnRequestParamList& params,
+    std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
+    QThread* targetThread)
+{
+    // [](bool, Handle, const QByteArray& response) {}
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    return executePost<QnJsonRestResult>("/api/ptz",
+        params,
+        contentType, QByteArray(),
+        callback,
+        targetThread);
+}
+
 Handle ServerConnection::debug(
     const QString& action, const QString& value, PostCallback callback, QThread* targetThread)
 {
@@ -1034,6 +1048,7 @@ QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList&
     return result;
 }
 
+/** Response deserialization for RestResultWithDataBase objects. */
 template<typename T,
     typename std::enable_if<std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
 T parseMessageBody(
@@ -1062,6 +1077,7 @@ T parseMessageBody(
     return T();
 }
 
+/** Response deserialization for the objects being not inherited from RestResultWithDataBase. */
 template<typename T,
     typename std::enable_if<!std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
 T parseMessageBody(
@@ -1082,6 +1098,29 @@ T parseMessageBody(
             break;
     }
     return T();
+}
+
+/** Response deserialization for pure QJsonObject. */
+template<>
+QJsonValue parseMessageBody<QJsonValue>(
+    const Qn::SerializationFormat& format,
+    const nx::network::http::BufferType& msgBody,
+    bool* success)
+{
+    QJsonValue result;
+    switch (format)
+    {
+        case Qn::JsonFormat:
+            if (QJsonDetail::deserialize_json(msgBody, &result) && success)
+                *success = true;
+            return result;
+        default:
+            if (success)
+                *success = false;
+            NX_ASSERT(0, "Unsupported data format");
+            break;
+    }
+    return QJsonObject();
 }
 
 template<typename CallbackType>

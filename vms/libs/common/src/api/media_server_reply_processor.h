@@ -23,7 +23,6 @@
 #include <api/model/upload_update_reply.h>
 #include "model/getnonce_reply.h"
 
-#include "media_server_connection.h"
 #include "model/recording_stats_reply.h"
 #include "api/model/audit/audit_record.h"
 

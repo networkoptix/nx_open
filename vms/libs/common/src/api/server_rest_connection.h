@@ -17,6 +17,7 @@
 #include <api/http_client_pool.h>
 #include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <core/ptz/ptz_fwd.h>
 #include <common/common_module_aware.h>
 #include <api/model/time_reply.h>
 #include <analytics/db/abstract_storage.h>
@@ -29,6 +30,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/data/event_rule_data.h>
+
 
 namespace rest {
 
@@ -505,6 +507,11 @@ public:
         const QString& action,
         const QString& value,
         PostCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle ptzCommand(
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
         QThread* targetThread = nullptr);
 
     /**

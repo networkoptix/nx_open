@@ -11,6 +11,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
+#include <api/media_server_connection.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>

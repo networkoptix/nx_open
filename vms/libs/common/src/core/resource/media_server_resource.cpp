@@ -7,10 +7,12 @@
 #include <api/session_manager.h>
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
+#include <api/media_server_connection.h>
 #include <api/model/ping_reply.h>
 #include <api/network_proxy_factory.h>
 #include <api/runtime_info_manager.h>
 #include <api/server_rest_connection.h>
+
 #include <common/common_module.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/security_cam_resource.h>
@@ -34,6 +36,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/vms/api/data/media_server_data.h>
 
 using namespace nx;
 

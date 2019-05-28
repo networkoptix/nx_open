@@ -12,6 +12,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
+#include <api/media_server_connection.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>

@@ -5,6 +5,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx_ec/ec_api.h>
 #include <utils/common/delayed.h>
 
 #include <core/resource_management/resource_pool.h>

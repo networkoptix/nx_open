@@ -6,6 +6,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx_ec/ec_api.h>
+
 #include "nx/vms/discovery/manager.h"
 #include <common/common_module.h>
 

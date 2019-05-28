@@ -18,6 +18,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
 
+#include <nx_ec/ec_api.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
