@@ -270,6 +270,8 @@
 #include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/vms/server/root_fs.h>
+#include <system_log/raid_event_ini_config.h>
+
 #include <nx/vms/server/server_update_manager.h>
 #include <nx_vms_server_ini.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
@@ -1008,6 +1010,13 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
     m_platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
     m_platform->setUpdatePeriodMs(
         isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
+
+    const QString raidEventLogName = system_log::ini().getLogName();
+    const QString raidEventProviderName = system_log::ini().getProviderName();
+    const int raidEventMaxLevel = system_log::ini().getMaxLevel();
+
+    m_raidEventLogReader.reset(new RaidEventLogReader(
+        raidEventLogName, raidEventProviderName, raidEventMaxLevel));
     m_enableMultipleInstances = settings->settings().enableMultipleInstances();
 }
 
@@ -1414,7 +1423,17 @@ void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& s
 {
     if (isStopping())
         return;
-    serverModule()->eventConnector()->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
+    serverModule()->eventConnector()->at_storageFailure(
+        m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
+}
+
+void MediaServerProcess::at_storageManager_raidStorageFailure(const QString& description,
+    nx::vms::event::EventReason reason)
+{
+    if (isStopping())
+        return;
+    serverModule()->eventConnector()->at_raidStorageFailure(
+        m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, description);
 }
 
 void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType)
@@ -4318,6 +4337,7 @@ static QByteArray loadDataFromUrl(nx::utils::Url url)
 {
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setResponseReadTimeout(kResourceDataReadingTimeout);
+    httpClient->setMessageBodyReadTimeout(kResourceDataReadingTimeout);
     if (httpClient->doGet(url)
         && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
     {
@@ -4655,6 +4675,10 @@ void MediaServerProcess::at_appStarted()
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     serverModule()->fileDeletor()->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
+
+    connect(m_raidEventLogReader.get(), &RaidEventLogReader::eventOccurred, this,
+        &MediaServerProcess::at_storageManager_raidStorageFailure);
+    m_raidEventLogReader->subscribe();
 };
 
 void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)

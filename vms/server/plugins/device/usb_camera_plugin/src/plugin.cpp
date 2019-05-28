@@ -4,6 +4,7 @@ extern "C" {
 } // extern "C"
 
 #include "discovery_manager.h"
+#include "device/audio/utils.h"
 
 extern "C" {
 #ifdef _WIN32
@@ -36,6 +37,7 @@ Plugin::Plugin():
 
 Plugin::~Plugin()
 {
+    nx::usb_cam::device::audio::uninitialize();
     webCameraPluginInstance = NULL;
 }
 

@@ -530,6 +530,11 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             result = tr("Analytics storage \"%1\" is almost full.").arg(storageUrl);
             break;
         }
+        case EventReason::raidStorageError:
+        {
+            result = tr("RAID error. %1.").arg(reasonParamsEncoded);
+            break;
+        }
         case EventReason::backupFailedNoBackupStorageError:
         {
             result = tr("Archive backup failed: No available backup storages with sufficient free space");

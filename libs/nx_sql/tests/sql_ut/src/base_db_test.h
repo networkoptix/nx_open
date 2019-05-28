@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <QtCore/QString>
-#include <QtSql/QSqlQuery>
 
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/sql/db_instance_controller.h>
@@ -23,10 +22,9 @@ class BasicFixture:
 {
 public:
     BasicFixture(const std::string& testModuleName);
-    ~BasicFixture();
 
 protected:
-    virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) = 0;
+    virtual bool initializeQueryExecutor(const ConnectionOptions& connectionOptions) = 0;
     virtual void closeDatabase() = 0;
     virtual AsyncSqlQueryExecutor& asyncSqlQueryExecutor() = 0;
 
@@ -87,11 +85,12 @@ protected:
         return queryCompletedPromise.get_future().get();
     }
 
-private:
-    QString m_tmpDir;
-    ConnectionOptions m_connectionOptions;
+    std::filesystem::path dbFilePath() const;
 
-    void init();
+private:
+    std::string m_tmpDir;
+    ConnectionOptions m_connectionOptions;
+    std::string m_dbFilePath;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -108,7 +107,7 @@ public:
     using base_type::base_type;
 
 protected:
-    virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
+    virtual bool initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
     virtual void closeDatabase() override;
     virtual AsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
 
@@ -127,7 +126,7 @@ public:
     using base_type::base_type;
 
 protected:
-    virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
+    virtual bool initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
     virtual void closeDatabase() override;
     virtual AsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
 
