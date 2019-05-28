@@ -1,6 +1,10 @@
 set(cloudGroup "test" CACHE STRING "Cloud instance group (dev, test, demo, prod)")
 set(customCloudHost "" CACHE STRING "Cloud host. Leave empty to fetch cloud host from server.")
 
+if(NOT build_utils_dir)
+    set(build_utils_dir "${CMAKE_SOURCE_DIR}/build_utils")
+endif()
+
 function(get_cloud_host cloudGroup customization result_variable)
     set(var cloud_hosts.groups.${cloudGroup}.${customization})
     set(cloudHost ${${var}})
@@ -16,9 +20,8 @@ function(set_cloud_hosts)
     set(cloud_hosts_json ${PACKAGES_DIR}/any/cloud_hosts/cloud_hosts.json)
     set(cloud_hosts_cmake ${CMAKE_BINARY_DIR}/cloud_hosts.cmake)
     if(${cloud_hosts_json} IS_NEWER_THAN ${cloud_hosts_cmake})
-        message(${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/json_to_cmake.py)
         execute_process(COMMAND ${PYTHON_EXECUTABLE}
-            ${CMAKE_SOURCE_DIR}/build_utils/json_to_cmake.py
+            ${build_utils_dir}/json_to_cmake.py
             ${cloud_hosts_json} ${cloud_hosts_cmake} -p cloud_hosts)
     endif()
 
