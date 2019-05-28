@@ -257,7 +257,7 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
     struct Item
     {
         QRegion region;
-        std::vector<int64_t> attributesIds;
+        std::set<int64_t> attributesIds;
     };
 
     std::map<std::pair<QnUuid, int /*objectType*/>, Item> regionByObjectType;
@@ -276,7 +276,7 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
             Item& item = regionByObjectType[
                 {objectAttributes.deviceId, objectAttributes.objectTypeId}];
             item.region += aggregatedTrackData.boundingBox;
-            item.attributesIds.push_back(objectAttributes.attributesDbId);
+            item.attributesIds.insert(objectAttributes.attributesDbId);
         }
     }
 
@@ -311,7 +311,7 @@ DetectionDataSaver::ObjectDbAttributes
 
 int64_t DetectionDataSaver::combineAttributes(
     nx::sql::QueryContext* queryContext,
-    const std::vector<int64_t>& attributesIds)
+    const std::set<int64_t>& attributesIds)
 {
     if (attributesIds.empty())
         return -1;
@@ -322,7 +322,7 @@ int64_t DetectionDataSaver::combineAttributes(
     )sql");
 
     query->bindValue(0, -1);
-    query->bindValue(1, (long long) attributesIds.front());
+    query->bindValue(1, (long long) *attributesIds.begin());
     query->exec();
 
     const auto combinationId = query->lastInsertId().toLongLong();
@@ -332,10 +332,10 @@ int64_t DetectionDataSaver::combineAttributes(
         "UPDATE combined_attributes SET combination_id = ? WHERE rowid = ?",
         combinationId, combinationId);
 
-    for (std::size_t i = 1; i < attributesIds.size(); ++i)
+    for (auto it = std::next(attributesIds.begin()); it != attributesIds.end(); ++it)
     {
         query->bindValue(0, combinationId);
-        query->bindValue(1, (long long) attributesIds[i]);
+        query->bindValue(1, (long long) *it);
         query->exec();
     }
 

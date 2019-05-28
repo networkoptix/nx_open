@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include <QtGui/QRegion>
 
 #include <nx/sql/query_context.h>
@@ -91,7 +93,7 @@ private:
 
     int64_t combineAttributes(
         nx::sql::QueryContext* queryContext,
-        const std::vector<int64_t>& attributesIds);
+        const std::set<int64_t>& attributesIds);
 };
 
 } // namespace nx::analytics::db
