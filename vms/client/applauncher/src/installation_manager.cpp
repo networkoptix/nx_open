@@ -127,7 +127,6 @@ void InstallationManager::updateInstalledVersionsInformation()
 	        if (installation.isNull())
 	            return;
 
-            NX_DEBUG(this, "Compatibility version %1 was not verified", version);
             installation->setVersion(nx::utils::SoftwareVersion(version));
 	        installations.insert(installation->version(), installation);
 
@@ -368,9 +367,6 @@ QString InstallationManager::installationDirForVersion(
     const nx::utils::SoftwareVersion& version) const
 {
     std::unique_lock<std::mutex> lk(m_mutex);
-    if (!m_installationsDir.exists())
-        return QString();
-
     return m_installationsDir.absoluteFilePath(versionToString(version));
 }
 
@@ -407,7 +403,7 @@ api::ResultType InstallationManager::installZip(
     if (targetDir.exists())
         targetDir.removeRecursively();
 
-    if (!QDir().mkdir(targetDir.absolutePath()))
+    if (!QDir().mkpath(targetDir.absolutePath()))
     {
         NX_ERROR(this, "Cannot create directory %1", targetDir.absolutePath());
         return api::ResultType::ioError;

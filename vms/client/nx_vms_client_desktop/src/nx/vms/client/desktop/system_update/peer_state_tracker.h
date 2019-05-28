@@ -12,6 +12,8 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <nx/update/common_update_manager.h>
 
+struct QnUpdateFreeSpaceReply;
+
 namespace nx::vms::client::desktop {
 
 using StatusCode = nx::update::Status::Code;
@@ -73,6 +75,9 @@ struct UpdateItem
     TimePoint lastStatusTime;
     /** Row in the table. */
     int row = -1;
+
+    int freeSpace = -1;
+    int requiredSpace = -1;
 };
 
 using UpdateItemPtr = std::shared_ptr<UpdateItem>;
@@ -125,6 +130,7 @@ public:
      * It will return number if peers with changed data.
      */
     int setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
+    int setFreeSpaceData(const  QnUpdateFreeSpaceReply& freeSpaceData);
     void markStatusUnknown(const QSet<QnUuid>& targets);
     /**
      * Forcing update for mediaserver versions.

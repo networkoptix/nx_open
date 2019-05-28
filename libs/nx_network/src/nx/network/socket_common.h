@@ -4,6 +4,7 @@
     #include <winsock2.h>
     #include <in6addr.h>
     #include <ws2ipdef.h>
+    #include <ws2tcpip.h>
 
     // Windows does not support this flag, so we emulate it
     #define MSG_DONTWAIT 0x01000000

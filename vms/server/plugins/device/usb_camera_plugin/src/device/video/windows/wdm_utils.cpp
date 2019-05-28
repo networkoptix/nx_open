@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 
+#include <Windows.h>
 #include <usb.h>
 #include <initguid.h>
 #include <usbioctl.h>

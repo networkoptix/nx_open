@@ -658,6 +658,10 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                 report.statusMessages << packageErrors;
                 break;
             }
+
+            case Error::serverConnectionError:
+                // We do not report anything for this case.
+                break;
         }
     }
 
@@ -1221,7 +1225,7 @@ void MultiServerUpdatesWidget::atServerPackageDownloadFailed(
         NX_INFO(this)
             << "atServerPackageDownloadFailed() - failed to download server package"
             << package.file << "error:" << error;
-        m_stateTracker->setTaskError(package.targets.toSet(), "OfflineDownloadError");
+        m_stateTracker->setTaskError(package.targets, "OfflineDownloadError");
     }
     else
     {
@@ -1234,11 +1238,8 @@ void MultiServerUpdatesWidget::atServerPackageDownloadFailed(
 ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress() const
 {
     ServerUpdateTool::ProgressInfo result;
-    if (m_widgetState == WidgetUpdateState::pushing)
-    {
-        m_serverUpdateTool->calculateUploadProgress(result);
-    }
-    else if (m_widgetState == WidgetUpdateState::downloading)
+    if (m_widgetState == WidgetUpdateState::downloading ||
+        m_widgetState == WidgetUpdateState::pushing)
     {
         auto peersIssued = m_stateTracker->peersIssued();
         auto peersActive = m_stateTracker->peersActive();
@@ -1373,6 +1374,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
             if (!offlineUpdateInfo.isEmpty())
             {
                 NX_INFO(NX_SCOPE_TAG, "picking update contents from offline update.");
+                // Note: mediaservers can have no active update right now
                 updateInfo = offlineUpdateInfo;
             }
             else
@@ -1387,7 +1389,6 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         m_stateTracker->processUnknownStates();
 
         /*
-         * TODO: We should deal with starting client update.
          * There are two distinct situations:
          *  1. This is the client, that has initiated update process.
          *  2. This is 'other' client, that have found that an update process is running.
@@ -1527,7 +1528,7 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
         // 3. All other cases. Some servers have failed
         messageBox->setIcon(QnMessageBoxIcon::Critical);
-        messageBox->setText(tr("Failed to download update packages to some servers"));
+        messageBox->setText(tr("Failed to download update packages to some components"));
 
         QString text = htmlParagraph(m_stateTracker->getErrorMessage());
         text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
@@ -2172,8 +2173,11 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     if (stateHasProgress(m_widgetState))
         syncProgress();
 
+    auto readyAndOnline = m_stateTracker->onlineAndInState(LocalStatusCode::readyToInstall);
     auto readyAndOffline = m_stateTracker->offlineAndInState(LocalStatusCode::readyToInstall);
-    if (m_widgetState == WidgetUpdateState::readyInstall && !readyAndOffline.empty())
+
+    if (m_widgetState == WidgetUpdateState::readyInstall
+        && (readyAndOnline.empty() || !readyAndOffline.empty()))
     {
         ui->downloadButton->setEnabled(false);
         ui->downloadButton->setToolTip(tr("Some servers have gone offline. "
@@ -2458,6 +2462,8 @@ QString MultiServerUpdatesWidget::toString(ServerUpdateTool::OfflineUpdateState 
             return "unpack";
         case ServerUpdateTool::OfflineUpdateState::ready:
             return "ready";
+        case ServerUpdateTool::OfflineUpdateState::preparing:
+            return "preparing";
         case ServerUpdateTool::OfflineUpdateState::push:
             return "push";
         case ServerUpdateTool::OfflineUpdateState::done:

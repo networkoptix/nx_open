@@ -19,7 +19,7 @@ public:
 
 private:
     int makeHeaders(
-        quint8* p, int type, int w, int h, const quint8* lqt, const quint8* cqt, u_short dri);
+        quint8* p, int type, int w, int h, const quint8* lqt, const quint8* cqt, unsigned short dri);
 
     void updateHeaderTables(const quint8* lumaTable, const quint8* chromaTable);
 

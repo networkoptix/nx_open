@@ -1579,11 +1579,11 @@
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation type="unfinished">Plugin Diagnostic Event</translation>
+      <translation>Plugin-Diagnoseereignis</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Unbekanntes Plugin-Diagnoseereignis</translation>
     </message>
   </context>
   <context>

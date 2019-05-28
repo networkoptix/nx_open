@@ -1969,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>不再显示此消息</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -2360,6 +2352,14 @@
       <location/>
       <source>The new System will have password and name from System:</source>
       <translation>新系统需要新的用户名和密码:</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>不再显示此消息</translation>
     </message>
   </context>
   <context>

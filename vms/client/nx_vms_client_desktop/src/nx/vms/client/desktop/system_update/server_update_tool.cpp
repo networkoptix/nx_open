@@ -130,7 +130,7 @@ void ServerUpdateTool::loadInternalState()
         auto state = (OfflineUpdateState)stored.state;
         switch(state)
         {
-            case OfflineUpdateState::ready:
+            case OfflineUpdateState::done:
             case OfflineUpdateState::push:
                 // We have no idea whether update files are still good on server.
                 // The most simple solution - to restart upload process.
@@ -280,7 +280,6 @@ void ServerUpdateTool::readUpdateManifest(
 // NOTE: We are probably not in the UI thread.
 void ServerUpdateTool::atExtractFilesFinished(int code)
 {
-    // TODO: Add some thread safety here
     NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::unpack);
 
     UpdateContents contents;
@@ -289,14 +288,15 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
 
     if (code != QnZipExtractor::Ok)
     {
-        NX_VERBOSE(this) << "atExtractFilesFinished() err=" << QnZipExtractor::errorToString((QnZipExtractor::Error)code);
+        NX_VERBOSE(this, "atExtractFilesFinished() err=%1",
+            QnZipExtractor::errorToString((QnZipExtractor::Error)code));
         changeUploadState(OfflineUpdateState::initial);
         contents.error = nx::update::InformationError::missingPackageError;
         m_offlineUpdateCheckResult.set_value(contents);
         return;
     }
 
-    NX_VERBOSE(this) << "atExtractFilesFinished() status = Ready";
+    NX_VERBOSE(this, "atExtractFilesFinished() status = Ready");
 
     // Find a subfolter containing update manifest
     QDir packageDir = findFolderForFile(m_outputDir, kPackageIndexFile);
@@ -307,9 +307,6 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
 
     if (contents.error == nx::update::InformationError::noError)
     {
-        m_uploadDestination = QString("updates/%1/").arg(contents.info.version);
-
-        // TODO: Move this verification to multi_server_updates_widget.cpp
         // TODO: Provide proper installed versions.
         if (verifyUpdateManifest(contents, {}) && !contents.filesToUpload.empty())
         {
@@ -317,7 +314,8 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
             if (!contents.eulaPath.isEmpty())
             {
                 QString eulaPath = contents.storageDir.filePath(contents.eulaPath);
-                NX_VERBOSE(this, "atExtractFilesFinished() fixing EULA path from %1 to %2", contents.eulaPath, eulaPath);
+                NX_VERBOSE(this, "atExtractFilesFinished() fixing EULA path from %1 to %2",
+                    contents.eulaPath, eulaPath);
                 contents.eulaPath = eulaPath;
             }
             changeUploadState(OfflineUpdateState::ready);
@@ -333,7 +331,6 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
     {
         changeUploadState(OfflineUpdateState::initial);
     }
-
     m_offlineUpdateCheckResult.set_value(contents);
 }
 
@@ -425,33 +422,42 @@ bool ServerUpdateTool::hasManualDownloads() const
     return !m_issuedDownloads.empty();
 }
 
-void ServerUpdateTool::uploadPackage(
+QSet<QnUuid> ServerUpdateTool::getTargetsForPackage(const nx::update::Package& package) const
+{
+    // TODO: We should provide additional server to store all update packages
+    return package.targets;
+}
+
+bool ServerUpdateTool::uploadPackage(
     const nx::update::Package& package,
     const QDir& storageDir)
 {
     NX_ASSERT(package.isValid());
 
-    QString path = package.file;
-    if (package.targets.empty())
+    QString localFile = package.localFile;
+
+    auto targets = package.targets;
+
+    if (targets.empty())
     {
-        NX_ERROR(this) << "uploadPackage(" << package.file << ") - no server wants this package";
-        return;
+        NX_WARNING(this, "uploadPackage(%1) - no server wants this package", localFile);
+        return false;
     }
 
-    NX_INFO(this) << "uploadPackage(" << package.file << ") - going to upload package to servers";
+    NX_INFO(this, "uploadPackage(%1) - going to upload package to servers", localFile);
 
     UploadState config;
-    config.source = storageDir.absoluteFilePath(path);
-    config.destination = m_uploadDestination + path;
+    config.source = storageDir.absoluteFilePath(localFile);
+    config.destination = package.file;
     // Updates should land to updates/publication_key/file_name.
     config.ttl = -1; //< This should mean 'infinite time'
 
-    for (const auto& serverId: package.targets)
+    for (const auto& serverId: targets)
     {
         auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
         if (!server)
         {
-            NX_ERROR(this) << "uploadPackage(" << package.file << ") - lost server for upload" << serverId;
+            NX_ERROR(this, "uploadPackage(%1) - lost server %2 for upload", localFile, serverId);
             continue;
         }
 
@@ -470,13 +476,13 @@ void ServerUpdateTool::uploadPackage(
         }
         else
         {
-            NX_VERBOSE(this) << "uploadPackage(" << package.file << ") - failed to start uploading file="
-                << path
-                << "reason="
-                << config.errorMessage;
+            NX_VERBOSE(this, "uploadPackage(%1) - failed to start uploading file=%2 reason=%3",
+                package.file, localFile, config.errorMessage);
             m_completedUploads.insert(id);
         }
     }
+
+    return true;
 }
 
 void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& state)
@@ -526,46 +532,6 @@ void ServerUpdateTool::markUploadCompleted(const QString& uploadId)
     }
 }
 
-void ServerUpdateTool::startUpload(
-    const QnMediaServerResourcePtr& server,
-    const QStringList& filesToUpload,
-    const QDir& storageDir)
-{
-    NX_ASSERT(server);
-    auto serverId = server->getId();
-    if (filesToUpload.isEmpty())
-        NX_ERROR(this, "no packages to upload to %1, what is going on!?", serverId);
-    for (const auto& path: filesToUpload)
-    {
-        auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
-        {
-            if (tool)
-                tool->atUploadWorkerState(serverId, state);
-        };
-
-        UploadState config;
-        config.source = storageDir.absoluteFilePath(path);
-        config.destination = m_uploadDestination + path;
-        // Updates should land to updates/publication_key/file_name.
-        config.ttl = -1; //< This should mean 'infinite time'
-        auto id = m_uploadManager->addUpload(server, config, this, callback);
-
-        if (!id.isEmpty())
-        {
-            m_uploadStateById[id] = config;
-            m_activeUploads.insert(id);
-        }
-        else
-        {
-            NX_VERBOSE(this) << "uploadNext - failed to start uploading file="
-                << path
-                << "reason="
-                << config.errorMessage;
-            m_completedUploads.insert(id);
-        }
-    }
-}
-
 bool ServerUpdateTool::startUpload(const UpdateContents& contents)
 {
     NX_VERBOSE(this) << "startUpload()";
@@ -573,7 +539,6 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
 
     if (recipients.empty())
     {
-        // TODO: Do something meaningfull here
         NX_WARNING(this, "startUpload(%1) - no recipients for update", contents.info.version);
         return false;
     }
@@ -591,8 +556,13 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
     }
     else
     {
-        for (const auto& server: recipients)
-            startUpload(server, contents.filesToUpload, contents.storageDir);
+        for (const auto& package: contents.info.packages)
+        {
+            if (package.isServer())
+                uploadPackage(package, contents.storageDir);
+        }
+        //for (const auto& server: recipients)
+        //    startUpload(server, contents.filesToUpload, contents.storageDir);
     }
 
     if (m_activeUploads.empty() && !m_completedUploads.empty())
@@ -606,9 +576,7 @@ void ServerUpdateTool::stopUpload()
 {
     NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::push);
     for (const auto& record: m_uploadStateById)
-    {
         m_uploadManager->cancelUpload(record.first);
-    }
 
     m_activeUploads.clear();
     m_completedUploads.clear();
@@ -632,6 +600,7 @@ bool ServerUpdateTool::verifyUpdateManifest(
     return verifyUpdateContents(commonModule(), contents, activeServers, clientData);
 }
 
+/*
 void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
 {
     int uploading = 0;
@@ -659,6 +628,7 @@ void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
     }
     result.uploading = uploading != 0;
 }
+*/
 
 void ServerUpdateTool::calculateManualDownloadProgress(ProgressInfo& progress)
 {
@@ -704,7 +674,7 @@ bool ServerUpdateTool::getServersStatusChanges(RemoteStatus& status)
 
 bool ServerUpdateTool::haveActiveUpdate() const
 {
-    return m_updateManifest.isValid();
+    return m_remoteUpdateManifest.isValid();
 }
 
 ServerUpdateTool::TimePoint::duration ServerUpdateTool::getInstallDuration() const
@@ -729,7 +699,7 @@ bool ServerUpdateTool::requestStopAction()
             {
                 // This will be called in outer
                 NX_VERBOSE(this, "requestStopAction() - success=%1", success);
-                m_updateManifest = nx::update::Information();
+                m_remoteUpdateManifest = nx::update::Information();
                 m_requestingStop = false;
                 emit cancelUpdateComplete(success);
             }), thread());
@@ -738,7 +708,7 @@ bool ServerUpdateTool::requestStopAction()
     if (!m_activeRequests.empty())
     {
         m_skippedRequests.unite(m_activeRequests);
-        NX_VERBOSE(this) << "requestStopAction() will skip requests" << m_skippedRequests;
+        NX_VERBOSE(this, "requestStopAction() will skip requests %1", m_skippedRequests);
     }
 
     for (const auto& file: m_activeDownloads)
@@ -800,7 +770,7 @@ void ServerUpdateTool::requestStartUpdate(
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         connection->updateActionStart(info);
-        m_updateManifest = info;
+        m_remoteUpdateManifest = info;
     }
 
     if (!m_activeRequests.empty())
@@ -951,7 +921,7 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                 {
                     if (tool->m_skippedRequests.contains((handle)))
                         return;
-                    tool->m_updateManifest = response.data;
+                    tool->m_remoteUpdateManifest = response.data;
                     tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
                 }
             }, thread());

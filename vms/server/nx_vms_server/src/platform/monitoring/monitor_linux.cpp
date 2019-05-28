@@ -553,6 +553,8 @@ static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
         return QnPlatformMonitor::NetworkPartition;
     else if( fsName == "cifs" )
         return QnPlatformMonitor::NetworkPartition;
+    else if( fsName == "fuse.osxfs" ) // Mounted volumes when Docker host is macOS.
+        return QnPlatformMonitor::LocalDiskPartition;
     else
         return QnPlatformMonitor::UnknownPartition;
 }

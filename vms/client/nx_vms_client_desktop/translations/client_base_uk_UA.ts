@@ -2950,10 +2950,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>Формати 44 і 48 кГц не підтримуються пристроєм захвату звуку. Будь ласка, виберіть інший пристрій або значення &quot;ні&quot; в налаштуваннях захоплення екрану.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation>Налаштований кодек: %1 не знайдено, h263p буде використано</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -8949,10 +8945,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Скасувати оновлення та видалити всі завантажені дані?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Не вдалося завантажити пакети оновлення для деяких серверів</translation>
-    </message>
-    <message>
       <source>There was an error while installing updates:</source>
       <translation>Відбулася помилка при встановленні:</translation>
     </message>
@@ -8962,7 +8954,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+      <translation>Оновлення завершено, але деякі компоненти не вдалося оновити</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
@@ -8971,6 +8963,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 will be restarted to the updated version.</source>
       <translation>%1 буде перезапущено до оновленої версії.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
     </message>
   </context>
   <context>
@@ -9017,7 +9013,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Невідома подія діагностики плагіна</translation>
     </message>
   </context>
   <context>
@@ -10104,28 +10100,26 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Ця збірка призначена для тестування.</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data</source>
-      <translation>Підтвердьте місце зберігання, щоб зберігати дані аналітики</translation>
-    </message>
-    <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>База даних Analytics повинна зберігатися на локальному сховищі і може займати до ста гігабайт.
-
-Після вибору розташування для зберігання аналітичних даних його не можна легко змінити, не втрачаючи вихідних даних. Ми рекомендуємо ретельно вибрати місце розташування та не використовувати системний розділ, щоб уникнути серйозних несправностей системи.
-
-Ви можете змінити місце зберігання на вкладці &quot;Storage Management&quot; у діалоговому вікні Параметри сервера.</translation>
-    </message>
-    <message>
       <source>Open Server Settings</source>
       <translation>Відкрити Налаштування Серверу</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>ОК</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

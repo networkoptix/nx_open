@@ -127,12 +127,17 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
         });
 
     connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,
-        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+        [this](const QnCameraBookmark &bookmark)
         {
             context()->statisticsModule()->registerClick(lit("bookmark_tooltip_play"));
 
-            static const int kMicrosecondsFactor = 1000;
+            auto slider = navigator()->timeSlider();
+            const bool enableNavigation = !slider->windowContains(slider->sliderTimePosition());
+
             navigator()->setPosition(microseconds(bookmark.startTimeMs).count());
+            if (enableNavigation)
+                slider->navigateTo(bookmark.startTimeMs);
+
             navigator()->setPlaying(true);
         });
 
