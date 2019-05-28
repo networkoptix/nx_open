@@ -14,14 +14,14 @@ set(android.packageName "com.daekyocns.viveex")
 
 # Support section
 set(companyUrl "http://www.daekyocns.com")
-set(productUrl "Http://www.daekyocns.com/viveex")
+set(productUrl "http://www.daekyocns.com/viveex")
 set(supportUrl "")
 set(supportEmail "viveex@daekyo.com")
 set(supportPhone "")
 set(licenseEmail "license@daekyo.com")
 # end of Support section
 
-set(defaultWebPages "{\"Home Page\": \"https://www.daekyo.com\"}")
+set(defaultWebPages "{\"Home Page\": \"https://www.daekyocns.com\"}")
 
 # Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{e44375fd-1b2e-478a-ab72-5b0df3fa9114}")

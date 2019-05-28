@@ -17,12 +17,12 @@ Config.helpLinks.push({
 Config.helpLinks.push({
     urls: [
         {
-            url: "https://itunes.apple.com/us/app/cox-business-security/id904940952?mt=8",
+            url: "https://itunes.apple.com/us/app/dw-spectrum/id1090087818?mt=8",
             button: "iOS Client",
             class:'appstore'
         },
         {
-            url: "https://play.google.com/store/apps/details?id=com.cox.hdsec",
+            url: "https://play.google.com/store/apps/details?id=com.digitalwatchdog.dwmobile",
             class:'googleplay',
             button: "Android Client"
         }
@@ -33,7 +33,7 @@ Config.helpLinks.push({
 
 Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
-Config.productName = 'Cox Business Security Solutions';
-Config.cloud.productName = 'Cox Cloud';
+Config.productName = 'DW Spectrum';
+Config.cloud.productName = 'DW Cloud';
 Config.defaultLanguage = 'en_US';
-Config.supportedLanguages = ['en_US', 'en_GB', 'fr_FR', 'de_DE', 'ru_RU', 'es_ES', 'ja_JP', 'ko_KR', 'tr_TR', 'zh_CN', 'zh_TW', 'hu_HU', 'he_IL', 'nl_NL', 'pl_PL', 'vi_VN', 'th_TH'];
+Config.supportedLanguages = ['en_US', 'fr_FR', 'es_ES'];
