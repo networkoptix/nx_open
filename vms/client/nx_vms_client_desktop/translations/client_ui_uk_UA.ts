@@ -1969,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>Більше не показувати це повідомлення</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -2360,6 +2352,14 @@
       <location/>
       <source>The new System will have password and name from System:</source>
       <translation>Нова система буде мати пароль і ім'я системи:</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>Більше не показувати це повідомлення</translation>
     </message>
   </context>
   <context>
@@ -3075,6 +3075,26 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>Параметри резервного копіювання...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
+      <translation>Дані Analytics можуть займати десятки гігабайт місця для зберігання. Ми рекомендуємо замість системного розділу вибрати інше місце для нього.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation>Дані Analytics продовжуватимуть зберігатися в інвалідному сховищі.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>Запис на недійсне сховище припиниться. Однак, видалення застарілих записів триватиме.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>Запис було увімкнено на USB-накопичувачі</translation>
     </message>
   </context>
   <context>

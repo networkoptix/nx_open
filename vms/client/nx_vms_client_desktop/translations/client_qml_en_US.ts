@@ -65,6 +65,17 @@
     </message>
 </context>
 <context>
+    <name>PluginsInformation</name>
+    <message>
+        <source>No plugins installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server is offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SystemTile</name>
     <message>
         <source>INCOMPATIBLE</source>

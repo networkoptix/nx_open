@@ -8,9 +8,7 @@
 
 #include <ui/dialogs/common/dialog.h>
 
-namespace Ui {
-class MessageBox;
-}
+namespace Ui { class QnMessageBox; }
 
 class QnMessageBoxPrivate;
 
@@ -202,7 +200,7 @@ private:
     QPixmap getPixmapByIconId(QnMessageBoxIcon icon);
 
 private:
-    const QScopedPointer<Ui::MessageBox> ui;
+    const QScopedPointer<Ui::QnMessageBox> ui;
 
     Q_DECLARE_PRIVATE(QnMessageBox)
     const QScopedPointer<QnMessageBoxPrivate> d_ptr;

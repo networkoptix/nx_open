@@ -115,12 +115,12 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         auto [trackMinTimestamp, trackMaxTimestamp] = findMinMaxTimestamp(object.track);
 
         query->bindValue(0, deviceDbId);
-        query->bindValue(1, objectTypeDbId);
+        query->bindValue(1, (long long) objectTypeDbId);
         query->bindValue(2, QnSql::serialized_field(object.objectAppearanceId));
         query->bindValue(3, trackMinTimestamp / kUsecInMs);
         query->bindValue(4, trackMaxTimestamp / kUsecInMs);
         query->bindValue(5, TrackSerializer::serialized(object.track));
-        query->bindValue(6, attributesId);
+        query->bindValue(6, (long long) attributesId);
         query->bindValue(7, object.bestShot.initialized()
             ? object.bestShot.timestampUsec / kUsecInMs
             : 0);
@@ -178,12 +178,12 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
             findMinMaxTimestamp(objectUpdate.appendedTrack);
 
         updateObjectQuery->bindValue(0, TrackSerializer::serialized(objectUpdate.appendedTrack));
-        updateObjectQuery->bindValue(1, newAttributesId);
+        updateObjectQuery->bindValue(1, (long long) newAttributesId);
         updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
         updateObjectQuery->bindValue(3, trackMaxTimestamp / kUsecInMs);
         updateObjectQuery->bindValue(4, objectUpdate.dbId != -1
-            ? objectUpdate.dbId
-            : m_objectCache->dbIdFromObjectId(objectUpdate.objectId));
+            ? (long long) objectUpdate.dbId
+            : (long long) m_objectCache->dbIdFromObjectId(objectUpdate.objectId));
         updateObjectQuery->exec();
 
         m_objectCache->saveObjectGuidToAttributesId(objectUpdate.objectId, newAttributesId);
@@ -225,7 +225,7 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
             const auto objectDbId = m_objectCache->dbIdFromObjectId(objectId);
 
             insertObjectSearchToAttributesBinding->bindValue(0, objectSearchCellId);
-            insertObjectSearchToAttributesBinding->bindValue(1, objectDbId);
+            insertObjectSearchToAttributesBinding->bindValue(1, (long long) objectDbId);
             insertObjectSearchToAttributesBinding->exec();
         }
     }
@@ -243,9 +243,7 @@ void DetectionDataSaver::saveToAnalyticsArchive(nx::sql::QueryContext* queryCont
         const auto result = m_analyticsArchive->saveToArchive(
             item.deviceId,
             item.timestamp,
-            translate<>(
-                std::vector<QRect>(item.region.begin(), item.region.end()),
-                QSize(kTrackSearchResolutionX, kTrackSearchResolutionY)),
+            std::vector<QRect>(item.region.begin(), item.region.end()),
             item.objectType,
             item.combinedAttributesId);
         if (!result)
@@ -259,7 +257,7 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
     struct Item
     {
         QRegion region;
-        std::vector<long long> attributesIds;
+        std::set<int64_t> attributesIds;
     };
 
     std::map<std::pair<QnUuid, int /*objectType*/>, Item> regionByObjectType;
@@ -274,11 +272,11 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
         for (const auto& objectId: aggregatedTrackData.objectIds)
         {
             const auto objectAttributes = getObjectDbDataById(objectId);
-            
+
             Item& item = regionByObjectType[
                 {objectAttributes.deviceId, objectAttributes.objectTypeId}];
             item.region += aggregatedTrackData.boundingBox;
-            item.attributesIds.push_back(objectAttributes.attributesDbId);
+            item.attributesIds.insert(objectAttributes.attributesDbId);
         }
     }
 
@@ -287,7 +285,8 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
     {
         AnalArchiveItem archiveItem;
         archiveItem.deviceId = deviceIdAndObjectType.first;
-        archiveItem.combinedAttributesId = combineAttributes(queryContext, item.attributesIds);
+        archiveItem.combinedAttributesId = 
+            m_attributesDao->combineAttributes(queryContext, item.attributesIds);
         archiveItem.objectType = deviceIdAndObjectType.second;
         archiveItem.region = item.region;
         archiveItem.timestamp = minTimestamp;
@@ -309,39 +308,6 @@ DetectionDataSaver::ObjectDbAttributes
     }
 
     return result;
-}
-
-long long DetectionDataSaver::combineAttributes(
-    nx::sql::QueryContext* queryContext,
-    const std::vector<long long>& attributesIds)
-{
-    if (attributesIds.empty())
-        return -1;
-
-    auto query = queryContext->connection()->createQuery();
-    query->prepare(R"sql(
-        INSERT INTO combined_attributes (combination_id, attributes_id) VALUES (?, ?)
-    )sql");
-
-    query->bindValue(0, -1);
-    query->bindValue(1, attributesIds.front());
-    query->exec();
-
-    const auto combinationId = query->lastInsertId().toLongLong();
-
-    // Replacing -1 with the correct value.
-    queryContext->connection()->executeQuery(
-        "UPDATE combined_attributes SET combination_id = ? WHERE rowid = ?",
-        combinationId, combinationId);
-
-    for (std::size_t i = 1; i < attributesIds.size(); ++i)
-    {
-        query->bindValue(0, combinationId);
-        query->bindValue(1, attributesIds[i]);
-        query->exec();
-    }
-
-    return combinationId;
 }
 
 } // namespace nx::analytics::db

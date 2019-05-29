@@ -29,10 +29,15 @@ struct Package
     QString md5;
     qint64 size = 0;
 
-    /** List of targets that should receive this package. */
-    QList<QnUuid> targets;
+    /**
+     * A set of targets that should receive this package.
+     * This set is used by client to keep track of package uploads.
+     */
+    QSet<QnUuid> targets;
 
     bool isValid() const { return !file.isEmpty(); }
+    bool isServer() const;
+    bool isClient() const;
 };
 
 #define Package_Fields (component)(arch)(platform)(variant)(variantVersion)(file)(url)(size)(md5)
@@ -78,6 +83,8 @@ enum class InformationError
     incompatibleVersion,
     incompatibleCloudHost,
     notFoundError,
+    /** Error when client tried to contact mediaserver for update verification. */
+    serverConnectionError,
     noNewVersion,
 };
 
@@ -216,15 +223,6 @@ struct UpdateContents
     QStringList filesToUpload;
 
     using SystemInformation = nx::vms::api::SystemInformation;
-
-    using PackageCache =
-        std::map<SystemInformation, QList<nx::update::Package>, SystemInformationComparator>;
-    /**
-     * Maps system information to a set of packages. We use this cache to find and check
-     * if a specific OS variant is supported.
-     */
-    PackageCache serverPackageCache;
-    PackageCache clientPackageCache;
 
     /** Information for the clent update. */
     nx::update::Package clientPackage;

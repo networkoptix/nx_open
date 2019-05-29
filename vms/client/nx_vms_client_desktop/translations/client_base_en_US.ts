@@ -2888,10 +2888,6 @@ to %1</source>
         <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Configured codec: %1 not found, h263p will used</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3196,6 +3192,17 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+        <source>Video card drivers are outdated or not installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 may not work properly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
         <source>Select folder...</source>
@@ -3278,17 +3285,6 @@ to %1</source>
     </message>
     <message>
         <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-        <source>Video card drivers are outdated or not installed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 may not work properly.</source>
         <translation></translation>
     </message>
 </context>
@@ -3586,8 +3582,8 @@ to %1</source>
         </translation>
     </message>
     <message>
-        <source>Qty</source>
-        <translation></translation>
+        <source>Channels</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5108,6 +5104,10 @@ to %1</source>
         <source>Server Web Page</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnServerSettingsWidget</name>
@@ -5577,16 +5577,29 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Recording was enabled on the USB storage</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>What to do with current analytics data?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5634,6 +5647,14 @@ to %1</source>
     <message>
         <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Use to store analytics data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stores analytics data</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7492,11 +7513,11 @@ to %1</source>
         </translation>
     </message>
     <message>
-        <source>UDP Multicast</source>
+        <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+        <source>Multicast</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8529,10 +8550,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Please make sure there is enough free storage space and network connection is stable.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>If the problem persists, please contact Customer Support.</source>
         <translation></translation>
     </message>
@@ -8545,15 +8562,7 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Please make sure they have enough free storage space and stable network connection.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Update completed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update completed, but some servers have failed an update</source>
         <translation></translation>
     </message>
     <message>
@@ -8562,10 +8571,6 @@ to %1</source>
     </message>
     <message>
         <source>OK</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to install updates to servers:</source>
         <translation></translation>
     </message>
     <message>
@@ -8700,6 +8705,26 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>There was an error while installing updates:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update completed, but some components have failed an update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please update %1 manually using an installation package.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 will be restarted to the updated version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Failed to download update packages to some components</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8733,10 +8758,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown Plugin Event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Device was disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8746,6 +8767,10 @@ to %1</source>
     </message>
     <message>
         <source>I/O Module was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Plugin Diagnostic Event</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8819,6 +8844,62 @@ to %1</source>
     </message>
     <message>
         <source>Failed to install update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for peer data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update package can&apos;t be not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is not enough space to download update files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is not enough space to extract update files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to download update packages.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update contents are invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update archive is corrupted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update files cannot be extracted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internal downloader error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Iternal server error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internal client error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unexpected error code.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ready to install update</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8973,6 +9054,21 @@ to %1</source>
     </message>
     <message>
         <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+        <source>Library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vendor</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9731,6 +9827,25 @@ to %1</source>
     </message>
     <message>
         <source>This build is for testing purposes only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Server Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

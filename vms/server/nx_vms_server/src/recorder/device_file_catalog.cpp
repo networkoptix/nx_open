@@ -473,7 +473,7 @@ void DeviceFileCatalog::scanMediaFiles(
     if (files.empty())
         return;
 
-    NX_INFO(this, "[Scan] started for directory: %1", nx::utils::url::hidePassword(folder));
+    NX_DEBUG(this, "[Scan] started for directory: %1", nx::utils::url::hidePassword(folder));
 
     QThreadPool tp;
     tp.setMaxThreadCount(4);
@@ -533,7 +533,7 @@ void DeviceFileCatalog::scanMediaFiles(
     }
     tp.waitForDone();
 
-    NX_INFO(this, "[Scan] finished for directory: %1, %2 files processed",
+    NX_DEBUG(this, "[Scan] finished for directory: %1, %2 files processed",
         nx::utils::url::hidePassword(folder), allChunks.size());
 }
 

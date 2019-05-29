@@ -12,7 +12,10 @@ extern "C"
 #include "transcoder.h"
 #include "utils/media/frame_info.h"
 #include "decoders/video/ffmpeg_video_decoder.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
+#include <export/signer.h>
 
+class QnLicensePool;
 
 class QnFfmpegTranscoder: public QnTranscoder
 {
@@ -23,7 +26,7 @@ public:
 
     struct Config
     {
-        bool computeSignatureHash = false;
+        bool computeSignature = false;
         DecoderConfig decoderConfig;
     };
 
@@ -47,8 +50,7 @@ public:
     bool inMiddleOfStream() const { return m_inMiddleOfStream; }
     void setStartTimeOffset(qint64 value) { m_startTimeOffset = value; }
 
-    void updateSignatureHash(uint8_t* data, int size);
-    QByteArray getSignatureHash();
+    QByteArray getSignature(QnLicensePool* licensePool);
 
     struct PacketTimestamp
     {
@@ -65,11 +67,11 @@ private:
     //friend qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size);
     AVIOContext* createFfmpegIOContext();
     void closeFfmpegContext();
-    int muxPacket(const AVPacket* packet);
+    int muxPacket(const QnConstAbstractMediaDataPtr& packet);
 
 private:
     Config m_config;
-    nx::utils::QnCryptographicHash m_signatureHash;
+    MediaSigner m_mediaSigner;
     AVCodecContext* m_videoEncoderCodecCtx;
     AVCodecContext* m_audioEncoderCodecCtx;
     int m_videoBitrate;

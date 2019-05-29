@@ -65,6 +65,17 @@
     </message>
   </context>
   <context>
+    <name>PluginsInformation</name>
+    <message>
+      <source>No plugins installed</source>
+      <translation>Brak zainstalowanych wtyczek</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation>Serwer jest odłączony</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
@@ -85,6 +96,14 @@
     <message>
       <source>New Server</source>
       <translation>Nowy serwer</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Edytuj</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Ukryj</translation>
     </message>
   </context>
   <context>

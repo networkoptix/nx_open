@@ -23,7 +23,8 @@ static constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833
 
 //-------------------------------------------------------------------------------------------------
 
-EventsStorage::EventsStorage():
+EventsStorage::EventsStorage(QnMediaServerModule* mediaServerModule):
+    m_mediaServerModule(mediaServerModule),
     m_timePeriodDao(&m_deviceDao),
     m_objectCache(kTrackAggregationPeriod, kMaxCachedObjectLifeTime),
     m_trackAggregator(
@@ -55,7 +56,7 @@ bool EventsStorage::initialize(const Settings& settings)
     m_dbController.reset();
 
     m_closingDbController = false;
-    
+
     auto dbConnectionOptions = settings.dbConnectionOptions;
     dbConnectionOptions.dbName = settings.path + "/" + dbConnectionOptions.dbName;
     m_dbController = std::make_unique<DbController>(dbConnectionOptions);
@@ -68,11 +69,9 @@ bool EventsStorage::initialize(const Settings& settings)
         return false;
     }
 
-    if (kSaveTimePeriodsToFile)
-    {
-        m_analyticsArchiveDirectory = std::make_unique<AnalyticsArchiveDirectory>(
-            settings.path + "/archive/");
-    }
+    m_analyticsArchiveDirectory = std::make_unique<AnalyticsArchiveDirectory>(
+        m_mediaServerModule,
+        settings.path + "/archive/");
 
     return true;
 }
@@ -206,6 +205,8 @@ void EventsStorage::lookup(
 {
     QnMutexLocker lock(&m_dbControllerMutex);
 
+    NX_DEBUG(this, "Selecting objects. Filter %1", filter);
+
     if (!m_dbController)
     {
         NX_DEBUG(this, "Attempt to look up objects in non-initialized analytics DB");
@@ -235,6 +236,8 @@ void EventsStorage::lookup(
         [this, result, completionHandler = std::move(completionHandler)](
             sql::DBResult resultCode)
         {
+            NX_DEBUG(this, "%1 objects selected. Result code %2", result->size(), resultCode);
+
             completionHandler(
                 dbResultToResultCode(resultCode),
                 std::move(*result));
@@ -247,6 +250,9 @@ void EventsStorage::lookupTimePeriods(
     TimePeriodsLookupCompletionHandler completionHandler)
 {
     QnMutexLocker lock(&m_dbControllerMutex);
+
+    NX_DEBUG(this, "Selecting time periods. Filter %1, detail level %2",
+        filter, options.detailLevel);
 
     if (!m_dbController)
     {
@@ -267,6 +273,7 @@ void EventsStorage::lookupTimePeriods(
                     m_deviceDao,
                     m_objectTypeDao,
                     m_timePeriodDao,
+                    &m_attributesDao,
                     m_analyticsArchiveDirectory.get(),
                     m_maxRecordedTimestamp);
                 return timePeriodFetcher.selectTimePeriods(
@@ -280,6 +287,8 @@ void EventsStorage::lookupTimePeriods(
         [this, result, completionHandler = std::move(completionHandler)](
             sql::DBResult resultCode)
         {
+            NX_DEBUG(this, "%1 time periods selected. Result code %2", result->size(), resultCode);
+
             completionHandler(
                 dbResultToResultCode(resultCode),
                 std::move(*result));
@@ -442,8 +451,8 @@ void EventsStorage::insertEvent(
     sql::QueryContext* queryContext,
     const common::metadata::DetectionMetadataPacket& packet,
     const common::metadata::DetectedObject& detectedObject,
-    long long attributesId,
-    long long /*timePeriodId*/)
+    int64_t attributesId,
+    int64_t /*timePeriodId*/)
 {
     sql::SqlQuery insertEventQuery(queryContext->connection());
     insertEventQuery.prepare(QString::fromLatin1(R"sql(
@@ -459,12 +468,12 @@ void EventsStorage::insertEvent(
     insertEventQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(packet.deviceId));
     insertEventQuery.bindValue(
         ":objectTypeId",
-        m_objectTypeDao.objectTypeIdFromName(detectedObject.objectTypeId));
+        (long long) m_objectTypeDao.objectTypeIdFromName(detectedObject.objectTypeId));
     insertEventQuery.bindValue(
         ":objectAppearanceId",
         QnSql::serialized_field(detectedObject.objectId));
 
-    insertEventQuery.bindValue(":attributesId", attributesId);
+    insertEventQuery.bindValue(":attributesId", (long long) attributesId);
 
     const auto packedBoundingBox = packRect(detectedObject.boundingBox);
 
@@ -619,8 +628,8 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
         {"object_id", "timestamp_usec_utc", "timestamp_usec_utc"},
         &sqlFilter);
 
-    if (!filter.boundingBox.isNull())
-        ObjectSearcher::addBoundingBoxToFilter(packRect(filter.boundingBox), &sqlFilter);
+    if (filter.boundingBox)
+        ObjectSearcher::addBoundingBoxToFilter(packRect(*filter.boundingBox), &sqlFilter);
 
     if (!filter.freeText.isEmpty())
     {
@@ -1085,7 +1094,8 @@ QRectF EventsStorage::unpackRect(const QRect& rect)
 //-------------------------------------------------------------------------------------------------
 
 EventsStorageFactory::EventsStorageFactory():
-    base_type(std::bind(&EventsStorageFactory::defaultFactoryFunction, this))
+    base_type([this](auto&&... args)
+        { return defaultFactoryFunction(std::forward<decltype(args)>(args)...); })
 {
 }
 
@@ -1095,9 +1105,10 @@ EventsStorageFactory& EventsStorageFactory::instance()
     return staticInstance;
 }
 
-std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunction()
+std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunction(
+    QnMediaServerModule* mediaServerModule)
 {
-    return std::make_unique<EventsStorage>();
+    return std::make_unique<EventsStorage>(mediaServerModule);
 }
 
 } // namespace nx::analytics::db

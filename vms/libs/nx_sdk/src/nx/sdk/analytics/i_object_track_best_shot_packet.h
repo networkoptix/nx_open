@@ -21,7 +21,7 @@ public:
     }
 
     /**
-     * Timestamp of the frame (in microseconds) the best shot belongs to. Should be a positive
+     * Timestamp of the frame (in microseconds) the best shot belongs to. Should be a non-negative
      * number.
      */
     virtual int64_t timestampUs() const = 0;

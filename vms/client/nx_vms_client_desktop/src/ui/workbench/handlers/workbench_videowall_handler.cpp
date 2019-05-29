@@ -255,7 +255,7 @@ const int kIdentifyFontSize = 100;
 
 const int cacheMessagesTimeoutMs = 500;
 
-const qreal defaultReviewAR = 1920.0 / 1080.0;
+const float defaultReviewAR = 1920.0 / 1080.0;
 
 const QnUuid uuidPoolBase("621992b6-5b8a-4197-af04-1657baab71f0");
 

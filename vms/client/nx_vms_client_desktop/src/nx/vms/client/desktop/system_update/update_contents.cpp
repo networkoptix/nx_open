@@ -19,7 +19,6 @@ using nx::update::UpdateContents;
 namespace {
 
 const QString kFilePrefix = "file://";
-const QString kClientComponent = "client";
 
 } // namespace
 
@@ -76,21 +75,24 @@ bool checkCloudHost(QnCommonModule* commonModule, nx::utils::SoftwareVersion tar
 }
 
 nx::update::Package* findPackageForOsVariant(
-    QList<nx::update::Package>& packages,
+    const QList<nx::update::Package*>& packages,
     const QString& component,
     const QString& variantVersion)
 {
     nx::utils::SoftwareVersion version{variantVersion};
     for (auto& package: packages)
     {
-        if (component != package.component)
+        if (package == nullptr)
             continue;
 
-        if (package.variantVersion.isEmpty())
-            return &package;
+        if (component != package->component)
+            continue;
 
-        if (nx::utils::SoftwareVersion(package.variantVersion) < version)
-            return &package;
+        if (package->variantVersion.isEmpty())
+            return package;
+
+        if (nx::utils::SoftwareVersion(package->variantVersion) < version)
+            return package;
     }
     return nullptr;
 }
@@ -187,8 +189,12 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 QFileInfo file(contents.storageDir.filePath(pkg.file));
                 if (file.exists())
                 {
-                    contents.filesToUpload.push_back(pkg.file);
+                    // In 4.0 we should upload only server components. There is no way to make
+                    // sure server keeps client packages.
+                    if (pkg.isServer())
+                        contents.filesToUpload.push_back(pkg.file);
                     pkg.localFile = file.fileName();
+                    // This filename will be used by uploader.
                     pkg.file = uploadDestination + file.fileName();
                     checked.push_back(pkg);
                 }
@@ -214,25 +220,31 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         contents.eulaPath = contents.info.eulaLink;
     }
 
-    // Update is allowed if either target version has the same cloud host or
-    // there are no servers linked to the cloud in the system.
-    //QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
+    /**
+     * Maps system information to a set of packages. We use this cache to find and check
+     * if a specific OS variant is supported.
+     */
 
-    for (const auto& package: info.packages)
+    using PackageCache = std::map<nx::vms::api::SystemInformation, QList<nx::update::Package*>,
+        nx::update::SystemInformationComparator>;
+    PackageCache serverPackageCache;
+    PackageCache clientPackageCache;
+
+    for (auto& package: info.packages)
     {
         nx::vms::api::SystemInformation info;
         info.arch = package.arch;
         info.modification = package.variant;
         info.platform = package.platform;
 
-        auto& cache = (package.component == kClientComponent)
-            ? contents.clientPackageCache
-            : contents.serverPackageCache;
+        auto& cache = package.isClient()
+            ? clientPackageCache
+            : serverPackageCache;
 
         if (!cache.count(info))
-            cache.emplace(info, QList<nx::update::Package>());
+            cache.emplace(info, QList<nx::update::Package*>());
         auto& record = cache[info];
-        record.append(package);
+        record.append(&package);
     }
 
     // We will try to set it to false when we check servers and clients
@@ -243,8 +255,8 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         if (clientData.currentVersion != contents.getVersion())
             alreadyInstalled = false;
 
-        auto it = contents.clientPackageCache.find(clientData.systemInfo);
-        if (it == contents.clientPackageCache.end())
+        auto it = clientPackageCache.find(clientData.systemInfo);
+        if (it == clientPackageCache.end())
         {
             NX_ERROR(typeid(UpdateContents)) << "verifyUpdateManifest("
                 << contents.info.version << ") client arch"
@@ -296,8 +308,8 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 
         auto serverInfo = server->getSystemInfo();
 
-        auto it = contents.serverPackageCache.find(serverInfo);
-        if (it == contents.serverPackageCache.end())
+        auto it = serverPackageCache.find(serverInfo);
+        if (it == serverPackageCache.end())
         {
             NX_ERROR(typeid(UpdateContents)) << "verifyUpdateManifest("
                 << contents.info.version << ") server"
@@ -342,7 +354,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 
         if (package && serverVersion <= targetVersion)
         {
-            package->targets.push_back(server->getId());
+            package->targets.insert(server->getId());
             contents.serversWithUpdate.insert(server->getId());
             auto hasInternet = server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
             if (!hasInternet)

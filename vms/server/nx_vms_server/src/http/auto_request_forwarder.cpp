@@ -377,8 +377,8 @@ qint64 QnAutoRequestForwarder::fetchTimestamp(
         auto rangeIter = request.headers.find(nx::network::rtsp::header::Range::NAME);
         if (rangeIter != request.headers.end())
         {
-            qint64 startTimestamp = 0;
-            qint64 endTimestamp = 0;
+            int64_t startTimestamp = 0;
+            int64_t endTimestamp = 0;
             if (nx::network::rtsp::parseRangeHeader(rangeIter->second, &startTimestamp, &endTimestamp))
                 return startTimestamp / kUsPerMs;
         }

@@ -124,6 +124,8 @@ TEST_F(SystemMerge, two_systems_can_be_merged)
 
     thenMergeSucceeded();
 
+    waitUntilAllServersSynchronizedData();
+
     nx::vms::api::ResourceParamDataList peer0Settings;
     ASSERT_EQ(
         ec2::ErrorCode::ok,
@@ -135,8 +137,6 @@ TEST_F(SystemMerge, two_systems_can_be_merged)
         peer(1).mediaServerClient()->ec2GetSettings(&peer1Settings));
 
     ASSERT_TRUE(peer0Settings == peer1Settings);
-
-    waitUntilAllServersSynchronizedData();
 }
 
 TEST_F(SystemMerge, merge_history_record_is_added_during_merge)

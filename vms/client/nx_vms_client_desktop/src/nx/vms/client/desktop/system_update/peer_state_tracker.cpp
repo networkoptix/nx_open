@@ -489,13 +489,25 @@ QSet<QnUuid> PeerStateTracker::offlineServers() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::offlineNotTooLong() const
+QSet<QnUuid> PeerStateTracker::onlineAndInState(StatusCode state) const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
     {
-        if (item->offline && item->state != StatusCode::offline)
+        if (!item->offline && item->state == state)
+            result.insert(item->id);
+    }
+    return result;
+}
+
+QSet<QnUuid> PeerStateTracker::offlineAndInState(StatusCode state) const
+{
+    QnMutexLocker locker(&m_dataLock);
+    QSet<QnUuid> result;
+    for (const auto& item: m_items)
+    {
+        if (item->offline && item->state == state)
             result.insert(item->id);
     }
     return result;
@@ -839,7 +851,7 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
             return tr("Unknown error.");
     }
     NX_ASSERT(false);
-    return tr("Unhandled error code.");
+    return tr("Unexpected error code.");
 }
 
 void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)

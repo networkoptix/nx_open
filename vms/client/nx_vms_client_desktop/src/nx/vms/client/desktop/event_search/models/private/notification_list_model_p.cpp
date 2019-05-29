@@ -442,7 +442,7 @@ QString NotificationListModel::Private::caption(const nx::vms::event::EventParam
 
         case EventType::pluginEvent:
             return parameters.caption.isEmpty()
-                ? tr("Unknown Plugin Event")
+                ? tr("Unknown Plugin Diagnostic Event")
                 : parameters.caption;
 
         case EventType::analyticsSdkEvent:

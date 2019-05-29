@@ -7,6 +7,8 @@
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 
+#include <api/helpers/camera_id_helper.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <common/common_globals.h>
@@ -16,7 +18,7 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
-#include <api/helpers/camera_id_helper.h>
+#include <nx/utils/impl_ptr.h>
 
 /**
  * This class holds all resources in the system that are READY TO BE USED (as long as resource is
@@ -29,7 +31,7 @@
  */
 class QnResourcePool: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
 {
-Q_OBJECT
+    Q_OBJECT
     using base_type = Connective<QObject>;
 
 public:
@@ -294,6 +296,7 @@ public:
     static void markLayoutLiteClient(const QnLayoutResourcePtr& layout);
 
     QThreadPool* threadPool() const;
+
 signals:
     void resourceAdded(const QnResourcePtr& resource);
     void resourceRemoved(const QnResourcePtr& resource);
@@ -301,17 +304,8 @@ signals:
     void statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason reason);
 
 private:
-    mutable struct Cache
-    {
-        void resourceRemoved(const QnResourcePtr& res);
-        void resourceAdded(const QnResourcePtr& res);
-
-        int ioModulesCount = 0;
-        QMap<QnUuid, QnMediaServerResourcePtr> mediaServers;
-        QMap<QString, QnResourcePtr> resourcesByUniqueId;
-    private:
-        bool isIoModule(const QnResourcePtr& res) const;
-    } m_cache;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 
     mutable QnMutex m_resourcesMtx;
     bool m_tranInProgress;

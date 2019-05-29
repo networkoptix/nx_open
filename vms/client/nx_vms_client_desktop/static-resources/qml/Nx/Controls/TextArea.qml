@@ -3,20 +3,34 @@ import Nx 1.0
 
 import "private"
 
-TextArea
+ScrollView
 {
+    id: control
+
+    property alias text: textArea.text
+
     implicitWidth: 200
     implicitHeight: 64
-    leftPadding: 8
-    rightPadding: 8
 
-    font.pixelSize: 14
+    TextArea
+    {
+        id: textArea
 
-    color: enabled ? ColorTheme.text : ColorTheme.transparent(ColorTheme.text, 0.3)
+        leftPadding: 8
+        rightPadding: control.ScrollBar.vertical.visible ? 12 : 8
+        bottomPadding: control.ScrollBar.horizontal.visible ? 12 : 4
 
-    background: TextFieldBackground { control: parent }
+        implicitWidth: control.implicitWidth
+        implicitHeight: control.implicitHeight
 
-    selectByMouse: true
-    selectedTextColor: ColorTheme.brightText
-    selectionColor: ColorTheme.highlight
+        font.pixelSize: 14
+
+        color: enabled ? ColorTheme.text : ColorTheme.transparent(ColorTheme.text, 0.3)
+
+        background: TextFieldBackground { control: parent }
+
+        selectByMouse: true
+        selectedTextColor: ColorTheme.brightText
+        selectionColor: ColorTheme.highlight
+    }
 }

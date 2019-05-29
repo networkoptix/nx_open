@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Email hoặc mật khẩu không chính xác",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Quá nhiều lần thử. Vui lòng thử lại sau một phút."
     },
     "navigaion": {
         "cannotGetUser": "Lỗi máy chủ: không thể truy xuất dữ liệu người dùng hiện tại"

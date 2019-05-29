@@ -29,7 +29,7 @@ LabeledItem
         editable: true
         validator: DoubleValidator { bottom: spinBox.from; top: spinBox.to }
 
-        onValueModified: control.value = value / multiplier
+        onValueChanged: control.value = value / multiplier
 
         textFromValue: function(value, locale)
         {

@@ -186,7 +186,8 @@ bool SdkObjectFactory::initPluginResources()
         auto sdkPluginItr = sdkPluginsById.find(pluginData.id);
         if (sdkPluginItr == sdkPluginsById.cend())
         {
-            NX_WARNING(this, "Unable to find a SDK plugin object. Plugin name: %1, plugin Id (%2)",
+            NX_WARNING(this,
+                "Unable to find an SDK plugin object. Plugin name: %1, plugin Id (%2)",
                 pluginData.name, pluginData.id);
             continue;
         }

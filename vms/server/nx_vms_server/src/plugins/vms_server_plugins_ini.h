@@ -24,6 +24,10 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "this setting enables the plugins that are disabled by default, and the\n"
         "disabledNxPlugins setting disables the plugins that are enabled by default.");
 
+    NX_INI_FLAG(0, disablePluginLinkedDllLookup,
+        "In Windows, for Plugins residing in a dedicated plugin folder, do not set DLL search\n"
+        "path to that folder via SetDllDirectoryW().");
+
     NX_INI_STRING("", analyticsEngineSettingsPath,
         "Path (absolute or relative to .ini dir) to {plugin_name}_engine_settings.json: array\n"
         "of objects with name and value strings. Settings are passed to the Engine from the file\n"

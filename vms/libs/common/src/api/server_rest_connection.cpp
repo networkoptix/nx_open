@@ -454,18 +454,20 @@ Handle ServerConnection::addFileUpload(
     qint64 chunkSize,
     const QByteArray& md5,
     qint64 ttl,
+    bool recreateIfExists,
     AddUploadCallback callback,
     QThread* targetThread)
 {
     QnRequestParamList params
     {
-        { lit("size"), QString::number(size) },
-        { lit("chunkSize"), QString::number(chunkSize) },
-        { lit("md5"), QString::fromUtf8(md5) },
-        { lit("ttl"), QString::number(ttl) },
-        { lit("upload"), lit("true") }
+        {"size", QString::number(size)},
+        {"chunkSize", QString::number(chunkSize)},
+        {"md5", QString::fromUtf8(md5)},
+        {"ttl", QString::number(ttl)},
+        {"upload", "true"},
+        {"recreate", recreateIfExists ? "true" : "false"},
     };
-    QString path = lit("/api/downloads/%1").arg(fileName);
+    const auto& path = QStringLiteral("/api/downloads/%1").arg(fileName);
     return executePost(path, params, QByteArray(), QByteArray(), callback, targetThread);
 }
 
@@ -911,6 +913,14 @@ Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
     return executePost<EmptyResponseType>("/api/installUpdate",
         QnRequestParamList{{ lit("peers"), peerList }},
         contentType, QByteArray(), internalCallback, targetThread);
+}
+
+Handle ServerConnection::retryUpdate(
+    Result<UpdateStatusAllData>::type callback, QThread* targetThread)
+{
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    return executePost<UpdateStatusAllData>("/ec2/retryUpdate",
+        QnRequestParamList(), contentType, QByteArray(), callback, targetThread);
 }
 
 Handle ServerConnection::getUpdateStatus(

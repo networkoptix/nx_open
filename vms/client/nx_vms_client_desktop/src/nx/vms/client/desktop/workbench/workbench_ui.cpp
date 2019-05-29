@@ -1441,6 +1441,7 @@ void WorkbenchUi::createFpsWidget()
     m_fpsItem->setAcceptedMouseButtons(0);
     m_fpsItem->setAcceptHoverEvents(false);
     m_fpsItem->setText(lit("...."));
+    m_fpsItem->setTextFormat(Qt::RichText);
     updateFpsGeometry();
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
@@ -1448,12 +1449,12 @@ void WorkbenchUi::createFpsWidget()
 
     connect(action(action::ShowFpsAction), &QAction::toggled, this, &WorkbenchUi::setFpsVisible);
     connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::updateFpsGeometry);
-    setFpsVisible(qnRuntime->isProfilerMode());
+    setFpsVisible(ini().profilerMode);
 
     connect(display()->debugInfoInstrument(), &DebugInfoInstrument::debugInfoChanged, this,
-        [this](const QString& text)
+        [this](const QString& richText)
         {
-            m_fpsItem->setText(text);
+            m_fpsItem->setText(richText);
             m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
         });
 }

@@ -43,6 +43,8 @@ DECLARE_STRUCT(ResetEventRulesData)
 DECLARE_STRUCT(TimeReply)
 DECLARE_STRUCT_AND_LIST(ServerTimeReply)
 
+DECLARE_STRUCT(MergeStatusReply)
+
 DECLARE_STRUCT_AND_LIST(ResourceData)
 DECLARE_STRUCT_AND_LIST(ResourceParamData)
 DECLARE_STRUCT_AND_LIST(ResourceParamWithRefData)

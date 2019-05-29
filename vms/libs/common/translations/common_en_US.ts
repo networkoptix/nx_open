@@ -1550,14 +1550,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Plugin Event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unknown plugin event</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Failed to force using camera time, it lags too much, system time will be used</source>
         <translation></translation>
     </message>
@@ -1567,6 +1559,30 @@
     </message>
     <message>
         <source>Multiple %1 events have occurred</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network address %1 is not a multicast address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics storage &quot;%1&quot; is offline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics storage &quot;%1&quot; is almost full.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugin Diagnostic Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Plugin Diagnostic Event</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

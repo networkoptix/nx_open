@@ -433,7 +433,7 @@ protected:
         const auto& engineManifest = engineInfo.engineManifest;
 
         inOutExpectedDescriptors->engineDescriptors[engineId] =
-            EngineDescriptor(engineId, kEngineName, pluginId);
+            EngineDescriptor(engineId, kEngineName, pluginId, EngineManifest());
 
         for (const auto& group: engineManifest.groups)
         {

@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.10
 import QtQuick.Controls 2.0
 import Nx 1.0
 
@@ -17,15 +17,25 @@ SpinBox
 
     background: TextFieldBackground { control: parent }
 
+    onValueChanged:
+    {
+        if (control.valueFromText(textInput.text, Qt.locale()) !== value)
+            textInput.text = control.textFromValue(value, Qt.locale())
+    }
+
     contentItem: TextInput
     {
+        id: textInput
+
         z: 0
         color: enabled ? ColorTheme.text : ColorTheme.transparent(ColorTheme.text, 0.3)
         selectByMouse: true
         selectedTextColor: ColorTheme.brightText
         selectionColor: ColorTheme.highlight
 
-        text: control.displayText
+        validator: control.validator
+
+        onTextEdited: control.value = control.valueFromText(text, Qt.locale())
     }
 
     up.indicator: Rectangle

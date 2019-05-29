@@ -66,7 +66,7 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
     m_config(config),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),
-    m_mtMode(false),
+    m_useMultiThreadEncode(false),
     m_lastEncodedTime(AV_NOPTS_VALUE),
     m_averageCodingTimePerFrame(0),
     m_averageVideoTimePerFrame(0),
@@ -137,7 +137,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->time_base.num = 1;
     m_encoderCtx->time_base.den = 60;
     m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
-    if (m_mtMode)
+    if (m_useMultiThreadEncode)
         m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
 
     AVDictionary* options = nullptr;
@@ -214,7 +214,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
     QnFfmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
     if (!decoder)
-        decoder = m_videoDecoders[video->channelNumber] = new QnFfmpegVideoDecoder(m_config, video->compressionType, video, m_mtMode);
+        decoder = m_videoDecoders[video->channelNumber] = new QnFfmpegVideoDecoder(m_config, video->compressionType, video);
 
     if (result)
         *result = QnCompressedVideoDataPtr();
@@ -307,9 +307,14 @@ AVCodecContext* QnFfmpegVideoTranscoder::getCodecContext()
     return m_encoderCtx;
 }
 
-void QnFfmpegVideoTranscoder::setMTMode(bool value)
+void QnFfmpegVideoTranscoder::setUseMultiThreadEncode(bool value)
 {
-    m_mtMode = value;
+    m_useMultiThreadEncode = value;
+}
+
+void QnFfmpegVideoTranscoder::setUseMultiThreadDecode(bool value)
+{
+    m_config.mtDecodePolicy = value ? MultiThreadDecodePolicy::enabled : MultiThreadDecodePolicy::disabled;
 }
 
 void QnFfmpegVideoTranscoder::setFilterList(QList<QnAbstractImageFilterPtr> filters)

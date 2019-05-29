@@ -2888,10 +2888,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>44.1Khz ve 48Khz ses formatları yakalama cihazı tarafından desteklenmiyor. Lütfen başka bir ses cihazı seçin yada kayıt seçeneklerinden &quot;yok&quot; u işaretleyin.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation>Ayarlanmış kodek: %1 bulunamadı, h263p kullanılacak</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3196,6 +3192,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Ekran kartı sürücüleri güncel değil yada yüklenmemiş</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 düzgün çalışmayabilir.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3279,17 +3286,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Herhangi bir aksilik olmasına karşın sistem konfigürasyonunu yedekleyebilir ve daha sonra tekrar yükleyebilirsiniz.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Ekran kartı sürücüleri güncel değil yada yüklenmemiş</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 düzgün çalışmayabilir.</translation>
     </message>
   </context>
   <context>
@@ -3586,8 +3582,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>Adet</translation>
+      <source>Channels</source>
+      <translation>Kanallar</translation>
     </message>
   </context>
   <context>
@@ -5108,6 +5104,10 @@ to %1</source>
       <source>Server Web Page</source>
       <translation>Sunucu Web Sayfası</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Eklentiler</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5577,16 +5577,30 @@ to %1</source>
       <translation>Yedekleme tamamlandı</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Kayıt depolama durduralacaktır. Hedef dışı kayıtlar silinmeye devam edecektir.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>USB depolamada kayıt etkinleştirildi</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Yeniden indexleme zarar gören arşiv ve yedekleri onarabilir yada donanım değişikliğinde gerekecektir.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation>Mevcut analiz verileriyle ne yapmalı?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Mevcut analitik verileri otomatik olarak başka bir yere taşınmayacak ve erişilemez hale gelecektir. Onu daha sonra manuel olarak hareket ettirebilir veya kalıcı olarak silebilirsiniz.
+Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam etmeden önce lütfen desteğe başvurun.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Sil</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Tut</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>İptal</translation>
     </message>
   </context>
   <context>
@@ -5634,6 +5648,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>Çok küçük ve sistem bölümleri korumalıdır ve kullanılabilir yeterli alan varsa, yazma için kullanılmamaktadır.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation>Analytics verilerini depolamak için kullanın</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation>Analytics verilerini depolar</translation>
     </message>
   </context>
   <context>
@@ -7492,12 +7514,12 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>UDP Multicast</source>
-      <translation>UDP Multicast</translation>
-    </message>
-    <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
       <translation>Sunucu herhangi bir kamera ayarını değiştirmeyecek, kamera akışını olduğu bırakacak ve kullanacaktır.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation>Çoklu Yayın</translation>
     </message>
   </context>
   <context>
@@ -8529,10 +8551,6 @@ to %1</source>
       <translation>Bazı sunucular çevrimdışıdır ve güncellenmez. Onları atla?</translation>
     </message>
     <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation>Yeterli boş alan olduğundan ve ağ bağlantısının kararlı olduğundan emin olun.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Eğer problem devam ederse Müşteri Hizmetleri ile iletişime geçin.</translation>
     </message>
@@ -8545,16 +8563,8 @@ to %1</source>
       <translation>Güncellemeyi iptal et</translation>
     </message>
     <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation>Yeterli boş alan olduğundan ve ağ bağlantısının kararlı olduğundan emin olun.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>Güncelleştirme tamamlandı</translation>
-    </message>
-    <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>Güncelleme tamamlandı ancak bazı sunucular güncellenemedi</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
@@ -8563,10 +8573,6 @@ to %1</source>
     <message>
       <source>OK</source>
       <translation>TAMAM</translation>
-    </message>
-    <message>
-      <source>Failed to install updates to servers:</source>
-      <translation>Güncelleme bu sunuculara yüklenemedi:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -8700,8 +8706,28 @@ to %1</source>
       <translation>Güncellemeyi iptal et ve tüm indirilmiş verileri sil?</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Güncelleme yüklenirken bir hata oluştu {0}:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Bazı sunucular çevrimdışı oldu. Lütfen devam etmek için çevrimiçi olana kadar bekleyin.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Güncelleme tamamlandı ancak bazı sunucular güncellenemedi</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Lütfen %1 i yükleme dosyası kullanarak güncelleyin.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 güncellenmiş versiyonda yeniden başlatılacak.</translation>
+    </message>
+    <message>
       <source>Failed to download update packages to some components</source>
-      <translation>Güncelleme paketinin bazı bileşenleri indirilemedi</translation>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
     </message>
   </context>
   <context>
@@ -8733,10 +8759,6 @@ to %1</source>
       <translation>Genel olay</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation>Bilinmeyen Eklenti Olayı</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation>Aygıt Bağlantısı Kesildi</translation>
     </message>
@@ -8747,6 +8769,10 @@ to %1</source>
     <message>
       <source>I/O Module was disconnected</source>
       <translation>G/Ç modülünün bağlantısı kesildi</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Bilinmeyen Eklenti Teşhis Olayı</translation>
     </message>
   </context>
   <context>
@@ -8820,6 +8846,62 @@ to %1</source>
     <message>
       <source>Failed to install update</source>
       <translation>Güncelleme yüklenemedi</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation>Eş bağlantıları için bekleniyor</translation>
+    </message>
+    <message>
+      <source>Update package can&apos;t be not found.</source>
+      <translation>Güncelleme paketi&apos;bulunamıyor.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation>Güncelleme dosyalarını indirmek için yeterli alan yok.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation>Güncelleme dosyalarını indirmek için yeterli alan yok.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation>Güncelleme paketleri indirilemedi.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation>Güncelleme içeriği geçersiz.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation>Güncelleme dosyası bozuk.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation>Güncelleme dosyaları çıkartılamıyor.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation>Dahili indirme hatası.</translation>
+    </message>
+    <message>
+      <source>Iternal server error.</source>
+      <translation>Yerel sunucu hatası.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation>İç sunucu hatası.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Bilinmeyen hata.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation>Beklenmedik bir hata oluştu.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation>Güncellemeyi indirmeye hazır</translation>
     </message>
   </context>
   <context>
@@ -8974,6 +9056,21 @@ to %1</source>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Oturumlar belirtilen süreyi aşarsa kullanıcıların otomatik olarak oturumu kapatılır.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation>Arşiv</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation>Sürüm</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Sağlayıcı</translation>
     </message>
   </context>
   <context>
@@ -9732,6 +9829,28 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation>Bu yapı sadece test amaçlıdır.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation>Sunucu Ayarları</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>TAMAM</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

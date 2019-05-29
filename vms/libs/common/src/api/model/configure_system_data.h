@@ -20,10 +20,11 @@ struct ConfigureSystemData: public PasswordData
     bool rewriteLocalSettings = false;
     QString systemName; //added for compatibility with NxTool
     QString currentPassword; // required for password change only
+    QnUuid mergeId;
 };
 
 #define ConfigureSystemData_Fields PasswordData_Fields \
     (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers) \
-    (foreignSettings)(additionParams)(rewriteLocalSettings)(systemName)(currentPassword)
+    (foreignSettings)(additionParams)(rewriteLocalSettings)(systemName)(currentPassword)(mergeId)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ConfigureSystemData), (json)(eq));

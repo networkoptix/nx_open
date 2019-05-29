@@ -5,11 +5,11 @@
     <name>AnalyticsSettings</name>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Aktivera</translation>
     </message>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Kameraanalys fungerar bara när kameran visas. Aktivera inspelning så att den fungerar hela tiden.</translation>
     </message>
   </context>
   <context>
@@ -65,6 +65,17 @@
     </message>
   </context>
   <context>
+    <name>PluginsInformation</name>
+    <message>
+      <source>No plugins installed</source>
+      <translation type="unfinished">No plugins installed</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation type="unfinished">Server is offline</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
@@ -85,6 +96,14 @@
     <message>
       <source>New Server</source>
       <translation>Ny server</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Redigera</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Dölj</translation>
     </message>
   </context>
   <context>

@@ -60,11 +60,12 @@ class NX_KIT_API IniConfig
 {
 public:
     /**
-     * @return Whether reading .ini files is enabled. If disabled the values are frozen at defaults.
-     * Enabled by default, can be disabled defining a macro at compiling ini_config.cpp:
-     * -DNX_INI_CONFIG_DISABLED to minimize performance overhead.
+     * @return Whether reading .ini files is enabled. If disabled, the values are frozen at
+     *     defaults. Enabled by default, can be disabled by setEnabled(false) or by defining a macro
+     *     at compiling ini_config.cpp: -DNX_INI_CONFIG_DISABLED to minimize performance overhead.
      */
     static bool isEnabled();
+
     static void setEnabled(bool value);
 
     /**
@@ -102,7 +103,10 @@ public:
     void reload();
 
     /**
-     * Allows to tweak ini config values for a duration, defined by this object life time.
+     * Allows to tweak ini config values for a duration defined by this object life time. Rereading
+     * the values is disabled while at least 1 Tweaks instanse exists.
+     *
+     * Usage:
      * ```
      * {
      *     Tweaks tweaks;
@@ -126,7 +130,7 @@ public:
         void set(const T* field, T newValue)
         {
             const auto oldValue = *field;
-            T* mutableField = const_cast<T*>(field);
+            T* const mutableField = const_cast<T*>(field);
             m_guards->push_back([=]() { *mutableField = oldValue; });
             *mutableField = newValue;
         }

@@ -6,14 +6,14 @@
                 <div class="webclient-panel mobile-alert" ng-if="hasMobileApp && !session.mobileAppNotified">
                     <div class="pull-right">
                         <a ng-href="{{mobileAppLink}}" class="btn webclient-button caption-row" ng-class="mobileStore">
-                            Install
+                            Asenna
                         </a>
                         <span class="webclient-button caption-row invisible-xs"
                               ng-click="mobileAppAlertClose()"><span class="glyphicon glyphicon-remove"></span></span>
                     </div>
                     <div>
                         <span class="caption-row ">
-                            Please, use the mobile application to view video
+                            Käytä mobiilisovellusta videon katseluun
                         </span>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                                                     ng-class="{'no-fullscreen': !enableFullScreen}"
                                                     ng-style="{'display' : showSettings ? 'block' : 'none'}">
 
-                                                    <li class="video-settings-title">Quality</li>
+                                                    <li class="video-settings-title">Laatu</li>
                                                     <li class="video-settings-divider"></li>
                                                     <li ng-repeat="resolution in availableResolutions"
                                                         class="video-settings-item">
@@ -65,7 +65,7 @@
                                                     </li>
 
                                                     <li class="video-settings-divider buffer" ng-if="debugMode"></li>
-                                                    <li class="video-settings-title" ng-if="debugMode">Video Player</li>
+                                                    <li class="video-settings-title" ng-if="debugMode">Videosoitin</li>
                                                     <li class="video-settings-divider"  ng-if="debugMode"></li>
                                                     <li ng-repeat="format in manualFormats" class="video-settings-item"
                                                         ng-if="debugMode">
@@ -76,7 +76,7 @@
                                                         ng-if="isWebAdmin || debugMode"></li>
                                                     <li class="video-settings-button" ng-if="isWebAdmin || debugMode"
                                                         ng-click="cameraLinks.enabled=!cameraLinks.enabled">
-                                                        <span class="glyphicon glyphicon-cog"></span>Camera Details
+                                                        <span class="glyphicon glyphicon-cog"></span>Kameran tiedot
                                                     </li>
                                                     <li class="video-settings-divider buffer"
                                                         ng-if="betaMode || debugMode"></li>
@@ -85,7 +85,7 @@
                                                         <span>
                                                             <span ng-class="{'voice-active': voiceControls.enabled}"
                                                                   class="glyphicon glyphicon-bullhorn"></span>
-                                                            &nbsp;Voice Commands
+                                                            &nbsp;Äänikomennot
                                                         </span>
                                                     </li>
                                                 </ul>
@@ -118,7 +118,7 @@
                             <div class="float-size">
                             <div ng-if="isFullscreen && enableFullscreenNotification"
                                  class="fullscreen-notification fade-out">
-                                    <span>Press ESC to exit fullscreen</span>
+                                    <span>Poistu koko näytöstä painamalla ESC</span>
                                 </div>
                                 <camera-links ng-if="cameraLinks.enabled"
                                               system="systemAPI" position="positionProvider.playedPosition"

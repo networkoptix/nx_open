@@ -2,8 +2,6 @@
 
 #include <set>
 
-#include <QtCore>
-
 #include <client_core/connection_context_aware.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
@@ -13,6 +11,8 @@
 #include <utils/common/connective.h>
 #include <utils/update/zip_utils.h>
 #include "update_contents.h"
+
+namespace nx::vms::applauncher::api { enum class ResultType; }
 
 namespace nx::vms::common::p2p::downloader {
 
@@ -191,7 +191,7 @@ private:
     /**
      * Converts applauncher::api::ResultType to a readable string.
      */
-    static QString applauncherErrorToString(int result);
+    static QString applauncherErrorToString(nx::vms::applauncher::api::ResultType result);
 
     std::unique_ptr<Downloader> m_downloader;
     /** Directory to store unpacked files. */
@@ -215,7 +215,7 @@ private:
     UpdateContents m_remoteUpdateContents;
     QnMutex m_mutex;
 
-    std::future<int> m_applauncherTask;
+    std::future<nx::vms::applauncher::api::ResultType> m_applauncherTask;
 
     mutable std::future<std::set<nx::utils::SoftwareVersion>> m_installedVersionsFuture;
     mutable std::set<nx::utils::SoftwareVersion> m_installedVersions;

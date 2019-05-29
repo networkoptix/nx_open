@@ -251,7 +251,10 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
         nx::analytics::EngineDescriptorManager engineDescriptorManager(q->commonModule());
         const auto eventTypeDescriptors = eventTypeDescriptorManager.descriptors();
         const auto engineDescriptors = engineDescriptorManager.descriptors();
+
         analyticsMenu->clear();
+        for (auto menu: analyticsMenu->findChildren<QMenu*>(QString(), Qt::FindChildrenRecursively))
+            menu->deleteLater();
 
         QSet<QnUuid> enabledEngines;
         const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();

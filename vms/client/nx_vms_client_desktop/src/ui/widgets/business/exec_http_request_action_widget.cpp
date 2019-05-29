@@ -127,7 +127,7 @@ void QnExecHttpRequestActionWidget::paramsChanged()
     url.setUserName(ui->loginLineEdit->text());
     url.setPassword(ui->passwordLineEdit->text());
     if (url.scheme().isEmpty())
-        url.setScheme(lit("http"));
+        url.setScheme(nx::network::http::kUrlSchemeName);
 
     params.url = url.toString();
     params.text = ui->contentTextEdit->toPlainText();

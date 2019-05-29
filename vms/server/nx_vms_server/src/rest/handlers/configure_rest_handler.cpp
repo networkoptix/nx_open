@@ -199,6 +199,12 @@ nx::network::http::StatusCode::Value ConfigureRestHandler::execute(
         }
     }
 
+    if (!data.mergeId.isNull())
+    {
+        owner->globalSettings()->setLastMergeSlaveId(data.mergeId);
+        owner->globalSettings()->resynchronizeNowSync();
+    }
+
     QnConfigureReply reply;
     reply.restartNeeded = false;
     result.setReply(reply);

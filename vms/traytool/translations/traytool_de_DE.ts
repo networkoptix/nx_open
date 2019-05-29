@@ -113,5 +113,9 @@
       <source>pausing</source>
       <translation>wird angehalten</translation>
     </message>
+    <message>
+      <source>Unknown error: %1</source>
+      <translation>Unbekannter Fehler: %1</translation>
+    </message>
   </context>
 </TS>

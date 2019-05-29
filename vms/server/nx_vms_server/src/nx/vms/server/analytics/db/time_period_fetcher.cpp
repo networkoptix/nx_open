@@ -5,6 +5,7 @@
 
 #include <analytics/db/config.h>
 
+#include "attributes_dao.h"
 #include "device_dao.h"
 #include "object_searcher.h"
 #include "serializers.h"
@@ -20,12 +21,14 @@ TimePeriodFetcher::TimePeriodFetcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
     const TimePeriodDao& timePeriodDao,
+    AttributesDao* attributesDao,
     AnalyticsArchiveDirectory* analyticsArchive,
     std::chrono::milliseconds maxRecordedTimestamp)
     :
     m_deviceDao(deviceDao),
     m_objectTypeDao(objectTypeDao),
     m_timePeriodDao(timePeriodDao),
+    m_attributesDao(attributesDao),
     m_analyticsArchive(analyticsArchive),
     m_maxRecordedTimestamp(maxRecordedTimestamp)
 {
@@ -37,23 +40,10 @@ nx::sql::DBResult TimePeriodFetcher::selectTimePeriods(
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
-    Filter localFilter = filter;
-    localFilter.deviceIds.clear();
-    localFilter.timePeriod.clear();
-
     if (!filter.objectAppearanceId.isNull())
-    {
         *result = selectTimePeriodsByObject(queryContext, filter, options);
-    }
-    else if (!m_analyticsArchive || localFilter.empty())
-    {
-        *result = selectFullTimePeriods(
-            queryContext, filter.deviceIds, filter.timePeriod, options);
-    }
     else
-    {
         *result = selectTimePeriodsFiltered(queryContext, filter, options);
-    }
 
     return nx::sql::DBResult::ok;
 }
@@ -148,16 +138,15 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
     const Filter& filter,
     const TimePeriodsLookupOptions& options)
 {
-    NX_DEBUG(this, "Selecting time periods by filter ", filter);
-
     AnalyticsArchive::Filter archiveFilter = prepareArchiveFilter(filter, options);
 
     nx::utils::ElapsedTimer timer;
-    
+
     if (!filter.freeText.isEmpty())
     {
         timer.restart();
-        archiveFilter.allAttributesHash = lookupCombinedAttributes(queryContext, filter.freeText);
+        archiveFilter.allAttributesHash = 
+            m_attributesDao->lookupCombinedAttributes(queryContext, filter.freeText);
         NX_DEBUG(this, "Text '%1' lookup completed in %2", filter.freeText, timer.elapsed());
     }
 
@@ -173,9 +162,6 @@ AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
 {
     AnalyticsArchive::Filter archiveFilter;
 
-    if (!filter.boundingBox.isEmpty())
-        archiveFilter.region.push_back(filter.boundingBox);
-
     if (!filter.objectTypeId.empty())
     {
         std::transform(
@@ -184,6 +170,7 @@ AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
             [this](const auto& objectTypeName) { return m_objectTypeDao.objectTypeIdFromName(objectTypeName); });
     }
 
+    archiveFilter.region = options.region;
     archiveFilter.timePeriod = filter.timePeriod;
     archiveFilter.sortOrder = filter.sortOrder;
     if (filter.maxObjectsToSelect > 0)
@@ -191,28 +178,6 @@ AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
     archiveFilter.detailLevel = options.detailLevel;
 
     return archiveFilter;
-}
-
-std::set<int> TimePeriodFetcher::lookupCombinedAttributes(
-    nx::sql::QueryContext* queryContext,
-    const QString& text)
-{
-    auto query = queryContext->connection()->createQuery();
-    query->prepare(R"sql(
-        SELECT distinct combination_id
-        FROM combined_attributes
-        WHERE attributes_id IN
-	        (SELECT docid FROM attributes_text_index WHERE content MATCH ?)
-    )sql");
-
-    query->addBindValue(text);
-    query->exec();
-
-    std::set<int> attributesIds;
-    while (query->next())
-        attributesIds.insert(query->value(0).toInt());
-
-    return attributesIds;
 }
 
 #if 0

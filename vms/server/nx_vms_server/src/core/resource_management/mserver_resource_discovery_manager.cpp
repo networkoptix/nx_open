@@ -299,9 +299,17 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 if (updateTypeId)
                     foundCamera->setTypeId(newTypeId);
 
-                NX_VERBOSE(this, "Add foreign resource [%1] to search list",
-                    netResourceString(existingCamera));
-
+                if (isForeign)
+                {
+                    NX_VERBOSE(this, "Add foreign resource [%1] to search list",
+                        netResourceString(existingCamera));
+                }
+                if (updateTypeId)
+                {
+                    NX_VERBOSE(this, "Resource [%1] TypeId changed (Old value = %2, new value = %3)."
+                        " Resource will be reinited",
+                        netResourceString(existingCamera), existingCamera->getTypeId(), foundCamera->getTypeId());
+                }
                 extraResources << foundCamera;
             }
             else

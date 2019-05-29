@@ -263,6 +263,8 @@ int Helper::handleAddUpload(const QString& fileName)
             return makeInvalidParameterError("ttl");
     }
 
+    const bool recreate = params.value("recreate") == "true";
+
     fileInfo.status = FileInformation::Status::uploading;
     auto errorCode = addFile(fileInfo);
 
@@ -272,7 +274,7 @@ int Helper::handleAddUpload(const QString& fileName)
         {
             const auto info = downloader->fileInformation(fileInfo.name);
             NX_ASSERT(info.isValid());
-            if (info.status != FileInformation::Status::downloaded)
+            if (info.status != FileInformation::Status::downloaded && recreate)
             {
                 downloader->deleteFile(fileInfo.name);
                 errorCode = addFile(fileInfo);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <QtQuickWidgets/QQuickWidget>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -11,12 +11,11 @@
 namespace nx::vms::common { struct Credentials; }
 namespace nx::utils { class Url; }
 
-class QQuickView;
-
-class QnWorkbenchWelcomeScreen: public Connective<QWidget>, public QnWorkbenchContextAware
+class QnWorkbenchWelcomeScreen: public Connective<QQuickWidget>, public QnWorkbenchContextAware
 {
+
     Q_OBJECT
-    typedef Connective<QWidget> base_type;
+    typedef Connective<QQuickWidget> base_type;
 
     Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged)
     Q_PROPERTY(bool isLoggedInToCloud READ isLoggedInToCloud NOTIFY isLoggedInToCloudChanged)
@@ -65,8 +64,6 @@ public: // Properties
     void setMessage(const QString& message);
 
     QString message() const;
-
-    void activateView() const;
 
 public:
     void setupFactorySystem(const QString& serverUrl);
@@ -144,7 +141,6 @@ protected:
     virtual void changeEvent(QEvent* event) override;
 
 private:
-    QQuickView* m_view = nullptr;
     bool m_receivingResources = false;
     bool m_visibleControls = false;
     QString m_connectingSystemName;

@@ -566,6 +566,11 @@ QByteArray Url::toPercentEncoding(
     return result;
 }
 
+void PrintTo(const Url& val, ::std::ostream* os)
+{
+    *os << val.toString().toStdString();
+}
+
 namespace url {
 
 bool equal(const nx::utils::Url& lhs, const nx::utils::Url& rhs, ComparisonFlags flags)

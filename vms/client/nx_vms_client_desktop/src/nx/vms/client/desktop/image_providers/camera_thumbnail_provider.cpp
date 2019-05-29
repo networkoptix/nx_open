@@ -94,6 +94,43 @@ Qn::ThumbnailStatus CameraThumbnailProvider::status() const
     return m_status;
 }
 
+bool CameraThumbnailProvider::tryLoad()
+{
+    if (m_status == Qn::ThumbnailStatus::Loading)
+        return false;
+
+    if (!m_request.camera)
+    {
+        setStatus(Qn::ThumbnailStatus::NoData);
+        return true;
+    }
+
+    auto cache = qnClientModule->videoCache();
+    if (!cache || nx::api::CameraImageRequest::isSpecialTimeValue(m_request.usecSinceEpoch))
+        return false;
+
+    std::chrono::microseconds requiredTime(m_request.usecSinceEpoch);
+    std::chrono::microseconds actualTime{};
+
+    const auto image = cache->image(m_request.camera->getId(), requiredTime, &actualTime);
+    if (image.isNull() || abs(requiredTime - actualTime) > kAllowedTimeDeviation)
+        return false;
+
+    setStatus(Qn::ThumbnailStatus::Loading);
+
+    NX_VERBOSE(this, "doLoadAsync(%1) - got image from the cache, error is %2 us",
+        m_request.camera->getName(), requiredTime - actualTime);
+
+    m_image = image;
+    m_timestampUs = actualTime.count();
+
+    emit imageChanged(m_image);
+    emit sizeHintChanged(sizeHint());
+
+    setStatus(Qn::ThumbnailStatus::Loaded);
+    return true;
+}
+
 void CameraThumbnailProvider::doLoadAsync()
 {
     if (m_status == Qn::ThumbnailStatus::Loading)
@@ -105,32 +142,6 @@ void CameraThumbnailProvider::doLoadAsync()
         return;
     }
 
-    setStatus(Qn::ThumbnailStatus::Loading);
-
-    auto cache = qnClientModule->videoCache();
-
-    if (cache && !nx::api::CameraImageRequest::isSpecialTimeValue(m_request.usecSinceEpoch))
-    {
-        std::chrono::microseconds requiredTime(m_request.usecSinceEpoch);
-        std::chrono::microseconds actualTime{};
-
-        const auto image = cache->image(m_request.camera->getId(), requiredTime, &actualTime);
-        if (!image.isNull() && abs(requiredTime - actualTime) < kAllowedTimeDeviation)
-        {
-            NX_VERBOSE(this, "doLoadAsync(%1) - got image from the cache, error is %2 us",
-                m_request.camera->getName(), requiredTime - actualTime);
-
-            m_image = image;
-            m_timestampUs = actualTime.count();
-
-            emit imageChanged(m_image);
-            emit sizeHintChanged(sizeHint());
-
-            setStatus(Qn::ThumbnailStatus::Loaded);
-            return;
-        }
-    }
-
     if (!commonModule()->currentServer())
     {
         NX_VERBOSE(this, "doLoadAsync(%1) - no server is available. Returning early",
@@ -138,6 +149,8 @@ void CameraThumbnailProvider::doLoadAsync()
         emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData, 0);
         return;
     }
+
+    setStatus(Qn::ThumbnailStatus::Loading);
 
     QPointer<CameraThumbnailProvider> guard(this);
     NX_VERBOSE(this, "doLoadAsync(%1) - sending request to the server",

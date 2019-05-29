@@ -51,7 +51,7 @@
     </message>
     <message>
       <source>&amp;Quit</source>
-      <translation type="unfinished">&amp;Quit</translation>
+      <translation>&amp;Avslutt</translation>
     </message>
     <message>
       <source>An error has occurred while trying to access installed services:</source>
@@ -112,6 +112,10 @@
     <message>
       <source>pausing</source>
       <translation type="unfinished">pausing</translation>
+    </message>
+    <message>
+      <source>Unknown error: %1</source>
+      <translation type="unfinished">Unknown error: %1</translation>
     </message>
   </context>
 </TS>

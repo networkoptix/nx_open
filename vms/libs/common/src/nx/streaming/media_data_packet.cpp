@@ -104,11 +104,11 @@ size_t QnEmptyMediaData::dataSize() const
 //--------------------------------------- QnMetaDataV1 -------------------------------------------
 
 //TODO #ak delegate constructor
-QnMetaDataV1::QnMetaDataV1(int initialValue):
-    QnAbstractCompressedMetadata(MetadataType::Motion)
+QnMetaDataV1::QnMetaDataV1(int initialValue, int extraBufferSize)
+    :
+    QnAbstractCompressedMetadata(MetadataType::Motion, kMotionDataBufferSize + extraBufferSize)
 {
     flags = 0;
-    m_input = 0;
     m_duration = 0;
     m_firstTimestamp = AV_NOPTS_VALUE;
     timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
@@ -119,10 +119,9 @@ QnMetaDataV1::QnMetaDataV1(int initialValue):
 }
 
 QnMetaDataV1::QnMetaDataV1(QnAbstractAllocator* allocator, int initialValue):
-    QnAbstractCompressedMetadata(MetadataType::Motion, allocator)
+    QnAbstractCompressedMetadata(MetadataType::Motion, kMotionDataBufferSize, allocator)
 {
     flags = 0;
-    m_input = 0;
     m_duration = 0;
     m_firstTimestamp = AV_NOPTS_VALUE;
     timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
@@ -138,7 +137,6 @@ QnMetaDataV1Ptr QnMetaDataV1::fromLightData(const QnMetaDataV1Light& lightData)
     result->timestamp = lightData.startTimeMs*1000;
     result->m_duration = lightData.durationMs*1000;
     result->channelNumber = lightData.channel;
-    result->m_input = lightData.input;
     memcpy(result->m_data.data(), lightData.data, result->m_data.size());
     return result;
 }
@@ -202,7 +200,6 @@ void QnMetaDataV1::assign(const QnMetaDataV1* other)
 {
     QnAbstractMediaData::assign(other);
     m_data = other->m_data;
-    m_input = other->m_input;
     m_duration = other->m_duration;
     m_firstTimestamp = other->m_firstTimestamp;
 }
@@ -355,6 +352,46 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 #endif
 }
 
+QRect QnMetaDataV1::rectFromNormalizedRect(const QRectF& rectF)
+{
+    const qreal kEpsilon = 0.01;
+
+    const auto x1 = rectF.left() * Qn::kMotionGridWidth;
+    const auto y1 = rectF.top() * Qn::kMotionGridHeight;
+    const auto x2 = rectF.right() * Qn::kMotionGridWidth;
+    const auto y2 = rectF.bottom() * Qn::kMotionGridHeight;
+
+    const int x = x1 + kEpsilon;
+    const int y = y1 + kEpsilon;
+
+    return QRect(x, y, x2 - x + (1.0 - kEpsilon), y2 - y + (1.0 - kEpsilon));
+}
+
+void QnMetaDataV1::addMotion(const QRectF& rectF)
+{
+    return addMotion(rectFromNormalizedRect(rectF));
+}
+
+void QnMetaDataV1::addMotion(const QRect& rect)
+{
+    const quint32 maskL = (1LL << (32 - rect.top())) - 1;
+    const quint32 maskR = ~((1 << (31 - rect.bottom())) - 1);
+    const quint32 mask = qToBigEndian(maskL & maskR);
+    const quint64 mask64 = (quint64(mask) << 32) + mask;
+
+    quint32* data = ((quint32*)m_data.data()) + rect.left();
+    const quint32* dataEnd = data + rect.width();
+    const quint64* dataEnd64 = (quint64*) (std::ptrdiff_t(dataEnd) & ~std::ptrdiff_t(7));
+    if (std::ptrdiff_t(data) % 8)
+        *data++ |= mask;
+    quint64* data64 = (quint64*) data;
+    while (data64 < dataEnd64)
+        *data64++ |= mask64;
+    data = (quint32*) data64;
+    if (data < dataEnd)
+        *data |= mask;
+}
+
 bool QnMetaDataV1::isMotionAt(int x, int y, char* mask)
 {
     NX_ASSERT(x<Qn::kMotionGridWidth);
@@ -405,11 +442,6 @@ bool QnMetaDataV1::mapMotion(const QRect& imageRect, const QRect& mRect)
         }
     }
     return true;
-}
-
-bool QnMetaDataV1::isInput(int index) const
-{
-    return (m_input >> index) & 1;
 }
 
 bool QnMetaDataV1::containTime(const qint64 timeUsec) const
@@ -469,9 +501,8 @@ void QnMetaDataV1::serialize(QIODevice* ioDevice) const
     ioDevice->write((const char*) &durationMs, sizeof(int));
     quint8 channel8 = channelNumber;
     ioDevice->write((const char*) &channel8, 1);
-    ioDevice->write((const char*) &m_input, 1);
     quint16 reserved  = 0;
-    ioDevice->write((const char*) &reserved, 2);
+    ioDevice->write((const char*) &reserved, 3);
     ioDevice->write(m_data.data(), m_data.size());
 }
 
@@ -487,26 +518,18 @@ bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
 
 //--------------------------------- QnAbstractCompressedMetadata ---------------------------------
 
-QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(MetadataType type):
+QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(MetadataType type, int bufferSize):
     QnAbstractMediaData(type == MetadataType::Motion ? META_V1 : GENERIC_METADATA),
     metadataType(type),
-    m_data(
-        CL_MEDIA_ALIGNMENT,
-        type == MetadataType::Motion
-            ? Qn::kMotionGridWidth*Qn::kMotionGridHeight/8
-            : 0)
+    m_data(CL_MEDIA_ALIGNMENT, bufferSize)
 {
 }
 
-QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(MetadataType type, QnAbstractAllocator* allocator):
+QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(
+    MetadataType type, int bufferSize, QnAbstractAllocator* allocator):
     QnAbstractMediaData(type == MetadataType::Motion ? META_V1 : GENERIC_METADATA),
     metadataType(type),
-    m_data(
-        allocator,
-        CL_MEDIA_ALIGNMENT,
-        type == MetadataType::Motion
-            ? Qn::kMotionGridWidth*Qn::kMotionGridHeight/8
-            : 0)
+    m_data(allocator, CL_MEDIA_ALIGNMENT, bufferSize)
 {
 }
 
@@ -527,19 +550,21 @@ qint64 QnAbstractCompressedMetadata::duration() const
 
 //------------------------------------ QnCompressedMetadata --------------------------------------
 
-QnCompressedMetadata::QnCompressedMetadata(MetadataType type):
-    QnAbstractCompressedMetadata(type)
+QnCompressedMetadata::QnCompressedMetadata(MetadataType type, int bufferSize):
+    QnAbstractCompressedMetadata(type, bufferSize)
 {
 }
 
-QnCompressedMetadata::QnCompressedMetadata(MetadataType type, QnAbstractAllocator* allocator):
-    QnAbstractCompressedMetadata(type, allocator)
+QnCompressedMetadata::QnCompressedMetadata(
+    MetadataType type, int bufferSize, QnAbstractAllocator* allocator)
+    :
+    QnAbstractCompressedMetadata(type, bufferSize, allocator)
 {
 }
 
 QnAbstractMediaData* QnCompressedMetadata::clone(QnAbstractAllocator* allocator) const
 {
-    QnCompressedMetadata* cloned = new QnCompressedMetadata(metadataType, allocator);
+    QnCompressedMetadata* cloned = new QnCompressedMetadata(metadataType, 0, allocator);
     cloned->assign(this);
     cloned->m_data.write(m_data.constData(), m_data.size());
     return cloned;

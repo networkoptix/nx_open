@@ -67,7 +67,7 @@ Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
 
     if (nx::utils::random::number<bool>())
     {
-        filter.boundingBox.setCoords(
+        filter.boundingBox = QRectF(
             nx::utils::random::number<float>(0, 1),
             nx::utils::random::number<float>(0, 1),
             nx::utils::random::number<float>(0, 1),

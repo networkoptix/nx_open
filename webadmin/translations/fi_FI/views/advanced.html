@@ -1,15 +1,15 @@
 <div class="container">
-    <h1><a href="#/metrics/">New: System health report</a></h1>
+    <h1><a href="#/metrics/">Uusi: Järjestelmän terveysraportti</a></h1>
 </div>
 <div class="container">
-    <h1>Advanced server settings</h1>
+    <h1>Järjestelmän lisäasetukset</h1>
 
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> Varoitus! </b> Kaikki tällä sivulla tehdyt muutokset voivat aiheuttaa palvelimen virheellisen toiminnan.
     </div>
 
 
-    <h2>Storage</h2>
+    <h2>Tallennustila</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -19,10 +19,10 @@
                         URL
                     </th>
                     <th width="200">
-                        Free Space
+                        Tilaa jäljellä
                     </th>
                     <th width="150">
-                        Reserved Space
+                        Varattu tila
                     </th>
                     <th >
                     </th>
@@ -43,7 +43,7 @@
                                  ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
                             </div>
 
-                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} of {{formatSpace(storage.totalSpace)}}</div>
+                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} ja {{formatSpace(storage.totalSpace)}}</div>
 
 
                             <div class="progress-bar progress-bar-success" role="progressbar"
@@ -57,7 +57,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inaccessible
+                                Käyttämätön
                             </div>
                         </div>
                     </td>
@@ -70,14 +70,14 @@
                                    min="1"
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
- placeholder="Reserved space"/>
+ placeholder="Varattu tila"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Reserved space"/>
+ placeholder="Varattu tila"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                     </td>
@@ -89,7 +89,7 @@
                                    ng-model="storage.isUsedForWriting"
                                    ng-disabled="!storage.isWritable"
                                    name="isUsedForWriting"
-                                   placeholder="Use for writing"/>
+                                   placeholder="Käytä kirjoittamista varten"/>
                                 </span>
                                 <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
                                 <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
@@ -106,41 +106,41 @@
             </tbody>
         </table>
         <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
-            No main storage drive was selected for writing - video will not be recorded on this server.
+            Mitään asemaa ei ole valittu kirjoittamista varten-videota ei tallenneta tälle palvelimelle.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            Varattu tila on suurempi kuin jäljellä oleva vapaa tila. Nykyinen videomateriaali voidaan poistaa tilan vapauttamiseksi.
         </div>
-        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Fix all highlighted settings to save it</div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Korjaa kaikki korostetut asetukset tallentaaksesi sen</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Tallenna</button>
+        <button class="btn btn-warning" ng-click="cancel()">Peruuta</button>
     </form>
 
-    <h2>Log settings</h2>
+    <h2>Lokin asetukset</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">{{name}} lokitaso</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
-                    <option value="none">None: Log disabled.</option>
-                    <option value="always">Always: Log errors, warnings and most important messages.</option>
-                    <option value="error">Error: Log errors only.</option>
-                    <option value="warning">Warning: Log warnings and errors.</option>
-                    <option value="info">Info: Log errors, warnings and all messages.</option>
-                    <option value="debug">Debug: Log every System message and debug information.</option>
-                    <option value="verbose">Verbose: Log all information available.</option>
+                    <option value="none">Ei mitään: Loki poistettu käytöstä.</option>
+                    <option value="always">Aina: kirjaa virheet, varoitukset ja tärkeimmät viestit.</option>
+                    <option value="error">Virhe: vain loki virheet.</option>
+                    <option value="warning">Varoitus: Kirjaa varoitukset ja virheet lokiin.</option>
+                    <option value="info">Tiedot: kirjaa virheet, varoitukset ja kaikki viestit.</option>
+                    <option value="debug">Debug: kirjaa jokaisen järjestelmän sanoman ja virheen korjauksen tiedot.</option>
+                    <option value="verbose">Verbose: Kirjaa kaikki käytettävissä olevat tiedot.</option>
                 </select>
             </div>
         </div>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Tallenna</button>
         </div>
     </form>
 
-    <h1>Advanced System settings</h1>
+    <h1>Järjestelmän lisäasetukset</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> Varoitus! </b> Kaikki tällä sivulla tehdyt muutokset voivat aiheuttaa palvelimen virheellisen toiminnan.
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -180,15 +180,15 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Tallenna</button>
         </div>
 
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Warning!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Varoitus!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="restartServer()" >Restart current server</button>
+            <button class="btn btn-primary" ng-click="restartServer()" >Käynnistä nykyinen palvelin uudelleen</button>
         </div>
     </div>
 </div>

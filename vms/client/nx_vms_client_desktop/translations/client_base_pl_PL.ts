@@ -2946,10 +2946,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>Formaty 44.1kHz i 48kHz nie są obsługiwane przez urządzenie przechwytujące dźwięk. W ustawieniach nagrywania ekranu usuń urządzenie audio lub wybierz inne.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation>Nie znaleziono kodeka %1, zostanie użyty h263p</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3268,6 +3264,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Sterowniki karty wideo są przestarzałe lub nie są zainstalowane</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 może nie działać poprawnie.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3351,17 +3358,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Tworzy kopię zapasową konfiguracji systemu, którą można przywrócić w przypadku awarii.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Sterowniki karty wideo są przestarzałe lub nie są zainstalowane</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 może nie działać poprawnie.</translation>
     </message>
   </context>
   <context>
@@ -3662,8 +3658,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>Ilość</translation>
+      <source>Channels</source>
+      <translation>Kanały</translation>
     </message>
   </context>
   <context>
@@ -4174,7 +4170,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Ustaw dla %n kamery</numerusform>
         <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
         <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
@@ -5149,7 +5145,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n na %1 z użytkowników ma nieprawidłowy adres e-mail</numerusform>
         <numerusform>%n na %1 z użytkowników ma nieprawidłowy adres e-mail</numerusform>
         <numerusform>%n na %1 z użytkowników ma nieprawidłowy adres e-mail</numerusform>
@@ -5162,7 +5158,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n na %1 z dodatkowych adresów e-mail jest nieprawidłowych</numerusform>
         <numerusform>%n na %1 z dodatkowych adresów e-mail jest nieprawidłowych</numerusform>
         <numerusform>%n na %1 z dodatkowych adresów e-mail jest nieprawidłowych</numerusform>
@@ -5229,6 +5225,10 @@ to %1</source>
     <message>
       <source>Server Web Page</source>
       <translation>Strona WWW serwera</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Wtyczki</translation>
     </message>
   </context>
   <context>
@@ -5702,16 +5702,29 @@ to %1</source>
       <translation>Zakończono tworzenie backupu</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Nagrywanie na wyłączonym archiwum zostanie wstrzymane. Jednak usuwanie przestarzałego materiału z tego archiwum będzie nadal kontynuowane.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Nagrywanie zostało włączone na nośniku USB</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Ponowne indeksowanie może rozwiązać problemy z archiwum lub backupem, jeśli jakieś nagrania zostały utracone lub uszkodzone, lub jeśli jakieś komponenty sprzętowe zostały wymienione.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation>Co zrobić z aktualnymi danymi analitycznymi?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Aktualne dane analityczne nie zostaną automatycznie przeniesione do innej lokalizacji i staną się niedostępne. Możesz je zachować i ręcznie przenieść później lub usunąć na stałe. Jeśli chcesz przenieść dane analityczne do innej lokalizacji, skontaktuj się najpierw z pomocą techniczną.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Usuń</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Zachowaj</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Anuluj</translation>
     </message>
   </context>
   <context>
@@ -5759,6 +5772,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>Małe partycje i partycje systemowe nie są używane do nagrywania, powinna być dostępna inna przestrzeń dyskowa.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation>Użyj do przechowywania danych analitycznych</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation>Przechowuje dane analityczne</translation>
     </message>
   </context>
   <context>
@@ -7367,7 +7388,7 @@ to %1</source>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n użytkownik</numerusform>
         <numerusform>%n użytkownicy</numerusform>
         <numerusform>%n użytkowników</numerusform>
@@ -7697,12 +7718,12 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>UDP Multicast</source>
-      <translation>Multicast UDP</translation>
-    </message>
-    <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
       <translation>Serwer nie zmieni żadnych ustawień kamer, czyli odbierze i użyje bieżących strumieni wideo.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation>Multicast</translation>
     </message>
   </context>
   <context>
@@ -8762,10 +8783,6 @@ to %1</source>
       <translation>Niektóre serwery są w trybie offline i nie zostaną zaktualizowane. Pominąć je?</translation>
     </message>
     <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation>Upewnij się, że dostępna jest wystarczająca ilość wolnego miejsca, a połączenie sieciowe jest stabilne.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Jeśli problem nie ustąpi, skontaktuj się z działem obsługi klienta.</translation>
     </message>
@@ -8778,16 +8795,8 @@ to %1</source>
       <translation>Anuluj aktualizację</translation>
     </message>
     <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation>Upewnij się, że dostępna jest wystarczająca ilość wolnego miejsca, a połączenie sieciowe jest stabilne.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>Aktualizacja zakończona</translation>
-    </message>
-    <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>Aktualizacja zakończona, ale niektóre serwery nie zostały zaktualizowane</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
@@ -8796,10 +8805,6 @@ to %1</source>
     <message>
       <source>OK</source>
       <translation>OK</translation>
-    </message>
-    <message>
-      <source>Failed to install updates to servers:</source>
-      <translation>Nie udało się zainstalować aktualizacji na serwerach:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -8935,8 +8940,28 @@ to %1</source>
       <translation>Anulować aktualizację i usunąć wszystkie pobrane dane?</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Wystąpił błąd podczas instalowania aktualizacji:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Niektóre serwery zostały odłączone. Proszę zaczekać, aż będą dostępne.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Zakończono aktualizację, ale niektóre elementy nie zostały zaktualizowane.</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Proszę zaktualizować %1 ręcznie przy użyciu pakietu instalacyjnego.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 zostanie uruchomiony ponownie w zaktualizowanej wersji.</translation>
+    </message>
+    <message>
       <source>Failed to download update packages to some components</source>
-      <translation>Nie udało się pobrać aktualizacji niektórych komponentów</translation>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
     </message>
   </context>
   <context>
@@ -8970,10 +8995,6 @@ to %1</source>
       <translation>Zdarzenie generowane</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation>Nieznane zdarzenie wtyczki</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation>Urządzenie zostało odłączone</translation>
     </message>
@@ -8984,6 +9005,10 @@ to %1</source>
     <message>
       <source>I/O Module was disconnected</source>
       <translation>Moduł I/O został odłączony</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Nieznane zdarzenie diagnostyczne wtyczki</translation>
     </message>
   </context>
   <context>
@@ -9057,6 +9082,62 @@ to %1</source>
     <message>
       <source>Failed to install update</source>
       <translation>Nie udało się zainstalować aktualizacji</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation>Oczekiwanie na dane</translation>
+    </message>
+    <message>
+      <source>Update package can&apos;t be not found.</source>
+      <translation>Nie można odnaleźć pakietu aktualizacji.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation>Brak wystarczającej ilości przestrzeni do pobrania plików aktualizacji.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation>Brak wystarczającej ilości przestrzeni do rozpakowania plików aktualizacji.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation>Nie udało się pobrać aktualizacji.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation>Zawartość aktualizacji jest nieprawidłowa.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation>Pakiet aktualizacji jest uszkodzony.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation>Nie można rozpakować plików aktualizacji.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation>Błąd wewnętrzny pobierania.</translation>
+    </message>
+    <message>
+      <source>Iternal server error.</source>
+      <translation>Wewnętrzny błąd serwera.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation>Wewnętrzny błąd klienta.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Nieznany błąd.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation>Wystąpił nieoczekiwany błąd.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation>Gotowy do zainstalowania aktualizacji</translation>
     </message>
   </context>
   <context>
@@ -9213,6 +9294,21 @@ to %1</source>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Użytkownicy zostaną automatycznie wylogowani, jeśli ich sesje przekroczą określony czas trwania.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation>Biblioteka</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation>Wersja</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Producent</translation>
     </message>
   </context>
   <context>
@@ -9807,7 +9903,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nie udało się przenieść %n urządzenia</numerusform>
         <numerusform>Nie udało się przenieść %n urządzeń</numerusform>
         <numerusform>Nie udało się przenieść %n urządzeń</numerusform>
@@ -9816,7 +9912,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nie udało się przenieść %n kamery</numerusform>
         <numerusform>Nie udało się przenieść %n kamer</numerusform>
         <numerusform>Nie udało się przenieść %n kamer</numerusform>
@@ -9825,7 +9921,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nie udało się przenieść %n modułu I/O</numerusform>
         <numerusform>Nie udało się przenieść %n modułów I/O</numerusform>
         <numerusform>Nie udało się przenieść %n modułów I/O</numerusform>
@@ -9838,7 +9934,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Serwer &quot;%1&quot; nie może uzyskać dostępu do %n urządzenia. Przenieść je mimo to?</numerusform>
         <numerusform>Serwer &quot;%1&quot; nie może uzyskać dostępu do %n urządzeń. Przenieść je mimo to?</numerusform>
         <numerusform>Serwer &quot;%1&quot; nie może uzyskać dostępu do %n urządzeń. Przenieść je mimo to?</numerusform>
@@ -9997,6 +10093,28 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation>Ta kompilacja służy wyłącznie do celów testowych.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation>Otwórz ustawienia serwera</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

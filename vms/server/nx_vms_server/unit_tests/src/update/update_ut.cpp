@@ -41,7 +41,7 @@ protected:
 
         for (int i = 0; i < count; ++i)
         {
-            m_peers[i]->waitForStarted();
+            ASSERT_TRUE(m_peers[i]->waitForStarted());
             m_peers[i]->commonModule()->globalSettings()->setLocalSystemId(systemId);
             m_peers[i]->commonModule()->globalSettings()->synchronizeNowSync();
         }

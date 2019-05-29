@@ -44,6 +44,8 @@ QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem* parent, Qt::WindowFlags 
     m_itemCached(true),
     m_fullRepaintPending(false)
 {
+    setFocusPolicy(Qt::NoFocus);
+
     /* In ItemCoordinateCache mode we cannot enforce sharp painting,
      * but can achieve accelerated scroll. Therefore it's better used for
      * big scrolling items with fixed position, like resource tree widget. */

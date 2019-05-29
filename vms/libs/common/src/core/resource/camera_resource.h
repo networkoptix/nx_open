@@ -159,6 +159,7 @@ signals:
     void userEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
     void compatibleAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
     void deviceAgentManifestsChanged(const QnVirtualCameraResourcePtr& camera);
+    void isIOModuleChanged(const QnVirtualCameraResourcePtr& camera);
 
 protected:
     virtual void emitPropertyChanged(const QString& key) override;

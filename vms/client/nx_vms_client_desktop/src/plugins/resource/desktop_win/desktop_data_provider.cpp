@@ -361,10 +361,11 @@ bool QnDesktopDataProvider::init()
         videoCodecName = getResource()->commonModule()->globalSettings()->lowQualityScreenVideoCodec();
     else
         videoCodecName = getResource()->commonModule()->globalSettings()->defaultExportVideoCodec();
+
     AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toLatin1().data());
     if (!videoCodec)
     {
-        NX_WARNING(this, tr("Configured codec: %1 not found, h263p will used").arg(videoCodecName));
+        NX_WARNING(this, "Configured codec: %1 not found, h263p will used", videoCodecName);
         videoCodec = avcodec_find_encoder(AV_CODEC_ID_H263P);
     }
     if(videoCodec == 0)

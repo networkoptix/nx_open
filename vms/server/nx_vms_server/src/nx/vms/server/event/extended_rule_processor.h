@@ -29,6 +29,8 @@ public:
 
     virtual void prepareAdditionActionParams(const vms::event::AbstractActionPtr& action) override;
 
+    void stop();
+
 protected slots:
     virtual bool executeActionInternal(const vms::event::AbstractActionPtr& action) override;
     void onRemoveResource(const QnResourcePtr &resource);

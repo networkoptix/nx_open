@@ -151,7 +151,7 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
     QnFfmpegVideoDecoder decoder(
         DecoderConfig(),
-        video->compressionType, video, false);
+        video->compressionType, video);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
@@ -367,7 +367,7 @@ int QnTranscoder::setVideoCodec(
         case TM_FfmpegTranscode:
         {
             ffmpegTranscoder = new QnFfmpegVideoTranscoder(
-                DecoderConfig::fromMediaResource(m_transcodingSettings.resource),
+                DecoderConfig(),
                 m_metrics,
                 codec);
 
@@ -386,7 +386,7 @@ int QnTranscoder::setVideoCodec(
                 // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version
                 bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
                 if (isAtom || resolution.height() >= 1080)
-                    ffmpegTranscoder->setMTMode(true);
+                    ffmpegTranscoder->setUseMultiThreadEncode(true);
             }
             m_vTranscoder = QSharedPointer<QnFfmpegVideoTranscoder>(ffmpegTranscoder);
             break;

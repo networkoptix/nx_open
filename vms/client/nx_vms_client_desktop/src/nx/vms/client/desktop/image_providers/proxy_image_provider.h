@@ -35,6 +35,8 @@ public:
     AbstractImageProcessor* imageProcessor() const;
     void setImageProcessor(AbstractImageProcessor* imageProcessor); //< Does not take ownership.
 
+    virtual bool tryLoad() override;
+
 protected:
     virtual void doLoadAsync() override;
 

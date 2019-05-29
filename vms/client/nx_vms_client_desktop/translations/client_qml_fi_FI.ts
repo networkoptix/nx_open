@@ -5,110 +5,129 @@
     <name>AnalyticsSettings</name>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Ota käyttöön</translation>
     </message>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Kameran analytiikka toimii vain, kun kameran kuvaa näytetään. Ota tallennus käyttöön, jotta se toimii koko ajan.</translation>
     </message>
   </context>
   <context>
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
-      <translation type="unfinished">Searching servers in your local network...</translation>
+      <translation>Etsitään palvelimia paikallisesta verkosta...</translation>
     </message>
     <message>
       <source>No servers found</source>
-      <translation type="unfinished">No servers found</translation>
+      <translation>Palvelimia ei löytynyt</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-      <translation type="unfinished">Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</translation>
+      <translation>Tarkista verkkoyhteys tai paina &quot;Yhdistä palvelimeen&quot; -painiketta, jos haluat syöttää tunnetun palvelimen osoitteen</translation>
     </message>
   </context>
   <context>
     <name>FactorySystemTileArea</name>
     <message>
       <source>Click to setup</source>
-      <translation type="unfinished">Click to setup</translation>
+      <translation>Klikkaa muokataksesi</translation>
     </message>
   </context>
   <context>
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Kirjaudu sisään</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Salasana</translation>
     </message>
     <message>
       <source>Save password</source>
-      <translation type="unfinished">Save password</translation>
+      <translation>Tallenna salasana</translation>
     </message>
     <message>
       <source>Auto-login</source>
-      <translation type="unfinished">Auto-login</translation>
+      <translation>Automaattinen kirjautuminen</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Yhdistä</translation>
     </message>
   </context>
   <context>
     <name>NxSearchEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Etsi</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginsInformation</name>
+    <message>
+      <source>No plugins installed</source>
+      <translation type="unfinished">No plugins installed</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation type="unfinished">Server is offline</translation>
     </message>
   </context>
   <context>
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>EI YHTEENSOPIVA</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>OFFLINE-TILASSA</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>Ei yhteyttä</translation>
     </message>
     <message>
       <source>SAFE MODE</source>
-      <translation type="unfinished">SAFE MODE</translation>
+      <translation>VIKASIETOTILA</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Uusi palvelin</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Muokkaa</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Piilota</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Mitään ei löytynyt</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Yhdistä toiseen palvelimeen...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Yhdistä palvelimeen...</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Ladataan...</translation>
     </message>
     <message>
       <source>You have no access to %1. Some features could be unavailable.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">You have no access to %1. Some features could be unavailable.</translation>
+      <translation>Sinulla ei ole pääsyä %1. Jotkin toiminnot eivät ehkä ole käytettävissä.</translation>
     </message>
   </context>
 </TS>

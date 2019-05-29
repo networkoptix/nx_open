@@ -26,6 +26,7 @@ public:
     void connectToSignals();
     update::Status status();
     void cancel();
+    void retry(bool forceRedownload = false);
     void startUpdate(const QByteArray& content);
     void install(const QnAuthSession& authInfo);
     bool participants(QList<QnUuid>* outParticipants) const;
@@ -53,6 +54,8 @@ private:
     update::FindPackageResult findPackage(
         nx::update::Package* outPackage,
         QString* outMessage = nullptr) const;
+    void extract();
+    void clearDownloader();
     bool canDownloadFile(const nx::update::Package& package, update::Status* outUpdateStatus);
     bool statusAppropriateForDownload(nx::update::Package* outPackage, update::Status* outStatus);
     bool installerState(update::Status* outUpdateStatus, const QnUuid& peerId);

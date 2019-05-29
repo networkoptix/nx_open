@@ -6,7 +6,6 @@
 
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
-#include <QtOpenGL/QGLWidget>
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>

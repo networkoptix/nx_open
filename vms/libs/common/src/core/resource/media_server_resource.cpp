@@ -308,14 +308,11 @@ void QnMediaServerResource::setUrl(const QString& url)
 {
     QnResource::setUrl(url);
 
-    QnMutexLocker lock(&m_mutex);
-    if (!m_primaryAddress.isNull())
-        return;
-
-    if (m_apiConnection)
-        m_apiConnection->setUrl(getApiUrl());
-
-    lock.unlock();
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (!m_primaryAddress.isNull())
+            return;
+    }
 
     emit primaryAddressChanged(toSharedPointer(this));
     emit apiUrlChanged(toSharedPointer(this));
@@ -331,7 +328,7 @@ nx::utils::Url QnMediaServerResource::getApiUrl() const
 QString QnMediaServerResource::getUrl() const
 {
     return nx::network::url::Builder()
-        .setScheme(isSslAllowed() ? "https" : "http")
+        .setScheme(nx::network::http::urlSheme(isSslAllowed()))
         .setEndpoint(getPrimaryAddress()).toUrl().toString();
 }
 
@@ -357,9 +354,6 @@ void QnMediaServerResource::setPrimaryAddress(const nx::network::SocketAddress& 
 
         m_primaryAddress = primaryAddress;
         NX_ASSERT(!m_primaryAddress.address.toString().isEmpty());
-
-        if (m_apiConnection)
-            m_apiConnection->setUrl(buildApiUrl());
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
@@ -368,19 +362,20 @@ void QnMediaServerResource::setPrimaryAddress(const nx::network::SocketAddress& 
 bool QnMediaServerResource::isSslAllowed() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_sslAllowed || commonModule()->globalSettings()->isTrafficEncriptionForced();
+    return nx::utils::Url(m_url).scheme() != nx::network::http::urlSheme(false)
+        || commonModule()->globalSettings()->isTrafficEncriptionForced();
 }
 
 void QnMediaServerResource::setSslAllowed(bool sslAllowed)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        if (sslAllowed == m_sslAllowed)
+        if (sslAllowed == isSslAllowed())
             return;
 
-        m_sslAllowed = sslAllowed;
-        if (m_apiConnection)
-            m_apiConnection->setUrl(buildApiUrl());
+        nx::utils::Url url(m_url);
+        url.setScheme(nx::network::http::urlSheme(sslAllowed));
+        m_url = url.toString();
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
@@ -476,11 +471,7 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::Notif
 
     const auto currentAddress = getPrimaryAddress();
     if (oldPrimaryAddress != currentAddress)
-    {
-        if (m_apiConnection)
-            m_apiConnection->setUrl(getApiUrl());
         notifiers << [r = toSharedPointer(this)]{ emit r->primaryAddressChanged(r); };
-    }
 }
 
 nx::utils::SoftwareVersion QnMediaServerResource::getVersion() const
@@ -588,7 +579,7 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     nx::vms::api::ModuleInformation moduleInformation;
     moduleInformation.type = nx::vms::api::ModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
-    moduleInformation.sslAllowed = m_sslAllowed;
+    moduleInformation.sslAllowed = isSslAllowed();
     moduleInformation.realm = nx::network::AppInfo::realm();
     moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     moduleInformation.name = getName();
@@ -740,24 +731,4 @@ void QnMediaServerResource::setResourcePool(QnResourcePool *resourcePool)
         connect(settings, &QnGlobalSettings::cloudSettingsChanged,
             this, &QnMediaServerResource::at_cloudSettingsChanged, Qt::DirectConnection);
     }
-}
-
-nx::utils::Url QnMediaServerResource::buildApiUrl() const
-{
-    nx::utils::Url url;
-    if (m_primaryAddress.isNull())
-    {
-        url = m_apiConnection->url();
-        url.setScheme(nx::network::http::urlSheme(m_sslAllowed));
-    }
-    else
-    {
-        url = nx::network::url::Builder()
-            .setScheme(nx::network::http::urlSheme(m_sslAllowed))
-            .setEndpoint(m_primaryAddress).toUrl();
-    }
-    NX_ASSERT(!url.host().isEmpty());
-    NX_ASSERT(url.isValid());
-
-    return url;
 }

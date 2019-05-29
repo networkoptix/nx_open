@@ -61,6 +61,8 @@ QString extractVersion(const QString& fullPath)
 
 } // namespace
 
+namespace nx::vms::applauncher {
+
 QString InstallationManager::defaultDirectoryForInstallations()
 {
     QString defaultDirectoryForNewInstallations = QStandardPaths::writableLocation(
@@ -125,7 +127,6 @@ void InstallationManager::updateInstalledVersionsInformation()
 	        if (installation.isNull())
 	            return;
 
-            NX_DEBUG(this, "Compatibility version %1 was not verified", version);
             installation->setVersion(nx::utils::SoftwareVersion(version));
 	        installations.insert(installation->version(), installation);
 
@@ -366,9 +367,6 @@ QString InstallationManager::installationDirForVersion(
     const nx::utils::SoftwareVersion& version) const
 {
     std::unique_lock<std::mutex> lk(m_mutex);
-    if (!m_installationsDir.exists())
-        return QString();
-
     return m_installationsDir.absoluteFilePath(versionToString(version));
 }
 
@@ -387,7 +385,7 @@ bool dummySpaceCheck(const QDir& dir, qint64 size)
     return success;
 }
 
-InstallationManager::ResultType InstallationManager::installZip(
+api::ResultType InstallationManager::installZip(
     const nx::utils::SoftwareVersion& version,
     const QString& fileName)
 {
@@ -397,7 +395,7 @@ InstallationManager::ResultType InstallationManager::installZip(
     if (installation)
     {
         NX_INFO(this, "Version %1 is already installed", version);
-        return ResultType::alreadyInstalled;
+        return api::ResultType::alreadyInstalled;
     }
 
     QDir targetDir(installationDirForVersion(version));
@@ -405,10 +403,10 @@ InstallationManager::ResultType InstallationManager::installZip(
     if (targetDir.exists())
         targetDir.removeRecursively();
 
-    if (!QDir().mkdir(targetDir.absolutePath()))
+    if (!QDir().mkpath(targetDir.absolutePath()))
     {
         NX_ERROR(this, "Cannot create directory %1", targetDir.absolutePath());
-        return ResultType::ioError;
+        return api::ResultType::ioError;
     }
 
     QnZipExtractor extractor(fileName, targetDir);
@@ -416,7 +414,7 @@ InstallationManager::ResultType InstallationManager::installZip(
     if (!dummySpaceCheck(targetDir, (qint64) extractor.estimateUnpackedSize()))
     {
         NX_ERROR(this, "Not enough space to install %1.", fileName);
-        return ResultType::notEnoughSpace;
+        return api::ResultType::notEnoughSpace;
     }
 
     auto errorCode = extractor.extractZip();
@@ -424,7 +422,7 @@ InstallationManager::ResultType InstallationManager::installZip(
     {
         NX_ERROR(this, "Cannot extract zip %1 to %2, errorCode = %3",
             fileName, targetDir.absolutePath(), extractor.errorToString(errorCode));
-        return ResultType::ioError;
+        return api::ResultType::ioError;
     }
 
     installation = QnClientInstallation::installationForPath(targetDir.absolutePath());
@@ -432,7 +430,7 @@ InstallationManager::ResultType InstallationManager::installZip(
     {
         targetDir.removeRecursively();
         NX_ERROR(this, "Update package %1 (%2) is invalid", version, fileName);
-        return ResultType::brokenPackage;
+        return api::ResultType::brokenPackage;
     }
 
     installation->setVersion(version);
@@ -447,10 +445,12 @@ InstallationManager::ResultType InstallationManager::installZip(
     NX_INFO(this, "Version %1 has been installed successfully to %2",
         version, targetDir.absolutePath());
 
-    return ResultType::ok;
+    return api::ResultType::ok;
 }
 
 bool InstallationManager::isValidVersionName(const QString& version)
 {
     return kVersionDirRegExp.exactMatch(version);
 }
+
+} // namespace nx::vms::applauncher

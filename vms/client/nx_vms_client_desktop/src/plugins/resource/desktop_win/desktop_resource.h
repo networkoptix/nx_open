@@ -8,12 +8,12 @@
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 
 class QnDesktopDataProvider;
-class QGLWidget;
+class QOpenGLWidget;
 
 class QnWinDesktopResource: public QnDesktopResource
 {
 public:
-    QnWinDesktopResource(QGLWidget* mainWindow = 0);
+    QnWinDesktopResource(QOpenGLWidget* mainWindow = nullptr);
     virtual ~QnWinDesktopResource();
 
     virtual bool isRendererSlow() const override;
@@ -33,8 +33,8 @@ private:
     friend class QnDesktopDataProviderWrapper;
 
 private:
-    QGLWidget* m_mainWidget;
-    QnDesktopDataProvider* m_desktopDataProvider;
+    QOpenGLWidget* const m_mainWidget;
+    QnDesktopDataProvider* m_desktopDataProvider = nullptr;
     QnMutex m_dpMutex;
     QMap<QnUuid, QnDesktopCameraConnectionPtr> m_connectionPool;
 };

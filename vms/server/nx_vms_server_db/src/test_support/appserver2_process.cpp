@@ -502,7 +502,7 @@ QnMediaServerResourcePtr Appserver2Process::addSelfServerResource(
     m_commonModule->resourcePool()->addResource(server);
     server->setServerFlags(nx::vms::api::SF_HasPublicIP);
     server->setName(QString::number(m_instanceCounter));
-    server->setUrl(lit("https://127.0.0.1:%1").arg(tcpPort));
+    server->setUrl(lit("http://127.0.0.1:%1").arg(tcpPort));
 
     m_commonModule->bindModuleInformation(server);
 

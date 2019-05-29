@@ -1969,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>Diese Nachricht nicht mehr anzeigen</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -2360,6 +2352,14 @@
       <location/>
       <source>The new System will have password and name from System:</source>
       <translation>Das neue System wird das Passwort und den Namen von diesem System haben:</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>Diese Nachricht nicht mehr anzeigen</translation>
     </message>
   </context>
   <context>
@@ -3075,6 +3075,26 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>Sicherungseinstellungen...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
+      <translation>Analyticsdaten können zig Gigabyte Speicherplatz belegen. Wir empfehlen, statt der Systempartition einen anderen Speicherort zu wählen.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation>Analyticsdaten werden weiterhin im deaktivierten Speicher gespeichert.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>Die Aufnahme in den deaktivierten Speicherort wird gestoppt. Das Löschen von veraltetem Filmmaterial wird jedoch fortgesetzt.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>Die Aufnahme wurde auf dem USB-Speicher aktiviert</translation>
     </message>
   </context>
   <context>

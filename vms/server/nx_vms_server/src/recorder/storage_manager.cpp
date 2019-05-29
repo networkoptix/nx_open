@@ -55,6 +55,7 @@
 #include <media_server/media_server_module.h>
 #include <media_server_process_aux.h>
 #include <nx/sql/database.h>
+#include <nx/vms/server/metadata/analytics_helper.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -1283,7 +1284,7 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
 void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     int storageIndex = storageDbPool()->getStorageIndex(storage);
-    NX_INFO(this, "Adding storage. Path: %1", nx::utils::url::hidePassword(storage->getUrl()));
+    NX_DEBUG(this, "Adding storage. Path: %1", nx::utils::url::hidePassword(storage->getUrl()));
 
     removeStorage(storage); // remove existing storage record if exists
     storage->setStatus(Qn::Offline); // we will check status after
@@ -1670,7 +1671,7 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     qint64 lowTime = itrLowLeft < itrLowRight ? itrLowLeft->startTimeMs : DATETIME_NOW;
     qint64 currentTime = qMin(hiTime, lowTime);
 
-    while (itrHiLeft < itrHiRight || itrLowLeft < itrLowLeft)
+    while (itrHiLeft < itrHiRight || itrLowLeft < itrLowRight)
     {
         qint64 nextHiTime = DATETIME_NOW;
         qint64 nextLowTime = DATETIME_NOW;
@@ -1716,16 +1717,16 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
             totalRecordedBytes += itrLowLeft->getFileSize() * percentUsage;
             if (storage)
                 result.recordedBytesPerStorage[storage->getId()] += itrLowLeft->getFileSize() * percentUsage;
-            if (hasHi)
-            {
-                // do not include bitrate calculation if only LQ quality
-                if (itrLowLeft->startTimeMs >= averagingStartTime)
-                    recordedBytesForPeriod += itrLowLeft->getFileSize() * percentUsage;
-            }
-            else
+
+            if (itrLowLeft->startTimeMs >= averagingStartTime)
+                recordedBytesForPeriod += itrLowLeft->getFileSize() * percentUsage;
+
+            if (!hasHi)
             {
                 // inc time if no HQ
                 totalRecordedMs += itrLowLeft->durationMs * percentUsage;
+                if (itrLowLeft->startTimeMs >= averagingStartTime)
+                    recordedMsForPeriod += itrLowLeft->durationMs * percentUsage;
             }
         }
 
@@ -1911,7 +1912,7 @@ void QnStorageManager::clearSpace(bool forced)
     {
         if (m_clearMotionTimer.elapsed() > MOTION_CLEANUP_INTERVAL) {
             m_clearMotionTimer.restart();
-            clearUnusedMotion();
+            clearUnusedMetadata();
         }
     }
     else {
@@ -2140,15 +2141,21 @@ void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
     }
 }
 
-void QnStorageManager::clearUnusedMotion()
+void QnStorageManager::clearUnusedMetadata()
 {
     UsedMonthsMap usedMonths;
 
     serverModule()->normalStorageManager()->updateRecordedMonths(usedMonths);
     serverModule()->backupStorageManager()->updateRecordedMonths(usedMonths);
+
     QDir baseDir = serverModule()->motionHelper()->getBaseDir();
     for( const QString& dir: baseDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
         serverModule()->motionHelper()->deleteUnusedFiles(usedMonths.value(dir).toList(), dir);
+
+    baseDir = serverModule()->metadataDatabaseDir();
+    nx::vms::server::metadata::AnalyticsHelper helper(serverModule()->metadataDatabaseDir());
+    for (const QString& dir: baseDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+        helper.deleteUnusedFiles(usedMonths.value(dir).toList(), dir);
 }
 
 void QnStorageManager::updateRecordedMonths(UsedMonthsMap& usedMonths)
@@ -2385,7 +2392,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
     //QnMutexLocker lock( &m_mutexStorages );
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
-        NX_INFO(this,
+        NX_DEBUG(this,
             "Storage. Path: %1. Goes to the online state. SpaceLimit: %2MiB. Currently available: %3MiB",
             nx::utils::url::hidePassword(fileStorage->getUrl()),
             fileStorage->getSpaceLimit() / 1024 / 1024,

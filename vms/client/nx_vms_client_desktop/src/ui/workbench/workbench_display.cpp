@@ -5,10 +5,12 @@
 
 #include <QtCore/QtAlgorithms>
 #include <QtCore/QScopedValueRollback>
+#include <QtGui/QScreen>
+#include <QtGui/QWindow>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsProxyWidget>
-#include <QtOpenGL/QGLContext>
-#include <QtOpenGL/QGLWidget>
+#include <QtWidgets/QOpenGLWidget>
+#include <QtGui/private/qopengltexturecache_p.h>
 
 #include <translation/datetime_formatter.h>
 
@@ -67,7 +69,6 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
-#include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/generic/splash_item.h>
@@ -75,7 +76,6 @@
 #include <ui/graphics/items/grid/grid_background_item.h>
 
 #include <ui/graphics/view/graphics_view.h>
-#include <ui/graphics/opengl/gl_hardware_checker.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -519,6 +519,16 @@ bool QnWorkbenchDisplay::animationAllowed() const
     return !m_lightMode.testFlag(Qn::LightModeNoAnimation);
 }
 
+// ------------------------------------------------------------------------------------------------
+// TODO: FIXME: THIS IS A HACK THAT SHOULD BE REPLACED WITH A QT PATCH.
+class QnOpenGLTextureCacheHack: public QOpenGLSharedResource
+{
+public:
+    QMutex m_mutex;
+    QCache<quint64, QOpenGLCachedTexture> m_cache;
+};
+// ------------------------------------------------------------------------------------------------
+
 void QnWorkbenchDisplay::initSceneView()
 {
     NX_ASSERT(m_scene && m_view);
@@ -547,35 +557,48 @@ void QnWorkbenchDisplay::initSceneView()
     static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
     if (!m_view->property(qn_viewInitializedPropertyName).toBool())
     {
-        auto viewport = new QGLWidget(m_view);
-        if (const auto window = viewport->windowHandle())
-        {
-            connect(window, &QWindow::screenChanged, this,
-                [this](QScreen *screen)
-                {
-                    for (auto& item : m_view->items())
-                        setScreenRecursive(item, screen);
-                });
-        }
-        m_view->setViewport(viewport);
+        const auto updateViewScreens =
+            [this](QScreen* screen)
+            {
+                for (auto& item: m_view->items())
+                    setScreenRecursive(item, screen);
+            };
 
+        executeDelayedParented(
+            [this, updateViewScreens]()
+            {
+                const auto window = mainWindowWidget()->windowHandle();
+
+                if (NX_ASSERT(window))
+                    connect(window, &QWindow::screenChanged, this, updateViewScreens);
+
+                updateViewScreens(window->screen());
+            }, 1, this);
+
+        const auto viewport = new QOpenGLWidget(m_view);
         viewport->makeCurrent();
-        QnGlHardwareChecker::checkCurrentContext(true);
-
-        /* QGLTextureCache leaks memory very fast when limit exceeded (Qt 5.6.1). */
-        QGLContext::currentContext()->setTextureCacheLimit(2 * 1024 * 1024);
-
-        /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
-        DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);
+        m_view->setViewport(viewport);
 
         /* Turn on antialiasing at QPainter level. */
         m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 
-        /* In OpenGL mode this one seems to be ignored, but it will help in software mode. */
-        m_view->setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
+        // All our items save and restore painter state. Required by framed widgets.
+        m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false);
 
-        /* All our items save and restore painter state. */
-        m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
+        // ----------------------------------------------------------------------------------------
+        // TODO: #vkutin FIXME: THIS IS A HACK THAT SHOULD BE REPLACED WITH A QT PATCH.
+        QSharedPointer<QMetaObject::Connection> connection(new QMetaObject::Connection);
+        const auto hackInit =
+            [this, connection, viewport]()
+            {
+                auto cache = QOpenGLTextureCache::cacheForContext(viewport->context());
+                auto cacheHack = reinterpret_cast<QnOpenGLTextureCacheHack*>(cache);
+                cacheHack->m_cache.setMaxCost(2 * 1024 * 1024);
+                QObject::disconnect(*connection);
+            };
+
+        *connection = connect(viewport, &QOpenGLWidget::aboutToCompose, this, hackInit);
+        // ----------------------------------------------------------------------------------------
 
 #ifndef Q_OS_MACX
         /* On macos, this flag results in QnMaskedProxyWidget::paint never called. */
@@ -1856,11 +1879,8 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate)
         /* Layout containing only one item (current) is supposed to have the same AR as the item.
          * So we just set item size to its video layout size. */
         size = widget->channelLayout()->size();
-        if (const auto mediaResource = widget->resource().dynamicCast<QnMediaResource>())
-		{
-            if (QnAspectRatio::isRotated90(mediaResource->defaultRotation()))
-                size = size.transposed();
-		}
+        if (QnAspectRatio::isRotated90(item->rotation()))
+            size = size.transposed();
     }
     else
     {

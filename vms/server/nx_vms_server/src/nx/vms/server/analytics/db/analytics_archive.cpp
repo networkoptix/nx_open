@@ -21,15 +21,11 @@ AnalyticsArchive::~AnalyticsArchive()
 
 bool AnalyticsArchive::saveToArchive(
     std::chrono::milliseconds timestamp,
-    const std::vector<QRectF>& region,
-    int objectType,
-    long long allAttributesId)
+    const std::vector<QRect>& region,
+    int64_t objectType,
+    int64_t allAttributesId)
 {
-    const auto translatedRegion = restore<>(
-        region,
-        QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
-
-    for (const auto& rect: translatedRegion)
+    for (const auto& rect: region)
     {
         m_items.push_back({
             timestamp,
@@ -45,9 +41,9 @@ QnTimePeriodList AnalyticsArchive::matchPeriod(const Filter& filter)
 {
     QnTimePeriodList periods;
 
-    const auto translatedRegion = translate<>(
-        filter.region,
-        QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
+    std::vector<QRect> translatedRegion;
+    for (const auto& rect: filter.region)
+        translatedRegion.push_back(rect);
 
     for (const auto& item: m_items)
     {
@@ -55,7 +51,16 @@ QnTimePeriodList AnalyticsArchive::matchPeriod(const Filter& filter)
             periods += QnTimePeriod(item.timestamp, std::chrono::milliseconds(1));
     }
 
-    return QnTimePeriodList::aggregateTimePeriodsUnconstrained(periods, filter.detailLevel);
+    periods = QnTimePeriodList::aggregateTimePeriodsUnconstrained(periods, filter.detailLevel);
+
+    if (filter.sortOrder == Qt::SortOrder::DescendingOrder)
+    {
+        std::sort(
+            periods.begin(), periods.end(),
+            [](const auto& left, const auto& right) { return left.startTime() > right.startTime(); });
+    }
+
+    return periods;
 }
 
 bool AnalyticsArchive::satisfiesFilter(
@@ -63,13 +68,13 @@ bool AnalyticsArchive::satisfiesFilter(
     const Filter& filter,
     const std::vector<QRect>& regionFilter)
 {
-    if (!filter.timePeriod.isEmpty() && !filter.timePeriod.contains(item.timestamp))
+    if (!filter.timePeriod.isInfinite() && !filter.timePeriod.contains(item.timestamp))
         return false;
 
     if (!filter.objectTypes.empty() && filter.objectTypes.count(item.objectType) == 0)
         return false;
 
-    if (!filter.allAttributesHash.empty() && 
+    if (!filter.allAttributesHash.empty() &&
         filter.allAttributesHash.count(item.allAttributesId) == 0)
     {
         return false;
