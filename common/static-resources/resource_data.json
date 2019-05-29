@@ -3068,7 +3068,10 @@
             "dahua|psd81602-a360",
             "dahua|IPC-HDBW4231F-E2-M",
             "avigilon|32c-h4a-4mh-360",
-            "dahua|psd81602-a360"
+            "dahua|psd81602-a360",
+            "dahua|ipc-hdbw4233x*",
+            "dahua|ipc-hdbw7233x*",
+            "hikvision|ds-2cd6d24fwd*"
             ],
             "canShareLicenseGroup": true
         },
