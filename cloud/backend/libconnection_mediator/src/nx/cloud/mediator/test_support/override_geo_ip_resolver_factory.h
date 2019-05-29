@@ -13,7 +13,7 @@ public:
     OverrideGeoIpResolverFactory()
     {
         m_factoryFuncBak = geo_ip::ResolverFactory::instance().setCustomFunc(
-            [this](const conf::Settings& /*settings*/)
+            [](const conf::Settings& /*settings*/)
             {
                 return std::make_unique<nx::geo_ip::test::MemoryResolver>();
             });
