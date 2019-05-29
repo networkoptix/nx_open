@@ -1,8 +1,8 @@
 <br>
-<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="{{ datastructure.name }}_vars">
-Show branding variables
+<button class="btn btn-info btn-xs" type="button" data-toggle="collapse" data-target="#{{ datastructure.name }}_vars">
+Show/hide branding variables
 </button>'
-<div id="{{ datastructure.name }}_vars" class="list-group" style="width: 1200px" data-field-name="id_{{ datastructure.name }}">
+<div id="{{ datastructure.name }}_vars" class="collapse list-group" style="width: 1200px" data-field-name="id_{{ datastructure.name }}">
     {% for var, value in brands %}
     <button class="brand-variable list-group-item list-group-item-action" data-name="{{ var.name }}">
     <strong>{{ var.label }}</strong> {{ var.description }} (Example: {{ value }}

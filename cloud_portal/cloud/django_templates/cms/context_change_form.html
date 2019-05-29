@@ -4,7 +4,11 @@
 
 {% block extrahead %}
     {{ block.super }}
-
+    <!-- Import django's static jQuery because admin_tools template doesn't import by default -->
+    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'admin/js/jquery.init.js' %}"></script>
+    <script>window.$ = django.jQuery;</script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'tiny_mce/tiny_mce.js' %}"></script>
 {% endblock %}
 <{% block breadcrumbs %}
