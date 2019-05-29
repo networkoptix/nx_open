@@ -7,9 +7,9 @@ namespace hpm {
 namespace stats {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-(Statistics),
-(json),
-_mediator_Fields)
+    (Statistics),
+    (json),
+    _mediator_Fields)
 
 //-------------------------------------------------------------------------------------------------
 
