@@ -145,7 +145,7 @@ protected:
             {
                 auto geoIpResolver = std::make_unique<nx::geo_ip::test::MemoryResolver>();
                 m_geoIpResolver = geoIpResolver.get();
-                mockupRelayRegions();
+                mockupRelayRegions(m_geoIpResolver);
                 return geoIpResolver;
             });
 
@@ -299,7 +299,7 @@ private:
         m_reportedRelayUrlForClient = m_reportedRelayUrlForClientPromise.get_future().get();
     }
 
-    void mockupRelayRegions()
+    void mockupRelayRegions(nx::geo_ip::test::MemoryResolver* geoIpResolver)
     {
         const auto needToWaitForRelayIpMockup =
             [this]()
@@ -308,21 +308,21 @@ private:
                 return (int)m_relayIpMockup.size() < relayClusterSize();
             };
 
-        ASSERT_NE(m_geoIpResolver, nullptr);
+        ASSERT_NE(geoIpResolver, nullptr);
 
         while (needToWaitForRelayIpMockup())
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         using namespace nx::geo_ip;
-        m_geoIpResolver->add(
+        geoIpResolver->add(
             m_relayIpMockup.at(relayUrl(0)),
             Location(Continent::northAmerica));
 
-        m_geoIpResolver->add(
+        geoIpResolver->add(
             m_relayIpMockup.at(relayUrl(1)),
             Location(Continent::northAmerica));
 
-        m_geoIpResolver->add(
+        geoIpResolver->add(
             m_relayIpMockup.at(relayUrl(2)),
             Location(Continent::australia));
 

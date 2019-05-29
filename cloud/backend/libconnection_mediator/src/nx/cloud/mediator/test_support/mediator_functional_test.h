@@ -18,6 +18,7 @@
 #include "local_cloud_data_provider.h"
 #include "mediaserver_emulator.h"
 #include "override_relay_cluster_client_factory.h"
+#include "override_geo_ip_resolver_factory.h"
 
 namespace nx {
 namespace hpm {
@@ -125,6 +126,7 @@ protected:
     void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
 
 private:
+    nx::hpm::test::OverrideGeoIpResolverFactory m_overrideGeoIpResolverFactory;
 	nx::hpm::test::OverrideRelayClusterClientFactory m_overrideRelayClusterClientFactory;
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
     LocalCloudDataProvider m_cloudDataProvider;
