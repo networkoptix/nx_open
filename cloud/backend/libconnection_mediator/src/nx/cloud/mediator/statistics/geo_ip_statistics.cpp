@@ -16,7 +16,6 @@ static const char kSubdivision[] = "subdivision";
 static const char kCountry[] = "country";
 static const char kContinent[] = "continent";
 static const char kLocation[] = "location";
-static const char kListeningPeers[] = "listeningPeers";
 
 QJsonObject toJsonObject(const std::map<std::string, int>& map)
 {
@@ -28,10 +27,10 @@ QJsonObject toJsonObject(const std::map<std::string, int>& map)
 
 QJsonObject toJsonObject(const Country& country)
 {
-    return QJsonObject({
+    return QJsonObject ({
         { kTotal, country.total },
         { kCity, toJsonObject(country.city) },
-        { kSubdivision, toJsonObject(country.subdivision)} });
+        { kSubdivision, toJsonObject(country.subdivision) } });
 }
 
 
@@ -40,8 +39,12 @@ QJsonObject toJsonObject(const Continent& continent)
     QJsonObject o;
     o.insert(kTotal, continent.total);
     for (const auto& element : continent.country)
-        o.insert(element.first.c_str(), toJsonObject(element.second));
-    return o;
+    {
+        o.insert(
+            element.first.c_str(),
+            toJsonObject(element.second));
+    }
+    return QJsonObject({ {kCountry, std::move(o)} });
 }
 
 QJsonObject toJsonObject(const Location& location)
@@ -49,7 +52,7 @@ QJsonObject toJsonObject(const Location& location)
     QJsonObject o;
     for (const auto& element : location.continent)
         o.insert(element.first.c_str(), toJsonObject(element.second));
-    return o;
+    return QJsonObject({ {kContinent, std::move(o)} });
 }
 
 QJsonObject toJsonObject(const ListeningPeerStatistics& listeningPeer)
