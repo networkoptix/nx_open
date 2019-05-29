@@ -76,7 +76,6 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (BookmarkUpdateObject, "cameraBookmarks/update")
     (BookmarkDeleteObject, "cameraBookmarks/delete")
     (InstallUpdateObject, "installUpdate")
-    (InstallUpdateUnauthenticatedObject, "installUpdateUnauthenticated")
     (Restart, "restart")
     (ConfigureObject, "configure")
     (PingSystemObject, "pingSystem")
@@ -217,7 +216,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             emitFinished(this, response.status, handle);
             break;
         case InstallUpdateObject:
-        case InstallUpdateUnauthenticatedObject:
             processJsonReply<QnUploadUpdateReply>(this, response, handle);
             break;
         case Restart:
