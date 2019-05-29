@@ -191,6 +191,9 @@ angular.module('cloudApp')
                            $scope.system.mergeInfo = mergeInfo;
                         }
                     }, function(error) {
+                        if(!error.primarySystemName && !error.secondarySystemName){
+                            return;
+                        }
                         var commonErrorMsg = L.merging.commonText
                             .replace('{{primarySystem}}', error.primarySystemName)
                             .replace('{{secondarySystem}}', error.secondarySystemName);
