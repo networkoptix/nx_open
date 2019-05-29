@@ -26,6 +26,7 @@ class NotifyingRelayClusterClient:
 public:
     NotifyingRelayClusterClient(
         const nx::hpm::conf::Settings& settings,
+        nx::geo_ip::AbstractResolver* resolver,
         MultipleRelays* testFixture);
 
     virtual void selectRelayInstanceForListeningPeer(
@@ -149,10 +150,11 @@ protected:
             });
 
         m_relayClusterClientFuncBak = RelayClusterClientFactory::instance().setCustomFunc(
-            [this](const conf::Settings& settings)
+            [this](const conf::Settings& settings, nx::geo_ip::AbstractResolver* resolver)
             {
                 auto relayClusterClient = std::make_unique<NotifyingRelayClusterClient>(
                     settings,
+                    resolver,
                     this);
                 m_relayClusterClient = relayClusterClient.get();
                 return relayClusterClient;
@@ -369,9 +371,10 @@ namespace {
 
 NotifyingRelayClusterClient::NotifyingRelayClusterClient(
     const nx::hpm::conf::Settings& settings,
+    nx::geo_ip::AbstractResolver* resolver,
     MultipleRelays* testFixture)
     :
-    base_type(settings),
+    base_type(settings, resolver),
     m_testFixture(testFixture)
 {
 }

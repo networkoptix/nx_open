@@ -1,12 +1,9 @@
 #include "online_relays_cluster_client.h"
 
-#include <nx/network/address_resolver.h>
-#include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/random.h>
 
 #include "nx/cloud/mediator/settings.h"
-#include "nx/cloud/mediator/geo_ip/resolver_factory.h"
 
 namespace nx::hpm {
 
@@ -24,9 +21,11 @@ nx::utils::Url baseUrl(nx::utils::Url url)
 
 }
 
-OnlineRelaysClusterClient::OnlineRelaysClusterClient(const conf::Settings& settings):
+OnlineRelaysClusterClient::OnlineRelaysClusterClient(
+    const conf::Settings& settings,
+    nx::geo_ip::AbstractResolver* resolver):
     m_settings(settings),
-    m_geoIpResolver(geo_ip::ResolverFactory::instance().create(settings)),
+    m_geoIpResolver(resolver),
     m_trafficRelayDiscoveryClient(
         settings.trafficRelay().discovery,
         settings.trafficRelay().clusterId,
