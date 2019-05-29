@@ -152,13 +152,28 @@ export class MergeModalContent {
 
     addStatus(system) {
         let status = '';
-
-        if (system.stateOfHealth === 'offline' || system.hasOwnProperty('isOnline') && !system.isOnline) {
-            status = ` – ${this.language.systemStatuses.offline}`;
-        } else if (system.stateOfHealth === 'online' && !system.canMerge) {
-            status = ` – ${this.language.systemStatuses.incompatible}`;
-        } else if (system.stateOfHealth === 'unavailable' || system.hasOwnProperty('isAvailable') && !system.isAvailable) {
-            status = ` – ${this.language.systemStatuses.unavailable}`;
+        const statusIncompatible = ` – ${this.language.systemStatuses.incompatible}`;
+        const statusUnavailable = ` – ${this.language.systemStatuses.unavailable}`;
+        const statusOffline = ` – ${this.language.systemStatuses.offline}`;
+        const stateOfHealth = system.info && system.info.stateOfHealth || system.stateOfHealth || system.stateMessage || '';
+        switch (stateOfHealth) {
+            case 'online':
+                if (!system.canMerge) {
+                    status = statusIncompatible;
+                }
+                break;
+            case 'unavailable':
+                status = statusUnavailable;
+                break;
+            case 'offline':
+                status = statusOffline;
+                break;
+            default:
+                if (system.hasOwnProperty('isOnline') && !system.isOnline) {
+                    status = statusOffline;
+                } else {
+                    status = statusUnavailable;
+                }
         }
 
         return `<span>${system.name}</span><span class="text-muted">${status}</span>`;
@@ -177,8 +192,15 @@ export class MergeModalContent {
         if (!system.canMerge) {
             return 'secondaryCannotMerge';
         }
+
         if (!this.system.canMerge) {
             return 'primaryCannotMerge';
+        }
+        if (!this.system.isOnline) {
+            return 'primaryOffline';
+        }
+        if (!this.system.isAvailable) {
+            return 'primaryUnavailable';
         }
         return '';
     }
@@ -188,10 +210,10 @@ export class MergeModalContent {
             this.targetSystem = {...this.targetSystem, ...system};
             return Promise.all([
                 this.system.mediaserver.getMediaServers().catch(error => {
-                    return Promise.reject({system: 'primary', errorResponse: error});
+                    return Promise.reject({system: 'current', errorResponse: error});
                 }),
                 this.targetSystem.mediaserver.getMediaServers().catch(error => {
-                    return Promise.reject({system: 'secondary', errorResponse: error});
+                    return Promise.reject({system: 'target', errorResponse: error});
                 })
             ]).then(res => {
                 this.tooManySystems = res.map(req => req.data.length)

@@ -55,9 +55,21 @@
                         <span [translate]="'dialogs.merge.systemUnavailable'" [translateParams]="{ targetSystem: targetSystem.name }"></span>
                         <span>&nbsp;<a [href]="config.supportLink" target="_blank" translate>support</a>.</span>
                     </p>
-                    <p *ngIf="systemMergeable == 'offline'" translate
-                       class="help-block-no-height warning-label mb-2">
-                        System {{targetSystem.name}} is offline and cannot be merged with the current one.
+                    <p *ngIf="systemMergeable == 'primaryUnavailable'" class="help-block-no-height warning-label mb-2">
+                        <span [translate]="'dialogs.merge.systemUnavailable'" [translateParams]="{ targetSystem: system.name }"></span>
+                        <span>&nbsp;<a [href]="config.supportLink" target="_blank" translate>support</a>.</span>
+                    </p>
+                    <p *ngIf="systemMergeable == 'offline'"
+                       class="help-block-no-height warning-label mb-2"
+                       [innerHTML]="'dialogs.merge.systemOffline' | translate: {
+                            targetSystem: targetSystem.name || targetSystem.info.name
+                            }">
+                    </p>
+                    <p *ngIf="systemMergeable == 'primaryOffline'"
+                       class="help-block-no-height warning-label mb-2"
+                       [innerHTML]="'dialogs.merge.primarySystemOffline' | translate: {
+                            primarySystem: system.info.name, targetSystem: targetSystem.name || targetSystem.info.name
+                            }">
                     </p>
                     <p *ngIf="systemMergeable == 'secondaryCannotMerge'" class="help-block-no-height warning-label mb-2"
                        [innerHTML]="'dialogs.merge.secondaryCannotMerge' | translate: {
