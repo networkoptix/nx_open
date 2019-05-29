@@ -33,7 +33,7 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     m_serverPeerConnectionMethods(api::ConnectionMethod::all),
     m_originatingPeerCloudConnectVersion(api::CloudConnectVersion::initial),
     m_findRelayInstanceFunc(
-        &AbstractRelayClusterClient::findRelayInstancePeerIsListeningOn)
+        &AbstractRelayClusterClient::findRelayInstanceForClient)
 {
     auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
     if (!serverConnectionStrongRef)

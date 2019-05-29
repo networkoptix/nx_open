@@ -20,7 +20,7 @@ public:
         const nx::network::SocketAddress& serverEndpoint,
         RelayInstanceSelectCompletionHandler completionHandler) override;
 
-    virtual void findRelayInstancePeerIsListeningOn(
+    virtual void findRelayInstanceForClient(
         const std::string& peerId,
         const nx::network::SocketAddress& clientEndpoint,
         RelayInstanceSearchCompletionHandler completionHandler) override;

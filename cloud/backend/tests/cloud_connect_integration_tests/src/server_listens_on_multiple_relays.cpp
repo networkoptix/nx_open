@@ -34,7 +34,7 @@ public:
         const nx::network::SocketAddress& serverEndpoint,
         nx::hpm::RelayInstanceSelectCompletionHandler completionHandler) override;
 
-    virtual void findRelayInstancePeerIsListeningOn(
+    virtual void findRelayInstanceForClient(
         const std::string& peerId,
         const nx::network::SocketAddress& clientEndpoint,
         nx::hpm::RelayInstanceSearchCompletionHandler completionHandler) override;
@@ -398,14 +398,14 @@ void NotifyingRelayClusterClient::selectRelayInstanceForListeningPeer(
         });
 }
 
-void NotifyingRelayClusterClient::findRelayInstancePeerIsListeningOn(
+void NotifyingRelayClusterClient::findRelayInstanceForClient(
     const std::string& peerId,
     const nx::network::SocketAddress& /*clientEndpoint*/,
     nx::hpm::RelayInstanceSearchCompletionHandler completionHandler)
 {
     m_testFixture->addIpAndRegion("127.0.0.2", nx::geo_ip::Continent::australia);
 
-    base_type::findRelayInstancePeerIsListeningOn(
+    base_type::findRelayInstanceForClient(
         peerId,
         nx::network::SocketAddress("127.0.0.2", 1),
         [this, completionHandler = std::move(completionHandler)](

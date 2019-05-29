@@ -74,7 +74,7 @@ void OnlineRelaysClusterClient::selectRelayInstanceForListeningPeer(
     });
 }
 
-void OnlineRelaysClusterClient::findRelayInstancePeerIsListeningOn(
+void OnlineRelaysClusterClient::findRelayInstanceForClient(
      const std::string& peerId,
      const nx::network::SocketAddress& clientEndpoint,
      RelayInstanceSearchCompletionHandler completionHandler)
@@ -94,7 +94,7 @@ void OnlineRelaysClusterClient::findRelayInstancePeerIsListeningOn(
 		auto& url = nx::utils::random::choice(relayUrls);
 
         NX_VERBOSE(this,
-            "findRelayInstancePeerIsListeningOn() reporting relay url: %1 for listening peer: %2"
+            "findRelayInstanceForClient() reporting relay url: %1 for listening peer: %2"
             "and client ip: %3",
             url, peerId, clientEndpoint.address);
 

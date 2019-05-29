@@ -98,7 +98,7 @@ private:
     std::function<void(api::ResultCode)> m_connectionAckCompletionHandler;
     api::CloudConnectVersion m_originatingPeerCloudConnectVersion;
     nx::network::aio::AsyncOperationWrapper<
-        decltype(&AbstractRelayClusterClient::findRelayInstancePeerIsListeningOn)
+        decltype(&AbstractRelayClusterClient::findRelayInstanceForClient)
     > m_findRelayInstanceFunc;
 
     virtual void stopWhileInAioThread() override;

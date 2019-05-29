@@ -27,7 +27,7 @@ public:
         const nx::network::SocketAddress& serverEndpoint,
         RelayInstanceSelectCompletionHandler completionHandler) = 0;
 
-    virtual void findRelayInstancePeerIsListeningOn(
+    virtual void findRelayInstanceForClient(
         const std::string& peerId,
         const nx::network::SocketAddress& clientEndpoint,
         RelayInstanceSearchCompletionHandler completionHandler) = 0;

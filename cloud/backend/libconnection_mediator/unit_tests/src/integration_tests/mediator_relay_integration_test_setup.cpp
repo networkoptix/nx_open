@@ -33,7 +33,7 @@ public:
         });
     }
 
-    virtual void findRelayInstancePeerIsListeningOn(
+    virtual void findRelayInstanceForClient(
         const std::string& /*peerId*/,
         const nx::network::SocketAddress& /*clientEndpoint*/,
         RelayInstanceSearchCompletionHandler completionHandler) override
