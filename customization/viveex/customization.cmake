@@ -1,3 +1,5 @@
+set(defaultSkin "dark_orange")
+
 # Components Namings
 set(product.name "VIVEex")
 set(display.product.name "VIVEex")
