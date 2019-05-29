@@ -422,7 +422,7 @@ void UDPHolePunchingConnectionInitiationFsm::findRelayInstance(
         },
         m_relayClusterClient,
         m_serverPeerHostName.toStdString(),
-        m_clientEndpoint);
+        m_clientEndpoint.address);
 }
 
 void UDPHolePunchingConnectionInitiationFsm::finishConnect()

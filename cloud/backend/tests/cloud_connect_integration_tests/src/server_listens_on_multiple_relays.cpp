@@ -31,12 +31,12 @@ public:
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& peerId,
-        const nx::network::SocketAddress& serverEndpoint,
+        const nx::network::HostAddress& serverHost,
         nx::hpm::RelayInstanceSelectCompletionHandler completionHandler) override;
 
     virtual void findRelayInstanceForClient(
         const std::string& peerId,
-        const nx::network::SocketAddress& clientEndpoint,
+        const nx::network::HostAddress& clientHost,
         nx::hpm::RelayInstanceSearchCompletionHandler completionHandler) override;
 
 private:
@@ -381,14 +381,14 @@ NotifyingRelayClusterClient::NotifyingRelayClusterClient(
 
 void NotifyingRelayClusterClient::selectRelayInstanceForListeningPeer(
     const std::string& peerId,
-    const nx::network::SocketAddress& /*serverEndpoint*/,
+    const nx::network::HostAddress& /*serverHost*/,
     nx::hpm::RelayInstanceSelectCompletionHandler completionHandler)
 {
     m_testFixture->addIpAndRegion("127.0.0.1", nx::geo_ip::Continent::northAmerica);
 
     base_type::selectRelayInstanceForListeningPeer(
         peerId,
-        nx::network::SocketAddress("127.0.0.1", 1),
+        nx::network::HostAddress("127.0.0.1"),
         [this, completionHandler = std::move(completionHandler)](
             nx::cloud::relay::api::ResultCode resultCode,
             std::vector<nx::utils::Url> relayUrls)
@@ -400,14 +400,14 @@ void NotifyingRelayClusterClient::selectRelayInstanceForListeningPeer(
 
 void NotifyingRelayClusterClient::findRelayInstanceForClient(
     const std::string& peerId,
-    const nx::network::SocketAddress& /*clientEndpoint*/,
+    const nx::network::HostAddress& /*clientHost*/,
     nx::hpm::RelayInstanceSearchCompletionHandler completionHandler)
 {
     m_testFixture->addIpAndRegion("127.0.0.2", nx::geo_ip::Continent::australia);
 
     base_type::findRelayInstanceForClient(
         peerId,
-        nx::network::SocketAddress("127.0.0.2", 1),
+        nx::network::HostAddress("127.0.0.2"),
         [this, completionHandler = std::move(completionHandler)](
             nx::cloud::relay::api::ResultCode resultCode,
             nx::utils::Url relayUrl)
