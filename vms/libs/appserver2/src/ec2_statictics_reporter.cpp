@@ -46,12 +46,12 @@ using namespace nx::vms;
 
 namespace ec2
 {
-    const QString Ec2StaticticsReporter::DEFAULT_SERVER_API = lit("http://stats.vmsproxy.com");
+    const QString Ec2StaticticsReporter::DEFAULT_SERVER_API = "https://stats.vmsproxy.com";
 
     // Hardcoded credentials (because of no way to keep it better)
-    const QString Ec2StaticticsReporter::AUTH_USER = lit("nx");
-    const QString Ec2StaticticsReporter::AUTH_PASSWORD = lit(
-                "f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
+    const QString Ec2StaticticsReporter::AUTH_USER = "nx";
+    const QString Ec2StaticticsReporter::AUTH_PASSWORD =
+        "f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd";
 
     Ec2StaticticsReporter::Ec2StaticticsReporter(ec2::AbstractECConnection* ec2Connection):
         m_ec2Connection(ec2Connection),

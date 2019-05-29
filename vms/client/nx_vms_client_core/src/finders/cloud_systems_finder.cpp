@@ -15,6 +15,20 @@
 static const std::chrono::milliseconds kCloudSystemsRefreshPeriod = std::chrono::seconds(15);
 static const std::chrono::milliseconds kSystemConnectTimeout = std::chrono::seconds(12);
 
+namespace {
+
+nx::utils::Url makeCloudModuleInformationUrl(const QString& cloudSystemId)
+{
+    nx::utils::Url url;
+    url.setScheme(nx::network::http::kSecureUrlSchemeName);
+    url.setHost(cloudSystemId);
+    url.setPort(0);
+    url.setPath("/api/moduleInformation");
+    return url;
+}
+
+} // namespace
+
 QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
     : base_type(parent)
     , m_updateSystemsTimer(new QTimer(this))
@@ -256,7 +270,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
 
         };
 
-    client->doGet(lit("http://%1:0/api/moduleInformation").arg(cloudSystemId), handleReply);
+    client->doGet(makeCloudModuleInformationUrl(cloudSystemId), handleReply);
 
     // This method is always called under mutex.
     m_runningRequests.push_back(client);
