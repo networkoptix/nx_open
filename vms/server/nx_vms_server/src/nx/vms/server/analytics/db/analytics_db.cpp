@@ -273,6 +273,7 @@ void EventsStorage::lookupTimePeriods(
                     m_deviceDao,
                     m_objectTypeDao,
                     m_timePeriodDao,
+                    &m_attributesDao,
                     m_analyticsArchiveDirectory.get(),
                     m_maxRecordedTimestamp);
                 return timePeriodFetcher.selectTimePeriods(

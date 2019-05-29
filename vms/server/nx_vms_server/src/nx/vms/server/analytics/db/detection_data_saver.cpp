@@ -257,7 +257,7 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
     struct Item
     {
         QRegion region;
-        std::vector<int64_t> attributesIds;
+        std::set<int64_t> attributesIds;
     };
 
     std::map<std::pair<QnUuid, int /*objectType*/>, Item> regionByObjectType;
@@ -276,7 +276,7 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
             Item& item = regionByObjectType[
                 {objectAttributes.deviceId, objectAttributes.objectTypeId}];
             item.region += aggregatedTrackData.boundingBox;
-            item.attributesIds.push_back(objectAttributes.attributesDbId);
+            item.attributesIds.insert(objectAttributes.attributesDbId);
         }
     }
 
@@ -285,7 +285,8 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
     {
         AnalArchiveItem archiveItem;
         archiveItem.deviceId = deviceIdAndObjectType.first;
-        archiveItem.combinedAttributesId = combineAttributes(queryContext, item.attributesIds);
+        archiveItem.combinedAttributesId = 
+            m_attributesDao->combineAttributes(queryContext, item.attributesIds);
         archiveItem.objectType = deviceIdAndObjectType.second;
         archiveItem.region = item.region;
         archiveItem.timestamp = minTimestamp;
@@ -307,39 +308,6 @@ DetectionDataSaver::ObjectDbAttributes
     }
 
     return result;
-}
-
-int64_t DetectionDataSaver::combineAttributes(
-    nx::sql::QueryContext* queryContext,
-    const std::vector<int64_t>& attributesIds)
-{
-    if (attributesIds.empty())
-        return -1;
-
-    auto query = queryContext->connection()->createQuery();
-    query->prepare(R"sql(
-        INSERT INTO combined_attributes (combination_id, attributes_id) VALUES (?, ?)
-    )sql");
-
-    query->bindValue(0, -1);
-    query->bindValue(1, (long long) attributesIds.front());
-    query->exec();
-
-    const auto combinationId = query->lastInsertId().toLongLong();
-
-    // Replacing -1 with the correct value.
-    queryContext->connection()->executeQuery(
-        "UPDATE combined_attributes SET combination_id = ? WHERE rowid = ?",
-        combinationId, combinationId);
-
-    for (std::size_t i = 1; i < attributesIds.size(); ++i)
-    {
-        query->bindValue(0, combinationId);
-        query->bindValue(1, (long long) attributesIds[i]);
-        query->exec();
-    }
-
-    return combinationId;
 }
 
 } // namespace nx::analytics::db

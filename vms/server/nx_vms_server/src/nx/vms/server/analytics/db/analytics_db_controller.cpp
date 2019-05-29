@@ -33,6 +33,7 @@ DbController::DbController(
         dbStructureUpdater().addUpdateScript(kSplitDataToObjectAndSearch);
         dbStructureUpdater().addUpdateScript(kObjectBestShot);
         dbStructureUpdater().addUpdateScript(kCombinedAttributes);
+        dbStructureUpdater().addUpdateScript(kFixObjectSearchToObjectIndices);
     }
 }
 

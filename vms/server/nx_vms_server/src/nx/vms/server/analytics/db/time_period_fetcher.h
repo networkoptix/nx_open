@@ -14,6 +14,7 @@ namespace nx::analytics::db {
 class DeviceDao;
 class ObjectTypeDao;
 class TimePeriodDao;
+class AttributesDao;
 class AnalyticsArchiveDirectory;
 
 class TimePeriodFetcher
@@ -23,6 +24,7 @@ public:
         const DeviceDao& deviceDao,
         const ObjectTypeDao& objectTypeDao,
         const TimePeriodDao& timePeriodDao,
+        AttributesDao* attributesDao,
         AnalyticsArchiveDirectory* analyticsArchive,
         std::chrono::milliseconds maxRecordedTimestamp);
 
@@ -36,6 +38,7 @@ private:
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
     const TimePeriodDao& m_timePeriodDao;
+    AttributesDao* m_attributesDao = nullptr;
     AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
     const std::chrono::milliseconds m_maxRecordedTimestamp;
 
@@ -64,10 +67,6 @@ private:
     AnalyticsArchive::Filter prepareArchiveFilter(
         const Filter& filter,
         const TimePeriodsLookupOptions& options);
-
-    std::set<int64_t> lookupCombinedAttributes(
-        nx::sql::QueryContext* queryContext,
-        const QString& text);
 
     void prepareSelectTimePeriodsFilteredQuery(
         nx::sql::AbstractSqlQuery* query,

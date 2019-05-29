@@ -250,4 +250,19 @@ CREATE INDEX idx_combined_attributes_full ON combined_attributes(
 
 )sql";
 
+//-------------------------------------------------------------------------------------------------
+// META-281.
+static constexpr char kFixObjectSearchToObjectIndices[] =
+R"sql(
+
+DROP INDEX idx_object_search_to_object_full;
+
+CREATE INDEX idx_object_search_to_object_object_search_id ON object_search_to_object(
+    object_search_id);
+
+CREATE INDEX idx_object_search_to_object_object_id ON object_search_to_object(
+    object_id);
+
+)sql";
+
 } // namespace nx::analytics::db
