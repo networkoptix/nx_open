@@ -4141,7 +4141,7 @@ bool MediaServerProcess::initializeAnalyticsEvents()
         }
     }
 
-    m_oldAnalyticsStoragePath = settings.path + "/" + settings.dbConnectionOptions.dbName;
+    m_oldAnalyticsStoragePath = closeDirPath(settings.path) + settings.dbConnectionOptions.dbName;
     return true;
 }
 
