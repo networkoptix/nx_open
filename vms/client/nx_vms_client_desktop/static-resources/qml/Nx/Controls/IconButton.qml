@@ -12,33 +12,33 @@ AbstractButton
     property string iconBaseName: ""
     property string iconCheckedBaseName: ""
 
-    property string iconNormalName: iconBaseName;
-    property string iconPressedName: iconBaseName + "_pressed";
-    property string iconHoveredName: iconBaseName + "_hovered";
-    property string iconDisabledName: iconBaseName + "_disabled";
+    property string iconNormalName: iconBaseName
+    property string iconPressedName: iconBaseName + "_pressed"
+    property string iconHoveredName: iconBaseName + "_hovered"
+    property string iconDisabledName: iconBaseName + "_disabled"
 
-    property string iconCheckedNormalName: iconCheckedBaseName;
-    property string iconCheckedPressedName: iconCheckedBaseName + "_pressed";
-    property string iconCheckedHoveredName: iconCheckedBaseName + "_hovered";
-    property string iconCheckedDisabledName: iconCheckedBaseName + "_disabled";
+    property string iconCheckedNormalName: iconCheckedBaseName
+    property string iconCheckedPressedName: iconCheckedBaseName + "_pressed"
+    property string iconCheckedHoveredName: iconCheckedBaseName + "_hovered"
+    property string iconCheckedDisabledName: iconCheckedBaseName + "_disabled"
 
     readonly property string currentIconName:
     {
         if (checked)
         {
             if (!enabled)
-                return iconCheckedDisabledName;
+                return iconCheckedDisabledName
             if (pressed)
-                return iconCheckedPressedName;
-            return hovered ? iconCheckedHoveredName : iconCheckedNormalName;
+                return iconCheckedPressedName
+            return hovered ? iconCheckedHoveredName : iconCheckedNormalName
         }
         else
         {
             if (!enabled)
-                return iconDisabledName;
+                return iconDisabledName
             if (pressed)
-                return iconPressedName;
-            return hovered ? iconHoveredName : iconNormalName;
+                return iconPressedName
+            return hovered ? iconHoveredName : iconNormalName
         }
     }
 
