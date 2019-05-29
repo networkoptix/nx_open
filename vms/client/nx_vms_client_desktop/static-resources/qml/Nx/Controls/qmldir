@@ -17,6 +17,7 @@ ToolTip 1.0 ToolTip.qml
 TextArea 1.0 TextArea.qml
 IconButton 1.0 IconButton.qml
 SidePanel 1.0 SidePanel.qml
+Resizer 1.0 Resizer.qml
 
 ArrowIcon 1.0 ArrowIcon.qml
 SwitchIcon 1.0 SwitchIcon.qml

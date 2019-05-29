@@ -6,3 +6,4 @@ MultiVideoOutput 1.0 MultiVideoOutput.qml
 VideoPositioner 1.0 VideoPositioner.qml
 SelectionMouseArea 1.0 SelectionMouseArea.qml
 CameraDisplay 1.0 CameraDisplay.qml
+Timeline 1.0 Timeline.qml
