@@ -3,6 +3,7 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR})
 
 nx_add_target(libtraffic_relay LIBRARY NO_MOC
+    WERROR_IF NOT WINDOWS
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/libtraffic_relay_app_info_impl.cpp"
     PUBLIC_LIBS

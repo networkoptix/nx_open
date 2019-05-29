@@ -12,15 +12,10 @@ class AuthenticationManager:
     public nx::network::http::server::AbstractAuthenticationManager
 {
 public:
-    AuthenticationManager(const nx::network::http::AuthMethodRestrictionList& authRestrictionList);
-
     virtual void authenticate(
         const nx::network::http::HttpServerConnection& connection,
         const nx::network::http::Request& request,
         nx::network::http::server::AuthenticationCompletionHandler completionHandler) override;
-
-private:
-    const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
 };
 
 } // namespace view

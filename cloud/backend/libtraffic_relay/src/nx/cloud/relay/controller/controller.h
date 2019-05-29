@@ -33,8 +33,6 @@ private:
     std::unique_ptr<controller::AbstractTrafficRelay> m_trafficRelay;
     std::unique_ptr<controller::AbstractConnectSessionManager> m_connectSessionManager;
     std::unique_ptr<relaying::AbstractListeningPeerManager> m_listeningPeerManager;
-    Model* m_model;
-    const conf::Settings& m_settings;
 };
 
 } // namespace relay
