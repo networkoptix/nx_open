@@ -218,8 +218,9 @@ public:
      * This field is set when we verify update contents.
      * @param package Package to be uploaded
      * @param sourceDir Directory that contains this package
+     * @returns number of recipients for this package.
      */
-    bool uploadPackage(const nx::update::Package& package, const QDir& sourceDir);
+    int uploadPackage(const nx::update::Package& package, const QDir& sourceDir);
 
     TimePoint::duration getInstallDuration() const;
 
