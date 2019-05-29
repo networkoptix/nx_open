@@ -1,5 +1,6 @@
 #pragma once
 
+#include <api/helpers/multiserver_request_data.h>
 #include <rest/server/json_rest_handler.h>
 #include <rest/helpers/request_context.h>
 #include <nx/vms/server/server_module_aware.h>

@@ -79,9 +79,9 @@ void WebSocket::onPingTimer()
         m_aliveTimeout,
         [this]()
         {
-            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+            nx::utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
             onRead(SystemError::timedOut, 0);
-            if (!watcher.objectDestroyed())
+            if (!watcher.interrupted())
                 onWrite(SystemError::timedOut, 0);
         });
 
@@ -308,9 +308,9 @@ void WebSocket::onWrite(SystemError::ErrorCode error, size_t transferred)
         m_failed = true;
         while (!m_writeQueue.empty())
         {
-            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+            utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
             callOnWriteHandler(error, 0);
-            if (watcher.objectDestroyed())
+            if (watcher.interrupted())
                 return;
         }
     }
