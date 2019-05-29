@@ -5,6 +5,7 @@
 
 #include <analytics/db/config.h>
 
+#include "attributes_dao.h"
 #include "device_dao.h"
 #include "object_searcher.h"
 #include "serializers.h"
@@ -20,12 +21,14 @@ TimePeriodFetcher::TimePeriodFetcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
     const TimePeriodDao& timePeriodDao,
+    AttributesDao* attributesDao,
     AnalyticsArchiveDirectory* analyticsArchive,
     std::chrono::milliseconds maxRecordedTimestamp)
     :
     m_deviceDao(deviceDao),
     m_objectTypeDao(objectTypeDao),
     m_timePeriodDao(timePeriodDao),
+    m_attributesDao(attributesDao),
     m_analyticsArchive(analyticsArchive),
     m_maxRecordedTimestamp(maxRecordedTimestamp)
 {
@@ -142,7 +145,8 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
     if (!filter.freeText.isEmpty())
     {
         timer.restart();
-        archiveFilter.allAttributesHash = lookupCombinedAttributes(queryContext, filter.freeText);
+        archiveFilter.allAttributesHash = 
+            m_attributesDao->lookupCombinedAttributes(queryContext, filter.freeText);
         NX_DEBUG(this, "Text '%1' lookup completed in %2", filter.freeText, timer.elapsed());
     }
 
@@ -174,28 +178,6 @@ AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
     archiveFilter.detailLevel = options.detailLevel;
 
     return archiveFilter;
-}
-
-std::set<int64_t> TimePeriodFetcher::lookupCombinedAttributes(
-    nx::sql::QueryContext* queryContext,
-    const QString& text)
-{
-    auto query = queryContext->connection()->createQuery();
-    query->prepare(R"sql(
-        SELECT distinct combination_id
-        FROM combined_attributes
-        WHERE attributes_id IN
-	        (SELECT docid FROM attributes_text_index WHERE content MATCH ?)
-    )sql");
-
-    query->addBindValue(text);
-    query->exec();
-
-    std::set<int64_t> attributesIds;
-    while (query->next())
-        attributesIds.insert(query->value(0).toLongLong());
-
-    return attributesIds;
 }
 
 #if 0

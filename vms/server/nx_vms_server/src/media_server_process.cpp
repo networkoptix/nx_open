@@ -2797,9 +2797,9 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/settingsDocumentation", new QnSettingsDocumentationHandler(&serverModule()->settings()));
 
     /**%apidoc GET /ec2/analyticsEngineSettings
+     * %param:string analyticsEngineId Id of analytics engine.
      * Return settings values of the specified Engine.
      * %return:object TODO:CHECK JSON object consisting of name-value settings pairs.
-     *      %param:string engineId Id of analytics engine.
      *
      * %apidoc POST /ec2/analyticsEngineSettings
      * Applies passed settings values to correspondent Analytics Engine.
@@ -2810,10 +2810,10 @@ void MediaServerProcess::registerRestHandlers(
         new nx::vms::server::rest::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
+     * %param:string analyticsEngineId Unique id of an Analytics Engine.
+     * %param:string deviceId Id of a device.
      * Return settings values of the specified device-engine pair.
      * %return:object TODO:CHECK JSON object consisting of name-value settings pairs.
-     *      %param:string engineId Unique id of an Analytics Engine.
-     *      %param:string deviceId Id of a device.
      *
      * %apidoc POST /ec2/deviceAnalyticsSettings
      * Applies passed settings values to the correspondent device-engine pair.

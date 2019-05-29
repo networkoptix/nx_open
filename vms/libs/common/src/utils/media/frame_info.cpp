@@ -126,17 +126,7 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
     //TODO/IMPL
     //dst->metadata = QnMetaDataV1Ptr( new QnMetaDataV1( *src->metadata ) );
 
-    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) src->format);
-    for (int i = 0; i < descr->nb_components && src->data[i]; ++i)
-    {
-        int h = src->height;
-        int w = src->width;
-        if (i > 0) {
-            h >>= descr->log2_chroma_h;
-            w >>= descr->log2_chroma_w;
-        }
-        copyPlane(dst->data[i], src->data[i], w, dst->linesize[i], src->linesize[i], h);
-    }
+    dst->copyDataFrom(src);
 }
 
 /*
@@ -146,16 +136,6 @@ int CLVideoDecoderOutput::getCapacity()
     return linesize[0]*height + (linesize[1] + linesize[2])*yu_h;
 }
 */
-
-void CLVideoDecoderOutput::copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride,  int src_stride, int height)
-{
-    for (int i = 0; i < height; ++i)
-    {
-        memcpy(dst, src, width);
-        dst+=dst_stride;
-        src+=src_stride;
-    }
-}
 
 void CLVideoDecoderOutput::fillRightEdge()
 {
@@ -373,19 +353,14 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
     NX_ASSERT(fixDeprecatedPixelFormat((AVPixelFormat) format)
         == fixDeprecatedPixelFormat((AVPixelFormat) frame->format));
 
-    if (const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format))
-    {
-        for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
-        {
-            int h = height;
-            int w = width;
-            if (i > 0) {
-                h >>= descr->log2_chroma_h;
-                w >>= descr->log2_chroma_w;
-            }
-            copyPlane(data[i], frame->data[i], w * descr->comp[i].step, linesize[i], frame->linesize[i], h);
-        }
-    }
+    av_image_copy(
+        data,
+        linesize,
+        (const uint8_t**)frame->data,
+        frame->linesize,
+        (AVPixelFormat)frame->format,
+        width,
+        height);
 }
 
 CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
