@@ -20,42 +20,44 @@ void WidgetProfiler::saveWidgetsReport(const QString& filePath,
     textStream.flush();
 }
 
+namespace {
+
+QStringList getWidgetHierarchyLines(const QWidget* rootWidget)
+{
+    QStringList lines;
+    if (!rootWidget)
+        return lines;
+
+    QString widgetHierarchyLine(rootWidget->metaObject()->className());
+    if (!rootWidget->objectName().isEmpty())
+        widgetHierarchyLine.append(QString(" (%1)").arg(rootWidget->objectName()));
+    lines.append(widgetHierarchyLine);
+
+    const auto children =
+        rootWidget->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
+    for (int i = 0; i < children.count(); ++i)
+    {
+        constexpr QChar boxUpAndRight(0x2514);
+        constexpr QChar boxVertical(0x2502);
+        constexpr QChar boxVerticalRight(0x251C);
+        const bool isLastChild = children.count() - 1 == i;
+        const auto firstIndent =
+            QString("%1 ").arg(isLastChild ? boxUpAndRight : boxVerticalRight);
+        const auto nextIndent =
+            QString("%1 ").arg(isLastChild ? QChar(' ') : boxVertical);
+
+        auto childHierarchyLines = getWidgetHierarchyLines(children.at(i));
+        lines.append(childHierarchyLines.takeFirst().prepend(firstIndent));
+        for (const auto& childHierarchyLine : childHierarchyLines)
+            lines.append(nextIndent + childHierarchyLine);
+    }
+    return lines;
+}
+
+} // namespace
+
 QString WidgetProfiler::getWidgetHierarchy(const QWidget* parent /*= nullptr*/)
 {
-    std::function<QStringList(const QWidget* widget)> getWidgetHierarchyLines;
-    getWidgetHierarchyLines =
-        [&getWidgetHierarchyLines](const QWidget* widget) -> QStringList
-        {
-            QStringList lines;
-            if (!widget)
-                return lines;
-
-            QString widgetHierarchyLine(widget->metaObject()->className());
-            if (!widget->objectName().isEmpty())
-                widgetHierarchyLine.append(QString(" (%1)").arg(widget->objectName()));
-            lines.append(widgetHierarchyLine);
-
-            const auto children =
-                widget->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
-            for (int i = 0; i < children.count(); ++i)
-            {
-                constexpr QChar boxUpAndRight(0x2514);
-                constexpr QChar boxVertical(0x2502);
-                constexpr QChar boxVerticalRight(0x251C);
-                const bool isLastChild = children.count() - 1 == i;
-                const auto firstIndent =
-                    QString("%1 ").arg(isLastChild ? boxUpAndRight : boxVerticalRight);
-                const auto nextIndent =
-                    QString("%1 ").arg(isLastChild ? QChar(' ') : boxVertical);
-
-                auto childHierarchyLines = getWidgetHierarchyLines(children.at(i));
-                lines.append(childHierarchyLines.takeFirst().prepend(firstIndent));
-                for (const auto& childHierarchyLine: childHierarchyLines)
-                    lines.append(nextIndent + childHierarchyLine);
-            }
-            return lines;
-        };
-
     const auto allWidgets = QApplication::allWidgets();
     QWidgetList listedWidgets;
     std::copy_if(allWidgets.cbegin(), allWidgets.cend(), std::back_inserter(listedWidgets),

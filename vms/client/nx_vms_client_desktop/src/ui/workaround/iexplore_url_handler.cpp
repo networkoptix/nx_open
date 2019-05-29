@@ -3,16 +3,19 @@
 #include <QtCore/QSettings>
 #include <QtGui/QDesktopServices>
 
-QnIexploreUrlHandler::QnIexploreUrlHandler(QObject *parent): 
+#include <nx/network/http/http_types.h>
+
+QnIexploreUrlHandler::QnIexploreUrlHandler(QObject *parent):
     QObject(parent)
 {
-    QDesktopServices::setUrlHandler(QString(QLatin1String("http")), this, "handleUrl");
-    QDesktopServices::setUrlHandler(QString(QLatin1String("https")), this, "handleUrl");
+    QDesktopServices::setUrlHandler(nx::network::http::kUrlSchemeName, this, "handleUrl");
+    QDesktopServices::setUrlHandler(nx::network::http::kSecureUrlSchemeName, this, "handleUrl");
 }
 
-QnIexploreUrlHandler::~QnIexploreUrlHandler() {
-    QDesktopServices::unsetUrlHandler(QString(QLatin1String("http")));
-    QDesktopServices::unsetUrlHandler(QString(QLatin1String("https")));
+QnIexploreUrlHandler::~QnIexploreUrlHandler()
+{
+    QDesktopServices::unsetUrlHandler(nx::network::http::kUrlSchemeName);
+    QDesktopServices::unsetUrlHandler(nx::network::http::kSecureUrlSchemeName);
 }
 
 bool QnIexploreUrlHandler::handleUrl(QUrl url) {

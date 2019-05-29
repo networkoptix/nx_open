@@ -7,6 +7,7 @@
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/sql/db_instance_controller.h>
 #include <nx/sql/types.h>
+#include <nx/utils/std/filesystem.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/test_support/utils.h>
 

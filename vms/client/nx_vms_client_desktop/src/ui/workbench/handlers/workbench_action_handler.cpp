@@ -2722,7 +2722,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         targetUrl = qnClientModule->networkProxyFactory()->urlToResource(targetUrl, request.server);
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-        targetUrl = nx::utils::Url(lit("http://%1/%2:%3:%4%5?%6")
+        targetUrl = nx::utils::Url(lit("https://%1/%2:%3:%4%5?%6")
             .arg(gateway->endpoint().toString()).arg(targetUrl.scheme())
             .arg(targetUrl.host()).arg(targetUrl.port())
             .arg(targetUrl.path()).arg(targetUrl.query()));
