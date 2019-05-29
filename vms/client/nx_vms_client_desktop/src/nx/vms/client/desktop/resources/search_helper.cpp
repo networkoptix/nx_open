@@ -110,7 +110,8 @@ Matches matchSearchWords(const QStringList& searchWords, const QnResourcePtr& re
 QStringList uniqueSearchWords(const QString& searchString)
 {
     QStringList result = searchString.split(" ", QString::SkipEmptyParts);
-    std::for_each(result.begin(), result.end(), [](QString& str) { str.toLower(); });
+    for (auto& searchWord: result)
+        searchWord = searchWord.toLower();
     result.removeDuplicates();
     return result;
 }
