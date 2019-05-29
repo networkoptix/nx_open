@@ -145,6 +145,7 @@
 #include <rest/handlers/update_status_rest_handler.h>
 #include <rest/handlers/install_update_rest_handler.h>
 #include <rest/handlers/cancel_update_rest_handler.h>
+#include <rest/handlers/retry_update.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/iflist_rest_handler.h>
@@ -2577,6 +2578,13 @@ void MediaServerProcess::registerRestHandlers(
      * manifest is cleared and all downloads are cancelled.
      */
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
+
+    /**%apidoc POST /ec2/retryUpdate
+     * Retries the latest failed update action. E.g. if one of servers has failed update because
+     * there was not enough free space, it will repty to reserve space and start downloading.
+     * %return:object Update status after retry. See ec2/updateStatus.
+     */
+    reg("ec2/retryUpdate", new nx::vms::server::rest::handlers::RetryUpdate(serverModule()));
 
     /**%apidoc GET /ec2/cameraThumbnail
      * Get the static image from the camera.
