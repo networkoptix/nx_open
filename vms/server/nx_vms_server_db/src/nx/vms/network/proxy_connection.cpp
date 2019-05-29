@@ -195,9 +195,10 @@ QString ProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, cons
             nx::network::SocketFactory::createStreamSocket(useSsl);
         d->dstSocket->setRecvTimeout(d->connectTimeout.count());
         d->dstSocket->setSendTimeout(d->connectTimeout.count());
+        NX_VERBOSE(this, "Connecting to [%1]", url);
         if (!d->dstSocket->connect(
-                nx::network::SocketAddress(url.host().toLatin1().data(), url.port()),
-                nx::network::deprecated::kDefaultConnectTimeout))
+            nx::network::SocketAddress(url.host().toLatin1().data(), url.port()),
+            nx::network::deprecated::kDefaultConnectTimeout))
         {
             d->socket->close();
             return QString(); // now answer from destination address
@@ -296,12 +297,16 @@ void ProxyConnectionProcessor::cleanupProxyInfo(nx::network::http::Request* requ
         QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority);
 }
 
-static void fixServerUrlSchemeSecurity(nx::utils::Url* url, const QnGlobalSettings* settings)
+static void fixServerUrlSchemeSecurity(nx::utils::Url* url, const QnGlobalSettings* settings,
+    QString protocol)
 {
     namespace http = nx::network::http;
     namespace rtsp = nx::network::rtsp;
 
-    // NOTE: ssl should be always used between servers.
+    if (url->scheme().isEmpty())
+        url->setScheme(protocol.toLower());
+
+    // NOTE: SSL should be always used between servers.
     if (url->scheme() == http::kUrlSchemeName)
         url->setScheme(http::kSecureUrlSchemeName);
     else if (settings->isVideoTrafficEncriptionForced() && url->scheme() == rtsp::kUrlSchemeName)
@@ -413,16 +418,16 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
         }
         else
         {
-            //proxying to ourself
-            dstRoute.addr = nx::network::SocketAddress(nx::network::HostAddress::localhost, d->socket->getLocalAddress().port);
+            // Proxying to ourself.
+            fixServerUrlSchemeSecurity(&dstUrl, commonModule()->globalSettings(), d->protocol);
+            dstRoute.addr = nx::network::SocketAddress(nx::network::HostAddress::localhost,
+                d->socket->getLocalAddress().port);
         }
     }
     else if (!dstRoute.id.isNull())
     {
         // dstUrl targets another server in the system.
-        if (dstUrl.scheme().isEmpty())
-            dstUrl.setScheme(d->protocol.toLower());
-        fixServerUrlSchemeSecurity(&dstUrl, commonModule()->globalSettings());
+        fixServerUrlSchemeSecurity(&dstUrl, commonModule()->globalSettings(), d->protocol);
 
         dstRoute = commonModule()->router()->routeTo(dstRoute.id);
     }
@@ -614,7 +619,6 @@ void ProxyConnectionProcessor::doProxyRequest()
         moreContentToReceive = contentLength - receivedContentLength;
     }
 
-    QString path = d->request.requestLine.url.path();
     // Parse next request and change dst if required.
     nx::utils::Url dstUrl;
     QnRoute dstRoute;
