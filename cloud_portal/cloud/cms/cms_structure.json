@@ -947,7 +947,8 @@
             "type": "html",
             "optional": true,
             "meta": {
-              "char_limit": 10000
+              "char_limit": 10000,
+              "brand_vars": true
             }
           },
           {

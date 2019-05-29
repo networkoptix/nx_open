@@ -2,9 +2,12 @@ import json
 from django import forms
 from django.core.validators import RegexValidator
 from django.contrib.admin.widgets import FilteredSelectMultiple
+from django.template.loader import render_to_string
 from .models import *
 
 from dal import autocomplete
+
+from cloud import settings
 
 BYTES_TO_MEGABYTES = 1048576.0
 
@@ -46,6 +49,22 @@ def get_languages_list():
     return map(modify_default_language, customization.languages.values_list('code', 'name'))
 
 
+def generate_branding_variables(datastructure):
+    cloud_portal = Product.objects.get(customizations__name=settings.CUSTOMIZATION,
+                                       product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
+    branding_context = Context.objects.get(name='branding', product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
+
+    brands = [
+        (ds, ds.find_actual_value(product=cloud_portal))
+        for ds in branding_context.datastructure_set.all()
+        if not ds.optional and ds.label and ds.type not in (DataStructure.DATA_TYPES.image,)
+    ]
+
+    return render_to_string(
+        'cms/widgets/branding_variables.html', context={'brands': brands, 'datastructure': datastructure}
+    )
+
+
 class CustomContextForm(forms.Form):
     language = forms.ChoiceField(
         widget=forms.Select, label="Language")
@@ -74,6 +93,8 @@ class CustomContextForm(forms.Form):
 
             if data_structure.meta_settings:
                 ds_description += convert_meta_to_description(data_structure.meta_settings)
+                if 'brand_vars' in data_structure.meta_settings and data_structure.meta_settings['brand_vars']:
+                    ds_description += generate_branding_variables(data_structure)
 
             if data_structure.type == DataStructure.DATA_TYPES.guid:
                 ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexadecimal " \
