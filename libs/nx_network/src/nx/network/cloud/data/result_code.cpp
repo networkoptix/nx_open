@@ -45,6 +45,11 @@ QString toString(ResultCode code)
     return s;
 }
 
+void PrintTo(ResultCode val, ::std::ostream* os)
+{
+    *os << toString(val).toStdString();
+}
+
 } // namespace api
 } // namespace hpm
 } // namespace nx

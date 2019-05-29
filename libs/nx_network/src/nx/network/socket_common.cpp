@@ -407,6 +407,11 @@ void swap(HostAddress& one, HostAddress& two)
     one.swap(two);
 }
 
+void PrintTo(const HostAddress& val, ::std::ostream* os)
+{
+    *os << val.toString().toStdString();
+}
+
 void serialize(
     class QnJsonContext*,
     const nx::network::HostAddress& value,
@@ -555,6 +560,11 @@ QString SocketAddress::trimIpV6(const QString& ip)
     return ip;
 }
 
+void PrintTo(const SocketAddress& val, ::std::ostream* os)
+{
+    *os << val.toString().toStdString();
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SocketAddress, (json), (address)(port))
 
 //-------------------------------------------------------------------------------------------------
@@ -623,6 +633,11 @@ std::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& stri
         std::chrono::seconds((size_t)split[1].trimmed().toUInt());
     options.probeCount = split[2].trimmed().toInt();
     return options;
+}
+
+void PrintTo(const KeepAliveOptions& val, ::std::ostream* os)
+{
+    *os << val.toString().toStdString();
 }
 
 } // namespace network
