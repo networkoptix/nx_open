@@ -170,7 +170,7 @@ class Customization(models.Model):
                                customization.<br><br>
                                If there is no parent selected or the parent is not in the review an integration
                                can be reviewed whenever.""",
-                               on_delete=models.CASCADE)
+                               on_delete=models.SET_DEFAULT)
     trust_parent = models.BooleanField(default=False, help_text="""Automatically accepts integrations the parent
                                                                    customization accepts.""")
 
@@ -315,7 +315,7 @@ class Context(models.Model):
             ("edit_content", "Can edit content and send for review"),
         )
     # TODO: Remove this after release of 19.1 - Task: CLOUD-2299
-    product = models.ForeignKey(Product, null=True, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
     product_type = models.ForeignKey(ProductType, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=1024)
     label = models.CharField(max_length=1024, default="")
@@ -522,19 +522,18 @@ class ContentVersion(models.Model):
         verbose_name_plural = 'revisions'
 
     # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
-    customization = models.ForeignKey(Customization, default=None, null=True, on_delete=models.CASCADE)
+    customization = models.ForeignKey(Customization, default=None, null=True, on_delete=models.SET_NULL)
     product = models.ForeignKey(Product, default=1, on_delete=models.CASCADE)
-    name = models.CharField(max_length=1024)
 
     created_date = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
-        blank=True, related_name='created_%(class)s', on_delete=models.CASCADE)
+        blank=True, related_name='created_%(class)s', on_delete=models.SET_NULL)
 
     accepted_date = models.DateTimeField(null=True, blank=True)
     accepted_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,
-        related_name='accepted_%(class)s', on_delete=models.CASCADE)
+        related_name='accepted_%(class)s', on_delete=models.SET_NULL)
 
     def __str__(self):
         return str(self.id)
@@ -591,7 +590,7 @@ class ProductCustomizationReview(models.Model):
     reviewed_date = models.DateTimeField(null=True, blank=True)
     reviewed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,
-        related_name='accepted_%(class)s', on_delete=models.CASCADE)
+        related_name='accepted_%(class)s', on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.version.product.__str__()
@@ -656,13 +655,13 @@ class DataRecord(models.Model):
     product = models.ForeignKey(Product, default=None, null=True, on_delete=models.CASCADE)
     language = models.ForeignKey(Language, null=True, blank=True, on_delete=models.CASCADE)
     # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
-    customization = models.ForeignKey(Customization, default=None, blank=True, null=True, on_delete=models.CASCADE)
+    customization = models.ForeignKey(Customization, default=None, blank=True, null=True, on_delete=models.SET_NULL)
     version = models.ForeignKey(ContentVersion, null=True, blank=True, on_delete=models.CASCADE)
 
     created_date = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
-        blank=True, related_name='created_%(class)s', on_delete=models.CASCADE)
+        blank=True, related_name='created_%(class)s', on_delete=models.SET_NULL)
 
     value = models.TextField(default='', blank=True)
     external_file = models.ForeignKey(ExternalFile, default=None, blank=True, null=True, on_delete=models.CASCADE)
