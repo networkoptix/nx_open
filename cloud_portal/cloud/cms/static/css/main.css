@@ -136,3 +136,7 @@ img.preview-image{
 .nodots > li {
     list-style-type: none;
 }
+
+.button.cancel-link {
+    height: 40px !important;
+}
