@@ -40,7 +40,7 @@ set(mac.bundle.identifier "com.daekyocns.viveex2")
 set(mac.protocol_handler_bundle.identifier "com.daekyocns.protocol_handler")
 
 set(ios.new_bundle_identifier "com.daekyocns.viveex")
-set(ios.group_identifier "com.daekyocns.viveex")
+set(ios.group_identifier "group.com.daekyocns.viveex")
 set(ios.sign.identity "iPhone Developer: Ivan Vigasin (KZ74EE5FP2)")
 
 # Other customizations.
