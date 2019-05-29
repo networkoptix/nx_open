@@ -18,6 +18,8 @@ function(nx_add_test target)
             GMock
         ${ARGN})
 
+    nx_force_include(${target} ${CMAKE_SOURCE_DIR}/libs/nx_utils/src/nx/utils/test_support/custom_gtest_printers.h)
+
     add_test(NAME ${target} COMMAND ${target})
 
     if(WINDOWS)
