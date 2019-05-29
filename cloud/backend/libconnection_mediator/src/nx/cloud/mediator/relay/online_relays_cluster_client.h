@@ -12,17 +12,19 @@ class OnlineRelaysClusterClient:
     public AbstractRelayClusterClient
 {
 public:
-    OnlineRelaysClusterClient(const conf::Settings& settings);
+    OnlineRelaysClusterClient(
+        const conf::Settings& settings,
+        nx::geo_ip::AbstractResolver* resolver);
     ~OnlineRelaysClusterClient();
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& peerId,
-        const nx::network::SocketAddress& serverEndpoint,
+        const nx::network::HostAddress& serverHost,
         RelayInstanceSelectCompletionHandler completionHandler) override;
 
-    virtual void findRelayInstancePeerIsListeningOn(
+    virtual void findRelayInstanceForClient(
         const std::string& peerId,
-        const nx::network::SocketAddress& clientEndpoint,
+        const nx::network::HostAddress& clientHost,
         RelayInstanceSearchCompletionHandler completionHandler) override;
 
 private:
@@ -58,7 +60,7 @@ private:
 private:
     const conf::Settings& m_settings;
 
-    std::unique_ptr<nx::geo_ip::AbstractResolver> m_geoIpResolver;
+    nx::geo_ip::AbstractResolver* m_geoIpResolver = nullptr;
     nx::cloud::discovery::DiscoveryClient m_trafficRelayDiscoveryClient;
 
     mutable QnMutex m_mutex;

@@ -5,6 +5,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/connection_server/server_statistics.h>
 
+#include "geo_ip_statistics.h"
 #include "stats_manager.h"
 
 namespace nx {
@@ -18,9 +19,10 @@ struct Statistics
     nx::network::server::Statistics http;
     nx::network::server::Statistics stun;
     CloudConnectStatistics cloudConnect;
+    geo_ip::ListeningPeerStatistics listeningPeers;
 };
 
-#define Statistics_mediator_Fields (http)(stun)(cloudConnect)
+#define Statistics_mediator_Fields (http)(stun)(cloudConnect)(listeningPeers)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Statistics),
@@ -32,7 +34,8 @@ public:
     Provider(
         const StatsManager& statsManager,
         const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
-        const nx::network::server::AbstractStatisticsProvider& stunServerStatisticsProvider);
+        const nx::network::server::AbstractStatisticsProvider& stunServerStatisticsProvider,
+        geo_ip::StatisticsProvider geoIpStatisticsProvider);
 
     Statistics getAllStatistics() const;
 
@@ -40,6 +43,7 @@ private:
     const StatsManager& m_statsManager;
     const nx::network::server::AbstractStatisticsProvider& m_httpServerStatisticsProvider;
     const nx::network::server::AbstractStatisticsProvider& m_stunServerStatisticsProvider;
+    geo_ip::StatisticsProvider m_geoIpStatisticsProvider;
 };
 
 } // namespace stats

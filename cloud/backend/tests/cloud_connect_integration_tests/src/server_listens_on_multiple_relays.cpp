@@ -26,16 +26,17 @@ class NotifyingRelayClusterClient:
 public:
     NotifyingRelayClusterClient(
         const nx::hpm::conf::Settings& settings,
+        nx::geo_ip::AbstractResolver* resolver,
         MultipleRelays* testFixture);
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& peerId,
-        const nx::network::SocketAddress& serverEndpoint,
+        const nx::network::HostAddress& serverHost,
         nx::hpm::RelayInstanceSelectCompletionHandler completionHandler) override;
 
-    virtual void findRelayInstancePeerIsListeningOn(
+    virtual void findRelayInstanceForClient(
         const std::string& peerId,
-        const nx::network::SocketAddress& clientEndpoint,
+        const nx::network::HostAddress& clientHost,
         nx::hpm::RelayInstanceSearchCompletionHandler completionHandler) override;
 
 private:
@@ -144,15 +145,16 @@ protected:
             {
                 auto geoIpResolver = std::make_unique<nx::geo_ip::test::MemoryResolver>();
                 m_geoIpResolver = geoIpResolver.get();
-                mockupRelayRegions();
+                mockupRelayRegions(m_geoIpResolver);
                 return geoIpResolver;
             });
 
         m_relayClusterClientFuncBak = RelayClusterClientFactory::instance().setCustomFunc(
-            [this](const conf::Settings& settings)
+            [this](const conf::Settings& settings, nx::geo_ip::AbstractResolver* resolver)
             {
                 auto relayClusterClient = std::make_unique<NotifyingRelayClusterClient>(
                     settings,
+                    resolver,
                     this);
                 m_relayClusterClient = relayClusterClient.get();
                 return relayClusterClient;
@@ -264,12 +266,12 @@ private:
             relayClient->startSession(
                 "",
                 serverSocketCloudAddress(),
-                [this, &requestCompletion](
+                [&requestCompletion](
                     api::ResultCode resultCode,
                     api::CreateClientSessionResponse response)
-            {
-                requestCompletion.set_value(std::make_tuple(resultCode, std::move(response)));
-            });
+                {
+                    requestCompletion.set_value(std::make_tuple(resultCode, std::move(response)));
+                });
 
             const auto result = requestCompletion.get_future().get();
             const auto resultCode = std::get<0>(result);
@@ -297,7 +299,7 @@ private:
         m_reportedRelayUrlForClient = m_reportedRelayUrlForClientPromise.get_future().get();
     }
 
-    void mockupRelayRegions()
+    void mockupRelayRegions(nx::geo_ip::test::MemoryResolver* geoIpResolver)
     {
         const auto needToWaitForRelayIpMockup =
             [this]()
@@ -306,21 +308,21 @@ private:
                 return (int)m_relayIpMockup.size() < relayClusterSize();
             };
 
-        ASSERT_NE(m_geoIpResolver, nullptr);
+        ASSERT_NE(geoIpResolver, nullptr);
 
         while (needToWaitForRelayIpMockup())
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         using namespace nx::geo_ip;
-        m_geoIpResolver->add(
+        geoIpResolver->add(
             m_relayIpMockup.at(relayUrl(0)),
             Location(Continent::northAmerica));
 
-        m_geoIpResolver->add(
+        geoIpResolver->add(
             m_relayIpMockup.at(relayUrl(1)),
             Location(Continent::northAmerica));
 
-        m_geoIpResolver->add(
+        geoIpResolver->add(
             m_relayIpMockup.at(relayUrl(2)),
             Location(Continent::australia));
 
@@ -369,23 +371,24 @@ namespace {
 
 NotifyingRelayClusterClient::NotifyingRelayClusterClient(
     const nx::hpm::conf::Settings& settings,
+    nx::geo_ip::AbstractResolver* resolver,
     MultipleRelays* testFixture)
     :
-    base_type(settings),
+    base_type(settings, resolver),
     m_testFixture(testFixture)
 {
 }
 
 void NotifyingRelayClusterClient::selectRelayInstanceForListeningPeer(
     const std::string& peerId,
-    const nx::network::SocketAddress& /*serverEndpoint*/,
+    const nx::network::HostAddress& /*serverHost*/,
     nx::hpm::RelayInstanceSelectCompletionHandler completionHandler)
 {
     m_testFixture->addIpAndRegion("127.0.0.1", nx::geo_ip::Continent::northAmerica);
 
     base_type::selectRelayInstanceForListeningPeer(
         peerId,
-        nx::network::SocketAddress("127.0.0.1", 1),
+        nx::network::HostAddress("127.0.0.1"),
         [this, completionHandler = std::move(completionHandler)](
             nx::cloud::relay::api::ResultCode resultCode,
             std::vector<nx::utils::Url> relayUrls)
@@ -395,16 +398,16 @@ void NotifyingRelayClusterClient::selectRelayInstanceForListeningPeer(
         });
 }
 
-void NotifyingRelayClusterClient::findRelayInstancePeerIsListeningOn(
+void NotifyingRelayClusterClient::findRelayInstanceForClient(
     const std::string& peerId,
-    const nx::network::SocketAddress& /*clientEndpoint*/,
+    const nx::network::HostAddress& /*clientHost*/,
     nx::hpm::RelayInstanceSearchCompletionHandler completionHandler)
 {
     m_testFixture->addIpAndRegion("127.0.0.2", nx::geo_ip::Continent::australia);
 
-    base_type::findRelayInstancePeerIsListeningOn(
+    base_type::findRelayInstanceForClient(
         peerId,
-        nx::network::SocketAddress("127.0.0.2", 1),
+        nx::network::HostAddress("127.0.0.2"),
         [this, completionHandler = std::move(completionHandler)](
             nx::cloud::relay::api::ResultCode resultCode,
             nx::utils::Url relayUrl)

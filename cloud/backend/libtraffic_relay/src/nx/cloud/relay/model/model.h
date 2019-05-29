@@ -41,7 +41,6 @@ public:
     const model::AliasManager& aliasManager() const;
 
 private:
-    const conf::Settings& m_settings;
     model::ClientSessionPool m_clientSessionPool;
     std::unique_ptr<model::AbstractRemoteRelayPeerPool> m_remoteRelayPeerPool;
     model::RemoteRelayPeerPoolAioWrapper m_remoteRelayPeerPoolAioWrapper;

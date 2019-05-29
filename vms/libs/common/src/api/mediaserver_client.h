@@ -45,8 +45,6 @@ public:
 
     MediaServerClient(const MediaServerClient&) = delete;
     MediaServerClient& operator=(const MediaServerClient&) = delete;
-    MediaServerClient(MediaServerClient&&) = default;
-    MediaServerClient& operator=(MediaServerClient&&) = default;
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 

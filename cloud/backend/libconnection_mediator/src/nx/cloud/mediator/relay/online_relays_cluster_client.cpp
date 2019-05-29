@@ -1,12 +1,9 @@
 #include "online_relays_cluster_client.h"
 
-#include <nx/network/address_resolver.h>
-#include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/random.h>
 
 #include "nx/cloud/mediator/settings.h"
-#include "nx/cloud/mediator/geo_ip/resolver_factory.h"
 
 namespace nx::hpm {
 
@@ -24,9 +21,11 @@ nx::utils::Url baseUrl(nx::utils::Url url)
 
 }
 
-OnlineRelaysClusterClient::OnlineRelaysClusterClient(const conf::Settings& settings):
+OnlineRelaysClusterClient::OnlineRelaysClusterClient(
+    const conf::Settings& settings,
+    nx::geo_ip::AbstractResolver* resolver):
     m_settings(settings),
-    m_geoIpResolver(geo_ip::ResolverFactory::instance().create(settings)),
+    m_geoIpResolver(resolver),
     m_trafficRelayDiscoveryClient(
         settings.trafficRelay().discovery,
         settings.trafficRelay().clusterId,
@@ -51,14 +50,14 @@ OnlineRelaysClusterClient::~OnlineRelaysClusterClient()
 
 void OnlineRelaysClusterClient::selectRelayInstanceForListeningPeer(
     const std::string& peerId,
-    const nx::network::SocketAddress& serverEndpoint,
+    const nx::network::HostAddress& serverHost,
     RelayInstanceSelectCompletionHandler completionHandler)
 {
     m_aioThreadBinder.post(
-        [this, peerId, serverEndpoint, completionHandler = std::move(completionHandler)]()
+        [this, peerId, serverHost, completionHandler = std::move(completionHandler)]()
     {
         std::string listeningPeer = std::string(kListeningPeer) + ": " + peerId;
-        auto location = resolve(listeningPeer, serverEndpoint.address.toStdString());
+        auto location = resolve(listeningPeer, serverHost.toStdString());
         auto relayUrls = findRelaysByLocation(listeningPeer, location);
         if (relayUrls.empty())
         {
@@ -75,15 +74,15 @@ void OnlineRelaysClusterClient::selectRelayInstanceForListeningPeer(
     });
 }
 
-void OnlineRelaysClusterClient::findRelayInstancePeerIsListeningOn(
+void OnlineRelaysClusterClient::findRelayInstanceForClient(
      const std::string& peerId,
-     const nx::network::SocketAddress& clientEndpoint,
+     const nx::network::HostAddress& clientHost,
      RelayInstanceSearchCompletionHandler completionHandler)
 {
     m_aioThreadBinder.post(
-        [this, peerId, clientEndpoint, completionHandler = std::move(completionHandler)]()
+        [this, peerId, clientHost, completionHandler = std::move(completionHandler)]()
     {
-        auto location = resolve(kClient, clientEndpoint.address.toStdString());
+        auto location = resolve(kClient, clientHost.toStdString());
         auto relayUrls = findRelaysByLocation(kClient, location);
         if (relayUrls.empty())
         {
@@ -95,9 +94,9 @@ void OnlineRelaysClusterClient::findRelayInstancePeerIsListeningOn(
 		auto& url = nx::utils::random::choice(relayUrls);
 
         NX_VERBOSE(this,
-            "findRelayInstancePeerIsListeningOn() reporting relay url: %1 for listening peer: %2"
+            "findRelayInstanceForClient() reporting relay url: %1 for listening peer: %2"
             "and client ip: %3",
-            url, peerId, clientEndpoint.address);
+            url, peerId, clientHost);
 
         completionHandler(
             nx::cloud::relay::api::ResultCode::ok,

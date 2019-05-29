@@ -17,6 +17,7 @@
 #include "libconnection_mediator_app_info.h"
 #include "settings.h"
 #include "statistics/statistics_provider.h"
+#include "statistics/geo_ip_statistics.h"
 #include "statistics/stats_manager.h"
 #include "view.h"
 
@@ -95,7 +96,10 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
     stats::Provider statisticsProvider(
         controller.statisticsManager(),
         view.httpServer().server(),
-        view.stunServer().statisticsProvider());
+        view.stunServer().statisticsProvider(),
+        stats::geo_ip::StatisticsProvider(
+            &controller.geoIpResolver(),
+            &controller.listeningPeerPool()));
     view.httpServer().registerStatisticsApiHandlers(statisticsProvider);
 
     NX_INFO(this, lm("Initializating view"));

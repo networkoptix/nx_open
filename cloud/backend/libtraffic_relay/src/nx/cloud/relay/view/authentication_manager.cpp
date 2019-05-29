@@ -5,13 +5,6 @@ namespace cloud {
 namespace relay {
 namespace view {
 
-AuthenticationManager::AuthenticationManager(
-    const nx::network::http::AuthMethodRestrictionList& authRestrictionList)
-    :
-    m_authRestrictionList(authRestrictionList)
-{
-}
-
 void AuthenticationManager::authenticate(
     const nx::network::http::HttpServerConnection& /*connection*/,
     const nx::network::http::Request& /*request*/,

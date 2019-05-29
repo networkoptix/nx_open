@@ -139,7 +139,7 @@ void PeerRegistrator::listen(
 
     m_relayClusterClient->selectRelayInstanceForListeningPeer(
         lm("%1.%2").arg(requestData.serverId).arg(requestData.systemId).toStdString(),
-        serverConnection->getSourceAddress(),
+        serverConnection->getSourceAddress().address,
         [this, serverConnectionAioThread = serverConnection->getAioThread(),
             completionHandler = std::move(completionHandler), mediaserverConnectionKey,
             asyncCallLocker = m_counter.getScopedIncrement()](

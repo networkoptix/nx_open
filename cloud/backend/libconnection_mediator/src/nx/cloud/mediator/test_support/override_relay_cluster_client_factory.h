@@ -2,6 +2,7 @@
 
 #include <nx/cloud/mediator/relay/relay_cluster_client.h>
 #include <nx/cloud/mediator/relay/relay_cluster_client_factory.h>
+#include <nx/geo_ip/abstract_resolver.h>
 
 namespace nx::hpm::test {
 
@@ -17,7 +18,8 @@ public:
 	{
 		m_relayClusterClientFactoryFuncBak =
 			nx::hpm::RelayClusterClientFactory::instance().setCustomFunc(
-				[](const nx::hpm::conf::Settings& settings)
+				[](const nx::hpm::conf::Settings& settings,
+                   nx::geo_ip::AbstractResolver* /*resolver*/)
 				{
 					return std::make_unique<nx::hpm::RelayClusterClient>(settings);
 				});
