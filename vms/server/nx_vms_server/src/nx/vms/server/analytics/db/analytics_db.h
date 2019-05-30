@@ -79,6 +79,8 @@ private:
     ObjectCache m_objectCache;
     ObjectTrackAggregator m_trackAggregator;
 
+    bool ensureDbDirIsWritable(const QString& path);
+
     bool readMaximumEventTimestamp();
 
     bool loadDictionaries();
