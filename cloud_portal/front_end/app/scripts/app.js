@@ -313,15 +313,16 @@ window.L = {};
                                 controller: 'DebugCtrl'
                             })
                             .when('/login', {
-                                template: '<landing-component></landing-component>'
-                                // title: lang.pageTitles.login,
-                                // templateUrl: CONFIG.viewsDir + 'startPage.html',
-                                // controller: 'StartPageCtrl',
-                                // resolve: {
-                                //     test: ['$route', function ($route) {
-                                //         $route.current.params.callLogin = true;
-                                //     }]
-                                // }
+                                // TODO: revert when account service is moved to A7
+                                // template: '<landing-component></landing-component>'
+                                title: lang.pageTitles.login,
+                                templateUrl: CONFIG.viewsDir + 'startPage.html',
+                                controller: 'StartPageCtrl',
+                                resolve: {
+                                    test: ['$route', function ($route) {
+                                        $route.current.params.callLogin = true;
+                                    }]
+                                }
                             })
                             .when('/admin', {
                                 resolve: {
@@ -388,7 +389,11 @@ window.L = {};
                                 template: ''
                             })
                             .when('/', {
-                                template: '<landing-component></landing-component>'
+                                // TODO: revert when account service is moved to A7
+                                // template: '<landing-component></landing-component>'
+                                title: ''/*lang.pageTitles.startPage*/,
+                                templateUrl: CONFIG.viewsDir + 'startPage.html',
+                                controller: 'StartPageCtrl'
                             })
                             .otherwise({
                                 title: lang.pageTitles.pageNotFound,
