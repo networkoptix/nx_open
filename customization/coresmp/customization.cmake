@@ -33,8 +33,6 @@ set(customization.fullBundleUpgradeCode "{6be91774-eb08-45fb-86b9-f259c8098e6d}"
 set(deb.customization.company.name "coresmp")
 
 set(mac.sign.identity "Developer ID Application: Comm-Core, Llc (UM4JR9V245)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Comm-Core, Llc (UM4JR9V245)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Comm-Core, Llc (UM4JR9V245)")
 set(mac.bundle.identifier "com.comm-core.coresmp2")
 set(mac.protocol_handler_bundle.identifier "com.comm-core.protocol_handler")
 

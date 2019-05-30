@@ -35,8 +35,6 @@ set(customization.fullBundleUpgradeCode "{586fb805-c215-4ff3-a355-dfa0e79eb0f0}"
 set(deb.customization.company.name "nutech")
 
 set(mac.sign.identity "Developer ID Application: Kaltec Electronics, INC (HW58JB7FUF)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Kaltec Electronics, INC (HW58JB7FUF)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Kaltec Electronics, INC (HW58JB7FUF)")
 set(mac.bundle.identifier "com.nutechnational.NTNSpectrum2")
 set(mac.protocol_handler_bundle.identifier "com.nutechnational.protocol_handler")
 
@@ -45,16 +43,9 @@ set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0006")
 
-# Installer Customizations
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")
-
 # Localization
 set(translations en_US)
 set(defaultTranslation en_US)
-
-# Defines (in one string)
-#set(customization.defines "REDUCE_NET_ISSUE_HACK")
 
 # Additional Features
 set(vmax "true")

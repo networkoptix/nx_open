@@ -68,8 +68,6 @@ set(ios.group_identifier "group.com.vista.qulu")
 set(ios.old_app_appstore_id "id888320566")
 
 set(mac.sign.identity "Developer ID Application: Norbain SD LTD (N3KX2CKR5P)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Norbain SD LTD (N3KX2CKR5P)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Norbain SD LTD (N3KX2CKR5P)")
 set(mac.bundle.identifier "com.vista.qulu2")
 set(mac.protocol_handler_bundle.identifier "com.vista.protocol_handler")
 
@@ -77,11 +75,6 @@ set(mac.protocol_handler_bundle.identifier "com.vista.protocol_handler")
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0018")
-
-# Installer Customizations
-#set(sign.password "0987654321nb")
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")
 
 # Localization
 set(translations

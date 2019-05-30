@@ -34,8 +34,6 @@ set(customization.fullBundleUpgradeCode "{c6a7a801-e010-4fc6-976e-29f0e96a9ba9}"
 set(deb.customization.company.name "viveex")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.daekyocns.viveex2")
 set(mac.protocol_handler_bundle.identifier "com.daekyocns.protocol_handler")
 

@@ -63,10 +63,7 @@ set(ios.group_identifier "group.com.networkoptix.NxMobile")
 set(ios.sign.identity "iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)")
 set(ios.old_app_appstore_id "id648369716")
 
-set(mac.skip.sign false)
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.networkoptix.HDWitness2")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 

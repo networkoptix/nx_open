@@ -55,8 +55,6 @@ set(ios.group_identifier "group.com.digitalwatchdog.DwSpectrum")
 set(ios.old_app_appstore_id "id648577856")
 
 set(mac.sign.identity "Developer ID Application: Kaltec Electronics, INC (HW58JB7FUF)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Kaltec Electronics, INC (HW58JB7FUF)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Kaltec Electronics, INC (HW58JB7FUF)")
 set(mac.bundle.identifier "tv.dwcc.DWSpectrum2")
 set(mac.protocol_handler_bundle.identifier "tv.dwcc.protocol_handler")
 
@@ -64,10 +62,6 @@ set(mac.protocol_handler_bundle.identifier "tv.dwcc.protocol_handler")
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0006")
-
-# Installer Customizations
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")
 
 # Localization
 set(defaultTranslation en_US)

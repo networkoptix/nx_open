@@ -40,8 +40,6 @@ set(customization.fullBundleUpgradeCode "{414c9665-cd4d-4a41-a1d0-ff98d36f4664}"
 set(deb.customization.company.name "networkoptix")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.networkoptix.NXWitnessCN2")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handlerCN2")
 
@@ -53,8 +51,6 @@ set(freeLicenseKey "0000-0000-0000-0007")
 # Installer Customizations
 set(installer.language "zh_CN")
 set(installer.cultures "zh-cn")
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")
 
 # Localization
 set(help.language "chinese")

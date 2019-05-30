@@ -35,8 +35,6 @@ set(customization.fullBundleUpgradeCode "{eb1f51b4-7462-4047-906f-5f789648b151}"
 set(deb.customization.company.name "cox")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.networkoptix.HDWitness2")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 set(mac.skip.sign "true")
@@ -52,11 +50,6 @@ set(display.mobile.name "${display.product.name} Surveillance")
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0006")
-
-# Installer Customizations
-set(windows.skip.sign "true")
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")
 
 # Additional Features
 set(vmax "true")
