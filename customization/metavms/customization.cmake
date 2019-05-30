@@ -24,18 +24,14 @@ set(licenseEmail "meta@networkoptix.com")
 
 set(installer.name "metavms")
 
-# Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{5c6f8f50-99d3-4bd5-9201-08e5c375bb13}")
 set(customization.clientUpgradeCode "{0f2ed89b-8c56-4a6c-a858-59007eb004c0}")
-set(customization.serverUpgradeCode "{8ac4ddb5-8ebe-423f-ae52-5df4ef9e5f20}")
-
 set(customization.clientBundleUpgradeCode "{3401937b-5715-40f7-bf3d-d34b67b3b317}")
 set(customization.serverBundleUpgradeCode "{b0f6cba5-66f5-4ecd-bba5-87064c7618a6}")
 set(customization.fullBundleUpgradeCode "{b98a8e7a-2e21-472c-b951-e16f82a43798}")
 
 set(deb.customization.company.name "networkoptix")
 
-set(mac.skip.sign false)
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.networkoptix.metavms")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")

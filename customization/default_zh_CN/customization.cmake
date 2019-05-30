@@ -29,11 +29,8 @@ set(licenseEmail "support@networkoptix.com")
 
 set(installer.name "nxwitness_zh_CN")
 
-# Custom Installer (if needed). If not leave "default"
-
 set(customization.upgradeCode "{d3062cfe-e403-4f51-aa44-89b7e51b1452}")
 set(customization.clientUpgradeCode "{f095ec38-62af-427c-ad3e-f928a5953718}")
-set(customization.serverUpgradeCode "{77de59d1-9d1b-4a4a-a0ae-7f2032500dd6}")
 set(customization.clientBundleUpgradeCode "{732a6919-720b-4380-ac9b-d02ede5ac2e2}")
 set(customization.serverBundleUpgradeCode "{1d68ad5f-2c19-449a-9c71-c9d2457b3856}")
 set(customization.fullBundleUpgradeCode "{414c9665-cd4d-4a41-a1d0-ff98d36f4664}")
@@ -41,8 +38,6 @@ set(customization.fullBundleUpgradeCode "{414c9665-cd4d-4a41-a1d0-ff98d36f4664}"
 set(deb.customization.company.name "networkoptix")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.networkoptix.NXWitnessCN2")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handlerCN2")
 

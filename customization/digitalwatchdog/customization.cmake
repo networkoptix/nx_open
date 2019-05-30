@@ -31,10 +31,8 @@ set(backgroundImage
 set(defaultWebPages
     "{\"Home Page\": \"http://digital-watchdog.com/DW_Spectrum/\"}")
 
-# Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{F2825E30-F367-4040-93B9-B71F05FDD6B1}")
 set(customization.clientUpgradeCode "{7083E473-BD53-4084-9BAD-9216EBF6BF3F}")
-set(customization.serverUpgradeCode "{31f9d975-d1e0-4aeb-af69-4d45f1b2cd67}")
 set(customization.clientBundleUpgradeCode "{b40de6ba-97ac-4591-8f27-2f1bba285472}")
 set(customization.serverBundleUpgradeCode "{631f8466-9baa-430d-ae15-da0e76dae3cd}")
 set(customization.fullBundleUpgradeCode "{c2c17dda-9651-44b9-841a-eee004ff2a16}")
@@ -56,8 +54,6 @@ set(ios.group_identifier "group.com.digitalwatchdog.DwSpectrum")
 set(ios.old_app_appstore_id "id648577856")
 
 set(mac.sign.identity "Developer ID Application: Kaltec Electronics, INC (HW58JB7FUF)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Kaltec Electronics, INC (HW58JB7FUF)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Kaltec Electronics, INC (HW58JB7FUF)")
 set(mac.bundle.identifier "tv.dwcc.DWSpectrum2")
 set(mac.protocol_handler_bundle.identifier "tv.dwcc.protocol_handler")
 

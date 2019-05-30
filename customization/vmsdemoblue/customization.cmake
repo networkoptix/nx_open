@@ -21,11 +21,8 @@ set(defaultWebPages
 
 set(installer.name "vmsdemoblue")
 
-# Custom Installer (if needed). If not leave "default"
-
 set(customization.upgradeCode "{0e8324fb-d4b4-4cc7-be9d-adba3fbee956}")
 set(customization.clientUpgradeCode "{7938767b-7a8a-4228-8bce-1a69383df3df}")
-set(customization.serverUpgradeCode "{7281bfb3-7724-40a9-a5f0-982abb051c4f}")
 set(customization.clientBundleUpgradeCode "{68c9797b-083c-412e-9fb1-2473ecfbef3b}")
 set(customization.serverBundleUpgradeCode "{ba74bf7e-a258-4fbd-a1a0-59e2d945c129}")
 set(customization.fullBundleUpgradeCode "{4855d804-8e44-44d5-99eb-807a28556273}")
@@ -33,8 +30,6 @@ set(customization.fullBundleUpgradeCode "{4855d804-8e44-44d5-99eb-807a28556273}"
 set(deb.customization.company.name "networkoptix")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.networkoptix.vmsdemoblue")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 

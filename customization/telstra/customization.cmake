@@ -23,16 +23,11 @@ set(licenseEmail "")
 
 set(defaultWebPages "{\"Home Page\": \"https://www.telstra.com.au\"}")
 
-# Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{e216dc9d-b009-4461-82a3-ecc5d46eb528}")
 set(customization.clientUpgradeCode "{e706076f-2528-4bce-b366-d0a0f5da1dee}")
-set(customization.serverUpgradeCode "{86989155-0688-486a-b4c8-c1f7584f145e}")
 set(customization.clientBundleUpgradeCode "{bb0ae6fe-f7cb-49ad-83f5-c24a9271e6a9}")
 set(customization.serverBundleUpgradeCode "{80210dbd-76da-420e-9f5e-2c0833ce23c0}")
 set(customization.fullBundleUpgradeCode "{7f96fd2c-fa49-4a32-807c-ed60c4a4e5d2}")
-
-#set(nxtool.company.name "")
-#set(nxtool.bundleUpgradeCode "{0d48f2d3-686e-49d4-ab66-7222e984296e}")
 
 set(deb.customization.company.name "telstra")
 
@@ -41,8 +36,6 @@ set(ios.group_identifier "group.com.telstra.telstra")
 set(ios.sign.identity "iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.telstra.telstra2")
 set(mac.protocol_handler_bundle.identifier "com.telstra.protocol_handler")
 

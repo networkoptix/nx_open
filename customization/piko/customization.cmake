@@ -40,10 +40,7 @@ set(ios.new_bundle_identifier "com.pikovms.pikomobile")
 set(ios.group_identifier "com.pikovms.piko")
 set(ios.sign.identity "iPhone Distribution: Cook Security Group, Inc (N52Z7JQP9L)")
 
-set(mac.skip.sign false)
 set(mac.sign.identity "Developer ID Application: Cook Security Group, Inc (N52Z7JQP9L)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Cook Security Group, Inc (N52Z7JQP9L)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Cook Security Group, Inc (N52Z7JQP9L)")
 set(mac.bundle.identifier "com.pikovms.piko")
 set(mac.protocol_handler_bundle.identifier "com.pikovms.protocol_handler")
 
