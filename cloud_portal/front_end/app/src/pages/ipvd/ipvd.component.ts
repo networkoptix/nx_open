@@ -124,15 +124,6 @@ export class NxIpvdComponent implements OnInit {
         });
 
         this.CONFIG = this.configService.getConfig();
-
-        setTimeout(() => {
-            this.lang = this.translate.translations[this.translate.currentLang];
-            this.title.setTitle(this.lang.pageTitles.supportedDevices);
-
-            this.company = this.CONFIG.companyName;
-            this.placeholder = this.lang.search.search_ipvd;
-
-        });
     }
 
     ngOnInit() {
@@ -150,6 +141,13 @@ export class NxIpvdComponent implements OnInit {
 
         this.activate();
 
+        setTimeout(() => {
+            this.lang = this.translate.translations[this.translate.currentLang];
+            this.title.setTitle(this.lang.pageTitles.supportedDevices);
+
+            this.company = this.CONFIG.companyName;
+            this.placeholder = this.lang.search.search_ipvd;
+        });
 
         this.breakpointObserver
             .observe([this.breakpoint])
