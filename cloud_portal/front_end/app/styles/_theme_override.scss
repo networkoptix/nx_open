@@ -234,10 +234,11 @@ select {
 }
 
 #badge-large {
-    height    : 32px;
+    height    : 2rem;
     font-family: $font-family-regular;
     font-size : rem(13px);
     padding   : 0 12px;
+    line-height: 2rem;
 }
 
 .badge {

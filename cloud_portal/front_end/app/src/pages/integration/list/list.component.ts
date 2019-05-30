@@ -79,7 +79,7 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
                 plugin.status = (plugin.pending) ? 'pending' : (plugin.draft) ? 'draft' : undefined;
 
                 plugin.link = '/integrations/' + plugin.id;
-                plugin.link += (plugin.status) ? '/' + plugin.status : '';
+                plugin.link += (plugin.status) ? '/' + plugin.status : '/retail';
             });
 
             if (haveInReviewOrDraft) {

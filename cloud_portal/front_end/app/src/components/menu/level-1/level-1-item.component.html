@@ -1,4 +1,5 @@
 <a class="menu-level-1"
+   [ngClass]="{'selected': selected == item.id}"
    [id]="item.id"
    [routerLink]="['/main', item.path]"
    [innerHtml]="item.label"></a>

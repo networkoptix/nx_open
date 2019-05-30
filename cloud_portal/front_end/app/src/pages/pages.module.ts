@@ -18,6 +18,9 @@ import { IntegrationsModule }     from './integration/integrations.module';
 import { IntegrationsListModule } from './integration/list/list.module';
 import { LandingModule }          from './landing/landing.module';
 
+import { NxOverviewModule }  from './integration/details/overview/overview.module';
+import { NxSetupModule }     from './integration/details/setup/setup.module';
+
 @NgModule({
     imports        : [
         SandboxModule,
@@ -35,6 +38,8 @@ import { LandingModule }          from './landing/landing.module';
         IpvdModule,
         Angular2CsvModule,
         LandingModule,
+        NxOverviewModule,
+        NxSetupModule,
     ],
     declarations   : [],
     entryComponents: [],

@@ -1,0 +1,13 @@
+@import '../../styles/mixins';
+
+.menu {
+    nx-level-1-item {}
+    
+    nx-level-2-item {
+        width       : 100%;
+        display     : block;
+        line-height : 26px;
+    }
+    
+    nx-level-3-item {}
+}
