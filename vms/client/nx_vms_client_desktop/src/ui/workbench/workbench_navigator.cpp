@@ -1688,7 +1688,9 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             if (camera->isDtsBased())
                 updateHasArchive();
         }
-        updateTimelineRelevancy(); //< TODO: #vbreus check if this update really needed
+        // #spanasenko: A call to updateTimelineRelevancy() has been removed from here
+        // because it led to incorrect state of 'LIVE' button for currently recording cameras.
+        // Additional research or refactoring may be needed.
     }
 }
 
