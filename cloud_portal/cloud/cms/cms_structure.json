@@ -1537,7 +1537,7 @@
             "description": "This section is visible in the detailed view page for the integration in the middle column. Recommended length 1500 characters. If you need more text its recommended that you create a pdf and add it to the download files section.",
             "type": "html",
             "meta": {
-              "char_limit": 2000
+              "char_limit": 10000
             }
           }
         ]
