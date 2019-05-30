@@ -1,5 +1,5 @@
 Config.helpLinks.push({
-    url: "mailto:support@flyvi.ru",
+    url: "mailto:viveex@daekyo.com",
     title: "Support",
     target: "new" // new|frame
 });
@@ -17,14 +17,14 @@ Config.helpLinks.push({
 });
 
 Config.helpLinks.push({
-    url: "https://play.google.com/store/apps/details?id=ru.ipera.flyviewmobile",
+    url: "https://play.google.com/store/apps/details?id=com.daekyocns.viveex",
     title: "Android Client",
     target: "new" // new|frame
 });
 
 Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
-Config.productName = 'FlyView';
-Config.cloud.productName = 'FlyView Cloud';
-Config.defaultLanguage = 'ru_RU';
-Config.supportedLanguages = ['ru_RU'];
+Config.productName = 'VIVEex';
+Config.cloud.productName = 'VIVEex-Link';
+Config.defaultLanguage = 'en_US';
+Config.supportedLanguages = ['en_US', 'en_GB', 'fr_FR', 'de_DE', 'ru_RU', 'es_ES', 'ja_JP', 'ko_KR', 'tr_TR', 'zh_CN', 'zh_TW', 'hu_HU', 'he_IL', 'nl_NL', 'pl_PL', 'vi_VN', 'th_TH'];

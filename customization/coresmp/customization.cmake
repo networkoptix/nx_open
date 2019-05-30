@@ -21,6 +21,9 @@ set(supportPhone "")
 set(licenseEmail "licensing@coresmp.com")
 # end of Support section
 
+# Default settings
+set(backgroundImage
+    "{\"enabled\": true, \"name\": \":/skin/background.png\", \"mode\": \"Crop\"}")
 set(defaultWebPages
     "{\"Home Page\": \"http://www.coresmp.com\", \"Company\": \"http://www.comm-core.com\"}")
 
