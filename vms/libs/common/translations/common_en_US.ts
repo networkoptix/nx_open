@@ -1585,6 +1585,10 @@
         <source>Unknown Plugin Diagnostic Event</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>RAID error. %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>utils::QnCameraNamesWatcher</name>
