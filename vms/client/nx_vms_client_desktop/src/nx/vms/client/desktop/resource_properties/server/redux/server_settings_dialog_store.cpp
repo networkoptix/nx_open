@@ -18,7 +18,7 @@ using Reducer = ServerSettingsDialogStateReducer;
 
 namespace {
 
-QVariantMap pluginData(const nx::vms::api::PluginModuleData& plugin)
+QVariantMap pluginData(const nx::vms::api::PluginInfo& plugin)
 {
     return QVariantMap({
         {"name", plugin.name},
@@ -28,12 +28,12 @@ QVariantMap pluginData(const nx::vms::api::PluginModuleData& plugin)
         {"version", plugin.version}});
 }
 
-QVariant pluginData(const std::optional<const nx::vms::api::PluginModuleData>& plugin)
+QVariant pluginData(const std::optional<const nx::vms::api::PluginInfo>& plugin)
 {
     return plugin ? pluginData(*plugin) : QVariant();
 }
 
-QVariantList pluginDetails(const nx::vms::api::PluginModuleData& plugin)
+QVariantList pluginDetails(const nx::vms::api::PluginInfo& plugin)
 {
     return QVariantList({
         QVariantMap({{"name", ServerSettingsDialogStore::tr("Library")}, {"value", plugin.libraryName}}),
@@ -41,7 +41,7 @@ QVariantList pluginDetails(const nx::vms::api::PluginModuleData& plugin)
         QVariantMap({{"name", ServerSettingsDialogStore::tr("Vendor")}, {"value", plugin.vendor}}) });
 }
 
-QVariantList pluginDetails(const std::optional<const nx::vms::api::PluginModuleData>& plugin)
+QVariantList pluginDetails(const std::optional<const nx::vms::api::PluginInfo>& plugin)
 {
     return plugin ? pluginDetails(*plugin) : QVariantList();
 }
@@ -96,7 +96,7 @@ QVariantList ServerSettingsDialogStore::pluginModules() const
     return result;
 }
 
-void ServerSettingsDialogStore::setPluginModules(const nx::vms::api::PluginModuleDataList& value)
+void ServerSettingsDialogStore::setPluginModules(const nx::vms::api::PluginInfoList& value)
 {
     d->executeAction(
         [&](State state) { return Reducer::setPluginModules(std::move(state), value); });

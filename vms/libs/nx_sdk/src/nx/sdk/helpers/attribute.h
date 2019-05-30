@@ -7,7 +7,6 @@
 
 namespace nx {
 namespace sdk {
-namespace analytics {
 
 class Attribute: public nx::sdk::RefCountable<IAttribute>
 {
@@ -32,6 +31,5 @@ private:
     float m_confidence;
 };
 
-} // namespace analytics
 } // namespace sdk
 } // namespace nx

@@ -555,7 +555,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
                 eventState,
                 params.caption,
                 params.description,
-                /*auxiliaryData*/ QString(),
+                /*attributes*/ std::map<QString, QString>(),
                 params.eventTimestampUsec));
 
             at_analyticsSdkEvent(event);

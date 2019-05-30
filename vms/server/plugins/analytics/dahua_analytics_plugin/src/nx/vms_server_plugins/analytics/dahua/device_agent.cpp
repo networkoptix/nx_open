@@ -83,7 +83,6 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
                 eventMetadata->setDescription(dahuaEvent.description.toStdString());
                 eventMetadata->setIsActive(dahuaEvent.isActive);
                 eventMetadata->setConfidence(1.0);
-                //eventMetadata->setAuxiliaryData(dahuaEvent.fullEventName.toStdString());
 
                 packet->setTimestampUs(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
