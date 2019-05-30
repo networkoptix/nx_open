@@ -54,6 +54,9 @@
 #include <nx/utils/random.h>
 #include <nx/utils/range_adapters.h>
 
+#include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/event_connector.h>
+
 #include <nx/fusion/model_functions.h>
 
 //#if defined(_DEBUG)
@@ -62,6 +65,64 @@
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
+
+namespace {
+
+using namespace nx::vms::rules;
+
+//#define FIELD(type, getter, setter) \
+//public: \
+//  type getter() const { return m_##getter; } \
+//  void setter(const type &val) { m_##getter = val; } \
+//private: \
+//  type m_##getter;
+//
+//class DebugEvent: public BasicEvent
+//{
+//    Q_PROPERTY(QString action READ action)
+//    Q_PROPERTY(qint64 value READ value)
+//
+//    FIELD(QString, test, setTest)
+//
+//public:
+//    DebugEvent(const QString &action, qint64 value):
+//        BasicEvent("DebugEvent"),
+//        m_action(action),
+//        m_value(value)
+//    {
+//    }
+//
+//    QString action() const
+//    {
+//        return m_action;
+//    }
+//
+//    qint64 value() const
+//    {
+//        return m_value;
+//    }
+//
+//private:
+//    QString m_action;
+//    qint64 m_value;
+//};
+
+class DebugEventConnector:
+    public EventConnector,
+    public Singleton<DebugEventConnector>
+{
+public:
+    void atInc()
+    {
+        emit vmsEvent(EventPtr(new DebugEvent("Increment", qnRuntime->debugCounter())));
+    }
+    void atDec()
+    {
+        emit vmsEvent(EventPtr(new DebugEvent("Decrement", qnRuntime->debugCounter())));
+    }
+};
+
+} // namespace
 
 namespace {
 
@@ -450,6 +511,10 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
         if (!started)
             NX_ERROR(this, QString("Cannot start client webserver - port %1 already occupied?").arg(port));
     }
+
+    auto connector = new DebugEventConnector(); // initialize instance
+    auto engine = new nx::vms::rules::Engine(); // initialize instance
+    engine->addEventConnector(connector);
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()
@@ -461,11 +526,13 @@ void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()
 void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered()
 {
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() + 1);
+    DebugEventConnector::instance()->atInc();
     qDebug() << qnRuntime->debugCounter();
 }
 
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
 {
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() - 1);
+    DebugEventConnector::instance()->atDec();
     qDebug() << qnRuntime->debugCounter();
 }
