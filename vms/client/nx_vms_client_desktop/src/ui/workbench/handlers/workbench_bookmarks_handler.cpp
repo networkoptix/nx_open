@@ -132,10 +132,14 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
             context()->statisticsModule()->registerClick(lit("bookmark_tooltip_play"));
 
             auto slider = navigator()->timeSlider();
-            const bool enableNavigation = !slider->windowContains(slider->sliderTimePosition());
+
+            // Pretty bookmark navigation should be performed when the slider is not immediately visible
+            // to the user (because either live streaming or the slider is outside of the time window).
+            const bool isVisibleInWindow = slider->positionMarkerVisible() &&
+                slider->windowContains(slider->sliderTimePosition());
 
             navigator()->setPosition(microseconds(bookmark.startTimeMs).count());
-            if (enableNavigation)
+            if (!isVisibleInWindow)
                 slider->navigateTo(bookmark.startTimeMs);
 
             navigator()->setPlaying(true);
