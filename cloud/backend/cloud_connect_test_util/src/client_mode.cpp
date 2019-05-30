@@ -268,7 +268,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
     nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId(
         "cc-tu-http", QnUuid::createUuid());
 
-    NX_ALWAYS(typeid(ClientModeFunctionsTag), lm("Issuing request to %1").arg(urlStr));
+    NX_INFO(typeid(ClientModeFunctionsTag), lm("Issuing request to %1").arg(urlStr));
 
     nx::network::http::HttpClient client;
     client.setSendTimeout(std::chrono::seconds(15));
@@ -322,7 +322,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
     }
 
     std::cout << std::endl;
-    NX_ALWAYS(typeid(ClientModeFunctionsTag), lm("Completed request to %1").arg(urlStr));
+    NX_INFO(typeid(ClientModeFunctionsTag), lm("Completed request to %1").arg(urlStr));
     return 0;
 }
 
