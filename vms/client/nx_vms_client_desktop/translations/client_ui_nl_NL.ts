@@ -675,7 +675,7 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Gewenst PTZ-preset type:</translation>
     </message>
     <message>
       <location/>
@@ -695,12 +695,12 @@
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Deze camera ondersteunt draaien en kantelen</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Deze camera ondersteunt zoomen</translation>
     </message>
     <message>
       <location/>
@@ -1673,7 +1673,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Zoek time-out(s)</translation>
     </message>
     <message>
       <location/>
@@ -3078,11 +3078,6 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
       <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
     </message>
@@ -3095,6 +3090,11 @@
       <location/>
       <source>Recording was enabled on the USB storage</source>
       <translation type="unfinished">Recording was enabled on the USB storage</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>

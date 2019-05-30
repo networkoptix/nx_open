@@ -3078,11 +3078,6 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
-      <translation>Analytics verileri, onlarca gigabaytlık depolama alanını kaplayabilir. Sistem bölümü yerine başka bir yer seçmenizi öneririz.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
       <translation>Analytics verileri, engelli deposunda depolanmaya devam edecek.</translation>
     </message>
@@ -3095,6 +3090,11 @@
       <location/>
       <source>Recording was enabled on the USB storage</source>
       <translation>USB depolamada kayıt etkinleştirildi</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>

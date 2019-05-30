@@ -861,7 +861,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Exporteer bladwijzers...</translation>
     </message>
     <message>
       <source>Forget password</source>
@@ -4907,7 +4907,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Exporteer bladwijzers...</translation>
     </message>
   </context>
   <context>
@@ -9407,7 +9407,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Verschillende bladwijzers kunnen alleen als schermindeling worden geëxporteerd.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>

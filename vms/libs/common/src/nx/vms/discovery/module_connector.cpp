@@ -15,7 +15,7 @@ namespace vms {
 namespace discovery {
 
 static const QString kUrl(
-    "https://localhost/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream=%1");
+    "http://localhost/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream=%1");
 
 static const std::chrono::seconds kDefaultDisconnectTimeout(15);
 static const network::RetryPolicy kDefaultRetryPolicy(
