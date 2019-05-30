@@ -71,6 +71,7 @@ void DiscoveryManager::start(
 
 void DiscoveryManager::updateInformation(const std::string& infoJson)
 {
+    m_infoJson = infoJson;
     if (m_discoveryClient)
         m_discoveryClient->updateInformation(infoJson);
 }
@@ -92,7 +93,7 @@ nx::cloud::discovery::NodeInfo DiscoveryManager::buildNodeInfo(
     return nx::cloud::discovery::NodeInfo{
         /*nodeId*/ m_syncEngine->peerId().toSimpleString().toStdString(),
         /*urls*/ {synchronizationEngineUrl.toStdString()},
-        /*infoJson*/ {}
+        /*infoJson*/ m_infoJson
     };
 }
 

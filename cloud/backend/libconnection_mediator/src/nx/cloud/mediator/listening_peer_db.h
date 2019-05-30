@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/clusterdb/map/embedded_database.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 #include "settings.h"
 
@@ -48,12 +49,6 @@ public:
     void stop();
 
     /**
-     * Sets the domain name that all added peers will be associated with.
-     * NOTE: MUST be called before addPeer or startDiscovery can be called.
-     */
-    void setThisMediatorEndpoint(const MediatorEndpoint& endpoint);
-
-    /**
     * Get this mediator instance's endpoint.
     */
     const MediatorEndpoint& thisMediatorEndpoint() const;
@@ -85,11 +80,11 @@ public:
     /*
      * Starts discovery of other mediator instances and synchronizes
      * their ListeningPeerDb entries.
-     * NOTE: setThisMediatorEndpoint MUST be called before startDiscovery will work.
      *
      * @return true if discovery service started successfully, false otherwise
      */
     void startDiscovery(
+        const MediatorEndpoint& endpoint,
         nx::network::http::server::rest::MessageDispatcher* messageDispatcher);
 
     /**
@@ -97,6 +92,11 @@ public:
      * failed.
      */
     std::string nodeId() const;
+
+private:
+    void setThisMediatorEndpoint(const MediatorEndpoint& endpoint);
+
+    std::string buildInfoJson(const MediatorEndpoint& endpoint) const;
 
 private:
     const conf::ListeningPeerDb& m_settings;

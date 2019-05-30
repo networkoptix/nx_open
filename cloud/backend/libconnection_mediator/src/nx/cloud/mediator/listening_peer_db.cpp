@@ -2,8 +2,10 @@
 
 #include <nx/utils/std/algorithm.h>
 #include <nx/clusterdb/engine/http/http_paths.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
+#include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_builder.h>
 
 namespace nx::hpm {
@@ -44,7 +46,6 @@ std::string toString(const MediatorEndpoint& endpoint)
     return s;
 }
 
-
 std::optional<MediatorEndpoint> toMediatorEndpoint(const std::string& endpointStr)
 {
     std::vector<std::string> values;
@@ -59,6 +60,25 @@ std::optional<MediatorEndpoint> toMediatorEndpoint(const std::string& endpointSt
         toInt(values[3])
     };
 }
+
+struct Urls
+{
+    std::string tcp;
+    std::string udp;
+};
+
+struct MediatorInfoJson
+{
+    Urls mediatorUrls;
+};
+
+#define MediatorInfoJson_Fields (mediatorUrls)
+#define Urls_Fields (tcp)(udp)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (MediatorInfoJson)(Urls),
+    (json),
+    _Fields)
 
 } //namespace
 
@@ -140,22 +160,6 @@ void ListeningPeerDb::stop()
         m_map->synchronizationEngine().pleaseStopSync();
     if (m_sqlExecutor)
         m_sqlExecutor->pleaseStopSync();
-}
-
-void ListeningPeerDb::setThisMediatorEndpoint(const MediatorEndpoint& endpoint)
-{
-    m_mediatorEndpoint = endpoint;
-    m_mediatorEndpointString = toString(endpoint);
-
-    NX_ASSERT(toMediatorEndpoint(m_mediatorEndpointString) == m_mediatorEndpoint);
-
-    m_syncEngineUrl = nx::network::url::Builder()
-        .setScheme(nx::network::http::kUrlSchemeName)
-        .setHost(endpoint.domainName.c_str())
-        .setPath(nx::network::http::rest::substituteParameters(
-            nx::clusterdb::engine::kBaseSynchronizationPath,
-            {m_settings.map.synchronizationSettings.clusterId}).c_str())
-        .setPort(endpoint.httpPort).toUrl();
 }
 
 const MediatorEndpoint& ListeningPeerDb::thisMediatorEndpoint() const
@@ -256,10 +260,15 @@ void ListeningPeerDb::findMediatorByPeerDomain(
 }
 
 void ListeningPeerDb::startDiscovery(
+    const MediatorEndpoint& endpoint,
     nx::network::http::server::rest::MessageDispatcher* messageDispatcher)
 {
     if (!m_map)
         return;
+
+    setThisMediatorEndpoint(endpoint);
+
+    m_map->synchronizationEngine().discoveryManager().updateInformation(buildInfoJson(endpoint));
 
     m_map->synchronizationEngine().registerHttpApi(
         nx::clusterdb::engine::kBaseSynchronizationPath,
@@ -279,6 +288,38 @@ std::string ListeningPeerDb::nodeId() const
     return m_map
         ? m_map->synchronizationEngine().peerId().toSimpleString().toStdString()
         : std::string();
+}
+
+void ListeningPeerDb::setThisMediatorEndpoint(const MediatorEndpoint& endpoint)
+{
+    m_mediatorEndpoint = endpoint;
+    m_mediatorEndpointString = toString(endpoint);
+
+    NX_ASSERT(toMediatorEndpoint(m_mediatorEndpointString) == m_mediatorEndpoint);
+
+    m_syncEngineUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(endpoint.domainName.c_str())
+        .setPath(nx::network::http::rest::substituteParameters(
+            nx::clusterdb::engine::kBaseSynchronizationPath,
+            { m_settings.map.synchronizationSettings.clusterId }).c_str())
+        .setPort(endpoint.httpPort).toUrl();
+}
+
+std::string ListeningPeerDb::buildInfoJson(const MediatorEndpoint& endpoint) const
+{
+    MediatorInfoJson infoJson;
+    infoJson.mediatorUrls.tcp = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(endpoint.domainName.c_str())
+        .setPort(endpoint.httpPort).toString().toStdString();
+
+    infoJson.mediatorUrls.udp = nx::network::url::Builder()
+        .setScheme(nx::network::stun::kUrlSchemeName)
+        .setHost(endpoint.domainName.c_str())
+        .setPort(endpoint.stunUdpPort).toString().toStdString();
+
+    return QJson::serialized(infoJson).constData();
 }
 
 } // namespace nx::hpm
