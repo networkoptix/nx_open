@@ -47,7 +47,15 @@ void QnUserSettingsModel::setUser(const QnUserResourcePtr& value)
 
     m_user = value;
 
-    auto calculateMode = [this]
+    updateMode();
+    updatePermissions();
+    emit userChanged(m_user);
+}
+
+void QnUserSettingsModel::updateMode()
+{
+    auto calculateMode =
+        [this]
         {
             if (!m_user)
                 return Invalid;
@@ -65,9 +73,6 @@ void QnUserSettingsModel::setUser(const QnUserResourcePtr& value)
         };
 
     m_mode = calculateMode();
-
-    updatePermissions();
-    emit userChanged(m_user);
 }
 
 void QnUserSettingsModel::updatePermissions()

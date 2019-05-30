@@ -435,6 +435,7 @@ void QnUserSettingsDialog::loadDataToUi()
 
 void QnUserSettingsDialog::forcedUpdate()
 {
+    m_model->updateMode();
     Qn::updateGuarded(this, [this]() { base_type::forcedUpdate(); });
     updatePermissions();
     updateButtonBox();

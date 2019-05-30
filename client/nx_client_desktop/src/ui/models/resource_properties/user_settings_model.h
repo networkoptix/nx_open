@@ -30,6 +30,8 @@ public:
     QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr& value);
 
+    void updateMode();
+
     void updatePermissions();
 
     virtual Qn::GlobalPermissions rawPermissions() const override;
