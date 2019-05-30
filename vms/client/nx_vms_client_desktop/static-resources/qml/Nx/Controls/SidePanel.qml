@@ -51,42 +51,45 @@ Control
     Rectangle
     {
         id: border
+
         color: ColorTheme.colors.dark8
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+    }
 
-        IconButton
+    IconButton
+    {
+        id: button
+
+        width: 12
+        height: 32
+        iconDir: "qrc:/skin/panel"
+        iconBaseName: sidePanel.opened ? "slide_left" : "slide_right"
+        enabled: openCloseButtonVisible
+        opacity: openCloseButtonVisible ? 1.0 : 0.0
+        visible: opacity > 0.0
+
+        onClicked: sidePanel.opened = !sidePanel.opened
+
+        Behavior on opacity
         {
-            id: button
-            width: 12
-            height: 32
-            iconDir: "qrc:/skin/panel"
-            iconBaseName: sidePanel.opened ? "slide_left" : "slide_right"
-            enabled: openCloseButtonVisible
-            opacity: openCloseButtonVisible ? 1.0 : 0.0
-            visible: opacity > 0.0
-
-            onClicked: sidePanel.opened = !sidePanel.opened
-
-            Behavior on opacity
-            {
-                NumberAnimation { duration: 150; easing.type: Easing.OutQuad }
-            }
+            NumberAnimation { duration: 150; easing.type: Easing.OutQuad }
         }
+    }
 
-        Rectangle
-        {
-            id: shadow
-            color: ColorTheme.transparent(ColorTheme.colors.dark1, 0.15)
+    Rectangle
+    {
+        id: shadow
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-        }
+        color: ColorTheme.transparent(ColorTheme.colors.dark1, 0.15)
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
     }
 
     states:
