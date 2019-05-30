@@ -57,7 +57,7 @@ def generate_branding_variables(datastructure):
     brands = [
         (ds, ds.find_actual_value(product=cloud_portal))
         for ds in branding_context.datastructure_set.all()
-        if not ds.optional and ds.label and ds.type not in (DataStructure.DATA_TYPES.image,)
+        if 'shortcut' in ds.meta_settings
     ]
 
     return render_to_string(

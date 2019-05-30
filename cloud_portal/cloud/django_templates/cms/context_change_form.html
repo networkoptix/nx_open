@@ -159,7 +159,7 @@
             var cv = brand_variables[i];
             cv.onclick = function(event) {
                 event.preventDefault();
-                editorId = this.closest('.list-group').getAttribute('data-field-name');
+                editorId = this.closest('.variable-group').getAttribute('data-field-name');
                 brand_var = this.getAttribute('data-name');
                 navigator.clipboard.writeText(brand_var);
                 tinymce.get(editorId).execCommand('mceInsertContent', false, brand_var);
@@ -170,6 +170,7 @@
     if (langSelector) {
         langSelector.addEventListener('change', languageChanged, false);
     }
+    $('[data-toggle="tooltip"]').tooltip();
 
     tinymce.init({
         selector: '.tinymce',

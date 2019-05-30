@@ -57,12 +57,15 @@
         "translatable": false,
         "values": [
           {
-            "label": "Product Name",
+            "label": "Cloud Name",
             "name": "%CLOUD_NAME%",
             "old_name": "%PRODUCT_NAME%",
             "type": "text",
             "value": "VMS Demo Cloud",
-            "description": "Name for cloud"
+            "description": "Name for cloud",
+            "meta": {
+              "shortcut": true
+            }
           },
           {
             "label": "Skin",
@@ -86,7 +89,10 @@
             "old_name": "{{VMS_NAME}}",
             "type": "text",
             "value": "VMS Demonstration",
-            "description": "Name of the VMS customization. Must be short!"
+            "description": "Name of the VMS customization. Must be short!",
+            "meta": {
+              "shortcut": true
+            }
           },
           {
             "label": "Cloud tab name",
@@ -134,7 +140,10 @@
             "old_name": "%COMPANY_NAME%",
             "type": "text",
             "value": "Network Optix",
-            "description": "The name of the company itself"
+            "description": "The name of the company itself",
+            "meta": {
+              "shortcut": true
+            }
           },
           {
             "label": "Copyright Year",

@@ -172,5 +172,8 @@ img.preview-image{
     font-size: 22px;
     font-family: Roboto;
     color: #2B383F;
+}
 
+.tooltip-inner {
+  max-width: 500px;
 }
