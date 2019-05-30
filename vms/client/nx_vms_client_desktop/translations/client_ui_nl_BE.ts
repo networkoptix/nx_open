@@ -3078,11 +3078,6 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
-      <translation>Analytics-gegevens kunnen tientallen gigabytes aan opslagruimte innemen. We raden aan om hiervoor een andere locatie te kiezen in plaats van de systeempartitie.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
       <translation>Analytics-gegevens worden nog steeds opgeslagen op de uitgeschakelde opslag.</translation>
     </message>
@@ -3095,6 +3090,11 @@
       <location/>
       <source>Recording was enabled on the USB storage</source>
       <translation>Opname is ingeschakeld op de USB-opslag</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>
