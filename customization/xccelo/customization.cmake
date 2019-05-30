@@ -23,10 +23,8 @@ set(licenseEmail "licensing.xstream@xccelo.com")
 
 set(defaultWebPages "{\"Home Page\": \"http://www.xccelo.com\"}")
 
-# Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{b9820da8-e9c1-48ab-9431-9ebd23acf771}")
 set(customization.clientUpgradeCode "{c2bf0094-294a-4af5-a28b-8d9b5b67b27b}")
-set(customization.serverUpgradeCode "{d4afbd9b-ebe3-4cfb-8427-b7f707cdcd2b}")
 set(customization.clientBundleUpgradeCode "{aabee719-c52b-4782-8d4a-b1a5ff37eb5f}")
 set(customization.serverBundleUpgradeCode "{bdb1b680-d5b0-4cae-a9ce-f17ba81f988e}")
 set(customization.fullBundleUpgradeCode "{99a56b24-e551-49bf-acea-7c082cefd5d8}")

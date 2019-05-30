@@ -33,11 +33,8 @@ set(android.alias "tricom")
 set(android.storepass "tricom")
 set(android.keypass "tricom")
 
-# Custom Installer (if needed). If not leave "default"
-
 set(customization.upgradeCode "{f942a106-912d-4917-b5ff-78b0aaab37ee}")
 set(customization.clientUpgradeCode "{c4fb92b6-c621-4fed-9142-1500e31f71ed}")
-set(customization.serverUpgradeCode "{bc3591ce-f999-4c31-95c8-36d41a21286f}")
 set(customization.clientBundleUpgradeCode "{dde84a45-76fa-4cfa-8997-ed4765a8e7b4}")
 set(customization.serverBundleUpgradeCode "{85bb4604-128d-45fa-a7f3-5b64f7633055}")
 set(customization.fullBundleUpgradeCode "{3f3ce050-de10-4a42-a071-9c1e278596ee}")

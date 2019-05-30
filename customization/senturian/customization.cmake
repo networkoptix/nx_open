@@ -32,12 +32,8 @@ set(android.alias "sentry")
 set(android.storepass "p79L5PDN")
 set(android.keypass "p3NxTA2v")
 
-# Custom Installer (if needed). If not leave "default"
-
 set(customization.upgradeCode "{C5C01865-C026-444C-9171-D54319F6E075}")
 set(customization.clientUpgradeCode "{0392A436-50D9-4B3D-8D86-0E8892B1B840}")
-set(customization.serverUpgradeCode "{D31F9820-283D-4F7B-BCEA-0BA8B13886CB}")
-
 set(customization.clientBundleUpgradeCode "{59175980-72c6-42f0-82e2-00f60a1e6653}")
 set(customization.serverBundleUpgradeCode "{f241da04-cd0e-4e83-a136-3e07d13e22c3}")
 set(customization.fullBundleUpgradeCode "{73346e2a-e08d-4ab0-85a4-3cd0807df39f}")

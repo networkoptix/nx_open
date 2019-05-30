@@ -33,11 +33,8 @@ set(android.alias "wave")
 set(android.storepass "5B4M2Gn5")
 set(android.keypass "S6rtgPMk")
 
-# Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{9FC2D14A-A8AA-42E9-A134-F1A3694FAF42}")
 set(customization.clientUpgradeCode "{1CD8F2DD-60B9-4E3E-BDC1-B698C507F1D7}")
-set(customization.serverUpgradeCode "{7A6B77AA-E139-4F23-B8FD-2379E9A69E87}")
-
 set(customization.clientBundleUpgradeCode "{3C05AA84-9E80-418D-9558-0BA6729AB6EA}")
 set(customization.serverBundleUpgradeCode "{110DF587-DBCE-4CEF-ABBF-2C502A4A3723}")
 set(customization.fullBundleUpgradeCode "{E20892D8-1438-478E-94EF-A23380B96A01}")

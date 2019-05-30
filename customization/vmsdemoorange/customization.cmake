@@ -23,11 +23,8 @@ set(licenseEmail "licenses@dwcc.tv")
 
 set(defaultWebPages "{\"Home Page\": \"http://dwspectrum.com\"}")
 
-# Custom Installer (if needed). If not leave "default"
-
 set(customization.upgradeCode "{8dd355cd-c0b7-4cb3-bfc3-f4f3fa8d3643}")
 set(customization.clientUpgradeCode "{dc45b79c-0477-4ec8-abdd-474fbe075659}")
-set(customization.serverUpgradeCode "{d4bf70f6-cf23-4020-9266-db2eb4fc9bcf}")
 set(customization.clientBundleUpgradeCode "{e98dde15-4b2c-4012-8fd0-5a008b1b822f}")
 set(customization.serverBundleUpgradeCode "{54b76f2d-41eb-4144-8797-336866044901}")
 set(customization.fullBundleUpgradeCode "{0fc1d29f-10f7-4109-aa23-6664865b967d}")

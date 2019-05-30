@@ -23,10 +23,8 @@ set(licenseEmail "https://www.cox.com/business/contact-us/contact-technical-supp
 
 set(defaultWebPages "{\"Home Page\": \"https://www.cox.com\"}")
 
-# Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{F2825E30-F367-4040-93B9-B71F05FDD6B1}")
 set(customization.clientUpgradeCode "{7083E473-BD53-4084-9BAD-9216EBF6BF3F}")
-set(customization.serverUpgradeCode "{d40d7717-5fa1-445f-a472-d597227f21bd}")
 set(customization.clientBundleUpgradeCode "{2c88e1bd-34e3-4ee3-9196-76c48ef9084f}")
 set(customization.serverBundleUpgradeCode "{7ca048d1-9ed1-4a45-be0b-669b7db8f933}")
 set(customization.fullBundleUpgradeCode "{eb1f51b4-7462-4047-906f-5f789648b151}")

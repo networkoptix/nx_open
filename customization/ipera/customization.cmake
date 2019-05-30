@@ -32,11 +32,8 @@ set(releaseNotesUrl "http://updates.flyviewvms.ru/releasenotes.json")
 set(testUpdateFeedUrl "http://updates.flyviewvms.ru/updates.json")
 set(update.generator.url "http://upd.flyviewvms.ru/upcombiner/upcombine")
 
-# Custom Installer (if needed). If not leave "default"
-
 set(customization.upgradeCode "{1f3e04ed-3a21-418a-943d-b24a8cc6bcde}")
 set(customization.clientUpgradeCode "{c8fc8c5d-4225-478f-8b2e-249f554630b0}")
-set(customization.serverUpgradeCode "{8021cd6c-2cc7-4dda-b31e-327ed7e24167}")
 set(customization.clientBundleUpgradeCode "{61d97f69-4bb3-4908-9948-14af7f217800}")
 set(customization.serverBundleUpgradeCode "{77f83e92-8cba-4007-b328-eff68cc9ecc7}")
 set(customization.fullBundleUpgradeCode "{d68bde62-2804-4429-ac3f-d347ced6ddb6}")

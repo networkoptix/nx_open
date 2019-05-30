@@ -25,10 +25,8 @@ set(licenseEmail "license@daekyo.com")
 
 set(defaultWebPages "{\"Home Page\": \"https://www.daekyocns.com\"}")
 
-# Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{e44375fd-1b2e-478a-ab72-5b0df3fa9114}")
 set(customization.clientUpgradeCode "{e31ac7eb-9e99-4b6f-8dc6-2c1056d5d2ff}")
-set(customization.serverUpgradeCode "{26a53ac7-8065-4539-b276-34e591810ad4}")
 set(customization.clientBundleUpgradeCode "{b49b8b46-33f8-42ad-84a0-44736b27456e}")
 set(customization.serverBundleUpgradeCode "{aa5ab6f1-6e1a-46a8-9587-731a502d535a}")
 set(customization.fullBundleUpgradeCode "{c6a7a801-e010-4fc6-976e-29f0e96a9ba9}")

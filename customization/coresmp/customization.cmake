@@ -24,10 +24,8 @@ set(licenseEmail "licensing@coresmp.com")
 set(defaultWebPages
     "{\"Home Page\": \"http://www.coresmp.com\", \"Company\": \"http://www.comm-core.com\"}")
 
-# Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{c7075054-1cfc-49c7-b720-6e9f22656784}")
 set(customization.clientUpgradeCode "{5faf2a9d-61a5-4106-b0aa-e46e005c27d3}")
-set(customization.serverUpgradeCode "{d01018ae-595a-47e1-b6ff-46c01fd64db9}")
 set(customization.clientBundleUpgradeCode "{b197328a-1f81-4cb8-9613-4728dcad0875}")
 set(customization.serverBundleUpgradeCode "{ce98ef17-ec2d-4d1a-900a-76b92b2c8494}")
 set(customization.fullBundleUpgradeCode "{6be91774-eb08-45fb-86b9-f259c8098e6d}")
