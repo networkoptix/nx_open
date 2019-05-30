@@ -104,6 +104,7 @@ class LicenseDeactivatorPrivate: public Connective<QObject>
 
 public:
     LicenseDeactivatorPrivate(
+        const nx::utils::Url& url,
         const RequestInfo& info,
         const QnLicenseList& licenses,
         const Handler& handler,
@@ -119,6 +120,7 @@ private:
 };
 
 LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
+    const nx::utils::Url& url,
     const RequestInfo& info,
     const QnLicenseList& licenses,
     const Handler& handler,
@@ -205,7 +207,7 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
 
     m_httpClient->doPost(
-        QnLicenseServer::kDeactivateUrl, kJsonContentType, QJson::serialized(request));
+        url, kJsonContentType, QJson::serialized(request));
 }
 
 }
@@ -218,13 +220,14 @@ namespace license {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(RequestInfo, (json), (name)(email)(reason)(systemName)(localUser))
 
 void Deactivator::deactivateAsync(
+    const nx::utils::Url& url,
     const RequestInfo& info,
     const QnLicenseList& licenses,
     const Handler& completionHandler,
     QObject* parent)
 {
     // Deactivator will delete himself when operation complete
-    new LicenseDeactivatorPrivate(info, licenses, completionHandler, parent);
+    new LicenseDeactivatorPrivate(url, info, licenses, completionHandler, parent);
 }
 
 QString Deactivator::errorDescription(ErrorCode error)
