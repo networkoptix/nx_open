@@ -216,33 +216,39 @@ bool Socket<SocketInterfaceToImplement>::getReuseAddrFlag(bool* val) const
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::setReusePortFlag(bool value)
+bool Socket<SocketInterfaceToImplement>::setReusePortFlag(
+    bool value)
 {
-#if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
-    const int on = value ? 1 : 0;
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on)))
-        return false;
-
-    return true;
-#else
+#if defined(_WIN32)
     return setReuseAddrFlag(value);
+#elif defined(SO_REUSEPORT)
+    const int on = value ? 1 : 0;
+    return ::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*) &on, sizeof(on)) == 0;
+#else
+    nx::utils::unused(value);
+    SystemError::setLastErrorCode(SystemError::unknownProtocolOption);
+    return false;
 #endif
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::getReusePortFlag(bool* value) const
+bool Socket<SocketInterfaceToImplement>::getReusePortFlag(
+    bool* value) const
 {
-#if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
+#if defined(_WIN32)
+    return getReuseAddrFlag(value);
+#elif defined(SO_REUSEPORT)
     int reuseAddrVal = 0;
     socklen_t optLen = sizeof(reuseAddrVal);
-
-    if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (char*)&reuseAddrVal, &optLen))
+    if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (char*) &reuseAddrVal, &optLen))
         return false;
 
     *value = reuseAddrVal > 0;
     return true;
 #else
-    return getReuseAddrFlag(value);
+    nx::utils::unused(value);
+    SystemError::setLastErrorCode(SystemError::unknownProtocolOption);
+    return false;
 #endif
 }
 
@@ -1599,10 +1605,13 @@ UDPSocket::UDPSocket(int ipVersion):
     {
         // Ignoring for now.
     }
+
+    ++SocketGlobals::instance().debugCounters().udpSocketCount;
 }
 
 UDPSocket::~UDPSocket()
 {
+    --SocketGlobals::instance().debugCounters().udpSocketCount;
 }
 
 bool UDPSocket::getProtocol(int* protocol) const

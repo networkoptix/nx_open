@@ -119,7 +119,17 @@ void DiscoveryClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioTh
 
 void DiscoveryClient::start()
 {
+    startRegistration();
+    startGetOnlineNodes();
+}
+
+void DiscoveryClient::startRegistration()
+{
     startRegisterNodeRequest(std::chrono::milliseconds::zero());
+}
+
+void DiscoveryClient::startGetOnlineNodes()
+{
     startOnlineNodesRequest(std::chrono::milliseconds::zero());
 }
 
@@ -230,7 +240,7 @@ void DiscoveryClient::setupOnlineNodesRequest()
     m_onlineNodesRequest = std::make_unique<RequestContext>(
         [this](nx::network::http::BufferType messageBody)
         {
-            // All error logging related to server failure is done by lambda in
+            // all error logging related to server failure is done by lambda in
             // setupRegisterNodeRequest.
             if (m_onlineNodesRequest->failed())
             {

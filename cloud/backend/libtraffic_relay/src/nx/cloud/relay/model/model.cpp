@@ -10,12 +10,11 @@ namespace cloud {
 namespace relay {
 
 Model::Model(const conf::Settings& settings):
-    m_settings(settings),
     m_clientSessionPool(settings),
-    m_listeningPeerPool(settings.listeningPeer()),
     m_remoteRelayPeerPool(
         model::RemoteRelayPeerPoolFactory::instance().create(settings)),
     m_remoteRelayPeerPoolAioWrapper(*m_remoteRelayPeerPool),
+    m_listeningPeerPool(settings.listeningPeer()),
     m_aliasManager(settings.proxy().unusedAliasExpirationPeriod)
 {
     if (m_remoteRelayPeerPool)
@@ -31,11 +30,7 @@ Model::Model(const conf::Settings& settings):
 
 Model::~Model()
 {
-    for (const auto& subscriptionId: m_listeningPeerPoolSubscriptions)
-    {
-        m_listeningPeerPool.peerConnectedSubscription()
-            .removeSubscription(subscriptionId);
-    }
+    stop();
 }
 
 bool Model::doMandatoryInitialization()
@@ -45,6 +40,16 @@ bool Model::doMandatoryInitialization()
     // implementation clear (free of DB needed/not needed checks).
 
     return m_remoteRelayPeerPool->connectToDb();
+}
+
+void Model::stop()
+{
+    m_remoteRelayPeerPool->pleaseStopSync();
+    for (const auto& subscriptionId : m_listeningPeerPoolSubscriptions)
+    {
+        m_listeningPeerPool.peerConnectedSubscription()
+            .removeSubscription(subscriptionId);
+    }
 }
 
 model::ClientSessionPool& Model::clientSessionPool()

@@ -48,6 +48,10 @@ public:
     {
     }
 
+    virtual void setConcurrentModificationQueryLimit(int /*limit*/) override
+    {
+    }
+
     virtual int pendingQueryCount() const override
     {
         return 0;

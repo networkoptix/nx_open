@@ -238,7 +238,7 @@ private:
         nx::utils::promise<SystemError::ErrorCode> sent;
         m_peers.back().connection->sendAsync(
             peerInfoJson,
-            [this, &sent](
+            [&sent](
                 SystemError::ErrorCode systemErrorCode,
                 std::size_t /*bytesWritten*/)
             {

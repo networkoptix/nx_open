@@ -8,12 +8,20 @@
 
 namespace nx::clusterdb::engine::transport {
 
-struct ConnectionRequestAttributes
+class ConnectionRequestAttributes
 {
+public:
     std::string connectionId;
     vms::api::PeerData remotePeer;
     std::string contentEncoding;
     int remotePeerProtocolVersion = 0;
+
+    void write(network::http::HttpHeaders* headers);
+
+    /**
+     * @return false if required data was not found.
+     */
+    bool read(const network::http::HttpHeaders& headers);
 };
 
 bool fetchDataFromConnectRequest(

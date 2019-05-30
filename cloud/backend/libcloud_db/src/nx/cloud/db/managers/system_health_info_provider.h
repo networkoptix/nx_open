@@ -41,7 +41,7 @@ class SystemHealthInfoProvider:
 public:
     SystemHealthInfoProvider(
         clusterdb::engine::ConnectionManager* ec2ConnectionManager,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager);
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager);
     virtual ~SystemHealthInfoProvider() override;
 
     virtual bool isSystemOnline(const std::string& systemId) const override;
@@ -53,7 +53,7 @@ public:
 
 private:
     clusterdb::engine::ConnectionManager* m_ec2ConnectionManager;
-    nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::sql::AbstractAsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
     dao::rdb::SystemHealthHistoryDataObject m_systemHealthHistoryDataObject;
     nx::utils::SubscriptionId m_systemStatusChangedSubscriptionId;
@@ -68,7 +68,7 @@ private:
 using SystemHealthInfoProviderFactoryFunction =
     std::unique_ptr<AbstractSystemHealthInfoProvider>(
         clusterdb::engine::ConnectionManager* ec2ConnectionManager,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager);
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager);
 
 class SystemHealthInfoProviderFactory:
     public nx::utils::BasicFactory<SystemHealthInfoProviderFactoryFunction>
@@ -83,7 +83,7 @@ public:
 private:
     std::unique_ptr<AbstractSystemHealthInfoProvider> defaultFactory(
         clusterdb::engine::ConnectionManager* ec2ConnectionManager,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager);
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager);
 };
 
 } // namespace nx::cloud::db

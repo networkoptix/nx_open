@@ -15,6 +15,7 @@ RelayClusterClient::~RelayClusterClient()
 
 void RelayClusterClient::selectRelayInstanceForListeningPeer(
     const std::string& /*peerId*/,
+    const nx::network::HostAddress& /*serverHost*/,
     RelayInstanceSelectCompletionHandler completionHandler)
 {
     // TODO: #Nate selecting online relays in same geograpic region instead of from settings.
@@ -30,8 +31,9 @@ void RelayClusterClient::selectRelayInstanceForListeningPeer(
         });
 }
 
-void RelayClusterClient::findRelayInstancePeerIsListeningOn(
+void RelayClusterClient::findRelayInstanceForClient(
     const std::string& /*peerId*/,
+    const nx::network::HostAddress& /*clientHost*/,
     RelayInstanceSearchCompletionHandler completionHandler)
 {
     // TODO: #Nate find relay instance that this peer is listening on from online relays db?
@@ -39,7 +41,7 @@ void RelayClusterClient::findRelayInstancePeerIsListeningOn(
     m_aioThreadBinder.post(
         [this, completionHandler = std::move(completionHandler)]()
         {
-            QUrl relayInstanceUrl;
+            nx::utils::Url relayInstanceUrl;
             if (!m_settings.trafficRelay().urls.empty())
                 relayInstanceUrl = m_settings.trafficRelay().urls.front();
 

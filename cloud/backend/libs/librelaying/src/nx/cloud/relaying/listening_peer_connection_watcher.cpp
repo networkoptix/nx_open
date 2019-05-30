@@ -153,14 +153,14 @@ void ListeningPeerConnectionWatcher::sendNotification(
 
             if (!m_connection)
             {
-                post([this, handler = std::move(handler)]()
+                post([handler = std::move(handler)]()
                     { handler(SystemError::connectionReset); });
                 return;
             }
 
             m_connection->sendAsync(
                 *notificationBuffer,
-                [this, notificationBuffer, handler = std::move(handler)](
+                [notificationBuffer, handler = std::move(handler)](
                     SystemError::ErrorCode sysErrorCode,
                     std::size_t /*bytesSent*/) mutable
                 {

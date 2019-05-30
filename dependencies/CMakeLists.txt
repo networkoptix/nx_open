@@ -32,3 +32,7 @@ endif()
 if(withTests)
     add_subdirectory(googletest)
 endif()
+
+if(withClouds)
+    add_subdirectory(libmaxminddb)
+endif()

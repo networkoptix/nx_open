@@ -1,5 +1,6 @@
 #include "controller.h"
 
+#include "geo_ip/resolver_factory.h"
 #include "relay/relay_cluster_client_factory.h"
 
 namespace nx {
@@ -16,7 +17,8 @@ Controller::Controller(const conf::Settings& settings):
             settings.cloudDB().startTimeout)
         : nullptr),
     m_mediaserverEndpointTester(m_cloudDataProvider.get()),
-    m_relayClusterClient(RelayClusterClientFactory::instance().create(settings)),
+    m_geoIpResolver(geo_ip::ResolverFactory::instance().create(settings)),
+    m_relayClusterClient(RelayClusterClientFactory::instance().create(settings, m_geoIpResolver.get())),
     m_listeningPeerDb(settings.listeningPeerDb()),
     m_listeningPeerPool(settings.listeningPeer(), &m_listeningPeerDb),
     m_listeningPeerRegistrator(
@@ -93,6 +95,11 @@ const ListeningPeerDb& Controller::listeningPeerDb() const
 const stats::StatsManager& Controller::statisticsManager() const
 {
     return m_statsManager;
+}
+
+nx::geo_ip::AbstractResolver& Controller::geoIpResolver()
+{
+    return *m_geoIpResolver;
 }
 
 bool Controller::doMandatoryInitialization()

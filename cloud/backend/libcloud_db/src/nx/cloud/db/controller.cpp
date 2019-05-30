@@ -80,6 +80,10 @@ Controller::Controller(
     m_cloudModuleUrlProvider(
         settings.moduleFinder().newCloudModulesXmlTemplatePath)
 {
+    // TODO: #ak CLOUD-1178 Temporary solution for MYSQL deadlock in copyExternalTransaction
+    // due to locking different rows of a transaction_log table.
+    m_dbInstanceController.queryExecutor().setConcurrentModificationQueryLimit(1);
+
     performDataMigrations();
 
     initializeDataSynchronizationEngine();
@@ -96,6 +100,11 @@ Controller::~Controller()
 
     m_ec2SynchronizationEngine.unsubscribeFromSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
+}
+
+const dao::rdb::DbInstanceController& Controller::dbInstanceController() const
+{
+    return m_dbInstanceController;
 }
 
 const StreeManager& Controller::streeManager() const

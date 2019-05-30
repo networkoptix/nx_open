@@ -4,6 +4,10 @@ add_subdirectory(nx_fusion)
 add_subdirectory(nx_network)
 add_subdirectory(udt)
 
+if (withClouds)
+    add_subdirectory(nx_geo_ip)
+endif()
+
 #if(((LINUX AND arch STREQUAL "x64") OR (WINDOWS AND arch STREQUAL "x64")) AND withClouds)
 if(arch STREQUAL "x64" AND withClouds)
     add_subdirectory(nx_cassandra)

@@ -38,7 +38,7 @@ public:
         ASSERT_TRUE(m_dbController.initialize());
     }
 
-    nx::sql::AsyncSqlQueryExecutor& queryExecutor()
+    nx::sql::AbstractAsyncSqlQueryExecutor& queryExecutor()
     {
         return m_dbController.queryExecutor();
     }
@@ -683,7 +683,7 @@ protected:
     {
         constexpr std::size_t transactionCount = 5;
 
-        queryExecutor().reserveConnections(transactionCount);
+        static_cast<nx::sql::AsyncSqlQueryExecutor&>(queryExecutor()).reserveConnections(transactionCount);
 
         auto dbTransactions = startDbTransactions(transactionCount);
         for (std::size_t i = 0; i < dbTransactions.size(); ++i)

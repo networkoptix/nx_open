@@ -7,7 +7,7 @@ nx_add_target(nx_sql LIBRARY ${library_type} NO_MOC
     WERROR_IF NOT WINDOWS
     PUBLIC_LIBS
         Qt5::Core Qt5::Sql
-        nx_kit nx_utils
+        nx_kit nx_utils nx_fusion
 )
 
 target_compile_definitions(nx_sql

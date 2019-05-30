@@ -70,6 +70,7 @@ SynchronizationEngine::~SynchronizationEngine()
 void SynchronizationEngine::pleaseStopSync()
 {
     m_startedAsyncCallsCounter.wait();
+    m_connector.pleaseStopSync();
     m_connectionManager.pleaseStopSync();
     m_commandLog.pleaseStopSync();
     m_discoveryManager.pleaseStopSync();
@@ -172,14 +173,18 @@ void SynchronizationEngine::registerHttpApi(
 {
     m_httpServer.registerHandlers(pathPrefix, dispatcher);
 
-    m_transportAcceptors = m_transportManager.createAllAcceptors(m_peerId);
+    auto transportAcceptors = m_transportManager.createAllAcceptors(m_peerId);
 
     std::for_each(
-        m_transportAcceptors.begin(), m_transportAcceptors.end(),
+        transportAcceptors.begin(), transportAcceptors.end(),
         [pathPrefix, dispatcher](auto& acceptor)
         {
             acceptor->registerHandlers(pathPrefix, dispatcher);
         });
+
+    std::move(
+        transportAcceptors.begin(), transportAcceptors.end(),
+        std::back_inserter(m_transportAcceptors));
 }
 
 DiscoveryManager& SynchronizationEngine::discoveryManager()

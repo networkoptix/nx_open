@@ -22,6 +22,8 @@
 #include <nx/cloud/mediator/mediator_process_public.h>
 #include <nx/cloud/mediator/mediator_service.h>
 #include <nx/cloud/mediator/test_support/local_cloud_data_provider.h>
+#include <nx/cloud/mediator/test_support/mediator_functional_test.h>
+#include <nx/cloud/mediator/test_support/override_relay_cluster_client_factory.h>
 
 namespace nx {
 namespace hpm {
@@ -206,10 +208,9 @@ protected:
     }
 
 private:
-    using Mediator = nx::utils::test::ModuleLauncher<MediatorProcessPublic>;
-
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
-    nx::utils::AtomicUniquePtr<Mediator> m_mediator;
+    nx::hpm::test::OverrideRelayClusterClientFactory m_overrideRelayClusterClientFactory;
+    nx::utils::AtomicUniquePtr<nx::hpm::MediatorFunctionalTest> m_mediator;
     std::unique_ptr<api::MediatorConnector> m_mediatorConnector;
     SystemCredentials m_cloudSystemCredentials;
     LocalCloudDataProvider m_localCloudDataProvider;
@@ -226,11 +227,10 @@ private:
 
     void startMediator()
     {
-        auto mediator = nx::utils::make_atomic_unique<Mediator>();
-        mediator->addArg("--cloud_db/runWithCloud=false");
-        mediator->addArg("--http/addrToListenList=127.0.0.1:0");
-        mediator->addArg("--stun/addrToListenList=127.0.0.1:0");
-        mediator->addArg("-general/dataDir", testDataDir().toStdString().c_str());
+        auto mediator = nx::utils::make_atomic_unique<nx::hpm::MediatorFunctionalTest>(
+            MediatorInstance::noFlags,
+            testDataDir());
+
         ASSERT_TRUE(mediator->startAndWaitUntilStarted());
 
         m_mediator = std::move(mediator);

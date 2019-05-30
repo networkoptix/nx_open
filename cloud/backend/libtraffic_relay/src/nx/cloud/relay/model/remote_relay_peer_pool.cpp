@@ -208,6 +208,12 @@ void RemoteRelayPeerPool::registerHttpApi(
     startDiscovery();
 }
 
+void RemoteRelayPeerPool::pleaseStopSync()
+{
+    if (m_map)
+        m_map->synchronizationEngine().pleaseStopSync();
+}
+
 void RemoteRelayPeerPool::startDiscovery()
 {
     if (m_map && !m_syncEngineUrl.isEmpty())

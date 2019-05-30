@@ -63,6 +63,8 @@ public:
     virtual void registerHttpApi(
         nx::network::http::server::rest::MessageDispatcher* messageDispatcher) override;
 
+    virtual void pleaseStopSync() override;
+
 private:
     void startDiscovery();
     std::string toInternalStorageFormat(const std::string& peerDomain) const;

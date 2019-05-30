@@ -65,7 +65,6 @@ private:
     nx::network::http::server::AuthenticationDispatcher m_authenticationDispatcher;
     nx::network::http::server::MultiEndpointAcceptor m_multiAddressHttpServer;
     std::unique_ptr<nx::cloud::discovery::HttpServer> m_discoveryHttpServer;
-    nx::cloud::discovery::RegisteredPeerPool* m_registeredPeerPool = nullptr;
     ListeningPeerDb* m_listeningPeerDb = nullptr;
     HolePunchingProcessor* m_holePunchingProcessor = nullptr;
     std::unique_ptr<MaintenanceAuthenticator> m_maintenanceAuthenticator;
@@ -119,7 +118,6 @@ protected:
     void redirectToRemoteMediator(
         CachedRequestContext requestContext,
         const nx::String& targetServer,
-        api::ResultCode resultCode,
         api::ConnectResponse response);
 
     bool validateMediatorEndpoint(const MediatorEndpoint& endpoint, bool useHttpsPort) const;

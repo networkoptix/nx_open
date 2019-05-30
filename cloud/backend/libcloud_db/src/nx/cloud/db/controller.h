@@ -44,6 +44,8 @@ public:
         Model* model);
     ~Controller();
 
+    const dao::rdb::DbInstanceController& dbInstanceController() const;
+
     const StreeManager& streeManager() const;
 
     TemporaryAccountPasswordManager& tempPasswordManager();

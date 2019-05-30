@@ -58,7 +58,6 @@ View::View(
         &controller->listeningPeerManager(),
         &model->listeningPeerPool()),
     m_clientConnectionTunnelingServer(&m_controller->connectSessionManager()),
-    m_authenticationManager(m_authRestrictionList),
     m_multiAddressHttpServer(
         &m_authenticationDispatcher,
         &m_httpMessageDispatcher)

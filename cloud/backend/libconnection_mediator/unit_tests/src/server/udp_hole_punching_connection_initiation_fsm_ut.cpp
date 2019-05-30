@@ -28,13 +28,15 @@ class TestRelayClusterClient:
 public:
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& /*peerId*/,
+        const nx::network::HostAddress& /*serverHost*/,
         RelayInstanceSelectCompletionHandler /*completionHandler*/)
     {
         // Unused.
     }
 
-    virtual void findRelayInstancePeerIsListeningOn(
+    virtual void findRelayInstanceForClient(
         const std::string& /*peerId*/,
+        const nx::network::HostAddress& /*clientHost*/,
         RelayInstanceSearchCompletionHandler completionHandler)
     {
         m_pendingRequestHandler = std::move(completionHandler);
@@ -47,7 +49,7 @@ public:
             nx::utils::swapAndCall(
                 m_pendingRequestHandler,
                 cloud::relay::api::ResultCode::networkError,
-                QUrl());
+                nx::utils::Url());
         }
     }
 

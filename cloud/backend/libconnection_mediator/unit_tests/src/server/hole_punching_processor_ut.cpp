@@ -68,8 +68,6 @@ protected:
 
 TEST_F(FtHolePunchingProcessor, generic_tests)
 {
-    const std::chrono::milliseconds kMaxConnectResponseWaitTimeout(15000);
-
     using namespace nx::hpm;
 
     const auto server1 = addRandomServer(m_system, boost::none, hpm::ServerTweak::noBindEndpoint);

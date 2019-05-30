@@ -98,8 +98,9 @@ private:
     std::function<void(api::ResultCode)> m_connectionAckCompletionHandler;
     api::CloudConnectVersion m_originatingPeerCloudConnectVersion;
     nx::network::aio::AsyncOperationWrapper<
-        decltype(&AbstractRelayClusterClient::findRelayInstancePeerIsListeningOn)
+        decltype(&AbstractRelayClusterClient::findRelayInstanceForClient)
     > m_findRelayInstanceFunc;
+    nx::network::SocketAddress m_clientEndpoint;
 
     virtual void stopWhileInAioThread() override;
 
@@ -142,7 +143,8 @@ private:
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 
-    bool initiateCloudConnect(api::ConnectionAckRequest connectionAck);
+    bool initiateCloudConnect(
+        api::ConnectionAckRequest connectionAck);
 
     void initiateRelayInstanceSearch();
 
@@ -151,12 +153,12 @@ private:
 
     void finishConnect();
 
-    void onRelayInstanceSearchCompletion(std::optional<QUrl> relayInstanceUrl);
+    void onRelayInstanceSearchCompletion(std::optional<nx::utils::Url> relayInstanceUrl);
 
     api::ConnectResponse prepareConnectResponse(
         const api::ConnectionAckRequest& connectionAckRequest,
         std::list<network::SocketAddress> tcpEndpoints,
-        std::optional<QUrl> relayInstanceUrl);
+        std::optional<nx::utils::Url> relayInstanceUrl);
 
     void sendConnectResponse(
         api::ResultCode resultCode,
