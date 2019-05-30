@@ -142,6 +142,12 @@ img.preview-image{
     list-style-type: none;
 }
 
+.button.cancel-link {
+    font-size: 14px;
+    height: 40px !important;
+    line-height: 20px !important;
+}
+
 .muted {
     opacity: 0.7;
 }
