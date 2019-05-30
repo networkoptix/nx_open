@@ -22,7 +22,7 @@ set(licenseEmail "licensing@coresmp.com")
 # end of Support section
 
 set(defaultWebPages
-    "{\"Home Page\": \"http://www.coresmp.com", \"Company\": \"http://www.comm-core.com"}")
+    "{\"Home Page\": \"http://www.coresmp.com\", \"Company\": \"http://www.comm-core.com\"}")
 
 # Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{c7075054-1cfc-49c7-b720-6e9f22656784}")
