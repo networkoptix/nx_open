@@ -210,7 +210,7 @@ void LicenseWatcher::processResponse(QByteArray responseData)
         {
             nx::vms::api::LicenseData rawData;
             ec2::fromResourceToApi(license, rawData);
-            NX_ALWAYS(this,
+            NX_INFO(this,
                 lm("License '%1' has been updated. New value: %2"), rawData.key, rawData.licenseBlock);
         }
     }
