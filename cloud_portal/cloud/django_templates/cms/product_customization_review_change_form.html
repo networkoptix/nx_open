@@ -76,7 +76,8 @@
                     <ul>
                     {% for record in records %}
                         {% with data_structure=record.data_structure language=record.language %}
-                        <li>
+                        <li class="{% if record.version.id != original.version.id %}muted{% endif %}">
+                            <span>
                             {% if data_structure.label %}
                                 {{ data_structure.label }}:
                             {% else %}
@@ -86,6 +87,7 @@
                             {% if language %}
                                 ({{ language.code }})
                             {% endif %}
+                            </span>
 
                             {% if data_structure.type == DataStructureTypes.image or data_structure.type == DataStructureTypes.external_image  %}
                                 <div><img class="preview-image review-preview"

@@ -140,3 +140,7 @@ img.preview-image{
 .button.cancel-link {
     height: 40px !important;
 }
+
+.muted {
+    opacity: 0.7;
+}

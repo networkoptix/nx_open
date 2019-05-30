@@ -2,6 +2,7 @@ from datetime import datetime
 
 from notifications.notifications_api import send
 from django.contrib.auth.models import Permission
+from django.db.models import Q
 
 from PIL import Image
 import base64
@@ -342,12 +343,20 @@ def send_version_for_review(product, user):
     return []
 
 
-def get_records_for_version(version):
-    data_records = version.datarecord_set.all()\
-        .order_by('data_structure__context__name', 'language__code', 'data_structure__order')
+def get_records_for_version(product, version, customization):
+    published_version = product.version_id(customization)
+    data_records = product.datarecord_set.filter(version__id__gte=published_version,
+                                                 version__id__lte=version.id).\
+        order_by('data_structure__context__name', 'language__code', 'data_structure__order', '-id')
     contexts = {}
+    used_data_structures = set()
 
     for record in data_records:
+        ds_with_lang = record.get_data_structure_with_name
+        if ds_with_lang in used_data_structures:
+            continue
+
+        used_data_structures.add(ds_with_lang)
         context_name = record.data_structure.context.get_nice_name()
         if context_name in contexts:
             contexts[context_name].append(record)

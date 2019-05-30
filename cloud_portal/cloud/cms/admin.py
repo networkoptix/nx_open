@@ -340,7 +340,10 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         extra_context = extra_context or {}
         customization_review = ProductCustomizationReview.objects.get(id=object_id)
         version = customization_review.version
-        extra_context['contexts'] = get_records_for_version(version)
+        extra_context['contexts'] = get_records_for_version(version.product,
+                                                            version,
+                                                            customization_review.customization)
+
         extra_context['title'] = f"Changes for {version.product.name} - Version: {version.id}"
 
         extra_context['review_states'] = ProductCustomizationReview.REVIEW_STATES

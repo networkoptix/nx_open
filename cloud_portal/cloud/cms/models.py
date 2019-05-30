@@ -678,6 +678,12 @@ class DataRecord(models.Model):
     def context(self):
         return self.data_structure.context
 
+    @property
+    def get_data_structure_with_name(self):
+        if self.language:
+            return f"{self.data_structure.name}-{self.language.code}"
+        return self.data_structure.name
+
     def save(self, *args, **kwargs):
         if not self.data_structure.translatable:
             self.language = None
