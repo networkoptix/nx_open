@@ -85,24 +85,22 @@ public:
 
 TEST_F(LogMainTest, ExplicitTag)
 {
-    NX_ALWAYS(kTestTag, "Always");
     NX_ERROR(kTestTag, "Error");
     NX_WARNING(kTestTag, "Warning");
     NX_INFO(kTestTag, "Info");
     NX_DEBUG(kTestTag, "Debug");
     NX_VERBOSE(kTestTag, "Verbose");
     expectMessages({
-        "* ALWAYS TestTag: Always",
         "* ERROR TestTag: Error",
         "* WARNING TestTag: Warning",
         "* INFO TestTag: Info"});
 
     const int kSeven = 7;
-    NX_ALWAYS(kTestTag) << "Always" << kSeven;
+    NX_ERROR(kTestTag) << "Error" << kSeven;
     NX_INFO(kTestTag) << "Info" << kSeven;
     NX_VERBOSE(kTestTag) << "Verbose" << kSeven;
     expectMessages({
-        "* ALWAYS TestTag: Always 7",
+        "* ERROR TestTag: Error 7",
         "* INFO TestTag: Info 7"});
 
     NX_ERROR(kTestTag, "Value %1 = %2", "error_count", 1);
@@ -115,14 +113,12 @@ TEST_F(LogMainTest, ExplicitTag)
 
 TEST_F(LogMainTest, This)
 {
-    NX_ALWAYS(this, "Always");
     NX_ERROR(this, "Error");
     NX_WARNING(this, "Warning");
     NX_INFO(this, "Info");
     NX_DEBUG(this, "Debug");
     NX_VERBOSE(this, "Verbose");
     expectMessages({
-        "* ALWAYS nx::utils::log::test::*LogMain*(0x*): Always",
         "* ERROR nx::utils::log::test::*LogMain*(0x*): Error",
         "* WARNING nx::utils::log::test::*LogMain*(0x*): Warning",
         "* INFO nx::utils::log::test::*LogMain*(0x*): Info",
@@ -130,11 +126,11 @@ TEST_F(LogMainTest, This)
         "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose"});
 
     const QSize kSize(2, 3);
-    NX_ALWAYS(this) << "Always" << kSize;
+    NX_ERROR(this) << "Error" << kSize;
     NX_INFO(this) << "Info" << kSize;
     NX_VERBOSE(this) << "Verbose" << kSize;
     expectMessages({
-        "* ALWAYS nx::utils::log::test::*LogMain*(0x*): Always QSize(2, 3)",
+        "* ERROR nx::utils::log::test::*LogMain*(0x*): Error QSize(2, 3)",
         "* INFO nx::utils::log::test::*LogMain*(0x*): Info QSize(2, 3)",
         "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose QSize(2, 3)"});
 
@@ -154,6 +150,7 @@ TEST_F(LogMainTest, LevelReducer)
     const auto logError = [this]() { NX_ERROR(this, "Error"); };
     const auto logWarning = [this]() { NX_WARNING(this, "Warning"); };
     const auto logInfo = [this]() { NX_INFO(this, "Info"); };
+    const auto logDebug = [this]() { NX_DEBUG(this, "Debug"); };
 
     iniTweaks.set(&ini().logLevelReducerPassLimit, 2);
     iniTweaks.set(&ini().logLevelReducerWindowSizeS, 60);
@@ -181,15 +178,19 @@ TEST_F(LogMainTest, LevelReducer)
     {
         logError();
         logInfo();
+        logDebug();
     }
 
     expectMessages({
         "* ERROR *: Error",
         "* INFO *: Info",
+        "* DEBUG *: Debug",
         "* ERROR *: TOO MANY SIMILAR MESSAGES: Error",
-        "* INFO *: Info",
+        "* INFO *: TOO MANY SIMILAR MESSAGES: Info",
+        "* DEBUG *: Debug",
         "* DEBUG *: Error",
-        "* INFO *: Info",
+        "* DEBUG *: Info",
+        "* DEBUG *: Debug",
     });
 }
 

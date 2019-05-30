@@ -1326,7 +1326,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
         if (it->second != mappedAddress.port)
         {
-            NX_ALWAYS(this, "New external address %1 has been mapped", address);
+            NX_INFO(this, "New external address %1 has been mapped", address);
 
             it->second = mappedAddress.port;
             updateAddressesList();
@@ -1337,7 +1337,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         const auto oldIp = m_forwardedAddresses.find(mappedAddress.address);
         if (oldIp != m_forwardedAddresses.end())
         {
-            NX_ALWAYS(this, "External address %1:%2 has been unmapped",
+            NX_INFO(this, "External address %1:%2 has been unmapped",
                 oldIp->first.toString(), oldIp->second);
 
             m_forwardedAddresses.erase(oldIp);

@@ -36,9 +36,7 @@ Controller::Controller(const conf::Settings& settings):
     m_discoveredPeerPool(settings.discovery())
 {
     if (!m_cloudDataProvider)
-    {
-        NX_ALWAYS(this, lit("STUN Server is running without cloud (debug mode)"));
-    }
+        NX_INFO(this, lit("STUN Server is running without cloud (debug mode)"));
 }
 
 MediaserverEndpointTester& Controller::mediaserverEndpointTester()

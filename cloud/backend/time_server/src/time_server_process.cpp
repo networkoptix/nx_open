@@ -60,7 +60,7 @@ int TimeServerProcess::serviceMain(
             return 2;
         }
 
-        NX_ALWAYS(this, lm("Serving time protocol (rfc868) on %1")
+        NX_INFO(this, lm("Serving time protocol (rfc868) on %1")
             .arg(timeProtocolServer.address()));
 
         return runMainLoop();

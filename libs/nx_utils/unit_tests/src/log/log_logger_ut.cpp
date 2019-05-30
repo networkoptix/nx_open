@@ -23,7 +23,6 @@ TEST(LogLogger, Levels)
     logger.setOnLevelChanged(onLevelChanged);
     ASSERT_EQ(Level::info, logger.defaultLevel());
 
-    EXPECT_TRUE(logger.isToBeLogged(Level::always));
     EXPECT_TRUE(logger.isToBeLogged(Level::error));
     EXPECT_TRUE(logger.isToBeLogged(Level::warning));
     EXPECT_TRUE(logger.isToBeLogged(Level::info));
@@ -42,7 +41,6 @@ TEST(LogLogger, Levels)
     EXPECT_EQ(1, levelChangedCount);
     ASSERT_EQ(Level::error, logger.defaultLevel());
 
-    EXPECT_TRUE(logger.isToBeLogged(Level::always));
     EXPECT_TRUE(logger.isToBeLogged(Level::error));
     EXPECT_FALSE(logger.isToBeLogged(Level::warning));
     EXPECT_FALSE(logger.isToBeLogged(Level::info));
@@ -142,16 +140,15 @@ TEST(LogLogger, Format)
     logger.setOnLevelChanged(onLevelChanged);
     EXPECT_EQ(0, levelChangedCount);
 
-    logger.log(Level::always, makeTag("nx::aaa::Object(1)"), "First message");
+    logger.log(Level::verbose, Tag(), "Message without tag");
     logger.log(Level::error, makeTag("nx::bbb::Object(2)"), "Second message");
     logger.log(Level::warning, makeTag("nx::ccc::Object(3)"), "Third message");
     logger.log(Level::info, makeTag("nx::ddd::Object(4)"), "Forth message");
     logger.log(Level::debug, makeTag("nx::eee::Object(5)"), "Fifth message");
     logger.log(Level::verbose, makeTag("nx::fff::Object(6)"), "Sixth message");
-    logger.log(Level::verbose, Tag(), "Message without tag");
 
     const auto messages = buffer->takeMessages();
-    ASSERT_EQ(7U, messages.size());
+    ASSERT_EQ(6U, messages.size());
 
     const auto today = QDateTime::currentDateTime().toString("yyyy-MM-dd");
     const auto verifyMessage =
@@ -162,13 +159,12 @@ TEST(LogLogger, Format)
             EXPECT_TRUE(message.endsWith(line)) << message.toStdString();
         };
 
-    verifyMessage(0, QLatin1String("ALWAYS nx::aaa::Object(1): First message"));
+    verifyMessage(0, QLatin1String("VERBOSE : Message without tag"));
     verifyMessage(1, QLatin1String("ERROR nx::bbb::Object(2): Second message"));
     verifyMessage(2, QLatin1String("WARNING nx::ccc::Object(3): Third message"));
     verifyMessage(3, QLatin1String("INFO nx::ddd::Object(4): Forth message"));
     verifyMessage(4, QLatin1String("DEBUG nx::eee::Object(5): Fifth message"));
     verifyMessage(5, QLatin1String("VERBOSE nx::fff::Object(6): Sixth message"));
-    verifyMessage(6, QLatin1String("VERBOSE : Message without tag"));
 
     EXPECT_EQ(0, levelChangedCount);
 }

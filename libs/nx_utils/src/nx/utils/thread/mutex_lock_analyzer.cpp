@@ -414,7 +414,7 @@ void MutexLockAnalyzer::setDeadlockDetectedHandler(DeadlockDetectedHandler handl
             [](const auto& message)
             {
                 std::cerr << message << std::endl;
-                NX_ALWAYS(typeid(MutexLockAnalyzer), message);
+                NX_ERROR(typeid(MutexLockAnalyzer), message);
 
                 #if defined(_WIN32)
                     DebugBreak();

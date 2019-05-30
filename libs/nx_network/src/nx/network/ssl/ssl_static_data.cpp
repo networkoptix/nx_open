@@ -143,7 +143,7 @@ void SslStaticData::setAllowedServerVersions(const String& versions)
 {
     int disabledVersions = kDisableAllSslVerions;
     const auto versionList = versions.split('|');
-    NX_ALWAYS(typeid(SslStaticData), lm("Set server SSL versions: %1").container(versionList));
+    NX_INFO(typeid(SslStaticData), lm("Set server SSL versions: %1").container(versionList));
 
     for (const auto& version: versionList)
     {
@@ -176,7 +176,7 @@ void SslStaticData::setAllowedServerVersions(const String& versions)
 
 void SslStaticData::setAllowedServerCiphers(const String& ciphers)
 {
-    NX_ALWAYS(typeid(SslStaticData), lm("Set server SSL ciphers: %1").arg(ciphers));
+    NX_INFO(typeid(SslStaticData), lm("Set server SSL ciphers: %1").arg(ciphers));
     s_allowedServerCiphers = ciphers;
     NX_ASSERT(!s_isInitialized, "SSL ciphers does not take effect after first SSL engine usage");
 }

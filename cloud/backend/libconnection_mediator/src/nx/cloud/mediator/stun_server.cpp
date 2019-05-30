@@ -44,7 +44,7 @@ void StunServer::listen()
                 .arg(containerString(m_udpEndpoints)).toStdString());
     }
 
-    NX_ALWAYS(this, lm("STUN Server is listening on tcp/%1 and udp/%2")
+    NX_INFO(this, lm("STUN Server is listening on tcp/%1 and udp/%2")
         .args(containerString(m_tcpEndpoints), containerString(m_udpEndpoints)));
 }
 
@@ -87,7 +87,7 @@ bool StunServer::bind()
 {
     if (m_settings.stun().addrToListenList.empty())
     {
-        NX_ALWAYS(this, "No STUN address to listen");
+        NX_ERROR(this, "No STUN address to listen");
         return false;
     }
 

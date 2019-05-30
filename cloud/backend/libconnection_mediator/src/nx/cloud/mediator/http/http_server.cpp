@@ -51,7 +51,7 @@ void Server::listen()
                 .arg(SystemError::toString(osErrorCode)).toStdString());
     }
 
-    NX_ALWAYS(this, lm("HTTP server is listening on %1, ssl: %2")
+    NX_INFO(this, lm("HTTP server is listening on %1, ssl: %2")
         .container(m_multiAddressHttpServer.endpoints())
         .container(m_multiAddressHttpServer.sslEndpoints()));
 }

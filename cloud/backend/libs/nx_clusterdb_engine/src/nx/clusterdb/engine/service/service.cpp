@@ -67,11 +67,11 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     view.listen();
     NX_INFO(this, lm("Listening on %1").container(httpEndpoints()));
 
-    NX_ALWAYS(this, lm("%1 has been started").arg(applicationDisplayName()));
+    NX_INFO(this, lm("%1 has been started").arg(applicationDisplayName()));
 
     const auto result = runMainLoop();
 
-    NX_ALWAYS(this, lm("Stopping..."));
+    NX_INFO(this, lm("Stopping..."));
 
     return result;
 }

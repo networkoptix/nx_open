@@ -14,7 +14,6 @@ enum class Level
 {
     undefined,
     none,
-    always,
     error,
     warning,
     info,

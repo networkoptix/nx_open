@@ -556,7 +556,7 @@ void QnClientModule::initLog()
     if (initLogFromFile(kLogConfig, logFileNameSuffix))
         return;
 
-    NX_ALWAYS(this, "Log is initialized from the settings");
+    NX_INFO(this, "Log is initialized from the settings");
     QSettings rawSettings;
     const auto maxBackupCount = rawSettings.value("logArchiveSize", 10).toUInt();
     const auto maxFileSize = rawSettings.value("maxLogFileSize", 10 * 1024 * 1024).toUInt();
@@ -567,11 +567,11 @@ void QnClientModule::initLog()
     if (logLevel.isEmpty())
     {
         logLevel = qnSettings->logLevel();
-        NX_ALWAYS(this, "Log level is initialized from the settings");
+        NX_INFO(this, "Log level is initialized from the settings");
     }
     else
     {
-        NX_ALWAYS(this, "Log level is initialized from the command line");
+        NX_INFO(this, "Log level is initialized from the command line");
     }
 
     Settings logSettings;
@@ -598,8 +598,8 @@ bool QnClientModule::initLogFromFile(const QString& filename, const QString& suf
     if (!QFileInfo(logConfigFile).exists())
         return false;
 
-    NX_ALWAYS(this, "Log is initialized from the %1", logConfigFile);
-    NX_ALWAYS(this, "Log options from settings are ignored!");
+    NX_INFO(this, "Log is initialized from the %1", logConfigFile);
+    NX_INFO(this, "Log options from settings are ignored!");
 
     return nx::utils::log::initializeFromConfigFile(
         logConfigFile,

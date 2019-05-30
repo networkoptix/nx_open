@@ -16,16 +16,13 @@ Level levelFromString(const QString& levelString)
     if (level == "none" || level == "n")
         return Level::none;
 
-    if (level == "always" || level == "a")
-        return Level::always;
-
     if (level == "error" || level == "e")
         return Level::error;
 
     if (level == "warning" || level == "w")
         return Level::warning;
 
-    if (level == "info" || level == "i")
+    if (level == "info" || level == "always" || level == "i")
         return Level::info;
 
     if (level == "debug" || level == "debug1" || level == "d")
@@ -49,9 +46,6 @@ QString toString(Level level)
 
         case Level::none:
             return "none";
-
-        case Level::always:
-            return "always";
 
         case Level::error:
             return "error";
