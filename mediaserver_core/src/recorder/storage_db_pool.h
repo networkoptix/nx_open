@@ -35,6 +35,7 @@ private:
     mutable QnMutex m_mutexStorageIndex;
     QnMutex m_tasksMutex;
     QnWaitCondition m_tasksWaitCondition;
+    QnWaitCondition m_overflowWaitCondition;
     std::queue<nx::utils::MoveOnlyFunc<void()>> m_tasksQueue;
 
     QMap<QString, QnStorageDbPtr> m_chunksDB;
