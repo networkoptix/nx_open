@@ -863,7 +863,9 @@
                 "none|nvr302-08e-p8",
                 "uniview|nvr302-16e-p8",
                 "hangzhou hikvision digital technology co., ltd|hik%2fds-7816*",
-                "ltd8308t-ft|embedded_net_dvr"
+                "ltd8308t-ft|embedded_net_dvr",
+				"Hangzhou Hikvision Digital Technology Co., Ltd|DS-6708HQHI-SATA",
+				"DS-6708HQHI-SATA|Hangzhou Hikvision Digital Technology Co., Ltd"				
             ],
             "analogEncoder": true
         },
@@ -3108,11 +3110,16 @@
             "axis|axisp3717*", "axis|p3717*",
             "axis|axis p3717*",
             "vivotek|ma9321-ehtv",
+			"VIVOTEK MA9321-EHTV|MA9321-EHTV",
+			"MA9321-EHTV|VIVOTEK MA9321-EHTV",
             "avigilon|32c-h4a-4mh-360",
             "dahua|psd81602-a360",
             "dahua|IPC-HDBW4231F-E2-M",
             "avigilon|32c-h4a-4mh-360",
-            "dahua|psd81602-a360"
+            "dahua|psd81602-a360",
+            "dahua|ipc-hdbw4233x*",
+            "dahua|ipc-hdbw7233x*",
+            "hikvision|ds-2cd6d24fwd*"
             ],
             "canShareLicenseGroup": true
         },

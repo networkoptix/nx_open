@@ -25,8 +25,6 @@ set(android.alias "vmsdtv")
 set(android.storepass "ustdtv")
 set(android.keypass "qweasd123")
 
-# Custom Installer (if needed). If not leave "default"
-
 set(customization.upgradeCode "{23a24724-a901-4308-90ef-eabdfd93174f}")
 set(customization.clientUpgradeCode "{77a5f99b-00b4-427c-9aa1-40e46f84b43c}")
 set(customization.clientBundleUpgradeCode "{dbdab234-4b8e-493b-a408-fbec12461a3e}")
