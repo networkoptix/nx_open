@@ -1807,7 +1807,6 @@
         ]
       },
       {"name":  "versionDetails",
-        "old_name": "Version Details",
         "label": "Version Details",
         "description": "Details about supported software version, plugin version and changelog.",
         "translatable": false,
