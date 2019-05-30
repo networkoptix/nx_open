@@ -200,18 +200,24 @@ void LicenseWatcher::processResponse(QByteArray responseData)
     for (const auto& licenseData: response.licenses)
     {
         if (existingLicenses.value(licenseData.key) != licenseData)
-        {
             updatedLicenses << QnLicensePtr(new QnLicense(licenseData));
-            nx::vms::api::LicenseData rawData;
-            ec2::fromResourceToApi(updatedLicenses.back(), rawData);
-            NX_ALWAYS(this,
-                lm("License '%1' has been updated. New value: %2"), licenseData.key, rawData.licenseBlock);
-        }
     }
 
     auto error = licenseManager->addLicensesSync(updatedLicenses);
-    if (error != ec2::ErrorCode::ok)
+    if (error == ec2::ErrorCode::ok)
+    {
+        for (const auto& license: updatedLicenses)
+        {
+            nx::vms::api::LicenseData rawData;
+            ec2::fromResourceToApi(license, rawData);
+            NX_ALWAYS(this,
+                lm("License '%1' has been updated. New value: %2"), rawData.key, rawData.licenseBlock);
+        }
+    }
+    else
+    {
         NX_WARNING(this, lm("Can't update licenses into the database. DB error %1").arg(error));
+    }
 }
 
 ServerLicenseInfo LicenseWatcher::licenseData() const
