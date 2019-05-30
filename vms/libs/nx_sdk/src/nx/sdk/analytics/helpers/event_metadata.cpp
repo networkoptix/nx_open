@@ -1,5 +1,7 @@
 #include "event_metadata.h"
 
+#include <algorithm>
+
 #include <nx/kit/debug.h>
 
 namespace nx {
@@ -75,7 +77,7 @@ void EventMetadata::addAttribute(nx::sdk::Ptr<Attribute> attribute)
     if (!NX_KIT_ASSERT(attribute))
         return;
 
-    auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
+    const auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
         [attributeName = attribute->name()](const nx::sdk::Ptr<Attribute>& attribute)
         {
             return strcmp(attribute->name(), attributeName) == 0;
