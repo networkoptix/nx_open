@@ -204,7 +204,7 @@ void LicenseWatcher::processResponse(QByteArray responseData)
             updatedLicenses << QnLicensePtr(new QnLicense(licenseData));
             nx::vms::api::LicenseData rawData;
             ec2::fromResourceToApi(updatedLicenses.back(), rawData);
-            NX_ALWAYS(this,
+            NX_INFO(this,
                 lm("License '%1' has been updated. New value: %2"), licenseData.key, rawData.licenseBlock);
         }
     }
