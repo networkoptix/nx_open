@@ -29,7 +29,7 @@ def update_draft_state(review_id, target_state, user):
         review.version.accepted_date = datetime.now()
         review.version.save()
 
-    review.update_state(user, target_state)
+    review.update_between_published_and_current(user, target_state)
 
     return None
 
@@ -345,8 +345,13 @@ def send_version_for_review(product, user):
 
 def get_records_for_version(product, version, customization):
     published_version = product.version_id(customization)
-    data_records = product.datarecord_set.filter(version__id__gte=published_version,
-                                                 version__id__lte=version.id).\
+    if version.id > published_version:
+
+        data_records = product.datarecord_set.filter(version__id__gt=published_version,
+                                                     version__id__lte=version.id)
+    else:
+        data_records = product.datarecord_set.filter(version__id=version.id)
+    data_records = data_records.\
         order_by('data_structure__context__name', 'language__code', 'data_structure__order', '-id')
     contexts = {}
     used_data_structures = set()

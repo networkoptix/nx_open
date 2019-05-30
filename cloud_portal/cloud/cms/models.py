@@ -634,6 +634,15 @@ class ProductCustomizationReview(models.Model):
         self.save()
         self.update_children_reviews()
 
+    def update_between_published_and_current(self, user, state):
+        product = self.version.product
+        versions = product.contentversion_set.filter(id__gt=product.version_id(self.customization),
+                                                     id__lte=self.version_id)
+        customization_reviews = ProductCustomizationReview.objects.\
+            filter(version__in=versions, customization=self.customization).distinct()
+        for review in customization_reviews:
+            review.update_state(user, state)
+
     @property
     def can_preview_customization(self):
         return self.customization.name == settings.CUSTOMIZATION and self.version.product.product_type.can_preview
