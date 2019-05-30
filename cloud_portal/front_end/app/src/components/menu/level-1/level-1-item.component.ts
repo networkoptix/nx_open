@@ -10,6 +10,7 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class NxLevel1ItemComponent implements OnInit {
     @Input() item: {};
+    @Input() selected: {};
 
     constructor() {
     }

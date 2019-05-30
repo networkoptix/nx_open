@@ -15,8 +15,9 @@ import { NxIntegrationDetailsComponent } from './details/details.component';
 
 const appRoutes: Routes = [
     { path    : 'integrations', component: NxIntegrationsComponent },
-    { path    : 'integrations/:pluginId', component: NxIntegrationDetailsComponent },
-    { path    : 'integrations/:pluginId/:status', component: NxIntegrationDetailsComponent }
+    // { path    : 'integrations/:id', component: NxIntegrationDetailsComponent },
+    // { path    : 'integrations/:id/pending', component: NxIntegrationDetailsComponent },
+    { path    : 'integrations/:id/:state', component: NxIntegrationDetailsComponent }
 ];
 
 @NgModule({

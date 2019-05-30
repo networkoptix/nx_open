@@ -15,16 +15,21 @@ interface Platform {
     providedIn: 'root'
 })
 export class IntegrationService implements OnDestroy {
+    config: any = {};
     pluginsSubject = new BehaviorSubject([]);
+    selectedSectionSubject = new BehaviorSubject([]);
+    plugin: any = {};
     inReview: boolean;
 
     constructor(private api: NxCloudApiService,
-                private config: NxConfigService) {
+                private configService: NxConfigService) {
 
         this.getIntegrations()
             .subscribe(result => {
                 this.pluginsSubject.next(result.data);
             });
+
+        this.config = this.configService.getConfig();
     }
 
     private getIntegrations(): Observable<any> {
@@ -90,7 +95,7 @@ export class IntegrationService implements OnDestroy {
                         platform.noFollow = true;
                     }
                 } else {
-                    platform.name = this.config.config.defaultPlatformNames[platformName];
+                    platform.name = this.config.defaultPlatformNames[platformName];
                 }
 
                 platform.url = downloadPlatforms[platformName];
@@ -112,6 +117,22 @@ export class IntegrationService implements OnDestroy {
             });
         }
 
+        const platformIcons = [];
+
+        this.config.icons.platforms.forEach(icon => {
+            const platform = plugin.information.platforms.find(platform => {
+                // 32 or 64 bit? ... it doesn't matter :)
+                return platform.toLowerCase().indexOf(icon.name) > -1;
+            });
+
+            if (platform) {
+                platformIcons.push({ name: platform, src: icon.src });
+            }
+        });
+
+        plugin.information.platforms.icons = platformIcons;
+
+
         this.setScreenshots(plugin.instructions);
         this.setScreenshots(plugin.overview);
 
@@ -120,6 +141,18 @@ export class IntegrationService implements OnDestroy {
 
     getIntegrationBy(id: number, status: string): Observable<any> {
         return this.api.getIntegrationBy(id, status);
+    }
+
+    setIntegrationPlugin(plugin: any = {}) {
+        this.plugin = plugin;
+    }
+
+    getIntegrationPlugin() {
+        return this.plugin;
+    }
+
+    setSection(section) {
+        this.selectedSectionSubject.next(section);
     }
 
     ngOnDestroy() {

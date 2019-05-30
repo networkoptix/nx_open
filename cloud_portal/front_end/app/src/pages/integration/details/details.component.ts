@@ -19,6 +19,7 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
     plugin: any;
     config: any = {};
     lang: any = {};
+    content: any = {};
 
     private setupDefaults() {
         this.config = this.configService.getConfig();
@@ -27,6 +28,8 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
             .subscribe((lang) => {
                 this.lang = lang;
             });
+
+
     }
 
     constructor(public sanitizer: DomSanitizer,
@@ -43,24 +46,58 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this._route.params.subscribe(params => {
-            this.integrationService.getIntegrationBy(params.pluginId, params.status)
-                .subscribe(result => {
-                    if (result.length) {
-                        this.plugin = this.integrationService.format(result[0]);
-                        if (this.plugin && (this.plugin.pending && this.plugin.draft)) {
-                            this.ribbonService.show(
-                                    this.lang[this.translate.currentLang].integration.previewRibbonText,
-                                    this.lang[this.translate.currentLang].integration.backToEditText,
-                                    this.config.links.admin.product.replace('%ID%', this.plugin.id)
-                            );
-                        }
+        this.integrationService
+            .selectedSectionSubject
+            .subscribe(selection => {
+                this.content.selectedSection = selection;
+                this.content = {...this.content}; // trigger onChange
+        });
 
-                        if (this.plugin.overview) {
-                            this.plugin.overview.screenshots = this.integrationService.formatScreenshots(this.plugin.overview);
+        this._route.params.subscribe(params => {
+            if (params.id) {
+
+                this.integrationService.setIntegrationPlugin({});
+                this.content = {
+                    selectedSection: '',        // updated by selectedSectionSubject
+                    base  : '/integrations/',   // updated by route param
+                    level1: [
+                        {
+                            id    : '',
+                            label : '',
+                            path  : '',
+                            level2: [
+                                {
+                                    id   : 'overview',
+                                    label: 'Overview',
+                                    path : 'overview',
+                                },
+                                {
+                                    id   : 'setup',
+                                    label: 'Setup Instructions',
+                                    path : 'setup',
+                                }]
+                        }]
+                };
+
+                this.integrationService.getIntegrationBy(params.id, params.status)
+                    .subscribe(result => {
+                        if (result.length) {
+                            this.content.base += params.id + '/' + params.state;
+
+                            this.plugin = this.integrationService.format(result[0]);
+
+                            if (this.plugin && (this.plugin.pending && this.plugin.draft)) {
+                                this.ribbonService.show(
+                                        this.lang[this.translate.currentLang].integration.previewRibbonText,
+                                        this.lang[this.translate.currentLang].integration.backToEditText,
+                                        this.config.links.admin.product.replace('%ID%', this.plugin.id)
+                                );
+                            }
+
+                            this.integrationService.setIntegrationPlugin(this.plugin);
                         }
-                    }
-                });
+                    });
+            }
         });
     }
 

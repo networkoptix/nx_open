@@ -8,28 +8,43 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { NxIntegrationDetailsComponent } from './details.component';
 
-import { TranslateModule }  from '@ngx-translate/core';
-import { ComponentsModule } from '../../../components/components.module';
+import { TranslateModule }      from '@ngx-translate/core';
+import { ComponentsModule }     from '../../../components/components.module';
+import { NxOverviewComponent }  from './overview/overview.component';
+import { NxSetupComponent }     from './setup/setup.component';
+
+const appRoutes: Routes = [
+    {
+        path    : 'integrations/:id/:state', component: NxIntegrationDetailsComponent,
+        children: [
+            { path: '', redirectTo: 'overview', pathMatch: 'full' },
+            { path: 'overview', component: NxOverviewComponent },
+            { path: 'setup', component: NxSetupComponent },
+        ]
+    }
+];
 
 @NgModule({
-    imports: [
+    imports        : [
         CommonModule,
         BrowserModule,
         UpgradeModule,
         RouterModule,
         NgbModule,
         TranslateModule,
-        ComponentsModule
+        ComponentsModule,
+
+        RouterModule.forChild(appRoutes)
     ],
-    providers: [],
-    declarations: [
+    providers      : [],
+    declarations   : [
         NxIntegrationDetailsComponent
     ],
-    bootstrap: [],
+    bootstrap      : [],
     entryComponents: [
         NxIntegrationDetailsComponent
     ],
-    exports: [
+    exports        : [
         NxIntegrationDetailsComponent
     ]
 })
