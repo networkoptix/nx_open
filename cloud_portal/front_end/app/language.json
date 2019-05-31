@@ -17,12 +17,18 @@
     "noClientDetectedTitle": "Install %VMS_NAME% to view your System",
     "download": "Download %VMS_NAME%"
   },
-  "messageType": {
-    "ipvd_feedback_page": "Cameras page feedback",
-    "ipvd_feedback_device": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
     "template": "{{title}} %CLOUD_NAME%",

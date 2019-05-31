@@ -129,14 +129,8 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
         this.plugin = undefined;
     }
 
-    requestSupport() {
-        this.messageDialog.open(this.config.messageType.support, this.plugin.information.name, this.plugin.id).then(() => {
-        });
-    }
-
-    sendInquiry() {
-        this.messageDialog.open(this.config.messageType.inquiry, this.plugin.information.name, this.plugin.id).then(() => {
-        });
+    openMessageDialog() {
+        this.messageDialog.open(this.config.messageType.integration, this.plugin.information.name, this.plugin.id).then(() => {});
     }
 }
 

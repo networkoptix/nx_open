@@ -224,11 +224,15 @@ export class NxConfigService {
                 chunksToCheckFatal: 30, // This is used in short cache when requesting chunks for jumpToPosition in timeline directive
                 skipFramesRenderingTimeline: true
             },
+            messageTopics: {
+                integration: ['contact_sales', 'contact_support'],
+                ipvd_feedback_page: ['ipvd_feedback_page'],
+                ipvd_feedback_device: ['ipvd_feedback_device']
+            },
             messageType: {
                 ipvd_page: 'ipvd_feedback_page',
                 ipvd_device: 'ipvd_feedback_device',
-                inquiry: 'sales_inquiry',
-                support: 'request_support',
+                integration: 'integration',
                 unknown: 'unknown'
             },
             permissions                   : {

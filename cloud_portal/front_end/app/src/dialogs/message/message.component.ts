@@ -26,6 +26,8 @@ export class MessageModalContent {
     contact: boolean;
     agree: boolean;
     title: string;
+    topic: string;
+    topics: any;
 
     @ViewChild('feedbackForm') public feedbackForm: NgForm;
 
@@ -38,15 +40,27 @@ export class MessageModalContent {
                 @Inject('languageService') private language: any
                 ) {
 
-        this.placeholder = '';
         this.lang = this.translation.translations[this.translation.currentLang];
+        this.placeholder = '';
+        this.topic = '';
     }
 
     ngOnInit() {
-        if (this.messageType === 'undefined') {
-            this.messageType = this.language.messageType.unknown;
-        }
+        this.initForm();
+        this.sendMessage = this.process.init(() => {
+            return this.cloudApi.sendMessage(this.topic, this.productId, this.message, this.userName, this.userEmail, this.contact);
+        }, {
+            successMessage: this.language.lang.dialogs.messageSent
+        }).then(() => {
+            this.activeModal.close(true);
+        });
+    }
 
+    close() {
+        this.activeModal.close();
+    }
+
+    initForm() {
         switch (this.messageType) {
             case this.config.messageType.ipvd_page :
                 this.placeholder = this.lang.messageDialogPlaceholders.feedback;
@@ -55,15 +69,15 @@ export class MessageModalContent {
                 this.placeholder = '';
         }
 
-        this.title = this.language.lang.messageType[this.messageType].replace('{{product}}', this.product);
-
-        this.sendMessage = this.process.init(() => {
-            return this.cloudApi.sendMessage(this.messageType, this.productId, this.message, this.userName, this.userEmail, this.contact);
-        }, {
-            successMessage: this.language.lang.dialogs.messageSent
-        }).then(() => {
-            this.activeModal.close(true);
+        this.title = this.language.lang.messageDialog.title[this.messageType].replace('{{product}}', this.product);
+        this.topics = this.config.messageTopics[this.messageType].map((topic) => {
+            return {
+                id: topic,
+                name: this.language.lang.messageDialog.topic[topic].replace('{{product}}', this.product)
+            };
         });
+
+        this.setTopic(this.topics[0]);
 
         this.account
             .get()
@@ -71,11 +85,10 @@ export class MessageModalContent {
                 this.userName = account.first_name + ' ' + account.last_name ;
                 this.userEmail = account.email;
             });
-
     }
 
-    close() {
-        this.activeModal.close();
+    setTopic(topic) {
+        this.topic = topic.id;
     }
 }
 
@@ -113,11 +126,11 @@ export class NxModalMessageComponent implements OnInit {
         return this.modalRef;
     }
 
-    open(type, product, productId) {
-        if (productId === 'undefined') {
+    open(type, product?, productId?) {
+        if (productId === undefined) {
             productId = '';
         }
-        if (product === 'undefined') {
+        if (product === undefined) {
             product = '';
         }
 
