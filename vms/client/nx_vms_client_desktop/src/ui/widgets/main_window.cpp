@@ -280,14 +280,17 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     const auto timeWatcher = context->instance<nx::vms::client::core::ServerTimeWatcher>();
     const auto timeModeNotifier = qnSettings->notifier(QnClientSettings::TIME_MODE);
-    connect(timeModeNotifier, &QnPropertyNotifier::valueChanged, timeWatcher,
-        [timeWatcher]()
-        {
-            const auto newMode = qnSettings->timeMode() == Qn::ClientTimeMode
-                ? nx::vms::client::core::ServerTimeWatcher::clientTimeMode
-                : nx::vms::client::core::ServerTimeWatcher::serverTimeMode;
-            timeWatcher->setTimeMode(newMode);
-        });
+    const auto updateTimeMode = [timeWatcher]()
+    {
+        const auto newMode = qnSettings->timeMode() == Qn::ClientTimeMode
+            ? nx::vms::client::core::ServerTimeWatcher::clientTimeMode
+            : nx::vms::client::core::ServerTimeWatcher::serverTimeMode;
+        timeWatcher->setTimeMode(newMode);
+    };
+    connect(timeModeNotifier, &QnPropertyNotifier::valueChanged, timeWatcher, updateTimeMode);
+
+    // Apply already loaded time mode settings
+    updateTimeMode();
 
     /* Set up actions. Only these actions will be available through hotkeys. */
     addAction(action(action::NotificationsTabAction));
