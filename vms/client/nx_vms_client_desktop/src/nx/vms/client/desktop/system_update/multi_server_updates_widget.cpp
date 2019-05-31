@@ -1540,13 +1540,15 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         messageBox->setIcon(QnMessageBoxIcon::Critical);
         messageBox->setText(tr("Failed to download update packages to some components"));
 
-        QString text = htmlParagraph(m_stateTracker->getErrorMessage());
+        PeerStateTracker::ErrorReport report;
+        m_stateTracker->getErrorReport(report);
+        QString text = report.message;
         text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
         messageBox->setInformativeText(text);
 
         // TODO: Client can be here as well, but it would not be displayed.
         // Should we display it somehow?
-        auto resourcesFailed = resourcePool()->getResourcesByIds(peersFailed.toList());
+        auto resourcesFailed = resourcePool()->getResourcesByIds(report.peers);
         injectResourceList(*messageBox, resourcesFailed);
 
         auto tryAgain = messageBox->addButton(tr("Try again"),
@@ -1650,8 +1652,12 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
             // 1. Everything is complete
             messageBox->setIcon(QnMessageBoxIcon::Critical);
             messageBox->setText(tr("There was an error while installing updates:"));
-            injectResourceList(*messageBox, resourcePool()->getResourcesByIds(peersFailed));
-            QString text =  htmlParagraph(m_stateTracker->getErrorMessage());
+
+            PeerStateTracker::ErrorReport report;
+            m_stateTracker->getErrorReport(report);
+
+            injectResourceList(*messageBox, resourcePool()->getResourcesByIds(report.peers));
+            QString text =  htmlParagraph(report.message);
             text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
             messageBox->setInformativeText(text);
             auto installNow = messageBox->addButton(tr("OK"),
