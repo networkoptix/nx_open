@@ -87,10 +87,96 @@ func postNode(writer http.ResponseWriter, request *http.Request, params httprout
 	}
 }
 
+func getCloudModulesXmlApi(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	mediatorClusterId := request.URL.Query().Get("mediatorCluster")
+	if len(mediatorClusterId) == 0 {
+		writeError(http.StatusBadRequest, writer,
+			errors.New(`Missing "mediatorCluster" query param`))
+		return
+	}
+
+	dao, err := NewDAO()
+	if err != nil {
+		log.Println("getCloudModulesXmlApi: error connecting to db:", err)
+		writeError(http.StatusInternalServerError, writer, err)
+		return
+	}
+
+	onlineNodes, err := dao.GetOnlineNodes(mediatorClusterId)
+	if err != nil {
+		log.Println("getCloudModulesXmlApi: error fetching online nodes from db:", err,
+			", clusterId:", mediatorClusterId)
+		writeError(http.StatusInternalServerError, writer, err)
+		return
+	}
+	if len(onlineNodes) == 0 {
+		log.Println("getCloudModulesXmlApi: No online nodes matching clusterId:",
+			mediatorClusterId)
+		writeError(http.StatusNotFound, writer,
+			errors.New("No online nodes matching clusterId: "+mediatorClusterId))
+		return
+	}
+
+	xml, err := ApiCloudModulesXml(request, &onlineNodes[0])
+	if err != nil {
+		log.Println("getCloudModulesXmlApi error:", err.Error())
+		writeError(http.StatusBadRequest, writer, err)
+		return
+	}
+
+	writer.Header().Set("Content-Type", "application/xml; charset=UTF-8")
+	writer.WriteHeader(http.StatusOK)
+	writer.Write([]byte(xml))
+}
+
+func getCloudModulesXmlV1(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	mediatorClusterId := request.URL.Query().Get("mediatorCluster")
+	if len(mediatorClusterId) == 0 {
+		writeError(http.StatusBadRequest, writer,
+			errors.New(`Missing "mediatorCluster" query param`))
+		return
+	}
+
+	dao, err := NewDAO()
+	if err != nil {
+		log.Println("getCloudModulesXmlApi: error connecting to db:", err)
+		writeError(http.StatusInternalServerError, writer, err)
+		return
+	}
+
+	onlineNodes, err := dao.GetOnlineNodes(mediatorClusterId)
+	if err != nil {
+		log.Println("getCloudModulesXmlApi: error fetching online nodes from db:", err,
+			", clusterId:", mediatorClusterId)
+		writeError(http.StatusInternalServerError, writer, err)
+		return
+	}
+	if len(onlineNodes) == 0 {
+		log.Println("getCloudModulesXmlApi: No online nodes matching clusterId:",
+			mediatorClusterId)
+		writeError(http.StatusNotFound, writer,
+			errors.New("No online nodes matching clusterId: "+mediatorClusterId))
+		return
+	}
+
+	xml, err := V1CloudModulesXml(request, &onlineNodes[0])
+	if err != nil {
+		log.Println("getCloudModulesXmlApi error:", err.Error())
+		writeError(http.StatusBadRequest, writer, err)
+		return
+	}
+
+	writer.Header().Set("Content-Type", "application/xml; charset=UTF-8")
+	writer.WriteHeader(http.StatusOK)
+	writer.Write([]byte(xml))
+}
+
 func main() {
 	log.Println("start lambda")
 	router := httprouter.New()
 	router.GET("/cluster/:clusterId/nodes", getOnlineNodes)
 	router.POST("/cluster/:clusterId/nodes", postNode)
+	router.GET("/api/cloud_modules.xml", getCloudModulesXmlApi)
+	router.GET("/discovery/v1/cloud_modules.xml", getCloudModulesXmlV1)
 	algnhsa.ListenAndServe(router, nil)
 }
