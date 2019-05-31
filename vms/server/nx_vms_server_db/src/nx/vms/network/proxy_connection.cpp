@@ -38,14 +38,55 @@
 
 class QnTcpListener;
 
-static const int kMaxProxyTtl = 8;
-static const std::chrono::milliseconds kIoTimeout = std::chrono::minutes(16);
-static const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(1);
-static const int kReadBufferSize = 1024 * 128; /* ~ 1 gbit/s */
-
 namespace nx {
 namespace vms {
 namespace network {
+
+namespace {
+
+const int kMaxProxyTtl = 8;
+const std::chrono::milliseconds kIoTimeout = std::chrono::minutes(16);
+const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(1);
+const int kReadBufferSize = 1024 * 128; /* ~ 1 gbit/s */
+
+#ifdef PROXY_STRICT_IP
+bool isLocalAddress(const QString& addr)
+{
+    return addr == lit("localhost") || addr == lit("127.0.0.1");
+}
+#endif
+
+bool isSchemeSecure(const QString& scheme)
+{
+    return scheme == nx::network::http::kSecureUrlSchemeName
+        || scheme == nx::network::rtsp::kSecureUrlSchemeName;
+}
+
+bool doesNextHopServerUsesSSL(const QnRoute& route, QnCommonModule* commonModule)
+{
+    const auto nextHopId = route.gatewayId.isNull() ? route.id : route.gatewayId;
+    auto nextHopServer =
+        commonModule->resourcePool()->getResourceById<QnMediaServerResource>(nextHopId);
+    if (!nextHopServer)
+    {
+        NX_ASSERT(false, lm("No server with GUID %1").args(nextHopId));
+        return true;
+    }
+    return isSchemeSecure(nextHopServer->getApiUrl().scheme());
+}
+
+int getDefaultPortByProtocol(const QString& protocol)
+{
+    const auto port = nx::network::url::getDefaultPortForScheme(protocol);
+    return port == 0 ? -1 : port;
+}
+
+bool isProtocol(const QString& protocol)
+{
+    return nx::network::http::isUrlSheme(protocol) || nx::network::rtsp::isUrlSheme(protocol);
+}
+
+} // namespace
 
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
@@ -101,18 +142,6 @@ bool ProxyConnectionProcessor::isProxyForCamera(
     return false;
 }
 
-bool ProxyConnectionProcessor::isProtocol(const QString& protocol) const
-{
-    return nx::network::http::isUrlSheme(protocol)
-        || nx::network::rtsp::isUrlSheme(protocol);
-}
-
-int ProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol)
-{
-    const auto port = nx::network::url::getDefaultPortForScheme(protocol);
-    return port == 0 ? -1 : port;
-}
-
 bool ProxyConnectionProcessor::doProxyData(
     nx::network::AbstractStreamSocket* srcSocket,
     nx::network::AbstractStreamSocket* dstSocket,
@@ -155,13 +184,6 @@ bool ProxyConnectionProcessor::doProxyData(
     }
 }
 
-#ifdef PROXY_STRICT_IP
-static bool isLocalAddress(const QString& addr)
-{
-    return addr == lit("localhost") || addr == lit("127.0.0.1");
-}
-#endif
-
 QString ProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, const nx::utils::Url &url)
 {
     Q_D(ProxyConnectionProcessor);
@@ -189,15 +211,13 @@ QString ProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, cons
             return QString();
         }
 
-        const bool useSsl = url.scheme() == nx::network::http::kSecureUrlSchemeName
-            || url.scheme() == nx::network::rtsp::kSecureUrlSchemeName;
-        d->dstSocket =
-            nx::network::SocketFactory::createStreamSocket(useSsl);
+        d->dstSocket = nx::network::SocketFactory::createStreamSocket(isSchemeSecure(url.scheme()));
         d->dstSocket->setRecvTimeout(d->connectTimeout.count());
         d->dstSocket->setSendTimeout(d->connectTimeout.count());
+        NX_VERBOSE(this, "Connecting to [%1]", url);
         if (!d->dstSocket->connect(
-                nx::network::SocketAddress(url.host().toLatin1().data(), url.port()),
-                nx::network::deprecated::kDefaultConnectTimeout))
+            nx::network::SocketAddress(url.host().toLatin1().data(), url.port()),
+            nx::network::deprecated::kDefaultConnectTimeout))
         {
             d->socket->close();
             return QString(); // now answer from destination address
@@ -296,18 +316,6 @@ void ProxyConnectionProcessor::cleanupProxyInfo(nx::network::http::Request* requ
         QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority);
 }
 
-static void fixServerUrlSchemeSecurity(nx::utils::Url* url, const QnGlobalSettings* settings)
-{
-    namespace http = nx::network::http;
-    namespace rtsp = nx::network::rtsp;
-
-    if (settings->isTrafficEncriptionForced() && url->scheme() == http::kUrlSchemeName)
-        url->setScheme(http::kSecureUrlSchemeName);
-    else
-    if (settings->isVideoTrafficEncriptionForced() && url->scheme() == rtsp::kUrlSchemeName)
-        url->setScheme(rtsp::kSecureUrlSchemeName);
-}
-
 bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRoute& dstRoute)
 {
     Q_D(ProxyConnectionProcessor);
@@ -376,9 +384,9 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
         d->request.requestLine.url = updatedUrl;
     }
 
-    nx::network::http::HttpHeaders::const_iterator xCameraGuidIter = d->request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
     QnUuid cameraGuid;
-    if( xCameraGuidIter != d->request.headers.end() )
+    const auto xCameraGuidIter = d->request.headers.find(Qn::CAMERA_GUID_HEADER_NAME);
+    if (xCameraGuidIter != d->request.headers.end())
         cameraGuid = QnUuid::fromStringSafe(xCameraGuidIter->second);
     else
         cameraGuid = QnUuid::fromStringSafe(d->request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME));
@@ -394,9 +402,6 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
         d->request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, dstRoute.id.toByteArray());
     else
         dstRoute.id = commonModule()->moduleGUID();
-
-    if (!dstRoute.id.isNull()) //< Means dstUrl targets another server in the system.
-        fixServerUrlSchemeSecurity(&dstUrl, commonModule()->globalSettings());
 
     if (dstRoute.id == commonModule()->moduleGUID())
     {
@@ -414,13 +419,17 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
         }
         else
         {
-            //proxying to ourself
-            dstRoute.addr = nx::network::SocketAddress(nx::network::HostAddress::localhost, d->socket->getLocalAddress().port);
+            // Proxying to ourself.
+            dstRoute.addr = nx::network::SocketAddress(nx::network::HostAddress::localhost,
+                d->socket->getLocalAddress().port);
+            fixServerUrlSchemeSecurity(dstUrl, dstRoute);
         }
     }
     else if (!dstRoute.id.isNull())
     {
+        // dstUrl targets another server in the system.
         dstRoute = commonModule()->router()->routeTo(dstRoute.id);
+        fixServerUrlSchemeSecurity(dstUrl, dstRoute);
     }
     else
     {
@@ -496,6 +505,32 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
     d->request.serialize(&d->clientRequest);
 
     return true;
+}
+
+void ProxyConnectionProcessor::fixServerUrlSchemeSecurity(utils::Url &dstUrl, QnRoute &dstRoute)
+{
+    Q_D(ProxyConnectionProcessor);
+
+    namespace http = nx::network::http;
+    namespace rtsp = nx::network::rtsp;
+
+    if (dstUrl.scheme().isEmpty())
+        dstUrl.setScheme(d->protocol);
+
+    auto settings = commonModule()->globalSettings();
+    if (dstUrl.scheme() == http::kUrlSchemeName && (settings->isTrafficEncriptionForced()
+        || doesNextHopServerUsesSSL(dstRoute, commonModule())))
+    {
+        dstUrl.setScheme(http::kSecureUrlSchemeName);
+    }
+    else if (settings->isVideoTrafficEncriptionForced() && dstUrl.scheme() == rtsp::kUrlSchemeName)
+    {
+        dstUrl.setScheme(rtsp::kSecureUrlSchemeName);
+    }
+    else
+    {
+        NX_DEBUG(typeid(ProxyConnectionProcessor), "Got unexpected scheme in URL [%1]", dstUrl);
+    }
 }
 
 bool ProxyConnectionProcessor::openProxyDstConnection()
@@ -610,7 +645,6 @@ void ProxyConnectionProcessor::doProxyRequest()
         moreContentToReceive = contentLength - receivedContentLength;
     }
 
-    QString path = d->request.requestLine.url.path();
     // Parse next request and change dst if required.
     nx::utils::Url dstUrl;
     QnRoute dstRoute;

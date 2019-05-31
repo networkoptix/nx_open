@@ -265,4 +265,28 @@ CREATE INDEX idx_object_search_to_object_object_id ON object_search_to_object(
 
 )sql";
 
+//-------------------------------------------------------------------------------------------------
+// META-290.
+static constexpr char kAddObjectGroups[] =
+R"sql(
+
+CREATE TABLE object_group(
+    group_id    INTEGER,
+    object_id   INTEGER
+);
+
+CREATE INDEX idx_object_group_full ON object_group(group_id, object_id);
+
+INSERT INTO object_group(group_id, object_id)
+SELECT object_search_id, object_id FROM object_search_to_object;
+
+ALTER TABLE object_search ADD COLUMN object_group_id INTEGER;
+UPDATE object_search SET object_group_id = id;
+
+DROP INDEX idx_object_search_to_object_object_search_id;
+DROP INDEX idx_object_search_to_object_object_id;
+DROP TABLE object_search_to_object;
+
+)sql";
+
 } // namespace nx::analytics::db

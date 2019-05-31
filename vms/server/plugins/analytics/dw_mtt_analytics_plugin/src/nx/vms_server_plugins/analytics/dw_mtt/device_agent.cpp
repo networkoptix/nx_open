@@ -55,7 +55,6 @@ EventMetadata* createCommonEvent(const EventType& eventType, bool active)
     eventMetadata->setDescription(eventType.name.toStdString());
     eventMetadata->setIsActive(active);
     eventMetadata->setConfidence(1.0);
-    eventMetadata->setAuxiliaryData(eventType.internalName.toStdString());
     return eventMetadata;
 }
 

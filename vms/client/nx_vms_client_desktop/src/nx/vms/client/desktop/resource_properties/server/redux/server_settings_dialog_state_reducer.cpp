@@ -15,7 +15,7 @@ int pluginIndex(const State& state, const QString& libraryName)
         return -1;
 
     const auto iter = std::find_if(state.plugins.modules.cbegin(), state.plugins.modules.cend(),
-        [libraryName](const nx::vms::api::PluginModuleData& data)
+        [libraryName](const nx::vms::api::PluginInfo& data)
         {
             return data.libraryName == libraryName;
         });
@@ -41,7 +41,7 @@ State ServerSettingsDialogStateReducer::setOnline(State state, bool value)
 }
 
 State ServerSettingsDialogStateReducer::setPluginModules(
-    State state, const nx::vms::api::PluginModuleDataList& value)
+    State state, const nx::vms::api::PluginInfoList& value)
 {
     const auto currentLibraryName = state.plugins.current > 0
         ? state.plugins.modules[state.plugins.current].libraryName

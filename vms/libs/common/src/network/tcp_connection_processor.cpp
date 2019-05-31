@@ -164,13 +164,11 @@ int QnTCPConnectionProcessor::isFullMessage(
 void QnTCPConnectionProcessor::parseRequest()
 {
     Q_D(QnTCPConnectionProcessor);
-//    qDebug() << "Client request from " << d->socket->getForeignAddress().address.toString();
-//    qDebug() << d->clientRequest;
 
     d->request = nx::network::http::Request();
-    if( !d->request.parse( d->clientRequest ) )
+    if (!d->request.parse(d->clientRequest))
     {
-        qWarning() << Q_FUNC_INFO << "Invalid request format.";
+        NX_DEBUG(this, "Unable to parse request: [%1]", d->clientRequest);
         return;
     }
     d->protocol = d->request.requestLine.version.protocol;

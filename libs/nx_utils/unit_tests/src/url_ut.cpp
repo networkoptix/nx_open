@@ -36,6 +36,24 @@ TEST(Url, ipv6_withScopeId)
     checkUrl("http://[fe80::5be3:f02d:21e7:2450%3]", kTestIp);
 }
 
+TEST(Url, setHost)
+{
+    Url url;
+
+    url.setHost("zorz");
+    ASSERT_EQ(url.host(), "zorz");
+    url.setHost("");
+    ASSERT_EQ(url.host(), "");
+
+    url.setHost("zorz-123");
+    ASSERT_EQ(url.host(), "zorz-123");
+    url.setHost("invalid_ho$tname_%");
+    ASSERT_EQ(url.host(), "zorz-123");
+    url.setHost(QString());
+    ASSERT_EQ(url.host(), QString());
+
+}
+
 TEST(Url, url_encoded)
 {
     Url nxUrl(kTestUrl);

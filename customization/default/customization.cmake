@@ -36,10 +36,8 @@ set(android.alias "hdwitness")
 set(android.storepass "hYCmvTDu")
 set(android.keypass "31O2zNNy")
 
-# Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{ce572797-45bf-4f1c-a783-369ea79c597e}")
 set(customization.clientUpgradeCode "{6ae0699e-af9d-4cc1-85a3-9bf8819563af}")
-
 set(customization.clientBundleUpgradeCode "{4505af3c-b20c-4ae9-b5c4-c1fddbc5db34}")
 set(customization.serverBundleUpgradeCode "{4904f26d-6146-45f4-be37-80a31c15872d}")
 set(customization.fullBundleUpgradeCode "{2c83e785-23e4-4b70-be6c-ed49fa329bb5}")

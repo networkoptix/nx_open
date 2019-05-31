@@ -12,6 +12,7 @@
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/server/analytics/predefined_attributes.h>
 
 #include "common.h"
 
@@ -95,7 +96,10 @@ Error DeviceAgent::startFetchingMetadata(
                 eventMetadata->setDescription(hanwhaEvent.caption.toStdString());
                 eventMetadata->setIsActive(hanwhaEvent.isActive);
                 eventMetadata->setConfidence(1.0);
-                eventMetadata->setAuxiliaryData(hanwhaEvent.fullEventName.toStdString());
+                eventMetadata->addAttribute(makePtr<Attribute>(
+                    IAttribute::Type::string,
+                    nx::vms::server::analytics::kInputPortIdAttribute,
+                    hanwhaEvent.fullEventName.toStdString()));
 
                 eventMetadataPacket->setTimestampUs(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());

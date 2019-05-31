@@ -32,7 +32,6 @@ set(backgroundImage
 set(defaultWebPages
     "{\"Home Page\": \"http://digital-watchdog.com/DW_Spectrum/\"}")
 
-# Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{F2825E30-F367-4040-93B9-B71F05FDD6B1}")
 set(customization.clientUpgradeCode "{7083E473-BD53-4084-9BAD-9216EBF6BF3F}")
 set(customization.clientBundleUpgradeCode "{b40de6ba-97ac-4591-8f27-2f1bba285472}")

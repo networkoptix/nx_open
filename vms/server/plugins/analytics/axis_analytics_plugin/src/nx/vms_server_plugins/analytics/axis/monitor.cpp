@@ -5,6 +5,7 @@
 
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
+#include <nx/sdk/helpers/attribute.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/network/system_socket.h>
 
@@ -25,12 +26,14 @@ static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seco
 nx::sdk::analytics::EventMetadata* createCommonEvent(
     const EventType& eventType, bool active)
 {
-    auto eventMetadata = new nx::sdk::analytics::EventMetadata();
+    using namespace nx::sdk;
+    using namespace nx::sdk::analytics;
+
+    auto eventMetadata = new EventMetadata();
     eventMetadata->setTypeId(eventType.id.toStdString());
     eventMetadata->setDescription(eventType.name.toStdString());
     eventMetadata->setIsActive(active);
     eventMetadata->setConfidence(1.0);
-    eventMetadata->setAuxiliaryData(eventType.topic.toStdString());
     return eventMetadata;
 }
 
