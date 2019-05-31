@@ -9,7 +9,7 @@ Config.helpLinks.push({
 Config.helpLinks.push({
     urls: [
         {
-            url: "https://itunes.apple.com/eg/app/hd-witness/id1050899754?mt=8",
+            url: "https://itunes.apple.com/app/id1466148931",
             button: "iOS Client",
             class:'appstore'
         },
