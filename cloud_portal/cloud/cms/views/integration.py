@@ -109,9 +109,9 @@ def check_integration_store_enabled():
 @api_view(("GET", ))
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
-def get_integration(request, product_id=None, state=None):
-    draft = state == "draft"
-    review = state == "pending"
+def get_integration(request, product_id=None):
+    draft = "draft" in request.GET
+    review = "pending" in request.GET
     if not product_id:
         return api_success("Integration not found.", status_code=status.HTTP_404_NOT_FOUND)
 
