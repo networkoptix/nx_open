@@ -519,7 +519,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 
     for (int i = 0; i < (int) m_objectIds.size(); ++i)
     {
-        auto objectMetadata = toPtr(makeObjectMetadata(
+        const auto objectMetadata = toPtr(makeObjectMetadata(
             m_objectTypeId,
             m_objectIds[i],
             dt,
@@ -530,13 +530,13 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 
         if (generatePreviewPacket)
         {
-            auto bestShotMetadataPacket = makeObjectTrackBestShotPacket(
+            if (const auto bestShotMetadataPacket = makeObjectTrackBestShotPacket(
                 m_objectIds[i],
                 m_lastVideoFrameTimestampUs,
-                dt);
-
-            if (bestShotMetadataPacket)
+                dt))
+            {
                 result.push_back(bestShotMetadataPacket);
+            }
         }
     }
 
