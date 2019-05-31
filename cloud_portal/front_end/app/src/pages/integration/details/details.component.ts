@@ -67,14 +67,14 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                             path  : '',
                             level2: [
                                 {
-                                    id   : 'overview',
-                                    label: 'Overview',
-                                    path : 'overview',
+                                    id   : 'how-it-works',
+                                    label: 'How it works',
+                                    path : 'how-it-works',
                                 },
                                 {
-                                    id   : 'setup',
-                                    label: 'Setup Instructions',
-                                    path : 'setup',
+                                    id   : 'how-to-install',
+                                    label: 'How to install?',
+                                    path : 'how-to-install',
                                 }]
                         }]
                 };

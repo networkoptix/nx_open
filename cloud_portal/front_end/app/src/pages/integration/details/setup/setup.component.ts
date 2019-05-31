@@ -13,7 +13,7 @@ export class NxSetupComponent implements OnInit, OnDestroy {
 
     private setupDefaults() {
         this.plugin = this.integrationService.getIntegrationPlugin();
-        this.integrationService.setSection('setup');
+        this.integrationService.setSection('how-to-install');
     }
 
     constructor(private integrationService: IntegrationService) {

@@ -33,6 +33,7 @@ export class NxIntegrationsComponent implements OnInit {
         this.CONFIG = this.config.getConfig();
 
         this.allElements = [];
+        this.elements = [];
 
         this.emptyFilter = {
             query: ''
@@ -68,7 +69,7 @@ export class NxIntegrationsComponent implements OnInit {
                             this.setTags();
                             this.setFilter();
                         } else {
-                            this.elements = [];
+                            this.elements = undefined;
                         }
                     },
                     error => {

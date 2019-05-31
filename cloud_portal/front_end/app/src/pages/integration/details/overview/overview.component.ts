@@ -13,7 +13,7 @@ export class NxOverviewComponent implements OnInit, OnDestroy {
 
     private setupDefaults() {
         this.plugin = this.integrationService.getIntegrationPlugin();
-        this.integrationService.setSection('overview');
+        this.integrationService.setSection('how-it-works');
     }
 
     constructor(private integrationService: IntegrationService) {

@@ -368,6 +368,9 @@ window.L = {};
                             .when('/sandbox', {
                                 template: ''
                             })
+                            .when('/integrations', {
+                                template: ''
+                            })
                             .when('/integrations/:id/:state', {
                                 template: ''
                             })
