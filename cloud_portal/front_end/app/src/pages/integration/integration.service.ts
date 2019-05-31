@@ -73,6 +73,22 @@ export class IntegrationService implements OnDestroy {
         plugin.overview.screenshots = processed;
     }
 
+    setPlatformIcons(plugin) {
+        const platformIcons = [];
+
+        this.config.icons.platforms.forEach(icon => {
+            const platform = plugin.information.platforms.find(platform => {
+                // 32 or 64 bit? ... it doesn't matter :)
+                return platform.toLowerCase().indexOf(icon.name) > -1;
+            });
+            if (platform) {
+                platformIcons.push({ name: platform, src: icon.src });
+            }
+        });
+
+        return platformIcons;
+    }
+
     format(plugin) {
         if (plugin.downloadFiles) {
             const downloadPlatforms = plugin.downloadFiles;
@@ -117,21 +133,7 @@ export class IntegrationService implements OnDestroy {
             });
         }
 
-        const platformIcons = [];
-
-        this.config.icons.platforms.forEach(icon => {
-            const platform = plugin.information.platforms.find(platform => {
-                // 32 or 64 bit? ... it doesn't matter :)
-                return platform.toLowerCase().indexOf(icon.name) > -1;
-            });
-
-            if (platform) {
-                platformIcons.push({ name: platform, src: icon.src });
-            }
-        });
-
-        plugin.information.platforms.icons = platformIcons;
-
+        plugin.information.platforms.icons = this.setPlatformIcons(plugin);
 
         this.setScreenshots(plugin.instructions);
         this.formatScreenshots(plugin);

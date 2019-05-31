@@ -67,23 +67,22 @@ export class NxIntegrationsComponent implements OnInit {
         this.integrations
             .pluginsSubject
             .subscribe((result: any) => {
-
-                        if (result) {
-                            if (result.length < 1) {
-                                this.location.go('404');
-                            } else {
-                                this.allElements = result;
-                                this.setTags();
-                                this.setFilter();
-                            }
-                        } else {
-                            this.elements = undefined;
-                        }
-                    },
-                    error => {
-                        console.error('Integration plugins error -> ', error);
+                if (result) {
+                    if (result.length < 1) {
                         this.location.go('404');
-                    });
+                    } else {
+                        this.allElements = result;
+                        this.setTags();
+                        this.setFilter();
+                    }
+                } else {
+                    this.elements = undefined;
+                }
+            },
+            error => {
+                console.error('Integration plugins error -> ', error);
+                this.location.go('404');
+            });
 
         setTimeout(() => {
             this.lang = this.translate.translations[this.translate.currentLang];
