@@ -11,7 +11,6 @@ class PartitionsInformationProvider: public AbstractPartitionsInformationProvide
     PartitionsInformationProvider(RootFileSystem* rootFs);
 
     virtual QByteArray mountsFileContent() const override;
-    virtual bool isScanfLongPattern() const override;
     virtual qint64 totalSpace(const QByteArray& fsPath) const override;
     virtual qint64 freeSpace(const QByteArray& fsPath) const override;
     virtual bool isFolder(const QByteArray& fsPath) const override;
@@ -28,7 +27,6 @@ class PartitionsInformationProvider: public AbstractPartitionsInformationProvide
     mutable QMap<QString, DeviceSpaces> m_deviceSpacesCache;
     mutable QnMutex m_mutex;
     mutable int m_tries;
-    bool m_scanfLongPattern = false;
     QString m_fileName;
 };
 
