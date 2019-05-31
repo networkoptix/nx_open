@@ -10,6 +10,8 @@
 
 #include <analytics/db/config.h>
 
+#include <nx/vms/server/root_fs.h>
+
 #include "analytics_db_cursor.h"
 #include "cursor.h"
 #include "cleaner.h"
@@ -60,7 +62,8 @@ bool EventsStorage::initialize(const Settings& settings)
     m_closingDbController = false;
 
     m_dbController = std::make_unique<DbController>(dbConnectionOptions);
-    if (!m_dbController->initialize()
+    if (!ensureDbDirIsWritable(settings.path)
+        || !m_dbController->initialize()
         || !readMaximumEventTimestamp()
         || !loadDictionaries())
     {
@@ -363,6 +366,28 @@ void EventsStorage::flush(StoreCompletionHandler completionHandler)
         });
 }
 
+bool EventsStorage::ensureDbDirIsWritable(const QString& path)
+{
+    if (!m_mediaServerModule)
+        return true;
+
+    if (!m_mediaServerModule->rootFileSystem()->makeDirectory(path))
+    {
+        NX_WARNING(this, "Failed to create directory %1 on root FS", path);
+        return false;
+    }
+
+    if (!m_mediaServerModule->rootFileSystem()->changeOwner(path))
+    {
+        NX_WARNING(this, "Failed to change owner of directory %1 on root FS", path);
+        return false;
+    }
+
+    NX_DEBUG(this, "Successfully changed access rights for %1", path);
+
+    return true;
+}
+
 bool EventsStorage::readMaximumEventTimestamp()
 {
     try
@@ -510,6 +535,7 @@ DetectionDataSaver EventsStorage::takeDataToSave(
         &m_attributesDao,
         &m_deviceDao,
         &m_objectTypeDao,
+        &m_objectGroupDao,
         &m_objectCache,
         m_analyticsArchiveDirectory.get());
 

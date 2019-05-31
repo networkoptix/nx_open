@@ -8,6 +8,7 @@
 #include "attributes_dao.h"
 #include "device_dao.h"
 #include "object_type_dao.h"
+#include "object_group_dao.h"
 #include "serializers.h"
 
 namespace nx::analytics::db {
@@ -16,12 +17,14 @@ DetectionDataSaver::DetectionDataSaver(
     AttributesDao* attributesDao,
     DeviceDao* deviceDao,
     ObjectTypeDao* objectTypeDao,
+    ObjectGroupDao* objectGroupDao,
     ObjectCache* objectCache,
     AnalyticsArchiveDirectory* analyticsArchive)
     :
     m_attributesDao(attributesDao),
     m_deviceDao(deviceDao),
     m_objectTypeDao(objectTypeDao),
+    m_objectGroupDao(objectGroupDao),
     m_objectCache(objectCache),
     m_analyticsArchive(analyticsArchive)
 {
@@ -197,18 +200,21 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
     auto insertObjectSearchCell = queryContext->connection()->createQuery();
     insertObjectSearchCell->prepare(R"sql(
         INSERT INTO object_search(timestamp_seconds_utc,
-            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
-        VALUES (?, ?, ?, ?, ?)
-    )sql");
-
-    auto insertObjectSearchToAttributesBinding = queryContext->connection()->createQuery();
-    insertObjectSearchToAttributesBinding->prepare(R"sql(
-        INSERT OR IGNORE INTO object_search_to_object(object_search_id, object_id)
-        VALUES (?, ?)
+            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y,
+            object_group_id)
+        VALUES (?, ?, ?, ?, ?, ?)
     )sql");
 
     for (const auto& objectSearchGridCell: m_objectSearchData)
     {
+        std::set<int64_t> objectDbIds;
+        std::transform(
+            objectSearchGridCell.objectIds.begin(), objectSearchGridCell.objectIds.end(),
+            std::inserter(objectDbIds, objectDbIds.end()),
+            [this](const QnUuid& objectId) { return m_objectCache->dbIdFromObjectId(objectId); });
+
+        const auto objectGroupId = m_objectGroupDao->insertOrFetchGroup(queryContext, objectDbIds);
+
         insertObjectSearchCell->bindValue(0,
             (long long) duration_cast<seconds>(objectSearchGridCell.timestamp).count());
 
@@ -216,18 +222,9 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
         insertObjectSearchCell->bindValue(2, objectSearchGridCell.boundingBox.topLeft().y());
         insertObjectSearchCell->bindValue(3, objectSearchGridCell.boundingBox.bottomRight().x());
         insertObjectSearchCell->bindValue(4, objectSearchGridCell.boundingBox.bottomRight().y());
+        insertObjectSearchCell->bindValue(5, (long long) objectGroupId);
 
         insertObjectSearchCell->exec();
-        const auto objectSearchCellId = insertObjectSearchCell->lastInsertId().toLongLong();
-
-        for (const auto& objectId: objectSearchGridCell.objectIds)
-        {
-            const auto objectDbId = m_objectCache->dbIdFromObjectId(objectId);
-
-            insertObjectSearchToAttributesBinding->bindValue(0, objectSearchCellId);
-            insertObjectSearchToAttributesBinding->bindValue(1, (long long) objectDbId);
-            insertObjectSearchToAttributesBinding->exec();
-        }
     }
 }
 

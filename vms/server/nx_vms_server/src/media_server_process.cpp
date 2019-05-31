@@ -4163,7 +4163,9 @@ bool MediaServerProcess::initializeAnalyticsEvents()
         if (policy == nx::vms::api::MetadataStorageChangePolicy::remove)
         {
             if (!QFile::remove(m_oldAnalyticsStoragePath))
-                NX_WARNING(this, "Can not remove database %1", m_oldAnalyticsStoragePath);
+                NX_WARNING(this, "Can't remove analytics database [%1]", m_oldAnalyticsStoragePath);
+            else
+                NX_INFO(this, "Analytics database [%1] removed", m_oldAnalyticsStoragePath);
         }
     }
 

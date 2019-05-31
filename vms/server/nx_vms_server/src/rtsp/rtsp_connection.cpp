@@ -573,9 +573,7 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createRtpEncoder(
     QnUniversalRtpEncoder::Config config;
     config.absoluteRtcpTimestamps = d->serverModule->settings().absoluteRtcpTimestamps();
     config.useRealTimeOptimization = d->serverModule->settings().ffmpegRealTimeOptimization();
-    QString require = nx::network::http::getHeaderValue(d->request.headers, "Require");
-    if (require.toLower().contains("onvif-replay"))
-        config.addOnvifHeaderExtension = true;
+    config.addOnvifHeaderExtension = d->params.onvifReplay();
     if (urlQuery.hasQueryItem("multiple_payload_types"))
         config.useMultipleSdpPayloadTypes = true;
 

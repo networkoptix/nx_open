@@ -68,11 +68,6 @@ private:
         const Filter& filter,
         const TimePeriodsLookupOptions& options);
 
-    void prepareSelectTimePeriodsFilteredQuery(
-        nx::sql::AbstractSqlQuery* query,
-        const Filter& filter,
-        const TimePeriodsLookupOptions& options);
-
     QnTimePeriodList loadTimePeriods(
         nx::sql::AbstractSqlQuery* query,
         const QnTimePeriod& timePeriod,

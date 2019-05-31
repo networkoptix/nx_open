@@ -16,6 +16,7 @@ namespace nx::analytics::db {
 class AttributesDao;
 class DeviceDao;
 class ObjectTypeDao;
+class ObjectGroupDao;
 class AnalyticsArchiveDirectory;
 
 class DetectionDataSaver
@@ -25,6 +26,7 @@ public:
         AttributesDao* attributesDao,
         DeviceDao* deviceDao,
         ObjectTypeDao* objectTypeDao,
+        ObjectGroupDao* objectGroupDao,
         ObjectCache* objectCache,
         AnalyticsArchiveDirectory* analyticsArchive);
 
@@ -68,6 +70,7 @@ private:
     AttributesDao* m_attributesDao = nullptr;
     DeviceDao* m_deviceDao = nullptr;
     ObjectTypeDao* m_objectTypeDao = nullptr;
+    ObjectGroupDao* m_objectGroupDao = nullptr;
     ObjectCache* m_objectCache = nullptr;
     AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
 

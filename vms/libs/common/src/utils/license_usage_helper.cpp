@@ -17,6 +17,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <api/global_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 
@@ -26,12 +27,32 @@
 
 #include <nx/vms/api/types/connection_types.h>
 
-static const QString kLicenseServerUrl("https://licensing.vmsproxy.com/nxlicensed");
+const QString QnLicenseServer::baseUrl(QnCommonModule* commonModule)
+{
+    auto result = commonModule->globalSettings()->licenseServerUrl();
+    while (result.endsWith(L'/'))
+        result.chop(1);
+    return result + "/nxlicensed";
+}
 
-const nx::utils::Url QnLicenseServer::kIndexUrl(kLicenseServerUrl);
-const nx::utils::Url QnLicenseServer::kActivateUrl(kLicenseServerUrl + "/activate.php");
-const nx::utils::Url QnLicenseServer::kDeactivateUrl(kLicenseServerUrl + "/api/v1/deactivate/");
-const nx::utils::Url QnLicenseServer::kValidateUrl(kLicenseServerUrl + "/api/v1/validate/");
+const nx::utils::Url QnLicenseServer::indexUrl(QnCommonModule* commonModule)
+{
+    return baseUrl(commonModule);
+}
+
+const nx::utils::Url QnLicenseServer::activateUrl(QnCommonModule* commonModule)
+{
+    return baseUrl(commonModule) + "/activate.php";
+}
+
+const nx::utils::Url QnLicenseServer::deactivateUrl(QnCommonModule* commonModule)
+{
+    return baseUrl(commonModule) + "/api/v1/deactivate/";
+}
+const nx::utils::Url QnLicenseServer::validateUrl(QnCommonModule* commonModule)
+{
+    return baseUrl(commonModule) + "/api/v1/validate/";
+}
 
 //#define QN_NO_LICENSE_CHECK
 

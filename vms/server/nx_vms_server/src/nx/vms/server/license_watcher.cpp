@@ -129,7 +129,7 @@ void LicenseWatcher::validateData()
     // Object guard is required so we could cancel async operation if it's scheduled when watcher
     // is destroyed.
     QPointer<QObject> objectGuard(this);
-    m_httpClient->doPost(QnLicenseServer::kValidateUrl,
+    m_httpClient->doPost(QnLicenseServer::validateUrl(commonModule()),
         [this, objectGuard]()
         {
             NX_ASSERT(objectGuard, "Destructor must wait for m_httpClient stop.");

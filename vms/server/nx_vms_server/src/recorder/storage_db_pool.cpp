@@ -122,6 +122,7 @@ void QnStorageDbPool::run()
 
         const auto vacuumTask = std::move(m_tasksQueue.front());
         m_tasksQueue.pop();
+        m_overflowWaitCondition.wakeOne();
         lock.unlock();
         vacuumTask();
         lock.relock();
@@ -131,10 +132,10 @@ void QnStorageDbPool::run()
 void QnStorageDbPool::addTask(nx::utils::MoveOnlyFunc<void()> vacuumTask)
 {
     QnMutexLocker lock(&m_tasksMutex);
-    if (m_tasksQueue.size() > kMaxTasksQueueSize)
+    while (m_tasksQueue.size() >= kMaxTasksQueueSize)
     {
-        NX_WARNING(this, "Tasks queue overflow. Dropping a task");
-        return;
+        NX_WARNING(this, "Tasks queue overflow. Waiting for it to free up.");
+        m_overflowWaitCondition.wait(&m_tasksMutex);
     }
 
     m_tasksQueue.push(std::move(vacuumTask));

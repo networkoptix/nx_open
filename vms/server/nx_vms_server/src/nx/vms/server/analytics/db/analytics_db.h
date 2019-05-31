@@ -22,6 +22,7 @@
 #include "device_dao.h"
 #include "detection_data_saver.h"
 #include "object_cache.h"
+#include "object_group_dao.h"
 #include "object_track_aggregator.h"
 #include "object_type_dao.h"
 #include "time_period_dao.h"
@@ -78,6 +79,9 @@ private:
     std::unique_ptr<AnalyticsArchiveDirectory> m_analyticsArchiveDirectory;
     ObjectCache m_objectCache;
     ObjectTrackAggregator m_trackAggregator;
+    ObjectGroupDao m_objectGroupDao;
+
+    bool ensureDbDirIsWritable(const QString& path);
 
     bool readMaximumEventTimestamp();
 

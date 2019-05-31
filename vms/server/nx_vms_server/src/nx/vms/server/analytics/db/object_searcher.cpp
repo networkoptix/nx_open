@@ -266,11 +266,11 @@ std::tuple<QString /*query text*/, nx::sql::Filter> ObjectSearcher::prepareBoxFi
     }
 
     QString queryText = lm(R"sql(
-        SELECT distinct os_to_o.object_id
-          FROM object_search_to_object os_to_o, object_search os
+        SELECT DISTINCT og.object_id
+          FROM object_group og, object_search os
           WHERE
             %1 AND
-            os_to_o.object_search_id = os.id
+            og.group_id = os.object_group_id
     )sql").args(sqlFilter.toString());
 
     return std::make_tuple(std::move(queryText), std::move(sqlFilter));
