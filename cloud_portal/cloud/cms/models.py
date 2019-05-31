@@ -636,10 +636,11 @@ class ProductCustomizationReview(models.Model):
 
     def update_between_published_and_current(self, user, state):
         product = self.version.product
-        versions = product.contentversion_set.filter(id__gt=product.version_id(self.customization),
-                                                     id__lte=self.version_id)
         customization_reviews = ProductCustomizationReview.objects.\
-            filter(version__in=versions, customization=self.customization).distinct()
+            filter(version__id__gt=product.version_id(self.customization),
+                   version__id__lte=self.version_id,
+                   version__product=product,
+                   customization=self.customization).distinct()
         for review in customization_reviews:
             review.update_state(user, state)
 
