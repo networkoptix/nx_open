@@ -36,6 +36,10 @@ QVariantMap engineInfoToVariantMap(const AnalyticsEnginesWatcher::AnalyticsEngin
 
 bool isEngineVisible(const AnalyticsEnginesWatcher::AnalyticsEngineInfo& info)
 {
+    // Device-dependent plugins without settings must be hidden.
+    if (!info.isDeviceDependent)
+        return true;
+
     const auto settings = info.settingsModel.value("items").toArray();
     return !settings.isEmpty();
 }
@@ -158,7 +162,7 @@ void AnalyticsSettingsWidget::Private::addEngine(
     const QnUuid& /*engineId*/,
     const AnalyticsEnginesWatcher::AnalyticsEngineInfo& engineInfo)
 {
-    // Hide engines without settings on the model level.
+    // Hide device-dependent engines without settings on the model level.
     if (!isEngineVisible(engineInfo))
         return;
 
