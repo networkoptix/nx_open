@@ -629,11 +629,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
             case Error::missingPackageError:
             {
                 QStringList packageErrors;
-                auto missing = contents.missingUpdate.size()
-                    + contents.unsuportedSystemsReport.size();
-                //auto clientId = m_stateTracker->getClientPeerId();
-
-                if (missing)
+                if (auto missing = contents.missingUpdate.size())
                 {
                     if (contents.missingUpdate.contains(clientId))
                     {
@@ -651,6 +647,20 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                     else
                     {
                         packageErrors << tr("Missing update package for some servers");
+                    }
+                }
+
+                if (auto unsupported = contents.unsuportedSystemsReport.size())
+                {
+                    if (contents.unsuportedSystemsReport.contains(clientId) && unsupported == 1)
+                    {
+                        packageErrors << tr("OS version of client is no longer supported. "
+                            "Please update its OS to a supported version.");
+                    }
+                    else
+                    {
+                        packageErrors << tr("OS versions of some components are no longer supported. "
+                            "Please remove them from the System or update their OS to a supported version.");
                     }
                 }
 
