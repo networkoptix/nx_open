@@ -76,7 +76,7 @@ def determine_package_versions(
         v["sysroot"] = "wheezy"
         # Bpi original version is build with vdpau support which is no longer needed since lite
         # client is disasbled for bpi.
-        v["ffmpeg"] = "3.1.1-bananapi-2"
+        v["ffmpeg"] = "3.1.9-5"
 
     if target == "linux_arm32":
         v["festival"] = "2.4-1"
