@@ -9,7 +9,7 @@ Control
 
     property int edge: Qt.LeftEdge
     property bool shown: true //< Visibility via opacity.
-    property bool opened: true //< Fully or partially slid in.
+    property bool opened: false //< Fully or partially slid in.
     readonly property bool closed: !opened && !positionAnimation.running //< Fully slid out.
 
     property real borderWidth: 1
@@ -29,12 +29,12 @@ Control
     property real fadeInDuration: fadeDuration
     property real fadeOutDuration: fadeDuration
 
-    // Private.
+    anchors.left: (parent && edge !== Qt.RightEdge) ? parent.left : undefined
+    anchors.right: (parent && edge !== Qt.LeftEdge) ? parent.right : undefined
+    anchors.top: (parent && edge !== Qt.BottomEdge) ? parent.top : undefined
+    anchors.bottom: (parent && edge !== Qt.TopEdge) ? parent.bottom : undefined
 
-    anchors.left: parent ? parent.left : undefined
-    anchors.right: parent ? parent.right : undefined
-    anchors.top: parent ? parent.top : undefined
-    anchors.bottom: parent ? parent.bottom : undefined
+    // Private.
 
     opacity: animatedOpacity
     visible: opacity > 0.0
@@ -99,7 +99,12 @@ Control
             name: "left"
             when: sidePanel.edge === Qt.LeftEdge
 
-            AnchorChanges { target: sidePanel;  anchors.right: undefined }
+            AnchorChanges
+            {
+                target: sidePanel
+                anchors.left: parent ? parent.left : undefined
+            }
+
             AnchorChanges { target: border; anchors.left: undefined }
             AnchorChanges { target: shadow; anchors.left: parent.right; anchors.right: undefined }
 
@@ -134,7 +139,12 @@ Control
             name: "right"
             when: sidePanel.edge === Qt.RightEdge
 
-            AnchorChanges { target: sidePanel; anchors.left: undefined }
+            AnchorChanges
+            {
+                target: sidePanel
+                anchors.right: parent ? parent.right : undefined
+            }
+
             AnchorChanges { target: border; anchors.right: undefined }
             AnchorChanges { target: shadow; anchors.left: undefined; anchors.right: parent.left }
 
@@ -167,9 +177,14 @@ Control
         State
         {
             name: "top"
-            when: sidePanel.edge == Qt.TopEdge
+            when: sidePanel.edge === Qt.TopEdge
 
-            AnchorChanges { target: sidePanel; anchors.bottom: undefined }
+            AnchorChanges
+            {
+                target: sidePanel
+                anchors.top: parent ? parent.top : undefined
+            }
+
             AnchorChanges { target: border; anchors.top: undefined }
             AnchorChanges { target: shadow; anchors.top: parent.bottom; anchors.bottom: undefined }
 
@@ -202,9 +217,14 @@ Control
         State
         {
             name: "bottom"
-            when: sidePanel.edge == Qt.BottomEdge
+            when: sidePanel.edge === Qt.BottomEdge
 
-            AnchorChanges { target: sidePanel; anchors.top: undefined }
+            AnchorChanges
+            {
+                target: sidePanel
+                anchors.bottom: parent ? parent.bottom : undefined
+            }
+
             AnchorChanges { target: border; anchors.bottom: undefined }
             AnchorChanges { target: shadow; anchors.top: undefined; anchors.bottom: parent.top }
 
