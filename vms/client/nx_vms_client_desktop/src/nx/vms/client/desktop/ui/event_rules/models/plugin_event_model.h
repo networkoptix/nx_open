@@ -19,7 +19,9 @@ public:
 
     using QStandardItemModel::QStandardItemModel;
 
-    void buildFromList(const nx::vms::common::AnalyticsEngineResourceList& engines);
+    void filterByCameras(
+        nx::vms::common::AnalyticsEngineResourceList engines,
+        const QnVirtualCameraResourceList& cameras);
     bool isValid() const;
 };
 

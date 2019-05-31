@@ -926,6 +926,14 @@ Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
         contentType, QByteArray(), internalCallback, targetThread);
 }
 
+Handle ServerConnection::retryUpdate(
+    Result<UpdateStatusAllData>::type callback, QThread* targetThread)
+{
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    return executePost<UpdateStatusAllData>("/ec2/retryUpdate",
+        QnRequestParamList(), contentType, QByteArray(), callback, targetThread);
+}
+
 Handle ServerConnection::getUpdateStatus(
     Result<UpdateStatusAllData>::type callback, QThread* targetThread)
 {

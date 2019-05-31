@@ -97,6 +97,11 @@ std::string toString(ResultCode resultCode)
     return QnLexical::serialized(resultCode).toStdString();
 }
 
+void PrintTo(ResultCode val, ::std::ostream* os)
+{
+    *os << toString(val);
+}
+
 //-------------------------------------------------------------------------------------------------
 // Support of nx::network::http::FusionRequestResult
 

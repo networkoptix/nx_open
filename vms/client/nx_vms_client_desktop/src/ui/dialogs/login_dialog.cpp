@@ -271,7 +271,7 @@ void QnLoginDialog::updateFocus()
 nx::utils::Url QnLoginDialog::currentUrl() const
 {
     nx::utils::Url url;
-    url.setScheme(lit("http"));
+    url.setScheme(nx::network::http::kSecureUrlSchemeName);
     url.setHost(ui->hostnameLineEdit->text().trimmed());
     url.setPort(ui->portSpinBox->value());
     url.setUserName(ui->loginLineEdit->text().trimmed());
@@ -764,7 +764,7 @@ void QnLoginDialog::at_moduleChanged(nx::vms::discovery::ModuleEndpoint module)
 
     QnFoundSystemData data;
     data.info = module;
-    data.url.setScheme(lit("http"));
+    data.url.setScheme(nx::network::http::kSecureUrlSchemeName);
     data.url.setHost(module.endpoint.address.toString());
     data.url.setPort(module.endpoint.port);
 

@@ -112,10 +112,10 @@ protected:
     struct ScopedFetchCommit: public nx::utils::SharedGuard
     {
         explicit ScopedFetchCommit(
-            AbstractSearchListModel* model, FetchDirection direction, const FetchResult& result)
+            AbstractSearchListModel* model, FetchDirection direction, FetchResult result)
             :
             nx::utils::SharedGuard(nx::utils::SharedGuardCallback(
-                [model, &result]() { emit model->fetchFinished(result, {}); }))
+                [model, result]() { emit model->fetchFinished(result, {}); }))
         {
             emit model->fetchCommitStarted(direction, {});
         }

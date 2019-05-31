@@ -17,25 +17,23 @@ public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IUncompressedMediaFrame"); }
 
     /**
-     * @return Number of planes with contain war byte data. For video frame, each plane contains
-     * pixel data for a particular channel (e.g. Red, Green, Blue, or Alpha channel). 0 in case
-     * the raw byte data is not accessible for this type of frame.
+     * @return Number of planes which contain raw byte data.
      */
     virtual int planeCount() const = 0;
 
     /**
-     * @param plane Number of the plane, in range 0..planeCount().
+     * @param plane Index of the plane, in range 0..planeCount() - 1.
      * @return Number of bytes accessible via data(plane), or 0 if the data is not accessible.
      */
     virtual int dataSize(int plane) const = 0;
 
     /**
-     * @param plane Number of the plane, in range 0..planeCount().
+     * @param plane Index of the plane, in range 0..planeCount() - 1.
      * @return Pointer to the byte data of the plane, or null if the data is not accessible.
      */
     virtual const char* data(int plane) const = 0;
 };
 
 } // namespace analytics
-} // namesapce sdk
+} // namespace sdk
 } // namespace nx

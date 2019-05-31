@@ -145,6 +145,7 @@
 #include <rest/handlers/update_status_rest_handler.h>
 #include <rest/handlers/install_update_rest_handler.h>
 #include <rest/handlers/cancel_update_rest_handler.h>
+#include <rest/handlers/retry_update.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/iflist_rest_handler.h>
@@ -189,9 +190,9 @@
 #endif
 #include <nx/vms/server/rest/device_analytics_settings_handler.h>
 #include <nx/vms/server/rest/analytics_engine_settings_handler.h>
-
 #include <nx/vms/server/rest/get_time_handler.h>
 #include <nx/vms/server/rest/server_time_handler.h>
+#include <nx/vms/server/rest/plugin_info_handler.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -2578,6 +2579,13 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
 
+    /**%apidoc POST /ec2/retryUpdate
+     * Retries the latest failed update action. E.g. if one of servers has failed update because
+     * there was not enough free space, it will repty to reserve space and start downloading.
+     * %return:object Update status after retry. See ec2/updateStatus.
+     */
+    reg("ec2/retryUpdate", new nx::vms::server::rest::handlers::RetryUpdate(serverModule()));
+
     /**%apidoc GET /ec2/cameraThumbnail
      * Get the static image from the camera.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
@@ -2733,6 +2741,24 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/executeEventAction",
         new nx::vms::server::rest::QnExecuteEventActionRestHandler(serverModule()));
+
+    /**%apidoc GET /api/pluginInfo
+     * %return:object JSON object with an error code, error string, and a list with information
+     *     about Server plugins on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:array reply List of JSON objects with the following structure:
+     *         %param reply[].name Name of the plugin.
+     *         %param reply[].description Description of the plugin.
+     *         %param reply[].vendor Vendor of the plugin.
+     *         %param reply[].version Version of the plugin.
+     *         %param reply[].libraryName Absolute path to the plugin library.
+     *         %param reply[].optionality Indicates whether plugin is optional or not.
+     *         %param reply[].status Status of the plugin after a loading attempt.
+     *         %param reply[].statusMessage Message with details about the plugin loading attempt.
+     */
+    reg("api/pluginInfo",
+        new nx::vms::server::rest::PluginInfoHandler(serverModule()));
 
     /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system

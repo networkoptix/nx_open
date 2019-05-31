@@ -944,9 +944,9 @@ qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
 
     if (const auto& camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
     {
-        const auto cameraAr = camera->aspectRatio();
-        if (cameraAr.isValid())
-            return cameraAr.toFloat();
+        const auto cameraAspectRatio = camera->aspectRatio();
+        if (cameraAspectRatio.isValid())
+            return cameraAspectRatio.toFloat();
     }
 
     if (m_renderer && !m_renderer->sourceSize().isEmpty())

@@ -466,6 +466,10 @@ public:
         std::function<void(Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
+    Handle retryUpdate(
+        Result<UpdateStatusAllData>::type callback,
+        QThread* targetThread = nullptr);
+
     Handle getUpdateStatus(
         Result<UpdateStatusAllData>::type callback,
         QThread* targetThread = nullptr);

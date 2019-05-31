@@ -26,6 +26,64 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
+namespace {
+
+enum class EventContinuityType
+{
+    impulse,
+    prolonged,
+};
+
+struct EventDescriptor
+{
+    std::string eventTypeId;
+    std::string caption;
+    std::string description;
+    EventContinuityType continuityType = EventContinuityType::impulse;
+
+    EventDescriptor(
+        std::string eventTypeId,
+        std::string caption,
+        std::string description,
+        EventContinuityType continuityType)
+        :
+        eventTypeId(std::move(eventTypeId)),
+        caption(std::move(caption)),
+        description(std::move(description)),
+        continuityType(continuityType)
+    {
+    }
+};
+
+static const std::vector<EventDescriptor> kEventsToFire = {
+    {
+        kObjectInTheAreaEventType,
+        "Object in the Area - prolonged event (caption)",
+        "Object in the Area - prolonged event (description)",
+        EventContinuityType::prolonged
+    },
+    {
+        kLineCrossingEventType,
+        "Line crossing - impulse event (caption)",
+        "Line crossing - impulse event (description)",
+        EventContinuityType::impulse
+    },
+    {
+        kSuspiciousNoiseEventType,
+        "Suspicious noise - group impulse event (caption)",
+        "Suspicious noise - group impulse event (description)",
+        EventContinuityType::impulse
+    },
+    {
+        kGunshotEventType,
+        "Gunshot - group impulse event (caption)",
+        "Gunshot - group impulse event (description)",
+        EventContinuityType::impulse
+    }
+};
+
+} // namespace
+
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
     VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
 {
@@ -295,7 +353,6 @@ static IObjectMetadata* makeObjectMetadata(
     int objectIndex)
 {
     auto objectMetadata = new ObjectMetadata();
-    objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
     objectMetadata->setTypeId(objectTypeId);
     objectMetadata->setId(objectId);
     objectMetadata->setBoundingBox(
@@ -360,41 +417,57 @@ void DeviceAgent::generateObjectIds()
 
 IMetadataPacket* DeviceAgent::cookSomeEvents()
 {
-    std::string caption;
-    std::string description;
-    bool isActive;
-
-    if (m_eventTypeId == kLineCrossingEventType)
-    {
-        m_eventTypeId = kObjectInTheAreaEventType;
-        caption = "Object in the Area (caption)";
-        description = "Object in the Area (description)";
-        isActive = true;
-    }
-    else
-    {
-        m_eventTypeId = kLineCrossingEventType;
-        caption = "Line Crossing (caption)";
-        description = "Line Crossing (description)";
-        isActive = false;
-    }
-
-    auto eventMetadata = makePtr<EventMetadata>();
-    eventMetadata->setCaption(caption);
-    eventMetadata->setDescription(description);
-    eventMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
-    eventMetadata->setTypeId(m_eventTypeId);
-    eventMetadata->setIsActive(isActive);
-
+    const auto descriptor = kEventsToFire[m_eventContext.currentEventTypeIndex];
     auto eventMetadataPacket = new EventMetadataPacket();
     eventMetadataPacket->setTimestampUs(usSinceEpoch());
     eventMetadataPacket->setDurationUs(0);
-    eventMetadataPacket->addItem(eventMetadata.get());
+
+    auto eventMetadata = makePtr<EventMetadata>();
+    eventMetadata->setTypeId(descriptor.eventTypeId);
+
+    auto nextEventTypeIndex =
+        [this]()
+        {
+            return (m_eventContext.currentEventTypeIndex == kEventsToFire.size() - 1)
+                ? 0
+                : (m_eventContext.currentEventTypeIndex + 1);
+        };
+
+    bool isActive = false;
+    auto caption = descriptor.caption;
+    auto description = descriptor.description;
+
+    if (descriptor.continuityType == EventContinuityType::prolonged)
+    {
+        static const std::string kStartedSuffix{" STARTED"};
+        static const std::string kFinishedSuffix{" FINISHED"};
+
+        isActive = !m_eventContext.isCurrentEventActive;
+        caption += isActive ? kStartedSuffix : kFinishedSuffix;
+        description += isActive ? kStartedSuffix : kFinishedSuffix;
+
+        eventMetadata->setIsActive(isActive);
+        if (m_eventContext.isCurrentEventActive)
+            m_eventContext.currentEventTypeIndex = nextEventTypeIndex();
+
+        m_eventContext.isCurrentEventActive = isActive;
+    }
+    else
+    {
+        isActive = true;
+        eventMetadata->setIsActive(isActive);
+        m_eventContext.isCurrentEventActive = false;
+        m_eventContext.currentEventTypeIndex = nextEventTypeIndex();
+    }
+
+    eventMetadata->setCaption(std::move(caption));
+    eventMetadata->setDescription(std::move(description));
 
     NX_OUTPUT << "Firing event: "
-        << "type: " << m_eventTypeId
+        << "type: " << descriptor.eventTypeId
         << ", isActive: " << (isActive ? "true" : "false");
 
+    eventMetadataPacket->addItem(eventMetadata.get());
     return eventMetadataPacket;
 }
 

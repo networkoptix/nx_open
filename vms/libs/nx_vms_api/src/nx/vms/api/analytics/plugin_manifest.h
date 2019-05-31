@@ -17,11 +17,14 @@ struct NX_VMS_API PluginManifest
 public: //< Required for Qt MOC run.
     QString id;
     QString name;
+    QString description;
+    QString version;
+    QString vendor;
     QJsonObject engineSettingsModel;
 };
 
 #define nx_vms_api_analytics_PluginManifest_Fields \
-    (id)(name)(engineSettingsModel)
+    (id)(name)(description)(version)(vendor)(engineSettingsModel)
 
 QN_FUSION_DECLARE_FUNCTIONS(PluginManifest, (json), NX_VMS_API)
 

@@ -78,16 +78,3 @@ void PrintTo(const path& val, ::std::ostream* os)
 
 } // namespace filesystem
 } // namespace std
-
-//-------------------------------------------------------------------------------------------------
-
-namespace nx {
-namespace utils {
-
-void PrintTo(const Url& val, ::std::ostream* os)
-{
-    *os << val.toString().toStdString();
-}
-
-} // namespace utils
-} // namespace nx

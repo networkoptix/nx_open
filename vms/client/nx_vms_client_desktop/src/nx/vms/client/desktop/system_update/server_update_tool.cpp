@@ -428,7 +428,7 @@ QSet<QnUuid> ServerUpdateTool::getTargetsForPackage(const nx::update::Package& p
     return package.targets;
 }
 
-bool ServerUpdateTool::uploadPackage(
+int ServerUpdateTool::uploadPackage(
     const nx::update::Package& package,
     const QDir& storageDir)
 {
@@ -436,13 +436,15 @@ bool ServerUpdateTool::uploadPackage(
 
     QString localFile = package.localFile;
 
-    auto targets = package.targets;
+    auto targets = getTargetsForPackage(package);
 
     if (targets.empty())
     {
         NX_WARNING(this, "uploadPackage(%1) - no server wants this package", localFile);
-        return false;
+        return 0;
     }
+
+    int toUpload = 0;
 
     NX_INFO(this, "uploadPackage(%1) - going to upload package to servers", localFile);
 
@@ -473,6 +475,7 @@ bool ServerUpdateTool::uploadPackage(
         {
             m_uploadStateById[id] = config;
             m_activeUploads.insert(id);
+            toUpload++;
         }
         else
         {
@@ -482,7 +485,7 @@ bool ServerUpdateTool::uploadPackage(
         }
     }
 
-    return true;
+    return toUpload;
 }
 
 void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& state)
@@ -550,6 +553,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
     m_completedUploads.clear();
     m_uploadStateById.clear();
 
+    int toUpload = 0;
     if (contents.filesToUpload.isEmpty())
     {
         NX_WARNING(this, "startUpload(%1) - nothing to upload", contents.info.version);
@@ -559,11 +563,12 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
         for (const auto& package: contents.info.packages)
         {
             if (package.isServer())
-                uploadPackage(package, contents.storageDir);
+                toUpload += uploadPackage(package, contents.storageDir);
         }
-        //for (const auto& server: recipients)
-        //    startUpload(server, contents.filesToUpload, contents.storageDir);
     }
+
+    if (toUpload > 0)
+        NX_VERBOSE(this, "startUpload(%1) - started %2 uploads", contents.info.version, toUpload);
 
     if (m_activeUploads.empty() && !m_completedUploads.empty())
         changeUploadState(OfflineUpdateState::done);

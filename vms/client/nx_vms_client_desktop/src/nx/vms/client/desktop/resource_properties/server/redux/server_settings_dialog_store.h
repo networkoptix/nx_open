@@ -32,7 +32,7 @@ public:
     void setOnline(bool value);
 
     Q_INVOKABLE QVariantList pluginModules() const;
-    void setPluginModules(const nx::vms::api::PluginModuleDataList& value);
+    void setPluginModules(const nx::vms::api::PluginInfoList& value);
 
     Q_INVOKABLE QVariant currentPlugin() const;
     Q_INVOKABLE QVariantList currentPluginDetails() const;

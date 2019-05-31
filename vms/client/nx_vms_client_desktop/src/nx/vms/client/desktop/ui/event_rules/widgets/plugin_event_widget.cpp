@@ -117,8 +117,13 @@ void PluginEventWidget::paramsChanged()
 
 void PluginEventWidget::updatePluginEventTypesModel()
 {
-    const auto pirs = resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>();
-    m_pluginEventModel->buildFromList(pirs);
+    const auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+        model()->eventResources());
+
+    m_pluginEventModel->filterByCameras(
+        resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>(),
+        cameras);
+
     ui->pirComboBox->setEnabled(m_pluginEventModel->isValid());
     ui->pirComboBox->model()->sort(0);
 }

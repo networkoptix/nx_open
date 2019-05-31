@@ -56,7 +56,7 @@ QString toString(const DetectedObject& object)
         + ", attributes {";
 
     const QRegularExpression kExpectedCharsOnlyRegex("\\A[A-Za-z_0-9.]+\\z");
-    
+
     bool isFirstAttribute = true;
     for (const auto& attribute: object.labels)
     {
@@ -78,6 +78,7 @@ QString toString(const DetectedObject& object)
     }
 
     s += "}";
+    s += QString(", isBestShot ") + (object.bestShot ? "true" : "false");
     return s;
 }
 

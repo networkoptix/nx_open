@@ -41,8 +41,12 @@ private:
     QFile m_outputFile;
     nx::vms::api::StreamIndex m_streamIndex;
 
+    bool m_isLoggingBestShot = false;
+
     nx::common::metadata::DetectionMetadataPacket m_currentObjectMetadataPacket;
     nx::common::metadata::DetectionMetadataPacket m_prevObjectMetadataPacket;
+
+    nx::common::metadata::DetectionMetadataPacket m_currentBestShotMetadataPacket;
 
     std::chrono::microseconds m_currentFrameTimestamp{0};
     std::chrono::microseconds m_prevFrameTimestamp{0};

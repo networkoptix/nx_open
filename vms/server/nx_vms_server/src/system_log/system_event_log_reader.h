@@ -7,6 +7,7 @@
 #include <QtCore/QString>
 
 #ifdef WIN32
+    #include <Windows.h>
     #include <winevt.h>
 #endif
 

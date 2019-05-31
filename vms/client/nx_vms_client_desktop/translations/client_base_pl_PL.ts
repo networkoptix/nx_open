@@ -8961,7 +8961,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>Nie udało się pobrać aktualizacji do niektórych komponentów</translation>
     </message>
   </context>
   <context>
@@ -10104,17 +10104,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <translation>Potwierdź przechowywanie archiwum danych analitycznych na &apos;%1&apos;</translation>
     </message>
     <message>
       <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
 Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
 By default analytics data will be stored in mediaserver&apos;s installation directory.
 You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <translation>Baza danych analitycznych powinna być przechowywana w lokalnej pamięci masowej i może zajmować do stu gigabajtów.
+Po wybraniu lokalizacji do przechowywania danych analitycznych nie można jej łatwo zmienić bez utraty danych. Zalecamy ostrożne wybranie lokalizacji i nieużywanie partycji systemowej, aby uniknąć awarii systemu.
+Domyślnie dane analityczne będą przechowywane w katalogu instalacyjnym serwera.
+Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</translation>
     </message>
   </context>
   <context>
