@@ -58,10 +58,10 @@ public:
 
     /**
      * In addition to the settings stored in a Server database, a DeviceAgent can have some
-     * settings which are stored somewhere "under the hood" of the Engine, e.g. on a device acting
-     * as a DeviceAgent's backend. Such settings do not need to be explicitly marked in the Settings
-     * Model, but every time the Server offers the user to edit the values, it calls this method and
-     * merges the received values with the ones in its database.
+     * settings which are stored somewhere "under the hood" of the DeviceAgent, e.g. on a device
+     * acting as a DeviceAgent's backend. Such settings do not need to be explicitly marked in the
+     * Settings Model, but every time the Server offers the user to edit the values, it calls this
+     * method and merges the received values with the ones in its database.
      *
      * @return DeviceAgent settings that are stored on the plugin side, or null if there are no
      *     such settings.
