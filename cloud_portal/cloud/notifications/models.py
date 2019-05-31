@@ -12,6 +12,13 @@ from api.models import Account
 USE_SQS_FOR_CLOUD_NOTIFICATIONS = hasattr(settings, "BROKER_TRANSPORT_OPTIONS")
 
 
+class MessageTypes(object):
+    contact_sales = "contact_sales"
+    contact_support = "contact_support"
+    ipvd_feedback_page = "ipvd_feedback_page"
+    ipvd_feedback_device = "ipvd_feedback_device"
+
+
 class Event(models.Model):
     object = models.CharField(max_length=255)
     type = models.CharField(max_length=255)

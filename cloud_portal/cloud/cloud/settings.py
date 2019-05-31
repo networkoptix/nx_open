@@ -424,23 +424,17 @@ NOTIFICATIONS_CONFIG = {
     'activate_account': {
         'engine': 'email'
     },
-    'restore_password': {
-        'engine': 'email'
-    },
-    'system_invite': {
-        'engine': 'email'
-    },
-    'system_shared': {
-        'engine': 'email'
-    },
-    'review_version': {
+    'cloud_invite': {
         'engine': 'email'
     },
     'cloud_notification': {
         'engine': 'email',
         'queue': 'broadcast-notifications'
     },
-    'cloud_invite': {
+    'contact_sales': {
+        'engine': 'email'
+    },
+    'contact_support': {
         'engine': 'email'
     },
     'ipvd_feedback_page': {
@@ -449,10 +443,16 @@ NOTIFICATIONS_CONFIG = {
     'ipvd_feedback_detail': {
         'engine': 'email'
     },
-    'sales_inquiry': {
+    'restore_password': {
         'engine': 'email'
     },
-    'support_request': {
+    'review_version': {
+        'engine': 'email'
+    },
+    'system_invite': {
+        'engine': 'email'
+    },
+    'system_shared': {
         'engine': 'email'
     }
 }

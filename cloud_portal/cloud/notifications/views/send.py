@@ -22,6 +22,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+MESSAGE_TYPES = MessageTypes()
+
 
 # Replaces </p> and <br> with \n and then remove all html tags
 def html_to_text(html):
@@ -73,8 +75,10 @@ def send_event(request):
             validation_error = True
             error_data['type'] = ['This field is required.']
 
-        if 'type' in request.data and request.data['type'] != 'ipvd_feedback_page' and \
-                request.data['type'] != 'ipvd_feedback_device' and 'productId' not in request.data:
+        if 'type' in request.data\
+            and request.data['type'] not in [MESSAGE_TYPES.ipvd_feedback_page,
+                                             MESSAGE_TYPES.ipvd_feedback_device]\
+                and 'productId' not in request.data:
             validation_error = True
             error_data['productId'] = ['This field is required.']
 
@@ -95,7 +99,8 @@ def send_event(request):
                                       error_data=error_data)
 
         product_id = ''
-        if request.data['type'] != 'ipvd_feedback_page' and request.data['type'] != 'ipvd_feedback_device':
+        if request.data['type'] not in [MESSAGE_TYPES.ipvd_feedback_page,
+                                        MESSAGE_TYPES.ipvd_feedback_device]:
             product = Product.objects.filter(id=request.data['productId']).first()
             if product:
                 request.data['product'] = product.name

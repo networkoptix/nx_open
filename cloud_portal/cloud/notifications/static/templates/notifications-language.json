@@ -2,6 +2,24 @@
   "activate_account":{
     "emailSubject": "Activate your account"
   },
+  "cloud_invite": {
+    "emailSubject": "You have been invited to %CLOUD_NAME%"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
+  },
+  "contact_sales": {
+    "emailSubject": "Sales inquiry for {{message.product}}"
+  },
+  "contact_support": {
+    "emailSubject": "Support request for {{message.product}}"
+  },
+  "ipvd_feedback": {
+    "emailSubject": "Camera Page Feedback for {{message.product}}"
+  },
+  "review_version": {
+    "emailSubject": "{{message.product_type}}: {{message.product}} has a new version to review"
+  },
   "restore_password":{
     "emailSubject": "Reset your password"
   },
@@ -10,23 +28,5 @@
   },
   "system_shared":{
     "emailSubject": "Video system {{message.system_name}} was shared with you"
-  },
-  "review_version": {
-    "emailSubject": "{{message.product_type}}: {{message.product}} has a new version to review"
-  },
-  "cloud_notification": {
-    "emailSubject": "{{message.subject}}"
-  },
-  "cloud_invite": {
-    "emailSubject": "You have been invited to %CLOUD_NAME%"
-  },
-  "ipvd_feedback": {
-    "emailSubject": "Camera Page Feedback for {{message.product}}"
-  },
-  "sales_inquiry": {
-    "emailSubject": "Sales inquiry for {{message.product}}"
-  },
-  "support_request": {
-    "emailSubject": "Support request for {{message.product}}"
   }
 }
