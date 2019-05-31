@@ -1,13 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Location }                     from '@angular/common';
 import { ActivatedRoute }               from '@angular/router';
-import { IntegrationService }           from '../integration.service';
-import { DomSanitizer }                 from '@angular/platform-browser';
-import { NxRibbonService }              from '../../../components/ribbon/ribbon.service';
-import { NxConfigService }              from '../../../services/nx-config';
-import { NxModalMessageComponent }      from '../../../dialogs/message/message.component';
-import { NxLanguageProviderService }    from '../../../services/nx-language-provider';
-import { TranslateService }             from '@ngx-translate/core';
+import { IntegrationService }        from '../integration.service';
+import { DomSanitizer }              from '@angular/platform-browser';
+import { NxRibbonService }           from '../../../components/ribbon/ribbon.service';
+import { NxConfigService }           from '../../../services/nx-config';
+import { NxModalMessageComponent }   from '../../../dialogs/message/message.component';
+import { NxLanguageProviderService } from '../../../services/nx-language-provider';
+import { TranslateService }          from '@ngx-translate/core';
+
+import { map }           from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 
 @Component({
     selector   : 'integration-detail-component',
@@ -35,7 +38,7 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
     }
 
     constructor(public sanitizer: DomSanitizer,
-                private _route: ActivatedRoute,
+                private route: ActivatedRoute,
                 private integrationService: IntegrationService,
                 private ribbonService: NxRibbonService,
                 private configService: NxConfigService,
@@ -56,56 +59,69 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                 this.content = {...this.content}; // trigger onChange
         });
 
-        this._route.params.subscribe(params => {
-            if (params.id) {
+        combineLatest(this.route.params, this.route.queryParams)
+                .pipe(map(results => ({ params: results[0], query: results[1] })))
+                .subscribe(results => {
 
-                this.integrationService.setIntegrationPlugin({});
-                this.content = {
-                    selectedSection: '',        // updated by selectedSectionSubject
-                    base  : '/integrations/',   // updated by route param
-                    level1: [
-                        {
-                            id    : '',
-                            label : '',
-                            path  : '',
-                            level2: [
+                    // @ts-ignore
+                    if (results.params.id) {
+
+                        this.integrationService.setIntegrationPlugin({});
+
+                        // @ts-ignore
+                        const query = results.query;
+
+                        this.content = {
+                            selectedSection: '',        // updated by selectedSectionSubject
+                            base  : '/integrations/',   // updated by route param
+                            level1: [
                                 {
-                                    id   : 'how-it-works',
-                                    label: 'How it works',
-                                    path : 'how-it-works',
-                                },
-                                {
-                                    id   : 'how-to-install',
-                                    label: 'How to install?',
-                                    path : 'how-to-install',
+                                    id    : '',
+                                    label : '',
+                                    path  : '',
+                                    level2: [
+                                        {
+                                            id   : 'how-it-works',
+                                            label: 'How it works',
+                                            // path : 'how-it-works',
+                                            path : '',
+                                            query
+                                        },
+                                        {
+                                            id   : 'how-to-install',
+                                            label: 'How to install?',
+                                            path : 'how-to-install',
+                                            query
+                                        }]
                                 }]
-                        }]
-                };
+                        };
 
-                this.integrationService.getIntegrationBy(params.id, params.status)
-                    .subscribe(result => {
-                        if (result.length) {
-                            this.content.base += params.id + '/' + params.state;
+                        // @ts-ignore
+                        this.integrationService.getIntegrationBy(results.params.id, results.query.state)
+                            .subscribe(result => {
+                                if (result.length) {
+                                    // @ts-ignore
+                                    this.content.base += results.params.id;
 
-                            this.plugin = this.integrationService.format(result[0]);
+                                    this.plugin = this.integrationService.format(result[0]);
 
-                            if (this.plugin && (this.plugin.pending && this.plugin.draft)) {
-                                this.ribbonService.show(
-                                        this.lang[this.translate.currentLang].integration.previewRibbonText,
-                                        this.lang[this.translate.currentLang].integration.backToEditText,
-                                        this.config.links.admin.product.replace('%ID%', this.plugin.id)
-                                );
-                            }
+                                    if (this.plugin && (this.plugin.pending && this.plugin.draft)) {
+                                        this.ribbonService.show(
+                                                this.lang[this.translate.currentLang].integration.previewRibbonText,
+                                                this.lang[this.translate.currentLang].integration.backToEditText,
+                                                this.config.links.admin.product.replace('%ID%', this.plugin.id)
+                                        );
+                                    }
 
-                            this.integrationService.setIntegrationPlugin(this.plugin);
-                        }
-                    }).add(() => {
-                        if (!this.plugin) {
-                            this.location.go('404');
-                        }
-                    });
-            }
-        });
+                                    this.integrationService.setIntegrationPlugin(this.plugin);
+                                }
+                            }).add(() => {
+                                if (!this.plugin) {
+                                    this.location.go('404');
+                                }
+                            });
+                    }
+                });
     }
 
     ngOnDestroy() {

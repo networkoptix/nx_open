@@ -20,7 +20,7 @@ export class NxCloudApiService {
 
     getIntegrationBy(id: number, status: string): Observable<any> {
         let uri = this.CONFIG.apiBase + '/integration/' + id;
-        uri += (status) ? '/' + status : '' ;
+        uri += (status) ? '?' + status : '' ;
 
         return this.http.get(uri);
     }

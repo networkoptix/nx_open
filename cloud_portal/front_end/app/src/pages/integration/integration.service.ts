@@ -47,10 +47,10 @@ export class IntegrationService implements OnDestroy {
         }
     }
 
-    formatScreenshots(screenshots) {
+    private formatScreenshots(plugin) {
         const processed: any = [];
 
-        Object.entries(screenshots).forEach((item) => {
+        Object.entries(plugin.overview).forEach((item) => {
             const matchScreenshot = item[0].match(/Screenshot[\d]+$/);
 
             if (matchScreenshot) {
@@ -58,7 +58,7 @@ export class IntegrationService implements OnDestroy {
             }
         });
 
-        Object.entries(screenshots).forEach((item) => {
+        Object.entries(plugin.overview).forEach((item) => {
             const matchCaption = item[0].match(/Screenshot[\d]+caption$/);
 
             if (matchCaption) {
@@ -70,7 +70,7 @@ export class IntegrationService implements OnDestroy {
             }
         });
 
-        return processed;
+        plugin.overview.screenshots = processed;
     }
 
     format(plugin) {
@@ -134,7 +134,7 @@ export class IntegrationService implements OnDestroy {
 
 
         this.setScreenshots(plugin.instructions);
-        this.setScreenshots(plugin.overview);
+        this.formatScreenshots(plugin);
 
         return plugin;
     }

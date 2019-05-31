@@ -17,7 +17,7 @@ const appRoutes: Routes = [
     { path    : 'integrations', component: NxIntegrationsComponent },
     // { path    : 'integrations/:id', component: NxIntegrationDetailsComponent },
     // { path    : 'integrations/:id/pending', component: NxIntegrationDetailsComponent },
-    { path    : 'integrations/:id/:state', component: NxIntegrationDetailsComponent }
+    { path    : 'integrations/:id', component: NxIntegrationDetailsComponent }
 ];
 
 @NgModule({

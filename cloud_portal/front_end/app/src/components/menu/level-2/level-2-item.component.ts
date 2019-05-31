@@ -19,5 +19,7 @@ export class NxLevel2ItemComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.itemPath = this.base;
+        this.itemPath += (this.item.path !== '') ? '/' + this.item.path : '';
     }
 }

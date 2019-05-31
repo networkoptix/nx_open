@@ -371,10 +371,10 @@ window.L = {};
                             .when('/integrations', {
                                 template: ''
                             })
-                            .when('/integrations/:id/:state', {
+                            .when('/integrations/:id', {
                                 template: ''
                             })
-                            .when('/integrations/:id/:state/:section', {
+                            .when('/integrations/:id/:section', {
                                 template: ''
                             })
                             .when('/new-content', {
