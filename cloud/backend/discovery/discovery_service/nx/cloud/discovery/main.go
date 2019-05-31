@@ -60,14 +60,14 @@ func getOnlineNodes(writer http.ResponseWriter, request *http.Request, params ht
 func postNode(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	dao, err := NewDAO()
 	if err != nil {
-		writeError("postNode: db access error", http.StatusInternalServerError, writer, err)
+		writeError("postNode: db access", http.StatusInternalServerError, writer, err)
 		return
 	}
 
 	nodeInfo := &NodeInfo{}
 	err = json.NewDecoder(request.Body).Decode(nodeInfo)
 	if err != nil {
-		writeError("postNode: error deserializing NodeInfo", http.StatusBadRequest, writer, err)
+		writeError("postNode: deserializing NodeInfo", http.StatusBadRequest, writer, err)
 		return
 	}
 
