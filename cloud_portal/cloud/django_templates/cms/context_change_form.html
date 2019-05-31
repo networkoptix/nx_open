@@ -154,16 +154,27 @@
         document.getElementById('context_form').submit();
     }
 
-    var brand_variables = document.getElementsByClassName('brand-variable');
-    for(var i = 0; i < brand_variables.length; i++) {
-            var cv = brand_variables[i];
-            cv.onclick = function(event) {
-                event.preventDefault();
-                editorId = this.closest('.variable-group').getAttribute('data-field-name');
-                brand_var = this.getAttribute('data-name');
-                navigator.clipboard.writeText(brand_var);
-                tinymce.get(editorId).execCommand('mceInsertContent', false, brand_var);
+    var brandVariables = document.getElementsByClassName('brand-variable');
+    for(var i = 0; i < brandVariables.length; i++) {
+        var cv = brandVariables[i];
+        cv.onclick = function(event) {
+            event.preventDefault();
+            inputId = this.closest('.variable-group').getAttribute('data-field-name');
+            inputElement = $('#' + inputId);
+            brandVar = this.getAttribute('data-name');
+            navigator.clipboard.writeText(brandVar);
+            if (inputElement.hasClass('tinymce')) {
+                tinymce.get(inputId).execCommand('mceInsertContent', false, brandVar);
+            } else {
+                carretPos = inputElement.prop('selectionEnd');
+                inputElement.val(
+                    inputElement.val().substring(0, carretPos) + brandVar + inputElement.val().substring(carretPos)
+                ).focus().prop(
+                    {'selectionStart': carretPos + brandVar.length, 'selectionEnd': carretPos + brandVar.length}
+                );
             }
+
+        }
         }
 
     var langSelector = document.getElementById('id_language');
