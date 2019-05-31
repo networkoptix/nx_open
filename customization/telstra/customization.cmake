@@ -12,6 +12,9 @@ set(android.alias "telstra")
 set(android.storepass "5B4M2Gn5")
 set(android.keypass "S6rtgPMk")
 
+set(display_mobile_name "Telstra Video Surveillance Mobile")
+set(mobile_bundle_name "TelstraMobile")
+
 # Support section
 set(companyUrl "https://www.telstra.com.au/")
 set(productUrl "https://www.telstra.com.au/business-enterprise/solutions/security/electronic-security/managed-video-surveillance")
