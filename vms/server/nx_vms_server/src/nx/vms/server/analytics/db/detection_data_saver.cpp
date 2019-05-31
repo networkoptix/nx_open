@@ -222,7 +222,7 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
         insertObjectSearchCell->bindValue(2, objectSearchGridCell.boundingBox.topLeft().y());
         insertObjectSearchCell->bindValue(3, objectSearchGridCell.boundingBox.bottomRight().x());
         insertObjectSearchCell->bindValue(4, objectSearchGridCell.boundingBox.bottomRight().y());
-        insertObjectSearchCell->bindValue(5, objectGroupId);
+        insertObjectSearchCell->bindValue(5, (long long) objectGroupId);
 
         insertObjectSearchCell->exec();
     }
