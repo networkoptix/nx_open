@@ -119,6 +119,15 @@ protected:
         {
             emit model->fetchCommitStarted(direction, {});
         }
+
+        explicit ScopedFetchCommit(
+            AbstractSearchListModel* model, FetchDirection direction, FetchResult* result)
+            :
+            nx::utils::SharedGuard(nx::utils::SharedGuardCallback(
+                [model, result]() { emit model->fetchFinished(*result, {}); }))
+        {
+            emit model->fetchCommitStarted(direction, {});
+        }
     };
 
 protected:
