@@ -12,6 +12,9 @@ set(android.storepass "hYCmvTDu")
 set(android.keypass "31O2zNNy")
 set(android.packageName "com.comm-core.coresmp")
 
+set(display_mobile_name "COREsmp")
+set(mobile_bundle_name "COREsmpMobile")
+
 # Support section
 set(companyUrl "http://www.comm-core.com")
 set(productUrl "http://www.coresmp.com")
@@ -42,7 +45,6 @@ set(mac.protocol_handler_bundle.identifier "com.comm-core.protocol_handler")
 set(ios.new_bundle_identifier "com.comm-core.coresmp")
 set(ios.group_identifier "group.com.comm-core.coresmp")
 set(ios.sign.identity "iPhone Developer: Todd Binkley (DB4VCPQ2W4)")
-set(display.mobile.name "${display.product.name}")
 
 # Other customizations.
 set(freeLicenseIsTrial "true")

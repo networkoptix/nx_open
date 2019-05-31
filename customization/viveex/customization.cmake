@@ -14,6 +14,9 @@ set(android.storepass "hYCmvTDu")
 set(android.keypass "31O2zNNy")
 set(android.packageName "com.daekyocns.viveex")
 
+set(display_mobile_name "VIVEex Mobile")
+set(mobile_bundle_name "VIVEexMobile")
+
 # Support section
 set(companyUrl "http://www.daekyocns.com")
 set(productUrl "http://www.daekyocns.com/viveex")
