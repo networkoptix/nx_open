@@ -10,7 +10,7 @@ import (
 var kCloudModulesXmlTemplateApi = `<?xml version="1.0" encoding="utf-8"?>
 <sequence>
 	<set resName="cdb" resValue="https://%s:443"/>
-	<set resName="hpm" resValue="//%s"/>
+	<set resName="hpm" resValue="%s"/>
 	<set resName="notification_module" resValue="https://%s:443"/>
 </sequence>
 `
