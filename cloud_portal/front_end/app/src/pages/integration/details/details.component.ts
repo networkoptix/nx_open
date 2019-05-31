@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Location }                     from '@angular/common';
 import { ActivatedRoute }               from '@angular/router';
 import { IntegrationService }           from '../integration.service';
 import { DomSanitizer }                 from '@angular/platform-browser';
@@ -18,8 +19,9 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
 
     plugin: any;
     config: any = {};
-    lang: any = {};
     content: any = {};
+    lang: any = {};
+    location: any;
 
     private setupDefaults() {
         this.config = this.configService.getConfig();
@@ -40,8 +42,9 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                 // TODO: Use dialog service when it is not being downgraded
                 private messageDialog: NxModalMessageComponent,
                 private language: NxLanguageProviderService,
-                private translate: TranslateService) {
-
+                private translate: TranslateService,
+                location: Location) {
+        this.location = location;
         this.setupDefaults();
     }
 
@@ -95,6 +98,10 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                             }
 
                             this.integrationService.setIntegrationPlugin(this.plugin);
+                        }
+                    }).add(() => {
+                        if (!this.plugin) {
+                            this.location.go('404');
                         }
                     });
             }

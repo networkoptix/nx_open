@@ -1,11 +1,4 @@
-
 <nx-pre-loader type="page" *ngIf="!list"></nx-pre-loader>
-
-<div class="col text-placeholder d-flex align-items-center"
-     *ngIf="list && !list.length"
-     translate>
-    Nothing Found
-</div>
 
 <div class="row p-0 m-0" *ngIf="list && list.length">
     <div *ngFor="let plugin of list" class="list col-12 col-md-6 col-lg-4 col-xxl-3 p-2">

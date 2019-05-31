@@ -16,7 +16,7 @@ interface Platform {
 })
 export class IntegrationService implements OnDestroy {
     config: any = {};
-    pluginsSubject = new BehaviorSubject([]);
+    pluginsSubject = new BehaviorSubject(undefined);
     selectedSectionSubject = new BehaviorSubject([]);
     plugin: any = {};
     inReview: boolean;

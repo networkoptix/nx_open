@@ -1,4 +1,5 @@
 import { Component, OnInit }  from '@angular/core';
+import { Location }           from '@angular/common';
 import { IntegrationService } from './integration.service';
 import { NxUriService }       from '../../services/uri.service';
 import { NxConfigService }    from '../../services/nx-config';
@@ -19,6 +20,7 @@ export class NxIntegrationsComponent implements OnInit {
     private elements: any;
     private emptyFilter: any = {};
     private filterModel: any = {};
+    location: any;
     params: any;
 
     selectors = {
@@ -46,8 +48,9 @@ export class NxIntegrationsComponent implements OnInit {
                 private integrations: IntegrationService,
                 private config: NxConfigService,
                 private translate: TranslateService,
-                private title: Title) {
-
+                private title: Title,
+                location: Location) {
+        this.location = location;
         this.setupDefaults();
     }
 
@@ -64,16 +67,22 @@ export class NxIntegrationsComponent implements OnInit {
         this.integrations
             .pluginsSubject
             .subscribe((result: any) => {
-                        if (result.length) {
-                            this.allElements = result;
-                            this.setTags();
-                            this.setFilter();
+
+                        if (result) {
+                            if (result.length < 1) {
+                                this.location.go('404');
+                            } else {
+                                this.allElements = result;
+                                this.setTags();
+                                this.setFilter();
+                            }
                         } else {
                             this.elements = undefined;
                         }
                     },
                     error => {
                         console.error('Integration plugins error -> ', error);
+                        this.location.go('404');
                     });
 
         setTimeout(() => {
