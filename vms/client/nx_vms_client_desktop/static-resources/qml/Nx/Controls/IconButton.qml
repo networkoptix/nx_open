@@ -5,8 +5,6 @@ AbstractButton
 {
     id: iconButton
 
-    // TODO: #vkutin What about hi-dpi mode?
-
     property string iconDir: "qrc:/skin"
     property string iconExtension: "png"
     property string iconBaseName: ""
