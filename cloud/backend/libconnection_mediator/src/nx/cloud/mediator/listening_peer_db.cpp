@@ -3,6 +3,7 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/clusterdb/engine/http/http_paths.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/network/stun/stun_types.h>
@@ -312,7 +313,8 @@ std::string ListeningPeerDb::buildInfoJson(const MediatorEndpoint& endpoint) con
     infoJson.mediatorUrls.tcp = nx::network::url::Builder()
         .setScheme(nx::network::http::kUrlSchemeName)
         .setHost(endpoint.domainName.c_str())
-        .setPort(endpoint.httpPort).toString().toStdString();
+        .setPort(endpoint.httpPort)
+        .setPath(nx::hpm::api::kMediatorApiPrefix).toString().toStdString();
 
     infoJson.mediatorUrls.udp = nx::network::url::Builder()
         .setScheme(nx::network::stun::kUrlSchemeName)
