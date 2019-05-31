@@ -535,6 +535,7 @@ DetectionDataSaver EventsStorage::takeDataToSave(
         &m_attributesDao,
         &m_deviceDao,
         &m_objectTypeDao,
+        &m_objectGroupDao,
         &m_objectCache,
         m_analyticsArchiveDirectory.get());
 

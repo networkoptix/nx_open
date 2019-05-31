@@ -41,8 +41,8 @@ int Cleaner::cleanObjectSearch(nx::sql::QueryContext* queryContext)
         queryContext,
         R"sql(
             DELETE FROM object_search WHERE id IN
-                (SELECT id FROM object_search WHERE id IN
-	                (SELECT object_search_id FROM object_search_to_object WHERE object_id IN
+                (SELECT id FROM object_search WHERE object_group_id IN
+	                (SELECT DISTINCT group_id FROM object_group WHERE object_id IN
 		                (SELECT id FROM object WHERE device_id=? AND track_start_ms<?))
                 LIMIT ?)
         )sql");
@@ -53,8 +53,8 @@ int Cleaner::cleanObjectSearchToObject(nx::sql::QueryContext* queryContext)
     return executeObjectDataCleanUpQuery(
         queryContext,
         R"sql(
-            DELETE FROM object_search_to_object WHERE rowid IN
-                (SELECT rowid FROM object_search_to_object WHERE object_id IN
+            DELETE FROM object_group WHERE rowid IN
+                (SELECT rowid FROM object_group WHERE object_id IN
                     (SELECT id FROM object WHERE device_id=? AND track_start_ms<?)
                 LIMIT ?)
         )sql");

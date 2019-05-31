@@ -34,6 +34,7 @@ DbController::DbController(
         dbStructureUpdater().addUpdateScript(kObjectBestShot);
         dbStructureUpdater().addUpdateScript(kCombinedAttributes);
         dbStructureUpdater().addUpdateScript(kFixObjectSearchToObjectIndices);
+        dbStructureUpdater().addUpdateScript(kAddObjectGroups);
     }
 }
 

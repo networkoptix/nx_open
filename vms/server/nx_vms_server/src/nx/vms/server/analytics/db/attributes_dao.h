@@ -2,8 +2,6 @@
 
 #include <QtCore/QCache>
 
-#include <deque>
-
 #include <nx/sql/query_context.h>
 
 #include <analytics/db/analytics_db_types.h>
