@@ -33,7 +33,40 @@
             <div>{{ current_versions.0.id }}</div>
         {% endif %}
         </div>
+
+        {% if related_groups %}
+            <h2>Related Groups</h2>
+            <div class="table-responsive">
+                <table class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <td><strong>Group</strong></td>
+                            <td><strong>Permissions</strong></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for group in related_groups %}
+                        <tr>
+                            <td>
+                                {% if user.is_superuser %}
+                                    <a href="{% url 'admin:api_proxygroup_change' group.pk %}">{{ group.name }}</a>
+                                {% else %}
+                                    {{ group.name }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% for permission in group.permissions.all %}
+                                {{ permission.name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
         <h2>Product Information</h2>
     </div>
     {{ block.super }}
+
 {% endblock %}

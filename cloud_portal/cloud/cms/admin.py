@@ -131,6 +131,10 @@ class ProductAdmin(CMSAdmin):
                 extra_context['current_versions'].append({'customization': customization.name,
                                                           'id': "Not published"})
 
+        extra_context['related_groups'] = Group.objects.filter(
+            usergroupstoproductpermissions__product=product
+        ).prefetch_related('permissions')
+
         return super(ProductAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
         )
