@@ -63,7 +63,8 @@ public:
      * Model, but every time the Server offers the user to edit the values, it calls this method and
      * merges the received values with the ones in its database.
      *
-     * @return DeviceAgent settings that are stored on the plugin side.
+     * @return DeviceAgent settings that are stored on the plugin side, or null if there are no
+     *     such settings.
      */
     virtual IStringMap* pluginSideSettings() const = 0;
 
@@ -76,9 +77,9 @@ public:
 
     /**
      * @param handler Processes event metadata and object metadata fetched by DeviceAgent.
-     *  DeviceAgent should fetch events metadata after setNeededMetadataTypes() call.
-     *  Generic device related events (errors, warning, info messages) might also be reported
-     *  via this handler.
+     *     DeviceAgent should fetch events metadata after setNeededMetadataTypes() call.
+     *     Generic device related events (errors, warning, info messages) might also be reported
+     *     via this handler.
      * @return noError in case of success, other value otherwise.
      */
     virtual Error setHandler(IHandler* handler) = 0;
