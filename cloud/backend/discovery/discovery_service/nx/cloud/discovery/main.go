@@ -120,7 +120,7 @@ func getCloudModulesXmlV1(writer http.ResponseWriter, request *http.Request, par
 
 	xml, err, httpStatusCode := V1CloudModulesXml(request, &onlineNodes[0])
 	if err != nil {
-		writeError("V1CloudModulesXml: V1CloudModulesXml", httpStatusCode, writer, err)
+		writeError("getCloudModulesXmlV1: V1CloudModulesXml", httpStatusCode, writer, err)
 		return
 	}
 
