@@ -10,7 +10,7 @@ type Urls struct {
 }
 
 type MediatorInfoJson struct {
-	MediatorUrls Urls `json:"mediatorUrls`
+	MediatorUrls Urls `json:"mediatorUrls"`
 }
 
 func Deserialize(infoJson string) (MediatorInfoJson, error) {

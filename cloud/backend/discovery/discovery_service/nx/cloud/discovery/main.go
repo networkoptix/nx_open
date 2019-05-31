@@ -10,7 +10,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func writeError(httpStatusCode int, writer http.ResponseWriter, err error) {
+func writeError(apiFunc string, httpStatusCode int, writer http.ResponseWriter, err error) {
+	log.Printf("%s: error: %s\n", apiFunc, err.Error())
 	writer.Header().Set("Content-Type", "text/plain; charset=UTF-8")
 	writer.WriteHeader(httpStatusCode)
 	if err != nil {
@@ -18,31 +19,39 @@ func writeError(httpStatusCode int, writer http.ResponseWriter, err error) {
 	}
 }
 
-func getOnlineNodes(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func getOnlineNodesImpl(clusterId string) ([]Node, error, int /*httpStatusCode*/) {
+	if len(clusterId) == 0 {
+		return nil, errors.New("Cluster id not provided"), http.StatusBadRequest
+	}
+
 	dao, err := NewDAO()
 	if err != nil {
-		log.Println("getOnlineNodes: error connecting to db:", err)
-		writeError(http.StatusInternalServerError, writer, err)
-		return
+		err = errors.New("Failed to create datbase object: " + err.Error())
+		return nil, err, http.StatusInternalServerError
 	}
 
-	onlineNodes, err := dao.GetOnlineNodes(params.ByName("clusterId"))
+	onlineNodes, err := dao.GetOnlineNodes(clusterId)
 	if err != nil {
-		log.Println("getOnlineNodes: error fetching online nodes from db:", err,
-			", clusterId:", params.ByName("clusterId"))
-		writeError(http.StatusInternalServerError, writer, err)
-		return
+		err = errors.New("Failed to fetch online nodes from db: " + err.Error())
+		return nil, err, http.StatusInternalServerError
 	}
-
 	if len(onlineNodes) == 0 {
-		errStr := "getOnlineNodes: no nodes matching clusterId: " + params.ByName("clusterId")
-		writeError(http.StatusNotFound, writer, errors.New(errStr))
+		err = errors.New("No online nodes matching clusterId: " + clusterId)
+		return nil, err, http.StatusNotFound
+	}
+	return onlineNodes, nil, http.StatusOK
+}
+
+func getOnlineNodes(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	onlineNodes, err, httpStatusCode := getOnlineNodesImpl(params.ByName("clusterId"))
+	if err != nil {
+		writeError("getOnlineNodes", httpStatusCode, writer, err)
 		return
 	}
 
 	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	writer.WriteHeader(http.StatusOK)
-	json.NewEncoder(writer).Encode(onlineNodes) //< Serializing directly into the message body
+	err = json.NewEncoder(writer).Encode(onlineNodes) //< Serializing directly into the message body
 	if err != nil {
 		log.Println("getOnlineNodes: error encoding to json:", err)
 	}
@@ -51,16 +60,14 @@ func getOnlineNodes(writer http.ResponseWriter, request *http.Request, params ht
 func postNode(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	dao, err := NewDAO()
 	if err != nil {
-		log.Println("postNode: db access error: ", err)
-		writeError(http.StatusInternalServerError, writer, err)
+		writeError("postNode: db access error", http.StatusInternalServerError, writer, err)
 		return
 	}
 
 	nodeInfo := &NodeInfo{}
 	err = json.NewDecoder(request.Body).Decode(nodeInfo)
 	if err != nil {
-		log.Println("postNode: Info json decoding error:", err)
-		writeError(http.StatusBadRequest, writer, err)
+		writeError("postNode: error deserializing NodeInfo", http.StatusBadRequest, writer, err)
 		return
 	}
 
@@ -74,8 +81,7 @@ func postNode(writer http.ResponseWriter, request *http.Request, params httprout
 
 	err = dao.InsertOrUpdate(node, params.ByName("clusterId"))
 	if err != nil {
-		log.Println("postNode: db insertOrUpdate error:", err, ", with node:", node)
-		writeError(http.StatusInternalServerError, writer, err)
+		writeError("postNode: dao.insertOrUpdate", http.StatusInternalServerError, writer, err)
 		return
 	}
 
@@ -83,44 +89,20 @@ func postNode(writer http.ResponseWriter, request *http.Request, params httprout
 	writer.WriteHeader(http.StatusCreated)     //< Need to write the header before message body
 	err = json.NewEncoder(writer).Encode(node) //< Serializing directly into the message body
 	if err != nil {
-		log.Println("postNode: error encoding to json:", err)
+		log.Println("postNode: json encoding error:", err)
 	}
 }
 
 func getCloudModulesXmlApi(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	mediatorClusterId := request.URL.Query().Get("mediatorCluster")
-	if len(mediatorClusterId) == 0 {
-		writeError(http.StatusBadRequest, writer,
-			errors.New(`Missing "mediatorCluster" query param`))
-		return
-	}
-
-	dao, err := NewDAO()
-	if err != nil {
-		log.Println("getCloudModulesXmlApi: error connecting to db:", err)
-		writeError(http.StatusInternalServerError, writer, err)
-		return
-	}
-
-	onlineNodes, err := dao.GetOnlineNodes(mediatorClusterId)
-	if err != nil {
-		log.Println("getCloudModulesXmlApi: error fetching online nodes from db:", err,
-			", clusterId:", mediatorClusterId)
-		writeError(http.StatusInternalServerError, writer, err)
-		return
-	}
+	onlineNodes, err, httpStatusCode := getOnlineNodesImpl(request.URL.Query().Get("mediatorCluster"))
 	if len(onlineNodes) == 0 {
-		log.Println("getCloudModulesXmlApi: No online nodes matching clusterId:",
-			mediatorClusterId)
-		writeError(http.StatusNotFound, writer,
-			errors.New("No online nodes matching clusterId: "+mediatorClusterId))
+		writeError("getCloudModulesXmlApi: getOnlineNodesImpl", httpStatusCode, writer, err)
 		return
 	}
 
-	xml, err := ApiCloudModulesXml(request, &onlineNodes[0])
+	xml, err, httpStatusCode := ApiCloudModulesXml(request, &onlineNodes[0])
 	if err != nil {
-		log.Println("getCloudModulesXmlApi error:", err.Error())
-		writeError(http.StatusBadRequest, writer, err)
+		writeError("getCloudModulesXmlApi: ApiCloudModulesXml", httpStatusCode, writer, err)
 		return
 	}
 
@@ -130,39 +112,15 @@ func getCloudModulesXmlApi(writer http.ResponseWriter, request *http.Request, pa
 }
 
 func getCloudModulesXmlV1(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	mediatorClusterId := request.URL.Query().Get("mediatorCluster")
-	if len(mediatorClusterId) == 0 {
-		writeError(http.StatusBadRequest, writer,
-			errors.New(`Missing "mediatorCluster" query param`))
+	onlineNodes, err, httpStatusCode := getOnlineNodesImpl(request.URL.Query().Get("mediatorCluster"))
+	if err != nil {
+		writeError("getCloudModulesXmlV1: getOnlineNdoesImpl", httpStatusCode, writer, err)
 		return
 	}
 
-	dao, err := NewDAO()
+	xml, err, httpStatusCode := V1CloudModulesXml(request, &onlineNodes[0])
 	if err != nil {
-		log.Println("getCloudModulesXmlApi: error connecting to db:", err)
-		writeError(http.StatusInternalServerError, writer, err)
-		return
-	}
-
-	onlineNodes, err := dao.GetOnlineNodes(mediatorClusterId)
-	if err != nil {
-		log.Println("getCloudModulesXmlApi: error fetching online nodes from db:", err,
-			", clusterId:", mediatorClusterId)
-		writeError(http.StatusInternalServerError, writer, err)
-		return
-	}
-	if len(onlineNodes) == 0 {
-		log.Println("getCloudModulesXmlApi: No online nodes matching clusterId:",
-			mediatorClusterId)
-		writeError(http.StatusNotFound, writer,
-			errors.New("No online nodes matching clusterId: "+mediatorClusterId))
-		return
-	}
-
-	xml, err := V1CloudModulesXml(request, &onlineNodes[0])
-	if err != nil {
-		log.Println("getCloudModulesXmlApi error:", err.Error())
-		writeError(http.StatusBadRequest, writer, err)
+		writeError("V1CloudModulesXml: V1CloudModulesXml", httpStatusCode, writer, err)
 		return
 	}
 

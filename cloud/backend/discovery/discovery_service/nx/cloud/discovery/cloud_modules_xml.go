@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -11,7 +10,6 @@ var kCloudModulesXmlTemplateApi = `<?xml version="1.0" encoding="utf-8"?>
 <sequence>
 	<set resName="cdb" resValue="https://%s:443"/>
 	<set resName="hpm" resValue="%s"/>
-	<set resName="notification_module" resValue="https://%s:443"/>
 </sequence>
 `
 
@@ -26,49 +24,47 @@ var kCloudModulesXmlTemplateV1 = `<?xml version="1.0" encoding="utf-8"?>
 </sequence>
 `
 
-func ApiCloudModulesXml(request *http.Request, node *Node) (string, error) {
+func ApiCloudModulesXml(request *http.Request, node *Node) (string, error, int /*httpStatusCode*/) {
 	cdbHost := request.URL.Query().Get("cdbHost")
 	if len(cdbHost) == 0 {
-		return "", errors.New(`http request missing query param "cdbHost"`)
+		return "", errors.New(`Http request missing query param "cdbHost"`), http.StatusBadRequest
 	}
 
 	infoJson, err := Deserialize(node.InfoJson)
 	if err != nil {
-		log.Println("Error deserializing mediatorInfoJson:", err.Error())
-		return "", err
+		err = errors.New("Error deserializing mediatorInfoJson: " + err.Error())
+		return "", err, http.StatusBadRequest
 	}
 	udpUrl := infoJson.MediatorUrls.Udp
 	if len(udpUrl) == 0 {
-		log.Println("Error: udp url is empty")
-		return "", errors.New("udp url is empty")
+		return "", errors.New("udp url is empty"), http.StatusBadRequest
 	}
 
-	return fmt.Sprintf(kCloudModulesXmlTemplateApi, cdbHost, udpUrl, cdbHost), nil
+	return fmt.Sprintf(kCloudModulesXmlTemplateApi, cdbHost, udpUrl), nil, http.StatusOK
 }
 
-func V1CloudModulesXml(request *http.Request, node *Node) (string, error) {
+func V1CloudModulesXml(request *http.Request, node *Node) (string, error, int /*httpStatusCode*/) {
 	cdbHost := request.URL.Query().Get("cdbHost")
 	if len(cdbHost) == 0 {
-		return "", errors.New(`http request missing query param "cdbHost"`)
+		return "", errors.New(`http request missing query param "cdbHost"`), http.StatusBadRequest
 	}
 
 	infoJson, err := Deserialize(node.InfoJson)
 	if err != nil {
-		log.Println("Error deserializing mediatorInfoJson:", err.Error())
-		return "", err
+		err = errors.New("Error deserializing MediatorInfoJson: " + err.Error())
+		return "", err, http.StatusBadRequest
 	}
 
 	tcpUrl := infoJson.MediatorUrls.Tcp
 	udpUrl := infoJson.MediatorUrls.Udp
 
 	if len(tcpUrl) == 0 {
-		log.Println("Error: tcp url is empty")
-		return "", errors.New("tcp url is empty")
+		return "", errors.New("tcp url is empty"), http.StatusBadRequest
 	}
 	if len(udpUrl) == 0 {
-		log.Println("Error: tcp url is empty")
-		return "", errors.New("udp url is empty")
+		return "", errors.New("udp url is empty"), http.StatusBadRequest
 	}
 
-	return fmt.Sprintf(kCloudModulesXmlTemplateV1, cdbHost, tcpUrl, udpUrl, cdbHost), nil
+	xml := fmt.Sprintf(kCloudModulesXmlTemplateV1, cdbHost, tcpUrl, udpUrl, cdbHost)
+	return xml, nil, http.StatusOK
 }
