@@ -27,7 +27,7 @@
                        pattern="{{ config.emailRegex }}" maxlength="255"
                        required>
             </div>
-            <div class="form-group">
+            <div class="form-group" *ngIf="topics && topics.length > 1">
                 <label for="topic" translate>Topic</label>
                 <nx-select id="topic"
                            [selected]="topics[0]"

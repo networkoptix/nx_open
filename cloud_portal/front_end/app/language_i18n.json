@@ -96,6 +96,7 @@
     "The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.": "The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.",
     "There will be more than": "There will be more than",
     "Too many attempts. Try again in a minute.": "Too many attempts. Try again in a minute.",
+    "Topic": "Topic",
     "Update them to the": "Update them to the",
     "Updated": "Updated",
     "User": "User",

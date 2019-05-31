@@ -21,7 +21,7 @@
     "title": {
       "integration": "Email for {{product}}",
       "ipvd_feedback_page": "Feedback for cameras page",
-      "ipvd_feedback_device": "Feedback about {{product}}",
+      "ipvd_feedback_device": "Feedback about {{product}}"
     },
     "topic": {
       "ipvd_feedback_page": "Feedback for cameras page",
