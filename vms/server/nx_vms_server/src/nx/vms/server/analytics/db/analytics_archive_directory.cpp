@@ -18,7 +18,8 @@ bool AnalyticsArchiveDirectory::saveToArchive(
     const QnUuid& deviceId,
     std::chrono::milliseconds timestamp,
     const std::vector<QRect>& region,
-    int64_t objectType,
+    uint32_t objectsGroupId,
+    uint32_t objectType,
     int64_t allAttributesHash)
 {
     auto& archive = m_deviceIdToArchive[deviceId];
@@ -42,7 +43,8 @@ bool AnalyticsArchiveDirectory::saveToArchive(
 #endif
     }
 
-    return archive->saveToArchive(timestamp, region, objectType, allAttributesHash);
+    return archive->saveToArchive(
+        timestamp, region, objectsGroupId, objectType, allAttributesHash);
 }
 
 QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(

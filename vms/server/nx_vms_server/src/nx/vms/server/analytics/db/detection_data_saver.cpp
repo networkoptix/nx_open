@@ -241,6 +241,7 @@ void DetectionDataSaver::saveToAnalyticsArchive(nx::sql::QueryContext* queryCont
             item.deviceId,
             item.timestamp,
             std::vector<QRect>(item.region.begin(), item.region.end()),
+            item.objectsGroupId,
             item.objectType,
             item.combinedAttributesId);
         if (!result)
@@ -282,7 +283,8 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
     {
         AnalArchiveItem archiveItem;
         archiveItem.deviceId = deviceIdAndObjectType.first;
-        archiveItem.combinedAttributesId = 
+        // TODO: #akolesnikov fill objectsGroupId here
+        archiveItem.combinedAttributesId =
             m_attributesDao->combineAttributes(queryContext, item.attributesIds);
         archiveItem.objectType = deviceIdAndObjectType.second;
         archiveItem.region = item.region;

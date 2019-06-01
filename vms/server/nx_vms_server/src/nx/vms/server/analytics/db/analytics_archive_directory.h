@@ -35,7 +35,8 @@ public:
         const QnUuid& deviceId,
         std::chrono::milliseconds timestamp,
         const std::vector<QRect>& region,
-        int64_t objectType,
+        uint32_t objectsGroupId,
+        uint32_t objectType,
         int64_t allAttributesHash);
 
     QnTimePeriodList matchPeriods(

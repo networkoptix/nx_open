@@ -250,6 +250,8 @@ int MetadataArchive::getSizeForTime(qint64 timeMs, bool reloadIndex)
 }
 
 void MetadataArchive::loadDataFromIndex(
+    MatchExtraDataFunc matchExtraData,
+    std::function<bool()> interruptionCallback,
     const Filter& filter,
     QFile& metadataFile,
     const IndexHeader& indexHeader,
@@ -279,7 +281,7 @@ void MetadataArchive::loadDataFromIndex(
         while (i < endItr && curData < dataEnd)
         {
             if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd)
-                && matchAdditionData(filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes))
+                && (!matchExtraData || matchExtraData(filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes)))
             {
                 qint64 fullStartTime = i->start + indexHeader.startTime;
 
@@ -302,6 +304,9 @@ void MetadataArchive::loadDataFromIndex(
                     }
                 }
             }
+            if (interruptionCallback && interruptionCallback())
+                return;
+
             curData += recordSize();
             ++i;
         }
@@ -310,6 +315,8 @@ void MetadataArchive::loadDataFromIndex(
 }
 
 void MetadataArchive::loadDataFromIndexDesc(
+    MatchExtraDataFunc matchExtraData,
+    std::function<bool()> interruptionCallback,
     const Filter& filter,
     QFile& metadataFile,
     const IndexHeader& indexHeader,
@@ -338,11 +345,11 @@ void MetadataArchive::loadDataFromIndexDesc(
             break;
 
         quint8* dataEnd = buffer + readed;
-        quint8* curData = buffer;
-        while (i >= startItr && curData < dataEnd)
+        quint8* curData = dataEnd - recordSize();
+        while (i >= startItr && curData >= buffer)
         {
             if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd)
-                && matchAdditionData(filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes))
+                && (!matchExtraData || matchExtraData(filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes)))
             {
                 qint64 fullStartTimeMs = i->start + indexHeader.startTime;
 
@@ -367,14 +374,20 @@ void MetadataArchive::loadDataFromIndexDesc(
                     }
                 }
             }
-            curData += recordSize();
+            if (interruptionCallback && interruptionCallback())
+                return;
+
+            curData -= recordSize();
             --i;
         }
         totalSteps -= readed / recordSize();
     }
 }
 
-QnTimePeriodList MetadataArchive::matchPeriodInternal(const Filter& filter)
+QnTimePeriodList MetadataArchive::matchPeriodInternal(
+    const Filter& filter,
+    MatchExtraDataFunc matchExtraData,
+    std::function<bool()> interruptionCallback)
 {
     qint64 msStartTime = filter.startTime.count();
     qint64 msEndTime = filter.endTime.count();
@@ -434,12 +447,16 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(const Filter& filter)
 
             if (descendingOrder)
             {
-                loadDataFromIndexDesc(filter, metadataFile, indexHeader, index, startItr, endItr,
+                loadDataFromIndexDesc(
+                    matchExtraData, interruptionCallback,
+                    filter, metadataFile, indexHeader, index, startItr, endItr,
                     buffer, mask, maskStart, maskEnd, rez);
             }
             else
             {
-                loadDataFromIndex(filter, metadataFile, indexHeader, index, startItr, endItr,
+                loadDataFromIndex(
+                    matchExtraData, interruptionCallback,
+                    filter, metadataFile, indexHeader, index, startItr, endItr,
                     buffer, mask, maskStart, maskEnd, rez);
             }
 
@@ -451,6 +468,9 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(const Filter& filter)
             msEndTime = minTime - 1;
         else
             msStartTime = maxTime + 1;
+
+        if (interruptionCallback && interruptionCallback())
+            break;
     }
     NX_VERBOSE(this, lm("Found %1 motion period(s) for camera %2 for range %3-%4")
         .args(rez.size(), m_uniqueId, filter.startTime, filter.endTime));

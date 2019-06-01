@@ -63,7 +63,12 @@ public:
 protected:
     static const int kGridDataSizeBytes = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8;
 
-    QnTimePeriodList matchPeriodInternal(const Filter& filter);
+    using MatchExtraDataFunc = std::function<bool(const Filter&, const quint8*, int)>;
+
+    QnTimePeriodList matchPeriodInternal(
+        const Filter& filter,
+        MatchExtraDataFunc matchExtraData = nullptr,
+        std::function<bool()> interruptionCallback = nullptr);
     QString getFilePrefix(const QDate& datetime) const;
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate) const;
     void fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile) const;
@@ -76,12 +81,12 @@ protected:
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDate& time) const;
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, qint64 msTime) const;
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, QFile& indexFile) const;
-protected:
-    virtual bool matchAdditionData(const Filter& /*filter*/, const quint8* /*data*/, int /*size*/) { return true; }
 private:
     int getSizeForTime(qint64 timeMs, bool reloadIndex);
 
     void loadDataFromIndex(
+        MatchExtraDataFunc matchExtraData,
+        std::function<bool()> interruptionCallback,
         const Filter& filter,
         QFile& motionFile,
         const IndexHeader& indexHeader,
@@ -94,6 +99,8 @@ private:
         int maskEnd,
         QnTimePeriodList& rez);
     void loadDataFromIndexDesc(
+        MatchExtraDataFunc matchExtraData,
+        std::function<bool()> interruptionCallback,
         const Filter& filter,
         QFile& motionFile,
         const IndexHeader& indexHeader,

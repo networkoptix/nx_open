@@ -779,7 +779,7 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(
     if (nonEmptyPeriods.size() == 1)
     {
         QnTimePeriodList result = nonEmptyPeriods.first();
-        if (result.size() > limit)
+        if (result.size() > limit && limit > 0)
             result.resize(limit);
         return result;
     }

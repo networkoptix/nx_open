@@ -51,6 +51,7 @@ private:
     struct AnalArchiveItem
     {
         QnUuid deviceId;
+        uint32_t objectsGroupId = 0;
         int objectType = -1;
         std::chrono::milliseconds timestamp = std::chrono::milliseconds::zero();
         /**
