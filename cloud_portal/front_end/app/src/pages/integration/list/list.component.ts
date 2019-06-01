@@ -19,7 +19,6 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
 
     @Input() list;
 
-    defaultLogo: string;
     config: any;
     lang: any;
 
@@ -41,10 +40,6 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
         this.setupDefaults();
     }
 
-    setPlugunLogo(plugin) {
-        plugin.information.logo = plugin.information.logo || this.defaultLogo;
-    }
-
     ngOnDestroy() {
         this.ribbonService.hide();
     }
@@ -54,8 +49,9 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
         if (changes.list.currentValue) {
             // inject platform icons info
             changes.list.currentValue.forEach(plugin => {
+                plugin.versionDetails.version = (plugin.versionDetails.version) ? 'v.&nbsp;' + plugin.versionDetails.version : '&nbsp;';
                 plugin.information.platforms.icons = this.integrations.setPlatformIcons(plugin);
-                this.setPlugunLogo(plugin);
+                plugin.information.logo = plugin.information.logo || this.config.icons.default;
 
                 haveInReviewOrDraft = haveInReviewOrDraft || plugin.pending || plugin.draft;
                 plugin.state = (plugin.pending) ? 'pending' : (plugin.draft) ? 'draft' : undefined;

@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 
 /* Usage
-<nx-block type?="gray | ...more to come" fixed-height? hoverable? extended-header?>
+<nx-block type?="gray | ...more to come" fixed-height? hoverable? header-style="extended | slim"?>
     <header>
         TITLE
     </header>
@@ -38,7 +38,7 @@ export class NxContentBlockComponent implements OnInit {
     @Input('type') type: string;
     @Input('fixed-height') fixedHeight: any;
     @Input('hoverable') hoverable: any;
-    @Input('extended-header') extendedHeader: any;
+    @Input('header-style') headerStyle: any;
 
     haveHeader: boolean;
     haveFooter: boolean;
@@ -57,6 +57,7 @@ export class NxContentBlockComponent implements OnInit {
 
         this.fixedHeight = (this.fixedHeight !== undefined);
         this.hoverable = (this.hoverable !== undefined);
-        this.extendedHeader = (this.extendedHeader !== undefined);
+
+        this.headerStyle = (this.headerStyle) ? this.headerStyle + '-header' : '';
     }
 }

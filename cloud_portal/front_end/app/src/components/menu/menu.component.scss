@@ -1,7 +1,11 @@
 @import '../../styles/mixins';
 
 .menu {
-    nx-level-1-item {}
+    padding          : .5rem 0;
+    background-color : $light4;
+    
+    nx-level-1-item {
+    }
     
     nx-level-2-item {
         width       : 100%;
@@ -9,5 +13,6 @@
         line-height : 26px;
     }
     
-    nx-level-3-item {}
+    nx-level-3-item {
+    }
 }

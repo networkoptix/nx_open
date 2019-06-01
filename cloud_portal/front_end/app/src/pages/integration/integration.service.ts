@@ -133,6 +133,7 @@ export class IntegrationService implements OnDestroy {
             });
         }
 
+        plugin.versionDetails.version = (plugin.versionDetails.version) ? 'v.&nbsp;' + plugin.versionDetails.version : '&nbsp;';
         plugin.information.platforms.icons = this.setPlatformIcons(plugin);
 
         this.setScreenshots(plugin.instructions);

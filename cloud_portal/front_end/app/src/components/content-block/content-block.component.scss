@@ -65,7 +65,8 @@
     
     &.gray {
         background-color : $light4;
-        border           : none;
+        border           : 1px solid $light4;
+        border-bottom    : none;
         
         .card--header {
             background-color    : $light4;
@@ -87,10 +88,19 @@
         overflow : hidden;
     }
     
+    
+    
     &.extended-header {
         .card--header {
             height  : auto;
             padding : 1rem;
+        }
+    }
+    
+    &.slim-header {
+        .card--header {
+            height  : auto;
+            padding : rem(12px);
         }
     }
 }

@@ -12,13 +12,13 @@
         <a class="plugin m-0"
            [href]="plugin.link">
 
-            <nx-block fixed-height hoverable extended-header>
+            <nx-block fixed-height hoverable header-style="extended">
                 <header>
                     <div class="card--header-logo"
                          [style.backgroundImage]="'url(' + plugin.information.logo + ')'">
                     </div>
                     <div class="card--header-info">
-                        <div class="version">v. {{ plugin.versionDetails.version }}</div>
+                        <div class="version" [innerHTML]="plugin.versionDetails.version"></div>
                         <div class="platforms">
                             <div *ngFor="let icon of plugin.information.platforms.icons">
                                 <img [src]="icon.src">
