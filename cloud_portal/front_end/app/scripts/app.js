@@ -96,6 +96,7 @@ window.L = {};
                     appState.feedbackEnabled = response.feedbackEnabled;
                     appState.footerItems = response.footerItems ? JSON.parse(response.footerItems) : {};
                     appState.integrationFilterItems = response.integrationFilterItems ? JSON.parse(response.integrationFilterItems) : {};
+                    appState.integrationStoreEnabled = response.integrationStoreEnabled;
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
                     appState.trafficRelayHost = response.trafficRelayHost;

@@ -68,7 +68,7 @@ export class NxIntegrationsComponent implements OnInit {
             .pluginsSubject
             .subscribe((result: any) => {
                 if (result) {
-                    if (result.length < 1) {
+                    if (!this.CONFIG.integrationStoreEnabled && result.length < 1) {
                         this.location.go('404');
                     } else {
                         this.allElements = result;
