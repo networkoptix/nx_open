@@ -636,7 +636,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         else
             avPkt.dts = dts;
         const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.get());
-        if (video && video->pts != AV_NOPTS_VALUE)
+        if (video && video->pts != AV_NOPTS_VALUE && !video->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
             avPkt.pts = av_rescale_q(video->pts - m_startDateTimeUs, srcRate, stream->time_base) + (avPkt.dts - dts);
         else
             avPkt.pts = avPkt.dts;
@@ -705,6 +705,11 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 void QnStreamRecorder::endOfRun()
 {
     close();
+}
+
+void QnStreamRecorder::setTranscoderFixedFrameRate(int value)
+{
+    m_transcoderFixedFrameRate = value;
 }
 
 bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData)
@@ -868,6 +873,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     m_videoTranscoder->setFilterList(*m_transcodeFilters);
                     m_videoTranscoder->setQuality(Qn::StreamQuality::highest);
                     m_videoTranscoder->open(videoData); // reopen again for new size
+                    if (m_transcoderFixedFrameRate)
+                        m_videoTranscoder->setFixedFrameRate(m_transcoderFixedFrameRate);
                     QnFfmpegHelper::copyAvCodecContex(videoStream->codec, m_videoTranscoder->getCodecContext());
                 }
                 else if (mediaData->context && mediaData->context->getWidth() > 0
