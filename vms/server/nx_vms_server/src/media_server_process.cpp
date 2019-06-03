@@ -185,6 +185,7 @@
 #include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
 #include <rest/handlers/wearable_camera_rest_handler.h>
 #include <rest/handlers/set_primary_time_server_rest_handler.h>
+#include <rest/handlers/persistent_update_storage_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -2546,6 +2547,14 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings(),
         commonModule()->engineVersion()));
+
+    /**%apidoc POST /ec2/updatePersistenStorages
+     * Retrieves a currently present or specified via a parameter update information manifest.
+     * %param:object JSON representation of the list of the servers selected for persistent update
+     *      files storing.
+     * %return:object JSON with the update manifest.
+     */
+    reg("ec2/updatePersistenStorages", new QnPersistentUpdateStorageRestHandler(serverModule()));
 
     /**%apidoc POST /ec2/startUpdate
      * Starts an update process.
