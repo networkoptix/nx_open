@@ -228,7 +228,7 @@ void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
 bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFromUser)
 {
     Ptr<IStringMap> effectiveSettings;
-    if (pluginsIni().analyticsDeviceAgentSettingsPath[0] != '\0')
+    if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
     {
         NX_WARNING(this, "Trying to load settings for the DeviceAgent from the file. "
             "Device: %1 (%2), Engine: %3 (%4)",
@@ -237,7 +237,8 @@ bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFrom
             m_engine->getName(),
             m_engine->getId());
 
-        effectiveSettings = debug_helpers::loadDeviceAgentSettingsFromFile(m_device, m_engine);
+        effectiveSettings = debug_helpers::loadDeviceAgentSettingsFromFile(
+            m_device, m_engine, pluginsIni().analyticsSettingsSubstitutePath);
     }
 
     if (!effectiveSettings)

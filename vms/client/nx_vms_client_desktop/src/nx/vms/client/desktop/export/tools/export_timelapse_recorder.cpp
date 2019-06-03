@@ -7,7 +7,8 @@
 namespace
 {
 
-static const qint64 kOutputDeltaUsec = 1000000ll / 30; //< 30 fps
+static const int kFramerate = 30;
+static const qint64 kOutputDeltaUsec = 1000000ll / kFramerate; //< 30 fps
 
 } // namespace
 
@@ -21,6 +22,7 @@ ExportTimelapseRecorder::ExportTimelapseRecorder(
     m_timeStepUsec(timeStepUsec)
 {
     setTranscoderQuality(Qn::StreamQuality::high);
+    setTranscoderFixedFrameRate(kFramerate);
 }
 
 ExportTimelapseRecorder::~ExportTimelapseRecorder()

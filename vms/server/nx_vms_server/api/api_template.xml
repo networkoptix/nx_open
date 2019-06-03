@@ -99,6 +99,11 @@
                             <description>Generate SDP with two payload types(high and low qualities). Payload type of RTP packets will changed accordingly transmitted stream</description>
                             <optional>true</optional>
                         </param>
+                        <param>
+                            <name>onvif_replay</name>
+                            <description>Insert ONVIF header extension that contains absolute timestamp (See: ONVIF Streaming Specification Ver. 17.06, 6.3 RTP header extension)</description>
+                            <optional>true</optional>
+                        </param>
                     </params>
                     <result>
                         <caption>RTSP video stream.</caption>
