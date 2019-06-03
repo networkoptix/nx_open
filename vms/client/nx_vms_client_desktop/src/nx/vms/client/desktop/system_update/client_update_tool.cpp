@@ -440,7 +440,7 @@ void ClientUpdateTool::checkInternalState()
             case ResultType::ioError:
             {
                 QString error = applauncherErrorToString(result);
-                NX_ERROR(this) << "Failed to run installation:" << error;
+                NX_ERROR(this) << "Failed check installation:" << error;
                 setApplauncherError(error);
                 break;
             }
@@ -494,6 +494,8 @@ bool ClientUpdateTool::installUpdateAsync()
             {
                 const ResultType result = applauncher::api::checkInstallationProgress();
                 QString message = applauncherErrorToString(result);
+                NX_VERBOSE(NX_SCOPE_TAG,
+                    "checkInstallationProgress returned %1", message);
 
                 switch (result)
                 {

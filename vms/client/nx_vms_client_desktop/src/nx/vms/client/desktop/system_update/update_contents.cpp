@@ -153,7 +153,7 @@ QString UpdateStrings::getReportForUnsupportedServer(const nx::vms::api::SystemI
 }
 
 bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateContents& contents,
-    std::map<QnUuid, QnMediaServerResourcePtr> activeServers,
+    const std::map<QnUuid, QnMediaServerResourcePtr>& activeServers,
     const ClientVerificationData& clientData)
 {
     nx::update::Information& info = contents.info;
@@ -224,7 +224,6 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
      * Maps system information to a set of packages. We use this cache to find and check
      * if a specific OS variant is supported.
      */
-
     using PackageCache = std::map<nx::vms::api::SystemInformation, QList<nx::update::Package*>,
         nx::update::SystemInformationComparator>;
     PackageCache serverPackageCache;

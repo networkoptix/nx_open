@@ -239,19 +239,32 @@ bool PeerStateTracker::hasStatusErrors() const
     return false;
 }
 
-QString PeerStateTracker::getErrorMessage() const
+bool PeerStateTracker::getErrorReport(ErrorReport& report) const
 {
     auto lastCode = UpdateItem::ErrorCode::noError;
+
+    // Maps error code to a set of servers with this code
+    QMap<UpdateItem::ErrorCode, QSet<QnUuid>> errorMap;
+
     for (auto& item: m_items)
     {
         if (item->errorCode == UpdateItem::ErrorCode::noError)
             continue;
+
+        auto& peers = errorMap[item->errorCode];
+        peers.insert(item->id);
+
         auto errorCode = item->errorCode;
         if (errorCode < lastCode || lastCode == UpdateItem::ErrorCode::noError)
             lastCode = errorCode;
     }
 
-    return errorString(lastCode);
+    if (lastCode == UpdateItem::ErrorCode::noError)
+        return false;
+
+    report.message = errorString(lastCode);
+    report.peers = errorMap[lastCode];
+    return true;
 }
 
 int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)

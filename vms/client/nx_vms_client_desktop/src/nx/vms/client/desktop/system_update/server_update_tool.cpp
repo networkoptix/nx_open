@@ -374,20 +374,21 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
     // TODO: Stop previous manual downloads
     m_manualPackages = contents.manualPackages;
 
-    for (const auto& package: contents.manualPackages)
+    for (auto& package: m_manualPackages)
     {
         FileInformation info;
         info.md5 = QByteArray::fromHex(package.md5.toLatin1());
         info.size = package.size;
         info.name = package.file;
         info.url = package.url;
+
         NX_ASSERT(info.isValid());
         auto code = m_downloader->addFile(info);
         m_downloader->startDownloads();
         using Code = vms::common::p2p::downloader::ResultCode;
         QString file =  m_downloader->filePath(package.file);
-
         m_issuedDownloads.insert(package.file);
+        package.localFile = file;
 
         switch (code)
         {
@@ -435,6 +436,7 @@ int ServerUpdateTool::uploadPackage(
     NX_ASSERT(package.isValid());
 
     QString localFile = package.localFile;
+    NX_ASSERT(!localFile.isEmpty());
 
     auto targets = getTargetsForPackage(package);
 

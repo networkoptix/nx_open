@@ -158,11 +158,17 @@ public:
 
     bool hasStatusErrors() const;
 
+    struct ErrorReport
+    {
+        QString message;
+        QSet<QnUuid> peers;
+    };
+
     /**
-     * Generates a common error for multiple peers.
+     * Generates an error report for multiple peers.
      * This error will be displayed in error dialog from multi_server_updates_widget
      */
-    QString getErrorMessage() const;
+    bool getErrorReport(ErrorReport& report) const;
 
 public:
     std::map<QnUuid, nx::update::Status::Code> allPeerStates() const;
