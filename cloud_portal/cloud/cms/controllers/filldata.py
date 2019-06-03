@@ -7,7 +7,7 @@ import zipfile
 import distutils.dir_util
 import errno
 import traceback
-from io import StringIO
+from io import BytesIO
 
 from concurrent.futures import ThreadPoolExecutor
 
@@ -398,7 +398,7 @@ def zip_context(zip_file, product, context, language_code,
 
 
 def get_zip_package(product, preview=True, version_id=None, add_root=True):
-    zip_data = StringIO()
+    zip_data = BytesIO()
     zip_file = zipfile.ZipFile(zip_data, "a", zipfile.ZIP_DEFLATED, False)
 
     global_contexts = Context.objects.filter(is_global=True, product_type=product.product_type)
