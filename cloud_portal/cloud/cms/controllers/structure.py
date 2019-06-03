@@ -132,7 +132,7 @@ def update_from_object(cms_structure):
                     file_path = file_path.replace("{{language}}", 'en_US')
                     try:
                         with open(file_path, 'rb') as file:
-                            value = base64.b64encode(file.read())
+                            value = base64.b64encode(file.read()).decode('utf-8')
                     except IOError:
                         pass
 
