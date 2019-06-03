@@ -19,7 +19,7 @@ Controller::Controller(const conf::Settings& settings):
     m_mediaserverEndpointTester(m_cloudDataProvider.get()),
     m_geoIpResolver(geo_ip::ResolverFactory::instance().create(settings)),
     m_relayClusterClient(RelayClusterClientFactory::instance().create(settings, m_geoIpResolver.get())),
-    m_listeningPeerDb(settings.listeningPeerDb()),
+    m_listeningPeerDb(settings),
     m_listeningPeerPool(settings.listeningPeer(), &m_listeningPeerDb),
     m_listeningPeerRegistrator(
         settings,

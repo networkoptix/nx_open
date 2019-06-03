@@ -43,7 +43,7 @@ class ConnectTest:
 {
 protected:
     ConnectTest():
-        m_listeningPeerDb(m_settings.listeningPeerDb()),
+        m_listeningPeerDb(m_settings),
         m_listeningPeerPool(m_settings.listeningPeer(), &m_listeningPeerDb)
     {
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
@@ -109,6 +109,7 @@ TEST_F( ConnectTest, BindConnect )
     msClient.connect(
         nx::network::url::Builder()
             .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address()));
+
     {
         stun::Message request( stun::Header( stun::MessageClass::request,
                                              stun::extension::methods::bind ) );
