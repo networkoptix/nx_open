@@ -90,13 +90,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
-        let title;
-        if ($event.nextId) {
-            title = this.language.lang.pageTitles.downloadPlatform + $event.nextId;
-        } else {
-            title = this.language.lang.pageTitles.download;
-        }
-        this.titleService.setTitle(title);
+        this.setTitle($event.nextId);
         this.locationProxy.path('/download/' + $event.nextId, false);
     }
 
@@ -160,13 +154,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
                     this.platform = this.detectOS().toLowerCase();
                 }
 
-                let title;
-                if (this.platform) {
-                    title = this.language.lang.pageTitles.downloadPlatform + this.platform;
-                } else {
-                    title = this.language.lang.pageTitles.download;
-                }
-                this.titleService.setTitle(title);
+                this.setTitle(this.platform);
 
                 setTimeout(() => {
                     this.tabsVisible = true;
@@ -175,6 +163,16 @@ export class DownloadComponent implements OnInit, OnDestroy {
                     }
                 });
             });
+    }
+
+    setTitle(platform) {
+        let title;
+        if (platform) {
+            title = this.language.lang.pageTitles.downloadPlatform + platform;
+        } else {
+            title = this.language.lang.pageTitles.download;
+        }
+        this.titleService.setTitle(title);
     }
 
     ngOnInit(): void {
