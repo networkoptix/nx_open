@@ -12,7 +12,6 @@
 
 #include <nx/vms/server/root_fs.h>
 
-#include "analytics_db_cursor.h"
 #include "cursor.h"
 #include "cleaner.h"
 #include "object_searcher.h"
