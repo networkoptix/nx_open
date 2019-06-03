@@ -7,6 +7,7 @@ from ssl import SSLError
 from celery.exceptions import Ignore
 
 from django.conf import settings
+from django.utils import timezone
 
 from api.models import Account
 from notifications import notifications_api
@@ -78,6 +79,8 @@ def send_email(msg_id, queue="", attempt=1):
                                                        })
         raise Ignore()
     else:
+        message.send_date = timezone.now()
+        message.save()
         return {
             'user_email': message.user_email,
             'type': message.type,

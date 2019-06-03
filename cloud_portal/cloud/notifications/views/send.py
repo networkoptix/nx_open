@@ -115,7 +115,7 @@ def send_event(request):
         ip = get_client_ip(request)
         logging.info("ip: {}\t user: {}\nrequest data: {}".format(ip, request.user, request.data))
 
-        notifications_api.notify(request.data['type'], product_id, request.data)
+        notifications_api.send_feedback(request.data['type'], product_id, request.data)
 
     except ValidationError as error:
         error_data = error.detail if hasattr(error, 'detail') else None
@@ -137,7 +137,7 @@ def send_notification(request):
             msg = notifications_api.find_message(external_id)
             if msg:
                 # there is already a message with this id - do not send the message, respond with status
-                serializer = models.MessageStatusSerializer(msg, many=False)
+                serializer = MessageStatusSerializer(msg, many=False)
                 return api_success(serializer.data)
 
         if 'user_email' not in request.data or not request.data['user_email']:

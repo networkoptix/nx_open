@@ -4,7 +4,7 @@ from jsonfield import JSONField
 from django.conf import settings
 from django.db.models import Q
 from rest_framework import serializers
-from cms.models import Customization
+from cms.models import Customization, Product
 from api.models import Account
 
 # When cloudportal is ran locally it uses amqp by default. BROKER_TRANSPORT_OPTIONS is related to sqs.
@@ -54,6 +54,8 @@ class Event(models.Model):
                 event=self
             )
             message.send()
+        self.send_date = timezone.now()
+        self.save()
 
 
 class Subscription(models.Model):
@@ -81,7 +83,6 @@ class Message(models.Model):
 
     def send(self):
         self.save()
-        self.send_date = timezone.now()
 
         # TODO: initiate business-logic here
         from .tasks import send_email
@@ -100,9 +101,51 @@ class Message(models.Model):
         self.save()
 
     def delivery_time_interval(self):
-        return (self.created_date - self.send_date).total_seconds()
+        if not self.send_date:
+            return "Message has not been sent yet"
+        return (self.send_date - self.created_date).total_seconds()
 
     delivery_time_interval.short_description = "Delivery Time Interval (sec)"
+
+
+class Feedback(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    message = models.TextField(default='', blank=True)
+    product_name = models.CharField(max_length=255)
+    sender_name = models.CharField(max_length=255)
+    sender_email = models.CharField(max_length=255)
+    sender_to_be_contacted = models.BooleanField()
+    target_product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    type = models.CharField(max_length=255)
+
+    def send(self):
+        self.save()
+        data = {
+            'sender_name': self.sender_name,
+            'sender_email': self.sender_email,
+            'sender_to_be_contacted': self.sender_to_be_contacted,
+            'product': self.product_name,
+            'message': self.message
+        }
+        event = Event.objects.create(type=self.type, object=self.target_product.id, data=data)
+        event.send()
+
+        # Send email to the contact email for an integration.
+        if self.target_product.contact_email:
+            contact_email = self.target_product.contact_email
+
+            contact_customization = Account.objects.filter(email=contact_email).first()
+            if contact_customization:
+                contact_customization = contact_customization.customization
+            else:
+                contact_customization = settings.CUSTOMIZATION
+
+            msg = Message.objects.create(user_email=contact_email,
+                                         type=self.type,
+                                         customization=contact_customization,
+                                         message=data,
+                                         event=event)
+            msg.send()
 
 
 class MessageStatusSerializer(serializers.ModelSerializer):  # model to use when checking on message status

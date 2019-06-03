@@ -224,6 +224,7 @@ class Product(models.Model):
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
         blank=True, related_name='created_%(class)s', on_delete=models.CASCADE)
+    contact_email = models.CharField(max_length=255, blank=True, default='')
     customizations = models.ManyToManyField(Customization, default=None, blank=True)
     product_type = models.ForeignKey(ProductType, default=get_integration_type, null=True, on_delete=models.CASCADE)
 

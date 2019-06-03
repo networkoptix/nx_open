@@ -257,8 +257,8 @@ admin.site.register(Context, ContextAdmin)
 
 
 class ContextTemplateAdmin(CMSAdmin):
-    list_display = ('context', 'language')
-    list_filter = ('context', 'language')
+    list_display = ('context', 'language', 'skin')
+    list_filter = ('context', 'language', 'skin')
     search_fields = ('context__name', 'context__file_path', 'language__code')
 
 
