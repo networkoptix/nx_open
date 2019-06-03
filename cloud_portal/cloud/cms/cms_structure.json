@@ -1522,16 +1522,6 @@
             }
           },
           {
-            "name": "downloadLinks",
-            "label": "Download links or Instructions",
-            "value": "",
-            "description": "This section is visible in the detailed view page for the integration in the middle column.",
-            "type": "html",
-            "meta": {
-              "char_limit": 500
-            }
-          },
-          {
             "name": "installationInstructions",
             "label": "Installation Instructions",
             "value": "",
