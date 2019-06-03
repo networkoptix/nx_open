@@ -11,7 +11,6 @@
                 InstallCondition="InstallServerOnly=1 OR InstallClientAndServer=1"
                 Vital="yes"
                 Compressed="yes">
-                <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
             </MsiPackage>
         </PackageGroup>
     </Fragment>

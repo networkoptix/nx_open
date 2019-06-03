@@ -50,23 +50,12 @@
                 Dialog="WelcomeDlg"
                 Control="Next"
                 Event="NewDialog"
-                Value="LicenseAgreementDlg">
-                NOT PREVIOUSVERSIONSINSTALLED AND NOT LICENSE_ALREADY_ACCEPTED
-            </Publish>
+                Value="ClientDlg">NOT PREVIOUSVERSIONSINSTALLED</Publish>
             <Publish
                 Dialog="WelcomeDlg"
                 Control="Next"
                 Event="NewDialog"
-                Value="ClientDlg">
-                NOT PREVIOUSVERSIONSINSTALLED AND LICENSE_ALREADY_ACCEPTED
-            </Publish>
-            <Publish
-                Dialog="WelcomeDlg"
-                Control="Next"
-                Event="NewDialog"
-                Value="UpgradeDlg">
-                PREVIOUSVERSIONSINSTALLED
-            </Publish>
+                Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
 
             <Publish
                 Dialog="UpgradeDlg"
@@ -80,34 +69,11 @@
                 Value="VerifyReadyDlg">1</Publish>
 
             <Publish
-                Dialog="LicenseAgreementDlg"
-                Control="Back"
-                Event="NewDialog"
-                Value="WelcomeDlg">1</Publish>
-            <Publish
-                Dialog="LicenseAgreementDlg"
-                Control="Next"
-                Event="NewDialog"
-                Value="ClientDlg">
-                LicenseAccepted = "1"
-            </Publish>
-
-            <Publish
-                Dialog="ClientDlg"
-                Control="Back"
-                Event="NewDialog"
-                Value="LicenseAgreementDlg"
-                Order="2">
-                NOT LICENSE_ALREADY_ACCEPTED
-            </Publish>
-            <Publish
                 Dialog="ClientDlg"
                 Control="Back"
                 Event="NewDialog"
                 Value="WelcomeDlg"
-                Order="2">
-                LICENSE_ALREADY_ACCEPTED
-            </Publish>
+                Order="2">1</Publish>
             <Publish
                 Dialog="ClientDlg"
                 Control="Next"

@@ -48,10 +48,6 @@
             <![CDATA[ CLIENT_DIRECTORY_REG = "" ]]>
         </SetProperty>
 
-        <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
-        <WixVariable Id="WixUIBannerBmp" Value="$(var.CustomizationDir)/wixsetup/Binary/eve/eve_logo-493x58.bmp" />
-        <WixVariable Id="WixUIDialogBmp" Value="$(var.CustomizationDir)/wixsetup/Binary/eve/eve_logo-493x312.bmp" />
-
         <!-- Logo -->
         <Icon Id="icon_menu.exe" SourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"/>
         <Icon Id="icon_desktop.exe" SourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"/>
