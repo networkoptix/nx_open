@@ -201,9 +201,19 @@ void LocalResourceProducer::updateFileLayoutResource(const QString& path)
     if (FileTypeSupport::isValidLayoutFile(path))
     {
         const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-        auto resource = resourcePool->getResourceByUrl(path);
-        if (auto fileLayoutResource = resource.dynamicCast<QnFileLayoutResource>())
-            layout::reloadFromFile(fileLayoutResource, fileLayoutResource->password());
+        if (auto fileLayoutResource =
+            resourcePool->getResourceByUrl(path).dynamicCast<QnFileLayoutResource>())
+        {
+            auto layoutResources = fileLayoutResource->layoutResources();
+            for (const auto& layoutResource: layoutResources)
+                resourcePool->removeResource(layoutResource);
+            resourcePool->removeResource(fileLayoutResource);
+        }
+        if (auto updatedFileLayoutResource =
+            ResourceDirectoryBrowser::layoutFromFile(path, resourcePool))
+        {
+            resourcePool->addResource(updatedFileLayoutResource);
+        }
     }
 }
 
