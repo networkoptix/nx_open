@@ -24,6 +24,9 @@ ResourceDirectoryBrowser::ResourceDirectoryBrowser(QObject* parent):
     connect(m_localResourceDirectoryModel, &LocalResourcesDirectoryModel::filesAdded,
         m_resourceProducer, &LocalResourceProducer::createLocalResources);
 
+    connect(m_localResourceDirectoryModel, &LocalResourcesDirectoryModel::layoutFileChanged,
+        m_resourceProducer, &LocalResourceProducer::updateFileLayoutResource);
+
     connect(this, &ResourceDirectoryBrowser::initLocalResources,
         m_resourceProducer, &LocalResourceProducer::createLocalResources);
 
@@ -191,6 +194,17 @@ void LocalResourceProducer::createLocalResources(const QStringList& pathList)
         return;
 
     resourcePool->addResources(newResources);
+}
+
+void LocalResourceProducer::updateFileLayoutResource(const QString& path)
+{
+    if (FileTypeSupport::isValidLayoutFile(path))
+    {
+        const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+        auto resource = resourcePool->getResourceByUrl(path);
+        if (auto fileLayoutResource = resource.dynamicCast<QnFileLayoutResource>())
+            layout::reloadFromFile(fileLayoutResource, fileLayoutResource->password());
+    }
 }
 
 } // namespace nx::vms::client::desktop

@@ -629,11 +629,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
             case Error::missingPackageError:
             {
                 QStringList packageErrors;
-                auto missing = contents.missingUpdate.size()
-                    + contents.unsuportedSystemsReport.size();
-                //auto clientId = m_stateTracker->getClientPeerId();
-
-                if (missing)
+                if (auto missing = contents.missingUpdate.size())
                 {
                     if (contents.missingUpdate.contains(clientId))
                     {
@@ -651,6 +647,20 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                     else
                     {
                         packageErrors << tr("Missing update package for some servers");
+                    }
+                }
+
+                if (auto unsupported = contents.unsuportedSystemsReport.size())
+                {
+                    if (contents.unsuportedSystemsReport.contains(clientId) && unsupported == 1)
+                    {
+                        packageErrors << tr("OS version of client is no longer supported. "
+                            "Please update its OS to a supported version.");
+                    }
+                    else
+                    {
+                        packageErrors << tr("OS versions of some components are no longer supported. "
+                            "Please remove them from the System or update their OS to a supported version.");
                     }
                 }
 
@@ -1530,13 +1540,15 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         messageBox->setIcon(QnMessageBoxIcon::Critical);
         messageBox->setText(tr("Failed to download update packages to some components"));
 
-        QString text = htmlParagraph(m_stateTracker->getErrorMessage());
+        PeerStateTracker::ErrorReport report;
+        m_stateTracker->getErrorReport(report);
+        QString text = report.message;
         text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
         messageBox->setInformativeText(text);
 
         // TODO: Client can be here as well, but it would not be displayed.
         // Should we display it somehow?
-        auto resourcesFailed = resourcePool()->getResourcesByIds(peersFailed.toList());
+        auto resourcesFailed = resourcePool()->getResourcesByIds(report.peers);
         injectResourceList(*messageBox, resourcesFailed);
 
         auto tryAgain = messageBox->addButton(tr("Try again"),
@@ -1640,8 +1652,12 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
             // 1. Everything is complete
             messageBox->setIcon(QnMessageBoxIcon::Critical);
             messageBox->setText(tr("There was an error while installing updates:"));
-            injectResourceList(*messageBox, resourcePool()->getResourcesByIds(peersFailed));
-            QString text =  htmlParagraph(m_stateTracker->getErrorMessage());
+
+            PeerStateTracker::ErrorReport report;
+            m_stateTracker->getErrorReport(report);
+
+            injectResourceList(*messageBox, resourcePool()->getResourcesByIds(report.peers));
+            QString text =  htmlParagraph(report.message);
             text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
             messageBox->setInformativeText(text);
             auto installNow = messageBox->addButton(tr("OK"),

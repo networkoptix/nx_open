@@ -3,6 +3,8 @@
 #include <QtCore/QSet>
 #include <QtCore/QDir>
 
+#include <core/resource/avi/filetypesupport.h>
+
 using namespace std::literals::chrono_literals;
 
 namespace nx::vms::client::desktop {
@@ -14,6 +16,9 @@ LocalResourcesDirectoryModel::LocalResourcesDirectoryModel(QObject* parent):
 
     connect(&m_fileSystemWatcher, &QFileSystemWatcher::directoryChanged,
         this, &LocalResourcesDirectoryModel::onDirectoryChanged);
+
+    connect(&m_fileSystemWatcher, &QFileSystemWatcher::fileChanged,
+        this, &LocalResourcesDirectoryModel::onFileChanged);
 
     connect(&m_deferredDirectoryChangeHandlerTimer, &QTimer::timeout,
         this, &LocalResourcesDirectoryModel::processPendingDirectoryChanges);
@@ -89,6 +94,13 @@ void LocalResourcesDirectoryModel::addWatchedDirectory(const QString& path)
     m_childFiles.insert(canonicalPath, childFiles);
     m_childDirectories.insert(canonicalPath, childDirectories);
 
+    for (const auto& fileName: childFiles)
+    {
+        const auto filePath = dir.filePath(fileName);
+        if (FileTypeSupport::isValidLayoutFile(filePath))
+            m_fileSystemWatcher.addPath(filePath);
+    }
+
     for (const auto& childDirectory: childDirectories)
         addWatchedDirectory(dir.absoluteFilePath(childDirectory));
 }
@@ -151,11 +163,27 @@ void LocalResourcesDirectoryModel::processPendingDirectoryChanges()
             addWatchedDirectory(dir.absoluteFilePath(newChildDirectory));
 
         for (auto& newChildFile: newChildFiles)
+        {
             newChildFile = dir.absoluteFilePath(newChildFile);
-        emit filesAdded(newChildFiles);
+            if (FileTypeSupport::isValidLayoutFile(newChildFile))
+                m_fileSystemWatcher.addPath(newChildFile);
+        }
+
+        if (!newChildFiles.empty())
+            emit filesAdded(newChildFiles);
     }
 
     m_pendingDirectoryChanges.clear();
+}
+
+void LocalResourcesDirectoryModel::onFileChanged(const QString& filePath)
+{
+    if (FileTypeSupport::isValidLayoutFile(filePath))
+    {
+        // QFileSystemWatcher lose tracking after temporary file renaming operation.
+        m_fileSystemWatcher.addPath(filePath);
+        emit layoutFileChanged(filePath);
+    }
 }
 
 } // namespace nx::vms::client::desktop

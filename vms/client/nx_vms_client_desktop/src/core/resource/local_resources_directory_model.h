@@ -22,11 +22,13 @@ public:
 
 signals:
     void filesAdded(const QStringList& newFiles);
+    void layoutFileChanged(const QString& filePath);
 
 private:
     void addWatchedDirectory(const QString& path);
     void removeWatchedDirectory(const QString& path);
     void onDirectoryChanged(const QString& path);
+    void onFileChanged(const QString& path);
     void processPendingDirectoryChanges();
 
 private:

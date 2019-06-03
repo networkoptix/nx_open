@@ -13,6 +13,7 @@ class LocalResourceProducer: public QObject
 public:
     LocalResourceProducer(QObject* parent = nullptr);
     void createLocalResources(const QStringList& pathList);
+    void updateFileLayoutResource(const QString& path);
 };
 
 class ResourceDirectoryBrowser:
