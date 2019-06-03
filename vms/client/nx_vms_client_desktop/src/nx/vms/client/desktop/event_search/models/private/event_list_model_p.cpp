@@ -120,12 +120,6 @@ QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventDat
 
 QnVirtualCameraResourceList EventListModel::Private::accessibleCameras(const EventData& event) const
 {
-    if (event.cameras.empty()
-        || !q->accessController()->hasGlobalPermission(GlobalPermission::viewArchive))
-    {
-        return QnVirtualCameraResourceList();
-    }
-
     return event.cameras.filtered(
         [this](const QnVirtualCameraResourcePtr& camera) -> bool
         {

@@ -13,6 +13,8 @@ namespace Ui {
 class QnBookmarkWidget : public QWidget {
     Q_OBJECT
 
+    typedef QWidget base_type;
+
 public:
     explicit QnBookmarkWidget(QWidget *parent = 0);
     ~QnBookmarkWidget();
@@ -30,6 +32,9 @@ public:
 
 signals:
     bool validChanged();
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
     void updateTagsList();

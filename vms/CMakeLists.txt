@@ -17,3 +17,7 @@ endif()
 if(withDistributions)
     add_subdirectory(distribution)
 endif()
+
+if(withVmsTools)
+    add_subdirectory(tools)
+endif()

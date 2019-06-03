@@ -392,13 +392,14 @@ void CommonUpdateManager::clearDownloader()
 {
     NX_DEBUG(this, "Start downloader clean up");
 
-    const vms::api::SoftwareVersion version = targetVersion();
     const QString prefix = update::rootUpdatesDirectoryForDownloader();
-    const QString neededFilesPrefix = update::updatesDirectoryForDownloader(version.toString());
+
+    nx::update::Package package;
+    findPackage(&package);
 
     for (const QString& file: downloader()->files())
     {
-        if (!file.startsWith(prefix) || file.startsWith(neededFilesPrefix))
+        if (!file.startsWith(prefix) || file == package.file) //< Can be empty.
             continue;
 
         NX_INFO(this, "Deleting file: %1", file);

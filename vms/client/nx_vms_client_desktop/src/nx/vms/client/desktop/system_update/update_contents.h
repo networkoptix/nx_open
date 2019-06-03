@@ -66,7 +66,7 @@ struct ClientVerificationData
 NX_VMS_CLIENT_DESKTOP_API bool verifyUpdateContents(
     QnCommonModule* commonModule,
     nx::update::UpdateContents& contents,
-    std::map<QnUuid, QnMediaServerResourcePtr> servers,
+    const std::map<QnUuid, QnMediaServerResourcePtr>& servers,
     const ClientVerificationData& clientData);
 
 } // namespace nx::vms::client::desktop
