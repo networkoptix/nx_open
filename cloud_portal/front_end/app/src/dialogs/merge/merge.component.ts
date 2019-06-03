@@ -207,19 +207,21 @@ export class MergeModalContent {
 
     precheckSystemMerge() {
         return this.systemService(this.targetSystem.id, this.user.email).update().then((system) => {
-            this.targetSystem = {...this.targetSystem, ...system};
-            return Promise.all([
-                this.system.mediaserver.getMediaServers().catch(error => {
-                    return Promise.reject({system: 'current', errorResponse: error});
-                }),
-                this.targetSystem.mediaserver.getMediaServers().catch(error => {
-                    return Promise.reject({system: 'target', errorResponse: error});
-                })
-            ]).then(res => {
-                this.tooManySystems = res.map(req => req.data.length)
-                    .reduce((acc, cur) => acc + cur) > this.config.maxServers;
-                return {};
-            }).catch(error => error);
+            return system.getUsersDataFromTheSystem().then(() => {
+                this.targetSystem = {...this.targetSystem, ...system};
+                return Promise.all([
+                    this.system.mediaserver.getMediaServers().catch(error => {
+                        return Promise.reject({system: 'current', errorResponse: error});
+                    }),
+                    this.targetSystem.mediaserver.getMediaServers().catch(error => {
+                        return Promise.reject({system: 'target', errorResponse: error});
+                    })
+                ]).then(res => {
+                    this.tooManySystems = res.map(req => req.data.length)
+                        .reduce((acc, cur) => acc + cur) > this.config.maxServers;
+                    return {};
+                }).catch(error => error);
+            });
         });
     }
 
