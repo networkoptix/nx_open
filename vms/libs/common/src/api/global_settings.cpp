@@ -1646,6 +1646,28 @@ void QnGlobalSettings::setTargetUpdateInformation(const QByteArray& updateInform
     m_targetUpdateInformationAdaptor->setValue(updateInformation);
 }
 
+QByteArray QnGlobalSettings::targetPersistentUpdateStorage() const
+{
+    return m_targetPersistentUpdateStorageAdaptor->value();
+}
+
+void QnGlobalSettings::setTargetPersistentUpdateStorage(
+    const QByteArray& persistentUpdateStorageSerializedData)
+{
+    m_targetPersistentUpdateStorageAdaptor->setValue(persistentUpdateStorageSerializedData);
+}
+
+QByteArray QnGlobalSettings::installedPersistentUpdateStorage() const
+{
+    return m_installedPersistentUpdateStorageAdaptor->value();
+}
+
+void QnGlobalSettings::setInstalledPersistentUpdateStorage(
+    const QByteArray& persistentUpdateStorageSerializedData)
+{
+    m_installedPersistentUpdateStorageAdaptor->setValue(persistentUpdateStorageSerializedData);
+}
+
 QByteArray QnGlobalSettings::installedUpdateInformation() const
 {
     return m_installedUpdateInformationAdaptor->value();

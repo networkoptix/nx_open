@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QString>
+#include <QtCore/QList>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
@@ -9,12 +10,12 @@ namespace nx::update {
 
 struct PersistentUpdateStorage
 {
-    QSet<QnUuid> servers;
+    QList<QnUuid> servers;
     bool manuallySet = false;
 };
 
 #define PersistentUpdateStorage_Fields (servers)(manuallySet)
-QN_FUSION_DECLARE_FUNCTIONS(Package, (ubjson)(json)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(PersistentUpdateStorage, (ubjson)(json)(eq))
 
 } // namespace nx::update
 

@@ -32,7 +32,7 @@ public:
     bool participants(QList<QnUuid>* outParticipants) const;
     bool setParticipants(const QList<QnUuid>& participants);
     bool updateLastInstallationRequestTime();
-    bool updatePersistentStorageServers(const QList<QnUuid>& serverList);
+    bool updatePersistentStorageServers(const QList<QnUuid>& serverList, const QString& version);
     void finish();
     vms::api::SoftwareVersion targetVersion() const;
 
