@@ -49,7 +49,12 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
         if (changes.list.currentValue) {
             // inject platform icons info
             changes.list.currentValue.forEach(plugin => {
-                plugin.versionDetails.version = (plugin.versionDetails.version) ? 'v.&nbsp;' + plugin.versionDetails.version : '&nbsp;';
+                if (!plugin.versionDetails.version || plugin.versionDetails.version &&
+                        plugin.versionDetails.version !== '&nbsp;' &&
+                        plugin.versionDetails.version.indexOf('v.') !== 0) {
+                    plugin.versionDetails.version = (plugin.versionDetails.version) ? 'v.&nbsp;' + plugin.versionDetails.version : '&nbsp;';
+                }
+
                 plugin.information.platforms.icons = this.integrations.setPlatformIcons(plugin);
                 plugin.information.logo = plugin.information.logo || this.config.icons.default;
 
