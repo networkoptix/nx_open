@@ -164,7 +164,9 @@ void Server::addPathToHtdigestAuthenticatorIfNeeded(const std::string& regex)
     if (m_htdigestAuthenticator)
     {
         NX_INFO(this, "Adding api path regex: '%1' to htdigest authenticator", regex);
-        m_authenticationDispatcher.add(std::regex(regex), &m_htdigestAuthenticator->manager);
+        m_authenticationDispatcher.add(
+            std::regex(regex),
+            &m_htdigestAuthenticator->manager);
     }
 }
 
@@ -194,7 +196,7 @@ void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
         &m_httpMessageDispatcher);
 
     addPathToHtdigestAuthenticatorIfNeeded(
-        network::url::joinPath(api::kMediatorApiPrefix, api::kStatisticsApiPrefix, "/?.*"));
+        network::url::joinPath(api::kMediatorApiPrefix, api::kStatisticsApiPrefix, "/.*"));
 
     addPathToHtdigestAuthenticatorIfNeeded(
         network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*"));
