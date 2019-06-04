@@ -10,7 +10,7 @@ set(installer.name "coresmp")
 set(android.alias "coresmp")
 set(android.storepass "hYCmvTDu")
 set(android.keypass "31O2zNNy")
-set(android.packageName "com.comm-core.coresmp")
+set(android.packageName "com.comm_core.coresmp")
 
 set(display_mobile_name "COREsmp")
 set(mobile_bundle_name "COREsmpMobile")
@@ -44,7 +44,7 @@ set(mac.protocol_handler_bundle.identifier "com.comm-core.protocol_handler")
 
 set(ios.new_bundle_identifier "com.comm-core.coresmp")
 set(ios.group_identifier "group.com.comm-core.coresmp")
-set(ios.sign.identity "iPhone Developer: Todd Binkley (DB4VCPQ2W4)")
+set(ios.sign.identity "iPhone Distribution: Comm-Core, Llc (UM4JR9V245)")
 
 # Other customizations.
 set(freeLicenseIsTrial "true")

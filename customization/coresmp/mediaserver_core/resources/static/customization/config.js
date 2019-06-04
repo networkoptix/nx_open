@@ -14,7 +14,7 @@ Config.helpLinks.push({
             class:'appstore'
         },
         {
-            url: "https://play.google.com/store/apps/details?id=com.comm-core.coresmp",
+            url: "https://play.google.com/store/apps/details?id=com.comm_core.coresmp",
             class:'googleplay',
             button: "Android Client"
         }
