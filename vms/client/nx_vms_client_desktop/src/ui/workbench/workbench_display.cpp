@@ -1187,7 +1187,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     // TODO: #GDM Fix inconsistency between options and buttons by using flux model.
 
     // Restore buttons state, saved while switching layouts.
-    const auto checkedButtons = widget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
+    int checkedButtons = widget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
     if (checkedButtons != -1)
     {
         checkedButtons &= ~Qn::MotionSearchButton; //< Handled by MotionSearchSynchronizer.
