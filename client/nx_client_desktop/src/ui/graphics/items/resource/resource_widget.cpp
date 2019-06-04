@@ -929,7 +929,7 @@ void QnResourceWidget::updateHud(bool animate)
     const bool showPosition = forceShowPosition()
         || (overlaysCanBeVisible && (detailsVisible || m_mouseInWidget));
     const bool showDetailedInfo = overlaysCanBeVisible && detailsVisible &&
-        (m_mouseInWidget || qnRuntime->showFullInfo());
+        (m_mouseInWidget || qnRuntime->showFullInfo() || qnSettings->showFullInfo());
 
     const bool showButtonsOverlay = (showOnlyCameraName || showCameraNameWithButtons);
 

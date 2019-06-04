@@ -1145,9 +1145,20 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if (widgetsForResource.size() == 1)
         emit resourceAdded(widget->resource());
 
-    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
+    // TODO: #GDM Fix inconsistency between options and buttons by using flux model.
+
+    // Setup custom options, provided by the action parameters.
+    const auto options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
     if (options)
         widget->setOptions(widget->options() | options);
+
+    // Restore buttons state, saved while switching layouts.
+    const auto checkedButtons = widget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
+    if (checkedButtons != -1)
+        widget->setCheckedButtons(checkedButtons);
+    // If we are opening the widget for the first time, show info button by default if needed.
+    else if (qnSettings->showInfoByDefault())
+        widget->setCheckedButtons(Qn::InfoButton);
 
     synchronize(widget, false);
     bringToFront(widget);
@@ -2056,10 +2067,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
     for (int i = 0; i < widgets.size(); i++)
     {
         QnResourceWidget *resourceWidget = widgets[i];
-
-        int checkedButtons = resourceWidget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
-        if (checkedButtons != -1)
-            resourceWidget->setCheckedButtons(checkedButtons);
 
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
         if (!widget)
