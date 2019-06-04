@@ -26,6 +26,21 @@ export class IntegrationService implements OnDestroy {
 
         this.getIntegrations()
             .subscribe(result => {
+                result.data.forEach(plugin => {
+                    if (!plugin.versionDetails.version || plugin.versionDetails.version &&
+                            plugin.versionDetails.version !== '&nbsp;' &&
+                            plugin.versionDetails.version.indexOf('v.') !== 0) {
+                        plugin.versionDetails.version = (plugin.versionDetails.version) ? 'v.&nbsp;' + plugin.versionDetails.version : '&nbsp;';
+                    }
+
+                    plugin.information.platforms.icons = this.setPlatformIcons(plugin);
+                    plugin.information.logo = plugin.information.logo || this.config.icons.default;
+
+                    plugin.state = (plugin.pending) ? 'pending' : (plugin.draft) ? 'draft' : undefined;
+
+                    plugin.link = '/integrations/' + plugin.id;
+                    plugin.link += (plugin.state) ? '?state=' + plugin.state : '';
+                });
                 this.pluginsSubject.next(result.data);
             });
 

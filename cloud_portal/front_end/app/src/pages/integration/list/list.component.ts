@@ -48,21 +48,11 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
         let haveInReviewOrDraft = false;
         if (changes.list.currentValue) {
             // inject platform icons info
-            changes.list.currentValue.forEach(plugin => {
-                if (!plugin.versionDetails.version || plugin.versionDetails.version &&
-                        plugin.versionDetails.version !== '&nbsp;' &&
-                        plugin.versionDetails.version.indexOf('v.') !== 0) {
-                    plugin.versionDetails.version = (plugin.versionDetails.version) ? 'v.&nbsp;' + plugin.versionDetails.version : '&nbsp;';
+            changes.list.currentValue.some(plugin => {
+                if (plugin.pending || plugin.draft) {
+                    haveInReviewOrDraft = true;
+                    return true;
                 }
-
-                plugin.information.platforms.icons = this.integrations.setPlatformIcons(plugin);
-                plugin.information.logo = plugin.information.logo || this.config.icons.default;
-
-                haveInReviewOrDraft = haveInReviewOrDraft || plugin.pending || plugin.draft;
-                plugin.state = (plugin.pending) ? 'pending' : (plugin.draft) ? 'draft' : undefined;
-
-                plugin.link = '/integrations/' + plugin.id;
-                plugin.link += (plugin.state) ? '?state=' + plugin.state : '';
             });
 
             if (haveInReviewOrDraft) {
