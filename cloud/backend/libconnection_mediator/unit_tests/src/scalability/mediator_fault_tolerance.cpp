@@ -31,16 +31,16 @@ protected:
         const auto haveEndpoint =
             [&mutex, &selectedEndpoints](
                 const nx::hpm::MediatorEndpoint& targetEndpoint) -> bool
-        {
-            std::lock_guard lock(mutex);
-            return std::find_if(
-                selectedEndpoints.begin(),
-                selectedEndpoints.end(),
-                [&targetEndpoint] (const MediatorEndpoint& endpoint)
-                {
-                    return targetEndpoint == endpoint;
-                }) != selectedEndpoints.end();
-        };
+            {
+                std::lock_guard lock(mutex);
+                return std::find_if(
+                    selectedEndpoints.begin(),
+                    selectedEndpoints.end(),
+                    [&targetEndpoint] (const MediatorEndpoint& endpoint)
+                    {
+                        return targetEndpoint == endpoint;
+                    }) != selectedEndpoints.end();
+            };
 
         for (const auto& expectedEndpoint : expectedEndpoints)
         {
@@ -79,15 +79,15 @@ protected:
 
             nx::utils::SyncQueue <std::tuple<
                 stun::TransportHeader,
-                nx::hpm::api::ResultCode,
-                nx::hpm::api::ConnectResponse>> connectResponseEvent;
+                api::ResultCode,
+                api::ConnectResponse>> connectResponseEvent;
 
             udpClient.connect(
                 request,
                 [&connectResponseEvent](
                     stun::TransportHeader stunTransportHeader,
-                    nx::hpm::api::ResultCode resultCode,
-                    nx::hpm::api::ConnectResponse response)
+                    api::ResultCode resultCode,
+                    api::ConnectResponse response)
                 {
                     connectResponseEvent.push(
                         std::make_tuple(stunTransportHeader, resultCode, std::move(response)));

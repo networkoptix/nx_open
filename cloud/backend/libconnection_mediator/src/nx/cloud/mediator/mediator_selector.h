@@ -13,6 +13,7 @@ namespace conf { class Settings; }
 class AbstractMediatorSelector
 {
 public:
+    virtual ~AbstractMediatorSelector() = default;
     virtual MediatorEndpoint select(
         const std::vector<MediatorEndpoint>& endpoints) const = 0;
 };
