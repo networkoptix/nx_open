@@ -118,6 +118,15 @@ BaseTile
             leftPadding: 16;
             rightPadding: 16;
 
+            visible:
+            {
+                var localhostIPv4RegEx = /^https?\:\/\/127\.0\.0\.1\:/;
+
+                var tile = control.areaLoader.item;
+                var host = control.isFactoryTile ? tile.host : tile.selectedHost;
+                return !host.match(localhostIPv4RegEx);
+            }
+
             onTriggered: context.hideSystem(control.systemId, control.localId);
         }
     }
