@@ -280,7 +280,7 @@ def remove_unused_records(product):
 
 def generate_preview_link(context=None, product=None, state=""):
     if product and product.is_integration:
-        return f"{settings.INTEGRATION_STORE_PAGE}/{product.id}/{state}"
+        return f"{settings.INTEGRATION_STORE_PAGE}/{product.id}?state={state}"
 
     return f"{context.url}?preview" if context else "/content/about?preview"
 
