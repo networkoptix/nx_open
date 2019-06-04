@@ -34,7 +34,8 @@ def make_integrations_json(integrations, contexts=None, show_pending=False, show
             current_version = integration.version_id()
 
             if show_pending:
-                pending_version = ProductCustomizationReview.objects.filter(version__product=integration,
+                pending_version = ProductCustomizationReview.objects.filter(version__id__gt=current_version,
+                                                                            version__product=integration,
                                                                             customization__name=settings.CUSTOMIZATION,
                                                                             state=PENDING).last()
 
