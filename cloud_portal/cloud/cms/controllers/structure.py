@@ -271,7 +271,7 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
             continue
 
         data = zip_file.read(name)
-        data64 = base64.b64encode(data)
+        data64 = base64.b64encode(data).decode('utf-8')
 
         if update_structure:
             # if set_defaults or data structure has no default value - save it

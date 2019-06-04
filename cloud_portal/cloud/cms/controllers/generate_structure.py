@@ -7,6 +7,9 @@ from PIL import Image  # get Pillow
 from zipfile import ZipFile
 from ..models import Context, DataStructure, ProductType
 
+import logging
+logger = logging.getLogger(__name__)
+
 IGNORE_DIRECTORIES = ('help',)
 IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns', 'jpg', 'jpeg')
 
@@ -119,7 +122,7 @@ def iterate_zip(file_descriptor):
     root = ''
     for name in zip_file.namelist():
         if name.count('/') == 0:  # ignore files from the root of the archive
-            print("IGNORED FILE", name)
+            logger.info(f"IGNORED FILE {name}")
             continue
         if name.endswith('/'):
             if not root:  # find root directory to ignore
@@ -132,13 +135,13 @@ def iterate_zip(file_descriptor):
 
 def iterate_directory(directory):
     for root, dirs, files in os.walk(directory):
-        print(root.replace(directory, '') + '/')
+        logger.info(f"{root.replace(directory, '')}/")
         yield root.replace(directory, '') + '/', None
         for filename in files:
             filename = os.path.join(root, filename)
             with open(filename, "rb") as file_descriptor:
                 data = file_descriptor.read()
-                print(filename.replace(directory, ''))
+                logger.info(f"{filename.replace(directory, '')}")
                 yield filename.replace(directory, ''), data
 
 
@@ -170,6 +173,7 @@ def process_files(file_iterator, product):
     log_errors = []
     structure = OrderedDict([('product', product.name),
                              ('type', ProductType.PRODUCT_TYPES[product.product_type.type]),
+                             ('single_customization', product.product_type.single_customization),
                              ('can_preview', product.product_type.can_preview),
                              ('contexts', [])])
     find_context('root', '.', structure, product.name)
