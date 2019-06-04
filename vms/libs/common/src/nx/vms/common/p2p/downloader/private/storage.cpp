@@ -368,7 +368,7 @@ ResultCode Storage::writeFileChunk(const QString& fileName, int chunkIndex, cons
         return ResultCode::invalidChunkIndex;
 
     if (it->status == FileInformation::Status::downloaded)
-        return ResultCode::ioError;
+        return ResultCode::fileAlreadyDownloaded;
 
     QFile file(it->fullFilePath);
     if (!file.open(QFile::ReadWrite)) //< ReadWrite because WriteOnly implies Truncate.
