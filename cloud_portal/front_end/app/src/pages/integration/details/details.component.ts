@@ -105,7 +105,7 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
 
                                     this.plugin = this.integrationService.format(result[0]);
 
-                                    if (this.plugin && (this.plugin.pending && this.plugin.draft)) {
+                                    if (this.plugin.pending || this.plugin.draft) {
                                         this.ribbonService.show(
                                                 this.lang[this.translate.currentLang].integration.previewRibbonText,
                                                 this.lang[this.translate.currentLang].integration.backToEditText,
