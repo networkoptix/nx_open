@@ -70,7 +70,7 @@ then
         KEYCHAIN_ARGS="--keychain $KEYCHAIN"
     fi
 
-    codesign -f -v --deep $KEYCHAIN_ARGS -s "@mac.sign.identity@" "$APP_DIR"
+    codesign -f -v --deep --timestamp $KEYCHAIN_ARGS -s "@mac.sign.identity@" "$APP_DIR"
 fi
 
 SetFile -c icnC $SRC/.VolumeIcon.icns
