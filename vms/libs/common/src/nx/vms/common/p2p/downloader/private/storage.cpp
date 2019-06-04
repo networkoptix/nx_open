@@ -9,7 +9,6 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/file_system.h>
-#include <utils/common/synctime.h>
 
 using namespace std::chrono;
 
@@ -93,7 +92,7 @@ FileInformation Storage::fileInformation(const QString& fileName) const
 ResultCode Storage::addFile(FileInformation fileInformation, bool updateTouchTime)
 {
     if (updateTouchTime)
-        fileInformation.touchTime = qnSyncTime->currentMSecsSinceEpoch();
+        fileInformation.touchTime = QDateTime::currentMSecsSinceEpoch();
 
     if (fileInformation.status == FileInformation::Status::downloaded)
         return addDownloadedFile(fileInformation);
@@ -401,7 +400,7 @@ ResultCode Storage::writeFileChunk(const QString& fileName, int chunkIndex, cons
         });
 
     it->downloadedChunks.setBit(chunkIndex);
-    it->touchTime = qnSyncTime->currentMSecsSinceEpoch();
+    it->touchTime = QDateTime::currentMSecsSinceEpoch();
     checkDownloadCompleted(it.value());
     saveMetadata(it.value());
 
@@ -534,7 +533,7 @@ void Storage::cleanupExpiredFiles()
 {
     QnMutexLocker lock(&m_mutex);
 
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 
     QSet<QString> expiredFiles;
     for (const FileMetadata& data: m_fileInformationByName)
