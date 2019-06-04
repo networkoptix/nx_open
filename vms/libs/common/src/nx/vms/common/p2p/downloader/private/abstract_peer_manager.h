@@ -1,6 +1,9 @@
 #pragma once
 
 #include <functional>
+#include <optional>
+#include <future>
+#include <memory>
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
@@ -30,38 +33,59 @@ public:
 
     virtual ~AbstractPeerManager() = default;
 
+    template<typename T>
+    struct RequestContext
+    {
+        using Result = std::optional<T>;
+        using Future = std::future<Result>;
+        Future future;
+        std::function<void()> cancelFunction = {};
+
+        void cancel() const
+        {
+            if (cancelFunction)
+                cancelFunction();
+        }
+
+        bool isValid() const
+        {
+            return future.valid();
+        }
+    };
+
+    // All peer managers managers share promise between handler and canceller, and it is hard to
+    // guarantee a certain call order. This function simplifies their code.
+    template<typename T>
+    static void setPromiseValueIfEmpty(
+        const std::shared_ptr<std::promise<T>>& promise, const T& value)
+    {
+        try
+        {
+            promise->set_value(value);
+        }
+        catch (const std::future_error&)
+        {
+        }
+    }
+
     /** @return Human readable peer name. This is mostly used in logs. */
     virtual QString peerString(const QnUuid& peerId) const { return peerId.toString(); }
     virtual QList<QnUuid> getAllPeers() const = 0;
     virtual QList<QnUuid> peers() const = 0;
     virtual int distanceTo(const QnUuid& peerId) const = 0;
 
-    using FileInfoCallback =
-        std::function<void(bool, rest::Handle, const FileInformation&)>;
-    virtual rest::Handle requestFileInfo(
-        const QnUuid& peer,
-        const QString& fileName,
-        const nx::utils::Url& url,
-        FileInfoCallback callback) = 0;
+    virtual RequestContext<FileInformation> requestFileInfo(
+        const QnUuid& peer, const QString& fileName, const nx::utils::Url& url) = 0;
 
-    using ChecksumsCallback =
-        std::function<void(bool, rest::Handle, const QVector<QByteArray>&)>;
-    virtual rest::Handle requestChecksums(
-        const QnUuid& peer,
-        const QString& fileName,
-        ChecksumsCallback callback) = 0;
+    virtual RequestContext<QVector<QByteArray>> requestChecksums(
+        const QnUuid& peer, const QString& fileName) = 0;
 
-    using ChunkCallback =
-        std::function<void(bool, rest::Handle, const QByteArray&)>;
-    virtual rest::Handle downloadChunk(
+    virtual RequestContext<QByteArray> downloadChunk(
         const QnUuid& peerId,
         const QString& fileName,
         const nx::utils::Url& url,
         int chunkIndex,
-        int chunkSize,
-        ChunkCallback callback) = 0;
-
-    virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) = 0;
+        int chunkSize) = 0;
 
     const Capabilities capabilities;
 };
