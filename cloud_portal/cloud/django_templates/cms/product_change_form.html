@@ -7,37 +7,42 @@
         <h2>Product Information</h2>
         {{ block.super }}
 
+        <h2>Related Groups</h2>
+        <div class="table-responsive" style="margin-bottom: 10px;">
         {% if related_groups %}
-            <h2>Related Groups</h2>
-            <div class="table-responsive" style="margin-bottom: 10px;">
-                <table class="table table-condensed">
-                    <thead>
-                        <tr>
-                            <td><strong>Group</strong></td>
-                            <td><strong>Permissions</strong></td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for group in related_groups %}
-                        <tr>
-                            <td>
-                                {% if user.is_superuser %}
-                                    <a href="{% url 'admin:api_proxygroup_change' group.pk %}">{{ group.name }}</a>
-                                {% else %}
-                                    {{ group.name }}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% for permission in group.permissions.all %}
-                                {{ permission.name }}{% if not forloop.last %}, {% endif %}
-                                {% endfor %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <td><strong>Group</strong></td>
+                        <td><strong>Permissions</strong></td>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for group in related_groups %}
+                    <tr>
+                        <td>
+                            {% if user.is_superuser %}
+                                <a href="{% url 'admin:api_proxygroup_change' group.pk %}">{{ group.name }}</a>
+                            {% else %}
+                                {{ group.name }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for permission in group.permissions.all %}
+                            {{ permission.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         {% endif %}
+
+        {% if user.is_superuser %}
+            <a class="btn btn-default pull-right" style="margin-bottom:10px;"
+               href="{% url 'admin:api_proxygroup_add' %}">Create Group</a>
+        {% endif %}
+        </div>
 
         {% if current_versions %}
             <h2>Current Version for customization</h2>
