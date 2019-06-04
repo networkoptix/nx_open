@@ -17,11 +17,6 @@ AnalyticsArchive::AnalyticsArchive(const QString& dataDir, const QString& unique
 {
 }
 
-QnTimePeriodList AnalyticsArchive::matchPeriod(const AnalyticsFilter& filter)
-{
-    return base_type::matchPeriodInternal(filter);
-}
-
 bool matchAdditionData(const AnalyticsArchive::Filter& filter, const quint8* data, int size)
 {
     auto matchIntInList = [](int64_t value, const std::vector<int64_t>& values)
@@ -37,6 +32,11 @@ bool matchAdditionData(const AnalyticsArchive::Filter& filter, const quint8* dat
     const auto& analyticsFilter = static_cast<const AnalyticsArchive::AnalyticsFilter&>(filter);
     return matchIntInList(recordEx->objectType, analyticsFilter.objectTypes)
         && matchIntInList(recordEx->attributesHash, analyticsFilter.allAttributesHash);
+}
+
+QnTimePeriodList AnalyticsArchive::matchPeriod(const AnalyticsFilter& filter)
+{
+    return base_type::matchPeriodInternal(filter, matchAdditionData);
 }
 
 std::tuple<std::vector<uint32_t>, QnTimePeriod>  AnalyticsArchive::matchObjects(
