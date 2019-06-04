@@ -441,9 +441,6 @@ bool QnStorageConfigWidget::hasChanges() const
     if (hasStoragesChanges(m_model->storages()))
         return true;
 
-    if (m_model->metadataStorageId() != m_server->metadataStorageId())
-        return true;
-
     if (m_quality != qnGlobalSettings->backupQualities())
         return true;
 
@@ -560,51 +557,66 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
             if (record.id != m_model->metadataStorageId())
             {
                 const auto storageId = record.id;
-                if (storageId == m_server->metadataStorageId())
+
+                // Metadata storage has been changed, we need to do something with database.
+                QnMessageBox msgBox(
+                    QnMessageBoxIcon::Question,
+                    tr("What to do with current analytics data?"),
+                    tr("Current analytics data will not be automatically moved to another location"
+                        " and will become unaccessible. You can keep it and manually move later,"
+                        " or delete permanently."
+                        "\n"
+                        "If you intended to move analytics data to another storage location,"
+                        " please contact support before proceeding."),
+                    QDialogButtonBox::StandardButtons(),
+                    QDialogButtonBox::NoButton,
+                    this);
+
+                const auto deleteButton = msgBox.addButton(tr("Delete"),
+                    QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Warning);
+                const auto keepButton = msgBox.addButton(tr("Keep"),
+                    QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
+                const auto cancelButton = msgBox.addButton(tr("Cancel"),
+                    QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
+
+                cancelButton->setFocus();
+
+                msgBox.exec();
+
+                const auto updateServerSettings =
+                    [this](
+                        const nx::vms::api::MetadataStorageChangePolicy policy,
+                        const QnUuid &storageId)
+                    {
+                        qnGlobalSettings->setMetadataStorageChangePolicy(policy);
+                        qnGlobalSettings->synchronizeNow();
+
+                        qnResourcesChangesManager->saveServer(m_server,
+                            [storageId](const QnMediaServerResourcePtr &server)
+                            {
+                                server->setMetadataStorageId(storageId);
+                            });
+                    };
+
+
+                if (msgBox.clickedButton() == deleteButton)
                 {
-                    // The current storage has been chosen.
+                    updateServerSettings(
+                        nx::vms::api::MetadataStorageChangePolicy::remove,
+                        storageId);
+
                     m_model->setMetadataStorageId(storageId);
                     updateWarnings();
                 }
-                else
+
+                if (msgBox.clickedButton() == keepButton)
                 {
-                    // Metadata storage has been changed, we need to do something with database.
-                    QnMessageBox msgBox(
-                        QnMessageBoxIcon::Question,
-                        tr("What to do with current analytics data?"),
-                        tr("Current analytics data will not be automatically moved to another location"
-                            " and will become unaccessible. You can keep it and manually move later,"
-                            " or delete permanently."
-                            "\n"
-                            "If you intended to move analytics data to another storage location,"
-                            " please contact support before proceeding."),
-                        QDialogButtonBox::StandardButtons(),
-                        QDialogButtonBox::NoButton,
-                        this);
+                    updateServerSettings(
+                        nx::vms::api::MetadataStorageChangePolicy::remove,
+                        storageId);
 
-                    const auto deleteButton = msgBox.addButton(tr("Delete"),
-                        QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Warning);
-                    const auto keepButton = msgBox.addButton(tr("Keep"),
-                        QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
-                    const auto cancelButton = msgBox.addButton(tr("Cancel"),
-                        QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
-
-                    cancelButton->setFocus();
-
-                    msgBox.exec();
-
-                    if (msgBox.clickedButton() == deleteButton)
-                    {
-                        m_model->setMetadataStorageId(storageId,
-                            QnStorageListModel::DeleteExistingMetadata);
-                        updateWarnings();
-                    }
-
-                    if (msgBox.clickedButton() == keepButton)
-                    {
-                        m_model->setMetadataStorageId(storageId);
-                        updateWarnings();
-                    }
+                    m_model->setMetadataStorageId(storageId);
+                    updateWarnings();
                 }
             }
         }
@@ -747,21 +759,6 @@ void QnStorageConfigWidget::applyChanges()
 
     if (!storagesToRemove.empty())
         qnServerStorageManager->deleteStorages(storagesToRemove);
-
-    if (m_model->metadataStorageId() != m_server->metadataStorageId())
-    {
-        qnGlobalSettings->setMetadataStorageChangePolicy(
-            m_model->keepMetadata()
-                ? nx::vms::api::MetadataStorageChangePolicy::keep
-                : nx::vms::api::MetadataStorageChangePolicy::remove);
-        qnGlobalSettings->synchronizeNow();
-
-        qnResourcesChangesManager->saveServer(m_server,
-            [this](const QnMediaServerResourcePtr &server)
-            {
-                server->setMetadataStorageId(m_model->metadataStorageId());
-            });
-    }
 
     if (m_backupSchedule != m_server->getBackupSchedule())
     {

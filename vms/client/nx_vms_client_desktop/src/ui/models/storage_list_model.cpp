@@ -105,20 +105,13 @@ QnUuid QnStorageListModel::metadataStorageId() const
     return m_metadataStorageId;
 }
 
-void QnStorageListModel::setMetadataStorageId(const QnUuid &id, MetadataAction action)
+void QnStorageListModel::setMetadataStorageId(const QnUuid &id)
 {
-    m_keepMetadata = (action == KeepExistingMetadata);
-
     if (m_metadataStorageId == id)
         return;
 
     ScopedReset reset(this); // TODO: #common Do we need this reset?
     m_metadataStorageId = id;
-}
-
-bool QnStorageListModel::keepMetadata() const
-{
-    return m_keepMetadata;
 }
 
 void QnStorageListModel::updateRebuildInfo(QnServerStoragesPool pool, const QnStorageScanData& rebuildStatus)
