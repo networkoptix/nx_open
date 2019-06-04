@@ -856,7 +856,7 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
         case Code::noError:
             return "No error. It is a bug if you see this message.";
         case Code::updatePackageNotFound:
-            return tr("Update package can't be not found.");
+            return tr("Update package is not found.");
         case Code::noFreeSpaceToDownload:
             return tr("There is not enough space to download update files.");
         case Code::noFreeSpaceToExtract:
