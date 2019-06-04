@@ -1091,7 +1091,7 @@ private:
     }
 };
 
-TEST_F(AnalyticsDbLookup, empty_filter_matches_all_events)
+TEST_F(AnalyticsDbLookup, empty_filter_matches_all_objects)
 {
     whenLookupByEmptyFilter();
     thenResultMatchesExpectations();

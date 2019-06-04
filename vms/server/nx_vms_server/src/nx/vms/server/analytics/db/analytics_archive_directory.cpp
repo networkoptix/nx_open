@@ -3,7 +3,14 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <analytics/db/config.h>
+
+#include "object_type_dao.h"
+#include "serializers.h"
+
 namespace nx::analytics::db {
+
+static constexpr QRect kFullRegion(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight);
 
 AnalyticsArchiveDirectory::AnalyticsArchiveDirectory(
     QnMediaServerModule* mediaServerModule,
@@ -49,8 +56,10 @@ bool AnalyticsArchiveDirectory::saveToArchive(
 
 QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(
     const std::vector<QnUuid>& deviceIds,
-    const Filter& filter)
+    Filter filter)
 {
+    fixFilterRegion(&filter);
+
     // TODO: #ak If there are more than one device given we can apply map/reduce to speed things up.
 
     std::vector<QnTimePeriodList> timePeriods;
@@ -64,40 +73,107 @@ QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(
     const QnUuid& deviceId,
     const Filter& filter)
 {
-    static constexpr QRect kFullRegion(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight);
-
     auto it = m_deviceIdToArchive.find(deviceId);
     if (it == m_deviceIdToArchive.end())
         return {};
 
-#ifdef USE_IN_MEMORY_ARCHIVE
     return it->second->matchPeriod(filter);
-#else
-    AnalyticsArchiveImpl::AnalyticsFilter archiveFilter;
-    archiveFilter.region = filter.region;
-    if (archiveFilter.region.isEmpty())
+}
+
+AnalyticsArchiveDirectory::ObjectMatchResult AnalyticsArchiveDirectory::matchObjects(
+    const std::vector<QnUuid>& deviceIds,
+    Filter filter)
+{
+    if (deviceIds.empty())
+        return {};
+
+    fixFilterRegion(&filter);
+    filter.limit = std::min(
+        filter.limit > 0 ? filter.limit : kMaxObjectLookupResultSet,
+        kMaxObjectLookupResultSet);
+
+    std::vector<std::pair<int64_t /*timestamp*/, int64_t /*objectGroupId*/>> objectGroups;
+    for (const auto deviceId: deviceIds)
     {
-        archiveFilter.region = kFullRegion;
+        auto deviceResult = matchObjects(deviceId, filter);
+
+        std::transform(
+            deviceResult.data.begin(), deviceResult.data.end(),
+            std::back_inserter(objectGroups),
+            [](const auto& item) { return std::make_pair(item.timestampMs, item.objectGroupId); });
     }
+
+    return toObjectMatchResult(filter, std::move(objectGroups));
+}
+
+AnalyticsArchiveDirectory::ObjectMatchResult AnalyticsArchiveDirectory::toObjectMatchResult(
+    const Filter& filter,
+    std::vector<std::pair<int64_t /*timestamp*/, int64_t /*objectGroupId*/>> objectGroups)
+{
+    if (filter.sortOrder == Qt::AscendingOrder)
+        std::sort(objectGroups.begin(), objectGroups.end(), std::less<>());
     else
+        std::sort(objectGroups.begin(), objectGroups.end(), std::greater<>());
+
+    if (objectGroups.size() > filter.limit)
+        objectGroups.erase(objectGroups.begin() + filter.limit, objectGroups.end());
+
+    ObjectMatchResult result;
+    std::transform(
+        objectGroups.begin(), objectGroups.end(),
+        std::back_inserter(result.objectGroups),
+        std::mem_fn(&std::pair<int64_t, int64_t>::second));
+
+    result.maxAnalyzedTime = std::chrono::milliseconds(objectGroups.back().first);
+
+    return result;
+}
+
+AnalyticsArchive::Filter AnalyticsArchiveDirectory::prepareArchiveFilter(
+    const db::Filter& filter,
+    const ObjectTypeDao& objectTypeDao)
+{
+    AnalyticsArchive::Filter archiveFilter;
+
+    if (!filter.objectTypeId.empty())
     {
-        // Cutting everything beyond grid.
-        archiveFilter.region = archiveFilter.region.intersected(kFullRegion);
+        std::transform(
+            filter.objectTypeId.begin(), filter.objectTypeId.end(),
+            std::back_inserter(archiveFilter.objectTypes),
+            [&objectTypeDao](const auto& objectType)
+            {
+                return objectTypeDao.objectTypeIdFromName(objectType);
+            });
     }
+
+    if (filter.boundingBox)
+        archiveFilter.region = kFullRegion.intersected(translateToSearchGrid(*filter.boundingBox));
     archiveFilter.startTime = filter.timePeriod.startTime();
     archiveFilter.endTime = filter.timePeriod.endTime();
-    archiveFilter.detailLevel = filter.detailLevel;
-    archiveFilter.limit = filter.limit;
     archiveFilter.sortOrder = filter.sortOrder;
-    std::copy(
-        filter.objectTypes.begin(), filter.objectTypes.end(),
-        std::back_inserter(archiveFilter.objectTypes));
-    std::copy(
-        filter.allAttributesHash.begin(), filter.allAttributesHash.end(),
-        std::back_inserter(archiveFilter.allAttributesHash));
+    if (filter.maxObjectsToSelect > 0)
+        archiveFilter.limit = filter.maxObjectsToSelect;
 
-    return it->second->matchPeriod(archiveFilter);
-#endif
+    return archiveFilter;
+}
+
+void AnalyticsArchiveDirectory::fixFilterRegion(Filter* filter)
+{
+    if (filter->region.isEmpty())
+        filter->region = kFullRegion;
+    else
+        filter->region = filter->region.intersected(kFullRegion);
+}
+
+nx::vms::server::metadata::AnalyticsArchive::MatchObjectsResult AnalyticsArchiveDirectory::matchObjects(
+    const QnUuid& deviceId,
+    const Filter& filter)
+{
+    auto it = m_deviceIdToArchive.find(deviceId);
+    if (it == m_deviceIdToArchive.end())
+        return {};
+
+    return it->second->matchObjects(filter);
 }
 
 } // namespace nx::analytics::db

@@ -13,6 +13,9 @@
 
 namespace nx::analytics::db {
 
+class AttributesDao;
+class AnalyticsArchiveDirectory;
+
 struct TimeRangeFields
 {
     const char* timeRangeStart;
@@ -35,6 +38,8 @@ public:
     ObjectSearcher(
         const DeviceDao& deviceDao,
         const ObjectTypeDao& objectTypeDao,
+        AttributesDao* attributesDao,
+        AnalyticsArchiveDirectory* analyticsArchive,
         Filter filter);
 
     /**
@@ -72,7 +77,20 @@ public:
 private:
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
+    AttributesDao* m_attributesDao = nullptr;
+    AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
     Filter m_filter;
+
+    std::optional<DetectedObject> fetchObjectById(
+        nx::sql::QueryContext* queryContext,
+        const QnUuid& objectGuid);
+
+    std::vector<DetectedObject> lookupObjectsUsingArchive(nx::sql::QueryContext* queryContext);
+
+    void fetchObjectsFromDb(
+        nx::sql::QueryContext* queryContext,
+        const std::vector<std::int64_t>& objectGroups,
+        std::vector<DetectedObject>* result);
 
     void prepareLookupQuery(nx::sql::AbstractSqlQuery* query);
 
@@ -82,6 +100,8 @@ private:
 
     std::vector<DetectedObject> loadObjects(nx::sql::AbstractSqlQuery* query);
     DetectedObject loadObject(nx::sql::AbstractSqlQuery* query);
+
+    bool satisfiesFilter(const DetectedObject& object) const;
     void filterTrack(std::vector<ObjectPosition>* const track);
 
     static void addObjectTypeIdToFilter(

@@ -138,6 +138,8 @@ void EventsStorage::createLookupCursor(
     auto objectSearcher = std::make_shared<ObjectSearcher>(
         m_deviceDao,
         m_objectTypeDao,
+        &m_attributesDao,
+        m_analyticsArchiveDirectory.get(),
         std::move(filter));
 
     m_dbController->queryExecutor().createCursor<DetectedObject>(
@@ -185,6 +187,8 @@ void EventsStorage::lookup(
             ObjectSearcher objectSearcher(
                 m_deviceDao,
                 m_objectTypeDao,
+                &m_attributesDao,
+                m_analyticsArchiveDirectory.get(),
                 std::move(filter));
             *result = objectSearcher.lookup(queryContext);
             return nx::sql::DBResult::ok;
