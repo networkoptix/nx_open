@@ -98,7 +98,7 @@ public:
         QByteArray* outContentType)
     {
         QnFusionRestHandlerDetail::serializeJsonRestReply(
-            outputData, params, *outBody, *outContentType);
+            outputData, params, *outBody, *outContentType, QnRestResult());
         return nx::network::http::StatusCode::ok;
     }
 };

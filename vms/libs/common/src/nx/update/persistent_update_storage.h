@@ -8,6 +8,9 @@
 
 namespace nx::update {
 
+static const QString kTargetKey = "target";
+static const QString kInstalledKey = "installed";
+
 struct PersistentUpdateStorage
 {
     QList<QnUuid> servers;

@@ -8,6 +8,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <rest/server/rest_connection_processor.h>
+#include <nx/update/persistent_update_storage.h>
 
 QnPersistentUpdateStorageRestHandler::QnPersistentUpdateStorageRestHandler(
     QnMediaServerModule* serverModule)
@@ -23,7 +24,8 @@ static const QString kVersionParam("version");
 static bool checkVersionParam(const QnRequestParamList& params)
 {
     return params.contains(kVersionParam)
-        && (params[kVersionParam] == "target" || params[kVersionParam] == "installed");
+        && (params[kVersionParam] == nx::update::kTargetKey
+            || params[kVersionParam] == nx::update::kInstalledKey);
 }
 
 static int logAndMakeError(
@@ -64,16 +66,8 @@ int QnPersistentUpdateStorageRestHandler::executePost(
             &result, &resultContentType);
     }
 
-    if (!serverModule()->updateManager()->setUpdatePersistentStorageServers(
-        serverList, params[kVersionParam]))
-    {
-        return logAndMakeError(
-            request,
-            QString("Failed to set new persistent storages list: (%1)").arg(QString::fromUtf8(body)),
-            &result,
-            &resultContentType,
-            nx::network::http::StatusCode::internalServerError);
-    }
+    serverModule()->updateManager()->setUpdatePersistentStorageServers(
+        serverList, params[kVersionParam], /*manuallySet*/ true);
 
     return QnFusionRestHandler::makeReply(
         serverModule()->updateManager()->updatePersistentStorageServers(params[kVersionParam]),
