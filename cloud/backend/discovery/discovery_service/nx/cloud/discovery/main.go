@@ -93,34 +93,24 @@ func postNode(writer http.ResponseWriter, request *http.Request, params httprout
 	}
 }
 
-func getCloudModulesXmlApi(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	onlineNodes, err, httpStatusCode := getOnlineNodesImpl(request.URL.Query().Get("mediatorCluster"))
-	if len(onlineNodes) == 0 {
-		writeError("getCloudModulesXmlApi: getOnlineNodesImpl", httpStatusCode, writer, err)
+func getCloudModulesXml(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	xmlFunc, ok := CloudModulesXmlFunctions[request.URL.Path]
+	if !ok {
+		err := errors.New("no cloud_modules.xml function found for url path: " + request.URL.Path)
+		writeError("getCloudModulesXml", http.StatusNotFound, writer, err)
 		return
 	}
 
-	xml, err, httpStatusCode := ApiCloudModulesXml(request, &onlineNodes[0])
-	if err != nil {
-		writeError("getCloudModulesXmlApi: ApiCloudModulesXml", httpStatusCode, writer, err)
-		return
-	}
-
-	writer.Header().Set("Content-Type", "application/xml; charset=UTF-8")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write([]byte(xml))
-}
-
-func getCloudModulesXmlV1(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	onlineNodes, err, httpStatusCode := getOnlineNodesImpl(request.URL.Query().Get("mediatorCluster"))
 	if err != nil {
-		writeError("getCloudModulesXmlV1: getOnlineNdoesImpl", httpStatusCode, writer, err)
+		writeError("getCloudModulesXml: getOnlineNodesImpl", httpStatusCode, writer, err)
 		return
 	}
 
-	xml, err, httpStatusCode := V1CloudModulesXml(request, &onlineNodes[0])
+	xml, err, httpStatusCode := xmlFunc(request, &onlineNodes[0])
 	if err != nil {
-		writeError("getCloudModulesXmlV1: V1CloudModulesXml", httpStatusCode, writer, err)
+		apiFunc := "getCloudModulesXml: url path: " + request.URL.Path
+		writeError(apiFunc, httpStatusCode, writer, err)
 		return
 	}
 
@@ -134,7 +124,8 @@ func main() {
 	router := httprouter.New()
 	router.GET("/cluster/:clusterId/nodes", getOnlineNodes)
 	router.POST("/cluster/:clusterId/nodes", postNode)
-	router.GET("/api/cloud_modules.xml", getCloudModulesXmlApi)
-	router.GET("/discovery/v1/cloud_modules.xml", getCloudModulesXmlV1)
+	for key := range CloudModulesXmlFunctions {
+		router.GET(key, getCloudModulesXml)
+	}
 	algnhsa.ListenAndServe(router, nil)
 }

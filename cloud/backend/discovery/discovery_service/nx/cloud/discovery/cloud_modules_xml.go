@@ -6,14 +6,14 @@ import (
 	"net/http"
 )
 
-var kCloudModulesXmlTemplateApi = `<?xml version="1.0" encoding="utf-8"?>
+const kCloudModulesXmlTemplateApi string = `<?xml version="1.0" encoding="utf-8"?>
 <sequence>
 	<set resName="cdb" resValue="https://%s:443"/>
 	<set resName="hpm" resValue="%s"/>
 </sequence>
 `
 
-var kCloudModulesXmlTemplateV1 = `<?xml version="1.0" encoding="utf-8"?>
+const kCloudModulesXmlTemplateV1 string = `<?xml version="1.0" encoding="utf-8"?>
 <sequence>
 	<set resName="cdb" resValue="https://%s:443"/>
 		<sequence>
@@ -23,6 +23,11 @@ var kCloudModulesXmlTemplateV1 = `<?xml version="1.0" encoding="utf-8"?>
 	<set resName="notification_module" resValue="https://%s:443"/>
 </sequence>
 `
+
+var CloudModulesXmlFunctions = map[string]func(*http.Request, *Node) (string, error, int){
+	"/api/cloud_modules.xml":          ApiCloudModulesXml,
+	"/discovery/v1/cloud_modules.xml": V1CloudModulesXml,
+}
 
 func ApiCloudModulesXml(request *http.Request, node *Node) (string, error, int /*httpStatusCode*/) {
 	cdbHost := request.URL.Query().Get("cdbHost")
