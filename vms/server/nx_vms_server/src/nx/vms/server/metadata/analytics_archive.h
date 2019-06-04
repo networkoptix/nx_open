@@ -40,11 +40,22 @@ public:
 
     QnTimePeriodList matchPeriod(const AnalyticsFilter& filter);
 
+    struct ObjectData
+    {
+        uint32_t objectGroupId = 0;
+        int64_t timestampMs = 0;
+    };
+    struct MatchObjectsResult
+    {
+        std::vector<ObjectData> data;
+        QnTimePeriod boundingPeriod;
+    };
+
     /*
-     * Return list of matched objectGroupId and scanned time period.
-     * Each GroupId from the result list should be resolved to a objectId list via SQL database.
+     * Return list of matched objectGroupId, their timestamps and bounding time period.
+     * Each objectGroupId from the result list should be resolved to a objectId list via SQL database.
      */
-    std::tuple<std::vector<uint32_t>, QnTimePeriod> matchObjects(const AnalyticsFilter& filter);
+    MatchObjectsResult matchObjects(const AnalyticsFilter& filter);
 };
 
 } // namespace nx::vms::server::metadata

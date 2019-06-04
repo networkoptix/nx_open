@@ -180,29 +180,25 @@ TEST_F(AnalyticsArchive, matchObjectGroups)
 
     createTestData();
 
-    metadata::AnalyticsArchive archive(serverModule().metadataDatabaseDir(), m_camera->getPhysicalId());
+    metadata::AnalyticsArchive archive(
+        serverModule().metadataDatabaseDir(), m_camera->getPhysicalId());
     auto request = createRequest(Qt::SortOrder::AscendingOrder);
     request.limit = 100;
 
-#if 0
     auto result = archive.matchObjects(request);
-    auto values = std::get<0>(result);
-    auto timePeriod = std::get<1>(result);
-    ASSERT_EQ(request.limit, values.size());
-    ASSERT_EQ(1, values[0]);
-    ASSERT_EQ(request.limit, values[values.size()-1]);
-    ASSERT_EQ(kbaseDateMs, timePeriod.startTimeMs);
-    ASSERT_EQ((request.limit-1) * kDeltaMs + kAggregationInterval.count(), timePeriod.durationMs);
-#endif
+    ASSERT_EQ(request.limit, result.data.size());
+    ASSERT_EQ(1, result.data[0].objectGroupId);
+    ASSERT_EQ(request.limit, result.data[result.data.size()-1].objectGroupId);
+    ASSERT_EQ(kbaseDateMs, result.boundingPeriod.startTimeMs);
+    ASSERT_EQ((request.limit-1) * kDeltaMs + kAggregationInterval.count(),
+        result.boundingPeriod.durationMs);
 
     request.sortOrder = Qt::SortOrder::DescendingOrder;
     request.limit = 100;
-    auto result = archive.matchObjects(request);
-    auto values = std::get<0>(result);
-    auto timePeriod = std::get<1>(result);
-    ASSERT_EQ(request.limit, values.size());
-    ASSERT_EQ(kSteps, values[0]);
-    ASSERT_EQ(kSteps - request.limit + 1, values[values.size() - 1]);
+    result = archive.matchObjects(request);
+    ASSERT_EQ(request.limit, result.data.size());
+    ASSERT_EQ(kSteps, result.data[0].objectGroupId);
+    ASSERT_EQ(kSteps - request.limit + 1, result.data[result.data.size()-1].objectGroupId);
 }
 
 } // nx::vms::server::test

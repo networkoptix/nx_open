@@ -17,7 +17,10 @@ AnalyticsArchive::AnalyticsArchive(const QString& dataDir, const QString& unique
 {
 }
 
-bool matchAdditionData(const AnalyticsArchive::Filter& filter, const quint8* data, int size)
+bool matchAdditionData(
+    int64_t /*timestampMs*/,
+    const AnalyticsArchive::Filter& filter,
+    const quint8* data, int size)
 {
     auto matchIntInList = [](int64_t value, const std::vector<int64_t>& values)
     {
@@ -39,19 +42,20 @@ QnTimePeriodList AnalyticsArchive::matchPeriod(const AnalyticsFilter& filter)
     return base_type::matchPeriodInternal(filter, matchAdditionData);
 }
 
-std::tuple<std::vector<uint32_t>, QnTimePeriod>  AnalyticsArchive::matchObjects(
+AnalyticsArchive::MatchObjectsResult  AnalyticsArchive::matchObjects(
     const AnalyticsFilter& filter)
 {
-    std::vector<uint32_t> result;
+    MatchObjectsResult result;
 
     auto matchExtraData =
-        [&result](const AnalyticsArchive::Filter& filter, const quint8* data, int size)
+        [&result](int64_t timestampMs,
+            const AnalyticsArchive::Filter& filter, const quint8* data, int size)
         {
-            bool isMatched = matchAdditionData(filter, data, size);
+            bool isMatched = matchAdditionData(timestampMs, filter, data, size);
             if (isMatched)
             {
                 BinaryRecordEx* recordEx = (BinaryRecordEx*)data;
-                result.push_back(recordEx->objectsGroupId);
+                result.data.push_back({recordEx->objectsGroupId, timestampMs});
             }
             return isMatched;
     };
@@ -59,26 +63,25 @@ std::tuple<std::vector<uint32_t>, QnTimePeriod>  AnalyticsArchive::matchObjects(
     auto checkLimitInResult =
         [&result, &filter]()
         {
-            return result.size() >= filter.limit;
+            return result.data.size() >= filter.limit;
         };
 
     auto timePeriods = base_type::matchPeriodInternal(filter, matchExtraData, checkLimitInResult);
-    QnTimePeriod outPeriod;
     if (!timePeriods.isEmpty())
     {
         if (filter.sortOrder == Qt::SortOrder::AscendingOrder)
         {
-            outPeriod.startTimeMs = timePeriods.front().startTimeMs;
-            outPeriod.setEndTimeMs(timePeriods.back().endTimeMs());
+            result.boundingPeriod.startTimeMs = timePeriods.front().startTimeMs;
+            result.boundingPeriod.setEndTimeMs(timePeriods.back().endTimeMs());
         }
         else
         {
-            outPeriod.startTimeMs = timePeriods.back().startTimeMs;
-            outPeriod.setEndTimeMs(timePeriods.front().endTimeMs());
+            result.boundingPeriod.startTimeMs = timePeriods.back().startTimeMs;
+            result.boundingPeriod.setEndTimeMs(timePeriods.front().endTimeMs());
         }
 
     }
-    return { result, outPeriod };
+    return result;
 }
 
 template <typename RectType>

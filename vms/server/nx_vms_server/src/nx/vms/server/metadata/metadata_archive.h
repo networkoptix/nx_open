@@ -63,7 +63,8 @@ public:
 protected:
     static const int kGridDataSizeBytes = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8;
 
-    using MatchExtraDataFunc = std::function<bool(const Filter&, const quint8*, int)>;
+    using MatchExtraDataFunc =
+        std::function<bool(int64_t timestampMs, const Filter&, const quint8*, int)>;
 
     QnTimePeriodList matchPeriodInternal(
         const Filter& filter,

@@ -280,11 +280,11 @@ void MetadataArchive::loadDataFromIndex(
         quint8* curData = buffer;
         while (i < endItr && curData < dataEnd)
         {
+            qint64 fullStartTime = i->start + indexHeader.startTime;
             if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd)
-                && (!matchExtraData || matchExtraData(filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes)))
+                && (!matchExtraData
+                    || matchExtraData(fullStartTime, filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes)))
             {
-                qint64 fullStartTime = i->start + indexHeader.startTime;
-
                 if (rez.empty())
                 {
                     rez.push_back(QnTimePeriod(fullStartTime, i->duration));
@@ -348,11 +348,11 @@ void MetadataArchive::loadDataFromIndexDesc(
         quint8* curData = dataEnd - recordSize();
         while (i >= startItr && curData >= buffer)
         {
+            qint64 fullStartTimeMs = i->start + indexHeader.startTime;
             if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd)
-                && (!matchExtraData || matchExtraData(filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes)))
+                && (!matchExtraData ||
+                    matchExtraData(fullStartTimeMs, filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes)))
             {
-                qint64 fullStartTimeMs = i->start + indexHeader.startTime;
-
                 if (rez.empty())
                 {
                     rez.push_back(QnTimePeriod(fullStartTimeMs, i->duration));
