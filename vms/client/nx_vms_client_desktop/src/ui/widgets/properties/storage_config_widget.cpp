@@ -581,6 +581,7 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
 
                 cancelButton->setFocus();
 
+                msgBox.setEscapeButton(cancelButton);
                 msgBox.exec();
 
                 const auto updateServerSettings =
