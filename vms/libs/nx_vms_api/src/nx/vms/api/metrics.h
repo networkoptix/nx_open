@@ -56,10 +56,10 @@ QN_FUSION_DECLARE_FUNCTIONS(ParameterGroupManifest, (json), NX_VMS_API)
 using Manifest
     = std::map<QString /*resourceGroup*/, std::vector<ParameterGroupManifest>>;
 
-ParameterGroupManifest makeParameterManifest(
+NX_UTILS_API ParameterGroupManifest makeParameterManifest(
     QString id, QString name = {}, QString unit = {});
 
-ParameterGroupManifest makeParameterGroupManifest(
+NX_UTILS_API ParameterGroupManifest makeParameterGroupManifest(
     QString id, QString name = {}, std::vector<ParameterGroupManifest> group = {});
 
 // -----------------------------------------------------------------------------------------------
@@ -79,8 +79,11 @@ struct ParameterGroupValues: ParameterValue
 #define ParameterGroupValues_Fields ParameterValue_Fields (group)
 QN_FUSION_DECLARE_FUNCTIONS(ParameterGroupValues, (json), NX_VMS_API)
 
-ParameterGroupValues makeParameterValue(Value value, Status status = {});
-ParameterGroupValues makeParameterGroupValue(std::map<QString, ParameterGroupValues> group);
+NX_UTILS_API ParameterGroupValues makeParameterValue(
+    Value value, Status status = {});
+
+NX_UTILS_API ParameterGroupValues makeParameterGroupValue(
+    std::map<QString, ParameterGroupValues> group);
 
 struct ResourceValues
 {
@@ -94,7 +97,7 @@ QN_FUSION_DECLARE_FUNCTIONS(ResourceValues, (json), NX_VMS_API)
 using Values
     = std::map<QString /*resourceGroup*/, std::map<QString /*resourceId*/, ResourceValues>>;
 
-void merge(Values* destination, Values* source);
-Values merge(std::vector<Values> valuesList);
+NX_UTILS_API void merge(Values* destination, Values* source);
+NX_UTILS_API Values merge(std::vector<Values> valuesList);
 
 } // namespace nx::vms::api::metrics
