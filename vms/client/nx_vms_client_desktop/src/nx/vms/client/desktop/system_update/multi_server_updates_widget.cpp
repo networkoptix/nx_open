@@ -1562,7 +1562,7 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         if (clicked == tryAgain)
         {
             auto serversToRetry = peersFailed;
-            m_serverUpdateTool->requestStartUpdate(m_updateInfo.info, serversToRetry);
+            m_serverUpdateTool->requestRetryAction();
             m_clientUpdateTool->setUpdateTarget(m_updateInfo);
             setTargetState(WidgetUpdateState::downloading, serversToRetry);
         }

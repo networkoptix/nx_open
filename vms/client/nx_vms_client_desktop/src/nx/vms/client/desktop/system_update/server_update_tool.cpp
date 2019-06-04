@@ -725,6 +725,32 @@ bool ServerUpdateTool::requestStopAction()
     return true;
 }
 
+bool ServerUpdateTool::requestRetryAction()
+{
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
+    {
+        NX_INFO(this, "requestRetryAction() - sending request");
+        auto handle = connection->retryUpdate(nx::utils::guarded(this,
+            [this, tool = QPointer<ServerUpdateTool>(this)](
+                bool success,
+                rest::Handle handle,
+                rest::UpdateStatusAllData response)
+            {
+                if (response.error != QnRestResult::NoError)
+                {
+                    NX_VERBOSE(this,
+                        "requestRetryAction: An error in response to the /ec2/retryUpdate request: code=%1, err=%2",
+                        response.error, response.errorString);
+                }
+
+                if (tool)
+                    tool->atUpdateStatusResponse(success, handle, response.data);
+            }), thread());
+        return handle != 0;
+    }
+    return false;
+}
+
 bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
 {
     if (m_requestingFinish)
