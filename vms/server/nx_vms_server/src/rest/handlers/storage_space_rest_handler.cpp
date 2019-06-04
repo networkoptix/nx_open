@@ -25,10 +25,13 @@
 #include <media_server/media_server_module.h>
 #include <nx/utils/log/log.h>
 
-namespace
-{
-    const QString kFastRequestKey("fast");
-}
+namespace {
+
+static const QString kFastRequestKey("fast");
+
+} // namespace
+
+const QString QnStorageSpaceRestHandler::kOwndedOnlyKey("ownedOnly");
 
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
@@ -71,7 +74,7 @@ int QnStorageSpaceRestHandler::executeGet(
             ? QnStorageResourceList()
             : serverModule()->backupStorageManager()->getAllWritableStorages());
 
-    if (!fastRequest)
+    if (!fastRequest && !params.contains(kOwndedOnlyKey))
     {
         for (const QnStorageSpaceData& optionalStorage: getOptionalStorages(owner->commonModule()))
             reply.storages.push_back(optionalStorage);

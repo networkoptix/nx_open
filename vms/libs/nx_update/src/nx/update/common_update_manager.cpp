@@ -4,7 +4,6 @@
 #include <common/common_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/update/common_update_installer.h>
-#include <nx/update/persistent_update_storage.h>
 #include <utils/common/synctime.h>
 
 namespace nx {
@@ -122,7 +121,7 @@ update::Status CommonUpdateManager::start()
     }
 }
 
-bool CommonUpdateManager::updatePersistentStorageServers(
+void CommonUpdateManager::setUpdatePersistentStorageServers(
     const QList<QnUuid>& serverList, const QString& version)
 {
     update::PersistentUpdateStorage updateStorage;
@@ -139,6 +138,21 @@ bool CommonUpdateManager::updatePersistentStorageServers(
         commonModule()->globalSettings()->setInstalledPersistentUpdateStorage(
             QJson::serialized(updateStorage));
     }
+}
+
+update::PersistentUpdateStorage CommonUpdateManager::updatePersistentStorageServers(
+    const QString& version) const
+{
+    QByteArray data;
+    if (version == "target")
+        data  = commonModule()->globalSettings()->targetPersistentUpdateStorage();
+    else
+        data = commonModule()->globalSettings()->installedPersistentUpdateStorage();
+
+    update::PersistentUpdateStorage result =
+        QJson::deserialized<update::PersistentUpdateStorage>(data);
+
+    return result;
 }
 
 update::Status CommonUpdateManager::status()

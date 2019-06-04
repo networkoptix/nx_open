@@ -1500,6 +1500,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /api/storageSpace
      * Get the list of all server storages.
+     * %param:string ownedOnly If set, only storages currently owned by Mediaserver will be
+     * included in the response.
      * %return:object JSON data with server storages.
      */
     reg("api/storageSpace", new QnStorageSpaceRestHandler(serverModule()));

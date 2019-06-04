@@ -16,6 +16,31 @@ QnPersistentUpdateStorageRestHandler::QnPersistentUpdateStorageRestHandler(
 {
 }
 
+namespace {
+
+static const QString kVersionParam("version");
+
+static bool checkVersionParam(const QnRequestParamList& params)
+{
+    return params.contains(kVersionParam)
+        && (params[kVersionParam] == "target" || params[kVersionParam] == "installed");
+}
+
+static int logAndMakeError(
+    const QnEmptyRequestData& request,
+    const QString& errorMessage,
+    QByteArray* outBody,
+    QByteArray* outContentType,
+    nx::network::http::StatusCode::Value code = nx::network::http::StatusCode::badRequest)
+{
+    NX_WARNING(typeid(QnPersistentUpdateStorageRestHandler), errorMessage);
+    return QnFusionRestHandler::makeError(
+        code, errorMessage, outBody, outContentType, Qn::JsonFormat,
+        request.extraFormatting, QnRestResult::CantProcessRequest);
+}
+
+} // namespace
+
 int QnPersistentUpdateStorageRestHandler::executePost(
     const QString& /*path*/,
     const QnRequestParamList& params,
@@ -28,38 +53,47 @@ int QnPersistentUpdateStorageRestHandler::executePost(
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(), params);
 
-    using namespace nx::network;
-    const auto logAndMakeError =
-        [&](const QString& errorMessage, http::StatusCode::Value code = http::StatusCode::badRequest)
-        {
-            NX_WARNING(this, errorMessage);
-            return QnFusionRestHandler::makeError(
-                code, errorMessage, &result, &resultContentType, Qn::JsonFormat,
-                request.extraFormatting, QnRestResult::CantProcessRequest);
-        };
-
-    const QString kVersionParam("version");
-    if (!params.contains(kVersionParam)
-        || (params[kVersionParam] != "target" && params[kVersionParam] != "installed"))
-    {
-        return logAndMakeError("Invalid 'version' parameter");
-    }
+    if (!checkVersionParam(params))
+        return logAndMakeError(request, "Invalid 'version' parameter", &result, &resultContentType);
 
     QList<QnUuid> serverList;
     if (!QJson::deserialize(body, &serverList))
     {
         return logAndMakeError(
-            QString("Failed to deserialize request: (%1)").arg(QString::fromUtf8(body)));
+            request, QString("Failed to deserialize request: (%1)").arg(QString::fromUtf8(body)),
+            &result, &resultContentType);
     }
 
-    if (!serverModule()->updateManager()->updatePersistentStorageServers(
+    if (!serverModule()->updateManager()->setUpdatePersistentStorageServers(
         serverList, params[kVersionParam]))
     {
         return logAndMakeError(
+            request,
             QString("Failed to set new persistent storages list: (%1)").arg(QString::fromUtf8(body)),
-            http::StatusCode::internalServerError);
+            &result,
+            &resultContentType,
+            nx::network::http::StatusCode::internalServerError);
     }
 
+    return QnFusionRestHandler::makeReply(
+        serverModule()->updateManager()->updatePersistentStorageServers(params[kVersionParam]),
+        params, &result, &resultContentType);
+}
 
-    return nx::network::http::StatusCode::ok;
+int QnPersistentUpdateStorageRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParamList& params,
+    QByteArray& result,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* processor)
+{
+    const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
+        processor->resourcePool(), params);
+
+    if (!checkVersionParam(params))
+        return logAndMakeError(request, "Invalid 'version' parameter", &result, &contentType);
+
+    return QnFusionRestHandler::makeReply(
+        serverModule()->updateManager()->updatePersistentStorageServers(params[kVersionParam]),
+        params, &result, &contentType);
 }

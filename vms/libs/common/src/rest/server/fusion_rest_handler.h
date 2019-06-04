@@ -91,4 +91,14 @@ public:
         int httpStatusCode, const QString &errorMessage, QByteArray* outBody,
         QByteArray* outContentType, Qn::SerializationFormat format, bool extraFormatting = false,
         QnRestResult::Error error = QnRestResult::CantProcessRequest);
+
+    template <typename OutputData>
+    static int makeReply(
+        const OutputData& outputData, const QnRequestParamList& params, QByteArray* outBody,
+        QByteArray* outContentType)
+    {
+        QnFusionRestHandlerDetail::serializeJsonRestReply(
+            outputData, params, *outBody, *outContentType);
+        return nx::network::http::StatusCode::ok;
+    }
 };
