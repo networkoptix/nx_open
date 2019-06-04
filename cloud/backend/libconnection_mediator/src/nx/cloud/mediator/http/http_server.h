@@ -77,7 +77,7 @@ private:
         nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool);
 
     void loadHtdigestAuthenticatorIfNeeded(const conf::Settings& settings);
-    void addPathToHtdigestAuthenticatorIfNeeded(const std::string& apiPath);
+    void addPathToHtdigestAuthenticatorIfNeeded(const std::string& regex);
 
     void registerApiHandlers(const PeerRegistrator& peerRegistrator);
 
