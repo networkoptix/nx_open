@@ -14,9 +14,11 @@
 
 {% block content%}
 <div>
+    <h3>Download package for product</h3>
     <p><a href="{% url 'download_package' product.id %}" download>Download package (zip)</a></p>
     <p><a href="{% url 'download_package' product.id %}?draft" download>Download package draft (zip)</a></p>
 </div>
+<h3>Update Product</h3>
 <form id="productForm" action="{% url 'product_settings' product.id %}"
       method="post" class="aligned" enctype="multipart/form-data">
     {% csrf_token %}

@@ -191,8 +191,7 @@ class CustomContextForm(forms.Form):
 class ProductSettingsForm(forms.Form):
     file = forms.FileField(
         label="File",
-        help_text="Archive with static files and images for content or structure.json file. "
-                  "Archive must have top-level directories named as customizations",
+        help_text="Archive with static files and images for content or structure.json file.",
         required=True
     )
 
@@ -202,8 +201,8 @@ class ProductSettingsForm(forms.Form):
         choices=(
             ('generate_json', 'Generate structure template based on archive'),
             ('update_structure',
-             'Update CMS structure and default values based on archive with structure.json and customization template'),
-            ('update_content', 'Upload customized content files for customizations')
+             'Update CMS structure and default values based on archive with structure.json and product_type template'),
+            ('update_content', 'Upload content files for product')
         )
     )
 
