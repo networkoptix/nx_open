@@ -646,9 +646,11 @@ void QnClientModule::initSkin()
     /* Initialize application UI. Skip if run in console (e.g. unit-tests). */
     if (qApp)
     {
+        const auto rootDir = QDir(QApplication::applicationDirPath());
         nx::vms::client::core::FontLoader::loadFonts(
-            QDir(QApplication::applicationDirPath()).absoluteFilePath(
+            rootDir.absoluteFilePath(
                 nx::utils::AppInfo::isMacOsX() ? "../Resources/fonts" : "fonts"));
+        QResource::registerResource(rootDir.absoluteFilePath("skin.rcc"));
 
         QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
