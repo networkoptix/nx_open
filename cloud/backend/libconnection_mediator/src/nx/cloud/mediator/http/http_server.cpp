@@ -116,6 +116,8 @@ bool Server::launchHttpServerIfNeeded(
 {
     NX_INFO(this, "Bringing up HTTP server");
 
+    loadHtdigestAuthenticatorIfNeeded(settings);
+
     registerApiHandlers(peerRegistrator);
 
     if (!m_multiAddressHttpServer.bind(
@@ -141,25 +143,33 @@ bool Server::launchHttpServerIfNeeded(
         &m_httpMessageDispatcher,
         registeredPeerPool);
 
-    m_maintenanceServer.registerRequestHandlers(
-        api::kMediatorApiPrefix,
-        &m_httpMessageDispatcher);
+    return true;
+}
 
-    if (!m_settings.http().maintenanceHtdigestPath.empty())
+void Server::loadHtdigestAuthenticatorIfNeeded(const conf::Settings& settings)
+{
+    if (!settings.http().maintenanceHtdigestPath.empty())
     {
         NX_INFO(this,
-            lm("htdigest authentication for connection mediator maintenance server enabled. File path: %1")
-                .arg(m_settings.http().maintenanceHtdigestPath));
+            lm("Htdigest authentication for connection mediator enabled. File path: %1")
+            .arg(settings.http().maintenanceHtdigestPath));
 
-        m_maintenanceAuthenticator = std::make_unique<MaintenanceAuthenticator>(
-            m_settings.http().maintenanceHtdigestPath);
+        m_htdigestAuthenticator =
+            std::make_unique<HtdigestAuthenticator>(settings.http().maintenanceHtdigestPath);
+    }
+}
+
+void Server::addPathToHtdigestAuthenticatorIfNeeded(const std::string& apiPath)
+{
+    if (m_htdigestAuthenticator)
+    {
+        NX_INFO(this, "Adding api path regex: '%1' to htdigest authenticator",
+            network::url::joinPath(apiPath, "/.*"));
 
         m_authenticationDispatcher.add(
-            std::regex(network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*")),
-            &m_maintenanceAuthenticator->manager);
+            std::regex(network::url::joinPath(apiPath, "/.*")),
+            &m_htdigestAuthenticator->manager);
     }
-
-    return true;
 }
 
 void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
@@ -173,6 +183,9 @@ void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
             return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator);
         });
 
+    addPathToHtdigestAuthenticatorIfNeeded(
+        network::url::joinPath(api::kMediatorApiPrefix, api::kStatisticsApiPrefix));
+
     m_httpMessageDispatcher.registerRequestProcessor<InitiateConnectionRequestHandler>(
         network::url::joinPath(api::kMediatorApiPrefix, api::kServerSessionsPath).c_str(),
         [this]()
@@ -182,6 +195,12 @@ void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
                 m_listeningPeerDb);
         },
         network::http::Method::post);
+
+    m_maintenanceServer.registerRequestHandlers(
+        api::kMediatorApiPrefix,
+        &m_httpMessageDispatcher);
+
+    addPathToHtdigestAuthenticatorIfNeeded(m_maintenanceServer.maintenancePath());
 }
 
 template<typename Handler, typename Arg>

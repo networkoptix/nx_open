@@ -115,7 +115,7 @@ const nx::network::http::server::MultiEndpointAcceptor& View::httpServer() const
     return m_multiAddressHttpServer;
 }
 
-nx::network::http::server::rest::MessageDispatcher & View::messageDispatcher()
+nx::network::http::server::rest::MessageDispatcher& View::messageDispatcher()
 {
     return m_httpMessageDispatcher;
 }
@@ -126,15 +126,15 @@ void View::registerAuthenticators()
     {
         NX_INFO(
             this,
-            lm("htdigest authentication for traffic relay maintenance server enabled. File path: %1")
+            lm("htdigest authentication for traffic relay enabled. File path: %1")
                .arg(m_settings.http().maintenanceHtdigestPath));
 
-        m_maintenanceAuthenticator = std::make_unique<MaintenanceAuthenticator>(
+        m_htdigestAuthenticator = std::make_unique<HtdigestAuthenticator>(
             m_settings.http().maintenanceHtdigestPath);
 
         m_authenticationDispatcher.add(
             std::regex(network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*")),
-            &m_maintenanceAuthenticator->manager);
+            &m_htdigestAuthenticator->manager);
     }
 
     m_authenticationDispatcher.add(std::regex(".*"), &m_authenticationManager);
