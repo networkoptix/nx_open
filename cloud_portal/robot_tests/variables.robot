@@ -171,7 +171,8 @@ ${MERGE BUTTON MODAL}                 ${MERGE DIALOG}//button[@class="btn btn-pr
 ${MERGE PASSWORD INPUT}               ${MERGE DIALOG}//input[@id="mergePassword"]
 ${CURRENTLY MERGING CARD}             //div[@ng-if="currentlyMerging"]
 ${MERGE NOT OWNER MESSAGE 2}          ${MERGE DIALOG}//p[@class='help-block-no-height'][2]
-
+${MERGE FAILED DIALOG HEADER}         //nx-modal-generic-content//h1[contains(text(),"${SYSTEMS MERGE FAILED TEXT}")]
+${MERGE FAILED OK BUTTON}             //nx-modal-generic-content//button[contains(text(),"${OK TEXT}")]
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
@@ -183,7 +184,7 @@ ${DISCONNECT FORM DISCONNECT BUTTON}    ${DISCONNECT FORM}//button[contains(text
 #Disconnect from my account
 ${DISCONNECT MODAL WARNING}              //p[contains(text(), "${DISCONNECT MODAL WARNING TEXT}")]
 # extra spaces here temporarily
-${DISCONNECT MODAL CANCEL}               //button[text()='${CANCEL BUTTON TEXT}']
+${DISCONNECT MODAL CANCEL}               //button[text()='${CANCEL BUTTON TEXT} ']
 ${DISCONNECT MODAL DISCONNECT BUTTON}    //button[text()='${DISCONNECT BUTTON TEXT} ']
 
 ${JUMBOTRON}                          //div[@class='jumbotron']

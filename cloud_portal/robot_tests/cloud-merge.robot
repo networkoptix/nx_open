@@ -1,10 +1,10 @@
 *** Settings ***
 Resource          resource.robot
 Resource          APIresource.robot
+Suite Setup       Startup
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    reset state
-Suite Setup       Startup
-Suite Teardown    Remove Containers
+# Suite Teardown    Remove Containers
 Force Tags        Threaded
 
 *** Variables ***
@@ -39,6 +39,8 @@ Merge
     Input Text    ${MERGE PASSWORD INPUT}    ${BASE PASSWORD}
     Click Button    ${MERGE BUTTON MODAL}
     sleep    1
+
+Validate Merge
     Check For Alert    ${SYSTEM MERGING TEXT}
     Element Should Not Be Visible    ${MERGE DIALOG}
     Wait Until Element Is Visible    ${CURRENTLY MERGING CARD}
@@ -115,12 +117,14 @@ Reset state
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL MERGE OWNER 1}    ${password}
     Validate Log In
+    ${state}    Run Keyword And Ignore Error    Element Should Be Visible    ${YOU HAVE NO SYSTEMS}
     ${count}    Run Keyword And Ignore Error    Get Element Count    ${SYSTEMS TILE}
     FOR    ${idx}    IN RANGE   ${count}[1]-1
+        Exit For Loop If    "${state[0]}"=="PASS"
         Click Element    ${SYSTEMS TILE}
         Disconnect from cloud
     END
-    Disconnect from cloud
+    Run Keyword Unless    "${state[0]}"=="PASS"    Disconnect from cloud
     Log Out
     Validate Log Out
     Log In    ${EMAIL MERGE OWNER 2}    ${password}
@@ -130,7 +134,7 @@ Reset state
         Click Element    ${SYSTEMS TILE}
         Disconnect from cloud
     END
-    Disconnect from cloud
+    Run Keyword Unless    "${state[0]}"=="PASS"    Disconnect from cloud
 
 
 *** Test Cases ***
@@ -221,6 +225,7 @@ From secondary system merge to primary with no other systems
     Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
     Go To    ${url}/systems
+    Reload Page
     Validate Log In
     Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
     Verify In System    API made system 2
@@ -228,6 +233,7 @@ From secondary system merge to primary with no other systems
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
 
     Merge    API made system 1    API made system 1    API made system 1
+    Validate Merge
 
     Check for alert    Connection to API made system 2 lost    timeout=120
     Verify In System    API made system 1
@@ -241,4 +247,48 @@ From secondary system merge to primary with no other systems
     FOR    ${key}  IN  @{all users dict.keys()}
         Check User Permissions    ${all users dict["${key}"]}    ${key}    timeout=120
     END
+    Disconnect from cloud
+
+2 Systems with identical servers
+    ${user}    Set Variable    ${EMAIL MERGE OWNER 2}
+    ${auth}=    Create List    ${user}    ${password}
+    Prepare System    ${user}    ${auth}    ${image}    7001    API made system 1    ${users dict 1}
+    Prepare System    ${user}    ${auth}    ${image}    7003    API made system 2    ${users dict 2}
+    log in    ${user}    ${password}
+    Validate Log in
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+    Go To    ${url}/systems
+    Validate Log In
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
+    Verify In System    API made system 2
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+
+    Merge    API made system 1    API made system 1    API made system 1
+    Validate Merge
+    sleep    30
+
+    stop containers    allContainers=False
+
+    Prepare System    ${user}    ${auth}    ${image}    7003    API made system 2    ${users dict 1}
+    Go To    ${url}/systems
+    Wait Until Element Is Visible    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
+    Verify In System    API made system 2
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+    Go To    ${url}/systems
+    Wait Until Element Is Visible    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
+    Verify In System    API made system 1
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+
+    Merge    API made system 1    API made system 2    API made system 2
+    Check For Alert    System merge failed
+    Wait Until Element Is Visible    ${MERGE FAILED DIALOG HEADER}
+    Click Button    ${MERGE FAILED OK BUTTON}
+    Disconnect from cloud
     Disconnect from cloud

@@ -196,11 +196,14 @@ class NoptixLibrary(object):
         cont = client.containers.run(image[0].id, detach=True, tmpfs=tmp, volumes=vol, ports=prt, network_mode=network, name=time.time())
         return cont
 
-    def stop_containers(self):
+    def stop_containers(self, allContainers=True):
         client = docker.from_env()
         conts = client.containers.list()
-        for cont in conts:
-            cont.stop()        
+        if allContainers:
+            for cont in conts:
+                cont.stop()
+        else:
+            conts[0].stop()
 
     def prune_containers(self):
         client = docker.from_env()
