@@ -14,7 +14,6 @@ QnRtpStreamReader::QnRtpStreamReader(
     CLServerPushStreamReader(res),
     m_rtpReader(res, res->getTimeOffset()),
     m_request(request),
-    m_rtpTransport(nx::vms::api::RtpTransportType::automatic),
     m_camera(res)
 {
 }
@@ -26,7 +25,7 @@ QnRtpStreamReader::~QnRtpStreamReader()
 
 void QnRtpStreamReader::setRtpTransport(nx::vms::api::RtpTransportType transport)
 {
-    m_rtpTransport = transport;
+    m_rtpReader.setRtpTransport(transport);
 }
 
 void QnRtpStreamReader::setRequest(const QString& request)
@@ -77,7 +76,6 @@ CameraDiagnostics::Result QnRtpStreamReader::openStreamInternal(bool /*isCameraC
 {
     m_rtpReader.setRole(getRole());
     m_rtpReader.setRequest(m_request);
-    m_rtpReader.setRtpTransport(m_rtpTransport);
 
     m_camera->updateSourceUrl(m_rtpReader.getCurrentStreamUrl(), getRole());
 

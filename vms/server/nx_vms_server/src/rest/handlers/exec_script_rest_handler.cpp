@@ -14,7 +14,9 @@ QnExecScript::QnExecScript(const QString& dataDirectory): m_dataDirectory(dataDi
 {
 }
 
-int QnExecScript::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnExecScript::executeGet(
+    const QString &path, const QnRequestParams &params, QnJsonRestResult &result,
+    const QnRestConnectionProcessor* /*owner*/)
 {
     if (path.contains(lit("..")) || path.contains('\\')) {
         result.setError(QnRestResult::InvalidParameter, "Path contains forbidden characters");
@@ -42,6 +44,13 @@ int QnExecScript::executeGet(const QString &path, const QnRequestParams &params,
     }
 
     return nx::network::http::StatusCode::ok;
+}
+
+int QnExecScript::executePost(
+    const QString& path, const QnRequestParams& params, const QByteArray& /*body*/,
+    QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
+{
+    return executeGet(path, params, result, owner);
 }
 
 void QnExecScript::afterExecute(const QString& path, const QnRequestParamList& params,

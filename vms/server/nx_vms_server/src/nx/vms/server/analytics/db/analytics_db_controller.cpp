@@ -28,14 +28,13 @@ DbController::DbController(
     dbStructureUpdater().addUpdateScript(lm(kPackCoordinates).args(kCoordinatesPrecision).toUtf8());
     dbStructureUpdater().addUpdateScript(kAddFullTimePeriods);
     dbStructureUpdater().addUpdateScript(kConvertDurationToMillis);
-    if (kUseTrackAggregation)
-    {
-        dbStructureUpdater().addUpdateScript(kSplitDataToObjectAndSearch);
-        dbStructureUpdater().addUpdateScript(kObjectBestShot);
-        dbStructureUpdater().addUpdateScript(kCombinedAttributes);
-        dbStructureUpdater().addUpdateScript(kFixObjectSearchToObjectIndices);
-        dbStructureUpdater().addUpdateScript(kAddObjectGroups);
-    }
+
+    dbStructureUpdater().addUpdateScript(kSplitDataToObjectAndSearch);
+    dbStructureUpdater().addUpdateScript(kObjectBestShot);
+    dbStructureUpdater().addUpdateScript(kCombinedAttributes);
+    dbStructureUpdater().addUpdateScript(kFixObjectSearchToObjectIndices);
+    dbStructureUpdater().addUpdateScript(kAddObjectGroups);
+    dbStructureUpdater().addUpdateScript(kDropTimePeriodTable);
 }
 
 } // namespace nx::analytics::db
