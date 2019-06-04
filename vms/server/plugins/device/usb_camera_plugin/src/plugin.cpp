@@ -51,7 +51,7 @@ void* Plugin::queryInterface( const nxpl::NX_GUID& interfaceID )
         if (!m_discoveryManager)
             m_discoveryManager.reset(new DiscoveryManager(
                 &m_refManager,
-                m_timeProvider));
+                m_timeProvider.get()));
         m_discoveryManager->addRef();
         return m_discoveryManager.get();
     }
@@ -95,8 +95,8 @@ void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 
 void Plugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
-    m_timeProvider = static_cast<nxpl::TimeProvider *>(
-            pluginContainer->queryInterface(nxpl::IID_TimeProvider));
+    m_timeProvider.reset(
+        static_cast<nxpl::TimeProvider*>(pluginContainer->queryInterface(nxpl::IID_TimeProvider)));
 }
 
 nxpt::CommonRefManager* Plugin::refManager()
