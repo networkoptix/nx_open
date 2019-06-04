@@ -66,14 +66,10 @@ protected:
     {
         using namespace nx::network;
 
-        std::vector<MediaServerEmulator*> servers = { m_mediaServer.get(), m_mediaServer2.get() };
-        ASSERT_TRUE(m_mediatorCluster->size() >= (int)servers.size());
-
-        for (auto i = 0; i < servers.size(); ++i)
+        for (int i = 0; i < m_mediatorCluster->size(); ++i)
         {
-            auto udpClient =
-                std::make_unique<api::MediatorClientUdpConnection>(
-                    m_mediatorCluster->mediator(i).stunUdpEndpoint());
+            api::MediatorClientUdpConnection udpClient(
+                m_mediatorCluster->mediator(i).stunUdpEndpoint());
 
             api::ConnectRequest request;
             request.connectionMethods = api::ConnectionMethod::udpHolePunching;
@@ -86,7 +82,7 @@ protected:
                 nx::hpm::api::ResultCode,
                 nx::hpm::api::ConnectResponse>> connectResponseEvent;
 
-            udpClient->connect(
+            udpClient.connect(
                 request,
                 [&connectResponseEvent](
                     stun::TransportHeader stunTransportHeader,
@@ -103,7 +99,7 @@ protected:
                 m_mediatorCluster->mediator(i).stunUdpEndpoint().toStdString(),
                 header.locationEndpoint.toStdString());
 
-            udpClient->pleaseStopSync();
+            udpClient.pleaseStopSync();
         }
     }
 
