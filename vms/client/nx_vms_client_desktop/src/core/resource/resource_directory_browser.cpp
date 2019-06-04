@@ -27,6 +27,9 @@ ResourceDirectoryBrowser::ResourceDirectoryBrowser(QObject* parent):
     connect(m_localResourceDirectoryModel, &LocalResourcesDirectoryModel::layoutFileChanged,
         m_resourceProducer, &LocalResourceProducer::updateFileLayoutResource);
 
+    connect(m_localResourceDirectoryModel, &LocalResourcesDirectoryModel::videoFileChanged,
+        m_resourceProducer, &LocalResourceProducer::updateVideoFileResource);
+
     connect(this, &ResourceDirectoryBrowser::initLocalResources,
         m_resourceProducer, &LocalResourceProducer::createLocalResources);
 
@@ -198,22 +201,32 @@ void LocalResourceProducer::createLocalResources(const QStringList& pathList)
 
 void LocalResourceProducer::updateFileLayoutResource(const QString& path)
 {
-    if (FileTypeSupport::isValidLayoutFile(path))
+    const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    if (auto fileLayoutResource =
+        resourcePool->getResourceByUrl(path).dynamicCast<QnFileLayoutResource>())
     {
-        const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-        if (auto fileLayoutResource =
-            resourcePool->getResourceByUrl(path).dynamicCast<QnFileLayoutResource>())
-        {
-            auto layoutResources = fileLayoutResource->layoutResources();
-            for (const auto& layoutResource: layoutResources)
-                resourcePool->removeResource(layoutResource);
-            resourcePool->removeResource(fileLayoutResource);
-        }
+        auto layoutResources = fileLayoutResource->layoutResources();
+        for (const auto& layoutResource: layoutResources)
+            resourcePool->removeResource(layoutResource);
+        resourcePool->removeResource(fileLayoutResource);
+
         if (auto updatedFileLayoutResource =
             ResourceDirectoryBrowser::layoutFromFile(path, resourcePool))
         {
             resourcePool->addResource(updatedFileLayoutResource);
         }
+    }
+}
+
+void LocalResourceProducer::updateVideoFileResource(const QString& path)
+{
+    const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    if (auto aviResource = resourcePool->getResourceByUrl(path).dynamicCast<QnAviResource>())
+    {
+        resourcePool->removeResource(aviResource);
+        auto updatedAviResource =
+            QnResourcePtr(new QnAviResource(path, qnClientCoreModule->commonModule()));
+        resourcePool->addResource(updatedAviResource);
     }
 }
 

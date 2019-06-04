@@ -23,6 +23,7 @@ public:
 signals:
     void filesAdded(const QStringList& newFiles);
     void layoutFileChanged(const QString& filePath);
+    void videoFileChanged(const QString& filePath);
 
 private:
     void addWatchedDirectory(const QString& path);

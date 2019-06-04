@@ -97,8 +97,11 @@ void LocalResourcesDirectoryModel::addWatchedDirectory(const QString& path)
     for (const auto& fileName: childFiles)
     {
         const auto filePath = dir.filePath(fileName);
-        if (FileTypeSupport::isValidLayoutFile(filePath))
+        if (FileTypeSupport::isValidLayoutFile(filePath)
+            || FileTypeSupport::isMovieFileExt(filePath))
+        {
             m_fileSystemWatcher.addPath(filePath);
+        }
     }
 
     for (const auto& childDirectory: childDirectories)
@@ -165,8 +168,11 @@ void LocalResourcesDirectoryModel::processPendingDirectoryChanges()
         for (auto& newChildFile: newChildFiles)
         {
             newChildFile = dir.absoluteFilePath(newChildFile);
-            if (FileTypeSupport::isValidLayoutFile(newChildFile))
+            if (FileTypeSupport::isValidLayoutFile(newChildFile)
+                || FileTypeSupport::isMovieFileExt(newChildFile))
+            {
                 m_fileSystemWatcher.addPath(newChildFile);
+            }
         }
 
         if (!newChildFiles.empty())
@@ -180,9 +186,13 @@ void LocalResourcesDirectoryModel::onFileChanged(const QString& filePath)
 {
     if (FileTypeSupport::isValidLayoutFile(filePath))
     {
-        // QFileSystemWatcher lose tracking after temporary file renaming operation.
+        // QFileSystemWatcher loses tracking after temporary file renaming operation.
         m_fileSystemWatcher.addPath(filePath);
         emit layoutFileChanged(filePath);
+    }
+    else if (FileTypeSupport::isMovieFileExt(filePath))
+    {
+        emit videoFileChanged(filePath);
     }
 }
 
