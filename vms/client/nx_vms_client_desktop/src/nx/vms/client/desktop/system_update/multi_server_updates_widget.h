@@ -96,6 +96,8 @@ public:
 
         HighlightMode versionHighlight = HighlightMode::regular;
         HighlightMode statusHighlight = HighlightMode::regular;
+
+        bool isEqual(const VersionReport& another) const;
     };
 
     /** Generates update report for a picked update contents. */
@@ -229,6 +231,13 @@ private:
     void completeInstallation(bool clientUpdated);
     static bool stateHasProgress(WidgetUpdateState state);
     void syncDebugInfoToUi();
+    /**
+     * Sets current update target.
+     * It changes m_updateInfo and updates UI states according to the report.
+     * @param contents - update contents.
+     * @param activeUpdate - true if mediaservers are already updating to this version.
+     */
+    void setUpdateTarget(const nx::update::UpdateContents& contents, bool activeUpdate);
 
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
