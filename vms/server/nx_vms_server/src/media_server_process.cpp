@@ -2551,10 +2551,18 @@ void MediaServerProcess::registerRestHandlers(
         commonModule()->engineVersion()));
 
     /**%apidoc POST /ec2/updatePersistenStorages
-     * Retrieves a currently present or specified via a parameter update information manifest.
+     * Set a list of servers used for persistent update files storage.
+     * %param:string version Possible values: {target | installed}. Indicates which update files
+     * should be stored on the given servers.
      * %param:object JSON representation of the list of the servers selected for persistent update
      *      files storing.
-     * %return:object JSON with the update manifest.
+     * %return:object JSON with the updated servers list.
+     *
+     **%apidoc GET /ec2/updatePersistenStorages
+     * Retrieves a currently present list of servers IDs used for update files storage.
+     * %param:string version Possible values: {target | installed}. Indicates which list should be
+     * retrieved.
+     * %return:object JSON with the servers list.
      */
     reg("ec2/updatePersistenStorages", new QnPersistentUpdateStorageRestHandler(serverModule()));
 
