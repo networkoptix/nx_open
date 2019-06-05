@@ -179,9 +179,9 @@ Your permissions is shown for non-owners
 should show (your system) for owner and (owner's name) for non-owners
     [tags]    C41881    Threaded
     Log in to AutoTests 2 System    ${EMAIL OWNER}
-    Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']
-    Wait Until Element Is Not Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Element Is Visible    //h2[text()='${YOUR SYSTEM TEXT}']
+    Wait Until Element Is Not Visible    //h2[text()='${OWNER TEXT}']
     Log Out
     Log in to Autotests 2 System    ${EMAIL VIEWER}
-    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']    //a[.='${EMAIL OWNER}']
-    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
+    Wait Until Elements Are Visible    //h2[text()\='${OWNER TEXT}']    //a[text()\='${EMAIL OWNER}']
+    Wait Until Element Is Not Visible    //h2[text()='${YOUR SYSTEM TEXT}']

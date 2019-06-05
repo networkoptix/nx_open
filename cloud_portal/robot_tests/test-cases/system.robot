@@ -25,8 +25,8 @@ Check System Text
     [arguments]    ${user}
     Log Out
     Log in to Auto Tests System    ${user}
-    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']    //a[.='${EMAIL OWNER}']
-    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
+    Wait Until Elements Are Visible    //h2[text()\='${OWNER TEXT}']    //a[text()\='${EMAIL OWNER}']
+    Wait Until Element Is Not Visible    //h2[text()='${YOUR SYSTEM TEXT}']
 
 Reset DB and Open New Browser On Failure
     Close Browser
@@ -106,8 +106,8 @@ correct items are shown for owner
     [tags]    C41560    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${USERS LIST}
-#    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']
-    Wait Until Elements Are Visible    //h2[.='${YOUR SYSTEM TEXT}']    ${RENAME SYSTEM}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
+#    Wait Until Elements Are Visible    //h2[text()\='${OWNER TEXT}']
+    Wait Until Elements Are Visible    //h2[text()\='${YOUR SYSTEM TEXT}']    ${RENAME SYSTEM}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
 
 correct items are shown for admin
     [tags]    C41561    Threaded
