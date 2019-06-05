@@ -608,6 +608,7 @@ private:
                 detectedObject.objectAppearanceId = object.objectId;
                 detectedObject.objectTypeId = object.objectTypeId;
                 detectedObject.attributes = object.labels;
+                detectedObject.deviceId = packet->deviceId;
                 detectedObject.track.push_back(ObjectPosition());
                 ObjectPosition& objectPosition = detectedObject.track.back();
                 objectPosition.boundingBox = object.boundingBox;

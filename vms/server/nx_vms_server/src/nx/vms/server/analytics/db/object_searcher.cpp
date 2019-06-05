@@ -1,6 +1,7 @@
 #include "object_searcher.h"
 
 #include <nx/fusion/serialization/sql_functions.h>
+#include <nx/utils/std/algorithm.h>
 
 #include <analytics/db/config.h>
 
@@ -193,6 +194,9 @@ bool ObjectSearcher::satisfiesFilter(
     {
         return false;
     }
+
+    if (!nx::utils::contains(filter.deviceIds, detectedObject.deviceId))
+        return false;
 
     if (!(microseconds(detectedObject.lastAppearanceTimeUsec) >= filter.timePeriod.startTime() &&
           (filter.timePeriod.isInfinite() ||

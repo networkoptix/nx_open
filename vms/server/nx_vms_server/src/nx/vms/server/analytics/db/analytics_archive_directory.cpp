@@ -124,7 +124,8 @@ AnalyticsArchiveDirectory::ObjectMatchResult AnalyticsArchiveDirectory::toObject
         std::back_inserter(result.objectGroups),
         std::mem_fn(&std::pair<int64_t, int64_t>::second));
 
-    result.maxAnalyzedTime = std::chrono::milliseconds(objectGroups.back().first);
+    if (!objectGroups.empty())
+        result.maxAnalyzedTime = std::chrono::milliseconds(objectGroups.back().first);
 
     return result;
 }
