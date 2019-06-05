@@ -4,6 +4,7 @@
 
 #include <memory>
 
+#include <nx/sdk/helpers/ptr.h>
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
 
@@ -58,7 +59,7 @@ private:
     mutable QnMutex m_mutex;
     nxpt::CommonRefManager m_refManager;
     std::unique_ptr<DiscoveryManager> m_discoveryManager;
-    nxpl::TimeProvider *m_timeProvider;
+    nx::sdk::Ptr<nxpl::TimeProvider> m_timeProvider;
 
     nx::utils::ElapsedTimer m_streamStateCacheCleanupTimer;
     std::map<nx::utils::Url, nx::utils::ElapsedTimer> m_streamStateCache;

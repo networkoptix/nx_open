@@ -256,7 +256,7 @@ public:
     Option<bool> noInitStoragesOnStartup{this, "noInitStoragesOnStartup", false, ""};
     Option<bool> noPlugins{this, "noPlugins", false, "Turn off all plugins"};
     Option<QString> ipVersion{this, "ipVersion", "", ""};
-    Option<QString> rtspTransport{this, "rtspTransport", "tcp", ""};
+    Option<QString> rtspTransport{this, "rtspTransport", "automatic", ""};
     Option<bool> absoluteRtcpTimestamps{this, "absoluteRtcpTimestamps",
         true,
         "Enable absolute RTCP timestamps for archive data, RTCP NTP timestamps will corresond to "

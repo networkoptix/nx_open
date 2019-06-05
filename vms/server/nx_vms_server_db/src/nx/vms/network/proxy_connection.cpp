@@ -69,7 +69,8 @@ bool doesNextHopServerUsesSSL(const QnRoute& route, QnCommonModule* commonModule
         commonModule->resourcePool()->getResourceById<QnMediaServerResource>(nextHopId);
     if (!nextHopServer)
     {
-        NX_ASSERT(false, lm("No server with GUID %1").args(nextHopId));
+        // NOTE: There are some cases when we are proxying request to the server before it was
+        // added to resource pool. In that case, defaulting to SSL.
         return true;
     }
     return isSchemeSecure(nextHopServer->getApiUrl().scheme());

@@ -25,7 +25,6 @@
 #include "object_group_dao.h"
 #include "object_track_aggregator.h"
 #include "object_type_dao.h"
-#include "time_period_dao.h"
 
 class QnMediaServerModule;
 
@@ -75,7 +74,6 @@ private:
     AttributesDao m_attributesDao;
     ObjectTypeDao m_objectTypeDao;
     DeviceDao m_deviceDao;
-    TimePeriodDao m_timePeriodDao;
     std::unique_ptr<AnalyticsArchiveDirectory> m_analyticsArchiveDirectory;
     ObjectCache m_objectCache;
     ObjectTrackAggregator m_trackAggregator;
@@ -86,10 +84,6 @@ private:
     bool readMaximumEventTimestamp();
 
     bool loadDictionaries();
-
-    nx::sql::DBResult savePacket(
-        nx::sql::QueryContext*,
-        common::metadata::ConstDetectionMetadataPacketPtr packet);
 
     /**
      * @return Inserted event id.
@@ -113,77 +107,14 @@ private:
 
     DetectionDataSaver takeDataToSave(const QnMutexLockerBase& /*lock*/, bool flushData);
 
-    void prepareCursorQuery(const Filter& filter, nx::sql::SqlQuery* query);
-
-    nx::sql::DBResult selectObjects(
-        nx::sql::QueryContext* queryContext,
-        const Filter& filter,
-        std::vector<DetectedObject>* result);
-
-    void prepareLookupQuery(const Filter& filter, nx::sql::SqlQuery* query);
-
-    nx::sql::Filter prepareSqlFilterExpression(
-        const Filter& filter,
-        QString* eventsFilteredByFreeTextSubQuery);
-
-    void loadObjects(
-        nx::sql::SqlQuery& selectEventsQuery,
-        const Filter& filter,
-        std::vector<DetectedObject>* result);
-
-    void loadObject(
-        nx::sql::SqlQuery* selectEventsQuery,
-        DetectedObject* object);
-
-    void mergeObjects(DetectedObject from, DetectedObject* to, bool loadTrack);
-
-    void queryTrackInfo(
-        nx::sql::QueryContext* queryContext,
-        std::vector<DetectedObject>* result);
-
     void reportCreateCursorCompletion(
         sql::DBResult resultCode,
         QnUuid dbCursorId,
         CreateCursorCompletionHandler completionHandler);
 
-    nx::sql::DBResult selectTimePeriods(
-        nx::sql::QueryContext* queryContext,
-        const Filter& filter,
-        const TimePeriodsLookupOptions& options,
-        QnTimePeriodList* result);
-
-    void prepareSelectTimePeriodsUnfilteredQuery(
-        nx::sql::AbstractSqlQuery* query,
-        const std::vector<QnUuid>& deviceIds,
-        const QnTimePeriod& timePeriod,
-        const TimePeriodsLookupOptions& options);
-
-    void prepareSelectTimePeriodsFilteredQuery(
-        nx::sql::AbstractSqlQuery* query,
-        const Filter& filter,
-        const TimePeriodsLookupOptions& options);
-
-    void loadTimePeriods(
-        nx::sql::AbstractSqlQuery* query,
-        const QnTimePeriod& timePeriod,
-        const TimePeriodsLookupOptions& options,
-        QnTimePeriodList* result);
-
     void scheduleDataCleanup(
         QnUuid deviceId,
         std::chrono::milliseconds oldestDataToKeepTimestamp);
-
-    nx::sql::DBResult cleanupData(
-        nx::sql::QueryContext* queryContext,
-        const QnUuid& deviceId,
-        std::chrono::milliseconds oldestDataToKeepTimestamp);
-
-    void cleanupEvents(
-        nx::sql::QueryContext* queryContext,
-        const QnUuid& deviceId,
-        std::chrono::milliseconds oldestDataToKeepTimestamp);
-
-    void cleanupEventProperties(nx::sql::QueryContext* queryContext);
 
     void logCleanupResult(
         sql::DBResult resultCode,

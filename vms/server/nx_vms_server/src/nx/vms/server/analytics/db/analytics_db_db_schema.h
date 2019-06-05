@@ -289,4 +289,13 @@ DROP TABLE object_search_to_object;
 
 )sql";
 
+//-------------------------------------------------------------------------------------------------
+// Time periods are stored in binary files.
+static constexpr char kDropTimePeriodTable[] =
+R"sql(
+
+DROP TABLE time_period_full;
+
+)sql";
+
 } // namespace nx::analytics::db
