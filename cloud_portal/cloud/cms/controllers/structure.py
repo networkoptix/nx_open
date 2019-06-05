@@ -158,7 +158,10 @@ def read_structure_json(filename):
 def process_zip(file_descriptor, user, product, update_structure, update_content):
     log_messages = []
     zip_file = ZipFile(file_descriptor)
-    # zip_file.printdir()
+    # zipfile.namelist()
+    root = zip_file.namelist()[0]
+    structures_changed = 0
+    records_created = 0
 
     if update_structure:
         name = next((name for name in zip_file.namelist() if name.endswith('structure.json')), None)
@@ -166,12 +169,16 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
             data = zip_file.read(name)
             cms_structure = json.loads(data)
             update_from_object(cms_structure)
-            log_messages.append(('success', 'Updated from json using %s' % name))
+            log_messages.append(('success', f'Updated from json using {name}'))
         else:
             log_messages.append(('warning', 'Not found structure.json file'))
 
     for name in zip_file.namelist():
         # log_messages.append(('info', 'Processing %s' % name))
+        # Skip of directories
+        if zip_file.getinfo(name).is_dir():
+            continue
+
         if name.startswith('__') or name.endswith('structure.json'):
             # Ignore trash in archive from MACs or **structure.json files
             if not name.startswith('__MAC'):
@@ -180,16 +187,20 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
 
         if name.startswith('help/'):  # Ignore help
             if name == 'help/':
-                log_messages.append(('info', 'Ignored: %s (help directory is ignored)' % name))
+                log_messages.append(('info', f'Ignored: {name} (help directory is ignored)'))
             continue
+
+        zip_name = name
+        if root:
+            name = name.replace(root, "")
 
         # try to find relevant context
         context = Context.objects.filter(file_path=name).first()
         if context:
             try:
-                file_content = zip_file.read(name).decode("utf-8")
+                file_content = zip_file.read(zip_name).decode("utf-8")
             except UnicodeDecodeError:
-                log_messages.append(('error', 'Ignored:  %s (file is not UTF-encoded)' % name))
+                log_messages.append(('error', f'Ignored:  {name} (file is not UTF-encoded)'))
                 continue
 
             if update_structure:
@@ -207,7 +218,7 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
             if update_content:
                 # try to parse datastructures from the file using template
                 if not context.contexttemplate_set.exists():  # no template - nothing we can do
-                    log_messages.append(('error', 'Ignored: %s (context has to template)' % name))
+                    log_messages.append(('error', f'Ignored: {name} (context has to template)'))
                     continue
                 # here we have template for context and file_content - which are relatively close.
                 # Ideally, the only difference is specific data values
@@ -221,8 +232,8 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
                     template_line = next((line for line in context_template.template.split("\n")
                                           if structure.name in line), None)
                     if not template_line:
-                        log_messages.append(('warning', 'No line in template %s for data structure %s' %
-                                             (name, structure.name)))
+                        log_messages.append(('warning', f'No line in template {name}'
+                                            f' for data structure {structure.name}'))
                         continue
 
                     replace_str = '(.*?)' if structure.type != structure.DATA_TYPES.html else '([.\s\S]*)'
@@ -237,17 +248,16 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
                     # try to parse file_content with regex
                     result = re.search(template_line, file_content)
                     if not result:
-                        log_messages.append(('warning', 'No line in file %s for data structure %s' %
-                                             (name, structure.name)))
+                        log_messages.append(('warning', f'No line in file {name} for data structure {structure.namee}'))
                         continue
 
                     # if there is a value - compare it with latest draft
                     value = result.group(1)
-                    current_value = structure.find_actual_value(product)
+                    current_value = structure.find_actual_value(product, draft=True)
                     if value == current_value:
-                        log_messages.append(('warning', 'value %s not changed %s for data structure %s' %
-                                             (value, name, structure.name)))
                         continue
+
+                    records_created += 1
 
                     # save if needed
                     record = DataRecord(product=product,
@@ -255,39 +265,37 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
                                         value=value,
                                         created_by=user)
                     record.save()
-                    log_messages.append(('success', 'Updated value for data structure %s using %s' %
-                                         (structure.label, name)))
             continue
 
         # try to find relevant data structure and update its default (maybe)
         structure = DataStructure.objects.filter(name=name).first()
         if not structure:
-            log_messages.append(('warning', 'Ignored: %s (data structure %s does not exist)' % (name, name)))
+            log_messages.append(('warning', f'Ignored: {name} (data structure {name} does not exist)'))
             continue
 
         # if data structure is not FILE or IMAGE - print to log and ignore
         if structure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
-            log_messages.append(('warning', 'Ignored: %s (data structure type is %s, not a %s or %s)' %
-                                 (name, structure.type, DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file)))
+            log_messages.append(('warning', f'Ignored: {name} (data structure type is {structure.type}'
+                                f', not a {DataStructure.DATA_TYPES.image} or {DataStructure.DATA_TYPES.file})'))
             continue
 
-        data = zip_file.read(name)
+        data = zip_file.read(zip_name)
         data64 = base64.b64encode(data).decode('utf-8')
 
         if update_structure:
             # if set_defaults or data structure has no default value - save it
             if structure.default != data64:
                 structure.default = data64
-                log_messages.append(('success', 'Updated default for data structure %s using %s' %
-                                     (structure.label, name)))
+                structures_changed += 1
                 structure.save()
 
         if update_content:
             # get latest value
-            latest_value = structure.find_actual_value(product)
+            latest_value = structure.find_actual_value(product, draft=True)
             # check if file was changed
             if latest_value == data64:
                 continue
+            records_created += 1
 
             # add new dataRecrod
             record = DataRecord(
@@ -297,6 +305,8 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
                 created_by=user
             )
             record.save()
-            log_messages.append(('success', 'Updated value for data structure %s using %s' % (structure.label, name)))
+
+    log_messages.append(('success', f'Data Structures updated: {structures_changed}\t '
+                                    f'Records created: {records_created}'))
     log_messages.append(('success', 'Finished'))
     return log_messages

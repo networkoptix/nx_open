@@ -19,6 +19,27 @@
     <p><a href="{% url 'download_package' product.id %}?draft" download>Download package draft (zip)</a></p>
 </div>
 <h3>Update Product</h3>
+<div>
+Notice root level directory will be ignored. The expected format is :<br>
+<pre style="margin: 5px 0 0 5px; width: 500px">
+    Parent dir / static content dir(s)
+               / structure.json
+</pre>
+<br>
+Example for vms
+<pre style="margin: 5px 0 0 5px; width: 500px">
+    default /client-dmg
+            /icons
+            /mediaserver_core
+            /mobile_client
+            /nx_client_desktop
+            /wixsetup
+            /customization.cmake
+            /license.html
+            /<b>structure.json</b>
+</pre>
+<br>
+</div>
 <form id="productForm" action="{% url 'product_settings' product.id %}"
       method="post" class="aligned" enctype="multipart/form-data">
     {% csrf_token %}
