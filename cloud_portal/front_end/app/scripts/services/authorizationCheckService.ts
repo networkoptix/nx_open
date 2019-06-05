@@ -48,9 +48,10 @@
                         const tempLogin = auth.substring(0, index);
                         const tempPassword = auth.substring(index + 1);
 
+                        console.log('INIT ->');
                         account.requestingLogin = login(tempLogin, tempPassword, false)
                             .then(() => {
-                                console.log('INIT login ->');
+                                console.log('INIT login(true) ->');
                                 $location.search('auth', undefined);
                             })
                             .catch((error) => {
