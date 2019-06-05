@@ -818,7 +818,6 @@ qint64 Storage::calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 chunk
         : fileSize - chunkSize * (chunkCount - 1);
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileMetadata, (json), FileInformation_Fields \
-    (chunkChecksums)(fullFilePath))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileMetadata, (json), FileInformation_Fields (chunkChecksums))
 
 } // nx::vms::common::p2p::downloader

@@ -5,6 +5,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/update/common_update_installer.h>
 #include <nx/update/persistent_update_storage.h>
+#include <nx/update/update_storages_helper.h>
 #include <utils/common/synctime.h>
 
 namespace nx {
@@ -12,6 +13,8 @@ namespace nx {
 using vms::common::p2p::downloader::FileInformation;
 using vms::common::p2p::downloader::Downloader;
 namespace downloader = vms::common::p2p::downloader;
+
+static const QString kUpdatesPath = "downloads/updates";
 
 CommonUpdateManager::CommonUpdateManager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
@@ -51,6 +54,7 @@ update::Status CommonUpdateManager::start()
     if (!package.isValid())
         return updateStatus;
 
+    managePersistentDownloads();
     if (!shouldDownloadFromScratch)
     {
         if (downloader()->fileInformation(package.file).status
@@ -67,28 +71,7 @@ update::Status CommonUpdateManager::start()
     downloader()->deleteFile(package.file);
     m_downloaderFailDetail = DownloaderFailDetail::noError;
 
-    FileInformation fileInformation;
-    fileInformation.name = package.file;
-    fileInformation.md5 = QByteArray::fromHex(package.md5.toLatin1());
-    fileInformation.size = package.size;
-    fileInformation.url = package.url;
-
-    auto downloaderPeers = globalSettings()->downloaderPeers();
-    if (downloaderPeers.contains(fileInformation.name))
-    {
-        fileInformation.additionalPeers = downloaderPeers[fileInformation.name];
-        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
-    }
-    else
-    {
-        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::all;
-    }
-
-    const auto addFileResult = downloader()->addFile(fileInformation);
-    NX_DEBUG(this, "Downloader::addFile (%1) called. Result is: %2",
-        fileInformation.name, addFileResult);
-
-    switch (addFileResult)
+    switch (addDownload(package, ""))
     {
         case downloader::ResultCode::ok:
             return update::Status(peerId, update::Status::Code::downloading);
@@ -122,6 +105,96 @@ update::Status CommonUpdateManager::start()
     }
 }
 
+downloader::ResultCode CommonUpdateManager::addDownload(
+    const nx::update::Package& package, const QString& downloadsDirPath)
+{
+    FileInformation fileInformation;
+    fileInformation.name = package.file;
+    fileInformation.md5 = QByteArray::fromHex(package.md5.toLatin1());
+    fileInformation.size = package.size;
+    fileInformation.url = package.url;
+    fileInformation.absoluteDirectoryPath = downloadsDirPath;
+
+    auto downloaderPeers = globalSettings()->downloaderPeers();
+    if (downloaderPeers.contains(fileInformation.name))
+    {
+        fileInformation.additionalPeers = downloaderPeers[fileInformation.name];
+        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
+    }
+    else
+    {
+        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::all;
+    }
+
+    const auto addFileResult = downloader()->addFile(fileInformation);
+    NX_DEBUG(this, "Downloader::addFile (%1) called. Result is: %2",
+        fileInformation.name, addFileResult);
+
+    return addFileResult;
+}
+
+void CommonUpdateManager::managePersistentDownloads()
+{
+    const auto variants = {
+        std::make_pair(
+            commonModule()->globalSettings()->targetUpdateInformation(), update::kTargetKey),
+        std::make_pair(
+            commonModule()->globalSettings()->installedUpdateInformation(), update::kInstalledKey)
+    };
+
+    std::vector<update::Package> packages;
+    for (const auto& p: variants)
+    {
+        const auto persistentServers = updatePersistentStorageServers(p.second);
+        if (!persistentServers.servers.contains(commonModule()->moduleGUID()))
+            continue;
+
+        update::Information info;
+        if (fromByteArray(p.first, &info, /*message*/ nullptr) != update::FindPackageResult::ok)
+            continue;
+
+        std::copy(info.packages.cbegin(), info.packages.cend(), std::back_inserter(packages));
+    }
+
+    const auto storageData = update::storage::selectOne(QnStorageSpaceDataList());
+    if (!storageData)
+    {
+        NX_WARNING(this, "Couldn't determine correct storage for storing persistent update files");
+        return;
+    }
+
+    QStringList storageUpdateFiles;
+    for (const auto& f: downloader()->files())
+    {
+        const auto fileInfo = downloader()->fileInformation(f);
+        if (!fileInfo.isValid())
+            continue;
+
+        if (fileInfo.fullFilePath.contains(storageData->url))
+            storageUpdateFiles.append(fileInfo.fullFilePath);
+    }
+
+    for (const auto& package: packages)
+    {
+        const bool hasFile = std::any_of(
+            storageUpdateFiles.cbegin(), storageUpdateFiles.cend(),
+            [&package](const QString& fileName) { return fileName.contains(package.file); });
+
+        if (!hasFile)
+            addDownload(package, QDir(storageData->url).absoluteFilePath(kUpdatesPath));
+    }
+
+    for (const auto& file: storageUpdateFiles)
+    {
+        const auto packageIt = std::find_if(
+            packages.cbegin(), packages.cend(),
+            [&file](const auto& package) { return file.contains(package.file); });
+
+        if (packageIt == packages.cend())
+            downloader()->deleteFile(file);
+    }
+}
+
 void CommonUpdateManager::setUpdatePersistentStorageServers(
     const QList<QnUuid>& serverList,
     const QString& version,
@@ -149,7 +222,7 @@ update::PersistentUpdateStorage CommonUpdateManager::updatePersistentStorageServ
     const QString& version) const
 {
     QByteArray data;
-    if (version == "target")
+    if (version == update::kTargetKey)
         data  = commonModule()->globalSettings()->targetPersistentUpdateStorage();
     else
         data = commonModule()->globalSettings()->installedPersistentUpdateStorage();

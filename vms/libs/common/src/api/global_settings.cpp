@@ -706,6 +706,16 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         nx::vms::api::MetadataStorageChangePolicy::keep,
         this);
 
+    m_targetPersistentUpdateStorageAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kTargetUpdateInformationName,
+        QByteArray(),
+        this);
+
+    m_installedPersistentUpdateStorageAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kInstalledUpdateInformationName,
+        QByteArray(),
+        this);
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -882,6 +892,20 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         &QnGlobalSettings::downloaderPeersChanged,
         Qt::QueuedConnection);
 
+    connect(
+        m_targetPersistentUpdateStorageAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &QnGlobalSettings::targetPersistentUpdateStorageChanged,
+        Qt::QueuedConnection);
+
+    connect(
+        m_installedPersistentUpdateStorageAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &QnGlobalSettings::installedPersistentUpdateStorageChanged,
+        Qt::QueuedConnection);
+
     AdaptorList result;
     result
         << m_systemNameAdaptor
@@ -929,6 +953,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_maxEventLogRecordsAdaptor
         << m_forceLiveCacheForPrimaryStreamAdaptor
         << m_metadataStorageChangePolicyAdaptor
+        << m_targetPersistentUpdateStorageAdaptor
+        << m_installedPersistentUpdateStorageAdaptor
     ;
 
     return result;

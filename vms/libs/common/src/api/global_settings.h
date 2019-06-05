@@ -422,6 +422,8 @@ signals:
     void targetUpdateInformationChanged();
     void installedUpdateInformationChanged();
     void downloaderPeersChanged();
+    void targetPersistentUpdateStorageChanged();
+    void installedPersistentUpdateStorageChanged();
     void watermarkChanged();
     void sessionTimeoutChanged();
 

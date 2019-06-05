@@ -34,7 +34,7 @@ public:
     bool setParticipants(const QList<QnUuid>& participants);
     bool updateLastInstallationRequestTime();
     void setUpdatePersistentStorageServers(
-        const QList<QnUuid>& serverList, 
+        const QList<QnUuid>& serverList,
         const QString& version,
         bool manuallySet);
     update::PersistentUpdateStorage updatePersistentStorageServers(const QString& version) const;
@@ -69,6 +69,9 @@ private:
     bool deserializedUpdateInformation(update::Information* outUpdateInformation,
         const QString& caller) const;
     void setUpdateInformation(const update::Information& updateInformation);
+    void managePersistentDownloads();
+    vms::common::p2p::downloader::ResultCode addDownload(
+        const nx::update::Package& package, const QString& downloadsDirPath);
 
     virtual vms::common::p2p::downloader::Downloader* downloader() = 0;
     virtual CommonUpdateInstaller* installer() = 0;
