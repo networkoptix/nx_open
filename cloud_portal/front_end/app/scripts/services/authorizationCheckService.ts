@@ -50,9 +50,11 @@
 
                         account.requestingLogin = login(tempLogin, tempPassword, false)
                             .then(() => {
+                                console.log('INIT login ->');
                                 $location.search('auth', undefined);
                             })
                             .catch((error) => {
+                                console.log('INIT login(error) ->', error);
                                 $location.search('auth', undefined);
                             });
                     }
@@ -62,7 +64,9 @@
             function get() {
                 if (account.requestingLogin) {
                     // login is requesting, so we wait
+                    console.log('requestLogin ->');
                     return account.requestingLogin.then(() => {
+                        console.log('requestLogin GET() ->');
                         account.requestingLogin = undefined; // clean requestingLogin reference
                         return get(); // Try again
                     });
@@ -71,6 +75,7 @@
                 return cloudApi
                     .account()
                     .then((account) => {
+                        console.log('GET() data ->');
                         return account.data;
                     });
             }
@@ -89,7 +94,7 @@
                                 if (result.data.email !== $rootScope.session.loginState) {
                                     logoutAuthorised();
                                 }
-
+                                console.log('LOGOUT ->');
                                 return $q.resolve(true);
                             }
 
@@ -98,6 +103,7 @@
                                 $rootScope.session.loginState = result.data.email; // Forcing changing loginState to reload interface
                             }
 
+                            console.log('LOGIN ->');
                             return $q.reject(false);
 
                         }, () => {
