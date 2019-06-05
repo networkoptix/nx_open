@@ -1,4 +1,4 @@
-(function () {
+(() => {
 
         'use strict';
 
@@ -7,15 +7,16 @@
             .factory('authorizationCheckService', AuthorizationCheckService);
 
         AuthorizationCheckService.$inject = ['$rootScope', '$q', '$localStorage', '$base64',
-            'cloudApi', 'account', 'nxConfigService', 'NxDialogsService', 'languageService', '$location'];
+            'cloudApi', 'nxConfigService', 'NxDialogsService', 'languageService', '$location'];
 
         function AuthorizationCheckService($rootScope, $q, $localStorage, $base64,
-                                           cloudApi, account, nxConfigService, NxDialogsService, languageService, $location) {
+                                           cloudApi, nxConfigService, NxDialogsService, languageService, $location) {
 
             const CONFIG = nxConfigService.getConfig();
 
             const search = $location.search();
             let auth: any;
+            let requestingLogin: any;
 
             $rootScope.session = $localStorage;
 
@@ -49,7 +50,7 @@
                         const tempPassword = auth.substring(index + 1);
 
                         console.log('INIT ->');
-                        account.requestingLogin = login(tempLogin, tempPassword, false)
+                        requestingLogin = login(tempLogin, tempPassword, false)
                             .then(() => {
                                 console.log('INIT login(true) ->');
                                 $location.search('auth', undefined);
@@ -58,17 +59,21 @@
                                 console.log('INIT login(error) ->', error);
                                 $location.search('auth', undefined);
                             });
+
+                        $rootScope.session.requestingLogin = requestingLogin;
                     }
                 }
             }
 
             function get() {
-                if (account.requestingLogin) {
+                if (requestingLogin) {
+                    debugger;
                     // login is requesting, so we wait
                     console.log('requestLogin ->');
-                    return account.requestingLogin.then(() => {
+                    return requestingLogin.then(() => {
                         console.log('requestLogin GET() ->');
-                        account.requestingLogin = undefined; // clean requestingLogin reference
+                        $rootScope.session.requestingLogin = undefined;
+                        requestingLogin = undefined; // clean requestingLogin reference
                         return get(); // Try again
                     });
                 }
@@ -105,7 +110,7 @@
                             }
 
                             console.log('LOGIN ->');
-                            return $q.reject(false);
+                            return $q.resolve(true);
 
                         }, () => {
                             NxDialogsService.notify(languageService.lang.errorCodes.wrongAuthCode, 'danger');

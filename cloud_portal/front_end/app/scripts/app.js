@@ -35,16 +35,22 @@ window.L = {};
             'cloudApp.templates'
 
         ])
-        .factory('httpResponseInterceptor', ['$q', '$rootScope', function($q, $rootScope) {
-            return {
-                responseError: function(error) {
-                    if (error.status === 401) {
-                        // Session expired - try to trigger browser reload
-                        $rootScope.session.loginState = undefined;
+        .factory('httpResponseInterceptor', ['$q', '$rootScope',
+            function($q, $rootScope) {
+                return {
+                    responseError: function(error) {
+                        if (error.status === 401) {
+                            console.log('$rootScope.session.requestingLogin ->', $rootScope.session.requestingLogin);
+                            if (!$rootScope.session.requestingLogin) {
+                                debugger;
+                                // Session expired - try to trigger browser reload
+                                $rootScope.session.loginState = undefined;
+                            }
+                        }
+                        
+                        return $q.reject(error);
                     }
-                    return $q.reject(error);
-                }
-            };
+                };
         }])
         .config(['$httpProvider', function ($httpProvider) {
             $httpProvider.defaults.xsrfCookieName = 'csrftoken';
