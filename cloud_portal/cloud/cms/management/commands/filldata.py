@@ -20,7 +20,7 @@ class Command(BaseCommand):
         if options['customization'] == 'all':
             for custom in Customization.objects.all():
                 product = get_cloud_portal_product(custom.name)
-                filldata.init_skin(product, options['preview'])
+                filldata.init_skin(product, options['preview'], workers=1)
                 self.stdout.write(self.style.SUCCESS('Initiated static content for ' + product.__str__()))
         else:
             customization = Customization.objects.filter(name=options['customization']).first()
@@ -38,7 +38,7 @@ class Command(BaseCommand):
                 product = structure.find_or_add_product('Cloud Portal', customization)
             else:
                 product = get_cloud_portal_product(options['customization'])
-            filldata.init_skin(product, options['preview'])
+            filldata.init_skin(product, options['preview'], workers=1)
             self.stdout.write(self.style.SUCCESS(
                 'Initiated static content for ' + product.__str__()))
 

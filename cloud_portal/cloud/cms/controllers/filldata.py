@@ -215,7 +215,7 @@ def generate_languages_json(save_location, language_codes, preview):
     save_content(target_file_name, json.dumps(languages_json, ensure_ascii=False))
 
 
-def init_skin(product, preview=False):
+def init_skin(product, preview=False, workers=2):
     if not product.is_cloud_portal:
         raise APIForbiddenException("Can not run update static files on non cloud_portal products")
     # 1. read skin for this customization
@@ -231,11 +231,11 @@ def init_skin(product, preview=False):
     if not preview:
         distutils.dir_util.copy_tree(from_dir, target_dir)
         logger.info("Fill content for " + product.__str__())
-        fill_content(product, preview=False, incremental=False)
+        fill_content(product, preview=False, incremental=False, workers=workers)
     else:
         distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
         logger.info("Fill preview for " + product.__str__())
-        fill_content(product, preview=True, incremental=False)
+        fill_content(product, preview=True, incremental=False, workers=workers)
 
 
 @timer
@@ -244,7 +244,8 @@ def fill_content(product,
                  version_id=None,
                  incremental=False,
                  changed_context=None,
-                 send_to_review=False):
+                 send_to_review=False,
+                 workers=2):
 
     # if preview=False
     #   retrieve latest accepted version
@@ -347,7 +348,7 @@ def fill_content(product,
 
     default_language_code = product.default_language.code
     languages_list = product.languages_list
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=workers) as executor:
         for context in changed_contexts:
             # logger.info("Process context: " + context.name + " file:" + context.file_path)
             if incremental:
