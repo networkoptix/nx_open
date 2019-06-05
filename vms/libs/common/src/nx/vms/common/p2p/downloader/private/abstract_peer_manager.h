@@ -53,8 +53,8 @@ public:
         }
     };
 
-    // All peer managers managers share promise between handler and canceller, and it is hard to
-    // guarantee a certain call order. This function simplifies their code.
+    // All peer managers share promise between handler and canceller, and it is hard to guarantee
+    // a certain call order. This function simplifies their code.
     template<typename T>
     static void setPromiseValueIfEmpty(
         const std::shared_ptr<std::promise<T>>& promise, const T& value)
