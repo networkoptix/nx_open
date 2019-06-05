@@ -15,12 +15,13 @@
 #include "cookie_logout_rest_handler.h"
 #include <nx/utils/scope_guard.h>
 #include <audit/audit_manager.h>
+#include <nx/utils/log/log_main.h>
 
 int QnCookieLoginRestHandler::executePost(
-    const QString &/*path*/,
-    const QnRequestParams &/*params*/,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& path,
+    const QnRequestParams& /*params*/,
+    const QByteArray& body,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
     bool success = false;
@@ -64,6 +65,10 @@ int QnCookieLoginRestHandler::executePost(
     {
         auto session = owner->authSession();
         session.id = QnUuid::createUuid();
+        NX_DEBUG(this, lm("Failure to authenticate request %1 with error %2. userName: %3").args(
+            path,
+            authResult,
+            session.userName));
         qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
 
         result.setError(QnRestResult::InvalidParameter, "Invalid login or password");
