@@ -21,8 +21,6 @@ static const std::chrono::milliseconds kHttpTimeout(10000);
 static const std::chrono::seconds kDefaultChunkDuration(60);
 
 static const QString kListRequestTemplate("/sdlist?filelist=%1");
-static const QString kStartDatePath("/sdlist?getrec=start");
-static const QString kEndDatePath("/sdlist?getrec=end");
 static const QString kChunkDownloadTemplate("/sdlist?download=%1");
 static const QString kChunkDeleteTemplate("/sdlist?del=%1");
 static const QString kListDirectoriesPath("/sdlist?dirlist=0");
@@ -30,7 +28,6 @@ static const QString kListDirectoriesPath("/sdlist?dirlist=0");
 static const QString kDeleteOkResponse("del OK");
 
 static const QString kDateTimeFormat("yyyyMMddhhmmss");
-static const QString kDateTimeFormat2("yyyy/MM/dd hh:mm:ss");
 
 static const std::chrono::minutes kMaxChunkDuration(1);
 
@@ -38,6 +35,14 @@ static const std::chrono::milliseconds kWaitBeforeSync(30000);
 static const int kNumberOfSyncCycles = 2;
 static const int kDefaultOverlappedId = 0;
 static const int kTriesPerChunk = 2;
+
+std::chrono::seconds secondsPart(const QString& dateTimeString)
+{
+    const auto fileStartDateTime = QDateTime::fromString(dateTimeString, kDateTimeFormat);
+    const auto timePart = fileStartDateTime.time();
+
+    return std::chrono::seconds(timePart.second());
+}
 
 } // namespace
 
@@ -55,39 +60,71 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
 {
     using namespace std::chrono;
 
-    auto dirs = getDirectoryList();
-
-    std::vector<QString> files;
-    for (const auto& dir : dirs)
-        fetchFileList(dir, &files);
-
-    auto driftMs = m_resource->getTimeDrift();
-    auto fileCount = files.size();
-    for (auto i = 0; i < files.size(); ++i)
+    const auto driftMs = m_resource->getTimeDrift();
+    const auto dirs = getDirectoryList();
+    for (const auto& dir: dirs)
     {
-        auto currentChunkStartMs = parseDate(files[i], kDateTimeFormat);
-        decltype(currentChunkStartMs) nextChunkStartMs = boost::none;
+        std::vector<QString> files;
+        seconds directoryTimeShift{0};
 
-        if (!currentChunkStartMs)
+        fetchFileList(dir, &files);
+        if (files.empty())
             continue;
 
-        if (i < fileCount - 1)
+        // Sometimes the first entry in the directory is shifted for a few seconds (relatively to
+        // the time it reports in its name). This shift is usually equal to the seconds part of the
+        // chunks timestamp that follow the first one.
+        const seconds firstEntrySecondsPart = secondsPart(files[0]);
+        if (firstEntrySecondsPart != seconds::zero())
         {
-            nextChunkStartMs = parseDate(files[i + 1], kDateTimeFormat);
-
-            if (!currentChunkStartMs || !nextChunkStartMs)
-                continue;
+            for (int i = 1; i < files.size(); ++i)
+            {
+                directoryTimeShift = secondsPart(files[i]);
+                if (directoryTimeShift != seconds::zero())
+                    break;
+            }
         }
 
-        auto durationMs = nextChunkStartMs
-            ? nextChunkStartMs.get() - currentChunkStartMs.get()
-            : duration_cast<milliseconds>(kMaxChunkDuration).count();
+        QDateTime firstEntryStartTime = QDateTime::fromString(files[0], kDateTimeFormat);
+        if (firstEntrySecondsPart < directoryTimeShift)
+        {
+            QTime time = firstEntryStartTime.time();
+            time.setHMS(time.hour(), time.minute(), 0);
+            firstEntryStartTime.setTime(time);
+        }
+        else
+        {
+            firstEntryStartTime.addSecs(-duration_cast<seconds>(directoryTimeShift).count());
+        }
+
+        static const int64_t kSecondsInMinute = 60;
+        static const int64_t kMillisecondsInSecond = 1000;
+        const int64_t firstEntryDurationMs =
+            (kSecondsInMinute - firstEntryStartTime.time().second()) * kMillisecondsInSecond;
 
         (*outArchiveEntries)[kDefaultOverlappedId].emplace_back(
-            files[i],
-            currentChunkStartMs.get() - driftMs,
-            durationMs,
+            files[0],
+            firstEntryStartTime.toMSecsSinceEpoch() - driftMs,
+            firstEntryDurationMs,
             kDefaultOverlappedId);
+
+        // Usually all chunks in the directory (except for the first one) are aligned by the minute
+        // border (i.e starts from  hh.mm.00). But its name may contain different slightly shifted
+        // timestamp, which is not true. So we assign 0 seconds part to every chunk except for the
+        // first one.
+        for (int i = 1; i < files.size(); ++i)
+        {
+            QDateTime entryStartTime = QDateTime::fromString(files[i], kDateTimeFormat);
+            QTime time = entryStartTime.time();
+            time.setHMS(time.hour(), time.minute(), 0);
+            entryStartTime.setTime(time);
+
+            (*outArchiveEntries)[kDefaultOverlappedId].emplace_back(
+                files[i],
+                entryStartTime.toMSecsSinceEpoch() - driftMs,
+                kSecondsInMinute * kMillisecondsInSecond,
+                kDefaultOverlappedId);
+        }
     }
 
     return true;
@@ -161,30 +198,6 @@ boost::optional<nx_http::BufferType> LilinRemoteArchiveManager::doRequest(
     return response;
 }
 
-boost::optional<int64_t> LilinRemoteArchiveManager::getRecordingBound(RecordingBound bound)
-{
-    auto path = bound == RecordingBound::start
-        ? kStartDatePath
-        : kEndDatePath;
-
-    auto response = doRequest(path);
-    if (!response)
-        return boost::none;
-
-    auto datetime = parseDate(response.get(), kDateTimeFormat2);
-    return datetime;
-}
-
-boost::optional<int64_t> LilinRemoteArchiveManager::getRecordingStart()
-{
-    return getRecordingBound(RecordingBound::start);
-}
-
-boost::optional<int64_t> LilinRemoteArchiveManager::getRecordingEnd()
-{
-    return getRecordingBound(RecordingBound::end);
-}
-
 std::vector<QString> LilinRemoteArchiveManager::getDirectoryList()
 {
     std::vector<QString> result;
@@ -208,7 +221,7 @@ bool LilinRemoteArchiveManager::fetchFileList(const QString& directory, std::vec
         return false;
 
     auto files = response->split(L',');
-    for (const auto& file : files)
+    for (const auto& file: files)
     {
         auto split = file.split(L'.');
         if (split.size() != 2)
@@ -223,16 +236,6 @@ bool LilinRemoteArchiveManager::fetchFileList(const QString& directory, std::vec
     }
 
     return true;
-}
-
-boost::optional<int64_t> LilinRemoteArchiveManager::parseDate(const QString& dateTimeStr, const QString& dateTimeFormat)
-{
-    auto dateTime = QDateTime::fromString(dateTimeStr, dateTimeFormat);
-
-    if (!dateTime.isValid())
-        return boost::none;
-
-    return dateTime.toMSecsSinceEpoch();
 }
 
 RemoteArchiveCapabilities LilinRemoteArchiveManager::capabilities() const
