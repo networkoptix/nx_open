@@ -22,7 +22,7 @@ namespace Ui {
 
 namespace Qn {
     /**
-     * Flags describing graphics tweaks usable in resource tree wigdet.
+     * Flags describing graphics tweaks usable in resource tree widget.
      */
     enum GraphicsTweaksFlag {
         /** Last row is hidden if there is not enough space to fully show it. */
@@ -40,21 +40,21 @@ class QnResourceTreeWidget : public QWidget {
     typedef QWidget base_type;
 
 public:
-    explicit QnResourceTreeWidget(QWidget *parent = 0);
+    explicit QnResourceTreeWidget(QWidget* parent = nullptr);
     ~QnResourceTreeWidget();
 
-    QAbstractItemModel *model() const;
+    QAbstractItemModel* model() const;
 
-    void setModel(QAbstractItemModel *model);
+    void setModel(QAbstractItemModel* model);
 
     QnResourceSearchProxyModel* searchModel() const;
 
-    QItemSelectionModel *selectionModel();
-    void setWorkbench(QnWorkbench *workbench);
+    QItemSelectionModel* selectionModel();
+    void setWorkbench(QnWorkbench* workbench);
 
     void edit();
 
-    void expand(const QModelIndex &index);
+    void expand(const QModelIndex& index);
 
     void expandAll();
 
@@ -116,7 +116,7 @@ public:
     bool isSimpleSelectionEnabled() const;
 
     QnResourceTreeModelCustomColumnDelegate* customColumnDelegate() const;
-    void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
+    void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate* columnDelegate);
 
     /**
      * Allow some nodes to be auto-expanded. By default all nodes are auto-expanded.
@@ -131,8 +131,8 @@ public:
     void update(const QnResourcePtr& resource);
 
 protected:
-    virtual bool eventFilter(QObject *obj, QEvent *event) override;
-    virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual bool eventFilter(QObject* obj, QEvent* event) override;
+    virtual void mousePressEvent(QMouseEvent* event) override;
 
 signals:
     void activated(const QModelIndex& index, bool withMouse);
@@ -152,8 +152,8 @@ signals:
     void filterCtrlEnterPressed();
 
 private:
-    void at_treeView_spacePressed(const QModelIndex &index);
-    void at_treeView_clicked(const QModelIndex &index);
+    void at_treeView_spacePressed(const QModelIndex& index);
+    void at_treeView_clicked(const QModelIndex& index);
 
     void at_resourceProxyModel_rowsInserted(const QModelIndex& parent, int start, int end);
     void expandNodeIfNeeded(const QModelIndex& index);
@@ -167,11 +167,11 @@ private:
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
 
-    QnResourceItemDelegate *m_itemDelegate;
+    QnResourceItemDelegate* m_itemDelegate;
 
     AutoExpandPolicy m_autoExpandPolicy;
 
-    QnResourceTreeSortProxyModel *m_resourceProxyModel;
+    QnResourceTreeSortProxyModel* m_resourceProxyModel;
 
     /** This property holds whether checkboxes against each row are visible. */
     bool m_checkboxesVisible;
