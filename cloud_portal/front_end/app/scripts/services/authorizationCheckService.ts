@@ -51,7 +51,8 @@
                         account.requestingLogin = login(tempLogin, tempPassword, false)
                             .then(() => {
                                 $location.search('auth', undefined);
-                            }, () => {
+                            })
+                            .catch((error) => {
                                 $location.search('auth', undefined);
                             });
                     }
@@ -82,30 +83,26 @@
                                 return $q.reject(result);
                             }
 
-                            return checkLoginState()
-                                    .then(() => {
-                                        // If the user that logged in matches the current session there's no need to show
-                                        // the logout dialog.
-                                        if (result.data.email !== $rootScope.session.loginState) {
-                                            logoutAuthorised();
-                                        }
-                                    })
-                                    .catch(() => {
-                                        if (result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
-                                            setEmail(result.data.email);
-                                            $rootScope.session.loginState = result.data.email; // Forcing changing loginState to reload interface
-                                        }
-                                    });
+                            if ($rootScope.session.loginState) {
+                                // If the user that logged in matches the current session there's no need to show
+                                // the logout dialog.
+                                if (result.data.email !== $rootScope.session.loginState) {
+                                    logoutAuthorised();
+                                }
+
+                                return $q.resolve(true);
+                            }
+
+                            if (result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
+                                setEmail(result.data.email);
+                                $rootScope.session.loginState = result.data.email; // Forcing changing loginState to reload interface
+                            }
+
+                            return $q.reject(false);
+
                         }, () => {
                             NxDialogsService.notify(languageService.lang.errorCodes.wrongAuthCode, 'danger');
                         });
-            }
-
-            function checkLoginState() {
-                if ($rootScope.session.loginState) {
-                    return $q.resolve(true);
-                }
-                return $q.reject(false);
             }
 
             function logout(doNotRedirect) {
