@@ -269,6 +269,7 @@ private:
     // get statistics for the whole archive except of bitrate. It's analyzed for the last records of archive only in range <= bitrateAnalyzePeriodMs
     QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalyzePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
     void clearAnalyticsEvents(const QMap<QnUuid, qint64>& dataToDelete);
+    void forciblyClearAnalyticsEvents();
     QMap<QnUuid, qint64> calculateOldestDataTimestampByCamera();
     bool getMinTimes(QMap<QString, qint64>& lastTime);
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);

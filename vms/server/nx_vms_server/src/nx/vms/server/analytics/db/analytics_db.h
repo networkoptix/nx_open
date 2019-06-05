@@ -62,6 +62,7 @@ public:
 
     virtual void flush(StoreCompletionHandler completionHandler) override;
 
+    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override;
 private:
     QnMediaServerModule* m_mediaServerModule = nullptr;
     std::unique_ptr<DbController> m_dbController;
