@@ -122,6 +122,14 @@ def downloads_history(request):
 
     downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', settings.CUSTOMIZATION)
     downloads_json = requests.get(downloads_url)
+
+    if downloads_json.status_code == 404:
+        logger.error(
+            "downloads.json doesn't exist for customization: {0}, Ask Boris to fix that (publish and accept a "
+            "release)".format(settings.CUSTOMIZATION)
+        )
+        return Response(None)
+
     downloads_json.raise_for_status()
     downloads_json = downloads_json.json()
 
