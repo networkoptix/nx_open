@@ -10,6 +10,17 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+func getCountryCode(apiFunc string, request *http.Request) string {
+	const kHeader string = "CloudFront-Viewer-Country"
+	countryCode := request.Header.Get(kHeader)
+	if len(countryCode) == 0 {
+		log.Printf(
+			`%s: Warning, http request missing "%s" header. Geolocation will not work\n`,
+			apiFunc, kHeader)
+	}
+	return countryCode
+}
+
 func writeError(apiFunc string, httpStatusCode int, writer http.ResponseWriter, err error) {
 	log.Printf("%s: error: %s\n", apiFunc, err.Error())
 	writer.Header().Set("Content-Type", "text/plain; charset=UTF-8")
@@ -77,6 +88,10 @@ func postNode(writer http.ResponseWriter, request *http.Request, params httprout
 		Urls:            nodeInfo.Urls,
 		ExpirationTime:  CalculateExpirationTime(request),
 		PublicIpAddress: ParsePublicIpAddress(request),
+		CountryCode:     getCountryCode("postNode", request),
+	}
+	if len(node.CountryCode) == 0 {
+		log.Println("postNode: CountryCode was not found, geopoint location will not work")
 	}
 
 	err = dao.InsertOrUpdate(node, params.ByName("clusterId"))
@@ -107,7 +122,17 @@ func getCloudModulesXml(writer http.ResponseWriter, request *http.Request, param
 		return
 	}
 
-	xml, err, httpStatusCode := xmlFunc(request, &onlineNodes[0])
+	var node *Node
+	clientCountryCode := getCountryCode("getCloudModulesXml", request)
+	if len(clientCountryCode) > 0 {
+		node = FindNodeClosestToClient(clientCountryCode, onlineNodes)
+	}
+	if node == nil {
+		log.Println("getCloudModulesXml: geolocation failed, using first node in the list")
+		node = &onlineNodes[0]
+	}
+
+	xml, err, httpStatusCode := xmlFunc(request, node)
 	if err != nil {
 		apiFunc := "getCloudModulesXml: url path: " + request.URL.Path
 		writeError(apiFunc, httpStatusCode, writer, err)
