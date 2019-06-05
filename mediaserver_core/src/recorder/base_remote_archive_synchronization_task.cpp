@@ -309,7 +309,8 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
         this,
         lm("Writing time period %1 (%2) - %3 (%4). "
             "Chunk bounds: %5 (%6) - %7 (%8). "
-            "Resource %9")
+            "Chunk id: %9 "
+            "Resource %10")
             .args(
                 QDateTime::fromMSecsSinceEpoch(timePeriod.startTimeMs),
                 timePeriod.startTimeMs,
@@ -319,6 +320,7 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
                 chunk.startTimeMs,
                 QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs + chunk.durationMs),
                 chunk.startTimeMs + chunk.durationMs,
+                chunk.id,
                 m_resource->getUserDefinedName()));
 
     {
@@ -349,7 +351,8 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
         this,
         lm("Time period %1 (%2) - %3 (%4) has been recorded."
             " Corresponding chunk: %5 (%6) - %7 (%8)."
-            " Resource: %9")
+            " Chunk id: %9"
+            " Resource: %10")
             .args(
                 QDateTime::fromMSecsSinceEpoch(timePeriod.startTimeMs),
                 timePeriod.startTimeMs,
@@ -359,6 +362,7 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
                 chunk.startTimeMs,
                 QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs + chunk.durationMs),
                 chunk.startTimeMs + chunk.durationMs,
+                chunk.id,
                 m_resource->getUserDefinedName()));
 
     return true;
