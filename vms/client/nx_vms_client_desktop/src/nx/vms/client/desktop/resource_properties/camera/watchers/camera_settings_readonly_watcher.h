@@ -29,9 +29,6 @@ public:
 signals:
     void readOnlyChanged(bool value, QPrivateSignal);
 
-protected:
-    virtual void afterContextInitialized() override;
-
 private:
     void updateReadOnly();
     bool calculateReadOnly() const;

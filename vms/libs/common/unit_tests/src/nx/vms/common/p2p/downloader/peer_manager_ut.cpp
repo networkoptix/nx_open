@@ -1,28 +1,21 @@
 #include <gtest/gtest.h>
 
-#include <utils/common/synctime.h>
-
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/random_file.h>
-#include <nx/utils/std/future.h>
 #include <nx/vms/common/p2p/downloader/private/storage.h>
 
 #include "test_peer_manager.h"
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
-namespace test {
+using namespace std::chrono;
 
-class DistributedFileDownloaderPeerManagerTest:
-    public ::testing::Test, public TestPeerManagerHandler
+namespace nx::vms::common::p2p::downloader::test {
+
+class DistributedFileDownloaderPeerManagerTest: public ::testing::Test
 {
 protected:
     virtual void SetUp() override
     {
-        peerManager.reset(new TestPeerManager(this));
+        peerManager.reset(new TestPeerManager());
 
         storageDir =
             (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
@@ -40,24 +33,15 @@ protected:
         NX_ASSERT(storageDir.removeRecursively());
     }
 
-    virtual void onRequestFileInfo() {}
-
     QScopedPointer<TestPeerManager> peerManager;
     QDir storageDir;
-    QnSyncTime syncTime;
 };
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, invalidPeerRequest)
 {
     const auto& peer = QnUuid::createUuid();
-    const auto handle = peerManager->requestFileInfo(peer, "test", nx::utils::Url(),
-        [&](bool, rest::Handle, const FileInformation&)
-    {
-        FAIL() << "Should not be called.";
-    });
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ASSERT_EQ(handle, 0);
+    auto request = peerManager->requestFileInfo(peer, "test", nx::utils::Url());
+    ASSERT_FALSE(request.future.valid());
 }
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, cancellingRequest)
@@ -65,14 +49,10 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, cancellingRequest)
     const auto& peer = peerManager->addPeer();
     peerManager->setDelayBeforeRequest(1000);
 
-    const auto handle = peerManager->requestFileInfo(peer, "test", nx::utils::Url(),
-        [&](bool, rest::Handle, const FileInformation&)
-    {
-        FAIL() << "Should not be called.";
-    });
-
-    peerManager->cancelRequest(peer, handle);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    auto request = peerManager->requestFileInfo(peer, "test", nx::utils::Url());
+    request.cancel();
+    request.future.wait_for(100ms);
+    ASSERT_FALSE(request.future.get().has_value());
 }
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, fileInfo)
@@ -83,16 +63,9 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, fileInfo)
 
     TestPeerManager::FileInformation fileInformation("test");
     peerManager->setFileInformation(peer, fileInformation);
-    nx::utils::promise<bool> readyPromise;
-    auto readyFuture = readyPromise.get_future();
 
-    peerManager->requestFileInfo(peer, fileInformation.name, fileInformation.url,
-        [&](bool success, rest::Handle /*handle*/, const FileInformation& fileInfo)
-        {
-            readyPromise.set_value(success && fileInfo.name == fileInformation.name);
-        });
-
-    ASSERT_TRUE(readyFuture.get());
+    auto request = peerManager->requestFileInfo(peer, fileInformation.name, fileInformation.url);
+    ASSERT_TRUE(request.future.get().has_value());
 }
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, emptyFileInfo)
@@ -100,16 +73,10 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, emptyFileInfo)
     const auto& peer = QnUuid::createUuid();
 
     peerManager->addPeer(peer);
-    nx::utils::promise<bool> readyPromise;
-    auto readyFuture = readyPromise.get_future();
 
-    peerManager->requestFileInfo(peer, "test", nx::utils::Url(),
-        [&](bool success, rest::Handle /*handle*/, const FileInformation& fileInfo)
-    {
-        readyPromise.set_value(!success && fileInfo.status == FileInformation::Status::notFound);
-    });
-
-    ASSERT_TRUE(readyFuture.get());
+    auto request = peerManager->requestFileInfo(peer, "test", nx::utils::Url());
+    const auto& info = request.future.get();
+    ASSERT_FALSE(info.has_value());
 }
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, invalidChunk)
@@ -123,16 +90,8 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidChunk)
     fileInformation.chunkSize = 1024;
     peerManager->setFileInformation(peer, fileInformation);
 
-    nx::utils::promise<bool> readyPromise;
-    auto readyFuture = readyPromise.get_future();
-
-    peerManager->downloadChunk(peer, fileInformation.name, nx::utils::Url(), 2, 0,
-        [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
-        {
-            readyPromise.set_value(success && !data.isEmpty());
-        });
-
-    ASSERT_FALSE(readyFuture.get());
+    auto request = peerManager->downloadChunk(peer, fileInformation.name, nx::utils::Url(), 2, 0);
+    ASSERT_FALSE(request.future.get().has_value());
 }
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
@@ -154,50 +113,26 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     originalFileInfo = storage->fileInformation(fileName);
     const auto originalChecksums = storage->getChunkChecksums(fileName);
 
-    TestPeerManager::FileInformation fileInfo;
-    nx::utils::promise<bool> fileInfoPromise;
-    auto fileInfoFuture = fileInfoPromise.get_future();
+    auto infoRequest = peerManager->requestFileInfo(peer, fileName, nx::utils::Url());
+    std::optional<TestPeerManager::FileInformation> fileInfo = infoRequest.future.get();
 
-    peerManager->requestFileInfo(peer, fileName, nx::utils::Url(),
-        [&](bool success, rest::Handle /*handle*/, const FileInformation& peerFileInfo)
-        {
-            fileInfo = peerFileInfo;
-            fileInfoPromise.set_value(success);
-        });
+    ASSERT_TRUE(fileInfo.has_value());
+    ASSERT_TRUE(fileInfo->isValid());
+    ASSERT_EQ(fileInfo->status, originalFileInfo.status);
+    ASSERT_EQ(fileInfo->size, originalFileInfo.size);
+    ASSERT_EQ(fileInfo->md5, originalFileInfo.md5);
 
-    ASSERT_TRUE(fileInfoFuture.get());
-    ASSERT_TRUE(fileInfo.isValid());
-    ASSERT_EQ(fileInfo.status, originalFileInfo.status);
-    ASSERT_EQ(fileInfo.size, originalFileInfo.size);
-    ASSERT_EQ(fileInfo.md5, originalFileInfo.md5);
+    auto chunkRequest = peerManager->downloadChunk(peer, fileName, nx::utils::Url(), 0, 0);
+    auto chunk = chunkRequest.future.get();
 
-    nx::utils::promise<bool> downloadPromise;
-    auto downloadFuture = downloadPromise.get_future();
-    QByteArray chunkData;
+    ASSERT_TRUE(chunk.has_value());
+    ASSERT_EQ(chunk->size(), originalFileInfo.size);
 
-    peerManager->downloadChunk(peer, fileName, nx::utils::Url(), 0, 0,
-        [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
-        {
-            chunkData = data;
-            downloadPromise.set_value(success);
-        });
+    auto checksumsRequest = peerManager->requestChecksums(peer, fileName);
+    const auto checksums = checksumsRequest.future.get();
 
-    ASSERT_TRUE(downloadFuture.get());
-    ASSERT_EQ(chunkData.size(), originalFileInfo.size);
-
-    nx::utils::promise<bool> checksumsPromise;
-    auto checksumsFuture = checksumsPromise.get_future();
-    QVector<QByteArray> checksums;
-
-    peerManager->requestChecksums(peer, fileName,
-        [&](bool success, rest::Handle /*handle*/, const QVector<QByteArray>& fileChecksums)
-        {
-            checksums = fileChecksums;
-            checksumsPromise.set_value(success);
-        });
-
-    ASSERT_TRUE(checksumsFuture.get());
-    ASSERT_EQ(checksums, originalChecksums);
+    ASSERT_TRUE(checksums);
+    ASSERT_EQ(checksums.value(), originalChecksums);
 }
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, internetFile)
@@ -214,19 +149,11 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, internetFile)
     peerManager->setHasInternetConnection(peerId);
     peerManager->setIndirectInternetRequestsAllowed(true);
 
-    nx::utils::promise<bool> downloadPromise;
-    auto downloadFuture = downloadPromise.get_future();
-    QByteArray chunkData;
+    auto request = peerManager->downloadChunk(peerId, fileName, url, 0, 1);
+    auto chunk = request.future.get();
 
-    peerManager->downloadChunk(peerId, fileName, url, 0, 1,
-        [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
-        {
-            chunkData = data;
-            downloadPromise.set_value(success);
-        });
-
-    ASSERT_TRUE(downloadFuture.get());
-    ASSERT_EQ(chunkData.size(), 1);
+    ASSERT_TRUE(chunk.has_value());
+    ASSERT_EQ(chunk->size(), 1);
 }
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, calculateDistances)
@@ -263,9 +190,4 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, calculateDistances)
     ASSERT_EQ(testPeerManager.distanceTo(peerD), std::numeric_limits<int>::max());
 }
 
-} // namespace test
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::common::p2p::downloader::test

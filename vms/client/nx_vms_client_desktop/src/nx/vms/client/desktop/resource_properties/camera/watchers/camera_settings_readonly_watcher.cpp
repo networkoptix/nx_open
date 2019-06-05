@@ -17,12 +17,20 @@ CameraSettingsReadOnlyWatcher::CameraSettingsReadOnlyWatcher(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent, InitializationMode::lazy)
+    QnWorkbenchContextAware(parent, InitializationMode::instant)
 {
     NX_ASSERT(store);
 
     connect(this, &CameraSettingsReadOnlyWatcher::readOnlyChanged,
         store, &CameraSettingsDialogStore::setReadOnly);
+
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        &CameraSettingsReadOnlyWatcher::updateReadOnly);
+
+    connect(commonModule(), &QnCommonModule::readOnlyChanged, this,
+        &CameraSettingsReadOnlyWatcher::updateReadOnly);
+
+    updateReadOnly();
 }
 
 QnVirtualCameraResourceList CameraSettingsReadOnlyWatcher::cameras() const
@@ -42,15 +50,6 @@ void CameraSettingsReadOnlyWatcher::setCameras(const QnVirtualCameraResourceList
 bool CameraSettingsReadOnlyWatcher::isReadOnly() const
 {
     return m_readOnly;
-}
-
-void CameraSettingsReadOnlyWatcher::afterContextInitialized()
-{
-    connect(context(), &QnWorkbenchContext::userChanged, this,
-        &CameraSettingsReadOnlyWatcher::updateReadOnly);
-
-    connect(commonModule(), &QnCommonModule::readOnlyChanged, this,
-        &CameraSettingsReadOnlyWatcher::updateReadOnly);
 }
 
 void CameraSettingsReadOnlyWatcher::updateReadOnly()

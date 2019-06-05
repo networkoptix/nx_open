@@ -328,12 +328,22 @@ bool ApplauncherProcess::installZipAsync(
     {
         // It is ok if we are already installing the same file and version.
         if (m_process.equals(request->version, request->zipFileName))
+        {
+            NX_INFO(this, "Already installing version %1 from file %2",
+                request->version, request->zipFileName);
             response->result = ResultType::ok;
+        }
         else
+        {
+            NX_ERROR(this, "Installer is busy with another task",
+                request->version, request->zipFileName);
             response->result = ResultType::busy;
+        }
     }
     else
     {
+        NX_VERBOSE(this, "Starting async installation for version %1 from file %2",
+            request->version, request->zipFileName);
         m_process.result = std::async(std::launch::async,
             [this, request]() -> ResultType
             {
@@ -347,6 +357,8 @@ bool ApplauncherProcess::installZipAsync(
                 return result;
             });
         response->result = ResultType::ok;
+        NX_INFO(this, "Started async installation for version %1 from file %2",
+            request->version, request->zipFileName);
     }
 
     return response->result == ResultType::ok;

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "abstract_peer_manager.h"
 #include <nx/network/aio/timer.h>
+
+#include "abstract_peer_manager.h"
 
 namespace nx::vms::common::p2p::downloader {
 
@@ -16,30 +17,22 @@ public:
     virtual QList<QnUuid> peers() const override;
     virtual int distanceTo(const QnUuid& peerId) const override;
 
-    virtual rest::Handle requestFileInfo(
+    virtual RequestContext<FileInformation> requestFileInfo(
         const QnUuid& peerId,
         const QString& fileName,
-        const nx::utils::Url& url,
-        FileInfoCallback callback) override;
+        const nx::utils::Url& url) override;
 
-    virtual rest::Handle requestChecksums(
-        const QnUuid& peerId,
-        const QString& fileName,
-        ChecksumsCallback callback) override;
+    virtual RequestContext<QVector<QByteArray>> requestChecksums(
+        const QnUuid& peerId, const QString& fileName) override;
 
-    virtual rest::Handle downloadChunk(
+    virtual RequestContext<QByteArray> downloadChunk(
         const QnUuid& peerId,
         const QString& fileName,
         const nx::utils::Url &url,
         int chunkIndex,
-        int chunkSize,
-        ChunkCallback callback) override;
-
-    virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
+        int chunkSize) override;
 
 private:
-    class Private;
-    const QScopedPointer<Private> d;
     network::aio::Timer m_aioTimer;
 };
 

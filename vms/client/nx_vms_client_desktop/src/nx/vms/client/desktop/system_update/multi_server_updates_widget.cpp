@@ -1562,7 +1562,7 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         if (clicked == tryAgain)
         {
             auto serversToRetry = peersFailed;
-            m_serverUpdateTool->requestStartUpdate(m_updateInfo.info, serversToRetry);
+            m_serverUpdateTool->requestRetryAction();
             m_clientUpdateTool->setUpdateTarget(m_updateInfo);
             setTargetState(WidgetUpdateState::downloading, serversToRetry);
         }
@@ -2049,10 +2049,11 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         && (m_widgetState == WidgetUpdateState::ready
             || m_widgetState != WidgetUpdateState::initial)
         && (m_updateInfo.error == nx::update::InformationError::networkError
-            || m_updateInfo.error == nx::update::InformationError::httpError
             // If one wants to download a file in another place.
             || m_updateInfo.error == nx::update::InformationError::noError)
-        && m_widgetState != WidgetUpdateState::readyInstall;
+        && m_widgetState != WidgetUpdateState::readyInstall
+        // httpError corresponds to 'Build not found'
+        && m_updateInfo.error != nx::update::InformationError::httpError;
 
     ui->manualDownloadButton->setVisible(showButton);
 

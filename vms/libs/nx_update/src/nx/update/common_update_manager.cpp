@@ -136,7 +136,8 @@ void CommonUpdateManager::cancel()
 
 void CommonUpdateManager::retry(bool forceRedownload)
 {
-    if (forceRedownload)    {
+    if (forceRedownload)
+    {
         nx::update::Package package;
         if (findPackage(&package) == update::FindPackageResult::ok)
             downloader()->deleteFile(package.file);

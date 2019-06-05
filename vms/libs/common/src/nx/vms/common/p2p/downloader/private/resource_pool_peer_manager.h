@@ -24,26 +24,20 @@ public:
     virtual QList<QnUuid> peers() const override;
     virtual int distanceTo(const QnUuid& peerId) const override;
 
-    virtual rest::Handle requestFileInfo(
+    virtual RequestContext<FileInformation> requestFileInfo(
         const QnUuid& peerId,
         const QString& fileName,
-        const nx::utils::Url& url,
-        FileInfoCallback callback) override;
+        const nx::utils::Url& url) override;
 
-    virtual rest::Handle requestChecksums(
-        const QnUuid& peerId,
-        const QString& fileName,
-        ChecksumsCallback callback) override;
+    virtual RequestContext<QVector<QByteArray>> requestChecksums(
+        const QnUuid& peerId, const QString& fileName) override;
 
-    virtual rest::Handle downloadChunk(
+    virtual RequestContext<QByteArray> downloadChunk(
         const QnUuid& peerId,
         const QString& fileName,
         const nx::utils::Url &url,
         int chunkIndex,
-        int chunkSize,
-        ChunkCallback callback) override;
-
-    virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
+        int chunkSize) override;
 
     void setServerDirectConnection(const QnUuid& id, const rest::QnConnectionPtr& connection);
 

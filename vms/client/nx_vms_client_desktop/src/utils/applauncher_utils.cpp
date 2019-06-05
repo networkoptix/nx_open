@@ -87,7 +87,8 @@ ResultType installZipAsync(
     ResultType result = ResultType::otherError;
     static const int kMaxTries = 5;
 
-    for (int retries = 0; retries < kMaxTries; retries++)
+    int retries = 0;
+    for (; retries < kMaxTries; retries++)
     {
         result = sendCommandToApplauncher(request, &response);
         if (result == ResultType::ok)
@@ -112,6 +113,9 @@ ResultType installZipAsync(
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+
+    if (retries == kMaxTries && result != ResultType::ok)
+        NX_ERROR(NX_SCOPE_TAG, "installZipAsync got error %1 after %2 retries", result, retries);
 
     return result;
 }

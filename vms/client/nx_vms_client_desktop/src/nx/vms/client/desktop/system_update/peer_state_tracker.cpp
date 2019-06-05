@@ -278,6 +278,8 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>
             {
                 bool changed = false;
 
+                item->lastStatusTime = UpdateItem::Clock::now();
+
                 if (status.second.code == StatusCode::offline)
                     continue;
 
@@ -322,10 +324,12 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>
                     item->statusUnknown = false;
                 }
 
-                item->lastStatusTime = UpdateItem::Clock::now();
-
                 if (changed)
                     itemsChanged.append(item);
+            }
+            else
+            {
+                NX_ERROR(this, "setUpdateStatus() got unknown peer id=%1", status.first);
             }
         }
     }
@@ -614,13 +618,24 @@ void PeerStateTracker::processUnknownStates()
 
             if (item->offline && state != StatusCode::offline)
             {
-                auto delta = now - item->lastOnlineTime;
-                if (delta > m_timeForServerToReturn)
+                if (state != StatusCode::offline)
                 {
-                    NX_INFO(this, "processUnknownStates() "
-                        "peer %1 has been offline for too long. Skipping it.", id);
-                    item->state = StatusCode::offline;
-                    itemsChanged.push_back(item);
+                    auto delta = now - item->lastOnlineTime;
+                    if (delta > m_timeForServerToReturn)
+                    {
+                        NX_INFO(this, "processUnknownStates() "
+                            "peer %1 has been offline for too long. Skipping it.", id);
+                        item->state = StatusCode::offline;
+                        itemsChanged.push_back(item);
+                    }
+                }
+                else
+                {
+                    // Sometimes mediaserver resource has offline status, but this server is actually
+                    // online and has state != StatusCode::offline at /ec2/updateStatus. So current
+                    // logic causes constant switches to 'full offline' and back.
+                    // Resetting offline timestamp to prevent such blinking.
+                    item->lastOnlineTime = now;
                 }
             }
         }
@@ -841,7 +856,7 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
         case Code::noError:
             return "No error. It is a bug if you see this message.";
         case Code::updatePackageNotFound:
-            return tr("Update package can't be not found.");
+            return tr("Update package is not found.");
         case Code::noFreeSpaceToDownload:
             return tr("There is not enough space to download update files.");
         case Code::noFreeSpaceToExtract:
