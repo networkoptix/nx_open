@@ -13,6 +13,7 @@
 #include <analytics/db/config.h>
 
 #include <nx/vms/server/analytics/db/analytics_db.h>
+#include <nx/vms/server/analytics/db/object_searcher.h>
 #include <nx/vms/server/analytics/db/serializers.h>
 
 #include "analytics_storage_types.h"
@@ -157,7 +158,7 @@ protected:
     {
         for (auto objectIter = objects.begin(); objectIter != objects.end(); )
         {
-            if (!satisfiesFilter(filter, *objectIter))
+            if (!ObjectSearcher::satisfiesFilter(filter, *objectIter))
             {
                 objectIter = objects.erase(objectIter);
                 continue;
@@ -524,29 +525,6 @@ private:
     }
 
     bool satisfiesFilter(
-        const Filter& filter, const DetectedObject& detectedObject)
-    {
-        if (!filter.objectAppearanceId.isNull() && detectedObject.objectAppearanceId != filter.objectAppearanceId)
-            return false;
-
-        if (!filter.objectTypeId.empty() &&
-            std::find(
-                filter.objectTypeId.begin(), filter.objectTypeId.end(),
-                detectedObject.objectTypeId) == filter.objectTypeId.end())
-        {
-            return false;
-        }
-
-        if (!filter.freeText.isEmpty() &&
-            !matchAttributes(detectedObject.attributes, filter.freeText))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    bool satisfiesFilter(
         const Filter& filter,
         const ObjectPosition& data)
     {
@@ -556,15 +534,7 @@ private:
         if (!filter.boundingBox)
             return true;
 
-        return rectsIntersectToPrecision(*filter.boundingBox, data.boundingBox);
-    }
-
-    bool rectsIntersectToPrecision(const QRectF& one, const QRectF& two)
-    {
-        const auto translatedOne = translateToSearchGrid(one);
-        const auto translatedTwo = translateToSearchGrid(two);
-
-        return translatedOne.intersects(translatedTwo);
+        return rectsIntersectToSearchPrecision(*filter.boundingBox, data.boundingBox);
     }
 
     bool satisfiesFilter(
@@ -584,7 +554,7 @@ private:
         {
             bool intersects = false;
             for (const auto& object: data.objects)
-                intersects |= rectsIntersectToPrecision(*filter.boundingBox, object.boundingBox);
+                intersects |= rectsIntersectToSearchPrecision(*filter.boundingBox, object.boundingBox);
             if (!intersects)
                 return false;
         }
@@ -606,7 +576,7 @@ private:
         {
             bool isFilterSatisfied = false;
             for (const auto& object: data.objects)
-                isFilterSatisfied |= matchAttributes(object.labels, filter.freeText);
+                isFilterSatisfied |= ObjectSearcher::matchAttributes(object.labels, filter.freeText);
             if (!isFilterSatisfied)
                 return false;
         }
@@ -622,32 +592,6 @@ private:
 
         if (!filter.timePeriod.contains(data.timestampUsec / kUsecInMs))
             return false;
-
-        return true;
-    }
-
-    bool matchAttributes(
-        const std::vector<nx::common::metadata::Attribute>& attributes,
-        const QString& filter)
-    {
-        const auto filterWords = filter.split(L' ');
-        // Attributes have to contain all words.
-        for (const auto& filterWord: filterWords)
-        {
-            bool found = false;
-            for (const auto& attribute: attributes)
-            {
-                if (attribute.name.indexOf(filterWord) != -1 ||
-                    attribute.value.indexOf(filterWord) != -1)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-                return false;
-        }
 
         return true;
     }

@@ -41,7 +41,7 @@ std::vector<DetectedObject> ObjectSearcher::lookup(nx::sql::QueryContext* queryC
     if (!m_filter.objectAppearanceId.isNull())
     {
         auto object = fetchObjectById(queryContext, m_filter.objectAppearanceId);
-        if (!object || !satisfiesFilter(*object))
+        if (!object || !satisfiesFilter(m_filter, *object))
             return {};
         return {std::move(*object)};
     }
@@ -182,6 +182,84 @@ template void ObjectSearcher::addTimePeriodToFilter<std::chrono::seconds>(
     const QnTimePeriod& timePeriod,
     const TimeRangeFields& timeRangeFields,
     nx::sql::Filter* sqlFilter);
+
+bool ObjectSearcher::satisfiesFilter(
+    const Filter& filter, const DetectedObject& detectedObject)
+{
+    using namespace std::chrono;
+
+    if (!filter.objectAppearanceId.isNull() &&
+        detectedObject.objectAppearanceId != filter.objectAppearanceId)
+    {
+        return false;
+    }
+
+    if (!(microseconds(detectedObject.lastAppearanceTimeUsec) >= filter.timePeriod.startTime() &&
+          (filter.timePeriod.isInfinite() ||
+              microseconds(detectedObject.firstAppearanceTimeUsec) < filter.timePeriod.endTime())))
+    {
+        return false;
+    }
+
+    if (!filter.objectTypeId.empty() &&
+        std::find(
+            filter.objectTypeId.begin(), filter.objectTypeId.end(),
+            detectedObject.objectTypeId) == filter.objectTypeId.end())
+    {
+        return false;
+    }
+
+    if (!filter.freeText.isEmpty() &&
+        !matchAttributes(detectedObject.attributes, filter.freeText))
+    {
+        return false;
+    }
+
+    // Checking the track.
+    if (filter.boundingBox)
+    {
+        bool instersects = false;
+        for (const auto& position: detectedObject.track)
+        {
+            if (rectsIntersectToSearchPrecision(*filter.boundingBox, position.boundingBox))
+            {
+                instersects = true;
+                break;
+            }
+        }
+        
+        if (!instersects)
+            return false;
+    }
+
+    return true;
+}
+
+bool ObjectSearcher::matchAttributes(
+    const std::vector<nx::common::metadata::Attribute>& attributes,
+    const QString& filter)
+{
+    const auto filterWords = filter.split(L' ');
+    // Attributes have to contain all words.
+    for (const auto& filterWord: filterWords)
+    {
+        bool found = false;
+        for (const auto& attribute : attributes)
+        {
+            if (attribute.name.indexOf(filterWord) != -1 ||
+                attribute.value.indexOf(filterWord) != -1)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            return false;
+    }
+
+    return true;
+}
 
 static constexpr char kBoxFilteredTable[] = "%boxFilteredTable%";
 static constexpr char kFromBoxFilteredTable[] = "%fromBoxFilteredTable%";
@@ -457,12 +535,6 @@ DetectedObject ObjectSearcher::loadObject(nx::sql::AbstractSqlQuery* query)
     }
 
     return detectedObject;
-}
-
-bool ObjectSearcher::satisfiesFilter(const DetectedObject& /*object*/) const
-{
-    // TODO: #ak
-    return true;
 }
 
 void ObjectSearcher::filterTrack(std::vector<ObjectPosition>* const track)

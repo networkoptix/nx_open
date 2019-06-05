@@ -74,6 +74,13 @@ public:
         const TimeRangeFields& timeRangeFields,
         nx::sql::Filter* sqlFilter);
 
+    static bool satisfiesFilter(
+        const Filter& filter, const DetectedObject& detectedObject);
+
+    static bool matchAttributes(
+        const std::vector<nx::common::metadata::Attribute>& attributes,
+        const QString& filter);
+
 private:
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
@@ -101,7 +108,6 @@ private:
     std::vector<DetectedObject> loadObjects(nx::sql::AbstractSqlQuery* query);
     DetectedObject loadObject(nx::sql::AbstractSqlQuery* query);
 
-    bool satisfiesFilter(const DetectedObject& object) const;
     void filterTrack(std::vector<ObjectPosition>* const track);
 
     static void addObjectTypeIdToFilter(
