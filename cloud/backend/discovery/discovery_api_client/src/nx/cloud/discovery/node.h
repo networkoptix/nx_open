@@ -36,8 +36,10 @@ struct NX_DISCOVERY_CLIENT_API Node
     std::string publicIpAddress;
     std::vector<std::string> urls;
     time_point expirationTime;
-    /* A string containing discovery client specific json. */
+    /* A string containing discovery client specific json */
     std::string infoJson;
+    /* A two letter string indicating the iso 1366 country code */
+    std::string countryCode;
 
     bool operator==(const Node& right) const;
 
