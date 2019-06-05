@@ -576,12 +576,16 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
                     QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Warning);
                 const auto keepButton = msgBox.addButton(tr("Keep"),
                     QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
+
+                // This dialog uses non-standard layout, so we can't use ButtonRole::CancelRole.
                 const auto cancelButton = msgBox.addButton(tr("Cancel"),
                     QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
 
                 cancelButton->setFocus();
 
+                // Since we don't have a button with CancelRole, we need to set it manually.
                 msgBox.setEscapeButton(cancelButton);
+
                 msgBox.exec();
 
                 const auto updateServerSettings =
