@@ -64,6 +64,9 @@ public:
     /** Check if storage can be removed from the system. */
     bool canRemoveStorage(const QnStorageModelInfo& data) const;
 
+    // Check if storage can be used to store analytics metadata.
+    bool canStoreAnalytics(const QnStorageModelInfo& data) const;
+
     /**
      *  Check if storage is active on the server.
      *  Inactive storages are:

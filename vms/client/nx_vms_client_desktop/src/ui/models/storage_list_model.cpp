@@ -237,7 +237,10 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
             if (canRemoveStorage(storageData))
                 return tr("Remove");
 
-            return tr("Use to store analytics data");
+            if (canStoreAnalytics(storageData))
+                return tr("Use to store analytics data");
+
+            return QString();
         }
 
         default:
@@ -457,6 +460,12 @@ bool QnStorageListModel::canRemoveStorage(const QnStorageModelInfo& data) const
         return false;
 
     return data.isExternal || !data.isOnline;
+}
+
+bool QnStorageListModel::canStoreAnalytics(const QnStorageModelInfo& data) const
+{
+    //TODO: use PartitionType enum value here instead of the serialized literal
+    return data.isOnline && data.storageType == lit("local");
 }
 
 bool QnStorageListModel::storageIsActive(const QnStorageModelInfo& data) const

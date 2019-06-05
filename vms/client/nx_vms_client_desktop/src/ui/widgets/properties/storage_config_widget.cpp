@@ -551,7 +551,7 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
             // Network storage.
             m_model->removeStorage(record);
         }
-        else
+        else if (m_model->canStoreAnalytics(record))
         {
             // Local storage, may be used to store analytics.
             if (record.id != m_model->metadataStorageId())
@@ -1055,6 +1055,7 @@ void QnStorageConfigWidget::updateWarnings()
         if (!storageData.isUsed)
             hasDisabledStorage = true;
 
+        //TODO: use PartitionType enum value here instead of the serialized literal
         if (storageData.isUsed && storageData.storageType == lit("usb"))
             hasUsbStorage = true;
     }
