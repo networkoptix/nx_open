@@ -412,6 +412,9 @@ bool CLH264RtpParser::processData(
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
 
+    if (rtpHeader->payloadType != m_rtpChannel)
+        return true; // skip data
+
     if (rtpHeader->extension)
     {
         if (bytesRead < RtpHeader::RTP_HEADER_SIZE + 4)
@@ -451,7 +454,6 @@ bool CLH264RtpParser::processData(
         else {
             NX_LOG("RTP Packet loss detected!!!!", cl_logWARNING);
         }
-        clearInternalBuffer();
         emit packetLostDetected(m_prevSequenceNum, sequenceNum);
     };
 
@@ -461,9 +463,6 @@ bool CLH264RtpParser::processData(
     m_prevSequenceNum = sequenceNum;
     if (isPacketLost)
         return false;
-
-    if (rtpHeader->payloadType != m_rtpChannel)
-        return true; // skip data
 
     if (rtpHeader->padding)
     {
@@ -601,6 +600,7 @@ bool CLH264RtpParser::processData(
     else if (isBufferOverflow())
     {
         processPacketLost();
+        clearInternalBuffer();
         return false;
     }
 
