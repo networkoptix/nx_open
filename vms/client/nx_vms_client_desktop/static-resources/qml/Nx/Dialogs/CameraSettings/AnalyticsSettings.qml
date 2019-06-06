@@ -16,7 +16,11 @@ Item
     property var enabledAnalyticsEngines: []
 
     property var currentEngineId
+    property var currentEngineInfo
     property bool loading: false
+
+    readonly property bool isDeviceDependent: currentEngineInfo !== undefined
+        && currentEngineInfo.isDeviceDependent
 
     Connections
     {
@@ -53,6 +57,7 @@ Item
                 }
 
                 currentEngineId = engineId
+                currentEngineInfo = engineInfo
                 menu.currentItemId = engineId
                 settingsView.loadModel(
                     engineInfo.settingsModel,
@@ -61,6 +66,7 @@ Item
             else
             {
                 currentEngineId = undefined
+                currentEngineInfo = undefined
                 menu.currentItemId = undefined
                 settingsView.loadModel({}, {})
             }
@@ -107,18 +113,20 @@ Item
             Layout.preferredWidth: Math.max(implicitWidth, 120)
             visible: currentEngineId !== undefined
 
+            enabled: !isDeviceDependent
+
             Binding
             {
                 target: enableSwitch
                 property: "checked"
-                value: enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
+                value: enabledAnalyticsEngines.indexOf(currentEngineId) !== -1 || isDeviceDependent
                 when: currentEngineId !== undefined
             }
 
             onClicked:
             {
                 var engines = enabledAnalyticsEngines.slice(0)
-                if (checked)
+                if (checked && !isDeviceDependent)
                 {
                     engines.push(currentEngineId)
                 }
