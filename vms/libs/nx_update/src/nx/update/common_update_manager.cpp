@@ -47,6 +47,7 @@ update::Status CommonUpdateManager::start()
     NX_DEBUG(this, "Start update: Should download from scratch: %1, package valid: %2",
         shouldDownloadFromScratch, package.isValid());
 
+    installer()->stopSync();
     if (!package.isValid())
         return updateStatus;
 
@@ -62,7 +63,6 @@ update::Status CommonUpdateManager::start()
         return updateStatus;
     }
 
-    installer()->stopSync();
     downloader()->deleteFile(package.file);
     m_downloaderFailDetail = DownloaderFailDetail::noError;
 

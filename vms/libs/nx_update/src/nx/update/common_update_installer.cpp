@@ -193,6 +193,7 @@ void CommonUpdateInstaller::stopSync()
     while (m_state == CommonUpdateInstaller::State::inProgress)
         m_condition.wait(lock.mutex());
     m_state = CommonUpdateInstaller::State::idle;
+    cleanInstallerDirectory();
 }
 
 bool CommonUpdateInstaller::cleanInstallerDirectory()
