@@ -54,13 +54,9 @@
                         </param>
                         <param>
                             <name>codec</name>
-                            <description>Defines video codec used for transcoding. Default value is H263.</description>
+                            <description>Defines video codec used for transcoding. Default value is H263p.</description>
                             <optional>true</optional>
                             <values>
-                                <value>
-                                    <name>H263</name>
-                                    <description/>
-                                </value>
                                 <value>
                                     <name>H263p</name>
                                     <description>H263 plus format</description>

@@ -92,6 +92,7 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
+        v["ffmpeg"] = "3.1.9-5"
 
     if "festival-vox" not in v:
         v["festival-vox"] = v["festival"]

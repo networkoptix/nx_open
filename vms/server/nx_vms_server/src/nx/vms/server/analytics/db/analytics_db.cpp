@@ -96,7 +96,7 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
     lock.unlock();
 
     QnMutexLocker dbLock(&m_dbControllerMutex);
-        
+
     if (!m_dbController)
     {
         NX_DEBUG(this, "Attempt to write to non-initialized analytics DB");
@@ -337,6 +337,29 @@ bool EventsStorage::readMaximumEventTimestamp()
         return false;
     }
 
+    return true;
+}
+
+bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResult)
+{
+    try
+    {
+        *outResult = m_dbController->queryExecutor().executeSelectQuerySync(
+            [](nx::sql::QueryContext* queryContext)
+        {
+            auto query = queryContext->connection()->createQuery();
+            query->prepare("SELECT min(timestamp_seconds_utc) * 1000 FROM object_search");
+            query->exec();
+            if (query->next())
+                return std::chrono::milliseconds(query->value(0).toLongLong());
+            return std::chrono::milliseconds::zero();
+        });
+    }
+    catch (const std::exception& e)
+    {
+        NX_WARNING(this, "Failed to read minimum event timestamp from the DB. %1", e.what());
+        return false;
+    }
     return true;
 }
 
