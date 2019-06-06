@@ -2408,6 +2408,31 @@ void QnWorkbenchNavigator::at_timeSlider_thumbnailClicked()
     m_preciseNextSeek = true;
 }
 
+void QnWorkbenchNavigator::syncIfOutOfSyncWithLive(QnResourceWidget *widget)
+{
+    if (!m_streamSynchronizer->isRunning())
+        return;
+
+    if (!widget->resource()->flags().testFlag(Qn::sync))
+        return;
+
+    auto mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if (!mediaWidget)
+        return;
+
+    auto reader = mediaWidget->display()->archiveReader();
+    if (!reader)
+        return;
+
+    const bool outOfSync = reader->isRealTimeSource() &&
+        m_streamSynchronizer->state().timeUs != DATETIME_NOW;
+
+    if (!outOfSync)
+        return;
+
+    setPosition(DATETIME_NOW);
+}
+
 void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role)
 {
     if (role == Qn::CentralRole)
@@ -2420,21 +2445,8 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role)
         // it is not going to play live video on its own (no component requests stream synchronizer to do this).
         // So it is requested manually here.
         if (auto widget = display()->widget(Qn::ZoomedRole))
-        {
-            if (m_streamSynchronizer->isRunning() && widget->resource()->flags().testFlag(Qn::sync))
-            {
-                if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-                {
-                    QnAbstractArchiveStreamReader *reader = mediaWidget->display()->archiveReader();
+            syncIfOutOfSyncWithLive(widget);
 
-                    const bool outOfSync = reader->isRealTimeSource() &&
-                        m_streamSynchronizer->state().timeUs != DATETIME_NOW;
-
-                    if (outOfSync)
-                        setPosition(DATETIME_NOW);
-                }
-            }
-        }
         updateLines();
         updateCalendar();
     }
