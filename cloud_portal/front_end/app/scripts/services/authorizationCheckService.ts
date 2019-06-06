@@ -46,6 +46,8 @@
             }
 
             function login(email, password, remember) {
+                this.setEmail(email);
+
                 return cloudApi
                         .login(email, password, remember)
                         .then((result) => {
