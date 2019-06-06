@@ -92,7 +92,7 @@ AnalyticsArchiveDirectory::ObjectMatchResult AnalyticsArchiveDirectory::matchObj
         filter.limit > 0 ? filter.limit : kMaxObjectLookupResultSet,
         kMaxObjectLookupResultSet);
 
-    std::vector<std::pair<int64_t /*timestamp*/, int64_t /*objectGroupId*/>> objectGroups;
+    std::vector<std::pair<std::chrono::milliseconds /*timestamp*/, int64_t /*objectGroupId*/>> objectGroups;
     for (const auto deviceId: deviceIds)
     {
         auto deviceResult = matchObjects(deviceId, filter);
@@ -100,7 +100,11 @@ AnalyticsArchiveDirectory::ObjectMatchResult AnalyticsArchiveDirectory::matchObj
         std::transform(
             deviceResult.data.begin(), deviceResult.data.end(),
             std::back_inserter(objectGroups),
-            [](const auto& item) { return std::make_pair(item.timestampMs, item.objectGroupId); });
+            [](const auto& item)
+            {
+                return std::make_pair(
+                    std::chrono::milliseconds(item.timestampMs), item.objectGroupId);
+            });
     }
 
     return toObjectMatchResult(filter, std::move(objectGroups));
@@ -108,7 +112,7 @@ AnalyticsArchiveDirectory::ObjectMatchResult AnalyticsArchiveDirectory::matchObj
 
 AnalyticsArchiveDirectory::ObjectMatchResult AnalyticsArchiveDirectory::toObjectMatchResult(
     const Filter& filter,
-    std::vector<std::pair<int64_t /*timestamp*/, int64_t /*objectGroupId*/>> objectGroups)
+    std::vector<std::pair<std::chrono::milliseconds /*timestamp*/, int64_t /*objectGroupId*/>> objectGroups)
 {
     if (filter.sortOrder == Qt::AscendingOrder)
         std::sort(objectGroups.begin(), objectGroups.end(), std::less<>());
@@ -122,10 +126,13 @@ AnalyticsArchiveDirectory::ObjectMatchResult AnalyticsArchiveDirectory::toObject
     std::transform(
         objectGroups.begin(), objectGroups.end(),
         std::back_inserter(result.objectGroups),
-        std::mem_fn(&std::pair<int64_t, int64_t>::second));
+        std::mem_fn(&std::pair<std::chrono::milliseconds, int64_t>::second));
 
     if (!objectGroups.empty())
-        result.maxAnalyzedTime = std::chrono::milliseconds(objectGroups.back().first);
+    {
+        result.timePeriod.setStartTime(std::min<>(objectGroups.front().first, objectGroups.back().first));
+        result.timePeriod.setEndTime(std::max<>(objectGroups.front().first, objectGroups.back().first));
+    }
 
     return result;
 }

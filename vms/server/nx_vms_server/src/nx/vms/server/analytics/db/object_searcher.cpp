@@ -300,6 +300,9 @@ std::vector<DetectedObject> ObjectSearcher::lookupObjectsUsingArchive(
 {
     auto archiveFilter =
         AnalyticsArchiveDirectory::prepareArchiveFilter(m_filter, m_objectTypeDao);
+    // NOTE: We are always searching for newest objects. 
+    // The sortOrder is applied to the lookup result.
+    archiveFilter.sortOrder = Qt::DescendingOrder;
 
     if (!m_filter.freeText.isEmpty())
     {
@@ -310,27 +313,42 @@ std::vector<DetectedObject> ObjectSearcher::lookupObjectsUsingArchive(
             std::back_inserter(archiveFilter.allAttributesHash));
     }
 
+    std::set<std::int64_t> analyzedObjectGroups;
+
     std::vector<DetectedObject> result;
     for (;;)
     {
-        const auto matchResult = m_analyticsArchive->matchObjects(
+        auto matchResult = m_analyticsArchive->matchObjects(
             m_filter.deviceIds,
             archiveFilter);
+        const auto fetchedObjectGroupsCount = matchResult.objectGroups.size();
+
+        matchResult.objectGroups.erase(
+            std::remove_if(
+                matchResult.objectGroups.begin(), matchResult.objectGroups.end(),
+                [&analyzedObjectGroups](auto id) { return analyzedObjectGroups.count(id) > 0; }),
+            matchResult.objectGroups.end());
+        std::copy(
+            matchResult.objectGroups.begin(), matchResult.objectGroups.end(),
+            std::inserter(analyzedObjectGroups, analyzedObjectGroups.end()));
 
         fetchObjectsFromDb(queryContext, matchResult.objectGroups, &result);
 
         if (result.size() >= m_filter.maxObjectsToSelect ||
-            matchResult.objectGroups.size() < archiveFilter.limit)
+            fetchedObjectGroupsCount < archiveFilter.limit)
         {
             break;
         }
 
         // Repeating match.
         if (m_filter.sortOrder == Qt::AscendingOrder)
-            archiveFilter.startTime = matchResult.maxAnalyzedTime;
+            archiveFilter.startTime = matchResult.timePeriod.endTime();
         else
-            archiveFilter.endTime = matchResult.maxAnalyzedTime;
+            archiveFilter.endTime = matchResult.timePeriod.startTime();
     }
+
+    if (result.size() > m_filter.maxObjectsToSelect)
+        result.erase(result.begin() + m_filter.maxObjectsToSelect, result.end());
 
     return result;
 }
@@ -359,7 +377,8 @@ void ObjectSearcher::fetchObjectsFromDb(
 
     query->exec();
 
-    *result = loadObjects(query.get());
+    auto objects = loadObjects(query.get());
+    std::move(objects.begin(), objects.end(), std::back_inserter(*result));
 }
 
 void ObjectSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)

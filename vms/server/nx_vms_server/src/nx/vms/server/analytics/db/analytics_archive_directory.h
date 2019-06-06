@@ -28,7 +28,7 @@ public:
     struct ObjectMatchResult
     {
         std::vector<std::int64_t> objectGroups;
-        std::chrono::milliseconds maxAnalyzedTime;
+        QnTimePeriod timePeriod;
     };
 
     AnalyticsArchiveDirectory(
@@ -81,7 +81,7 @@ private:
 
     ObjectMatchResult toObjectMatchResult(
         const Filter& filter,
-        std::vector<std::pair<int64_t /*timestamp*/, int64_t /*objectGroupId*/>> objectGroups);
+        std::vector<std::pair<std::chrono::milliseconds /*timestamp*/, int64_t /*objectGroupId*/>> objectGroups);
 };
 
 } // namespace nx::analytics::db
