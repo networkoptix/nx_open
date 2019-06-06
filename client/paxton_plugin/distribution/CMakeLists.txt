@@ -10,6 +10,12 @@ endif()
 nx_configure_file(app_info.wxi.in ${CMAKE_CURRENT_BINARY_DIR}/app_info.wxi)
 nx_configure_file(theme.xml.in ${CMAKE_CURRENT_BINARY_DIR}/theme.xml)
 
+set(lightOptions -nologo)
+if(NOT developerBuild)
+    # Suppress all validation to make build pass on server OS without admin permissions.
+    set(lightOptions ${lightOptions} -sval)
+endif()
+
 add_custom_command(
     OUTPUT package.wixobj
     COMMAND ${wix_directory}/bin/candle.exe
@@ -28,7 +34,7 @@ add_custom_command(
     OUTPUT ${installerMsiFile}
     COMMAND ${wix_directory}/bin/light.exe
         ${CMAKE_CURRENT_BINARY_DIR}/package.wixobj
-        -nologo
+        ${lightOptions}
         -out ${installerMsiFile}
         -pdbout ${CMAKE_CURRENT_BINARY_DIR}/package.wixpdb
     MAIN_DEPENDENCY
@@ -55,7 +61,7 @@ add_custom_command(
     COMMAND ${wix_directory}/bin/light.exe
         ${CMAKE_CURRENT_BINARY_DIR}/bundle.wixobj
         -out ${installerUnsignedExeFile}
-        -nologo
+        ${lightOptions}
         -ext WixBalExtension
         -pdbout ${CMAKE_CURRENT_BINARY_DIR}/bundle.wixpdb
     MAIN_DEPENDENCY
