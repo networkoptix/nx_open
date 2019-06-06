@@ -51,7 +51,7 @@ static const QByteArray kRulesExample(R"json({
 
 TEST(Metrics, Rules)
 {
-    Rules rules;
+    SystemRules rules;
     ASSERT_TRUE(QJson::deserialize(kRulesExample, &rules));
     EXPECT_EQ(2, rules.size());
 
@@ -111,7 +111,7 @@ static const QByteArray kManifestExample(R"json({
 
 TEST(Metrics, Manifest)
 {
-    static const Manifest manifest{
+    static const SystemManifest manifest{
         {"servers", {
             makeParameterManifest("status"),
             makeParameterManifest("cpuUsage", "CPU usage", "%"),
@@ -173,7 +173,7 @@ static const QByteArray kValuesExample(R"json(
 
 TEST(Metrics, Values)
 {
-    Values serverOneValues;
+    SystemValues serverOneValues;
     {
         auto& servers = serverOneValues["servers"];
         servers["SERVER_1"] = {"Server 1", "SYSTEM_1", {
@@ -195,7 +195,7 @@ TEST(Metrics, Values)
         }};
     }
 
-    Values serverTwoValues;
+    SystemValues serverTwoValues;
     {
         auto& servers = serverOneValues["servers"];
         servers["SERVER_2"] = {"Server 2", "SYSTEM_1", {
