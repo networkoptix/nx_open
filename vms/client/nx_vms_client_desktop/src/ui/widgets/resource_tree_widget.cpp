@@ -182,7 +182,7 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel* model)
 {
     if (m_resourceProxyModel)
     {
-        disconnect(m_resourceProxyModel, nullptr, this, nullptr);
+        m_resourceProxyModel->disconnect(this);
         delete m_resourceProxyModel;
         m_resourceProxyModel = nullptr;
     }

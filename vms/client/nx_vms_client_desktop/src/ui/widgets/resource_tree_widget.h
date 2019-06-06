@@ -41,7 +41,7 @@ class QnResourceTreeWidget : public QWidget {
 
 public:
     explicit QnResourceTreeWidget(QWidget* parent = nullptr);
-    ~QnResourceTreeWidget();
+    virtual ~QnResourceTreeWidget() override;
 
     QAbstractItemModel* model() const;
 
