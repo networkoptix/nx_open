@@ -169,8 +169,7 @@ DATABASES = {
             'charset': 'utf8mb4',
             'init_command': 'SET \
                 character_set_server=utf8mb4,\
-                collation_server = utf8mb4_unicode_ci;\
-                SET GLOBAL max_connections = 1000'
+                collation_server = utf8mb4_unicode_ci'
         }
     }
 }
