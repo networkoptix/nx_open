@@ -348,7 +348,11 @@ def fill_content(product,
 
     default_language_code = product.default_language.code
     languages_list = product.languages_list
+
+    thread_error = False
+    # Creates a pool of thread works
     with ThreadPoolExecutor(max_workers=workers) as executor:
+        # Stores the tasks that the thread pool runs. This is needed for checking for exceptions
         futures = []
         for context in changed_contexts:
             # logger.info("Process context: " + context.name + " file:" + context.file_path)
@@ -357,21 +361,24 @@ def fill_content(product,
                                          values_list('language__code', flat=True).distinct())
 
                 if default_language_code in changed_languages:
-                    # if default language changes - it can affect all languages in the context
+                    # If default language changes - it can affect all languages in the context
                     changed_languages = languages_list
+            # Add the context too the list of tasks for the thread pool.
             futures.append(executor.submit(thread_context, context, product, changed_languages, preview,
                                            version_id, global_contexts, global_contexts_dict))
 
+        # Catch any errors raise by thread workers.
         for future in futures:
             try:
                 future.result()
             except Exception as e:
                 logger.warning(e)
-                logger.warning("Quiting filldata. If ran by management command will retry soon.")
-                return False
+                thread_error = True
 
     generate_languages_json(product.product_root, languages_list,  preview)
-    return True
+    if thread_error:
+        logger.warning("Filldata has ran into an exception. If run by the management command it will retry soon.")
+    return not thread_error
 
 
 def thread_context(context, product, changed_languages, preview, version_id, global_contexts, global_contexts_dict):

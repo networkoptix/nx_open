@@ -8,9 +8,6 @@ from cloud.debug import timer
 
 logger = logging.getLogger(__name__)
 
-FILLDATA_TRIES = 10
-FILLDATA_TIMEOUT = 30
-
 
 class Command(BaseCommand):
     help = 'Fills initial data from CMS database to static files'
@@ -37,18 +34,18 @@ class Command(BaseCommand):
         else:
             product = get_cloud_portal_product(options['customization'])
 
-        for i in range(FILLDATA_TRIES):
+        for i in range(settings.FILLDATA_TRIES):
             result = filldata.init_skin(product, options['preview'], workers=10)
             if result:
                 break
 
-            warning_msg = f"Filldata Failed. Retrying in {FILLDATA_TIMEOUT} seconds"
+            warning_msg = f"Filldata Failed. Retrying in {settings.FILLDATA_TIMEOUT} seconds"
             logger.warning(warning_msg)
             self.stdout.write(self.style.WARNING(warning_msg))
-            time.sleep(FILLDATA_TIMEOUT)
+            time.sleep(settings.FILLDATA_TIMEOUT)
 
         else:
-            error_msg = f"Filldata failed after running {FILLDATA_TRIES} time(s). " \
+            error_msg = f"Filldata failed after running {settings.FILLDATA_TRIES} time(s). " \
                 f"Run forceupdate for {product.__str__()} to fix the problem."
             logger.critical(error_msg)
             self.stdout.write(self.style.ERROR(error_msg))

@@ -470,6 +470,11 @@ CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS = 30
 CMS_MAX_FILE_SIZE = 9437184
 INTEGRATION_STORE_PAGE = '/integrations'
 
+# Filldata settings
+FILLDATA_TRIES = 10
+FILLDATA_TIMEOUT = 30
+
+
 SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions
 
 # Use if you want to check user level permissions only users with the can_csv_<model_label>
