@@ -52,6 +52,7 @@ Item
                 {
                     id: thisItem
                     text: modelData.name
+                    active: modelData.loaded
                     onClicked: store.selectCurrentPlugin(modelData.id)
 
                     Connections

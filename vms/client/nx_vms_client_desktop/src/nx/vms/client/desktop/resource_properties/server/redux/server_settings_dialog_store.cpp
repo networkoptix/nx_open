@@ -30,7 +30,8 @@ QVariantMap pluginData(const PluginInfo& plugin)
     return QVariantMap({
         {"id", plugin.libraryName},
         {"name", pluginName},
-        {"description", plugin.description}});
+        {"description", plugin.description},
+        {"loaded", plugin.status == PluginInfo::Status::loaded}});
 }
 
 QVariant pluginData(const std::optional<const PluginInfo>& plugin)
@@ -80,7 +81,7 @@ QString pluginStatus(const PluginInfo& plugin)
 
         case PluginInfo::Status::notLoadedBecauseOptional:
             return notLoadedMessage(ServerSettingsDialogStore::tr(
-                "plugin is optional and not in the white list"));
+                "plugin is optional and isn't in the white list"));
 
         default:
             NX_ASSERT(false);
