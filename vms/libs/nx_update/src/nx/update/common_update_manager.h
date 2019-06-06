@@ -9,6 +9,8 @@
 #include <nx/update/update_check.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/utils/uuid.h>
+#include <api/model/api_model_fwd.h>
+#include <api/model/storage_status_reply.h>
 
 struct QnAuthSession;
 
@@ -76,6 +78,7 @@ private:
     virtual vms::common::p2p::downloader::Downloader* downloader() = 0;
     virtual CommonUpdateInstaller* installer() = 0;
     virtual int64_t freeSpace(const QString& path) const = 0;
+    virtual QnStorageSpaceDataList availableStorages() const = 0;
 };
 
 } // namespace nx

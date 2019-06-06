@@ -11,7 +11,8 @@ std::optional<QnStorageSpaceData> selectOne(const QnStorageSpaceDataList& candid
         {
             static const int64_t kMinUpdatePersistentStorageTotalSpace = 1024 * 1024 * 1024LL; // 1 GB
             return
-                data.freeSpace > data.reservedSpace * 0.9
+                data.isWritable
+                && data.freeSpace > data.reservedSpace * 0.9
                 && data.totalSpace > kMinUpdatePersistentStorageTotalSpace;
         });
 

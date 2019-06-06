@@ -71,10 +71,10 @@ void checkUpdateStatusRemotely(
 void getStoragesDataRemotely(
     const IfParticipantPredicate& ifParticipantPredicate,
     QnMediaServerModule* serverModule,
-    const QString& path,
     nx::update::storage::ServerToStoragesList* reply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context)
 {
+    static const QString kStorageInfoPath = "/api/storageSpace?ownedOnly=true";
     std::unordered_map<QnUuid, QnStorageSpaceDataList> serverToStorages;
     auto mergeFunction =
         [serverModule, reply, &serverToStorages](
@@ -92,7 +92,7 @@ void getStoragesDataRemotely(
 
     QnJsonRestResult result;
     requestRemotePeers(
-        serverModule->commonModule(), path, result, context, mergeFunction,
+        serverModule->commonModule(), kStorageInfoPath, result, context, mergeFunction,
         ifParticipantPredicate);
 
     for (const auto& p: serverToStorages)

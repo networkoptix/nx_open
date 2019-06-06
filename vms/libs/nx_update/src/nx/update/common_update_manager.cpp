@@ -156,7 +156,7 @@ void CommonUpdateManager::managePersistentDownloads()
         std::copy(info.packages.cbegin(), info.packages.cend(), std::back_inserter(packages));
     }
 
-    const auto storageData = update::storage::selectOne(QnStorageSpaceDataList());
+    const auto storageData = update::storage::selectOne(availableStorages());
     if (!storageData)
     {
         NX_WARNING(this, "Couldn't determine correct storage for storing persistent update files");

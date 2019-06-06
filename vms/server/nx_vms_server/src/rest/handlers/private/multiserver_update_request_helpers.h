@@ -23,7 +23,6 @@ void checkUpdateStatusRemotely(
 void getStoragesDataRemotely(
     const IfParticipantPredicate& ifParticipantPredicate,
     QnMediaServerModule* serverModule,
-    const QString& path,
     nx::update::storage::ServerToStoragesList* reply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context);
 

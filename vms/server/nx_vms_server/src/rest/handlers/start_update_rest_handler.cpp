@@ -37,7 +37,7 @@ int QnStartUpdateRestHandler::executePost(
         nx::update::storage::ServerToStoragesList serversToStorages;
         detail::getStoragesDataRemotely(
             detail::makeIfParticipantPredicate(serverModule()->updateManager()),
-            serverModule(), path, &serversToStorages, &context);
+            serverModule(), &serversToStorages, &context);
 
         const auto serverIds = nx::update::storage::selectServers(serversToStorages);
         serverModule()->updateManager()->setUpdatePersistentStorageServers(
