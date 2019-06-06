@@ -27,7 +27,6 @@ func (g *Geopoint) DistanceTo(other Geopoint) float64 {
 	return 2.0 * kEarthRadiusKm * math.Asin(math.Sqrt(u*u+math.Cos(lat1r)*math.Cos(lat2r)*v*v))
 }
 
-//Note: this list is missing "UM" (U.S. Minor Outlying Islands)
 var kCountries = map[string]Geopoint{
 	"AD": {42.546245, 1.601554},
 	"AE": {23.424076, 53.847818},
@@ -255,6 +254,7 @@ var kCountries = map[string]Geopoint{
 	"TZ": {-6.369028, 34.888822},
 	"UA": {48.379433, 31.16558},
 	"UG": {1.373333, 32.290275},
+	"UM": {37.09024, -95.712891},
 	"US": {37.09024, -95.712891},
 	"UY": {-32.522779, -55.765835},
 	"UZ": {41.377491, 64.585262},
