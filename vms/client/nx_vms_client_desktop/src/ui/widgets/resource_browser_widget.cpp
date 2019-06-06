@@ -201,6 +201,16 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
         }
     );
 
+    connect(ui->resourceTreeWidget->selectionModel(), &QItemSelectionModel::currentChanged,
+        [this](const QModelIndex& current, const QModelIndex& previous)
+        {
+            Q_UNUSED(previous);
+            const auto treeView = ui->resourceTreeWidget->treeView();
+            const auto itemRect = treeView->visualRect(current)
+                .translated(treeView->mapTo(ui->scrollArea->widget(), QPoint()));
+            ui->scrollArea->ensureVisible(0, itemRect.center().y() + 1, 0, itemRect.height() / 2);
+        });
+
     ui->shortcutHintWidget->setContentsMargins(6, 0, 0, 0);
     ui->shortcutHintWidget->setVisible(false);
     ui->resourceTreeWidget->treeView()->setProperty(
