@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"math"
+	"sort"
 )
 
 func toRadians(degrees float64) float64 {
@@ -14,9 +15,8 @@ type Geopoint struct {
 	Longitude float64
 }
 
-type Kilometers float64
-
-func (g *Geopoint) DistanceTo(other Geopoint) Kilometers {
+//DistanceTo get the distance between this geopoint and other in kilometers
+func (g *Geopoint) DistanceTo(other Geopoint) float64 {
 	const kEarthRadiusKm = 6371.0
 	lat1r := toRadians(g.Latitude)
 	lon1r := toRadians(g.Longitude)
@@ -24,8 +24,7 @@ func (g *Geopoint) DistanceTo(other Geopoint) Kilometers {
 	lon2r := toRadians(other.Longitude)
 	u := math.Sin((lat2r - lat1r) / 2)
 	v := math.Sin((lon2r - lon1r) / 2)
-	return Kilometers(
-		2.0 * kEarthRadiusKm * math.Asin(math.Sqrt(u*u+math.Cos(lat1r)*math.Cos(lat2r)*v*v)))
+	return 2.0 * kEarthRadiusKm * math.Asin(math.Sqrt(u*u+math.Cos(lat1r)*math.Cos(lat2r)*v*v))
 }
 
 //Note: this list is missing "UM" (U.S. Minor Outlying Islands)
@@ -284,25 +283,26 @@ func FindNodeClosestToClient(clientCountryCode string, nodes []Node) *Node {
 			clientCountryCode)
 		return nil
 	}
+	if len(nodes) == 0 {
+		return nil
+	}
 
-	nodesByDistance := make(map[Kilometers][]*Node)
+	nodesByDistance := make(map[float64][]*Node)
+	distances := make([]float64, len(nodes))
 
 	for i, _ := range nodes {
 		if geopoint, ok := kCountries[nodes[i].CountryCode]; ok {
-			distance := clientGeopoint.DistanceTo(geopoint)
-			nodesByDistance[distance] = append(nodesByDistance[distance], &nodes[i])
+			kilometers := clientGeopoint.DistanceTo(geopoint)
+			nodesByDistance[kilometers] = append(nodesByDistance[kilometers], &nodes[i])
+			distances[i] = kilometers
 		}
 	}
+	sort.Float64s(distances)
 
 	if len(nodesByDistance) == 0 {
 		log.Println("FindClosestNodeToClient: 0 nodes found by distance")
 		return nil
 	}
 
-	//TODO is there something like nodesByDistance.begin() ?
-	for distance, _ := range nodesByDistance {
-		return nodesByDistance[distance][0]
-	}
-
-	return nil
+	return nodesByDistance[distances[0]][0]
 }
