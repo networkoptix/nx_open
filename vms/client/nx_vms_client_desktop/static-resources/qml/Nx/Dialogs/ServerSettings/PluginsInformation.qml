@@ -52,14 +52,14 @@ Item
                 {
                     id: thisItem
                     text: modelData.name
-                    onClicked: store.selectCurrentPlugin(modelData.libraryName)
+                    onClicked: store.selectCurrentPlugin(modelData.id)
 
                     Connections
                     {
                         target: pluginsInformation
                         onCurrentPluginChanged:
                         {
-                            if (currentPlugin && modelData.libraryName == currentPlugin.libraryName)
+                            if (currentPlugin && modelData.id === currentPlugin.id)
                                 menu.currentItemId = thisItem
                         }
                     }
@@ -91,7 +91,7 @@ Item
             {
                 width: parent.width
                 spacing: 16
-                anchors.top: descriptionText.bottom
+                anchors.top: descriptionText.text ? descriptionText.bottom : descriptionText.top
                 anchors.topMargin: 8
 
                 Column
