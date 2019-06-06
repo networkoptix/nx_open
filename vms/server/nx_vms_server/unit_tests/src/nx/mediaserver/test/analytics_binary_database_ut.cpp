@@ -195,10 +195,20 @@ TEST_F(AnalyticsArchive, matchObjectGroups)
 
     request.sortOrder = Qt::SortOrder::DescendingOrder;
     request.limit = 100;
+    request.endTime = milliseconds(kbaseDateMs + (kSteps - 1) * kDeltaMs - 1);
     result = archive.matchObjects(request);
     ASSERT_EQ(request.limit, result.data.size());
+    ASSERT_EQ(kSteps - 1, result.data[0].objectGroupId);
+    ASSERT_EQ(kSteps - request.limit, result.data[result.data.size()-1].objectGroupId);
+
+    request.limit = 2;
+    request.sortOrder = Qt::SortOrder::DescendingOrder;
+    request.endTime = milliseconds(kbaseDateMs + (kSteps - 1) * kDeltaMs);
+    request.startTime = milliseconds(request.endTime.count() - kDeltaMs);
+    result = archive.matchObjects(request);
+    ASSERT_EQ(2, result.data.size());
     ASSERT_EQ(kSteps, result.data[0].objectGroupId);
-    ASSERT_EQ(kSteps - request.limit + 1, result.data[result.data.size()-1].objectGroupId);
+    ASSERT_EQ(kSteps-1, result.data[1].objectGroupId);
 }
 
 } // nx::vms::server::test
