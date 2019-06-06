@@ -34,23 +34,23 @@ TEST(ValueHistoryTest, main)
 
 TEST(TreeValueHistoryTest, main)
 {
-    TreeValueHistory<int> history;
-    TreeValueHistoryInserter<int> baseInserter(&history);
+    TreeValueHistory<QString, int> history;
+    const auto baseAccess = history.access();
 
-    auto singleInserter = baseInserter.subValue("single");
-    singleInserter.insert(10);
+    auto singleAccess = baseAccess["single"];
+    singleAccess->update(10);
 
-    auto groupInserter = baseInserter.subValue("group");
+    auto groupAccess = baseAccess["group"];
 
-    auto aaaGroupInserter = groupInserter.subValue("aaa");
-    aaaGroupInserter.insert(20);
+    auto aaaGroupAccess = groupAccess["aaa"];
+    aaaGroupAccess->update(20);
 
-    auto bbbGroupInserter = groupInserter.subValue("bbb");
-    bbbGroupInserter.insert(30);
+    auto bbbGroupAccess = groupAccess["bbb"];
+    bbbGroupAccess->update(30);
 
-    EXPECT_EQ(10, history.value(TreeKey{"single"})->current());
-    EXPECT_EQ(20, history.value(TreeKey{"group"}["aaa"])->current());
-    EXPECT_EQ(30, history.value(TreeKey{"group"}["bbb"])->current());
+    EXPECT_EQ(10, history.access("single")->current());
+    EXPECT_EQ(20, history.access("group")["aaa"]->current());
+    EXPECT_EQ(30, history.access("group")["bbb"]->current());
 }
 
 } // namespace nx::utils::test

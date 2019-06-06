@@ -10,7 +10,7 @@ class NameProvider: public AbstractParameterProvider
 public:
     virtual api::metrics::ParameterGroupManifest manifest() override
     {
-        return api::metrics::makeParameterManifest("nameParameter", "name parameter");
+        return api::metrics::makeParameterManifest("name", "name parameter");
     }
 
     virtual std::unique_ptr<Monitor> monitor(QnResourcePtr resource) override
@@ -23,7 +23,7 @@ private:
     {
         QString name;
         ValueMonitor(QString name): name(std::move(name)) {}
-        virtual void start(DataBaseInserter inserter) override { inserter.insert(name); }
+        virtual void start(DataBase::Access access) override { access->update(name); }
     };
 };
 
@@ -32,7 +32,7 @@ class NumberProvider: public AbstractParameterProvider
 public:
     virtual api::metrics::ParameterGroupManifest manifest() override
     {
-        return api::metrics::makeParameterManifest("numberParameter", "number parameter", "%");
+        return api::metrics::makeParameterManifest("number", "number parameter", "%");
     }
 
     virtual std::unique_ptr<Monitor> monitor(QnResourcePtr resource) override
@@ -45,7 +45,7 @@ private:
     {
         int number = 0;
         ValueMonitor(int number): number(number) {}
-        virtual void start(DataBaseInserter inserter) override { inserter.insert(number); };
+        virtual void start(DataBase::Access access) override { access->update(number); };
     };
 };
 
@@ -57,10 +57,17 @@ public:
 
     virtual std::unique_ptr<ParameterGroupProvider> parameters() override
     {
-        return makeParameterGroupProvider(
-            "testResources", "resources for tests",
-            std::make_unique<NameProvider>(),
-            std::make_unique<NumberProvider>()
+        return std::make_unique<ParameterGroupProvider>(
+            "tests", "test resources", makeParameterProviders(
+                std::make_unique<NameProvider>(),
+                std::make_unique<NumberProvider>(),
+                std::make_unique<ParameterGroupProvider>(
+                    "group", "group in resource", makeParameterProviders(
+                        std::make_unique<NameProvider>(),
+                        std::make_unique<NumberProvider>()
+                    )
+                )
+            )
         );
     }
 

@@ -13,7 +13,7 @@ template<typename Value>
 struct TimedValue
 {
     Value value{};
-    std::chrono::steady_clock::time_point time{0};
+    std::chrono::steady_clock::time_point time{};
 };
 
 template<typename Value>
@@ -36,38 +36,35 @@ private:
 
 // -----------------------------------------------------------------------------------------------
 
-struct TreeKey
-{
-    const QString value;
-    TreeKey operator[](const QString& subkey) const { return {value + "." + subkey}; }
-};
-
-template<typename Value>
+template<typename Id, typename Value>
 class TreeValueHistory
 {
+    struct Node;
+
 public:
-    ValueHistory<Value>* value(const TreeKey& key);
+    class Access
+    {
+    public:
+        Access(Node* node);
+        ValueHistory<Value>* operator->() const;
+        Access operator[](const Id& id) const;
+
+    private:
+        Node* node = nullptr;
+    };
+
+    Access access(std::optional<Id> id = {});
 
 private:
-    nx::utils::Mutex m_mutex;
-    // TODO: This flat map is an abominaion! Should be a proper tree sructure.
-    std::map<QString, std::unique_ptr<ValueHistory<Value>>> m_values;
-};
-
-template<typename Value>
-class TreeValueHistoryInserter
-{
-public:
-    explicit TreeValueHistoryInserter(
-        TreeValueHistory<Value>* history,
-        std::optional<TreeKey> key = std::nullopt);
-
-    void insert(Value value);
-    TreeValueHistoryInserter subValue(const QString& value);
+    struct Node
+    {
+        nx::utils::Mutex mutex;
+        std::unique_ptr<ValueHistory<Value>> history;
+        std::map<Id, Node> subNodes;
+    };
 
 private:
-    TreeValueHistory<Value>* m_history;
-    std::optional<TreeKey> m_key;
+    Node m_root;
 };
 
 // -----------------------------------------------------------------------------------------------
@@ -117,38 +114,36 @@ std::vector<TimedValue<Value>> ValueHistory<Value>::last(std::chrono::millisecon
     return values;
 }
 
-template<typename Value>
-ValueHistory<Value>* TreeValueHistory<Value>::value(const TreeKey& key)
-{
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    if (const auto it = m_values.find(key.value); it != m_values.end())
-        return it->second.get();
 
-    return m_values.emplace(key.value, std::make_unique<ValueHistory<Value>>())
-        .first->second.get();
-}
-
-template<typename Value>
-TreeValueHistoryInserter<Value>::TreeValueHistoryInserter(
-    TreeValueHistory<Value>* history, std::optional<TreeKey> key)
-:
-    m_history(history),
-    m_key(std::move(key))
+template<typename Id, typename Value>
+TreeValueHistory<Id, Value>::Access::Access(Node* node):
+    node(node)
 {
 }
 
-template<typename Value>
-void TreeValueHistoryInserter<Value>::insert(Value value)
+template<typename Id, typename Value>
+ValueHistory<Value>* TreeValueHistory<Id, Value>::Access::operator->() const
 {
-    NX_CRITICAL(m_key);
-    m_history->value(*m_key)->update(std::move(value));
+    NX_MUTEX_LOCKER locker(&node->mutex);
+    if (!node->history)
+        node->history = std::make_unique<ValueHistory<Value>>();
+    return node->history.get();
 }
 
-template<typename Value>
-TreeValueHistoryInserter<Value> TreeValueHistoryInserter<Value>::subValue(const QString& value)
+template<typename Id, typename Value>
+typename TreeValueHistory<Id, Value>::Access TreeValueHistory<Id, Value>::Access::operator[](
+    const Id& id) const
 {
-    return TreeValueHistoryInserter<Value>(
-        m_history, m_key ? (*m_key)[value] : TreeKey{value});
+    NX_MUTEX_LOCKER locker(&node->mutex);
+    return Access(&node->subNodes[id]);
+}
+
+template<typename Id, typename Value>
+typename TreeValueHistory<Id, Value>::Access TreeValueHistory<Id, Value>::access(
+    std::optional<Id> id)
+{
+    const Access root(&m_root);
+    return id ? root[*id] : root;
 }
 
 } // namespace nx::utils

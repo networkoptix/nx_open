@@ -2,148 +2,198 @@
 
 namespace nx::vms::server::metrics {
 
-ResourceGroupController::ResourceGroupController(
-    std::unique_ptr<AbstractResourceProvider> resourceProvider)
-:
-    m_resourceProvider(std::move(resourceProvider)),
-    m_parameterProviders(m_resourceProvider->parameters()),
-    m_parameterManifest(m_parameterProviders->manifest())
+void Controller::registerGroup(std::unique_ptr<AbstractResourceProvider> resourceProvider)
 {
+    ResourceGroup group;
+    group.resourceProvider = std::move(resourceProvider);
+    group.parameterProviders = group.resourceProvider->parameters();
+    group.parameterManifest = group.parameterProviders->manifest();
+
+    const auto id = group.parameterManifest.id;
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    m_resourceGroups[id] = std::move(group);
 }
 
-QString ResourceGroupController::id() const
+void Controller::startMonitoring()
 {
-    return m_parameterManifest.id;
-}
+    for (auto& [id, group]: m_resourceGroups)
+    {
+        group.resourceProvider->startDiscovery(
+            [this, &group](QnResourcePtr resource)
+            {
+                AbstractParameterProvider::Monitor* monitor = nullptr;
+                {
+                    NX_MUTEX_LOCKER locker(&m_mutex);
+                    const auto [iterator, isInserted] = group.parameterMonitors.emplace(
+                        resource, group.parameterProviders->monitor(resource));
 
-void ResourceGroupController::startMonitoring()
-{
-    m_resourceProvider->startDiscovery(
-        [this](QnResourcePtr resource)
-        {
-            AbstractParameterProvider::Monitor* monitor = nullptr;
+                    monitor = iterator->second.get();
+                    if (!NX_ASSERT(isInserted, lm("Duplicate %1").arg(resource)))
+                        return;
+                }
+
+                monitor->start(m_dataBase.access(resource->getId().toSimpleString()));
+            },
+            [this, &group](QnResourcePtr resource)
             {
                 NX_MUTEX_LOCKER locker(&m_mutex);
-                const auto [iterator, isInserted] = m_parameterMonitors.emplace(
-                    resource, m_parameterProviders->monitor(resource));
-
-                monitor = iterator->second.get();
-                if (!NX_ASSERT(isInserted, lm("Duplicate %1").arg(resource)))
-                    return;
-            }
-
-            auto key = DataBaseKey{resource->getId().toSimpleString()};
-            monitor->start(DataBaseInserter(&m_dataBase, std::move(key)));
-        },
-        [this](QnResourcePtr resource)
-        {
-            NX_MUTEX_LOCKER locker(&m_mutex);
-            m_parameterMonitors.erase(resource);
-        });
+                group.parameterMonitors.erase(resource);
+            });
+    }
 }
 
-api::metrics::ResourceRules ResourceGroupController::rules()
+api::metrics::SystemRules Controller::rules()
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     return m_rules;
 }
 
-void ResourceGroupController::setRules(api::metrics::ResourceRules rules)
+void Controller::setRules(api::metrics::SystemRules rules)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     m_rules = rules;
 }
 
-api::metrics::ResourceManifest ResourceGroupController::manifest()
+api::metrics::SystemManifest Controller::manifest()
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-    auto result = m_parameterManifest.group;
-    applyRulesUnlocked(&result, m_rules);
-    return result;
+    api::metrics::SystemManifest systemManifest;
+    for (const auto& [groupId, group]: m_resourceGroups)
+    {
+        auto groupManifest = group.parameterManifest.group;
+        applyRulesUnlocked(&groupManifest, m_rules[groupId]);
+        systemManifest[groupId] =  std::move(groupManifest);
+    }
+
+    return systemManifest;
 }
 
-api::metrics::ResourceGroupValues ResourceGroupController::rawValues()
+api::metrics::SystemValues Controller::rawValues()
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     return rawValuesUnlocked();
 }
 
-api::metrics::ResourceGroupValues ResourceGroupController::values()
+api::metrics::SystemValues Controller::values()
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-    auto result = rawValuesUnlocked();
-    for (const auto& [resource, monitor]: m_parameterMonitors)
+    auto systemValues = rawValuesUnlocked();
+    for (const auto& [groupId, group]: m_resourceGroups)
     {
-        const auto resourceId = resource->getId().toSimpleString();
-        applyRulesUnlocked(&result[resourceId].values, DataBaseKey{resourceId}, m_rules);
+        auto& groupValues = systemValues[groupId];
+        for (const auto& [resource, monitor]: group.parameterMonitors)
+        {
+            const auto resourceId = resource->getId().toSimpleString();
+            applyRulesUnlocked(
+                &groupValues[resourceId].values,
+                m_dataBase.access(resourceId),
+                m_rules[groupId]);
+        }
     }
-    return result;
+
+    return systemValues;
 }
 
-api::metrics::ResourceGroupValues ResourceGroupController::rawValuesUnlocked()
+api::metrics::SystemValues Controller::rawValuesUnlocked()
 {
-    api::metrics::ResourceGroupValues values;
-    for (const auto& [resource, monitor]: m_parameterMonitors)
+    api::metrics::SystemValues systemValues;
+    for (const auto& [groupId, group]: m_resourceGroups)
     {
-        const auto resourceId = resource->getId().toSimpleString();
-        auto& resourceValues = values[resourceId];
-        resourceValues.name = resource->getName();
-        resourceValues.parent = resource->getParentId().toSimpleString();
-        loadGroupValuesUnlocked(
-            &resourceValues.values, DataBaseKey{resourceId}, m_parameterManifest.group);
+        auto& groupValues = systemValues[groupId];
+        for (const auto& [resource, monitor]: group.parameterMonitors)
+        {
+            const auto resourceId = resource->getId().toSimpleString();
+
+            auto& resourceValues = groupValues[resourceId];
+            resourceValues.name = resource->getName();
+            resourceValues.parent = resource->getParentId().toSimpleString();
+
+            loadGroupValuesUnlocked(
+                &resourceValues.values,
+                m_dataBase.access(resourceId),
+                group.parameterManifest.group);
+        }
     }
-    return values;
+
+    return systemValues;
 }
 
-void ResourceGroupController::loadGroupValuesUnlocked(
+void Controller::loadGroupValuesUnlocked(
     std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
-    const DataBaseKey& baseKey,
+    DataBase::Access groupAccess,
     const std::vector<api::metrics::ParameterGroupManifest>& manifests)
 {
     for (const auto& manifest: manifests)
     {
         auto& parameter = (*group)[manifest.id];
-        const auto key = baseKey[manifest.id];
+        const auto access = groupAccess[manifest.id];
 
         if (manifest.group.empty())
-            parameter.value = m_dataBase.value(key)->current();
+            parameter.value = access->current();
         else
-            loadGroupValuesUnlocked(&parameter.group, key, manifest.group);
+            loadGroupValuesUnlocked(&parameter.group, access, manifest.group);
     }
 }
 
-void ResourceGroupController::applyRulesUnlocked(
+static api::metrics::Value calculate(DataBase::Access access, const QStringList& formula)
+{
+    if (formula[0] == "count")
+    {
+        const auto values = access[formula[1]]->last().size();
+        return static_cast<double>(values ? values - 1 : 0);
+    }
+
+    return "ERROR: unknown function: " + formula[0];
+}
+
+static api::metrics::Status checkStatus(
+    const api::metrics::Value& value,
+    const std::map<api::metrics::Status, api::metrics::Value>& alarmRules)
+{
+    for (const auto& [level, alarmValue]: alarmRules)
+    {
+        if (value.type() == api::metrics::Value::Double && value.toDouble() >= alarmValue.toDouble())
+            return level;
+
+        if (value == alarmValue)
+            return level;
+    }
+
+    return {};
+}
+
+void Controller::applyRulesUnlocked(
     std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
-    const DataBaseKey& baseKey,
+    DataBase::Access groupAccess,
     const std::map<QString /*id*/, api::metrics::ParameterGroupRules>& rules)
 {
     for (const auto& [id, rule]: rules)
     {
         auto& parameter = (*group)[id];
-        const auto key = baseKey[id];
-
         if (!parameter.group.empty())
         {
-            applyRulesUnlocked(&parameter.group, key, rule.group);
+            applyRulesUnlocked(&parameter.group, groupAccess[id], rule.group);
             continue;
         }
 
         if (!rule.calculate.isEmpty())
-        {
-            // TODO: Add parameters calculation.
-            parameter.value = "CALCULATED";
-        }
+            parameter.value = calculate(groupAccess, rule.calculate.split(" "));
 
-        for (const auto& [level, value]: rule.alarms)
-        {
-            // TODO: Add checks by type.
-            if (parameter.value == value)
-                parameter.status = level;
-        }
+        parameter.status = checkStatus(parameter.value, rule.alarms);
     }
 }
 
-void ResourceGroupController::applyRulesUnlocked(
+static std::vector<api::metrics::ParameterGroupManifest>::iterator insertPosition(
+    std::vector<api::metrics::ParameterGroupManifest>& group,
+    const QStringList& desire)
+{
+    auto position = api::metrics::find(group, desire[1]);
+    if (position != group.end() && desire[0] == "after")
+        return position + 1;
+    return position;
+}
+
+void Controller::applyRulesUnlocked(
     std::vector<api::metrics::ParameterGroupManifest>* group,
     const std::map<QString /*id*/, api::metrics::ParameterGroupRules>& rules)
 {
@@ -151,16 +201,15 @@ void ResourceGroupController::applyRulesUnlocked(
     {
         if (!rule.name.isEmpty())
         {
-            // TODO: Locate position according to insert field.
-            group->push_back(api::metrics::makeParameterManifest(id, rule.name));
+            group->insert(
+                insertPosition(*group, rule.insert.split(" ")),
+                api::metrics::makeParameterManifest(id, rule.name));
             continue;
         }
 
         if (!rule.group.empty())
         {
-            auto it = std::find_if(
-                group->begin(), group->end(), [&](auto item) { return item.id == id; });
-
+            auto it = api::metrics::find(*group, id);
             if (!NX_ASSERT(it != group->end()))
                 continue;
 

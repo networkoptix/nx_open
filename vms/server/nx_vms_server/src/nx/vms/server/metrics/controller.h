@@ -4,32 +4,30 @@
 
 namespace nx::vms::server::metrics {
 
-class ResourceGroupController
+class Controller
 {
 public:
-    ResourceGroupController(std::unique_ptr<AbstractResourceProvider> resourceProvider);
-
-    QString id() const;
+    void registerGroup(std::unique_ptr<AbstractResourceProvider> resourceProvider);
     void startMonitoring();
 
-    api::metrics::ResourceRules rules();
-    void setRules(api::metrics::ResourceRules rules);
+    api::metrics::SystemRules rules();
+    void setRules(api::metrics::SystemRules rules);
 
-    api::metrics::ResourceManifest manifest();
-    api::metrics::ResourceGroupValues rawValues();
-    api::metrics::ResourceGroupValues values();
+    api::metrics::SystemManifest manifest();
+    api::metrics::SystemValues rawValues();
+    api::metrics::SystemValues values();
 
 private:
-    api::metrics::ResourceGroupValues rawValuesUnlocked();
+    api::metrics::SystemValues rawValuesUnlocked();
 
     void loadGroupValuesUnlocked(
         std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
-        const DataBaseKey& base,
+        DataBase::Access base,
         const std::vector<api::metrics::ParameterGroupManifest>& manifests);
 
     void applyRulesUnlocked(
         std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
-        const DataBaseKey& baseKey,
+        DataBase::Access baseKey,
         const std::map<QString /*id*/, api::metrics::ParameterGroupRules>& rules);
 
     void applyRulesUnlocked(
@@ -37,15 +35,19 @@ private:
         const std::map<QString /*id*/, api::metrics::ParameterGroupRules>& rules);
 
 private:
-    const std::unique_ptr<AbstractResourceProvider> m_resourceProvider;
-    const std::unique_ptr<ParameterGroupProvider> m_parameterProviders;
-    const api::metrics::ParameterGroupManifest m_parameterManifest;
+    struct ResourceGroup
+    {
+        std::unique_ptr<AbstractResourceProvider> resourceProvider;
+        std::unique_ptr<ParameterGroupProvider> parameterProviders;
+        api::metrics::ParameterGroupManifest parameterManifest;
+        std::map<QnResourcePtr, std::unique_ptr<AbstractParameterProvider::Monitor>>
+            parameterMonitors;
+    };
 
     DataBase m_dataBase;
-
     mutable nx::utils::Mutex m_mutex;
-    api::metrics::ResourceRules m_rules;
-    std::map<QnResourcePtr, std::unique_ptr<AbstractParameterProvider::Monitor>> m_parameterMonitors;
+    api::metrics::SystemRules m_rules;
+    std::map<QString, ResourceGroup> m_resourceGroups;
 };
 
 } // namespace nx::vms::server::metrics

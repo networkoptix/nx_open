@@ -6,9 +6,7 @@
 
 namespace nx::vms::server::metrics {
 
-using DataBase = nx::utils::TreeValueHistory<api::metrics::Value>;
-using DataBaseInserter = nx::utils::TreeValueHistoryInserter<api::metrics::Value>;
-using DataBaseKey = nx::utils::TreeKey;
+using DataBase = nx::utils::TreeValueHistory<QString, api::metrics::Value>;
 
 class AbstractParameterProvider
 {
@@ -18,7 +16,7 @@ public:
     class Monitor
     {
     public:
-        virtual void start(DataBaseInserter inserter) = 0;
+        virtual void start(DataBase::Access access) = 0;
         virtual ~Monitor() = default;
     };
 
@@ -28,6 +26,14 @@ public:
 
 using ParameterProviders = std::vector<std::unique_ptr<AbstractParameterProvider>>;
 using ParameterMonitors = std::vector<std::unique_ptr<AbstractParameterProvider::Monitor>>;
+
+template<typename... Providers>
+ParameterProviders makeParameterProviders(Providers... providers)
+{
+    ParameterProviders parameters;
+    (parameters.push_back(std::forward<Providers>(providers)), ...);
+    return parameters;
+}
 
 class ParameterGroupProvider: public AbstractParameterProvider
 {
@@ -42,16 +48,6 @@ private:
     const QString m_name;
     const ParameterProviders m_providers;
 };
-
-template<typename... Providers>
-std::unique_ptr<ParameterGroupProvider> makeParameterGroupProvider(
-    QString id, QString name, Providers... providers)
-{
-    ParameterProviders container;
-    (container.push_back(std::forward<Providers>(providers)), ...);
-    return std::make_unique<ParameterGroupProvider>(
-        std::move(id), std::move(name), std::move(container));
-}
 
 class AbstractResourceProvider
 {

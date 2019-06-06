@@ -26,10 +26,10 @@ struct GroupMonitor: public AbstractParameterProvider::Monitor
 {
     std::map<QString /*id*/, std::unique_ptr<AbstractParameterProvider::Monitor>> monitors;
 
-    virtual void start(DataBaseInserter inserter) override
+    virtual void start(DataBase::Access access) override
     {
         for (const auto& [id, monitor]: monitors)
-            monitor->start(inserter.subValue(id));
+            monitor->start(access[id]);
     }
 };
 

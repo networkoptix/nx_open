@@ -56,6 +56,9 @@ struct ParameterGroupManifest: ParameterManifest
 #define ParameterGroupManifest_Fields ParameterManifest_Fields (group)
 QN_FUSION_DECLARE_FUNCTIONS(ParameterGroupManifest, (json), NX_VMS_API)
 
+NX_UTILS_API std::vector<ParameterGroupManifest>::iterator find(
+    std::vector<ParameterGroupManifest>& group, const QString& id);
+
 using ResourceManifest
     = std::vector<ParameterGroupManifest>;
 
