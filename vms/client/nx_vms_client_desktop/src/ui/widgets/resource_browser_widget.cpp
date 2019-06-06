@@ -201,7 +201,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
         }
     );
 
-    connect(ui->resourceTreeWidget->selectionModel(), &QItemSelectionModel::currentChanged,
+    m_connections << connect(ui->resourceTreeWidget->selectionModel(),
+        &QItemSelectionModel::currentChanged,
         [this](const QModelIndex& current, const QModelIndex& previous)
         {
             Q_UNUSED(previous);
