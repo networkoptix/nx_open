@@ -245,7 +245,7 @@ class ProductForm(forms.ModelForm):
 
         if product_type and product_type.single_customization:
             if len(customizations) > 1:
-                raise ValidationError("Too many customizations selected for product type.")
+                raise forms.ValidationError("Too many customizations selected for product type.")
 
             if customizations and product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
                 customization_portal_id = get_cloud_portal_product(customizations[0])
@@ -253,7 +253,7 @@ class ProductForm(forms.ModelForm):
 
                 if customization_portal_id and product_id and product_id != customization_portal_id or \
                         not product_id and customization_portal_id:
-                    raise ValidationError("Customization is already used for a cloud portal product.")
+                    raise forms.ValidationError("Customization is already used for a cloud portal product.")
         return customizations
 
 
