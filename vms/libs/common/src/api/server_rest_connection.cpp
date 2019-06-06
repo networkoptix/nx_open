@@ -1029,6 +1029,11 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
         targetThread);
 }
 
+Handle ServerConnection::getPluginInformation(GetCallback callback, QThread* targetThread)
+{
+    return executeGet("/api/pluginInfo", {}, callback, targetThread);
+}
+
 Handle ServerConnection::debug(
     const QString& action, const QString& value, PostCallback callback, QThread* targetThread)
 {
