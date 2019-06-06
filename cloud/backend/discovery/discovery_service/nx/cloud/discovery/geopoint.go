@@ -279,7 +279,7 @@ func FindNodeClosestToClient(clientCountryCode string, nodes []Node) *Node {
 	clientGeopoint, ok := kCountries[clientCountryCode]
 	if !ok {
 		log.Printf(
-			`FindClosestNodeToClient: clientCountryCode "%s" not found\n`,
+			`FindNodeClosestToClient: clientCountryCode "%s" not found\n`,
 			clientCountryCode)
 		return nil
 	}
@@ -300,7 +300,7 @@ func FindNodeClosestToClient(clientCountryCode string, nodes []Node) *Node {
 	sort.Float64s(distances)
 
 	if len(nodesByDistance) == 0 {
-		log.Println("FindClosestNodeToClient: 0 nodes found by distance")
+		log.Println("FindNodeClosestToClient: 0 nodes found by distance")
 		return nil
 	}
 
