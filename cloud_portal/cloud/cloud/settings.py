@@ -169,7 +169,8 @@ DATABASES = {
             'charset': 'utf8mb4',
             'init_command': 'SET \
                 character_set_server=utf8mb4,\
-                collation_server = utf8mb4_unicode_ci'
+                collation_server = utf8mb4_unicode_ci;\
+                SET GLOBAL max_connections = 1000'
         }
     }
 }
@@ -189,7 +190,7 @@ CACHES = {
 
 
 if LOCAL_ENVIRONMENT:
-    conf["cloud_db"]["url"] = 'https://cloud-dev2.hdw.mx/cdb'
+    conf["cloud_db"]["url"] = 'https://cloud-test.hdw.mx/cdb'
 
     # BROKER_URL = 'sqs://...'
     # This setting is removed because every developer needs personal AWS credentials

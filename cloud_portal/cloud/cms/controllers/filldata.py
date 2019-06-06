@@ -231,11 +231,11 @@ def init_skin(product, preview=False, workers=2):
     if not preview:
         distutils.dir_util.copy_tree(from_dir, target_dir)
         logger.info("Fill content for " + product.__str__())
-        fill_content(product, preview=False, incremental=False, workers=workers)
+        return fill_content(product, preview=False, incremental=False, workers=workers)
     else:
         distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
         logger.info("Fill preview for " + product.__str__())
-        fill_content(product, preview=True, incremental=False, workers=workers)
+        return fill_content(product, preview=True, incremental=False, workers=workers)
 
 
 @timer
@@ -349,6 +349,7 @@ def fill_content(product,
     default_language_code = product.default_language.code
     languages_list = product.languages_list
     with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = []
         for context in changed_contexts:
             # logger.info("Process context: " + context.name + " file:" + context.file_path)
             if incremental:
@@ -358,10 +359,19 @@ def fill_content(product,
                 if default_language_code in changed_languages:
                     # if default language changes - it can affect all languages in the context
                     changed_languages = languages_list
-            executor.submit(thread_context, context, product, changed_languages, preview,
-                            version_id, global_contexts, global_contexts_dict)
+            futures.append(executor.submit(thread_context, context, product, changed_languages, preview,
+                                           version_id, global_contexts, global_contexts_dict))
+
+        for future in futures:
+            try:
+                future.result()
+            except Exception as e:
+                logger.warning(e)
+                logger.warning("Quiting filldata. If ran by management command will retry soon.")
+                return False
 
     generate_languages_json(product.product_root, languages_list,  preview)
+    return True
 
 
 def thread_context(context, product, changed_languages, preview, version_id, global_contexts, global_contexts_dict):
