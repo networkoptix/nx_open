@@ -6,17 +6,13 @@
             .module('cloudApp')
             .factory('authorizationCheckService', AuthorizationCheckService);
 
-        AuthorizationCheckService.$inject = ['$rootScope', '$q', '$localStorage', '$base64',
+        AuthorizationCheckService.$inject = ['$rootScope', '$q', '$localStorage',
             'cloudApi', 'nxConfigService', 'NxDialogsService', 'languageService', '$location'];
 
-        function AuthorizationCheckService($rootScope, $q, $localStorage, $base64,
+        function AuthorizationCheckService($rootScope, $q, $localStorage,
                                            cloudApi, nxConfigService, NxDialogsService, languageService, $location) {
 
             const CONFIG = nxConfigService.getConfig();
-
-            const search = $location.search();
-            let auth: any;
-            let requestingLogin: any;
 
             $rootScope.session = $localStorage;
 
@@ -37,51 +33,12 @@
             //////////////////////////////////////////////////
 
             function init() {
-                if (search.auth) {
-                    try {
-                        auth = $base64.decode(search.auth);
-                    } catch (exception) {
-                        auth = false;
-                        console.error(exception);
-                    }
-                    if (auth) {
-                        const index = auth.indexOf(':');
-                        const tempLogin = auth.substring(0, index);
-                        const tempPassword = auth.substring(index + 1);
-
-                        console.log('INIT ->');
-                        requestingLogin = login(tempLogin, tempPassword, false)
-                            .then(() => {
-                                console.log('INIT login(true) ->');
-                                $location.search('auth', undefined);
-                            })
-                            .catch((error) => {
-                                console.log('INIT login(error) ->', error);
-                                $location.search('auth', undefined);
-                            });
-
-                        $rootScope.session.requestingLogin = requestingLogin;
-                    }
-                }
             }
 
             function get() {
-                if (requestingLogin) {
-                    debugger;
-                    // login is requesting, so we wait
-                    console.log('requestLogin ->');
-                    return requestingLogin.then(() => {
-                        console.log('requestLogin GET() ->');
-                        $rootScope.session.requestingLogin = undefined;
-                        requestingLogin = undefined; // clean requestingLogin reference
-                        return get(); // Try again
-                    });
-                }
-
                 return cloudApi
                     .account()
                     .then((account) => {
-                        console.log('GET() data ->');
                         return account.data;
                     });
             }
@@ -100,7 +57,7 @@
                                 if (result.data.email !== $rootScope.session.loginState) {
                                     logoutAuthorised();
                                 }
-                                console.log('LOGOUT ->');
+
                                 return $q.resolve(true);
                             }
 
@@ -109,7 +66,6 @@
                                 $rootScope.session.loginState = result.data.email; // Forcing changing loginState to reload interface
                             }
 
-                            console.log('LOGIN ->');
                             return $q.resolve(true);
 
                         }, () => {
@@ -172,8 +128,6 @@
                         });
                 });
             }
-
         }
     }
-
 )();

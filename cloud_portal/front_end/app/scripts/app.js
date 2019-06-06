@@ -40,14 +40,9 @@ window.L = {};
                 return {
                     responseError: function(error) {
                         if (error.status === 401) {
-                            console.log('$rootScope.session.requestingLogin ->', $rootScope.session.requestingLogin);
-                            if (!$rootScope.session.requestingLogin) {
-                                debugger;
-                                // Session expired - try to trigger browser reload
-                                $rootScope.session.loginState = undefined;
-                            }
+                            // Session expired - try to trigger browser reload
+                            $rootScope.session.loginState = undefined;
                         }
-                        
                         return $q.reject(error);
                     }
                 };
