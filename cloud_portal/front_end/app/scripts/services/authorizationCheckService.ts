@@ -66,7 +66,8 @@
                                 $rootScope.session.loginState = result.data.email; // Forcing changing loginState to reload interface
                             }
 
-                            return $q.resolve(true);
+                            get().then(() => $q.resolve(true))
+                                 .catch(error => $q.reject(error));
 
                         }, () => {
                             NxDialogsService.notify(languageService.lang.errorCodes.wrongAuthCode, 'danger');

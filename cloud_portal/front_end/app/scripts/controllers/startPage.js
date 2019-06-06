@@ -33,7 +33,7 @@
                     const index = auth.indexOf(':');
                     const tempLogin = auth.substring(0, index);
                     const tempPassword = auth.substring(index + 1);
-                    
+    
                     authorizationCheckService
                         .login(tempLogin, tempPassword, false)
                         .then(function () {
