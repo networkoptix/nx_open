@@ -36,8 +36,8 @@ set(customization.fullBundleUpgradeCode "{7f96fd2c-fa49-4a32-807c-ed60c4a4e5d2}"
 
 set(deb.customization.company.name "telstra")
 
-set(ios.new_bundle_identifier "com.telstra.telstramobile")
-set(ios.group_identifier "group.com.telstra.telstra")
+set(ios.new_bundle_identifier "com.telstrabusinessandenterprise.videosurveillance")
+set(ios.group_identifier "group.com.telstrabusinessandenterprise")
 set(ios.sign.identity "iPhone Distribution: Telstra Software Group PTY LTD (P82Y83AYW9)")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
