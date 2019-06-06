@@ -91,12 +91,13 @@ protected:
         This method is supposed to bind socket to \a localAddress and call \a listen
         \note If \a nullptr has been returned, system error code is set to proper error
     */
-    virtual nx::network::AbstractStreamServerSocket* createAndPrepareSocket(
+    virtual std::unique_ptr<nx::network::AbstractStreamServerSocket> createAndPrepareSocket(
         bool sslNeeded,
         const nx::network::SocketAddress& localAddress);
-    virtual void destroyServerSocket(nx::network::AbstractStreamServerSocket* serverSocket);
 
     void setLastError(SystemError::ErrorCode error);
+protected:
+    virtual void destroyServerSocket();
 private:
     void removeDisconnectedConnections();
     void removeAllConnections();
