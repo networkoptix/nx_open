@@ -248,7 +248,7 @@ class ProductForm(forms.ModelForm):
                 raise forms.ValidationError("Too many customizations selected for product type.")
 
             if customizations and product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
-                customization_portal_id = get_cloud_portal_product(customizations[0])
+                customization_portal_id = get_cloud_portal_product(customizations[0]).id
                 product_id = self.instance and self.instance.id
 
                 if customization_portal_id and product_id and product_id != customization_portal_id or \
