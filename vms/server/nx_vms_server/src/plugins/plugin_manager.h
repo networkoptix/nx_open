@@ -120,6 +120,7 @@ private:
     void storeInfoAboutLoadingError(
         nx::vms::api::PluginInfo,
         nx::vms::api::PluginInfo::Status loadingStatus,
+        nx::vms::api::PluginInfo::Error errorCode,
         QString statusMessage);
 
 private:

@@ -293,10 +293,12 @@ std::unique_ptr<QLibrary> PluginManager::loadPluginLibrary(
 void PluginManager::storeInfoAboutLoadingError(
     nx::vms::api::PluginInfo pluginInfo,
     nx::vms::api::PluginInfo::Status loadingStatus,
+    nx::vms::api::PluginInfo::Error errorCode,
     QString statusMessage)
 {
     pluginInfo.status = loadingStatus;
     pluginInfo.statusMessage = std::move(statusMessage);
+    pluginInfo.errorCode = errorCode;
     m_nxPlugins.push_back({std::move(pluginInfo), /*plugin*/ nullptr});
 }
 
@@ -314,7 +316,13 @@ bool PluginManager::loadNxPlugin(
 
     const auto lib = loadPluginLibrary(linkedLibsDirectory, libFilename);
     if (!lib)
+    {
+        // TODO: #dmishin
+        // Please store plugin information with PluginInfo::Error::cannotLoadLibrary error code.
+        // Maybe split it into different codes, if possible (file not found, no access rights etc.)
+        // This is going to be the most frequent plugin loading error.
         return false;
+    }
 
     if (const auto entryPointFunc = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
         lib->resolve(nxpl::Plugin::kEntryPointFuncName)))
@@ -326,6 +334,7 @@ bool PluginManager::loadNxPlugin(
             storeInfoAboutLoadingError(
                 std::move(pluginInfo),
                 PluginInfo::Status::notLoadedBecauseOfError,
+                PluginInfo::Error::libraryFailure,
                 "Failed to load Nx old SDK plugin: entry function returned null");
 
             NX_ERROR(this, "Failed to load Nx old SDK plugin [%1]: entry function returned null",
@@ -374,6 +383,7 @@ bool PluginManager::loadNxPlugin(
             storeInfoAboutLoadingError(
                 std::move(pluginInfo),
                 PluginInfo::Status::notLoadedBecauseOfError,
+                PluginInfo::Error::libraryFailure,
                 "Failed to load Nx plugin: entry function returned null");
 
             NX_ERROR(this, "Failed to load Nx plugin [%1]: entry function returned null",
@@ -414,10 +424,10 @@ bool PluginManager::loadNxPlugin(
     }
     else
     {
-
         storeInfoAboutLoadingError(
             std::move(pluginInfo),
             PluginInfo::Status::notLoadedBecauseOfError,
+            PluginInfo::Error::invalidLibrary,
             lm("Failed to load Nx plugin: Neither %1(), nor the old SDK's %2() functions found")
                 .args(IPlugin::kEntryPointFuncName, nxpl::Plugin::kEntryPointFuncName));
 

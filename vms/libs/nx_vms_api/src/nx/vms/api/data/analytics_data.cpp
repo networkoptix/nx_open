@@ -28,3 +28,10 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginInfo, Status,
     (nx::vms::api::PluginInfo::Status::notLoadedBecauseOfError, "notLoadedBecauseOfError")
     (nx::vms::api::PluginInfo::Status::notLoadedBecauseOfBlackList, "notLoadedBecauseOfBlackList")
     (nx::vms::api::PluginInfo::Status::notLoadedBecauseOptional, "notLoadedBecauseOptional"))
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginInfo, Error,
+    (nx::vms::api::PluginInfo::Error::undefined, "undefined")
+    (nx::vms::api::PluginInfo::Error::cannotLoadLibrary, "cannotLoadLibrary")
+    (nx::vms::api::PluginInfo::Error::invalidLibrary, "invalidLibrary")
+    (nx::vms::api::PluginInfo::Error::libraryFailure, "libraryFailure")
+    (nx::vms::api::PluginInfo::Error::unsupportedVersion, "unsupportedVersion"))

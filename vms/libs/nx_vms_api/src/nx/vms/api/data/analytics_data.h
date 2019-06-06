@@ -42,6 +42,15 @@ struct NX_VMS_API PluginInfo: Data
         notLoadedBecauseOptional,
     };
 
+    enum class Error
+    {
+        undefined,
+        cannotLoadLibrary, //< OS cannot load the library file.
+        invalidLibrary, //< The library doesn't seem a valid Nx Plugin library.
+        libraryFailure, //< The plugin library failed to initialize.
+        unsupportedVersion //< The plugin API version is no longer supported.
+    };
+
     QString name;
     QString description;
     QString libraryName;
@@ -50,11 +59,11 @@ struct NX_VMS_API PluginInfo: Data
     Optionality optionality = Optionality::nonOptional;
     Status status = Status::loaded;
     QString statusMessage;
-
-    // TODO: #vkutin #mschevchenko Add library loaded status, most probably as an enumeration.
+    Error errorCode = Error::undefined;
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Optionality)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Status)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Error)
 #define PluginInfo_Fields (name) \
     (description) \
     (libraryName) \
@@ -62,7 +71,8 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Status)
     (version) \
     (optionality) \
     (status) \
-    (statusMessage)
+    (statusMessage) \
+    (errorCode)
 
 } // namespace nx::vms::api
 
