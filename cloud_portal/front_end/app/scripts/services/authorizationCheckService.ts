@@ -36,9 +36,11 @@
             }
 
             function get() {
+                console.log('GET() ->');
                 return cloudApi
                     .account()
                     .then((account) => {
+                        console.log('GET() (then) ->');
                         return account.data;
                     });
             }
@@ -55,6 +57,7 @@
                                 // If the user that logged in matches the current session there's no need to show
                                 // the logout dialog.
                                 if (result.data.email !== $rootScope.session.loginState) {
+                                    console.log('logoutAuthorised ->');
                                     logoutAuthorised();
                                 }
 
@@ -64,10 +67,17 @@
                             if (result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
                                 setEmail(result.data.email);
                                 $rootScope.session.loginState = result.data.email; // Forcing changing loginState to reload interface
+                                console.log('setEmail ->');
                             }
 
-                            get().then(() => $q.resolve(true))
-                                 .catch(error => $q.reject(error));
+                            get().then(() => {
+                                     console.log('LOGIN resolved ->');
+                                     return $q.resolve(true);
+                                 })
+                                 .catch(error => {
+                                     console.log('LOGIN rejected ->');
+                                     return $q.reject(error);
+                                 });
 
                         }, () => {
                             NxDialogsService.notify(languageService.lang.errorCodes.wrongAuthCode, 'danger');
@@ -99,7 +109,9 @@
             }
 
             function redirectAuthorised() {
+                console.log('redirectAuthorised (start) ->');
                 get().then(() => {
+                    console.log('redirectAuthorised (then) ->');
                     $location.path(CONFIG.redirectAuthorised);
                 });
             }
