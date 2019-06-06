@@ -20,7 +20,6 @@ CommonUpdateInstaller::CommonUpdateInstaller(QObject* parent):
 
 CommonUpdateInstaller::~CommonUpdateInstaller()
 {
-    stopSync();
 }
 
 void CommonUpdateInstaller::prepareAsync(const QString& path)
