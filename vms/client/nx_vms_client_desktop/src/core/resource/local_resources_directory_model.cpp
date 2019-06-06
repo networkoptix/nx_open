@@ -54,30 +54,6 @@ void LocalResourcesDirectoryModel::setLocalResourcesDirectories(const QStringLis
         removeWatchedDirectory(removedDirectory);
 }
 
-QStringList LocalResourcesDirectoryModel::getAllFilePaths() const
-{
-    QStringList result;
-    for (auto i = m_childFiles.cbegin(); i != m_childFiles.cend(); ++i)
-    {
-        for (const auto& filename: i.value())
-            result.append(QDir(i.key()).absoluteFilePath(filename));
-    }
-    return result;
-}
-
-QStringList LocalResourcesDirectoryModel::getFilePaths(const QString& directoryPath)
-{
-    QStringList result;
-    for (auto i = m_childFiles.cbegin(); i != m_childFiles.cend(); ++i)
-    {
-        if (!QDir(i.key()).canonicalPath().startsWith(QDir(directoryPath).canonicalPath()))
-            continue;
-        for (const auto& filename: i.value())
-            result.append(QDir(i.key()).absoluteFilePath(filename));
-    }
-    return result;
-}
-
 void LocalResourcesDirectoryModel::addWatchedDirectory(const QString& path)
 {
     QDir dir(path);
@@ -94,18 +70,21 @@ void LocalResourcesDirectoryModel::addWatchedDirectory(const QString& path)
     m_childFiles.insert(canonicalPath, childFiles);
     m_childDirectories.insert(canonicalPath, childDirectories);
 
-    for (const auto& fileName: childFiles)
+    for (auto& childFile: childFiles)
     {
-        const auto filePath = dir.filePath(fileName);
-        if (FileTypeSupport::isValidLayoutFile(filePath)
-            || FileTypeSupport::isMovieFileExt(filePath))
+        childFile = dir.absoluteFilePath(childFile);
+        if (FileTypeSupport::isValidLayoutFile(childFile)
+            || FileTypeSupport::isMovieFileExt(childFile))
         {
-            m_fileSystemWatcher.addPath(filePath);
+            m_fileSystemWatcher.addPath(childFile);
         }
     }
 
     for (const auto& childDirectory: childDirectories)
         addWatchedDirectory(dir.absoluteFilePath(childDirectory));
+
+    if (!childFiles.empty())
+        emit filesAdded(childFiles);
 }
 
 void LocalResourcesDirectoryModel::removeWatchedDirectory(const QString& path)

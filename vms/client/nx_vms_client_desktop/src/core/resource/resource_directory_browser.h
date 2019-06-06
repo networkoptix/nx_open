@@ -35,9 +35,6 @@ public:
     static QnResourcePtr createArchiveResource(const QString& filename,
         QnResourcePool* resourcePool);
 
-signals:
-    void initLocalResources(const QStringList& pathList);
-
 private:
     void dropResourcesFromDirectory(const QString& path);
 

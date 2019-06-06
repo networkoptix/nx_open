@@ -101,13 +101,14 @@ public:
     void setNoDataHandler(nx::utils::MoveOnlyFunc<void()> noDataHandler);
 
     void addMediaFilter(const std::shared_ptr<AbstractMediaDataFilter>& filter);
-protected:
 
     /**
      * \returns                         Current position of this reader, in
      *                                  microseconds.
      */
-    virtual qint64 currentTime() const = 0;
+    virtual std::chrono::microseconds currentTime() const = 0;
+
+protected:
 
     virtual QnAbstractMediaDataPtr getNextData() = 0;
 signals:

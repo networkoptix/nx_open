@@ -696,9 +696,11 @@ void DeviceAdditionDialog::updateResultsWidgetState()
         const int current = status.total ? status.current : 0;
         ui->searchProgressBar->setMaximum(total);
         ui->searchProgressBar->setValue(current);
-        const auto text = m_currentSearch->searching()
+        const bool isSearching = m_currentSearch->searching();
+        const auto text = isSearching
             ? tr("Searching...")
             : tr("No devices found");
+        setSearchAccent(!isSearching);
         ui->placeholderLabel->setText(text.toUpper());
     }
 

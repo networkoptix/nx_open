@@ -49,7 +49,7 @@ class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel
     typedef QnResourceSearchProxyModel base_type;
 
 public:
-    QnResourceTreeSortProxyModel(QObject *parent = NULL):
+    QnResourceTreeSortProxyModel(QObject* parent = nullptr):
         base_type(parent)
     {
     }
@@ -80,7 +80,7 @@ private:
      * videowall nodes, which are pinned between Layouts and WebPages. Also if the system has one
      * server, ServersNode is not displayed, so server/edge node must be displayed on it's place.
      */
-    static qreal nodeOrder(const QModelIndex &index)
+    static qreal nodeOrder(const QModelIndex& index)
     {
         using NodeType = ResourceTreeNodeType;
 
@@ -108,7 +108,7 @@ private:
 
 
 protected:
-    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
+    virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override
     {
         qreal leftOrder = nodeOrder(left);
         qreal rightOrder = nodeOrder(right);
@@ -123,7 +123,7 @@ protected:
 // -------------------------------------------------------------------------- //
 // QnResourceTreeWidget
 // -------------------------------------------------------------------------- //
-QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
+QnResourceTreeWidget::QnResourceTreeWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::QnResourceTreeWidget()),
     m_itemDelegate(nullptr),
@@ -168,23 +168,23 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
 
 QnResourceTreeWidget::~QnResourceTreeWidget()
 {
-    setWorkbench(NULL);
+    setWorkbench(nullptr);
 }
 
-QAbstractItemModel *QnResourceTreeWidget::model() const
+QAbstractItemModel* QnResourceTreeWidget::model() const
 {
     return m_resourceProxyModel
         ? m_resourceProxyModel->sourceModel()
         : nullptr;
 }
 
-void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
+void QnResourceTreeWidget::setModel(QAbstractItemModel* model)
 {
     if (m_resourceProxyModel)
     {
-        disconnect(m_resourceProxyModel, NULL, this, NULL);
+        m_resourceProxyModel->disconnect(this);
         delete m_resourceProxyModel;
-        m_resourceProxyModel = NULL;
+        m_resourceProxyModel = nullptr;
     }
 
     if (model)
@@ -213,7 +213,7 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
     }
     else
     {
-        ui->resourcesTreeView->setModel(NULL);
+        ui->resourcesTreeView->setModel(nullptr);
     }
 }
 
@@ -227,7 +227,7 @@ QItemSelectionModel* QnResourceTreeWidget::selectionModel()
     return ui->resourcesTreeView->selectionModel();
 }
 
-void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench)
+void QnResourceTreeWidget::setWorkbench(QnWorkbench* workbench)
 {
     m_itemDelegate->setWorkbench(workbench);
 }
@@ -238,7 +238,7 @@ void QnResourceTreeWidget::edit()
     view->edit(selectionModel()->currentIndex());
 }
 
-void QnResourceTreeWidget::expand(const QModelIndex &index)
+void QnResourceTreeWidget::expand(const QModelIndex& index)
 {
     ui->resourcesTreeView->expand(index);
 }
@@ -305,7 +305,7 @@ QnResourceTreeModelCustomColumnDelegate* QnResourceTreeWidget::customColumnDeleg
     return nullptr;
 }
 
-void QnResourceTreeWidget::setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate)
+void QnResourceTreeWidget::setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate* columnDelegate)
 {
     QAbstractItemModel* sourceModel = model();
     while (QAbstractProxyModel* proxy = qobject_cast<QAbstractProxyModel*>(sourceModel))
@@ -461,14 +461,14 @@ void QnResourceTreeWidget::updateFilter()
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event)
+bool QnResourceTreeWidget::eventFilter(QObject* obj, QEvent* event)
 {
     switch (event->type())
     {
         case QEvent::ContextMenu:
             if (obj == ui->resourcesTreeView)
             {
-                QContextMenuEvent* me = static_cast<QContextMenuEvent *>(event);
+                QContextMenuEvent* me = static_cast<QContextMenuEvent*>(event);
                 if (me->reason() == QContextMenuEvent::Mouse && !ui->resourcesTreeView->indexAt(me->pos()).isValid())
                     selectionModel()->clear();
             }
@@ -485,12 +485,12 @@ bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event)
     return base_type::eventFilter(obj, event);
 }
 
-void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event)
+void QnResourceTreeWidget::mousePressEvent(QMouseEvent* event)
 {
     base_type::mousePressEvent(event);
 }
 
-void QnResourceTreeWidget::at_treeView_spacePressed(const QModelIndex &index)
+void QnResourceTreeWidget::at_treeView_spacePressed(const QModelIndex& index)
 {
     if (!m_checkboxesVisible)
         return;
@@ -502,7 +502,7 @@ void QnResourceTreeWidget::at_treeView_spacePressed(const QModelIndex &index)
     m_resourceProxyModel->setData(checkedIdx, inverted, Qt::CheckStateRole);
 }
 
-void QnResourceTreeWidget::at_treeView_clicked(const QModelIndex &index)
+void QnResourceTreeWidget::at_treeView_clicked(const QModelIndex& index)
 {
     if (!m_simpleSelectionEnabled)
         return;
@@ -511,7 +511,7 @@ void QnResourceTreeWidget::at_treeView_clicked(const QModelIndex &index)
         return; /* Will be processed by delegate. */
 
     QModelIndex checkIndex = index.sibling(index.row(), Qn::CheckColumn);
-    if (QAbstractItemModel *model = ui->resourcesTreeView->model())
+    if (QAbstractItemModel* model = ui->resourcesTreeView->model())
     {
         int checkState = model->data(checkIndex, Qt::CheckStateRole).toInt();
         if (checkState == Qt::Checked)

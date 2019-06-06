@@ -30,9 +30,6 @@ ResourceDirectoryBrowser::ResourceDirectoryBrowser(QObject* parent):
     connect(m_localResourceDirectoryModel, &LocalResourcesDirectoryModel::videoFileChanged,
         m_resourceProducer, &LocalResourceProducer::updateVideoFileResource);
 
-    connect(this, &ResourceDirectoryBrowser::initLocalResources,
-        m_resourceProducer, &LocalResourceProducer::createLocalResources);
-
     connect(m_resourceProducerThread, &QThread::finished,
         m_resourceProducer, &LocalResourceProducer::deleteLater);
 
@@ -67,9 +64,6 @@ void ResourceDirectoryBrowser::setLocalResourcesDirectories(const QStringList& p
 
     for (const auto& removedDirectory: removedDirectories)
         dropResourcesFromDirectory(removedDirectory);
-
-    for (const auto& newDirectory: newDirectories)
-        emit initLocalResources(m_localResourceDirectoryModel->getFilePaths(newDirectory));
 }
 
 QnFileLayoutResourcePtr ResourceDirectoryBrowser::layoutFromFile(const QString& filename,

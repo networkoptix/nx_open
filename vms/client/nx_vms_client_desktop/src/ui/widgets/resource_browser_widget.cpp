@@ -11,7 +11,6 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
-#include <QtWidgets/QTabWidget>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QGraphicsLinearLayout>
@@ -218,17 +217,11 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_connections << connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated,
         this, &QnResourceBrowserWidget::handleItemActivated);
 
-    m_connections << connect(ui->tabWidget, &QTabWidget::currentChanged,
-        this, &QnResourceBrowserWidget::at_tabWidget_currentChanged);
     m_connections << connect(ui->resourceTreeWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
         this, &QnResourceBrowserWidget::selectionChanged);
 
     /* Connect to context. */
     ui->resourceTreeWidget->setWorkbench(workbench());
-
-    setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
-    ui->tabWidget->setProperty(style::Properties::kTabBarIndent, style::Metrics::kDefaultTopLevelMargin);
-    ui->tabWidget->tabBar()->setMaximumHeight(32);
 
     m_connections << connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged,
         this, &QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged);
@@ -243,9 +236,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
         &QnWorkbenchAccessController::globalPermissionsChanged,
         this,
         &QnResourceBrowserWidget::updateIcons);
-
-    m_connections << connect(this->context(), &QnWorkbenchContext::userChanged,
-        this, [this]() { ui->tabWidget->setCurrentWidget(ui->resourcesTab); });
 
     m_connections << connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
@@ -317,8 +307,6 @@ void forEachIndex(
 void QnResourceBrowserWidget::initInstantSearch()
 {
     const auto filterEdit = ui->instantFilterLineEdit;
-
-    ui->tabWidget->tabBar()->hide();
 
     setPaletteColor(ui->nothingFoundLabel, QPalette::WindowText, colorTheme()->color("dark14"));
     setPaletteColor(ui->nothingFoundDescriptionLabel, QPalette::WindowText, colorTheme()->color("dark14"));
@@ -1265,8 +1253,6 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged()
     if (auto synchronizer = layoutSynchronizer(layout, false))
         synchronizer->enableUpdates();
 
-    at_tabWidget_currentChanged(ui->tabWidget->currentIndex());
-
     /* Bold state has changed. */
     currentTreeWidget()->update();
 
@@ -1292,11 +1278,6 @@ void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem* item)
 {
     /* Bold state has changed. */
     updateTreeItem(currentTreeWidget(), item);
-}
-
-void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)
-{
-    emit scrollBarVisibleChanged();
 }
 
 void QnResourceBrowserWidget::at_thumbnailClicked()

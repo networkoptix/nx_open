@@ -48,6 +48,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
+#include <nx/analytics/utils.h>
 #include <nx/utils/unused.h>
 
 using namespace nx;
@@ -551,38 +552,12 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
             // Network storage.
             m_model->removeStorage(record);
         }
-        else
+        else if (m_model->canStoreAnalytics(record))
         {
             // Local storage, may be used to store analytics.
             if (record.id != m_model->metadataStorageId())
             {
                 const auto storageId = record.id;
-
-                // Metadata storage has been changed, we need to do something with database.
-                QnMessageBox msgBox(
-                    QnMessageBoxIcon::Question,
-                    tr("What to do with current analytics data?"),
-                    tr("Current analytics data will not be automatically moved to another location"
-                        " and will become unaccessible. You can keep it and manually move later,"
-                        " or delete permanently."
-                        "\n"
-                        "If you intended to move analytics data to another storage location,"
-                        " please contact support before proceeding."),
-                    QDialogButtonBox::StandardButtons(),
-                    QDialogButtonBox::NoButton,
-                    this);
-
-                const auto deleteButton = msgBox.addButton(tr("Delete"),
-                    QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Warning);
-                const auto keepButton = msgBox.addButton(tr("Keep"),
-                    QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
-                const auto cancelButton = msgBox.addButton(tr("Cancel"),
-                    QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
-
-                cancelButton->setFocus();
-
-                msgBox.setEscapeButton(cancelButton);
-                msgBox.exec();
 
                 const auto updateServerSettings =
                     [this](
@@ -599,21 +574,67 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
                             });
                     };
 
-
-                if (msgBox.clickedButton() == deleteButton)
+                if (nx::analytics::hasActiveObjectEngines(commonModule(), m_server->getId()))
                 {
-                    updateServerSettings(
-                        nx::vms::api::MetadataStorageChangePolicy::remove,
-                        storageId);
+                    // Metadata storage has been changed, we need to do something with database.
 
-                    m_model->setMetadataStorageId(storageId);
-                    updateWarnings();
+                    QnMessageBox msgBox(
+                        QnMessageBoxIcon::Question,
+                        tr("What to do with current analytics data?"),
+                        tr("Current analytics data will not be automatically moved to another location"
+                            " and will become unaccessible. You can keep it and manually move later,"
+                            " or delete permanently."
+                            "\n"
+                            "If you intended to move analytics data to another storage location,"
+                            " please contact support before proceeding."),
+                        QDialogButtonBox::StandardButtons(),
+                        QDialogButtonBox::NoButton,
+                        this);
+
+                    const auto deleteButton = msgBox.addButton(tr("Delete"),
+                        QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Warning);
+                    const auto keepButton = msgBox.addButton(tr("Keep"),
+                        QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
+
+                    // This dialog uses non-standard layout, so we can't use ButtonRole::CancelRole.
+                    const auto cancelButton = msgBox.addButton(tr("Cancel"),
+                        QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
+
+                    cancelButton->setFocus();
+
+                    // Since we don't have a button with CancelRole, we need to set it manually.
+                    msgBox.setEscapeButton(cancelButton);
+
+                    msgBox.exec();
+
+                    if (msgBox.clickedButton() == deleteButton)
+                    {
+                        updateServerSettings(
+                            nx::vms::api::MetadataStorageChangePolicy::remove,
+                            storageId);
+
+                        m_model->setMetadataStorageId(storageId);
+                        updateWarnings();
+                    }
+
+                    if (msgBox.clickedButton() == keepButton)
+                    {
+                        updateServerSettings(
+                            nx::vms::api::MetadataStorageChangePolicy::keep,
+                            storageId);
+
+                        m_model->setMetadataStorageId(storageId);
+                        updateWarnings();
+                    }
+
+                    // If the cancel button has been clicked, do nothing...
                 }
-
-                if (msgBox.clickedButton() == keepButton)
+                else
                 {
+                    // We don't have analytics database jet, so just assign a new storage.
+
                     updateServerSettings(
-                        nx::vms::api::MetadataStorageChangePolicy::remove,
+                        nx::vms::api::MetadataStorageChangePolicy::keep, //< Just to be sure...
                         storageId);
 
                     m_model->setMetadataStorageId(storageId);
@@ -1051,6 +1072,7 @@ void QnStorageConfigWidget::updateWarnings()
         if (!storageData.isUsed)
             hasDisabledStorage = true;
 
+        //TODO: use PartitionType enum value here instead of the serialized literal
         if (storageData.isUsed && storageData.storageType == lit("usb"))
             hasUsbStorage = true;
     }
