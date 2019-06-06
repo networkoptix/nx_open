@@ -26,7 +26,7 @@ SERIAL_LIST = list(set((test[0] for test in get_threaded_names("Unthreaded"))))
 
 
 q = queue.Queue(maxsize=0)
-NUM_THREADS = 16
+NUM_THREADS = 8
 
 # actually runs the commands in the queue
 def do_stuff(q):

@@ -296,7 +296,7 @@ should display same user data as showed in user account
 should show (your system) for owner and (owner's name) for non-owners
     [tags]    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']
-    Wait Until Element Is Not Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Element Is Visible    //h2[text()='${YOUR SYSTEM TEXT}']
+    Wait Until Element Is Not Visible    //h2[text()='${OWNER TEXT}']
     :FOR    ${user}    IN    @{EMAILS LIST}
     \  Run Keyword Unless    "${user}"=="${EMAIL OWNER}"    Check System Text    ${user}
