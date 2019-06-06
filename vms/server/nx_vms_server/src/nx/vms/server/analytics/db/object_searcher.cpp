@@ -359,8 +359,6 @@ void ObjectSearcher::fetchObjectsFromDb(
 
     query->exec();
 
-    // TODO: #ak Filtering objects while loading.
-    
     *result = loadObjects(query.get());
 }
 
@@ -498,7 +496,9 @@ std::vector<DetectedObject> ObjectSearcher::loadObjects(nx::sql::AbstractSqlQuer
     while (query->next())
     {
         auto object = loadObject(query);
-        objects.push_back(std::move(object));
+     
+        if (satisfiesFilter(m_filter, object))
+            objects.push_back(std::move(object));
     }
 
     return objects;
