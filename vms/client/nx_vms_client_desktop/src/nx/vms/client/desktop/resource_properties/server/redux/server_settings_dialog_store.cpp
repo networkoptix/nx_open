@@ -24,11 +24,11 @@ using PluginInfo = nx::vms::api::PluginInfo;
 QVariantMap pluginData(const PluginInfo& plugin)
 {
     const auto pluginName = plugin.name.isEmpty()
-        ? QFileInfo(plugin.libraryName).fileName()
+        ? QFileInfo(plugin.libraryFilename).fileName()
         : plugin.name;
 
     return QVariantMap({
-        {"id", plugin.libraryName},
+        {"id", plugin.libraryFilename},
         {"name", pluginName},
         {"description", plugin.description},
         {"loaded", plugin.status == PluginInfo::Status::loaded}});
@@ -106,7 +106,7 @@ QVariantList pluginDetails(const PluginInfo& plugin)
                 add(name, value);
         };
 
-    add(ServerSettingsDialogStore::tr("Library"), plugin.libraryName);
+    add(ServerSettingsDialogStore::tr("Library"), plugin.libraryFilename);
     addNonEmpty(ServerSettingsDialogStore::tr("Version"), plugin.version.trimmed());
     addNonEmpty(ServerSettingsDialogStore::tr("Vendor"), plugin.vendor.trimmed());
     add(ServerSettingsDialogStore::tr("Status"), pluginStatus(plugin));
@@ -180,12 +180,12 @@ QVariant ServerSettingsDialogStore::currentPlugin() const
     return pluginData(d->state.currentPlugin());
 }
 
-void ServerSettingsDialogStore::selectCurrentPlugin(const QString& libraryName)
+void ServerSettingsDialogStore::selectCurrentPlugin(const QString& libraryFilename)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::selectCurrentPlugin(std::move(state), libraryName.trimmed());
+            return Reducer::selectCurrentPlugin(std::move(state), libraryFilename.trimmed());
         });
 }
 

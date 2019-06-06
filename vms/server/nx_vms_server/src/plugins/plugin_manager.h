@@ -10,6 +10,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 
+#include <nx/sdk/i_plugin.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <plugins/plugin_api.h>
 #include <nx/vms/server/plugins/utility_provider.h>
@@ -105,7 +106,8 @@ private:
         const nx::plugins::SettingsHolder& settingsHolder,
         const QDir& dirToSearchIn,
         nx::vms::api::PluginInfo::Optionality pluginLoadingType,
-        std::function<bool(const QFileInfo& pluginFileInfo)> allowPlugin);
+        std::function<bool(const QFileInfo& pluginFileInfo, nx::vms::api::PluginInfo* pluginInfo)>
+            allowPlugin);
 
     bool loadNxPlugin(
         const nx::plugins::SettingsHolder& settingsHolder,
@@ -114,13 +116,36 @@ private:
         const QString& libName,
         nx::vms::api::PluginInfo pluginInfo);
 
-    std::unique_ptr<QLibrary> loadPluginLibrary(
-        const QString& linkedLibsDir, const QString& libFilename);
+    bool loadNxPluginForOldSdk(
+        const nxpl::Plugin::EntryPointFunc entryPointFunc,
+        const nx::plugins::SettingsHolder& settingsHolder,
+        const QString& linkedLibsDirectory,
+        const QString& libFilename,
+        const QString& libName,
+        nx::vms::api::PluginInfo pluginInfo);
 
-    void storeInfoAboutLoadingError(
+    bool loadNxPluginForNewSdk(
+        const nx::sdk::IPlugin::EntryPointFunc entryPointFunc,
+        const nx::plugins::SettingsHolder& settingsHolder,
+        const QString& linkedLibsDirectory,
+        const QString& libFilename,
+        const QString& libName,
+        nx::vms::api::PluginInfo pluginInfo);
+
+    std::unique_ptr<QLibrary> loadPluginLibrary(
+        const QString& linkedLibsDir,
+        const QString& libFilename,
+        nx::vms::api::PluginInfo* pluginInfo);
+
+    void storeFailedPluginInfo(
         nx::vms::api::PluginInfo,
         nx::vms::api::PluginInfo::Status loadingStatus,
         nx::vms::api::PluginInfo::Error errorCode,
+        QString statusMessage);
+
+    void storeSkippedPluginInfo(
+        nx::vms::api::PluginInfo,
+        nx::vms::api::PluginInfo::Status loadingStatus,
         QString statusMessage);
 
 private:

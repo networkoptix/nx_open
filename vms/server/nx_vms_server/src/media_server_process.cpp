@@ -2725,10 +2725,11 @@ void MediaServerProcess::registerRestHandlers(
      *         %param reply[].description Description of the plugin.
      *         %param reply[].vendor Vendor of the plugin.
      *         %param reply[].version Version of the plugin.
-     *         %param reply[].libraryName Absolute path to the plugin library.
+     *         %param reply[].libraryFilename Absolute path to the plugin library.
      *         %param reply[].optionality Indicates whether the plugin is optional or not.
      *         %param reply[].status Status of the plugin after a loading attempt.
      *         %param reply[].statusMessage Message with details about the plugin loading attempt.
+     *         %// TODO: #mshevchenko: Add missing fields; add enum values.
      */
     reg("api/pluginInfo",
         new nx::vms::server::rest::PluginInfoHandler(serverModule()));

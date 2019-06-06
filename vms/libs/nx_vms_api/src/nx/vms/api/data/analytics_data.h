@@ -24,7 +24,7 @@ struct NX_VMS_API AnalyticsEngineData: ResourceData
 #define AnalyticsEngineData_Fields ResourceData_Fields
 
 /**
- * Information about plugin module.
+ * Information about a Server plugin library.
  */
 struct NX_VMS_API PluginInfo: Data
 {
@@ -46,14 +46,14 @@ struct NX_VMS_API PluginInfo: Data
     {
         undefined,
         cannotLoadLibrary, //< OS cannot load the library file.
-        invalidLibrary, //< The library doesn't seem a valid Nx Plugin library.
+        invalidLibrary, //< The library doesn't seem to be a valid Nx Plugin library.
         libraryFailure, //< The plugin library failed to initialize.
         unsupportedVersion //< The plugin API version is no longer supported.
     };
 
     QString name;
     QString description;
-    QString libraryName;
+    QString libraryFilename;
     QString vendor;
     QString version;
     Optionality optionality = Optionality::nonOptional;
@@ -66,7 +66,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Status)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Error)
 #define PluginInfo_Fields (name) \
     (description) \
-    (libraryName) \
+    (libraryFilename) \
     (vendor) \
     (version) \
     (optionality) \

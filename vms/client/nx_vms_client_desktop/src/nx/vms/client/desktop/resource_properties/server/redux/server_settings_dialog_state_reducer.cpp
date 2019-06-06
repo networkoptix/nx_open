@@ -11,15 +11,15 @@ using Server = QnMediaServerResourcePtr;
 
 namespace {
 
-int pluginIndex(const State& state, const QString& libraryName)
+int pluginIndex(const State& state, const QString& libraryFilename)
 {
-    if (libraryName.isEmpty())
+    if (libraryFilename.isEmpty())
         return -1;
 
     const auto iter = std::find_if(state.plugins.modules.cbegin(), state.plugins.modules.cend(),
-        [libraryName](const nx::vms::api::PluginInfo& data)
+        [libraryFilename](const nx::vms::api::PluginInfo& data)
         {
-            return data.libraryName == libraryName;
+            return data.libraryFilename == libraryFilename;
         });
 
     return iter != state.plugins.modules.cend()
@@ -48,19 +48,19 @@ State ServerSettingsDialogStateReducer::setPluginModules(
     using PluginInfo = nx::vms::api::PluginInfo;
 
     const auto currentLibraryName = state.plugins.current > 0
-        ? state.plugins.modules[state.plugins.current].libraryName
+        ? state.plugins.modules[state.plugins.current].libraryFilename
         : QString();
 
     state.plugins.modules.clear();
 
-    // Ensure uniqueness of libraryName.
+    // Ensure uniqueness of libraryFilename.
     QSet<QString> usedNames;
     for (const auto& plugin: value)
     {
-        if (!NX_ASSERT(!usedNames.contains(plugin.libraryName)))
+        if (!NX_ASSERT(!usedNames.contains(plugin.libraryFilename)))
             continue;
 
-        usedNames.insert(plugin.libraryName);
+        usedNames.insert(plugin.libraryFilename);
         state.plugins.modules.push_back(plugin);
     }
 
@@ -79,7 +79,7 @@ State ServerSettingsDialogStateReducer::setPluginModules(
             if (code > 0)
                 return false;
 
-            return l.libraryName < r.libraryName;
+            return l.libraryFilename < r.libraryFilename;
         });
 
     state.plugins.current = pluginIndex(state, currentLibraryName);
@@ -90,9 +90,9 @@ State ServerSettingsDialogStateReducer::setPluginModules(
 }
 
 State ServerSettingsDialogStateReducer::selectCurrentPlugin(
-    State state, const QString& libraryName)
+    State state, const QString& libraryFilename)
 {
-    state.plugins.current = pluginIndex(state, libraryName);
+    state.plugins.current = pluginIndex(state, libraryFilename);
     return state;
 }
 
