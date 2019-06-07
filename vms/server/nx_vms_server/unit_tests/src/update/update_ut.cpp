@@ -7,6 +7,7 @@
 #include <api/test_api_requests.h>
 #include <api/global_settings.h>
 #include <nx/update/update_information.h>
+#include <nx/update/persistent_update_storage.h>
 #include <nx/network/http/test_http_server.h>
 #include <quazip/quazipfile.h>
 #include <rest/server/json_rest_handler.h>
@@ -178,14 +179,14 @@ protected:
         ASSERT_NE(QnRestResult::NoError, result.error);
     }
 
-    void whenServerRestartedWithNewVersion(int peerIndex, const std::string& version = "4.0.0.1")
+    void whenServerRestartedWithNewVersion(size_t peerIndex, const std::string& version = "4.0.0.1")
     {
         m_peers[peerIndex]->stop();
         m_peers[peerIndex]->addCmdOption("--override-version=" + version);
         ASSERT_TRUE(m_peers[peerIndex]->start());
     }
 
-    void whenServerRestartedWithOldVersion(int peerIndex)
+    void whenServerRestartedWithOldVersion(size_t peerIndex)
     {
         m_peers[peerIndex]->stop();
         m_peers[peerIndex]->addCmdOption("--override-version=4.0.0.0");
@@ -207,9 +208,26 @@ protected:
         issueFinishUpdateRequestAndAssertResponse(true, QnRestResult::NoError);
     }
 
-    void whenPeerGoesOffline(int peerIndex)
+    void whenPeerGoesOffline(size_t peerIndex)
     {
         m_peers[peerIndex]->stop();
+    }
+
+    void whenPersistentUpdateStorageDataSet(const QString& version)
+    {
+        m_persistentServersData[version] =
+            update::PersistentUpdateStorage({m_peers[0]->commonModule()->moduleGUID()}, true);
+
+        const QString path = "/ec2/updatePersistenStorages?version=" + version;
+        NX_TEST_API_POST(m_peers[0].get(), path, m_persistentServersData[version]);
+    }
+
+    void thenPersistentUpdateStorageDataShouldBeRetrievalble(const QString& version)
+    {
+        update::PersistentUpdateStorage persistentStorageData;
+        const QString path = "/ec2/updatePersistenStorages?version=" + version;
+        NX_TEST_API_GET(m_peers[0].get(), path, &persistentStorageData);
+        ASSERT_EQ(persistentStorageData, m_persistentServersData[version]);
     }
 
 private:
@@ -227,10 +245,11 @@ private:
     std::vector<std::unique_ptr<MediaServerLauncher>> m_peers;
     nx::update::Information m_updateInformation;
     nx::network::http::TestHttpServer m_testHttpServer;
+    std::map<QString, update::PersistentUpdateStorage> m_persistentServersData;
 
     void connectPeers()
     {
-        for (int i = 0; i < m_peers.size() - 1; ++i)
+        for (size_t i = 0; i < m_peers.size() - 1; ++i)
         {
             const auto& to = m_peers[i + 1];
             const auto toUrl = nx::utils::url::parseUrlFields(to->endpoint().toString(),
@@ -242,7 +261,7 @@ private:
 
         const auto firstPeerMessageBus = m_peers[0]->serverModule()->ec2Connection()->messageBus();
         int distance = std::numeric_limits<int>::max();
-        while (distance > m_peers.size())
+        while (distance > static_cast<int>(m_peers.size()))
         {
             distance = firstPeerMessageBus->distanceToPeer(
                 m_peers[m_peers.size() - 1]->commonModule()->moduleGUID());
@@ -815,6 +834,16 @@ TEST_F(FtUpdates, finishUpdate_success_installedUpdateInformationSetCorrectly)
     thenInstalledtUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ false);
     thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, QString());
     thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, "target");
+}
+
+TEST_F(FtUpdates, PersistentUpdateStorage_Properties_GetSet)
+{
+    givenConnectedPeers(1);
+    whenPersistentUpdateStorageDataSet(update::kTargetKey);
+    whenPersistentUpdateStorageDataSet(update::kInstalledKey);
+
+    thenPersistentUpdateStorageDataShouldBeRetrievalble(update::kTargetKey);
+    thenPersistentUpdateStorageDataShouldBeRetrievalble(update::kInstalledKey);
 }
 
 } // namespace nx::vms::server::test

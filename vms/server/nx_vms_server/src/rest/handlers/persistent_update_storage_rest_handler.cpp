@@ -47,7 +47,7 @@ int QnPersistentUpdateStorageRestHandler::executePost(
     const QString& /*path*/,
     const QnRequestParamList& params,
     const QByteArray& body,
-    const QByteArray& srcBodyContentType,
+    const QByteArray& /*srcBodyContentType*/,
     QByteArray& result,
     QByteArray& resultContentType,
     const QnRestConnectionProcessor* processor)
@@ -75,7 +75,7 @@ int QnPersistentUpdateStorageRestHandler::executePost(
 }
 
 int QnPersistentUpdateStorageRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParamList& params,
     QByteArray& result,
     QByteArray& contentType,

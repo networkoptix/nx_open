@@ -15,6 +15,13 @@ struct PersistentUpdateStorage
 {
     QList<QnUuid> servers;
     bool manuallySet = false;
+
+    PersistentUpdateStorage(const QList<QnUuid>& servers, bool manuallySet):
+        servers(servers),
+        manuallySet(manuallySet)
+    {}
+
+    PersistentUpdateStorage() = default;
 };
 
 #define PersistentUpdateStorage_Fields (servers)(manuallySet)

@@ -17,7 +17,7 @@ QnStartUpdateRestHandler::QnStartUpdateRestHandler(QnMediaServerModule* serverMo
 }
 
 int QnStartUpdateRestHandler::executePost(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParamList& params,
     const QByteArray& body,
     const QByteArray& /*srcBodyContentType*/,
