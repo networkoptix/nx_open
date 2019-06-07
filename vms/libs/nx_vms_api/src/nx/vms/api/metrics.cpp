@@ -10,6 +10,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (ParameterValue)(ParameterGroupValues)(ResourceValues),
     (json), _Fields, (optional, true))
 
+std::vector<ParameterGroupManifest>::iterator find(
+    std::vector<ParameterGroupManifest>& group, const QString& id)
+{
+    return std::find_if(group.begin(), group.end(), [&](const auto& i) { return i.id == id; });
+}
+
 ParameterGroupManifest makeParameterManifest(QString id, QString name, QString unit)
 {
     ParameterGroupManifest manifest;
@@ -42,7 +48,7 @@ ParameterGroupValues makeParameterGroupValue(std::map<QString, ParameterGroupVal
     return parameter;
 }
 
-void merge(Values* destination, Values* source)
+void merge(SystemValues* destination, SystemValues* source)
 {
     for (auto& [group, sourceResources]: *source)
     {
@@ -52,9 +58,9 @@ void merge(Values* destination, Values* source)
     }
 }
 
-Values merge(std::vector<Values> valuesList)
+SystemValues merge(std::vector<SystemValues> valuesList)
 {
-    Values result;
+    SystemValues result;
     for (auto values: valuesList)
         merge(&result, &values);
     return result;
