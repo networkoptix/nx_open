@@ -73,7 +73,8 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
     m_droppedFrames(0),
     m_useRealTimeOptimization(false),
     m_outPacket(av_packet_alloc()),
-    m_metrics(metrics)
+    m_metrics(metrics),
+    m_fixedFrameRate(0)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -85,6 +86,11 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
     m_decodedVideoFrame->setUseExternalData(true);
     if (m_metrics)
         m_metrics->transcoders()++;
+}
+
+void QnFfmpegVideoTranscoder::setFixedFrameRate(int value)
+{
+    m_fixedFrameRate = value;
 }
 
 QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
@@ -135,7 +141,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->bit_rate = m_bitrate;
     m_encoderCtx->gop_size = 32;
     m_encoderCtx->time_base.num = 1;
-    m_encoderCtx->time_base.den = 60;
+    m_encoderCtx->time_base.den = m_fixedFrameRate ? m_fixedFrameRate : 60;
     m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
     if (m_useMultiThreadEncode)
         m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
@@ -246,8 +252,16 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         return 0;
     }
 
-    m_frameNumToPts[m_encoderCtx->frame_number] = decodedFrame->pts;
-    decodedFrame->pts = m_encoderCtx->frame_number;
+    static AVRational r = { 1, 1000000 };
+    if (m_fixedFrameRate)
+    {
+        m_frameNumToPts[m_encoderCtx->frame_number] = decodedFrame->pts;
+        decodedFrame->pts = m_encoderCtx->frame_number;
+    }
+    else
+    {
+        decodedFrame->pts = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
+    }
 
     if( !result )
         return 0;
@@ -279,11 +293,19 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         return 0;
 
     QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_outPacket->size);
-    auto itr = m_frameNumToPts.find(m_outPacket->pts);
-    if (itr != m_frameNumToPts.end())
+
+    if (m_fixedFrameRate)
     {
-        resultVideoData->timestamp = itr->second;
-        m_frameNumToPts.erase(itr);
+        auto itr = m_frameNumToPts.find(m_outPacket->pts);
+        if (itr != m_frameNumToPts.end())
+        {
+            resultVideoData->timestamp = itr->second;
+            m_frameNumToPts.erase(itr);
+        }
+    }
+    else
+    {
+        resultVideoData->timestamp = av_rescale_q(m_outPacket->pts, m_encoderCtx->time_base, r);
     }
 
     if (m_outPacket->flags & AV_PKT_FLAG_KEY)

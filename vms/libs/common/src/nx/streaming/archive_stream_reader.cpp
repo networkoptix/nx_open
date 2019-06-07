@@ -184,13 +184,10 @@ void QnArchiveStreamReader::setCurrentTime(qint64 value)
     m_currentTime = value;
 }
 
-qint64 QnArchiveStreamReader::currentTime() const
+std::chrono::microseconds QnArchiveStreamReader::currentTime() const
 {
     QnMutexLocker mutex( &m_jumpMtx );
-    if (m_skipFramesToTime)
-        return m_skipFramesToTime;
-    else
-        return m_currentTime;
+    return std::chrono::microseconds(m_skipFramesToTime ? m_skipFramesToTime : m_currentTime);
 }
 
 QnConstResourceVideoLayoutPtr QnArchiveStreamReader::getDPVideoLayout() const

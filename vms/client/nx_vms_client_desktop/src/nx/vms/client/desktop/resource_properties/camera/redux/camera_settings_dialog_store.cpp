@@ -364,13 +364,7 @@ QVariantList CameraSettingsDialogStore::analyticsEngines() const
 {
     QVariantList result;
     for (const auto& plugin: d->state.analytics.engines)
-    {
-        result.append(QVariantMap{
-            {"id", QVariant::fromValue(plugin.id)},
-            {"name", plugin.name},
-            {"settingsModel", plugin.settingsModel}
-        });
-    }
+        result.append(plugin.toVariantMap());
     return result;
 }
 

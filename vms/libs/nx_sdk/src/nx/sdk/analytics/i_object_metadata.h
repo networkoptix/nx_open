@@ -31,25 +31,6 @@ public:
     virtual const char* subtype() const = 0;
 
     /**
-     * Provides values of so-called Object Attributes - typically, some object properties (e.g. age
-     * or color), represented as a name-value map.
-     * @param index 0-based index of the attribute.
-     * @return Item of an attribute array, or null if index is out of range.
-     */
-    virtual const IAttribute* attribute(int index) const = 0;
-
-    /**
-     * @return Number of items in the attribute array.
-     */
-    virtual int attributeCount() const = 0;
-
-    /**
-     * Arbitrary data (in json format) associated with the object.
-     * @return JSON string in UTF-8.
-     */
-    virtual const char* auxiliaryData() const = 0;
-
-    /**
      * @return Bounding box of an object detected in a video frame.
      */
     virtual Rect boundingBox() const = 0;

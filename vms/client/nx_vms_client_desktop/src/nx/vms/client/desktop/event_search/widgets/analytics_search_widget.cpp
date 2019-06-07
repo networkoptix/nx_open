@@ -33,6 +33,7 @@
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
@@ -293,9 +294,7 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     const auto objectTypeDescriptors = objectTypeDescriptorManager.descriptors();
     const auto engineDescriptors = engineDescriptorManager.descriptors();
 
-    m_objectTypeMenu->clear();
-    for (auto menu: m_objectTypeMenu->findChildren<QMenu*>(QString(), Qt::FindChildrenRecursively))
-        menu->deleteLater();
+    WidgetUtils::clearMenu(m_objectTypeMenu);
 
     m_defaultAction = addMenuAction(m_objectTypeMenu, tr("Any type"), {});
 

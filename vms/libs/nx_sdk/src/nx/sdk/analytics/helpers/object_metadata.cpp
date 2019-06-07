@@ -47,11 +47,6 @@ Rect ObjectMetadata::boundingBox() const
     return m_rect;
 }
 
-const char* ObjectMetadata::auxiliaryData() const
-{
-    return m_auxiliaryData.c_str();
-}
-
 void ObjectMetadata::setTypeId(std::string typeId)
 {
     m_typeId = std::move(typeId);
@@ -98,11 +93,6 @@ void ObjectMetadata::addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& v
 {
     for (const auto& newAttribute: value)
         addAttribute(newAttribute);
-}
-
-void ObjectMetadata::setAuxiliaryData(std::string auxiliaryData)
-{
-    m_auxiliaryData = std::move(auxiliaryData);
 }
 
 void ObjectMetadata::setBoundingBox(const Rect& rect)

@@ -28,19 +28,6 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "In Windows, for Plugins residing in a dedicated plugin folder, do not set DLL search\n"
         "path to that folder via SetDllDirectoryW().");
 
-    NX_INI_STRING("", analyticsEngineSettingsPath,
-        "Path (absolute or relative to .ini dir) to {plugin_name}_engine_settings.json: array\n"
-        "of objects with name and value strings. Settings are passed to the Engine from the file\n"
-        "only if this value is not empty and the file is present in the filesystem. Otherwise\n"
-        "the setttings from the database are used.");
-
-    NX_INI_STRING("", analyticsDeviceAgentSettingsPath,
-        "Path (absolute or relative to .ini dir) to\n"
-        "{plugin_name}_device_{device_unique_id}_settings.json: array of objects with name and\n"
-        "value strings. Settings are passed to the DeviceAgent from the file only if this value\n"
-        "is not empty and the file is present in the filesystem. Otherwise the settings from the\n"
-        "database are used.");
-
     NX_INI_STRING("", analyticsManifestSubstitutePath,
         "Path (absolute or relative to .ini dir) to dir with manifests that will be used instead\n"
         "of real manifests from Plugins, Engines and DeviceAgents. The filename pattern is the\n"
@@ -49,6 +36,19 @@ struct PluginsIniConfig: public nx::kit::IniConfig
     NX_INI_STRING("", analyticsManifestOutputPath,
         "Path (absolute or relative to .ini dir) to existing dir for saving analytics plugin\n"
         "manifests.");
+
+    NX_INI_STRING("", analyticsSettingsSubstitutePath,
+        "Path (absolute or relative to .ini dir) to dir with settings for Engines and\n"
+        "DeviceAgents, that will be used instead of the values of settings from the Server\n"
+        "database, in case the properly named file is present in this directory. Such files\n"
+        "should be JSON with an array of objects with setting name and value strings.\n"
+        "File name format for Engine (all Engines of the plugin match):\n"
+        "    {plugin_name}_engine_settings.json\n"
+        "File name format for Engine (only the specified Engine matches):\n"
+        "    {plugin_name}_engine_{engine_id}_settings.json\n"
+        "File name format for DeviceAgent:\n"
+        "    {plugin_name}_device_{device_id}_settings.json\n"
+        "Here {plugin_name} is the library name without extension and \"lib\" prefix.");
 
     NX_INI_STRING("", analyticsSettingsOutputPath,
         "Path (absolute or relative to .ini dir) to existing dir for saving settings that the\n"

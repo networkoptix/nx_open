@@ -114,8 +114,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(
             continue;
 
         bool hasStorage = std::any_of(
-            storagePaths.cbegin(),
-            storagePaths.cend(),
+            storagePaths.cbegin(), storagePaths.cend(),
             [&partition](const QString &storagePath)
             {
                 return closeDirPath(storagePath).startsWith(partition.path);

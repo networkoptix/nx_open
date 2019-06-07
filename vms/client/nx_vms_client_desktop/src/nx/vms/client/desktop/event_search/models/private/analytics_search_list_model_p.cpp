@@ -423,9 +423,8 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     if (!m_selectedObjectType.isEmpty())
         request.objectTypeId = {m_selectedObjectType};
 
-    request.boundingBox = q->cameraSet()->type() == ManagedCameraSet::Type::single
-        ? m_filterRect
-        : QRectF();
+    if (q->cameraSet()->type() == ManagedCameraSet::Type::single && m_filterRect.isValid())
+        request.boundingBox = m_filterRect;
 
     request.sortOrder = currentRequest().direction == FetchDirection::earlier
         ? Qt::DescendingOrder

@@ -40,6 +40,7 @@
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/vms/server/resource/multicast_parameters.h>
+#include <nx/vms/server/analytics/predefined_attributes.h>
 
 namespace nx {
 namespace vms::server {
@@ -817,9 +818,15 @@ bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
     if (parameters.getAnalyticsEventTypeId() != kHanwhaInputPortEventTypeId)
         return false;
 
+    const auto portIdAttribute = analyticsEvent->attribute(
+        QString::fromStdString(nx::vms::server::analytics::kInputPortIdAttribute));
+
+    if (!portIdAttribute)
+        return false;
+
     emit inputPortStateChanged(
         toSharedPointer(this),
-        analyticsEvent->auxiliaryData(),
+        *portIdAttribute,
         analyticsEvent->getToggleState() == nx::vms::api::EventState::active,
         parameters.eventTimestampUsec);
 

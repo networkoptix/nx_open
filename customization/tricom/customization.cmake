@@ -8,12 +8,6 @@ set(company.name "Tricom Research, Inc.")
 set(uri.protocol "mvss-vms")
 set(cloudName "Tricom Cloud")
 
-#set(namespace.major "com")
-#set(namespace.minor "tricom")
-#set(namespace.additional "tricom")
-#set(new.namespace.additional "tricommobile")
-#set(display.namespace.additional "tricom")
-
 set(product.appName "tricom")
 
 # Default settings
@@ -32,16 +26,11 @@ set(android.alias "tricom")
 set(android.storepass "tricom")
 set(android.keypass "tricom")
 
-# Custom Installer (if needed). If not leave "default"
-
 set(customization.upgradeCode "{f942a106-912d-4917-b5ff-78b0aaab37ee}")
 set(customization.clientUpgradeCode "{c4fb92b6-c621-4fed-9142-1500e31f71ed}")
 set(customization.clientBundleUpgradeCode "{dde84a45-76fa-4cfa-8997-ed4765a8e7b4}")
 set(customization.serverBundleUpgradeCode "{85bb4604-128d-45fa-a7f3-5b64f7633055}")
 set(customization.fullBundleUpgradeCode "{3f3ce050-de10-4a42-a071-9c1e278596ee}")
-
-#set(nxtool.company.name "Tricom")
-#set(nxtool.bundleUpgradeCode "{31441e34-e980-40fe-ae2f-ab3e6d6931dd}")
 
 set(deb.customization.company.name "mvss")
 

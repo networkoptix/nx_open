@@ -82,7 +82,6 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
                 eventMetadata->setDescription(hikvisionEvent.description.toStdString());
                 eventMetadata->setIsActive(hikvisionEvent.isActive);
                 eventMetadata->setConfidence(1.0);
-                //eventMetadata->setAuxiliaryData(hikvisionEvent.fullEventName.toStdString());
 
                 packet->setTimestampUs(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());

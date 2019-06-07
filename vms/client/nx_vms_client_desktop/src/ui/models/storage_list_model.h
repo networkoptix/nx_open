@@ -39,12 +39,6 @@ public:
         ColumnCount
     };
 
-    enum MetadataAction
-    {
-        KeepExistingMetadata,
-        DeleteExistingMetadata
-    };
-
     QnStorageListModel(QObject* parent = nullptr);
     virtual ~QnStorageListModel();
 
@@ -57,9 +51,7 @@ public:
     void setServer(const QnMediaServerResourcePtr& server);
 
     QnUuid metadataStorageId() const;
-    void setMetadataStorageId(const QnUuid &id, MetadataAction action = KeepExistingMetadata);
-
-    bool keepMetadata() const;
+    void setMetadataStorageId(const QnUuid &id);
 
     QnStorageModelInfo storage(const QModelIndex& index) const;
     QnStorageModelInfoList storages() const;
@@ -71,6 +63,9 @@ public:
 
     /** Check if storage can be removed from the system. */
     bool canRemoveStorage(const QnStorageModelInfo& data) const;
+
+    // Check if storage can be used to store analytics metadata.
+    bool canStoreAnalytics(const QnStorageModelInfo& data) const;
 
     /**
      *  Check if storage is active on the server.

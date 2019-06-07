@@ -71,7 +71,6 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.layoutRef, "--layout-name");
 
     /* Development options */
-    addParserParam(commandLineParser, &result.dynamicCustomizationPath,"--customization");
     addParserParam(commandLineParser, &result.softwareYuv,          "--soft-yuv");
     addParserParam(commandLineParser, &result.forceLocalSettings,   "--local-settings");
     addParserParam(commandLineParser, &result.fullScreenDisabled,   "--no-fullscreen");

@@ -84,7 +84,7 @@ struct DebugInfoInstrument::Private
                 threadCount = entry.cntThreads;
         #endif
         #if defined(Q_OS_MACOS) || defined (Q_OS_LINUX)
-            const auto command = QString("ps -M -p %1 | wc -l").arg(getpid());
+            const auto command = QString("ps M -p %1 | wc -l").arg(getpid());
             QString output;
             if (auto pipe = popen(command.toStdString().c_str(), "r"))
             {

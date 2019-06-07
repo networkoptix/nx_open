@@ -22,36 +22,51 @@ namespace nx::vms::server::analytics::debug_helpers {
 
 namespace {
 
-static nx::utils::log::Tag kLogTag(QString("AnalyticsDebugHelpers"));
 static const QString kSettingsFilenamePostfix("_settings.json");
 
-// Examples of filenames used to save manifests to:
+// Examples of filenames used to save/load manifests:
 // DeviceAgent: stub_analytics_plugin_device_a25c01be-f7dc-4600-8b8e-915bf4c0a688_manifest.json
 // Engine: stub_analytics_plugin_engine_manifest.json
 // Plugin: stub_analytics_plugin_manifest.json
 //
-// Examples of filenames used to load settings from:
+// Examples of filenames used to save/load settings:
 // DeviceAgent: stub_analytics_plugin_device_a25c01be-f7dc-4600-8b8e-915bf4c0a688_settings.json
 // Engine: stub_analytics_plugin_engine_settings.json
 
-QString pluginLibName(const nx::sdk::analytics::IPlugin* plugin)
+static QString pluginLibName(
+    const nx::sdk::analytics::IPlugin* plugin)
 {
     if (!NX_ASSERT(plugin))
         return QString();
 
-    return plugin->name();
+    const char* const pluginName = plugin->name();
+    if (!pluginName)
+        NX_ERROR(NX_SCOPE_TAG, "Plugin name is null Plugin instance %1", plugin);
+    if (pluginName[0] == '\0')
+        NX_ERROR(NX_SCOPE_TAG, "Plugin name is empty for Plugin instance %1", plugin);
+    return pluginName;
 }
 
-QString pluginLibName(const nx::vms::server::resource::AnalyticsPluginResourcePtr& pluginResource)
+static QString pluginLibName(
+    const nx::vms::server::resource::AnalyticsPluginResourcePtr& pluginResource)
 {
-    if (const auto plugin = pluginResource->sdkPlugin())
-        return plugin->name();
+    if (!NX_ASSERT(pluginResource))
+        return QString();
 
-    NX_ASSERT(false, "Unable to access the plugin SDK object");
-    return QString();
+    const auto plugin = pluginResource->sdkPlugin();
+    if (!NX_ASSERT(plugin, "Unable to access SDK's Plugin for Plugin Resource %1", pluginResource))
+        return QString();
+
+    const char* const pluginName = plugin->name();
+    if (!pluginName)
+        NX_ERROR(NX_SCOPE_TAG, "Plugin name is null for Plugin Resource %1", pluginResource);
+    if (pluginName[0] == '\0')
+        NX_ERROR(NX_SCOPE_TAG, "Plugin name is empty for Plugin Resource %1", pluginResource);
+    return pluginName;
 }
 
-QString pluginLibName(const nx::vms::server::resource::AnalyticsEngineResourcePtr& engineResource)
+static QString pluginLibName(
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engineResource)
 {
     const auto pluginResource =
         engineResource->plugin().dynamicCast<nx::vms::server::resource::AnalyticsPluginResource>();
@@ -62,25 +77,25 @@ QString pluginLibName(const nx::vms::server::resource::AnalyticsEngineResourcePt
     return pluginLibName(pluginResource);
 }
 
-QString filename(
-    const QnVirtualCameraResourcePtr& device,
+static QString nameOfFileToDumpOrLoadDataForDevice(
+    const QnVirtualCameraResourcePtr& deviceResource,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engineResource,
     const QString& postfix)
 {
     if (!NX_ASSERT(engineResource))
         return QString();
 
-    if (!NX_ASSERT(device))
+    if (!NX_ASSERT(deviceResource))
         return QString();
 
     const auto libName = pluginLibName(engineResource);
     if (!NX_ASSERT(!libName.isEmpty()))
         return QString();
 
-    return libName + "_device_" + device->getId().toSimpleString() + postfix;
+    return libName + "_device_" + deviceResource->getId().toSimpleString() + postfix;
 }
 
-QString filename(
+static QString nameOfFileToDumpOrLoadDataForEngine(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engineResource,
     const QString& postfix,
     bool useEngineId)
@@ -100,32 +115,19 @@ QString filename(
     return result;
 }
 
-QString buildFilename(const QString& libName, const QString& postfix)
-{
-    if (!NX_ASSERT(!libName.isEmpty()))
-        return QString();
-
-    if (!NX_ASSERT(!postfix.isEmpty()))
-        return QString();
-
-    return libName + postfix;
-}
-
-nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFileInternal(
-    const QString& settingsFilename)
+/** @param settingsFilename If empty, the call does nothing - an assertion has already failed. */
+static nx::sdk::Ptr<nx::sdk::IStringMap> doLoadEngineSettingsFromFile(
+    const char* fileDir, const QString& settingsFilename)
 {
     if (settingsFilename.isEmpty())
         return nullptr;
 
-    if (!NX_ASSERT(pluginsIni().analyticsEngineSettingsPath[0]))
+    if (!NX_ASSERT(fileDir) || !NX_ASSERT(fileDir[0]))
         return nullptr;
 
-    const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(
-        pluginsIni().analyticsEngineSettingsPath));
+    const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(fileDir));
 
-    return loadSettingsFromFile(
-        "Engine settings",
-        dir.absoluteFilePath(settingsFilename));
+    return loadSettingsFromFile("Engine settings", dir.absoluteFilePath(settingsFilename));
 }
 
 } // namespace
@@ -135,11 +137,11 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
     const QString& filename)
 {
     using nx::utils::log::Level;
-    auto log = //< Can be used to return empty settings: return log(...)
+    const auto log = //< Can be used to return empty settings: return log(...)
         [&](Level level, const QString& message)
         {
-            NX_UTILS_LOG(level, kLogTag) << lm("Metadata %1 settings: %2: [%3]")
-                .args(fileDescription, message, filename);
+            NX_UTILS_LOG(level, NX_SCOPE_TAG, "Analytics %1 settings: %2: [%3]",
+                fileDescription, message, filename);
             return nullptr;
         };
 
@@ -147,59 +149,53 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
     if (settingsJson.isEmpty())
         return log(Level::error, "Unable to read from file");
 
-    auto settings = sdk_support::toIStringMap(settingsJson);
+    const auto settings = sdk_support::toIStringMap(settingsJson);
     if (!settings)
         return log(Level::error, "Invalid JSON in file");
 
+    log(Level::warning, "Loaded from file");
     return settings;
 }
 
 nx::sdk::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
     const QnVirtualCameraResourcePtr& device,
-    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
+    const char* fileDir)
 {
-    const auto settingsFilename = filename(device, engine, kSettingsFilenamePostfix);
+    const auto settingsFilename = nameOfFileToDumpOrLoadDataForDevice(
+        device, engine, kSettingsFilenamePostfix);
     if (settingsFilename.isEmpty())
         return nullptr;
 
-    if (!NX_ASSERT(pluginsIni().analyticsDeviceAgentSettingsPath[0]))
+    if (!NX_ASSERT(fileDir) || !NX_ASSERT(fileDir))
         return nullptr;
 
-    const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(
-        pluginsIni().analyticsDeviceAgentSettingsPath));
+    const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(fileDir));
 
-    return loadSettingsFromFile(
-        "DeviceAgent settings",
-        dir.absoluteFilePath(settingsFilename));
+    return loadSettingsFromFile("DeviceAgent settings", dir.absoluteFilePath(settingsFilename));
 }
 
 nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
-    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine, const char* fileDir)
 {
-    nx::sdk::Ptr<nx::sdk::IStringMap> settings;
-    QString settingsFilename = filename(engine, kSettingsFilenamePostfix, /*useEngineId*/ true);
+    const QString specificFileName = nameOfFileToDumpOrLoadDataForEngine(
+        engine, kSettingsFilenamePostfix, /*useEngineId*/ true);
 
-    NX_DEBUG(
-        NX_SCOPE_TAG,
-        "Trying to load Engine settings from an engine-specific (%1) file for the Engine %2",
-        settingsFilename,
-        engine);
+    NX_WARNING(NX_SCOPE_TAG, "Trying to load Engine %1 settings from the Engine-specific file %2",
+        engine, specificFileName);
 
-    settings = loadEngineSettingsFromFileInternal(settingsFilename);
-    if (!settings)
-    {
-        settingsFilename = filename(engine, kSettingsFilenamePostfix, /*useEngineId*/ false);
+    const nx::sdk::Ptr<nx::sdk::IStringMap> settings =
+        doLoadEngineSettingsFromFile(fileDir, specificFileName);
+    if (settings)
+        return settings;
 
-        NX_DEBUG(
-            NX_SCOPE_TAG,
-            "Trying to load Engine settings from a generic file (%1) for the Engine %2",
-            settingsFilename,
-            engine);
+    const QString genericFileName = nameOfFileToDumpOrLoadDataForEngine(
+        engine, kSettingsFilenamePostfix, /*useEngineId*/ false);
 
-        settings = loadEngineSettingsFromFileInternal(settingsFilename);
-    }
+    NX_WARNING(NX_SCOPE_TAG, "Trying to load Engine %1 settings from the generic file %2",
+        engine, genericFileName);
 
-    return settings;
+    return doLoadEngineSettingsFromFile(fileDir, genericFileName);
 }
 
 QString nameOfFileToDumpOrLoadData(
@@ -208,23 +204,29 @@ QString nameOfFileToDumpOrLoadData(
     const nx::vms::server::resource::AnalyticsPluginResourcePtr& plugin,
     const QString& postfix)
 {
-    if (device && engine) //< filename to dump something related to a DeviceAgent
-        return filename(device, engine, postfix);
-    else if (engine) //< filename to dump something related to an Engine
-        return filename(engine, postfix, /*useEngineId*/ true);
-    else if (plugin) //< filename to dump something related to a Plugin
-        return buildFilename(pluginLibName(plugin), postfix);
+    NX_ASSERT(!postfix.isEmpty());
+
+    if (device && engine) //< Filename for something related to a DeviceAgent.
+        return nameOfFileToDumpOrLoadDataForDevice(device, engine, postfix);
+    else if (engine) //< Filename for something related to an Engine.
+        return nameOfFileToDumpOrLoadDataForEngine(engine, postfix, /*useEngineId*/ true);
+    else if (plugin) //< Filename for something related to a Plugin.
+        return pluginLibName(plugin) + postfix;
 
     NX_ASSERT(false, "Incorrect parameters");
     return QString();
 }
 
-QString nameOfFileToDumpOrLoadData(const nx::sdk::analytics::IPlugin* plugin, const QString& postfix)
+QString nameOfFileToDumpOrLoadData(
+    const nx::sdk::analytics::IPlugin* plugin,
+    const QString& postfix)
 {
+    NX_ASSERT(!postfix.isEmpty());
+
     if (!NX_ASSERT(plugin))
         return QString();
 
-    return buildFilename(pluginLibName(plugin), postfix);
+    return pluginLibName(plugin) + postfix;
 }
 
 void dumpStringToFile(

@@ -8966,7 +8966,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>Не вдалося завантажити пакети оновлення для деяких компонентів</translation>
     </message>
   </context>
   <context>
@@ -10109,17 +10109,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <translation>Підтвердьте місце зберігання, щоб зберігати дані аналітики на &apos;%1&apos;</translation>
     </message>
     <message>
       <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
 Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
 By default analytics data will be stored in mediaserver&apos;s installation directory.
 You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <translation>База даних Analytics повинна зберігатися на локальному сховищі і може займати до ста гігабайт. Після вибору розташування для зберігання аналітичних даних його не можна змінити не втративши вихідні дані. Ми рекомендуємо ретельно вибирати місце розташування та не використовувати системний розділ, щоб уникнути серйозних несправностей системи. За замовчуванням лані аналітики зберігатимуться у каталозі установки &apos;
+Ви можете змінити місце зберігання на вкладці &quot;Управління зберіганнями&quot; у діалоговому вікні Параметри сервера.</translation>
     </message>
   </context>
   <context>

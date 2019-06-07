@@ -7,6 +7,8 @@
 #include <QtCore/QRegExp>
 #include <QtGui/QColor>
 
+#include <ui/style/skin.h>
+
 #include <nx/utils/log/log.h>
 
 static uint qHash(const QColor& color)
@@ -16,8 +18,8 @@ static uint qHash(const QColor& color)
 
 namespace nx::vms::client::desktop {
 
-static const auto kBaseSkinFileName = ":/skin/customization_common.json";
-static const auto kCustomSkinFileName = ":/skin/skin.json";
+static const auto kBaseSkinFileName = "customization_common.json";
+static const auto kCustomSkinFileName = "skin.json";
 
 struct ColorTheme::Private
 {
@@ -49,7 +51,7 @@ void ColorTheme::Private::loadColors()
 
 void ColorTheme::Private::loadColorsFromFile(const QString& filename)
 {
-    QFile file(filename);
+    QFile file(qnSkin->path(filename));
     const bool opened = file.open(QFile::ReadOnly);
     if (!NX_ASSERT(opened, "Cannot read skin file %1", filename))
         return;

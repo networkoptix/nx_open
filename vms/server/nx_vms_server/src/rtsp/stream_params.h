@@ -15,12 +15,14 @@ public:
     int64_t endPosition() { return m_endPosition; }
     MediaQuality quality() { return m_quality; }
     AVCodecID videoCodec() { return m_codec; }
+    bool onvifReplay() { return m_onvifReplay; }
 
 private:
     bool parseCodec(const network::http::HttpHeaders& headers, const UrlParams& urlParams);
     bool parsePosition(const network::http::HttpHeaders& headers, const UrlParams& urlParams);
     bool parseQuality(const network::http::HttpHeaders& headers, const UrlParams& urlParams);
     bool parseResolution(const network::http::HttpHeaders& headers, const UrlParams& urlParams);
+    bool parseOnvifReplay(const network::http::HttpHeaders& headers, const UrlParams& urlParams);
 
 private:
     int64_t m_position = DATETIME_NOW;
@@ -28,6 +30,7 @@ private:
     MediaQuality m_quality = MEDIA_Quality_High;
     AVCodecID m_codec = AV_CODEC_ID_NONE;
     QSize m_resolution;
+    bool m_onvifReplay = false;
 
 private:
     UrlParams m_urlParams;

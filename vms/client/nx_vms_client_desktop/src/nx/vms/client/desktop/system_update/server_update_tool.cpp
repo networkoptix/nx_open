@@ -374,20 +374,21 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
     // TODO: Stop previous manual downloads
     m_manualPackages = contents.manualPackages;
 
-    for (const auto& package: contents.manualPackages)
+    for (auto& package: m_manualPackages)
     {
         FileInformation info;
         info.md5 = QByteArray::fromHex(package.md5.toLatin1());
         info.size = package.size;
         info.name = package.file;
         info.url = package.url;
+
         NX_ASSERT(info.isValid());
         auto code = m_downloader->addFile(info);
         m_downloader->startDownloads();
         using Code = vms::common::p2p::downloader::ResultCode;
         QString file =  m_downloader->filePath(package.file);
-
         m_issuedDownloads.insert(package.file);
+        package.localFile = file;
 
         switch (code)
         {
@@ -428,21 +429,24 @@ QSet<QnUuid> ServerUpdateTool::getTargetsForPackage(const nx::update::Package& p
     return package.targets;
 }
 
-bool ServerUpdateTool::uploadPackage(
+int ServerUpdateTool::uploadPackage(
     const nx::update::Package& package,
     const QDir& storageDir)
 {
     NX_ASSERT(package.isValid());
 
     QString localFile = package.localFile;
+    NX_ASSERT(!localFile.isEmpty());
 
-    auto targets = package.targets;
+    auto targets = getTargetsForPackage(package);
 
     if (targets.empty())
     {
         NX_WARNING(this, "uploadPackage(%1) - no server wants this package", localFile);
-        return false;
+        return 0;
     }
+
+    int toUpload = 0;
 
     NX_INFO(this, "uploadPackage(%1) - going to upload package to servers", localFile);
 
@@ -473,6 +477,7 @@ bool ServerUpdateTool::uploadPackage(
         {
             m_uploadStateById[id] = config;
             m_activeUploads.insert(id);
+            toUpload++;
         }
         else
         {
@@ -482,7 +487,7 @@ bool ServerUpdateTool::uploadPackage(
         }
     }
 
-    return true;
+    return toUpload;
 }
 
 void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& state)
@@ -550,6 +555,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
     m_completedUploads.clear();
     m_uploadStateById.clear();
 
+    int toUpload = 0;
     if (contents.filesToUpload.isEmpty())
     {
         NX_WARNING(this, "startUpload(%1) - nothing to upload", contents.info.version);
@@ -559,11 +565,12 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
         for (const auto& package: contents.info.packages)
         {
             if (package.isServer())
-                uploadPackage(package, contents.storageDir);
+                toUpload += uploadPackage(package, contents.storageDir);
         }
-        //for (const auto& server: recipients)
-        //    startUpload(server, contents.filesToUpload, contents.storageDir);
     }
+
+    if (toUpload > 0)
+        NX_VERBOSE(this, "startUpload(%1) - started %2 uploads", contents.info.version, toUpload);
 
     if (m_activeUploads.empty() && !m_completedUploads.empty())
         changeUploadState(OfflineUpdateState::done);
@@ -716,6 +723,32 @@ bool ServerUpdateTool::requestStopAction()
     m_activeDownloads.clear();
     m_stateTracker->clearState();
     return true;
+}
+
+bool ServerUpdateTool::requestRetryAction()
+{
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
+    {
+        NX_INFO(this, "requestRetryAction() - sending request");
+        auto handle = connection->retryUpdate(nx::utils::guarded(this,
+            [this, tool = QPointer<ServerUpdateTool>(this)](
+                bool success,
+                rest::Handle handle,
+                rest::UpdateStatusAllData response)
+            {
+                if (response.error != QnRestResult::NoError)
+                {
+                    NX_VERBOSE(this,
+                        "requestRetryAction: An error in response to the /ec2/retryUpdate request: code=%1, err=%2",
+                        response.error, response.errorString);
+                }
+
+                if (tool)
+                    tool->atUpdateStatusResponse(success, handle, response.data);
+            }), thread());
+        return handle != 0;
+    }
+    return false;
 }
 
 bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)

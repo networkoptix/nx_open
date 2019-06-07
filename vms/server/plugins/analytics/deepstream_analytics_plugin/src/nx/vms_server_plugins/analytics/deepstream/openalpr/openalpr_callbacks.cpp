@@ -128,7 +128,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             << "width: " << rectangle.width << ", "
             << "height: " << rectangle.height;
 
-        std::deque<nx::sdk::Ptr<nx::sdk::analytics::Attribute>> attributes;
+        std::deque<nx::sdk::Ptr<nx::sdk::Attribute>> attributes;
 
         auto encodedAttributes = split(displayText, '%');
         if (encodedAttributes.empty())
@@ -144,7 +144,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 case 0:
                 {
                     attributes.emplace_back(
-                        nx::sdk::makePtr<nx::sdk::analytics::Attribute>(
+                        nx::sdk::makePtr<nx::sdk::Attribute>(
                             nx::sdk::IAttribute::Type::string,
                             "Number",
                             encodedAttributes[i]));
@@ -153,7 +153,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 case 1:
                 {
                     attributes.emplace_back(
-                        nx::sdk::makePtr<nx::sdk::analytics::Attribute>(
+                        nx::sdk::makePtr<nx::sdk::Attribute>(
                             nx::sdk::IAttribute::Type::string,
                             "Country",
                             encodedAttributes[i]));
@@ -162,7 +162,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 case 2:
                 {
                     attributes.emplace_back(
-                        nx::sdk::makePtr<nx::sdk::analytics::Attribute>(
+                        nx::sdk::makePtr<nx::sdk::Attribute>(
                             nx::sdk::IAttribute::Type::string,
                             "Region",
                             encodedAttributes[i]));
@@ -185,14 +185,14 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
         if (ini().showGuids)
         {
             attributes.emplace_front(
-                nx::sdk::makePtr<nx::sdk::analytics::Attribute>(
+                nx::sdk::makePtr<nx::sdk::Attribute>(
                     nx::sdk::IAttribute::Type::string,
                     "GUID",
                     nx::sdk::UuidHelper::toStdString(info.uuid)));
         }
 
         detectedObject->addAttributes(
-            std::vector<nx::sdk::Ptr<nx::sdk::analytics::Attribute>>(
+            std::vector<nx::sdk::Ptr<nx::sdk::Attribute>>(
                 attributes.begin(),
                 attributes.end()));
 

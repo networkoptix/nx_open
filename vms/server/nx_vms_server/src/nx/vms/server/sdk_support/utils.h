@@ -230,4 +230,7 @@ nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> createUncompressedVide
     const CLVideoDecoderOutputPtr& frame,
     nx::vms::api::analytics::PixelFormat pixelFormat);
 
+std::map<QString, QString> attributesMap(
+    const nx::sdk::Ptr<const nx::sdk::analytics::IMetadata>& metadata);
+
 } // namespace nx::vms::server::sdk_support

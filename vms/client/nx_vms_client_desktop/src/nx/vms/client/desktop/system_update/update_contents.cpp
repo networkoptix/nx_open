@@ -153,7 +153,7 @@ QString UpdateStrings::getReportForUnsupportedServer(const nx::vms::api::SystemI
 }
 
 bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateContents& contents,
-    std::map<QnUuid, QnMediaServerResourcePtr> activeServers,
+    const std::map<QnUuid, QnMediaServerResourcePtr>& activeServers,
     const ClientVerificationData& clientData)
 {
     nx::update::Information& info = contents.info;
@@ -180,7 +180,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     if (contents.sourceType == nx::update::UpdateSourceType::file && !contents.packagesGenerated)
     {
         contents.filesToUpload.clear();
-        QString uploadDestination = QString("updates/%1/").arg(contents.info.version);
+        QString uploadDestination = QString("updates/%1/").arg(targetVersion.build());
         QList<nx::update::Package> checked;
         for (auto& pkg: contents.info.packages)
         {
@@ -224,7 +224,6 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
      * Maps system information to a set of packages. We use this cache to find and check
      * if a specific OS variant is supported.
      */
-
     using PackageCache = std::map<nx::vms::api::SystemInformation, QList<nx::update::Package*>,
         nx::update::SystemInformationComparator>;
     PackageCache serverPackageCache;
@@ -352,7 +351,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
             alreadyInstalled = false;
         }
 
-        if (package && serverVersion <= targetVersion)
+        if (package && serverVersion < targetVersion)
         {
             package->targets.insert(server->getId());
             contents.serversWithUpdate.insert(server->getId());

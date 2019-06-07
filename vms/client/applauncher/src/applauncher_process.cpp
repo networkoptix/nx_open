@@ -328,12 +328,22 @@ bool ApplauncherProcess::installZipAsync(
     {
         // It is ok if we are already installing the same file and version.
         if (m_process.equals(request->version, request->zipFileName))
+        {
+            NX_INFO(this, "Already installing version %1 from file %2",
+                request->version, request->zipFileName);
             response->result = ResultType::ok;
+        }
         else
+        {
+            NX_ERROR(this, "Installer is busy with another task",
+                request->version, request->zipFileName);
             response->result = ResultType::busy;
+        }
     }
     else
     {
+        NX_VERBOSE(this, "Starting async installation for version %1 from file %2",
+            request->version, request->zipFileName);
         m_process.result = std::async(std::launch::async,
             [this, request]() -> ResultType
             {
@@ -347,6 +357,8 @@ bool ApplauncherProcess::installZipAsync(
                 return result;
             });
         response->result = ResultType::ok;
+        NX_INFO(this, "Started async installation for version %1 from file %2",
+            request->version, request->zipFileName);
     }
 
     return response->result == ResultType::ok;
@@ -359,13 +371,25 @@ bool ApplauncherProcess::checkInstallationProgress(
     if (!m_process.isEmpty())
     {
         if (m_process.result.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready)
+        {
             response->result = m_process.result.get();
+            NX_DEBUG(this,
+                "checkInstallationProgress() - completed installation right now, result=%1",
+                response->result);
+        }
         else
+        {
+            QString fileName = m_process.getFile();
             response->result = ResultType::unpackingZip;
+            NX_DEBUG(this,
+                "checkInstallationProgress() - still installaing %1", fileName);
+        }
     }
     else
     {
         response->result = ResultType::ok;
+        NX_DEBUG(this,
+            "checkInstallationProgress() - there is no active installation");
     }
 
     return response->result == ResultType::ok;
@@ -428,6 +452,12 @@ void ApplauncherProcess::onTimer(const quint64& timerID)
     // Stopping process if needed.
     const auto code = nx::killProcessByPid(task.processID);
     static_cast<void>(code);
+}
+
+QString ApplauncherProcess::InstallationProcess::getFile() const
+{
+    std::scoped_lock<std::mutex> lock(mutex);
+    return fileName;
 }
 
 void ApplauncherProcess::InstallationProcess::reset()

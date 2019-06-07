@@ -4,6 +4,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QResource>
 
 #include <QtWidgets/QApplication>
 #include <QtWebKit/QWebSettings>
@@ -139,12 +140,24 @@
 
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/vms/utils/external_resources.h>
+
 using namespace nx;
 using namespace nx::vms::client::desktop;
 
 static const QString kQmlRoot = QStringLiteral("qrc:///qml");
 
 namespace {
+
+void initExternalResources()
+{
+    using namespace nx::vms::utils;
+
+    nx::vms::client::core::FontLoader::loadFonts(
+        externalResourcesDirectory().absoluteFilePath("fonts"));
+
+    registerExternalResource("nx_vms_client_desktop.dat");
+}
 
 typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
 
@@ -218,9 +231,22 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
 {
     ini().reload();
 
+#if defined(Q_OS_WIN)
+    // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
+    if (ini().profilerMode)
+        win32_exception::setCreateFullCrashDump(true);
+#endif
+
     initThread();
     initMetaInfo();
     initApplication();
+
+    // Skip some modules initialization for unit tests.
+    const bool isFullApplicationMode = (qApp != nullptr);
+
+    if (isFullApplicationMode)
+        initExternalResources();
+
     initSingletons();
 
     /* Do not initialize anything else because we must exit immediately if run in self-update mode. */
@@ -228,7 +254,11 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
         return;
 
     initNetwork();
-    initSkin();
+
+    // Initialize application UI.
+    if (isFullApplicationMode)
+        initSkin();
+
     initLocalResources();
     initSurfaceFormat();
 
@@ -354,9 +384,10 @@ void QnClientModule::initSingletons()
     // Persistent settings are standalone.
     auto clientSettings = std::make_unique<QnClientSettings>(m_startupParameters);
 
-#ifdef Q_OS_WIN
-    // As soon as settings are ready, setup full crash dumps if needed.
-    win32_exception::setCreateFullCrashDump(clientSettings->createFullCrashDump());
+#if defined(Q_OS_WIN)
+    // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
+    if (clientSettings->createFullCrashDump())
+        win32_exception::setCreateFullCrashDump(true);
 #endif
 
     // Runtime settings are standalone, but some actual values are taken from persistent settings.
@@ -618,21 +649,10 @@ void QnClientModule::initNetwork()
     commonModule->instance<QnServerInterfaceWatcher>();
 }
 
-//#define ENABLE_DYNAMIC_CUSTOMIZATION
 void QnClientModule::initSkin()
 {
     QStringList paths;
     paths << ":/skin";
-    paths << ":/skin_dark";
-
-#ifdef ENABLE_DYNAMIC_CUSTOMIZATION
-    if (!m_startupParameters.dynamicCustomizationPath.isEmpty())
-    {
-        QDir base(startupParams.dynamicCustomizationPath);
-        paths << base.absoluteFilePath("skin");
-        paths << base.absoluteFilePath("skin_dark");
-    }
-#endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
     QScopedPointer<QnSkin> skin(new QnSkin(paths));
 
@@ -643,16 +663,8 @@ void QnClientModule::initSkin()
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(customization));
     customizer->customize(qnGlobals);
 
-    /* Initialize application UI. Skip if run in console (e.g. unit-tests). */
-    if (qApp)
-    {
-        nx::vms::client::core::FontLoader::loadFonts(
-            QDir(QApplication::applicationDirPath()).absoluteFilePath(
-                nx::utils::AppInfo::isMacOsX() ? "../Resources/fonts" : "fonts"));
-
-        QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
-        QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
-    }
+    QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
+    QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
 
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->store(skin.take());

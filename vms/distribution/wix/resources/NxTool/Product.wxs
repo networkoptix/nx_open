@@ -51,10 +51,6 @@
             <![CDATA[ NXTOOL_DIRECTORY_REG = "" ]]>
         </SetProperty>
 
-        <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
-        <WixVariable Id="WixUIBannerBmp" Value="$(var.CustomizationDir)/wixsetup/nxtool/logo_493x58.bmp" />
-        <WixVariable Id="WixUIDialogBmp" Value="$(var.CustomizationDir)/wixsetup/nxtool/logo_493x312.bmp" />
-
         <!-- Logo -->
         <Icon Id="icon_menu.exe" SourceFile="$(var.CustomizationDir)/icons/windows/nxtool.ico"/>
         <Icon Id="icon_desktop.exe" SourceFile="$(var.CustomizationDir)/icons/windows/nxtool.ico"/>
@@ -155,18 +151,13 @@
             <Publish Dialog="MyExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
             <Publish Dialog="MyExitDialog" Control="Finish" Order="1" Event="DoAction" Value="LaunchNxtool">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>
 
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED AND NOT LICENSE_ALREADY_ACCEPTED</Publish>
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="NxtoolDlg">NOT PREVIOUSVERSIONSINSTALLED AND LICENSE_ALREADY_ACCEPTED</Publish>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="NxtoolDlg">NOT PREVIOUSVERSIONSINSTALLED</Publish>
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
 
             <Publish Dialog="UpgradeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
             <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
 
-            <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="NxtoolDlg">LicenseAccepted = "1"</Publish>
-
-            <Publish Dialog="NxtoolDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg" Order="2">NOT LICENSE_ALREADY_ACCEPTED</Publish>
-            <Publish Dialog="NxtoolDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">LICENSE_ALREADY_ACCEPTED</Publish>
+            <Publish Dialog="NxtoolDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">1</Publish>
             <Publish Dialog="NxtoolDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
 
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="NxtoolDlg">1</Publish>

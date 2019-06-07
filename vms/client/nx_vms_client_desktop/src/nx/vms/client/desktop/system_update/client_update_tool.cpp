@@ -440,7 +440,7 @@ void ClientUpdateTool::checkInternalState()
             case ResultType::ioError:
             {
                 QString error = applauncherErrorToString(result);
-                NX_ERROR(this) << "Failed to run installation:" << error;
+                NX_ERROR(this) << "Failed check installation:" << error;
                 setApplauncherError(error);
                 break;
             }
@@ -480,7 +480,7 @@ bool ClientUpdateTool::installUpdateAsync()
             if (result != ResultType::ok)
             {
                 const QString message = applauncherErrorToString(result);
-                NX_VERBOSE(NX_SCOPE_TAG, "Failed to run zip installation: %1", message);
+                NX_ERROR(NX_SCOPE_TAG, "Failed to start async zip installation: %1", message);
                 // Other variants can be fixed by retrying installation, do they?
                 return result;
             }
@@ -494,6 +494,8 @@ bool ClientUpdateTool::installUpdateAsync()
             {
                 const ResultType result = applauncher::api::checkInstallationProgress();
                 QString message = applauncherErrorToString(result);
+                NX_VERBOSE(NX_SCOPE_TAG,
+                    "checkInstallationProgress returned %1", message);
 
                 switch (result)
                 {
@@ -510,7 +512,7 @@ bool ClientUpdateTool::installUpdateAsync()
                     case ResultType::connectError:
                     case ResultType::ioError:
                     default:
-                        NX_VERBOSE(NX_SCOPE_TAG, "failed to check zip installation status: %1", message);
+                        NX_ERROR(NX_SCOPE_TAG, "failed to check zip installation status: %1", message);
                         break;
                 }
                 std::this_thread::sleep_for(std::chrono::seconds(2));

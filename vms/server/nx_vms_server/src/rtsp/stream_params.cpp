@@ -80,6 +80,20 @@ bool StreamParams::parseResolution(
     return true;
 }
 
+bool StreamParams::parseOnvifReplay(
+    const network::http::HttpHeaders& headers, const UrlParams& urlParams)
+{
+    m_onvifReplay = false;
+    QString require = network::http::getHeaderValue(headers, "Require");
+    if (require.toLower().contains("onvif-replay"))
+        m_onvifReplay = true;
+
+    if (urlParams.onvifReplay && urlParams.onvifReplay.value())
+        m_onvifReplay = true;
+
+    return true;
+}
+
 bool StreamParams::parseRequest(
     const network::http::Request& request, const QString& defaultVideoCodec)
 {
@@ -103,6 +117,8 @@ bool StreamParams::parseRequest(
         if (!parseQuality(request.headers, m_urlParams))
             return false;
         if (!parseResolution(request.headers, m_urlParams))
+            return false;
+        if (!parseOnvifReplay(request.headers, m_urlParams))
             return false;
 
         // Setup codec if resolution configured

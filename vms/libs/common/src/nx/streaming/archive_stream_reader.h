@@ -108,6 +108,8 @@ public:
 
     CameraDiagnostics::Result lastError() const;
 
+    virtual std::chrono::microseconds currentTime() const override;
+
 protected:
     virtual bool init();
 
@@ -118,7 +120,6 @@ protected:
     QnAbstractMediaDataPtr createEmptyPacket(bool isReverseMode);
     void beforeJumpInternal(qint64 mksec);
 
-    virtual qint64 currentTime() const override;
 protected:
     qint64 m_currentTime;
     qint64 m_topIFrameTime;

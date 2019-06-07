@@ -38,17 +38,6 @@ file(COPY "${CMAKE_SOURCE_DIR}/vms/libs/common/maven/bin-resources/resources/qt/
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
 
-message(STATUS "Generating license")
-execute_process(
-    COMMAND pandoc -s ${customization.dir}/license.html -o ${CMAKE_CURRENT_BINARY_DIR}/license.rtf
-    WORKING_DIRECTORY ${pandoc_directory}/bin
-    RESULT_VARIABLE pandoc_result
-)
-
-if(NOT pandoc_result STREQUAL "0")
-    message(FATAL_ERROR "error: License generation failed")
-endif()
-
 if (withMediaServer OR withDesktopClient)
     add_custom_target(distribution_wix ALL
         DEPENDS
@@ -109,8 +98,7 @@ if(withNxTool)
 endif()
 
 if(withDesktopClient)
-    set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/vms/client/nx_vms_client_desktop/static-resources/qml/")
-    set(desktop_client_executable "${bin_source_dir}/nx_vms_client_desktop.dll")
+    set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/vms/client/nx_vms_client_desktop/qml/")
 
     add_custom_target(collect_qml_dependencies
         DEPENDS

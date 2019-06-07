@@ -77,13 +77,13 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
     NX_DEBUG(this, "Sending settings to the Engine %1 (%2)", getName(), getId());
 
     nx::sdk::Ptr<nx::sdk::IStringMap> effectiveSettings;
-    if (pluginsIni().analyticsEngineSettingsPath[0] != '\0')
+    if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
     {
-        NX_WARNING(this, "Trying to load settings for the Engine from the file. Engine %1 (%2)",
-            getName(), getId());
+        NX_WARNING(this, "Trying to load settings for the Engine %1 (%2) from a file as per %3",
+            getName(), getId(), pluginsIni().iniFile());
 
-        effectiveSettings =
-            analytics::debug_helpers::loadEngineSettingsFromFile(toSharedPointer(this));
+        effectiveSettings = analytics::debug_helpers::loadEngineSettingsFromFile(
+            toSharedPointer(this), pluginsIni().analyticsSettingsSubstitutePath);
     }
 
     if (!effectiveSettings)

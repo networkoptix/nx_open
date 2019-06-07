@@ -92,6 +92,11 @@ public:
     bool requestStopAction();
 
     /**
+     * Asks mediaservers to retry current update action.
+     */
+    bool requestRetryAction();
+
+    /**
      * Asks mediaservers to finish update process.
      * @param skipActivePeers - will force update completion even if there are
      *     some servers installing.
@@ -218,8 +223,9 @@ public:
      * This field is set when we verify update contents.
      * @param package Package to be uploaded
      * @param sourceDir Directory that contains this package
+     * @returns number of recipients for this package.
      */
-    bool uploadPackage(const nx::update::Package& package, const QDir& sourceDir);
+    int uploadPackage(const nx::update::Package& package, const QDir& sourceDir);
 
     TimePoint::duration getInstallDuration() const;
 

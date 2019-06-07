@@ -32,9 +32,7 @@ int64_t AttributesDao::insertOrFetchAttributes(
     sql::QueryContext* queryContext,
     const std::vector<common::metadata::Attribute>& attributes)
 {
-    const auto content = kUseTrackAggregation
-        ? QnUbjson::serialized(attributes)
-        : QJson::serialized(attributes);
+    const auto content = QnUbjson::serialized(attributes);
 
     auto attributesId = findAttributesIdInCache(content);
     if (attributesId >= 0)
@@ -126,11 +124,8 @@ void AttributesDao::clear()
 std::vector<common::metadata::Attribute> AttributesDao::deserialize(
     const QString& attributesStr)
 {
-    return kUseTrackAggregation
-        ? QnUbjson::deserialized<std::vector<common::metadata::Attribute>>(
-            attributesStr.toUtf8())
-        : QJson::deserialized<std::vector<common::metadata::Attribute>>(
-            attributesStr.toUtf8());
+    return QnUbjson::deserialized<std::vector<common::metadata::Attribute>>(
+        attributesStr.toUtf8());
 }
 
 int64_t AttributesDao::insertAttributes(
