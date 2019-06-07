@@ -120,11 +120,13 @@ ResultType installZipAsync(
     return result;
 }
 
-ResultType checkInstallationProgress()
+ResultType checkInstallationProgress(InstallationProgress& progress)
 {
     InstallZipCheckStatus request;
-    Response response;
+    InstallZipCheckStatusResponse response;
     const auto result = sendCommandToApplauncher(request, &response);
+    progress.total = response.total;
+    progress.extracted = response.extracted;
     if (result != ResultType::ok)
         return result;
     if (response.result != ResultType::ok)

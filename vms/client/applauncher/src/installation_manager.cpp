@@ -11,7 +11,6 @@
 #include <nx/utils/file_system.h>
 
 #include <utils/common/app_info.h>
-#include <utils/update/zip_utils.h>
 
 #if defined(Q_OS_MACX)
 #include <nx/utils/platform/core_foundation_mac/cf_url.h>
@@ -119,49 +118,53 @@ void InstallationManager::updateInstalledVersionsInformation()
     }
 
     const auto fillInstallationFromDir =
-        [this, &installations](const QString& path, const QString& version)
-	    {
-	        const QnClientInstallationPtr installation =
-	            QnClientInstallation::installationForPath(path);
+        [&installations](const QString& path, const QString& version)
+        {
+            const QnClientInstallationPtr installation =
+                QnClientInstallation::installationForPath(path);
 
-	        if (installation.isNull())
-	            return;
+            if (installation.isNull())
+                return;
 
             installation->setVersion(nx::utils::SoftwareVersion(version));
-	        installations.insert(installation->version(), installation);
-
-            NX_DEBUG(this, "Compatibility version %1 found", version);
-	    };
+            installations.insert(installation->version(), installation);
+        };
 
     const auto fillInstallationsFromDir =
         [fillInstallationFromDir](const QDir& root)
-	    {
-	        const QStringList entries = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-	        for (const QString& entry: entries)
-	        {
-	            if (kVersionDirRegExp.exactMatch(entry))
-	            {
-	                const auto fullPath = root.absoluteFilePath(entry);
-	                fillInstallationFromDir(fullPath, entry);
-	            }
-	        }
-	    };
+        {
+            const QStringList entries = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+            for (const QString& entry: entries)
+            {
+                if (kVersionDirRegExp.exactMatch(entry))
+                {
+                    const auto fullPath = root.absoluteFilePath(entry);
+                    fillInstallationFromDir(fullPath, entry);
+                }
+            }
+        };
 
     // find other versions
     #if defined(Q_OS_MACX)
-    	static const auto kPathPostfix = QString();
+        static const auto kPathPostfix = QString();
     #else
-	    static const auto kPathPostfix = "/client/"; /*< Default client install location. */
+         static const auto kPathPostfix = "/client/"; /*< Default client install location. */
     #endif
     QString baseRoot = QnApplauncherAppInfo::installationRoot() + kPathPostfix;
     fillInstallationsFromDir(m_installationsDir);
 
-    #if defined(Q_OS_MACX)
-    	const auto version = extractVersion(baseRoot + QnApplauncherAppInfo::bundleName());
-	    fillInstallationFromDir(baseRoot, version);
-    #else
-    	fillInstallationsFromDir(baseRoot);
-    #endif
+#if defined(Q_OS_MACX)
+    const auto version = extractVersion(baseRoot + QnApplauncherAppInfo::bundleName());
+    fillInstallationFromDir(baseRoot, version);
+#else
+    fillInstallationsFromDir(baseRoot);
+#endif
+    // Making a pretty log
+    QStringList versions;
+    for (const auto& record: installations.keys())
+        versions << record.toString();
+    NX_DEBUG(this, "Compatibility versions: %1 found", versions);
+
     std::unique_lock<std::mutex> lk(m_mutex);
     m_installationByVersion = std::move(installations);
     lk.unlock();
@@ -389,7 +392,10 @@ api::ResultType InstallationManager::installZip(
     const nx::utils::SoftwareVersion& version,
     const QString& fileName)
 {
+    // NOTE: This function can be started from a separate thread. Be safe with threading.
     NX_DEBUG(this, "Installing update %1 from %2", version, fileName);
+
+    m_totalUnpackedSize = 0;
 
     QnClientInstallationPtr installation = installationForVersion(version, true);
     if (installation)
@@ -409,19 +415,26 @@ api::ResultType InstallationManager::installZip(
         return api::ResultType::ioError;
     }
 
-    QnZipExtractor extractor(fileName, targetDir);
+    auto extractor = QScopedPointer(new QnZipExtractor(fileName, targetDir));
 
-    if (!dummySpaceCheck(targetDir, (qint64) extractor.estimateUnpackedSize()))
+    if (!dummySpaceCheck(targetDir, (qint64) extractor->estimateUnpackedSize()))
     {
         NX_ERROR(this, "Not enough space to install %1.", fileName);
         return api::ResultType::notEnoughSpace;
     }
 
-    auto errorCode = extractor.extractZip();
+    m_totalUnpackedSize = extractor->estimateUnpackedSize();
+
+    {
+        std::scoped_lock<std::mutex> lk(m_mutex);
+        m_extractor.swap(extractor);
+    }
+
+    auto errorCode = m_extractor->extractZip();
     if (errorCode != QnZipExtractor::Ok)
     {
         NX_ERROR(this, "Cannot extract zip %1 to %2, errorCode = %3",
-            fileName, targetDir.absolutePath(), extractor.errorToString(errorCode));
+            fileName, targetDir.absolutePath(), m_extractor->errorToString(errorCode));
         return api::ResultType::ioError;
     }
 
@@ -436,9 +449,10 @@ api::ResultType InstallationManager::installZip(
     installation->setVersion(version);
     targetDir.remove("update.json");
 
-    std::unique_lock<std::mutex> lk(m_mutex);
-    m_installationByVersion.insert(installation->version(), installation);
-    lk.unlock();
+    {
+        std::scoped_lock<std::mutex> lk(m_mutex);
+        m_installationByVersion.insert(installation->version(), installation);
+    }
 
     createGhosts();
 
@@ -446,6 +460,17 @@ api::ResultType InstallationManager::installZip(
         version, targetDir.absolutePath());
 
     return api::ResultType::ok;
+}
+
+uint64_t InstallationManager::getBytesExtracted() const
+{
+    std::scoped_lock<std::mutex> lk(m_mutex);
+    return m_extractor ? m_extractor->bytesExtracted() : 0;
+}
+
+uint64_t InstallationManager::getBytesTotal() const
+{
+    return m_totalUnpackedSize;
 }
 
 bool InstallationManager::isValidVersionName(const QString& version)

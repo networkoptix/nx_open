@@ -37,7 +37,8 @@ public:
     Error error() const;
     QDir dir() const;
 
-    size_t estimateUnpackedSize() const;
+    uint64_t estimateUnpackedSize() const;
+    uint64_t bytesExtracted() const;
 
     Error extractZip();
     QStringList fileList();
@@ -51,6 +52,7 @@ protected:
 private:
     QDir m_dir;
     QScopedPointer<QuaZip> m_zip;
+    std::atomic_uint64_t m_extracted;
     Error m_lastError;
 };
 
