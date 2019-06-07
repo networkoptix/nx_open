@@ -203,9 +203,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
     m_connections << connect(ui->resourceTreeWidget->selectionModel(),
         &QItemSelectionModel::currentChanged,
-        [this](const QModelIndex& current, const QModelIndex& previous)
+        [this](const QModelIndex& current, const QModelIndex& /*previous*/)
         {
-            Q_UNUSED(previous);
             const auto treeView = ui->resourceTreeWidget->treeView();
             const auto itemRect = treeView->visualRect(current)
                 .translated(treeView->mapTo(ui->scrollArea->widget(), QPoint()));
