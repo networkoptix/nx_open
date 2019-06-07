@@ -217,6 +217,77 @@ Only one system connected to Cloud Account
     Disconnect from cloud
     Disconnect from cloud
 
+Merge with 3.0
+    Log In    ${EMAIL MERGE OWNER 3.0}    ${password}
+    Validate Log In
+    ${user}    Set Variable    ${EMAIL MERGE OWNER 3.0}
+    ${auth}=    Create List    ${user}    ${password}
+    Create system and attach to cloud    ${user}    ${image}    7001    API made system 1
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+    Elements Should Not Be Visible    ${MERGE BUTTON SYSTEM}
+    Go To    ${url}/systems
+    Validate Log In
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+    Wait Until Element Is Enabled    ${MERGE BUTTON SYSTEM}
+    Click Button    ${MERGE BUTTON SYSTEM}
+    Wait Until Elements Are Visible    ${MERGE FORM}    ${MERGE SYSTEM DROPDOWN}    ${MERGE OK BUTTON}    ${MERGE CANCEL BUTTON}    ${MERGE X BUTTON}
+    Wait Until Element Is Visible    ${MERGE SYSTEM DROPDOWN}//span[contains(text()," – incompatible")]
+    Click Button    ${MERGE CANCEL BUTTON}
+    Disconnect from cloud
+
+2 Systems with identical servers
+    ${user}    Set Variable    ${EMAIL MERGE OWNER 2}
+    ${auth}=    Create List    ${user}    ${password}
+    Create system and attach to cloud    ${user}    ${image}    7001    API made system 1
+    Create system and attach to cloud    ${user}    ${image}    7003    API made system 2
+    log in    ${user}    ${password}
+    Validate Log in
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+    Go To    ${url}/systems
+    Validate Log In
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
+    Verify In System    API made system 2
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+
+    Merge    API made system 1    API made system 1    API made system 1
+    Validate Merge
+    sleep    30
+
+    stop containers    allContainers=False
+
+    Create system and attach to cloud    ${user}    ${image}    7003    API made system 2
+    Go To    ${url}/systems
+    Wait Until Element Is Visible    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
+    Verify In System    API made system 2
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+    Go To    ${url}/systems
+    Wait Until Element Is Visible    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
+    Verify In System    API made system 1
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+
+    Merge    API made system 1    API made system 2    API made system 2
+    Check For Alert    System merge failed
+    Wait Until Element Is Visible    ${MERGE FAILED DIALOG HEADER}
+    Click Button    ${MERGE FAILED OK BUTTON}
+    Disconnect from cloud
+    ${state}    Run Keyword And Ignore Error    Element Should Be Visible    ${YOU HAVE NO SYSTEMS}
+    ${count}    Run Keyword And Ignore Error    Get Element Count    ${SYSTEMS TILE}
+    FOR    ${idx}    IN RANGE   ${count}[1]-1
+        Click Element    ${SYSTEMS TILE}
+        Disconnect from cloud
+    END
+    Run Keyword Unless    "${state[0]}"=="PASS"    Disconnect from cloud
+
 From secondary system merge to primary with no other systems
     ${user}    Set Variable    ${EMAIL MERGE OWNER 1}
     ${auth}=    Create List    ${user}    ${password}
@@ -269,6 +340,30 @@ From secondary system merge to primary with other systems
     Disconnect from cloud
     Disconnect from cloud
 
+From primary system
+    ${user}    Set Variable    ${EMAIL MERGE OWNER 1}
+    ${auth}=    Create List    ${user}    ${password}
+    Create system and attach to cloud    ${user}    ${image}    7001    API made system 2
+    Create system and attach to cloud    ${user}    ${image}    7003    API made system 1
+    log in    ${user}    ${password}
+    Validate Log in
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
+    Validate system available    API made system 2
+    Go To    ${url}/systems
+    Reload Page
+    Validate Log In
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
+    Validate system available    API made system 1
+
+    Merge    API made system 1    API made system 2    API made system 2
+    Validate Merge
+
+    Verify In System    API made system 1
+    Wait Until Element Is Visible    ${USERS LIST}
+    Wait Until Element Is Not Visible    ${CURRENTLY MERGING CARD}    120
+    Check For Alert Dismissable    ${SYSTEM MERGE COMPLETED TEXT}
+    Disconnect from cloud
+
 Merge with different types of users
     ${user}    Set Variable    ${EMAIL MERGE OWNER 2}
     ${auth}=    Create List    ${user}    ${password}
@@ -294,75 +389,3 @@ Merge with different types of users
     FOR    ${key}  IN  @{all users dict.keys()}
         Check User Permissions    ${all users dict["${key}"]}    ${key}    timeout=120
     END
-
-Merge with 3.0
-    Log In    ${EMAIL MERGE OWNER 3.0}    ${password}
-    Validate Log In
-    ${user}    Set Variable    ${EMAIL MERGE OWNER 3.0}
-    ${auth}=    Create List    ${user}    ${password}
-    Create system and attach to cloud    ${user}    ${image}    7001    API made system 1
-    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
-    Elements Should Not Be Visible    ${MERGE BUTTON SYSTEM}
-    Go To    ${url}/systems
-    Validate Log In
-    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
-    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
-    Wait Until Element Is Enabled    ${MERGE BUTTON SYSTEM}
-    Click Button    ${MERGE BUTTON SYSTEM}
-    Wait Until Elements Are Visible    ${MERGE FORM}    ${MERGE SYSTEM DROPDOWN}    ${MERGE OK BUTTON}    ${MERGE CANCEL BUTTON}    ${MERGE X BUTTON}
-    Wait Until Element Is Visible    ${MERGE SYSTEM DROPDOWN}//span[contains(text()," – incompatible")]
-    Click Button    ${MERGE CANCEL BUTTON}
-    Disconnect from cloud
-
-
-2 Systems with identical servers
-    ${user}    Set Variable    ${EMAIL MERGE OWNER 2}
-    ${auth}=    Create List    ${user}    ${password}
-    Create system and attach to cloud    ${user}    ${image}    7001    API made system 1
-    Create system and attach to cloud    ${user}    ${image}    7003    API made system 2
-    log in    ${user}    ${password}
-    Validate Log in
-    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
-    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
-    Go To    ${url}/systems
-    Validate Log In
-    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
-    Verify In System    API made system 2
-    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
-
-    Merge    API made system 1    API made system 1    API made system 1
-    Validate Merge
-    sleep    30
-
-    stop containers    allContainers=False
-
-    Create system and attach to cloud    ${user}    ${image}    7003    API made system 2
-    Go To    ${url}/systems
-    Wait Until Element Is Visible    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
-    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
-    Verify In System    API made system 2
-    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
-    Go To    ${url}/systems
-    Wait Until Element Is Visible    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
-    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
-    Verify In System    API made system 1
-    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
-
-    Merge    API made system 1    API made system 2    API made system 2
-    Check For Alert    System merge failed
-    Wait Until Element Is Visible    ${MERGE FAILED DIALOG HEADER}
-    Click Button    ${MERGE FAILED OK BUTTON}
-    Disconnect from cloud
-    ${state}    Run Keyword And Ignore Error    Element Should Be Visible    ${YOU HAVE NO SYSTEMS}
-    ${count}    Run Keyword And Ignore Error    Get Element Count    ${SYSTEMS TILE}
-    FOR    ${idx}    IN RANGE   ${count}[1]-1
-        Click Element    ${SYSTEMS TILE}
-        Disconnect from cloud
-    END
-    Run Keyword Unless    "${state[0]}"=="PASS"    Disconnect from cloud
