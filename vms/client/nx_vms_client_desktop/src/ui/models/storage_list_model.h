@@ -34,6 +34,7 @@ public:
         StoragePoolColumn,
         TotalSpaceColumn,
         ActionsColumn,
+        SeparatorColumn,
         CheckBoxColumn,
 
         ColumnCount

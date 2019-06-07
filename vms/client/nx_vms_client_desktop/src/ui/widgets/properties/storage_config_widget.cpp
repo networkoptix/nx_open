@@ -190,6 +190,31 @@ namespace
         int m_editedRow;
     };
 
+    class ColumnResizer : public QObject
+    {
+    public:
+        using QObject::QObject;
+
+    protected:
+        bool eventFilter(QObject *object, QEvent *event)
+        {
+            auto view = qobject_cast<nx::vms::client::desktop::TreeView *>(object);
+
+            if (view && event->type() == QEvent::Resize)
+            {
+                int occupiedWidth = 0;
+                for (int i = 1; i < view->model()->columnCount(); ++i)
+                    occupiedWidth += view->sizeHintForColumn(i);
+
+                int urlWidth = view->sizeHintForColumn(QnStorageListModel::UrlColumn);
+                view->setColumnWidth(QnStorageListModel::UrlColumn,
+                    qMin(urlWidth, view->width() - occupiedWidth));
+            }
+
+            return false;
+        }
+    };
+
     QnVirtualCameraResourceList getCurrentSelectedCameras(QnResourcePool* resourcePool)
     {
         const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr& camera)
@@ -220,6 +245,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     ui(new Ui::StorageConfigWidget()),
     m_server(),
     m_model(new QnStorageListModel()),
+    m_columnResizer(new ColumnResizer(this)),
     m_updateStatusTimer(new QTimer(this)),
     m_updateLabelsTimer(new QTimer(this)),
     m_storagePoolMenu(new QMenu(this)),
@@ -282,8 +308,10 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     ui->storageView->sortByColumn(0, Qt::AscendingOrder);
     ui->storageView->header()->setStretchLastSection(false);
     ui->storageView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->storageView->header()->setSectionResizeMode(QnStorageListModel::UrlColumn, QHeaderView::Stretch);
+    ui->storageView->header()->setSectionResizeMode(QnStorageListModel::UrlColumn, QHeaderView::Fixed);
+    ui->storageView->header()->setSectionResizeMode(QnStorageListModel::SeparatorColumn, QHeaderView::Stretch);
     ui->storageView->setMouseTracking(true);
+    ui->storageView->installEventFilter(m_columnResizer);
 
     auto itemClicked = [this, itemDelegate](const QModelIndex& index)
     {
@@ -410,6 +438,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
 QnStorageConfigWidget::~QnStorageConfigWidget()
 {
+    delete m_columnResizer;
 }
 
 void QnStorageConfigWidget::restoreCamerasToBackup()
