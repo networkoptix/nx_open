@@ -129,6 +129,7 @@ private:
 
         std::future<api::ResultType> result;
 
+        QString getFile() const;
         void reset();
         bool isEmpty() const;
         bool equals(const nx::utils::SoftwareVersion& version, const QString& fileName) const;

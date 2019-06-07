@@ -16,7 +16,6 @@
 
 class QComboBox;
 class QLineEdit;
-class QTabWidget;
 class QToolButton;
 class QTreeView;
 class QModelIndex;
@@ -136,8 +135,6 @@ private slots:
     void updateToolTipPosition();
 
     void updateIcons();
-
-    void at_tabWidget_currentChanged(int index);
 
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();

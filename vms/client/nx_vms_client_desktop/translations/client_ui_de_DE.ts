@@ -3078,11 +3078,6 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
-      <translation>Analyticsdaten können zig Gigabyte Speicherplatz belegen. Wir empfehlen, statt der Systempartition einen anderen Speicherort zu wählen.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
       <translation>Analyticsdaten werden weiterhin im deaktivierten Speicher gespeichert.</translation>
     </message>
@@ -3095,6 +3090,11 @@
       <location/>
       <source>Recording was enabled on the USB storage</source>
       <translation>Die Aufnahme wurde auf dem USB-Speicher aktiviert</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>

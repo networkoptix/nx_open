@@ -1,6 +1,7 @@
 #include "mount_helper.h"
 #include <sstream>
 #include <cctype>
+#include <iostream>
 
 namespace nx {
 namespace system_commands {
@@ -37,7 +38,12 @@ SystemCommands::MountCode MountHelper::mount(
     for (const auto& domain: m_domains)
         tryMountWithDomain(domain);
 
-    return m_hasCredentialsError ? SystemCommands::MountCode::wrongCredentials : m_result;
+    if (m_result == SystemCommands::MountCode::ok)
+        return m_result;
+
+    return m_hasCredentialsError
+        ? SystemCommands::MountCode::wrongCredentials
+        : SystemCommands::MountCode::otherError;
 }
 
 bool MountHelper::checkAndParseUsername()
@@ -82,7 +88,7 @@ void MountHelper::tryMountWithDomainAndPassword(
         if (m_result == SystemCommands::MountCode::ok)
             break;
 
-        if (m_result == SystemCommands::MountCode::wrongCredentials)
+        if (m_result == SystemCommands::MountCode::wrongCredentials && m_password == password)
             m_hasCredentialsError = true;
     }
 }

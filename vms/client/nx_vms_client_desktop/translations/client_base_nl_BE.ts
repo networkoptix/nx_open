@@ -8728,7 +8728,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>Downloaden van updatepakketten naar bepaalde servers is mislukt</translation>
     </message>
   </context>
   <context>
@@ -9841,17 +9841,17 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <translation>Bevestig opslag locatie om analytics gegevens op te slaan naar &apos;%1&apos;</translation>
     </message>
     <message>
       <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
 Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
 By default analytics data will be stored in mediaserver&apos;s installation directory.
 You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <translation>Analytics-database moet worden opgeslagen op een lokale opslag en kan maximaal honderd gigabytes beslaan.
+Nadat de locatie voor het opslaan van analysegegevens is geselecteerd, kan deze niet eenvoudig worden gewijzigd zonder verlies van gegevens. We raden aan om de locatie zorgvuldig te kiezen en de systeempartitie niet te gebruiken om ernstige systeemstoringen te voorkomen.
+Standaard worden analysegegevens opgeslagen in de installatiemap van mediaserver&apos;.
+U kunt de opslaglocatie wijzigen op het tabblad &quot;Storage Management&quot; in het dialoogvenster Serverinstellingen.</translation>
     </message>
   </context>
   <context>

@@ -146,8 +146,7 @@ protected:
 
         convertPacketsToObjects(analyticsDataPackets, &objects);
         groupObjects(&objects);
-        if (kUseTrackAggregation)
-            removeDuplicateAttributes(&objects);
+        removeDuplicateAttributes(&objects);
 
         return objects;
     }
@@ -470,12 +469,9 @@ private:
         auto objects = toDetectedObjects(packets);
         objects = filterObjectsAndApplySortOrder(filter, std::move(objects));
 
-        if (kUseTrackAggregation)
-        {
-            // NOTE: Object box is stored in the DB with limited precision.
-            // So, lowering precision to that in the DB.
-            objects = applyTrackBoxPrecision(std::move(objects));
-        }
+        // NOTE: Object box is stored in the DB with limited precision.
+        // So, lowering precision to that in the DB.
+        objects = applyTrackBoxPrecision(std::move(objects));
 
         return objects;
     }
@@ -560,10 +556,7 @@ private:
         if (!filter.boundingBox)
             return true;
 
-        if (kUseTrackAggregation)
-            return rectsIntersectToPrecision(*filter.boundingBox, data.boundingBox);
-        else
-            return filter.boundingBox->intersects(data.boundingBox);
+        return rectsIntersectToPrecision(*filter.boundingBox, data.boundingBox);
     }
 
     bool rectsIntersectToPrecision(const QRectF& one, const QRectF& two)
@@ -777,9 +770,6 @@ TEST_F(AnalyticsDb, storing_multiple_events_concurrently)
 
 TEST_F(AnalyticsDb, objects_best_shot_is_saved_and_reported)
 {
-    if (!kUseTrackAggregation)
-        return; // TODO: #ak Remove it after enabling kUseTrackAggregation in the repository.
-
     whenSaveObjectTrackContainingBestShot();
 
     thenAllEventsCanBeRead();

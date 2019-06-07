@@ -49,6 +49,80 @@ const QString packageRawData = R"(
   ]
 })";
 
+const QString packagesForSystemSupportTest = R"(
+{
+  "version": "4.0.0.29069",
+  "cloudHost": "cloud-test.hdw.mx",
+  "releaseNotesUrl": "http://www.networkoptix.com/all-nx-witness-release-notes",
+  "description": "",
+  "eulaLink": "eula-1.html",
+  "eulaVersion": 1,
+  "packages": [
+    {
+      "component": "server",
+      "arch": "x64",
+      "platform": "linux",
+      "variant": "ubuntu",
+      "variantVersion": "18.04",
+      "file": "nxwitness-server_update-4.0.0.29069-linux64-beta-test.zip",
+      "size": 121216913,
+      "md5": "a26a03ea0b5e88e272437def2555b379"
+    },
+    {
+      "component": "client",
+      "arch": "x64",
+      "platform": "windows",
+      "variant": "winxp",
+      "file": "nxwitness-client_update-4.0.0.29069-win64-beta-test.zip",
+      "size": 96953959,
+      "md5": "aedf0b757dc806a1980858ecfcb805f3"
+    }
+  ]
+})";
+
+struct OS
+{
+    static nx::vms::api::SystemInformation ubuntu14(const QString& arch="x64")
+    {
+        nx::vms::api::SystemInformation info;
+        info.arch = arch;
+        info.platform = "linux";
+        info.modification = "ubuntu";
+        info.version = "14.04";
+        return info;
+    }
+
+    static nx::vms::api::SystemInformation ubuntu16(const QString& arch="x64")
+    {
+        nx::vms::api::SystemInformation info;
+        info.arch = arch;
+        info.platform = "linux";
+        info.modification = "ubuntu";
+        info.version = "16.04";
+        return info;
+    }
+
+    static nx::vms::api::SystemInformation ubuntu18(const QString& arch="x64")
+    {
+        nx::vms::api::SystemInformation info;
+        info.arch = arch;
+        info.platform = "linux";
+        info.modification = "ubuntu";
+        info.version = "18.04";
+        return info;
+    }
+
+    static nx::vms::api::SystemInformation windows()
+    {
+        nx::vms::api::SystemInformation info;
+        info.arch = "x64";
+        info.platform = "windows";
+        info.modification = "winxp";
+        info.version = "";
+        return info;
+    }
+};
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -190,6 +264,35 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
         EXPECT_TRUE(report.hasLatestVersion);
     }
     removeAllServers();
+}
+
+TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
+{
+    nx::update::UpdateContents contents;
+    contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
+    ASSERT_TRUE(QJson::deserialize<nx::update::Information>(packagesForSystemSupportTest,
+        &contents.info));
+    ASSERT_FALSE(contents.isEmpty());
+
+    // Update to 4.0.0.29069
+    // client = 4.0.0.29067
+    // server = 4.0.0.29067
+    // Showing page 'This version is already installed'.
+    auto server = makeServer(nx::utils::SoftwareVersion("4.0.0.29067"));
+    server->setSystemInfo(OS::ubuntu16());
+    ClientVerificationData clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.29067"));
+    clientData.systemInfo = OS::windows();
+    auto servers = getAllServers();
+    verifyUpdateContents(nullptr, contents, servers, clientData);
+    EXPECT_EQ(contents.error, nx::update::InformationError::missingPackageError);
+    // There should be one unsupported system.
+    EXPECT_EQ(contents.unsuportedSystemsReport.size(), 1);
+    // And zero servers with missing update file.
+    EXPECT_EQ(contents.missingUpdate.size(), 0);
+
+    auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
+        contents, clientData.clientId);
+    EXPECT_TRUE(report.statusHighlight == MultiServerUpdatesWidget::VersionReport::HighlightMode::red);
 }
 
 } // namespace nx::vms::client::desktop

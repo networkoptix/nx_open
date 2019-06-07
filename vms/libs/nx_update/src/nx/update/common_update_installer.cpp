@@ -20,7 +20,6 @@ CommonUpdateInstaller::CommonUpdateInstaller(QObject* parent):
 
 CommonUpdateInstaller::~CommonUpdateInstaller()
 {
-    stopSync();
 }
 
 void CommonUpdateInstaller::prepareAsync(const QString& path)
@@ -193,6 +192,7 @@ void CommonUpdateInstaller::stopSync()
     while (m_state == CommonUpdateInstaller::State::inProgress)
         m_condition.wait(lock.mutex());
     m_state = CommonUpdateInstaller::State::idle;
+    cleanInstallerDirectory();
 }
 
 bool CommonUpdateInstaller::cleanInstallerDirectory()

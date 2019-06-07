@@ -844,7 +844,9 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
             QnMessageBox::success(this, text);
         };
 
-    Deactivator::deactivateAsync(m_deactivationReason, licenses, handler, parentWidget());
+    Deactivator::deactivateAsync(
+        QnLicenseServer::deactivateUrl(commonModule()),
+        m_deactivationReason, licenses, handler, parentWidget());
 }
 
 void QnLicenseManagerWidget::takeAwaySelectedLicenses()
@@ -1031,7 +1033,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
     {
         updateFromServer(
             ui->licenseWidget->serialKey().toLatin1(), /*infoMode*/ true,
-            QnLicenseServer::kActivateUrl.toQUrl());
+            QnLicenseServer::activateUrl(commonModule()).toQUrl());
     }
     else
     {

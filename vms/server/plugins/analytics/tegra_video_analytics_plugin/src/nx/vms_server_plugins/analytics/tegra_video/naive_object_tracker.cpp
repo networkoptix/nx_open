@@ -11,7 +11,7 @@
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
-#include <nx/sdk/analytics/helpers/attribute.h>
+#include <nx/sdk/helpers/attribute.h>
 
 #include "tegra_video_analytics_plugin_ini.h"
 
@@ -208,13 +208,13 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
         objectMetadata->setConfidence(1);
         objectMetadata->setTypeId(m_objectTypeId);
 
-        std::vector<nx::sdk::Ptr<nx::sdk::analytics::Attribute>> attributes;
+        std::vector<nx::sdk::Ptr<nx::sdk::Attribute>> attributes;
         for (const auto& entry: cached.attributes)
         {
             const auto attributeName = entry.first;
             const auto attributeValue = entry.second;
 
-            auto attribute = nx::sdk::makePtr<nx::sdk::analytics::Attribute>(
+            auto attribute = nx::sdk::makePtr<nx::sdk::Attribute>(
                 nx::sdk::IAttribute::Type::string,
                 attributeName,
                 attributeValue);

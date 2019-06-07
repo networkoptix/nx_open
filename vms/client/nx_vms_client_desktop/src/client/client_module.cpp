@@ -231,6 +231,12 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
 {
     ini().reload();
 
+#if defined(Q_OS_WIN)
+    // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
+    if (ini().profilerMode)
+        win32_exception::setCreateFullCrashDump(true);
+#endif
+
     initThread();
     initMetaInfo();
     initApplication();
@@ -378,9 +384,10 @@ void QnClientModule::initSingletons()
     // Persistent settings are standalone.
     auto clientSettings = std::make_unique<QnClientSettings>(m_startupParameters);
 
-#ifdef Q_OS_WIN
-    // As soon as settings are ready, setup full crash dumps if needed.
-    win32_exception::setCreateFullCrashDump(clientSettings->createFullCrashDump());
+#if defined(Q_OS_WIN)
+    // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
+    if (clientSettings->createFullCrashDump())
+        win32_exception::setCreateFullCrashDump(true);
 #endif
 
     // Runtime settings are standalone, but some actual values are taken from persistent settings.

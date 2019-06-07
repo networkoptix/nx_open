@@ -55,7 +55,7 @@ private:
         nx::update::Package* outPackage,
         QString* outMessage = nullptr) const;
     void extract();
-    void clearDownloader();
+    void clearDownloader(bool force);
     bool canDownloadFile(const nx::update::Package& package, update::Status* outUpdateStatus);
     bool statusAppropriateForDownload(nx::update::Package* outPackage, update::Status* outStatus);
     bool installerState(update::Status* outUpdateStatus, const QnUuid& peerId);

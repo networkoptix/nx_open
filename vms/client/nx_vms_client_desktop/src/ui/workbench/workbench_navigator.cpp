@@ -959,9 +959,10 @@ void QnWorkbenchNavigator::jumpBackward()
     qint64 pos = reader->startTime();
     if (auto loader = loaderByWidget(m_currentMediaWidget))
     {
-        bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
-        QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingContent : Qn::MotionContent);
-        if (loader->isMotionRegionsEmpty())
+        const bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
+        const auto content = canUseMotion ? Qn::MotionContent : Qn::RecordingContent;
+        QnTimePeriodList periods = loader->periods(content);
+        if (content == Qn::RecordingContent)
             periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);
 
         if (!periods.empty())
@@ -972,10 +973,10 @@ void QnWorkbenchNavigator::jumpBackward()
             }
             else
             {
-                /* We want timeline to jump relatively to current position, not camera frame. */
-                qint64 currentTime = m_timeSlider->value().count();
+                /* We want to jump relatively to current reader position. */
+                const auto currentTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(reader->currentTime());
 
-                QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime, true);
+                QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTimeMs.count(), true);
                 if (itr != periods.cbegin())
                     --itr;
 
@@ -1010,16 +1011,17 @@ void QnWorkbenchNavigator::jumpForward()
     }
     else if (auto loader = loaderByWidget(m_currentMediaWidget))
     {
-        bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
-        QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingContent : Qn::MotionContent);
-        if (loader->isMotionRegionsEmpty())
+        const bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
+        const auto content = canUseMotion ? Qn::MotionContent : Qn::RecordingContent;
+        QnTimePeriodList periods = loader->periods(content);
+        if (content == Qn::RecordingContent)
             periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);
 
-        /* We want timeline to jump relatively to current position, not camera frame. */
-        qint64 currentTime = m_timeSlider->value().count();
+        /* We want to jump relatively to current reader position. */
+        const auto currentTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(reader->currentTime());
 
-        QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime, true);
-        if (itr != periods.cend() && currentTime >= itr->startTimeMs)
+        QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTimeMs.count(), true);
+        if (itr != periods.cend() && currentTimeMs.count() >= itr->startTimeMs)
             ++itr;
 
         if (itr == periods.cend() || m_timeSlider->isLive())
@@ -1688,7 +1690,9 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             if (camera->isDtsBased())
                 updateHasArchive();
         }
-        updateTimelineRelevancy(); //< TODO: #vbreus check if this update really needed
+        // #spanasenko: A call to updateTimelineRelevancy() has been removed from here
+        // because it led to incorrect state of 'LIVE' button for currently recording cameras.
+        // Additional research or refactoring may be needed.
     }
 }
 

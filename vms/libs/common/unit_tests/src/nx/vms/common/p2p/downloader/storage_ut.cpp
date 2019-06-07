@@ -588,7 +588,7 @@ TEST_F(DistributedFileDownloaderStorageTest, writeToDownloadedFile)
 
     QByteArray buffer;
     ASSERT_EQ(downloaderStorage->writeFileChunk(testFileName, 0, buffer),
-        ResultCode::ioError);
+        ResultCode::fileAlreadyDownloaded);
 }
 
 TEST_F(DistributedFileDownloaderStorageTest, fileCorruptionDuringDownload)

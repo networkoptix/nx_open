@@ -86,7 +86,7 @@ private:
         const auto makePluginData =
             [](QString name, QString desc, QString libraryName, QString vendor, QString ver)
             {
-                nx::vms::api::PluginModuleData data;
+                nx::vms::api::PluginInfo data;
                 data.name = name;
                 data.description = desc;
                 data.libraryName = libraryName;
@@ -95,7 +95,7 @@ private:
                 return data;
             };
 
-        m_store->setPluginModules(nx::vms::api::PluginModuleDataList{
+        m_store->setPluginModules(nx::vms::api::PluginInfoList{
             makePluginData(
                 "Plugin 1",
                 "This is test plugin 1 description",

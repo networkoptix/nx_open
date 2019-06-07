@@ -30,12 +30,10 @@ EventMetadataPacket* createCommonEventMetadataPacket(
 {
     using namespace std::chrono;
 
-    auto eventMetadata = makePtr<nx::sdk::analytics::EventMetadata>();
     auto packet = new EventMetadataPacket();
+    auto eventMetadata = makePtr<nx::sdk::analytics::EventMetadata>();
     eventMetadata->setTypeId(eventType.id.toStdString());
     eventMetadata->setDescription(eventType.name.toStdString());
-    eventMetadata->setAuxiliaryData(std::to_string(logicalId));
-
     packet->addItem(eventMetadata.get());
     packet->setTimestampUs(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());

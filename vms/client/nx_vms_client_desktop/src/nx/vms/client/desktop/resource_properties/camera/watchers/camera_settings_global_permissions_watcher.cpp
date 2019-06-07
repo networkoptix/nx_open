@@ -14,18 +14,19 @@ CameraSettingsGlobalPermissionsWatcher::CameraSettingsGlobalPermissionsWatcher(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent, InitializationMode::lazy)
+    QnWorkbenchContextAware(parent, InitializationMode::instant)
 {
     NX_ASSERT(store);
 
-    connect(this, &CameraSettingsGlobalPermissionsWatcher::globalPermissionsChanged,
-        store, &CameraSettingsDialogStore::setGlobalPermissions);
-}
+    auto updateGlobalPermissions =
+        [this, store]()
+        {
+            store->setGlobalPermissions(accessController()->globalPermissions());
+        };
 
-void CameraSettingsGlobalPermissionsWatcher::afterContextInitialized()
-{
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
-        [this]() { emit globalPermissionsChanged(accessController()->globalPermissions(), {}); });
+        updateGlobalPermissions);
+    updateGlobalPermissions();
 }
 
 } // namespace nx::vms::client::desktop

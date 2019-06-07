@@ -93,6 +93,14 @@ private:
     std::string m_objectTypeId;
     int m_currentObjectTypeIndex = 0;
     int64_t m_lastVideoFrameTimestampUs = 0;
+
+    struct EventContext
+    {
+        int currentEventTypeIndex = 0;
+        bool isCurrentEventActive = false;
+    };
+
+    EventContext m_eventContext;
 };
 
 const std::string kLineCrossingEventType = "nx.stub.lineCrossing";

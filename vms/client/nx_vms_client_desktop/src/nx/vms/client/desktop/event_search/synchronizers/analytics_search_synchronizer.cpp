@@ -204,9 +204,12 @@ void AnalyticsSearchSynchronizer::updateTimelineDisplay()
         return;
     }
 
+    const auto filterRect = m_analyticsSearchWidget->filterRect();
+
     analytics::db::Filter filter;
     filter.deviceIds = {camera->getId()};
-    filter.boundingBox = m_analyticsSearchWidget->filterRect();
+    if (!filterRect.isNull())
+        filter.boundingBox = filterRect;
     filter.freeText = m_analyticsSearchWidget->textFilter();
     navigator()->setAnalyticsFilter(filter);
     navigator()->setSelectedExtraContent(Qn::AnalyticsContent);

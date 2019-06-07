@@ -99,6 +99,11 @@ public:
         FAIL();
     }
 
+    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override
+    {
+        return false;
+    }
+
 private:
     nx::utils::SyncQueue<LookupRequestData>* m_lookupRequestQueue;
     nx::network::aio::BasicPollable m_asyncCaller;
