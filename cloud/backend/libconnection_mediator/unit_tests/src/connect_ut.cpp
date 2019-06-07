@@ -115,7 +115,7 @@ TEST_F( ConnectTest, BindConnect )
         request.newAttribute< stun::extension::attrs::SystemId >( SYSTEM_ID );
         request.newAttribute< stun::extension::attrs::ServerId >( SERVER_ID );
         request.newAttribute< stun::extension::attrs::PublicEndpointList >(
-            std::list< nx::network::SocketAddress >( 1, testHttpServer.serverAddress() ) );
+            std::vector< nx::network::SocketAddress >( 1, testHttpServer.serverAddress() ) );
 
         request.insertIntegrity( SYSTEM_ID, AUTH_KEY );
         cloud.expect_getSystem( SYSTEM_ID, AUTH_KEY );

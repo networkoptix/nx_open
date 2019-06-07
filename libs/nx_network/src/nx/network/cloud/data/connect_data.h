@@ -1,7 +1,7 @@
 #pragma once
 
-#include <list>
 #include <optional>
+#include <vector>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/cloud/cloud_connect_version.h>
@@ -32,7 +32,7 @@ public:
     nx::String connectSessionId;
     ConnectionMethods connectionMethods;
     /** If port is zero then mediator uses source port */
-    std::list<network::SocketAddress> udpEndpointList;
+    std::vector<network::SocketAddress> udpEndpointList;
     /** if true, mediator does not report Connect request source address to the server peer.
         Only addresses found in udpEndpointList are reported
     */
@@ -59,8 +59,8 @@ public:
     constexpr static const network::stun::extension::methods::Value kMethod =
         network::stun::extension::methods::connect;
 
-    std::list<network::SocketAddress> forwardedTcpEndpointList;
-    std::list<network::SocketAddress> udpEndpointList;
+    std::vector<network::SocketAddress> forwardedTcpEndpointList;
+    std::vector<network::SocketAddress> udpEndpointList;
     /** Optional for backward compatibility. */
     std::optional<nx::String> trafficRelayUrl;
     /**

@@ -26,7 +26,6 @@ bool ClientBindRequest::parseAttributes(const nx::network::stun::Message& messag
             message, &originatingPeerID) &&
         readAttributeValue<stun::extension::attrs::TcpReverseEndpointList>(
             message, &tcpReverseEndpoints);
-
 }
 
 //-------------------------------------------------------------------------------------------------
