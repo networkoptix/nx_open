@@ -496,7 +496,15 @@ void UDPHolePunchingConnectionInitiationFsm::sendConnectResponse(
     NX_VERBOSE(this, lm("Connection %1. Sending connect response (%2) while in state %3")
         .args(m_connectionID, QnLexical::serialized(resultCode), toString(m_state)));
 
-    NX_CRITICAL(m_connectResponseSender);
+    NX_ASSERT(m_connectResponseSender,
+        lm("State %1. Cached response: (%2, %3). Response: %4")
+        .args(toString(m_state),
+            m_cachedConnectResponse ? QnLexical::serialized(m_cachedConnectResponse->first) : QString(),
+            QJson::serialized(m_cachedConnectResponse ? m_cachedConnectResponse->second : api::ConnectResponse()),
+            QJson::serialized(connectResponse)));
+    if (!m_connectResponseSender)
+        return;
+
     decltype(m_connectResponseSender) connectResponseSender;
     connectResponseSender.swap(m_connectResponseSender);
 
@@ -548,8 +556,7 @@ void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)
 
     m_state = State::fini;
 
-    auto onFinishedHandler = std::move(m_onFsmFinishedEventHandler);
-    onFinishedHandler(m_sessionStatisticsInfo.resultCode);
+    nx::utils::swapAndCall(m_onFsmFinishedEventHandler, m_sessionStatisticsInfo.resultCode);
 }
 
 const char* UDPHolePunchingConnectionInitiationFsm::toString(State state)
