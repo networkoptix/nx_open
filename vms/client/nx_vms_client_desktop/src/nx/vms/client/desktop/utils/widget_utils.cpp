@@ -6,6 +6,7 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QLayout>
+#include <QtWidgets/QMenu>
 
 namespace nx::vms::client::desktop {
 
@@ -34,6 +35,17 @@ void WidgetUtils::setFlag(QWidget* widget, Qt::WindowFlags flags, bool value)
         initialFlags &= ~flags;
 
     widget->setWindowFlags(initialFlags);
+}
+
+void WidgetUtils::clearMenu(QMenu* menu)
+{
+    if (!menu)
+        return;
+
+    menu->clear();
+
+    for (auto subMenu: menu->findChildren<QMenu*>(QString(), Qt::FindChildrenRecursively))
+        subMenu->deleteLater();
 }
 
 const QWidget* WidgetUtils::graphicsProxiedWidget(const QWidget* widget)
