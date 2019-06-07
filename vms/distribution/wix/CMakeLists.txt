@@ -209,7 +209,6 @@ if(withClouds)
             cloud_connect_test_util
             cloud_db
             connection_mediator
-            vms_gateway
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_cloud_debug_package.py
             "--config" ${config_file}
