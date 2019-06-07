@@ -33,15 +33,19 @@
                 return $q.reject(false);
             },
             get: function () {
+                console.log('GET() (AccountService) ->');
                 let self = this;
                 if (requestingLogin) {
+                    console.log('GET(requestingLogin) ->');
                     // login is requesting, so we wait
                     return requestingLogin.then(function () {
+                        console.log('GET() (AccountService/then) ->');
                         requestingLogin = null; // clean requestingLogin reference
                         return self.get(); // Try again
                     });
                 }
                 return cloudApi.account().then(function (account) {
+                    console.log('GET() (AccountService/return) ->');
                     return account.data;
                 });
             },
@@ -71,6 +75,7 @@
             },
             redirectAuthorised: function () {
                 this.get().then(function () {
+                    console.log('ACCOUNT (redirectAuthorised) ->');
                     $location.path(CONFIG.redirectAuthorised);
                 });
             },
@@ -91,6 +96,7 @@
             login: function (email, password, remember) {
                 this.setEmail(email);
                 let self = this;
+                console.log('LOGIN() (AccountService) ->');
 
                 return cloudApi.login(email, password, remember)
                                .then((result) => {
@@ -106,6 +112,8 @@
                                });
             },
             logout: function (doNotRedirect) {
+                console.log('LOGOUT (AccountService)->');
+                console.trace();
                 cloudApi.logout().finally(function () {
                     $rootScope.session.$reset(); // Clear session
                     if (!doNotRedirect) {
@@ -117,6 +125,7 @@
                 });
             },
             logoutAuthorised: function () {
+                console.log('LOGOUT authorized (AccountService)->');
                 let self = this;
                 this.get().then(function () {
                     // logoutAuthorisedLogoutButton
@@ -133,6 +142,7 @@
                 });
             },
             checkUnauthorized: function (data) {
+                console.log('CHECK unauthorized (AccountService)->');
                 if (data && data.data && data.data.resultCode == 'notAuthorized') {
                     this.logout();
                     return false;

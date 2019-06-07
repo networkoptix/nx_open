@@ -47,7 +47,7 @@
 
             function login(email, password, remember) {
                 this.setEmail(email);
-
+                console.log('LOGUN (setEmail) ->');
                 return cloudApi
                         .login(email, password, remember)
                         .then((result) => {
@@ -69,7 +69,7 @@
                             if (result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
                                 setEmail(result.data.email);
                                 $rootScope.session.loginState = result.data.email; // Forcing changing loginState to reload interface
-                                console.log('setEmail ->');
+                                console.log('LOGIN (then/setEmail) ->');
                             }
 
                             get().then(() => {
@@ -87,6 +87,7 @@
             }
 
             function logout(doNotRedirect) {
+                console.log('LOGOUT (AuthService)->');
                 cloudApi
                     .logout()
                     .finally(() => {
@@ -127,6 +128,7 @@
             }
 
             function logoutAuthorised() {
+                console.log('LOGOUT autorized (AuthService)->');
                 get().then(() => {
                     // logoutAuthorisedLogoutButton
                     NxDialogsService
