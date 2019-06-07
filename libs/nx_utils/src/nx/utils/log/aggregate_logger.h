@@ -40,6 +40,8 @@ public:
 
     virtual void writeLogHeader() override;
 
+    const std::vector<std::unique_ptr<AbstractLogger>>& loggers() const;
+
 private:
     std::vector<std::unique_ptr<AbstractLogger>> m_loggers;
 };
