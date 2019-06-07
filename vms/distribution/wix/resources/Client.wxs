@@ -104,15 +104,20 @@
             </Directory>
         </DirectoryRef>
 
+        <ComponentGroup Id="external_resources"
+                Directory="InstallDirRoot"
+                Source="$(var.SourceDir)">
+            <Component><File Name="nx_vms_client_core_translations.dat" KeyPath="yes"/></Component>
+            <Component><File Name="nx_vms_client_desktop_translations.dat" KeyPath="yes"/></Component>
+            <Component><File Name="nx_vms_client_desktop.dat" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
         <ComponentGroup Id="info_files"
                 Directory="InstallDirRoot"
                 Source="$(var.CMAKE_BINARY_DIR)">
             <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
             <Component><File Name="nx_log_viewer.html" KeyPath="yes"/></Component>
         </ComponentGroup>
-
-        <!-- These libraries are used in TrayTool and not in MediaServer, so they are here. -->
-
 
         <Feature Id="ClientFeature" Title="$(var.productName) Client" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
@@ -146,6 +151,8 @@
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentGroupRef Id="ClientQmlComponent"/>
             <ComponentGroupRef Id="info_files"/>
+            <ComponentGroupRef Id="external_resources"/>
+            <ComponentGroupRef Id="shared_external_resources"/>
         </Feature>
     </Fragment>
 </Wix>
