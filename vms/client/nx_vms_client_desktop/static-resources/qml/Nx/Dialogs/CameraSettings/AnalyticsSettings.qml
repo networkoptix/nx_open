@@ -125,8 +125,14 @@ Item
 
             onClicked:
             {
+                if (isDeviceDependent)
+                {
+                    console.assert("Button must not be clickable for the device-dependent engines.")
+                    return
+                }
+
                 var engines = enabledAnalyticsEngines.slice(0)
-                if (checked && !isDeviceDependent)
+                if (checked)
                 {
                     engines.push(currentEngineId)
                 }
