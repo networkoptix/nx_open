@@ -25,7 +25,7 @@ endif()
 if(targetDevice STREQUAL "linux_arm32" OR targetDevice STREQUAL "linux_arm64")
     set(variantVersion "") #< ARM distributions should be compatible with any linux flavor.
 else()
-    set(variantVersion "14.04")
+    set(variantVersion "16.04")
 endif()
 
 # Read license.txt and properly format it to be included into deb templates file:

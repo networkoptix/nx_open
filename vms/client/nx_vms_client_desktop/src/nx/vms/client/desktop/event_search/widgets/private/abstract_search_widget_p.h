@@ -17,6 +17,7 @@
 
 class QMenu;
 class QLabel;
+class QPropertyAnimation;
 class QTimer;
 
 namespace Ui { class AbstractSearchWidget; }
@@ -96,6 +97,7 @@ private:
     void handleFetchFinished();
 
     void updateDeviceDependentActions();
+    void updatePlaceholderVisibility();
 
     QString currentDeviceText() const;
 
@@ -126,6 +128,9 @@ private:
     QMetaObject::Connection m_currentCameraConnection;
     Cameras m_previousCameras = Cameras::all;
     QHash<Cameras, QAction*> m_cameraSelectionActions;
+
+    bool m_placeholderVisible = false;
+    QPointer<QPropertyAnimation> m_placeholderOpacityAnimation;
 
     struct DeviceDependentAction
     {
