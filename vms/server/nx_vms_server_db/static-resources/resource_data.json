@@ -3367,7 +3367,7 @@
             }
         },
         {
-            "_comment1": "Mapping for firmware: IPC_HCMN2108-B0006P10D1711",
+            "_comment1": "Mapping for firmware: IPC_HCMN2108-B0009P30D1809",
             "keys": [
                 "UNIVIEW|IPC6322SR-X22*"
             ],
@@ -3380,7 +3380,7 @@
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [-0.1666667, 1],
+                        "device":  [-1, 1],
                         "logical": [15, -90]
                     },
                     "z": {

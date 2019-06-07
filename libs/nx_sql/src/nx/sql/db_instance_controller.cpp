@@ -32,17 +32,17 @@ bool InstanceController::initialize()
         return false;
     }
 
-    NX_DEBUG(this, lm("Updating DB structure"));
-    if (!updateDbStructure())
-    {
-        NX_ERROR(this, "Could not update DB to current version");
-        return false;
-    }
-
     NX_DEBUG(this, lm("Configuring DB"));
     if (!configureDb())
     {
         NX_ERROR(this, "Failed to tune DB");
+        return false;
+    }
+
+    NX_DEBUG(this, lm("Updating DB structure"));
+    if (!updateDbStructure())
+    {
+        NX_ERROR(this, "Could not update DB to current version");
         return false;
     }
 
@@ -102,6 +102,15 @@ bool InstanceController::configureDb()
 DBResult InstanceController::configureSqliteInstance(
     QueryContext* queryContext)
 {
+    QSqlQuery enableAutoVacuumQuery(*queryContext->connection()->qtSqlConnection());
+    enableAutoVacuumQuery.prepare("PRAGMA auto_vacuum = 1");
+    if (!enableAutoVacuumQuery.exec())
+    {
+        NX_WARNING(this, lm("Failed to enable auto vacuum mode. %1")
+            .arg(enableAutoVacuumQuery.lastError().text()));
+        return DBResult::ioError;
+    }
+
     QSqlQuery enableWalQuery(*queryContext->connection()->qtSqlConnection());
     enableWalQuery.prepare("PRAGMA journal_mode = WAL");
     if (!enableWalQuery.exec())

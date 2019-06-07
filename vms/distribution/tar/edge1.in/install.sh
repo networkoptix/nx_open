@@ -11,6 +11,7 @@ upgradeVms()
 {
     "$STARTUP_SCRIPT" stop
     rm -rf "$INSTALL_DIR/mediaserver/lib"
+    rm -f "$INSTALL_DIR/mediaserver/bin/plugins"/libcpro*
     tar xfv "$TAR_FILE" -C /
     "$STARTUP_SCRIPT" start
 }

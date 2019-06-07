@@ -86,7 +86,7 @@ nx::streaming::rtp::TimePolicy getTimePolicy(const QnResourcePtr& res)
 
 nx::utils::Mutex QnMulticodecRtpReader::s_defaultTransportMutex;
 nx::vms::api::RtpTransportType QnMulticodecRtpReader::s_defaultTransportToUse =
-    nx::vms::api::RtpTransportType::tcp;
+    nx::vms::api::RtpTransportType::automatic;
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(
     const QnResourcePtr& res,
@@ -576,7 +576,7 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 
 nx::vms::api::RtpTransportType QnMulticodecRtpReader::getRtpTransport() const
 {
-    NX_MUTEX_LOCKER lock(&s_defaultTransportMutex);
+    // Client defined settings for resource.
     if (m_resource)
     {
         const auto rtpTransportString =
@@ -587,15 +587,18 @@ nx::vms::api::RtpTransportType QnMulticodecRtpReader::getRtpTransport() const
             nx::vms::api::RtpTransportType::automatic);
 
         if (transport != nx::vms::api::RtpTransportType::automatic)
-            return transport; //< User defined settings for resource.
-        if (m_rtpTransport != nx::vms::api::RtpTransportType::automatic)
-            return m_rtpTransport; //< Server side setting for resource.
+            return transport;
     }
 
+    // Server side setting for resource.
+    if (m_rtpTransport != nx::vms::api::RtpTransportType::automatic)
+        return m_rtpTransport;
+
+    NX_MUTEX_LOCKER lock(&s_defaultTransportMutex);
     return s_defaultTransportToUse;
 }
 
-void QnMulticodecRtpReader::setRtpTransport(nx::vms::api::RtpTransportType value )
+void QnMulticodecRtpReader::setRtpTransport(nx::vms::api::RtpTransportType value)
 {
     m_rtpTransport = value;
 }

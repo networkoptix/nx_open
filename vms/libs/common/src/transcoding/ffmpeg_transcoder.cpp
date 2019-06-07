@@ -155,9 +155,13 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
 
         if (m_vTranscoder)
         {
-            m_vTranscoder->open(video);
-            if (!m_vTranscoder->getLastError().isEmpty())
-                qWarning() << "Can't open video transcoder for RTSP streaming: " << m_vTranscoder->getLastError();
+            if (!m_vTranscoder->open(video))
+            {
+                m_vTranscoder->getLastError().isEmpty();
+                NX_WARNING(this, "Can't open video transcoder for RTSP streaming: [%1]",
+                    m_vTranscoder->getLastError());
+                return -1;
+            }
 
             QnFfmpegVideoTranscoderPtr ffmpegVideoTranscoder = m_vTranscoder.dynamicCast<QnFfmpegVideoTranscoder>();
             if (ffmpegVideoTranscoder->getCodecContext()) {
