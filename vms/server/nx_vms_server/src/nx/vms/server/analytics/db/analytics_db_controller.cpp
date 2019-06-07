@@ -35,6 +35,8 @@ DbController::DbController(
     dbStructureUpdater().addUpdateScript(kFixObjectSearchToObjectIndices);
     dbStructureUpdater().addUpdateScript(kAddObjectGroups);
     dbStructureUpdater().addUpdateScript(kDropTimePeriodTable);
+
+    dbStructureUpdater().addUpdateScript(kDropObjectSearchFromDb);
 }
 
 } // namespace nx::analytics::db
