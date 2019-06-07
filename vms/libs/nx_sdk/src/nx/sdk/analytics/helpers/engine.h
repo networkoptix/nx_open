@@ -54,7 +54,7 @@ protected:
      * @return Param value, or an empty string if such param does not exist, having logged the
      * error.
      */
-    std::string getParamValue(const char* paramName);
+    std::string getParamValue(const std::string& paramName);
 
     /**
      * Action handler. Called when some action defined by this engine is triggered by Server.

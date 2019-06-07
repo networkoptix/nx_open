@@ -73,11 +73,14 @@ private:
 
     void generateObjectIds();
 
+    void parseSettings();
+
 private:
     std::unique_ptr<std::thread> m_pluginEventThread;
     std::mutex m_pluginEventGenerationLoopMutex;
     std::condition_variable m_pluginEventGenerationLoopCondition;
-    bool m_terminated = false;
+    std::atomic<bool> m_terminated{false};
+    std::atomic<bool> m_needToThrowPluginEvents{false};
 
     std::unique_ptr<std::thread> m_eventThread;
     std::condition_variable m_eventGenerationLoopCondition;
@@ -93,6 +96,18 @@ private:
     std::string m_objectTypeId;
     int m_currentObjectTypeIndex = 0;
     int64_t m_lastVideoFrameTimestampUs = 0;
+
+    struct DeviceAgentContext
+    {
+        std::atomic<bool> generateObjects{true};
+        std::atomic<bool> generateEvents{true};
+        std::atomic<int> generateObjectsEveryNFrames{1};
+        std::atomic<int> numberOfObjectsToGenerate{1};
+        std::atomic<bool> generatePreviewPacket{true};
+        std::atomic<bool> throwPluginEvents{false};
+    };
+
+    DeviceAgentContext m_deviceAgentContext;
 
     struct EventContext
     {

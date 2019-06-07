@@ -56,11 +56,22 @@ private:
 
     std::unique_ptr<std::thread> m_thread;
     std::atomic<bool> m_terminated{false};
+    std::atomic<bool> m_needToThrowPluginEvents{false};
 
     std::string m_capabilities;
     bool m_needUncompressedVideoFrames = false;
     PixelFormat m_pixelFormat = PixelFormat::yuv420;
 };
+
+static const std::string kGenerateEventsSetting{"stub.generateEvents"};
+static const std::string kGenerateObjectsSetting{"stub.generateObjects"};
+static const std::string kGenerateObjectsEveryNFramesSetting{"stub.generateObjectsEveryNFrames"};
+static const std::string kNumberOfObjectsToGenerateSetting{"stub.numberOfObjectsToGenerate"};
+static const std::string kGeneratePreviewPacketSetting{"stub.generatePreviewPacket"};
+static const std::string kThrowPluginEventsFromEngineSetting{
+    "stub.throwPluginEventsFromDeviceAgent"};
+static const std::string kThrowPluginEventsFromDeviceAgentSetting{
+    "stub.throwPluginEventsFromDeviceAgent"};
 
 } // namespace stub
 } // namespace analytics
