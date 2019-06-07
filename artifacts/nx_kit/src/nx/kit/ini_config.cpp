@@ -1,9 +1,9 @@
 #include "ini_config.h"
 
+#include "utils.h"
+
 #include <algorithm>
 #include <atomic>
-#include <cerrno>
-#include <climits>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -247,6 +247,27 @@ struct Param: AbstractParam
     }
 };
 
+template<typename Value>
+bool Param<Value>::reload(const std::string* value, std::ostream* output)
+{
+    const auto oldValue = *pValue;
+    *pValue = defaultValue;
+    const char* error = "";
+    if (value && !value->empty()) //< Existing but empty values are treated as default.
+    {
+        if (!nx::kit::utils::fromString(*value, pValue))
+            error = " [invalid value]";
+    }
+    printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
+    return oldValue != *pValue;
+}
+
+template<typename Value>
+std::string Param<Value>::defaultValueStr() const
+{
+    return toString(defaultValue);
+}
+
 template<>
 bool Param<bool>::reload(const std::string* value, std::ostream* output)
 {
@@ -270,88 +291,6 @@ template<>
 std::string Param<bool>::defaultValueStr() const
 {
     return defaultValue ? "1" : "0";
-}
-
-template<>
-bool Param<int>::reload(const std::string* value, std::ostream* output)
-{
-    const int oldValue = *pValue;
-    *pValue = defaultValue;
-    const char* error = "";
-    if (value && !value->empty()) //< Existing but empty int values are treated as default.
-    {
-        // NOTE: std::stoi() is missing on Android.
-        char* pEnd = nullptr;
-        errno = 0; //< Required before strtol().
-        const long v = std::strtol(value->c_str(), &pEnd, /*base*/ 0);
-        if (v > INT_MAX || v < INT_MIN || errno != 0 || *pEnd != '\0')
-            error = " [invalid value]";
-        else
-            *pValue = (int) v;
-    }
-    printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
-    return oldValue != *pValue;
-}
-
-template<>
-bool Param<float>::reload(const std::string* value, std::ostream* output)
-{
-    const float oldValue = *pValue;
-    *pValue = defaultValue;
-    const char* error = "";
-    if (value && !value->empty()) //< Existing but empty float values are treated as default.
-    {
-        // NOTE: std::stof() is missing on Android.
-        char* pEnd = nullptr;
-        errno = 0; //< Required before strtof().
-        // Android NDK does not support std::strtof.
-        const float v = (float) std::strtod(value->c_str(), &pEnd);
-        if (errno == ERANGE || *pEnd != '\0')
-            error = " [invalid value]";
-        else
-            *pValue = (float) v;
-    }
-    printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
-    return oldValue != *pValue;
-}
-
-template<>
-bool Param<double>::reload(const std::string* value, std::ostream* output)
-{
-    const double oldValue = *pValue;
-    *pValue = defaultValue;
-    const char* error = "";
-    if (value && !value->empty()) //< Existing but empty double values are treated as default.
-    {
-        // NOTE: std::stof() is missing on Android.
-        char* pEnd = nullptr;
-        errno = 0; //< Required before strtod().
-        const double v = std::strtod(value->c_str(), &pEnd);
-        if (errno == ERANGE || *pEnd != '\0')
-            error = " [invalid value]";
-        else
-            *pValue = v;
-    }
-    printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
-    return oldValue != *pValue;
-}
-
-template<>
-std::string Param<int>::defaultValueStr() const
-{
-    return toString(defaultValue);
-}
-
-template<>
-std::string Param<float>::defaultValueStr() const
-{
-    return toString(defaultValue);
-}
-
-template<>
-std::string Param<double>::defaultValueStr() const
-{
-    return toString(defaultValue);
 }
 
 template<>
