@@ -11,6 +11,8 @@ angular
         
         $scope.Config = nxConfigService.getConfig();
         $scope.Lang = languageService.lang;
+        $scope.showSearch = false;
+        $scope.fetchComplete = false;
     
         nxPageService.setPageTitle($scope.Lang.pageTitles.systems);
         
@@ -18,8 +20,6 @@ angular
             $scope.account = newAccount;
             $scope.gettingSystems.run();
         });
-
-        $scope.showSearch = false;
 
         $scope.systemsProvider = systemsProvider;
         $scope.$watch('systemsProvider.systems', function(){
@@ -32,6 +32,7 @@ angular
         });
 
         $scope.gettingSystems = process.init(function () {
+            $scope.fetchComplete = true;
             return systemsProvider.forceUpdateSystems();
         }, {
             errorPrefix: $scope.Lang.errorCodes.cantGetSystemsListPrefix,

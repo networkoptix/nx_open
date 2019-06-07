@@ -33,11 +33,10 @@
                     const index = auth.indexOf(':');
                     const tempLogin = auth.substring(0, index);
                     const tempPassword = auth.substring(index + 1);
-                    console.log('START ->');
+                    
                     authorizationCheckService
                         .login(tempLogin, tempPassword, false)
                         .then(function () {
-                            console.log('START redirect ->');
                             authorizationCheckService.redirectAuthorised();
                             $scope.userEmail = account.getEmail();
                         })
@@ -46,9 +45,12 @@
                         });
                 }
             } else {
-                console.log('START (no auth) rejected ->');
-                authorizationCheckService.redirectAuthorised();
-                $scope.userEmail = account.getEmail();
+                authorizationCheckService
+                    .checkLoginState()
+                    .then(function () {
+                        authorizationCheckService.redirectAuthorised();
+                        $scope.userEmail = account.getEmail();
+                    })
             }
         }
     }

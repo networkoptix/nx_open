@@ -68,21 +68,19 @@
                 }
 
                 updateActive();
-
-                account
-                    .get()
-                    .then(function (account) {
-                        scope.account = account;
-                        scope.downloadsHistory = scope.account.permissions.indexOf(CONFIG.permissions.canViewRelease) > -1;
-
+    
+                scope.$watch('$rootScope.session.loginState', function () {
+                    if ($rootScope.session.loginState) {
                         $('body').removeClass('loading');
+                        $('body').removeClass('anonymous');
                         $('body').addClass('authorized');
-                    }, function () {
+                    } else {
                         $('body').removeClass('loading');
+                        $('body').removeClass('authorized');
                         $('body').addClass('anonymous');
-                    });
-
-
+                    }
+                });
+                
                 scope.$on('$locationChangeSuccess', function (next, current) {
                     if ($route.current.params.systemId && !scope.systems) {
                             scope.systemsProvider.forceUpdateSystems();

@@ -18,6 +18,7 @@
 
             const service = {
                 get,
+                checkLoginState,
                 login,
                 logout,
                 requireLogin,
@@ -35,19 +36,28 @@
             function init() {
             }
 
+            function checkLoginState() {
+                if ($rootScope.session.loginState) {
+                    return $q.resolve(true);
+                }
+                return $q.reject(false);
+            }
+
             function get() {
-                console.log('GET() ->');
                 return cloudApi
                     .account()
                     .then((account) => {
-                        console.log('GET() (then) ->');
                         return account.data;
                     });
             }
 
+            function setEmail(email) {
+                $rootScope.session.email = email;
+            }
+
             function login(email, password, remember) {
-                this.setEmail(email);
-                console.log('LOGUN (setEmail) ->');
+                setEmail(email);
+
                 return cloudApi
                         .login(email, password, remember)
                         .then((result) => {
@@ -59,7 +69,6 @@
                                 // If the user that logged in matches the current session there's no need to show
                                 // the logout dialog.
                                 if (result.data.email !== $rootScope.session.loginState) {
-                                    console.log('logoutAuthorised ->');
                                     logoutAuthorised();
                                 }
 
@@ -69,15 +78,12 @@
                             if (result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
                                 setEmail(result.data.email);
                                 $rootScope.session.loginState = result.data.email; // Forcing changing loginState to reload interface
-                                console.log('LOGIN (then/setEmail) ->');
                             }
 
                             get().then(() => {
-                                     console.log('LOGIN resolved ->');
                                      return $q.resolve(true);
                                  })
                                  .catch(error => {
-                                     console.log('LOGIN rejected ->');
                                      return $q.reject(error);
                                  });
 
@@ -87,7 +93,6 @@
             }
 
             function logout(doNotRedirect) {
-                console.log('LOGOUT (AuthService)->');
                 cloudApi
                     .logout()
                     .finally(() => {
@@ -101,10 +106,6 @@
                     });
             }
 
-            function setEmail(email) {
-                $rootScope.session.email = email;
-            }
-
             function requireLogin() {
                 return get().catch(() => {
                     return NxDialogsService.login(true);
@@ -112,9 +113,7 @@
             }
 
             function redirectAuthorised() {
-                console.log('redirectAuthorised (start) ->');
                 get().then(() => {
-                    console.log('redirectAuthorised (then) ->');
                     $location.path(CONFIG.redirectAuthorised);
                 });
             }
@@ -128,7 +127,6 @@
             }
 
             function logoutAuthorised() {
-                console.log('LOGOUT autorized (AuthService)->');
                 get().then(() => {
                     // logoutAuthorisedLogoutButton
                     NxDialogsService

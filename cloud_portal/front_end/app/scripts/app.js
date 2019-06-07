@@ -39,8 +39,7 @@ window.L = {};
             function($q, $rootScope) {
                 return {
                     responseError: function(error) {
-                        if (error.status === 401) {
-                            console.trace(error);
+                        if (error.status === 401 && $rootScope.session.loginState !== undefined) {
                             // Session expired - try to trigger browser reload
                             $rootScope.session.loginState = undefined;
                         }
