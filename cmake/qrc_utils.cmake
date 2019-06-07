@@ -113,7 +113,7 @@ function(nx_add_qrc qrc_file out_cpp_file_variable)
 
 endfunction()
 
-function(nx_add_rcc_target target)
+function(nx_add_external_resources_target target)
     set(oneValueArgs OUTPUT)
     cmake_parse_arguments(QRC "" "${oneValueArgs}" "" ${ARGN})
 

@@ -19,19 +19,20 @@ if(MACOSX)
     set(mac_sources src/ui/workaround/mac_utils.mm)
 endif()
 
-file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
+file(GLOB_RECURSE QML_FILES external_resources/qml/*.qml external_resources/qml/*.js)
 
 set(library_type)
 if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-nx_add_rcc_target(nx_vms_client_desktop_skin
+nx_add_external_resources_target(nx_vms_client_desktop_skin
+        "${CMAKE_CURRENT_LIST_DIR}/external_resources"
         "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
     OUTPUT
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/skin.rcc
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/external.dat
 )
 
 nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}

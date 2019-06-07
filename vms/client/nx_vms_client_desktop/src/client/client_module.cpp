@@ -228,7 +228,11 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
         return;
 
     initNetwork();
-    initSkin();
+
+    // Initialize application UI. Skip if run in console (e.g. unit-tests).
+    if (qApp)
+        initSkin();
+
     initLocalResources();
     initSurfaceFormat();
 
@@ -618,21 +622,18 @@ void QnClientModule::initNetwork()
     commonModule->instance<QnServerInterfaceWatcher>();
 }
 
-//#define ENABLE_DYNAMIC_CUSTOMIZATION
 void QnClientModule::initSkin()
 {
+    const auto rootDir = QDir(QApplication::applicationDirPath());
+    const auto resourcesDir = nx::utils::AppInfo::isMacOsX()
+        ? QDir(rootDir.absoluteFilePath("../Resources"))
+        : rootDir;
+
+    nx::vms::client::core::FontLoader::loadFonts(resourcesDir.absoluteFilePath("fonts"));
+    QResource::registerResource(resourcesDir.absoluteFilePath("external.dat"));
+
     QStringList paths;
     paths << ":/skin";
-    paths << ":/skin_dark";
-
-#ifdef ENABLE_DYNAMIC_CUSTOMIZATION
-    if (!m_startupParameters.dynamicCustomizationPath.isEmpty())
-    {
-        QDir base(startupParams.dynamicCustomizationPath);
-        paths << base.absoluteFilePath("skin");
-        paths << base.absoluteFilePath("skin_dark");
-    }
-#endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
     QScopedPointer<QnSkin> skin(new QnSkin(paths));
 
@@ -643,18 +644,8 @@ void QnClientModule::initSkin()
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(customization));
     customizer->customize(qnGlobals);
 
-    /* Initialize application UI. Skip if run in console (e.g. unit-tests). */
-    if (qApp)
-    {
-        const auto rootDir = QDir(QApplication::applicationDirPath());
-        nx::vms::client::core::FontLoader::loadFonts(
-            rootDir.absoluteFilePath(
-                nx::utils::AppInfo::isMacOsX() ? "../Resources/fonts" : "fonts"));
-        QResource::registerResource(rootDir.absoluteFilePath("skin.rcc"));
-
-        QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
-        QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
-    }
+    QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
+    QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
 
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->store(skin.take());
