@@ -14,7 +14,7 @@ struct AnalyticsEngineInfo
     QJsonObject settingsModel;
     bool isDeviceDependent = false;
 
-    // TODO: Looks like we need a fusion method or any other simple way to proxy struct to QML.
+    // TODO: Use fusion to serialize to QJsonObject instead.
     QVariantMap toVariantMap() const
     {
         return {
