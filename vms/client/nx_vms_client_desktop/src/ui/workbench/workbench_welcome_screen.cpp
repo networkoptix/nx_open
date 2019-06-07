@@ -5,6 +5,7 @@
 #include <QtQuick/QQuickView>
 #include <QtQuick/QQuickItem>
 #include <QtQml/QQmlContext>
+#include <QtQml/QQmlEngine>
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
@@ -68,7 +69,6 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
     QnWorkbenchContextAware(parent)
 {
     NX_ASSERT(qnRuntime->isDesktopMode());
-
 
     rootContext()->setContextProperty(lit("context"), this);
     setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
