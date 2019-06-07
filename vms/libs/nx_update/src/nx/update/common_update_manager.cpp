@@ -47,6 +47,9 @@ update::Status CommonUpdateManager::start()
     NX_DEBUG(this, "Start update: Should download from scratch: %1, package valid: %2",
         shouldDownloadFromScratch, package.isValid());
 
+    installer()->stopSync();
+
+    clearDownloader(/*force*/ !package.isValid() || shouldDownloadFromScratch);
     if (!package.isValid())
         return updateStatus;
 
@@ -62,8 +65,6 @@ update::Status CommonUpdateManager::start()
         return updateStatus;
     }
 
-    installer()->stopSync();
-    downloader()->deleteFile(package.file);
     m_downloaderFailDetail = DownloaderFailDetail::noError;
 
     FileInformation fileInformation;
@@ -186,7 +187,6 @@ void CommonUpdateManager::finish()
 
 void CommonUpdateManager::onGlobalUpdateSettingChanged()
 {
-    clearDownloader();
     start();
 }
 
@@ -389,7 +389,7 @@ void CommonUpdateManager::extract()
     installer()->prepareAsync(downloader()->filePath(package.file));
 }
 
-void CommonUpdateManager::clearDownloader()
+void CommonUpdateManager::clearDownloader(bool force)
 {
     NX_DEBUG(this, "Start downloader clean up");
 
@@ -400,7 +400,7 @@ void CommonUpdateManager::clearDownloader()
 
     for (const QString& file: downloader()->files())
     {
-        if (!file.startsWith(prefix) || file == package.file) //< Can be empty.
+        if (!file.startsWith(prefix) || (file == package.file && !force))
             continue;
 
         NX_INFO(this, "Deleting file: %1", file);
