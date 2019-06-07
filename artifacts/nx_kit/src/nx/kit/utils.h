@@ -70,7 +70,6 @@ std::string format(const std::string& formatStr, Args... args)
 NX_KIT_API bool fromString(const std::string& s, int* value);
 NX_KIT_API bool fromString(const std::string& s, double* value);
 NX_KIT_API bool fromString(const std::string& s, float* value);
-NX_KIT_API bool fromString(const std::string& s, bool* value);
 
 //-------------------------------------------------------------------------------------------------
 // OS support.
