@@ -109,7 +109,7 @@ if(withNxTool)
 endif()
 
 if(withDesktopClient)
-    set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/vms/client/nx_vms_client_desktop/external_resources/qml/")
+    set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/vms/client/nx_vms_client_desktop/qml/")
 
     add_custom_target(collect_qml_dependencies
         DEPENDS

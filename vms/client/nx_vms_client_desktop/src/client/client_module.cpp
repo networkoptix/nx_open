@@ -4,6 +4,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QResource>
 
 #include <QtWidgets/QApplication>
 #include <QtWebKit/QWebSettings>
@@ -146,6 +147,24 @@ static const QString kQmlRoot = QStringLiteral("qrc:///qml");
 
 namespace {
 
+void initExternalResources()
+{
+    // TODO: Resources folder calculation introduces code duplication with translations manager.
+    const auto rootDir = QDir(QApplication::applicationDirPath());
+    const auto resourcesDir = nx::utils::AppInfo::isMacOsX()
+        ? QDir(rootDir.absoluteFilePath("../Resources"))
+        : rootDir;
+
+    nx::vms::client::core::FontLoader::loadFonts(resourcesDir.absoluteFilePath("fonts"));
+
+    static const QList<QString> kExternalResourceFilenames = {
+        "nx_vms_client_desktop.dat"
+    };
+
+    for (const auto filename: kExternalResourceFilenames)
+        QResource::registerResource(resourcesDir.absoluteFilePath(filename));
+}
+
 typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
 
 QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
@@ -221,6 +240,13 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initThread();
     initMetaInfo();
     initApplication();
+
+    // Skip some modules initialization for unit tests.
+    const bool isFullApplicationMode = (qApp != nullptr);
+
+    if (isFullApplicationMode)
+        initExternalResources();
+
     initSingletons();
 
     /* Do not initialize anything else because we must exit immediately if run in self-update mode. */
@@ -229,8 +255,8 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
 
     initNetwork();
 
-    // Initialize application UI. Skip if run in console (e.g. unit-tests).
-    if (qApp)
+    // Initialize application UI.
+    if (isFullApplicationMode)
         initSkin();
 
     initLocalResources();
@@ -624,14 +650,6 @@ void QnClientModule::initNetwork()
 
 void QnClientModule::initSkin()
 {
-    const auto rootDir = QDir(QApplication::applicationDirPath());
-    const auto resourcesDir = nx::utils::AppInfo::isMacOsX()
-        ? QDir(rootDir.absoluteFilePath("../Resources"))
-        : rootDir;
-
-    nx::vms::client::core::FontLoader::loadFonts(resourcesDir.absoluteFilePath("fonts"));
-    QResource::registerResource(resourcesDir.absoluteFilePath("external.dat"));
-
     QStringList paths;
     paths << ":/skin";
 

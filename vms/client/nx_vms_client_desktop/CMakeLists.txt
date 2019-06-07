@@ -19,8 +19,6 @@ if(MACOSX)
     set(mac_sources src/ui/workaround/mac_utils.mm)
 endif()
 
-file(GLOB_RECURSE QML_FILES external_resources/qml/*.qml external_resources/qml/*.js)
-
 set(library_type)
 if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
@@ -32,8 +30,12 @@ nx_add_external_resources_target(nx_vms_client_desktop_skin
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
     OUTPUT
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/external.dat
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_vms_client_desktop.dat
 )
+
+file(GLOB_RECURSE QML_FILES qml/*)
+set_source_files_properties(${QML_FILES}
+    PROPERTIES RESOURCE_BASE_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
 nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
     ADDITIONAL_SOURCES
@@ -44,6 +46,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         "${customization_dir}/license.html"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
         "${nov_file_launcher_executable}"
+        "${QML_FILES}"
     ADDITIONAL_MOCABLES
         src/nx/vms/client/desktop/system_administration/widgets/analytics_settings_widget.cpp
         src/nx/vms/client/desktop/ui/common/global_tool_tip.cpp
