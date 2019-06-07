@@ -1,5 +1,7 @@
 #include "cleaner.h"
 
+#include <analytics/db/config.h>
+
 #include "attributes_dao.h"
 
 namespace nx::analytics::db {
@@ -19,8 +21,11 @@ Cleaner::Cleaner(
 
 Cleaner::Result Cleaner::clean(nx::sql::QueryContext* queryContext)
 {
-    if (cleanObjectSearch(queryContext) >= kRecordsToRemoveAtATime)
-        return Result::incomplete;
+    if (!kLookupObjectsInAnalyticsArchive)
+    {
+        if (cleanObjectSearch(queryContext) >= kRecordsToRemoveAtATime)
+            return Result::incomplete;
+    }
 
     if (cleanObjectSearchToObject(queryContext) >= kRecordsToRemoveAtATime)
         return Result::incomplete;

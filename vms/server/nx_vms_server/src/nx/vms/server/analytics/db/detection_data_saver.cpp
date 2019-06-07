@@ -52,7 +52,10 @@ void DetectionDataSaver::save(nx::sql::QueryContext* queryContext)
 {
     insertObjects(queryContext);
     updateObjects(queryContext);
-    saveObjectSearchData(queryContext);
+    
+    if (!kLookupObjectsInAnalyticsArchive)
+        saveObjectSearchData(queryContext);
+    
     if (m_analyticsArchive)
         saveToAnalyticsArchive(queryContext);
 }

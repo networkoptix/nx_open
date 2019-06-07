@@ -61,6 +61,11 @@ public:
         const ObjectFields& fieldNames,
         nx::sql::Filter* sqlFilter);
 
+    static void addDeviceFilterCondition(
+        const std::vector<QnUuid>& deviceIds,
+        const DeviceDao& deviceDao,
+        nx::sql::Filter* sqlFilter);
+
     static void addBoundingBoxToFilter(
         const QRect& boundingBox,
         nx::sql::Filter* sqlFilter);
@@ -98,6 +103,8 @@ private:
         nx::sql::QueryContext* queryContext,
         const std::vector<std::int64_t>& objectGroups,
         std::vector<DetectedObject>* result);
+
+    void prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query);
 
     void prepareLookupQuery(nx::sql::AbstractSqlQuery* query);
 

@@ -4,6 +4,8 @@
 
 #include <vector>
 
+#include <nx/utils/thread/mutex.h>
+
 #include <nx/vms/server/metadata/analytics_archive.h>
 #include <analytics/db/analytics_db_types.h>
 
@@ -72,6 +74,9 @@ private:
     QnMediaServerModule* m_mediaServerModule = nullptr;
     const QString m_dataDir;
     std::map<QnUuid, std::unique_ptr<AnalyticsArchiveImpl>> m_deviceIdToArchive;
+    QnMutex m_mutex;
+
+    AnalyticsArchiveImpl* openOrGetArchive(const QnUuid& deviceId);
 
     void fixFilterRegion(Filter* filter);
 

@@ -29,29 +29,16 @@ bool AnalyticsArchiveDirectory::saveToArchive(
     uint32_t objectType,
     int64_t allAttributesHash)
 {
-    auto& archive = m_deviceIdToArchive[deviceId];
-    if (!archive)
+    if (auto archive = openOrGetArchive(deviceId);
+        archive != nullptr)
     {
-#ifdef USE_IN_MEMORY_ARCHIVE
-        archive = std::make_unique<AnalyticsArchiveImpl>(m_dataDir, deviceId);
-#else
-        if (m_mediaServerModule)
-        {
-            auto camera = m_mediaServerModule->resourcePool()
-                ->getResourceById<QnVirtualCameraResource>(deviceId);
-            if (!camera)
-                return false;
-            archive = std::make_unique<AnalyticsArchiveImpl>(m_dataDir, camera->getPhysicalId());
-        }
-        else
-        {
-            archive = std::make_unique<AnalyticsArchiveImpl>(m_dataDir, deviceId.toSimpleString());
-        }
-#endif
+        return archive->saveToArchive(
+            timestamp, region, objectsGroupId, objectType, allAttributesHash);
     }
-
-    return archive->saveToArchive(
-        timestamp, region, objectsGroupId, objectType, allAttributesHash);
+    else
+    {
+        return false;
+    }
 }
 
 QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(
@@ -73,11 +60,15 @@ QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(
     const QnUuid& deviceId,
     const Filter& filter)
 {
-    auto it = m_deviceIdToArchive.find(deviceId);
-    if (it == m_deviceIdToArchive.end())
+    if (auto archive = openOrGetArchive(deviceId);
+        archive != nullptr)
+    {
+        return archive->matchPeriod(filter);
+    }
+    else
+    {
         return {};
-
-    return it->second->matchPeriod(filter);
+    }
 }
 
 AnalyticsArchiveDirectory::ObjectMatchResult AnalyticsArchiveDirectory::matchObjects(
@@ -165,6 +156,35 @@ AnalyticsArchive::Filter AnalyticsArchiveDirectory::prepareArchiveFilter(
     return archiveFilter;
 }
 
+AnalyticsArchiveImpl* AnalyticsArchiveDirectory::openOrGetArchive(
+    const QnUuid& deviceId)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto& archive = m_deviceIdToArchive[deviceId];
+    if (!archive)
+    {
+#ifdef USE_IN_MEMORY_ARCHIVE
+        archive = std::make_unique<AnalyticsArchiveImpl>(m_dataDir, deviceId);
+#else
+        if (m_mediaServerModule)
+        {
+            auto camera = m_mediaServerModule->resourcePool()
+                ->getResourceById<QnVirtualCameraResource>(deviceId);
+            if (!camera)
+                return nullptr;
+            archive = std::make_unique<AnalyticsArchiveImpl>(m_dataDir, camera->getPhysicalId());
+        }
+        else
+        {
+            archive = std::make_unique<AnalyticsArchiveImpl>(m_dataDir, deviceId.toSimpleString());
+        }
+#endif
+    }
+
+    return archive.get();
+}
+
 void AnalyticsArchiveDirectory::fixFilterRegion(Filter* filter)
 {
     if (filter->region.isEmpty())
@@ -177,11 +197,15 @@ nx::vms::server::metadata::AnalyticsArchive::MatchObjectsResult AnalyticsArchive
     const QnUuid& deviceId,
     const Filter& filter)
 {
-    auto it = m_deviceIdToArchive.find(deviceId);
-    if (it == m_deviceIdToArchive.end())
+    if (auto archive = openOrGetArchive(deviceId); 
+        archive != nullptr)
+    {
+        return archive->matchObjects(filter);
+    }
+    else
+    {
         return {};
-
-    return it->second->matchObjects(filter);
+    }
 }
 
 } // namespace nx::analytics::db

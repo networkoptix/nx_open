@@ -6,6 +6,8 @@
 
 namespace nx::analytics::db {
 
+static constexpr bool kLookupObjectsInAnalyticsArchive = true;
+
 // Using 14 bits for coordinates. That allows using only 2 bytes when compressing the value.
 static constexpr int kCoordinatesBits = 14;
 static constexpr int kCoordinatesPrecision = (1 << kCoordinatesBits) - 1;

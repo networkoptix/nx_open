@@ -1206,6 +1206,19 @@ protected:
         filter().deviceIds = {deviceId};
     }
 
+    void givenRandomCursorFilter()
+    {
+        givenRandomFilter();
+
+        if (filter().deviceIds.size() > 1)
+            filter().deviceIds.erase(std::next(filter().deviceIds.begin()), filter().deviceIds.end());
+
+        filter().objectTypeId.clear();
+        filter().objectAppearanceId = QnUuid();
+        filter().boundingBox = std::nullopt;
+        filter().freeText.clear();
+    }
+
     void whenReadDataUsingCursor()
     {
         // NOTE: Currently, the cursor is forward only.
@@ -1320,7 +1333,7 @@ TEST_F(AnalyticsDbCursor, reads_all_available_data)
 
 TEST_F(AnalyticsDbCursor, reads_all_matched_data)
 {
-    givenRandomFilter();
+    givenRandomCursorFilter();
 
     whenReadDataUsingCursor();
     thenResultMatchesExpectations();

@@ -10,8 +10,6 @@
 #include "cursor.h"
 #include "serializers.h"
 
-#define LOOKUP_FROM_ARCHIVE
-
 namespace nx::analytics::db {
 
 static const QSize kSearchResolution(
@@ -35,40 +33,39 @@ ObjectSearcher::ObjectSearcher(
         m_filter.maxObjectsToSelect = kMaxObjectLookupResultSet;
 }
 
-#ifdef LOOKUP_FROM_ARCHIVE
-
 std::vector<DetectedObject> ObjectSearcher::lookup(nx::sql::QueryContext* queryContext)
 {
-    if (!m_filter.objectAppearanceId.isNull())
+    if (kLookupObjectsInAnalyticsArchive)
     {
-        auto object = fetchObjectById(queryContext, m_filter.objectAppearanceId);
-        if (!object || !satisfiesFilter(m_filter, *object))
-            return {};
-        return {std::move(*object)};
+        if (!m_filter.objectAppearanceId.isNull())
+        {
+            auto object = fetchObjectById(queryContext, m_filter.objectAppearanceId);
+            if (!object || !satisfiesFilter(m_filter, *object))
+                return {};
+            return {std::move(*object)};
+        }
+        else
+        {
+            return lookupObjectsUsingArchive(queryContext);
+        }
     }
     else
     {
-        return lookupObjectsUsingArchive(queryContext);
+        auto selectEventsQuery = queryContext->connection()->createQuery();
+        selectEventsQuery->setForwardOnly(true);
+        prepareLookupQuery(selectEventsQuery.get());
+        selectEventsQuery->exec();
+
+        return loadObjects(selectEventsQuery.get());
     }
 }
 
-#else
-
-std::vector<DetectedObject> ObjectSearcher::lookup(nx::sql::QueryContext* queryContext)
-{
-    auto selectEventsQuery = queryContext->connection()->createQuery();
-    selectEventsQuery->setForwardOnly(true);
-    prepareLookupQuery(selectEventsQuery.get());
-    selectEventsQuery->exec();
-
-    return loadObjects(selectEventsQuery.get());
-}
-
-#endif
-
 void ObjectSearcher::prepareCursorQuery(nx::sql::SqlQuery* query)
 {
-    prepareLookupQuery(query);
+    if (kLookupObjectsInAnalyticsArchive)
+        prepareCursorQueryImpl(query);
+    else
+        prepareLookupQuery(query);
 }
 
 void ObjectSearcher::loadCurrentRecord(
@@ -92,13 +89,7 @@ void ObjectSearcher::addObjectFilterConditions(
     nx::sql::Filter* sqlFilter)
 {
     if (!filter.deviceIds.empty())
-    {
-        auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
-            "device_id", ":deviceId");
-        for (const auto& deviceGuid: filter.deviceIds)
-            condition->addValue(deviceDao.deviceIdFromGuid(deviceGuid));
-        sqlFilter->addCondition(std::move(condition));
-    }
+        addDeviceFilterCondition(filter.deviceIds, deviceDao, sqlFilter);
 
     if (!filter.objectAppearanceId.isNull())
     {
@@ -117,6 +108,18 @@ void ObjectSearcher::addObjectFilterConditions(
             fieldNames.timeRange,
             sqlFilter);
     }
+}
+
+void ObjectSearcher::addDeviceFilterCondition(
+    const std::vector<QnUuid>& deviceIds,
+    const DeviceDao& deviceDao,
+    nx::sql::Filter* sqlFilter)
+{
+    auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
+        "device_id", ":deviceId");
+    for (const auto& deviceGuid: deviceIds)
+        condition->addValue(deviceDao.deviceIdFromGuid(deviceGuid));
+    sqlFilter->addCondition(std::move(condition));
 }
 
 void ObjectSearcher::addBoundingBoxToFilter(
@@ -379,6 +382,45 @@ void ObjectSearcher::fetchObjectsFromDb(
 
     auto objects = loadObjects(query.get());
     std::move(objects.begin(), objects.end(), std::back_inserter(*result));
+}
+
+void ObjectSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query)
+{
+    nx::sql::Filter sqlFilter;
+    if (!m_filter.deviceIds.empty())
+        addDeviceFilterCondition(m_filter.deviceIds, m_deviceDao, &sqlFilter);
+
+    if (!m_filter.timePeriod.isNull())
+    {
+        addTimePeriodToFilter<std::chrono::milliseconds>(
+            m_filter.timePeriod,
+            {"track_start_ms", "track_end_ms"},
+            &sqlFilter);
+    }
+
+    auto filterExpr = sqlFilter.toString();
+    if (!filterExpr.empty())
+        filterExpr = " AND " + filterExpr;
+
+    std::string limitExpr;
+    if (m_filter.maxObjectsToSelect > 0)
+        limitExpr = "LIMIT " + std::to_string(m_filter.maxObjectsToSelect);
+
+    query->setForwardOnly(true);
+
+    query->prepare(lm(R"sql(
+        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, 
+            ua.content AS content, best_shot_timestamp_ms, best_shot_rect
+        FROM object o, unique_attributes ua
+        WHERE o.attributes_id=ua.id %1
+        ORDER BY track_start_ms %2
+        %3
+    )sql").args(
+        filterExpr,
+        m_filter.sortOrder == Qt::AscendingOrder ? "ASC" : "DESC",
+        limitExpr));
+
+    sqlFilter.bindFields(&query->impl());
 }
 
 void ObjectSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
