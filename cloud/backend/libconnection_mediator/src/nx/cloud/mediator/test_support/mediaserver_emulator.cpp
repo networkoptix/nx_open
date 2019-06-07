@@ -258,7 +258,7 @@ void MediaServerEmulator::setServerIdForModuleInformation(
 }
 
 nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(
-    std::list<network::SocketAddress> addresses)
+    std::vector<network::SocketAddress> addresses)
 {
     utils::promise<nx::hpm::api::ResultCode> promise;
     m_mediatorAddressPublisher->updateAddresses(

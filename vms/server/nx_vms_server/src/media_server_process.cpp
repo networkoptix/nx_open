@@ -1183,7 +1183,7 @@ void MediaServerProcess::updateAddressesList()
     }
 
     nx::network::SocketGlobals::cloud().addressPublisher().updateAddresses(
-        std::list<nx::network::SocketAddress>(
+        std::vector<nx::network::SocketAddress>(
             serverAddresses.begin(),
             serverAddresses.end()));
 }

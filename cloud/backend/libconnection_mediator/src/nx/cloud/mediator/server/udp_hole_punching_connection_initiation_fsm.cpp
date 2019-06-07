@@ -269,7 +269,8 @@ nx::network::stun::Message
         }
         if (!connectRequest.ignoreSourceAddress)
         {
-            connectionRequestedEvent.udpEndpointList.emplace_front(
+            connectionRequestedEvent.udpEndpointList.insert(
+                connectionRequestedEvent.udpEndpointList.begin(),
                 originatingPeerSourceAddress);
         }
     }
@@ -305,10 +306,7 @@ void UDPHolePunchingConnectionInitiationFsm::noConnectionAckOnTime()
     // Sending connect response.
     m_state = State::waitingConnectionResult;
 
-    api::ConnectResponse connectResponse = prepareConnectResponse(
-        api::ConnectionAckRequest(),
-        std::list<network::SocketAddress>(),
-        std::nullopt);
+    api::ConnectResponse connectResponse = prepareConnectResponse(api::ConnectionAckRequest(), {}, std::nullopt);
     sendConnectResponse(api::ResultCode::noReplyFromServer, std::move(connectResponse));
 
     if (m_settings.connectionParameters().connectionResultWaitTimeout ==
@@ -332,7 +330,7 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
         requestSourceDescriptor.sourceAddress.toString().toUtf8();
 
     if (requestSourceDescriptor.transportProtocol == nx::network::TransportProtocol::udp)
-        request.udpEndpointList.push_front(requestSourceDescriptor.sourceAddress);
+        request.udpEndpointList.insert(request.udpEndpointList.begin(), requestSourceDescriptor.sourceAddress);
 
     m_timer.pleaseStopSync();
 
@@ -474,7 +472,7 @@ void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
 
 api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectResponse(
     const api::ConnectionAckRequest& connectionAckRequest,
-    std::list<network::SocketAddress> tcpEndpoints,
+    std::vector<network::SocketAddress> tcpEndpoints,
     std::optional<QUrl> relayInstanceUrl)
 {
     api::ConnectResponse connectResponse;
