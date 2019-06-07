@@ -413,7 +413,7 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
     QFile metadataFile, indexFile;
     const bool descendingOrder = filter.sortOrder == Qt::SortOrder::DescendingOrder;
 
-    while (msStartTime < msEndTime)
+    while (msStartTime <= msEndTime)
     {
         qint64 minTime, maxTime;
         auto timePointMs = descendingOrder ? msEndTime : msStartTime;
