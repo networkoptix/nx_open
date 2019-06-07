@@ -50,7 +50,7 @@ Item
 
                 MenuItem
                 {
-                    id: thisItem
+                    itemId: modelData.id
                     text: modelData.name
                     active: modelData.loaded
                     onClicked: store.selectCurrentPlugin(modelData.id)
@@ -61,7 +61,7 @@ Item
                         onCurrentPluginChanged:
                         {
                             if (currentPlugin && modelData.id === currentPlugin.id)
-                                menu.currentItemId = thisItem
+                                menu.currentItemId = itemId
                         }
                     }
                 }
