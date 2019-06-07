@@ -496,7 +496,7 @@ QnAuditRecordList QnServerDb::getAuditData(const QnTimePeriod& period, const QnU
         "WHERE createdTimeSec BETWEEN ? and ? ");
     if (!sessionId.isNull())
         request += lit("AND authSession like '%1%'").arg(sessionId.toString());
-    request += lit("ORDER BY createdTimeSec");
+    request += lit("ORDER BY id");
 
     QnWriteLocker lock(&m_mutex);
     QSqlQuery query(m_sdb);
@@ -883,7 +883,7 @@ QString QnServerDb::getRequestStr(const QnEventLogFilterData& request,
             .arg(guidToSqlString(request.ruleId));
     }
 
-    requestStr += lit(" ORDER BY timestamp");
+    requestStr += lit(" ORDER BY rowid");
 
     if (order == Qt::DescendingOrder)
         requestStr += lit(" DESC");
