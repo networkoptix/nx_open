@@ -89,7 +89,7 @@ public:
 
     /**
      * @return Ids of Analytics Engines which are actually compatible with the Device, enabled by
-     * the user and active (running on the current server).
+     *    the user and active (running on the current server).
      */
     QSet<QnUuid> enabledAnalyticsEngines() const;
 
@@ -101,43 +101,43 @@ public:
 
     /**
      * @return Ids of Analytics Engines which are explicitly enabled by the user. Not validated for
-     * compatibility with the Device or if the engine is active (running on the current server).
+     *     compatibility with the Device or if the engine is active (running on the current server).
      */
     QSet<QnUuid> userEnabledAnalyticsEngines() const;
 
     /**
      * Set ids of Analytics Engines which are explicitly enabled by the user. Not validated for
-     * compatibility with the Device or if the engine is active (running on the current server).
+     * compatibility with the Device or if the Engine is active (running on the current server).
      */
     void setUserEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
 
     /**
-     * @return Ids of Analytics Engines, which can be potentially used with the Device. Only active
-     * (running on the current server) Engines are included.
+     * @return Ids of Analytics Engines which can be potentially used with the Device. Only active
+     *     (running on the current server) Engines are included.
      */
     const QSet<QnUuid> compatibleAnalyticsEngines() const;
 
     /**
-     * @return Analytics Engines, which can be potentially used with the Device. Only active
-     * (running on the current server) Engines are included.
+     * @return Analytics Engines which can be potentially used with the Device. Only active
+     *     (running on the current server) Engines are included.
      */
     nx::vms::common::AnalyticsEngineResourceList compatibleAnalyticsEngineResources() const;
 
     /**
-     * Set ids of Analytics Engines, which can be potentially used with the Device. Only active
+     * Set ids of Analytics Engines which can be potentially used with the Device. Only active
      * (running on the current server) Engines must be included.
      */
     void setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines);
 
     /**
      * @return Map of supported Event types by the Engine id. Only actually compatible with the
-     * Device, enabled by the user and active (running on the current Server) Engines are used.
+     *     Device, enabled by the user and active (running on the current Server) Engines are used.
      */
     std::map<QnUuid, std::set<QString>> supportedEventTypes() const;
 
     /**
-     * @return Map of supported Object types by the Engine id. Only actually compatible with the
-     * Device, enabled by the user and active (running on the current Server) Engines are used.
+     * @return Map of the supported Object types by the Engine id. Only actually compatible with the
+     *     Device, enabled by the user and active (running on the current Server) Engines are used.
      */
     std::map<QnUuid, std::set<QString>> supportedObjectTypes() const;
 
