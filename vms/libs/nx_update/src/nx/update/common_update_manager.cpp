@@ -196,9 +196,7 @@ void CommonUpdateManager::managePersistentDownloads()
 }
 
 void CommonUpdateManager::setUpdatePersistentStorageServers(
-    const QList<QnUuid>& serverList,
-    const QString& version,
-    bool manuallySet)
+    const QList<QnUuid>& serverList, const QString& version, bool manuallySet)
 {
     update::PersistentUpdateStorage updateStorage;
     updateStorage.manuallySet = manuallySet;

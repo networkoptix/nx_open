@@ -219,14 +219,18 @@ protected:
             update::PersistentUpdateStorage({m_peers[0]->commonModule()->moduleGUID()}, true);
 
         const QString path = "/ec2/updatePersistenStorages?version=" + version;
-        NX_TEST_API_POST(m_peers[0].get(), path, m_persistentServersData[version]);
+        NX_TEST_API_POST(m_peers[0].get(), path, m_persistentServersData[version].servers);
     }
 
     void thenPersistentUpdateStorageDataShouldBeRetrievalble(const QString& version)
     {
-        update::PersistentUpdateStorage persistentStorageData;
         const QString path = "/ec2/updatePersistenStorages?version=" + version;
-        NX_TEST_API_GET(m_peers[0].get(), path, &persistentStorageData);
+
+        QnJsonRestResult result;
+        NX_TEST_API_GET(m_peers[0].get(), path, &result);
+
+        update::PersistentUpdateStorage persistentStorageData =
+            result.deserialized<update::PersistentUpdateStorage>();
         ASSERT_EQ(persistentStorageData, m_persistentServersData[version]);
     }
 

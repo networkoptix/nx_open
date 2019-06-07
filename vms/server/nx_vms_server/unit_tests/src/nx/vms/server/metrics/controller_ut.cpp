@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/vms/server/metrics/controller.cpp>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/model_functions.h>
 
 #include "test_providers.h"
 
