@@ -140,6 +140,8 @@
 
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/vms/utils/external_resources.h>
+
 using namespace nx;
 using namespace nx::vms::client::desktop;
 
@@ -149,20 +151,12 @@ namespace {
 
 void initExternalResources()
 {
-    // TODO: Resources folder calculation introduces code duplication with translations manager.
-    const auto rootDir = QDir(QApplication::applicationDirPath());
-    const auto resourcesDir = nx::utils::AppInfo::isMacOsX()
-        ? QDir(rootDir.absoluteFilePath("../Resources"))
-        : rootDir;
+    using namespace nx::vms::utils;
 
-    nx::vms::client::core::FontLoader::loadFonts(resourcesDir.absoluteFilePath("fonts"));
+    nx::vms::client::core::FontLoader::loadFonts(
+        externalResourcesDirectory().absoluteFilePath("fonts"));
 
-    static const QList<QString> kExternalResourceFilenames = {
-        "nx_vms_client_desktop.dat"
-    };
-
-    for (const auto filename: kExternalResourceFilenames)
-        QResource::registerResource(resourcesDir.absoluteFilePath(filename));
+    registerExternalResource("nx_vms_client_desktop.dat");
 }
 
 typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;

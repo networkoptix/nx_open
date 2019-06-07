@@ -1,14 +1,14 @@
 #include "translation_manager.h"
 
 #include <QtCore/QDir>
-#include <QtCore/QResource>
-#include <QtCore/QTranslator>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QTranslator>
 
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
 
-#include <nx/utils/app_info.h>
+#include <nx/vms/utils/external_resources.h>
+
 #include <nx/utils/log/assert.h>
 
 namespace {
@@ -48,13 +48,7 @@ QnTranslationManager::QnTranslationManager(QObject *parent):
     addPrefix("qtbase");
     addSearchPath(kDefaultSearchPath);
 
-    const auto rootDir = QDir(QCoreApplication::applicationDirPath());
-    const auto resourcesDir = nx::utils::AppInfo::isMacOsX()
-        ? QDir(rootDir.absoluteFilePath("../Resources"))
-        : rootDir;
-
-    for (const auto filename: resourcesDir.entryList(QStringList{"*_translations.dat"}))
-        QResource::registerResource(resourcesDir.absoluteFilePath(filename));
+    nx::vms::utils::registerExternalResourcesByMask("*_translations.dat");
 }
 
 QnTranslationManager::~QnTranslationManager()
