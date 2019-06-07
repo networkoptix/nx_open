@@ -269,6 +269,7 @@ class DataStructureAdmin(CMSAdmin):
     list_display = ('context', 'label', 'name', 'description', 'translatable', 'type')
     list_filter = ('context', 'translatable', 'context__product_type')
     search_fields = ('context__name', 'name', 'description', 'type')
+    actions = ['delete_selected']
 
 
 admin.site.register(DataStructure, DataStructureAdmin)
