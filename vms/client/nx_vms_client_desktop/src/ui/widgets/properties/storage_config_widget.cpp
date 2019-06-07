@@ -121,15 +121,24 @@ namespace
             bool hovered = m_hoverTracker && m_hoverTracker->hoveredIndex() == index;
             bool beingEdited = m_editedRow == index.row();
 
+            bool hoveredRow = m_hoverTracker && m_hoverTracker->hoveredIndex().row() == index.row();
+            bool hasActiveAction = index.column() == QnStorageListModel::ActionsColumn
+                && index.data(Qn::ItemMouseCursorRole).toInt() == Qt::PointingHandCursor;
+                // TODO: add a separate data role for such cases?
+
+            // Hide actions when their row is not hovered.
+            if (hasActiveAction && !hoveredRow)
+                return;
+
             auto storage = index.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
 
             /* Set disabled style for unchecked rows: */
             if (!index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
                 opt.state &= ~QStyle::State_Enabled;
 
-            /* Set proper color for links: */
-            if (index.column() == QnStorageListModel::ActionsColumn && !opt.text.isEmpty())
-                opt.palette.setColor(QPalette::Text, style::linkColor(opt.palette, hovered));
+            // Set proper color for actions when they are hovered.
+            if (hasActiveAction && hovered)
+                opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::ButtonText));
 
             /* Set warning color for inaccessible storages: */
             if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
