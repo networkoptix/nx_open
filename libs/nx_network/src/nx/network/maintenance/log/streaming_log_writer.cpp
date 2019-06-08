@@ -15,7 +15,7 @@ void StreamingLogWriter::write(nx::utils::log::Level /*level*/, const QString& m
 {
     QnMutexLocker lock(&m_mutex);
     if (m_messageBody)
-        m_messageBody->writeBodyData(message.toUtf8());  
+        m_messageBody->writeBodyData((message + "\r\n").toUtf8());
 }
 
 void StreamingLogWriter::setMessageBody(WritableMessageBody * messageBody)
