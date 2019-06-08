@@ -35,7 +35,7 @@ class Command(BaseCommand):
             product = get_cloud_portal_product(options['customization'])
 
         for i in range(settings.FILLDATA_TRIES):
-            result = filldata.init_skin(product, options['preview'], workers=10)
+            result = filldata.init_skin(product, options['preview'], workers=1)
             if result:
                 break
 
