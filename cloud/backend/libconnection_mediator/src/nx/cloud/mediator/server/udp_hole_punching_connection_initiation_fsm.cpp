@@ -271,7 +271,8 @@ nx::network::stun::Message
         }
         if (!connectRequest.ignoreSourceAddress)
         {
-            connectionRequestedEvent.udpEndpointList.emplace_front(
+            connectionRequestedEvent.udpEndpointList.insert(
+                connectionRequestedEvent.udpEndpointList.begin(),
                 originatingPeerSourceAddress);
         }
     }
@@ -307,10 +308,7 @@ void UDPHolePunchingConnectionInitiationFsm::noConnectionAckOnTime()
     // Sending connect response.
     m_state = State::waitingConnectionResult;
 
-    api::ConnectResponse connectResponse = prepareConnectResponse(
-        api::ConnectionAckRequest(),
-        std::list<network::SocketAddress>(),
-        std::nullopt);
+    api::ConnectResponse connectResponse = prepareConnectResponse(api::ConnectionAckRequest(), {}, std::nullopt);
     sendConnectResponse(api::ResultCode::noReplyFromServer, std::move(connectResponse));
 
     if (m_settings.connectionParameters().connectionResultWaitTimeout ==
@@ -334,7 +332,7 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
         requestSourceDescriptor.sourceAddress.toString().toUtf8();
 
     if (requestSourceDescriptor.transportProtocol == nx::network::TransportProtocol::udp)
-        request.udpEndpointList.push_front(requestSourceDescriptor.sourceAddress);
+        request.udpEndpointList.insert(request.udpEndpointList.begin(), requestSourceDescriptor.sourceAddress);
 
     m_timer.pleaseStopSync();
 
@@ -477,7 +475,7 @@ void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
 
 api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectResponse(
     const api::ConnectionAckRequest& connectionAckRequest,
-    std::list<network::SocketAddress> tcpEndpoints,
+    std::vector<network::SocketAddress> tcpEndpoints,
     std::optional <nx::utils::Url> relayInstanceUrl)
 {
     api::ConnectResponse connectResponse;
@@ -499,7 +497,15 @@ void UDPHolePunchingConnectionInitiationFsm::sendConnectResponse(
     NX_VERBOSE(this, lm("Connection %1. Sending connect response (%2) while in state %3")
         .args(m_connectionID, QnLexical::serialized(resultCode), toString(m_state)));
 
-    NX_CRITICAL(m_connectResponseSender);
+    NX_ASSERT(m_connectResponseSender,
+        lm("State %1. Cached response: (%2, %3). Response: %4")
+        .args(toString(m_state),
+            m_cachedConnectResponse ? QnLexical::serialized(m_cachedConnectResponse->first) : QString(),
+            QJson::serialized(m_cachedConnectResponse ? m_cachedConnectResponse->second : api::ConnectResponse()),
+            QJson::serialized(connectResponse)));
+    if (!m_connectResponseSender)
+        return;
+
     decltype(m_connectResponseSender) connectResponseSender;
     connectResponseSender.swap(m_connectResponseSender);
 
@@ -551,8 +557,7 @@ void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)
 
     m_state = State::fini;
 
-    auto onFinishedHandler = std::move(m_onFsmFinishedEventHandler);
-    onFinishedHandler(m_sessionStatisticsInfo.resultCode);
+    nx::utils::swapAndCall(m_onFsmFinishedEventHandler, m_sessionStatisticsInfo.resultCode);
 }
 
 const char* UDPHolePunchingConnectionInitiationFsm::toString(State state)
