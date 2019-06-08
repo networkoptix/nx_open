@@ -471,8 +471,8 @@ CMS_MAX_FILE_SIZE = 9437184
 INTEGRATION_STORE_PAGE = '/integrations'
 
 # Filldata settings
-FILLDATA_TRIES = 10
-FILLDATA_TIMEOUT = 30
+FILLDATA_TRIES = 15
+FILLDATA_TIMEOUT = 60
 
 
 SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions

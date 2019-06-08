@@ -363,7 +363,7 @@ def fill_content(product,
                 if default_language_code in changed_languages:
                     # If default language changes - it can affect all languages in the context
                     changed_languages = languages_list
-            # Add the context too the list of tasks for the thread pool.
+            # Add the context to the list of tasks for the thread pool.
             futures.append(executor.submit(thread_context, context, product, changed_languages, preview,
                                            version_id, global_contexts, global_contexts_dict))
 
