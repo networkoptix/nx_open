@@ -1249,17 +1249,13 @@ protected:
 
     void thenResultMatchesExpectations()
     {
-        auto filteredPackets = filterPackets(filter(), analyticsDataPackets());
-        filteredPackets = sortPacketsByTimestamp(
-            std::move(filteredPackets),
-            Qt::SortOrder::DescendingOrder);
-
-        if (filter().maxObjectsToSelect > 0 && (int)filteredPackets.size() > filter().maxObjectsToSelect)
-            filteredPackets.erase(filteredPackets.begin() + filter().maxObjectsToSelect, filteredPackets.end());
-
-        auto expected = sortPacketsByTimestamp(
-            std::move(filteredPackets),
+        auto expected = filterPackets(filter(), analyticsDataPackets());
+        expected = sortPacketsByTimestamp(
+            std::move(expected),
             filter().sortOrder);
+
+        if (filter().maxObjectsToSelect > 0 && (int)expected.size() > filter().maxObjectsToSelect)
+            expected.erase(expected.begin() + filter().maxObjectsToSelect, expected.end());
 
         sortObjectsById(&expected);
 
