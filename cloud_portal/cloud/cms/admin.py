@@ -266,8 +266,8 @@ admin.site.register(ContextTemplate, ContextTemplateAdmin)
 
 
 class DataStructureAdmin(CMSAdmin):
-    list_display = ('context', 'label', 'name', 'description', 'translatable', 'type')
-    list_filter = ('context', 'translatable', 'context__product_type')
+    list_display = ('context', 'label', 'name', 'description', 'translatable', 'type', 'deprecated')
+    list_filter = ('context', 'translatable', 'context__product_type', 'deprecated')
     search_fields = ('context__name', 'name', 'description', 'type')
     actions = ['delete_selected']
 

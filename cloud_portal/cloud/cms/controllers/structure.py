@@ -146,6 +146,7 @@ def update_from_object(cms_structure):
 
                 data_structure.meta_settings = meta if meta else {}
                 data_structure.default = value
+                data_structure.deprecated = False
                 data_structure.save()
 
 

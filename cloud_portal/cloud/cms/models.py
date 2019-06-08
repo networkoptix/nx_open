@@ -408,6 +408,7 @@ class DataStructure(models.Model):
     order = models.IntegerField(default=100000)
     optional = models.BooleanField(default=False)
     public = models.BooleanField(default=True)
+    deprecated = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
