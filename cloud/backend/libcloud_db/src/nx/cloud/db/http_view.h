@@ -57,12 +57,12 @@ public:
 
 private:
     /** Provides htdigest authentication for maintenance server*/
-    struct MaintenanceAuthenticator
+    struct HtdigestAuthenticator
     {
         nx::network::http::server::HtdigestAuthenticationProvider provider;
         nx::network::http::server::BaseAuthenticationManager manager;
 
-        MaintenanceAuthenticator(const std::string& htdigestPath):
+        HtdigestAuthenticator(const std::string& htdigestPath):
             provider(htdigestPath),
             manager(&provider)
         {
@@ -74,7 +74,7 @@ private:
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::http::server::AuthenticationDispatcher m_authenticationDispatcher;
     HttpServer m_multiAddressHttpServer;
-    std::unique_ptr<MaintenanceAuthenticator> m_maintenanceAuthenticator;
+    std::unique_ptr<HtdigestAuthenticator> m_htdigestAuthenticator;
     network::maintenance::Server m_maintenanceServer;
 
     void registerAuthenticators();

@@ -145,16 +145,15 @@ void MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& se
     }
 
     MediatorEndpoint endpoint;
-    endpoint.domainName = settings.server().name;;
+    endpoint.domainName = settings.server().name;
     assignPort(httpEndpoints(), &endpoint.httpPort);
     assignPort(httpsEndpoints(), &endpoint.httpsPort);
     assignPort(stunUdpEndpoints(), &endpoint.stunUdpPort);
 
-    m_controller->listeningPeerDb().setThisMediatorEndpoint(endpoint);
-
     if (settings.listeningPeerDb().map.synchronizationSettings.discovery.enabled)
     {
         m_controller->listeningPeerDb().startDiscovery(
+            endpoint,
             &m_view->httpServer().messageDispatcher());
     }
 }

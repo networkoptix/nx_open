@@ -36,6 +36,7 @@ static constexpr char kMaintenanceGetVmsConnections[] = "/cdb/maintenance/vmsCon
 static constexpr char kMaintenanceGetTransactionLog[] = "/cdb/maintenance/transactionLog";
 static constexpr char kMaintenanceGetStatistics[] = "/cdb/maintenance/statistics";
 
+static constexpr char kStatisticsPath[] = "/cdb/statistics";
 static constexpr char kStatisticsMetricsPath[] = "/cdb/statistics/metrics/";
 
 static constexpr char kDeprecatedCloudModuleXmlPath[] = "/cdb/cloud_modules.xml";

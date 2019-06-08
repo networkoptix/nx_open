@@ -389,7 +389,7 @@ class HolePunchingProcessor:
 
 public:
     HolePunchingProcessor():
-        m_listeningPeerDb(m_settings.listeningPeerDb()),
+        m_listeningPeerDb(m_settings),
         m_listeningPeerPool(m_settings.listeningPeer(), &m_listeningPeerDb),
         m_relayClusterClient(m_settings),
         m_holePunchingProcessor(

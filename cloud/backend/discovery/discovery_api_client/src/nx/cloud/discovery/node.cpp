@@ -58,6 +58,7 @@ static constexpr char kPublicIpAddress[] = "publicIpAddress";
 static constexpr char kUrls[] = "urls";
 static constexpr char kExpirationTime[] = "expirationTime";
 static constexpr char kInfoJson[] = "infoJson";
+static constexpr char kCountryCode[] = "countryCode";
 
 QString toString(const Node::time_point& expirationTime)
 {
@@ -92,7 +93,8 @@ QJsonObject toJsonObject(const Node& node)
         {kPublicIpAddress, node.publicIpAddress.c_str()},
         {kUrls, toJsonArray(node.urls)},
         {kExpirationTime, toString(node.expirationTime)},
-        {kInfoJson, node.infoJson.c_str()} });
+        {kInfoJson, node.infoJson.c_str()},
+        {kCountryCode, node.countryCode.c_str()} });
 }
 
 Node toNode(const QVariantMap& map, const Node& defaultValue, bool* ok = nullptr)
@@ -132,6 +134,10 @@ Node toNode(const QVariantMap& map, const Node& defaultValue, bool* ok = nullptr
     if (!contains(kInfoJson))
         return defaultValue;
     node.infoJson = it->toString().toStdString();
+
+    if (!contains(kCountryCode))
+        return defaultValue;
+    node.countryCode = it->toString().toStdString();
 
     if (ok)
         *ok = true;

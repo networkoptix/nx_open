@@ -51,6 +51,9 @@ func toNode(item map[string]*dynamodb.AttributeValue) Node {
 	if publicIpAddress, ok := item["publicIpAddress"]; ok {
 		node.PublicIpAddress = *publicIpAddress.S
 	}
+	if countryCode, ok := item["countryCode"]; ok {
+		node.CountryCode = *countryCode.S
+	}
 	return node
 }
 
@@ -60,6 +63,7 @@ func toItem(node *Node, clusterId string) map[string]*dynamodb.AttributeValue {
 		"nodeId":          &dynamodb.AttributeValue{S: &node.NodeId},
 		"expirationTime":  &dynamodb.AttributeValue{N: toUnixStr(node.ExpirationTime.Time)},
 		"publicIpAddress": &dynamodb.AttributeValue{S: &node.PublicIpAddress},
+		"countryCode":     &dynamodb.AttributeValue{S: &node.CountryCode},
 	}
 	if len(node.Urls) > 0 {
 		item["urls"] = &dynamodb.AttributeValue{SS: toStrPtrSlice(node.Urls)}
@@ -144,7 +148,8 @@ func (dao *DAO) GetOnlineNodes(clusterId string) ([]Node, error) {
 			":clusterId": &dynamodb.AttributeValue{S: &clusterId},
 			":now":       &dynamodb.AttributeValue{N: toUnixStr(time.Now())},
 		},
-		ProjectionExpression: aws.String("nodeId, urls, expirationTime, infoJson, publicIpAddress"),
+		ProjectionExpression: aws.String(
+			"nodeId, urls, expirationTime, infoJson, publicIpAddress, countryCode"),
 	}
 
 	var onlineNodes []Node
