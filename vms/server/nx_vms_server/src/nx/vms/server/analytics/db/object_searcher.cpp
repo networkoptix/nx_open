@@ -16,6 +16,8 @@ static const QSize kSearchResolution(
     kTrackSearchResolutionX,
     kTrackSearchResolutionY);
 
+static constexpr int kMaxObjectLookupIterations = 100;
+
 ObjectSearcher::ObjectSearcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
@@ -319,7 +321,7 @@ std::vector<DetectedObject> ObjectSearcher::lookupObjectsUsingArchive(
     std::set<std::int64_t> analyzedObjectGroups;
 
     std::vector<DetectedObject> result;
-    for (;;)
+    for (int i = 0; i < kMaxObjectLookupIterations; ++i)
     {
         auto matchResult = m_analyticsArchive->matchObjects(
             m_filter.deviceIds,
@@ -340,18 +342,21 @@ std::vector<DetectedObject> ObjectSearcher::lookupObjectsUsingArchive(
         if (result.size() >= m_filter.maxObjectsToSelect ||
             fetchedObjectGroupsCount < archiveFilter.limit)
         {
-            break;
+            if (result.size() > m_filter.maxObjectsToSelect)
+                result.erase(result.begin() + m_filter.maxObjectsToSelect, result.end());
+            return result;
         }
 
         // Repeating match.
+        // NOTE: Both time period boundaries are inclusive.
         if (m_filter.sortOrder == Qt::AscendingOrder)
-            archiveFilter.startTime = matchResult.timePeriod.endTime();
+            archiveFilter.startTime = matchResult.timePeriod.endTime() + std::chrono::milliseconds(1);
         else
             archiveFilter.endTime = matchResult.timePeriod.startTime();
     }
 
-    if (result.size() > m_filter.maxObjectsToSelect)
-        result.erase(result.begin() + m_filter.maxObjectsToSelect, result.end());
+    NX_WARNING(this, "Failed to select all required objects in %1 iterations. Filter %2",
+        kMaxObjectLookupIterations, m_filter);
 
     return result;
 }
