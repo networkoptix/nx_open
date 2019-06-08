@@ -90,6 +90,11 @@ do
             popd
             echo 'Generated files are created in ./cloud/cms'
             ;;
+
+        rebuild_frontend)
+            build_frontend
+            setup_cms
+            ;;
         setup_cms)
             . ./env/bin/activate
             setup_cms
@@ -107,10 +112,11 @@ do
             stop_docker_containers
             ;;
         *)
-            echo Usage: cloud_shortcuts '[init|build_frontend|setup_cms|setup_db|setup_env|start_docker|stop_docker]'
+            echo Usage: cloud_shortcuts '[init|build_frontend|rebuild_frontend|setup_cms|setup_db|setup_env|start_docker|stop_docker]'
             echo 'init - Does everything. Only run this once'
             echo 'build_frontend - Builds the frontend'
             echo 'generate_cms_docs - Creates an html file for each product in cms/cms_structure.json'
+            echo 'rebuild_frontend - Rebuilds the frontend and runs readstructre and filldata commands'
             echo 'setup_cms - Fills in the cms. Runs migrate, readstructure and filldata commands'
             echo 'setup_db - Loads local db with sql file in ~/develop/nx_vms/cloud_portal/'
             echo 'start_docker - Starts docker containers used by cloud'
