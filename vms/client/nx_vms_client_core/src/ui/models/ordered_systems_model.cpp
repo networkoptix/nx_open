@@ -224,10 +224,12 @@ bool QnOrderedSystemsModel::lessThan(
             return (leftSystemId < rightSystemId);
         };
 
-    static const QLatin1String localhostIPv4("127.0.0.1");
+    static const QRegularExpression localhostRegExp(
+        "\\b(127\\.0\\.0\\.1|localhost)\\b",
+        QRegularExpression::CaseInsensitiveOption | QRegularExpression::DontCaptureOption);
 
-    const auto leftIsLocalhost = left.data(QnSystemsModel::SearchRoleId).toString().contains(localhostIPv4);
-    const auto rightIsLocalhost = right.data(QnSystemsModel::SearchRoleId).toString().contains(localhostIPv4);
+    const auto leftIsLocalhost = left.data(QnSystemsModel::SearchRoleId).toString().contains(localhostRegExp);
+    const auto rightIsLocalhost = right.data(QnSystemsModel::SearchRoleId).toString().contains(localhostRegExp);
 
     const auto leftIsFactory = left.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
     const auto rightIsFactory = right.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
