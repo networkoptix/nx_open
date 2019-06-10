@@ -8963,6 +8963,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Failed to download update packages to some components</source>
       <translation>Nie udało się pobrać aktualizacji do niektórych komponentów</translation>
     </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9088,10 +9096,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Oczekiwanie na dane</translation>
     </message>
     <message>
-      <source>Update package can&apos;t be not found.</source>
-      <translation>Nie można odnaleźć pakietu aktualizacji.</translation>
-    </message>
-    <message>
       <source>There is not enough space to download update files.</source>
       <translation>Brak wystarczającej ilości przestrzeni do pobrania plików aktualizacji.</translation>
     </message>
@@ -9138,6 +9142,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Ready to install update</source>
       <translation>Gotowy do zainstalowania aktualizacji</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
     </message>
   </context>
   <context>

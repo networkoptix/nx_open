@@ -2651,11 +2651,6 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation>Filtro PRUEBA</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>No hubo resultado</translation>
     </message>

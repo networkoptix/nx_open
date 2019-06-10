@@ -8968,6 +8968,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Failed to download update packages to some components</source>
       <translation>Не вдалося завантажити пакети оновлення для деяких компонентів</translation>
     </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9093,10 +9101,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Очікування однорангових даних</translation>
     </message>
     <message>
-      <source>Update package can&apos;t be not found.</source>
-      <translation>Пакет оновлення &apos;не знайдено.</translation>
-    </message>
-    <message>
       <source>There is not enough space to download update files.</source>
       <translation>Не вистачає місця для завантаження файлів оновлення.</translation>
     </message>
@@ -9143,6 +9147,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Ready to install update</source>
       <translation>Готовий до встановлення оновлення</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
     </message>
   </context>
   <context>

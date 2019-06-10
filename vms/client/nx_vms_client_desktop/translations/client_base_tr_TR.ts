@@ -8729,6 +8729,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Failed to download update packages to some components</source>
       <translation>Güncelleme paketinin bazı bileşenleri indirilemedi</translation>
     </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8852,10 +8860,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Eş bağlantıları için bekleniyor</translation>
     </message>
     <message>
-      <source>Update package can&apos;t be not found.</source>
-      <translation>Güncelleme paketi&apos;bulunamıyor.</translation>
-    </message>
-    <message>
       <source>There is not enough space to download update files.</source>
       <translation>Güncelleme dosyalarını indirmek için yeterli alan yok.</translation>
     </message>
@@ -8902,6 +8906,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Ready to install update</source>
       <translation>Güncellemeyi indirmeye hazır</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
     </message>
   </context>
   <context>
