@@ -106,31 +106,43 @@ Item
 
         enabled: !loading
 
+        RowLayout
+        {
+            visible: currentEngineId !== undefined && isDeviceDependent
+            spacing: 16
+
+            Image
+            {
+                source: "qrc:/skin/standard_icons/sp_message_box_information.png"
+            }
+
+            Text
+            {
+                wrapMode: Text.WordWrap
+                color: ColorTheme.windowText
+                font.pixelSize: 13
+                font.weight: Font.Bold
+                text: qsTr("This is the default built-in functionality")
+            }
+        }
+
         SwitchButton
         {
             id: enableSwitch
             text: qsTr("Enable")
             Layout.preferredWidth: Math.max(implicitWidth, 120)
-            visible: currentEngineId !== undefined
-
-            enabled: !isDeviceDependent
+            visible: currentEngineId !== undefined && !isDeviceDependent
 
             Binding
             {
                 target: enableSwitch
                 property: "checked"
-                value: enabledAnalyticsEngines.indexOf(currentEngineId) !== -1 || isDeviceDependent
+                value: enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
                 when: currentEngineId !== undefined
             }
 
             onClicked:
             {
-                if (isDeviceDependent)
-                {
-                    console.assert("Button must not be clickable for the device-dependent engines.")
-                    return
-                }
-
                 var engines = enabledAnalyticsEngines.slice(0)
                 if (checked)
                 {
