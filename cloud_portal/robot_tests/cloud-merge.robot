@@ -5,7 +5,7 @@ Suite Setup       Startup
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    reset state
 Suite Teardown    Remove Containers
-Force Tags        Threaded
+Force Tags        Threaded    merge
 
 *** Variables ***
 ${email}             ${EMAIL OWNER}
@@ -24,7 +24,8 @@ Merge
     [arguments]    ${primary}    ${target}    ${expected dropdown}
     Wait Until Element Is Visible    ${MERGE BUTTON SYSTEM}
     Click Button    ${MERGE BUTTON SYSTEM}
-    Wait Until Elements Are Visible    ${MERGE DIALOG}    ${MERGE X BUTTON}    ${MERGE OK BUTTON}    ${MERGE CANCEL BUTTON}
+    Wait Until Elements Are Visible    ${MERGE DIALOG}    ${MERGE X BUTTON}    ${MERGE OK BUTTON}
+    ...                                ${MERGE CANCEL BUTTON}    ${MERGE CURRENT SYSTEM WITH}    ${MERGE ONLY AS OWNER}
     Element Text Should Be    ${MERGE SYSTEM DROPDOWN}    ${expected dropdown}
     Click Element    ${MERGE SYSTEM DROPDOWN}
     Wait Until Element Is Visible    ${MERGE FORM}//li/a//span[text()="${target}"]
@@ -35,6 +36,7 @@ Merge
     Wait Until Element Is Visible    ${radio button}/span[contains(@class, "checked")]
     sleep    5
     Click Button    ${MERGE OK BUTTON}
+    Wait Until Element Is Visible    ${MERGE CHECKING HINT}
     Wait Until Elements Are Visible    ${MERGE BUTTON MODAL}    ${MERGE PASSWORD INPUT}    ${MERGE CANCEL BUTTON}    timeout=60
     Input Text    ${MERGE PASSWORD INPUT}    ${BASE PASSWORD}
     Click Button    ${MERGE BUTTON MODAL}
@@ -43,13 +45,16 @@ Merge
 Validate Merge
     Check For Alert    ${SYSTEM MERGING TEXT}
     Element Should Not Be Visible    ${MERGE DIALOG}
-    Wait Until Element Is Visible    ${CURRENTLY MERGING CARD}
+    Wait Until Elements Are Visible    ${CURRENTLY MERGING CARD}    ${CURRENTLY MERGING DOTS}
 
 Validate system available
     [arguments]    ${system name}
     Verify In System    ${system name}
     Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
+    ${elements}    Set Variable    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    FOR    ${element}    IN    @{elements}
+        Wait Until Element Is Enabled    ${element}    180
+    END
 
 Prepare System With Users
     [arguments]    ${user}    ${auth}    ${image}    ${port}    ${system name}    ${users dict}    ${network}=bridge
@@ -141,6 +146,13 @@ Reset state
         Disconnect from cloud
     END
     Run Keyword Unless    "${state[0]}"=="PASS"    Disconnect from cloud
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL MERGE OWNER 3.0}    ${password}
+    Validate Log In
+    ${state}    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]    10
+    Run Keyword If    "${state[0]}"=="PASS"    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]    10
+    Run Keyword If    "${state[0]}"=="PASS"    Disconnect from cloud    API made system 1
 
 
 *** Test Cases ***
@@ -257,7 +269,6 @@ Merge with 3.0
 
     Merge    API made system 1    API made system 1    API made system 1
     Validate Merge
-    sleep    30
 
     stop containers    allContainers=False
 
@@ -276,9 +287,19 @@ Merge with 3.0
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}    180
 
     Merge    API made system 1    API made system 2    API made system 2
+
     Check For Alert    System merge failed
     Wait Until Element Is Visible    ${MERGE FAILED DIALOG HEADER}
     Click Button    ${MERGE FAILED OK BUTTON}
+    Element Should Not Be Visible    ${MERGE FAILED DIALOG HEADER}
+
+    Merge    API made system 1    API made system 2    API made system 2
+
+    Check For Alert    System merge failed
+    Wait Until Element Is Visible    ${MERGE FAILED DIALOG HEADER}
+    Click Button    ${MERGE FAILED X BUTTON}
+    Element Should Not Be Visible    ${MERGE FAILED DIALOG HEADER}
+
     Disconnect from cloud
     ${state}    Run Keyword And Ignore Error    Element Should Be Visible    ${YOU HAVE NO SYSTEMS}
     ${count}    Run Keyword And Ignore Error    Get Element Count    ${SYSTEMS TILE}
@@ -289,6 +310,7 @@ Merge with 3.0
     Run Keyword Unless    "${state[0]}"=="PASS"    Disconnect from cloud
 
 From secondary system merge to primary with no other systems
+    [tags]    C53944
     ${user}    Set Variable    ${EMAIL MERGE OWNER 1}
     ${auth}=    Create List    ${user}    ${password}
     Create system and attach to cloud    ${user}    ${image}    7001    API made system 1    network=host
@@ -307,9 +329,10 @@ From secondary system merge to primary with no other systems
     Validate Merge
 
     Check for alert    Connection to API made system 2 lost    timeout=120
-    Verify In System    API made system 1
     Wait Until Element Is Visible    ${USERS LIST}
     Wait Until Element Is Not Visible    ${CURRENTLY MERGING CARD}    120
+    Validate system available    API made system 1
+
     Disconnect from cloud
 
 From secondary system merge to primary with other systems
@@ -330,17 +353,19 @@ From secondary system merge to primary with other systems
     Validate Log In
     Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 3")]
     Validate system available    API made system 3
+
     Merge    API made system 1    API made system 1    API made system 1
     Validate Merge
 
     Check for alert    Connection to API made system 3 lost    timeout=120
     Wait Until Elements Are Visible    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
     Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
-    Verify In System    API made system 1
+    Validate system available    API made system 1
     Disconnect from cloud
     Disconnect from cloud
 
 From primary system
+    [tags]    C48946
     ${user}    Set Variable    ${EMAIL MERGE OWNER 1}
     ${auth}=    Create List    ${user}    ${password}
     Create system and attach to cloud    ${user}    ${image}    7001    API made system 2
@@ -358,10 +383,10 @@ From primary system
     Merge    API made system 1    API made system 2    API made system 2
     Validate Merge
 
-    Verify In System    API made system 1
     Wait Until Element Is Visible    ${USERS LIST}
     Wait Until Element Is Not Visible    ${CURRENTLY MERGING CARD}    120
     Check For Alert Dismissable    ${SYSTEM MERGE COMPLETED TEXT}
+    Validate system available    API made system 1
     Disconnect from cloud
 
 Merge with different types of users
@@ -377,10 +402,12 @@ Merge with different types of users
     Validate Log In
     Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
     Validate system available    API made system 2
+
     Merge    API made system 1    API made system 1    API made system 1
     Validate Merge
+
     Check for alert    Connection to API made system 2 lost    timeout=120
-    Verify In System    API made system 1
+    Validate system available    API made system 1
     FOR     ${idx}  IN RANGE  90
         ${result}    Run Keyword And Ignore Error    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${email admin no reg}')]
         Reload Page
@@ -389,3 +416,7 @@ Merge with different types of users
     FOR    ${key}  IN  @{all users dict.keys()}
         Check User Permissions    ${all users dict["${key}"]}    ${key}    timeout=120
     END
+    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${email admin no reg}')]
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${email admin no reg}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[contains(text(),'${DELETE USER BUTTON TEXT}')]
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${email admin no reg}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
+    Disconnect from cloud
