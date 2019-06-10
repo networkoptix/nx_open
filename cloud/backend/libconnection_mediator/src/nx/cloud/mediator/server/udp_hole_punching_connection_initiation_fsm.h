@@ -87,7 +87,7 @@ private:
     nx::network::aio::Timer m_timer;
     ConnectionWeakRef m_serverConnectionWeakRef;
     ConnectCompletionHandler m_connectResponseSender;
-    const std::list<network::SocketAddress> m_serverPeerEndpoints;
+    const std::vector<network::SocketAddress> m_serverPeerEndpoints;
     const nx::String m_serverPeerHostName;
     const api::CloudConnectVersion m_serverPeerCloudConnectVersion;
     api::ConnectionMethods m_serverPeerConnectionMethods;
@@ -157,7 +157,7 @@ private:
 
     api::ConnectResponse prepareConnectResponse(
         const api::ConnectionAckRequest& connectionAckRequest,
-        std::list<network::SocketAddress> tcpEndpoints,
+        std::vector<network::SocketAddress> tcpEndpoints,
         std::optional<nx::utils::Url> relayInstanceUrl);
 
     void sendConnectResponse(

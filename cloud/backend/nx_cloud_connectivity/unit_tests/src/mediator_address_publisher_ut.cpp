@@ -160,7 +160,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        std::list<nx::network::SocketAddress> addresses{ nx::network::SocketAddress::anyPrivateAddress };
+        std::vector<nx::network::SocketAddress> addresses{ nx::network::SocketAddress::anyPrivateAddress };
         for (int i = 0; i < requestCount; ++i)
         {
             m_publisher->updateAddresses(

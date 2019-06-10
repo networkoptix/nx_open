@@ -1,31 +1,19 @@
 #pragma once
 
 #include <nx/clusterdb/map/embedded_database.h>
+#include <nx/fusion/model_functions_fwd.h>
 
-#include "settings.h"
+#include "mediator_endpoint.h"
+#include "mediator_selector.h"
 
 namespace nx::hpm {
 
-/**
- * Represents the endpoint that a mediator instance listens on,
- * including http(or https) and stun udp ports. A given port is set to -1 if unused.
- */
-struct MediatorEndpoint
-{
-    static constexpr int kPortUnused = -1;
+namespace conf {
 
-    std::string domainName; //< Ip address without port, or domain name to be resolved by dns
-    int httpPort = kPortUnused;
-    int httpsPort = kPortUnused;
-    int stunUdpPort = kPortUnused;
+class Settings;
+struct ListeningPeerDb;
 
-    std::string toString() const;
-    bool operator ==(const MediatorEndpoint& other) const;
-    bool operator !=(const MediatorEndpoint& other) const;
-};
-
-//-------------------------------------------------------------------------------------------------
-// ListeningPeerDb
+}
 
 /**
  * Associates peer domains (e.g. mediaserverid.systemid) with a mediator instance domain
@@ -35,7 +23,7 @@ struct MediatorEndpoint
 class ListeningPeerDb
 {
 public:
-    ListeningPeerDb(const conf::ListeningPeerDb& settings);
+    ListeningPeerDb(const conf::Settings& settings);
 
     /**
      * Initializes the underlying database.
@@ -46,12 +34,6 @@ public:
      * stops the underlying database.
      */
     void stop();
-
-    /**
-     * Sets the domain name that all added peers will be associated with.
-     * NOTE: MUST be called before addPeer or startDiscovery can be called.
-     */
-    void setThisMediatorEndpoint(const MediatorEndpoint& endpoint);
 
     /**
     * Get this mediator instance's endpoint.
@@ -85,11 +67,11 @@ public:
     /*
      * Starts discovery of other mediator instances and synchronizes
      * their ListeningPeerDb entries.
-     * NOTE: setThisMediatorEndpoint MUST be called before startDiscovery will work.
      *
      * @return true if discovery service started successfully, false otherwise
      */
     void startDiscovery(
+        const MediatorEndpoint& endpoint,
         nx::network::http::server::rest::MessageDispatcher* messageDispatcher);
 
     /**
@@ -99,7 +81,15 @@ public:
     std::string nodeId() const;
 
 private:
+    void setThisMediatorEndpoint(const MediatorEndpoint& endpoint);
+
+    std::string toInternalStorageFormat(const std::string& peerId) const;
+
+    std::string buildInfoJson(const MediatorEndpoint& endpoint) const;
+
+private:
     const conf::ListeningPeerDb& m_settings;
+    std::unique_ptr<AbstractMediatorSelector> m_mediatorSelector;
     std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_sqlExecutor;
     std::unique_ptr<nx::clusterdb::map::EmbeddedDatabase> m_map;
 

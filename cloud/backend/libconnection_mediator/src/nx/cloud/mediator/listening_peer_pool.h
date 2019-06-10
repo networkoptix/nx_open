@@ -29,7 +29,7 @@ struct ListeningPeerData
     nx::String hostName;
     /** Valid for locally-registered peer only. */
     std::shared_ptr<nx::network::stun::ServerConnection> peerConnection;
-    std::list<network::SocketAddress> endpoints;
+    std::vector<network::SocketAddress> endpoints;
     api::CloudConnectVersion cloudConnectVersion;
 
     ListeningPeerData():

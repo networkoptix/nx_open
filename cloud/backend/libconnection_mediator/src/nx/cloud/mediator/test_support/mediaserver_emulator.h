@@ -74,7 +74,7 @@ public:
     void setServerIdForModuleInformation(
         std::optional<nx::String> serverId);
 
-    nx::hpm::api::ResultCode updateTcpAddresses(std::list<network::SocketAddress> addresses);
+    nx::hpm::api::ResultCode updateTcpAddresses(std::vector<network::SocketAddress> addresses);
     hpm::api::MediatorConnector& mediatorConnector();
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection();
 

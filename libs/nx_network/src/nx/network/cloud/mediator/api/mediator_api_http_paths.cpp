@@ -5,6 +5,7 @@ namespace hpm {
 namespace api {
 
 const char* const kMediatorApiPrefix = "/mediator";
+const char* const kStatisticsApiPrefix = "/statistics";
 
 const char* const kStatisticsListeningPeersPath = "/statistics/listening_peers";
 const char* const kStunOverHttpTunnelPath = "/stun_tunnel";

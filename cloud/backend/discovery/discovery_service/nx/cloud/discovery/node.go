@@ -14,4 +14,5 @@ type Node struct {
 	ExpirationTime  Date     `json:"expirationTime"`
 	InfoJson        string   `json:"infoJson"`
 	PublicIpAddress string   `json:"publicIpAddress"`
+	CountryCode     string   `json:"countryCode"`
 }

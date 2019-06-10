@@ -80,7 +80,7 @@ private:
     struct ClientBindInfo
     {
         ConnectionWeakRef connection;
-        std::list<network::SocketAddress> tcpReverseEndpoints;
+        std::vector<network::SocketAddress> tcpReverseEndpoints;
     };
 
     using BoundClients = std::map<nx::String, ClientBindInfo>;

@@ -116,6 +116,8 @@ bool Server::launchHttpServerIfNeeded(
 {
     NX_INFO(this, "Bringing up HTTP server");
 
+    loadHtdigestAuthenticatorIfNeeded(settings);
+
     registerApiHandlers(peerRegistrator);
 
     if (!m_multiAddressHttpServer.bind(
@@ -141,25 +143,29 @@ bool Server::launchHttpServerIfNeeded(
         &m_httpMessageDispatcher,
         registeredPeerPool);
 
-    m_maintenanceServer.registerRequestHandlers(
-        api::kMediatorApiPrefix,
-        &m_httpMessageDispatcher);
+    return true;
+}
 
-    if (!m_settings.http().maintenanceHtdigestPath.empty())
+void Server::loadHtdigestAuthenticatorIfNeeded(const conf::Settings& settings)
+{
+    if (!settings.http().maintenanceHtdigestPath.empty())
     {
         NX_INFO(this,
-            lm("htdigest authentication for connection mediator maintenance server enabled. File path: %1")
-                .arg(m_settings.http().maintenanceHtdigestPath));
+            lm("Htdigest authentication for connection mediator enabled. File path: %1")
+            .arg(settings.http().maintenanceHtdigestPath));
 
-        m_maintenanceAuthenticator = std::make_unique<MaintenanceAuthenticator>(
-            m_settings.http().maintenanceHtdigestPath);
-
-        m_authenticationDispatcher.add(
-            std::regex(network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*")),
-            &m_maintenanceAuthenticator->manager);
+        m_htdigestAuthenticator =
+            std::make_unique<HtdigestAuthenticator>(settings.http().maintenanceHtdigestPath);
     }
+}
 
-    return true;
+void Server::addPathToHtdigestAuthenticatorIfNeeded(const std::string& regex)
+{
+    if (m_htdigestAuthenticator)
+    {
+        NX_INFO(this, "Adding api path regex: '%1' to htdigest authenticator", regex);
+        m_authenticationDispatcher.add(std::regex(regex), &m_htdigestAuthenticator->manager);
+    }
 }
 
 void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
@@ -182,6 +188,16 @@ void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
                 m_listeningPeerDb);
         },
         network::http::Method::post);
+
+    m_maintenanceServer.registerRequestHandlers(
+        api::kMediatorApiPrefix,
+        &m_httpMessageDispatcher);
+
+    addPathToHtdigestAuthenticatorIfNeeded(
+        network::url::joinPath(api::kMediatorApiPrefix, api::kStatisticsApiPrefix, "/.*"));
+
+    addPathToHtdigestAuthenticatorIfNeeded(
+        network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*"));
 }
 
 template<typename Handler, typename Arg>

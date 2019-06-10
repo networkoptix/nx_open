@@ -31,6 +31,7 @@ static constexpr char kClientGetPostTunnelPath[] =
 static constexpr char kClientTunnelBasePath[] = "/relay/client_session/{sessionId}/tunnel";
 static constexpr char kRelayClientPathPrefix[] = "/relay/client/";
 
+static constexpr char kRelayStatisticsPath[] = "/relay/statistics";
 static constexpr char kRelayStatisticsMetricsPath[] = "/relay/statistics/metrics/";
 static constexpr char kRelayStatisticsSpecificMetricPath[] = "/relay/statistics/metrics/{metric}";
 

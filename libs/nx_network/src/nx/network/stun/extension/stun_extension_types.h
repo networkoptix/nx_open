@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <nx/network/cloud/cloud_connect_type.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/socket_common.h>
@@ -239,28 +241,28 @@ struct NX_NETWORK_API Endpoint: BaseStringAttribute
 /** Base class for endpoint attributes. */
 struct NX_NETWORK_API EndpointList : BaseStringAttribute
 {
-    EndpointList( int type, const std::list< SocketAddress >& endpoints );
-    std::list< SocketAddress > get() const;
+    EndpointList( int type, const std::vector< SocketAddress >& endpoints );
+    std::vector< SocketAddress > get() const;
 };
 
 struct NX_NETWORK_API PublicEndpointList : EndpointList
 {
     static const AttributeType TYPE = publicEndpointList;
-    PublicEndpointList( const std::list< SocketAddress >& endpoints )
+    PublicEndpointList( const std::vector< SocketAddress >& endpoints )
         : EndpointList( TYPE, endpoints ) {}
 };
 
 struct NX_NETWORK_API TcpHpEndpointList : EndpointList
 {
     static const AttributeType TYPE = tcpHpEndpointList;
-    TcpHpEndpointList( const std::list< SocketAddress >& endpoints )
+    TcpHpEndpointList( const std::vector< SocketAddress >& endpoints )
         : EndpointList( TYPE, endpoints ) {}
 };
 
 struct NX_NETWORK_API UdtHpEndpointList : EndpointList
 {
     static const AttributeType TYPE = udtHpEndpointList;
-    UdtHpEndpointList( const std::list< SocketAddress >& endpoints )
+    UdtHpEndpointList( const std::vector< SocketAddress >& endpoints )
         : EndpointList( TYPE, endpoints ) {}
 };
 
@@ -274,7 +276,7 @@ struct NX_NETWORK_API TrafficRelayUrl: BaseStringAttribute
 struct NX_NETWORK_API TcpReverseEndpointList : EndpointList
 {
     static const AttributeType TYPE = tcpReverseEndpointList;
-    TcpReverseEndpointList( const std::list< SocketAddress >& endpoints )
+    TcpReverseEndpointList( const std::vector< SocketAddress >& endpoints )
         : EndpointList( TYPE, endpoints ) {}
 };
 
