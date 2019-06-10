@@ -299,11 +299,24 @@ private:
             }
         }
 
-        NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
-            nx::network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
-        QnRestResult installResponse;
-        QJson::deserialize(responseBuffer, &installResponse);
-        ASSERT_EQ(expectedRestResult, installResponse.error);
+        while (true)
+        {
+            NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
+                nx::network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
+            QnRestResult installResponse;
+            QJson::deserialize(responseBuffer, &installResponse);
+            if (expectedRestResult != installResponse.error)
+            {
+                NX_DEBUG(
+                    this, "Waiting for  install request to return expected result:",
+                    expectedRestResult);
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 
     void issueFinishUpdateRequestAndAssertResponse(bool ignorePendingPeers,

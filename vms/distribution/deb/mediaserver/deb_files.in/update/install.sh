@@ -87,9 +87,8 @@ update()
     ensureDependencyInstalled cifs-utils
     installDeb "$SERVER_DEB_FILE"
 
-    if grep '^Hardware.*:.*BCM2835[[:space:]]*$' /proc/cpuinfo &>/dev/null
+    if [[ -f "/var/run/reboot-required" ]]
     then
-        bash nx_rpi_cam_setup.sh
         reboot
         exit 0
     fi

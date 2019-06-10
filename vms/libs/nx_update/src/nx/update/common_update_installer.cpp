@@ -186,13 +186,16 @@ QString CommonUpdateInstaller::workDir() const
     return closeDirPath(dataDirectoryPath()) + "nx_installer-" + selfPath;
 }
 
-void CommonUpdateInstaller::stopSync()
+void CommonUpdateInstaller::stopSync(bool clearAndReset)
 {
     QnMutexLocker lock(&m_mutex);
     while (m_state == CommonUpdateInstaller::State::inProgress)
         m_condition.wait(lock.mutex());
-    m_state = CommonUpdateInstaller::State::idle;
-    cleanInstallerDirectory();
+    if (clearAndReset)
+    {
+        m_state = CommonUpdateInstaller::State::idle;
+        cleanInstallerDirectory();
+    }
 }
 
 bool CommonUpdateInstaller::cleanInstallerDirectory()
