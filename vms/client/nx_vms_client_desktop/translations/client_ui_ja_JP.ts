@@ -2651,11 +2651,6 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation>フィルターテスト</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>何も見つかりませんでした</translation>
     </message>

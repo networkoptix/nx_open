@@ -1,5 +1,7 @@
 #include "rtsp_perf.h"
 
+#include <random>
+
 #include <nx/streaming/rtsp_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/custom_headers.h>

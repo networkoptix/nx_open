@@ -1,6 +1,8 @@
 #include "sendmail_business_action_widget.h"
 #include "ui_sendmail_business_action_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <QtWidgets/QAction>
 
 #include <nx/vms/event/action_parameters.h>

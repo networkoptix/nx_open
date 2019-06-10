@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QSize>
+
 #include <utils/common/property_storage.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/log/log_level.h>

@@ -60,7 +60,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget* parent):
                         ui->onlineKeyEdit->setCursorPosition(pos);
                 };
 
-            executeDelayedParented(adjustCursorPosition, 0, ui->onlineKeyEdit);
+            executeLater(adjustCursorPosition, ui->onlineKeyEdit);
         });
 
     ui->onlineKeyEdit->setFocus();

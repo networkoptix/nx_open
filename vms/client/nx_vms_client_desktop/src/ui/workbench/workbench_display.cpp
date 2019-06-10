@@ -281,7 +281,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
              * after some delay, because some OS make resize call before move widget to correct
              * position while expanding it to fullscreen. #gdm
              */
-            executeDelayedParented([this]() { fitInView(false); }, 0, this);
+            executeLater([this]() { fitInView(false); }, this);
         });
 
     connect(m_widgetActivityInstrument, SIGNAL(activityStopped()), this, SLOT(at_widgetActivityInstrument_activityStopped()));

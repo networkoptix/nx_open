@@ -657,7 +657,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                 {
                     if (contents.unsuportedSystemsReport.contains(clientId) && unsupported == 1)
                     {
-                        packageErrors << tr("OS version of client is no longer supported. "
+                        packageErrors << tr("OS version of the client is no longer supported. "
                             "Please update its OS to a supported version.");
                     }
                     else

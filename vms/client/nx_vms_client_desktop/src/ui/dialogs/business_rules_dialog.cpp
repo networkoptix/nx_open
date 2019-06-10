@@ -519,7 +519,7 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
      * Fixes QT bug when we able to select multiple rows even if we set single selection mode.
      * See VMS-5799.
      */
-    executeDelayedParented(handleRowChanged, 0, this);
+    executeLater(handleRowChanged, this);
 }
 
 void QnBusinessRulesDialog::at_tableViewport_resizeEvent() {

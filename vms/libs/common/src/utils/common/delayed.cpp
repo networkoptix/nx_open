@@ -4,6 +4,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QEvent>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QAbstractEventDispatcher>
 
 #include <utils/common/event_loop.h>
 
@@ -11,39 +12,6 @@
 
 namespace
 {
-
-class ExecuteLaterHandler: public QObject
-{
-    using base_type = QObject;
-
-public:
-    ExecuteLaterHandler(Callback callback, QObject* parent);
-
-    bool event(QEvent* e) override;
-
-private:
-    const Callback m_callback;
-};
-
-ExecuteLaterHandler::ExecuteLaterHandler(Callback callback, QObject* parent):
-    base_type(parent),
-    m_callback(std::move(callback))
-{
-}
-
-bool ExecuteLaterHandler::event(QEvent* e)
-{
-    if (e->type() != QEvent::User)
-        return base_type::event(e);
-
-    if (m_callback)
-        m_callback();
-
-    deleteLater();
-    return true;
-}
-
-//-------------------------------------------------------------------------------------------------
 
 class DelayedFunctor: public QObject
 {
@@ -102,8 +70,12 @@ QTimer* executeDelayedImpl(Callback callback, int delayMs, QThread* targetThread
 
 void executeLater(Callback callback, QObject* parent)
 {
-    qApp->postEvent(new ExecuteLaterHandler(std::move(callback), parent),
-        new QEvent(QEvent::User));
+    QMetaObject::invokeMethod(parent, std::move(callback), Qt::QueuedConnection);
+}
+
+void executeLaterInThread(Callback callback, QThread* thread)
+{
+    executeLater(std::move(callback), QAbstractEventDispatcher::instance(thread));
 }
 
 void executeDelayed(Callback callback, int delayMs, QThread* targetThread)

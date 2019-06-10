@@ -192,7 +192,7 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
         [this, guard, handler, postHandler](nx::network::http::AsyncHttpClientPtr /*client*/)
         {
             if (guard && handler)
-                executeDelayed(postHandler, 0, guard->thread());
+                executeLaterInThread(postHandler, guard->thread());
         };
 
     connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::done, this, threadSafeHandler,

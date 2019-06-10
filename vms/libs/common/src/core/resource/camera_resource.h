@@ -89,7 +89,7 @@ public:
 
     /**
      * @return Ids of Analytics Engines which are actually compatible with the Device, enabled by
-     *    the user and active (running on the current server).
+     *     the user and active (running on the current server).
      */
     QSet<QnUuid> enabledAnalyticsEngines() const;
 

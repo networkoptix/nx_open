@@ -866,7 +866,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
     const auto workbenchStateUpdate =
         [this] { context()->instance<QnWorkbenchStateManager>()->forcedUpdate(); };
 
-    executeDelayedParented(workbenchStateUpdate, 0, this);
+    executeLater(workbenchStateUpdate, this);
 
     /* In several seconds after connect show warnings. */
     executeDelayedParented([this] { showWarnMessagesOnce(); }, kMessagesDelayMs, this);

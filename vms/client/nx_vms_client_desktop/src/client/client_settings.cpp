@@ -1,9 +1,11 @@
 #include "client_settings.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtCore/QSettings>
-#include <QtCore/QCoreApplication>
+#include <QtCore/QScopedValueRollback>
+#include <QtCore/QStandardPaths>
 
 #include <client_core/client_core_settings.h>
 

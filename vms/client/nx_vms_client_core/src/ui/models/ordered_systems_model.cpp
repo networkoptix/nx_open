@@ -1,5 +1,7 @@
 #include "ordered_systems_model.h"
 
+#include <QtCore/QRegularExpression>
+
 #include <ui/models/systems_model.h>
 #include <nx/utils/string.h>
 #include <nx/utils/log/assert.h>

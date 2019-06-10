@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtCore/QPluginLoader>
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 #include <QtCore/QSettings>
 
@@ -16,6 +16,9 @@
 #include <plugins/settings.h>
 
 #include <nx/vms/api/data/analytics_data.h>
+
+class QDir;
+class QFileInfo;
 
 /**
  * Loads custom application plugins and provides plugin management methods. Plugins are looked for

@@ -1,5 +1,7 @@
 #include "resource_pool.h"
 
+#include <QtCore/QThreadPool>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/layout_resource.h>

@@ -5,49 +5,49 @@
     <name>QObject</name>
     <message>
       <source>System Tray</source>
-      <translation type="unfinished">System Tray</translation>
+      <translation>Oppgavelinje</translation>
     </message>
     <message>
       <source>There is no system tray on this system.</source>
-      <translation type="unfinished">There is no system tray on this system.</translation>
+      <translation>Det er ingen systemstatusfelt på dette systemet.</translation>
     </message>
     <message>
       <source>Application will now quit.</source>
-      <translation type="unfinished">Application will now quit.</translation>
+      <translation>Programmet avsluttes nå.</translation>
     </message>
   </context>
   <context>
     <name>QnElevationChecker</name>
     <message>
       <source>Insufficient rights to manage services.</source>
-      <translation type="unfinished">Insufficient rights to manage services.</translation>
+      <translation>Utilstrekkelige rettigheter til å administrere tjenester.</translation>
     </message>
     <message>
       <source>UAC must be enabled to request privileges for non-admin users.</source>
-      <translation type="unfinished">UAC must be enabled to request privileges for non-admin users.</translation>
+      <translation>UAC må være aktivert for å be om privilegier for brukere uten administrasjon.</translation>
     </message>
   </context>
   <context>
     <name>QnSystrayWindow</name>
     <message>
       <source>Access denied.</source>
-      <translation type="unfinished">Access denied.</translation>
+      <translation>Ingen tilgang.</translation>
     </message>
     <message>
       <source>Specified database does not exist.</source>
-      <translation type="unfinished">Specified database does not exist.</translation>
+      <translation>Den angitte database eksisterer ikke.</translation>
     </message>
     <message>
       <source>Specified parameter is invalid.</source>
-      <translation type="unfinished">Specified parameter is invalid.</translation>
+      <translation>Det angitte parameteret er ugyldig.</translation>
     </message>
     <message>
       <source>Could not access installed services</source>
-      <translation type="unfinished">Could not access installed services</translation>
+      <translation>Kunne ikke få tilgang til installerte tjenester</translation>
     </message>
     <message>
       <source>No %1 services installed</source>
-      <translation type="unfinished">No %1 services installed</translation>
+      <translation>Ingen %1 tjenester installert</translation>
     </message>
     <message>
       <source>&amp;Quit</source>
@@ -55,67 +55,67 @@
     </message>
     <message>
       <source>An error has occurred while trying to access installed services:</source>
-      <translation type="unfinished">An error has occurred while trying to access installed services:</translation>
+      <translation>Det har oppstått en feil under forsøk på å få tilgang til installerte tjenester:</translation>
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation type="unfinished">Server has been stopped</translation>
+      <translation>Serveren er stoppet</translation>
     </message>
     <message>
       <source>Server has been started</source>
-      <translation type="unfinished">Server has been started</translation>
+      <translation>Server er startet</translation>
     </message>
     <message>
       <source>Server will be stopped. Continue?</source>
-      <translation type="unfinished">Server will be stopped. Continue?</translation>
+      <translation>Serveren blir stoppet. Fortsette?</translation>
     </message>
     <message>
       <source>Show Server Log</source>
-      <translation type="unfinished">Show Server Log</translation>
+      <translation>Vis serverlogg</translation>
     </message>
     <message>
       <source>Start Server</source>
-      <translation type="unfinished">Start Server</translation>
+      <translation>Start serveren</translation>
     </message>
     <message>
       <source>Stop Server</source>
-      <translation type="unfinished">Stop Server</translation>
+      <translation>Stopp server</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Server webside</translation>
     </message>
     <message>
       <source>stopped</source>
-      <translation type="unfinished">stopped</translation>
+      <translation>stoppet</translation>
     </message>
     <message>
       <source>starting</source>
-      <translation type="unfinished">starting</translation>
+      <translation>starter</translation>
     </message>
     <message>
       <source>stopping</source>
-      <translation type="unfinished">stopping</translation>
+      <translation>stopper</translation>
     </message>
     <message>
       <source>started</source>
-      <translation type="unfinished">started</translation>
+      <translation>startet</translation>
     </message>
     <message>
       <source>resuming</source>
-      <translation type="unfinished">resuming</translation>
+      <translation>gjenopptar</translation>
     </message>
     <message>
       <source>paused</source>
-      <translation type="unfinished">paused</translation>
+      <translation>pauset</translation>
     </message>
     <message>
       <source>pausing</source>
-      <translation type="unfinished">pausing</translation>
+      <translation>pauser</translation>
     </message>
     <message>
       <source>Unknown error: %1</source>
-      <translation type="unfinished">Unknown error: %1</translation>
+      <translation>Ukjent feil: %1</translation>
     </message>
   </context>
 </TS>
