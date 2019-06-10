@@ -888,6 +888,10 @@ protected:
     {
         using namespace std::chrono;
 
+        const auto startTime = system_clock::from_time_t(
+            analyticsDataPackets().back()->timestampUsec / 1000000) + hours(1);
+        setAllowedTimeRange(startTime, startTime + hours(24));
+
         m_specificObjectAppearanceId = QnUuid::createUuid();
         const auto deviceId = QnUuid::createUuid();
         auto analyticsDataPackets = generateEventsByCriteria();
@@ -1164,14 +1168,21 @@ public:
 protected:
     void givenDetectedObjectsWithSameTimestamp()
     {
+        using namespace std::chrono;
+
+        const auto startTime = system_clock::from_time_t(
+            analyticsDataPackets().back()->timestampUsec / 1000000) + hours(1);
+        setAllowedTimeRange(startTime, startTime + hours(24));
+
         auto newPackets = generateEventsByCriteria();
-        newPackets.erase(std::next(newPackets.begin()), newPackets.end());
 
-        const auto existingPackets = analyticsDataPackets();
-        const auto& existingPacket = nx::utils::random::choice(existingPackets);
-
-        newPackets.front()->deviceId = existingPacket->deviceId;
-        newPackets.front()->timestampUsec = existingPacket->timestampUsec;
+        std::for_each(
+            std::next(newPackets.begin()), newPackets.end(),
+            [existingPacket = newPackets.front()](auto& packet)
+            {
+                packet->deviceId = existingPacket->deviceId;
+                packet->timestampUsec = existingPacket->timestampUsec;
+            });
 
         saveAnalyticsDataPackets(std::move(newPackets));
         aggregateAnalyticsDataPacketsByTimestamp();
@@ -1182,9 +1193,9 @@ protected:
         using namespace std::chrono;
 
         constexpr int objectCount = 3;
+
         const auto startTime = system_clock::from_time_t(
             analyticsDataPackets().back()->timestampUsec / 1000000) + hours(1);
-
         setAllowedTimeRange(startTime, startTime + hours(24));
 
         auto newPackets = generateEventsByCriteria();
