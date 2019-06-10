@@ -297,6 +297,8 @@ private:
 
     void updatePlaybackMask();
 
+    void syncIfOutOfSyncWithLive(QnResourceWidget *widget);
+
 private:
     QPointer<QnWorkbenchStreamSynchronizer> m_streamSynchronizer;
     QTime m_updateSliderTimer;

@@ -2412,6 +2412,31 @@ void QnWorkbenchNavigator::at_timeSlider_thumbnailClicked()
     m_preciseNextSeek = true;
 }
 
+void QnWorkbenchNavigator::syncIfOutOfSyncWithLive(QnResourceWidget *widget)
+{
+    if (!m_streamSynchronizer->isRunning())
+        return;
+
+    if (!widget->resource()->flags().testFlag(Qn::sync))
+        return;
+
+    auto mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if (!mediaWidget)
+        return;
+
+    auto reader = mediaWidget->display()->archiveReader();
+    if (!reader)
+        return;
+
+    const bool outOfSync = reader->isRealTimeSource() &&
+        m_streamSynchronizer->state().timeUs != DATETIME_NOW;
+
+    if (!outOfSync)
+        return;
+
+    setPosition(DATETIME_NOW);
+}
+
 void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role)
 {
     if (role == Qn::CentralRole)
@@ -2419,6 +2444,13 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role)
 
     if (role == Qn::ZoomedRole)
     {
+        // Zoom activates live mode for the camera with no archive.
+        // When the camera was not playing video because it has been synced with other camera's archive,
+        // it is not going to play live video on its own (no component requests stream synchronizer to do this).
+        // So it is requested manually here.
+        if (auto widget = display()->widget(Qn::ZoomedRole))
+            syncIfOutOfSyncWithLive(widget);
+
         updateLines();
         updateCalendar();
     }
