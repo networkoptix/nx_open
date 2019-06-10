@@ -5,6 +5,8 @@
 #include <mutex>
 #include <vector>
 
+#include <QtCore/QFile>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/http/http_client.h>

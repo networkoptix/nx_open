@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QStandardPaths>
+
 #include <nx/utils/settings.h>
 #include <network/multicodec_rtp_reader.h>
 #include <network/system_helpers.h>

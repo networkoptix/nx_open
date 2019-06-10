@@ -2,6 +2,7 @@
 #include "ui_look_and_feel_preferences_widget.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QScopedValueRollback>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>

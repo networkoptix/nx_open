@@ -1,5 +1,6 @@
 #include "system_helpers.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QFile>
 
 #include <nx/utils/crypt/linux_passwd_crypt.h>

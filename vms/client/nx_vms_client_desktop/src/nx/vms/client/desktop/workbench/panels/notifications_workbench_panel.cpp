@@ -1,5 +1,6 @@
 #include "notifications_workbench_panel.h"
 
+#include <QtCore/QModelIndex>
 #include <QtCore/QTimer>
 
 #include <QtWidgets/QAction>

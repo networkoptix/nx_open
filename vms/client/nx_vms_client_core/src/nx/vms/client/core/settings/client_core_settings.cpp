@@ -1,6 +1,7 @@
 #include "client_core_settings.h"
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QSettings>
 
 #include <utils/crypt/symmetrical.h>
 

@@ -1,6 +1,8 @@
 #include "show_text_overlay_action_widget.h"
 #include "ui_show_text_overlay_action_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <nx/vms/event/action_parameters.h>
 
 #include <ui/common/read_only.h>
