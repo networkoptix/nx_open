@@ -122,7 +122,7 @@ Item
                 color: ColorTheme.windowText
                 font.pixelSize: 13
                 font.weight: Font.Bold
-                text: qsTr("This is the default built-in functionality")
+                text: qsTr("This is the built-in functionality")
             }
         }
 
