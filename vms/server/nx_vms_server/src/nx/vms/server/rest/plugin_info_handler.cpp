@@ -12,7 +12,7 @@ PluginInfoHandler::PluginInfoHandler(QnMediaServerModule* serverModule):
 {
 }
 
-nx::network::rest::Response PluginInfoHandler::executeGet(const nx::network::rest::Request& request)
+nx::network::rest::Response PluginInfoHandler::executeGet(const nx::network::rest::Request& /*request*/)
 {
     using namespace nx::network::http;
 
