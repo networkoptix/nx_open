@@ -9,7 +9,8 @@ class PluginInfoHandler: public QnJsonRestHandler, public ServerModuleAware
 {
 public:
     PluginInfoHandler(QnMediaServerModule* serverModule);
-    virtual JsonRestResponse executeGet(const JsonRestRequest& request) override;
+    virtual nx::network::rest::Response executeGet(
+        const nx::network::rest::Request& request) override;
 };
 
 } // namespace nx::vms::server::rest

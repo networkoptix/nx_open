@@ -12,19 +12,19 @@ PluginInfoHandler::PluginInfoHandler(QnMediaServerModule* serverModule):
 {
 }
 
-JsonRestResponse PluginInfoHandler::executeGet(const JsonRestRequest& request)
+nx::network::rest::Response PluginInfoHandler::executeGet(const nx::network::rest::Request& request)
 {
     using namespace nx::network::http;
 
     auto pluginManager = serverModule()->pluginManager();
     if (!NX_ASSERT(pluginManager, "Unable to access plugin manager"))
     {
-        return JsonRestResponse(
+        return nx::network::rest::Response::error(
             StatusCode::internalServerError,
             QnRestResult::Error::InternalServerError);
     }
 
-    return JsonRestResponse(pluginManager->pluginInformation());
+    return nx::network::rest::Response::reply(pluginManager->pluginInformation());
 }
 
 } // namespace nx::vms::server::rest

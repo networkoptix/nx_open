@@ -16,6 +16,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_history.h>
 #include "core/resource/resource_data.h"
+#include <core/resource_management/resource_pool.h>
 #include "core/resource_management/resource_data_pool.h"
 #include "api/common_message_processor.h"
 #include "api/app_server_connection.h"
@@ -2003,13 +2004,14 @@ void QnStorageManager::clearAnalyticsEvents(
 
 void QnStorageManager::forciblyClearAnalyticsEvents()
 {
+    auto resourcePool = serverModule()->resourcePool();
     // 2. Forcibly remove more analytics data if there is still no disk space left
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+    auto server = resourcePool->getResourceById<QnMediaServerResource>(
         serverModule()->commonModule()->moduleGUID());
     if (!server)
         return;
 
-    if (auto storage = resourcePool()->getResourceById<QnStorageResource>(server->metadataStorageId()))
+    if (auto storage = resourcePool->getResourceById<QnStorageResource>(server->metadataStorageId()))
     {
         const auto freeSpace = storage->getFreeSpace();
         if (storage->getStatus() == Qn::Online && freeSpace < storage->getSpaceLimit() / 2)
