@@ -575,7 +575,7 @@ void Worker::handleChecksumsReply(
         return;
     }
 
-    const auto resultCode = m_storage->setChunkChecksums(m_fileName, checksums.value());
+    const auto resultCode = m_storage->setChunkChecksums(m_fileName, *checksums);
 
     if (resultCode != ResultCode::ok)
     {
@@ -703,7 +703,7 @@ void Worker::handleDownloadChunkReply(
         return;
     }
 
-    const auto resultCode = m_storage->writeFileChunk(m_fileName, chunkIndex, data.value());
+    const auto resultCode = m_storage->writeFileChunk(m_fileName, chunkIndex, *data);
     if (resultCode != ResultCode::ok)
     {
         NX_WARNING(m_logTag, "Cannot write chunk %1. Storage error: %2", chunkIndex, resultCode);
