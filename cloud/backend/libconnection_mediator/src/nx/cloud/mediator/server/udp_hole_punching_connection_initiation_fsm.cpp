@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/network/cloud/data/connection_ack_data.h>
 #include <nx/network/cloud/data/connection_requested_event_data.h>
 #include <nx/utils/log/log.h>
