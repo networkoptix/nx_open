@@ -1179,7 +1179,13 @@ protected:
 
     void givenObjectsWithInterleavedTracks()
     {
+        using namespace std::chrono;
+
         constexpr int objectCount = 3;
+        const auto startTime = system_clock::from_time_t(
+            analyticsDataPackets().back()->timestampUsec / 1000000) + hours(1);
+
+        setAllowedTimeRange(startTime, startTime + hours(24));
 
         auto newPackets = generateEventsByCriteria();
 
