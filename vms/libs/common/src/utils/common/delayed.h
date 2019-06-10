@@ -37,4 +37,6 @@ QTimer* executeDelayedParented(Callback callback, QObject* parent);
 
 void executeLater(Callback callback, QObject* parent = nullptr);
 
+void executeLaterInThread(Callback callback, QThread* thread);
+
 void executeInThread(QThread* thread, Callback callback);

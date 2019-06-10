@@ -182,7 +182,7 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
     }
 
     // Just expand online local tile
-    executeDelayedParented([this, system]() { emit openTile(system->id());  }, 0, this);
+    executeLater([this, system]() { emit openTile(system->id());  }, this);
 }
 
 void QnWorkbenchWelcomeScreen::showEvent(QShowEvent* event)
@@ -250,7 +250,7 @@ void QnWorkbenchWelcomeScreen::openConnectingTile()
     if (systemId.isEmpty())
         return;
 
-    executeDelayedParented([this, systemId]() { emit openTile(systemId);  }, 0, this);
+    executeLater([this, systemId]() { emit openTile(systemId);  }, this);
 }
 void QnWorkbenchWelcomeScreen::handleDisconnectedFromSystem()
 {
@@ -380,7 +380,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
             nx::vms::client::core::settings()->systemAuthenticationData = authData;
         };
 
-    executeDelayedParented(callback, 0, this);
+    executeLater(callback, this);
 }
 
 void QnWorkbenchWelcomeScreen::forceActiveFocus()

@@ -1,5 +1,7 @@
 #include "applauncher_utils.h"
 
+#include <thread>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 

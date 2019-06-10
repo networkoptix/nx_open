@@ -149,7 +149,7 @@ void BaseInputFieldPrivate::updateVisualStateDelayed()
 
             hint->setPalette(customHintText.isEmpty() ? palette : defaultPalette);
         };
-    executeDelayedParented(updateFunction, 0, this);
+    executeLater(updateFunction, this);
 }
 
 void BaseInputFieldPrivate::setLastResult(ValidationResult result)

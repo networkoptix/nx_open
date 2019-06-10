@@ -31,7 +31,7 @@ void ToolButton::mousePressEvent(QMouseEvent* event)
     * in the signal handler, otherwise bad things with mouse grab etc. may happen
     * especially when the button resides in graphics proxy widget: */
     auto emitJustPressed = [this] { emit justPressed(); };
-    executeDelayedParented(emitJustPressed, 0, this);
+    executeLater(emitJustPressed, this);
 }
 
 void ToolButton::paintEvent(QPaintEvent* /*event*/)

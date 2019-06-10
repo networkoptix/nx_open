@@ -4357,7 +4357,7 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
                     }
                 };
 
-            executeDelayedParented(updateSectionSizes, 0, header);
+            executeLater(updateSectionSizes, header);
         }
     }
 
