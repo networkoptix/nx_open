@@ -1,5 +1,6 @@
 #include "query_queue.h"
 
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/time.h>
 
 #include "multiple_query_executor.h"
@@ -33,7 +34,7 @@ std::size_t QueryQueue::size() const
 {
     QnMutexLocker lock(&m_mutex);
 
-    return m_elementsByPriority.size() + m_postponedElements.size();
+    return m_elementsByPriority.size();
 }
 
 std::optional<QueryQueue::value_type> QueryQueue::pop(
@@ -45,13 +46,15 @@ std::optional<QueryQueue::value_type> QueryQueue::pop(
         &m_cond,
         timeout ? *timeout : std::chrono::milliseconds::max());
 
+    QuerySelectionContext querySelectionContext;
+
     std::vector<QueryQueue::value_type> resultingQueries;
     for (;;)
     {
         removeExpiredElements(&lock);
 
         std::optional<FoundQueryContext> queryQueueElementContext =
-            postponeUntilNextSuitableQuery(resultingQueries.empty());
+            getNextSuitableQuery(&querySelectionContext, resultingQueries.empty());
         if (queryQueueElementContext)
         {
             if (canAggregate(resultingQueries, queryQueueElementContext->value))
@@ -70,6 +73,8 @@ std::optional<QueryQueue::value_type> QueryQueue::pop(
 
         if (!resultingQueries.empty())
             return aggregateQueries(std::exchange(resultingQueries, {}));
+
+        querySelectionContext = QuerySelectionContext();
 
         if (!waitTimer.wait(lock.mutex()))
             return std::nullopt;
@@ -118,57 +123,35 @@ int QueryQueue::getPriority(const AbstractExecutor& value) const
         : priorityIter->second;
 }
 
-std::optional<QueryQueue::FoundQueryContext>
-    QueryQueue::postponeUntilNextSuitableQuery(bool consumeLimits)
+std::optional<QueryQueue::FoundQueryContext> QueryQueue::getNextSuitableQuery(
+    QuerySelectionContext* querySelectionContext,
+    bool consumeLimits)
 {
-    for (;;)
+    for (auto it = m_elementsByPriority.begin(); it != m_elementsByPriority.end(); ++it)
     {
-        if (!m_postponedElements.empty())
+        auto& query = it->second.value;
+
+        if (nx::utils::contains(querySelectionContext->forbiddenQueryTypes, query->queryType()))
+            continue;
+
+        if (!consumeLimits || checkAndUpdateQueryLimits(query))
+            return FoundQueryContext{query, it};
+
+        if (consumeLimits)
         {
-            auto& query = m_postponedElements.front().value;
-
-            if (!consumeLimits || checkAndUpdateQueryLimits(query))
-                return FoundQueryContext{query, QueueType::postponedQueries};
+            // Limits check didn't pass. Making sure we are not selecting a query of the same type 
+            // on this iteration since it will lead to query reordering.
+            querySelectionContext->forbiddenQueryTypes.push_back(query->queryType());
         }
-
-        if (!m_elementsByPriority.empty())
-        {
-            auto& query = m_elementsByPriority.begin()->second.value;
-
-            if (!consumeLimits || checkAndUpdateQueryLimits(query))
-                return FoundQueryContext{query, QueueType::queriesByPriority};
-
-            if (consumeLimits)
-            {
-                // checkAndUpdateQueryLimits failed.
-                postponeTopQuery();
-                continue;
-            }
-        }
-
-        return std::nullopt;
     }
+
+    return std::nullopt;
 }
 
 void QueryQueue::pop(const FoundQueryContext& queryContext)
 {
-    if (queryContext.queueType == QueueType::postponedQueries)
-    {
-        removeExpirationTimer(m_postponedElements.front());
-        m_postponedElements.pop_front();
-    }
-    else if (queryContext.queueType == QueueType::queriesByPriority)
-    {
-        removeExpirationTimer(m_elementsByPriority.begin()->second);
-        m_elementsByPriority.erase(m_elementsByPriority.begin());
-    }
-}
-
-void QueryQueue::postponeTopQuery()
-{
-    auto elementContext = std::move(m_elementsByPriority.begin()->second);
-    m_elementsByPriority.erase(m_elementsByPriority.begin());
-    postponeElement(std::move(elementContext));
+    removeExpirationTimer(queryContext.it->second);
+    m_elementsByPriority.erase(queryContext.it);
 }
 
 bool QueryQueue::checkAndUpdateQueryLimits(
@@ -242,7 +225,7 @@ void QueryQueue::addElementExpirationTimer(
 {
     auto timerIter = m_elementExpirationTimers.emplace(
         nx::utils::monotonicTime() + *m_itemStayTimeout,
-        ElementExpirationContext{elementIter, std::nullopt});
+        ElementExpirationContext{elementIter});
     elementIter->second.timerIter = timerIter;
 }
 
@@ -250,18 +233,6 @@ void QueryQueue::removeExpirationTimer(const ElementContext& elementContext)
 {
     if (elementContext.timerIter)
         m_elementExpirationTimers.erase(*elementContext.timerIter);
-}
-
-void QueryQueue::postponeElement(ElementContext elementContext)
-{
-    m_postponedElements.push_back(std::move(elementContext));
-
-    if (m_postponedElements.back().timerIter)
-    {
-        (*m_postponedElements.back().timerIter)->second.elementsByPriorityIter = std::nullopt;
-        (*m_postponedElements.back().timerIter)->second.postponedElementsIter =
-            std::prev(m_postponedElements.end());
-    }
 }
 
 void QueryQueue::removeExpiredElements(QnMutexLockerBase* lock)
@@ -278,12 +249,6 @@ void QueryQueue::removeExpiredElements(QnMutexLockerBase* lock)
         {
             value = std::move((*expirationContext.elementsByPriorityIter)->second.value);
             m_elementsByPriority.erase(*expirationContext.elementsByPriorityIter);
-        }
-
-        if (expirationContext.postponedElementsIter)
-        {
-            value = std::move((*expirationContext.postponedElementsIter)->value);
-            m_postponedElements.erase(*expirationContext.postponedElementsIter);
         }
 
         QnMutexUnlocker unlocker(lock);
