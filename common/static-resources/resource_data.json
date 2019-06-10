@@ -3434,6 +3434,33 @@
                     }
                 }
             }
+        },
+        {
+            "_comment1": "Mapped for 2.623.0000000.7.R, Build Date 2018-11-24",
+            "keys": [
+                "Dahua|DH-SD49225*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1,1],
+                        "logical": [-90, 15]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1, 2.26, 3.90, 5.46, 7.13, 8.72, 10.31, 12.21, 13.95, 15.69, 18],
+                        "logicalMultiplier": 33,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }
