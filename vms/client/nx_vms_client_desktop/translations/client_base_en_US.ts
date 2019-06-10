@@ -8728,6 +8728,14 @@ If you intended to move analytics data to another storage location, please conta
         <source>Failed to download update packages to some components</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8851,10 +8859,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update package can&apos;t be not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>There is not enough space to download update files.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8900,6 +8904,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Ready to install update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update package is not found.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
