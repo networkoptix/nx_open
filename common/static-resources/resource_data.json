@@ -867,7 +867,8 @@
                 "yc-r0814|network video recorder",
                 "onvif_encoder|viper-hdaenc16",
                 "dahua|dh-xvr5108hs-x",
-                "dahua|dhi-nvr4432-4ks2"
+                "dahua|dhi-nvr4432-4ks2",
+                "dahua|dh-xvr7104*"
             ],
             "analogEncoder": true
         },
