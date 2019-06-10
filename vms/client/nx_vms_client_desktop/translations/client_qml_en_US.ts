@@ -12,7 +12,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>This is the default built-in functionality</source>
+        <source>This is the built-in functionality</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
