@@ -47,9 +47,9 @@ update::Status CommonUpdateManager::start()
     NX_DEBUG(this, "Start update: Should download from scratch: %1, package valid: %2",
         shouldDownloadFromScratch, package.isValid());
 
-    installer()->stopSync();
-
-    clearDownloader(/*force*/ !package.isValid() || shouldDownloadFromScratch);
+    const bool shouldClearFiles = !package.isValid() || shouldDownloadFromScratch;
+    installer()->stopSync(shouldClearFiles);
+    clearDownloader(shouldClearFiles);
     if (!package.isValid())
         return updateStatus;
 

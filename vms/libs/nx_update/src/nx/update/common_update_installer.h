@@ -36,7 +36,7 @@ public:
     bool install(const QnAuthSession& authInfo);
     CommonUpdateInstaller(QObject* parent);
     ~CommonUpdateInstaller();
-    void stopSync();
+    void stopSync(bool clearAndReset);
     State state() const;
 
     virtual QString dataDirectoryPath() const = 0;
