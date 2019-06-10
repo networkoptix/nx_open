@@ -2044,7 +2044,7 @@ QMap<QnUuid, qint64> QnStorageManager::calculateOldestDataTimestampByCamera()
         const qint64 timestampMs = itr.value();
 
         auto itrPrev = m_lastCatalogTimes.find(uniqueId);
-        if (itrPrev != m_lastCatalogTimes.end() && itrPrev.value() != timestampMs)
+        if (itrPrev == m_lastCatalogTimes.end() || itrPrev.value() != timestampMs)
         {
             dataToDelete.insert(
                 QnSecurityCamResource::makeCameraIdFromUniqueId(uniqueId), timestampMs);
