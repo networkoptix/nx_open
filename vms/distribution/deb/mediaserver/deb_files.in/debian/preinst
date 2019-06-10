@@ -15,6 +15,8 @@ BASE_DIR="/opt/$COMPANY_NAME/mediaserver"
 ETC_DIR="$BASE_DIR/etc"
 CONFIG_FILE="$ETC_DIR/mediaserver.conf"
 
+MEDIA_SERVER_STARTUP_SCRIPT="/etc/init.d/${COMPANY_NAME}-mediaserver"
+
 errmsg()
 {
     echo >&2 ''
@@ -45,7 +47,27 @@ check_cloud_host()
     fi
 }
 
-[ "$1" = "upgrade" ] && check_cloud_host
+if [ "$1" = "upgrade" ]
+then
+    check_cloud_host
+elif [ "$1" = "install" ]
+then
+    if [ -f "$MEDIA_SERVER_STARTUP_SCRIPT" ]
+    then
+        "$MEDIA_SERVER_STARTUP_SCRIPT" stop
+    fi
+
+    # Clean up potentially unwanted files from previous installations.
+    for dir in \
+        "$BASE_DIR/lib" \
+        "$BASE_DIR/bin" \
+        "$BASE_DIR/var/scripts" \
+        "/opt/$COMPANY_NAME/lib" \
+        "/opt/deb"
+    do
+        rm -rf "$dir" || true
+    done
+fi
 
 db_get $COMPANY_NAME-mediaserver/accepted-$license
 if [ "$RET" = "true" ]; then
