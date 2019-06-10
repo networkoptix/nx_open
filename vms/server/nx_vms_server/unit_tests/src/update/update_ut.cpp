@@ -27,11 +27,11 @@ protected:
         ASSERT_TRUE(m_testHttpServer.bindAndListen());
     }
 
-    void givenConnectedPeers(int count)
+    void givenConnectedPeers(size_t count)
     {
 
         const QnUuid systemId = QnUuid::createUuid();
-        for (int i = 0; i < count; ++i)
+        for (size_t i = 0; i < count; ++i)
         {
             m_peers.emplace_back(std::make_unique<MediaServerLauncher>(QString()));
 
@@ -40,7 +40,7 @@ protected:
             ASSERT_TRUE(m_peers.back()->startAsync());
         }
 
-        for (int i = 0; i < count; ++i)
+        for (size_t i = 0; i < count; ++i)
         {
             ASSERT_TRUE(m_peers[i]->waitForStarted());
             m_peers[i]->commonModule()->globalSettings()->setLocalSystemId(systemId);
@@ -111,7 +111,7 @@ protected:
         issueInstallUpdateRequest(false, QnUuidList(), QnRestResult::MissingParameter);
     }
 
-    QnUuid peerId(int index)
+    QnUuid peerId(size_t index)
     {
         return m_peers[index]->commonModule()->moduleGUID();
     }
