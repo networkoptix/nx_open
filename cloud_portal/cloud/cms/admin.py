@@ -23,6 +23,10 @@ def clone_product(request, product_id):
         messages.error(request, "Copy already exists")
         return None
 
+    if product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+        messages.error(request, "Cannot clone cloud portal products")
+        return None
+
     product.pk = product.id = None
     product.name = clone_name
     product.created_by = created_by
@@ -170,7 +174,7 @@ class ProductAdmin(CMSAdmin):
             usergroupstoproductpermissions__product=product
         ).prefetch_related('permissions')
 
-        if self.has_clone_permission(request, product):
+        if self.has_clone_permission(request, product) and product.product_type.type != ProductType.PRODUCT_TYPES.cloud_portal:
             extra_context['show_clone_asset'] = True
 
         return super(ProductAdmin, self).change_view(
