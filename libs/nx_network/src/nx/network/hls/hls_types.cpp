@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include <QtCore/QTimezone>
+#include <QtCore/QTimeZone>
 
 namespace nx::network::hls {
 
