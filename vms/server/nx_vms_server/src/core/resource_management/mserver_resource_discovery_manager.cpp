@@ -39,7 +39,6 @@
 namespace {
 
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
-static const int kRetryCountToMakeCamOffline = 3;
 static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
 
 template<class ResourcePointer>
@@ -524,7 +523,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             // resource is not found
             m_resourceDiscoveryCounter[uniqId]++;
 
-            if (m_resourceDiscoveryCounter[uniqId] >= kRetryCountToMakeCamOffline)
+            if (m_resourceDiscoveryCounter[uniqId] >= m_serverModule->settings().retryCountToMakeCameraOffline())
             {
                 QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
                 if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)
