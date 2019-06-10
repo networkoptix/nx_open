@@ -27,9 +27,16 @@ public:
 
 class AnalyticsArchive: public MediaServerModuleFixture
 {
+    using base_type = MediaServerModuleFixture;
+
   public:
       AnalyticsArchive(): MediaServerModuleFixture()
       {
+      }
+
+      virtual void SetUp() override
+      {
+          base_type::SetUp();
           m_camera.reset(new resource::test::CameraMock(&serverModule()));
           m_camera->setPhysicalId("analytics binary archive test");
           m_dataProviderStub.reset(new DataProviderStub(m_camera));
