@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <nx/vms/server/metrics/controller.cpp>
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/utils/metrics/controller.h>
 
 #include "test_providers.h"
 
@@ -9,7 +10,7 @@ void PrintTo(const QJsonValue& v, ::std::ostream* s)
     *s << QJson::serialized(v).toStdString();
 }
 
-namespace nx::vms::server::metrics::test {
+namespace nx::vms::utils::metrics::test {
 
 static const QByteArray kRulesExample(R"json({
     "tests": {
@@ -37,7 +38,7 @@ class MetricsControllerTest: public ::testing::Test
 public:
     MetricsControllerTest()
     {
-        controller.registerGroup(std::make_unique<TestResourceProvider>(1, 2, 3));
+        controller.registerGroup("tests", std::make_unique<TestResourceProvider>(1, 2, 3));
         controller.startMonitoring();
     }
 
@@ -101,7 +102,7 @@ TEST_F(MetricsControllerTest, Values)
     auto testValues = systemValues["tests"];
     EXPECT_EQ(3, testValues.size());
 
-    auto test1 = testValues[uuid(1).toSimpleString()];
+    auto test1 = testValues["test_1"];
     EXPECT_EQ("Test 1", test1.name);
     {
         EXPECT_EQ(3, test1.values.size());
@@ -113,7 +114,7 @@ TEST_F(MetricsControllerTest, Values)
         checkParameter(group, "name", "Test 1");
     }
 
-    auto test2 = testValues[uuid(2).toSimpleString()];
+    auto test2 = testValues["test_2"];
     EXPECT_EQ("Test 2", test2.name);
     {
         EXPECT_EQ(3, test2.values.size());
@@ -125,7 +126,7 @@ TEST_F(MetricsControllerTest, Values)
         checkParameter(group, "name", "Test 2");
     }
 
-    auto test3 = testValues[uuid(3).toSimpleString()];
+    auto test3 = testValues["test_3"];
     EXPECT_EQ("Test 3", test3.name);
     checkParameter(test3.values, "number", 3);
 
@@ -164,7 +165,7 @@ TEST_F(MetricsControllerTest, ValuesWithRules)
     auto testValues = systemValues["tests"];
     EXPECT_EQ(3, testValues.size());
 
-    auto test1 = testValues[uuid(1).toSimpleString()];
+    auto test1 = testValues["test_1"];
     EXPECT_EQ("Test 1", test1.name);
     {
         EXPECT_EQ(4, test1.values.size());
@@ -178,7 +179,7 @@ TEST_F(MetricsControllerTest, ValuesWithRules)
         checkParameter(group, "name", "Test 1");
     }
 
-    auto test2 = testValues[uuid(2).toSimpleString()];
+    auto test2 = testValues["test_2"];
     EXPECT_EQ("Test 2", test2.name);
     {
         EXPECT_EQ(4, test2.values.size());
@@ -192,7 +193,7 @@ TEST_F(MetricsControllerTest, ValuesWithRules)
         checkParameter(group, "name", "Test 2");
     }
 
-    auto test3 = testValues[uuid(3).toSimpleString()];
+    auto test3 = testValues["test_3"];
     EXPECT_EQ("Test 3", test3.name);
     checkParameter(test3.values, "number", 3, "error");
 
@@ -201,4 +202,4 @@ TEST_F(MetricsControllerTest, ValuesWithRules)
     EXPECT_EQ(test1.parent, test3.parent);
 }
 
-} // namespace nx::vms::server::metrics::test
+} // namespace nx::vms::utils::metrics::test

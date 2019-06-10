@@ -45,7 +45,7 @@ public:
     class Access
     {
     public:
-        Access(Node* node);
+        explicit Access(Node* node = nullptr);
         ValueHistory<Value>* operator->() const;
         Access operator[](const Id& id) const;
 

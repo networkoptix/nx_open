@@ -293,6 +293,9 @@
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
 
+#include <nx/vms/server/metrics/camera_providers.h>
+#include <nx/vms/server/metrics/rest_handlers.h>
+
 using namespace nx::vms::server;
 
 // This constant is used while checking for compatibility.
@@ -2856,6 +2859,12 @@ void MediaServerProcess::registerRestHandlers(
         nx::network::http::Method::options,
         QnRestProcessorPool::kAnyPath,
         new OptionsRequestHandler());
+
+    reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(
+        m_metricsController.get()));
+
+    reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
+        m_metricsController.get(), serverModule()->resourcePool()));
 }
 
 void MediaServerProcess::reg(
@@ -3758,6 +3767,7 @@ void MediaServerProcess::stopObjects()
     m_autoRequestForwarder.reset();
     m_audioStreamerPool.reset();
     m_upnpPortMapper.reset();
+    m_metricsController.reset();
 
     stopAsync();
 }
@@ -4496,6 +4506,47 @@ void MediaServerProcess::loadResourceParamsData()
     }
 }
 
+void MediaServerProcess::initMetricsController()
+{
+    m_metricsController = std::make_unique<nx::vms::utils::metrics::Controller>();
+    m_metricsController->registerGroup(
+        "cameras",
+        std::make_unique<nx::vms::server::metrics::CamerasProvider>(
+            m_serverModule.lock()->resourcePool()));
+
+    // TODO: Should be moved into a resource file.
+    static const QByteArray kRules(R"json({
+        "cameras": {
+            "status": { "alarms": { "warning": "Unauthorized", "error": "Offline" } },
+            "statusChanges": {
+                "name": "status changes in last hour",
+                "calculate": "count status",
+                "insert": "after status",
+                "alarms": { "warning": 1, "error": 2 }
+            },
+            "packetLoss": { "alarms": { "warning": 1, "error": 5 } },
+            "conflictCount": { "alarms": { "warning": 1, "error": 2 } },
+            "primaryStream": {
+                "group": {
+                    "fpsDrop": {
+                        "name": "fps drop",
+                        "calculate": "minus targetFps actualFps",
+                        "insert": "after actualFps",
+                        "alarms": { "warning": 2 }
+                    },
+                    "bitrate": { "alarms": { "warning": "0" } }
+                }
+            }
+        }
+    })json");
+
+    nx::vms::api::metrics::SystemRules rules;
+    NX_CRITICAL(QJson::deserialize(kRules, &rules));
+    m_metricsController->setRules(std::move(rules));
+
+    m_metricsController->startMonitoring();
+}
+
 void MediaServerProcess::updateRootPassword()
 {
     // TODO: Root password for Nx1 should be updated in case of cloud owner.
@@ -4612,6 +4663,8 @@ void MediaServerProcess::run()
     loadPlugins();
 
     initResourceTypes();
+
+    initMetricsController();
 
     if (needToStop())
         return;
