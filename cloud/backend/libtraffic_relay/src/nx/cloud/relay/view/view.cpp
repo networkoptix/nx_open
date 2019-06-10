@@ -102,7 +102,7 @@ void View::start()
                 .args(SystemError::getLastOSErrorText()).toStdString());
     }
 
-    NX_ALWAYS(this, "HTTP server is listening on %1, ssl: %2",
+    NX_INFO(this, "HTTP server is listening on %1, ssl: %2",
         containerString(m_multiAddressHttpServer.endpoints()),
         containerString(m_multiAddressHttpServer.sslEndpoints()));
 }

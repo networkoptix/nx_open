@@ -86,7 +86,7 @@ void HttpView::listen()
     if (!m_multiAddressHttpServer.listen(m_settings.http().tcpBacklogSize))
         throw std::system_error(SystemError::getLastOSErrorCode(), std::system_category());
 
-    NX_ALWAYS(this, "HTTP server is listening on %1",
+    NX_INFO(this, "HTTP server is listening on %1",
         containerString(m_multiAddressHttpServer.endpoints()));
 }
 
