@@ -161,7 +161,10 @@ void QnSearchTask::doSearch()
     QnManualResourceSearchList results;
     for (const auto& checker: m_searchers)
     {
+        NX_DEBUG(this, lm("Starting camera manual search: [%1]").arg(checker->manufacture()));
         auto seqResults = checker->checkHostAddr(m_url, m_auth, true);
+        NX_DEBUG(this, lm("Manual camera search [%1] completed, %2 resources found").arg
+            (checker->manufacture()).arg(seqResults.size()));
 
         for (const auto& res: seqResults)
         {
