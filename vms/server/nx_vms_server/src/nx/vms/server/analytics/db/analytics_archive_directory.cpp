@@ -110,9 +110,6 @@ AnalyticsArchiveDirectory::ObjectMatchResult AnalyticsArchiveDirectory::toObject
     else
         std::sort(objectGroups.begin(), objectGroups.end(), std::greater<>());
 
-    if (objectGroups.size() > filter.limit)
-        objectGroups.erase(objectGroups.begin() + filter.limit, objectGroups.end());
-
     ObjectMatchResult result;
     std::transform(
         objectGroups.begin(), objectGroups.end(),

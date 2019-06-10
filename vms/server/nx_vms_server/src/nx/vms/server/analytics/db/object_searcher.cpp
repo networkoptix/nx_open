@@ -371,15 +371,24 @@ void ObjectSearcher::fetchObjectsFromDb(
         ":groupId",
         objectGroups);
 
+    std::string limitExpr;
+    if (m_filter.maxObjectsToSelect > 0)
+        limitExpr = "LIMIT " + std::to_string(m_filter.maxObjectsToSelect);
+
     auto query = queryContext->connection()->createQuery();
     query->setForwardOnly(true);
     query->prepare(lm(R"sql(
         SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, 
-            ua.content AS content, best_shot_timestamp_ms, best_shot_rect
-        FROM object o, unique_attributes ua, object_group og
-        WHERE o.attributes_id=ua.id AND o.id=og.object_id AND %1
-        ORDER BY track_start_ms %2
-    )sql").args(objectGroupFilter.toString(),
+            content, best_shot_timestamp_ms, best_shot_rect
+        FROM
+            (SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, 
+                ua.content AS content, best_shot_timestamp_ms, best_shot_rect
+            FROM object o, unique_attributes ua, object_group og
+            WHERE o.attributes_id=ua.id AND o.id=og.object_id AND %1
+            ORDER BY track_start_ms DESC
+            %2)
+        ORDER BY track_start_ms %3
+    )sql").args(objectGroupFilter.toString(), limitExpr,
         m_filter.sortOrder == Qt::AscendingOrder ? "ASC" : "DESC"));
     objectGroupFilter.bindFields(&query->impl());
 
