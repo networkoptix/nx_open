@@ -118,5 +118,5 @@ if(LINUX)
 endif()
 
 if(WINDOWS)
-    target_link_libraries(mediaserver_core PRIVATE Wldap32.dll Iphlpapi.dll Crypt32.lib)
+    target_link_libraries(mediaserver_core PRIVATE Wldap32.dll Iphlpapi.dll Crypt32.lib Wevtapi.lib)
 endif()

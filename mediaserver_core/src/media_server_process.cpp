@@ -1040,12 +1040,11 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
     m_platform->setUpdatePeriodMs(
         isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
 
-    const QString raidEventLogName = system_log::ini().getLogName();
-    const QString raidEventProviderName = system_log::ini().getProviderName();
-    const int raidEventMaxLevel = system_log::ini().getMaxLevel();
+    const QString raidEventLogName = system_log::ini().logName;
+    const QString raidEventProviderName = system_log::ini().providerName;
 
     m_raidEventLogReader.reset(new RaidEventLogReader(
-        raidEventLogName, raidEventProviderName, raidEventMaxLevel));
+        raidEventLogName, raidEventProviderName));
 }
 
 void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
@@ -3641,6 +3640,10 @@ void MediaServerProcess::run()
     connect(qnBackupStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
     connect(qnBackupStorageMan, &QnStorageManager::backupFinished, this, &MediaServerProcess::at_archiveBackupFinished);
 
+    connect(m_raidEventLogReader.get(), &RaidEventLogReader::eventOccurred, this,
+        &MediaServerProcess::at_storageManager_raidStorageFailure);
+    m_raidEventLogReader->subscribe();
+
     connectArchiveIntegrityWatcher();
 
     auto remoteArchiveSynchronizer =
@@ -4214,6 +4217,10 @@ void MediaServerProcess::run()
             disconnect(commonModule()->resourceDiscoveryManager(), 0, this, 0);
             disconnect(qnNormalStorageMan, 0, this, 0);
             disconnect(qnBackupStorageMan, 0, this, 0);
+
+            m_raidEventLogReader->unsubscribe();
+            disconnect(m_raidEventLogReader.get(), 0, this, 0);
+
             disconnect(commonModule(), 0, this, 0);
             disconnect(runtimeManager, 0, this, 0);
             disconnect(ec2Connection->getTimeNotificationManager().get(), 0, this, 0);
@@ -4340,10 +4347,6 @@ void MediaServerProcess::at_appStarted()
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
-
-    connect(m_raidEventLogReader.get(), &RaidEventLogReader::eventOccurred, this,
-        &MediaServerProcess::at_storageManager_raidStorageFailure);
-    m_raidEventLogReader->subscribe();
 };
 
 void MediaServerProcess::at_timeChanged(qint64 newTime)
