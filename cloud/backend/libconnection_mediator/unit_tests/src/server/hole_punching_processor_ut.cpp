@@ -73,7 +73,7 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
     const auto server1 = addRandomServer(m_system, boost::none, hpm::ServerTweak::noBindEndpoint);
     ASSERT_NE(nullptr, server1);
 
-    static const std::vector<std::list<nx::network::SocketAddress>> kTestCases =
+    static const std::vector<std::vector<nx::network::SocketAddress>> kTestCases =
     {
         {}, // no public addresses
         { server1->endpoint() },
@@ -389,7 +389,7 @@ class HolePunchingProcessor:
 
 public:
     HolePunchingProcessor():
-        m_listeningPeerDb(m_settings.listeningPeerDb()),
+        m_listeningPeerDb(m_settings),
         m_listeningPeerPool(m_settings.listeningPeer(), &m_listeningPeerDb),
         m_relayClusterClient(m_settings),
         m_holePunchingProcessor(

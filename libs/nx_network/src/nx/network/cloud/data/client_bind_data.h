@@ -18,7 +18,7 @@ public:
         network::stun::extension::methods::clientBind;
 
     nx::String originatingPeerID;
-    std::list<network::SocketAddress> tcpReverseEndpoints;
+    std::vector<network::SocketAddress> tcpReverseEndpoints;
 
     ClientBindRequest();
     void serializeAttributes(nx::network::stun::Message* const message) override;

@@ -29,7 +29,7 @@ protected:
 
     void givenSynchronizedClusterWithListeningServer();
 
-    void whenAddServer();
+    void whenAddServer(int mediatorIndex = 0);
 
     void whenMediaServerGoesOffline();
 

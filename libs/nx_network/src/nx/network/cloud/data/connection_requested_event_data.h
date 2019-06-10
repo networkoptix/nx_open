@@ -19,8 +19,8 @@ public:
     nx::String connectSessionId;
     nx::String originatingPeerID;
     /** Peer UDP addresses. */
-    std::list<network::SocketAddress> udpEndpointList;
-    std::list<network::SocketAddress> tcpReverseEndpointList;
+    std::vector<network::SocketAddress> udpEndpointList;
+    std::vector<network::SocketAddress> tcpReverseEndpointList;
     /** All requests connection types. */
     ConnectionMethods connectionMethods;
     ConnectionParameters params;

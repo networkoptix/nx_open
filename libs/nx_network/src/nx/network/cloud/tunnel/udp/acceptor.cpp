@@ -11,7 +11,7 @@ namespace udp {
 
 TunnelAcceptor::TunnelAcceptor(
     const SocketAddress& mediatorUdpEndpoint,
-    std::list<SocketAddress> peerAddresses,
+    std::vector<SocketAddress> peerAddresses,
     nx::hpm::api::ConnectionParameters connectionParametes)
 :
     m_peerAddresses(std::move(peerAddresses)),

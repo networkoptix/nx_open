@@ -132,7 +132,7 @@ BaseStringAttribute::BaseStringAttribute(int userType, const String& value):
 {
 }
 
-static String endpointsToString(const std::list<SocketAddress>& endpoints)
+static String endpointsToString(const std::vector<SocketAddress>& endpoints)
 {
     QStringList list;
     for (const auto& ep: endpoints)
@@ -155,18 +155,18 @@ SocketAddress Endpoint::get() const
 
 //-------------------------------------------------------------------------------------------------
 
-EndpointList::EndpointList(int type, const std::list<SocketAddress>& endpoints):
+EndpointList::EndpointList(int type, const std::vector<SocketAddress>& endpoints):
     BaseStringAttribute(type, endpointsToString(endpoints))
 {
 }
 
-std::list<SocketAddress> EndpointList::get() const
+std::vector<SocketAddress> EndpointList::get() const
 {
     const auto value = getString();
     if (value.isEmpty())
         return {};
 
-    std::list<SocketAddress> list;
+    std::vector<SocketAddress> list;
     for (const auto& ep: QString::fromUtf8(value).split(","))
         list.push_back(SocketAddress(ep));
 

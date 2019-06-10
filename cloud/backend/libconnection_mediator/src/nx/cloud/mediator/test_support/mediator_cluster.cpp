@@ -142,6 +142,17 @@ std::optional<MediatorEndpoint> MediatorCluster::lookupMediatorEndpoint(
     return std::nullopt;
 }
 
+std::vector<MediatorEndpoint> MediatorCluster::endpoints() const
+{
+    std::vector<MediatorEndpoint> mediatorEndpoints;
+    for (const auto& mediator : m_mediators)
+    {
+        mediatorEndpoints.push_back(
+            mediator->moduleInstance()->impl()->listeningPeerDb().thisMediatorEndpoint());
+    }
+    return mediatorEndpoints;
+}
+
 void MediatorCluster::addClusterArgs(int index, MediatorInstance* mediator)
 {
     std::string nodeId = lm("mediator_%1").arg(index).toStdString();

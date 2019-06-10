@@ -45,7 +45,7 @@ public:
     AbstractCloudDataProvider::System addRandomSystem();
 
     /*
-     * Get the number of nodes (mediators) in the cluster
+     * Get the number of nodes (mediators) in the cluster.
      */
     int size() const;
 
@@ -63,9 +63,14 @@ public:
     bool peerInformationIsAbsentFromCluster(const std::string& peerDomainName) const;
 
     /**
-     * Get the endpoint that the given peer is listening on, or an std::nullopt if none is found
+     * Get the endpoint that the given peer is listening on, or an std::nullopt if none is found.
      */
     std::optional<MediatorEndpoint> lookupMediatorEndpoint(const std::string& peerDomainName) const;
+
+    /**
+     * Get all of the MediatorEndpoints in the cluster.
+     */
+    std::vector<MediatorEndpoint> endpoints() const;
 
 private:
     void addClusterArgs(int index, MediatorInstance* mediator);

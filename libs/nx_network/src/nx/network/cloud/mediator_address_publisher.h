@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <nx/network/cloud/mediator_server_connections.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
@@ -28,7 +30,7 @@ public:
     void setRetryInterval(std::chrono::milliseconds interval);
 
     void updateAddresses(
-        std::list<SocketAddress> addresses,
+        std::vector<SocketAddress> addresses,
         utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> updateHandler = nullptr);
 
 private:
@@ -39,8 +41,8 @@ private:
 private:
     std::chrono::milliseconds m_retryInterval;
     bool m_isRequestInProgress;
-    std::list<SocketAddress> m_serverAddresses;
-    std::list<SocketAddress> m_publishedAddresses;
+    std::vector<SocketAddress> m_serverAddresses;
+    std::vector<SocketAddress> m_publishedAddresses;
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
     std::list<utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)>> m_updateHandlers;
     std::unique_ptr<aio::Timer> m_retryTimer;

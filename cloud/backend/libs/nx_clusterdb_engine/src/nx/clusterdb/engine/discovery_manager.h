@@ -30,7 +30,8 @@ public:
 
     /**
      * Update this node's information, sending to discovery service ASAP.
-     * NOTE: Does nothing if start() hasn't been called, or if stop() has been called.
+     * NOTE: if called before start(), infoJson is saved and passed to the discovery
+     *    service when start() is called.
      */
     void updateInformation(const std::string& infoJson);
 
@@ -53,6 +54,8 @@ private:
     SynchronizationEngine* m_syncEngine;
 
     std::unique_ptr<nx::cloud::discovery::DiscoveryClient> m_discoveryClient;
+
+    std::string m_infoJson;
 };
 
 } //namespace nx::clusterdb::engine

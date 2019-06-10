@@ -16,10 +16,9 @@ public:
     constexpr static const network::stun::extension::methods::Value kMethod =
         network::stun::extension::methods::ping;
 
-    std::list<network::SocketAddress> endpoints;
+    std::vector<network::SocketAddress> endpoints;
 
-    PingRequest();
-    PingRequest(std::list<network::SocketAddress> _endpoints);
+    PingRequest(std::vector<network::SocketAddress> _endpoints = {});
 
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::network::stun::Message& message) override;
@@ -32,7 +31,7 @@ public:
     constexpr static const network::stun::extension::methods::Value kMethod =
         network::stun::extension::methods::ping;
 
-    std::list<network::SocketAddress> endpoints;
+    std::vector<network::SocketAddress> endpoints;
 
     PingResponse();
 
