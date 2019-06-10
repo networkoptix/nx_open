@@ -216,7 +216,7 @@ then
 
     bash "${BASE_DIR}/var/scripts/rpi/cam_setup.sh"
 
-    # Plan the reboot after the package installation. This mark will be processed in install.sh.
+    # Plan a reboot after the package installation. This mark will be processed in install.sh.
     touch "/var/run/reboot-required"
 else
     ( cd "${BASE_DIR}/lib"; ln -s ffmpeg-arm32 ffmpeg )
