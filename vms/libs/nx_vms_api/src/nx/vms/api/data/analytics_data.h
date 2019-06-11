@@ -67,6 +67,7 @@ struct NX_VMS_API PluginInfo: Data
     QString name;
     QString description;
     QString libraryFilename;
+    QString homeDir;
     QString vendor;
     QString version;
     Optionality optionality = Optionality::nonOptional;
@@ -82,6 +83,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::MainInterface)
 #define PluginInfo_Fields (name) \
     (description) \
     (libraryFilename) \
+    (homeDir) \
     (vendor) \
     (version) \
     (optionality) \

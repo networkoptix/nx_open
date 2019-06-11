@@ -5,6 +5,7 @@
 
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/i_plugin_home_dir_utility_provider.h>
 
 #include "utils.h"
 #include "device_agent.h"
@@ -21,6 +22,7 @@ using namespace nx::sdk::analytics;
 Engine::Engine(nx::sdk::analytics::Plugin* plugin):
     nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
+    obtainPluginHomeDir();
     initCapabilities();
 }
 
@@ -73,6 +75,20 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     const IDeviceInfo* deviceInfo, Error* /*outError*/)
 {
     return new DeviceAgent(this, deviceInfo);
+}
+
+void Engine::obtainPluginHomeDir()
+{
+    if (const auto pluginHomeDirUtilityProvider =
+        queryInterfacePtr<IPluginHomeDirUtilityProvider>(plugin()->utilityProvider()))
+    {
+        m_pluginHomeDir = toPtr(pluginHomeDirUtilityProvider->homeDir(plugin()))->str();
+    }
+
+    if (m_pluginHomeDir.empty())
+        NX_PRINT << "Plugin home dir: absent";
+    else
+        NX_PRINT << "Plugin home dir: " << nx::kit::utils::toString(m_pluginHomeDir);
 }
 
 void Engine::initCapabilities()

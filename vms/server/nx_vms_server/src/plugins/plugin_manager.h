@@ -2,12 +2,9 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QList>
-#include <QtCore/QPluginLoader>
-#include <QSharedPointer>
 #include <QtCore/QString>
 #include <QtCore/QSettings>
 
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <nx/sdk/i_plugin.h>
@@ -90,7 +87,12 @@ public:
 
     void unloadPlugins();
 
-    nx::vms::api::PluginInfoList pluginInformation() const;
+    nx::vms::api::PluginInfoList pluginInfoList() const;
+
+    /** @return Null if not found. */
+    std::shared_ptr<const nx::vms::api::PluginInfo> pluginInfo(
+        const nx::sdk::IPlugin* plugin) const;
+
 signals:
     /** Emitted just after new plugin has been loaded. */
     void pluginLoaded();

@@ -51,6 +51,7 @@ protected:
         nx::sdk::Error* error) override;
 
 private:
+    void obtainPluginHomeDir();
     void initCapabilities();
     void generatePluginEvents();
 
@@ -62,6 +63,7 @@ private:
     std::atomic<bool> m_terminated{false};
     std::atomic<bool> m_needToThrowPluginEvents{false};
 
+    std::string m_pluginHomeDir; /**< Can be empty. */
     std::string m_capabilities;
     bool m_needUncompressedVideoFrames = false;
     PixelFormat m_pixelFormat = PixelFormat::yuv420;

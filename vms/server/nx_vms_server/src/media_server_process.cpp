@@ -2726,6 +2726,9 @@ void MediaServerProcess::registerRestHandlers(
      *         %param reply[].vendor Vendor of the plugin from its manifest.
      *         %param reply[].version Version of the plugin from its manifest.
      *         %param reply[].libraryFilename Absolute path to the plugin dynamic library.
+     *         %param reply[].homeDir Absolute path to the plugin's dedicated directory where its
+     *             dynamic library resides together with its possible dependencies, or an empty
+     *             string if the plugin resides in a common directory with other plugins.
      *         %param reply[].optionality Whether the plugin resides in "plugins_optional" folder
      *             or in the regular "plugins" folder.
      *         %param reply[].status Status of the plugin after the plugin loading attempt.

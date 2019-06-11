@@ -13,7 +13,6 @@
 
 #include <plugins/plugin_api.h>
 #include <nx/sdk/helpers/ptr.h>
-#include <nx/sdk/i_plugin.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/vms/server/plugins/utility_provider.h>
 #include <nx/vms/server/sdk_support/utils.h>
@@ -34,7 +33,7 @@ static QStringList stringToListViaComma(const QString& s)
 
 PluginManager::PluginManager(QObject* parent):
     QObject(parent),
-    m_utilityProvider(new nx::vms::server::plugins::UtilityProvider())
+    m_utilityProvider(new nx::vms::server::plugins::UtilityProvider(this))
 {
 }
 
@@ -122,19 +121,20 @@ void PluginManager::loadPluginsFromDir(
         pluginInfo->optionality = optionality;
         pluginInfo->libraryFilename = fileInfo.absoluteFilePath();
 
-        if (!allowPlugin(fileInfo, pluginInfo))
-            continue;
-
-        // If the plugin is located in its dedicated directory, then use this directory for plugin
-        // dependencies lookup, otherwise do not perform the dependencies lookup.
-        const QString linkedLibsDirectory =
+        // If the plugin is located in its dedicated directory, then set this directory as its home
+        // directory, otherwise, set empty home directory. If a plugin has a home directory, it is
+        // used for its dynamic library dependencies lookup.
+        pluginInfo->homeDir =
             (fileInfo.dir() != dirToSearchIn) // The plugin resides in its dedicated dir.
                 ? fileInfo.dir().absolutePath()
                 : "";
 
+        if (!allowPlugin(fileInfo, pluginInfo))
+            continue;
+
         loadNxPlugin(
             settingsHolder,
-            linkedLibsDirectory,
+            pluginInfo->homeDir,
             fileInfo.absoluteFilePath(),
             libName,
             pluginInfo);
@@ -239,22 +239,22 @@ void PluginManager::loadOptionalPluginsIfNeeded(
 }
 
 /**
- * @param linkedLibsDirectory Can be empty if the plugin is not contained in its dedicated dir.
+ * @param pluginHomeDir Can be empty if the plugin does not reside in its dedicated dir.
  */
 std::unique_ptr<QLibrary> PluginManager::loadPluginLibrary(
-    const QString& linkedLibsDirectory,
+    const QString& pluginHomeDir,
     const QString& libFilename,
     PluginInfoPtr pluginInfo)
 {
     #if defined(_WIN32)
-        if (!pluginsIni().disablePluginLinkedDllLookup && !linkedLibsDirectory.isEmpty())
+        if (!pluginsIni().disablePluginLinkedDllLookup && !pluginHomeDir.isEmpty())
         {
             NX_DEBUG(this, "Calling SetDllDirectoryW(%1)",
-                nx::kit::utils::toString(linkedLibsDirectory));
-            if (!SetDllDirectoryW(linkedLibsDirectory.toStdWString().c_str()))
+                nx::kit::utils::toString(pluginHomeDir));
+            if (!SetDllDirectoryW(pluginHomeDir.toStdWString().c_str()))
             {
                 NX_ERROR(this, "SetDllDirectoryW(%1) failed",
-                    nx::kit::utils::toString(linkedLibsDirectory));
+                    nx::kit::utils::toString(pluginHomeDir));
             }
         }
     #endif
@@ -270,7 +270,7 @@ std::unique_ptr<QLibrary> PluginManager::loadPluginLibrary(
     const bool libLoaded = lib->load();
 
     #if defined(_WIN32)
-        if (!pluginsIni().disablePluginLinkedDllLookup && !linkedLibsDirectory.isEmpty())
+        if (!pluginsIni().disablePluginLinkedDllLookup && !pluginHomeDir.isEmpty())
         {
             NX_DEBUG(this, "Calling SetDllDirectoryW(nullptr)");
             if (!SetDllDirectoryW(nullptr))
@@ -307,7 +307,7 @@ void PluginManager::storePluginInfo(
 
 bool PluginManager::loadNxPlugin(
     const nx::plugins::SettingsHolder& settingsHolder,
-    const QString& linkedLibsDirectory,
+    const QString& pluginHomeDir,
     const QString& libFilename,
     const QString& libName,
     PluginInfoPtr pluginInfo)
@@ -317,7 +317,7 @@ bool PluginManager::loadNxPlugin(
     using namespace nx::vms::server;
     using nx::vms::api::analytics::PluginManifest;
 
-    const auto lib = loadPluginLibrary(linkedLibsDirectory, libFilename, pluginInfo);
+    const auto lib = loadPluginLibrary(pluginHomeDir, libFilename, pluginInfo);
     if (!lib)
         return false;
 
@@ -326,7 +326,7 @@ bool PluginManager::loadNxPlugin(
     {
         // Old entry point found: currently, this is a Storage or Camera plugin.
         if (!loadNxPluginForOldSdk(
-            entryPointFunc, settingsHolder, linkedLibsDirectory, libFilename, libName, pluginInfo))
+            entryPointFunc, settingsHolder, pluginHomeDir, libFilename, libName, pluginInfo))
         {
             lib->unload();
             return false;
@@ -337,7 +337,7 @@ bool PluginManager::loadNxPlugin(
     {
         // New entry point found: currently, this is an Analytics plugin.
         if (!loadNxPluginForNewSdk(
-            entryPointFunc, settingsHolder, linkedLibsDirectory, libFilename, libName, pluginInfo))
+            entryPointFunc, settingsHolder, pluginHomeDir, libFilename, libName, pluginInfo))
         {
             lib->unload();
             return false;
@@ -362,7 +362,7 @@ bool PluginManager::loadNxPlugin(
 bool PluginManager::loadNxPluginForOldSdk(
     const nxpl::Plugin::EntryPointFunc entryPointFunc,
     const nx::plugins::SettingsHolder& settingsHolder,
-    const QString& linkedLibsDirectory,
+    const QString& pluginHomeDir,
     const QString& libFilename,
     const QString& libName,
     PluginInfoPtr pluginInfo)
@@ -471,7 +471,7 @@ private:
 bool PluginManager::loadNxPluginForNewSdk(
     const nx::sdk::IPlugin::EntryPointFunc entryPointFunc,
     const nx::plugins::SettingsHolder& settingsHolder,
-    const QString& linkedLibsDirectory,
+    const QString& pluginHomeDir,
     const QString& libFilename,
     const QString& libName,
     PluginInfoPtr pluginInfo)
@@ -504,10 +504,31 @@ bool PluginManager::loadNxPluginForNewSdk(
         return false;
     }
 
+    const char* const name = plugin->name();
+    if (!name)
+    {
+        storePluginInfo(
+            pluginInfo,
+            PluginInfo::Status::notLoadedBecauseOfError,
+            PluginInfo::Error::libraryFailure,
+            lm("Failed loading plugin [%1]: name() returned null").args(libFilename));
+        return false;
+    }
+
+    if (name[0] == '\0')
+    {
+        storePluginInfo(
+            pluginInfo,
+            PluginInfo::Status::notLoadedBecauseOfError,
+            PluginInfo::Error::libraryFailure,
+            lm("Failed loading plugin [%1]: name() returned an empty string").args(libFilename));
+        return false;
+    }
+
     static const QString kPluginLoadedMessageFormat =
         "Loaded plugin [" + libFilename + "]; highest supported interface: %1";
 
-    pluginInfo->name = plugin->name();
+    pluginInfo->name = name;
     pluginInfo->status = PluginInfo::Status::loaded;
     pluginInfo->statusMessage = lm(kPluginLoadedMessageFormat).arg("nx::sdk::IPlugin");
     pluginInfo->mainInterface = PluginInfo::MainInterface::nx_sdk_IPlugin;
@@ -520,10 +541,10 @@ bool PluginManager::loadNxPluginForNewSdk(
             lm(kPluginLoadedMessageFormat).arg("nx::sdk::analytics::IPlugin");
         pluginInfo->mainInterface = PluginInfo::MainInterface::nx_sdk_analytics_IPlugin;
 
-        if (plugin->name() != libName)
+        if (name != libName)
         {
             NX_WARNING(this, "Analytics plugin name [%1] does not equal library name [%2]",
-                plugin->name(), libName);
+                name, libName);
         }
 
         if (const auto manifest = sdk_support::manifestFromSdkObject<PluginManifest>(
@@ -546,7 +567,7 @@ bool PluginManager::loadNxPluginForNewSdk(
     return true;
 }
 
-nx::vms::api::PluginInfoList PluginManager::pluginInformation() const
+nx::vms::api::PluginInfoList PluginManager::pluginInfoList() const
 {
     if (m_cachedPluginInfo.empty())
     {
@@ -555,4 +576,20 @@ nx::vms::api::PluginInfoList PluginManager::pluginInformation() const
     }
 
     return m_cachedPluginInfo;
+}
+
+std::shared_ptr<const nx::vms::api::PluginInfo> PluginManager::pluginInfo(
+    const nx::sdk::IPlugin* plugin) const
+{
+    if (!NX_ASSERT(plugin))
+        return nullptr;
+
+    for (const auto& pluginContext: m_nxPlugins)
+    {
+        if (pluginContext.plugin.get() == plugin)
+            return pluginContext.pluginInfo;
+    }
+
+    NX_ERROR(this, "PluginInfo not found for plugin [%1]", plugin->name());
+    return nullptr;
 }
