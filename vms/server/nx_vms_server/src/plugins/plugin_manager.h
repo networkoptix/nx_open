@@ -4,6 +4,7 @@
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QSettings>
+#include <QtCore/QLibrary>
 
 #include <nx/utils/thread/mutex.h>
 
@@ -119,7 +120,7 @@ private:
 
     bool loadNxPlugin(
         const nx::plugins::SettingsHolder& settingsHolder,
-        const QString& linkedLibsDirectory,
+        const QString& pluginHomeDir,
         const QString& libFilename,
         const QString& libName,
         PluginInfoPtr pluginInfo);
@@ -127,21 +128,18 @@ private:
     bool loadNxPluginForOldSdk(
         const nxpl::Plugin::EntryPointFunc entryPointFunc,
         const nx::plugins::SettingsHolder& settingsHolder,
-        const QString& linkedLibsDirectory,
         const QString& libFilename,
         const QString& libName,
         PluginInfoPtr pluginInfo);
 
     bool loadNxPluginForNewSdk(
         const nx::sdk::IPlugin::EntryPointFunc entryPointFunc,
-        const nx::plugins::SettingsHolder& settingsHolder,
-        const QString& linkedLibsDirectory,
         const QString& libFilename,
         const QString& libName,
         PluginInfoPtr pluginInfo);
 
     std::unique_ptr<QLibrary> loadPluginLibrary(
-        const QString& linkedLibsDir,
+        const QString& pluginHomeDir,
         const QString& libFilename,
         PluginInfoPtr pluginInfo);
 

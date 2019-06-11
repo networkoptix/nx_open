@@ -258,6 +258,8 @@ std::unique_ptr<QLibrary> PluginManager::loadPluginLibrary(
                     nx::kit::utils::toString(pluginHomeDir));
             }
         }
+    #else
+        nx::utils::unused(pluginHomeDir);
     #endif
 
     auto lib = std::make_unique<QLibrary>(libFilename);
@@ -327,7 +329,7 @@ bool PluginManager::loadNxPlugin(
     {
         // Old entry point found: currently, this is a Storage or Camera plugin.
         if (!loadNxPluginForOldSdk(
-            entryPointFunc, settingsHolder, pluginHomeDir, libFilename, libName, pluginInfo))
+            entryPointFunc, settingsHolder, libFilename, libName, pluginInfo))
         {
             lib->unload();
             return false;
@@ -338,7 +340,7 @@ bool PluginManager::loadNxPlugin(
     {
         // New entry point found: currently, this is an Analytics plugin.
         if (!loadNxPluginForNewSdk(
-            entryPointFunc, settingsHolder, pluginHomeDir, libFilename, libName, pluginInfo))
+            entryPointFunc, libFilename, libName, pluginInfo))
         {
             lib->unload();
             return false;
@@ -363,9 +365,8 @@ bool PluginManager::loadNxPlugin(
 bool PluginManager::loadNxPluginForOldSdk(
     const nxpl::Plugin::EntryPointFunc entryPointFunc,
     const nx::plugins::SettingsHolder& settingsHolder,
-    const QString& pluginHomeDir,
     const QString& libFilename,
-    const QString& libName,
+    const QString& /*libName*/,
     PluginInfoPtr pluginInfo)
 {
     using namespace nx::sdk;
@@ -471,8 +472,6 @@ private:
 
 bool PluginManager::loadNxPluginForNewSdk(
     const nx::sdk::IPlugin::EntryPointFunc entryPointFunc,
-    const nx::plugins::SettingsHolder& settingsHolder,
-    const QString& pluginHomeDir,
     const QString& libFilename,
     const QString& libName,
     PluginInfoPtr pluginInfo)
