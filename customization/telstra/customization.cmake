@@ -40,7 +40,7 @@ set(ios.new_bundle_identifier "com.telstra.telstramobile")
 set(ios.group_identifier "group.com.telstra.telstra")
 set(ios.sign.identity "iPhone Distribution: Telstra Software Group PTY LTD (P82Y83AYW9)")
 
-set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
+set(mac.sign.identity "Developer ID Application: Telstra Software Group PTY LTD (P82Y83AYW9)")
 set(mac.bundle.identifier "com.telstra.telstra2")
 set(mac.protocol_handler_bundle.identifier "com.telstra.protocol_handler")
 
