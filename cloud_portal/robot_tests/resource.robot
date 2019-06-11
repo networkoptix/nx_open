@@ -254,7 +254,7 @@ Failure Tasks
     ${console}    Get Browser Log
     Log    ${console}
     Capture Page Screenshot    selenium-screenshot-${LANGUAGE}{index}.png
-    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True    folder=[Gmail]/All Mail
     Delete All Emails
     Close Mailbox
 

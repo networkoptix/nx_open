@@ -207,11 +207,6 @@ def read_languages(skin_name):
         find_or_add_language(language_code)
 
 
-def mark_all_data_structures_as_deprecated():
-    for ds in DataStructure.objects.all():
-        ds.deprecated = True
-
-
 class Command(BaseCommand):
     help = 'Creates initial structure for CMS in ' \
            'the database (contexts, datastructure)'
@@ -231,7 +226,6 @@ class Command(BaseCommand):
             default_customization.languages.add(Language.by_code('en_US'))
             default_customization.save()
 
-        mark_all_data_structures_as_deprecated()
         structure.read_structure_json('cms/cms_structure.json')
         read_structure(product_type)
         self.stdout.write(self.style.SUCCESS(

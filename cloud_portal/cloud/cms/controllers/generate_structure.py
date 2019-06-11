@@ -6,6 +6,7 @@ from collections import OrderedDict
 from PIL import Image  # get Pillow
 from zipfile import ZipFile
 from ..models import Context, DataStructure, ProductType
+from cms.serializers import ProductTypeSerializer
 
 import logging
 logger = logging.getLogger(__name__)
@@ -31,15 +32,18 @@ def find_context(name, file_path, structure, product_name):
         db_context = Context.objects.filter(file_path=file_path, product__name=product_name).first()
         translatable = False
         hidden = True
+        label = ""
         description = ""
         if db_context:
             name = db_context.name
+            label = db_context.label
             description = db_context.description
             translatable = db_context.translatable
             hidden = db_context.hidden
 
         context = OrderedDict([
             ("name", name),
+            ("label", label),
             ("description", description),
             ("file_path", file_path),
             ("translatable", translatable),
@@ -185,9 +189,13 @@ def process_files(file_iterator, product):
     return [structure], log_errors
 
 
-def from_zip(file_descriptor, product):
-    return process_files(iterate_zip(file_descriptor), product)
+def from_database(product):
+    return [ProductTypeSerializer(product.product_type).data]
 
 
 def from_directory(directory, product):
     return process_files(iterate_directory(directory), product)
+
+
+def from_zip(file_descriptor, product):
+    return process_files(iterate_zip(file_descriptor), product)

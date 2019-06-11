@@ -63,6 +63,12 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
     return data
 
 
+def deprecate_data_structures_for_product_type(product_type):
+    for ds in DataStructure.objects.filter(context__product_type=product_type):
+        ds.deprecated = True
+        ds.save()
+
+
 def update_from_object(cms_structure):
     for product_type_structure in cms_structure:
         # If product_type_structure type cannot be found in the structure
@@ -81,6 +87,8 @@ def update_from_object(cms_structure):
         product_type.single_customization = single_customization
         product_type.save()
         order = 0
+
+        deprecate_data_structures_for_product_type(product_type)
 
         for context_data in product_type_structure['contexts']:
             has_language = context_data["translatable"]

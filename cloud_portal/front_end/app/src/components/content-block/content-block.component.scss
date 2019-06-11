@@ -35,6 +35,11 @@
         padding          : 1rem;
         overflow         : hidden;
         background-color : $light1;
+        
+        img {
+            max-width : 100%;
+            height    : auto;
+        }
     }
     
     &--footer {
