@@ -157,6 +157,7 @@ Reset state
 
 *** Test Cases ***
 Wrong and empty password
+    [tags]    C54686
     ${user}    Set Variable    ${EMAIL MERGE OWNER 2}
     ${auth}=    Create List    ${user}    ${password}
     Create system and attach to cloud    ${user}    ${image}    7001    API made system 1
