@@ -52,7 +52,10 @@ void DetectionDataSaver::save(nx::sql::QueryContext* queryContext)
 {
     insertObjects(queryContext);
     updateObjects(queryContext);
-    saveObjectSearchData(queryContext);
+    
+    if (!kLookupObjectsInAnalyticsArchive)
+        saveObjectSearchData(queryContext);
+    
     if (m_analyticsArchive)
         saveToAnalyticsArchive(queryContext);
 }
@@ -241,6 +244,7 @@ void DetectionDataSaver::saveToAnalyticsArchive(nx::sql::QueryContext* queryCont
             item.deviceId,
             item.timestamp,
             std::vector<QRect>(item.region.begin(), item.region.end()),
+            item.objectsGroupId,
             item.objectType,
             item.combinedAttributesId);
         if (!result)
@@ -255,9 +259,10 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
     {
         QRegion region;
         std::set<int64_t> attributesIds;
+        std::set<int64_t> objectIds;
     };
 
-    std::map<std::pair<QnUuid, int /*objectType*/>, Item> regionByObjectType;
+    std::map<std::pair<QnUuid /*deviceGuid*/, int /*objectType*/>, Item> regionByObjectType;
 
     std::chrono::milliseconds minTimestamp = m_objectSearchData.front().timestamp;
     for (const auto& aggregatedTrackData: m_objectSearchData)
@@ -274,6 +279,7 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
                 {objectAttributes.deviceId, objectAttributes.objectTypeId}];
             item.region += aggregatedTrackData.boundingBox;
             item.attributesIds.insert(objectAttributes.attributesDbId);
+            item.objectIds.insert(m_objectCache->dbIdFromObjectId(objectId));
         }
     }
 
@@ -282,7 +288,9 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
     {
         AnalArchiveItem archiveItem;
         archiveItem.deviceId = deviceIdAndObjectType.first;
-        archiveItem.combinedAttributesId = 
+        archiveItem.objectsGroupId =
+            m_objectGroupDao->insertOrFetchGroup(queryContext, item.objectIds);
+        archiveItem.combinedAttributesId =
             m_attributesDao->combineAttributes(queryContext, item.attributesIds);
         archiveItem.objectType = deviceIdAndObjectType.second;
         archiveItem.region = item.region;

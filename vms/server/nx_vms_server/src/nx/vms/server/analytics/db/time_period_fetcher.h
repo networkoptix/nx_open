@@ -48,10 +48,6 @@ private:
         nx::sql::QueryContext* queryContext,
         const Filter& filter,
         const TimePeriodsLookupOptions& options);
-
-    AnalyticsArchive::Filter prepareArchiveFilter(
-        const Filter& filter,
-        const TimePeriodsLookupOptions& options);
 };
 
 } // namespace nx::analytics::db
