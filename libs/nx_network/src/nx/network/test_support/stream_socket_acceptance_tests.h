@@ -1863,7 +1863,8 @@ TYPED_TEST_P(StreamSocketAcceptance, reuse_addr)
 
     auto server2 = this->createServerSocket();
     ASSERT_TRUE(server2->setReuseAddrFlag(true));
-    ASSERT_TRUE(server2->bind(SocketAddress(HostAddress::localhost, server1->getLocalAddress().port)));
+    ASSERT_TRUE(server2->bind(
+        SocketAddress(HostAddress::localhost, server1->getLocalAddress().port)));
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, reuse_port)
