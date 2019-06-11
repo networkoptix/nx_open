@@ -4260,9 +4260,16 @@ void MediaServerProcess::startObjects()
     else
     {
         const int64_t dbBackupPeriodMS = serverModule()->settings().dbBackupPeriodMS().count();
-        initialBackupDbPeriodMs = std::max<int64_t>(
-            *lastDbBackupTimestamp + dbBackupPeriodMS - qnSyncTime->currentMSecsSinceEpoch(),
-            0LL);
+        const int64_t nowMs = qnSyncTime->currentMSecsSinceEpoch();
+        if (*lastDbBackupTimestamp >= nowMs) //< Last backup was performed in the future.
+        {
+            initialBackupDbPeriodMs = dbBackupPeriodMS;
+        }
+        else
+        {
+            initialBackupDbPeriodMs =
+                std::max<int64_t>(*lastDbBackupTimestamp + dbBackupPeriodMS - nowMs, 0LL);
+        }
     }
     m_createDbBackupTimer->start(initialBackupDbPeriodMs);
 
