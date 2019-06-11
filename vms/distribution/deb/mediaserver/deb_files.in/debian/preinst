@@ -62,8 +62,7 @@ then
         "$BASE_DIR/lib" \
         "$BASE_DIR/bin" \
         "$BASE_DIR/var/scripts" \
-        "/opt/$COMPANY_NAME/lib" \
-        "/opt/deb"
+        "/opt/$COMPANY_NAME/lib"
     do
         rm -rf "$dir" || true
     done

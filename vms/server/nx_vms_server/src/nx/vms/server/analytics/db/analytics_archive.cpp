@@ -1,5 +1,7 @@
 #include "analytics_archive.h"
 
+#include <nx/utils/std/algorithm.h>
+
 #include <analytics/db/config.h>
 
 #include "serializers.h"
@@ -68,14 +70,14 @@ bool AnalyticsArchive::satisfiesFilter(
     const Filter& filter,
     const std::vector<QRect>& regionFilter)
 {
-    if (!filter.timePeriod.isInfinite() && !filter.timePeriod.contains(item.timestamp))
+    if (!(item.timestamp >= filter.startTime && item.timestamp < filter.endTime))
         return false;
 
-    if (!filter.objectTypes.empty() && filter.objectTypes.count(item.objectType) == 0)
+    if (!filter.objectTypes.empty() && !nx::utils::contains(filter.objectTypes, item.objectType))
         return false;
 
     if (!filter.allAttributesHash.empty() &&
-        filter.allAttributesHash.count(item.allAttributesId) == 0)
+        !nx::utils::contains(filter.allAttributesHash, item.allAttributesId))
     {
         return false;
     }

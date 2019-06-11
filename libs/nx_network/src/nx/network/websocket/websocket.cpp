@@ -348,6 +348,7 @@ void WebSocket::callOnWriteHandler(SystemError::ErrorCode error, size_t transfer
 void WebSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
     m_pingTimer->cancelSync();
+    m_pongTimer->cancelSync();
     m_socket->cancelIOSync(eventType);
 }
 
@@ -421,6 +422,14 @@ void WebSocket::frameEnded()
 
 void WebSocket::sendControlResponse(FrameType type)
 {
+    if (m_failed)
+    {
+        NX_DEBUG(
+            this,
+            "sendControlResponse called after connection has been terminated. Ignoring.");
+        return;
+    }
+
     nx::Buffer responseFrame;
     m_serializer.prepareMessage(m_controlBuffer, type, &responseFrame);
     m_controlBuffer.resize(0);
@@ -440,6 +449,14 @@ void WebSocket::sendControlResponse(FrameType type)
 
 void WebSocket::sendControlRequest(FrameType type)
 {
+    if (m_failed)
+    {
+        NX_DEBUG(
+            this,
+            "sendControlRequest called after connection has been terminated. Ignoring.");
+        return;
+    }
+
     nx::Buffer requestFrame;
     m_serializer.prepareMessage("", type, &requestFrame);
 

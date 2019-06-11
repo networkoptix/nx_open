@@ -2152,20 +2152,21 @@ void MediaServerProcess::registerRestHandlers(
      * message body with content type "application/json". Example of such object can be seen in
      * the result of GET /api/iflist function. </p>
      * %permissions Owner.
-     * %param:string name Interface name.
-     * %param:string ipAddr IP address with dot-separated decimal components.
-     * %param:string netMask Network mask with dot-separated decimal components.
-     * %param:string  mac MAC address with colon-separated upper-case hex components.
-     * %param:string gateway IP address of the gateway with dot-separated decimal components. Can
-     *     be empty.
-     * %param:boolean dhcp
-     *     %value false DHCP is not used, IP address and other parameters should be specified in
-     *         the respective JSON fields.
-     *     %value true IP address and other parameters assigned via DHCP, the respective JSON
-     *         fields can be empty.
-     * %param:object extraParams JSON object with data in the internal format.
-     * %param:string dns_servers Space-separated list of IP addresses with dot-separated decimal
-     *     components.
+     * %param:array interfaces List of network interfaces settings
+     *     %param:string interfaces[].name  Interface name.
+     *     %param:string interfaces[].ipAddr IP address with dot-separated decimal components.
+     *     %param:string interfaces[].netMask Network mask with dot-separated decimal components.
+     *     %param:string interfaces[].mac MAC address with colon-separated upper-case hex components.
+     *     %param:string interfaces[].gateway IP address of the gateway with dot-separated decimal components. Can
+     *         be empty.
+     *     %param:boolean interfaces[].dhcp
+     *         %value false DHCP is not used, IP address and other parameters should be specified in
+     *             the respective JSON fields.
+     *         %value true IP address and other parameters assigned via DHCP, the respective JSON
+     *             fields can be empty.
+     *     %param:object interfaces[].extraParams JSON object with data in the internal format.
+     *     %param:string interfaces[].dns_servers Space-separated list of IP addresses with dot-separated decimal
+     *         components.
      */
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 

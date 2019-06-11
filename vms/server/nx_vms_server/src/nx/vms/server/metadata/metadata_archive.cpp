@@ -250,6 +250,8 @@ int MetadataArchive::getSizeForTime(qint64 timeMs, bool reloadIndex)
 }
 
 void MetadataArchive::loadDataFromIndex(
+    MatchExtraDataFunc matchExtraData,
+    std::function<bool()> interruptionCallback,
     const Filter& filter,
     QFile& metadataFile,
     const IndexHeader& indexHeader,
@@ -278,11 +280,11 @@ void MetadataArchive::loadDataFromIndex(
         quint8* curData = buffer;
         while (i < endItr && curData < dataEnd)
         {
+            qint64 fullStartTime = i->start + indexHeader.startTime;
             if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd)
-                && matchAdditionData(filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes))
+                && (!matchExtraData
+                    || matchExtraData(fullStartTime, filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes)))
             {
-                qint64 fullStartTime = i->start + indexHeader.startTime;
-
                 if (rez.empty())
                 {
                     rez.push_back(QnTimePeriod(fullStartTime, i->duration));
@@ -302,6 +304,9 @@ void MetadataArchive::loadDataFromIndex(
                     }
                 }
             }
+            if (interruptionCallback && interruptionCallback())
+                return;
+
             curData += recordSize();
             ++i;
         }
@@ -310,6 +315,8 @@ void MetadataArchive::loadDataFromIndex(
 }
 
 void MetadataArchive::loadDataFromIndexDesc(
+    MatchExtraDataFunc matchExtraData,
+    std::function<bool()> interruptionCallback,
     const Filter& filter,
     QFile& metadataFile,
     const IndexHeader& indexHeader,
@@ -324,7 +331,7 @@ void MetadataArchive::loadDataFromIndexDesc(
 {
     int totalSteps = endItr - startItr;
 
-    int recordNumberToSeek = qMax<int>(0LL, (endItr - kRecordsPerIteration) - index.begin());
+    int recordNumberToSeek = qMax<int>(0LL, (endItr - std::min(kRecordsPerIteration, totalSteps)) - index.begin());
 
     // math file (one month)
     QVector<IndexRecord>::const_iterator i = endItr - 1;
@@ -338,14 +345,14 @@ void MetadataArchive::loadDataFromIndexDesc(
             break;
 
         quint8* dataEnd = buffer + readed;
-        quint8* curData = buffer;
-        while (i >= startItr && curData < dataEnd)
+        quint8* curData = dataEnd - recordSize();
+        while (i >= startItr && curData >= buffer)
         {
+            qint64 fullStartTimeMs = i->start + indexHeader.startTime;
             if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd)
-                && matchAdditionData(filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes))
+                && (!matchExtraData ||
+                    matchExtraData(fullStartTimeMs, filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes)))
             {
-                qint64 fullStartTimeMs = i->start + indexHeader.startTime;
-
                 if (rez.empty())
                 {
                     rez.push_back(QnTimePeriod(fullStartTimeMs, i->duration));
@@ -367,14 +374,20 @@ void MetadataArchive::loadDataFromIndexDesc(
                     }
                 }
             }
-            curData += recordSize();
+            if (interruptionCallback && interruptionCallback())
+                return;
+
+            curData -= recordSize();
             --i;
         }
         totalSteps -= readed / recordSize();
     }
 }
 
-QnTimePeriodList MetadataArchive::matchPeriodInternal(const Filter& filter)
+QnTimePeriodList MetadataArchive::matchPeriodInternal(
+    const Filter& filter,
+    MatchExtraDataFunc matchExtraData,
+    std::function<bool()> interruptionCallback)
 {
     qint64 msStartTime = filter.startTime.count();
     qint64 msEndTime = filter.endTime.count();
@@ -400,7 +413,7 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(const Filter& filter)
     QFile metadataFile, indexFile;
     const bool descendingOrder = filter.sortOrder == Qt::SortOrder::DescendingOrder;
 
-    while (msStartTime < msEndTime)
+    while (msStartTime <= msEndTime)
     {
         qint64 minTime, maxTime;
         auto timePointMs = descendingOrder ? msEndTime : msStartTime;
@@ -434,12 +447,16 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(const Filter& filter)
 
             if (descendingOrder)
             {
-                loadDataFromIndexDesc(filter, metadataFile, indexHeader, index, startItr, endItr,
+                loadDataFromIndexDesc(
+                    matchExtraData, interruptionCallback,
+                    filter, metadataFile, indexHeader, index, startItr, endItr,
                     buffer, mask, maskStart, maskEnd, rez);
             }
             else
             {
-                loadDataFromIndex(filter, metadataFile, indexHeader, index, startItr, endItr,
+                loadDataFromIndex(
+                    matchExtraData, interruptionCallback,
+                    filter, metadataFile, indexHeader, index, startItr, endItr,
                     buffer, mask, maskStart, maskEnd, rez);
             }
 
@@ -451,6 +468,9 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(const Filter& filter)
             msEndTime = minTime - 1;
         else
             msStartTime = maxTime + 1;
+
+        if (interruptionCallback && interruptionCallback())
+            break;
     }
     NX_VERBOSE(this, lm("Found %1 motion period(s) for camera %2 for range %3-%4")
         .args(rez.size(), m_uniqueId, filter.startTime, filter.endTime));

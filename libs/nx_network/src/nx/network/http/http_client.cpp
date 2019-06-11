@@ -397,6 +397,10 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         (m_asyncHttpClient->state() <= AsyncClient::State::sResponseReceived) &&
         !m_lastResponse)
     {
+        // m_lastResponse is set in responseReceived hander. But, AsyncHttpClient first sets state 
+        // to AsyncClient::State::sResponseReceived, then emits responseReceived event.
+        // So, there is a period of time when the state is already 
+        // AsyncClient::State::sResponseReceived but m_lastResponse is still not set.
         m_cond.wait(lk.mutex());
     }
 

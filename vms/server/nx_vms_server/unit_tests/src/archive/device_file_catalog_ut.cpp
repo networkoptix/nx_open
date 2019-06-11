@@ -30,11 +30,11 @@ TEST(DeviceFileCatalog, catalogRange)
     chunk3.durationMs = 55 * 1000;
     catalog.addRecord(chunk3);
 
-    auto getChunks = [&catalog] (qint64 startTimeMs, qint64 endTimeMs)
+    auto getChunks = [&catalog] (qint64 startTimeMs, qint64 endTimeMs, qint64 detailLevel = 1)
     {
         return catalog.getTimePeriods(
             startTimeMs, endTimeMs,
-            1,  //< Detail level.
+            detailLevel,
             true,  //< Keep small.
             1000000,
             Qt::SortOrder::AscendingOrder); //< Unlimited result size.
@@ -43,6 +43,13 @@ TEST(DeviceFileCatalog, catalogRange)
     {
         QnTimePeriodList allPeriods = getChunks(chunk1.startTimeMs, chunk3.endTimeMs());
         ASSERT_EQ(2, allPeriods.size());
+        ASSERT_EQ(chunk1.startTimeMs, allPeriods.front().startTimeMs);
+        ASSERT_EQ(chunk3.endTimeMs(), allPeriods.last().endTimeMs());
+    }
+
+    {
+        QnTimePeriodList allPeriods = getChunks(chunk1.startTimeMs, chunk3.endTimeMs(), 5000000000);
+        ASSERT_EQ(1, allPeriods.size());
         ASSERT_EQ(chunk1.startTimeMs, allPeriods.front().startTimeMs);
         ASSERT_EQ(chunk3.endTimeMs(), allPeriods.last().endTimeMs());
     }

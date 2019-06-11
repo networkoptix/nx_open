@@ -1,12 +1,9 @@
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <map>
 #include <vector>
-
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/ordered_index.hpp>
-#include <boost/multi_index/member.hpp>
 
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
