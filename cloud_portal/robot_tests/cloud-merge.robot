@@ -156,6 +156,37 @@ Reset state
 
 
 *** Test Cases ***
+Wrong and empty password
+    ${user}    Set Variable    ${EMAIL MERGE OWNER 2}
+    ${auth}=    Create List    ${user}    ${password}
+    Create system and attach to cloud    ${user}    ${image}    7001    API made system 1
+    Create system and attach to cloud    ${user}    ${image}    7003    API made system 2
+    log in    ${user}    ${password}
+    Validate Log in
+    Wait Until Element Is Visible    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
+    Validate system available    API made system 1
+    Go To    ${url}/systems
+    Validate Log In
+    Wait Until Element Is Visible    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
+    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 2")]
+    Validate system available    API made system 2
+    Wait Until Element Is Visible    ${MERGE BUTTON SYSTEM}
+    Click Button    ${MERGE BUTTON SYSTEM}
+    Wait Until Elements Are Visible    ${MERGE DIALOG}    ${MERGE X BUTTON}    ${MERGE OK BUTTON}
+    ...                                ${MERGE CANCEL BUTTON}    ${MERGE CURRENT SYSTEM WITH}    ${MERGE ONLY AS OWNER}
+    Click Button    ${MERGE OK BUTTON}
+    Wait Until Element Is Visible    ${MERGE CHECKING HINT}
+    Wait Until Elements Are Visible    ${MERGE BUTTON MODAL}    ${MERGE PASSWORD INPUT}    ${MERGE CANCEL BUTTON}    timeout=60
+    Click Button    ${MERGE BUTTON MODAL}
+    Wait Until Element Is Visible    ${MERGE PASSWORD REQUIRED}
+    Input Text    ${MERGE PASSWORD INPUT}    qwerasdf
+    Click Button    ${MERGE BUTTON MODAL}
+    Wait Until Element Is Visible    ${MERGE PASSWORD INCORRECT}
+    Press Key    ${MERGE BUTTON MODAL}    ${ESCAPE}
+    Disconnect from cloud
+    Disconnect from cloud
+
 Only one system connected to Cloud Account
     ${user}    Set Variable    ${EMAIL MERGE OWNER 1}
     ${auth}=    Create List    ${user}    ${password}
@@ -208,6 +239,7 @@ Only one system connected to Cloud Account
     Disconnect from cloud
 
 2 Systems: 1 online and 1 offline
+    [tags]    C53960
     ${user}    Set Variable    ${EMAIL MERGE OWNER 1}
     ${auth}=    Create List    ${user}    ${password}
     Create system and attach to cloud    ${user}    ${image}    7001    API made system 1
@@ -390,6 +422,7 @@ From primary system
     Disconnect from cloud
 
 Merge with different types of users
+    [tags]    C53946
     ${user}    Set Variable    ${EMAIL MERGE OWNER 2}
     ${auth}=    Create List    ${user}    ${password}
     Prepare System With Users    ${user}    ${auth}    ${image}    7001    API made system 1    ${users dict 1}    network=bridge

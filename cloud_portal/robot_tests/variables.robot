@@ -179,6 +179,8 @@ ${MERGE CURRENT SYSTEM WITH}          ${MERGE DIALOG}//label[contains(text(),"${
 ${MERGE ONLY AS OWNER}                ${MERGE DIALOG}//p[contains(text(),"${YOU CAN ONLY MERGE AS OWNER TEXT}")]
 ${MERGE CHECKING HINT}                ${MERGE DIALOG}//p[contains(text(),"${CHECKING TEXT}")]
 ${MERGE ENTER YOUR PASSWORD}          ${MERGE FORM}//label[contains(text(),"${ENTER PASSWORD TO CONTINUE TEXT}")]
+${MERGE PASSWORD REQUIRED}            ${MERGE FORM}//label[@class="input-error" and contains(text(),"${PASSWORD IS REQUIRED TEXT}")]
+${MERGE PASSWORD INCORRECT}           ${MERGE FORM}//label[@class="input-error" and contains(text(),"${WRONG PASSWORD}")]
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
