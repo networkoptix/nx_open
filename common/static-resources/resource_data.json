@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.75",
+    "version": "1.0.1.77",
     "data": [
         {
             "keys": [
@@ -3088,7 +3088,10 @@
             "dahua|psd81602-a360",
             "dahua|ipc-hdbw4233x*",
             "dahua|ipc-hdbw7233x*",
-            "hikvision|ds-2cd6d24fwd*"
+            "hikvision|ds-2cd6d24fwd*",
+            "flir|FLIR DH-390*",
+            "DH-390*|FLIR DH-390*",
+            "flir|DH-390*"
             ],
             "canShareLicenseGroup": true
         },
