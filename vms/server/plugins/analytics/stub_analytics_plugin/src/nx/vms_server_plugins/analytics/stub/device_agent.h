@@ -97,7 +97,7 @@ private:
     int m_currentObjectTypeIndex = 0;
     int64_t m_lastVideoFrameTimestampUs = 0;
 
-    struct DeviceAgentContext
+    struct DeviceAgentSettings
     {
         std::atomic<bool> generateObjects{true};
         std::atomic<bool> generateEvents{true};
@@ -107,7 +107,7 @@ private:
         std::atomic<bool> throwPluginEvents{false};
     };
 
-    DeviceAgentContext m_deviceAgentContext;
+    DeviceAgentSettings m_deviceAgentSettings;
 
     struct EventContext
     {

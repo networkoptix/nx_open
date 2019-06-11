@@ -211,51 +211,8 @@ std::string Engine::manifest() const
         "type": "Settings",
         "items": [
             {
-                "type": "TextField",
-                "name": "testTextField",
-                "caption": "Device Agent Text Field",
-                "description": "A text field",
-                "defaultValue": "a text"
-            },
-            {
                 "type": "GroupBox",
-                "caption": "Device Agent Group",
-                "items": [
-                    {
-                        "type": "SpinBox",
-                        "caption": "Device Agent SpinBox",
-                        "name": "testSpinBox",
-                        "defaultValue": 42,
-                        "minValue": 0,
-                        "maxValue": 100
-                    },
-                    {
-                        "type": "DoubleSpinBox",
-                        "caption": "Device Agent DoubleSpinBox",
-                        "name": "testDoubleSpinBox",
-                        "defaultValue": 3.1415,
-                        "minValue": 0.0,
-                        "maxValue": 100.0
-                    },
-                    {
-                        "type": "ComboBox",
-                        "name": "testComboBox",
-                        "caption": "Device Agent ComboBox",
-                        "defaultValue": "value2",
-                        "range": ["value1", "value2", "value3"]
-                    },
-                    {
-                        "type": "CheckBox",
-                        "caption": "Device Agent CheckBox",
-                        "name": "testCheckBox",
-                        "defaultValue": true,
-                        "value": true
-                    }
-                ]
-            },
-            {
-                "type": "GroupBox",
-                "caption": "Stub DeviceAgent settings",
+                "caption": "Real Stub DeviceAgent settings",
                 "items": [
                      {
                         "type": "CheckBox",
@@ -300,6 +257,49 @@ std::string Engine::manifest() const
                         "caption": "Throw plugin events from the DeviceAgent",
                         "defaultValue": false,
                         "value": false
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "Example Stub DeviceAgent settings",
+                "items": [
+                    {
+                        "type": "TextField",
+                        "name": "testTextField",
+                        "caption": "Device Agent Text Field",
+                        "description": "A text field",
+                        "defaultValue": "a text"
+                    },
+                    {
+                        "type": "SpinBox",
+                        "caption": "Device Agent SpinBox",
+                        "name": "testSpinBox",
+                        "defaultValue": 42,
+                        "minValue": 0,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "DoubleSpinBox",
+                        "caption": "Device Agent DoubleSpinBox",
+                        "name": "testDoubleSpinBox",
+                        "defaultValue": 3.1415,
+                        "minValue": 0.0,
+                        "maxValue": 100.0
+                    },
+                    {
+                        "type": "ComboBox",
+                        "name": "testComboBox",
+                        "caption": "Device Agent ComboBox",
+                        "defaultValue": "value2",
+                        "range": ["value1", "value2", "value3"]
+                    },
+                    {
+                        "type": "CheckBox",
+                        "caption": "Device Agent CheckBox",
+                        "name": "testCheckBox",
+                        "defaultValue": true,
+                        "value": true
                     }
                 ]
             }
@@ -479,16 +479,29 @@ static const std::string kPluginManifest = R"json(
         "type": "Settings",
         "items": [
             {
-                "type": "TextField",
-                "name": "text",
-                "caption": "Text Field",
-                "description": "A text field",
-                "defaultValue": "a text"
+                "type": "GroupBox",
+                "caption": "Real Stub Engine settings",
+                "items": [
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kThrowPluginEventsFromEngineSetting + R"json(",
+                        "caption": "Throw plugin events from the Engine",
+                        "defaultValue": false,
+                        "value": false
+                    }
+                ]
             },
             {
                 "type": "GroupBox",
-                "caption": "Group",
+                "caption": "Example Stub Engine settings",
                 "items": [
+                    {
+                        "type": "TextField",
+                        "name": "text",
+                        "caption": "Text Field",
+                        "description": "A text field",
+                        "defaultValue": "a text"
+                    },
                     {
                         "type": "SpinBox",
                         "name": "testSpinBox",
@@ -518,19 +531,6 @@ static const std::string kPluginManifest = R"json(
                         "caption": "Check Box",
                         "defaultValue": true,
                         "value": true
-                    }
-                ]
-            },
-            {
-                "type": "GroupBox",
-                "caption": "Stub Engine settings",
-                "items": [
-                    {
-                        "type": "CheckBox",
-                        "name": ")json" + kThrowPluginEventsFromEngineSetting + R"json(",
-                        "caption": "Throw plugin events from the Engine",
-                        "defaultValue": false,
-                        "value": false
                     }
                 ]
             }
