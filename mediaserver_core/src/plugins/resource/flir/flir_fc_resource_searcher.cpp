@@ -65,6 +65,7 @@ QList<QnResourcePtr> FcResourceSearcher::checkHostAddr(
 
     httpClient.setSendTimeoutMs(kDeviceInfoRequestTimeout.count());
     httpClient.setResponseReadTimeoutMs(kDeviceInfoResponseTimeout.count());
+    httpClient.setMessageBodyReadTimeoutMs(kDeviceInfoResponseTimeout.count());
 
     auto deviceInfoUrl = url;
     deviceInfoUrl.setScheme("http");
