@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QStandardPaths>
+
 #include <nx/utils/settings.h>
 #include <network/multicodec_rtp_reader.h>
 #include <network/system_helpers.h>
@@ -256,7 +258,7 @@ public:
     Option<bool> noInitStoragesOnStartup{this, "noInitStoragesOnStartup", false, ""};
     Option<bool> noPlugins{this, "noPlugins", false, "Turn off all plugins"};
     Option<QString> ipVersion{this, "ipVersion", "", ""};
-    Option<QString> rtspTransport{this, "rtspTransport", "tcp", ""};
+    Option<QString> rtspTransport{this, "rtspTransport", "automatic", ""};
     Option<bool> absoluteRtcpTimestamps{this, "absoluteRtcpTimestamps",
         true,
         "Enable absolute RTCP timestamps for archive data, RTCP NTP timestamps will corresond to "
@@ -368,6 +370,10 @@ public:
             return value;
         }
     };
+
+    Option<int> retryCountToMakeCameraOffline{ this, "retryCountToMakeCameraOffline", 3,
+        "How many discovery loops should pass before mark missed camera offline"
+        };
 
 #if defined(__arm__)
     static constexpr qint64 kDefaultMinStorageSpace = 100 * 1024 * 1024; //< 100MB

@@ -1,9 +1,9 @@
+#include "joystick_event_filter_win.h"
+
 #if defined(Q_OS_WIN)
 
-#include "joystick_event_filter_win.h"
 #include "mm_joystick_driver_win.h"
 
-#include <WinUser.h>
 #include <Dbt.h>
 
 namespace nx {
@@ -16,16 +16,16 @@ namespace driver {
 JoystickEventFilter::JoystickEventFilter(HWND windowId):
     m_windowId(windowId)
 {
-}   
+}
 
 JoystickEventFilter::~JoystickEventFilter()
 {
-    
+
 }
 
 bool JoystickEventFilter::nativeEventFilter(const QByteArray &eventType, void* message, long* result)
 {
-    auto winMessage = reinterpret_cast<MSG*>(message); 
+    auto winMessage = reinterpret_cast<MSG*>(message);
 
     auto winMessageType = winMessage->message;
     int joystickIndex = -1;
@@ -37,7 +37,7 @@ bool JoystickEventFilter::nativeEventFilter(const QByteArray &eventType, void* m
         if (joystickIndex < 0)
             return false;
 
-        JOYINFOEX info; 
+        JOYINFOEX info;
         info.dwSize = sizeof(JOYINFOEX);
         info.dwFlags = JOY_RETURNALL;
 
@@ -49,8 +49,8 @@ bool JoystickEventFilter::nativeEventFilter(const QByteArray &eventType, void* m
         mmDriver->notifyJoystickStateChanged(info, joystickIndex);
     }
 
-    if (isJoystickConnectivityMessage(winMessage))    
-        mmDriver->notifyHardwareConfigurationChanged();        
+    if (isJoystickConnectivityMessage(winMessage))
+        mmDriver->notifyHardwareConfigurationChanged();
 
     return false;
 }
@@ -60,9 +60,9 @@ bool JoystickEventFilter::isJoystickInteractionMessage(MSG* message, int* outJoy
     *outJoystickNum = -1;
 
     auto messageType = message->message;
-    
-    if (messageType == MM_JOY1MOVE 
-        || messageType == MM_JOY1BUTTONDOWN 
+
+    if (messageType == MM_JOY1MOVE
+        || messageType == MM_JOY1BUTTONDOWN
         || messageType == MM_JOY1BUTTONUP)
     {
         *outJoystickNum = 0;
@@ -89,7 +89,7 @@ bool JoystickEventFilter::isJoystickConnectivityMessage(MSG* message)
 
     auto changeType = message->wParam;
 
-    bool hardwareConfigurationChanged = changeType == DBT_DEVNODES_CHANGED 
+    bool hardwareConfigurationChanged = changeType == DBT_DEVNODES_CHANGED
         || changeType == DBT_DEVICEARRIVAL
         || changeType == DBT_DEVICEREMOVECOMPLETE;
 

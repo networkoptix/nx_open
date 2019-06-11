@@ -293,7 +293,7 @@ void QnPlAxisResource::stopInputPortStatesMonitoring()
 void QnPlAxisResource::stopInputPortMonitoringSync()
 {
     std::promise<void> promise;
-    m_timer.cancelAsync(
+    m_timer.dispatch(
         [this, &promise]()
         {
             static const auto removeClient =
@@ -304,6 +304,7 @@ void QnPlAxisResource::stopInputPortMonitoringSync()
                     client->reset();
                 };
 
+            m_timer.cancelSync();
             removeClient(&m_inputIoMonitor.httpClient);
             removeClient(&m_outputIoMonitor.httpClient);
             removeClient(&m_inputPortStateReader);

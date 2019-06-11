@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <QtCore/QtMath>
+
 #include <ui/graphics/items/generic/particle_item.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 

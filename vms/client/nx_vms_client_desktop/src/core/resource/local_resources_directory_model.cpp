@@ -3,6 +3,8 @@
 #include <QtCore/QSet>
 #include <QtCore/QDir>
 
+#include <core/resource/avi/filetypesupport.h>
+
 using namespace std::literals::chrono_literals;
 
 namespace nx::vms::client::desktop {
@@ -14,6 +16,9 @@ LocalResourcesDirectoryModel::LocalResourcesDirectoryModel(QObject* parent):
 
     connect(&m_fileSystemWatcher, &QFileSystemWatcher::directoryChanged,
         this, &LocalResourcesDirectoryModel::onDirectoryChanged);
+
+    connect(&m_fileSystemWatcher, &QFileSystemWatcher::fileChanged,
+        this, &LocalResourcesDirectoryModel::onFileChanged);
 
     connect(&m_deferredDirectoryChangeHandlerTimer, &QTimer::timeout,
         this, &LocalResourcesDirectoryModel::processPendingDirectoryChanges);
@@ -49,30 +54,6 @@ void LocalResourcesDirectoryModel::setLocalResourcesDirectories(const QStringLis
         removeWatchedDirectory(removedDirectory);
 }
 
-QStringList LocalResourcesDirectoryModel::getAllFilePaths() const
-{
-    QStringList result;
-    for (auto i = m_childFiles.cbegin(); i != m_childFiles.cend(); ++i)
-    {
-        for (const auto& filename: i.value())
-            result.append(QDir(i.key()).absoluteFilePath(filename));
-    }
-    return result;
-}
-
-QStringList LocalResourcesDirectoryModel::getFilePaths(const QString& directoryPath)
-{
-    QStringList result;
-    for (auto i = m_childFiles.cbegin(); i != m_childFiles.cend(); ++i)
-    {
-        if (!QDir(i.key()).canonicalPath().startsWith(QDir(directoryPath).canonicalPath()))
-            continue;
-        for (const auto& filename: i.value())
-            result.append(QDir(i.key()).absoluteFilePath(filename));
-    }
-    return result;
-}
-
 void LocalResourcesDirectoryModel::addWatchedDirectory(const QString& path)
 {
     QDir dir(path);
@@ -89,8 +70,21 @@ void LocalResourcesDirectoryModel::addWatchedDirectory(const QString& path)
     m_childFiles.insert(canonicalPath, childFiles);
     m_childDirectories.insert(canonicalPath, childDirectories);
 
+    for (auto& childFile: childFiles)
+    {
+        childFile = dir.absoluteFilePath(childFile);
+        if (FileTypeSupport::isValidLayoutFile(childFile)
+            || FileTypeSupport::isMovieFileExt(childFile))
+        {
+            m_fileSystemWatcher.addPath(childFile);
+        }
+    }
+
     for (const auto& childDirectory: childDirectories)
         addWatchedDirectory(dir.absoluteFilePath(childDirectory));
+
+    if (!childFiles.empty())
+        emit filesAdded(childFiles);
 }
 
 void LocalResourcesDirectoryModel::removeWatchedDirectory(const QString& path)
@@ -151,11 +145,34 @@ void LocalResourcesDirectoryModel::processPendingDirectoryChanges()
             addWatchedDirectory(dir.absoluteFilePath(newChildDirectory));
 
         for (auto& newChildFile: newChildFiles)
+        {
             newChildFile = dir.absoluteFilePath(newChildFile);
-        emit filesAdded(newChildFiles);
+            if (FileTypeSupport::isValidLayoutFile(newChildFile)
+                || FileTypeSupport::isMovieFileExt(newChildFile))
+            {
+                m_fileSystemWatcher.addPath(newChildFile);
+            }
+        }
+
+        if (!newChildFiles.empty())
+            emit filesAdded(newChildFiles);
     }
 
     m_pendingDirectoryChanges.clear();
+}
+
+void LocalResourcesDirectoryModel::onFileChanged(const QString& filePath)
+{
+    if (FileTypeSupport::isValidLayoutFile(filePath))
+    {
+        // QFileSystemWatcher loses tracking after temporary file renaming operation.
+        m_fileSystemWatcher.addPath(filePath);
+        emit layoutFileChanged(filePath);
+    }
+    else if (FileTypeSupport::isMovieFileExt(filePath))
+    {
+        emit videoFileChanged(filePath);
+    }
 }
 
 } // namespace nx::vms::client::desktop

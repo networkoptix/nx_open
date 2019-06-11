@@ -39,7 +39,6 @@
 namespace {
 
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
-static const int kRetryCountToMakeCamOffline = 3;
 static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
 
 template<class ResourcePointer>
@@ -308,9 +307,17 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     if (updateTypeId)
                         newNetRes->setTypeId(newTypeId);
 
-                    NX_VERBOSE(this, "Add foreign resource [%1] to search list",
-                        netResourceString(rpNetRes));
-
+                    if (isForeign)
+                    {
+                        NX_VERBOSE(this, "Add foreign resource [%1] to search list",
+                            netResourceString(rpNetRes));
+                    }
+                    if (updateTypeId)
+                    {
+                        NX_VERBOSE(this, "Resource [%1] TypeId changed (Old value = %2, new value = %3)."
+                            " Resource will be reinited",
+                            netResourceString(rpNetRes), existCamRes->getTypeId(), newNetRes->getTypeId());
+                    }
                     extraResources << newNetRes;
                 }
                 else
@@ -516,13 +523,23 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             // resource is not found
             m_resourceDiscoveryCounter[uniqId]++;
 
-            if (m_resourceDiscoveryCounter[uniqId] >= kRetryCountToMakeCamOffline)
+            if (m_resourceDiscoveryCounter[uniqId] >= m_serverModule->settings().retryCountToMakeCameraOffline())
             {
                 QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
+
+                NX_VERBOSE(this,
+                    "Camera %1 has not answered to %2 discovery loops in a row.",
+                    netResourceString(netRes), m_resourceDiscoveryCounter[uniqId]);
+
                 if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)
                     || (camRes && camRes->isLicenseUsed()))
                 {
-                    if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId]) {
+                    if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId])
+                    {
+                        NX_VERBOSE(this,
+                            "Send disconnected signal for camera %1",
+                            netResourceString(netRes));
+
                         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
                         if (cam)
                             cam->issueOccured();

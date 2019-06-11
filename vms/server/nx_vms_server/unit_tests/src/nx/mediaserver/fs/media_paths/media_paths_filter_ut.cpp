@@ -160,6 +160,11 @@ protected:
                 }));
     }
 
+    void whenSomePathsDuplicated()
+    {
+        m_filterConfig.partitions.append(m_filterConfig.partitions);
+    }
+
 private:
     static const QnUuid kServerUuid;
     static const QString kMediaFolder;
@@ -251,6 +256,18 @@ TEST_F(MediaPathFilter, Linux_allAllowed_noMultipleInstances)
     givenOsIs(Os::other);
     whenNonHdd(true);
     whenMultipleInstancesFlagIs(false);
+    whenPathsRequested();
+
+    thenNumberOfStoragesReturnedShouldBeEqualTo(3);
+    thenPathsShouldBeAmendedCorrectly();
+}
+
+TEST_F(MediaPathFilter, FilterOutNonUnique)
+{
+    givenOsIs(Os::other);
+    whenNonHdd(true);
+    whenMultipleInstancesFlagIs(false);
+    whenSomePathsDuplicated();
     whenPathsRequested();
 
     thenNumberOfStoragesReturnedShouldBeEqualTo(3);

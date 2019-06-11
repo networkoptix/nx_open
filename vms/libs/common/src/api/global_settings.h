@@ -238,10 +238,10 @@ public:
      *
      * Last merge operation id. It set same value for master and slave hosts during merge
      */
-    QnUuid LastMergeMasterId() const;
+    QnUuid lastMergeMasterId() const;
     void setLastMergeMasterId(const QnUuid& value);
 
-    QnUuid LastMergeSlaveId() const;
+    QnUuid lastMergeSlaveId() const;
     void setLastMergeSlaveId(const QnUuid& value);
 
     QString clientStatisticsSettingsUrl() const;
@@ -381,6 +381,10 @@ public:
 
     nx::vms::api::MetadataStorageChangePolicy metadataStorageChangePolicy() const;
     void setMetadataStorageChangePolicy(nx::vms::api::MetadataStorageChangePolicy value);
+
+
+    QString licenseServerUrl() const;
+    void setLicenseServerUrl(const QString& value);
 
 signals:
     void initialized();
@@ -542,6 +546,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_lowQualityScreenVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_forceLiveCacheForPrimaryStreamAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

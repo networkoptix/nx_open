@@ -12,10 +12,12 @@
 
 struct QnLicenseServer
 {
-    static const nx::utils::Url kIndexUrl;
-    static const nx::utils::Url kActivateUrl;
-    static const nx::utils::Url kDeactivateUrl;
-    static const nx::utils::Url kValidateUrl;
+    static const nx::utils::Url indexUrl(QnCommonModule* commonModule);
+    static const nx::utils::Url activateUrl(QnCommonModule* commonModule);
+    static const nx::utils::Url deactivateUrl(QnCommonModule* commonModule);
+    static const nx::utils::Url validateUrl(QnCommonModule* commonModule);
+private:
+    static const QString baseUrl(QnCommonModule* commonModule);
 };
 
 struct LicenseCompatibility;

@@ -11,6 +11,10 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Kameraanalys fungerar bara när kameran visas. Aktivera inspelning så att den fungerar hela tiden.</translation>
     </message>
+    <message>
+      <source>This is the built-in functionality</source>
+      <translation type="unfinished">This is the built-in functionality</translation>
+    </message>
   </context>
   <context>
     <name>EmptyTilesPlaceholder</name>

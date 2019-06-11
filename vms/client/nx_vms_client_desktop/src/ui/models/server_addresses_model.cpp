@@ -3,6 +3,9 @@
 #include <QtCore/QSet>
 
 #include "utils/common/util.h"
+
+#include <nx/network/http/http_types.h>
+
 #include "nx/utils/string.h"
 
 QnServerAddressesModel::QnServerAddressesModel(QObject *parent)
@@ -166,7 +169,7 @@ bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &v
     switch (index.column()) {
     case AddressColumn: {
         nx::utils::Url url = nx::utils::Url::fromUserInput(value.toString());
-        url.setScheme(lit("http"));
+        url.setScheme(nx::network::http::kSecureUrlSchemeName);
 
         if (url.isEmpty())
             return false;

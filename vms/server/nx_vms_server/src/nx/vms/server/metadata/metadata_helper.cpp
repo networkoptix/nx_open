@@ -1,6 +1,10 @@
 #include "metadata_helper.h"
 
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <QtGui/QRegion>
+
+#include <nx/fusion/serialization/json_functions.h>
 
 #include <utils/common/util.h>
 #include <motion/motion_detection.h>

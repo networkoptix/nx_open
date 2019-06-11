@@ -26,6 +26,8 @@ namespace nx::analytics::db {
  * Example 3 (extreme case: output is larger than input):
  * Input: {r{1;1;5;5}, v1}, {r{2;2;4;4}, v2}.
  * Output: {r{1;1;5;2}, v1}, {r{4;1;5;5}, v1}, {r{1;4;5;5}, v1}, {r{1;1;2;5}, v1}, {r{2;2;4;4}, {v1, v2}}.
+ *
+ * NOTE: All aggregation happens when adding data.
  */
 template<typename Value>
 class RectAggregator
@@ -65,7 +67,7 @@ public:
             if (aggregatedRect.values.find(value) == aggregatedRect.values.end())
             {
                 if (intersection != aggregatedRect.rect)
-                    it = splitRectInplace(it, intersection);
+                    it = splitRectInplace(it, intersection, value);
                 it->values.insert(value);
             }
             region -= intersection;
@@ -75,7 +77,7 @@ public:
         }
 
         for (const auto& newRect: region)
-            m_aggregatedRects.push_back({newRect, {value}});
+            insertNonOverlappingRect(m_aggregatedRects.end(), {newRect, {value}});
     }
 
     const std::vector<AggregatedRect>& aggregatedData() const
@@ -111,7 +113,8 @@ private:
      */
     typename AggregatedRects::iterator splitRectInplace(
         typename AggregatedRects::iterator rectIter,
-        const QRect& requiredSubRect)
+        const QRect& requiredSubRect,
+        const Value& value)
     {
         NX_ASSERT(rectIter->rect.contains(requiredSubRect));
 
@@ -119,18 +122,49 @@ private:
         const auto aggregatedRect = std::move(*rectIter);
         m_aggregatedRects.erase(rectIter);
 
-        auto leftOver = QRegion(aggregatedRect.rect) - requiredSubRect;
+        auto leftover = QRegion(aggregatedRect.rect) - requiredSubRect;
 
-        for (const auto& subRect: leftOver)
+        for (const auto& subRect: leftover)
         {
-            m_aggregatedRects.insert(
+            insertNonOverlappingRect(
                 m_aggregatedRects.begin() + posToInsertAt,
                 {subRect, aggregatedRect.values});
         }
 
-        return m_aggregatedRects.insert(
+        auto newValues = aggregatedRect.values;
+        newValues.insert(value);
+
+        return insertNonOverlappingRect(
             m_aggregatedRects.begin() + posToInsertAt,
-            {requiredSubRect, aggregatedRect.values});
+            {requiredSubRect, std::move(newValues)});
+    }
+
+    /**
+     * If there is adjacent rect with same values, then merges adjacent rects instead of inserting.
+     * NOTE: The caller MUST guarantee that data.rect does not intersect with any existing rect.
+     */
+    typename AggregatedRects::iterator insertNonOverlappingRect(
+        typename AggregatedRects::iterator pos,
+        const AggregatedRect& data)
+    {
+        // Checking for adjasent rect to merge to.
+        for (auto it = m_aggregatedRects.begin(); it != m_aggregatedRects.end(); ++it)
+        {
+            if (it->values == data.values && adjacent(it->rect, data.rect))
+            {
+                it->rect = it->rect.united(data.rect);
+                return it;
+            }
+        }
+
+        return m_aggregatedRects.insert(pos, data);
+    }
+
+    bool adjacent(const QRect& one, const QRect& two)
+    {
+        const auto& united = one.united(two);
+        return united.width() * united.height() == 
+            one.width() * one.height() + two.width() * two.height();
     }
 };
 

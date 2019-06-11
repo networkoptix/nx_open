@@ -33,7 +33,6 @@ public:
     const Filter& filter() const;
 
     nx::utils::SyncQueue<common::metadata::ConstDetectionMetadataPacketPtr>& packetsProvidedQueue();
-
 private:
     std::size_t m_nextPacketPosition = 0;
     EventsStorageStub* m_eventsStorageStub = nullptr;
@@ -164,6 +163,10 @@ public:
             packet->timestampUsec = (kInitialTimestamp + i * kTimestampStep).count();
             m_detectionPackets.push_back(packet);
         }
+    }
+    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override
+    {
+        return false;
     }
 
 private:

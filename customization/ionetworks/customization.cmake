@@ -24,15 +24,11 @@ set(licenseEmail "support@ioezio.com")
 
 set(defaultWebPages "{\"Home Page\": \"http://www.ioezio.com\"}")
 
-# Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{C43C9E04-A80F-4B10-AF54-C8A16425EDDE}")
 set(customization.clientUpgradeCode "{BD2CD61C-F8AA-45C1-A359-81DFB479740E}")
 set(customization.clientBundleUpgradeCode "{86a16bbe-1785-4caf-9f47-fc021ec7a6ba}")
 set(customization.serverBundleUpgradeCode "{bd64e4e9-b648-4ce2-9b43-9f4f53ca3554}")
 set(customization.fullBundleUpgradeCode "{38c17e44-e9d4-4d1f-b631-51def695cb94}")
-
-#set(nxtool.company.name "ioEZ")
-#set(nxtool.bundleUpgradeCode "{39f7d12d-bed9-49a0-97ba-dea8422d6e28}")
 
 set(deb.customization.company.name "ioezio")
 

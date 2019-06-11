@@ -2,6 +2,7 @@
 
 #include <cstddef>
 
+#include <QtCore/QSharedPointer>
 #include <QtGui/QOpenGLContext>
 
 class QOpenGLWidget;

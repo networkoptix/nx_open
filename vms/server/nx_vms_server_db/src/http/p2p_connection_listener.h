@@ -35,11 +35,12 @@ private:
     Qn::UserAccessData userAccessData(const vms::api::PeerDataEx& remotePeer) const;
     bool canAcceptConnection(const vms::api::PeerDataEx& remotePeer);
     bool tryAcquireConnecting(
-        ec2::ConnectionLockGuard& connectionLockGuard, 
+        ec2::ConnectionLockGuard& connectionLockGuard,
         const vms::api::PeerDataEx& remotePeer);
     bool tryAcquireConnected(
         ec2::ConnectionLockGuard& connectionLockGuard,
         const vms::api::PeerDataEx& remotePeer);
+    void sendForbiddenResponse(const QByteArray& messageBody);
 private:
     QnMediaServerModule* m_serverModule = nullptr;
 };

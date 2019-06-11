@@ -95,8 +95,13 @@ public:
     }
 
     virtual void flush(StoreCompletionHandler /*completionHandler*/) override
-    { 
+    {
         FAIL();
+    }
+
+    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override
+    {
+        return false;
     }
 
 private:

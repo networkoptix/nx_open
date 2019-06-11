@@ -244,6 +244,15 @@ void ConnectionBase::onHttpClientDone()
         return;
     }
 
+    if (statusCode == nx::network::http::StatusCode::forbidden)
+    {
+        cancelConnecting(
+            State::Error,
+            lm("Remote peer forbid connection with message: %1")
+            .arg(m_httpClient->fetchMessageBodyBuffer()));
+        return;
+    }
+
     vms::api::PeerDataEx remotePeer = deserializePeerData(headers, m_localPeer.dataFormat);
 
     if (remotePeer.id.isNull())

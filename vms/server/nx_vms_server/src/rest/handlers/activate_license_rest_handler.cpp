@@ -206,7 +206,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     bool infoMode,
     QByteArray& response)
 {
-    const auto url = QnLicenseServer::kActivateUrl;
+    const auto url = QnLicenseServer::activateUrl(commonModule);
     CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
 
     const auto runtimeData = commonModule->runtimeInfoManager()->items()

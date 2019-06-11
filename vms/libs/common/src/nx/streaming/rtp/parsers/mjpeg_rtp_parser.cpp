@@ -225,7 +225,7 @@ quint8* MakeDRIHeader(quint8* p, u_short dri)
  * @return Length of the generated headers.
  */
 int MjpegParser::makeHeaders(
-    quint8* p, int type, int w, int h, const quint8* lqt, const quint8* cqt, u_short dri)
+    quint8* p, int type, int w, int h, const quint8* lqt, const quint8* cqt, unsigned short dri)
 {
     quint8* start = p;
 

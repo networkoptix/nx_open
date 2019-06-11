@@ -4,10 +4,12 @@
 * Date: 5 dec 2006
 ***********************************************************************/
 
+#include "../file.h"
+
 #ifdef Q_OS_WIN
 
 #include <QtCore/QDebug>
-#include "../file.h"
+#include <QtCore/QDir>
 
 #include <sstream>
 #include <io.h>

@@ -1,6 +1,11 @@
 #ifdef _WIN32
 
-#include <Windows.h>
+#include <winsock2.h>
+#include <Windows.h> //< You HAVE to include winsock2.h BEFORE windows.h.
+#include <Ws2tcpip.h>
+#include <tcpmib.h>
+#include <iphlpapi.h>
+#include <Tcpestats.h>
 
 #include <memory>
 

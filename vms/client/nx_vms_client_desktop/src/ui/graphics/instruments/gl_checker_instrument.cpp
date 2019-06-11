@@ -10,6 +10,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/dialogs/common/message_box.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 

@@ -26,7 +26,6 @@ set(licenseEmail "support@networkoptix.com")
 
 set(installer.name "nxwitness_cn")
 
-# Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{15fba27b-3222-4218-8142-45a79f900462}")
 set(customization.clientUpgradeCode "{d36f78de-5b91-443e-9c44-b597c8ec9911}")
 set(customization.clientBundleUpgradeCode "{147fb03d-5f8d-400f-84c1-fe03f6084b9d}")

@@ -10,6 +10,13 @@
 #include <nx/vms/api/data/software_version.h>
 #include <nx/utils/scope_guard.h>
 
+namespace {
+
+const QString kClientComponent = "client";
+const QString kServerComponent = "server";
+
+} // namespace
+
 namespace nx::update {
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
@@ -23,6 +30,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (nx::update::InformationError::incompatibleVersion, "incompatible version")
     (nx::update::InformationError::incompatibleCloudHost, "incompatible cloud host")
     (nx::update::InformationError::notFoundError, "not found")
+    (nx::update::InformationError::serverConnectionError, "failed to get response from mediaserver")
     (nx::update::InformationError::noNewVersion, "no new version"))
 
 QString toString(InformationError error)
@@ -38,6 +46,16 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Information, (ubjson)(json)(datastr
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, Code)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, ErrorCode)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Status, (ubjson)(json), UpdateStatus_Fields)
+
+bool Package::isServer() const
+{
+    return component == kServerComponent;
+}
+
+bool Package::isClient() const
+{
+    return component == kClientComponent;
+}
 
 nx::utils::SoftwareVersion UpdateContents::getVersion() const
 {

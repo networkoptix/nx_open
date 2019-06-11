@@ -12,7 +12,7 @@
 
 namespace {
 
-    static const QString kDocumentationScheme = lit("http");
+    static const QString kDocumentationScheme = nx::network::http::kUrlSchemeName;
     static const QString kApiDocPath = lit("/static/api.xml");
     static const QString kApiDocFragment = lit("group_Server_API_method_createEvent");
 

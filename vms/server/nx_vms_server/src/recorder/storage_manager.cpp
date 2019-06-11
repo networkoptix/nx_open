@@ -87,6 +87,8 @@ const QString kArchiveCameraModelKey = lit("cameraModel");
 const QString kArchiveCameraGroupIdKey = lit("groupId");
 const QString kArchiveCameraGroupNameKey = lit("groupName");
 
+static const std::chrono::hours kAnalyticsDataCleanupStep {1};
+
 const std::chrono::minutes kWriteInfoFilesInterval(5);
 
 struct TasksQueueInfo {
@@ -1630,7 +1632,7 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     qint64 lowTime = itrLowLeft < itrLowRight ? itrLowLeft->startTimeMs : DATETIME_NOW;
     qint64 currentTime = qMin(hiTime, lowTime);
 
-    while (itrHiLeft < itrHiRight || itrLowLeft < itrLowLeft)
+    while (itrHiLeft < itrHiRight || itrLowLeft < itrLowRight)
     {
         qint64 nextHiTime = DATETIME_NOW;
         qint64 nextLowTime = DATETIME_NOW;
@@ -1676,16 +1678,16 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
             totalRecordedBytes += itrLowLeft->getFileSize() * percentUsage;
             if (storage)
                 result.recordedBytesPerStorage[storage->getId()] += itrLowLeft->getFileSize() * percentUsage;
-            if (hasHi)
-            {
-                // do not include bitrate calculation if only LQ quality
-                if (itrLowLeft->startTimeMs >= averagingStartTime)
-                    recordedBytesForPeriod += itrLowLeft->getFileSize() * percentUsage;
-            }
-            else
+
+            if (itrLowLeft->startTimeMs >= averagingStartTime)
+                recordedBytesForPeriod += itrLowLeft->getFileSize() * percentUsage;
+
+            if (!hasHi)
             {
                 // inc time if no HQ
                 totalRecordedMs += itrLowLeft->durationMs * percentUsage;
+                if (itrLowLeft->startTimeMs >= averagingStartTime)
+                    recordedMsForPeriod += itrLowLeft->durationMs * percentUsage;
             }
         }
 
@@ -1892,7 +1894,7 @@ void QnStorageManager::clearSpace(bool forced)
                             << "(" << (elapsedSecs / (60 * 60)) << " hrs)" << endl;
         clearSpaceLogStream << "[Cleanup, measure]: cleanup speed was "
                             << (toDeleteTotal / (1024 * 1024 * elapsedSecs)) << " Mb/s"
-                            << endl;
+        << endl;
         NX_VERBOSE(this, clearSpaceLogMessage);
     }
 
@@ -1902,7 +1904,7 @@ void QnStorageManager::clearSpace(bool forced)
     // 5. Cleanup motion
 
     bool readyToDeleteMotion = (m_archiveRebuildInfo.state == Qn::RebuildState_None); // do not delete motion while rebuilding in progress (just in case, unnecessary)
-    for(const QnStorageResourcePtr& storage: getAllStorages()) {
+    for (const QnStorageResourcePtr& storage : getAllStorages()) {
         if (storage->getStatus() == Qn::Offline) {
             readyToDeleteMotion = false; // offline storage may contain archive. do not delete motion so far
             break;
@@ -1920,7 +1922,7 @@ void QnStorageManager::clearSpace(bool forced)
         m_clearMotionTimer.restart();
     }
 
-    // 6. Cleanup bookmarks
+    // 6. Cleanup bookmarks and analytics by cameras
     if (m_clearBookmarksTimer.elapsed() > BOOKMARK_CLEANUP_INTERVAL) {
         m_clearBookmarksTimer.restart();
 
@@ -1932,6 +1934,9 @@ void QnStorageManager::clearSpace(bool forced)
             if (m_analyticsEventsStorage)
                 clearAnalyticsEvents(oldestDataTimestampByCamera);
         }
+
+        // 7. Cleanup more analytics if there is no disk space
+        forciblyClearAnalyticsEvents();
     }
 }
 
@@ -1985,6 +1990,7 @@ bool QnStorageManager::canAddChunk(qint64 timeMs, qint64 size)
 void QnStorageManager::clearAnalyticsEvents(
     const QMap<QnUuid, qint64>& dataToDelete)
 {
+    // 1. Remove corresponding analytics data if there is no video archive
     for (auto itr = dataToDelete.begin(); itr != dataToDelete.end(); ++itr)
     {
         const QnUuid& cameraId = itr.key();
@@ -1993,6 +1999,33 @@ void QnStorageManager::clearAnalyticsEvents(
         m_analyticsEventsStorage->markDataAsDeprecated(
             cameraId,
             std::chrono::milliseconds(timestampMs));
+    }
+}
+
+void QnStorageManager::forciblyClearAnalyticsEvents()
+{
+    // 2. Forcibly remove more analytics data if there is still no disk space left
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+        serverModule()->commonModule()->moduleGUID());
+    if (!server)
+        return;
+
+    if (auto storage = resourcePool()->getResourceById<QnStorageResource>(server->metadataStorageId()))
+    {
+        const auto freeSpace = storage->getFreeSpace();
+        if (storage->getStatus() == Qn::Online && freeSpace < storage->getSpaceLimit() / 2)
+        {
+            std::chrono::milliseconds minDatabaseTime;
+            if (m_analyticsEventsStorage->readMinimumEventTimestamp(&minDatabaseTime))
+            {
+                NX_WARNING(this, "Free space on the analytics storage %1 has reached %2(Gb). "
+                    "Remove extra data from the analytics database.",
+                    storage->getUrl(), freeSpace / 1e9);
+                m_analyticsEventsStorage->markDataAsDeprecated(
+                    QnUuid(), //< Any camera
+                    minDatabaseTime + kAnalyticsDataCleanupStep);
+            }
+        }
     }
 }
 
@@ -2011,7 +2044,7 @@ QMap<QnUuid, qint64> QnStorageManager::calculateOldestDataTimestampByCamera()
         const qint64 timestampMs = itr.value();
 
         auto itrPrev = m_lastCatalogTimes.find(uniqueId);
-        if (itrPrev != m_lastCatalogTimes.end() && itrPrev.value() != timestampMs)
+        if (itrPrev == m_lastCatalogTimes.end() || itrPrev.value() != timestampMs)
         {
             dataToDelete.insert(
                 QnSecurityCamResource::makeCameraIdFromUniqueId(uniqueId), timestampMs);

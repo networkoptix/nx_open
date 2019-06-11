@@ -3,15 +3,25 @@
 #include <memory>
 
 #include <QtCore/QObject>
+#include <QtCore/QTime>
+#include <QtGui/QPixmap>
 
-// TODO: #Elric move system includes into implementation
 #include <windows.h>
 #include <shellapi.h>
 #include <commdlg.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include <QtCore/QTime>
+
 #include "ui/screen_recording/video_recorder_settings.h"
+
+#include <nx/utils/thread/wait_condition.h>
+
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/imgutils.h>
+#include <libswscale/swscale.h>
+}
 
 struct CaptureInfo
 {

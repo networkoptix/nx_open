@@ -57,6 +57,8 @@ public:
         {
             auto peer = std::make_unique<MediaServerLauncher>();
             peer->start();
+            NX_VERBOSE(this, "Server#%1 (%2) started on %3",
+                m_peers.size(), peer->commonModule()->moduleGUID(), peer->endpoint());
 
             auto settings = peer->serverModule()->globalSettings();
             settings->setTrafficEncriptionForced(sslMode != SslMode::noSsl);
@@ -119,7 +121,11 @@ TEST_P(ProxyTest, proxyToAnotherThenToThemself)
         // Media server should proxy to itself if header is missing.
         if (i > 0)
             client->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, guid.toByteArray());
-        ASSERT_TRUE(client->doGet(serverUrl(0, "/api/moduleInformation", testMode.sslMode)));
+
+        const auto requestUrl =
+            serverUrl(0, "/api/moduleInformation", testMode.sslMode);
+        NX_VERBOSE(this, "Sending request %1 to server#%2", requestUrl, i);
+        ASSERT_TRUE(client->doGet(requestUrl));
         ASSERT_TRUE(client->response());
         ASSERT_EQ(nx::network::http::StatusCode::ok, client->response()->statusLine.statusCode);
 

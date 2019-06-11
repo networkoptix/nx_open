@@ -74,6 +74,10 @@ bool pluggedIn(const std::string& devicePath)
     return false;
 }
 
+void uninitialize()
+{
+}
+
 } // namespace nx::usb_cam::device::audio::detail
 
 #endif //_WIN32

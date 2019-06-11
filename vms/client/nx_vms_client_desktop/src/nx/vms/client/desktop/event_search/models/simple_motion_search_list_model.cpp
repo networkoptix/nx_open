@@ -194,7 +194,7 @@ void SimpleMotionSearchListModel::requestFetch()
     const int oldCount = int(m_data.size());
     FetchResult result = FetchResult::complete;
 
-    ScopedFetchCommit scopedFetch(this, fetchDirection(), result /*by reference*/);
+    ScopedFetchCommit scopedFetch(this, fetchDirection(), &result);
 
     QnTimePeriod fetchedPeriod(relevantTimePeriod());
     if (periods.empty())

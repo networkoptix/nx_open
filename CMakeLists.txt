@@ -6,6 +6,7 @@ include(cmake/default_target.cmake)
 set(customization "default" CACHE STRING "Product customization")
 nx_option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
+set(eulaVersionOverride "" CACHE STRING "Overriden EULA version")
 
 # Remember to reset the in-version protocol number when updating the project version
 set(releaseVersion 4.0.0)

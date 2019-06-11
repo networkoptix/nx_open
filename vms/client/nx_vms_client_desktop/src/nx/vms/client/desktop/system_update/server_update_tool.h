@@ -59,6 +59,7 @@ public:
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
     bool hasOfflineUpdateChanges() const;
+    void resumeTasks();
 
     /**
      * Sends GET https://localhost:7001/ec2/updateInformation and stores response in an internal
@@ -91,6 +92,11 @@ public:
     bool requestStopAction();
 
     /**
+     * Asks mediaservers to retry current update action.
+     */
+    bool requestRetryAction();
+
+    /**
      * Asks mediaservers to finish update process.
      * @param skipActivePeers - will force update completion even if there are
      *     some servers installing.
@@ -116,6 +122,8 @@ public:
         unpack,
         // Data is unpacked and we are ready to push packages to the servers.
         ready,
+        // Preparing for upload. We are calculating recipients and a free space.
+        preparing,
         // Pushing to the servers.
         push,
         // All update contents are pushed to the servers. They can start the update.
@@ -123,6 +131,8 @@ public:
         // Failed to push all the data.
         error,
     };
+
+    Q_ENUM(OfflineUpdateState);
 
     /**
      * Checks latest update in the internet. It will reqest mediaserver for updates if client
@@ -135,6 +145,7 @@ public:
 
     std::future<UpdateContents> checkUpdateFromFile(const QString& file);
     std::future<UpdateContents> checkMediaserverUpdateInfo();
+    std::future<UpdateContents> takeUpdateCheckFromFile();
 
     /**
      * Check if update info contains all the packages necessary to update the system.
@@ -146,23 +157,28 @@ public:
         UpdateContents& contents,
         const std::set<nx::utils::SoftwareVersion>& clientVersions, bool checkClient = true) const;
 
-    // Start uploading local update packages to the servers.
+    /** Start uploading local update packages to the servers. */
     bool startUpload(const UpdateContents& contents);
-    void startUpload(
-        const QnMediaServerResourcePtr& server,
-        const QStringList& files,
-        const QDir& directory);
+
+    /** Stops all uploads. */
     void stopUpload();
 
+    /**
+     * Get a path to a folder with downloads.
+     * ServerUpdateTool can download server packages for the servers without internet.
+     */
     QDir getDownloadDir() const;
 
+    /**
+     * Report-like object to describe a progress for a current action.
+     */
     struct ProgressInfo
     {
         int current = 0;
         int max = 0;
         int active = 0;
         int done = 0;
-        // This flags help UI to pick proper caption for a progress.
+        /** This flags help UI to pick proper caption for a progress. */
         bool downloadingClient = false;
         bool downloadingServers = false;
         /** Client is downloading files for the servers without internet. */
@@ -173,13 +189,14 @@ public:
         bool installingClient = false;
     };
 
-    // Calculates a progress for uploading files to the server.
-    void calculateUploadProgress(ProgressInfo& progress);
     void calculateManualDownloadProgress(ProgressInfo& progress);
 
     OfflineUpdateState getUploaderState() const;
 
     bool haveActiveUpdate() const;
+
+    /** Get recipients for upload for specified update package. */
+    QSet<QnUuid> getTargetsForPackage(const nx::update::Package& package) const;
 
     /** Get authentication string for current connection to mediaserver. */
     QString getServerAuthString() const;
@@ -206,8 +223,9 @@ public:
      * This field is set when we verify update contents.
      * @param package Package to be uploaded
      * @param sourceDir Directory that contains this package
+     * @returns number of recipients for this package.
      */
-    void uploadPackage(const nx::update::Package& package, const QDir& sourceDir);
+    int uploadPackage(const nx::update::Package& package, const QDir& sourceDir);
 
     TimePoint::duration getInstallDuration() const;
 
@@ -232,6 +250,9 @@ private:
     void atUploadWorkerState(QnUuid serverId, const nx::vms::client::desktop::UploadState& state);
     // Called by QnZipExtractor when the offline update package is unpacked.
     void atExtractFilesFinished(int code);
+
+    void atRequestServerFreeSpaceResponse(bool success, rest::Handle handle,
+        const QnUpdateFreeSpaceReply& reply);
 
     // Wrapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.
@@ -280,12 +301,10 @@ private:
 
     // Current update manifest. We get it from mediaservers, or overriding it by calling
     // requestStartUpdate(...) method.
-    nx::update::Information m_updateManifest;
+    nx::update::Information m_remoteUpdateManifest;
 
     std::future<UpdateContents> m_checkFileUpdate;
 
-    // Path to a remote folder with update packages.
-    QString m_uploadDestination;
     // Cached path to file with offline updates.
     QString m_localUpdateFile;
     QDir m_outputDir;

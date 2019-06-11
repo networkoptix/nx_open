@@ -1,5 +1,6 @@
 #include "notifications_workbench_panel.h"
 
+#include <QtCore/QModelIndex>
 #include <QtCore/QTimer>
 
 #include <QtWidgets/QAction>
@@ -33,6 +34,7 @@
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_pane_settings.h>
 
 #include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
@@ -417,7 +419,7 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
     connect(m_eventPanel.data(), &EventPanel::currentTabChanged, this,
         [this](EventPanel::Tab tab)
         {
-            if (tab == EventPanel::Tab::motion)
+            if (tab == EventPanel::Tab::motion && !display()->widget(Qn::ZoomedRole))
                 setOpened();
         });
 }

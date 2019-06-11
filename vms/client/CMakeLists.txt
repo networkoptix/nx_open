@@ -41,11 +41,3 @@ endif()
 if(withMobileClient)
     add_subdirectory(mobile_client)
 endif()
-
-if(withScreenChecker)
-    add_subdirectory(screen_checker)
-endif()
-
-if(withNovBrowser)
-    add_subdirectory(nov_browser)
-endif()

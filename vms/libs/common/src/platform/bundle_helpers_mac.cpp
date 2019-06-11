@@ -4,15 +4,15 @@
 
 #include <ApplicationServices/ApplicationServices.h>
 
+#include <QtCore/QVector>
+
 #include <nx/utils/platform/core_foundation_mac/cf_url.h>
 #include <nx/utils/platform/core_foundation_mac/cf_string.h>
 
 namespace {
 
-const auto kAppClassTag = cf::QnCFString(lit("NSPrincipalClass"));
-const auto kHiDpiSupportTag = cf::QnCFString(lit("NSHighResolutionCapable"));
-
-const auto kAppCalssAplicationValue = lit("NSApplication");
+const auto kAppClassTag = cf::QnCFString("NSPrincipalClass");
+const auto kHiDpiSupportTag = cf::QnCFString("NSHighResolutionCapable");
 
 }
 

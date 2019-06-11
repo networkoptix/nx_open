@@ -29,6 +29,7 @@
 
 #include "transcoding/transcoder.h"
 #include "transcoding/ffmpeg_transcoder.h"
+#include "transcoding/ffmpeg_video_transcoder.h"
 #include "camera/video_camera.h"
 #include "camera/camera_pool.h"
 #include "streaming/streaming_params.h"
@@ -51,14 +52,14 @@ static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
 static const unsigned int DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP = 1;
 
-AVCodecID getPrefferedVideoCodec(const QByteArray& streamingFormat)
+AVCodecID getPrefferedVideoCodec(const QByteArray& streamingFormat, const QString& defaultCodec)
 {
     if (streamingFormat == "webm")
         return AV_CODEC_ID_VP8;
     if (streamingFormat == "mpjpeg")
         return AV_CODEC_ID_MJPEG;
 
-    return AV_CODEC_ID_MPEG4;
+    return findVideoEncoder(defaultCodec);
 }
 
 bool isCodecCompatibleWithFormat(AVCodecID codec, const QByteArray& streamingFormat)
@@ -657,7 +658,8 @@ void QnProgressiveDownloadingConsumer::run()
         {
             qualityToUse = QnServer::HiQualityCatalog;
             transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
-            videoCodec = getPrefferedVideoCodec(streamingFormat);
+            videoCodec = getPrefferedVideoCodec(
+                streamingFormat, commonModule()->globalSettings()->defaultExportVideoCodec());
             NX_DEBUG(this,
                 "Compatible video stream not found, transcoding will used, codec id[%1]",
                 videoCodec);

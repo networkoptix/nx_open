@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include <QtGui/QRegion>
 
 #include <nx/sql/query_context.h>
@@ -14,6 +16,7 @@ namespace nx::analytics::db {
 class AttributesDao;
 class DeviceDao;
 class ObjectTypeDao;
+class ObjectGroupDao;
 class AnalyticsArchiveDirectory;
 
 class DetectionDataSaver
@@ -23,6 +26,7 @@ public:
         AttributesDao* attributesDao,
         DeviceDao* deviceDao,
         ObjectTypeDao* objectTypeDao,
+        ObjectGroupDao* objectGroupDao,
         ObjectCache* objectCache,
         AnalyticsArchiveDirectory* analyticsArchive);
 
@@ -47,6 +51,7 @@ private:
     struct AnalArchiveItem
     {
         QnUuid deviceId;
+        uint32_t objectsGroupId = 0;
         int objectType = -1;
         std::chrono::milliseconds timestamp = std::chrono::milliseconds::zero();
         /**
@@ -66,6 +71,7 @@ private:
     AttributesDao* m_attributesDao = nullptr;
     DeviceDao* m_deviceDao = nullptr;
     ObjectTypeDao* m_objectTypeDao = nullptr;
+    ObjectGroupDao* m_objectGroupDao = nullptr;
     ObjectCache* m_objectCache = nullptr;
     AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
 
@@ -88,10 +94,6 @@ private:
     void saveToAnalyticsArchive(nx::sql::QueryContext* queryContext);
     std::vector<AnalArchiveItem> prepareArchiveData(nx::sql::QueryContext* queryContext);
     ObjectDbAttributes getObjectDbDataById(const QnUuid& objectId);
-
-    int64_t combineAttributes(
-        nx::sql::QueryContext* queryContext,
-        const std::vector<int64_t>& attributesIds);
 };
 
 } // namespace nx::analytics::db

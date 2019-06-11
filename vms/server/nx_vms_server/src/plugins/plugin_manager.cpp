@@ -7,6 +7,7 @@
 #include <QtCore/QAtomicPointer>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 
 #include <nx/utils/log/log.h>
 #include <nx/kit/utils.h>

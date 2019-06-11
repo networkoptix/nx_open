@@ -7,8 +7,8 @@ Button
 {
     id: control
 
-    property url icon
-    property url checkedIcon: icon
+    property url iconUrl
+    property url checkedIconUrl: iconUrl
     property color backgroundColor: ColorTheme.transparent(hoverColor, 0)
     property color hoverColor: ColorTheme.colors.brand_core
     property color pressedColor: ColorTheme.darker(ColorTheme.colors.brand_core, 3)
@@ -45,14 +45,14 @@ Button
         Behavior on color { ColorAnimation { duration: 50 } }
     }
 
-    label: Image
+    contentItem: Image
     {
         anchors.centerIn: control
 
         width: control.availableWidth
         height: control.availableHeight
 
-        source: control.checked ? checkedIcon : icon
+        source: control.checked ? checkedIconUrl : iconUrl
     }
 
     MouseTracker

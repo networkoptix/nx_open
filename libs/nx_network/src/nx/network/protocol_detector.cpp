@@ -21,6 +21,11 @@ std::string toString(ProtocolMatchResult detectionResult)
     return "unsupported value";
 }
 
+void PrintTo(const ProtocolMatchResult& val, ::std::ostream* os)
+{
+    *os << toString(val);
+}
+
 //-------------------------------------------------------------------------------------------------
 
 FixedProtocolPrefixRule::FixedProtocolPrefixRule(const std::string& prefix):

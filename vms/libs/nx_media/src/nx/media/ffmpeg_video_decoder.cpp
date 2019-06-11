@@ -301,11 +301,7 @@ int FfmpegVideoDecoder::decode(
         // It's already guaranteed by QnByteArray that there is an extra space reserved. We must
         // fill the padding bytes according to ffmpeg documentation.
         if (avpkt.data)
-        {
-            static_assert(QN_BYTE_ARRAY_PADDING >= FF_INPUT_BUFFER_PADDING_SIZE,
-                "FfmpegVideoDecoder: Insufficient padding size");
-            memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
-        }
+            memset(avpkt.data + avpkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
         d->lastPts = compressedVideoData->timestamp;
     }

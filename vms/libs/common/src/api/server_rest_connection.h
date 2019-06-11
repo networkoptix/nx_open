@@ -235,6 +235,7 @@ public:
         qint64 chunkSize,
         const QByteArray& md5,
         qint64 ttl,
+        bool recreateIfExists,
         AddUploadCallback callback,
         QThread* targetThread = nullptr);
 
@@ -463,6 +464,10 @@ public:
 
     Handle updateActionInstall(const QSet<QnUuid>& participants,
         std::function<void(Handle, bool)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle retryUpdate(
+        Result<UpdateStatusAllData>::type callback,
         QThread* targetThread = nullptr);
 
     Handle getUpdateStatus(

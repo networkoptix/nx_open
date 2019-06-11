@@ -457,18 +457,20 @@ Handle ServerConnection::addFileUpload(
     qint64 chunkSize,
     const QByteArray& md5,
     qint64 ttl,
+    bool recreateIfExists,
     AddUploadCallback callback,
     QThread* targetThread)
 {
     QnRequestParamList params
     {
-        { lit("size"), QString::number(size) },
-        { lit("chunkSize"), QString::number(chunkSize) },
-        { lit("md5"), QString::fromUtf8(md5) },
-        { lit("ttl"), QString::number(ttl) },
-        { lit("upload"), lit("true") }
+        {"size", QString::number(size)},
+        {"chunkSize", QString::number(chunkSize)},
+        {"md5", QString::fromUtf8(md5)},
+        {"ttl", QString::number(ttl)},
+        {"upload", "true"},
+        {"recreate", recreateIfExists ? "true" : "false"},
     };
-    QString path = lit("/api/downloads/%1").arg(fileName);
+    const auto& path = QStringLiteral("/api/downloads/%1").arg(fileName);
     return executePost(path, params, QByteArray(), QByteArray(), callback, targetThread);
 }
 
@@ -924,6 +926,14 @@ Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
         contentType, QByteArray(), internalCallback, targetThread);
 }
 
+Handle ServerConnection::retryUpdate(
+    Result<UpdateStatusAllData>::type callback, QThread* targetThread)
+{
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    return executePost<UpdateStatusAllData>("/ec2/retryUpdate",
+        QnRequestParamList(), contentType, QByteArray(), callback, targetThread);
+}
+
 Handle ServerConnection::getUpdateStatus(
     Result<UpdateStatusAllData>::type callback, QThread* targetThread)
 {
@@ -1194,11 +1204,10 @@ void invoke(Callback<ResultType> callback,
     if (targetThread)
     {
          auto ptr = std::make_shared<ResultType>(std::move(result));
-         executeDelayed([callback, success, id, ptr]() mutable
+         executeLaterInThread([callback, success, id, ptr]() mutable
              {
                  callback(success, id, std::move(*ptr));
              },
-             0,
              targetThread);
     }
     else
@@ -1228,12 +1237,11 @@ void invoke(ServerConnection::Result<QByteArray>::type callback,
     if (targetThread)
     {
         auto ptr = std::make_shared<QByteArray>(result);
-        executeDelayed(
+        executeLaterInThread(
             [callback, headers, success, id, ptr]() mutable
             {
                 callback(success, id, std::move(*ptr), headers);
             },
-            0,
             targetThread);
     }
     else

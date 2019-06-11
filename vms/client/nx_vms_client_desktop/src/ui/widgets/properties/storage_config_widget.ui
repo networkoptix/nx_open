@@ -550,7 +550,7 @@
    <item>
     <widget class="nx::vms::client::desktop::AlertBar" name="analyticsOnSystemDriveWarningLabel" native="true">
      <property name="text" stdset="0">
-      <string>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</string>
+      <string>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</string>
      </property>
     </widget>
    </item>

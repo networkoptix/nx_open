@@ -12,6 +12,8 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <nx/update/common_update_manager.h>
 
+struct QnUpdateFreeSpaceReply;
+
 namespace nx::vms::client::desktop {
 
 using StatusCode = nx::update::Status::Code;
@@ -73,6 +75,9 @@ struct UpdateItem
     TimePoint lastStatusTime;
     /** Row in the table. */
     int row = -1;
+
+    int freeSpace = -1;
+    int requiredSpace = -1;
 };
 
 using UpdateItemPtr = std::shared_ptr<UpdateItem>;
@@ -125,6 +130,7 @@ public:
      * It will return number if peers with changed data.
      */
     int setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
+    int setFreeSpaceData(const  QnUpdateFreeSpaceReply& freeSpaceData);
     void markStatusUnknown(const QSet<QnUuid>& targets);
     /**
      * Forcing update for mediaserver versions.
@@ -152,11 +158,17 @@ public:
 
     bool hasStatusErrors() const;
 
+    struct ErrorReport
+    {
+        QString message;
+        QSet<QnUuid> peers;
+    };
+
     /**
-     * Generates a common error for multiple peers.
+     * Generates an error report for multiple peers.
      * This error will be displayed in error dialog from multi_server_updates_widget
      */
-    QString getErrorMessage() const;
+    bool getErrorReport(ErrorReport& report) const;
 
 public:
     std::map<QnUuid, nx::update::Status::Code> allPeerStates() const;
@@ -167,7 +179,8 @@ public:
     QSet<QnUuid> peersInState(StatusCode state) const;
     QSet<QnUuid> legacyServers() const;
     QSet<QnUuid> offlineServers() const;
-    QSet<QnUuid> offlineNotTooLong() const;
+    QSet<QnUuid> offlineAndInState(StatusCode state) const;
+    QSet<QnUuid> onlineAndInState(StatusCode state) const;
     QSet<QnUuid> peersInstalling() const;
     QSet<QnUuid> peersCompleteInstall() const;
     QSet<QnUuid> serversWithChangedProtocol() const;

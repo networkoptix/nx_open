@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <array>
 #include <limits>
 
 #include <nx/network/ssl/ssl_pipeline.h>

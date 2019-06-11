@@ -34,7 +34,7 @@ public:
 
 protected:
     std::string m_username;
-    std::string m_password;
+    const std::string m_password;
     std::vector<std::string> m_domains = { "WORKGROUP", "" };
 
 private:

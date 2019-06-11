@@ -1969,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>Больше не показывать это сообщение</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -2363,6 +2355,14 @@
     </message>
   </context>
   <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>Больше не показывать это сообщение</translation>
+    </message>
+  </context>
+  <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
@@ -2648,11 +2648,6 @@
       <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
       <source>Resources</source>
       <translation>Ресурсы</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
     </message>
     <message>
       <location/>
@@ -3078,11 +3073,6 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
       <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
     </message>
@@ -3095,6 +3085,11 @@
       <location/>
       <source>Recording was enabled on the USB storage</source>
       <translation type="unfinished">Recording was enabled on the USB storage</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>

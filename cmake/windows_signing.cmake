@@ -1,3 +1,5 @@
+include(CMakeDependentOption)
+
 set(signingServer "http://localhost:8080" CACHE STRING "Signing server address")
 
 cmake_dependent_option(trustedTimestamping

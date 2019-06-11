@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QString>
+
 struct QnTraytoolAppInfo
 {
     /** Real application name, visible to the user. */

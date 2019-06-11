@@ -48,7 +48,7 @@ CREATE INDEX idx_event_for_streaming_cursor ON event(device_guid, timestamp_usec
 static const char kMoveAttributesTextToASeparateTable[] =
 R"sql(
 
-CREATE TABLE unique_attributes(id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT);
+CREATE TABLE unique_attributes(id INTEGER PRIMARY KEY, content TEXT);
 CREATE INDEX unique_attributes_content_idx on unique_attributes(content);
 INSERT INTO unique_attributes (content) SELECT DISTINCT attributes FROM event;
 
@@ -73,10 +73,10 @@ INSERT INTO attributes_text_index(docid, content) SELECT id, content FROM unique
 static const char kMoveObjectTypeAndDeviceToSeparateTables[] =
 R"sql(
 
-CREATE TABLE object_type (id INTEGER PRIMARY KEY AUTOINCREMENT, name text);
+CREATE TABLE object_type (id INTEGER PRIMARY KEY, name text);
 INSERT INTO object_type(name) SELECT DISTINCT object_type_id FROM event;
 
-CREATE TABLE device (id INTEGER PRIMARY KEY AUTOINCREMENT, guid BLOB(16) NOT NULL);
+CREATE TABLE device (id INTEGER PRIMARY KEY, guid BLOB(16) NOT NULL);
 INSERT INTO device (guid) SELECT DISTINCT device_guid FROM event;
 
 ALTER TABLE event ADD COLUMN device_id INTEGER;
@@ -147,7 +147,7 @@ static constexpr char kAddFullTimePeriods[] =
 R"sql(
 
 CREATE TABLE time_period_full(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     device_id          INTEGER,
     period_start_ms    INTEGER,
     period_end_ms      INTEGER
@@ -187,7 +187,7 @@ DROP INDEX IF EXISTS event_attributes_id;
 DROP TABLE event;
 
 CREATE TABLE object(
-    id                          INTEGER PRIMARY KEY AUTOINCREMENT,
+    id                          INTEGER PRIMARY KEY,
     device_id                   INTEGER,
     object_type_id              INTEGER,
     guid                        BLOB,
@@ -203,7 +203,7 @@ CREATE INDEX idx_object_device_id_track_start_ms ON object(
     device_id, track_start_ms);
 
 CREATE TABLE object_search(
-    id                          INTEGER PRIMARY KEY AUTOINCREMENT,
+    id                          INTEGER PRIMARY KEY,
     timestamp_seconds_utc       INTEGER,
     box_top_left_x              INTEGER,
     box_top_left_y              INTEGER,
@@ -247,6 +247,63 @@ CREATE TABLE combined_attributes(
 
 CREATE INDEX idx_combined_attributes_full ON combined_attributes(
     attributes_id, combination_id);
+
+)sql";
+
+//-------------------------------------------------------------------------------------------------
+// META-281.
+static constexpr char kFixObjectSearchToObjectIndices[] =
+R"sql(
+
+DROP INDEX idx_object_search_to_object_full;
+
+CREATE INDEX idx_object_search_to_object_object_search_id ON object_search_to_object(
+    object_search_id);
+
+CREATE INDEX idx_object_search_to_object_object_id ON object_search_to_object(
+    object_id);
+
+)sql";
+
+//-------------------------------------------------------------------------------------------------
+// META-290.
+static constexpr char kAddObjectGroups[] =
+R"sql(
+
+CREATE TABLE object_group(
+    group_id    INTEGER,
+    object_id   INTEGER
+);
+
+CREATE INDEX idx_object_group_full ON object_group(group_id, object_id);
+
+INSERT INTO object_group(group_id, object_id)
+SELECT object_search_id, object_id FROM object_search_to_object;
+
+ALTER TABLE object_search ADD COLUMN object_group_id INTEGER;
+UPDATE object_search SET object_group_id = id;
+
+DROP INDEX idx_object_search_to_object_object_search_id;
+DROP INDEX idx_object_search_to_object_object_id;
+DROP TABLE object_search_to_object;
+
+)sql";
+
+//-------------------------------------------------------------------------------------------------
+// Time periods are stored in binary files.
+static constexpr char kDropTimePeriodTable[] =
+R"sql(
+
+DROP TABLE time_period_full;
+
+)sql";
+
+//-------------------------------------------------------------------------------------------------
+static constexpr char kDropObjectSearchFromDb[] =
+R"sql(
+
+DROP INDEX idx_object_search_box_timestamp;
+DROP TABLE object_search;
 
 )sql";
 

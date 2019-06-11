@@ -15,6 +15,9 @@
 
 #include <nx/vms/api/data/analytics_data.h>
 
+class QDir;
+class QFileInfo;
+
 /**
  * Loads custom application plugins and provides plugin management methods. Plugins are looked for
  * in the hard-coded "plugins" directory located next to the executable, and additionally in the

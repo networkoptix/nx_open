@@ -35,7 +35,6 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
-        "${customization_dir}/icons/all/videowall.ico"
         "${customization_dir}/license.html"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
         "${nov_file_launcher_executable}"
@@ -67,6 +66,7 @@ nx_force_include(nx_vms_client_desktop ${CMAKE_SOURCE_DIR}/libs/nx_utils/src/nx/
 
 if(WINDOWS)
     add_dependencies(nx_vms_client_desktop nov_file_launcher)
+    target_link_libraries(nx_vms_client_desktop PUBLIC nx_gdi_tracer)
 endif()
 
 target_include_directories(nx_vms_client_desktop

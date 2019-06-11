@@ -295,6 +295,9 @@ void OnvifResourceInformationFetcher::findResources(
         model = info.uniqId;
     }
 
+    NX_VERBOSE(this, "New device found: manufacture = %1, model = %2, mac = %3, ip = %4",
+        manufacturer, model, mac, info.discoveryIp);
+
     QnPlOnvifResourcePtr res = createResource(manufacturer, firmware, QHostAddress(sender), QHostAddress(info.discoveryIp),
                                               model, mac, info.uniqId, soapWrapper.login(), soapWrapper.password(), endpoint);
     if (res)
@@ -344,7 +347,8 @@ QnUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manu
 {
     const QString kOnvifManufacture("OnvifDevice");
 
-    QnUuid rt = qnResTypePool->getResourceTypeId(kOnvifManufacture, manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
+    // Try to find child resource type, use real manufacturer name as camera model in onvif XML.
+    QnUuid rt = qnResTypePool->getResourceTypeId(kOnvifManufacture, manufacturer, false);
     if (!rt.isNull())
         return rt;
     else if (isAnalogOnvifResource(manufacturer, model) && !onvifAnalogTypeId.isNull())
@@ -375,6 +379,10 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(
         return resource;
 
     auto typeId = getOnvifResourceType(manufacturerAlias, model);
+    NX_VERBOSE(this,
+        "TypeId is calculated for the resource. TypeId = %1, manufacture = %2, manufactureAlias = %3, model = %4",
+        typeId, manufacturer, manufacturerAlias, model);
+
     NX_ASSERT(!typeId.isNull());
     resource->setTypeId(typeId);
 

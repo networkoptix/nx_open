@@ -73,9 +73,14 @@ bool handleTransaction2(
     const Function& function,
     FastFunctionType fastFunction)
 {
+    static const int kGetKnownPeersSystemTime = 2005;
+
     switch (transaction.command)
     {
         TRANSACTION_DESCRIPTOR_LIST(HANDLE_TRANSACTION_PARAMS_APPLY)
+    case kGetKnownPeersSystemTime:
+        NX_VERBOSE(bus, "Ignore deprecated unused transaction %1", transaction.command);
+        return true;
     default:
         NX_ASSERT(0, "Unknown transaction command");
     }

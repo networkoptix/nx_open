@@ -2560,17 +2560,21 @@ void ActionHandler::confirmAnalyticsStorageLocation()
         if (server->metadataStorageId().isNull()
             && nx::analytics::hasActiveObjectEngines(commonModule(), server->getId()))
         {
+            const auto name = server->getName();
             QnMessageBox msgBox(
                 QnMessageBoxIcon::Warning,
-                tr("Confirm storage location to store analytics data"),
+                tr("Confirm storage location to store analytics data on '%1'").arg(name),
                 tr("Analytics database should be stored on a local storage"
                     " and can occupy up to hundred gigabytes."
-                    "\n\n"
+                    "\n"
                     "Once location to store analytics data is selected,"
                     " it cannot be easily changed without loosing exitsing data. "
                     "We recommed to choose location carefully and not to use"
                     " system partition to avoid severe system malfunction."
-                    "\n\n"
+                    "\n"
+                    "By default analytics data will be stored"
+                    " in mediaserver's installation directory."
+                    "\n"
                     "You can change storage location in the \"Storage Management\""
                     " tab in the Server Settings dialog."
                 ),
@@ -2718,7 +2722,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         targetUrl = qnClientModule->networkProxyFactory()->urlToResource(targetUrl, request.server);
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-        targetUrl = nx::utils::Url(lit("http://%1/%2:%3:%4%5?%6")
+        targetUrl = nx::utils::Url(lit("https://%1/%2:%3:%4%5?%6")
             .arg(gateway->endpoint().toString()).arg(targetUrl.scheme())
             .arg(targetUrl.host()).arg(targetUrl.port())
             .arg(targetUrl.path()).arg(targetUrl.query()));

@@ -2888,10 +2888,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>44.1Khz ve 48Khz ses formatları yakalama cihazı tarafından desteklenmiyor. Lütfen başka bir ses cihazı seçin yada kayıt seçeneklerinden &quot;yok&quot; u işaretleyin.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation>Ayarlanmış kodek: %1 bulunamadı, h263p kullanılacak</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3196,6 +3192,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Ekran kartı sürücüleri güncel değil yada yüklenmemiş</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 düzgün çalışmayabilir.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3279,17 +3286,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Herhangi bir aksilik olmasına karşın sistem konfigürasyonunu yedekleyebilir ve daha sonra tekrar yükleyebilirsiniz.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Ekran kartı sürücüleri güncel değil yada yüklenmemiş</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 düzgün çalışmayabilir.</translation>
     </message>
   </context>
   <context>
@@ -3587,7 +3583,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Kanallar</translation>
     </message>
   </context>
   <context>
@@ -5110,7 +5106,7 @@ to %1</source>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Eklentiler</translation>
     </message>
   </context>
   <context>
@@ -5586,13 +5582,13 @@ to %1</source>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>Mevcut analiz verileriyle ne yapmalı?</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Mevcut analitik verileri otomatik olarak başka bir yere taşınmayacak ve erişilemez hale gelecektir. Onu daha sonra manuel olarak hareket ettirebilir veya kalıcı olarak silebilirsiniz.
+Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam etmeden önce lütfen desteğe başvurun.</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5655,11 +5651,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation type="unfinished">Use to store analytics data</translation>
+      <translation>Analytics verilerini depolamak için kullanın</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation type="unfinished">Stores analytics data</translation>
+      <translation>Analytics verilerini depolar</translation>
     </message>
   </context>
   <context>
@@ -7523,7 +7519,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Çoklu Yayın</translation>
     </message>
   </context>
   <context>
@@ -8571,10 +8567,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Güncelleştirme tamamlandı</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>Güncelleme tamamlandı ancak bazı sunucular güncellenemedi</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>Nx Witness Client'ı güncellenen versiyonda yeniden başlatılacak.</translation>
     </message>
@@ -8714,16 +8706,36 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Güncellemeyi iptal et ve tüm indirilmiş verileri sil?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation type="unfinished">Failed to download update packages to some servers</translation>
-    </message>
-    <message>
       <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
+      <translation>Güncelleme yüklenirken bir hata oluştu {0}:</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+      <translation>Bazı sunucular çevrimdışı oldu. Lütfen devam etmek için çevrimiçi olana kadar bekleyin.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Güncelleme tamamlandı ancak bazı sunucular güncellenemedi</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Lütfen %1 i yükleme dosyası kullanarak güncelleyin.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 güncellenmiş versiyonda yeniden başlatılacak.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Güncelleme paketinin bazı bileşenleri indirilemedi</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
     </message>
   </context>
   <context>
@@ -8755,10 +8767,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Genel olay</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation>Bilinmeyen Eklenti Olayı</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation>Aygıt Bağlantısı Kesildi</translation>
     </message>
@@ -8769,6 +8777,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Module was disconnected</source>
       <translation>G/Ç modülünün bağlantısı kesildi</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Bilinmeyen Eklenti Teşhis Olayı</translation>
     </message>
   </context>
   <context>
@@ -8845,47 +8857,43 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
-    </message>
-    <message>
-      <source>Update package can&apos;t be not found.</source>
-      <translation type="unfinished">Update package can&apos;t be not found.</translation>
+      <translation>Eş bağlantıları için bekleniyor</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>Güncelleme dosyalarını indirmek için yeterli alan yok.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>Güncelleme dosyalarını indirmek için yeterli alan yok.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>Güncelleme paketleri indirilemedi.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>Güncelleme içeriği geçersiz.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>Güncelleme dosyası bozuk.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>Güncelleme dosyaları çıkartılamıyor.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>Dahili indirme hatası.</translation>
     </message>
     <message>
       <source>Iternal server error.</source>
-      <translation type="unfinished">Iternal server error.</translation>
+      <translation>Yerel sunucu hatası.</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>İç sunucu hatası.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8893,11 +8901,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>Beklenmedik bir hata oluştu.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>Güncellemeyi indirmeye hazır</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
     </message>
   </context>
   <context>
@@ -9058,11 +9070,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>Arşiv</translation>
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Sürüm</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -9827,28 +9839,27 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Bu yapı sadece test amaçlıdır.</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data</source>
-      <translation type="unfinished">Confirm storage location to store analytics data</translation>
-    </message>
-    <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
-    </message>
-    <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Sunucu Ayarları</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>TAMAM</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation>Analytics verilerini depolamak için depolama konumunu onaylayın</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation>Analytics veritabanı yerel bir depolama biriminde depolanmalı ve yüz gigabayt'ı kaplayabilir.
+
+Analitik verilerini depolamak için konum seçildiğinde, çıkış verilerini kaybetmeden kolayca değiştirilemez. Konumun dikkatlice seçilmesi ve ciddi sistem arızalarının önlenmesi için sistem bölümünün kullanılmaması önerilir.
+
+Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi&quot; sekmesinden değiştirebilirsiniz.</translation>
     </message>
   </context>
   <context>

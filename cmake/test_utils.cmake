@@ -7,7 +7,7 @@ set(testTempDirectory "${CMAKE_BINARY_DIR}" CACHE STRING "Temp directory for run
 function(nx_add_test target)
     set_output_directories(RUNTIME "bin" LIBRARY "lib"
         AFFECTED_VARIABLES_RESULT affected_variables)
-    nx_expose_variables_to_parent_scope(affected_variables)
+    nx_expose_variables_to_parent_scope(${affected_variables})
 
     nx_add_target(${target}
         EXECUTABLE
@@ -17,6 +17,8 @@ function(nx_add_test target)
             GTest
             GMock
         ${ARGN})
+
+    nx_force_include(${target} ${CMAKE_SOURCE_DIR}/libs/nx_utils/src/nx/utils/test_support/custom_gtest_printers.h)
 
     add_test(NAME ${target} COMMAND ${target})
 

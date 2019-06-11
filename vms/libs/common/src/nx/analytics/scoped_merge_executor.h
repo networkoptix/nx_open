@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 namespace nx::analytics {
 
 template<typename Descriptor>

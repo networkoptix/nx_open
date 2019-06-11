@@ -573,9 +573,7 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createRtpEncoder(
     QnUniversalRtpEncoder::Config config;
     config.absoluteRtcpTimestamps = d->serverModule->settings().absoluteRtcpTimestamps();
     config.useRealTimeOptimization = d->serverModule->settings().ffmpegRealTimeOptimization();
-    QString require = nx::network::http::getHeaderValue(d->request.headers, "Require");
-    if (require.toLower().contains("onvif-replay"))
-        config.addOnvifHeaderExtension = true;
+    config.addOnvifHeaderExtension = d->params.onvifReplay();
     if (urlQuery.hasQueryItem("multiple_payload_types"))
         config.useMultipleSdpPayloadTypes = true;
 
@@ -750,7 +748,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
             }
         }
         if (encoder == 0)
-            return nx::network::http::StatusCode::notFound;
+            return nx::network::http::StatusCode::unsupportedMediaType;
 
         sdp << encoder->getSdpMedia(i < numVideo, i);
         RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
@@ -1483,7 +1481,7 @@ bool QnRtspConnectionProcessor::processRequest()
         d->dataProcessor->pauseNetwork();
 
     QString method = d->request.requestLine.method;
-    if (!d->params.processRequest(d->request, commonModule()->globalSettings()->defaultVideoCodec()))
+    if (!d->params.parseRequest(d->request, commonModule()->globalSettings()->defaultVideoCodec()))
     {
         NX_DEBUG(this, "Request parsing failed: [%1], [%2]",
             d->request.requestLine.toString().trimmed(), d->params.getParseError());
@@ -1491,6 +1489,8 @@ bool QnRtspConnectionProcessor::processRequest()
         sendResponse(nx::network::http::StatusCode::badRequest, QByteArray());
     }
     d->transcodeParams.codecId = d->params.videoCodec();
+    if (d->transcodeParams.codecId == AV_CODEC_ID_H263)
+        d->transcodeParams.codecId = AV_CODEC_ID_H263P; //< force using h263p codec
     d->transcodeParams.resolution = d->params.resolution();
     d->quality = d->params.quality();
     d->startTime = d->params.position();

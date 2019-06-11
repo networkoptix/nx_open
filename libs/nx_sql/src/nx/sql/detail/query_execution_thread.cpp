@@ -64,10 +64,10 @@ void QueryExecutionThread::queryExecutionThreadMain()
         std::chrono::milliseconds(50);
 
     auto invokeOnClosedHandlerGuard = nx::utils::makeScopeGuard(
-        [onClosedHandler = std::move(m_onClosedHandler)]()
+        [this]()
         {
-            if (onClosedHandler)
-                onClosedHandler();
+            if (m_onClosedHandler)
+                m_onClosedHandler();
         });
 
     if (!m_dbConnectionHolder.open())

@@ -2893,10 +2893,6 @@ a %1</translation>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>Formatos de áudio de 44.1 kHz e 48 kHz não são suportados pelo dispositivo de captura de áudio. Por favor, selecione outro dispositivo de áudio ou &quot;nenhum&quot; nas configurações de gravação de tela.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3201,6 +3197,17 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Os drivers da placa de vídeo estão desatualizados ou não estão instalados</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 pode não funcionar corretamente.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3284,17 +3291,6 @@ a %1</translation>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Cria um backup da configuração do Sistema que pode ser restaurada em caso de falha.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Os drivers da placa de vídeo estão desatualizados ou não estão instalados</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 pode não funcionar corretamente.</translation>
     </message>
   </context>
   <context>
@@ -8577,10 +8573,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Atualização concluída</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
     </message>
@@ -8720,16 +8712,36 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation type="unfinished">Failed to download update packages to some servers</translation>
-    </message>
-    <message>
       <source>There was an error while installing updates:</source>
       <translation type="unfinished">There was an error while installing updates:</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Por favor, atualize %1 manualmente usando um pacote de instalação.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 será reiniciado para a versão atualizada.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
     </message>
   </context>
   <context>
@@ -8761,10 +8773,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Evento Genérico</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation type="unfinished">Unknown Plugin Event</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation type="unfinished">Device was disconnected</translation>
     </message>
@@ -8775,6 +8783,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Module was disconnected</source>
       <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>
@@ -8854,10 +8866,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Waiting for peer data</translation>
     </message>
     <message>
-      <source>Update package can&apos;t be not found.</source>
-      <translation type="unfinished">Update package can&apos;t be not found.</translation>
-    </message>
-    <message>
       <source>There is not enough space to download update files.</source>
       <translation type="unfinished">There is not enough space to download update files.</translation>
     </message>
@@ -8904,6 +8912,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Ready to install update</source>
       <translation type="unfinished">Ready to install update</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
     </message>
   </context>
   <context>
@@ -9833,28 +9845,26 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">This build is for testing purposes only.</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data</source>
-      <translation type="unfinished">Confirm storage location to store analytics data</translation>
-    </message>
-    <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
-    </message>
-    <message>
       <source>Open Server Settings</source>
       <translation type="unfinished">Open Server Settings</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

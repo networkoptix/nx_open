@@ -129,7 +129,7 @@ void LicenseWatcher::validateData()
     // Object guard is required so we could cancel async operation if it's scheduled when watcher
     // is destroyed.
     QPointer<QObject> objectGuard(this);
-    m_httpClient->doPost(QnLicenseServer::kValidateUrl,
+    m_httpClient->doPost(QnLicenseServer::validateUrl(commonModule()),
         [this, objectGuard]()
         {
             NX_ASSERT(objectGuard, "Destructor must wait for m_httpClient stop.");
@@ -204,8 +204,20 @@ void LicenseWatcher::processResponse(QByteArray responseData)
     }
 
     auto error = licenseManager->addLicensesSync(updatedLicenses);
-    if (error != ec2::ErrorCode::ok)
+    if (error == ec2::ErrorCode::ok)
+    {
+        for (const auto& license: updatedLicenses)
+        {
+            nx::vms::api::LicenseData rawData;
+            ec2::fromResourceToApi(license, rawData);
+            NX_ALWAYS(this,
+                lm("License '%1' has been updated. New value: %2"), rawData.key, rawData.licenseBlock);
+        }
+    }
+    else
+    {
         NX_WARNING(this, lm("Can't update licenses into the database. DB error %1").arg(error));
+    }
 }
 
 ServerLicenseInfo LicenseWatcher::licenseData() const

@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <QtCore/QtMath>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyle>
 

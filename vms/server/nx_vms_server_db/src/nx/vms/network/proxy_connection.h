@@ -44,13 +44,12 @@ private:
         char* buffer,
         int bufferSize,
         qint64* outBytesRead);
-    static int getDefaultPortByProtocol(const QString& protocol);
     QString connectToRemoteHost(const QnRoute& route, const nx::utils::Url& url); // return new client request buffer size or -1 if error
-    bool isProtocol(const QString& protocol) const;
     void doRawProxy();
     void doSmartProxy();
     bool openProxyDstConnection();
     bool updateClientRequest(nx::utils::Url& dstUrl, QnRoute& dstRoute);
+    void fixServerUrlSchemeSecurity(nx::utils::Url& dstUrl, QnRoute& dstRoute);
     bool replaceAuthHeader();
 
     /** Returns false if socket would block in blocking mode */

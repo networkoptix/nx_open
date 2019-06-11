@@ -18,4 +18,9 @@ bool pluggedIn(const std::string& devicePath)
     return detail::pluggedIn(devicePath);
 }
 
+void uninitialize()
+{
+    detail::uninitialize();
+}
+
 } // namespace nx::usb_cam::device::audio

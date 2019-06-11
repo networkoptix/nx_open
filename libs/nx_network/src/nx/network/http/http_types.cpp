@@ -265,6 +265,8 @@ StringType toString(Value val)
             return StringType("Service Unavailable");
         case requestTimeOut:
             return StringType("Request Timeout");
+        case unsupportedMediaType:
+            return StringType("Unsupported Media Type");
         default:
             return StringType("Unknown_") + StringType::number(val);
     }

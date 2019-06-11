@@ -13,6 +13,7 @@
 #include <analytics/db/config.h>
 
 #include <nx/vms/server/analytics/db/analytics_db.h>
+#include <nx/vms/server/analytics/db/object_searcher.h>
 #include <nx/vms/server/analytics/db/serializers.h>
 
 #include "analytics_storage_types.h"
@@ -146,8 +147,7 @@ protected:
 
         convertPacketsToObjects(analyticsDataPackets, &objects);
         groupObjects(&objects);
-        if (kUseTrackAggregation)
-            removeDuplicateAttributes(&objects);
+        removeDuplicateAttributes(&objects);
 
         return objects;
     }
@@ -158,7 +158,7 @@ protected:
     {
         for (auto objectIter = objects.begin(); objectIter != objects.end(); )
         {
-            if (!satisfiesFilter(filter, *objectIter))
+            if (!ObjectSearcher::satisfiesFilter(filter, *objectIter))
             {
                 objectIter = objects.erase(objectIter);
                 continue;
@@ -470,12 +470,9 @@ private:
         auto objects = toDetectedObjects(packets);
         objects = filterObjectsAndApplySortOrder(filter, std::move(objects));
 
-        if (kUseTrackAggregation)
-        {
-            // NOTE: Object box is stored in the DB with limited precision.
-            // So, lowering precision to that in the DB.
-            objects = applyTrackBoxPrecision(std::move(objects));
-        }
+        // NOTE: Object box is stored in the DB with limited precision.
+        // So, lowering precision to that in the DB.
+        objects = applyTrackBoxPrecision(std::move(objects));
 
         return objects;
     }
@@ -528,29 +525,6 @@ private:
     }
 
     bool satisfiesFilter(
-        const Filter& filter, const DetectedObject& detectedObject)
-    {
-        if (!filter.objectAppearanceId.isNull() && detectedObject.objectAppearanceId != filter.objectAppearanceId)
-            return false;
-
-        if (!filter.objectTypeId.empty() &&
-            std::find(
-                filter.objectTypeId.begin(), filter.objectTypeId.end(),
-                detectedObject.objectTypeId) == filter.objectTypeId.end())
-        {
-            return false;
-        }
-
-        if (!filter.freeText.isEmpty() &&
-            !matchAttributes(detectedObject.attributes, filter.freeText))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    bool satisfiesFilter(
         const Filter& filter,
         const ObjectPosition& data)
     {
@@ -560,18 +534,7 @@ private:
         if (!filter.boundingBox)
             return true;
 
-        if (kUseTrackAggregation)
-            return rectsIntersectToPrecision(*filter.boundingBox, data.boundingBox);
-        else
-            return filter.boundingBox->intersects(data.boundingBox);
-    }
-
-    bool rectsIntersectToPrecision(const QRectF& one, const QRectF& two)
-    {
-        const auto translatedOne = translateToSearchGrid(one);
-        const auto translatedTwo = translateToSearchGrid(two);
-
-        return translatedOne.intersects(translatedTwo);
+        return rectsIntersectToSearchPrecision(*filter.boundingBox, data.boundingBox);
     }
 
     bool satisfiesFilter(
@@ -591,7 +554,7 @@ private:
         {
             bool intersects = false;
             for (const auto& object: data.objects)
-                intersects |= rectsIntersectToPrecision(*filter.boundingBox, object.boundingBox);
+                intersects |= rectsIntersectToSearchPrecision(*filter.boundingBox, object.boundingBox);
             if (!intersects)
                 return false;
         }
@@ -613,7 +576,7 @@ private:
         {
             bool isFilterSatisfied = false;
             for (const auto& object: data.objects)
-                isFilterSatisfied |= matchAttributes(object.labels, filter.freeText);
+                isFilterSatisfied |= ObjectSearcher::matchAttributes(object.labels, filter.freeText);
             if (!isFilterSatisfied)
                 return false;
         }
@@ -633,32 +596,6 @@ private:
         return true;
     }
 
-    bool matchAttributes(
-        const std::vector<nx::common::metadata::Attribute>& attributes,
-        const QString& filter)
-    {
-        const auto filterWords = filter.split(L' ');
-        // Attributes have to contain all words.
-        for (const auto& filterWord: filterWords)
-        {
-            bool found = false;
-            for (const auto& attribute: attributes)
-            {
-                if (attribute.name.indexOf(filterWord) != -1 ||
-                    attribute.value.indexOf(filterWord) != -1)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-                return false;
-        }
-
-        return true;
-    }
-
     static void convertPacketsToObjects(
         const std::vector<common::metadata::DetectionMetadataPacketPtr>& analyticsDataPackets,
         std::vector<DetectedObject>* objects)
@@ -671,6 +608,7 @@ private:
                 detectedObject.objectAppearanceId = object.objectId;
                 detectedObject.objectTypeId = object.objectTypeId;
                 detectedObject.attributes = object.labels;
+                detectedObject.deviceId = packet->deviceId;
                 detectedObject.track.push_back(ObjectPosition());
                 ObjectPosition& objectPosition = detectedObject.track.back();
                 objectPosition.boundingBox = object.boundingBox;
@@ -777,9 +715,6 @@ TEST_F(AnalyticsDb, storing_multiple_events_concurrently)
 
 TEST_F(AnalyticsDb, objects_best_shot_is_saved_and_reported)
 {
-    if (!kUseTrackAggregation)
-        return; // TODO: #ak Remove it after enabling kUseTrackAggregation in the repository.
-
     whenSaveObjectTrackContainingBestShot();
 
     thenAllEventsCanBeRead();
@@ -953,6 +888,10 @@ protected:
     {
         using namespace std::chrono;
 
+        const auto startTime = system_clock::from_time_t(
+            analyticsDataPackets().back()->timestampUsec / 1000000) + hours(1);
+        setAllowedTimeRange(startTime, startTime + hours(24));
+
         m_specificObjectAppearanceId = QnUuid::createUuid();
         const auto deviceId = QnUuid::createUuid();
         auto analyticsDataPackets = generateEventsByCriteria();
@@ -1101,7 +1040,7 @@ private:
     }
 };
 
-TEST_F(AnalyticsDbLookup, empty_filter_matches_all_events)
+TEST_F(AnalyticsDbLookup, empty_filter_matches_all_objects)
 {
     whenLookupByEmptyFilter();
     thenResultMatchesExpectations();
@@ -1229,14 +1168,21 @@ public:
 protected:
     void givenDetectedObjectsWithSameTimestamp()
     {
+        using namespace std::chrono;
+
+        const auto startTime = system_clock::from_time_t(
+            analyticsDataPackets().back()->timestampUsec / 1000000) + hours(1);
+        setAllowedTimeRange(startTime, startTime + hours(24));
+
         auto newPackets = generateEventsByCriteria();
-        newPackets.erase(std::next(newPackets.begin()), newPackets.end());
 
-        const auto existingPackets = analyticsDataPackets();
-        const auto& existingPacket = nx::utils::random::choice(existingPackets);
-
-        newPackets.front()->deviceId = existingPacket->deviceId;
-        newPackets.front()->timestampUsec = existingPacket->timestampUsec;
+        std::for_each(
+            std::next(newPackets.begin()), newPackets.end(),
+            [existingPacket = newPackets.front()](auto& packet)
+            {
+                packet->deviceId = existingPacket->deviceId;
+                packet->timestampUsec = existingPacket->timestampUsec;
+            });
 
         saveAnalyticsDataPackets(std::move(newPackets));
         aggregateAnalyticsDataPacketsByTimestamp();
@@ -1244,7 +1190,13 @@ protected:
 
     void givenObjectsWithInterleavedTracks()
     {
+        using namespace std::chrono;
+
         constexpr int objectCount = 3;
+
+        const auto startTime = system_clock::from_time_t(
+            analyticsDataPackets().back()->timestampUsec / 1000000) + hours(1);
+        setAllowedTimeRange(startTime, startTime + hours(24));
 
         auto newPackets = generateEventsByCriteria();
 
@@ -1269,6 +1221,19 @@ protected:
         saveAnalyticsDataPackets(std::move(newPackets));
 
         filter().deviceIds = {deviceId};
+    }
+
+    void givenRandomCursorFilter()
+    {
+        givenRandomFilter();
+
+        if (filter().deviceIds.size() > 1)
+            filter().deviceIds.erase(std::next(filter().deviceIds.begin()), filter().deviceIds.end());
+
+        filter().objectTypeId.clear();
+        filter().objectAppearanceId = QnUuid();
+        filter().boundingBox = std::nullopt;
+        filter().freeText.clear();
     }
 
     void whenReadDataUsingCursor()
@@ -1301,17 +1266,13 @@ protected:
 
     void thenResultMatchesExpectations()
     {
-        auto filteredPackets = filterPackets(filter(), analyticsDataPackets());
-        filteredPackets = sortPacketsByTimestamp(
-            std::move(filteredPackets),
-            Qt::SortOrder::DescendingOrder);
-
-        if (filter().maxObjectsToSelect > 0 && (int)filteredPackets.size() > filter().maxObjectsToSelect)
-            filteredPackets.erase(filteredPackets.begin() + filter().maxObjectsToSelect, filteredPackets.end());
-
-        auto expected = sortPacketsByTimestamp(
-            std::move(filteredPackets),
+        auto expected = filterPackets(filter(), analyticsDataPackets());
+        expected = sortPacketsByTimestamp(
+            std::move(expected),
             filter().sortOrder);
+
+        if (filter().maxObjectsToSelect > 0 && (int)expected.size() > filter().maxObjectsToSelect)
+            expected.erase(expected.begin() + filter().maxObjectsToSelect, expected.end());
 
         sortObjectsById(&expected);
 
@@ -1385,7 +1346,7 @@ TEST_F(AnalyticsDbCursor, reads_all_available_data)
 
 TEST_F(AnalyticsDbCursor, reads_all_matched_data)
 {
-    givenRandomFilter();
+    givenRandomCursorFilter();
 
     whenReadDataUsingCursor();
     thenResultMatchesExpectations();
@@ -1487,6 +1448,10 @@ protected:
         // duration - kTrackAggregationPeriod.
 
         roundTimePeriods(&expected);
+        expected = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+            std::move(expected),
+            std::max<milliseconds>(m_lookupOptions.detailLevel, kMinTimePeriodAggregationPeriod));
+
         roundTimePeriods(&actualTimePeriods);
 
         assertTimePeriodsMatchUpToAggregationPeriod(expected, actualTimePeriods);

@@ -207,10 +207,10 @@ QnCameraDeviceType QnDeviceDependentStrings::calculateDeviceType(
         return QnCameraDeviceType::Camera;
 
     const bool hasCameras = std::any_of(devices.begin(), devices.end(),
-        [](const auto& device) { return device->hasVideo(nullptr); });
+        [](const auto& device) { return device->hasVideo(); });
 
     const bool hasIoModules = std::any_of(devices.begin(), devices.end(),
-        [](const auto& device) { return device->isIOModule() && !device->hasVideo(nullptr); });
+        [](const auto& device) { return device->isIOModule(); });
 
     // If only one type of devices.
     if (hasCameras ^ hasIoModules)

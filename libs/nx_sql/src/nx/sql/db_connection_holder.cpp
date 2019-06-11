@@ -29,9 +29,9 @@ bool DbConnectionHolder::open()
 {
     if (!m_connection.open())
     {
-        NX_WARNING(this, lm("Failed to establish connection to DB %1 at %2:%3. %4").
-            arg(connectionOptions().dbName).arg(connectionOptions().hostName).
-            arg(connectionOptions().port).arg(toString(m_connection.lastError())));
+        NX_WARNING(this, "Failed to establish connection to %1 DB %2 at %3:%4. %5",
+            connectionOptions().driverType, connectionOptions().dbName, connectionOptions().hostName,
+            connectionOptions().port, toString(m_connection.lastError()));
         return false;
     }
 

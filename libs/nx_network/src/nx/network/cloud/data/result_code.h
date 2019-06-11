@@ -32,6 +32,7 @@ ResultCode NX_NETWORK_API fromStunErrorToResultCode(
 int NX_NETWORK_API resultCodeToStunErrorCode(ResultCode resultCode);
 
 QString NX_NETWORK_API toString(ResultCode code);
+NX_NETWORK_API void PrintTo(ResultCode val, ::std::ostream* os);
 
 } // namespace api
 } // namespace hpm

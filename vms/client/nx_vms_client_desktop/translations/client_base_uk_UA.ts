@@ -2950,10 +2950,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>Формати 44 і 48 кГц не підтримуються пристроєм захвату звуку. Будь ласка, виберіть інший пристрій або значення &quot;ні&quot; в налаштуваннях захоплення екрану.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation>Налаштований кодек: %1 не знайдено, h263p буде використано</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3272,6 +3268,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Драйвери відеокарти застаріли або не встановлені</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 може не працювати належним чином.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3355,17 +3362,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Створює резервну копію системних налаштувань для відновлення в разі краху системи.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Драйвери відеокарти застаріли або не встановлені</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 може не працювати належним чином.</translation>
     </message>
   </context>
   <context>
@@ -8808,10 +8804,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Оновлення завершено</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>Оновлення завершено, але деякі сервери не отримали оновлення</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>Nx Witness Client буде перезапущено до оновленої версії.</translation>
     </message>
@@ -8953,16 +8945,36 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Скасувати оновлення та видалити всі завантажені дані?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Не вдалося завантажити пакети оновлення для деяких серверів</translation>
-    </message>
-    <message>
       <source>There was an error while installing updates:</source>
       <translation>Відбулася помилка при встановленні:</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation>Деякі сервери перейшли в офлайн. Будь ласка, зачекайте, поки вони стануть онлайн, щоб продовжити.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Оновлення завершено, але деякі компоненти не вдалося оновити</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Будь ласка, оновіть %1 вручну за допомогою інсталятора.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 буде перезапущено до оновленої версії.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Не вдалося завантажити пакети оновлення для деяких компонентів</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Деякі версії компонентів ОС більше не підтримуються. Видаліть їх із системи або оновіть до підтримуваної версії.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Версія ОС клієнта більше не підтримується. Оновіть його ОС до підтримуваної версії.</translation>
     </message>
   </context>
   <context>
@@ -8996,10 +9008,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Загальні події</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation>Невідомий плагін події</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation>Пристрій було відключено</translation>
     </message>
@@ -9010,6 +9018,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Module was disconnected</source>
       <translation>Модуль вводу-виводу був відключений</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Невідома подія діагностики плагіна</translation>
     </message>
   </context>
   <context>
@@ -9089,10 +9101,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Очікування однорангових даних</translation>
     </message>
     <message>
-      <source>Update package can&apos;t be not found.</source>
-      <translation>Пакет оновлення &apos;не знайдено.</translation>
-    </message>
-    <message>
       <source>There is not enough space to download update files.</source>
       <translation>Не вистачає місця для завантаження файлів оновлення.</translation>
     </message>
@@ -9139,6 +9147,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Ready to install update</source>
       <translation>Готовий до встановлення оновлення</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation>Пакет оновлення не знайдено.</translation>
     </message>
   </context>
   <context>
@@ -10096,28 +10108,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Ця збірка призначена для тестування.</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data</source>
-      <translation>Підтвердьте місце зберігання, щоб зберігати дані аналітики</translation>
-    </message>
-    <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>База даних Analytics повинна зберігатися на локальному сховищі і може займати до ста гігабайт.
-
-Після вибору розташування для зберігання аналітичних даних його не можна легко змінити, не втрачаючи вихідних даних. Ми рекомендуємо ретельно вибрати місце розташування та не використовувати системний розділ, щоб уникнути серйозних несправностей системи.
-
-Ви можете змінити місце зберігання на вкладці &quot;Storage Management&quot; у діалоговому вікні Параметри сервера.</translation>
-    </message>
-    <message>
       <source>Open Server Settings</source>
       <translation>Відкрити Налаштування Серверу</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>ОК</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation>Підтвердьте місце зберігання, щоб зберігати дані аналітики на &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation>База даних Analytics повинна зберігатися на локальному сховищі і може займати до ста гігабайт. Після вибору розташування для зберігання аналітичних даних його не можна змінити не втративши вихідні дані. Ми рекомендуємо ретельно вибирати місце розташування та не використовувати системний розділ, щоб уникнути серйозних несправностей системи. За замовчуванням лані аналітики зберігатимуться у каталозі установки &apos;
+Ви можете змінити місце зберігання на вкладці &quot;Управління зберіганнями&quot; у діалоговому вікні Параметри сервера.</translation>
     </message>
   </context>
   <context>

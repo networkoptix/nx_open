@@ -72,6 +72,9 @@ bool UrlParams::parse(const QUrlQuery& query)
             return false;
         }
     }
+    if (query.hasQueryItem("onvif_replay"))
+        onvifReplay = true;
+
     return true;
 }
 

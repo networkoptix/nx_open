@@ -22,7 +22,8 @@ AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& eng
     return AnalyticsEngineInfo {
         engine->getId(),
         engine->getName(),
-        engine->manifest().deviceAgentSettingsModel
+        engine->manifest().deviceAgentSettingsModel,
+        engine->isDeviceDependent()
     };
 }
 

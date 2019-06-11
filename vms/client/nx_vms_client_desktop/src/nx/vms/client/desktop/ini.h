@@ -160,6 +160,11 @@ struct Ini: nx::kit::IniConfig
         "Dump icons, generated from svg, to a given folder.");
     NX_INI_FLAG(0, enableVSyncWorkaround,
         "Always limit frame rate to approximately 60 fps, even if VSync is disabled.");
+        
+    NX_INI_FLAG(0, enableGdiTrace,
+        "Enable tracing of GDI object allocation.");
+    NX_INI_INT(5000, gdiTraceLimit, 
+        "Number of GDI handles in use which triggers report creation.");
 };
 
 inline Ini& ini()

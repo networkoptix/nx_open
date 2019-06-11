@@ -219,18 +219,11 @@ bool Socket<SocketInterfaceToImplement>::setReusePortFlag(bool value)
 {
 #if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
     const int on = value ? 1 : 0;
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on))
-        && errno != ENOPROTOOPT)
-    {
-        // TODO: #muskov: set lastError
+    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on)))
         return false;
-    }
-
-    errno = 0;
 
     return true;
 #else
-    // TODO: is it misprint? If no, the comment should be added
     return setReuseAddrFlag(value);
 #endif
 }
@@ -242,15 +235,10 @@ bool Socket<SocketInterfaceToImplement>::getReusePortFlag(bool* value) const
     int reuseAddrVal = 0;
     socklen_t optLen = sizeof(reuseAddrVal);
 
-    if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (char*)&reuseAddrVal, &optLen)
-        && errno != ENOPROTOOPT)
-    {
-        // TODO: #muskov: set lastError
+    if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (char*)&reuseAddrVal, &optLen))
         return false;
-    }
 
-    *value = (errno == ENOPROTOOPT) ? false : reuseAddrVal > 0;
-    errno = 0;
+    *value = reuseAddrVal > 0;
     return true;
 #else
     return getReuseAddrFlag(value);

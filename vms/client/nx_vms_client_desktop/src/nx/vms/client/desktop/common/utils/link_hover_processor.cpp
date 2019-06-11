@@ -149,7 +149,7 @@ void LinkHoverProcessor::updateColors(UpdateTime when)
     else
     {
         auto changer = [this, alteredText, hovered]() { changeLabelState(alteredText, hovered); };
-        executeDelayedParented(changer, 0, this);
+        executeLater(changer, this);
     }
 }
 

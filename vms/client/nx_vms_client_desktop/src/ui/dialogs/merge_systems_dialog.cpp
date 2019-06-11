@@ -48,7 +48,7 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->urlComboBox->lineEdit()->setPlaceholderText("http(s)://host:port");
+    ui->urlComboBox->lineEdit()->setPlaceholderText("https://host:port");
     m_mergeButton = ui->buttonBox->addButton(QString(), QDialogButtonBox::ActionRole);
     setWarningStyle(ui->errorLabel);
     m_mergeButton->hide();

@@ -5,6 +5,7 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
+#include <QtCore/QSize>
 #include <QtCore/QUrl>
 
 #include "../std/filesystem.h"
@@ -40,13 +41,3 @@ NX_UTILS_API void PrintTo(const path& val, ::std::ostream* os);
 
 } // namespace filesystem
 } // namespace std
-
-//-------------------------------------------------------------------------------------------------
-
-namespace nx {
-namespace utils {
-
-NX_UTILS_API void PrintTo(const Url& val, ::std::ostream* os);
-
-} // namespace utils
-} // namespace nx

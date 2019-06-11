@@ -17,16 +17,16 @@ public:
     QStringList getLocalResourcesDirectories() const;
     void setLocalResourcesDirectories(const QStringList& paths);
 
-    QStringList getAllFilePaths() const;
-    QStringList getFilePaths(const QString& directoryPath);
-
 signals:
     void filesAdded(const QStringList& newFiles);
+    void layoutFileChanged(const QString& filePath);
+    void videoFileChanged(const QString& filePath);
 
 private:
     void addWatchedDirectory(const QString& path);
     void removeWatchedDirectory(const QString& path);
     void onDirectoryChanged(const QString& path);
+    void onFileChanged(const QString& path);
     void processPendingDirectoryChanges();
 
 private:

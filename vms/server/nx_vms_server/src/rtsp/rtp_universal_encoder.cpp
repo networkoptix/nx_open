@@ -350,10 +350,10 @@ bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
     uint32_t packetSize = packets[m_packetIndex];
     if (m_config.addOnvifHeaderExtension)
     {
+        rtpHeader->extension = 1;
         sendBuffer.write(packetOffset, nx::streaming::rtp::RtpHeader::kSize);
         packetOffset += nx::streaming::rtp::RtpHeader::kSize;
         packetSize -= nx::streaming::rtp::RtpHeader::kSize;
-        rtpHeader->extension = 1;
         uint8_t buffer[nx::streaming::rtp::OnvifHeaderExtension::kSize];
         nx::streaming::rtp::OnvifHeaderExtension onvifExtension;
         onvifExtension.ntp = std::chrono::microseconds(timestamps.ntpTimestamp);

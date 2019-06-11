@@ -32,14 +32,18 @@ NX_VMS_APPLAUNCHER_API_API QString toString(TaskType value);
 enum class ResultType
 {
     ok,
-    //* Failed to connect to applauncher. */
+    /** Failed to connect to applauncher. */
     connectError,
+    /** Requested client version is not installed. */
     versionNotInstalled,
+    /** Requested client version is installed. */
     alreadyInstalled,
+    /** Requested version has invalid format. */
     invalidVersionFormat,
     notFound,
     badResponse,
     ioError,
+    /** Not enough space to install client package. */
     notEnoughSpace,
     /** Zip with update data is broken and can not be installed. */
     brokenPackage,
@@ -47,6 +51,7 @@ enum class ResultType
     unpackingZip,
     /** Applauncher can not start another async task right now. */
     busy,
+    /** Unknown error. */
     otherError
 };
 
@@ -68,6 +73,17 @@ public:
 
 //* Parses serializedTask header, creates the corresponding object (*ptr) and calls deserialize. */
 NX_VMS_APPLAUNCHER_API_API bool deserializeTask(const QByteArray& serializedTask, BaseTask** ptr);
+
+class NX_VMS_APPLAUNCHER_API_API Response
+{
+public:
+    virtual ~Response() = default;
+
+    ResultType result = ResultType::ok;
+
+    virtual QByteArray serialize() const;
+    virtual bool deserialize(const QByteArray& data);
+};
 
 /**
  * Start the specified application version.
@@ -152,6 +168,18 @@ public:
     InstallZipCheckStatus(): BaseTask(TaskType::checkZipProgress) {}
 };
 
+class NX_VMS_APPLAUNCHER_API_API InstallZipCheckStatusResponse: public Response
+{
+public:
+    /** Number of bytes extracted. */
+    quint64 extracted = 0;
+    /** Total byte size of extracted data. */
+    quint64 total = 0;
+
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QByteArray& data) override;
+};
+
 /*
  * Check, if the specified version is installed.
  */
@@ -166,6 +194,15 @@ public:
     virtual bool deserialize(const QByteArray& data) override;
 };
 
+class NX_VMS_APPLAUNCHER_API_API IsVersionInstalledResponse: public Response
+{
+public:
+    bool installed = false;
+
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QByteArray& data) override;
+};
+
 /*
  * Get a list of all installed versions.
  */
@@ -173,26 +210,6 @@ class NX_VMS_APPLAUNCHER_API_API GetInstalledVersionsRequest: public BaseTask
 {
 public:
     GetInstalledVersionsRequest(): BaseTask(TaskType::getInstalledVersions) {}
-
-    virtual QByteArray serialize() const override;
-    virtual bool deserialize(const QByteArray& data) override;
-};
-
-class NX_VMS_APPLAUNCHER_API_API Response
-{
-public:
-    virtual ~Response() = default;
-
-    ResultType result = ResultType::ok;
-
-    virtual QByteArray serialize() const;
-    virtual bool deserialize(const QByteArray& data);
-};
-
-class NX_VMS_APPLAUNCHER_API_API IsVersionInstalledResponse: public Response
-{
-public:
-    bool installed = false;
 
     virtual QByteArray serialize() const override;
     virtual bool deserialize(const QByteArray& data) override;

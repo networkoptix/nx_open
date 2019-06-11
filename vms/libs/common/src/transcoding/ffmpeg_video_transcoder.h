@@ -38,6 +38,7 @@ public:
     void setUseRealTimeOptimization(bool value);
     virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList) override;
 
+    void setFixedFrameRate(int value);
 private:
     int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);
 
@@ -65,6 +66,7 @@ private:
     QnConstMediaContextPtr m_ctxPtr;
     nx::metrics::Storage* m_metrics = nullptr;
     std::map<qint64, qint64> m_frameNumToPts;
+    int m_fixedFrameRate = 0;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

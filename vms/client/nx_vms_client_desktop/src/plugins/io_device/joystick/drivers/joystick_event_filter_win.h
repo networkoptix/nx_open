@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QtGlobal>
+
 #if defined(Q_OS_WIN)
 
 #include <QtCore/QAbstractNativeEventFilter>

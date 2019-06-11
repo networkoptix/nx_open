@@ -33,13 +33,16 @@ TEST(RtspUtils, parseUrlParams)
     ASSERT_TRUE(params.parse(QUrlQuery("codec=h263p&resolution=720p")));
     ASSERT_FALSE(params.quality);
     ASSERT_FALSE(params.position);
+    ASSERT_FALSE(params.onvifReplay);
     ASSERT_TRUE(params.codec);
     ASSERT_EQ(params.codec, AV_CODEC_ID_H263P);
     ASSERT_TRUE(params.resolution);
     ASSERT_EQ(params.resolution, QSize(0,720));
 
-    ASSERT_TRUE(params.parse(QUrlQuery("stream=1")));
+    ASSERT_TRUE(params.parse(QUrlQuery("stream=1&onvif_replay")));
     ASSERT_TRUE(params.quality);
+    ASSERT_TRUE(params.onvifReplay);
+    ASSERT_TRUE(params.onvifReplay.value());
     ASSERT_EQ(params.quality, MEDIA_Quality_Low);
 
     ASSERT_FALSE(params.parse(QUrlQuery("stream=3")));

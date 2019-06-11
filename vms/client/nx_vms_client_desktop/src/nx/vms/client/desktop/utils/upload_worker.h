@@ -32,6 +32,7 @@ signals:
     void progress(const UploadState&);
 
 private:
+    // TODO: Move to PIMPL.
     void emitProgress();
     void handleStop();
     void handleError(const QString& message);

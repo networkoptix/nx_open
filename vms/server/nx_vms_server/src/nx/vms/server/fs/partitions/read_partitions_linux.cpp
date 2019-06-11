@@ -37,17 +37,8 @@ SystemError::ErrorCode readPartitionsInformation(
         char cDevName[kMaxLineLength];
         char cPath[kMaxLineLength];
         char cFSName[kMaxLineLength];
-        if (partitionsInfoProvider->isScanfLongPattern())
-        {
-            char cTmp[kMaxLineLength];
-            if (sscanf(line.constData(), "%s %s %s %s %s ", cDevName, cTmp, cPath, cTmp, cFSName) != 5)
-                continue; /* Skip unrecognized lines. */
-        }
-        else
-        {
-            if (sscanf(line.constData(), "%s %s %s ", cDevName, cPath, cFSName) != 3)
-                continue; /* Skip unrecognized lines. */
-        }
+        if (sscanf(line.constData(), "%s %s %s ", cDevName, cPath, cFSName) != 3)
+            continue; /* Skip unrecognized lines. */
 
         decodeOctalEncodedPath(cPath);
 
@@ -70,6 +61,7 @@ SystemError::ErrorCode readPartitionsInformation(
 
         partitionInfo.fsName = QString::fromLatin1(std::get<fsType>(pathInfo));
         partitionInfo.sizeBytes = partitionsInfoProvider->totalSpace(std::get<fsPath>(pathInfo));
+
         if (partitionInfo.sizeBytes == -1)
             continue;
 

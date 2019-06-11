@@ -675,7 +675,7 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Gewenst PTZ-preset type:</translation>
     </message>
     <message>
       <location/>
@@ -695,12 +695,12 @@
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Deze camera ondersteunt draaien en kantelen</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Deze camera ondersteunt zoomen</translation>
     </message>
     <message>
       <location/>
@@ -1673,7 +1673,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Zoek time-out(s)</translation>
     </message>
     <message>
       <location/>
@@ -1966,14 +1966,6 @@
       <location filename="../src/nx/vms/client/desktop/resource_properties/media_file/media_file_settings_dialog.ui"/>
       <source>File Settings</source>
       <translation>Bestandsinstellingen</translation>
-    </message>
-  </context>
-  <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>Toon dit bericht niet opnieuw</translation>
     </message>
   </context>
   <context>
@@ -2363,6 +2355,14 @@
     </message>
   </context>
   <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>Toon dit bericht niet opnieuw</translation>
+    </message>
+  </context>
+  <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
@@ -2648,11 +2648,6 @@
       <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
       <source>Resources</source>
       <translation>Systeemoverzicht</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
     </message>
     <message>
       <location/>
@@ -3078,11 +3073,6 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
       <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
     </message>
@@ -3095,6 +3085,11 @@
       <location/>
       <source>Recording was enabled on the USB storage</source>
       <translation type="unfinished">Recording was enabled on the USB storage</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>

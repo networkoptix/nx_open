@@ -97,6 +97,8 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
         {
             m_userLoggedIn = user != nullptr;
             syncState();
+            if (m_private && m_private->serverUpdateTool)
+                m_private->serverUpdateTool->resumeTasks();
         });
 }
 

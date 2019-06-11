@@ -21,6 +21,11 @@ set(freeLicenseCount "4")
 set(freeLicenseIsTrial "true")
 set(eulaVersion 1)
 
+# Support section
+set(supportUrl "")
+set(supportEmail "")
+set(supportPhone "")
+
 # Update parameters
 set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
 set(updateFeedUrl "http://updates.vmsproxy.com/updates.json")

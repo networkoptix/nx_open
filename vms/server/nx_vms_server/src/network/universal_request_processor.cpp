@@ -81,7 +81,6 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
     Q_D(QnUniversalRequestProcessor);
 
     int retryCount = 0;
-    bool logReported = false;
     if (d->needAuth)
     {
         nx::utils::Url url = getDecodedUrl();

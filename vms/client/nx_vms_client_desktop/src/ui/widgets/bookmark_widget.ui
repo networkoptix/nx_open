@@ -123,8 +123,11 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>nameInputField</tabstop>
   <tabstop>descriptionTextEdit</tabstop>
   <tabstop>timeoutComboBox</tabstop>
+  <tabstop>tagsLineEdit</tabstop>
+  <tabstop>tagsListLabel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

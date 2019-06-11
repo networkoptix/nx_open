@@ -85,7 +85,7 @@ private:
         applauncher::api::Response* const response);
     bool checkInstallationProgress(
         const std::shared_ptr<applauncher::api::InstallZipCheckStatus>& request,
-        applauncher::api::Response* const response);
+        applauncher::api::InstallZipCheckStatusResponse* const response);
     bool isVersionInstalled(
         const std::shared_ptr<applauncher::api::IsVersionInstalledRequest>& request,
         applauncher::api::IsVersionInstalledResponse* const response);
@@ -129,6 +129,7 @@ private:
 
         std::future<api::ResultType> result;
 
+        QString getFile() const;
         void reset();
         bool isEmpty() const;
         bool equals(const nx::utils::SoftwareVersion& version, const QString& fileName) const;

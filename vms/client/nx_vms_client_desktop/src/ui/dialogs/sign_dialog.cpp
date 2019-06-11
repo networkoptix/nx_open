@@ -3,22 +3,20 @@
 
 #include <QtWidgets/QOpenGLWidget>
 
+#include <camera/gl_renderer.h>
+#include <camera/cam_display.h>
+#include <camera/sign_dialog_display.h>
 #include <client_core/client_core_module.h>
-
-#include "core/resource/avi/avi_resource.h"
+#include <core/resource/avi/avi_resource.h>
 #include <core/dataprovider/data_provider_factory.h>
-#include "nx/streaming/abstract_archive_stream_reader.h"
+#include <export/sign_helper.h>
+#include <ui/workaround/gl_native_painting.h>
+#include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <utils/common/event_processors.h>
 
-#include "camera/gl_renderer.h"
-#include "camera/cam_display.h"
-#include "camera/sign_dialog_display.h"
-
-#include "ui/workaround/gl_native_painting.h"
-#include "ui/graphics/items/resource/resource_widget_renderer.h"
-#include "ui/help/help_topic_accessor.h"
-#include "ui/help/help_topics.h"
-
-#include "export/sign_helper.h"
+#include <nx/streaming/abstract_archive_stream_reader.h>
 
 // TODO: #Elric replace with QnRenderingWidget
 class QnSignDialogGlWidget: public QOpenGLWidget
@@ -120,13 +118,22 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
     connect(m_camDispay, &QnSignDialogDisplay::gotImageSize, this,
         &SignDialog::at_gotImageSize);
 
-    m_renderer = new QnResourceWidgetRenderer(0, m_openGLWidget.data());
-    m_openGLWidget->setRenderer(m_renderer);
-    m_camDispay->addVideoRenderer(1, m_renderer, true);
-    m_reader->addDataProcessor(m_camDispay.data());
-    m_reader->setSpeed(1024 * 1024);
-    m_reader->start();
-    m_camDispay->start();
+    const auto ensureInitialized =
+        [this]()
+        {
+            if (m_renderer)
+                return;
+
+            m_renderer = new QnResourceWidgetRenderer(0, m_openGLWidget.data());
+            m_openGLWidget->setRenderer(m_renderer);
+            m_camDispay->addVideoRenderer(1, m_renderer, true);
+            m_reader->addDataProcessor(m_camDispay.data());
+            m_reader->setSpeed(1024 * 1024);
+            m_reader->start();
+            m_camDispay->start();
+        };
+
+    installEventHandler(this, QEvent::Show, this, ensureInitialized);
 }
 
 SignDialog::~SignDialog()

@@ -22,7 +22,7 @@ class QnTcpListenerPrivate
 {
 public:
     nx::network::SocketGlobals::InitGuard socketGlobalsInitGuard;
-    nx::network::AbstractStreamServerSocket* serverSocket;
+    std::unique_ptr<nx::network::AbstractStreamServerSocket> serverSocket;
     nx::network::SocketAddress localEndpoint;
     QList<QnLongRunnable*> connections;
     QByteArray authDigest;
@@ -40,7 +40,6 @@ public:
     static QString pathIgnorePrefix;
 
     QnTcpListenerPrivate():
-        serverSocket(nullptr),
         newPort(0),
         localPort(0),
         useSSL(false),
@@ -103,7 +102,6 @@ QnTcpListener::QnTcpListener(
     Q_D(QnTcpListener);
     d->serverAddress = address;
     d->localPort = port;
-    d->serverSocket = nullptr;
     d->maxConnections = maxConnections;
     d->useSSL = useSSL;
 }
@@ -113,7 +111,7 @@ QnTcpListener::~QnTcpListener()
     Q_D(QnTcpListener);
     stop();
 
-    NX_ASSERT(d->serverSocket == nullptr);
+    NX_ASSERT(!d->serverSocket);
 
     delete d_ptr;
 }
@@ -125,9 +123,9 @@ bool QnTcpListener::bindToLocalAddress()
     Q_D(QnTcpListener);
 
     const nx::network::SocketAddress localAddress(d->serverAddress.toString(), d->localPort);
-    d->serverSocket = createAndPrepareSocket(d->useSSL, localAddress);
-    if (!d->serverSocket
-        || !d->serverSocket->setRecvTimeout(kSocketAcceptTimeoutMs))
+    auto serverSocket = createAndPrepareSocket(d->useSSL, localAddress);
+    if (!serverSocket
+        || !serverSocket->setRecvTimeout(kSocketAcceptTimeoutMs))
     {
         const auto errorMessage = lm("Error: Unable to bind and listen on %1: %2")
             .args(localAddress, SystemError::toString(lastError()));
@@ -136,6 +134,7 @@ bool QnTcpListener::bindToLocalAddress()
         qCritical() << errorMessage;
         return false;
     }
+    d->serverSocket = std::move(serverSocket);
 
     {
         QnMutexLocker lk(&d->mutex);
@@ -152,7 +151,7 @@ void QnTcpListener::doPeriodicTasks()
     removeDisconnectedConnections();
 }
 
-nx::network::AbstractStreamServerSocket* QnTcpListener::createAndPrepareSocket(
+std::unique_ptr<nx::network::AbstractStreamServerSocket> QnTcpListener::createAndPrepareSocket(
     bool sslNeeded,
     const nx::network::SocketAddress& localAddress)
 {
@@ -166,12 +165,15 @@ nx::network::AbstractStreamServerSocket* QnTcpListener::createAndPrepareSocket(
         return nullptr;
     }
 
-    return serverSocket.release();
+    return serverSocket;
 }
 
-void QnTcpListener::destroyServerSocket(nx::network::AbstractStreamServerSocket* serverSocket)
+void QnTcpListener::destroyServerSocket()
 {
-    delete serverSocket;
+    Q_D(QnTcpListener);
+    if (d->serverSocket)
+        d->serverSocket->pleaseStopSync();
+    d->serverSocket.reset();
 }
 
 void QnTcpListener::removeDisconnectedConnections()
@@ -317,8 +319,7 @@ void QnTcpListener::run()
                     d->serverAddress, oldPort, d->localPort);
                 // TODO: Add comment why this code is commented out.
                 //removeAllConnections();
-                destroyServerSocket(d->serverSocket);
-                d->serverSocket = nullptr;
+                destroyServerSocket();
                 if(!bindToLocalAddress())
                 {
                     QThread::msleep(1000);
@@ -379,8 +380,7 @@ void QnTcpListener::run()
     NX_DEBUG(this, "(%1:%2). Removing all connections before stop",
         d->serverAddress, d->localPort);
     removeAllConnections();
-    destroyServerSocket(d->serverSocket);
-    d->serverSocket = nullptr;
+    destroyServerSocket();
     NX_DEBUG(this, "Exiting run(). %1:%2", d->serverAddress, d->localPort);
 }
 

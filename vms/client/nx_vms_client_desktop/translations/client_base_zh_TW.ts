@@ -84,15 +84,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>從伺服器獲取更新信息</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>正在下載更新套件</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>安裝中</translation>
     </message>
   </context>
   <context>
@@ -866,7 +866,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>忘記密碼</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -878,7 +878,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>分析引擎設定......</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -898,11 +898,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>虛擬攝影機...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>新虛擬攝影機...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -2864,10 +2864,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>音源擷取裝置不支援 44.1khz 和 48khz 格式. 請在螢幕錄影設定中選擇其他音源裝置或選擇&quot;無&quot;.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3165,6 +3161,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>顯示卡驅動程式太舊或未安裝</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 可能無法正常運作.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3248,17 +3255,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>建立系統備份檔可在系統故障後還原.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>顯示卡驅動程式太舊或未安裝</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 可能無法正常運作.</translation>
     </message>
   </context>
   <context>
@@ -8461,10 +8457,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更新完成。</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
     </message>
@@ -8603,16 +8595,36 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation type="unfinished">Failed to download update packages to some servers</translation>
-    </message>
-    <message>
       <source>There was an error while installing updates:</source>
       <translation type="unfinished">There was an error while installing updates:</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>請使用安裝包手動更新 %1.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 將重新啟動到更新的版本.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
     </message>
   </context>
   <context>
@@ -8643,10 +8655,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>通用事件</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation type="unfinished">Unknown Plugin Event</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation type="unfinished">Device was disconnected</translation>
     </message>
@@ -8657,6 +8665,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Module was disconnected</source>
       <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>
@@ -8736,10 +8748,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Waiting for peer data</translation>
     </message>
     <message>
-      <source>Update package can&apos;t be not found.</source>
-      <translation type="unfinished">Update package can&apos;t be not found.</translation>
-    </message>
-    <message>
       <source>There is not enough space to download update files.</source>
       <translation type="unfinished">There is not enough space to download update files.</translation>
     </message>
@@ -8786,6 +8794,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Ready to install update</source>
       <translation type="unfinished">Ready to install update</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
     </message>
   </context>
   <context>
@@ -9701,28 +9713,26 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">This build is for testing purposes only.</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data</source>
-      <translation type="unfinished">Confirm storage location to store analytics data</translation>
-    </message>
-    <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
-    </message>
-    <message>
       <source>Open Server Settings</source>
       <translation type="unfinished">Open Server Settings</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>確定</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

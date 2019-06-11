@@ -203,6 +203,9 @@ void WearableWorker::processCurrentFile()
     UploadState config;
     config.source = file.path;
     config.ttl = kDefaultUploadTtl;
+    // TODO: Check if it is necessary. Configured to keep the original behavior.
+    config.uploadAllChunks = true;
+    config.recreateFile = true;
 
     QString uploadId = qnClientModule->uploadManager()->addUpload(
         d->server, config, this,

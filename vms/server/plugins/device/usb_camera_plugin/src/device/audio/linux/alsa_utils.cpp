@@ -217,6 +217,11 @@ bool pluggedIn(const std::string& devicePath)
     return false;
 }
 
+void uninitialize()
+{
+    snd_config_update_free_global();
+}
+
 } // namespace nx::usb_cam::device::audio::detail
 
 #endif

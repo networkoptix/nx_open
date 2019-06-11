@@ -16,7 +16,11 @@ Item
     property var enabledAnalyticsEngines: []
 
     property var currentEngineId
+    property var currentEngineInfo
     property bool loading: false
+
+    readonly property bool isDeviceDependent: currentEngineInfo !== undefined
+        && currentEngineInfo.isDeviceDependent
 
     Connections
     {
@@ -53,6 +57,7 @@ Item
                 }
 
                 currentEngineId = engineId
+                currentEngineInfo = engineInfo
                 menu.currentItemId = engineId
                 settingsView.loadModel(
                     engineInfo.settingsModel,
@@ -61,6 +66,7 @@ Item
             else
             {
                 currentEngineId = undefined
+                currentEngineInfo = undefined
                 menu.currentItemId = undefined
                 settingsView.loadModel({}, {})
             }
@@ -100,12 +106,32 @@ Item
 
         enabled: !loading
 
+        RowLayout
+        {
+            visible: currentEngineId !== undefined && isDeviceDependent
+            spacing: 16
+
+            Image
+            {
+                source: "qrc:/skin/standard_icons/sp_message_box_information.png"
+            }
+
+            Text
+            {
+                wrapMode: Text.WordWrap
+                color: ColorTheme.windowText
+                font.pixelSize: 13
+                font.weight: Font.Bold
+                text: qsTr("This is the built-in functionality")
+            }
+        }
+
         SwitchButton
         {
             id: enableSwitch
             text: qsTr("Enable")
             Layout.preferredWidth: Math.max(implicitWidth, 120)
-            visible: currentEngineId !== undefined
+            visible: currentEngineId !== undefined && !isDeviceDependent
 
             Binding
             {

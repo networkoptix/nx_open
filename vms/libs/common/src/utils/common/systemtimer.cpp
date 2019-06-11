@@ -5,8 +5,9 @@
 
 #include "systemtimer.h"
 
-
 #ifdef _WIN32
+
+#include "Windows.h"
 
 class AbstractSystemTimerImpl
 {

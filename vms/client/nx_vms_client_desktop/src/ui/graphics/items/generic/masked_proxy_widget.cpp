@@ -285,3 +285,28 @@ void QnMaskedProxyWidget::syncDirtyRect()
     else
         m_dirtyRect |= d->needsRepaint.toAlignedRect();
 }
+
+// QGraphicsProxyWidget ignores context menu events if it is not focused.
+// The following is a copy of the Qt code with the focus check removed.
+void QnMaskedProxyWidget::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+{
+    if (!event || !widget() || !widget()->isVisible())
+        return;
+
+    QPointF pos = event->pos();
+    const auto alienWidget = widget()->childAt(pos.toPoint());
+    const auto receiver = alienWidget ? alienWidget : widget();
+
+    for (auto current = receiver; current && current != widget(); current = current->parentWidget())
+        pos -= QPointF(current->pos());
+
+    QPoint globalPos = receiver->mapToGlobal(pos.toPoint());
+    if (bypassGraphicsProxyWidget(receiver))
+        globalPos = event->screenPos();
+
+    QContextMenuEvent contextMenuEvent(QContextMenuEvent::Reason(event->reason()),
+        pos.toPoint(), globalPos, event->modifiers());
+
+    QApplication::sendEvent(receiver, &contextMenuEvent);
+    event->setAccepted(contextMenuEvent.isAccepted());
+}

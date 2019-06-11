@@ -261,7 +261,7 @@ void VideoFrameProcessingDeviceAgent::logMetadataPacketIfNeeded(
         }
 
         const std::string itemsName = (compoundMetadataPacket->count() == 1)
-            ? (std::string("item of type ") + compoundMetadataPacket->at(0)->typeId())
+            ? (std::string("item of type ") + toPtr(compoundMetadataPacket->at(0))->typeId())
             : "item(s)";
 
         NX_OUTPUT << __func__ << "(): " << packetName << " contains "

@@ -283,11 +283,12 @@ private:
     bool isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const;
 
     void openNewConnection(const QnMutexLockerBase& /*lk*/);
+
+    void saveOpenedConnection(
+        const QnMutexLockerBase& lock,
+        std::unique_ptr<detail::BaseQueryExecutor> connection);
+
     std::unique_ptr<detail::BaseQueryExecutor> createNewConnectionThread(
-        const QnMutexLockerBase& /*lock*/,
-        detail::QueryQueue* const queryQueue);
-    std::unique_ptr<detail::BaseQueryExecutor> createNewConnectionThread(
-        const QnMutexLockerBase& /*lock*/,
         const ConnectionOptions& connectionOptions,
         detail::QueryQueue* const queryQueue);
 

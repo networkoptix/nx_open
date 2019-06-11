@@ -358,7 +358,7 @@ void Url::setHost(const QString &host, QUrl::ParsingMode mode)
 {
     QUrl newUrl;
     newUrl.setHost(host);
-    if (newUrl.isValid() && !newUrl.isEmpty())
+    if (newUrl.isValid() || host.isEmpty())
     {
         m_ipV6ScopeId = boost::none;
         m_url.setHost(host);
@@ -564,6 +564,11 @@ QByteArray Url::toPercentEncoding(
         qurl.host().toUtf8() + '%' + QByteArray::number(urlWithIp.scopeId()));
 
     return result;
+}
+
+void PrintTo(const Url& val, ::std::ostream* os)
+{
+    *os << val.toString().toStdString();
 }
 
 namespace url {

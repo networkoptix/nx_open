@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.55",
+    "version": "1.0.1.76",
     "data": [
         {
             "keys": [
@@ -863,7 +863,22 @@
                 "none|nvr302-08e-p8",
                 "uniview|nvr302-16e-p8",
                 "hangzhou hikvision digital technology co., ltd|hik%2fds-7816*",
-                "ltd8308t-ft|embedded_net_dvr"
+                "ltd8308t-ft|embedded_net_dvr",
+                "Hangzhou Hikvision Digital Technology Co., Ltd|DS-6708HQHI-SATA",
+                "DS-6708HQHI-SATA|Hangzhou Hikvision Digital Technology Co., Ltd",
+                "c7413-awr|dvr support center",
+                "ds-7116hqhi-k1|business ddd co,.ltd.",
+                "dahua|dh-xvr5116he-x",
+                "acti|v24",
+                "dahua|dh-xvr7108e-4kl-b-x",
+                "ds-7208hthi-k2|embedded net dvr",
+                "ds-h116g|embedded net dvr",
+                "dahua|dh-xvr5108hs-4kl-x",
+                "yc-r0814|network video recorder",
+                "onvif_encoder|viper-hdaenc16",
+                "dahua|dh-xvr5108hs-x",
+                "dahua|dhi-nvr4432-4ks2",
+                "dahua|dh-xvr7104*"
             ],
             "analogEncoder": true
         },
@@ -2126,6 +2141,13 @@
         },
         {
             "keys": [
+                "DW|*"
+            ],
+            "onvifVendorSubtype": "Digital Watchdog",
+            "_comment": "Used to set typeId of 'Digital Watchdog' for all manufectures that are resolved to 'DW'."
+        },
+        {
+            "keys": [
                 "PelcoOptera|IMM12018",
                 "PelcoOptera|IMM12027",
                 "PelcoOptera|IMM12036"
@@ -3101,11 +3123,16 @@
             "axis|axisp3717*", "axis|p3717*",
             "axis|axis p3717*",
             "vivotek|ma9321-ehtv",
+			"VIVOTEK MA9321-EHTV|MA9321-EHTV",
+			"MA9321-EHTV|VIVOTEK MA9321-EHTV",
             "avigilon|32c-h4a-4mh-360",
             "dahua|psd81602-a360",
             "dahua|IPC-HDBW4231F-E2-M",
             "avigilon|32c-h4a-4mh-360",
-            "dahua|psd81602-a360"
+            "dahua|psd81602-a360",
+            "dahua|ipc-hdbw4233x*",
+            "dahua|ipc-hdbw7233x*",
+            "hikvision|ds-2cd6d24fwd*"
             ],
             "canShareLicenseGroup": true
         },
@@ -3341,7 +3368,7 @@
             }
         },
         {
-            "_comment1": "Mapping for firmware: IPC_HCMN2108-B0006P10D1711",
+            "_comment1": "Mapping for firmware: IPC_HCMN2108-B0009P30D1809",
             "keys": [
                 "UNIVIEW|IPC6322SR-X22*"
             ],
@@ -3354,7 +3381,7 @@
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [-0.1666667, 1],
+                        "device":  [-1, 1],
                         "logical": [15, -90]
                     },
                     "z": {
@@ -3447,6 +3474,33 @@
                         "device":  [0, 0.25, 0.5, 0.75, 0.775, 0.8125, 0.825, 0.875, 0.9, 0.925, 0.95, 0.975, 0.987, 1],
                         "logical": [1, 7, 13.3, 16.6, 17.6, 18, 18.3, 19, 19.3, 20, 20.6, 21.6, 22.3, 23.6],
                         "logicalMultiplier": 31,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapped for 2.623.0000000.7.R, Build Date 2018-11-24",
+            "keys": [
+                "Dahua|DH-SD49225*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1,1],
+                        "logical": [-90, 15]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1, 2.26, 3.90, 5.46, 7.13, 8.72, 10.31, 12.21, 13.95, 15.69, 18],
+                        "logicalMultiplier": 33,
                         "space": "35MmEquiv"
                     }
                 }

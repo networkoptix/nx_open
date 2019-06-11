@@ -64,16 +64,8 @@ private:
     std::unique_ptr<nx::network::http::HttpClient> initHttpClient() const;
     boost::optional<nx::network::http::BufferType> doRequest(const QString& requestPath, bool expectOnlyBody = false);
 
-    boost::optional<int64_t> getRecordingBound(RecordingBound bound);
-    boost::optional<int64_t> getRecordingStart();
-    boost::optional<int64_t> getRecordingEnd();
-
     std::vector<QString> getDirectoryList();
     bool fetchFileList(const QString& directory, std::vector<QString>* outFileLists);
-
-    boost::optional<int64_t> parseDate(
-        const QString& dateTimeStr,
-        const QString& dateTimeFormat);
 
 private:
     LilinResource* m_resource;

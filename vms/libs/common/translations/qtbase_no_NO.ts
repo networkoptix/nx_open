@@ -47,136 +47,136 @@
     </message>
     <message>
       <source>&amp;Step up</source>
-      <translation type="unfinished">&amp;Step up</translation>
+      <translation>&amp; Steg opp</translation>
     </message>
     <message>
       <source>Step &amp;down</source>
-      <translation type="unfinished">Step &amp;down</translation>
+      <translation>Steg &amp;ned</translation>
     </message>
   </context>
   <context>
     <name>QAccessibleActionInterface</name>
     <message>
       <source>Press</source>
-      <translation type="unfinished">Press</translation>
+      <translation>Trykk</translation>
     </message>
     <message>
       <source>Increase</source>
-      <translation type="unfinished">Increase</translation>
+      <translation>Øk</translation>
     </message>
     <message>
       <source>Decrease</source>
-      <translation type="unfinished">Decrease</translation>
+      <translation>Reduser</translation>
     </message>
     <message>
       <source>ShowMenu</source>
-      <translation type="unfinished">ShowMenu</translation>
+      <translation>VisMeny</translation>
     </message>
     <message>
       <source>SetFocus</source>
-      <translation type="unfinished">SetFocus</translation>
+      <translation>SetFokus</translation>
     </message>
     <message>
       <source>Toggle</source>
-      <translation type="unfinished">Toggle</translation>
+      <translation>Veksle</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Rull til venstre</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Rull til høyre</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation type="unfinished">Scroll Up</translation>
+      <translation>Rull opp</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation type="unfinished">Scroll Down</translation>
+      <translation>Rull ned</translation>
     </message>
     <message>
       <source>Previous Page</source>
-      <translation type="unfinished">Previous Page</translation>
+      <translation>Forrige side</translation>
     </message>
     <message>
       <source>Next Page</source>
-      <translation type="unfinished">Next Page</translation>
+      <translation>Neste side</translation>
     </message>
     <message>
       <source>Triggers the action</source>
-      <translation type="unfinished">Triggers the action</translation>
+      <translation>Utløser handlingen</translation>
     </message>
     <message>
       <source>Increase the value</source>
-      <translation type="unfinished">Increase the value</translation>
+      <translation>Øk verdien</translation>
     </message>
     <message>
       <source>Decrease the value</source>
-      <translation type="unfinished">Decrease the value</translation>
+      <translation>Reduser verdien</translation>
     </message>
     <message>
       <source>Shows the menu</source>
-      <translation type="unfinished">Shows the menu</translation>
+      <translation>Viser menyen</translation>
     </message>
     <message>
       <source>Sets the focus</source>
-      <translation type="unfinished">Sets the focus</translation>
+      <translation>Setter fokus</translation>
     </message>
     <message>
       <source>Toggles the state</source>
-      <translation type="unfinished">Toggles the state</translation>
+      <translation>Veksler tilstand</translation>
     </message>
     <message>
       <source>Scrolls to the left</source>
-      <translation type="unfinished">Scrolls to the left</translation>
+      <translation>Ruller til venstre</translation>
     </message>
     <message>
       <source>Scrolls to the right</source>
-      <translation type="unfinished">Scrolls to the right</translation>
+      <translation>Ruller til høyre</translation>
     </message>
     <message>
       <source>Scrolls up</source>
-      <translation type="unfinished">Scrolls up</translation>
+      <translation>Ruller opp</translation>
     </message>
     <message>
       <source>Scrolls down</source>
-      <translation type="unfinished">Scrolls down</translation>
+      <translation>Ruller ned</translation>
     </message>
     <message>
       <source>Goes back a page</source>
-      <translation type="unfinished">Goes back a page</translation>
+      <translation>Går tilbake en side</translation>
     </message>
     <message>
       <source>Goes to the next page</source>
-      <translation type="unfinished">Goes to the next page</translation>
+      <translation>Går til neste side</translation>
     </message>
   </context>
   <context>
     <name>QAndroidPlatformTheme</name>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ja</translation>
     </message>
     <message>
       <source>Yes to All</source>
-      <translation type="unfinished">Yes to All</translation>
+      <translation>Ja til alt</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Nei</translation>
     </message>
     <message>
       <source>No to All</source>
-      <translation type="unfinished">No to All</translation>
+      <translation>Nei til alle</translation>
     </message>
   </context>
   <context>
     <name>QCocoaMenuItem</name>
     <message>
       <source>About Qt</source>
-      <translation type="unfinished">About Qt</translation>
+      <translation>Om Qt</translation>
     </message>
     <message>
       <source>About</source>
@@ -184,23 +184,23 @@
     </message>
     <message>
       <source>Config</source>
-      <translation type="unfinished">Config</translation>
+      <translation>Konfigurer</translation>
     </message>
     <message>
       <source>Preference</source>
-      <translation type="unfinished">Preference</translation>
+      <translation>Preferanser</translation>
     </message>
     <message>
       <source>Options</source>
-      <translation type="unfinished">Options</translation>
+      <translation>Alternativer</translation>
     </message>
     <message>
       <source>Setting</source>
-      <translation type="unfinished">Setting</translation>
+      <translation>Innstilling</translation>
     </message>
     <message>
       <source>Setup</source>
-      <translation type="unfinished">Setup</translation>
+      <translation>Oppsett</translation>
     </message>
     <message>
       <source>Quit</source>
@@ -208,19 +208,19 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
+      <translation>Avslutt</translation>
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Klipp ut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopiér</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Lim inn</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -231,38 +231,38 @@
     <name>QCocoaTheme</name>
     <message>
       <source>Don&apos;t Save</source>
-      <translation type="unfinished">Don&apos;t Save</translation>
+      <translation>Ikke lagre</translation>
     </message>
   </context>
   <context>
     <name>QColorDialog</name>
     <message>
       <source>Hu&amp;e:</source>
-      <translation type="unfinished">Hu&amp;e:</translation>
+      <translation>Hu&amp;e:</translation>
     </message>
     <message>
       <source>&amp;Sat:</source>
-      <translation type="unfinished">&amp;Sat:</translation>
+      <translation>&amp;Sat:</translation>
     </message>
     <message>
       <source>&amp;Val:</source>
-      <translation type="unfinished">&amp;Val:</translation>
+      <translation>&amp;Val:</translation>
     </message>
     <message>
       <source>&amp;Red:</source>
-      <translation type="unfinished">&amp;Red:</translation>
+      <translation>&amp;Red:</translation>
     </message>
     <message>
       <source>&amp;Green:</source>
-      <translation type="unfinished">&amp;Green:</translation>
+      <translation>&amp;Green:</translation>
     </message>
     <message>
       <source>Bl&amp;ue:</source>
-      <translation type="unfinished">Bl&amp;ue:</translation>
+      <translation>Bl&amp;ue:</translation>
     </message>
     <message>
       <source>A&amp;lpha channel:</source>
-      <translation type="unfinished">A&amp;lpha channel:</translation>
+      <translation>A&amp;lpha channel:</translation>
     </message>
     <message>
       <source>&amp;HTML:</source>
@@ -271,476 +271,476 @@
     <message>
       <source>Cursor at %1, %2
 Press ESC to cancel</source>
-      <translation type="unfinished">Cursor at %1, %2
-Press ESC to cancel</translation>
+      <translation>Markør ved %1, %2
+Trykk ESC for å avbryte</translation>
     </message>
     <message>
       <source>&amp;Pick Screen Color</source>
-      <translation type="unfinished">&amp;Pick Screen Color</translation>
+      <translation>&amp; Velg skjermfarge</translation>
     </message>
     <message>
       <source>Select Color</source>
-      <translation type="unfinished">Select Color</translation>
+      <translation>Velg Farge</translation>
     </message>
     <message>
       <source>&amp;Basic colors</source>
-      <translation type="unfinished">&amp;Basic colors</translation>
+      <translation>&amp; Grunnleggende farger</translation>
     </message>
     <message>
       <source>&amp;Custom colors</source>
-      <translation type="unfinished">&amp;Custom colors</translation>
+      <translation>&amp;Egendefinerte farger</translation>
     </message>
     <message>
       <source>&amp;Add to Custom Colors</source>
-      <translation type="unfinished">&amp;Add to Custom Colors</translation>
+      <translation>&amp; Legg til i egendefinerte farger</translation>
     </message>
   </context>
   <context>
     <name>QComboBox</name>
     <message>
       <source>False</source>
-      <translation type="unfinished">False</translation>
+      <translation>Falsk</translation>
     </message>
     <message>
       <source>True</source>
-      <translation type="unfinished">True</translation>
+      <translation>Sant</translation>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation type="unfinished">Open the combo box selection popup</translation>
+      <translation>Åpne popup-vinduet for kombinasjonsboksen</translation>
     </message>
   </context>
   <context>
     <name>QDateTimeParser</name>
     <message>
       <source>AM</source>
-      <translation type="unfinished">AM</translation>
+      <translation>AM</translation>
     </message>
     <message>
       <source>am</source>
-      <translation type="unfinished">am</translation>
+      <translation>am</translation>
     </message>
     <message>
       <source>PM</source>
-      <translation type="unfinished">PM</translation>
+      <translation>PM</translation>
     </message>
     <message>
       <source>pm</source>
-      <translation type="unfinished">pm</translation>
+      <translation>pm</translation>
     </message>
   </context>
   <context>
     <name>QDialog</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>Hva er dette?</translation>
     </message>
   </context>
   <context>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
     <name>QDirModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Størrelse</translation>
     </message>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation type="unfinished">Kind</translation>
+      <translation>Type</translation>
     </message>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Type</translation>
+      <translation>Skriv</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation type="unfinished">Date Modified</translation>
+      <translation>Dato endret</translation>
     </message>
   </context>
   <context>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation type="unfinished">Destination file is the same file.</translation>
+      <translation>Destinasjonsfilen er den samme filen.</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
-      <translation type="unfinished">Source file does not exist.</translation>
+      <translation>Kildefilen finnes ikke.</translation>
     </message>
     <message>
       <source>Destination file exists</source>
-      <translation type="unfinished">Destination file exists</translation>
+      <translation>Destinasjonsfilen eksisterer</translation>
     </message>
     <message>
       <source>Error while renaming.</source>
-      <translation type="unfinished">Error while renaming.</translation>
+      <translation>Feil ved omdøping.</translation>
     </message>
     <message>
       <source>Unable to restore from %1: %2</source>
-      <translation type="unfinished">Unable to restore from %1: %2</translation>
+      <translation>Kan ikke gjenopprettes fra %1: %2</translation>
     </message>
     <message>
       <source>Will not rename sequential file using block copy</source>
-      <translation type="unfinished">Will not rename sequential file using block copy</translation>
+      <translation>Vil ikke gi nytt navn til sekvensiell fil ved hjelp av blokk kopi</translation>
     </message>
     <message>
       <source>Cannot remove source file</source>
-      <translation type="unfinished">Cannot remove source file</translation>
+      <translation>Kan ikke fjerne kildefilen</translation>
     </message>
     <message>
       <source>Cannot open %1 for input</source>
-      <translation type="unfinished">Cannot open %1 for input</translation>
+      <translation>Kan ikke åpne %1 for inngang</translation>
     </message>
     <message>
       <source>Cannot open for output</source>
-      <translation type="unfinished">Cannot open for output</translation>
+      <translation>Kan ikke åpne for utgang</translation>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation type="unfinished">Failure to write block</translation>
+      <translation>Kunne ikke skrive block</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
-      <translation type="unfinished">Cannot create %1 for output</translation>
+      <translation>Kan ikke opprette %1 for utgang</translation>
     </message>
   </context>
   <context>
     <name>QFileDialog</name>
     <message>
       <source>Look in:</source>
-      <translation type="unfinished">Look in:</translation>
+      <translation>Se i:</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Tilbake</translation>
     </message>
     <message>
       <source>Go back</source>
-      <translation type="unfinished">Go back</translation>
+      <translation>Gå tilbake</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation type="unfinished">Forward</translation>
+      <translation>Neste</translation>
     </message>
     <message>
       <source>Go forward</source>
-      <translation type="unfinished">Go forward</translation>
+      <translation>Gå til neste</translation>
     </message>
     <message>
       <source>Parent Directory</source>
-      <translation type="unfinished">Parent Directory</translation>
+      <translation>Overordnet mappe</translation>
     </message>
     <message>
       <source>Go to the parent directory</source>
-      <translation type="unfinished">Go to the parent directory</translation>
+      <translation>Gå til overordnet mappe</translation>
     </message>
     <message>
       <source>Create New Folder</source>
-      <translation type="unfinished">Create New Folder</translation>
+      <translation>Opprett ny mappe</translation>
     </message>
     <message>
       <source>Create a New Folder</source>
-      <translation type="unfinished">Create a New Folder</translation>
+      <translation>Lag en ny mappe</translation>
     </message>
     <message>
       <source>List View</source>
-      <translation type="unfinished">List View</translation>
+      <translation>Listevisning</translation>
     </message>
     <message>
       <source>Change to list view mode</source>
-      <translation type="unfinished">Change to list view mode</translation>
+      <translation>Bytt til listevisning</translation>
     </message>
     <message>
       <source>Detail View</source>
-      <translation type="unfinished">Detail View</translation>
+      <translation>Detaljvisning</translation>
     </message>
     <message>
       <source>Change to detail view mode</source>
-      <translation type="unfinished">Change to detail view mode</translation>
+      <translation>Bytt til detaljvisning</translation>
     </message>
     <message>
       <source>Files of type:</source>
-      <translation type="unfinished">Files of type:</translation>
+      <translation>Filtyper:</translation>
     </message>
     <message>
       <source>Find Directory</source>
-      <translation type="unfinished">Find Directory</translation>
+      <translation>Finn mappe</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Åpne</translation>
     </message>
     <message>
       <source>Save As</source>
-      <translation type="unfinished">Save As</translation>
+      <translation>Lagre som</translation>
     </message>
     <message>
       <source>Directory:</source>
-      <translation type="unfinished">Directory:</translation>
+      <translation>Mapper:</translation>
     </message>
     <message>
       <source>File &amp;name:</source>
-      <translation type="unfinished">File &amp;name:</translation>
+      <translation>Fil &amp;navn:</translation>
     </message>
     <message>
       <source>&amp;Open</source>
-      <translation type="unfinished">&amp;Open</translation>
+      <translation>&amp;Åpne</translation>
     </message>
     <message>
       <source>&amp;Choose</source>
-      <translation type="unfinished">&amp;Choose</translation>
+      <translation>&amp;Velge</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation type="unfinished">&amp;Save</translation>
+      <translation>&amp;Lagre</translation>
     </message>
     <message>
       <source>All Files (*)</source>
-      <translation type="unfinished">All Files (*)</translation>
+      <translation>Alle filer (*)</translation>
     </message>
     <message>
       <source>Show </source>
-      <translation type="unfinished">Show </translation>
+      <translation>Vis </translation>
     </message>
     <message>
       <source>&amp;Rename</source>
-      <translation type="unfinished">&amp;Rename</translation>
+      <translation>&amp;Endre navn</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation type="unfinished">&amp;Delete</translation>
+      <translation>&amp;Slett</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
-      <translation type="unfinished">Show &amp;hidden files</translation>
+      <translation>Vis &amp;hidden files</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
-      <translation type="unfinished">&amp;New Folder</translation>
+      <translation>&amp;Ny mappe</translation>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation type="unfinished">All files (*)</translation>
+      <translation>Alle filer (*)</translation>
     </message>
     <message>
       <source>Directories</source>
-      <translation type="unfinished">Directories</translation>
+      <translation>Mapper</translation>
     </message>
     <message>
       <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
-      <translation type="unfinished">%1
-Directory not found.
-Please verify the correct directory name was given.</translation>
+      <translation>%1
+Mappe ikke funnet.
+Vennligst verifiser at det riktige mappenavnet ble gitt.</translation>
     </message>
     <message>
       <source>%1 already exists.
 Do you want to replace it?</source>
-      <translation type="unfinished">%1 already exists.
-Do you want to replace it?</translation>
+      <translation>%1 eksisterer allerede.
+Vil du erstatte den?</translation>
     </message>
     <message>
       <source>%1
 File not found.
 Please verify the correct file name was given.</source>
-      <translation type="unfinished">%1
-File not found.
-Please verify the correct file name was given.</translation>
+      <translation>%1
+Filen ble ikke funnet.
+Vennligst verifiser at det riktige filnavnet ble gitt.</translation>
     </message>
     <message>
       <source>New Folder</source>
-      <translation type="unfinished">New Folder</translation>
+      <translation>Ny Mappe</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slett</translation>
     </message>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation type="unfinished">&apos;%1&apos; is write protected.
-Do you want to delete it anyway?</translation>
+      <translation>&apos;%1&apos; er skrivebeskyttet.
+Ønsker du å slette det uansett?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation type="unfinished">Are you sure you want to delete &apos;%1&apos;?</translation>
+      <translation>Er du sikker på at du vil slette &apos;%1&apos;?</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
-      <translation type="unfinished">Could not delete directory.</translation>
+      <translation>Kunne ikke slette mappen.</translation>
     </message>
     <message>
       <source>Recent Places</source>
-      <translation type="unfinished">Recent Places</translation>
+      <translation>Nylige Steder</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Fjern</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation type="unfinished">My Computer</translation>
+      <translation>Min datamaskin</translation>
     </message>
     <message>
       <source>Drive</source>
-      <translation type="unfinished">Drive</translation>
+      <translation>Disk</translation>
     </message>
     <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
-      <translation type="unfinished">%1 File</translation>
+      <translation>%1 Fil</translation>
     </message>
     <message>
       <source>File</source>
-      <translation type="unfinished">File</translation>
+      <translation>Fil</translation>
     </message>
     <message>
       <source>File Folder</source>
       <comment>Match Windows Explorer</comment>
-      <translation type="unfinished">File Folder</translation>
+      <translation>Fil mappe</translation>
     </message>
     <message>
       <source>Folder</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Folder</translation>
+      <translation>Mappe</translation>
     </message>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation type="unfinished">Alias</translation>
+      <translation>Alias</translation>
     </message>
     <message>
       <source>Shortcut</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Shortcut</translation>
+      <translation>Snarvei</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Ukjent</translation>
     </message>
     <message>
       <source>Sidebar</source>
-      <translation type="unfinished">Sidebar</translation>
+      <translation>Sidepanel</translation>
     </message>
     <message>
       <source>List of places and bookmarks</source>
-      <translation type="unfinished">List of places and bookmarks</translation>
+      <translation>Liste over steder og bokmerker</translation>
     </message>
     <message>
       <source>Files</source>
-      <translation type="unfinished">Files</translation>
+      <translation>Filer</translation>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation type="unfinished">Alt+Left</translation>
+      <translation>Alt+Venstre</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation type="unfinished">Alt+Right</translation>
+      <translation>Alt+Høyre</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation type="unfinished">Alt+Up</translation>
+      <translation>Alt+Opp</translation>
     </message>
   </context>
   <context>
     <name>QFileSystemModel</name>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>%1 MB</source>
-      <translation type="unfinished">%1 MB</translation>
+      <translation>%1 MB</translation>
     </message>
     <message>
       <source>%1 KB</source>
-      <translation type="unfinished">%1 KB</translation>
+      <translation>%1 KB</translation>
     </message>
     <message>
       <source>%1 bytes</source>
-      <translation type="unfinished">%1 bytes</translation>
+      <translation>%1 byte</translation>
     </message>
     <message>
       <source>Invalid filename</source>
-      <translation type="unfinished">Invalid filename</translation>
+      <translation>Ugyldig filnavn</translation>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation type="unfinished">&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</translation>
+      <translation>&lt;b&gt;Navnet &quot;%1&quot; kan ikke brukes.&lt;/b&gt;&lt;p&gt;Prøv å bruke et annet navn, med færre tegn eller ingen skilletegn.</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Størrelse</translation>
     </message>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation type="unfinished">Kind</translation>
+      <translation>Type</translation>
     </message>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Type</translation>
+      <translation>Skriv</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation type="unfinished">Date Modified</translation>
+      <translation>Dato endret</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation type="unfinished">My Computer</translation>
+      <translation>Min datamaskin</translation>
     </message>
     <message>
       <source>Computer</source>
-      <translation type="unfinished">Computer</translation>
+      <translation>Datamaskin</translation>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation type="unfinished">%1 byte(s)</translation>
+      <translation>%1 byte</translation>
     </message>
   </context>
   <context>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation type="unfinished">&amp;OK</translation>
+      <translation>&amp;OK</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation type="unfinished">&amp;Save</translation>
+      <translation>&amp;Lagre</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
-      <translation type="unfinished">&amp;Cancel</translation>
+      <translation>&amp;Avbryt</translation>
     </message>
     <message>
       <source>&amp;Close</source>
-      <translation type="unfinished">&amp;Close</translation>
+      <translation>&amp;Lukk</translation>
     </message>
     <message>
       <source>Close without Saving</source>
-      <translation type="unfinished">Close without Saving</translation>
+      <translation>Lukk uten å lagre</translation>
     </message>
   </context>
   <context>
@@ -748,90 +748,90 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
       <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
+      <translation>QT_LAYOUT_DIRECTION</translation>
     </message>
   </context>
   <context>
     <name>QIODevice</name>
     <message>
       <source>Permission denied</source>
-      <translation type="unfinished">Permission denied</translation>
+      <translation>Adgang nektet</translation>
     </message>
     <message>
       <source>Too many open files</source>
-      <translation type="unfinished">Too many open files</translation>
+      <translation>For mange åpne filer</translation>
     </message>
     <message>
       <source>No such file or directory</source>
-      <translation type="unfinished">No such file or directory</translation>
+      <translation>Ingen slik fil eller mappe</translation>
     </message>
     <message>
       <source>No space left on device</source>
-      <translation type="unfinished">No space left on device</translation>
+      <translation>Ikke mer lagringskapasitet igjen på enheten</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Ukjent feil</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation type="unfinished">file to open is a directory</translation>
+      <translation>fil for å åpne er en mappe</translation>
     </message>
   </context>
   <context>
     <name>QImageReader</name>
     <message>
       <source>Invalid device</source>
-      <translation type="unfinished">Invalid device</translation>
+      <translation>Ugyldig enhet</translation>
     </message>
     <message>
       <source>File not found</source>
-      <translation type="unfinished">File not found</translation>
+      <translation>Fil ikke funnet</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation type="unfinished">Unsupported image format</translation>
+      <translation>Ikke-støttet bildeformat</translation>
     </message>
     <message>
       <source>Unable to read image data</source>
-      <translation type="unfinished">Unable to read image data</translation>
+      <translation>Kan ikke lese bildedata</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Ukjent feil</translation>
     </message>
   </context>
   <context>
     <name>QImageWriter</name>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Ukjent feil</translation>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation type="unfinished">Device is not set</translation>
+      <translation>Enheten er ikke angitt</translation>
     </message>
     <message>
       <source>Device not writable</source>
-      <translation type="unfinished">Device not writable</translation>
+      <translation>Kan ikke skrive til enhet</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation type="unfinished">Unsupported image format</translation>
+      <translation>Ikke-støttet bildeformat</translation>
     </message>
   </context>
   <context>
     <name>QInputDialog</name>
     <message>
       <source>Enter a value:</source>
-      <translation type="unfinished">Enter a value:</translation>
+      <translation>Skriv inn en verdi:</translation>
     </message>
   </context>
   <context>
     <name>QKeySequenceEdit</name>
     <message>
       <source>Press shortcut</source>
-      <translation type="unfinished">Press shortcut</translation>
+      <translation>Trykk snarvei</translation>
     </message>
     <message>
       <source>%1, ...</source>
@@ -843,27 +843,27 @@ Do you want to delete it anyway?</translation>
     <name>QLineEdit</name>
     <message>
       <source>&amp;Undo</source>
-      <translation type="unfinished">&amp;Undo</translation>
+      <translation>&amp;Angre</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation type="unfinished">&amp;Redo</translation>
+      <translation>&amp;Gjøre om</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation type="unfinished">Cu&amp;t</translation>
+      <translation>Cu&amp;t</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation type="unfinished">&amp;Copy</translation>
+      <translation>&amp;Kopier</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation type="unfinished">&amp;Paste</translation>
+      <translation>&amp;Lim inn</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slett</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -874,302 +874,302 @@ Do you want to delete it anyway?</translation>
     <name>QMessageBox</name>
     <message>
       <source>Show Details...</source>
-      <translation type="unfinished">Show Details...</translation>
+      <translation>Vis detaljer...</translation>
     </message>
     <message>
       <source>Hide Details...</source>
-      <translation type="unfinished">Hide Details...</translation>
+      <translation>Skjul detaljer...</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Hjelp</translation>
     </message>
   </context>
   <context>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Lagre</translation>
     </message>
     <message>
       <source>Save All</source>
-      <translation type="unfinished">Save All</translation>
+      <translation>Lagre alt</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Åpen</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
-      <translation type="unfinished">&amp;Yes</translation>
+      <translation>&amp;Ja</translation>
     </message>
     <message>
       <source>Yes to &amp;All</source>
-      <translation type="unfinished">Yes to &amp;All</translation>
+      <translation>Ja til &amp;alle</translation>
     </message>
     <message>
       <source>&amp;No</source>
-      <translation type="unfinished">&amp;No</translation>
+      <translation>&amp;Nei</translation>
     </message>
     <message>
       <source>N&amp;o to All</source>
-      <translation type="unfinished">N&amp;o to All</translation>
+      <translation>Nei til alle</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>Avbryt</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Prøv på nytt</translation>
     </message>
     <message>
       <source>Ignore</source>
-      <translation type="unfinished">Ignore</translation>
+      <translation>Ignorer</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Lukk</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
     <message>
       <source>Discard</source>
-      <translation type="unfinished">Discard</translation>
+      <translation>Forkast</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Hjelp</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Bruk</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Tilbakestill</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation type="unfinished">Restore Defaults</translation>
+      <translation>Gjenopprett standardinnstillinger</translation>
     </message>
   </context>
   <context>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>
     <name>QQnxFileDialogHelper</name>
     <message>
       <source>All files (*.*)</source>
-      <translation type="unfinished">All files (*.*)</translation>
+      <translation>Alle filer (*.*)</translation>
     </message>
   </context>
   <context>
     <name>QSaveFile</name>
     <message>
       <source>Existing file %1 is not writable</source>
-      <translation type="unfinished">Existing file %1 is not writable</translation>
+      <translation>Eksisterende fil %1 er ikke skrivbar</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation type="unfinished">Filename refers to a directory</translation>
+      <translation>Filnavn refererer til en katalog</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
-      <translation type="unfinished">Writing canceled by application</translation>
+      <translation>Opperasjonen ble avbrutt av programmet</translation>
     </message>
   </context>
   <context>
     <name>QScrollBar</name>
     <message>
       <source>Scroll here</source>
-      <translation type="unfinished">Scroll here</translation>
+      <translation>Bla her</translation>
     </message>
     <message>
       <source>Left edge</source>
-      <translation type="unfinished">Left edge</translation>
+      <translation>Venstre kant</translation>
     </message>
     <message>
       <source>Top</source>
-      <translation type="unfinished">Top</translation>
+      <translation>Topp</translation>
     </message>
     <message>
       <source>Right edge</source>
-      <translation type="unfinished">Right edge</translation>
+      <translation>Høyre kant</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation type="unfinished">Bottom</translation>
+      <translation>Bunn</translation>
     </message>
     <message>
       <source>Page left</source>
-      <translation type="unfinished">Page left</translation>
+      <translation>Bla venstre</translation>
     </message>
     <message>
       <source>Page up</source>
-      <translation type="unfinished">Page up</translation>
+      <translation>Forrige side</translation>
     </message>
     <message>
       <source>Page right</source>
-      <translation type="unfinished">Page right</translation>
+      <translation>Bla høyre</translation>
     </message>
     <message>
       <source>Page down</source>
-      <translation type="unfinished">Page down</translation>
+      <translation>Neste side</translation>
     </message>
     <message>
       <source>Scroll left</source>
-      <translation type="unfinished">Scroll left</translation>
+      <translation>Rull til venstre</translation>
     </message>
     <message>
       <source>Scroll up</source>
-      <translation type="unfinished">Scroll up</translation>
+      <translation>Rull opp</translation>
     </message>
     <message>
       <source>Scroll right</source>
-      <translation type="unfinished">Scroll right</translation>
+      <translation>Rull til høyre</translation>
     </message>
     <message>
       <source>Scroll down</source>
-      <translation type="unfinished">Scroll down</translation>
+      <translation>Bla nedover</translation>
     </message>
   </context>
   <context>
     <name>QStandardPaths</name>
     <message>
       <source>Desktop</source>
-      <translation type="unfinished">Desktop</translation>
+      <translation>Skrivebord</translation>
     </message>
     <message>
       <source>Documents</source>
-      <translation type="unfinished">Documents</translation>
+      <translation>Dokumenter</translation>
     </message>
     <message>
       <source>Fonts</source>
-      <translation type="unfinished">Fonts</translation>
+      <translation>Skrifttyper</translation>
     </message>
     <message>
       <source>Applications</source>
-      <translation type="unfinished">Applications</translation>
+      <translation>Programmer</translation>
     </message>
     <message>
       <source>Music</source>
-      <translation type="unfinished">Music</translation>
+      <translation>Musikk</translation>
     </message>
     <message>
       <source>Movies</source>
-      <translation type="unfinished">Movies</translation>
+      <translation>Filmer</translation>
     </message>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Bilder</translation>
     </message>
     <message>
       <source>Temporary Directory</source>
-      <translation type="unfinished">Temporary Directory</translation>
+      <translation>Midlertidige filer</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Hjem</translation>
     </message>
     <message>
       <source>Application Data</source>
-      <translation type="unfinished">Application Data</translation>
+      <translation>Programdata</translation>
     </message>
     <message>
       <source>Application Configuration</source>
-      <translation type="unfinished">Application Configuration</translation>
+      <translation>Programkonfigurasjon</translation>
     </message>
     <message>
       <source>Cache</source>
-      <translation type="unfinished">Cache</translation>
+      <translation>Cache</translation>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation type="unfinished">Shared Data</translation>
+      <translation>Delte data</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation type="unfinished">Runtime</translation>
+      <translation>Runtime</translation>
     </message>
     <message>
       <source>Configuration</source>
-      <translation type="unfinished">Configuration</translation>
+      <translation>Konfigurasjon</translation>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation type="unfinished">Shared Configuration</translation>
+      <translation>Delt konfigurasjon</translation>
     </message>
     <message>
       <source>Shared Cache</source>
-      <translation type="unfinished">Shared Cache</translation>
+      <translation>Delt cache</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Last ned</translation>
     </message>
   </context>
   <context>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Rull til venstre</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Rulle til høyre</translation>
     </message>
   </context>
   <context>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>Hva er dette?</translation>
     </message>
   </context>
   <context>
     <name>QWidgetTextControl</name>
     <message>
       <source>&amp;Undo</source>
-      <translation type="unfinished">&amp;Undo</translation>
+      <translation>&amp;Angre</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation type="unfinished">&amp;Redo</translation>
+      <translation>&amp;Gjenta</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation type="unfinished">Cu&amp;t</translation>
+      <translation>Kl&amp;ipp</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation type="unfinished">&amp;Copy</translation>
+      <translation>&amp;Kopiér</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
-      <translation type="unfinished">Copy &amp;Link Location</translation>
+      <translation>Kopier &amp;lenke sted</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation type="unfinished">&amp;Paste</translation>
+      <translation>&amp;Lim inn</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slett</translation>
     </message>
     <message>
       <source>Select All</source>

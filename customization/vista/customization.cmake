@@ -40,11 +40,8 @@ set(releaseNotesUrl "http://updates.vista-cctv.com/releasenotes.json")
 set(testUpdateFeedUrl "http://updates.vista-cctv.com/updates.json")
 set(update.generator.url "http://manual-updates.vista-cctv.com/upcombiner/upcombine")
 
-# Custom Installer (if needed). If not leave "default"
-
 set(customization.upgradeCode "{b96e7ebf-bd31-49fd-95b3-f1b9fe2a957e}")
 set(customization.clientUpgradeCode "{a41c6f94-b9f7-4a68-85b9-a6ee43b7a530}")
-
 set(customization.clientBundleUpgradeCode "{6d44e2f9-55a2-46f1-942c-97b7daf19a93}")
 set(customization.serverBundleUpgradeCode "{f4f70e01-4e4e-4d2c-a9cd-25b3654343d6}")
 set(customization.fullBundleUpgradeCode "{b6dd7f41-90e2-4b84-bcb9-7dd789f3f82e}")

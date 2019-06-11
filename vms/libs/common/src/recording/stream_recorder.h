@@ -168,6 +168,7 @@ protected:
     virtual bool forceDefaultContext(const QnConstAbstractMediaDataPtr& mediaData) const;
 
     void setTranscoderQuality(Qn::StreamQuality quality);
+    void setTranscoderFixedFrameRate(int value);
 private:
     struct StreamRecorderContext
     {
@@ -248,6 +249,7 @@ private:
     int64_t m_lastFileSize = 0;
     bool m_interleavedStream = false;
     Qn::StreamQuality m_transcodeQuality = Qn::StreamQuality::normal;
+    int m_transcoderFixedFrameRate = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MessageBox</class>
+ <class>QnMessageBox</class>
  <widget class="QDialog" name="MessageBox">
   <property name="geometry">
    <rect>

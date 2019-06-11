@@ -1,5 +1,7 @@
 #include "resource_pool.h"
 
+#include <QtCore/QThreadPool>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/layout_resource.h>
@@ -16,6 +18,8 @@
 #include <nx/utils/log/log.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <api/helpers/camera_id_helper.h>
+
+#include "private/resource_pool_p.h"
 
 namespace {
 
@@ -44,6 +48,7 @@ static const QString kLiteClientLayoutKey = lit("liteClient");
 QnResourcePool::QnResourcePool(QObject* parent):
     base_type(parent),
     QnCommonModuleAware(parent),
+    d(new Private(this)),
     m_resourcesMtx(QnMutex::Recursive),
     m_tranInProgress(false)
 {
@@ -120,7 +125,7 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         {
             if (insertOrUpdateResource(resource, &m_resources))
             {
-                m_cache.resourceAdded(resource);
+                d->handleResourceAdded(resource);
                 newResources.insert(resource->getId(), resource);
             }
             m_incompatibleServers.remove(resource->getId());
@@ -195,7 +200,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
         const auto resIter = m_resources.find(resId);
         if (resIter != m_resources.end())
         {
-            m_cache.resourceRemoved(resource);
+            d->handleResourceRemoved(resource);
             m_resources.erase(resIter);
             appendRemovedResource(resource);
         }
@@ -339,10 +344,10 @@ QnMediaServerResourceList QnResourcePool::getAllServers(Qn::ResourceStatus statu
     QnMutexLocker lock(&m_resourcesMtx); //m_resourcesMtx is recursive
 
     if (status == Qn::AnyStatus)
-        return m_cache.mediaServers.values();
+        return d->mediaServers.values();
 
     QnMediaServerResourceList result;
-    for (const auto& server: m_cache.mediaServers.values())
+    for (const auto& server: d->mediaServers)
     {
         if (server->getStatus() == status)
             result.push_back(server);
@@ -372,7 +377,7 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(
 QnResourcePtr QnResourcePool::getResourceByUniqueId(const QString& uniqueId) const
 {
     QnMutexLocker locker(&m_resourcesMtx);
-    return m_cache.resourcesByUniqueId.value(uniqueId);
+    return d->resourcesByUniqueId.value(uniqueId);
 }
 
 QnResourcePtr QnResourcePool::getResourceByDescriptor(
@@ -429,7 +434,7 @@ void QnResourcePool::clear()
 bool QnResourcePool::containsIoModules() const
 {
     QnMutexLocker lk(&m_resourcesMtx);
-    return m_cache.ioModulesCount > 0;
+    return !d->ioModules.empty();
 }
 
 void QnResourcePool::markLayoutLiteClient(const QnLayoutResourcePtr& layout)
@@ -510,30 +515,6 @@ QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(
             result << index;
     }
     return result;
-}
-
-bool QnResourcePool::Cache::isIoModule(const QnResourcePtr& res) const
-{
-    if (const auto& device = res.dynamicCast<QnVirtualCameraResource>())
-        return device->isIOModule() && !device->hasVideo(nullptr);
-    return false;
-}
-
-void QnResourcePool::Cache::resourceRemoved(const QnResourcePtr& res)
-{
-    resourcesByUniqueId.remove(res->getUniqueId());
-    mediaServers.remove(res->getId());
-    if (isIoModule(res))
-        --ioModulesCount;
-}
-
-void QnResourcePool::Cache::resourceAdded(const QnResourcePtr& res)
-{
-    resourcesByUniqueId.insert(res->getUniqueId(), res);
-    if (const auto& server = res.dynamicCast<QnMediaServerResource>())
-        mediaServers.insert(server->getId(), server);
-    else if (isIoModule(res))
-        ++ioModulesCount;
 }
 
 QnVirtualCameraResourceList QnResourcePool::getCamerasByFlexibleIds(

@@ -13,7 +13,7 @@ namespace nx::analytics::db {
 
 class DeviceDao;
 class ObjectTypeDao;
-class TimePeriodDao;
+class AttributesDao;
 class AnalyticsArchiveDirectory;
 
 class TimePeriodFetcher
@@ -22,7 +22,7 @@ public:
     TimePeriodFetcher(
         const DeviceDao& deviceDao,
         const ObjectTypeDao& objectTypeDao,
-        const TimePeriodDao& timePeriodDao,
+        AttributesDao* attributesDao,
         AnalyticsArchiveDirectory* analyticsArchive,
         std::chrono::milliseconds maxRecordedTimestamp);
 
@@ -35,7 +35,7 @@ public:
 private:
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
-    const TimePeriodDao& m_timePeriodDao;
+    AttributesDao* m_attributesDao = nullptr;
     AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
     const std::chrono::milliseconds m_maxRecordedTimestamp;
 
@@ -44,39 +44,9 @@ private:
         const Filter& filter,
         const TimePeriodsLookupOptions& options);
 
-    QnTimePeriodList selectFullTimePeriods(
-        nx::sql::QueryContext* queryContext,
-        const std::vector<QnUuid>& deviceIds,
-        const QnTimePeriod& timePeriod,
-        const TimePeriodsLookupOptions& options);
-
-    void prepareSelectTimePeriodsSimpleQuery(
-        nx::sql::AbstractSqlQuery* query,
-        const std::vector<QnUuid>& deviceIds,
-        const QnTimePeriod& timePeriod,
-        const TimePeriodsLookupOptions& options);
-
     QnTimePeriodList selectTimePeriodsFiltered(
         nx::sql::QueryContext* queryContext,
         const Filter& filter,
-        const TimePeriodsLookupOptions& options);
-
-    AnalyticsArchive::Filter prepareArchiveFilter(
-        const Filter& filter,
-        const TimePeriodsLookupOptions& options);
-
-    std::set<int64_t> lookupCombinedAttributes(
-        nx::sql::QueryContext* queryContext,
-        const QString& text);
-
-    void prepareSelectTimePeriodsFilteredQuery(
-        nx::sql::AbstractSqlQuery* query,
-        const Filter& filter,
-        const TimePeriodsLookupOptions& options);
-
-    QnTimePeriodList loadTimePeriods(
-        nx::sql::AbstractSqlQuery* query,
-        const QnTimePeriod& timePeriod,
         const TimePeriodsLookupOptions& options);
 };
 

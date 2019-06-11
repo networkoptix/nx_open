@@ -6,27 +6,9 @@
 namespace nx::vms::server::fs {
 
 PartitionsInformationProvider::PartitionsInformationProvider(RootFileSystem* rootFs):
-   m_rootFs(rootFs)
+    m_rootFs(rootFs),
+    m_fileName("/proc/mounts")
 {
-    m_fileName = lit("/proc/mounts");
-    // TODO: Fix this condition: /dev/root can be in Linux with any architecture.
-    if (nx::utils::AppInfo::isArm())
-    {
-        // On Rapberry Pi 2+ "/proc/mounts" contains unexisting "/dev/root" on "/", while mount
-        // reports a valid mounted device.
-        if (system("mount > /root/mounts") == 0)
-        {
-            // Some devices have /tmp related problems, while root can always access /root.
-            m_fileName = lit("/root/mounts");
-            m_scanfLongPattern = true;
-        }
-        else if (system("mount > /tmp/mounts") == 0)
-        {
-            // Temporary directory /tmp is a fallback for non-root users.
-            m_fileName = lit("/tmp/mounts");
-            m_scanfLongPattern = true;
-        }
-    }
 }
 
 QByteArray PartitionsInformationProvider::mountsFileContent() const
@@ -43,11 +25,6 @@ QByteArray PartitionsInformationProvider::mountsFileContent() const
         return QByteArray();
 
     return mountsFile.readAll();
-}
-
-bool PartitionsInformationProvider::isScanfLongPattern() const
-{
-    return m_scanfLongPattern;
 }
 
 qint64 PartitionsInformationProvider::totalSpace(const QByteArray& fsPath) const
