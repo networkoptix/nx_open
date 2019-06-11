@@ -7,20 +7,28 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from zipfile import ZipFile
 from ..models import Context, ContextTemplate, DataStructure, DataRecord, Product, ProductType
+from cloud import settings
 
 
-def find_or_add_product_type(product_type):
+def deprecate_data_structures_for_product_type(product_type):
+    for ds in DataStructure.objects.filter(context__product_type=product_type):
+        ds.deprecated = True
+        ds.save()
+
+
+def find_or_add_product_type(product_type, name=""):
     try:
-        product_type = ProductType.objects.get(type=product_type)
+        product_type = ProductType.objects.get(name=name, type=product_type)
     except ObjectDoesNotExist:
-        product_type = ProductType(type=product_type)
+        product_type = ProductType(name=name, type=product_type)
         product_type.save()
 
     return product_type
 
 
-def find_or_add_product(name, customization, product_type_name='cloud_portal'):
-    product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_name))
+def find_or_add_product(name, customization, product_type_type, product_type_name):
+    # TODO: add product_type.name
+    product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_type), product_type_name)
     product = Product.objects.filter(name=name, customizations__in=[customization], product_type=product_type).first()
     if not product:
         product = Product(name=name)
@@ -63,105 +71,51 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
     return data
 
 
-def deprecate_data_structures_for_product_type(product_type):
-    for ds in DataStructure.objects.filter(context__product_type=product_type):
-        ds.deprecated = True
-        ds.save()
-
-
-def update_from_object(cms_structure):
+def update_from_object(cms_structure, product_type_name=""):
     for product_type_structure in cms_structure:
-        # If product_type_structure type cannot be found in the structure
-        product_type_name = ProductType.PRODUCT_TYPES[0]
-        can_preview = False
-        single_customization = False
-        if 'type' in product_type_structure:
-            product_type_name = product_type_structure['type']
-        if 'can_preview' in product_type_structure:
-            can_preview = product_type_structure['can_preview']
-        if 'single_customization' in product_type_structure:
-            single_customization = product_type_structure['single_customization']
+        if product_type_name == "":
+            raise ValueError(f"Product type name cannot be {product_type_name}")
 
-        product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_name))
-        product_type.can_preview = can_preview
-        product_type.single_customization = single_customization
-        product_type.save()
+        product_type = update_product_type(product_type_name, product_type_structure)
         order = 0
-
         deprecate_data_structures_for_product_type(product_type)
 
         for context_data in product_type_structure['contexts']:
-            has_language = context_data["translatable"]
-            is_global = context_data["is_global"] if "is_global" in context_data else False
-            old_name = context_data["old_name"] if "old_name" in context_data else None
-            context = find_or_add_context(
-                context_data["name"], old_name, product_type, has_language, is_global)
-            if "description" in context_data:
-                context.description = context_data["description"]
-            if "file_path" in context_data:
-                context.file_path = context_data["file_path"]
-            if "url" in context_data:
-                context.url = context_data["url"]
-            context.is_global = is_global
-            context.label = context_data["label"] if "label" in context_data else ""
-            context.hidden = context_data["hidden"] if "hidden" in context_data else False
-            context.save()
-
+            context = update_context(context_data, product_type)
+            has_language = context.translatable
             for record in context_data["values"]:
-                name = record['name']
-                value = record['value'] if 'value' in record else ""
-                label = record['label'] if 'label' in record else ""
-                old_name = record['old_name'] if 'old_name' in record else None
-                description = record['description'] if 'description' in record else None
-                record_type = record['type'] if 'type' in record else None
-                meta = record['meta'] if 'meta' in record else None
-                advanced = record['advanced'] if 'advanced' in record else False
-                optional = record['optional'] if 'optional' in record else False
-                public = record['public'] if 'public' in record else True
-
-                data_structure = find_or_add_data_structure(name, old_name, context.id, has_language)
-
-                data_structure.order = order
+                update_data_structure(context.id, has_language, record, order)
                 order += 1
-                data_structure.label = label
-                data_structure.advanced = advanced
-                data_structure.optional = optional
-                data_structure.public = public
-                if description:
-                    data_structure.description = description
-                if record_type:
-                    data_structure.type = DataStructure.get_type_by_name(record_type)
-
-                if data_structure.type == DataStructure.DATA_TYPES.image:
-                    data_structure.translatable = "{{language}}" in name
-
-                    # this is used to convert source images into b64 strings
-                    file_path = os.path.join('static', '_source', 'blue', name)
-                    file_path = file_path.replace("{{language}}", 'en_US')
-                    try:
-                        with open(file_path, 'rb') as file:
-                            value = base64.b64encode(file.read()).decode('utf-8')
-                    except IOError:
-                        pass
-
-                # Checkboxes should always be optional otherwise they can initially be false but will always be true
-                # if modified.
-                elif data_structure.type == DataStructure.DATA_TYPES.check_box:
-                    data_structure.optional = True
-
-                elif data_structure.type in [DataStructure.DATA_TYPES.object, DataStructure.DATA_TYPES.array]:
-                    value = json.dumps(value, indent=4)
-
-                data_structure.meta_settings = meta if meta else {}
-                data_structure.default = value
-                data_structure.deprecated = False
-                data_structure.save()
 
 
 def read_structure_json(filename):
     with codecs.open(filename, 'r', 'utf-8') as file_descriptor:
         cms_structure = json.load(file_descriptor)
-        update_from_object(cms_structure)
+        update_from_object(cms_structure, product_type_name=settings.DEFAULT_PRODUCT_TYPE_NAME)
+
+
+def process_data_structure_type(data_structure, name, value):
+    if data_structure.type == DataStructure.DATA_TYPES.image:
+        data_structure.translatable = "{{language}}" in name
+
+        # this is used to convert source images into b64 strings
+        file_path = os.path.join('static', '_source', 'blue', name)
+        file_path = file_path.replace("{{language}}", 'en_US')
+        try:
+            with open(file_path, 'rb') as file:
+                value = base64.b64encode(file.read()).decode('utf-8')
+        except IOError:
+            pass
+
+    # Checkboxes should always be optional otherwise they can initially be false but will always be true
+    # if modified.
+    elif data_structure.type == DataStructure.DATA_TYPES.check_box:
+        data_structure.optional = True
+
+    elif data_structure.type in [DataStructure.DATA_TYPES.object, DataStructure.DATA_TYPES.array]:
+        value = json.dumps(value, indent=4)
+
+    return value
 
 
 def process_zip(file_descriptor, user, product, update_structure, update_content):
@@ -177,7 +131,7 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
         if name:
             data = zip_file.read(name)
             cms_structure = json.loads(data)
-            update_from_object(cms_structure)
+            update_from_object(cms_structure, product_type_name=product.product_type.name)
             log_messages.append(('success', f'Updated from json using {name}'))
         else:
             log_messages.append(('warning', 'Not found structure.json file'))
@@ -319,3 +273,53 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
                                     f'Records created: {records_created}'))
     log_messages.append(('success', 'Finished'))
     return log_messages
+
+
+def update_context(context_data, product_type):
+    has_language = context_data.get("translatable", False)
+    is_global = context_data.get("is_global", False)
+    old_name = context_data.get("old_name", None)
+    context = find_or_add_context(
+        context_data["name"], old_name, product_type, has_language, is_global)
+
+    context.is_global = is_global
+    context.translatable = has_language
+    context.description = context_data.get("description", "")
+    context.file_path = context_data.get("file_path", "")
+    context.url = context_data.get("url", "")
+    context.label = context_data.get("label", "")
+    context.hidden = context_data.get("hidden", False)
+    context.save()
+    return context
+
+
+def update_data_structure(context_id, has_lang, record, order):
+    name = record['name']
+    label = record.get("label", "")
+    old_name = record.get("old_name", None)
+
+    data_structure = find_or_add_data_structure(name, old_name, context_id, has_lang)
+    data_structure.label = label
+    data_structure.order = order
+    data_structure.advanced = record.get("advanced", False)
+    data_structure.optional = record.get("optional", False)
+    data_structure.public = record.get("public", True)
+    data_structure.description = record.get("description", "")
+    data_structure.type = DataStructure.get_type_by_name(record.get("type", "text"))
+
+    data_structure.meta_settings = record.get("meta", {})
+    data_structure.default = process_data_structure_type(data_structure, name, record.get("value", ""))
+    data_structure.deprecated = False
+    data_structure.save()
+
+
+def update_product_type(product_type_name, product_type_structure):
+    product_type_type = ProductType.get_type_by_name(product_type_structure.
+                                                     get("type", ProductType.PRODUCT_TYPES[0]))
+
+    product_type = find_or_add_product_type(product_type_type, product_type_name)
+    product_type.can_preview = product_type_structure.get("can_preview", False)
+    product_type.single_customization = product_type_structure.get('single_customization', False)
+    product_type.save()
+
+    return product_type

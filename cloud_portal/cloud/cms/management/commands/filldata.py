@@ -30,7 +30,7 @@ class Command(BaseCommand):
 
         if not Product.objects.filter(customizations__in=[customization],
                                       product_type__type=ProductType.PRODUCT_TYPES.cloud_portal).exists():
-            product = structure.find_or_add_product('Cloud Portal', customization)
+            product = structure.find_or_add_product('Cloud Portal', customization, 'cloud_portal', settings.DEFAULT_PRODUCT_TYPE_NAME)
         else:
             product = get_cloud_portal_product(options['customization'])
 

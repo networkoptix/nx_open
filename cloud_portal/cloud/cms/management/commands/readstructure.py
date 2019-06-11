@@ -33,7 +33,8 @@ def create_new_cloudportals_for_each_customization(logger):
             product_name = "Nx Cloud"
             logger.stdout.write(logger.style.SUCCESS("\tCouldnt find product name for {} using {}".
                                                      format(customization.name, product_name)))
-        cloud = structure.find_or_add_product(product_name, customization)
+        cloud = structure.find_or_add_product(product_name, customization, "cloud_portal",
+                                              settings.DEFAULT_PRODUCT_TYPE_NAME)
         cloud.customizations.add(customization)
         cloud.save()
     logger.stdout.write(logger.style.SUCCESS("Done creating new cloud portals"))
@@ -43,7 +44,8 @@ def move_contexts_to_producttype(logger):
     logger.stdout.write(
         logger.style.SUCCESS("\nMoving contexts from original cloud portal to product_type cloud_portal"))
     cloud_portal = Product.objects.get(name="cloud_portal")
-    cloud_portal_type = structure.find_or_add_product_type(ProductType.PRODUCT_TYPES.cloud_portal)
+    cloud_portal_type = structure.find_or_add_product_type(ProductType.PRODUCT_TYPES.cloud_portal,
+                                                           settings.DEFAULT_PRODUCT_TYPE_NAME)
 
     for context in cloud_portal.context_set.all():
         logger.stdout.write(logger.style.SUCCESS("\tMoving {}".format(context.name)))
@@ -79,7 +81,8 @@ def move_revisions_to_new_cloud_portals(logger):
 def migrate_18_3_to_18_4(logger):
     # If there are not products create a ProductType of cloud_portal and we can skip migrating 18 -> 19
     if not Product.objects.all().exists():
-        structure.find_or_add_product_type(ProductType.PRODUCT_TYPES.cloud_portal)
+        structure.find_or_add_product_type(ProductType.PRODUCT_TYPES.cloud_portal,
+                                           settings.DEFAULT_PRODUCT_TYPE_NAME)
 
     if ProductType.objects.all().exists():
         logger.stdout.write(logger.style.SUCCESS("Migration has already been completed skipping this step"))
@@ -170,7 +173,7 @@ def read_structure_file(filename, product_type, global_strings, skin):
 
 
 def read_structure(product_type):
-    product_type = structure.find_or_add_product_type(product_type)
+    product_type = structure.find_or_add_product_type(product_type, settings.DEFAULT_PRODUCT_TYPE_NAME)
     global_strings = DataStructure.objects.\
         filter(context__is_global=True, context__product_type=product_type).\
         values_list("name", flat=True)

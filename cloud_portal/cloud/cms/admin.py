@@ -135,7 +135,8 @@ class CMSAdmin(admin.ModelAdmin):
 
 
 class ProductTypeAdmin(CMSAdmin):
-    list_display = ('type', 'can_preview', 'single_customization',)
+    list_display = ('name', 'type', 'can_preview', 'single_customization',)
+    list_display_links = ('name', 'type')
 
 
 admin.site.register(ProductType, ProductTypeAdmin)
@@ -229,7 +230,7 @@ class ProductAdmin(CMSAdmin):
         return request.user.is_superuser
 
     def product_settings(self, obj):
-        if obj.product_type and not obj.product_type.single_customization:
+        if obj.product_type.type == ProductType.PRODUCT_TYPES.integration:
             return format_html('')
         return format_html('<a class="btn btn-sm" href="{}">Settings</a>',
                            reverse('product_settings', args=[obj.id]))
