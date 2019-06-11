@@ -27,7 +27,6 @@ def find_or_add_product_type(product_type, name=""):
 
 
 def find_or_add_product(name, customization, product_type_type, product_type_name):
-    # TODO: add product_type.name
     product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_type), product_type_name)
     product = Product.objects.filter(name=name, customizations__in=[customization], product_type=product_type).first()
     if not product:
