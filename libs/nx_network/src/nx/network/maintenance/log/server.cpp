@@ -223,7 +223,7 @@ std::vector<Logger> Server::splitAggregateLogger(
     nx::utils::log::AbstractLogger* logger,
     const std::set<nx::utils::log::Filter>& effectiveFilters) const
 {
-    auto aggregateLogger = reinterpret_cast<AggregateLogger*>(logger);
+    auto aggregateLogger = dynamic_cast<AggregateLogger*>(logger);
     if (!aggregateLogger)
         return { utils::toLoggerInfo(logger, effectiveFilters, id) };
 
