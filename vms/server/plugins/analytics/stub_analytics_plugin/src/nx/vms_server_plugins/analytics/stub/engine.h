@@ -7,6 +7,7 @@
 #include <condition_variable>
 
 #include <nx/sdk/uuid.h>
+#include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/helpers/engine.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
@@ -19,8 +20,9 @@ class Engine: public nx::sdk::analytics::Engine
 {
 public:
     using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;
+    using Plugin = nx::sdk::analytics::Plugin;
 
-    Engine(nx::sdk::analytics::IPlugin* plugin);
+    Engine(Plugin* plugin);
     virtual ~Engine() override;
 
     virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
@@ -29,6 +31,8 @@ public:
     // Capabilities.
     bool needUncompressedVideoFrames() const { return m_needUncompressedVideoFrames; }
     PixelFormat pixelFormat() const { return m_pixelFormat; }
+
+    virtual Plugin* plugin() const override { return pluginCasted<Plugin>(); }
 
 protected:
     virtual std::string manifest() const override;

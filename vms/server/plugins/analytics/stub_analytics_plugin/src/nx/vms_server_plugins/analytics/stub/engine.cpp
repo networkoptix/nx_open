@@ -4,9 +4,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/i_device_info.h>
-#include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/helpers/uuid_helper.h>
-#include <nx/sdk/helpers/ref_countable.h>
 
 #include "utils.h"
 #include "device_agent.h"
@@ -20,7 +18,7 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::IPlugin* plugin):
+Engine::Engine(nx::sdk::analytics::Plugin* plugin):
     nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
     initCapabilities();
@@ -545,7 +543,7 @@ extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
     return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
-        [](nx::sdk::analytics::IPlugin* plugin)
+        [](nx::sdk::analytics::Plugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::stub::Engine(plugin);
         });

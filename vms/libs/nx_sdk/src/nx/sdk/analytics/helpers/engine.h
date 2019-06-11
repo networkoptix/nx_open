@@ -93,14 +93,14 @@ protected:
      * @return Parent Plugin, casted to the specified type.
      */
     template<typename DerivedPlugin>
-    DerivedPlugin* pluginCasted()
+    DerivedPlugin* pluginCasted() const
     {
         const auto plugin = dynamic_cast<DerivedPlugin*>(m_plugin);
         assertPluginCasted(plugin);
         return plugin;
     }
 
-    IEngine::IHandler* handler() const { return m_handler.get(); }
+    IHandler* handler() const { return m_handler.get(); }
 
 public:
     virtual ~Engine() override;
