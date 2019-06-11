@@ -11,6 +11,6 @@ urlpatterns = [
 
     url(r'package/(?P<product_id>.+?)/?$', product.download_package, name="download_package"),
 
-    url(r'product_settings/(?P<product_id>.+?)/?$', product.product_settings, name="product_settings"),
+    url(r'product_settings/(?P<product_id>.+?)/$', product.product_settings, name="product_settings"),
 
 ]
