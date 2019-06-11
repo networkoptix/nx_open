@@ -6,6 +6,7 @@ from collections import OrderedDict
 from PIL import Image  # get Pillow
 from zipfile import ZipFile
 from ..models import Context, DataStructure, ProductType
+from cms.serializers import ProductTypeSerializer
 
 import logging
 logger = logging.getLogger(__name__)
@@ -185,9 +186,13 @@ def process_files(file_iterator, product):
     return [structure], log_errors
 
 
-def from_zip(file_descriptor, product):
-    return process_files(iterate_zip(file_descriptor), product)
+def from_database(product):
+    return [ProductTypeSerializer(product.product_type).data]
 
 
 def from_directory(directory, product):
     return process_files(iterate_directory(directory), product)
+
+
+def from_zip(file_descriptor, product):
+    return process_files(iterate_zip(file_descriptor), product)

@@ -668,7 +668,7 @@ class DataRecord(models.Model):
     language = models.ForeignKey(Language, null=True, blank=True, on_delete=models.CASCADE)
     # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
     customization = models.ForeignKey(Customization, default=None, blank=True, null=True, on_delete=models.SET_NULL)
-    version = models.ForeignKey(ContentVersion, null=True, blank=True, on_delete=models.CASCADE)
+    version = models.ForeignKey(ContentVersion, null=True, blank=True, on_delete=models.SET_NULL)
 
     created_date = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
