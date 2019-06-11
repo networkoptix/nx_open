@@ -7,6 +7,13 @@
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 {% endblock %}
 
+{% block object-tools-items %}
+    {% if user.is_superuser %}
+    <li><a href="{% url 'download_structure_from_db' original.id %}?get_values">Get Current Records</a></li>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
+
 {% block field_sets %}
     <div class="module custom-block">
         <h2>Product Information</h2>

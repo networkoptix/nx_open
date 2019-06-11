@@ -2,38 +2,58 @@ from rest_framework import serializers
 from cms.models import Context, DataStructure, ProductType
 
 
-class DataStructureSerializer(serializers.ModelSerializer):
+class BaseCMSSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        self.get_actual = False
+        if "get_actual" in kwargs:
+            self.get_actual = kwargs.pop("get_actual")
+        super().__init__(*args, **kwargs)
+
+
+class DataStructureSerializer(BaseCMSSerializer):
     class Meta:
         model = DataStructure
         fields = ("label", "name", "value", "description", "type", "advanced", "optional", "public", "meta")
         ordering = ('order', )
 
-    value = serializers.CharField(source="default")
+    value = serializers.SerializerMethodField('get_actual_value')
     meta = serializers.JSONField(source="meta_settings")
     type = serializers.SerializerMethodField("get_nice_name")
+
+    def get_actual_value(self, obj):
+        if obj.type in [DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file]:
+            return ""
+        if self.get_actual:
+            current_record = obj.datarecord_set.last()
+            if current_record:
+                return current_record.value
+        return obj.default
 
     def get_nice_name(self, obj):
         return DataStructure.DATA_TYPES[obj.type]
 
 
-class ContextSerializer(serializers.ModelSerializer):
+class ContextSerializer(BaseCMSSerializer):
     class Meta:
         model = Context
         fields = ("name", "label", "file_path", "description", "url", "translatable", "values")
 
-    values = DataStructureSerializer(source="datastructure_set", many=True)
+    values = serializers.SerializerMethodField('get_datastructure_values')
+
+    def get_datastructure_values(self, obj):
+        return DataStructureSerializer(obj.datastructure_set.all(), many=True, get_actual=self.get_actual).data
 
 
-class ProductTypeSerializer(serializers.ModelSerializer):
+class ProductTypeSerializer(BaseCMSSerializer):
     class Meta:
         model = ProductType
         fields = ("type", "can_preview", "single_customization", "contexts")
 
-    contexts = ContextSerializer(source="context_set", many=True)
+    contexts = serializers.SerializerMethodField('get_contexts_values')
     type = serializers.SerializerMethodField("get_nice_name")
+
+    def get_contexts_values(self, obj):
+        return ContextSerializer(obj.context_set.all(), many=True, get_actual=self.get_actual).data
 
     def get_nice_name(self, obj):
         return ProductType.PRODUCT_TYPES[obj.type]
-
-
-

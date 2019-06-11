@@ -310,9 +310,10 @@ def product_settings(request, product_id):
 
 @require_http_methods(["GET"])
 def download_current_structure(request, product_id):
+    use_current_values = "get_values" in request.GET
     product = Product.objects.filter(id=product_id).last()
     if product_id and product:
-        data = generate_structure.from_database(product)
+        data = generate_structure.from_database(product, use_current_values)
         content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
         return response_attachment(content, 'structure.json', 'application/json')
     return APIRequestException("Product not given or not found")

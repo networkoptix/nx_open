@@ -189,8 +189,8 @@ def process_files(file_iterator, product):
     return [structure], log_errors
 
 
-def from_database(product):
-    return [ProductTypeSerializer(product.product_type).data]
+def from_database(product, use_current_values):
+    return [ProductTypeSerializer(product.product_type, get_actual=use_current_values).data]
 
 
 def from_directory(directory, product):
