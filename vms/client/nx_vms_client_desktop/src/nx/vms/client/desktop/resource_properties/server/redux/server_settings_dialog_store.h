@@ -36,7 +36,7 @@ public:
 
     Q_INVOKABLE QVariant currentPlugin() const;
     Q_INVOKABLE QVariantList currentPluginDetails() const;
-    Q_INVOKABLE void selectCurrentPlugin(const QString& libraryName);
+    Q_INVOKABLE void selectCurrentPlugin(const QString& libraryFilename);
 
     Q_INVOKABLE bool pluginsInformationLoading() const;
     void setPluginsInformationLoading(bool value);

@@ -356,7 +356,7 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogge
 {
     const QString messageTemplate("Error occurred while fetching Plugin manifest: {:error}");
     return std::make_unique<sdk_support::ManifestLogger>(
-        typeid(this), //< Using the same tag for all instances.
+        typeid(*this), //< Using the same tag for all instances.
         messageTemplate,
         std::move(pluginResource));
 }
@@ -365,7 +365,7 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogge
     const nx::sdk::analytics::IPlugin* plugin) const
 {
     return std::make_unique<sdk_support::StartupPluginManifestLogger>(
-        nx::utils::log::Tag(typeid(this)),
+        typeid(*this), //< Using the same tag for all instances.
         plugin);
 }
 

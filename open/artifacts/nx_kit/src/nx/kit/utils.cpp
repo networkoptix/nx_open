@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <climits>
+#include <cerrno>
 
 #if defined(_WIN32)
     #define NOMINMAX //< Needed to prevent windows.h define macros min() and max().
@@ -167,6 +169,56 @@ std::string toString(std::nullptr_t ptr)
 std::string toString(bool b)
 {
     return b ? "true" : "false";
+}
+
+bool fromString(const std::string& s, int* value)
+{
+    if (!value || s.empty())
+        return false;
+
+    // NOTE: std::stoi() is missing on Android, thus, using std::strtol().
+    char* pEnd = nullptr;
+    errno = 0; //< Required before std::strtol().
+    const long v = std::strtol(s.c_str(), &pEnd, /*base*/ 0);
+
+    if (v > INT_MAX || v < INT_MIN || errno != 0 || *pEnd != '\0')
+        return false;
+
+    *value = (int) v;
+    return true;
+}
+
+bool fromString(const std::string& s, double* value)
+{
+    if (!value || s.empty())
+        return false;
+
+    // NOTE: std::stod() is missing on Android, thus, using std::strtod().
+    char* pEnd = nullptr;
+    errno = 0; //< Required before std::strtod().
+    const double v = std::strtod(s.c_str(), &pEnd);
+
+    if (errno == ERANGE || *pEnd != '\0')
+        return false;
+
+    *value = v;
+    return true;
+}
+
+bool fromString(const std::string& s, float* value)
+{
+    if (!value || s.empty())
+        return false;
+
+    // NOTE: std::stof() and std::strtof() are missing on Android, thus, using std::strtod().
+    char* pEnd = nullptr;
+    errno = 0; //< Required before std::strtod().
+    const float v = (float) std::strtod(s.c_str(), &pEnd);
+    if (errno == ERANGE || *pEnd != '\0')
+        return false;
+
+    *value = (float) v;
+    return true;
 }
 
 } // namespace utils

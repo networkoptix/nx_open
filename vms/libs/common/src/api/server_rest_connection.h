@@ -506,6 +506,8 @@ public:
         Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
+    Handle getPluginInformation(GetCallback callback, QThread* targetThread = nullptr);
+
     Handle debug(
         const QString& action,
         const QString& value,
