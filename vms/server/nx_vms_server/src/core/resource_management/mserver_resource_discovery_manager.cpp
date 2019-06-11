@@ -526,10 +526,20 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             if (m_resourceDiscoveryCounter[uniqId] >= m_serverModule->settings().retryCountToMakeCameraOffline())
             {
                 QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
+
+                NX_VERBOSE(this,
+                    "Camera %1 has not answered to %2 discovery loops in a row.",
+                    netResourceString(netRes), m_resourceDiscoveryCounter[uniqId]);
+
                 if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)
                     || (camRes && camRes->isLicenseUsed()))
                 {
-                    if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId]) {
+                    if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId])
+                    {
+                        NX_VERBOSE(this,
+                            "Send disconnected signal for camera %1",
+                            netResourceString(netRes));
+
                         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
                         if (cam)
                             cam->issueOccured();
