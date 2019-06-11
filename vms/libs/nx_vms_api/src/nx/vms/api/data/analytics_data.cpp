@@ -21,17 +21,31 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginInfo, Optionality,
     (nx::vms::api::PluginInfo::Optionality::nonOptional, "nonOptional")
-    (nx::vms::api::PluginInfo::Optionality::optional, "optional"))
+    (nx::vms::api::PluginInfo::Optionality::optional, "optional")
+)
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginInfo, Status,
     (nx::vms::api::PluginInfo::Status::loaded, "loaded")
     (nx::vms::api::PluginInfo::Status::notLoadedBecauseOfError, "notLoadedBecauseOfError")
     (nx::vms::api::PluginInfo::Status::notLoadedBecauseOfBlackList, "notLoadedBecauseOfBlackList")
-    (nx::vms::api::PluginInfo::Status::notLoadedBecauseOptional, "notLoadedBecauseOptional"))
+    (nx::vms::api::PluginInfo::Status::notLoadedBecauseOptional, "notLoadedBecauseOptional")
+)
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginInfo, Error,
-    (nx::vms::api::PluginInfo::Error::undefined, "undefined")
+    (nx::vms::api::PluginInfo::Error::noError, "noError")
     (nx::vms::api::PluginInfo::Error::cannotLoadLibrary, "cannotLoadLibrary")
     (nx::vms::api::PluginInfo::Error::invalidLibrary, "invalidLibrary")
     (nx::vms::api::PluginInfo::Error::libraryFailure, "libraryFailure")
-    (nx::vms::api::PluginInfo::Error::unsupportedVersion, "unsupportedVersion"))
+    (nx::vms::api::PluginInfo::Error::badManifest, "badManifest")
+    (nx::vms::api::PluginInfo::Error::unsupportedVersion, "unsupportedVersion")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginInfo, MainInterface,
+    (nx::vms::api::PluginInfo::MainInterface::undefined, "undefined")
+    (nx::vms::api::PluginInfo::MainInterface::nxpl_PluginInterface, "nxpl_PluginInterface")
+    (nx::vms::api::PluginInfo::MainInterface::nxpl_Plugin, "nxpl_Plugin")
+    (nx::vms::api::PluginInfo::MainInterface::nxpl_Plugin2, "nxpl_Plugin2")
+    (nx::vms::api::PluginInfo::MainInterface::nx_sdk_IPlugin, "nx_sdk_IPlugin")
+    (nx::vms::api::PluginInfo::MainInterface::nx_sdk_analytics_IPlugin,
+        "nx_sdk_analytics_IPlugin")
+)

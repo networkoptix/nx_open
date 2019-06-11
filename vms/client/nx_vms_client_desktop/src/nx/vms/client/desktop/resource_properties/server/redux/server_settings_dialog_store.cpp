@@ -43,6 +43,9 @@ QString pluginError(PluginInfo::Error errorCode)
 {
     switch (errorCode)
     {
+        case PluginInfo::Error::noError:
+            return ServerSettingsDialogStore::tr("no error");
+
         case PluginInfo::Error::cannotLoadLibrary:
             return ServerSettingsDialogStore::tr("library file cannot be loaded");
 
@@ -51,6 +54,9 @@ QString pluginError(PluginInfo::Error errorCode)
 
         case PluginInfo::Error::libraryFailure:
             return ServerSettingsDialogStore::tr("plugin library failed to initialize");
+
+        case PluginInfo::Error::badManifest:
+            return ServerSettingsDialogStore::tr("plugin returned bad manifest");
 
         case PluginInfo::Error::unsupportedVersion:
             return ServerSettingsDialogStore::tr("plugin API version is no longer supported");

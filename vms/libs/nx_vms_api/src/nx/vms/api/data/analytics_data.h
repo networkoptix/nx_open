@@ -25,6 +25,8 @@ struct NX_VMS_API AnalyticsEngineData: ResourceData
 
 /**
  * Information about a Server plugin library.
+ *
+ * See Apidoc for /api/pluginInfo for details.
  */
 struct NX_VMS_API PluginInfo: Data
 {
@@ -44,11 +46,22 @@ struct NX_VMS_API PluginInfo: Data
 
     enum class Error
     {
+        noError,
+        cannotLoadLibrary,
+        invalidLibrary,
+        libraryFailure,
+        badManifest,
+        unsupportedVersion
+    };
+
+    enum class MainInterface
+    {
         undefined,
-        cannotLoadLibrary, //< OS cannot load the library file.
-        invalidLibrary, //< The library doesn't seem to be a valid Nx Plugin library.
-        libraryFailure, //< The plugin library failed to initialize.
-        unsupportedVersion //< The plugin API version is no longer supported.
+        nxpl_PluginInterface,
+        nxpl_Plugin,
+        nxpl_Plugin2,
+        nx_sdk_IPlugin,
+        nx_sdk_analytics_IPlugin,
     };
 
     QString name;
@@ -59,11 +72,13 @@ struct NX_VMS_API PluginInfo: Data
     Optionality optionality = Optionality::nonOptional;
     Status status = Status::loaded;
     QString statusMessage;
-    Error errorCode = Error::undefined;
+    Error errorCode = Error::noError;
+    MainInterface mainInterface = MainInterface::undefined;
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Optionality)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Status)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Error)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::MainInterface)
 #define PluginInfo_Fields (name) \
     (description) \
     (libraryFilename) \
@@ -72,7 +87,8 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Error)
     (optionality) \
     (status) \
     (statusMessage) \
-    (errorCode)
+    (errorCode) \
+    (mainInterface)
 
 } // namespace nx::vms::api
 
@@ -82,3 +98,5 @@ Q_DECLARE_METATYPE(nx::vms::api::PluginInfo)
 Q_DECLARE_METATYPE(nx::vms::api::PluginInfoList)
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginInfo::Optionality, (lexical), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginInfo::Status, (lexical), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginInfo::Error, (lexical), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginInfo::MainInterface, (lexical), NX_VMS_API)
