@@ -119,6 +119,10 @@
 </form>
 
 <script>
+    {% if preview_link %}
+        window.open("{{ preview_link }}");
+    {% endif %}
+
     function openPreview() {
         window.open("{{ preview_link }}");
     }
