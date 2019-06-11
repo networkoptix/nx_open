@@ -55,7 +55,9 @@ export class IntegrationService implements OnDestroy {
         if (section) {
             section.screenshots = Object.keys(section).filter((element) => {
                 return element.match(/screenshot/i) && section[element];
-            }).sort().map((key) => section[key]);
+            }).sort().map((key) => {
+                return {id: key, value: section[key]};
+            });
             if (section.screenshots.length < 1) {
                 delete section.screenshots;
             }
