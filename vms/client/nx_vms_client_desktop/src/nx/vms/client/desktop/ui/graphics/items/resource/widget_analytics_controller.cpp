@@ -227,6 +227,11 @@ void WidgetAnalyticsController::Private::findExistingItems()
 
 void WidgetAnalyticsController::Private::updateZoomWindowForArea(const QnUuid& areaId)
 {
+    // Click on the highlighted widget must not create a zoom window if the current widget is a
+    // zoom window itself.
+    if (mediaResourceWidget->isZoomWindow())
+        return;
+
     auto item = findItemForObject(layoutResource(), areaId);
     const bool newItem = item.uuid.isNull();
 
@@ -344,7 +349,24 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
         {
             areaInfo.rectangle = objectInfo.rectangle;
         }
+
         areaInfo.rectangle = Geometry::movedInto(areaInfo.rectangle, kWidgetBounds);
+
+        // If the current widget is zoom window itself, transpose object area correspondingly.
+        if (mediaResourceWidget->isZoomWindow())
+        {
+            areaInfo.rectangle = Geometry::toSubRect(mediaResourceWidget->zoomRect(),
+                areaInfo.rectangle);
+
+            // Remove areas that are not fit into current zoom window.
+            areaInfo.rectangle = Geometry::intersection(areaInfo.rectangle, kWidgetBounds);
+            if (areaInfo.rectangle.isEmpty())
+            {
+                areaHighlightWidget->removeArea(areaInfo.id);
+                continue;
+            }
+
+        }
 
         if (!objectInfo.zoomWindowItemUuid.isNull())
         {
