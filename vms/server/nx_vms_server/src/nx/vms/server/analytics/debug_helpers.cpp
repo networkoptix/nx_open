@@ -236,15 +236,13 @@ void dumpStringToFile(
     const QString& filename)
 {
     using nx::utils::log::Level;
-    auto log = //< Can be used to return after logging: return log(...).
+    const auto log = //< Can be used to return after logging: `return log(...);`.
         [&logTag, &filename](Level level, const QString& message)
         {
             NX_UTILS_LOG(level, logTag, "Dumping to file: %1: [%2]", message, filename);
         };
 
-    log(Level::info, "Saving to file");
-
-    QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(directoryPath));
+    const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(directoryPath));
     if (!nx::utils::file_system::ensureDir(dir))
         return log(Level::error, "Unable to create directory for file");
 
@@ -258,8 +256,10 @@ void dumpStringToFile(
     if (!stringToDump.isEmpty() && stringToDump.back() != '\n')
     {
         if (f.write("\n") < 0)
-            return log(Level::error, "Unable to write trailing `\n` to file");
+            return log(Level::error, "Unable to write trailing newline to file");
     }
+
+    log(Level::info, "Success");
 }
 
 QString loadStringFromFile(
