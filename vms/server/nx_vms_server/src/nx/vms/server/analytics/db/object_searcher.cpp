@@ -369,7 +369,7 @@ void ObjectSearcher::fetchObjectsFromDb(
     nx::sql::SqlFilterFieldAnyOf objectGroupFilter(
         "og.group_id",
         ":groupId",
-        objectGroups);
+        std::vector<long long>(objectGroups.begin(), objectGroups.end()));
 
     std::string limitExpr;
     if (m_filter.maxObjectsToSelect > 0)
