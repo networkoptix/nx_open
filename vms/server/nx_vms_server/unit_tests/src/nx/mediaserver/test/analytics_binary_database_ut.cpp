@@ -20,6 +20,8 @@ static const int kAllAttributesHash = 1;
 auto kbaseDateMs =
     QDateTime::fromString("2017-12-31T00:23:50", Qt::ISODate).toMSecsSinceEpoch();
 
+auto kbaseDateMs2 =
+    QDateTime::fromString("2018-01-31T00:23:50", Qt::ISODate).toMSecsSinceEpoch();
 
 using namespace std::chrono;
 using namespace nx::vms::server::metadata;
@@ -209,6 +211,35 @@ TEST_F(AnalyticsArchive, matchObjectGroups)
     ASSERT_EQ(2, result.data.size());
     ASSERT_EQ(kSteps, result.data[0].objectGroupId);
     ASSERT_EQ(kSteps-1, result.data[1].objectGroupId);
+}
+
+TEST_F(AnalyticsArchive, matchLongArchive)
+{
+    static const std::chrono::milliseconds kAggregationInterval(
+        nx::vms::server::metadata::AnalyticsArchive::kAggregationInterval);
+
+    const std::vector<qint64> timePoints = {kbaseDateMs, kbaseDateMs2, kbaseDateMs2 + kDeltaMs};
+    for (auto timestamp: timePoints)
+    {
+        nx::vms::server::metadata::AnalyticsArchive archive(
+            serverModule().metadataDatabaseDir(),
+            m_camera->getPhysicalId());
+        std::vector<QRectF> rects{QRectF(0.0, 0.0, 0.5, 0.5)};
+        archive.saveToArchive(
+            std::chrono::milliseconds(timestamp),
+            rects,
+            0,
+            kObjectTypeId,/* bjectType*/
+            kAllAttributesHash /*allAttributesHash*/);
+    }
+
+    metadata::AnalyticsArchive archive(
+        serverModule().metadataDatabaseDir(), m_camera->getPhysicalId());
+    auto result = archive.matchObjects(createRequest(Qt::SortOrder::AscendingOrder));
+
+    ASSERT_EQ(timePoints.size(), result.data.size());
+    for (int i = 0; i < timePoints.size(); ++i)
+        ASSERT_EQ(timePoints[i], result.data[i].timestampMs);
 }
 
 } // nx::vms::server::test
