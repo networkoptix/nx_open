@@ -1,28 +1,28 @@
 {
 	"search": {
 		"Search": "חיפוש",
-		"search_ipvd": "Search by model or manufacturer",
-		"filter applied": "filter applied",
-		"filters applied": "filters applied",
-		"Any": "Any",
-		"selected": "selected",
-		"vendor": "Manufacturer",
-		"vendors": "manufacturers",
+		"search_ipvd": "חפש לפי דגם או יצרן",
+		"filter applied": "מסננים הופעלו",
+		"filters applied": "מסננים הופעלו",
+		"Any": "כל",
+		"selected": "נבחר",
+		"vendor": "יצרן",
+		"vendors": "יצרנים",
 		"hardwareType": "סוג",
-		"hardwareTypes": "types",
-		"minResolution": "Minimum Resolution"
+		"hardwareTypes": "סוגים",
+		"minResolution": "רזולוציה מינימלית"
 	},
 	"cameraFilters": {
-		"ptz": "PTZ cameras",
-		"aptz": "Cameras with advanced PTZ",
-		"fisheye": "Fisheye cameras",
-		"H265": "H.265 Cameras",
-		"IO": "I / O modules",
-		"multiSensor": "Multi-sensor cameras",
-		"TwWayAudio": "2-way audio devices",
-		"audio": "Cameras with audio",
-		"encoder": "Encoders",
-		"highRes": "Extra high resolution cameras"
+		"ptz": "מצלמות PTZ",
+		"aptz": "מצלמות עם PTZ מתקדם",
+		"fisheye": "מצלמות Fisheye",
+		"H265": "H.265 מצלמות",
+		"IO": "מודולי קלט פלט",
+		"multiSensor": "מצלמות מרובות חיישנים",
+		"TwWayAudio": "התקני שמע דו-כיוונית",
+		"audio": "מצלמות עם אודיו",
+		"encoder": "דוחסים",
+		"highRes": "מצלמות ברזולוציה גבוהה במיוחד"
 	},
 	"downloads": {
 		"mobile": {
@@ -62,19 +62,17 @@
 			"arm": {
 				"label": "ARM",
 				"shortLabel": "ARM",
-				"supported": "Debian/Ubuntu based"
+				"supported": "Debian/Ubuntu Linux"
 			},
 			"sdk": {
 				"label": "SDK",
 				"shortLabel": "SDK",
-				"supported": "C++ cross platform SDK"
+				"supported": "C + + פלטפורמת SDK"
 			}
 		},
 		"platforms": {
 			"win64": "x64",
-			"win86": "x86",
 			"linux64": "x64",
-			"linux86": "x86",
 			"mac": "X",
 			"bananapi": "Banana Pi",
 			"bpi": "Nx1",
@@ -85,73 +83,81 @@
 			"server": "שרת בלבד",
 			"bundle": "לקוח ושרת",
 			"servertool": "כלי תצורה",
-			"package": "Package"
+			"package": "חבילה"
 		},
 		"releasesTypes": {
-			"beta": "Beta",
+			"beta": "בטא",
 			"betas": "ביתא",
-			"rc": "Release Candidate",
-			"release": "Release",
+			"rc": "גירסא לא סופית",
+			"release": "מהדורה",
 			"releases": "גרסאות",
-			"patch": "Patch",
+			"patch": "תיקון",
 			"patches": "תיקונים"
 		}
 	},
 	"ipvd": {
-		"count": "Count",
-		"vendor": "Manufacturer",
+		"count": "ספירה",
+		"vendor": "יצרן",
 		"model": "מודל",
 		"hardwareType": "סוג",
-		"maxResolution": "Max Resolution",
-		"maxFps": "Max FPS",
-		"primaryCodec": "Codec",
+		"maxResolution": "רזולוציה מקסימלית",
+		"maxFps": "מקס FPS",
+		"primaryCodec": "מקודד",
 		"isAudioSupported": "אודיו",
-		"isTwAudioSupported": "2-way Audio",
+		"isTwAudioSupported": "אודיו דו כיווני",
 		"isPtzSupported": "מצלמה ממונעת",
-		"isAptzSupported": "Advanced PTZ",
-		"isAptzSupportedShort": "Adv. PTZ",
+		"isAptzSupported": "מתקדם PTZ",
+		"isAptzSupportedShort": "מתקדם PTZ",
 		"isFisheye": "עין הדג",
 		"isMdSupported": "תנועה",
-		"isIoSupported": "I/O",
+		"isIoSupported": "I / O",
 		"isH265": "H.265",
-		"isMultiSensor": "Multi Sensor",
+		"isMultiSensor": "מרובה חיישנים",
 		"camera": "מצלמה",
-		"multiSensorCamera": "Multi-Sensor Camera",
-		"encoder": "Encoder",
+		"multiSensorCamera": "מצלמה עם מספר חיישנים",
+		"encoder": "דוחס",
 		"dvr": "DVR",
-		"other": "Other",
-		"PTZ cameras": "PTZ cameras",
-		"Advanced PTZ cameras": "Advanced PTZ cameras",
-		"Fisheye Cameras": "Fisheye Cameras",
-		"Cameras supporting H.265": "Cameras supporting H.265",
-		"I / O modules": "I / O modules",
-		"Multisensor Cameras": "Multisensor Cameras",
-		"Cameras with 2-way audio": "Cameras with 2-way audio",
-		"Extra high resolution cameras": "Extra high resolution cameras",
+		"other": "אחר",
+		"PTZ cameras": "מצלמות PTZ",
+		"Advanced PTZ cameras": "מצלמות PTZ מתקדמות",
+		"Fisheye Cameras": "מצלמות Fisheye",
+		"Cameras supporting H.265": "מצלמות התומכות H.265",
+		"I / O modules": "מודולי קלט פלט",
+		"Multisensor Cameras": "מצלמות מרובות חיישנים",
+		"Cameras with 2-way audio": "מצלמות עם אודיו דו כיווני",
+		"Extra high resolution cameras": "מצלמות ברזולוציה גבוהה במיוחד",
 		"feedback": {
-			"a_Please": "Please",
-			"b_Link": "submit a request",
-			"c_Info": "for additional questions/concerns regarding supported devices."
+			"a_Please": "בבקשה",
+			"b_Link": "הגש בקשה",
+			"c_Info": "לשאלות / בקשות נוספות בנוגע להתקנים נתמכים."
 		}
 	},
 	"integration": {
-		"previewRibbonText": "This page is a preview of the latest changes, and it doesn't match publicly available version.",
-		"backToEditText": "Back to the editing interfaces",
-		"Access Control": "Access Control",
-		"Connector": "Connector",
-		"Data Analytics": "Data Analytics",
-		"Drone": "Drone",
+		"previewRibbonText": "דף זה הוא תצוגה מקדימה של השינויים האחרונים, והוא אינו תואם לגרסה הזמינה לציבור.",
+		"backToEditText": "חזרה לממשקי העריכה",
+		"Access Control": "בקרת כניסה",
+		"Connector": "מחבר",
+		"Data Analytics": "ניתוח נתונים",
+		"Drone": "מטוס זעיר ללא טייס",
 		"Health Monitor": "ניטור תקינות",
 		"Storage": "אחסון"
 	},
 	"messageDialogPlaceholders": {
-		"feedback": "Make sure you include your camera model and manufacturer..."
+		"feedback": "הקפד לכלול את דגם המצלמה והיצרן שלך..."
 	},
-	"About %PRODUCT_NAME%": "אודות %PRODUCT_NAME%",
-	"Download %VMS_NAME%": "הורד %VMS_NAME%",
-	"Integrations": "Integrations",
-	"Support": "תמיכה",
-	"Terms": "תנאי שימוש",
-	"Privacy": "פרטיות",
-	"Supported Devices": "Supported Devices"
+	"pageTitles": {
+		"supportedDevices": "Supported Devices",
+		"integrations": "Integrations"
+	},
+	"dialogs": {
+		"merge": {
+			"connectToCloud": "Connect System you want to merge with this one to <strong>{{cloudName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.",
+			"mergeConfirmation": "You are about to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>. Settings and the name will be taken from the <strong>{{primarySystem}}</strong>.",
+			"primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current system. Update the current system to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.",
+			"primarySystemOffline": "System {{primarySystem}} is offline and cannot be merged with System {{targetSystem}}.",
+			"secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current system. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
+			"systemOffline": "System {{targetSystem}} is offline and cannot be merged with the current one.",
+			"systemUnavailable": "System {{targetSystem}} is currently unreachable. Try again in a few minutes or contact"
+		}
+	}
 }

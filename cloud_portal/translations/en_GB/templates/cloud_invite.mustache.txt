@@ -1,12 +1,12 @@
 Hello,
 
-You have been invited to %PRODUCT_NAME%.
+You have been invited to %CLOUD_NAME%.
 {{#message.message}}
 
 {{ message.message }}
 
 {{/message.message}}
-Please create account on %PRODUCT_NAME%
+Please create account on %CLOUD_NAME%
 using your current email address and follow further instructions.
 
 Register your account using this link: {{ config.portal_url }}/register/{{ message.code }}

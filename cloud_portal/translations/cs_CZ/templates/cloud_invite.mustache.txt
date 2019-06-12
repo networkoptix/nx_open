@@ -1,12 +1,12 @@
-Hello,
+Dobrý den,
 
-You have been invited to %PRODUCT_NAME%.
+You have been invited to %CLOUD_NAME%.
 {{#message.message}}
 
 {{ message.message }}
 
 {{/message.message}}
-Please create account on %PRODUCT_NAME%
-using your current email address and follow further instructions.
+Please create account on %CLOUD_NAME%
+pomocí aktuální e-mailové adresy a postupujte podle dalších pokynů.
 
-Register your account using this link: {{ config.portal_url }}/register/{{ message.code }}
+Registrujte svůj účet pomocí tohoto odkazu: {{ config.portal_url }}/register/{{ message.code }}

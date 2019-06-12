@@ -9,7 +9,7 @@
 		"vendor": "Produttore",
 		"vendors": "produttori",
 		"hardwareType": "Tipo",
-		"hardwareTypes": "tipi",
+		"hardwareTypes": "tipo",
 		"minResolution": "Risoluzione minima"
 	},
 	"cameraFilters": {
@@ -72,9 +72,7 @@
 		},
 		"platforms": {
 			"win64": "x64",
-			"win86": "x86",
 			"linux64": "x64",
-			"linux86": "x86",
 			"mac": "X",
 			"bananapi": "Banana Pi",
 			"bpi": "Nx1",
@@ -147,11 +145,19 @@
 	"messageDialogPlaceholders": {
 		"feedback": "Assicurati di includere il modello della telecamera e il produttore..."
 	},
-	"About %PRODUCT_NAME%": "Informazioni su %PRODUCT_NAME%",
-	"Download %VMS_NAME%": "Scarica %VMS_NAME%",
-	"Integrations": "Integrazioni",
-	"Support": "Supporto",
-	"Terms": "Termini di servizio",
-	"Privacy": "Privacy",
-	"Supported Devices": "Dispositivi supportati"
+	"pageTitles": {
+		"supportedDevices": "Supported Devices",
+		"integrations": "Integrations"
+	},
+	"dialogs": {
+		"merge": {
+			"connectToCloud": "Connect System you want to merge with this one to <strong>{{cloudName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.",
+			"mergeConfirmation": "You are about to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>. Settings and the name will be taken from the <strong>{{primarySystem}}</strong>.",
+			"primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current system. Update the current system to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.",
+			"primarySystemOffline": "System {{primarySystem}} is offline and cannot be merged with System {{targetSystem}}.",
+			"secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current system. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
+			"systemOffline": "System {{targetSystem}} is offline and cannot be merged with the current one.",
+			"systemUnavailable": "System {{targetSystem}} is currently unreachable. Try again in a few minutes or contact"
+		}
+	}
 }

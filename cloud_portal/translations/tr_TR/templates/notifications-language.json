@@ -2,31 +2,31 @@
   "activate_account": {
     "emailSubject": "Hesabınızı Aktifleştirin"
   },
-  "restore_password": {
-    "emailSubject": "Parolanızı sıfırlayın"
-  },
-  "system_invite": {
-    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} seni davet ediyor %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Video sistemi {{message.system_name}} seninle paylaşıldı{{/message.sharer_name}}"
-  },
-  "system_shared": {
-    "emailSubject": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
-  },
-  "review_version": {
-    "emailSubject": "Sürüm {{message.id}} incelenmeye hazır"
+  "cloud_invite": {
+    "emailSubject": "You have been invited to %CLOUD_NAME%"
   },
   "cloud_notification": {
     "emailSubject": "{{message.subject}}"
   },
-  "cloud_invite": {
-    "emailSubject": "%PRODUCT_NAME% davet edildin"
+  "contact_sales": {
+    "emailSubject": "Sales inquiry for {{message.product}}"
+  },
+  "contact_support": {
+    "emailSubject": "Support request for {{message.product}}"
   },
   "ipvd_feedback": {
     "emailSubject": "{{message.product}} için Kamera Geribildirim Sayfası"
   },
-  "sales_inquiry": {
-    "emailSubject": "{{message.product}} için satış talebi"
+  "review_version": {
+    "emailSubject": "{{message.product_type}}: {{message.product}} has a new version to review"
   },
-  "support_request": {
-    "emailSubject": "{{message.product}} için Destek talebi"
+  "restore_password": {
+    "emailSubject": "Parolanızı sıfırlayın"
+  },
+  "system_invite": {
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} invites you to %CLOUD_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Video system {{message.system_name}} was shared with you{{/message.sharer_name}}"
+  },
+  "system_shared": {
+    "emailSubject": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
   }
 }

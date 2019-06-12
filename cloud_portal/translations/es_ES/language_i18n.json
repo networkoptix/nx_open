@@ -1,12 +1,11 @@
 {
     "2-Way Audio": "Audio bidireccional",
-    "About %PRODUCT_NAME%": "Sobre %PRODUCT_NAME%",
     "Account Settings": "Ajustes de cuenta",
     "Account not activated": "Cuenta no activada",
     "Account not found": "Cuenta no encontrada",
-    "Administration": "Administration",
-    "Advanced PTZ": "PTZ avanzado",
-    "Advanced search": "Búsqueda Avanzada",
+    "Administration": "Administración",
+    "Advanced PTZ": "PTZ Avanzado",
+    "Advanced Search": "Advanced Search",
     "All Systems": "Todos los Sistemas",
     "All cloud users will be deleted.": "Se eliminarán todos los usuarios de la nube.",
     "All integrations": "Todas las integraciones",
@@ -19,50 +18,51 @@
     "Cameras menu": "Menú de cámaras",
     "Cancel": "Cancelar",
     "Change Password": "Cambiar contraseña",
+    "Checking...": "Comprobando...",
     "Choose which properties should be visible to customers:": "Elija qué propiedades deben ser visibles para los clientes:",
     "Close": "Cerrar",
     "Codec": "Codec",
-    "Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.": "Conecte el sistema que desea fusionar con este a %PRODUCT_NAME% o fusione localmente usando %VMS_NAME% Client.",
     "Contact": "Contacto",
     "Create Account": "Crear Cuenta",
     "Create account": "Crear Cuenta",
     "Disconnect": "Desconectar",
-    "Disconnect System from %PRODUCT_NAME%?": "¿Desconectar el Sistema de %PRODUCT_NAME%?",
+    "Disconnect System from %CLOUD_NAME%?": "Disconnect System from %CLOUD_NAME%?",
     "Download": "Descargar",
     "Download %VMS_NAME%": "Descargar %VMS_NAME%",
     "Download Chrome": "Descargar Chrome",
     "Download Firefox": "Descargar Firefox",
     "Download Links:": "Enlaces de descarga:",
     "Downloads": "Descargas",
+    "Draft": "Draft",
     "Dual Streaming": "Doble flujo",
     "Email": "Correo electrónico",
     "Embed": "Insertar",
     "Enter \"Public User\" credentials:": "Introduzca las credenciales de \"Usuario público\":",
+    "Enter password for your account to continue": "Introduzca la contraseña para que su cuenta continúe",
     "Enter password to continue.": "Introduzca la contraseña para continuar.",
-    "Enter password to your account.": "Introduzca la contraseña de su cuenta.",
     "Export all to CSV": "Exportar todo a CSV",
     "FPS(max)": "FPS (max)",
     "Firmware version": "Versión de firmware",
     "Fisheye": "Ojo de pez",
     "Forgot password?": "¿Has olvidado tu contraseña?",
+    "Get in touch": "Get in touch",
+    "How to install?": "How to install?",
     "I agree to the": "Estoy de acuerdo con",
     "I want you to contact me": "Quiero que me contactes",
     "I/O": "E/S",
+    "In Review": "In Review",
     "In-Client Upgrade:": "Actualización en el cliente:",
-    "Instructions": "Instrucciones",
-    "Integrations": "Integraciones",
     "Latest version": "Última versión",
     "Log In": "Iniciar sesión",
     "Log Out": "Cerrar Sessión",
-    "Log in to %PRODUCT_NAME%": "Inicie sesión en %PRODUCT_NAME%",
-    "Merge": "Combinar",
-    "Merge Anyway": "Fusionar de todos modos",
+    "Log in to %CLOUD_NAME%": "Log in to %CLOUD_NAME%",
     "Merge Systems": "Unir Sistemas",
     "Merge current System with": "Combinar el sistema actual con",
     "Message": "Mensaje",
     "Motion Detection": "Detección de movimiento",
     "Multi Sensor": "Multi Sensor",
     "Nothing Found": "No hay resultados",
+    "OK": "Aceptar",
     "Ok": "Ok",
     "Other packages:": "Otros paquetes:",
     "Other releases, patches and beta versions": "Otros lanzamientos, parches y versiones beta",
@@ -72,11 +72,10 @@
     "Password:": "Contraseña:",
     "Permissions": "Permissiones",
     "Popularity": "Popularidad",
-    "Privacy": "Privacidad",
     "Release Notes": "Notas de la versión",
     "Release notes": "Notas de la versión",
     "Remember me": "Recuérdame",
-    "Resend activation email": "Reenviar correo de activación",
+    "Resend activation email": "Reenviar E-Mail de activación",
     "Resolution(max)": "Resolución(max)",
     "Save": "Guardar",
     "Search in google": "Buscar en google",
@@ -87,48 +86,106 @@
     "Share": "Compartir",
     "Show All": "Mostrar todo",
     "Some of your servers don't support cloud System merge because of outdated software version.": "Algunos de sus servidores no admiten la combinación de sistemas en la nube debido a una versión de software desactualizada.",
-    "Support": "Soporte",
-    "Supported Devices": "Dispositivos soportados",
-    "System": "Sistema",
+    "Support": "Asistencia",
     "System name": "Nombre del sistema",
     "System name is required": "Nombre del sistema es requierido",
     "System will be accessible through local network with local administrator account.": "El sistema será accesible a través de la red local con la cuenta del administrador local.",
     "Systems": "Sistemas",
     "Systems of such size may work but will be unstable and have troubles with updates and synchronisation.": "Los sistemas de tal tamaño pueden funcionar pero serán inestables y tendrán problemas con las actualizaciones y la sincronización.",
-    "Take System name and settings from": "Tome el nombre del sistema y la configuración de",
-    "Terms": "Términos",
+    "Take the name and settings from": "Tome el nombre y la configuración de",
     "The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.": "Las credenciales de este usuario serán expuestas! Debe crear un rol de \"Usuario público\" personalizado con acceso solo\n            a las cámaras seleccionadas para uso público, y asignado solo los permisos de visualización mínimos requeridos. Este\n            \"Usuario público\" no debe tener acceso a todo el sistema de ningún tipo.",
     "There will be more than": "Habrá más de",
     "Too many attempts. Try again in a minute.": "Demasiados intentos. Inténtalo de nuevo en un minuto.",
+    "Topic": "Topic",
     "Update them to the": "Actualizarlos a",
     "Updated": "Actualizado",
     "User": "Usuario",
     "View": "Vista",
-    "We'd recommend consulting with": "Recomendamos consultar con",
     "We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.": "Recomendamos instalar las últimas versiones de Google Chrome o Mozilla Firefox, pero puede usar cualquier otro navegador web moderno.",
     "What's new?": "¿Qué novedades hay?",
     "Wrong password": "Contraseña incorrecta",
     "You can merge only those cloud Systems, where you have the \"Owner\" permissions.": "Puede fusionar esos sistemas en la nube, solo cuando tiene los permisos de \"Propietario\".",
-    "You can only merge Systems in which you have owner permissions.": "Solo puede fusionar sistemas en los que tenga permisos de propietario.",
+    "You can only merge Systems where you are the owner.": "Sólo puede fusionar Sistemas donde usted es el propietario.",
     "Your Name": "Tu Nombre",
     "Your browser is not supported": "Tu navegador no es compatible",
-    "and_x_more": "... and {{value}} more",
-    "before proceeding.": "antes de continuar.",
+    "and_x_more": "... y {{value}} más",
     "cameraFilters": {
-        "TwWayAudio": "2-way audio devices",
-        "H265": "H.265 Cameras",
-        "encoder": "Encoders",
-        "multiSensor": "Multi-sensor cameras",
-        "ptz": "PTZ cameras",
+        "H265": "Cámaras H.265",
         "IO": "I / O modules",
-        "highRes": "Extra high resolution cameras",
+        "TwWayAudio": "Dispositivos de audio de 2 vías",
         "aptz": "Cameras with advanced PTZ",
         "audio": "Cameras with audio",
-        "fisheye": "Fisheye cameras"
+        "encoder": "Codificador",
+        "fisheye": "Fisheye cameras",
+        "highRes": "Extra high resolution cameras",
+        "multiSensor": "Multi-sensor cameras",
+        "ptz": "PTZ cameras"
     },
     "devices": "dispositivos",
-    "disclaimer": "This list is limited to actual devices auto-reporting data to {{value}}, as approved by anonymous system users. The complete list of supported manufacturers and models is greater in scope.",
+    "dialogs": {
+        "merge": {
+            "connectToCloud": "Connect System you want to merge with this one to <strong>{{cloudName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.",
+            "mergeConfirmation": "You are about to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>. Settings and the name will be taken from the <strong>{{primarySystem}}</strong>.",
+            "primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current system. Update the current system to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.",
+            "primarySystemOffline": "System {{primarySystem}} is offline and cannot be merged with System {{targetSystem}}.",
+            "secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current system. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
+            "systemOffline": "System {{targetSystem}} is offline and cannot be merged with the current one.",
+            "systemUnavailable": "El sistema {{targetSystem}} es actualmente inalcanzable. Inténtalo de nuevo en unos minutos o contacta"
+        }
+    },
+    "dialogs.merge.connectToCloud": "Connect System you want to merge with this one to <strong>{{cloudName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.",
+    "dialogs.merge.mergeConfirmation": "You are about to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>. Settings and the name will be taken from the <strong>{{primarySystem}}</strong>.",
+    "dialogs.merge.primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current system. Update the current system to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.",
+    "dialogs.merge.primarySystemOffline": "dialogs.merge.primarySystemOffline",
+    "dialogs.merge.secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current system. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
+    "dialogs.merge.systemOffline": "dialogs.merge.systemOffline",
+    "dialogs.merge.systemUnavailable": "El sistema {{targetSystem}} es actualmente inalcanzable. Inténtalo de nuevo en unos minutos o contacta",
+    "disclaimer": "disclaimer",
     "downloads": {
+        "appTypes": {
+            "bundle": "Cliente y Servidor",
+            "client": "Cliente solamente",
+            "package": "Package",
+            "server": "Servidor solamente",
+            "servertool": "Herramienta de configuración"
+        },
+        "groups": {
+            "android": {
+                "label": "Android",
+                "shortLabel": "Android"
+            },
+            "arm": {
+                "label": "ARM",
+                "shortLabel": "ARM",
+                "supported": "Debian/Ubuntu based"
+            },
+            "ios": {
+                "label": "iOS",
+                "shortLabel": "iOS"
+            },
+            "linux": {
+                "label": "Ubuntu Linux",
+                "shortLabel": "Ubuntu",
+                "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+            },
+            "mac": {
+                "label": "Mac OS",
+                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+            },
+            "macos": {
+                "label": "Mac OS",
+                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+            },
+            "sdk": {
+                "label": "SDK",
+                "shortLabel": "SDK",
+                "supported": "C++ cross platform SDK"
+            },
+            "windows": {
+                "label": "Windows",
+                "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+            }
+        },
         "mobile": {
             "android": {
                 "link": "%ANDROID_APPLICATION_LINK%"
@@ -138,135 +195,92 @@
             }
         },
         "platforms": {
-            "win86": "x86",
             "bananapi": "Banana Pi",
             "bpi": "Nx1",
-            "win64": "x64",
-            "mac": "X",
             "linux64": "x64",
+            "mac": "X",
             "rpi": " Raspberry Pi",
-            "linux86": "x86"
+            "win64": "x64"
         },
         "releasesTypes": {
-            "patches": "Parches",
-            "releases": "Ediciones",
-            "patch": "Parche",
             "beta": "Beta",
             "betas": "Betas",
+            "patch": "Parche",
+            "patches": "Parches",
             "rc": "Candidato de Lanzamiento",
-            "release": "Publicar"
-        },
-        "groups": {
-            "macos": {
-                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra",
-                "label": "Mac OS"
-            },
-            "windows": {
-                "supported": "7, 8, 8.1, 10, Server 2008, Server 2012",
-                "label": "Windows"
-            },
-            "ios": {
-                "shortLabel": "iOS",
-                "label": "iOS"
-            },
-            "mac": {
-                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra",
-                "label": "Mac OS"
-            },
-            "linux": {
-                "shortLabel": "Ubuntu",
-                "supported": "Ubuntu 14.04 LTS, 16.04 LTS",
-                "label": "Ubuntu Linux"
-            },
-            "android": {
-                "shortLabel": "Android",
-                "label": "Android"
-            },
-            "arm": {
-                "shortLabel": "ARM",
-                "supported": "Debian/Ubuntu based",
-                "label": "ARM"
-            },
-            "sdk": {
-                "shortLabel": "SDK",
-                "supported": "C++ cross platform SDK",
-                "label": "SDK"
-            }
-        },
-        "appTypes": {
-            "package": "Package",
-            "client": "Cliente solamente",
-            "servertool": "Herramienta de configuración",
-            "bundle": "Cliente y Servidor",
-            "server": "Servidor solamente"
+            "release": "Publicar",
+            "releases": "Ediciones"
         }
     },
     "integration": {
-        "backToEditText": "Volver a las interfaces de edición",
         "Access Control": "Control de Acceso",
-        "previewRibbonText": "Esta página es una vista previa de los últimos cambios y no coincide con la versión de acceso público.",
-        "Storage": "Almacenamiento",
         "Connector": "Conector",
-        "Health Monitor": "Monitor de salud",
+        "Data Analytics": "Analítica de datos",
         "Drone": "Drone",
-        "Data Analytics": "Analítica de datos"
+        "Health Monitor": "Monitor de Salud",
+        "Storage": "Almacenamiento",
+        "backToEditText": "Volver a las interfaces de edición",
+        "previewRibbonText": "Esta página es una vista previa de los últimos cambios y no coincide con la versión de acceso público."
     },
     "ipvd": {
-        "Cameras supporting H.265": "Cameras supporting H.265",
-        "feedback": {
-            "c_Info": "for additional questions/concerns regarding supported devices.",
-            "b_Link": "submit a request",
-            "a_Please": "Please"
-        },
-        "isAptzSupported": "PTZ avanzado",
-        "hardwareType": "Tipo",
-        "isAptzSupportedShort": "PTZ Av.",
-        "isIoSupported": "E/S",
-        "isMdSupported": "Movimiento",
-        "Multisensor Cameras": "Multisensor Cameras",
         "Advanced PTZ cameras": "Advanced PTZ cameras",
-        "primaryCodec": "Codec",
+        "Cameras supporting H.265": "Cameras supporting H.265",
+        "Cameras with 2-way audio": "Cameras with 2-way audio",
+        "Extra high resolution cameras": "Extra high resolution cameras",
+        "Fisheye Cameras": "Fisheye Cameras",
+        "I / O modules": "I / O modules",
+        "Multisensor Cameras": "Multisensor Cameras",
         "PTZ cameras": "PTZ cameras",
         "camera": "Camara",
-        "multiSensorCamera": "Cámara multisensor",
-        "Extra high resolution cameras": "Extra high resolution cameras",
-        "vendor": "Fabricante",
-        "isFisheye": "Ojo de pez",
-        "isTwAudioSupported": "Audio bidireccional",
-        "Cameras with 2-way audio": "Cameras with 2-way audio",
-        "isMultiSensor": "Multi Sensor",
-        "encoder": "Codificador",
-        "maxResolution": "Resolución máxima",
-        "maxFps": "FPS máx",
-        "I / O modules": "I / O modules",
         "count": "Count",
-        "isH265": "H.265",
-        "Fisheye Cameras": "Fisheye Cameras",
+        "dvr": "DVR",
+        "encoder": "Codificador",
+        "feedback": {
+            "a_Please": "Please",
+            "b_Link": "submit a request",
+            "c_Info": "for additional questions/concerns regarding supported devices."
+        },
+        "hardwareType": "Tipo",
+        "isAptzSupported": "PTZ Avanzado",
+        "isAptzSupportedShort": "PTZ Av.",
         "isAudioSupported": "Audio",
-        "model": "Modelo",
-        "other": "Otro",
+        "isFisheye": "Ojo de pez",
+        "isH265": "H.265",
+        "isIoSupported": "E/S",
+        "isMdSupported": "Movimiento",
+        "isMultiSensor": "Multi Sensor",
         "isPtzSupported": "PTZ",
-        "dvr": "DVR"
+        "isTwAudioSupported": "audio bidireccional",
+        "maxFps": "FPS máx",
+        "maxResolution": "Resolución máxima",
+        "model": "Modelo",
+        "multiSensorCamera": "Cámara multisensor",
+        "other": "Otro",
+        "primaryCodec": "Codec",
+        "vendor": "Fabricante"
     },
-    "is incompatible and cannot be merged with the current one.": "es incompatible y no se puede combinar con la actual.",
-    "is offline and cannot be merged with the current one.": "está fuera de línea y no se puede combinar con la actual.",
     "latest build": "última versión",
     "manufacturers": "manufacturers",
     "messageDialogPlaceholders": {
         "feedback": "Make sure you include your camera model and manufacturer..."
     },
+    "pageTitles": {
+        "integrations": "Integrations",
+        "supportedDevices": "Supported Devices"
+    },
     "search": {
+        "Any": "Cualquiera",
         "Search": "Búsqueda",
         "filter applied": "filter applied",
-        "vendor": "Fabricante",
-        "selected": "selected",
-        "hardwareType": "Tipo",
-        "search_ipvd": "Search by model or manufacturer",
-        "vendors": "manufacturers",
         "filters applied": "filters applied",
-        "Any": "Cualquiera",
+        "hardwareType": "Tipo",
         "hardwareTypes": "types",
-        "minResolution": "Minimum Resolution"
+        "minResolution": "Minimum Resolution",
+        "search_ipvd": "Search by model or manufacturer",
+        "selected": "selected",
+        "vendor": "Fabricante",
+        "vendors": "manufacturers"
     },
-    "servers in the merged System.": "servidores en el Sistema fusionado."
+    "servers in the merged System.": "servidores en el Sistema fusionado.",
+    "support": "asistencia"
 }

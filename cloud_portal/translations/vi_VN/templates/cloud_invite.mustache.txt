@@ -1,12 +1,12 @@
-Hello,
+Xin chào,
 
-You have been invited to %PRODUCT_NAME%.
+You have been invited to %CLOUD_NAME%.
 {{#message.message}}
 
 {{ message.message }}
 
 {{/message.message}}
-Please create account on %PRODUCT_NAME%
-using your current email address and follow further instructions.
+Please create account on %CLOUD_NAME%
+sử dụng địa chỉ email hiện tại của bạn và làm theo hướng dẫn thêm.
 
-Register your account using this link: {{ config.portal_url }}/register/{{ message.code }}
+Đăng ký tài khoản của bạn bằng liên kết này: {{ config.portal_url }}/ đăng ký /{{ message.code }}

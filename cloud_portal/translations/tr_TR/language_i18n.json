@@ -1,12 +1,11 @@
 {
     "2-Way Audio": "Çift Yönlü Ses",
-    "About %PRODUCT_NAME%": "%PRODUCT_NAME% Hakkında",
     "Account Settings": "Hesap Ayarları",
     "Account not activated": "Hesap etkin değil",
     "Account not found": "Hesap bulunamadı",
     "Administration": "Yönetim",
     "Advanced PTZ": "Gelişmiş PTZ",
-    "Advanced search": "Detaylı Arama",
+    "Advanced Search": "Advanced Search",
     "All Systems": "Tüm sistemler",
     "All cloud users will be deleted.": "Tüm bulut kullanıcıları silinecek.",
     "All integrations": "Tüm entegrasyonlar",
@@ -19,50 +18,51 @@
     "Cameras menu": "Kamera menüsü",
     "Cancel": "Vazgeç",
     "Change Password": "Parola Değiştir",
+    "Checking...": "Kontrol Ediliyor...",
     "Choose which properties should be visible to customers:": "Müşterilere hangi özelliklerin görünmesi gerektiğini seçin:",
     "Close": "Kapat",
     "Codec": "Kodek",
-    "Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.": "%PRODUCT_NAME% yada client kullanarak sistemleri birleştirmek için istediğiniz sistemi bağlayın.",
     "Contact": "İletişim",
     "Create Account": "Hesap oluştur",
     "Create account": "Hesap oluştur",
     "Disconnect": "Bağlantıyı kes",
-    "Disconnect System from %PRODUCT_NAME%?": "%PRODUCT_NAME% den bağlantıyı kesmek istiyor musunuz?",
+    "Disconnect System from %CLOUD_NAME%?": "Disconnect System from %CLOUD_NAME%?",
     "Download": "İndir",
     "Download %VMS_NAME%": "İndir %VMS_NAME%",
     "Download Chrome": "Chrome'u indir",
     "Download Firefox": "Firefox'u indir",
     "Download Links:": "İndirme linki:",
     "Downloads": "İndirilenler",
+    "Draft": "Draft",
     "Dual Streaming": "Çift akış",
     "Email": "E-posta",
     "Embed": "Göm",
     "Enter \"Public User\" credentials:": "\"Genel Kullanıcı\" kimlik bilgilerini girin:",
+    "Enter password for your account to continue": "Devam etmek için hesabınızın şifresini girin",
     "Enter password to continue.": "Devam etmek için parola girin.",
-    "Enter password to your account.": "Hesabın için şifreni gir.",
     "Export all to CSV": "Tamamını CSV olarak dışarıya aktar",
     "FPS(max)": "FPS(maks)",
     "Firmware version": "Firmware versiyonu",
-    "Fisheye": "Balıkgözü",
+    "Fisheye": "Fish-Eye",
     "Forgot password?": "Parolayı mı unuttunuz?",
+    "Get in touch": "Get in touch",
+    "How to install?": "How to install?",
     "I agree to the": "Kabul ediyorum",
     "I want you to contact me": "Benimle iletişime geçilmesini istiyorum",
     "I/O": "G/Ç",
+    "In Review": "In Review",
     "In-Client Upgrade:": "İstemci Yükseltmesi:",
-    "Instructions": "Talimatlar",
-    "Integrations": "Entegrasyonlar",
     "Latest version": "Son Sürüm",
     "Log In": "Oturum Aç",
     "Log Out": "Oturumu Kapat",
-    "Log in to %PRODUCT_NAME%": "%PRODUCT_NAME% e giriş yapın",
-    "Merge": "Birleştir",
-    "Merge Anyway": "Yine de Birleştir",
+    "Log in to %CLOUD_NAME%": "Log in to %CLOUD_NAME%",
     "Merge Systems": "Sistemleri Birleştir",
     "Merge current System with": "Geçerli sistem ile birleştir",
     "Message": "Mesaj",
     "Motion Detection": "Hareket Algılama",
     "Multi Sensor": "Çoklu sensör",
     "Nothing Found": "Hiçbir şey Bulunamadı",
+    "OK": "Tamam",
     "Ok": "Tamam",
     "Other packages:": "Diğer paketler:",
     "Other releases, patches and beta versions": "Diğer sürümler, yamalar ve beta sürümleri",
@@ -72,7 +72,6 @@
     "Password:": "Şifre:",
     "Permissions": "İzinler",
     "Popularity": "Popülarite",
-    "Privacy": "Gizlilik",
     "Release Notes": "Sürüm Notları",
     "Release notes": "Yayıncı Notları",
     "Remember me": "Beni Hatırla",
@@ -88,47 +87,105 @@
     "Show All": "Tümünü Göster",
     "Some of your servers don't support cloud System merge because of outdated software version.": "Sunucularınızın bazıları, eski yazılım sürümleri nedeniyle bulut sistem birleştirme özelliğini desteklemiyor.",
     "Support": "Destek",
-    "Supported Devices": "Desteklenen cihazlar",
-    "System": "Sistem",
     "System name": "Sistem Adı",
     "System name is required": "Sistem adı zorunludur",
     "System will be accessible through local network with local administrator account.": "Sisteme yerel yönetici hesabı ile yerel ağ üzerinden erişilebilir.",
     "Systems": "Sistemler",
     "Systems of such size may work but will be unstable and have troubles with updates and synchronisation.": "Bu büyüklükteki sistemler belki çalışabilir ancak kararsız olabilir ve güncelleme senkroniyle ile ilgili sorunlar yaşayabilir.",
-    "Take System name and settings from": "Sistem adını ve ayarlarını al",
-    "Terms": "Şartlar",
+    "Take the name and settings from": "Sistem adını ve ayarlarını al",
     "The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.": "Bu kullanıcının kimlik bilgileri açıkta kalacak! Genel kullanım için seçilen kameralara yalnızca\n            erişimi olan ve yalnızca gerekli minimum görüntüleme izinleri atanan özel bir \"Genel Kullanıcı\" rolü oluşturmanız gerekir. Bu\n            \"Genel Kullanıcı\", sistem genelinde herhangi bir türde erişime sahip olmamalıdır.",
     "There will be more than": "Daha fazla olacak",
     "Too many attempts. Try again in a minute.": "Çok fazla deneme yapıldı. Bir dakika sonra tekrar deneyiniz.",
+    "Topic": "Topic",
     "Update them to the": "Onları güncelle",
     "Updated": "Güncellendi",
     "User": "Kullanıcı",
     "View": "Görünüm",
-    "We'd recommend consulting with": "Danışmanızı tavsiye ederiz",
     "We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.": "Google Chrome veya Mozilla Firefox'un en son sürümlerini yüklemenizi öneririz ancak başka herhangi bir modern web tarayıcısını kullanabilirsiniz.",
     "What's new?": "Neler Değişti?",
     "Wrong password": "Hatalı parola",
     "You can merge only those cloud Systems, where you have the \"Owner\" permissions.": "Yalnızca \"Sahip\" izinlerine sahip olduğunuz bulut Sistemlerini birleştirebilirsiniz.",
-    "You can only merge Systems in which you have owner permissions.": "Yalnızca sahibi olduğunuz sistemleri birleştirebilirsiniz.",
+    "You can only merge Systems where you are the owner.": "Yalnızca sahip olduğunuz Sistemleri birleştirebilirsiniz.",
     "Your Name": "Adınız",
     "Your browser is not supported": "Tarayıcınız desteklenmiyor",
     "and_x_more": "... ve {{value}} daha fazla",
-    "before proceeding.": "işlemden önce.",
     "cameraFilters": {
-        "TwWayAudio": "Çift yönlü ses cihazları",
         "H265": "H.265 Kameralar",
-        "encoder": "Çeviriciler",
-        "multiSensor": "Çok sensörlü kameralar",
-        "ptz": "PTZ kameralar",
         "IO": "G / Ç modülleri",
-        "highRes": "Eksta yüksek çözünürlüklü kameralar",
+        "TwWayAudio": "Çift yönlü ses cihazları",
         "aptz": "Gelişmiş PTZ'li kameralar",
         "audio": "Sesli kameralar",
-        "fisheye": "Balıkgözü kameralar"
+        "encoder": "Çeviriciler",
+        "fisheye": "Balıkgözü kameralar",
+        "highRes": "Eksta yüksek çözünürlüklü kameralar",
+        "multiSensor": "Çok sensörlü kameralar",
+        "ptz": "PTZ kameralar"
     },
     "devices": "aygıtlar",
-    "disclaimer": "Bu liste, anonim sistem kullanıcıları tarafından onaylandığı şekilde, verileri {{value}} ile otomatik olarak raporlayan gerçek cihazlarla sınırlıdır. Desteklenen üreticilerin ve modellerin tam listesi kapsam açısından daha büyüktür.",
+    "dialogs": {
+        "merge": {
+            "connectToCloud": "Connect System you want to merge with this one to <strong>{{cloudName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.",
+            "mergeConfirmation": "You are about to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>. Settings and the name will be taken from the <strong>{{primarySystem}}</strong>.",
+            "primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current system. Update the current system to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.",
+            "primarySystemOffline": "System {{primarySystem}} is offline and cannot be merged with System {{targetSystem}}.",
+            "secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current system. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
+            "systemOffline": "System {{targetSystem}} is offline and cannot be merged with the current one.",
+            "systemUnavailable": "{{targetSystem}} sistemi erişilebilir değil. Birkaç dakika sonra tekrar deneyin"
+        }
+    },
+    "dialogs.merge.connectToCloud": "Connect System you want to merge with this one to <strong>{{cloudName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.",
+    "dialogs.merge.mergeConfirmation": "You are about to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>. Settings and the name will be taken from the <strong>{{primarySystem}}</strong>.",
+    "dialogs.merge.primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current system. Update the current system to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.",
+    "dialogs.merge.primarySystemOffline": "dialogs.merge.primarySystemOffline",
+    "dialogs.merge.secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current system. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
+    "dialogs.merge.systemOffline": "dialogs.merge.systemOffline",
+    "dialogs.merge.systemUnavailable": "{{targetSystem}} sistemi erişilebilir değil. Birkaç dakika sonra tekrar deneyin",
+    "disclaimer": "disclaimer",
     "downloads": {
+        "appTypes": {
+            "bundle": "İstemci ve sunucu",
+            "client": "Yalnızca istemci",
+            "package": "Paket",
+            "server": "Yalnızca sunucu",
+            "servertool": "Konfigürasyon aracı"
+        },
+        "groups": {
+            "android": {
+                "label": "Android",
+                "shortLabel": "Android"
+            },
+            "arm": {
+                "label": "ARM",
+                "shortLabel": "ARM",
+                "supported": "Debian/Ubuntu tabanlı"
+            },
+            "ios": {
+                "label": "iOS",
+                "shortLabel": "iOS"
+            },
+            "linux": {
+                "label": "Ubuntu Linux",
+                "shortLabel": "Ubuntu",
+                "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
+            },
+            "mac": {
+                "label": "Mac OS",
+                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+            },
+            "macos": {
+                "label": "Mac OS",
+                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+            },
+            "sdk": {
+                "label": "SDK",
+                "shortLabel": "SDK",
+                "supported": "C++ cross platform SDK"
+            },
+            "windows": {
+                "label": "Windows",
+                "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+            }
+        },
         "mobile": {
             "android": {
                 "link": "%ANDROID_APPLICATION_LINK%"
@@ -138,135 +195,92 @@
             }
         },
         "platforms": {
-            "win86": "x86",
             "bananapi": "Banana Pi",
             "bpi": "Nx1",
-            "win64": "x64",
-            "mac": "X",
             "linux64": "x64",
+            "mac": "X",
             "rpi": " Raspberry Pi",
-            "linux86": "x86"
+            "win64": "x64"
         },
         "releasesTypes": {
-            "patches": "Düzeltmeler",
-            "releases": "Sürümler",
-            "patch": "Düzeltme",
             "beta": "Beta",
             "betas": "Beta Sürümleri",
+            "patch": "Düzeltme",
+            "patches": "Düzeltmeler",
             "rc": "Sürüm Adayı",
-            "release": "Sürüm"
-        },
-        "groups": {
-            "macos": {
-                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra",
-                "label": "Mac OS"
-            },
-            "windows": {
-                "supported": "7, 8, 8.1, 10, Server 2008, Server 2012",
-                "label": "Windows"
-            },
-            "ios": {
-                "shortLabel": "iOS",
-                "label": "iOS"
-            },
-            "mac": {
-                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra",
-                "label": "Mac OS"
-            },
-            "linux": {
-                "shortLabel": "Ubuntu",
-                "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS",
-                "label": "Ubuntu Linux"
-            },
-            "android": {
-                "shortLabel": "Android",
-                "label": "Android"
-            },
-            "arm": {
-                "shortLabel": "ARM",
-                "supported": "Debian/Ubuntu tabanlı",
-                "label": "ARM"
-            },
-            "sdk": {
-                "shortLabel": "SDK",
-                "supported": "C++ cross platform SDK",
-                "label": "SDK"
-            }
-        },
-        "appTypes": {
-            "package": "Paket",
-            "client": "Yalnızca istemci",
-            "servertool": "Konfigürasyon aracı",
-            "bundle": "İstemci ve sunucu",
-            "server": "Yalnızca sunucu"
+            "release": "Sürüm",
+            "releases": "Sürümler"
         }
     },
     "integration": {
-        "backToEditText": "Düzeleme arayüzüne dön",
         "Access Control": "Erişim Kontrolü",
-        "previewRibbonText": "Bu sayfa en son değişikliklerin önizlemesidir ve herkese açık kullanılabilir sürümle eşleşmiyor.",
-        "Storage": "Depolama",
         "Connector": "Konnektör",
-        "Health Monitor": "Performans İzleme",
+        "Data Analytics": "Veri Analizleri",
         "Drone": "Drone",
-        "Data Analytics": "Veri Analizleri"
+        "Health Monitor": "Durum İzleyici",
+        "Storage": "Depolama",
+        "backToEditText": "Düzeleme arayüzüne dön",
+        "previewRibbonText": "Bu sayfa en son değişikliklerin önizlemesidir ve herkese açık kullanılabilir sürümle eşleşmiyor."
     },
     "ipvd": {
-        "Cameras supporting H.265": "H.265'i destekleyen kameralar",
-        "feedback": {
-            "c_Info": "desteklenen cihazlarla ilgili ek sorularınız için.",
-            "b_Link": "destek talebi gönder",
-            "a_Please": "Lütfen"
-        },
-        "isAptzSupported": "Gelişmiş PTZ",
-        "hardwareType": "Tür",
-        "isAptzSupportedShort": "Gelş. PTZ",
-        "isIoSupported": "G/Ç",
-        "isMdSupported": "Hareket",
-        "Multisensor Cameras": "Çok Sensörlü Kameralar",
         "Advanced PTZ cameras": "Gelişmiş PTZ kameralar",
-        "primaryCodec": "Kodek",
+        "Cameras supporting H.265": "H.265'i destekleyen kameralar",
+        "Cameras with 2-way audio": "Çift yönlü sesli kameralar",
+        "Extra high resolution cameras": "Eksta yüksek çözünürlüklü kameralar",
+        "Fisheye Cameras": "Balıkgözü kameralar",
+        "I / O modules": "G / Ç modülleri",
+        "Multisensor Cameras": "Çok Sensörlü Kameralar",
         "PTZ cameras": "PTZ kameralar",
         "camera": "Kamera",
-        "multiSensorCamera": "Çok Sensörlü Kamera",
-        "Extra high resolution cameras": "Eksta yüksek çözünürlüklü kameralar",
-        "vendor": "Üretici",
-        "isFisheye": "Balıkgözü",
-        "isTwAudioSupported": "Çift Yönlü Ses",
-        "Cameras with 2-way audio": "Çift yönlü sesli kameralar",
-        "isMultiSensor": "Çoklu sensör",
+        "count": "Sayım",
+        "dvr": "DVR",
         "encoder": "Kodlayıcı",
-        "maxResolution": "Maks. Çözünürlük",
-        "maxFps": "Maksimum FPS",
-        "I / O modules": "G / Ç modülleri",
-        "count": "Sayı",
-        "isH265": "H.265",
-        "Fisheye Cameras": "Balıkgözü kameralar",
+        "feedback": {
+            "a_Please": "Lütfen",
+            "b_Link": "destek talebi gönder",
+            "c_Info": "desteklenen cihazlarla ilgili ek sorularınız için."
+        },
+        "hardwareType": "Tür",
+        "isAptzSupported": "Gelişmiş PTZ",
+        "isAptzSupportedShort": "Gelş. PTZ",
         "isAudioSupported": "Ses",
-        "model": "Model",
-        "other": "Diğer",
+        "isFisheye": "Fish-Eye",
+        "isH265": "H.265",
+        "isIoSupported": "G/Ç",
+        "isMdSupported": "Hareket",
+        "isMultiSensor": "Çoklu sensör",
         "isPtzSupported": "PTZ",
-        "dvr": "DVR"
+        "isTwAudioSupported": "çift Yönlü Ses",
+        "maxFps": "Maksimum FPS",
+        "maxResolution": "Maks. Çözünürlük",
+        "model": "Model",
+        "multiSensorCamera": "Çok Sensörlü Kamera",
+        "other": "Diğer",
+        "primaryCodec": "Kodek",
+        "vendor": "Üretici"
     },
-    "is incompatible and cannot be merged with the current one.": "uyumlu değil ve mevcut olanla birleştirilemez.",
-    "is offline and cannot be merged with the current one.": "çevrimdışı ve mevcut olanla birleştirilemez.",
     "latest build": "son yapı",
     "manufacturers": "ureticiler",
     "messageDialogPlaceholders": {
-        "feedback": "Make sure you include your camera model and manufacturer..."
+        "feedback": "Kamera üreticisi ve modelinin olduğundan emin olun..."
+    },
+    "pageTitles": {
+        "integrations": "Integrations",
+        "supportedDevices": "Supported Devices"
     },
     "search": {
+        "Any": "Herhangi",
         "Search": "Arama",
         "filter applied": "filtre uygulandı",
-        "vendor": "Üretici",
-        "selected": "seçildi",
-        "hardwareType": "Tür",
-        "search_ipvd": "Belirli bir üretici veya modele göre arama",
-        "vendors": "ureticiler",
         "filters applied": "filtreler uygulandı",
-        "Any": "Herhangi",
+        "hardwareType": "Tür",
         "hardwareTypes": "türler",
-        "minResolution": "Minimum Çözünürlük"
+        "minResolution": "Minimum Çözünürlük",
+        "search_ipvd": "Belirli bir üretici veya modele göre arama",
+        "selected": "seçildi",
+        "vendor": "Üretici",
+        "vendors": "ureticiler"
     },
-    "servers in the merged System.": "birleştirilmiş sistemdeki sunucular."
+    "servers in the merged System.": "birleştirilmiş sistemdeki sunucular.",
+    "support": "destek"
 }

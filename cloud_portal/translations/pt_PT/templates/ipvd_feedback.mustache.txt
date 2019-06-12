@@ -1,4 +1,4 @@
-Hello, {{ message.userFullName }}
+Olá, {{ message.userFullName }}
 {{ message.sender_name}} ({{ message.sender_email }}) gave the following feedback for {{ message.product }}:
 <pre>{{ message.message }}</pre>
 

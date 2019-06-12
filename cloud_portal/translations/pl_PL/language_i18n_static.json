@@ -72,13 +72,11 @@
 		},
 		"platforms": {
 			"win64": "x64",
-			"win86": "x86",
 			"linux64": "x64",
-			"linux86": "x86",
 			"mac": "X",
 			"bananapi": "Banana Pi",
 			"bpi": "Nx1",
-			"rpi": " Raspberry Pi"
+			"rpi": "Raspberry Pi"
 		},
 		"appTypes": {
 			"client": "Tylko klient",
@@ -121,7 +119,7 @@
 		"dvr": "DVR",
 		"other": "Inne",
 		"PTZ cameras": "Kamery PTZ",
-		"Advanced PTZ cameras": "Kamery z zaawansowanym PTZ",
+		"Advanced PTZ cameras": "Zaawansowane kamery PTZ",
 		"Fisheye Cameras": "Kamery fisheye",
 		"Cameras supporting H.265": "Kamery obsługujące H.265",
 		"I / O modules": "Moduły I/O",
@@ -147,11 +145,19 @@
 	"messageDialogPlaceholders": {
 		"feedback": "Proszę podać model kamery i producenta..."
 	},
-	"About %PRODUCT_NAME%": "Informacje o %PRODUCT_NAME%",
-	"Download %VMS_NAME%": "Pobierz %VMS_NAME%",
-	"Integrations": "Integracje",
-	"Support": "Wsparcie",
-	"Terms": "Warunki",
-	"Privacy": "Prywatność",
-	"Supported Devices": "Obsługiwane urządzenia"
+	"pageTitles": {
+		"supportedDevices": "Supported Devices",
+		"integrations": "Integrations"
+	},
+	"dialogs": {
+		"merge": {
+			"connectToCloud": "Connect System you want to merge with this one to <strong>{{cloudName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.",
+			"mergeConfirmation": "You are about to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>. Settings and the name will be taken from the <strong>{{primarySystem}}</strong>.",
+			"primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current system. Update the current system to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.",
+			"primarySystemOffline": "System {{primarySystem}} is offline and cannot be merged with System {{targetSystem}}.",
+			"secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current system. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
+			"systemOffline": "System {{targetSystem}} is offline and cannot be merged with the current one.",
+			"systemUnavailable": "System {{targetSystem}} is currently unreachable. Try again in a few minutes or contact"
+		}
+	}
 }

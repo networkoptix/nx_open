@@ -8,4 +8,4 @@ Olá {{message.userFullName}}
 Recebeu acesso ao sistema de gestão de vídeo "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Visualizar no Portal de %PRODUCT_NAME%: {{config.portal_url}}/systems/{{message.system_id}}
+View in %CLOUD_NAME% Portal: {{config.portal_url}}/systems/{{message.system_id}}

@@ -118,7 +118,7 @@
         "updateNotificationsEnabled": "Update meldingen ingeschakeld",
         "upnpPortMappingEnabled": "UPNP-poorttoewijzing ingeschakeld",
         "useTextEmailFormat": "Verstuur e-mails met platte tekst",
-        "useWindowsEmailLineFeed": "Gebruik Windows line feed in e-mails",
+        "useWindowsEmailLineFeed": "Gebruik Windows-regelfeed in e-mails",
         "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
         "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
         "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",

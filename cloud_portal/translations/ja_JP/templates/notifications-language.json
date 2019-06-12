@@ -2,31 +2,31 @@
   "activate_account": {
     "emailSubject": "アカウントの有効化"
   },
-  "restore_password": {
-    "emailSubject": "パスワードをリセット"
-  },
-  "system_invite": {
-    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} さんが %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}に招待しました　ビデオシステム {{message.system_name}} が{{/message.sharer_name}}さんと共有されました"
-  },
-  "system_shared": {
-    "emailSubject": "ビデオ システム {{message.system_name}} が共有されました"
-  },
-  "review_version": {
-    "emailSubject": "バージョン{{message.id}}の準備ができました"
+  "cloud_invite": {
+    "emailSubject": "You have been invited to %CLOUD_NAME%"
   },
   "cloud_notification": {
     "emailSubject": "{{message.subject}}"
   },
-  "cloud_invite": {
-    "emailSubject": "%PRODUCT_NAME% に登録されました"
+  "contact_sales": {
+    "emailSubject": "Sales inquiry for {{message.product}}"
+  },
+  "contact_support": {
+    "emailSubject": "Support request for {{message.product}}"
   },
   "ipvd_feedback": {
     "emailSubject": "{{message.product}}カメラページフィードバック"
   },
-  "sales_inquiry": {
-    "emailSubject": "{{message.product}}販売問い合わせ"
+  "review_version": {
+    "emailSubject": "{{message.product_type}}: {{message.product}} has a new version to review"
   },
-  "support_request": {
-    "emailSubject": "{{message.product}}サポート依頼"
+  "restore_password": {
+    "emailSubject": "パスワードをリセット"
+  },
+  "system_invite": {
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} invites you to %CLOUD_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Video system {{message.system_name}} was shared with you{{/message.sharer_name}}"
+  },
+  "system_shared": {
+    "emailSubject": "ビデオ システム {{message.system_name}} が共有されました"
   }
 }

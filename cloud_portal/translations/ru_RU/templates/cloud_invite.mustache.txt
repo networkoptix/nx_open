@@ -1,12 +1,12 @@
-Hello,
+Здравствуйте,
 
-You have been invited to %PRODUCT_NAME%.
+You have been invited to %CLOUD_NAME%.
 {{#message.message}}
 
 {{ message.message }}
 
 {{/message.message}}
-Please create account on %PRODUCT_NAME%
-using your current email address and follow further instructions.
+Please create account on %CLOUD_NAME%
+используя свой текущий адрес электронной почты, и следуйте дальнейшим инструкциям.
 
-Register your account using this link: {{ config.portal_url }}/register/{{ message.code }}
+Зарегистрируйте свою учетную запись используя эту ссылку: {{ config.portal_url }}/ регистрация /{{ message.code }}

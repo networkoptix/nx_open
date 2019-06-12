@@ -24,7 +24,7 @@
                     <td class="button-cell">
                         <a href=''
                            class="hover-visible image-link"
-                           ng-if="system.isAvailable && user.canBeEdited"
+                           ng-if="system.isAvailable && user.canBeEdited && !currentlyMerging"
                            ng-class="{disabled:locked[user.email]}"
                            title="Engedélyek szerkesztése"
                            ng-click="editShare(user)">
@@ -35,7 +35,7 @@
                     <td class="button-cell">
                         <a href=''
                            class="hover-visible image-link"
-                           ng-if="system.isAvailable && user.canBeDeleted"
+                           ng-if="system.isAvailable && user.canBeDeleted && !currentlyMerging"
                            ng-class="{ 'disabled': locked[user.email]}"
                            title="Törlés"
                            ng-click="unshare(user)">

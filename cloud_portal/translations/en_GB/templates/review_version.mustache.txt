@@ -1,8 +1,8 @@
-There is a new revision for {{ message.product }}
+There is a new version for {{ message.product }}({{message.product_type}}) to review.
 
 Click on the link to review draft {{ message.id }} for {{ message.product }}
 
-Link to review: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
+Link to review: {{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/
 
 On this page you can
 1) Create a preview to see the most recent changes.
