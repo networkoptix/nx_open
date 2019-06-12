@@ -197,15 +197,17 @@ class ProductType(models.Model):
         ]
     PRODUCT_TYPES = Choices((0, "cloud_portal", "Cloud Portal"),
                             (1, "vms", "Vms"),
-                            (2, "plugin", "Plugin"),
-                            (3, "integration", "Integration"))
-    name = models.CharField(max_length=255, default="")
+                            (2, "integration", "Integration"),
+                            (3, "other", "Other"))
+    name = models.CharField(max_length=255, default="", blank=True)
     can_preview = models.BooleanField(default=False)
     single_customization = models.BooleanField(default=False)
     type = models.IntegerField(choices=PRODUCT_TYPES, default=PRODUCT_TYPES.cloud_portal)
 
     def __str__(self):
-        return f"{self.name} - {ProductType.PRODUCT_TYPES[self.type]}"
+        if self.name:
+            return f"{self.name} - {ProductType.PRODUCT_TYPES[self.type]}"
+        return ProductType.PRODUCT_TYPES[self.type]
 
     @staticmethod
     def get_type_by_name(name):

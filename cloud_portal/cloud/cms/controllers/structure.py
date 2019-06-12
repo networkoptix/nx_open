@@ -7,7 +7,6 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from zipfile import ZipFile
 from ..models import Context, ContextTemplate, DataStructure, DataRecord, Product, ProductType
-from cloud import settings
 
 
 def deprecate_data_structures_for_product_type(product_type):
@@ -72,9 +71,6 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
 
 def update_from_object(cms_structure, product_type_name=""):
     for product_type_structure in cms_structure:
-        if product_type_name == "":
-            raise ValueError(f"Product type name cannot be {product_type_name}")
-
         product_type = update_product_type(product_type_name, product_type_structure)
         order = 0
         deprecate_data_structures_for_product_type(product_type)
@@ -90,7 +86,7 @@ def update_from_object(cms_structure, product_type_name=""):
 def read_structure_json(filename):
     with codecs.open(filename, 'r', 'utf-8') as file_descriptor:
         cms_structure = json.load(file_descriptor)
-        update_from_object(cms_structure, product_type_name=settings.DEFAULT_PRODUCT_TYPE_NAME)
+        update_from_object(cms_structure)
 
 
 def process_data_structure_type(data_structure, name, value):
