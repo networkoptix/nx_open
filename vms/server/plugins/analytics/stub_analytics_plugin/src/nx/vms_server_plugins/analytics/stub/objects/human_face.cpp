@@ -9,9 +9,6 @@ using namespace nx::sdk;
 
 namespace {
 
-static constexpr char kTypeId[] = "nx.stub.humanFace";
-static constexpr char kTypeName[] = "Human Face";
-
 std::pair<const char*, const char*> randomPerson()
 {
     static std::map<const char*, std::vector<const char*>> kPeople = {
