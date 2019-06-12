@@ -12,6 +12,7 @@
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 
 #include "engine.h"
+#include "objects/abstract_object.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -71,7 +72,7 @@ private:
 
     void processPluginEvents();
 
-    void generateObjectIds();
+    void setObjectCount();
 
 private:
     std::unique_ptr<std::thread> m_pluginEventThread;
@@ -88,7 +89,7 @@ private:
     int m_frameCounter = 0;
     int m_objectCounter = 0;
     int m_currentObjectIndex = -1;
-    std::vector<nx::sdk::Uuid> m_objectIds;
+    std::vector<std::unique_ptr<AbstractObject>> m_objects;
     std::string m_eventTypeId;
     std::string m_objectTypeId;
     int m_currentObjectTypeIndex = 0;
@@ -110,11 +111,6 @@ const std::string kIntrusionEventType = "nx.stub.intrusion";
 const std::string kGunshotEventType = "nx.stub.gunshot";
 const std::string kSuspiciousNoiseEventType = "nx.stub.suspiciousNoise";
 const std::string kSoundRelatedEventGroup = "nx.stub.soundRelatedEvent";
-const std::string kCarObjectType = "nx.stub.car";
-const std::string kHumanFaceObjectType = "nx.stub.humanFace";
-const std::string kTruckObjectType = "nx.stub.truck";
-const std::string kPedestrianObjectType = "nx.stub.pedestrian";
-const std::string kBicycleObjectType = "nx.stub.bicycle";
 
 } // namespace stub
 } // namespace analytics
