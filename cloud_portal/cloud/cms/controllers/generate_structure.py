@@ -190,7 +190,8 @@ def process_files(file_iterator, product):
 
 
 def from_database(product, use_current_values):
-    return [ProductTypeSerializer(product.product_type, get_actual=use_current_values).data]
+    product_id = product.id if use_current_values else 0
+    return [ProductTypeSerializer(product.product_type, product_id=product_id).data]
 
 
 def from_directory(directory, product):

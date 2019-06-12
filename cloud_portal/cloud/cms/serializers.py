@@ -4,9 +4,9 @@ from cms.models import Context, DataStructure, ProductType
 
 class BaseCMSSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
-        self.get_actual = False
-        if "get_actual" in kwargs:
-            self.get_actual = kwargs.pop("get_actual")
+        self.product_id = 0
+        if "product_id" in kwargs:
+            self.product_id = kwargs.pop("product_id")
         super().__init__(*args, **kwargs)
 
 
@@ -23,8 +23,8 @@ class DataStructureSerializer(BaseCMSSerializer):
     def get_value_for_datastructure(self, obj):
         if obj.type in [DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file]:
             return ""
-        if self.get_actual:
-            current_record = obj.datarecord_set.last()
+        if self.product_id:
+            current_record = obj.datarecord_set.filter(product_id=self.product_id).last()
             if current_record:
                 return current_record.value
         return obj.default
@@ -41,7 +41,7 @@ class ContextSerializer(BaseCMSSerializer):
     values = serializers.SerializerMethodField('get_datastructure_values')
 
     def get_datastructure_values(self, obj):
-        return DataStructureSerializer(obj.datastructure_set.all(), many=True, get_actual=self.get_actual).data
+        return DataStructureSerializer(obj.datastructure_set.all(), many=True, product_id=self.product_id).data
 
 
 class ProductTypeSerializer(BaseCMSSerializer):
@@ -53,7 +53,7 @@ class ProductTypeSerializer(BaseCMSSerializer):
     type = serializers.SerializerMethodField("get_nice_name")
 
     def get_contexts_values(self, obj):
-        return ContextSerializer(obj.context_set.all(), many=True, get_actual=self.get_actual).data
+        return ContextSerializer(obj.context_set.all(), many=True, product_id=self.product_id).data
 
     def get_nice_name(self, obj):
         return ProductType.PRODUCT_TYPES[obj.type]
