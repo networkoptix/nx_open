@@ -9,7 +9,7 @@
 
 {% block object-tools-items %}
     {% if user.is_superuser %}
-    <li><a href="{% url 'download_structure_from_db' original.id %}?get_values">Get Current Records</a></li>
+    <li><a href="{% url 'download_structure_from_db' original.id %}?get_values">Export Current Records</a></li>
     {% endif %}
     {{ block.super }}
 {% endblock %}

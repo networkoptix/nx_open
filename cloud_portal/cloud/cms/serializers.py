@@ -16,11 +16,11 @@ class DataStructureSerializer(BaseCMSSerializer):
         fields = ("label", "name", "value", "description", "type", "advanced", "optional", "public", "meta")
         ordering = ('order', )
 
-    value = serializers.SerializerMethodField('get_actual_value')
+    value = serializers.SerializerMethodField('get_value_for_datastructure')
     meta = serializers.JSONField(source="meta_settings")
     type = serializers.SerializerMethodField("get_nice_name")
 
-    def get_actual_value(self, obj):
+    def get_value_for_datastructure(self, obj):
         if obj.type in [DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file]:
             return ""
         if self.get_actual:
