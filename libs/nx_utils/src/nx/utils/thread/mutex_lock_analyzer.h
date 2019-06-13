@@ -12,76 +12,6 @@
 
 namespace nx::utils {
 
-/**
-* Checks that two sorted ranges contain elements of same value using comparator comp.
-* Though, different element count is allowed.
-* NOTE: Multiple same elements in either range are allowed.
-* @param Comp comparator used to sort ranges.
-*/
-template<class FirstRangeIter, class SecondRangeIter, class Comp>
-bool is_equal_sorted_ranges_if(
-    const FirstRangeIter& firstRangeBegin, const FirstRangeIter& firstRangeEnd,
-    const SecondRangeIter& secondRangeBegin, const SecondRangeIter& secondRangeEnd,
-    Comp comp)
-{
-    FirstRangeIter fIt = firstRangeBegin;
-    SecondRangeIter sIt = secondRangeBegin;
-    for (; (fIt != firstRangeEnd) || (sIt != secondRangeEnd); )
-    {
-        if (((fIt == firstRangeEnd) != (sIt == secondRangeEnd)) ||
-            (comp(*fIt, *sIt) || comp(*sIt, *fIt)))    //*fIt != *sIt
-        {
-            return false;
-        }
-
-        ++fIt;
-        //iterating second range while *sIt < *fIt
-        const auto& prevSVal = *sIt;
-        while ((sIt != secondRangeEnd) &&
-            ((sIt == secondRangeEnd) < (fIt == firstRangeEnd) || comp(*sIt, *fIt)))
-        {
-            if (comp(prevSVal, *sIt) || comp(*sIt, prevSVal))   //prevSVal != *sIt
-                return false;   //second range element changed value but still less than first range element
-            ++sIt;
-        }
-    }
-
-    return true;
-}
-
-/*!
-NOTE: Multiple same elements in either range are allowed
-*/
-template<class FirstRangeIter, class SecondRangeIter>
-bool are_elements_same_in_sorted_ranges(
-    const FirstRangeIter& firstRangeBegin, const FirstRangeIter& firstRangeEnd,
-    const SecondRangeIter& secondRangeBegin, const SecondRangeIter& secondRangeEnd)
-{
-    FirstRangeIter fIt = firstRangeBegin;
-    SecondRangeIter sIt = secondRangeBegin;
-    for (; (fIt != firstRangeEnd) || (sIt != secondRangeEnd); )
-    {
-        if (((fIt == firstRangeEnd) != (sIt == secondRangeEnd)) ||
-            (*fIt != *sIt))
-        {
-            return false;
-        }
-
-        ++fIt;
-        //iterating second range while *sIt < *fIt
-        const auto& prevSVal = *sIt;
-        while ((sIt != secondRangeEnd) &&
-            ((sIt == secondRangeEnd) < (fIt == firstRangeEnd) || (*sIt < *fIt)))
-        {
-            if (*sIt != prevSVal)
-                return false;   //second range element changed value but still less than first range element
-            ++sIt;
-        }
-    }
-
-    return true;
-}
-
 class MutexDelegate;
 
 class NX_UTILS_API MutexLockKey
@@ -153,6 +83,8 @@ public:
     bool connectedTo(const LockGraphEdgeData& rhs) const;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 struct ThreadContext
 {
     std::deque<MutexLockKey> currentLockPath;
@@ -189,9 +121,15 @@ private:
     ThreadContext& m_threadContext;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class NX_UTILS_API MutexLockAnalyzer
 {
 public:
+    using DeadlockDetectedHandler = std::function<void()>;
+
+    MutexLockAnalyzer();
+
     void mutexCreated(MutexDelegate* const mutex);
     void beforeMutexDestruction(MutexDelegate* const mutex);
 
@@ -200,19 +138,21 @@ public:
 
     void expectNoLocks();
 
-    //!Should be called just after a new thread has been started
-    void threadStarted(std::uintptr_t sysThreadID);
-    //!Should be called just before a thread descriptor is freed
-    void threadStopped(std::uintptr_t sysThreadID);
+    /**
+     * By default, deadlock results in a process interrupt.
+     * @param handler If nullptr, then default handler is installed.
+     */
+    void setDeadlockDetectedHandler(DeadlockDetectedHandler handler);
 
     static MutexLockAnalyzer* instance();
 
 private:
-    typedef Digraph<MutexDelegate*, LockGraphEdgeData> MutexLockDigraph;
+    using MutexLockDigraph = Digraph<MutexDelegate*, LockGraphEdgeData>;
 
     mutable QReadWriteLock m_mutex;
     MutexLockDigraph m_lockDigraph;
     ThreadContextPool m_threadContextPool;
+    DeadlockDetectedHandler m_deadlockDetectedHandler;
 
     template<class _Iter>
     QString pathToString(const _Iter& pathStart, const _Iter& pathEnd)

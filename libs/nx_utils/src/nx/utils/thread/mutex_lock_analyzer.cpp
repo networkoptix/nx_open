@@ -237,6 +237,12 @@ const ThreadContext* ThreadContextGuard::operator->() const
 //-------------------------------------------------------------------------------------------------
 // class MutexLockAnalyzer
 
+MutexLockAnalyzer::MutexLockAnalyzer()
+{
+    // Installing default handler.
+    setDeadlockDetectedHandler(nullptr);
+}
+
 void MutexLockAnalyzer::mutexCreated(MutexDelegate* const /*mutex*/)
 {
 }
@@ -275,6 +281,8 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
 
         std::cerr << deadLockMsg.toStdString() << std::endl;
         NX_ALWAYS(this, deadLockMsg);
+
+        m_deadlockDetectedHandler();
         return;
     }
 
@@ -299,8 +307,8 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
     std::list<LockGraphEdgeData> edgesTravelled;
     //travelling edges containing any thread different from current
     //    This is needed to avoid reporting deadlock in case of loop in the same thread.
-    //    Consider following: m1->m2, m2->m1. But both lock happen in the same thread only,
-    //    so deadlock is possible.
+    //    Consider following: m1->m2, m2->m1. But both locks happen in the same thread only,
+    //    so deadlock is not possible.
     //    NOTE: recursive locking is handled separately
     if (m_lockDigraph.findAnyPathIf(
             mutexLockPosition.mutexPtr, prevLock.mutexPtr,
@@ -345,11 +353,7 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
             std::cerr << deadLockMsg.toStdString() << std::endl;
             NX_ALWAYS(this, deadLockMsg);
 
-#if defined(_WIN32)
-            DebugBreak();
-#elif defined(__linux__)
-            kill(getppid(), SIGTRAP);
-#endif
+            m_deadlockDetectedHandler();
         }
     }
 
@@ -393,14 +397,24 @@ void MutexLockAnalyzer::beforeMutexUnlocked(const MutexLockKey& mutexLockPositio
     threadContext->currentLockPath.pop_front();
 }
 
-void MutexLockAnalyzer::threadStarted(std::uintptr_t /*sysThreadID*/)
+void MutexLockAnalyzer::setDeadlockDetectedHandler(DeadlockDetectedHandler handler)
 {
-    //TODO #ak
-}
-
-void MutexLockAnalyzer::threadStopped(std::uintptr_t /*sysThreadID*/)
-{
-    //TODO #ak
+    if (handler)
+    {
+        m_deadlockDetectedHandler = std::move(handler);
+    }
+    else
+    {
+        m_deadlockDetectedHandler =
+            []()
+            {
+                #if defined(_WIN32)
+                    DebugBreak();
+                #elif defined(__linux__)
+                    kill(getppid(), SIGTRAP);
+                #endif
+            };
+    }
 }
 
 Q_GLOBAL_STATIC(MutexLockAnalyzer, MutexLockAnalyzer_instance)
