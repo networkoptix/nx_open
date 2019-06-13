@@ -24,7 +24,7 @@ static float fastInverseSqrt(float number)
 
 } // namespace
 
-Size::Size(float width, float height) :
+Size::Size(float width, float height):
     width(width),
     height(height)
 {

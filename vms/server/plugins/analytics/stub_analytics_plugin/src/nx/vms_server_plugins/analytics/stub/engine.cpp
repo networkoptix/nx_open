@@ -10,7 +10,7 @@
 
 #include "device_agent.h"
 #include "stub_analytics_plugin_ini.h"
-#include "objects/vehicle.h"
+#include "objects/vehicles.h"
 #include "objects/human_face.h"
 
 namespace nx {

@@ -18,13 +18,13 @@ public:
     virtual void update() override;
 };
 
-class Car : public Vehicle
+class Car: public Vehicle
 {
 public:
     Car();
 };
 
-class Truck : public Vehicle
+class Truck: public Vehicle
 {
 public:
     Truck();

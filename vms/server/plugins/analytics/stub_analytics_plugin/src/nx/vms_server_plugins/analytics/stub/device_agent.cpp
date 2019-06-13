@@ -17,7 +17,7 @@
 #include <nx/kit/debug.h>
 
 #include "stub_analytics_plugin_ini.h"
-#include "objects/vehicle.h"
+#include "objects/vehicles.h"
 #include "objects/pedestrian.h"
 #include "objects/bicycle.h"
 #include "objects/random.h"
