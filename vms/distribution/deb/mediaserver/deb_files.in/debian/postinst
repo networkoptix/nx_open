@@ -33,12 +33,12 @@ SYSTEM_USER=$COMPANY_NAME
 TARGET_DEVICE='@targetDevice@'
 WITH_ROOT_TOOL='@withRootTool@'
 
-is_systemd_used()
+isSystemdUsed()
 {
     [[ $(readlink -m /sbin/init) =~ .*systemd$ ]]
 }
 
-is_rpi()
+isRpi()
 {
     if [[ $TARGET_DEVICE == "linux_arm32" ]]
     then
@@ -48,7 +48,7 @@ is_rpi()
     fi
 }
 
-is_local_addr()
+isLocalAddr()
 {
     local -r hostname="$1"
     local addr=$(gethostip "$hostname" -d)
@@ -63,7 +63,7 @@ is_local_addr()
     ip -4 -o addr | awk '{gsub("/", " "); print $4;}' | grep "^$addr$" > /dev/null 2>&1
 }
 
-find_free_port()
+findFreePort()
 {
     local -i port="$1"
 
@@ -80,7 +80,7 @@ find_free_port()
     done
 }
 
-check_new_system()
+checkNewSystem()
 {
     local -r -i RETRY_COUNT=20
     local -i port="$1"
@@ -99,7 +99,11 @@ check_new_system()
         return 1
     fi
 
-    local -r localSystemIdRegex="\\{[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}\\}"
+    local -r c="[0-9a-z]"
+    local -r localSystemIdRegex="\\{$c{8}-$c{4}-$c{4}-$c{4}-$c{12}\\}"
+    # Find `"localSystemId": "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"` pattern in the JSON
+    # response and assign matching to the variable. If no matching was found, assign an empty
+    # string to it.
     local -r localSystemIdDefinition=$(
         echo "$response" | grep -E -o "\"localSystemId\":\s*\"$localSystemIdRegex\""
     )
@@ -110,20 +114,26 @@ check_new_system()
         return 1
     fi
 
+    # Extract the value from `"localSystemId": "...."` and assign it to the variable.
     local -r localSystemIdValue=$(
         echo "$localSystemIdDefinition" | grep -E -o "$localSystemIdRegex"
     )
 
-    [[ $localSystemIdValue == "{00000000-0000-0000-0000-000000000000}" ]]
+    if [[ $localSystemIdValue != "{00000000-0000-0000-0000-000000000000}" ]]
+    then
+        return 1
+    fi
+
+    return 0
 }
 
-display_complete_setup_hint()
+displayCompleteSetupHint()
 {
     local -i port="$1"
 
     [ -n "$UPGRADING" ] && return
 
-    if check_new_system $port
+    if checkNewSystem $port
     then
         db_fset @deb.customization.company.name@-mediaserver/complete-setup-hint seen false
         db_input critical @deb.customization.company.name@-mediaserver/complete-setup-hint || true
@@ -131,7 +141,7 @@ display_complete_setup_hint()
     fi
 }
 
-install_modification_specific_config()
+installModificationSpecificConfig()
 {
     local -r config_file_path="${BASE_DIR}/share/configs/mediaserver.conf.$TARGET_DEVICE.template"
 
@@ -157,7 +167,7 @@ case "$1" in
 
         ECS_HOST="$($CFG_HELPER appserverHost)"
         if [ -n "$ECS_HOST" ]; then
-            if is_local_addr "$ECS_HOST"; then
+            if isLocalAddr "$ECS_HOST"; then
                 $CFG_HELPER appserverHost -d
                 $CFG_HELPER appserverPort -d
                 $CFG_HELPER appserverLogin -d
@@ -173,7 +183,7 @@ case "$1" in
         if [ -z "$UPGRADING" ]
         then
             PORT="$($CFG_HELPER port)"
-            [ -z "$PORT" ] && PORT=$(find_free_port $PORT_DEFAULT)
+            [ -z "$PORT" ] && PORT=$(findFreePort $PORT_DEFAULT)
             $CFG_HELPER port "$PORT"
 
             if [ ! -f $DB_PATH ]
@@ -198,7 +208,7 @@ case "$1" in
             $CFG_HELPER statisticsReportAllowed "$STATISTICS_REPORT_ALLOWED"
         else
             PORT="$($CFG_HELPER port)"
-            [ -z "$PORT" ] && PORT=$(find_free_port $PORT_DEFAULT)
+            [ -z "$PORT" ] && PORT=$(findFreePort $PORT_DEFAULT)
             $CFG_HELPER port "$PORT"
 
             SYSTEM_NAME="$($CFG_HELPER systemName)"
@@ -237,7 +247,7 @@ service apport stop >/dev/null 2>&1 || true
 
 [[ -L "${BASE_DIR}/lib/ffmpeg" ]] && unlink "${BASE_DIR}/lib/ffmpeg"
 
-if is_rpi
+if isRpi
 then
     # RPi requires specially compiled ffmpeg with mmal support - for RPi camera.
     ( cd "${BASE_DIR}/lib"; ln -s ffmpeg-rpi ffmpeg )
@@ -250,9 +260,9 @@ else
     ( cd "${BASE_DIR}/lib"; ln -s ffmpeg-arm32 ffmpeg )
 fi
 
-install_modification_specific_config
+installModificationSpecificConfig
 
-if is_systemd_used
+if isSystemdUsed
 then
     # Systemd requires explicit enabling of the service to start it on boot.
     if [[ $WITH_ROOT_TOOL == 'true' ]]
@@ -282,4 +292,4 @@ else
     echo "WARNING: Unable to start service" 1>&2
 fi
 
-display_complete_setup_hint $PORT
+displayCompleteSetupHint $PORT
