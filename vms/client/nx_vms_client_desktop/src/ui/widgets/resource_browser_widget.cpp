@@ -101,6 +101,8 @@ const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1
 
 static const QSize kMaxThumbnailSize(224, 184);
 
+static constexpr int kMaxAutoExpandedServers = 2;
+
 static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* item)
 {
     if (!item)
@@ -175,31 +177,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);
     ui->resourceTreeWidget->setEditingEnabled();
-    ui->resourceTreeWidget->setAutoExpandPolicy(
-        [](const QModelIndex& index)
-        {
-            switch (index.data(Qn::NodeTypeRole).value<NodeType>())
-            {
-                case NodeType::resource:
-                {
-                    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-                    return resource && resource->hasFlags(Qn::server);
-                }
-                case NodeType::servers:
-                case NodeType::userResources:
-
-                case NodeType::filteredServers:
-                case NodeType::filteredCameras:
-                case NodeType::filteredLayouts:
-                case NodeType::filteredUsers:
-                case NodeType::filteredVideowalls:
-                    return true;
-                default:
-                    break;
-            }
-            return false;
-        }
-    );
+    setupAutoExpandPolicy();
 
     m_connections << connect(ui->resourceTreeWidget->selectionModel(),
         &QItemSelectionModel::currentChanged,
@@ -496,6 +474,39 @@ void QnResourceBrowserWidget::restoreExpandedStates()
             tree->setExpanded(searchIndex, data.second);
     }
     m_expandedStatesList.clear();
+}
+
+void QnResourceBrowserWidget::setupAutoExpandPolicy()
+{
+    ui->resourceTreeWidget->setAutoExpandPolicy(
+        [this](const QModelIndex& index)
+        {
+            switch (index.data(Qn::NodeTypeRole).value<NodeType>())
+            {
+                case NodeType::resource:
+                {
+                    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+                    if (resource && resource->hasFlags(Qn::server))
+                    {
+                        const auto serverCount =
+                            resourcePool()->getResources<QnMediaServerResource>().count();
+                        return serverCount <= kMaxAutoExpandedServers;
+                    }
+                }
+                case NodeType::servers:
+                case NodeType::userResources:
+                case NodeType::filteredServers:
+                case NodeType::filteredCameras:
+                case NodeType::filteredLayouts:
+                case NodeType::filteredUsers:
+                case NodeType::filteredVideowalls:
+                    return true;
+                default:
+                    break;
+            }
+            return false;
+        }
+    );
 }
 
 void QnResourceBrowserWidget::updateInstantFilter()
