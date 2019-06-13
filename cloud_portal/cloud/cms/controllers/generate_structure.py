@@ -194,13 +194,14 @@ def list_to_dict(obj, key):
     return {o[key]: o for o in obj}
 
 
-def merge_object(obj1, obj2, obj_join, state="same", parent_key=""):
+def merge_object(obj1, obj2, obj_join, state=REC_STATE.same, parent_key=""):
     for key in obj1:
         if key == "status":
             continue
 
         if key not in obj2:
-            state = REC_STATE.deprecated
+            state = REC_STATE.updated
+            del obj_join[key]
             continue
 
         if type(obj1[key]) is dict:
@@ -216,7 +217,7 @@ def merge_object(obj1, obj2, obj_join, state="same", parent_key=""):
 
         if key not in obj1:
             obj_join[key] = obj2[key]
-            state = REC_STATE.new
+            state = REC_STATE.updated
 
     if parent_key != "meta":
         obj_join["status"] = state
