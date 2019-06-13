@@ -21,9 +21,10 @@ class DataStructureSerializer(BaseCMSSerializer):
     type = serializers.SerializerMethodField("get_nice_name")
 
     def get_value_for_datastructure(self, obj):
-        if obj.type in [DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file]:
-            return ""
         if self.product_id:
+            if obj.type in [DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file]:
+                return ""
+
             current_record = obj.datarecord_set.filter(product_id=self.product_id).last()
             if current_record:
                 return current_record.value

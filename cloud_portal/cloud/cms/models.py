@@ -336,6 +336,8 @@ class Context(models.Model):
     url = models.CharField(max_length=1024, blank=True, default='')
 
     def __str__(self):
+        if self.product_type:
+            return f"{self.product_type} - {self.name}"
         return self.name
 
     def get_nice_name(self):

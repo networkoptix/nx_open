@@ -15,6 +15,16 @@ IGNORE_DIRECTORIES = ('help',)
 IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns', 'jpg', 'jpeg')
 
 
+class RecordState(object):
+    deprecated = "deprecated"
+    new = "new"
+    same = "same"
+    updated = "updated"
+
+
+REC_STATE = RecordState()
+
+
 def image_meta(data, extension):
     # noinspection PyBroadException
     try:
@@ -74,7 +84,10 @@ def find_structure(name, context, structure_type, meta=None, description=""):
             ("name", name),
             ("value", value),
             ("description", description),
-            ("type", structure_type)
+            ("type", structure_type),
+            ("advanced", False),
+            ("optional", False),
+            ("public", True)
         ])
         if meta:
             data_structure.update({"meta": meta})
@@ -173,6 +186,93 @@ def iterate_contexts(file_iterator):
         yield name, context_name, data
 
 
+def get_object_by_name(name, objects):
+    return next((obj for obj in objects if name == obj["name"]), None)
+
+
+def list_to_dict(obj, key):
+    return {o[key]: o for o in obj}
+
+
+def merge_object(obj1, obj2, obj_join, state="same", parent_key=""):
+    for key in obj1:
+        if key == "status":
+            continue
+
+        if key not in obj2:
+            state = REC_STATE.deprecated
+            continue
+
+        if type(obj1[key]) is dict:
+            state = merge_object(obj1[key], obj2[key], obj_join[key], state, key)
+
+        elif obj1[key] != obj2[key]:
+            obj_join[key] = obj2[key]
+            state = REC_STATE.updated
+
+    for key in obj2:
+        if key == "status":
+            continue
+
+        if key not in obj1:
+            obj_join[key] = obj2[key]
+            state = REC_STATE.new
+
+    if parent_key != "meta":
+        obj_join["status"] = state
+
+    return state
+
+
+def merge_context(base_context, new_context):
+    merged_data_structures = base_context["values"]
+    base_data_structures = list_to_dict(base_context["values"], "name")
+    new_data_structures = list_to_dict(new_context["values"], "name")
+
+    for key, base_ds in base_data_structures.items():
+        # check and update matching data structures
+        if key in new_data_structures:
+            merge_ds = get_object_by_name(key, merged_data_structures)
+            merge_object(base_ds, new_data_structures[key], merge_ds)
+
+        else:
+            ds = get_object_by_name(key, merged_data_structures)
+            ds["status"] = REC_STATE.deprecated
+
+    for key, new_ds in new_data_structures.items():
+        if key not in base_data_structures:
+            new_ds["status"] = REC_STATE.new
+            merged_data_structures.append(new_ds)
+
+    return merged_data_structures
+
+
+def merge_structure(base_structure, new_structure):
+    merged_structure = base_structure
+    base_contexts = list_to_dict(base_structure["contexts"], "name")
+    new_contexts = list_to_dict(new_structure["contexts"], "name")
+
+    for key, base_context in base_contexts.items():
+        # Update base
+        context = get_object_by_name(key, merged_structure["contexts"])
+        if key in new_contexts:
+            context["values"] = merge_context(base_context, new_contexts[key])
+
+            status = {ds["status"] for ds in context["values"]}
+            context["status"] = next(iter(status)) if len(status) < 2 else REC_STATE.updated
+        else:
+            set_data_structure_state(context["values"], REC_STATE.deprecated)
+            context["status"] = REC_STATE.deprecated
+
+    for key, new_context in new_contexts.items():
+        if key not in base_contexts:
+            set_data_structure_state(new_context["values"], REC_STATE.new)
+            new_context["status"] = REC_STATE.new
+            merged_structure["contexts"].append(new_context["values"])
+
+    return merged_structure
+
+
 def process_files(file_iterator, product):
     log_errors = []
     structure = OrderedDict([('product', product.name),
@@ -200,3 +300,14 @@ def from_directory(directory, product):
 
 def from_zip(file_descriptor, product):
     return process_files(iterate_zip(file_descriptor), product)
+
+
+def merge_db_with_archive(file_descriptor, product):
+    db_structure = from_database(product, False)[0]
+    archive_structure = from_zip(file_descriptor, product)[0][0]
+    return merge_structure(db_structure, archive_structure)
+
+
+def set_data_structure_state(context, state):
+    for ds in context["values"]:
+        ds["state"] = state

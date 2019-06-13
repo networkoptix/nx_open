@@ -262,6 +262,7 @@ def product_settings(request, product_id):
     if form:
         action = form.cleaned_data['action']
         generate_json = action == 'generate_json'
+        merge_with_db = action == 'merge_with_db'
         update_structure = action == 'update_structure'
         update_content = action == 'update_content'
 
@@ -271,7 +272,7 @@ def product_settings(request, product_id):
             if not update_structure:
                 return HttpResponseBadRequest('json is acceptable only for Updating structure')
             cms_structure = json.load(file)
-            structure.update_from_object(cms_structure, product_type_name=product.product_type.name)
+            structure.update_from_object(cms_structure, product_type=product.product_type)
             messages.success(request, "Structure updated")
         else:
             if not file.name.endswith('zip'):
@@ -282,6 +283,11 @@ def product_settings(request, product_id):
                 for error in log_messages:
                     messages.error(request, "Error with {} problem with {}".format(error['file'], error['extension']))
                 return response_attachment(content, 'structure.json', 'application/json')
+            elif merge_with_db:
+                data = generate_structure.merge_db_with_archive(file, product)
+                content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
+                return response_attachment(content, 'structure.json', 'application/json')
+
             else:
                 log_messages = structure.process_zip(file, request.user, product, update_structure, update_content)
             for item in log_messages:

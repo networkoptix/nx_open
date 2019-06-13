@@ -68,17 +68,19 @@ Example for vms
             The check cookie function keeps checking the cookies until it a changed.
             Afterwards it reloads the page so that the user can see any error messages with the file upload
          */
+        var cookieCheckInterval = undefined;
         var checkCookie = function () {
             var lastCookie = document.cookie;
             return function () {
                 var currentCookie = document.cookie;
                 if (currentCookie != lastCookie) {
-                    window.location.reload()
+                    clearInterval(cookieCheckInterval);
+                    window.location.reload();
                 }
             };
         }();
         function cookieInterval() {
-            window.setInterval(checkCookie, 100);
+            cookieCheckInterval = setInterval(checkCookie, 100);
         }
     </script>
 
