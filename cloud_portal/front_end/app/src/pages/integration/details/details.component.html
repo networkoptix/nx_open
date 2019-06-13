@@ -58,7 +58,7 @@
                     <label class="group-label" translate>Support</label>
                 </div>
                 <div *ngIf="plugin.support.supportPhone"
-                     [translate]="'phone_label_number'"
+                     [translate]="'phoneNumberWithLabel'"
                      [translateParams]="{number: plugin.support.supportPhone}"></div>
                 <div *ngIf="plugin.support.supportWeb">
                     <a [href]="plugin.support.supportWeb"

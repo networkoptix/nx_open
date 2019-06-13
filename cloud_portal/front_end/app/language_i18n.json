@@ -109,7 +109,7 @@
     "You can only merge Systems where you are the owner.": "You can only merge Systems where you are the owner.",
     "Your Name": "Your Name",
     "Your browser is not supported": "Your browser is not supported",
-    "and_x_more": "... and {{value}} more",
+    "andXMore": "... and {{value}} more",
     "cameraFilters": {
         "H265": "H.265 Cameras",
         "IO": "I / O modules",
@@ -269,7 +269,7 @@
         "integrations": "Integrations",
         "supportedDevices": "Supported Devices"
     },
-    "phone_label_number": "Tel: {{number}}",
+    "phoneNumberWithLabel": "Tel: {{number}}",
     "search": {
         "Any": "Any",
         "Search": "Search",
