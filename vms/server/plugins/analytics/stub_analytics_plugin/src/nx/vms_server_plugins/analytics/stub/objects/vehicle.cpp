@@ -13,8 +13,6 @@ using namespace nx::sdk;
 
 namespace {
 
-using VehicleMap = std::map <const char*, std::vector<const char*>>;
-
 static const VehicleMap kCars = {
     { "Honda", { "Civic", "Accord" } },
     { "Toyota", { "Corolla", "Camry", "Supra" } },
