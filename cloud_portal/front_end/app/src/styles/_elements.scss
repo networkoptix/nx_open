@@ -16,3 +16,9 @@
         width            : calc(100% - 24px);
     }
 }
+
+.group-label {
+    margin-bottom : 8px;
+    font-family   : $font-family-regular;
+    color         : $light16;
+}

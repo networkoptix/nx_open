@@ -10,14 +10,13 @@
 
             <nx-block header-style="slim" type="menu top">
                 <header>
-                    <div class="" style="line-height: 15px;">{{plugin.information.name}}
-                    </div>
-                    <div class="" style="color: #698796; margin-top : 4px;">
-                        <div class="version" style="font-family: 'robotoregular';float: left; font-size: 11px; line-height: 1rem; position: absolute; bottom: 10px;"
+                    <div class="title">{{plugin.information.name}}</div>
+                    <div class="second-row">
+                        <div class="version"
                              [innerHTML]="plugin.versionDetails.version">
                         </div>
 
-                        <div class="platforms" style="color: #A5B7C0; float: right; display: flex;">
+                        <div class="platforms">
                             <div style="font-size: 0.75rem; width: 1rem; margin-left: 4px;" *ngFor="let icon of plugin.information.platforms.icons">
                                 <img [src]="icon.src">
                             </div>
@@ -32,7 +31,7 @@
 
             <div class="mt-3 clearfix">
                 <div>
-                    <label style="margin-bottom: 4px; font-family: 'robotoregular'; color: #698796" translate>Tags</label>
+                    <label class="group-label mb-1" translate>Tags</label>
                 </div>
                 <h3 class="float-left m-0 mt-1 mr-1" *ngIf="plugin.pending">
                     <span class="badge large badge-danger" translate>In Review</span>
@@ -47,8 +46,7 @@
 
             <div class="mt-3 clearfix">
                 <div>
-                    <label style="margin-bottom: 8px; font-family: 'robotoregular'; color: #698796"
-                           translate>Contact</label>
+                    <label class="group-label" translate>Contact</label>
                 </div>
                 <div class="d-inline-flex flex-wrap justify-content-start w-100">
                     <button class="btn btn-primary" (click)="openMessageDialog()" translate>Get in touch</button>
@@ -57,8 +55,7 @@
 
             <div class="mt-3 clearfix">
                 <div>
-                    <label style="margin-bottom: 8px; font-family: 'robotoregular'; color: #698796"
-                           translate>Support</label>
+                    <label class="group-label" translate>Support</label>
                 </div>
                 <div *ngIf="plugin.support.supportPhone"
                      [translate]="'phone_label_number'"

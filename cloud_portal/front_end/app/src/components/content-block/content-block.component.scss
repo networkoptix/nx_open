@@ -17,7 +17,7 @@
             margin : 0;
             width  : 100%;
         }
-    
+        
         &-logo {
             float               : left;
             display             : flex;
@@ -64,7 +64,7 @@
     
     nx-section:first-of-type {
         .card--body {
-            border-top: none;
+            border-top : none;
         }
     }
     
@@ -82,7 +82,7 @@
             background-color : $light4;
             border-top       : 1px solid $light6;
         }
-    
+        
         .card--footer {
             background-color : $light4;
         }
@@ -108,8 +108,8 @@
         }
         
         &.top {
-            border-radius: 2px 2px 0 0;
-    
+            border-radius : 2px 2px 0 0;
+            
             .card--header {
                 border-bottom : none;
             }
@@ -120,7 +120,6 @@
         height   : rem(300px);
         overflow : hidden;
     }
-    
     
     
     &.extended-header {
@@ -134,6 +133,29 @@
         .card--header {
             height  : auto;
             padding : rem(12px);
+            
+            .title {
+                line-height : 15px;
+            }
+            
+            .second-row {
+                margin-top : 4px;
+                
+                .version {
+                    font-family : $font-family-regular;
+                    color       : $light16;
+                    float       : left;
+                    font-size   : 11px;
+                    position    : absolute;
+                    bottom      : 10px;
+                }
+                
+                .platforms {
+                    color   : $light10;
+                    float   : right;
+                    display : flex;
+                }
+            }
         }
     }
 }

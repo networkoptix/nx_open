@@ -92,6 +92,7 @@
     "System will be accessible through local network with local administrator account.": "System will be accessible through local network with local administrator account.",
     "Systems": "Systems",
     "Systems of such size may work but will be unstable and have troubles with updates and synchronisation.": "Systems of such size may work but will be unstable and have troubles with updates and synchronisation.",
+    "Tags": "Tags",
     "Take the name and settings from": "Take the name and settings from",
     "The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.": "The credentials of this user will be exposed! You must create a custom \"Public User\" role with access only\n            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This\n            \"Public User\" should not have system-wide access of any kind.",
     "There will be more than": "There will be more than",
@@ -109,7 +110,6 @@
     "Your Name": "Your Name",
     "Your browser is not supported": "Your browser is not supported",
     "and_x_more": "... and {{value}} more",
-    "phone_label_number": "Tel: {{number}}",
     "cameraFilters": {
         "H265": "H.265 Cameras",
         "IO": "I / O modules",
@@ -269,6 +269,7 @@
         "integrations": "Integrations",
         "supportedDevices": "Supported Devices"
     },
+    "phone_label_number": "Tel: {{number}}",
     "search": {
         "Any": "Any",
         "Search": "Search",
