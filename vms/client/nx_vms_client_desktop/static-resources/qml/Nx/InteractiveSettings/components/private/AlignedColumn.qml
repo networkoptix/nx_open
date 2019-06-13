@@ -6,7 +6,7 @@ Column
 
     spacing: 8
 
-    onChildrenChanged: alignCaptions()
+    onChildrenChanged: { alignCaptions() }
 
     function alignCaptions()
     {
