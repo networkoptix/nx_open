@@ -332,7 +332,7 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
         {
             //found deadlock between prevLock and mutexLockPosition
             const QString& deadLockMsg = QString::fromLatin1(
-                "Detected deadlock between %1 and %2:\n"
+                "Detected deadlock possibility between %1 and %2:\n"
                 "    Existing path:\n%3\n"
                 "    New path:\n%4\n").
                 arg(prevLock.toString()).arg(mutexLockPosition.toString()).
@@ -345,7 +345,7 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
             NX_ALWAYS(this, deadLockMsg);
 
 #if defined(_WIN32)
-            DebugBreak();
+            // Do nothing. DebugBreak() will crash the program.
 #elif defined(__linux__)
             kill(getppid(), SIGTRAP);
 #endif

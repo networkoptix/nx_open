@@ -1,6 +1,7 @@
 #include "debug_handler.h"
 
 #include <cstdlib>
+#include <thread>
 
 #include <nx/utils/switch.h>
 #include <nx/utils/crash_dump/systemexcept.h>

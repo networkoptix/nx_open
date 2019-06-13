@@ -233,10 +233,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Drop Resources</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Start Screen Recording</source>
         <translation></translation>
     </message>
