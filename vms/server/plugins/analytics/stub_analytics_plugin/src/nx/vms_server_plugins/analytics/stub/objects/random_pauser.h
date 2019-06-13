@@ -57,8 +57,8 @@ public:
 
 private:
     std::chrono::milliseconds m_duration;
-    int m_maxNumberOfPauses = 3;
-    int m_randModulus = 7;
+    int m_maxNumberOfPauses;
+    const int m_randModulus;
     bool m_paused = false;
     std::chrono::high_resolution_clock::time_point m_pauseStartTime;
     bool m_resuming = false;

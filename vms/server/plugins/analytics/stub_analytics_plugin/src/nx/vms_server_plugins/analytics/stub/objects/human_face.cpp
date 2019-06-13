@@ -1,4 +1,6 @@
-#include "abstract_object.h"
+#include "human_face.h"
+
+#include "random.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -9,13 +11,14 @@ using namespace nx::sdk;
 
 namespace {
 
-std::pair<const char*, const char*> randomPerson()
+static std::pair<const char*, const char*> randomPerson()
 {
-    static std::map<const char*, std::vector<const char*>> kPeople = {
-        { "Female", { "Kat", "Olga", "Triss", "Judy", "Nate" } },
-        { "Male", {
+    static const std::map<const char*, std::vector<const char*>> kPeople = {
+        {"Female", {"Kat", "Olga", "Triss", "Judy", "Nate"}},
+        {"Male", {
             "Andrey", "Ivan", "Roman", "Nick", "Sergey", "Oleg", "Yingfan", "Tony", "Igal",
-            "Sasha", "Evgeny", "Kyle", "Borris", "Mike" } } };
+            "Sasha", "Evgeny", "Kyle", "Borris", "Mike"}}
+    };
 
     auto it = kPeople.begin();
     std::advance(it, rand() % kPeople.size());
@@ -25,9 +28,10 @@ std::pair<const char*, const char*> randomPerson()
 static Attributes makeAttributes()
 {
     static const std::vector<const char*> kHairColors = {
-        "Red", "Brown", "Blonde", "Black", "Blue" };
+        "Red", "Brown", "Blonde", "Black", "Blue"
+    };
 
-    auto person = randomPerson();
+    const auto person = randomPerson();
     return {
         nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Sex", person.first),
         nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Name", person.second),

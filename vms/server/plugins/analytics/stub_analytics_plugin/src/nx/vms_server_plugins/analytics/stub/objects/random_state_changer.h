@@ -32,8 +32,8 @@ public:
     }
 
 private:
-    int m_randModulus = 7;
-    int m_maxStateChanges = 4;
+    const int m_randModulus;
+    int m_maxStateChanges;
     bool m_stateChanged = false;
 };
 

@@ -1,6 +1,4 @@
-#pragma once
-
-#include "abstract_object.h"
+#include "vehicle.h"
 
 #include <map>
 
@@ -13,35 +11,34 @@ using namespace nx::sdk;
 
 namespace {
 
-using VehicleMap = std::map <const char*, std::vector<const char*>>;
+using VehicleMap = std::map<const char*, std::vector<const char*>>;
 
 static const VehicleMap kCars = {
-    { "Honda", { "Civic", "Accord" } },
-    { "Toyota", { "Corolla", "Camry", "Supra" } },
-    { "Ford", { "Mustang", "Focus", "GT"} },
-    { "Lada", { "Granta", "Vesta", "Largus"} },
-    { "Mazda", {"Miata", "3", "6", "Cx3"} },
-    { "Subaru", { "Impreza", "Wrx", "Legacy", "Crosstrek", "Outback" } },
-    { "Tesla", { "Model 3", "Model S", "Model X"} }
+    {"Honda", {"Civic", "Accord"}},
+    {"Toyota", {"Corolla", "Camry", "Supra"}},
+    {"Ford", {"Mustang", "Focus", "GT"}},
+    {"Lada", {"Granta", "Vesta", "Largus"}},
+    {"Mazda", {"Miata", "3", "6", "Cx3"}},
+    {"Subaru", {"Impreza", "Wrx", "Legacy", "Crosstrek", "Outback"}},
+    {"Tesla", {"Model 3", "Model S", "Model X"}}
 };
 
 static const VehicleMap kTrucks = {
-    { "Honda", { "Ridgeline" } },
-    { "Toyota", { "Tacoma", "Tundra" } },
-    { "Ford", { "F150", "F250", "F350" } },
-    { "Lada", { "4x4 Bronco" } },
-    { "Nissan", { "Frontier", "Titan" } },
-    { "GMC", { "Canyon", "Sierra" } },
-    { "Chevy", { "Colorado", "Silverado" } },
-};
-
-static std::vector<const char*> kColors = {
-    "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet", "Pink", "Purple", "White",
-    "Black", "Grey",
+    {"Honda", {"Ridgeline"}},
+    {"Toyota", {"Tacoma", "Tundra"}},
+    {"Ford", {"F150", "F250", "F350"}},
+    {"Lada", {"4x4 Bronco"}},
+    {"Nissan", {"Frontier", "Titan"}},
+    {"GMC", {"Canyon", "Sierra"}},
+    {"Chevy", {"Colorado", "Silverado"}}
 };
 
 static const char* randomColor()
 {
+    static const std::vector<const char*> kColors = {
+        "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet", "Pink", "Purple", "White",
+        "Black", "Grey"
+    };
     return kColors[rand() % kColors.size()];
 }
 
@@ -54,7 +51,7 @@ static std::pair<const char*, const char*> randomVehicle(const VehicleMap& map)
 
 static Attributes makeAttributes(const VehicleMap& map)
 {
-    auto vehicle = randomVehicle(map);
+    const auto vehicle = randomVehicle(map);
     return {
         makePtr<Attribute>(IAttribute::Type::string, "Brand", vehicle.first),
         makePtr<Attribute>(IAttribute::Type::string, "Model", vehicle.second),
@@ -62,10 +59,10 @@ static Attributes makeAttributes(const VehicleMap& map)
     };
 }
 
-} //namespace
+} // namespace
 
 Vehicle::Vehicle(const std::string& typeId, Attributes attributes):
-    base_type(std::move(typeId), std::move(attributes))
+    base_type(typeId, std::move(attributes))
 {
 }
 

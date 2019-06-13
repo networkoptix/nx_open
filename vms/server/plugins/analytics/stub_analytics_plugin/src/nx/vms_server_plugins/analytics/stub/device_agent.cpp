@@ -17,6 +17,10 @@
 #include <nx/kit/debug.h>
 
 #include "stub_analytics_plugin_ini.h"
+#include "objects/vehicle.h"
+#include "objects/pedestrian.h"
+#include "objects/bicycle.h"
+#include "objects/random.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -345,15 +349,14 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 //-------------------------------------------------------------------------------------------------
 // private
 
-static IObjectMetadata* makeObjectMetadata(AbstractObject* object)
+static IObjectMetadata* makeObjectMetadata(const AbstractObject* object)
 {
     auto objectMetadata = new ObjectMetadata();
     objectMetadata->setTypeId(object->typeId());
     objectMetadata->setId(object->id());
-    auto position = object->position();
-    auto size = object->size();
-    objectMetadata->setBoundingBox(Rect(
-        position.x, position.y, size.width, size.height));
+    const auto position = object->position();
+    const auto size = object->size();
+    objectMetadata->setBoundingBox(Rect(position.x, position.y, size.width, size.height));
     objectMetadata->addAttributes(object->attributes());
     return objectMetadata;
 }
@@ -451,7 +454,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     dt = (float) modf(dt, &intPart) * 0.75F;
     const int sequentialNumber = static_cast<int>(intPart);
 
-    for (auto& object : m_objects)
+    for (auto& object: m_objects)
     {
         if (!object)
             object = randomObject();
@@ -473,7 +476,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 
     auto objectMetadataPacket = new ObjectMetadataPacket();
 
-    for (const auto& object : m_objects)
+    for (const auto& object: m_objects)
     {
         if (!object)
             continue;

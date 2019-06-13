@@ -1,4 +1,6 @@
-#include "abstract_object.h"
+#include "bicycle.h"
+
+#include "random.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -9,7 +11,7 @@ using namespace nx::sdk;
 
 namespace {
 
-Attributes makeAttributes()
+static Attributes makeAttributes()
 {
     static const std::vector<const char*> kBikeTypes = {
         "Mountain Bike", "Road Bike", "Fixie", "BMX"

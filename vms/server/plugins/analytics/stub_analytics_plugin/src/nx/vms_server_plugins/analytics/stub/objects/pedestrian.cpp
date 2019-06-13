@@ -1,6 +1,6 @@
-#include "abstract_object.h"
+#include "pedestrian.h"
 
-#include <iostream>
+#include "random.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -13,7 +13,8 @@ namespace {
 
 static Attributes makeAttributes()
 {
-    static std::vector<const char*> kDirections = { "Towards the camera", "Away from the camera" };
+    static const std::vector<const char*> kDirections = {
+        "Towards the camera", "Away from the camera"};
     return {
         nx::sdk::makePtr<Attribute>(
             IAttribute::Type::string,
