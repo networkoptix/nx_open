@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QMargins>
 #include <QtCore/QScopedPointer>
 
 #include <client_core/connection_context_aware.h>
