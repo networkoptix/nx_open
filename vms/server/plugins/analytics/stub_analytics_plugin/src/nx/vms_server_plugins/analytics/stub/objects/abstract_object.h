@@ -66,8 +66,6 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-using VehicleMap = std::map <const char*, std::vector<const char*>>;
-
 class Vehicle : public AbstractObject
 {
     using base_type = AbstractObject;
