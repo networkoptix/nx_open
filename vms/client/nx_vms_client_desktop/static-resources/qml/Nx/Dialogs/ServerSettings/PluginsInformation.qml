@@ -18,7 +18,7 @@ Item
     property bool loading: false
     property bool hasPlugins: plugins && plugins.length > 0
 
-    Item 
+    Item
     {
         visible: online && !loading && hasPlugins
         anchors.fill: parent
@@ -53,7 +53,7 @@ Item
                     itemId: modelData.id
                     text: modelData.name
                     active: modelData.loaded
-                    onClicked: store.selectCurrentPlugin(modelData.id)
+                    onClicked: { store.selectCurrentPlugin(modelData.id) }
 
                     Connections
                     {
@@ -96,9 +96,9 @@ Item
                 anchors.topMargin: 8
 
                 Column
-                {       
+                {
                     width: Math.max(implicitWidth, 64)
-    
+
                     Repeater
                     {
                         model: currentPluginDetails
@@ -113,7 +113,7 @@ Item
                 }
 
                 Column
-                {           
+                {
                     Repeater
                     {
                         model: currentPluginDetails
