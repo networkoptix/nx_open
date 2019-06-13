@@ -52,7 +52,7 @@ public:
 private:
     utils::MutexLockAnalyzer* m_analyzer = nullptr;
     nx::utils::Mutex::RecursionMode m_mode = nx::utils::Mutex::NonRecursive;
-    std::atomic<int> m_lockRecursionDepth{0};
+    int m_lockRecursionDepth = 0;
     uintptr_t m_threadHoldingMutex = 0;
 };
 
@@ -117,13 +117,24 @@ TEST_F(MutexLockAnalyzer, recursive_lock_of_recursive_mutex_is_not_a_deadlock)
     assertNoDeadlockIsReported();
 }
 
-TEST_F(MutexLockAnalyzer, deadlock_between_threads_is_detected)
+TEST_F(MutexLockAnalyzer, deadlock_between_two_threads_is_detected)
 {
     DummyMutex m1(&m_analyzer);
     DummyMutex m2(&m_analyzer);
 
     lockInANewThread({&m1, &m2});
     lockInANewThread({&m2, &m1});
+
+    assertDeadlockIsReported();
+}
+
+TEST_F(MutexLockAnalyzer, deadlock_between_N_threads_is_detected)
+{
+    static constexpr int kMutexCount = 5;
+
+    std::vector<DummyMutex> mutexes(kMutexCount, DummyMutex(&m_analyzer));
+    for (int i = 0; i < kMutexCount; ++i)
+        lockInANewThread({&mutexes[i], &mutexes[(i+1) % kMutexCount]});
 
     assertDeadlockIsReported();
 }
