@@ -31,6 +31,11 @@ Attributes makeAttributes()
     };
 }
 
+static std::unique_ptr<AbstractObject> newObject()
+{
+    return std::make_unique<Bicycle>();
+}
+
 } // namespace
 
 Bicycle::Bicycle():

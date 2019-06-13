@@ -39,6 +39,11 @@ static Attributes makeAttributes()
     };
 }
 
+static std::unique_ptr<AbstractObject> newObject()
+{
+    return std::make_unique<HumanFace>();
+}
+
 } // namespace
 
  HumanFace::HumanFace():
