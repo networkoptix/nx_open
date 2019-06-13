@@ -1,4 +1,4 @@
-# Network Optix nx_kit
+# C++ library `nx_kit` by Network Optix
 
 ---------------------------------------------------------------------------------------------------
 ## Introduction
@@ -11,7 +11,7 @@ Qt is used by a project which uses nx_kit, additional convenience (e.g. supporti
 in debug utilities) is provided. Similarly, while being fully cross-platform, if nx_kit detects one
 of the familiar platforms, additional convenience or customized behavior is offered.
 
-Currently, the following components are included into `nx_kit`:
+Currently, the following units are included into `nx_kit`:
 
 - `nx::kit::IniConfig` - `ini_config.h`
    Mechanism for configuration variables that can alter the behavior of the code for the purpose of
@@ -20,12 +20,14 @@ Currently, the following components are included into `nx_kit`:
    ini files (with name=value lines) in the system temp directory (or /sdcard on Android).
 
 - `nx::kit::debug` - `debug.h`
-   Utilities for debugging: measuring execution time and FPS, working with strings, logging values
-   and messages.
+   Utilities for debugging: measuring execution time and FPS, logging values and messages, etc.
 
 - `nx::kit::test` - `test.h`
    Rudimentary standalone unit testing framework designed to mimic Google Test to a certain degree.
-   This framework is used for the unit tests for `ini_config` and `debug` units of `nx_kit`.
+   Used for the unit tests for `ini_config`, `debug` and `utils` units of `nx_kit`.
+
+- `nx::kit::utils` - `utils.h`
+   Simple utilities used by other `nx_kit` units.
 
 ---------------------------------------------------------------------------------------------------
 ## Building
