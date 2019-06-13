@@ -9,10 +9,6 @@
 #include <set>
 #include <unordered_map>
 
-#ifndef Q_MOC_RUN
-#include <boost/optional.hpp>
-#endif
-
 //!Directed graph
 /*!
     \param NodeKey Requirements: comparable, copyable

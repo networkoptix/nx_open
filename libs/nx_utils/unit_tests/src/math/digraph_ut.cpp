@@ -3,6 +3,7 @@
 #include <array>
 #include <algorithm>
 
+#include <nx/utils/algorithm/same.h>
 #include <nx/utils/math/digraph.h>
 #include <nx/utils/thread/mutex_lock_analyzer.h>
 
@@ -143,7 +144,7 @@ TEST( Digraph, loopDetection )
     }
 }
 
-TEST( Digraph, are_elements_same_in_sorted_ranges )
+TEST( Digraph, same_sorted_ranges )
 {
     {
         const int range1[] = { 2, 3, 4 };
@@ -152,7 +153,7 @@ TEST( Digraph, are_elements_same_in_sorted_ranges )
         auto r1 = generatePath( range1 );
         auto r2 = generatePath( range2 );
 
-        ASSERT_TRUE( are_elements_same_in_sorted_ranges(
+        ASSERT_TRUE( algorithm::same_sorted_ranges(
             r1.begin(), r1.end(),
             r2.begin(), r2.end() ) );
     }
@@ -164,7 +165,7 @@ TEST( Digraph, are_elements_same_in_sorted_ranges )
         auto r1 = generatePath( range1 );
         auto r2 = generatePath( range2 );
 
-        ASSERT_TRUE( are_elements_same_in_sorted_ranges(
+        ASSERT_TRUE( algorithm::same_sorted_ranges(
             r1.begin(), r1.end(),
             r2.begin(), r2.end() ) );
     }
@@ -176,7 +177,7 @@ TEST( Digraph, are_elements_same_in_sorted_ranges )
         auto r1 = generatePath( range1 );
         auto r2 = generatePath( range2 );
 
-        ASSERT_TRUE( are_elements_same_in_sorted_ranges(
+        ASSERT_TRUE( algorithm::same_sorted_ranges(
             r1.begin(), r1.end(),
             r2.begin(), r2.end() ) );
     }
@@ -188,7 +189,7 @@ TEST( Digraph, are_elements_same_in_sorted_ranges )
         auto r1 = generatePath( range1 );
         auto r2 = generatePath( range2 );
 
-        ASSERT_TRUE( are_elements_same_in_sorted_ranges(
+        ASSERT_TRUE( algorithm::same_sorted_ranges(
             r1.begin(), r1.end(),
             r2.begin(), r2.end() ) );
     }
@@ -200,7 +201,7 @@ TEST( Digraph, are_elements_same_in_sorted_ranges )
         auto r1 = generatePath( range1 );
         auto r2 = generatePath( range2 );
 
-        ASSERT_TRUE( are_elements_same_in_sorted_ranges(
+        ASSERT_TRUE( algorithm::same_sorted_ranges(
             r1.begin(), r1.end(),
             r2.begin(), r2.end() ) );
     }
@@ -212,7 +213,7 @@ TEST( Digraph, are_elements_same_in_sorted_ranges )
         auto r1 = generatePath( range1 );
         auto r2 = generatePath( range2 );
 
-        ASSERT_FALSE( are_elements_same_in_sorted_ranges(
+        ASSERT_FALSE( algorithm::same_sorted_ranges(
             r1.begin(), r1.end(),
             r2.begin(), r2.end() ) );
     }
@@ -224,7 +225,7 @@ TEST( Digraph, are_elements_same_in_sorted_ranges )
         auto r1 = generatePath( range1 );
         auto r2 = generatePath( range2 );
 
-        ASSERT_FALSE( are_elements_same_in_sorted_ranges(
+        ASSERT_FALSE( algorithm::same_sorted_ranges(
             r1.begin(), r1.end(),
             r2.begin(), r2.end() ) );
     }
@@ -236,7 +237,7 @@ TEST( Digraph, are_elements_same_in_sorted_ranges )
         auto r1 = generatePath( range1 );
         auto r2 = generatePath( range2 );
 
-        ASSERT_FALSE( are_elements_same_in_sorted_ranges(
+        ASSERT_FALSE( algorithm::same_sorted_ranges(
             r1.begin(), r1.end(),
             r2.begin(), r2.end() ) );
     }
@@ -248,7 +249,7 @@ TEST( Digraph, are_elements_same_in_sorted_ranges )
         auto r1 = generatePath( range1 );
         auto r2 = generatePath( range2 );
 
-        ASSERT_FALSE( are_elements_same_in_sorted_ranges(
+        ASSERT_FALSE( algorithm::same_sorted_ranges(
             r1.begin(), r1.end(),
             r2.begin(), r2.end() ) );
     }
@@ -260,7 +261,7 @@ TEST( Digraph, are_elements_same_in_sorted_ranges )
         auto r1 = generatePath( range1 );
         auto r2 = generatePath( range2 );
 
-        ASSERT_FALSE( are_elements_same_in_sorted_ranges(
+        ASSERT_FALSE( algorithm::same_sorted_ranges(
             r1.begin(), r1.end(),
             r2.begin(), r2.end() ) );
     }
