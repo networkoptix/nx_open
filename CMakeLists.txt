@@ -4,7 +4,7 @@ include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
-nx_option(beta "Is this build is beta build" ON)
+nx_option(beta "Whether this build is a beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 
 # Remember to reset the in-version protocol number when updating the project version
@@ -34,6 +34,12 @@ set(box "none")
 
 if(targetDevice STREQUAL "none")
     set(targetDevice "")
+endif()
+
+if(beta)
+    set(beta_bool "true")
+else()
+    set(beta_bool "false")
 endif()
 
 if(NOT CMAKE_TOOLCHAIN_FILE AND targetDevice)
@@ -215,12 +221,6 @@ if(withTests)
 endif()
 
 include(fix_qt_vars)
-
-if(beta)
-    set(beta_bool "true")
-else()
-    set(beta_bool "false")
-endif()
 
 if(withClouds)
     add_custom_target(cloud DEPENDS cloud-backend)
