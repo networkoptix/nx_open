@@ -2,7 +2,12 @@
 
 .menu {
     padding          : .5rem 0;
-    background-color : $light4;
+    background-color : $light5;
+    
+    // TODO: Add additional class for not having header
+    // border-radius    : 2px;
+    // else
+    border-radius    : 0 0 2px 2px;
     
     nx-level-1-item {
     }

@@ -3,17 +3,17 @@
 @import '../../../styles/mixins';
 
 .menu-level-2 {
-    background-color : $light4;
+    background-color : $light5;
     font-family      : $font-family-medium;
     font-size        : $font-size-base;
     color            : $dark9;
-    border-radius    : 2px;
+    border-radius    : 0;
     text-decoration  : none;
     padding-left     : rem(12px);
     display          : block;
     
     &:hover {
-        background-color : $light5;
+        background-color : $light6;
     }
     
     &.selected {

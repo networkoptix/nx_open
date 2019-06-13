@@ -109,6 +109,7 @@
     "Your Name": "Your Name",
     "Your browser is not supported": "Your browser is not supported",
     "and_x_more": "... and {{value}} more",
+    "phone_label_number": "Tel: {{number}}",
     "cameraFilters": {
         "H265": "H.265 Cameras",
         "IO": "I / O modules",
