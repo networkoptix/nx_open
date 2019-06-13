@@ -104,6 +104,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     {
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new nx::analytics::db::AnalyticsEventsReceptor(
+                serverModule()->commonModule(),
                 serverModule()->analyticsEventsStorage()));
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new ConditionalDataProxy(
