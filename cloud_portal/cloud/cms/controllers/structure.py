@@ -69,24 +69,27 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
     return data
 
 
-def update_from_object(cms_structure, product_type_name=""):
-    for product_type_structure in cms_structure:
-        product_type = update_product_type(product_type_name, product_type_structure)
-        order = 0
-        deprecate_data_structures_for_product_type(product_type)
+def update_from_object(product_type_structure, product_type=None):
+    update_product_type(product_type, product_type_structure)
 
-        for context_data in product_type_structure['contexts']:
-            context = update_context(context_data, product_type)
-            has_language = context.translatable
-            for record in context_data["values"]:
-                update_data_structure(context.id, has_language, record, order)
-                order += 1
+    order = 0
+    deprecate_data_structures_for_product_type(product_type)
+
+    for context_data in product_type_structure['contexts']:
+        context = update_context(context_data, product_type)
+        has_language = context.translatable
+        for record in context_data["values"]:
+            update_data_structure(context.id, has_language, record, order)
+            order += 1
 
 
 def read_structure_json(filename):
     with codecs.open(filename, 'r', 'utf-8') as file_descriptor:
         cms_structure = json.load(file_descriptor)
-        update_from_object(cms_structure)
+        for product_type_structure in cms_structure:
+            product_type_type = ProductType.get_type_by_name(product_type_structure["type"])
+            product_type = find_or_add_product_type(product_type_type)
+            update_from_object(product_type_structure, product_type)
 
 
 def process_data_structure_type(data_structure, name, value):
@@ -126,7 +129,7 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
         if name:
             data = zip_file.read(name)
             cms_structure = json.loads(data)
-            update_from_object(cms_structure, product_type_name=product.product_type.name)
+            update_from_object(cms_structure, product.product_type)
             log_messages.append(('success', f'Updated from json using {name}'))
         else:
             log_messages.append(('warning', 'Not found structure.json file'))
@@ -308,13 +311,7 @@ def update_data_structure(context_id, has_lang, record, order):
     data_structure.save()
 
 
-def update_product_type(product_type_name, product_type_structure):
-    product_type_type = ProductType.get_type_by_name(product_type_structure.
-                                                     get("type", ProductType.PRODUCT_TYPES[0]))
-
-    product_type = find_or_add_product_type(product_type_type, product_type_name)
+def update_product_type(product_type, product_type_structure):
     product_type.can_preview = product_type_structure.get("can_preview", False)
     product_type.single_customization = product_type_structure.get('single_customization', False)
     product_type.save()
-
-    return product_type
