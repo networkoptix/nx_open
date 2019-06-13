@@ -48,12 +48,14 @@ is_rpi()
     fi
 }
 
-function is_local_addr {
-    local hostname=$1;
-    local addr=$(gethostip $hostname -d)
+is_local_addr()
+{
+    local -r hostname="$1"
+    local addr=$(gethostip "$hostname" -d)
 
-    if [ $? -ne 0 ]; then
-    addr=$hostname
+    if (( $? != 0 ))
+    then
+        addr="$hostname"
     fi
 
     [[ "$addr" =~ ^127.[0-9]+.[0-9]+.[0-9]+$ ]] && return 0
@@ -61,15 +63,16 @@ function is_local_addr {
     ip -4 -o addr | awk '{gsub("/", " "); print $4;}' | grep "^$addr$" > /dev/null 2>&1
 }
 
-function find_free_port {
-    local port=$1
+find_free_port()
+{
+    local -i port="$1"
 
-    while :
+    while true
     do
         netstat -nl4t | awk '{print $4;}' | grep ":$port" > /dev/null 2>&1
-        if [ $? -ne 0 ]
+        if (( $? != 0 ))
         then
-            echo $port
+            echo "$port"
             return
         else
             port=$((port+10))
@@ -77,21 +80,46 @@ function find_free_port {
     done
 }
 
-function check_new_system {
-    local port=$1
+check_new_system()
+{
+    local -r -i RETRY_COUNT=20
+    local -i port="$1"
+    local response
 
-    for ((i = 1; i <= 5; i++))
+    for ((i = 1; i <= $RETRY_COUNT; i++))
     do
         sleep 1
-        echo "[$i] Checking if the server is running..."
-        INFO=$(wget "http://localhost:$port/api/moduleInformation" --quiet -O-) && break
+        echo "[$i] Checking if the server is running..." >&2
+        response=$(curl -s "http://localhost:$port/api/moduleInformation" 2>/dev/null) && break
     done
 
-    echo "$INFO" | grep -q '"localSystemId":\s*"{00000000-0000-0000-0000-000000000000}"'
+    if (( i > $RETRY_COUNT ))
+    then
+        echo "Request to /api/moduleInformation FAILED" >&2
+        return 1
+    fi
+
+    local -r localSystemIdRegex="\\{[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}\\}"
+    local -r localSystemIdDefinition=$(
+        echo "$response" | grep -E -o "\"localSystemId\":\s*\"$localSystemIdRegex\""
+    )
+
+    if [[ -z $localSystemIdDefinition ]]
+    then
+        echo "Request to /api/moduleInformation returns unexpected result." >&2
+        return 1
+    fi
+
+    local -r localSystemIdValue=$(
+        echo "$localSystemIdDefinition" | grep -E -o "$localSystemIdRegex"
+    )
+
+    [[ $localSystemIdValue == "{00000000-0000-0000-0000-000000000000}" ]]
 }
 
-function display_complete_setup_hint {
-    local port=$1
+display_complete_setup_hint()
+{
+    local -i port="$1"
 
     [ -n "$UPGRADING" ] && return
 
@@ -193,7 +221,7 @@ case "$1" in
 
   ;;
 
-  abort-upgrade|abort-remove|abort-configure)
+  abort-upgrade|abort-remove|abort-deconfigure)
   ;;
 
   *)
