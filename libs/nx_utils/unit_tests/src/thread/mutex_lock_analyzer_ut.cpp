@@ -128,21 +128,4 @@ TEST_F(MutexLockAnalyzer, deadlock_between_threads_is_detected)
     assertDeadlockIsReported();
 }
 
-TEST_F(MutexLockAnalyzer, DISABLED_recursive_mutex_does_not_produce_deadlock_2)
-{
-    DummyMutex m1(&m_analyzer, nx::utils::Mutex::Recursive);
-    DummyMutex m2(&m_analyzer);
-
-    lockInANewThread({&m1, &m2});
-
-    m1.lock();
-    m2.lock();
-    m1.lock();
-    m1.unlock();
-    m2.unlock();
-    m1.unlock();
-
-    assertNoDeadlockIsReported();
-}
-
 } // namespace nx::utils::test
