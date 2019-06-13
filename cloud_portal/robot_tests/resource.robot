@@ -259,9 +259,9 @@ Failure Tasks
     Close Mailbox
 
 Wait Until Elements Are Visible
-    [arguments]    @{elements}    ${timeout}=${selenium_timeout}
+    [arguments]    @{elements}
     :FOR     ${element}  IN  @{elements}
-    \  Wait Until Element Is Visible    ${element}    ${timeout}
+    \  Wait Until Element Is Visible    ${element}
 
 Elements Should Not Be Visible
     [arguments]    @{elements}
