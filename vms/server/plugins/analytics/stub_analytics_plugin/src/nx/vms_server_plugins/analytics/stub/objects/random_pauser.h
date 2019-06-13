@@ -56,7 +56,7 @@ public:
     }
 
 private:
-    std::chrono::milliseconds m_duration;
+    const std::chrono::milliseconds m_duration;
     int m_maxNumberOfPauses;
     const int m_randModulus;
     bool m_paused = false;

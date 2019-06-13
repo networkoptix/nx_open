@@ -10,7 +10,7 @@ namespace stub {
 class RandomStateChanger
 {
 public:
-    RandomStateChanger(int randModulus = 7, int maxNumberOfStateChanges = 4) :
+    RandomStateChanger(int randModulus = 7, int maxNumberOfStateChanges = 4):
         m_randModulus(randModulus),
         m_maxStateChanges(maxNumberOfStateChanges)
     {
