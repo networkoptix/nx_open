@@ -9,6 +9,9 @@ using namespace nx::sdk;
 
 namespace {
 
+static constexpr char kTypeId[] = "nx.stub.bicycle";
+static constexpr char kTypeName[] = "Bicycle";
+
 Attributes makeAttributes()
 {
     static const std::vector<const char*> kBikeTypes = {
