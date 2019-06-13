@@ -87,7 +87,7 @@ static const std::vector<EventDescriptor> kEventsToFire = {
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
     VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
 {
-    setObjectCount();
+    generateObjectIds();
 }
 
 DeviceAgent::~DeviceAgent()
@@ -345,16 +345,49 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 //-------------------------------------------------------------------------------------------------
 // private
 
-static IObjectMetadata* makeObjectMetadata(AbstractObject* object)
+static IObjectMetadata* makeObjectMetadata(
+    const std::string& objectTypeId,
+    const Uuid& objectId,
+    double offset,
+    int64_t lastVideoFrameTimestampUs,
+    int objectIndex)
 {
     auto objectMetadata = new ObjectMetadata();
-    objectMetadata->setTypeId(object->typeId());
-    objectMetadata->setId(object->id());
-    auto position = object->position();
-    auto size = object->size();
-    objectMetadata->setBoundingBox(Rect(
-        position.x, position.y, size.width, size.height));
-    objectMetadata->addAttributes(object->attributes());
+    objectMetadata->setTypeId(objectTypeId);
+    objectMetadata->setId(objectId);
+    objectMetadata->setBoundingBox(
+		Rect((float) offset, (float) offset + 0.05F * (float) objectIndex, 0.25F, 0.25F));
+
+    const std::map<std::string, std::vector<nx::sdk::Ptr<Attribute>>> kObjectAttributes = {
+        {kCarObjectType, {
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Brand", "Tesla"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Model", "X"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Color", "Pink"),
+        }},
+        {kHumanFaceObjectType, {
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Sex", "Female"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Hair color", "Red"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Age", "29"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Name", "Triss"),
+
+        }},
+        {kTruckObjectType, {
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Length", "12 m"),
+        }},
+        {kPedestrianObjectType, {
+            nx::sdk::makePtr<Attribute>(
+                IAttribute::Type::string,
+                "Direction",
+                "Towards the camera"),
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Clothes color", "White"),
+        }},
+        {kBicycleObjectType, {
+            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Type", "Mountain bike"),
+        }},
+    };
+
+    objectMetadata->addAttributes(kObjectAttributes.at(objectTypeId));
+
     return objectMetadata;
 }
 
@@ -369,7 +402,7 @@ static IObjectTrackBestShotPacket* makeObjectTrackBestShotPacket(
         Rect(offset, offset, 0.1F, 0.1F));
 }
 
-void DeviceAgent::setObjectCount()
+void DeviceAgent::generateObjectIds()
 {
     int objectCount = ini().objectCount;
     if (objectCount < 1)
@@ -377,7 +410,9 @@ void DeviceAgent::setObjectCount()
         NX_OUTPUT << "Invalid value for objectCount in .ini; assuming 1.";
         objectCount = 1;
     }
-    m_objects.resize(objectCount);
+    m_objectIds.resize(objectCount);
+    for (auto& objectId: m_objectIds)
+        objectId = UuidHelper::randomUuid();
 }
 
 IMetadataPacket* DeviceAgent::cookSomeEvents()
@@ -450,14 +485,23 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     double intPart;
     dt = (float) modf(dt, &intPart) * 0.75F;
     const int sequentialNumber = static_cast<int>(intPart);
+    static const std::vector<std::string> kObjectTypes = {
+        kCarObjectType,
+        kHumanFaceObjectType,
+        kTruckObjectType,
+        kPedestrianObjectType,
+        kBicycleObjectType,
+    };
 
-    for (auto& object : m_objects)
+    if (m_currentObjectIndex != sequentialNumber)
     {
-        if (!object)
-            object = randomObject();
-        object->update();
-        if (!object->inBounds())
-            object.reset();
+        generateObjectIds();
+        m_currentObjectIndex = sequentialNumber;
+        m_objectTypeId = kObjectTypes.at(m_currentObjectTypeIndex);
+        ++m_currentObjectTypeIndex;
+
+        if (m_currentObjectTypeIndex == (int) kObjectTypes.size())
+            m_currentObjectTypeIndex = 0;
     }
 
     bool generatePreviewPacket = false;
@@ -473,19 +517,21 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 
     auto objectMetadataPacket = new ObjectMetadataPacket();
 
-    for (const auto& object : m_objects)
+    for (int i = 0; i < (int) m_objectIds.size(); ++i)
     {
-        if (!object)
-            continue;
-
-        auto objectMetadata = toPtr(makeObjectMetadata(object.get()));
+        auto objectMetadata = toPtr(makeObjectMetadata(
+            m_objectTypeId,
+            m_objectIds[i],
+            dt,
+            m_lastVideoFrameTimestampUs,
+            i));
 
         objectMetadataPacket->addItem(objectMetadata.get());
 
         if (generatePreviewPacket)
         {
             auto bestShotMetadataPacket = makeObjectTrackBestShotPacket(
-                object->id(),
+                m_objectIds[i],
                 m_lastVideoFrameTimestampUs,
                 dt);
 
