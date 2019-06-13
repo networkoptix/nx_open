@@ -1,5 +1,7 @@
 #include "metadata_logger.h"
 
+#include <QtCore/QDir>
+
 #include <nx/kit/utils.h>
 
 #include <utils/common/synctime.h>

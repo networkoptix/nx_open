@@ -4,7 +4,6 @@
 
 #include <QtCore/QUrl>
 #include <QtCore/QJsonValue>
-#include <QtXml/QtXml>
 
 #include <nx/utils/log/log.h>
 

@@ -17,12 +17,10 @@ AnalyticsArchive::AnalyticsArchive(const QString& dataDir, const QString& unique
 {
 }
 
-QnTimePeriodList AnalyticsArchive::matchPeriod(const AnalyticsFilter& filter)
-{
-    return base_type::matchPeriodInternal(filter);
-}
-
-bool AnalyticsArchive::matchAdditionData(const Filter& filter, const quint8* data, int size)
+bool matchAdditionData(
+    int64_t /*timestampMs*/,
+    const AnalyticsArchive::Filter& filter,
+    const quint8* data, int size)
 {
     auto matchIntInList = [](int64_t value, const std::vector<int64_t>& values)
     {
@@ -34,16 +32,64 @@ bool AnalyticsArchive::matchAdditionData(const Filter& filter, const quint8* dat
     };
 
     BinaryRecordEx* recordEx = (BinaryRecordEx*)data;
-    const auto& analyticsFilter = static_cast<const AnalyticsFilter&>(filter);
+    const auto& analyticsFilter = static_cast<const AnalyticsArchive::AnalyticsFilter&>(filter);
     return matchIntInList(recordEx->objectType, analyticsFilter.objectTypes)
         && matchIntInList(recordEx->attributesHash, analyticsFilter.allAttributesHash);
+}
+
+QnTimePeriodList AnalyticsArchive::matchPeriod(const AnalyticsFilter& filter)
+{
+    return base_type::matchPeriodInternal(filter, matchAdditionData);
+}
+
+AnalyticsArchive::MatchObjectsResult  AnalyticsArchive::matchObjects(
+    const AnalyticsFilter& filter)
+{
+    MatchObjectsResult result;
+
+    auto matchExtraData =
+        [&result](int64_t timestampMs,
+            const AnalyticsArchive::Filter& filter, const quint8* data, int size)
+        {
+            bool isMatched = matchAdditionData(timestampMs, filter, data, size);
+            if (isMatched)
+            {
+                BinaryRecordEx* recordEx = (BinaryRecordEx*)data;
+                result.data.push_back({recordEx->objectsGroupId, timestampMs});
+            }
+            return isMatched;
+    };
+
+    auto checkLimitInResult =
+        [&result, &filter]()
+        {
+            return result.data.size() >= filter.limit;
+        };
+
+    auto timePeriods = base_type::matchPeriodInternal(filter, matchExtraData, checkLimitInResult);
+    if (!timePeriods.isEmpty())
+    {
+        if (filter.sortOrder == Qt::SortOrder::AscendingOrder)
+        {
+            result.boundingPeriod.startTimeMs = timePeriods.front().startTimeMs;
+            result.boundingPeriod.setEndTimeMs(timePeriods.back().endTimeMs());
+        }
+        else
+        {
+            result.boundingPeriod.startTimeMs = timePeriods.back().startTimeMs;
+            result.boundingPeriod.setEndTimeMs(timePeriods.front().endTimeMs());
+        }
+
+    }
+    return result;
 }
 
 template <typename RectType>
 bool AnalyticsArchive::saveToArchive(
     std::chrono::milliseconds startTime,
     const std::vector<RectType>& data,
-    int64_t objectType,
+    uint32_t objectsGroupId,
+    uint32_t objectType,
     int64_t allAttributesHash)
 {
     QnMetaDataV1Ptr packet(
@@ -52,6 +98,7 @@ bool AnalyticsArchive::saveToArchive(
     packet->m_duration = std::chrono::microseconds(kAggregationInterval).count();
 
     BinaryRecordEx* recordEx = (BinaryRecordEx*)(packet->data() + QnMetaDataV1::kMotionDataBufferSize);
+    recordEx->objectsGroupId = objectsGroupId;
     recordEx->objectType = objectType;
     recordEx->attributesHash = allAttributesHash;
 
@@ -64,13 +111,15 @@ bool AnalyticsArchive::saveToArchive(
 template bool AnalyticsArchive::saveToArchive<QRect>(
     std::chrono::milliseconds startTime,
     const std::vector<QRect>& data,
-    int64_t objectType,
+    uint32_t objectsGroupId,
+    uint32_t objectType,
     int64_t allAttributesHash);
 
 template bool AnalyticsArchive::saveToArchive<QRectF>(
     std::chrono::milliseconds startTime,
     const std::vector<QRectF>& data,
-    int64_t objectType,
+    uint32_t objectsGroupId,
+    uint32_t objectType,
     int64_t allAttributesHash);
 
 } // namespace nx::vms::server::metadata

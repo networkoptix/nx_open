@@ -44,7 +44,7 @@ private:
     void setupTableHeader();
     void setupPortStuff(QCheckBox* autoCheckbox, QStackedWidget* portStackedWidget);
     void setupSearchResultsPlaceholder();
-    void setSearchAccent(bool isEnabled);
+    void setAddDevicesAccent(bool isEnabled);
 
     void updateProgress();
     void handleStartSearchClicked();

@@ -102,6 +102,19 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
         this, &QnWorkbenchWelcomeScreen::handleStartupTileAction);
 }
 
+void QnWorkbenchWelcomeScreen::resizeEvent(QResizeEvent* event)
+{
+    base_type::resizeEvent(event);
+
+    // Resize offscreen QQuickWindow content item here because
+    // it does not get resized when offscreen QQuickWindow size is changed.
+    // This content item is a parent for popup mouse grab overlay.
+    // The overlay should be the same size as the window in order to
+    // correctly hide popups when mouse button is pressed.
+    if (auto contentItem = quickWindow()->contentItem())
+        contentItem->setSize(quickWindow()->size());
+}
+
 QnWorkbenchWelcomeScreen::~QnWorkbenchWelcomeScreen()
 {
 }
@@ -169,7 +182,7 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
     }
 
     // Just expand online local tile
-    executeDelayedParented([this, system]() { emit openTile(system->id());  }, 0, this);
+    executeLater([this, system]() { emit openTile(system->id());  }, this);
 }
 
 void QnWorkbenchWelcomeScreen::showEvent(QShowEvent* event)
@@ -237,7 +250,7 @@ void QnWorkbenchWelcomeScreen::openConnectingTile()
     if (systemId.isEmpty())
         return;
 
-    executeDelayedParented([this, systemId]() { emit openTile(systemId);  }, 0, this);
+    executeLater([this, systemId]() { emit openTile(systemId);  }, this);
 }
 void QnWorkbenchWelcomeScreen::handleDisconnectedFromSystem()
 {
@@ -367,7 +380,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
             nx::vms::client::core::settings()->systemAuthenticationData = authData;
         };
 
-    executeDelayedParented(callback, 0, this);
+    executeLater(callback, this);
 }
 
 void QnWorkbenchWelcomeScreen::forceActiveFocus()

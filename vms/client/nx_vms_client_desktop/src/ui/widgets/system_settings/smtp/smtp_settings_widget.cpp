@@ -1,6 +1,8 @@
 #include "smtp_settings_widget.h"
 #include "ui_smtp_settings_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <api/global_settings.h>
 
 #include <common/common_module.h>

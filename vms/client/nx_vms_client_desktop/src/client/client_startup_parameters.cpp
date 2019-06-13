@@ -1,5 +1,6 @@
 #include "client_startup_parameters.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QFile>
 
 #include <nx/vms/client/core/common/utils/encoded_string.h>

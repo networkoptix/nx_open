@@ -595,6 +595,15 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
         NX_VERBOSE(this, "%1() END -> null: frame not found", __func__);
         return nullptr;
     }
+    else if (
+        request.usecSinceEpoch != DATETIME_NOW
+        && request.usecSinceEpoch != nx::api::ImageRequest::kLatestThumbnail
+        && request.usecSinceEpoch != 0
+        && frame->pkt_dts - request.usecSinceEpoch > std::chrono::microseconds(MAX_FRAME_DURATION).count())
+    {
+        NX_VERBOSE(this, "%1() frame for a requested archive position is not found", __func__);
+        return nullptr;
+    }
 
     QnConstResourceVideoLayoutPtr layout = camera->getVideoLayout();
     const int channelCount = layout->channelCount();

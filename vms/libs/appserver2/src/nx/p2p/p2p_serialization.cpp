@@ -4,6 +4,7 @@
 #include <array>
 
 #include <QtCore/QBuffer>
+#include <QtCore/QUrlQuery>
 
 #include <utils/math/math.h>
 #include <utils/media/nalUnits.h>

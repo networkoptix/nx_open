@@ -11,6 +11,8 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/algorithm/index_of.h>
 
+#include <ui/style/skin.h>
+
 namespace
 {
     // TODO: #GDM #vkutin #common Refactor all this to use HumanReadable helper class
@@ -283,6 +285,23 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
     {
         case Qt::DisplayRole:
             return displayData(index, false);
+
+        case Qt::DecorationRole:
+            if (index.column() == ActionsColumn)
+            {
+                const auto &storage = m_storages.at(index.row());
+
+                if (storage.id == m_metadataStorageId)
+                    return qnSkin->pixmap("text_buttons/analytics.png");
+
+                if (canRemoveStorage(storage))
+                    return qnSkin->pixmap("text_buttons/trash.png");
+
+                if (canStoreAnalytics(storage))
+                    return qnSkin->pixmap("text_buttons/analytics.png");
+            }
+
+            return QVariant();
 
         case Qn::ItemMouseCursorRole:
             return mouseCursorData(index);

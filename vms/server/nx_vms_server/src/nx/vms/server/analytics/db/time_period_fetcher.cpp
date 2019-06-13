@@ -52,7 +52,7 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsByObject(
 {
     using namespace std::chrono;
 
-    ObjectSearcher objectSearcher(m_deviceDao, m_objectTypeDao, filter);
+    ObjectSearcher objectSearcher(m_deviceDao, m_objectTypeDao, m_attributesDao, m_analyticsArchive, filter);
     const auto objects = objectSearcher.lookup(queryContext);
 
     QnTimePeriodList result;
@@ -75,15 +75,21 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
     const Filter& filter,
     const TimePeriodsLookupOptions& options)
 {
-    AnalyticsArchive::Filter archiveFilter = prepareArchiveFilter(filter, options);
+    AnalyticsArchive::Filter archiveFilter =
+        AnalyticsArchiveDirectory::prepareArchiveFilter(filter, m_objectTypeDao);
+    archiveFilter.region = options.region;
+    archiveFilter.detailLevel = options.detailLevel;
 
     nx::utils::ElapsedTimer timer;
 
     if (!filter.freeText.isEmpty())
     {
         timer.restart();
-        archiveFilter.allAttributesHash = 
+        const auto attributeGroups =
             m_attributesDao->lookupCombinedAttributes(queryContext, filter.freeText);
+        std::copy(
+            attributeGroups.begin(), attributeGroups.end(),
+            std::back_inserter(archiveFilter.allAttributesHash));
         NX_DEBUG(this, "Text '%1' lookup completed in %2", filter.freeText, timer.elapsed());
     }
 
@@ -91,30 +97,6 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
     const auto timePeriods = m_analyticsArchive->matchPeriods(filter.deviceIds, archiveFilter);
     NX_DEBUG(this, "Time periods lookup completed in %1", timer.elapsed());
     return timePeriods;
-}
-
-AnalyticsArchive::Filter TimePeriodFetcher::prepareArchiveFilter(
-    const Filter& filter,
-    const TimePeriodsLookupOptions& options)
-{
-    AnalyticsArchive::Filter archiveFilter;
-
-    if (!filter.objectTypeId.empty())
-    {
-        std::transform(
-            filter.objectTypeId.begin(), filter.objectTypeId.end(),
-            std::inserter(archiveFilter.objectTypes, archiveFilter.objectTypes.begin()),
-            [this](const auto& objectTypeName) { return m_objectTypeDao.objectTypeIdFromName(objectTypeName); });
-    }
-
-    archiveFilter.region = options.region;
-    archiveFilter.timePeriod = filter.timePeriod;
-    archiveFilter.sortOrder = filter.sortOrder;
-    if (filter.maxObjectsToSelect > 0)
-        archiveFilter.limit = filter.maxObjectsToSelect;
-    archiveFilter.detailLevel = options.detailLevel;
-
-    return archiveFilter;
 }
 
 } // namespace nx::analytics::db

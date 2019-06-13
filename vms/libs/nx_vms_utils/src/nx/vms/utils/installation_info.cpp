@@ -1,5 +1,7 @@
 #include "installation_info.h"
 
+#include <QtCore/QFile>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
 #include <nx/fusion/model_functions.h>

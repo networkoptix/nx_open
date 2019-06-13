@@ -22,7 +22,7 @@ namespace analytics {
 class Plugin: public RefCountable<IPlugin>
 {
 public:
-    using CreateEngine = std::function<IEngine*(IPlugin* plugin)>;
+    using CreateEngine = std::function<IEngine*(Plugin* plugin)>;
 
     /**
      * @param libName Name of the plugin library. It's needed for the logging.

@@ -11,6 +11,7 @@
 #include <nx/utils/software_version.h>
 #include <client_installation.h>
 #include <nx/vms/applauncher/api/applauncher_api.h>
+#include <utils/update/zip_utils.h>
 
 namespace nx::vms::applauncher {
 
@@ -62,6 +63,10 @@ public:
     QString installationDirForVersion(const nx::utils::SoftwareVersion &version) const;
 
     api::ResultType installZip(const nx::utils::SoftwareVersion &version, const QString &fileName);
+    /** Get number of bytes already extracted by installZip method. */
+    uint64_t getBytesExtracted() const;
+    /** Get total number of bytes to be extracted by installZip method. */
+    uint64_t getBytesTotal() const;
 
     static bool isValidVersionName(const QString &version);
 
@@ -72,6 +77,10 @@ public:
 private:
     mutable QMap<nx::utils::SoftwareVersion, QnClientInstallationPtr> m_installationByVersion;
     QDir m_installationsDir;
+    QScopedPointer<QnZipExtractor> m_extractor;
+    /** Total number of bytes to be extracted by installZip method. */
+    std::atomic_uint64_t m_totalUnpackedSize = 0;
+
     mutable std::mutex m_mutex;
 };
 

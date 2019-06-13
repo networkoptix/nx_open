@@ -98,6 +98,8 @@ QRect restore(const QRectF& box, const QSize& resolution);
  */
 QRectF translate(const QRect& box, const QSize& resolution);
 
+bool rectsIntersectToSearchPrecision(const QRectF& one, const QRectF& two);
+
 template<typename Rect>
 struct OtherRect {};
 

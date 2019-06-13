@@ -68,7 +68,7 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
     base_type(parent),
     m_outputDir(QDir::temp().absoluteFilePath("nx_updates/offline"))
 {
-    // Expecting paths like /temp/nx_updates/offline/rand_file
+    // Expecting paths like "/temp/nx_updates/offline/rand_file".
     QString path = m_outputDir.path();
     NX_VERBOSE(this) << "ServerUpdateTool will output temp files to " << path;
 
@@ -80,6 +80,11 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
     m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
 
     m_downloader.reset(new Downloader(m_outputDir, commonModule()));
+
+    // This object is managed by shared_ptr. So we must sure there is no parent, or this instance
+    // can be deleted twice.
+    setParent(nullptr);
+
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ServerUpdateTool::atDownloaderStatusChanged);
 

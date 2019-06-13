@@ -83,6 +83,7 @@ QnZipExtractor::Error QnZipExtractor::extractZip()
     if (!m_zip->open(QuaZip::mdUnzip))
         return BrokenZip;
 
+    m_extracted = 0;
     QList<QPair<QString, QString>> symlinks;
 
     QuaZipFile file(m_zip.get());
@@ -130,6 +131,7 @@ QnZipExtractor::Error QnZipExtractor::extractZip()
                     file.close();
                     return NoFreeSpace;
                 }
+                m_extracted += read;
             }
 
             auto permissions = info.getPermissions();
@@ -173,9 +175,9 @@ QStringList QnZipExtractor::fileList()
     return result;
 }
 
-size_t QnZipExtractor::estimateUnpackedSize() const
+uint64_t QnZipExtractor::estimateUnpackedSize() const
 {
-    size_t result = 0;
+    uint64_t result = 0;
     if (m_zip->open(QuaZip::mdUnzip))
     {
         auto fileList = m_zip->getFileInfoList64();
@@ -188,6 +190,11 @@ size_t QnZipExtractor::estimateUnpackedSize() const
     // affected by the block size of a filesystem.
     auto constexpr padding = 1.2;
     return result * padding;
+}
+
+uint64_t QnZipExtractor::bytesExtracted() const
+{
+    return m_extracted;
 }
 
 #endif

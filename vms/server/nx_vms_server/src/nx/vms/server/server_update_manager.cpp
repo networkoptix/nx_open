@@ -14,7 +14,7 @@ ServerUpdateManager::ServerUpdateManager(QnMediaServerModule* serverModule):
 
 ServerUpdateManager::~ServerUpdateManager()
 {
-    m_installer.stopSync();
+    m_installer.stopSync(/*clearAndReset*/false);
 }
 
 vms::common::p2p::downloader::Downloader* ServerUpdateManager::downloader()

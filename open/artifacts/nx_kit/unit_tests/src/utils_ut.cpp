@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <cstring>
+#include <climits>
 
 #include <nx/kit/test.h>
 #include <nx/kit/utils.h>
@@ -113,6 +113,67 @@ TEST(utils, toString_char_ptr)
     ASSERT_STREQ(R"("str\x7Fwith_127")", toString("str\x7Fwith_127"));
     ASSERT_STREQ(R"("str\x1Fwith_31")", toString("str\x1Fwith_31"));
     ASSERT_STREQ(R"("str\xFFwith_255")", toString("str\xFFwith_255"));
+}
+
+TEST(utils, fromString_int)
+{
+    int value = 0;
+
+    ASSERT_TRUE(fromString("-3", &value));
+    ASSERT_EQ(-3, value);
+
+    ASSERT_TRUE(fromString("42", &value));
+    ASSERT_EQ(42, value);
+
+    ASSERT_TRUE(fromString(toString(INT_MAX), &value));
+    ASSERT_EQ(INT_MAX, value);
+
+    ASSERT_TRUE(fromString(toString(INT_MIN), &value));
+    ASSERT_EQ(INT_MIN, value);
+
+    ASSERT_FALSE(fromString(/* INT_MAX * 10 */ toString(INT_MAX) + "0", &value));
+    ASSERT_FALSE(fromString(/* INT_MIN * 10 */ toString(INT_MIN) + "0", &value));
+
+    ASSERT_FALSE(fromString("text", &value));
+    ASSERT_FALSE(fromString("42-some-suffix", &value));
+    ASSERT_FALSE(fromString("2.0", &value));
+    ASSERT_FALSE(fromString("", &value));
+}
+
+TEST(utils, fromString_double)
+{
+    double value = 0;
+
+    ASSERT_TRUE(fromString("-3", &value));
+    ASSERT_EQ(-3.0, value);
+
+    ASSERT_TRUE(fromString("42", &value));
+    ASSERT_EQ(42.0, value);
+
+    ASSERT_TRUE(fromString("3.14", &value));
+    ASSERT_EQ(3.14, value);
+
+    ASSERT_FALSE(fromString("text", &value));
+    ASSERT_FALSE(fromString("42-some-suffix", &value));
+    ASSERT_FALSE(fromString("", &value));
+}
+
+TEST(utils, fromString_float)
+{
+    float value = 0;
+
+    ASSERT_TRUE(fromString("-3", &value));
+    ASSERT_EQ(-3.0F, value);
+
+    ASSERT_TRUE(fromString("42", &value));
+    ASSERT_EQ(42.0F, value);
+
+    ASSERT_TRUE(fromString("3.14", &value));
+    ASSERT_EQ(3.14F, value);
+
+    ASSERT_FALSE(fromString("text", &value));
+    ASSERT_FALSE(fromString("42-some-suffix", &value));
+    ASSERT_FALSE(fromString("", &value));
 }
 
 } // namespace test

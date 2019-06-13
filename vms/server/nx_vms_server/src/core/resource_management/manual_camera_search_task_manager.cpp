@@ -1,5 +1,7 @@
 #include "manual_camera_search_task_manager.h"
 
+#include <QtCore/QThreadPool>
+
 #include <nx/utils/unused.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/concurrent.h>

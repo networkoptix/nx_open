@@ -104,10 +104,10 @@ void ApplauncherProcess::processRequest(
             break;
 
         case TaskType::checkZipProgress:
-            *response = new Response();
+            *response = new InstallZipCheckStatusResponse();
             checkInstallationProgress(
                 std::static_pointer_cast<InstallZipCheckStatus>(request),
-                *response);
+                static_cast<InstallZipCheckStatusResponse*>(*response));
             break;
 
         case TaskType::isVersionInstalled:
@@ -366,7 +366,7 @@ bool ApplauncherProcess::installZipAsync(
 
 bool ApplauncherProcess::checkInstallationProgress(
     const std::shared_ptr<nx::vms::applauncher::api::InstallZipCheckStatus>& /*request*/,
-    applauncher::api::Response* const response)
+    applauncher::api::InstallZipCheckStatusResponse* const response)
 {
     if (!m_process.isEmpty())
     {
@@ -384,6 +384,9 @@ bool ApplauncherProcess::checkInstallationProgress(
             NX_DEBUG(this,
                 "checkInstallationProgress() - still installaing %1", fileName);
         }
+
+        response->total = m_installationManager->getBytesTotal();
+        response->extracted = m_installationManager->getBytesExtracted();
     }
     else
     {

@@ -42,11 +42,17 @@ ResultType installZip(const nx::utils::SoftwareVersion& version, const QString& 
  */
 ResultType installZipAsync(const nx::utils::SoftwareVersion& version, const QString& zipFileName);
 
+
+struct InstallationProgress
+{
+    uint64_t extracted = 0;
+    uint64_t total = 0;
+};
 /**
  * Checks progress of an installation.
  * @return ResultType::ok if request has been performed successfully, otherwise - error code.
  */
-ResultType checkInstallationProgress();
+ResultType checkInstallationProgress(InstallationProgress& progress);
 
 /** Adds timer to kill process with pid processId in a timeoutMillis. */
 ResultType scheduleProcessKill(qint64 processId, quint32 timeoutMillis);

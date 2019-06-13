@@ -1,7 +1,8 @@
-
 #include "ffmpeg_video_transcoder.h"
 
 #ifdef ENABLE_DATA_PROVIDERS
+
+#include <QtCore/QThread>
 
 #include "nx/streaming/video_data_packet.h"
 #include "decoders/video/ffmpeg_video_decoder.h"

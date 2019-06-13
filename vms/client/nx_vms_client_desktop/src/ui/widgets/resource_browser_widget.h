@@ -108,6 +108,7 @@ private:
     bool updateFilteringMode(bool value);
     void storeExpandedStates();
     void restoreExpandedStates();
+    void setupAutoExpandPolicy();
 
     void initInstantSearch();
     void updateSearchMode();

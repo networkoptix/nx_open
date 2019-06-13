@@ -476,7 +476,6 @@ void initialize(Manager* manager, Action* root)
 
     factory(DropOnVideoWallItemAction)
         .flags(ResourceTarget | LayoutItemTarget | LayoutTarget | VideoWallItemTarget | SingleTarget | MultiTarget)
-        .text(ContextMenu::tr("Drop Resources"))
         .requiredGlobalPermission(GlobalPermission::controlVideowall)
         .condition(!condition::isSafeMode());
 

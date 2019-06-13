@@ -349,6 +349,23 @@ bool InstallZipTaskAsync::deserialize(const QByteArray& data)
     return false;
 }
 
+QByteArray InstallZipCheckStatusResponse::serialize() const
+{
+    return serializeResponseParameters(result,
+        {QString::number(extracted), QString::number(total)});
+}
+
+bool InstallZipCheckStatusResponse::deserialize(const QByteArray& data)
+{
+    if (const auto& parameters = deserializeResponseParameters(&result, 1, data))
+    {
+        extracted = parameters->at(0).toLongLong();
+        total = parameters->at(1).toLongLong();
+        return true;
+    }
+    return false;
+}
+
 QByteArray AddProcessKillTimerRequest::serialize() const
 {
     return serializeTaskParameters(type,

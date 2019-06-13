@@ -58,7 +58,6 @@ private:
     struct ElementContext;
 
     using ElementsByPriority = std::multimap<int, ElementContext, std::greater<int>>;
-    using PostponedElements = std::list<ElementContext>;
 
     /**
      * Element can be in either m_elementsByPriority or m_postponedElements.
@@ -66,7 +65,6 @@ private:
     struct ElementExpirationContext
     {
         std::optional<typename ElementsByPriority::iterator> elementsByPriorityIter;
-        std::optional<typename PostponedElements::iterator> postponedElementsIter;
     };
 
     using ElementExpirationTimers =
@@ -78,18 +76,17 @@ private:
         std::optional<typename ElementExpirationTimers::iterator> timerIter;
     };
 
-    enum class QueueType
-    {
-        postponedQueries,
-        queriesByPriority,
-    };
-
     struct FoundQueryContext
     {
         value_type& value;
-        QueueType queueType;
+        ElementsByPriority::iterator it;
 
         FoundQueryContext() = delete;
+    };
+
+    struct QuerySelectionContext
+    {
+        std::vector<QueryType> forbiddenQueryTypes;
     };
 
     mutable QnMutex m_mutex;
@@ -100,7 +97,6 @@ private:
     int m_concurrentModificationQueryLimit = 0;
     int m_aggregationLimit = -1;
     ElementsByPriority m_elementsByPriority;
-    PostponedElements m_postponedElements;
     ElementExpirationTimers m_elementExpirationTimers;
 
     std::optional<std::chrono::milliseconds> m_itemStayTimeout;
@@ -108,11 +104,11 @@ private:
 
     int getPriority(const AbstractExecutor& query) const;
 
-    std::optional<FoundQueryContext> postponeUntilNextSuitableQuery(
+    std::optional<FoundQueryContext> getNextSuitableQuery(
+        QuerySelectionContext* querySelectionContext,
         bool consumeLimits);
-    void pop(const FoundQueryContext&);
 
-    void postponeTopQuery();
+    void pop(const FoundQueryContext&);
 
     bool canAggregate(
         const std::vector<QueryQueue::value_type>& queries,
@@ -127,8 +123,6 @@ private:
         typename ElementsByPriority::iterator elementIter);
 
     void removeExpirationTimer(const ElementContext& elementContext);
-
-    void postponeElement(ElementContext elementContext);
 
     void removeExpiredElements(QnMutexLockerBase* lock);
 

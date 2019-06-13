@@ -27,7 +27,10 @@ public:
     /** @return Number of elements in the packet. */
     virtual int count() const = 0;
 
-    /** @return Element at the zero-based index, or null if the index is invalid. */
+    /**
+     * @return Element at the zero-based index, or null if the index is invalid.
+     * ATTENTION: The item's reference counter is incremented by this call.
+     */
     virtual const IMetadata* at(int index) const = 0;
 };
 

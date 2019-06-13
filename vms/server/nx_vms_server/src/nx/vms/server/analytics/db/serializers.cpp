@@ -172,4 +172,12 @@ QRectF translate(const QRect& box, const QSize& resolution)
             box.bottomRight().y() / (double) resolution.height()));
 }
 
+bool rectsIntersectToSearchPrecision(const QRectF& one, const QRectF& two)
+{
+    const auto translatedOne = translateToSearchGrid(one);
+    const auto translatedTwo = translateToSearchGrid(two);
+
+    return translatedOne.intersects(translatedTwo);
+}
+
 } // namespace nx::analytics::db

@@ -420,7 +420,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         };
 
     connect(eventData.extraAction.data(), &QAction::triggered,
-        [this, actionHandler]() { executeDelayedParented(actionHandler, 0, this); });
+        [this, actionHandler]() { executeLater(actionHandler, this); });
 }
 
 QString NotificationListModel::Private::caption(const nx::vms::event::EventParameters& parameters,

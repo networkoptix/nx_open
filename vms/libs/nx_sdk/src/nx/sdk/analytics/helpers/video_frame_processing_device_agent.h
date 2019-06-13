@@ -110,7 +110,7 @@ protected:
      * @return Param value, or an empty string if such param does not exist, having logged the
      *     error.
      */
-    std::string getParamValue(const char* paramName);
+    std::string getParamValue(const std::string& paramName);
 
     virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override = 0;
 

@@ -104,6 +104,7 @@ private:
     QScopedPointer<Ui::StorageConfigWidget> ui;
     QnMediaServerResourcePtr m_server;
     QScopedPointer<QnStorageListModel> m_model;
+    QObject *m_columnResizer;
     QTimer* m_updateStatusTimer;
     QTimer* m_updateLabelsTimer;
     QMenu* m_storagePoolMenu;

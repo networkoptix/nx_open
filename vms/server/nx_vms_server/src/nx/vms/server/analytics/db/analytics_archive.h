@@ -11,6 +11,7 @@
 
 #include <nx/utils/uuid.h>
 
+#include <nx/vms/server/metadata/analytics_archive.h>
 #include <recording/time_period_list.h>
 
 namespace nx::analytics::db {
@@ -18,17 +19,7 @@ namespace nx::analytics::db {
 class AnalyticsArchive
 {
 public:
-    struct Filter
-    {
-        // Region with the search grid resolution.
-        QRegion region;
-        QnTimePeriod timePeriod;
-        std::chrono::milliseconds detailLevel = std::chrono::milliseconds::zero();
-        Qt::SortOrder sortOrder = Qt::AscendingOrder;
-        int limit = std::numeric_limits<int>::max();
-        std::set<int64_t> objectTypes;
-        std::set<int64_t> allAttributesHash;
-    };
+    using Filter = nx::vms::server::metadata::AnalyticsArchive::AnalyticsFilter;
 
     AnalyticsArchive(const QString& dataDir, const QnUuid& resourceId);
     virtual ~AnalyticsArchive();

@@ -20,6 +20,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/impl_ptr.h>
 
+class QThreadPool;
+
 /**
  * This class holds all resources in the system that are READY TO BE USED (as long as resource is
  * in the pool => shared pointer counter >= 1).

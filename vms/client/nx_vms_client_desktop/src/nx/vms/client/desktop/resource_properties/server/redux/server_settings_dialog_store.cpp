@@ -3,6 +3,7 @@
 #include <type_traits>
 
 #include <QtCore/QAbstractListModel>
+#include <QtCore/QFileInfo>
 #include <QtCore/QScopedValueRollback>
 
 #include <nx/utils/scoped_model_operations.h>
@@ -18,30 +19,108 @@ using Reducer = ServerSettingsDialogStateReducer;
 
 namespace {
 
-QVariantMap pluginData(const nx::vms::api::PluginInfo& plugin)
+using PluginInfo = nx::vms::api::PluginInfo;
+
+QVariantMap pluginData(const PluginInfo& plugin)
 {
+    const auto pluginName = plugin.name.isEmpty()
+        ? QFileInfo(plugin.libraryFilename).fileName()
+        : plugin.name;
+
     return QVariantMap({
-        {"name", plugin.name},
+        {"id", plugin.libraryFilename},
+        {"name", pluginName},
         {"description", plugin.description},
-        {"libraryName", plugin.libraryName},
-        {"vendor", plugin.vendor},
-        {"version", plugin.version}});
+        {"loaded", plugin.status == PluginInfo::Status::loaded}});
 }
 
-QVariant pluginData(const std::optional<const nx::vms::api::PluginInfo>& plugin)
+QVariant pluginData(const std::optional<const PluginInfo>& plugin)
 {
     return plugin ? pluginData(*plugin) : QVariant();
 }
 
-QVariantList pluginDetails(const nx::vms::api::PluginInfo& plugin)
+QString pluginError(PluginInfo::Error errorCode)
 {
-    return QVariantList({
-        QVariantMap({{"name", ServerSettingsDialogStore::tr("Library")}, {"value", plugin.libraryName}}),
-        QVariantMap({{"name", ServerSettingsDialogStore::tr("Version")}, {"value", plugin.version}}),
-        QVariantMap({{"name", ServerSettingsDialogStore::tr("Vendor")}, {"value", plugin.vendor}}) });
+    switch (errorCode)
+    {
+        case PluginInfo::Error::noError:
+            return ServerSettingsDialogStore::tr("no error");
+
+        case PluginInfo::Error::cannotLoadLibrary:
+            return ServerSettingsDialogStore::tr("library file cannot be loaded");
+
+        case PluginInfo::Error::invalidLibrary:
+            return ServerSettingsDialogStore::tr("invalid or incompatible plugin library");
+
+        case PluginInfo::Error::libraryFailure:
+            return ServerSettingsDialogStore::tr("plugin library failed to initialize");
+
+        case PluginInfo::Error::badManifest:
+            return ServerSettingsDialogStore::tr("plugin returned bad manifest");
+
+        case PluginInfo::Error::unsupportedVersion:
+            return ServerSettingsDialogStore::tr("plugin API version is no longer supported");
+
+        default:
+            return ServerSettingsDialogStore::tr("unknown error");
+    }
 }
 
-QVariantList pluginDetails(const std::optional<const nx::vms::api::PluginInfo>& plugin)
+QString pluginStatus(const PluginInfo& plugin)
+{
+    const auto notLoadedMessage =
+        [](const QString& details)
+        {
+            return QString("%1: %2").arg(ServerSettingsDialogStore::tr("Not loaded"), details);
+        };
+
+    switch (plugin.status)
+    {
+        case PluginInfo::Status::loaded:
+            return ServerSettingsDialogStore::tr("Loaded");
+
+        case PluginInfo::Status::notLoadedBecauseOfError:
+            return notLoadedMessage(pluginError(plugin.errorCode));
+
+        case PluginInfo::Status::notLoadedBecauseOfBlackList:
+            return notLoadedMessage(ServerSettingsDialogStore::tr("plugin is in the black list"));
+
+        case PluginInfo::Status::notLoadedBecauseOptional:
+            return notLoadedMessage(ServerSettingsDialogStore::tr(
+                "plugin is optional and isn't in the white list"));
+
+        default:
+            NX_ASSERT(false);
+            return "<unknown status>";
+    }
+}
+
+QVariantList pluginDetails(const PluginInfo& plugin)
+{
+    QVariantList result;
+
+    const auto add =
+        [&](const QString& name, const QString& value)
+        {
+            result << QVariantMap({{"name", name}, {"value", value}});
+        };
+
+    const auto addNonEmpty =
+        [&](const QString& name, const QString& value)
+        {
+            if (!value.isEmpty())
+                add(name, value);
+        };
+
+    add(ServerSettingsDialogStore::tr("Library"), plugin.libraryFilename);
+    addNonEmpty(ServerSettingsDialogStore::tr("Version"), plugin.version.trimmed());
+    addNonEmpty(ServerSettingsDialogStore::tr("Vendor"), plugin.vendor.trimmed());
+    add(ServerSettingsDialogStore::tr("Status"), pluginStatus(plugin));
+
+    return result;
+}
+
+QVariantList pluginDetails(const std::optional<const PluginInfo>& plugin)
 {
     return plugin ? pluginDetails(*plugin) : QVariantList();
 }
@@ -107,12 +186,12 @@ QVariant ServerSettingsDialogStore::currentPlugin() const
     return pluginData(d->state.currentPlugin());
 }
 
-void ServerSettingsDialogStore::selectCurrentPlugin(const QString& libraryName)
+void ServerSettingsDialogStore::selectCurrentPlugin(const QString& libraryFilename)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::selectCurrentPlugin(std::move(state), libraryName.trimmed());
+            return Reducer::selectCurrentPlugin(std::move(state), libraryFilename.trimmed());
         });
 }
 

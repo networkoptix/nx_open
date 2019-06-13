@@ -59,10 +59,8 @@ Engine::Engine(
     NX_PRINT << "Created " << this << ": \"" << plugin->name() << "\"";
 }
 
-std::string Engine::getParamValue(const char* paramName)
+std::string Engine::getParamValue(const std::string& paramName)
 {
-    if (paramName == nullptr)
-        return "";
     return m_settings[paramName];
 }
 

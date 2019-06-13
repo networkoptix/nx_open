@@ -15,6 +15,7 @@
 #include <common/common_module.h>
 
 #include "universal_request_processor.h"
+#include "network/tcp_listener.h"
 
 QnUniversalTcpListener::QnUniversalTcpListener(
     QnCommonModule* commonModule,
@@ -76,7 +77,7 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
     return new QnUniversalRequestProcessor(std::move(clientSocket), this, needAuth());
 }
 
-nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
+std::unique_ptr<nx::network::AbstractStreamServerSocket> QnUniversalTcpListener::createAndPrepareSocket(
     bool sslNeeded,
     const nx::network::SocketAddress& localAddress)
 {
@@ -97,36 +98,26 @@ nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepar
     }
 
     m_multipleServerSocket = multipleServerSocket.get();
-    m_serverSocket = std::move(multipleServerSocket);
-
     if (m_boundToCloud)
         updateCloudConnectState(&lk);
 
     #ifdef ENABLE_SSL
         if (sslNeeded)
         {
-            m_serverSocket = nx::network::SocketFactory::createSslAdapter(
-                std::exchange(m_serverSocket, nullptr),
+            return nx::network::SocketFactory::createSslAdapter(
+                std::move(multipleServerSocket),
                 nx::network::ssl::EncryptionUse::autoDetectByReceivedData);
         }
     #endif
 
-   return m_serverSocket.get();
+   return multipleServerSocket;
 }
 
-void QnUniversalTcpListener::destroyServerSocket(
-    nx::network::AbstractStreamServerSocket* serverSocket)
+void QnUniversalTcpListener::destroyServerSocket()
 {
-    decltype(m_serverSocket) serverSocketToDestroy;
-    {
-        QnMutexLocker lk(&m_mutex);
-
-        NX_ASSERT(m_serverSocket.get() == serverSocket);
-        std::swap(m_serverSocket, serverSocketToDestroy);
-    }
-    if (serverSocketToDestroy)
-        serverSocketToDestroy->pleaseStopSync();
-    serverSocketToDestroy.reset();
+    QnMutexLocker lk(&m_mutex);
+    m_multipleServerSocket = nullptr;
+    base_type::destroyServerSocket();
 }
 
 void QnUniversalTcpListener::onCloudBindingStatusChanged(

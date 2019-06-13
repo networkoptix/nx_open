@@ -60,6 +60,8 @@ public:
         readyRestart,
         /** Installation is complete, client has newest version. */
         complete,
+        /** ClientUpdateTool is being destructed. All async operations should exit ASAP. */
+        exiting,
         /** Got some critical error and can not continue installation. */
         error,
         /** Got an error during installation. */
@@ -85,12 +87,6 @@ public:
      * @param info - update manifest
      */
     void setUpdateTarget(const UpdateContents& contents);
-
-    /**
-     * Returns a progress for downloading client package
-     * @return percents
-     */
-    int getDownloadProgress() const;
 
     /**
      * Resets tool to initial state.
@@ -200,8 +196,9 @@ private:
     vms::common::p2p::downloader::ResourcePoolPeerManager* m_peerManager = nullptr;
     vms::common::p2p::downloader::ResourcePoolPeerManager* m_proxyPeerManager = nullptr;
     nx::update::Package m_clientPackage;
-    State m_state = State::initial;
-    int m_progress = 0;
+
+    std::atomic<State> m_state = State::initial;
+
     bool m_stateChanged = false;
     nx::utils::SoftwareVersion m_updateVersion;
 
