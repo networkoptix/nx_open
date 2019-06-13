@@ -114,12 +114,16 @@ void ResourceProvider<Resource>::found(const Resource& resource)
         if (!NX_ASSERT(isInserted, "Duplicate %1", resource))
             return;
     }
+
+    NX_VERBOSE(this, "Found %1", resource);
     changed(resource);
 }
 
 template<typename Resource>
 void ResourceProvider<Resource>::lost(const Resource& resource)
 {
+
+    NX_VERBOSE(this, "Lost %1", resource);
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_resources.erase(resource);
 }
@@ -134,6 +138,7 @@ void ResourceProvider<Resource>::changed(const Resource& resource)
         const auto& id = description->id;
         if (!monitoringGuard)
         {
+            NX_DEBUG(this, "Start monitoring %1", resource);
             auto guard = m_parameters.monitor(resource, m_dataBaseAccess[id]);
             monitoringGuard = guard;
         }
@@ -141,7 +146,10 @@ void ResourceProvider<Resource>::changed(const Resource& resource)
     else
     {
         if (monitoringGuard)
+        {
+            NX_DEBUG(this, "Stop monitoring %1", resource);
             monitoringGuard.reset();
+        }
     }
 }
 
@@ -176,4 +184,4 @@ std::unique_ptr<AbstractParameterProvider<Resource>>
         std::move(manifest), parameterProviders(std::forward<Providers>(providers)...));
 }
 
-} // namespace nx::vms::server::metrics
+} // namespace nx::vms::utils::metrics

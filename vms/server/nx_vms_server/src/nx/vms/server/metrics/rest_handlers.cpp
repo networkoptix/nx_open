@@ -111,7 +111,7 @@ rest::Response SystemRestHandler::executeGet(const rest::Request& request)
         url.setQuery(request.params().toUrlQuery());
         if (!client.doGet(url) || !client.response())
         {
-            NX_WARNING(this, "Query [ %1 ] has failed", url);
+            NX_DEBUG(this, "Query [ %1 ] has failed", url);
             continue;
         }
 
@@ -124,13 +124,13 @@ rest::Response SystemRestHandler::executeGet(const rest::Request& request)
         if (!http::StatusCode::isSuccessCode(httpCode)
             || result.error != rest::Result::Error::NoError)
         {
-            NX_WARNING(this, "Query [ %1 ] has failed %1 (%2)", url, httpCode, result.errorString);
+            NX_DEBUG(this, "Query [ %1 ] has failed %1 (%2)", url, httpCode, result.errorString);
             continue;
         }
 
         auto serverValues = result.deserialized<api::metrics::SystemValues>();
         for (const auto& [name, values]: serverValues)
-            NX_DEBUG(this, "Query [ %1 ] returned %2 %3", url, values.size(), name);
+            NX_VERBOSE(this, "Query [ %1 ] returned %2 %3", url, values.size(), name);
 
         api::metrics::merge(&systemValues, &serverValues);
     }

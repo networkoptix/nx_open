@@ -293,8 +293,9 @@
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
 
-#include <nx/vms/server/metrics/camera_providers.h>
+#include <nx/vms/server/metrics/camera_provider.h>
 #include <nx/vms/server/metrics/rest_handlers.h>
+#include <nx/vms/server/metrics/server_provider.h>
 
 using namespace nx::vms::server;
 
@@ -4534,10 +4535,14 @@ void MediaServerProcess::loadResourceParamsData()
 void MediaServerProcess::initMetricsController()
 {
     m_metricsController = std::make_unique<nx::vms::utils::metrics::Controller>();
+
+    m_metricsController->registerGroup(
+        "servers",
+        std::make_unique<nx::vms::server::metrics::ServerProvider>(serverModule()));
+
     m_metricsController->registerGroup(
         "cameras",
-        std::make_unique<nx::vms::server::metrics::CamerasProvider>(
-            m_serverModule.lock()->resourcePool()));
+        std::make_unique<nx::vms::server::metrics::CameraProvider>(serverModule()->resourcePool()));
 
     // TODO: Should be moved into a resource file.
     static const QByteArray kRules(R"json({
@@ -4549,7 +4554,7 @@ void MediaServerProcess::initMetricsController()
                 "insert": "after status",
                 "alarms": { "warning": 1, "error": 2 }
             },
-            "packetLoss": { "alarms": { "warning": 1, "error": 5 } },
+            "packetLossCount": { "alarms": { "warning": 1, "error": 5 } },
             "conflictCount": { "alarms": { "warning": 1, "error": 2 } },
             "primaryStream": {
                 "group": {

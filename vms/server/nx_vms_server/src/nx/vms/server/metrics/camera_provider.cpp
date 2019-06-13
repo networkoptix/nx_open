@@ -1,18 +1,17 @@
-#include "camera_providers.h"
+#include "camera_provider.h"
 
+#include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/server/resource/camera.h>
 
 namespace nx::vms::server::metrics {
 
-CamerasProvider::CamerasProvider(QnResourcePool* resourcePool):
+CameraProvider::CameraProvider(QnResourcePool* resourcePool):
     utils::metrics::ResourceProvider<resource::CameraPtr>(makeProviders()),
     m_resourcePool(resourcePool)
 {
 }
 
-void CamerasProvider::startMonitoring()
+void CameraProvider::startMonitoring()
 {
     QObject::connect(
         m_resourcePool, &QnResourcePool::resourceAdded,
@@ -39,7 +38,7 @@ void CamerasProvider::startMonitoring()
         });
 }
 
-std::optional<utils::metrics::ResourceDescription> CamerasProvider::describe(
+std::optional<utils::metrics::ResourceDescription> CameraProvider::describe(
     const resource::CameraPtr& resource) const
 {
     if (resource->flags().testFlag(Qn::foreigner))
@@ -52,13 +51,13 @@ std::optional<utils::metrics::ResourceDescription> CamerasProvider::describe(
     };
 }
 
-template<typename Resource = QnResource, typename Signal>
-typename utils::metrics::SingleParameterProvider<QnSharedResourcePointer<Resource>>::Watch
+template<typename Signal>
+typename utils::metrics::SingleParameterProvider<resource::CameraPtr>::Watch
     signalWatch(Signal signal)
 {
     return [signal](
-        const QnSharedResourcePointer<Resource>& resource,
-        typename utils::metrics::SingleParameterProvider<Resource>::OnChange change)
+        const resource::CameraPtr& resource,
+        typename utils::metrics::SingleParameterProvider<resource::CameraPtr>::OnChange change)
     {
         const auto connection = QObject::connect(
             resource.get(), signal,
@@ -68,13 +67,13 @@ typename utils::metrics::SingleParameterProvider<QnSharedResourcePointer<Resourc
     };
 }
 
-CamerasProvider::ParameterProviders CamerasProvider::makeProviders()
+CameraProvider::ParameterProviders CameraProvider::makeProviders()
 {
     return parameterProviders(
         singleParameterProvider(
             {"url", "URL"},
             [](const auto& resource) { return Value(resource->getUrl()); },
-            signalWatch<resource::Camera>(&QnResource::urlChanged)
+            signalWatch(&QnResource::urlChanged)
         ),
         singleParameterProvider(
             {"type"},
@@ -99,7 +98,7 @@ CamerasProvider::ParameterProviders CamerasProvider::makeProviders()
         singleParameterProvider(
             {"status"},
             [](const auto& resource) { return Value(QnLexical::serialized(resource->getStatus())); },
-            signalWatch<resource::Camera>(&QnResource::statusChanged)
+            signalWatch(&QnResource::statusChanged)
         ),
         singleParameterProvider(
             {"packetLossCount", "number of packets lost in 1h"},
@@ -116,11 +115,10 @@ CamerasProvider::ParameterProviders CamerasProvider::makeProviders()
     );
 }
 
-CamerasProvider::ParameterProviderPtr CamerasProvider::makeStreamProvider(api::StreamIndex index)
+CameraProvider::ParameterProviderPtr CameraProvider::makeStreamProvider(api::StreamIndex index)
 {
     // TODO: Implement actual providers for each video stream.
-    return parameterGroupProvider(
-        {
+    return parameterGroupProvider({
             (index == api::StreamIndex::primary) ? "primaryStream" : "secondaryStream",
             (index == api::StreamIndex::primary) ? "primary stream" : "secondary stream"
         },
