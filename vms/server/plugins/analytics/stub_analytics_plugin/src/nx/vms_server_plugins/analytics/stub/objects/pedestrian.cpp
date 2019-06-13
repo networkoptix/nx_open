@@ -11,9 +11,6 @@ using namespace nx::sdk;
 
 namespace {
 
-static constexpr char kObjectTypeId[] = "nx.stub.pedestrian";
-static constexpr char kTypeName[] = "Pedestrian";
-
 static Attributes makeAttributes()
 {
     static std::vector<const char*> kDirections = { "Towards the camera", "Away from the camera" };
