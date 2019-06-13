@@ -1573,7 +1573,7 @@
             "value": "",
             "description": "Company web address.",
             "type": "text",
-            "optional": true,
+            "optional": false,
             "meta": {
               "regex": "^https?:\\/\\/([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$"
             }
