@@ -32,6 +32,8 @@ bool AnalyticsArchiveDirectory::saveToArchive(
     if (auto archive = openOrGetArchive(deviceId);
         archive != nullptr)
     {
+        NX_VERBOSE(this, "Saving (%1; 2)", timestamp, objectsGroupId);
+
         return archive->saveToArchive(
             timestamp, region, objectsGroupId, objectType, allAttributesHash);
     }
@@ -91,8 +93,10 @@ AnalyticsArchiveDirectory::ObjectMatchResult AnalyticsArchiveDirectory::matchObj
         std::transform(
             deviceResult.data.begin(), deviceResult.data.end(),
             std::back_inserter(objectGroups),
-            [](const auto& item)
+            [this](const auto& item)
             {
+                NX_VERBOSE(this, "Found (%1; %2)", item.timestampMs, item.objectGroupId);
+
                 return std::make_pair(
                     std::chrono::milliseconds(item.timestampMs), item.objectGroupId);
             });
