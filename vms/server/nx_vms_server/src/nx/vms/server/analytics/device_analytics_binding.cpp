@@ -477,7 +477,7 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> DeviceAnalyticsBinding::mak
         "and engine {:engine}: {:error}").arg(manifestType);
 
     return std::make_unique<sdk_support::ManifestLogger>(
-        typeid(this), //< Using the same tag for all instances.
+        typeid(*this), //< Using the same tag for all instances.
         messageTemplate,
         m_device,
         m_engine);

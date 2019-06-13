@@ -50,7 +50,7 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> AnalyticsPluginResource::ma
         "Error occurred while fetching Engine manifest for engine: {:engine}: {:error}");
 
     return std::make_unique<sdk_support::ManifestLogger>(
-        typeid(this), //< Using the same tag for all instances.
+        typeid(*this), //< Using the same tag for all instances.
         messageTemplate,
         toSharedPointer(this));
 }

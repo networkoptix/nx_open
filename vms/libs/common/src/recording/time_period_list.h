@@ -62,7 +62,7 @@ public:
     static QnTimePeriodList filterTimePeriodsAsc(
         Iterator itr,
         Iterator endItr,
-        int detailLevel,
+        qint64 detailLevel,
         bool keepSmallChunks,
         int limit)
     {
@@ -102,7 +102,7 @@ public:
     static QnTimePeriodList filterTimePeriodsDesc(
         Iterator itr,
         Iterator endItr,
-        int detailLevel,
+        qint64 detailLevel,
         bool keepSmallChunks,
         int limit)
     {
@@ -141,7 +141,7 @@ public:
     static QnTimePeriodList filterTimePeriods(
         Iterator itr,
         Iterator endItr,
-        int detailLevel,
+        qint64 detailLevel,
         bool keepSmalChunks,
         int limit,
         Qt::SortOrder sortOrder)

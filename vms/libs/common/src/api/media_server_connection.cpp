@@ -117,7 +117,6 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (ec2BookmarkDeleteObject, "ec2/bookmarks/delete")
     (ec2BookmarkTagsObject, "ec2/bookmarks/tags")
     (MergeLdapUsersObject, "mergeLdapUsers")
-    (PluginModuleInformationObject, "pluginModuleInformation")
 );
 
 #if 0
@@ -1356,14 +1355,4 @@ int QnMediaServerConnection::getBookmarkTagsAsync(
 {
     return sendAsyncGetRequestLogged(ec2BookmarkTagsObject,
         request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkTagList), target, slot);
-}
-
-int QnMediaServerConnection::pluginInfo(QObject* target, const char* slot)
-{
-    return sendAsyncGetRequestLogged(
-        PluginModuleInformationObject,
-        QnRequestParamList(),
-        QN_STRINGIZE_TYPE(nx::vms::api::PluginInfoList),
-        target,
-        slot);
 }

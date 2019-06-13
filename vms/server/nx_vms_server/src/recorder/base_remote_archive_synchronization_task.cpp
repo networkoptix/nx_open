@@ -346,21 +346,24 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
     if (!prepareDataSource(timePeriod, chunk))
         return false;
 
+    const QString additionalTimePeriodSyncInfo =
+        lm("Chunk bounds: %1 (%2) - %3 (%4). Chunk id: %5. Resource %6").args(
+            QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs),
+            chunk.startTimeMs,
+            QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs + chunk.durationMs),
+            chunk.startTimeMs + chunk.durationMs,
+            chunk.id,
+            m_resource->getUserDefinedName());
+
     NX_DEBUG(
         this,
-        lm("Writing time period %1 (%2) - %3 (%4). "
-            "Chunk bounds: %5 (%6) - %7 (%8). "
-            "Resource %9")
+        lm("Writing time period %1 (%2) - %3 (%4). %5")
             .args(
                 QDateTime::fromMSecsSinceEpoch(timePeriod.startTimeMs),
                 timePeriod.startTimeMs,
                 QDateTime::fromMSecsSinceEpoch(timePeriod.endTimeMs()),
                 timePeriod.endTimeMs(),
-                QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs),
-                chunk.startTimeMs,
-                QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs + chunk.durationMs),
-                chunk.startTimeMs + chunk.durationMs,
-                m_resource->getUserDefinedName()));
+                additionalTimePeriodSyncInfo));
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -388,19 +391,13 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
 
     NX_DEBUG(
         this,
-        lm("Time period %1 (%2) - %3 (%4) has been recorded."
-            " Corresponding chunk: %5 (%6) - %7 (%8)."
-            " Resource: %9")
+        lm("Time period %1 (%2) - %3 (%4) has been recorded. %5")
             .args(
                 QDateTime::fromMSecsSinceEpoch(timePeriod.startTimeMs),
                 timePeriod.startTimeMs,
                 QDateTime::fromMSecsSinceEpoch(timePeriod.endTimeMs()),
                 timePeriod.endTimeMs(),
-                QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs),
-                chunk.startTimeMs,
-                QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs + chunk.durationMs),
-                chunk.startTimeMs + chunk.durationMs,
-                m_resource->getUserDefinedName()));
+                additionalTimePeriodSyncInfo));
 
     return true;
 }

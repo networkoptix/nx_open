@@ -2,8 +2,10 @@
 
 #include <QtCore/QPointer>
 
+#include <api/server_rest_connection.h>
 #include <core/resource/media_server_resource.h>
 
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/analytics_data.h>
 
 #include "../redux/server_settings_dialog_store.h"
@@ -47,10 +49,9 @@ public:
 private:
     void handleStateChange()
     {
+        clearActiveRequest();
         if (!m_store)
             return;
-
-        cancelActiveRequest();
 
         const bool isOnline = m_server && m_server->isOnline();
         m_store->setOnline(isOnline);
@@ -58,83 +59,43 @@ private:
             requestData();
     }
 
-    // TODO: FIXME: #vkutin The following 3 methods are a debug stub.
-    // Replace them with actual request when it's implemented.
-
     void requestData()
     {
-        m_requestTimerDEBUG = new QTimer(this);
-        m_requestTimerDEBUG->setSingleShot(true);
-        m_requestTimerDEBUG->start(3000);
-
-        connect(m_requestTimerDEBUG.data(), &QTimer::timeout, this,
-            [this]()
-            {
-                m_requestTimerDEBUG->deleteLater();
-                handleDataReceived();
-            });
-
-        if (m_store)
-            m_store->setPluginsInformationLoading(true);
-    }
-
-    void handleDataReceived()
-    {
-        if (!m_store)
+        const auto connection = m_server ? m_server->restConnection() : rest::QnConnectionPtr();
+        if (!NX_ASSERT(connection))
             return;
 
-        const auto makePluginData =
-            [](QString name, QString desc, QString libraryName, QString vendor, QString ver)
+        const auto handleResponse = nx::utils::guarded(this,
+            [this](bool success, rest::Handle requestId, QnJsonRestResult result)
             {
-                nx::vms::api::PluginInfo data;
-                data.name = name;
-                data.description = desc;
-                data.libraryName = libraryName;
-                data.vendor = vendor;
-                data.version = ver;
-                return data;
-            };
+                if (success && requestId == m_requestId && m_store)
+                    m_store->setPluginModules(result.deserialized<nx::vms::api::PluginInfoList>());
 
-        m_store->setPluginModules(nx::vms::api::PluginInfoList{
-            makePluginData(
-                "Plugin 1",
-                "This is test plugin 1 description",
-                "plugin_1.dll",
-                "Vendor 1",
-                "1.0.1"),
-            makePluginData(
-                "Plugin 2",
-                "This is test plugin 2 description",
-                "plugin_2.dll",
-                "Vendor 2",
-                "1.0.2"),
-            makePluginData(
-                "Plugin 3",
-                "This is test plugin 3 description",
-                "plugin_3.dll",
-                "Vendor 3",
-                "3.0")});
+                clearActiveRequest();
+            });
 
-        m_store->setPluginsInformationLoading(false);
+        m_requestId = connection->getPluginInformation(handleResponse, thread());
+        if (m_store)
+            m_store->setPluginsInformationLoading(m_requestId != rest::Handle{});
     }
 
-    void cancelActiveRequest()
+    void clearActiveRequest()
     {
-        delete m_requestTimerDEBUG;
+        m_requestId = {};
+        if (m_store)
+            m_store->setPluginsInformationLoading(false);
     }
 
 private:
     QPointer<ServerSettingsDialogStore> m_store;
     QnMediaServerResourcePtr m_server;
-
-    // TODO: FIXME: #vkutin As a debug stub here is a timer instead of a request handle.
-    QPointer<QTimer> m_requestTimerDEBUG;
+    rest::Handle m_requestId{};
 };
 
 // ------------------------------------------------------------------------------------------------
 // ServerPluginDataWatcher
 
-ServerPluginDataWatcher::ServerPluginDataWatcher(ServerSettingsDialogStore* store, QObject* parent) :
+ServerPluginDataWatcher::ServerPluginDataWatcher(ServerSettingsDialogStore* store, QObject* parent):
     base_type(parent),
     d(new Private(this, store))
 {

@@ -234,12 +234,27 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * The list of parameters depends on the resource type.
      * %param[default] format
      * %param id Resource unique id.
-     * %return Object in the requested format.
+     * %return List of objects in the requested format.
+     *     %param resourceId Resource unique id.
+     *     %param value Parameter value.
+     *     %param name Parameter name.
      * %// AbstractResourceManager::getKvPairs
      */
     regGet<QnUuid, ResourceParamWithRefDataList>(p, ApiCommand::getResourceParams);
 
-    // AbstractResourceManager::save
+    /**%apidoc:arrayParams POST /ec2/setResourceParams
+     * Set resource (camera, user or server) additional parameters (camera firmware version, etc).
+     * The list of parameters depends on the resource type.
+     * <p>
+     * Parameters should be passed as a JSON array of objects in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %param resourceId Resource unique id.
+     * %param value Parameter value.
+     * %param name Parameter name.
+     * %// AbstractResourceManager::save
+     */
     regUpdate<ResourceParamWithRefDataList>(p, ApiCommand::setResourceParams);
 
     /**%apidoc POST /ec2/removeResource

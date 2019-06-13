@@ -652,6 +652,9 @@ QnTimePeriodList mergeTimePeriodsInternal(
     std::vector<IteratorType>& maxIndices,
     int limit)
 {
+    if (limit <= 0)
+        limit = std::numeric_limits<int>::max();
+
     QnTimePeriodList result;
 
     int maxSize = std::min<int>(
@@ -779,7 +782,7 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(
     if (nonEmptyPeriods.size() == 1)
     {
         QnTimePeriodList result = nonEmptyPeriods.first();
-        if (result.size() > limit)
+        if (result.size() > limit && limit > 0)
             result.resize(limit);
         return result;
     }

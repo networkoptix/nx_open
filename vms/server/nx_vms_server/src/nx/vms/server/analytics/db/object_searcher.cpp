@@ -1,9 +1,11 @@
 #include "object_searcher.h"
 
 #include <nx/fusion/serialization/sql_functions.h>
+#include <nx/utils/std/algorithm.h>
 
 #include <analytics/db/config.h>
 
+#include "analytics_archive_directory.h"
 #include "attributes_dao.h"
 #include "cursor.h"
 #include "serializers.h"
@@ -14,13 +16,19 @@ static const QSize kSearchResolution(
     kTrackSearchResolutionX,
     kTrackSearchResolutionY);
 
+static constexpr int kMaxObjectLookupIterations = 100;
+
 ObjectSearcher::ObjectSearcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
+    AttributesDao* attributesDao,
+    AnalyticsArchiveDirectory* analyticsArchive,
     Filter filter)
     :
     m_deviceDao(deviceDao),
     m_objectTypeDao(objectTypeDao),
+    m_attributesDao(attributesDao),
+    m_analyticsArchive(analyticsArchive),
     m_filter(std::move(filter))
 {
     if (m_filter.maxObjectsToSelect == 0 || m_filter.maxObjectsToSelect > kMaxObjectLookupResultSet)
@@ -29,17 +37,37 @@ ObjectSearcher::ObjectSearcher(
 
 std::vector<DetectedObject> ObjectSearcher::lookup(nx::sql::QueryContext* queryContext)
 {
-    auto selectEventsQuery = queryContext->connection()->createQuery();
-    selectEventsQuery->setForwardOnly(true);
-    prepareLookupQuery(selectEventsQuery.get());
-    selectEventsQuery->exec();
+    if (kLookupObjectsInAnalyticsArchive)
+    {
+        if (!m_filter.objectAppearanceId.isNull())
+        {
+            auto object = fetchObjectById(queryContext, m_filter.objectAppearanceId);
+            if (!object || !satisfiesFilter(m_filter, *object))
+                return {};
+            return {std::move(*object)};
+        }
+        else
+        {
+            return lookupObjectsUsingArchive(queryContext);
+        }
+    }
+    else
+    {
+        auto selectEventsQuery = queryContext->connection()->createQuery();
+        selectEventsQuery->setForwardOnly(true);
+        prepareLookupQuery(selectEventsQuery.get());
+        selectEventsQuery->exec();
 
-    return loadObjects(selectEventsQuery.get());
+        return loadObjects(selectEventsQuery.get());
+    }
 }
 
 void ObjectSearcher::prepareCursorQuery(nx::sql::SqlQuery* query)
 {
-    prepareLookupQuery(query);
+    if (kLookupObjectsInAnalyticsArchive)
+        prepareCursorQueryImpl(query);
+    else
+        prepareLookupQuery(query);
 }
 
 void ObjectSearcher::loadCurrentRecord(
@@ -63,13 +91,7 @@ void ObjectSearcher::addObjectFilterConditions(
     nx::sql::Filter* sqlFilter)
 {
     if (!filter.deviceIds.empty())
-    {
-        auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
-            "device_id", ":deviceId");
-        for (const auto& deviceGuid: filter.deviceIds)
-            condition->addValue(deviceDao.deviceIdFromGuid(deviceGuid));
-        sqlFilter->addCondition(std::move(condition));
-    }
+        addDeviceFilterCondition(filter.deviceIds, deviceDao, sqlFilter);
 
     if (!filter.objectAppearanceId.isNull())
     {
@@ -88,6 +110,18 @@ void ObjectSearcher::addObjectFilterConditions(
             fieldNames.timeRange,
             sqlFilter);
     }
+}
+
+void ObjectSearcher::addDeviceFilterCondition(
+    const std::vector<QnUuid>& deviceIds,
+    const DeviceDao& deviceDao,
+    nx::sql::Filter* sqlFilter)
+{
+    auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
+        "device_id", ":deviceId");
+    for (const auto& deviceGuid: deviceIds)
+        condition->addValue(deviceDao.deviceIdFromGuid(deviceGuid));
+    sqlFilter->addCondition(std::move(condition));
 }
 
 void ObjectSearcher::addBoundingBoxToFilter(
@@ -155,6 +189,87 @@ template void ObjectSearcher::addTimePeriodToFilter<std::chrono::seconds>(
     const TimeRangeFields& timeRangeFields,
     nx::sql::Filter* sqlFilter);
 
+bool ObjectSearcher::satisfiesFilter(
+    const Filter& filter, const DetectedObject& detectedObject)
+{
+    using namespace std::chrono;
+
+    if (!filter.objectAppearanceId.isNull() &&
+        detectedObject.objectAppearanceId != filter.objectAppearanceId)
+    {
+        return false;
+    }
+
+    if (!nx::utils::contains(filter.deviceIds, detectedObject.deviceId))
+        return false;
+
+    if (!(microseconds(detectedObject.lastAppearanceTimeUsec) >= filter.timePeriod.startTime() &&
+          (filter.timePeriod.isInfinite() ||
+              microseconds(detectedObject.firstAppearanceTimeUsec) < filter.timePeriod.endTime())))
+    {
+        return false;
+    }
+
+    if (!filter.objectTypeId.empty() &&
+        std::find(
+            filter.objectTypeId.begin(), filter.objectTypeId.end(),
+            detectedObject.objectTypeId) == filter.objectTypeId.end())
+    {
+        return false;
+    }
+
+    if (!filter.freeText.isEmpty() &&
+        !matchAttributes(detectedObject.attributes, filter.freeText))
+    {
+        return false;
+    }
+
+    // Checking the track.
+    if (filter.boundingBox)
+    {
+        bool instersects = false;
+        for (const auto& position: detectedObject.track)
+        {
+            if (rectsIntersectToSearchPrecision(*filter.boundingBox, position.boundingBox))
+            {
+                instersects = true;
+                break;
+            }
+        }
+        
+        if (!instersects)
+            return false;
+    }
+
+    return true;
+}
+
+bool ObjectSearcher::matchAttributes(
+    const std::vector<nx::common::metadata::Attribute>& attributes,
+    const QString& filter)
+{
+    const auto filterWords = filter.split(L' ');
+    // Attributes have to contain all words.
+    for (const auto& filterWord: filterWords)
+    {
+        bool found = false;
+        for (const auto& attribute : attributes)
+        {
+            if (attribute.name.indexOf(filterWord) != -1 ||
+                attribute.value.indexOf(filterWord) != -1)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            return false;
+    }
+
+    return true;
+}
+
 static constexpr char kBoxFilteredTable[] = "%boxFilteredTable%";
 static constexpr char kFromBoxFilteredTable[] = "%fromBoxFilteredTable%";
 static constexpr char kJoinBoxFilteredTable[] = "%joinBoxFilteredTable%";
@@ -162,6 +277,165 @@ static constexpr char kObjectFilteredByTextExpr[] = "%objectFilteredByText%";
 static constexpr char kObjectExpr[] = "%objectExpr%";
 static constexpr char kLimitObjectCount[] = "%limitObjectCount%";
 static constexpr char kObjectOrderByTrackStart[] = "%objectOrderByTrackStart%";
+
+std::optional<DetectedObject> ObjectSearcher::fetchObjectById(
+    nx::sql::QueryContext* queryContext,
+    const QnUuid& objectGuid)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->setForwardOnly(true);
+    query->prepare(R"sql(
+        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, 
+            ua.content AS content, best_shot_timestamp_ms, best_shot_rect
+        FROM object o, unique_attributes ua
+        WHERE o.attributes_id=ua.id AND guid=?
+    )sql");
+    query->addBindValue(QnSql::serialized_field(objectGuid));
+
+    query->exec();
+
+    if (query->next())
+        return loadObject(query.get());
+
+    return std::nullopt;
+}
+
+std::vector<DetectedObject> ObjectSearcher::lookupObjectsUsingArchive(
+    nx::sql::QueryContext* queryContext)
+{
+    auto archiveFilter =
+        AnalyticsArchiveDirectory::prepareArchiveFilter(m_filter, m_objectTypeDao);
+    // NOTE: We are always searching for newest objects. 
+    // The sortOrder is applied to the lookup result.
+    archiveFilter.sortOrder = Qt::DescendingOrder;
+
+    if (!m_filter.freeText.isEmpty())
+    {
+        const auto attributeGroups =
+            m_attributesDao->lookupCombinedAttributes(queryContext, m_filter.freeText);
+        std::copy(
+            attributeGroups.begin(), attributeGroups.end(),
+            std::back_inserter(archiveFilter.allAttributesHash));
+    }
+
+    std::set<std::int64_t> analyzedObjectGroups;
+
+    std::vector<DetectedObject> result;
+    for (int i = 0; i < kMaxObjectLookupIterations; ++i)
+    {
+        auto matchResult = m_analyticsArchive->matchObjects(
+            m_filter.deviceIds,
+            archiveFilter);
+        const auto fetchedObjectGroupsCount = matchResult.objectGroups.size();
+
+        matchResult.objectGroups.erase(
+            std::remove_if(
+                matchResult.objectGroups.begin(), matchResult.objectGroups.end(),
+                [&analyzedObjectGroups](auto id) { return analyzedObjectGroups.count(id) > 0; }),
+            matchResult.objectGroups.end());
+        std::copy(
+            matchResult.objectGroups.begin(), matchResult.objectGroups.end(),
+            std::inserter(analyzedObjectGroups, analyzedObjectGroups.end()));
+
+        fetchObjectsFromDb(queryContext, matchResult.objectGroups, &result);
+
+        if (result.size() >= m_filter.maxObjectsToSelect ||
+            fetchedObjectGroupsCount < archiveFilter.limit)
+        {
+            if (result.size() > m_filter.maxObjectsToSelect)
+                result.erase(result.begin() + m_filter.maxObjectsToSelect, result.end());
+            return result;
+        }
+
+        // Repeating match.
+        // NOTE: Both time period boundaries are inclusive.
+        if (m_filter.sortOrder == Qt::AscendingOrder)
+            archiveFilter.startTime = matchResult.timePeriod.endTime() + std::chrono::milliseconds(1);
+        else
+            archiveFilter.endTime = matchResult.timePeriod.startTime();
+    }
+
+    NX_WARNING(this, "Failed to select all required objects in %1 iterations. Filter %2",
+        kMaxObjectLookupIterations, m_filter);
+
+    return result;
+}
+
+void ObjectSearcher::fetchObjectsFromDb(
+    nx::sql::QueryContext* queryContext,
+    const std::vector<std::int64_t>& objectGroups,
+    std::vector<DetectedObject>* result)
+{
+    nx::sql::SqlFilterFieldAnyOf objectGroupFilter(
+        "og.group_id",
+        ":groupId",
+        std::vector<long long>(objectGroups.begin(), objectGroups.end()));
+
+    std::string limitExpr;
+    if (m_filter.maxObjectsToSelect > 0)
+        limitExpr = "LIMIT " + std::to_string(m_filter.maxObjectsToSelect);
+
+    auto query = queryContext->connection()->createQuery();
+    query->setForwardOnly(true);
+    query->prepare(lm(R"sql(
+        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, 
+            content, best_shot_timestamp_ms, best_shot_rect
+        FROM
+            (SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, 
+                ua.content AS content, best_shot_timestamp_ms, best_shot_rect
+            FROM object o, unique_attributes ua, object_group og
+            WHERE o.attributes_id=ua.id AND o.id=og.object_id AND %1
+            ORDER BY track_start_ms DESC
+            %2)
+        ORDER BY track_start_ms %3
+    )sql").args(objectGroupFilter.toString(), limitExpr,
+        m_filter.sortOrder == Qt::AscendingOrder ? "ASC" : "DESC"));
+    objectGroupFilter.bindFields(&query->impl());
+
+    query->exec();
+
+    auto objects = loadObjects(query.get());
+    std::move(objects.begin(), objects.end(), std::back_inserter(*result));
+}
+
+void ObjectSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query)
+{
+    nx::sql::Filter sqlFilter;
+    if (!m_filter.deviceIds.empty())
+        addDeviceFilterCondition(m_filter.deviceIds, m_deviceDao, &sqlFilter);
+
+    if (!m_filter.timePeriod.isNull())
+    {
+        addTimePeriodToFilter<std::chrono::milliseconds>(
+            m_filter.timePeriod,
+            {"track_start_ms", "track_end_ms"},
+            &sqlFilter);
+    }
+
+    auto filterExpr = sqlFilter.toString();
+    if (!filterExpr.empty())
+        filterExpr = " AND " + filterExpr;
+
+    std::string limitExpr;
+    if (m_filter.maxObjectsToSelect > 0)
+        limitExpr = "LIMIT " + std::to_string(m_filter.maxObjectsToSelect);
+
+    query->setForwardOnly(true);
+
+    query->prepare(lm(R"sql(
+        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, 
+            ua.content AS content, best_shot_timestamp_ms, best_shot_rect
+        FROM object o, unique_attributes ua
+        WHERE o.attributes_id=ua.id %1
+        ORDER BY track_start_ms %2
+        %3
+    )sql").args(
+        filterExpr,
+        m_filter.sortOrder == Qt::AscendingOrder ? "ASC" : "DESC",
+        limitExpr));
+
+    sqlFilter.bindFields(&query->impl());
+}
 
 void ObjectSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
 {
@@ -297,7 +571,9 @@ std::vector<DetectedObject> ObjectSearcher::loadObjects(nx::sql::AbstractSqlQuer
     while (query->next())
     {
         auto object = loadObject(query);
-        objects.push_back(std::move(object));
+     
+        if (satisfiesFilter(m_filter, object))
+            objects.push_back(std::move(object));
     }
 
     return objects;

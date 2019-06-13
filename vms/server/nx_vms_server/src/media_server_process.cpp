@@ -2152,20 +2152,21 @@ void MediaServerProcess::registerRestHandlers(
      * message body with content type "application/json". Example of such object can be seen in
      * the result of GET /api/iflist function. </p>
      * %permissions Owner.
-     * %param:string name Interface name.
-     * %param:string ipAddr IP address with dot-separated decimal components.
-     * %param:string netMask Network mask with dot-separated decimal components.
-     * %param:string  mac MAC address with colon-separated upper-case hex components.
-     * %param:string gateway IP address of the gateway with dot-separated decimal components. Can
-     *     be empty.
-     * %param:boolean dhcp
-     *     %value false DHCP is not used, IP address and other parameters should be specified in
-     *         the respective JSON fields.
-     *     %value true IP address and other parameters assigned via DHCP, the respective JSON
-     *         fields can be empty.
-     * %param:object extraParams JSON object with data in the internal format.
-     * %param:string dns_servers Space-separated list of IP addresses with dot-separated decimal
-     *     components.
+     * %param:array interfaces List of network interfaces settings
+     *     %param:string interfaces[].name  Interface name.
+     *     %param:string interfaces[].ipAddr IP address with dot-separated decimal components.
+     *     %param:string interfaces[].netMask Network mask with dot-separated decimal components.
+     *     %param:string interfaces[].mac MAC address with colon-separated upper-case hex components.
+     *     %param:string interfaces[].gateway IP address of the gateway with dot-separated decimal components. Can
+     *         be empty.
+     *     %param:boolean interfaces[].dhcp
+     *         %value false DHCP is not used, IP address and other parameters should be specified in
+     *             the respective JSON fields.
+     *         %value true IP address and other parameters assigned via DHCP, the respective JSON
+     *             fields can be empty.
+     *     %param:object interfaces[].extraParams JSON object with data in the internal format.
+     *     %param:string interfaces[].dns_servers Space-separated list of IP addresses with dot-separated decimal
+     *         components.
      */
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 
@@ -2748,14 +2749,38 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:array reply List of JSON objects with the following structure:
-     *         %param reply[].name Name of the plugin.
-     *         %param reply[].description Description of the plugin.
-     *         %param reply[].vendor Vendor of the plugin.
-     *         %param reply[].version Version of the plugin.
-     *         %param reply[].libraryName Absolute path to the plugin library.
-     *         %param reply[].optionality Indicates whether plugin is optional or not.
-     *         %param reply[].status Status of the plugin after a loading attempt.
-     *         %param reply[].statusMessage Message with details about the plugin loading attempt.
+     *         %param reply[].name Name of the plugin from its manifest.
+     *         %param reply[].description Description of the plugin from its manifest.
+     *         %param reply[].vendor Vendor of the plugin from its manifest.
+     *         %param reply[].version Version of the plugin from its manifest.
+     *         %param reply[].libraryFilename Absolute path to the plugin dynamic library.
+     *         %param reply[].homeDir Absolute path to the plugin's dedicated directory where its
+     *             dynamic library resides together with its possible dependencies, or an empty
+     *             string if the plugin resides in a common directory with other plugins.
+     *         %param reply[].optionality Whether the plugin resides in "plugins_optional" folder
+     *             or in the regular "plugins" folder.
+     *         %param reply[].status Status of the plugin after the plugin loading attempt.
+     *         %param reply[].statusMessage Message in English with details about the plugin
+     *             loading attempt.
+     *         %param reply[].errorCode If the plugin status is "notLoadedBecauseOfError",
+     *             describes the error.
+     *             %value undefined No error.
+     *             %value cannotLoadLibrary OS cannot load the library file.
+     *             %value invalidLibrary The library does not seem to be a valid Nx Plugin library,
+     *                 e.g. no expected entry point functions found.
+     *             %value libraryFailure The plugin library failed to initialize, e.g. its entry
+     *                 point function returned an error.
+     *             %value badManifest The plugin has returned a bad manifest, e.g. null, empty,
+     *                 non-json, or json with an unexpected structure.
+     *             %value unsupportedVersion The plugin API version is no longer supported.
+     *         %param reply[].highestSupportedInterface The latest Interface type that the Plugin
+     *             object supports via queryInterface().
+     *             %value undefined
+     *             %value nxpl_PluginInterface Base interface for the old 3.2 SDK.
+     *             %value nxpl_Plugin Old 3.2 SDK plugin supporting roSettings.
+     *             %value nxpl_Plugin2 Old 3.2 SDK plugin supporting pluginContainer.
+     *             %value nx_sdk_IPlugin Base interface for the new 4.0 SDK.
+     *             %value nx_sdk_analytics_IPlugin New 4.0 SDK Analytics plugin.
      */
     reg("api/pluginInfo",
         new nx::vms::server::rest::PluginInfoHandler(serverModule()));

@@ -17,7 +17,7 @@ public:
 
     static State setPluginModules(
         State state, const nx::vms::api::PluginInfoList& value);
-    static State selectCurrentPlugin(State state, const QString& libraryName);
+    static State selectCurrentPlugin(State state, const QString& libraryFilename);
     static State setPluginsInformationLoading(State state, bool value);
 };
 

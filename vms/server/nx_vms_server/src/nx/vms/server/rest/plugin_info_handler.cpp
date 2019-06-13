@@ -12,7 +12,7 @@ PluginInfoHandler::PluginInfoHandler(QnMediaServerModule* serverModule):
 {
 }
 
-JsonRestResponse PluginInfoHandler::executeGet(const JsonRestRequest& request)
+JsonRestResponse PluginInfoHandler::executeGet(const JsonRestRequest& /*request*/)
 {
     using namespace nx::network::http;
 
@@ -24,7 +24,7 @@ JsonRestResponse PluginInfoHandler::executeGet(const JsonRestRequest& request)
             QnRestResult::Error::InternalServerError);
     }
 
-    return JsonRestResponse(pluginManager->pluginInformation());
+    return JsonRestResponse(pluginManager->pluginInfoList());
 }
 
 } // namespace nx::vms::server::rest
