@@ -126,7 +126,7 @@ private:
 class NX_UTILS_API MutexLockAnalyzer
 {
 public:
-    using DeadlockDetectedHandler = std::function<void()>;
+    using DeadlockDetectedHandler = std::function<void(const std::string& message)>;
 
     MutexLockAnalyzer();
 

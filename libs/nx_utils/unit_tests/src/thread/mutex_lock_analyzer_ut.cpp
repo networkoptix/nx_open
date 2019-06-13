@@ -26,9 +26,11 @@ public:
         m_threadHoldingMutex = ::currentThreadSystemId();
 
         MutexLockKey key;
+        key.mutexPtr = reinterpret_cast<decltype(key.mutexPtr)>(this);
         key.recursive = m_mode == nx::utils::Mutex::Recursive;
         key.threadHoldingMutex = m_threadHoldingMutex;
-        key.lockRecursionDepth = ++m_lockRecursionDepth;
+
+        ++m_lockRecursionDepth;
 
         m_analyzer->afterMutexLocked(key);
     }
@@ -36,12 +38,13 @@ public:
     void unlock()
     {
         MutexLockKey key;
+        key.mutexPtr = reinterpret_cast<decltype(key.mutexPtr)>(this);
         key.recursive = m_mode == nx::utils::Mutex::Recursive;
         key.threadHoldingMutex = m_threadHoldingMutex;
-        key.lockRecursionDepth = --m_lockRecursionDepth;
 
         m_analyzer->beforeMutexUnlocked(key);
 
+        --m_lockRecursionDepth;
         if (m_lockRecursionDepth == 0)
             m_threadHoldingMutex = 0;
     }
@@ -62,7 +65,10 @@ public:
     MutexLockAnalyzer()
     {
         m_analyzer.setDeadlockDetectedHandler(
-            [this]() { m_detectedDeadlocks.push_back(0); });
+            [this](const auto& /*message*/)
+            {
+                m_detectedDeadlocks.push_back(0);
+            });
     }
 
 protected:
@@ -78,11 +84,22 @@ protected:
         ASSERT_TRUE(m_detectedDeadlocks.empty());
     }
 
+    void lockInANewThread(const std::vector<DummyMutex*>& mutexes)
+    {
+        std::thread(
+            [&mutexes]()
+            {
+                std::for_each(mutexes.begin(), mutexes.end(), std::mem_fn(&DummyMutex::lock));
+                std::for_each(mutexes.rbegin(), mutexes.rend(), std::mem_fn(&DummyMutex::unlock));
+            }
+        ).join();
+    }
+
 private:
     std::deque<int /*dummy*/> m_detectedDeadlocks;
 };
 
-TEST_F(MutexLockAnalyzer, mutex_deadlock_is_reported)
+TEST_F(MutexLockAnalyzer, recursive_lock_of_non_recursive_mutex_is_deadlock)
 {
     DummyMutex m1(&m_analyzer);
     m1.lock();
@@ -91,7 +108,7 @@ TEST_F(MutexLockAnalyzer, mutex_deadlock_is_reported)
     assertDeadlockIsReported();
 }
 
-TEST_F(MutexLockAnalyzer, recursive_mutex_does_not_produce_deadlock)
+TEST_F(MutexLockAnalyzer, recursive_lock_of_recursive_mutex_is_not_a_deadlock)
 {
     DummyMutex m1(&m_analyzer, nx::utils::Mutex::Recursive);
     m1.lock();
@@ -100,20 +117,23 @@ TEST_F(MutexLockAnalyzer, recursive_mutex_does_not_produce_deadlock)
     assertNoDeadlockIsReported();
 }
 
+TEST_F(MutexLockAnalyzer, deadlock_between_threads_is_detected)
+{
+    DummyMutex m1(&m_analyzer);
+    DummyMutex m2(&m_analyzer);
+
+    lockInANewThread({&m1, &m2});
+    lockInANewThread({&m2, &m1});
+
+    assertDeadlockIsReported();
+}
+
 TEST_F(MutexLockAnalyzer, DISABLED_recursive_mutex_does_not_produce_deadlock_2)
 {
     DummyMutex m1(&m_analyzer, nx::utils::Mutex::Recursive);
     DummyMutex m2(&m_analyzer);
 
-    auto t = std::thread(
-        [&m1, &m2]()
-        {
-            m1.lock();
-            m2.lock();
-            m2.unlock();
-            m1.unlock();
-        });
-    t.join();
+    lockInANewThread({&m1, &m2});
 
     m1.lock();
     m2.lock();
