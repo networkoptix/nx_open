@@ -58,6 +58,7 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
         if (storage && storage->getStatus() != Qn::Online)
         {
             NX_DEBUG(this, "Skip writing metadata record to the analytics database because metadata storage is offline");
+            return;
         }
     }
 
