@@ -2,6 +2,7 @@
 
 #include <core/resource/media_server_resource.h>
 #include <nx/network/http/http_client.h>
+#include <nx/utils/timer_manager.h>
 
 namespace nx::vms::server::metrics {
 
@@ -77,11 +78,16 @@ rest::Response LocalRestHandler::executeGet(const rest::Request& request)
     if (request.path().endsWith("/rules"))
         return rest::Response::reply(cleanJson(m_controller->rules()));
 
+    const auto applyRules = !request.param("noRules");
     if (request.path().endsWith("/manifest"))
-        return rest::Response::reply(cleanJson(m_controller->manifest(!request.param("noRules"))));
+        return rest::Response::reply(cleanJson(m_controller->manifest(applyRules)));
+
+    std::optional<std::chrono::milliseconds> timeLine;
+    if (const auto value = request.param("timeLine"))
+        timeLine = nx::utils::parseTimerDuration(*value, std::chrono::hours(24));
 
     if (request.path().endsWith("/values"))
-        return rest::Response::reply(cleanJson(m_controller->values(!request.param("noRules"))));
+        return rest::Response::reply(cleanJson(m_controller->values(applyRules, timeLine)));
 
     return rest::Response::error(http::StatusCode::notFound, rest::Result::BadRequest);
 }

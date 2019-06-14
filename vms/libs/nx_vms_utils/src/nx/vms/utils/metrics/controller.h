@@ -13,14 +13,19 @@ public:
     api::metrics::SystemRules rules() const;
     void setRules(api::metrics::SystemRules rules);
 
-    api::metrics::SystemManifest manifest(bool applyRules = true) const;
-    api::metrics::SystemValues values(bool applyRules = true) const;
+    api::metrics::SystemManifest manifest(
+        bool applyRules = true) const;
+
+    api::metrics::SystemValues values(
+        bool applyRules = true,
+        std::optional<std::chrono::milliseconds> timeline = {}) const;
 
 private:
     void loadGroupValuesUnlocked(
         std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
         DataBase::Access dataBaseAccess,
-        const std::vector<api::metrics::ParameterGroupManifest>& manifests) const;
+        const std::vector<api::metrics::ParameterGroupManifest>& manifests,
+        std::optional<std::chrono::milliseconds> timeLine) const;
 
     void applyRulesUnlocked(
         std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,

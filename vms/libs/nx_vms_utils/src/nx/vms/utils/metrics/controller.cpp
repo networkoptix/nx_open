@@ -1,5 +1,7 @@
 #include "controller.h"
 
+#include <QtCore/QJsonObject>
+
 namespace nx::vms::utils::metrics {
 
 void Controller::registerGroup(QString name, std::unique_ptr<AbstractResourceProvider> resourceProvider)
@@ -44,7 +46,8 @@ api::metrics::SystemManifest Controller::manifest(bool applyRules) const
     return systemManifest;
 }
 
-api::metrics::SystemValues Controller::values(bool applyRules) const
+api::metrics::SystemValues Controller::values(
+    bool applyRules, std::optional<std::chrono::milliseconds> timeLine) const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     api::metrics::SystemValues systemValues;
@@ -60,9 +63,10 @@ api::metrics::SystemValues Controller::values(bool applyRules) const
             resourceValues.parent = resource.parent;
 
             const auto resourceDb = groupDb[resource.id];
-            loadGroupValuesUnlocked(&resourceValues.values, resourceDb, provider->manifest());
+            loadGroupValuesUnlocked(
+                &resourceValues.values, resourceDb, provider->manifest(), timeLine);
 
-            if (groupRules != m_rules.end() && applyRules)
+            if (groupRules != m_rules.end() && applyRules && !timeLine)
                 applyRulesUnlocked(&resourceValues.values, resourceDb, groupRules->second);
         }
     }
@@ -70,10 +74,28 @@ api::metrics::SystemValues Controller::values(bool applyRules) const
     return systemValues;
 }
 
+static Value makeTimeLine(DataBase::Access access, std::chrono::milliseconds timeLine)
+{
+    const auto timedValues = access->last(timeLine);
+    const auto now = std::chrono::steady_clock::now();
+    const auto timeSinseEpochS =
+        std::chrono::system_clock::now().time_since_epoch() / std::chrono::seconds(1);
+
+    QJsonObject values;
+    for (const auto& [value, time]: timedValues)
+    {
+        const auto delayS = std::chrono::duration_cast<std::chrono::seconds>(now - time).count();
+        values[QString::number(timeSinseEpochS - delayS)] = value;
+    }
+
+    return values;
+}
+
 void Controller::loadGroupValuesUnlocked(
     std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
     DataBase::Access groupAccess,
-    const std::vector<api::metrics::ParameterGroupManifest>& manifests) const
+    const std::vector<api::metrics::ParameterGroupManifest>& manifests,
+    std::optional<std::chrono::milliseconds> timeLine) const
 {
     for (const auto& manifest: manifests)
     {
@@ -81,9 +103,9 @@ void Controller::loadGroupValuesUnlocked(
         const auto access = groupAccess[manifest.id];
 
         if (manifest.group.empty())
-            parameter.value = access->current();
+            parameter.value = timeLine ? makeTimeLine(access, *timeLine) : access->current();
         else
-            loadGroupValuesUnlocked(&parameter.group, access, manifest.group);
+            loadGroupValuesUnlocked(&parameter.group, access, manifest.group, timeLine);
     }
 }
 

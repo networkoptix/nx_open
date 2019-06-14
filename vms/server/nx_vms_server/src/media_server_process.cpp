@@ -2886,9 +2886,23 @@ void MediaServerProcess::registerRestHandlers(
         QnRestProcessorPool::kAnyPath,
         new OptionsRequestHandler());
 
+
     reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(
         m_metricsController.get()));
 
+    /**%apidoc GET /ec2/metrics/rules
+     * %return:object Metric rules, which are currently in use in the system. See metrics.md
+     * for details.
+     *
+     * %apidoc GET /ec2/metrics/manifest
+     * %param:string noRules Do not include parameters fron rules.
+     * %return:object Metrics parameter manifest. See metrics.md for details.
+     *
+     * %apidoc GET /ec2/metrics/values
+     * %param:string noRules Do not include parameters fron rules.
+     * %param:string timeLine Return values with timestamps instead of just values, ignores noRules.
+     * %return:object Metrics parameter values according to manifest. See metrics.md for details.
+     */
     reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
         m_metricsController.get(), serverModule()->resourcePool()));
 }
