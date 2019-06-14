@@ -120,7 +120,8 @@ def rename_file(instance, filename):
 
 
 def get_integration_type():
-    integration = ProductType.objects.filter(type=ProductType.PRODUCT_TYPES.integration).first()
+    # Prevents issue when migrating from empty db
+    integration = ProductType.objects.only('id', 'type').filter(type=ProductType.PRODUCT_TYPES.integration).first()
     if integration:
         return integration.id
     return None

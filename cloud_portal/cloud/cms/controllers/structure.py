@@ -4,7 +4,6 @@ import codecs
 import os
 import re
 
-from django.core.exceptions import ObjectDoesNotExist
 from zipfile import ZipFile
 from ..models import Context, ContextTemplate, DataStructure, DataRecord, Product, ProductType
 
@@ -16,24 +15,14 @@ def deprecate_data_structures_for_product_type(product_type):
 
 
 def find_or_add_product_type(product_type, name=""):
-    try:
-        product_type = ProductType.objects.get(name=name, type=product_type)
-    except ObjectDoesNotExist:
-        product_type = ProductType(name=name, type=product_type)
-        product_type.save()
 
-    return product_type
+    return ProductType.objects.get_or_create(name=name, type=product_type)[0]
 
 
 def find_or_add_product(name, customization, product_type_type, product_type_name):
     product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_type), product_type_name)
-    product = Product.objects.filter(name=name, customizations__in=[customization], product_type=product_type).first()
-    if not product:
-        product = Product(name=name)
-        product.product_type = product_type
-        product.save()
-        product.customizations.add(customization)
-        product.save()
+    product = Product.objects.get_or_create(name=name, product_type=product_type)[0]
+    product.customizations.set([customization])
     return product
 
 
