@@ -1,5 +1,5 @@
 HDWitness.xcworkspace
-.hg*
+.hg
 
 # IDE and misc software files.
 .idea
