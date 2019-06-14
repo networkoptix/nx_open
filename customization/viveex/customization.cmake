@@ -26,7 +26,7 @@ set(supportPhone "")
 set(licenseEmail "license@daekyo.com")
 # end of Support section
 
-set(defaultWebPages "{\"Home Page\": \"https://www.daekyocns.com\"}")
+set(defaultWebPages "{\"Home Page\": \"http://www.daekyocns.com\"}")
 
 set(customization.upgradeCode "{e44375fd-1b2e-478a-ab72-5b0df3fa9114}")
 set(customization.clientUpgradeCode "{e31ac7eb-9e99-4b6f-8dc6-2c1056d5d2ff}")
