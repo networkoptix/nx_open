@@ -1,18 +1,6 @@
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
 
-button {
-    height: 100% !important;
-    min-width: 10% !important;
-    opacity: 0.6;
-    padding: 0 0.25rem !important;
-
-    &:hover,
-    &.active {
-        opacity: 1;
-    }
-}
-
 .carousel {
     background-color: $additional_light1;
     border: 1px solid rgba(0,0,0,0.125);
@@ -63,9 +51,9 @@ button {
     }
 
     &-item {
-        min-width: 15%;
-        opacity: 0.6;
         margin: 0 0.25rem;
+        opacity: 0.6;
+        width: 15%;
 
         &:hover,
         &.active {
