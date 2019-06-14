@@ -68,7 +68,7 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
     base_type(parent),
     m_outputDir(QDir::temp().absoluteFilePath("nx_updates/offline"))
 {
-    // Expecting paths like /temp/nx_updates/offline/rand_file
+    // Expecting paths like "/temp/nx_updates/offline/rand_file".
     QString path = m_outputDir.path();
     NX_VERBOSE(this) << "ServerUpdateTool will output temp files to " << path;
 
@@ -80,6 +80,11 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
     m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
 
     m_downloader.reset(new Downloader(m_outputDir, commonModule()));
+
+    // This object is managed by shared_ptr. So we must sure there is no parent, or this instance
+    // can be deleted twice.
+    setParent(nullptr);
+
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ServerUpdateTool::atDownloaderStatusChanged);
 
@@ -723,6 +728,32 @@ bool ServerUpdateTool::requestStopAction()
     m_activeDownloads.clear();
     m_stateTracker->clearState();
     return true;
+}
+
+bool ServerUpdateTool::requestRetryAction()
+{
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
+    {
+        NX_INFO(this, "requestRetryAction() - sending request");
+        auto handle = connection->retryUpdate(nx::utils::guarded(this,
+            [this, tool = QPointer<ServerUpdateTool>(this)](
+                bool success,
+                rest::Handle handle,
+                rest::UpdateStatusAllData response)
+            {
+                if (response.error != QnRestResult::NoError)
+                {
+                    NX_VERBOSE(this,
+                        "requestRetryAction: An error in response to the /ec2/retryUpdate request: code=%1, err=%2",
+                        response.error, response.errorString);
+                }
+
+                if (tool)
+                    tool->atUpdateStatusResponse(success, handle, response.data);
+            }), thread());
+        return handle != 0;
+    }
+    return false;
 }
 
 bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)

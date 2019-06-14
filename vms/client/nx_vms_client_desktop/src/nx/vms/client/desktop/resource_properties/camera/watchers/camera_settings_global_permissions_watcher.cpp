@@ -6,6 +6,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/guarded_callback.h>
 
 namespace nx::vms::client::desktop {
 
@@ -14,18 +15,19 @@ CameraSettingsGlobalPermissionsWatcher::CameraSettingsGlobalPermissionsWatcher(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent, InitializationMode::lazy)
+    QnWorkbenchContextAware(parent, InitializationMode::instant)
 {
     NX_ASSERT(store);
 
-    connect(this, &CameraSettingsGlobalPermissionsWatcher::globalPermissionsChanged,
-        store, &CameraSettingsDialogStore::setGlobalPermissions);
-}
+    auto updateGlobalPermissions = nx::utils::guarded(store,
+        [this, store]()
+        {
+            store->setGlobalPermissions(accessController()->globalPermissions());
+        });
 
-void CameraSettingsGlobalPermissionsWatcher::afterContextInitialized()
-{
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
-        [this]() { emit globalPermissionsChanged(accessController()->globalPermissions(), {}); });
+        updateGlobalPermissions);
+    updateGlobalPermissions();
 }
 
 } // namespace nx::vms::client::desktop

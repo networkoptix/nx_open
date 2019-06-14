@@ -18,7 +18,7 @@ Item
     property bool loading: false
     property bool hasPlugins: plugins && plugins.length > 0
 
-    Item 
+    Item
     {
         visible: online && !loading && hasPlugins
         anchors.fill: parent
@@ -50,17 +50,18 @@ Item
 
                 MenuItem
                 {
-                    id: thisItem
+                    itemId: modelData.id
                     text: modelData.name
-                    onClicked: store.selectCurrentPlugin(modelData.libraryName)
+                    active: modelData.loaded
+                    onClicked: { store.selectCurrentPlugin(modelData.id) }
 
                     Connections
                     {
                         target: pluginsInformation
                         onCurrentPluginChanged:
                         {
-                            if (currentPlugin && modelData.libraryName == currentPlugin.libraryName)
-                                menu.currentItemId = thisItem
+                            if (currentPlugin && modelData.id === currentPlugin.id)
+                                menu.currentItemId = itemId
                         }
                     }
                 }
@@ -91,13 +92,13 @@ Item
             {
                 width: parent.width
                 spacing: 16
-                anchors.top: descriptionText.bottom
+                anchors.top: descriptionText.text ? descriptionText.bottom : descriptionText.top
                 anchors.topMargin: 8
 
                 Column
-                {       
+                {
                     width: Math.max(implicitWidth, 64)
-    
+
                     Repeater
                     {
                         model: currentPluginDetails
@@ -112,7 +113,7 @@ Item
                 }
 
                 Column
-                {           
+                {
                     Repeater
                     {
                         model: currentPluginDetails

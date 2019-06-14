@@ -1,6 +1,7 @@
 #include "access_blocker.h"
 
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 #include <nx/cloud/db/client/cdb_request_path.h>
 

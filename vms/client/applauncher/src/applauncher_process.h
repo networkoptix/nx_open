@@ -85,7 +85,7 @@ private:
         applauncher::api::Response* const response);
     bool checkInstallationProgress(
         const std::shared_ptr<applauncher::api::InstallZipCheckStatus>& request,
-        applauncher::api::Response* const response);
+        applauncher::api::InstallZipCheckStatusResponse* const response);
     bool isVersionInstalled(
         const std::shared_ptr<applauncher::api::IsVersionInstalledRequest>& request,
         applauncher::api::IsVersionInstalledResponse* const response);

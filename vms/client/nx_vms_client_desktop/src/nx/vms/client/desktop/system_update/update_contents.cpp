@@ -180,7 +180,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     if (contents.sourceType == nx::update::UpdateSourceType::file && !contents.packagesGenerated)
     {
         contents.filesToUpload.clear();
-        QString uploadDestination = QString("updates/%1/").arg(contents.info.version);
+        QString uploadDestination = QString("updates/%1/").arg(targetVersion.build());
         QList<nx::update::Package> checked;
         for (auto& pkg: contents.info.packages)
         {

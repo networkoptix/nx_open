@@ -1679,7 +1679,7 @@
     </message>
     <message>
       <source>RAID error. %1.</source>
-      <translation type="unfinished">RAID error. %1.</translation>
+      <translation>Помилка RAID. %1.</translation>
     </message>
   </context>
   <context>

@@ -2651,11 +2651,6 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation>בדיקת פילטר</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>לא נמצא דבר</translation>
     </message>

@@ -16,7 +16,6 @@
 
 class QComboBox;
 class QLineEdit;
-class QTabWidget;
 class QToolButton;
 class QTreeView;
 class QModelIndex;
@@ -109,6 +108,7 @@ private:
     bool updateFilteringMode(bool value);
     void storeExpandedStates();
     void restoreExpandedStates();
+    void setupAutoExpandPolicy();
 
     void initInstantSearch();
     void updateSearchMode();
@@ -136,8 +136,6 @@ private slots:
     void updateToolTipPosition();
 
     void updateIcons();
-
-    void at_tabWidget_currentChanged(int index);
 
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();

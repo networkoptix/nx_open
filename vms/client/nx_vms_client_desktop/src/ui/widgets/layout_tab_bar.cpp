@@ -1,5 +1,6 @@
 #include "layout_tab_bar.h"
 
+#include <QtCore/QScopedValueRollback>
 #include <QtCore/QVariant>
 
 #include <QtGui/QContextMenuEvent>

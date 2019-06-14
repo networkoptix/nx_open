@@ -14,6 +14,7 @@ public:
     LocalResourceProducer(QObject* parent = nullptr);
     void createLocalResources(const QStringList& pathList);
     void updateFileLayoutResource(const QString& path);
+    void updateVideoFileResource(const QString& path);
 };
 
 class ResourceDirectoryBrowser:
@@ -33,9 +34,6 @@ public:
     static QnResourcePtr resourceFromFile(const QString& filename, QnResourcePool* resourcePool);
     static QnResourcePtr createArchiveResource(const QString& filename,
         QnResourcePool* resourcePool);
-
-signals:
-    void initLocalResources(const QStringList& pathList);
 
 private:
     void dropResourcesFromDirectory(const QString& path);

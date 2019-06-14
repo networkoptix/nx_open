@@ -15,7 +15,9 @@
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
+#include <nx/kit/utils.h>
 
+#include "utils.h"
 #include "stub_analytics_plugin_ini.h"
 #include "objects/vehicles.h"
 #include "objects/pedestrian.h"
@@ -99,6 +101,7 @@ DeviceAgent::~DeviceAgent()
     {
         std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
         m_terminated = true;
+        m_needToThrowPluginEvents = false;
     }
     m_pluginEventGenerationLoopCondition.notify_all();
     if (m_pluginEventThread)
@@ -160,14 +163,21 @@ std::string DeviceAgent::manifest() const
 
 void DeviceAgent::settingsReceived()
 {
-    if (ini().throwPluginEventsFromDeviceAgent && !m_pluginEventThread)
+    parseSettings();
+
+    if (m_deviceAgentSettings.throwPluginEvents && !m_pluginEventThread)
     {
         NX_PRINT << __func__ << "(): Starting plugin event generation thread";
+        m_needToThrowPluginEvents = true;
         m_pluginEventThread = std::make_unique<std::thread>([this]() { processPluginEvents(); });
     }
-    else
+    else if (!m_deviceAgentSettings.throwPluginEvents && m_pluginEventThread)
     {
-        NX_PRINT << __func__ << "()";
+        NX_PRINT << __func__ << "(): Stopping plugin event generation thread";
+        m_needToThrowPluginEvents = false;
+        m_pluginEventGenerationLoopCondition.notify_all();
+        m_pluginEventThread->join();
+        m_pluginEventThread.reset();
     }
 }
 
@@ -219,7 +229,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     NX_OUTPUT << __func__ << "() BEGIN";
 
     const char* logMessage = "";
-    if (ini().generateObjects)
+    if (m_deviceAgentSettings.generateObjects)
     {
         const std::vector<IMetadataPacket*> result = cookSomeObjects();
         if (!result.empty())
@@ -260,7 +270,7 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/
 
     m_eventTypeId = kLineCrossingEventType; //< First event to produce.
 
-    if (ini().generateEvents)
+    if (m_deviceAgentSettings.generateEvents)
     {
         auto metadataDigger =
             [this]()
@@ -306,7 +316,7 @@ void DeviceAgent::stopFetchingMetadata()
 
 void DeviceAgent::processPluginEvents()
 {
-    while (!m_terminated)
+    while (!m_terminated && m_needToThrowPluginEvents)
     {
         using namespace std::chrono_literals;
 
@@ -330,7 +340,7 @@ void DeviceAgent::processPluginEvents()
         // the timeout has occurred) and spurious wake-ups are ignored.
         {
             std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
-            if (m_terminated)
+            if (m_terminated || !m_needToThrowPluginEvents)
                 break;
             static const std::chrono::seconds kPluginEventGenerationPeriod{5};
             m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
@@ -374,7 +384,7 @@ static IObjectTrackBestShotPacket* makeObjectTrackBestShotPacket(
 
 void DeviceAgent::setObjectCount()
 {
-    int objectCount = ini().objectCount;
+    int objectCount = m_deviceAgentSettings.numberOfObjectsToGenerate;
     if (objectCount < 1)
     {
         NX_OUTPUT << "Invalid value for objectCount in .ini; assuming 1.";
@@ -445,7 +455,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     if (m_lastVideoFrameTimestampUs == 0)
         return {};
 
-    if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
+    if (m_frameCounter % m_deviceAgentSettings.generateObjectsEveryNFrames != 0)
         return {};
 
     float dt = m_objectCounter / 32.0F;
@@ -468,7 +478,9 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     {
         m_previewAttributesGenerated = false;
     }
-    else if (dt > 0.5 && !m_previewAttributesGenerated && ini().generatePreviewPacket)
+    else if (dt > 0.5
+        && !m_previewAttributesGenerated
+        && m_deviceAgentSettings.generatePreviewPacket)
     {
         m_previewAttributesGenerated = true;
         generatePreviewPacket = true;
@@ -487,13 +499,13 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 
         if (generatePreviewPacket)
         {
-            auto bestShotMetadataPacket = makeObjectTrackBestShotPacket(
+            if (const auto bestShotMetadataPacket = makeObjectTrackBestShotPacket(
                 object->id(),
                 m_lastVideoFrameTimestampUs,
-                dt);
-
-            if (bestShotMetadataPacket)
+                dt))
+            {
                 result.push_back(bestShotMetadataPacket);
+            }
         }
     }
 
@@ -624,6 +636,44 @@ void DeviceAgent::dumpSomeFrameBytes(
                 plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
             frame->data(plane) + dumpOffset, dumpSize);
     }
+}
+
+void DeviceAgent::parseSettings()
+{
+    auto assignIntegerSetting =
+        [this](const std::string& parameterName, std::atomic<int>* target)
+        {
+            using namespace nx::kit::utils;
+
+            int result = 0;
+            const auto parameterValueString = getParamValue(parameterName);
+            if (const bool success = fromString(parameterValueString, &result))
+            {
+                *target = result;
+            }
+            else
+            {
+                NX_PRINT << "Received an incorrect setting value for '"
+                    << parameterName << "' "
+                    << parameterValueString
+                    << ". Expected an integer";
+            }
+        };
+
+    m_deviceAgentSettings.generateEvents = toBool(getParamValue(kGenerateEventsSetting));
+    m_deviceAgentSettings.generateObjects = toBool(getParamValue(kGenerateObjectsSetting));
+    assignIntegerSetting(
+        kGenerateObjectsEveryNFramesSetting,
+        &m_deviceAgentSettings.generateObjectsEveryNFrames);
+
+    assignIntegerSetting(
+        kNumberOfObjectsToGenerateSetting,
+        &m_deviceAgentSettings.numberOfObjectsToGenerate);
+
+    m_deviceAgentSettings.generatePreviewPacket =
+        toBool(getParamValue(kGeneratePreviewPacketSetting));
+    m_deviceAgentSettings.throwPluginEvents =
+        toBool(getParamValue(kThrowPluginEventsFromDeviceAgentSetting));
 }
 
 } // namespace stub

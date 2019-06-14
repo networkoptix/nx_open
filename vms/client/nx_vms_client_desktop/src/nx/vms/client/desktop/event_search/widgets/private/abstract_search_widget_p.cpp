@@ -7,6 +7,7 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QGraphicsOpacityEffect>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QScrollBar>
@@ -50,6 +51,9 @@ static constexpr int kCounterPanelHeight = 32;
 static constexpr milliseconds kQueuedFetchMoreDelay = 50ms;
 static constexpr milliseconds kTimeSelectionDelay = 250ms;
 static constexpr milliseconds kTextFilterDelay = 250ms;
+
+static constexpr milliseconds kPlaceholderFadeDuration = 150ms;
+static constexpr auto kPlaceholderFadeEasing = QEasingCurve::InOutQuad;
 
 SearchLineEdit* createSearchLineEdit(QWidget* parent)
 {
@@ -332,8 +336,20 @@ void AbstractSearchWidget::Private::setupViewportHeader()
 void AbstractSearchWidget::Private::setupPlaceholder()
 {
     ui->placeholder->setParent(ui->ribbonContainer);
-    ui->placeholder->hide();
     anchorWidgetToParent(ui->placeholder);
+
+    auto effect = new QGraphicsOpacityEffect(ui->placeholder);
+    ui->placeholder->setGraphicsEffect(effect);
+
+    connect(effect, &QGraphicsOpacityEffect::opacityChanged, this,
+        [this](qreal opacity)
+        {
+            ui->placeholder->setHidden(qFuzzyIsNull(opacity));
+            ui->placeholder->graphicsEffect()->setEnabled(!qFuzzyIsNull(opacity - 1.0));
+        });
+
+    m_placeholderVisible = false;
+    effect->setOpacity(0.0);
 
     QFont font;
     font.setPixelSize(kPlaceholderFontPixelSize);
@@ -864,7 +880,10 @@ void AbstractSearchWidget::Private::tryFetchMore()
     const bool active = m_mainModel->fetchInProgress();
     indicator->setActive(active);
     if (active)
+    {
         indicator->setVisible(true); //< All hiding is done in handleFetchFinished.
+        updatePlaceholderVisibility();
+    }
 }
 
 BusyIndicatorModel* AbstractSearchWidget::Private::relevantIndicatorModel() const
@@ -884,19 +903,47 @@ void AbstractSearchWidget::Private::handleFetchFinished()
 
 void AbstractSearchWidget::Private::handleItemCountChanged()
 {
-    const auto itemCount = m_mainModel->rowCount();
-    const bool placeholderVisible = itemCount == 0 && !m_mainModel->canFetchMore();
-    if (placeholderVisible)
-        ui->placeholderText->setText(q->placeholderText(m_mainModel->isConstrained()));
+    updatePlaceholderVisibility();
 
-    ui->placeholder->setVisible(placeholderVisible);
-    ui->ribbon->viewportHeader()->setVisible(!placeholderVisible);
+    const auto itemCount = m_mainModel->rowCount();
+    ui->ribbon->viewportHeader()->setVisible(!m_placeholderVisible && itemCount > 0);
 
     static constexpr int kThreshold = 99;
     if (itemCount > kThreshold)
         m_itemCounterLabel->setText(QString(">") + q->itemCounterText(kThreshold));
     else
         m_itemCounterLabel->setText(q->itemCounterText(itemCount));
+}
+
+void AbstractSearchWidget::Private::updatePlaceholderVisibility()
+{
+    m_placeholderVisible = m_visualModel->rowCount() == 0 && !m_mainModel->canFetchMore();
+    if (m_placeholderVisible)
+        ui->placeholderText->setText(q->placeholderText(m_mainModel->isConstrained()));
+
+    const auto effect = qobject_cast<QGraphicsOpacityEffect*>(ui->placeholder->graphicsEffect());
+    if (!effect)
+        return;
+
+    const qreal targetOpacity = m_placeholderVisible ? 1.0 : 0.0;
+    const qreal currentOpacity = effect->opacity();
+
+    if (m_placeholderOpacityAnimation)
+    {
+        m_placeholderOpacityAnimation->pause();
+        m_placeholderOpacityAnimation->deleteLater();
+    }
+
+    const qreal delta = qAbs(targetOpacity - currentOpacity);
+    if (qFuzzyIsNull(delta))
+        return;
+
+    m_placeholderOpacityAnimation = new QPropertyAnimation(effect, "opacity", effect);
+    m_placeholderOpacityAnimation->setStartValue(currentOpacity);
+    m_placeholderOpacityAnimation->setEndValue(targetOpacity);
+    m_placeholderOpacityAnimation->setEasingCurve(kPlaceholderFadeEasing);
+    m_placeholderOpacityAnimation->setDuration(kPlaceholderFadeDuration.count() * delta);
+    m_placeholderOpacityAnimation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 } // namespace nx::vms::client::desktop

@@ -5,10 +5,14 @@
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/async_stoppable.h>
-#include <nx/utils/move_only_func.h>
 #include <nx/network/socket_common.h>
 
+#include <nx/utils/move_only_func.h>
+#include <nx/utils/url.h>
+
 #include "manual_camera_search_task.h"
+
+class QThreadPool;
 
 class QnManualSearchTaskManager: public /*mixin*/ QnCommonModuleAware, public nx::network::QnStoppableAsync
 {

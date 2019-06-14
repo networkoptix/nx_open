@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <QtCore/QTimeZone>
+
 namespace nx::network::hls {
 
 Chunk::Chunk():

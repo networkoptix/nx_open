@@ -291,6 +291,7 @@ void QnIfConfigRestHandler::afterExecute(const QString& /*path*/,
     if (!m_modified)
         return;
 
+    // TODO: #alevenkov: Investigate whether the condition is correct.
     if (nx::utils::AppInfo::isNx1()
         || nx::vms::utils::installationInfo().hwPlatform ==
             nx::vms::api::HwPlatform::bananaPi)

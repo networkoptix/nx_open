@@ -92,6 +92,11 @@ public:
     bool requestStopAction();
 
     /**
+     * Asks mediaservers to retry current update action.
+     */
+    bool requestRetryAction();
+
+    /**
      * Asks mediaservers to finish update process.
      * @param skipActivePeers - will force update completion even if there are
      *     some servers installing.

@@ -4,10 +4,10 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/i_device_info.h>
-#include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/helpers/uuid_helper.h>
-#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/i_plugin_home_dir_utility_provider.h>
 
+#include "utils.h"
 #include "device_agent.h"
 #include "stub_analytics_plugin_ini.h"
 #include "objects/vehicles.h"
@@ -21,9 +21,10 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::IPlugin* plugin):
+Engine::Engine(nx::sdk::analytics::Plugin* plugin):
     nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
+    obtainPluginHomeDir();
     initCapabilities();
 }
 
@@ -40,7 +41,7 @@ Engine::~Engine()
 
 void Engine::generatePluginEvents()
 {
-    while (!m_terminated)
+    while (!m_terminated && m_needToThrowPluginEvents)
     {
         using namespace std::chrono_literals;
 
@@ -64,7 +65,7 @@ void Engine::generatePluginEvents()
         // timeout has occurred) and spurious wake-ups are ignored.
         {
             std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
-            if (m_terminated)
+            if (m_terminated || !m_needToThrowPluginEvents)
                 break;
             static const std::chrono::seconds kEventGenerationPeriod{7};
             m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
@@ -76,6 +77,20 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     const IDeviceInfo* deviceInfo, Error* /*outError*/)
 {
     return new DeviceAgent(this, deviceInfo);
+}
+
+void Engine::obtainPluginHomeDir()
+{
+    if (const auto pluginHomeDirUtilityProvider =
+        queryInterfacePtr<IPluginHomeDirUtilityProvider>(plugin()->utilityProvider()))
+    {
+        m_pluginHomeDir = toPtr(pluginHomeDirUtilityProvider->homeDir(plugin()))->str();
+    }
+
+    if (m_pluginHomeDir.empty())
+        NX_PRINT << "Plugin home dir: absent";
+    else
+        NX_PRINT << "Plugin home dir: " << nx::kit::utils::toString(m_pluginHomeDir);
 }
 
 void Engine::initCapabilities()
@@ -212,16 +227,66 @@ std::string Engine::manifest() const
         "type": "Settings",
         "items": [
             {
-                "type": "TextField",
-                "name": "testTextField",
-                "caption": "Device Agent Text Field",
-                "description": "A text field",
-                "defaultValue": "a text"
+                "type": "GroupBox",
+                "caption": "Real Stub DeviceAgent settings",
+                "items": [
+                     {
+                        "type": "CheckBox",
+                        "name": ")json" + kGenerateObjectsSetting + R"json(",
+                        "caption": "Generate objects",
+                        "defaultValue": true,
+                        "value": true
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kGenerateEventsSetting + R"json(",
+                        "caption": "Generate events",
+                        "defaultValue": true,
+                        "value": true
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": ")json" + kGenerateObjectsEveryNFramesSetting + R"json(",
+                        "caption": "Generate objects every N frames",
+                        "defaultValue": 1,
+                        "minValue": 1,
+                        "maxValue": 100000
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": ")json" + kNumberOfObjectsToGenerateSetting + R"json(",
+                        "caption": "Number of objects to generate",
+                        "defaultValue": 1,
+                        "minValue": 1,
+                        "maxValue": 100000
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kGeneratePreviewPacketSetting + R"json(",
+                        "caption": "Generate preview packet",
+                        "defaultValue": true,
+                        "value": true
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kThrowPluginEventsFromDeviceAgentSetting + R"json(",
+                        "caption": "Throw plugin events from the DeviceAgent",
+                        "defaultValue": false,
+                        "value": false
+                    }
+                ]
             },
             {
                 "type": "GroupBox",
-                "caption": "Device Agent Group",
+                "caption": "Example Stub DeviceAgent settings",
                 "items": [
+                    {
+                        "type": "TextField",
+                        "name": "testTextField",
+                        "caption": "Device Agent Text Field",
+                        "description": "A text field",
+                        "defaultValue": "a text"
+                    },
                     {
                         "type": "SpinBox",
                         "caption": "Device Agent SpinBox",
@@ -262,15 +327,20 @@ std::string Engine::manifest() const
 
 void Engine::settingsReceived()
 {
-    if (ini().throwPluginEventsFromEngine)
+    m_needToThrowPluginEvents = toBool(getParamValue(kThrowPluginEventsFromEngineSetting));
+    if (m_needToThrowPluginEvents && !m_thread)
     {
         NX_PRINT << __func__ << "(): Starting plugin event generation thread";
-        if (!m_thread)
-            m_thread.reset(new std::thread([this]() { generatePluginEvents(); }));
+        m_needToThrowPluginEvents = true;
+        m_thread.reset(new std::thread([this]() { generatePluginEvents(); }));
     }
-    else
+    else if (!m_needToThrowPluginEvents && m_thread)
     {
-        NX_PRINT << __func__ << "()";
+        NX_PRINT << __func__ << "(): Stopping plugin event generation thread";
+        m_needToThrowPluginEvents = false;
+        m_pluginEventGenerationLoopCondition.notify_all();
+        m_thread->join();
+        m_thread.reset();
     }
 }
 
@@ -410,6 +480,8 @@ void Engine::executeAction(
 
 namespace {
 
+using namespace nx::vms_server_plugins::analytics::stub;
+
 static const std::string kLibName = "stub_analytics_plugin";
 
 static const std::string kPluginManifest = R"json(
@@ -423,16 +495,29 @@ static const std::string kPluginManifest = R"json(
         "type": "Settings",
         "items": [
             {
-                "type": "TextField",
-                "name": "text",
-                "caption": "Text Field",
-                "description": "A text field",
-                "defaultValue": "a text"
+                "type": "GroupBox",
+                "caption": "Real Stub Engine settings",
+                "items": [
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kThrowPluginEventsFromEngineSetting + R"json(",
+                        "caption": "Throw plugin events from the Engine",
+                        "defaultValue": false,
+                        "value": false
+                    }
+                ]
             },
             {
                 "type": "GroupBox",
-                "caption": "Group",
+                "caption": "Example Stub Engine settings",
                 "items": [
+                    {
+                        "type": "TextField",
+                        "name": "text",
+                        "caption": "Text Field",
+                        "description": "A text field",
+                        "defaultValue": "a text"
+                    },
                     {
                         "type": "SpinBox",
                         "name": "testSpinBox",
@@ -476,7 +561,7 @@ extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
     return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
-        [](nx::sdk::analytics::IPlugin* plugin)
+        [](nx::sdk::analytics::Plugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::stub::Engine(plugin);
         });

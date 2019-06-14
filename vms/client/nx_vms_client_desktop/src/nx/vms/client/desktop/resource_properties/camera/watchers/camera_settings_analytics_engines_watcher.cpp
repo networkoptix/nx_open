@@ -22,7 +22,8 @@ AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& eng
     return AnalyticsEngineInfo {
         engine->getId(),
         engine->getName(),
-        engine->manifest().deviceAgentSettingsModel
+        engine->manifest().deviceAgentSettingsModel,
+        engine->isDeviceDependent()
     };
 }
 
@@ -157,6 +158,7 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_engineManifestChanged(
     if (const auto it = engines.find(engine->getId()); it != engines.end())
     {
         it->settingsModel = engine->manifest().deviceAgentSettingsModel;
+        it->isDeviceDependent = engine->isDeviceDependent();
         updateStore();
     }
 }

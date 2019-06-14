@@ -74,11 +74,14 @@ private:
 
     void setObjectCount();
 
+    void parseSettings();
+
 private:
     std::unique_ptr<std::thread> m_pluginEventThread;
     std::mutex m_pluginEventGenerationLoopMutex;
     std::condition_variable m_pluginEventGenerationLoopCondition;
-    bool m_terminated = false;
+    std::atomic<bool> m_terminated{false};
+    std::atomic<bool> m_needToThrowPluginEvents{false};
 
     std::unique_ptr<std::thread> m_eventThread;
     std::condition_variable m_eventGenerationLoopCondition;
@@ -91,6 +94,18 @@ private:
     std::vector<std::unique_ptr<AbstractObject>> m_objects;
     std::string m_eventTypeId;
     int64_t m_lastVideoFrameTimestampUs = 0;
+
+    struct DeviceAgentSettings
+    {
+        std::atomic<bool> generateObjects{true};
+        std::atomic<bool> generateEvents{true};
+        std::atomic<int> generateObjectsEveryNFrames{1};
+        std::atomic<int> numberOfObjectsToGenerate{1};
+        std::atomic<bool> generatePreviewPacket{true};
+        std::atomic<bool> throwPluginEvents{false};
+    };
+
+    DeviceAgentSettings m_deviceAgentSettings;
 
     struct EventContext
     {

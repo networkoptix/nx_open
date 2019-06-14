@@ -31,7 +31,7 @@ QnAutoRequestForwarder::QnAutoRequestForwarder(QnCommonModule* commonModule):
     if (ini().verboseAutoRequestForwarder)
     {
         using namespace nx::utils::log;
-        static const Filter kFilter(Tag(typeid(this)));
+        static const Filter kFilter(Tag(typeid(*this)));
 
         addLogger(
             std::make_unique<Logger>(

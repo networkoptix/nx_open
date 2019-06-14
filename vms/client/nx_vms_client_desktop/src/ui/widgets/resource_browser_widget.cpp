@@ -11,7 +11,6 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
-#include <QtWidgets/QTabWidget>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QGraphicsLinearLayout>
@@ -102,6 +101,8 @@ const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1
 
 static const QSize kMaxThumbnailSize(224, 184);
 
+static constexpr int kMaxAutoExpandedServers = 2;
+
 static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* item)
 {
     if (!item)
@@ -176,31 +177,17 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);
     ui->resourceTreeWidget->setEditingEnabled();
-    ui->resourceTreeWidget->setAutoExpandPolicy(
-        [](const QModelIndex& index)
-        {
-            switch (index.data(Qn::NodeTypeRole).value<NodeType>())
-            {
-                case NodeType::resource:
-                {
-                    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-                    return resource && resource->hasFlags(Qn::server);
-                }
-                case NodeType::servers:
-                case NodeType::userResources:
+    setupAutoExpandPolicy();
 
-                case NodeType::filteredServers:
-                case NodeType::filteredCameras:
-                case NodeType::filteredLayouts:
-                case NodeType::filteredUsers:
-                case NodeType::filteredVideowalls:
-                    return true;
-                default:
-                    break;
-            }
-            return false;
-        }
-    );
+    m_connections << connect(ui->resourceTreeWidget->selectionModel(),
+        &QItemSelectionModel::currentChanged,
+        [this](const QModelIndex& current, const QModelIndex& /*previous*/)
+        {
+            const auto treeView = ui->resourceTreeWidget->treeView();
+            const auto itemRect = treeView->visualRect(current)
+                .translated(treeView->mapTo(ui->scrollArea->widget(), QPoint()));
+            ui->scrollArea->ensureVisible(0, itemRect.center().y() + 1, 0, itemRect.height() / 2);
+        });
 
     ui->shortcutHintWidget->setContentsMargins(6, 0, 0, 0);
     ui->shortcutHintWidget->setVisible(false);
@@ -218,17 +205,11 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_connections << connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated,
         this, &QnResourceBrowserWidget::handleItemActivated);
 
-    m_connections << connect(ui->tabWidget, &QTabWidget::currentChanged,
-        this, &QnResourceBrowserWidget::at_tabWidget_currentChanged);
     m_connections << connect(ui->resourceTreeWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
         this, &QnResourceBrowserWidget::selectionChanged);
 
     /* Connect to context. */
     ui->resourceTreeWidget->setWorkbench(workbench());
-
-    setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
-    ui->tabWidget->setProperty(style::Properties::kTabBarIndent, style::Metrics::kDefaultTopLevelMargin);
-    ui->tabWidget->tabBar()->setMaximumHeight(32);
 
     m_connections << connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged,
         this, &QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged);
@@ -243,9 +224,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
         &QnWorkbenchAccessController::globalPermissionsChanged,
         this,
         &QnResourceBrowserWidget::updateIcons);
-
-    m_connections << connect(this->context(), &QnWorkbenchContext::userChanged,
-        this, [this]() { ui->tabWidget->setCurrentWidget(ui->resourcesTab); });
 
     m_connections << connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
@@ -317,8 +295,6 @@ void forEachIndex(
 void QnResourceBrowserWidget::initInstantSearch()
 {
     const auto filterEdit = ui->instantFilterLineEdit;
-
-    ui->tabWidget->tabBar()->hide();
 
     setPaletteColor(ui->nothingFoundLabel, QPalette::WindowText, colorTheme()->color("dark14"));
     setPaletteColor(ui->nothingFoundDescriptionLabel, QPalette::WindowText, colorTheme()->color("dark14"));
@@ -498,6 +474,39 @@ void QnResourceBrowserWidget::restoreExpandedStates()
             tree->setExpanded(searchIndex, data.second);
     }
     m_expandedStatesList.clear();
+}
+
+void QnResourceBrowserWidget::setupAutoExpandPolicy()
+{
+    ui->resourceTreeWidget->setAutoExpandPolicy(
+        [this](const QModelIndex& index)
+        {
+            switch (index.data(Qn::NodeTypeRole).value<NodeType>())
+            {
+                case NodeType::resource:
+                {
+                    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+                    if (resource && resource->hasFlags(Qn::server))
+                    {
+                        const auto serverCount =
+                            resourcePool()->getResources<QnMediaServerResource>().count();
+                        return serverCount <= kMaxAutoExpandedServers;
+                    }
+                }
+                case NodeType::servers:
+                case NodeType::userResources:
+                case NodeType::filteredServers:
+                case NodeType::filteredCameras:
+                case NodeType::filteredLayouts:
+                case NodeType::filteredUsers:
+                case NodeType::filteredVideowalls:
+                    return true;
+                default:
+                    break;
+            }
+            return false;
+        }
+    );
 }
 
 void QnResourceBrowserWidget::updateInstantFilter()
@@ -1265,8 +1274,6 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged()
     if (auto synchronizer = layoutSynchronizer(layout, false))
         synchronizer->enableUpdates();
 
-    at_tabWidget_currentChanged(ui->tabWidget->currentIndex());
-
     /* Bold state has changed. */
     currentTreeWidget()->update();
 
@@ -1292,11 +1299,6 @@ void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem* item)
 {
     /* Bold state has changed. */
     updateTreeItem(currentTreeWidget(), item);
-}
-
-void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)
-{
-    emit scrollBarVisibleChanged();
 }
 
 void QnResourceBrowserWidget::at_thumbnailClicked()

@@ -21,6 +21,7 @@ public:
     virtual ~TreeView() override = default;
 
     using base_type::rowHeight;
+    using base_type::sizeHintForColumn;
 
     /** Sometimes we need to disable default selection behavior by space key and handle it manually. */
     bool isDefaultSpacePressIgnored() const;

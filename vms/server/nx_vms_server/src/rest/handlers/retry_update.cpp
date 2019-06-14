@@ -24,6 +24,7 @@ int RetryUpdate::executePost(
     // Hidden feature, mainly for testing purposes. This parameter should not appear in the
     // documentation.
     const bool forceRedownload = params.value("force") == "true";
+    NX_VERBOSE(this, "executePost(), force=%1", forceRedownload);
     serverModule()->updateManager()->retry(forceRedownload);
 
     QnUpdateStatusRestHandler handler(serverModule());

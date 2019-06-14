@@ -339,7 +339,7 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
         {
             //found deadlock between prevLock and mutexLockPosition
             const auto deadLockMsg = lm(
-                "Detected deadlock between %1 and %2:\n"
+                "Detected deadlock possibility between %1 and %2:\n"
                 "    Existing path:\n%3\n"
                 "    New path:\n%4\n")
                 .args(prevLock.toString(), mutexLockPosition.toString(),

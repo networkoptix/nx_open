@@ -183,7 +183,8 @@ void AreaHighlightOverlayWidget::Private::updateArea(
 
     const bool highlighted = highlightedAreaId == area.info.id;
 
-    area.rectItem->setRect(area.actualRect(q->size()));
+    const auto& rect = area.actualRect(q->size());
+    area.rectItem->setRect(rect);
     area.rectItem->setFlag(QGraphicsItem::ItemStacksBehindParent, !highlighted);
 
     QPen pen(area.info.color, highlighted ? 2 : 1);
@@ -193,7 +194,6 @@ void AreaHighlightOverlayWidget::Private::updateArea(
     area.tooltipItem->setFlag(QGraphicsItem::ItemStacksBehindParent, !highlighted);
     area.tooltipItem->setText(highlighted ? area.info.hoverText : area.info.text);
 
-    const auto& rect = area.actualRect(q->size());
     const auto& naturalTooltipSize = area.tooltipItem->boundingRect().size();
     const auto& tooltipGeometry = calculateLabelGeometry(
         q->rect(), naturalTooltipSize, area.tooltipItem->textMargins(), rect);

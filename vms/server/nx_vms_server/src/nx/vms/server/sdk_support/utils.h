@@ -102,7 +102,7 @@ std::optional<Manifest> manifestFromSdkObject(
     nx::sdk::Error error = nx::sdk::Error::noError;
     const auto manifestStr = nx::sdk::toPtr(sdkObject->manifest(&error));
 
-    auto log =
+    const auto log =
         [&logger](
             const QString& manifestString,
             nx::sdk::Error error,
@@ -110,31 +110,27 @@ std::optional<Manifest> manifestFromSdkObject(
         {
             if (logger)
                 logger->log(manifestString, error, customError);
+            return std::nullopt; //< Allows to call as `return log(...);` on error.
         };
 
     if (error != nx::sdk::Error::noError)
-    {
-        log(QString(), error);
-        return std::nullopt;
-    }
+        return log(QString(), error);
 
     if (!manifestStr)
-    {
-        log(QString(), nx::sdk::Error::unknownError, "No manifest string");
-        return std::nullopt;
-    }
+        return log(QString(), nx::sdk::Error::unknownError, "No manifest (null IString)");
 
-    const auto rawString = manifestStr->str();
-    if (!NX_ASSERT(rawString))
-        return std::nullopt;
+    const char* const rawString = manifestStr->str();
+
+    if (!rawString)
+        return log(QString(), nx::sdk::Error::unknownError, "No manifest (null IString::str())");
+
+    if (rawString[0] == '\0')
+        return log(QString(), nx::sdk::Error::unknownError, "No manifest (empty string)");
 
     bool success = false;
-    auto deserializedManifest = QJson::deserialized(rawString, Manifest(), &success);
+    const auto deserializedManifest = QJson::deserialized(rawString, Manifest(), &success);
     if (!success)
-    {
-        log(rawString, nx::sdk::Error::unknownError, "Can't deserialize manifest");
-        return std::nullopt;
-    }
+        return log(rawString, nx::sdk::Error::unknownError, "Can't deserialize manifest");
 
     log(rawString, nx::sdk::Error::noError);
     return deserializedManifest;

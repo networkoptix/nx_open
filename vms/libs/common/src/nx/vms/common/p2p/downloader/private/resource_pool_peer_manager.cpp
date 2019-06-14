@@ -1,8 +1,5 @@
 #include "resource_pool_peer_manager.h"
 
-#include <functional>
-#include <atomic>
-
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/delayed.h>
@@ -18,36 +15,35 @@
 
 namespace nx::vms::common::p2p::downloader {
 
+namespace {
+
+template<typename Promise>
+auto makeCanceller(Promise promise, const rest::QnConnectionPtr& connection, rest::Handle handle)
+{
+    return [promise, connection, handle]()
+        {
+            connection->cancelRequest(handle);
+            AbstractPeerManager::setPromiseValueIfEmpty(promise, {});
+        };
+}
+
+} // namespace
+
 class ResourcePoolPeerManager::Private
 {
     ResourcePoolPeerManager* const q = nullptr;
 
 public:
-    QScopedPointer<InternetOnlyPeerManager> internetPeerManger;
     QHash<QnUuid, rest::QnConnectionPtr> directConnectionByServerId;
     PeerSelector peerSelector;
 
     QnMutex mutex;
-    std::atomic<rest::Handle> nextRequestId = 1;
-    QHash<rest::Handle, std::function<void()>> cancelFunctionByRequestId;
     bool allowIndirectInternetRequests = false;
 
 public:
     Private(ResourcePoolPeerManager* q):
         q(q)
     {
-    }
-
-    void saveCanceller(rest::Handle handle, std::function<void()>&& canceller)
-    {
-        NX_MUTEX_LOCKER lock(&mutex);
-        cancelFunctionByRequestId.insert(handle, std::move(canceller));
-    }
-
-    bool removeCanceller(rest::Handle handle)
-    {
-        NX_MUTEX_LOCKER lock(&mutex);
-        return cancelFunctionByRequestId.remove(handle) == 1;
     }
 
     QList<PeerSelector::PeerInformation> otherPeersInfos() const
@@ -104,7 +100,6 @@ ResourcePoolPeerManager::ResourcePoolPeerManager(
     QnCommonModuleAware(commonModule),
     d(new Private(this))
 {
-    d->internetPeerManger.reset(new InternetOnlyPeerManager());
     d->peerSelector = peerSelector;
 }
 
@@ -171,130 +166,97 @@ void ResourcePoolPeerManager::setIndirectInternetRequestsAllowed(bool allow)
     d->allowIndirectInternetRequests = allow;
 }
 
-rest::Handle ResourcePoolPeerManager::requestFileInfo(
+AbstractPeerManager::RequestContext<FileInformation> ResourcePoolPeerManager::requestFileInfo(
     const QnUuid& peerId,
     const QString& fileName,
-    const nx::utils::Url& url,
-    FileInfoCallback callback)
+    const nx::utils::Url& url)
 {
     const auto& connection = getConnection(peerId);
     if (!connection)
-        return -1;
+        return {};
 
-    const auto localRequestId = d->nextRequestId.fetch_add(1);
+    auto promise = std::make_shared<std::promise<std::optional<FileInformation>>>();
 
     if (d->allowIndirectInternetRequests)
     {
-        d->saveCanceller(localRequestId, nullptr);
+        const auto& server = resourcePool()->getResourceById<QnMediaServerResource>(peerId);
+        const bool hasInternet =
+            !server || server->getServerFlags().testFlag(vms::api::SF_HasPublicIP);
 
-        std::async(std::launch::async,
-            [this, fileName, url, peerId, callback, localRequestId, thread = thread()]()
-            {
-                if (!d->removeCanceller(localRequestId))
-                    return;
+        if (hasInternet && url.isValid())
+            setPromiseValueIfEmpty(promise, {FileInformation(fileName)});
+        else
+            setPromiseValueIfEmpty(promise, {});
 
-                const auto& server =
-                    resourcePool()->getResourceById<QnMediaServerResource>(peerId);
-                const bool hasInternet =
-                    !server || server->getServerFlags().testFlag(vms::api::SF_HasPublicIP);
-
-                executeInThread(thread,
-                    [fileName, url, hasInternet, callback, localRequestId]()
-                    {
-                        if (hasInternet && url.isValid())
-                            callback(true, localRequestId, FileInformation(fileName));
-                        else
-                            callback(false, localRequestId, FileInformation());
-                    });
-            });
-
-        return localRequestId;
+        return {promise->get_future()};
     }
 
-    const auto handleReply =
-        [this, callback, localRequestId](
-            bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
+    auto handleReply =
+        [promise](bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
         {
-            d->removeCanceller(localRequestId);
-
-            if (!success)
-                return callback(success, localRequestId, FileInformation());
-
-            const auto& fileInfo = result.deserialized<FileInformation>();
-            callback(success, localRequestId, fileInfo);
+            if (success)
+                setPromiseValueIfEmpty(promise, {result.deserialized<FileInformation>()});
+            else
+                setPromiseValueIfEmpty(promise, {});
         };
 
-    const auto handle = connection->fileDownloadStatus(fileName, handleReply, thread());
+    const auto handle = connection->fileDownloadStatus(fileName, std::move(handleReply), thread());
     if (handle < 0)
-        return -1;
+        return {};
 
-    d->saveCanceller(
-        localRequestId,
-        [connection, handle]() { connection->cancelRequest(handle); });
-
-    return localRequestId;
+    return {promise->get_future(), makeCanceller(promise, connection, handle)};
 }
 
-rest::Handle ResourcePoolPeerManager::requestChecksums(
-    const QnUuid& peerId,
-    const QString& fileName,
-    AbstractPeerManager::ChecksumsCallback callback)
+AbstractPeerManager::RequestContext<QVector<QByteArray>> ResourcePoolPeerManager::requestChecksums(
+    const QnUuid& peerId, const QString& fileName)
 {
     const auto& connection = getConnection(peerId);
     if (!connection)
-        return -1;
+        return {};
 
-    const auto localRequestId = d->nextRequestId.fetch_add(1);
+    auto promise = std::make_shared<std::promise<std::optional<QVector<QByteArray>>>>();
 
     const auto handleReply =
-        [this, callback, localRequestId](
-            bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
+        [promise](bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
         {
-            d->removeCanceller(localRequestId);
-
-            if (!success)
-                return callback(success, localRequestId, QVector<QByteArray>());
-
-            const auto& checksums = result.deserialized<QVector<QByteArray>>();
-            callback(success, localRequestId, checksums);
+            if (success)
+                setPromiseValueIfEmpty(promise, {result.deserialized<QVector<QByteArray>>()});
+            else
+                setPromiseValueIfEmpty(promise, {});
         };
 
     const auto handle = connection->fileChunkChecksums(fileName, handleReply, thread());
     if (handle < 0)
-        return -1;
+        return {};
 
-    d->saveCanceller(
-        localRequestId,
-        [connection, handle]() { connection->cancelRequest(handle); });
-
-    return localRequestId;
+    return {promise->get_future(), makeCanceller(promise, connection, handle)};
 }
 
-rest::Handle ResourcePoolPeerManager::downloadChunk(
+AbstractPeerManager::RequestContext<QByteArray> ResourcePoolPeerManager::downloadChunk(
     const QnUuid& peerId,
     const QString& fileName,
     const nx::utils::Url& url,
     int chunkIndex,
-    int chunkSize,
-    AbstractPeerManager::ChunkCallback callback)
+    int chunkSize)
 {
     const auto& connection = getConnection(peerId);
     if (!connection)
-        return -1;
+        return {};
 
-    const auto localRequestId = d->nextRequestId.fetch_add(1);
+    auto promise = std::make_shared<std::promise<std::optional<QByteArray>>>();
 
     const auto handleReply =
-        [this, callback = std::move(callback), localRequestId](
+        [promise](
             bool success,
             rest::Handle /*requestId*/,
             QByteArray result,
             const nx::network::http::HttpHeaders& /*headers*/)
         {
-            d->removeCanceller(localRequestId);
-            return callback(success, localRequestId, result);
+            if (success)
+                setPromiseValueIfEmpty(promise, {result});
+            else
+                setPromiseValueIfEmpty(promise, {});
         };
-
 
     rest::Handle handle = -1;
     if (d->allowIndirectInternetRequests)
@@ -308,20 +270,9 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
     }
 
     if (handle < 0)
-        return -1;
+        return {};
 
-    d->saveCanceller(
-        localRequestId,
-        [connection, handle]() { connection->cancelRequest(handle); });
-
-    return localRequestId;
-}
-
-void ResourcePoolPeerManager::cancelRequest(const QnUuid& /*peerId*/, rest::Handle handle)
-{
-    NX_MUTEX_LOCKER lock(&d->mutex);
-    if (const auto& cancelFunction = d->cancelFunctionByRequestId.take(handle))
-        cancelFunction();
+    return {promise->get_future(), makeCanceller(promise, connection, handle)};
 }
 
 QnMediaServerResourcePtr ResourcePoolPeerManager::getServer(const QnUuid& peerId) const
