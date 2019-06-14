@@ -19,15 +19,15 @@ AggregationWidget::AggregationWidget(QWidget* parent):
     minSize.setWidth(kDefaultOptimalWidth);
     setMinimumSize(minSize);
 
-    // initial state: checkbox is cleared
+    // Initial state: checkbox is cleared.
     ui->periodWidget->setVisible(false);
     ui->periodWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
     ui->periodWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
     ui->periodWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
 
-    connect(ui->enabledCheckBox,    &QCheckBox::toggled,    ui->periodWidget,   &QWidget::setVisible);
-    connect(ui->enabledCheckBox,    &QCheckBox::toggled,    ui->instantLabel,   &QLabel::setHidden);
-    connect(ui->enabledCheckBox,    &QCheckBox::toggled,    this,               &AggregationWidget::valueChanged);
+    connect(ui->enabledCheckBox, &QCheckBox::toggled, ui->periodWidget, &QWidget::setVisible);
+    connect(ui->enabledCheckBox, &QCheckBox::toggled, ui->instantLabel, &QLabel::setHidden);
+    connect(ui->enabledCheckBox, &QCheckBox::toggled, this, &AggregationWidget::valueChanged);
 
     connect(ui->periodWidget, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()));
 }
