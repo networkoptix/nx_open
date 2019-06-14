@@ -116,9 +116,12 @@ protected:
     void atStartUpdateAction();
     /** Called by clicking 'cancel' button. */
     bool atCancelCurrentAction();
-    /** Called when server responds to /ec2/cancelUpdate. Connected to ServerUpdateToool.*/
+
+    /** Called when server responds to /ec2/startUpdate. Connected to ServerUpdateToool. */
+    void atStartUpdateComplete(bool success, const nx::update::Information& info);
+    /** Called when server responds to /ec2/cancelUpdate. Connected to ServerUpdateToool. */
     void atCancelUpdateComplete(bool success);
-    /** Called when server responds to /ec2/finishUpdate. Connected to ServerUpdateToool.*/
+    /** Called when server responds to /ec2/finishUpdate. Connected to ServerUpdateToool. */
     void atFinishUpdateComplete(bool success);
 
     /**
@@ -145,17 +148,19 @@ private:
          * We have obtained update info from the internet, but we need to
          * GET /ec2/updateInformation from the servers, to decide which state we should move to.
          */
-        checkingServers,
+        initialCheck,
         /**
          * We have obtained some state from the servers. We can do some actions now.
          * Next action depends on m_updateSourceMode, and whether the update
          * is available for picked update source.
          */
         ready,
-        /** We have issued a command to remote servers to start downloading the updates. */
+        /** We have sent /ec2/startUpdate and waiting for response. */
+        startingDownload,
+        /** Mediaservers have started downloading update packages. */
         downloading,
         /** Pushing local update package to the servers. */
-        pushing,
+        //pushing,
         /**
          * Waiting server to respond to /ec2/cancelUpdate from 'downloading' or 'pushing'
          * state.
@@ -213,10 +218,10 @@ private:
 
     bool processRemoteChanges();
     /** Part of processRemoteChanges FSM processor. */
-    void processRemoteInitialState();
-    void processRemoteUpdateInformation();
-    void processRemoteDownloading();
-    void processRemoteInstalling();
+    void processInitialState();
+    void processInitialCheckState();
+    void processDownloadingState();
+    void processInstallingState();
 
     bool isChecking() const;
     bool hasLatestVersion() const;
@@ -274,6 +279,7 @@ private:
     std::future<nx::update::UpdateContents> m_updateCheck;
     /** This promise is used to get update info from mediaservers. */
     std::future<nx::update::UpdateContents> m_serverUpdateCheck;
+
     /**
      * This promise is used to wait until ServerUpdateTool restores the state
      * for offline update package.
