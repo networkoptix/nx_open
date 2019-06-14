@@ -1,7 +1,8 @@
 #include "camera_providers.h"
 
-#include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_pool.h>
+
+#include <nx/vms/server/resource/camera.h>
 
 namespace nx::vms::server::metrics {
 
