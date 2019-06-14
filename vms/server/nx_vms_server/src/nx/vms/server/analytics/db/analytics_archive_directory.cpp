@@ -32,7 +32,7 @@ bool AnalyticsArchiveDirectory::saveToArchive(
     if (auto archive = openOrGetArchive(deviceId);
         archive != nullptr)
     {
-        NX_VERBOSE(this, "Saving (%1; 2)", timestamp, objectsGroupId);
+        NX_VERBOSE(this, "Saving (%1; %2)", timestamp, objectsGroupId);
 
         return archive->saveToArchive(
             timestamp, region, objectsGroupId, objectType, allAttributesHash);
