@@ -18,6 +18,15 @@ nx-checkbox {
             }
         }
     }
+    label {
+        &:hover:not([disabled]) {
+            color: $dark1;
+        }
+
+        &:active:not([disabled]) {
+            color: $dark9 !important;
+        }
+    }
 
     & + label {
         cursor : pointer;
