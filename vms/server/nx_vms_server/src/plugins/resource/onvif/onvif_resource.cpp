@@ -2222,7 +2222,7 @@ bool QnPlOnvifResource::trustMaxFPS()
     return result;
 }
 
-bool QnPlOnvifResource::getVideoEncoderTokens(BaseSoapWrapper& soapWrapper,
+bool QnPlOnvifResource::getVideoEncoder1Tokens(BaseSoapWrapper& soapWrapper,
     const std::vector<onvifXsd__VideoEncoderConfiguration*>& configurations,
     QStringList* tokenList)
 {
@@ -2250,6 +2250,41 @@ bool QnPlOnvifResource::getVideoEncoderTokens(BaseSoapWrapper& soapWrapper,
     for (int i = confRangeStart; i < confRangeEnd; ++i)
     {
         const onvifXsd__VideoEncoderConfiguration* configuration = configurations[i];
+        if (configuration)
+            tokenList->push_back(QString::fromStdString(configuration->token));
+    }
+
+    return true;
+}
+
+bool QnPlOnvifResource::getVideoEncoder2Tokens(BaseSoapWrapper& soapWrapper,
+    const std::vector<onvifXsd__VideoEncoder2Configuration*>& configurations,
+    QStringList* tokenList)
+{
+    int confRangeStart = 0;
+    int confRangeEnd = (int)configurations.size();
+    if (m_maxChannels > 1)
+    {
+        const int configurationsPerChannel = (int)configurations.size() / m_maxChannels;
+        confRangeStart = configurationsPerChannel * getChannel();
+        confRangeEnd = confRangeStart + configurationsPerChannel;
+
+        if (confRangeEnd > (int)configurations.size())
+        {
+            const QString errorMessage =
+                makeFailMessage("Current channel number is %1, that is more then number "
+                    "of configurations").arg(QString::number(getChannel()));
+
+            NX_DEBUG(this, makeSoapSmallRangeMessage(
+                soapWrapper, "configurations", (int)configurations.size(), confRangeEnd, __func__,
+                "GetVideoEncoderConfiguration"));
+            return false;
+        }
+    }
+
+    for (int i = confRangeStart; i < confRangeEnd; ++i)
+    {
+        const onvifXsd__VideoEncoder2Configuration* configuration = configurations[i];
         if (configuration)
             tokenList->push_back(QString::fromStdString(configuration->token));
     }
@@ -2287,7 +2322,44 @@ QString QnPlOnvifResource::getInputPortNumberFromString(const QString& portName)
 CameraDiagnostics::Result QnPlOnvifResource::ReadVideoEncoderOptionsForToken(
     std::string token, QList<VideoEncoderCapabilities>* dstOptionsList, const QnBounds& frameRateBounds)
 {
-    if (m_serviceUrls.media2ServiceUrl.isEmpty())
+    bool isMedia2Supported = !m_serviceUrls.media2ServiceUrl.isEmpty();
+    if (isMedia2Supported)
+    {
+        // New code - Media2.
+
+        Media2::VideoEncoderConfigurationOptions videoEncoderConfigurationOptions(this);
+        Media2::VideoEncoderConfigurationOptions::Request request;
+        request.ConfigurationToken = &token;
+        videoEncoderConfigurationOptions.receiveBySoap(request);
+
+        if (!videoEncoderConfigurationOptions)
+        {
+            NX_DEBUG(this, makeSoapFailMessage(
+                videoEncoderConfigurationOptions.innerWrapper(), __func__,
+                "GetVideoEncoderConfigurationOptions",
+                videoEncoderConfigurationOptions.soapError()));
+
+            NX_DEBUG(this, "Media2::videoEncoderConfigurationOptions failed. Switch to Media1.");
+
+            isMedia2Supported = false;
+        }
+        else
+        {
+            std::vector<onvifXsd__VideoEncoder2ConfigurationOptions *>& optionsList =
+                videoEncoderConfigurationOptions.get()->Options;
+
+            for (const onvifXsd__VideoEncoder2ConfigurationOptions* options : optionsList)
+            {
+                if (options && supportedVideoCodecFlavorFromOnvifString(options->Encoding) != SupportedVideoEncoding::NONE)
+                {
+                    *dstOptionsList << VideoEncoderCapabilities(token, *options, frameRateBounds);
+                }
+            }
+        }
+    }
+
+    // isMedia2Supported could have been changed in the previous if branch
+    if (!isMedia2Supported)
     {
         // Old code - Media.
 
@@ -2328,38 +2400,8 @@ CameraDiagnostics::Result QnPlOnvifResource::ReadVideoEncoderOptionsForToken(
         const auto optionsList = VideoEncoderCapabilities::createVideoEncoderCapabilitiesList(
             token, *options, frameRateBounds);
 
-        for (const auto& options: optionsList)
+        for (const auto& options : optionsList)
             *dstOptionsList << options;
-    }
-    else
-    {
-        // New code - Media2.
-
-        Media2::VideoEncoderConfigurationOptions videoEncoderConfigurationOptions(this);
-        Media2::VideoEncoderConfigurationOptions::Request request;
-        request.ConfigurationToken = &token;
-        videoEncoderConfigurationOptions.receiveBySoap(request);
-
-        if (!videoEncoderConfigurationOptions)
-        {
-            NX_DEBUG(this, makeSoapFailMessage(
-                videoEncoderConfigurationOptions.innerWrapper(), __func__,
-                "GetVideoEncoderConfigurationOptions",
-                videoEncoderConfigurationOptions.soapError()));
-
-            return videoEncoderConfigurationOptions.requestFailedResult();
-        }
-
-        std::vector<onvifXsd__VideoEncoder2ConfigurationOptions *>& optionsList =
-            videoEncoderConfigurationOptions.get()->Options;
-
-        for (const onvifXsd__VideoEncoder2ConfigurationOptions* options: optionsList)
-        {
-            if (options && supportedVideoCodecFlavorFromOnvifString(options->Encoding) != SupportedVideoEncoding::NONE)
-            {
-                *dstOptionsList << VideoEncoderCapabilities(token, *options, frameRateBounds);
-            }
-        }
     }
 
     return CameraDiagnostics::NoErrorResult();
@@ -2403,12 +2445,16 @@ void QnPlOnvifResource::fillStreamCapabilityLists(
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
 {
-    // Step 1. Get videoEncoderConfigurations and videoEncodersTokenList
-    Media::VideoEncoderConfigurations videoEncoderConfigurations(this);
+    bool isMedia2Supported = !m_serviceUrls.media2ServiceUrl.isEmpty();
+    // Step 1. Get videoEncoder[1/2]Configurations and videoEncodersTokenList
+
+    Media::VideoEncoderConfigurations videoEncoder1Configurations(this);
+    Media2::VideoEncoderConfigurations videoEncoder2Configurations(this);
+
+    QStringList videoEncodersTokenList;
 
     QnOnvifConfigDataPtr forcedOnvifParams =
         resourceData().value<QnOnvifConfigDataPtr>(QString("forcedOnvifParams"));
-    QStringList videoEncodersTokenList;
 
     if (forcedOnvifParams && forcedOnvifParams->videoEncoders.size() > getChannel())
     {
@@ -2419,19 +2465,43 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         if (commonModule()->isNeedToStop())
             return CameraDiagnostics::ServerTerminatedResult();
 
-        videoEncoderConfigurations.receiveBySoap();
-        if (!videoEncoderConfigurations)
+        if (isMedia2Supported)
         {
-            NX_DEBUG(this, makeSoapFailMessage(
-                videoEncoderConfigurations.innerWrapper(), __func__,
-                "GetVideoEncoderConfigurations", videoEncoderConfigurations.soapError()));
-            return videoEncoderConfigurations.requestFailedResult();
+            videoEncoder2Configurations.receiveBySoap();
+            if (!videoEncoder2Configurations)
+            {
+                NX_DEBUG(this, makeSoapFailMessage(
+                    videoEncoder2Configurations.innerWrapper(), __func__,
+                    "Media2::GetVideoEncoderConfigurations", videoEncoder2Configurations.soapError()));
+                NX_DEBUG(this, "Switch form Media2 to Media1 web service and repeat the request.");
+                isMedia2Supported = false;
+            }
+            else
+            {
+                auto result = getVideoEncoder2Tokens(videoEncoder2Configurations.innerWrapper(),
+                    videoEncoder2Configurations.get()->Configurations, &videoEncodersTokenList);
+                if (!result)
+                    isMedia2Supported = false;
+            }
         }
 
-        auto result = getVideoEncoderTokens(videoEncoderConfigurations.innerWrapper(),
-            videoEncoderConfigurations.get()->Configurations, &videoEncodersTokenList);
-        if (!result)
-            return videoEncoderConfigurations.requestFailedResult();
+        // isMedia2Supported could have been changed in the previous if section
+        if (!isMedia2Supported)
+        {
+            videoEncoder1Configurations.receiveBySoap();
+            if (!videoEncoder1Configurations)
+            {
+                NX_DEBUG(this, makeSoapFailMessage(
+                    videoEncoder1Configurations.innerWrapper(), __func__,
+                    "GetVideoEncoderConfigurations", videoEncoder1Configurations.soapError()));
+                return videoEncoder1Configurations.requestFailedResult();
+            }
+
+            auto result = getVideoEncoder1Tokens(videoEncoder1Configurations.innerWrapper(),
+                videoEncoder1Configurations.get()->Configurations, &videoEncodersTokenList);
+            if (!result)
+                return videoEncoder1Configurations.requestFailedResult();
+        }
     }
 
     // Step 2. Extract video encoder options for every token into optionsList.
@@ -2487,11 +2557,11 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
 
     if (optionsList[0].frameRateMax > 0)
         setMaxFps(optionsList[0].frameRateMax);
-    if (m_maxChannels == 1 && !trustMaxFPS() && !isCameraControlDisabled())
-    {
 
+    if (m_maxChannels == 1 && !trustMaxFPS() && !isCameraControlDisabled() && !isMedia2Supported)
+    {
         onvifXsd__VideoEncoderConfiguration* bestConfiguration = nullptr;
-        auto& configurations = videoEncoderConfigurations.get()->Configurations;
+        auto& configurations = videoEncoder1Configurations.get()->Configurations;
         for (onvifXsd__VideoEncoderConfiguration* configuration: configurations)
         {
             if (configuration && configuration->token == optionsList[0].videoEncoderToken)
