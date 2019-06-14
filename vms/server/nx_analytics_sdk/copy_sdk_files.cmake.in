@@ -32,3 +32,5 @@ nx_copy_always(${copied_sample_origin} "${copied_sample_files}"
     ${target_dir}/samples/stub_analytics_plugin/src)
 nx_copy_always(${copied_sample_ut_origin} "${copied_sample_ut_files}"
     ${target_dir}/samples/stub_analytics_plugin/unit_tests/src)
+nx_copy_always(${CMAKE_SOURCE_DIR}/open "${CMAKE_SOURCE_DIR}/open/license_mpl2.md"
+    ${target_dir})

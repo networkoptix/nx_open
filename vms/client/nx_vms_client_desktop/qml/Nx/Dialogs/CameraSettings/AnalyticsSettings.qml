@@ -91,7 +91,7 @@ Item
                 itemId: modelData.id
                 text: modelData.name
                 active: enabledAnalyticsEngines.indexOf(modelData.id) !== -1
-                onClicked: store.setCurrentAnalyticsEngineId(modelData.id)
+                onClicked: { store.setCurrentAnalyticsEngineId(modelData.id) }
             }
         }
     }
@@ -165,7 +165,7 @@ Item
             Layout.fillHeight: true
             Layout.fillWidth: true
 
-            onValuesEdited: store.setDeviceAgentSettingsValues(currentEngineId, getValues())
+            onValuesEdited: { store.setDeviceAgentSettingsValues(currentEngineId, getValues()) }
 
             enabled: enableSwitch.checked
         }
