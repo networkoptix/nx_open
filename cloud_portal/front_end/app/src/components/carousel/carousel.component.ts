@@ -52,4 +52,8 @@ export class NxCarouselComponent implements OnInit {
     nextElement() {
         this.currentIndex = this.mod((this.currentIndex + 1), this.screenshots.length);
     }
+
+    setIndex(i) {
+        this.currentIndex = i;
+    }
 }

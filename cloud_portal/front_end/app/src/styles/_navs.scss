@@ -57,6 +57,31 @@
     }
 }
 
+.nav-arrow.left {
+    & span:nth-child(odd) {
+        transform     : rotate(-55deg);
+        top: 25%;
+    }
+    & span:nth-child(even) {
+        transform     : rotate(55deg);
+        top: 55%;
+    }
+}
+
+.nav-arrow.right {
+    & span:nth-child(odd) {
+        transform     : rotate(-55deg);
+        top: 65%;
+        left: 50%;
+    }
+
+    & span:nth-child(even) {
+        transform     : rotate(55deg);
+        top: 15%;
+        left: 50%;
+    }
+}
+
 .dropdown.show,
 .btn-tag.selected{
     .nav-arrow span:nth-child(1) {
