@@ -114,7 +114,7 @@ checkNewSystem()
         return 1
     fi
 
-    # Extract the value from `"localSystemId": "...."` and assign it to the variable.
+    # Extract the value from `"localSystemId": "..."` and assign it to the variable.
     local -r localSystemIdValue=$(
         echo "$localSystemIdDefinition" | grep -E -o "$localSystemIdRegex"
     )
