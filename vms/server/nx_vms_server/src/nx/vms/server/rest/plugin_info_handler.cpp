@@ -24,7 +24,7 @@ nx::network::rest::Response PluginInfoHandler::executeGet(const nx::network::res
             QnRestResult::Error::InternalServerError);
     }
 
-    return nx::network::rest::Response::reply(pluginManager->pluginInformation());
+    return nx::network::rest::Response::reply(pluginManager->pluginInfoList());
 }
 
 } // namespace nx::vms::server::rest
