@@ -132,7 +132,10 @@
             "old_name": "{{companyUrl}}",
             "type": "text",
             "value": "http://networkoptix.com",
-            "description": "Company main web site"
+            "description": "Company main web site. Example: http://www.google.com, https://mail.yahoo.com",
+            "meta": {
+              "regex": "^https?:\\/\\/([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$"
+            }
           },
           {
             "label": "Company Name",
@@ -1571,7 +1574,7 @@
             "name": "companyWeb",
             "label": "Company URL",
             "value": "",
-            "description": "Company web address.",
+            "description": "Company's web address. Example: http://www.google.com, https://mail.yahoo.com",
             "type": "text",
             "optional": false,
             "meta": {
@@ -1582,7 +1585,7 @@
             "name": "companyWebTitle",
             "label": "Company URL Title",
             "value": "",
-            "description": "Human friendly title for company's web address.",
+            "description": "Human friendly title for company's web address. Example: 'Visit our web site'",
             "type": "text",
             "optional": true,
             "meta": {
@@ -1624,7 +1627,7 @@
             "name": "supportWeb",
             "label": "Support URL",
             "value": "",
-            "description": "Web address customers should use for support.",
+            "description": "Web address customers should use for support. Example: http://support.google.com, https://www.yahoo.com/support",
             "type": "text",
             "optional": true,
             "meta": {
