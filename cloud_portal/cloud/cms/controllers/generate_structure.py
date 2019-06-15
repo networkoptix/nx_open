@@ -290,9 +290,9 @@ def process_files(file_iterator, product):
     return [structure], log_errors
 
 
-def from_database(product, use_current_values):
-    product_id = product.id if use_current_values else 0
-    return [ProductTypeSerializer(product.product_type, product_id=product_id).data]
+def from_database(product, use_actual_values=False, draft=False):
+    return [ProductTypeSerializer(product.product_type, use_actual_values=use_actual_values,
+                                  product=product, lang=product.default_language, draft=draft).data]
 
 
 def from_directory(directory, product):
@@ -304,7 +304,7 @@ def from_zip(file_descriptor, product):
 
 
 def merge_db_with_archive(file_descriptor, product):
-    db_structure = from_database(product, False)[0]
+    db_structure = from_database(product, use_actual_values=False)[0]
     archive_structure = from_zip(file_descriptor, product)[0][0]
     return merge_structure(db_structure, archive_structure)
 
