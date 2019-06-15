@@ -7,10 +7,14 @@
     {% endif %}
     {% if show_clone_asset %}
         <button class="pull-left btn" style="margin-left: 4px;" type="button" value="Clone Asset" data-toggle="popover"
-                title="Saving changes and cloning asset" data-html="true" data-placement="top"
+                title="Save changes and clone asset" data-html="true" data-placement="right"
                 data-content="
+                {% if user.is_superuser %}
                 <input type='checkbox' value='Copy permissions' name='_clone_copy_perms'>  Copy Permissions
-                <button type='submit' style='margin-left: 10px;' name='_clone' class='btn btn-primary'>Confirm</button>
+                <button type='submit' name='_clone' style='margin-left: 10px;' class='btn btn-primary'>Confirm</button>
+                {% else %}
+                <button type='submit' name='_clone' class='btn btn-primary center-block'>Confirm</button>
+                {% endif %}
                 ">Clone Asset</button>
         <script>
             $(function () {

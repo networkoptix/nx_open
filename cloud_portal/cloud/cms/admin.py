@@ -44,7 +44,7 @@ def clone_product(request, product_id):
             datarecord.version = None
             datarecord.save()
 
-    if '_clone_copy_perms' in request.POST:
+    if '_clone_copy_perms' in request.POST or not request.user.is_superuser:
         grouptoproducts = UserGroupsToProductPermissions.objects.filter(product=old_product)
         for relation in grouptoproducts:
             UserGroupsToProductPermissions.objects.create(group=relation.group, product=product)
@@ -175,7 +175,7 @@ class ProductAdmin(CMSAdmin):
             usergroupstoproductpermissions__product=product
         ).prefetch_related('permissions')
 
-        if self.has_clone_permission(request, product) and product.product_type.type != ProductType.PRODUCT_TYPES.cloud_portal:
+        if product.product_type.type != ProductType.PRODUCT_TYPES.cloud_portal:
             extra_context['show_clone_asset'] = True
 
         return super(ProductAdmin, self).change_view(
@@ -186,6 +186,13 @@ class ProductAdmin(CMSAdmin):
         if not request.user.is_superuser and not obj.product_type.single_customization:
             return [field for field in self.form.base_fields if field != 'customizations']
         return self.form.base_fields
+
+    def get_readonly_fields(self, request, obj=None):
+        read_only_fields = super().get_readonly_fields(request, obj)
+        if not request.user.is_superuser:
+            read_only_fields.remove('name')
+            read_only_fields.remove('contact_email')
+        return read_only_fields
 
     def get_list_display(self, request):
         if not request.user.is_superuser:
@@ -218,16 +225,13 @@ class ProductAdmin(CMSAdmin):
         return my_urls + urls
 
     def response_change(self, request, obj):
-        if '_clone' in request.POST and self.has_clone_permission(request, obj):
+        if '_clone' in request.POST:
             new_id = clone_product(request, obj.id)
             if new_id:
                 return redirect(reverse('admin:cms_product_change', args=(new_id,)))
             else:
                 return redirect('.')
         return super().response_change(request, obj)
-
-    def has_clone_permission(self, request, obj=None):
-        return request.user.is_superuser
 
     def product_settings(self, obj):
         if obj.product_type.type == ProductType.PRODUCT_TYPES.integration:

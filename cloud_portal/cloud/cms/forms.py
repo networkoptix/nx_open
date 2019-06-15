@@ -234,11 +234,10 @@ class ProductForm(forms.ModelForm):
                                    if product.customizations.exists() and
                                    product.customizations.first() != cloud_customization]
 
-            # if the form doesnt have the customizations field create it
-            if 'customizations' not in self.fields:
-                self.fields['customizations'] = forms.MultipleChoiceField()
-            self.fields['customizations'].queryset = Customization.objects.exclude(name__in=used_customizations)
-            self.initial['customizations'] = self.instance.customizations.all()
+            # used for removing customizations that are already in use from the multiple choice field,
+            if 'customizations' in [field.name for field in self.visible_fields()]:
+                self.fields['customizations'].queryset = Customization.objects.exclude(name__in=used_customizations)
+                self.initial['customizations'] = self.instance.customizations.all()
 
     def clean_customizations(self):
         customizations = self.cleaned_data['customizations']
