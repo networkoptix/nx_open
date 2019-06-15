@@ -36,13 +36,13 @@ set(customization.fullBundleUpgradeCode "{c6a7a801-e010-4fc6-976e-29f0e96a9ba9}"
 
 set(deb.customization.company.name "viveex")
 
-set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
+set(mac.sign.identity "Developer ID Application: Daekyo CNS Co., Ltd. (F9YS49GC96)")
 set(mac.bundle.identifier "com.daekyocns.viveex2")
 set(mac.protocol_handler_bundle.identifier "com.daekyocns.protocol_handler")
 
 set(ios.new_bundle_identifier "com.daekyocns.viveex")
 set(ios.group_identifier "group.com.daekyocns.viveex")
-set(ios.sign.identity "iPhone Developer: Ivan Vigasin (KZ74EE5FP2)")
+set(ios.sign.identity "iPhone Developer: Daekyo CNS Co., Ltd. (F9YS49GC96)")
 
 # Other customizations.
 set(freeLicenseIsTrial "true")
