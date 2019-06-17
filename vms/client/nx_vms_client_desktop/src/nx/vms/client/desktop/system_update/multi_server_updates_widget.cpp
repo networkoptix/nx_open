@@ -695,12 +695,6 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
             .arg(nx::network::AppInfo::cloudName());
     }
 
-    QString versionRaw = nx::utils::AppInfo::applicationVersion();
-    auto currentVersion = nx::utils::SoftwareVersion(versionRaw);
-
-    if (validUpdate && contents.getVersion() < currentVersion)
-        report.statusMessages << tr("Downgrade to earlier versions is not possible");
-
     return report;
 }
 
