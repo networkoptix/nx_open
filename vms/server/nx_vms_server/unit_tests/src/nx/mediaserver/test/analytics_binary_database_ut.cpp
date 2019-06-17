@@ -17,9 +17,11 @@ static const int kDeltaMs = 10 * 1000LL;
 static const int kObjectTypeId = 1;
 static const int kAllAttributesHash = 1;
 
-auto kbaseDateMs =
+auto kBaseDateMs =
     QDateTime::fromString("2017-12-31T00:23:50", Qt::ISODate).toMSecsSinceEpoch();
 
+auto kBaseDateMs2 =
+    QDateTime::fromString("2018-01-31T00:23:50", Qt::ISODate).toMSecsSinceEpoch();
 
 using namespace std::chrono;
 using namespace nx::vms::server::metadata;
@@ -52,7 +54,7 @@ class AnalyticsArchive: public MediaServerModuleFixture
 
           for (qint64 i = 0; i < kSteps; ++i)
           {
-              qint64 valueMs = kbaseDateMs + i * kDeltaMs;
+              qint64 valueMs = kBaseDateMs + i * kDeltaMs;
               m_numericDates.push_back(valueMs);
               archive.saveToArchive(
                   std::chrono::milliseconds(valueMs),
@@ -189,13 +191,13 @@ TEST_F(AnalyticsArchive, matchObjectGroups)
     ASSERT_EQ(request.limit, result.data.size());
     ASSERT_EQ(1, result.data[0].objectGroupId);
     ASSERT_EQ(request.limit, result.data[result.data.size()-1].objectGroupId);
-    ASSERT_EQ(kbaseDateMs, result.boundingPeriod.startTimeMs);
+    ASSERT_EQ(kBaseDateMs, result.boundingPeriod.startTimeMs);
     ASSERT_EQ((request.limit-1) * kDeltaMs + kAggregationInterval.count(),
         result.boundingPeriod.durationMs);
 
     request.sortOrder = Qt::SortOrder::DescendingOrder;
     request.limit = 100;
-    request.endTime = milliseconds(kbaseDateMs + (kSteps - 1) * kDeltaMs - 1);
+    request.endTime = milliseconds(kBaseDateMs + (kSteps - 1) * kDeltaMs - 1);
     result = archive.matchObjects(request);
     ASSERT_EQ(request.limit, result.data.size());
     ASSERT_EQ(kSteps - 1, result.data[0].objectGroupId);
@@ -203,12 +205,41 @@ TEST_F(AnalyticsArchive, matchObjectGroups)
 
     request.limit = 2;
     request.sortOrder = Qt::SortOrder::DescendingOrder;
-    request.endTime = milliseconds(kbaseDateMs + (kSteps - 1) * kDeltaMs);
+    request.endTime = milliseconds(kBaseDateMs + (kSteps - 1) * kDeltaMs);
     request.startTime = milliseconds(request.endTime.count() - kDeltaMs);
     result = archive.matchObjects(request);
     ASSERT_EQ(2, result.data.size());
     ASSERT_EQ(kSteps, result.data[0].objectGroupId);
     ASSERT_EQ(kSteps-1, result.data[1].objectGroupId);
+}
+
+TEST_F(AnalyticsArchive, matchLongArchive)
+{
+    static const std::chrono::milliseconds kAggregationInterval(
+        nx::vms::server::metadata::AnalyticsArchive::kAggregationInterval);
+
+    const std::vector<qint64> timePointsMs = {kBaseDateMs, kBaseDateMs2, kBaseDateMs2 + kDeltaMs};
+    for (auto timestampMs: timePointsMs)
+    {
+        nx::vms::server::metadata::AnalyticsArchive archive(
+            serverModule().metadataDatabaseDir(),
+            m_camera->getPhysicalId());
+        std::vector<QRectF> rects{QRectF(0.0, 0.0, 0.5, 0.5)};
+        archive.saveToArchive(
+            std::chrono::milliseconds(timestampMs),
+            rects,
+            /*objectGroupId*/ 0,
+            kObjectTypeId,
+            kAllAttributesHash /*allAttributesHash*/);
+    }
+
+    metadata::AnalyticsArchive archive(
+        serverModule().metadataDatabaseDir(), m_camera->getPhysicalId());
+    auto result = archive.matchObjects(createRequest(Qt::SortOrder::AscendingOrder));
+
+    ASSERT_EQ(timePointsMs.size(), result.data.size());
+    for (int i = 0; i < timePointsMs.size(); ++i)
+        ASSERT_EQ(timePointsMs[i], result.data[i].timestampMs);
 }
 
 } // nx::vms::server::test

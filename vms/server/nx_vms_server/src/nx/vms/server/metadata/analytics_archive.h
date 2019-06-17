@@ -9,9 +9,17 @@ namespace nx::vms::server::metadata {
 #pragma pack(push, 1)
     struct BinaryRecordEx
     {
-        uint32_t objectsGroupId = 0;
-        uint32_t objectType = 0;
-        int64_t attributesHash = 0;
+        uint32_t objectsGroupId() const { return qFromLittleEndian(m_objectsGroupId); }
+        uint32_t objectType() const { return qFromLittleEndian(m_objectType); }
+        int64_t attributesHash() const { return qFromLittleEndian(m_attributesHash); }
+
+        void setObjectsGroupId(uint32_t value) { m_objectsGroupId = qToLittleEndian(value); }
+        void setObjectType(uint32_t value) { m_objectType = qToLittleEndian(value); }
+        void setAttributesHash(int64_t value) { m_attributesHash = qToLittleEndian(value); }
+    private:
+        uint32_t m_objectsGroupId = 0;
+        uint32_t m_objectType = 0;
+        int64_t m_attributesHash = 0;
     };
 #pragma pack(pop)
 

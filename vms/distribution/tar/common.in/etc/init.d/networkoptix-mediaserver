@@ -232,6 +232,8 @@ run_watchdog()
         if is_systemd_used
         then
             service $(basename "$0") status && continue
+            # "restart" should be used instead of "start", because of "start"
+            # doesn't really starts in some cases (e.g., in case of error).
             service $(basename "$0") restart
         else
             start

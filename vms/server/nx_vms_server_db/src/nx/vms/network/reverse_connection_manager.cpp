@@ -12,6 +12,7 @@
 #include <nx/utils/log/log_main.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/network/url/url_builder.h>
 
 namespace {
 
@@ -73,6 +74,13 @@ void ReverseConnectionManager::at_reverseConnectionRequested(
     auto server = resourcePool()->getResourceById<QnMediaServerResource>(data.targetServer);
     if (!server)
     {
+        // If remote server is not known yet try to use current server for authentication.
+        // It work in case of remote server already know about current server.
+        server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+    }
+
+    if (!server)
+    {
         NX_WARNING(this, lm("Target server %1 is not known yet")
             .arg(qnStaticCommon->moduleDisplayName(data.targetServer)));
         return;
@@ -86,10 +94,11 @@ void ReverseConnectionManager::at_reverseConnectionRequested(
 
         httpClient->setSendTimeout(kReverseConnectionTimeout);
         httpClient->setResponseReadTimeout(kReverseConnectionTimeout);
-        nx::utils::Url url(server->getApiUrl());
-        url.setHost(route.addr.address.toString());
-        url.setPort(route.addr.port);
-        url.setPath(kReverseConnectionListenerPath);
+        const auto url = nx::network::url::Builder()
+            .setScheme(server->getApiUrl().scheme())
+            .setHost(route.addr.address.toString())
+            .setPort(route.addr.port)
+            .setPath(kReverseConnectionListenerPath).toUrl();
         httpClient->addAdditionalHeader(
             Qn::PROXY_SENDER_HEADER_NAME, commonModule()->moduleGUID().toSimpleByteArray());
         httpClient->doConnect(

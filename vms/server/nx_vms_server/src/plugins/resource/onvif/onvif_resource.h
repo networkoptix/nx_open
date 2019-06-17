@@ -673,9 +673,14 @@ private:
     CameraDiagnostics::Result fetchOnvifMedia2Url(QString* url);
     void fillFullUrlInfo(const _onvifDevice__GetCapabilitiesResponse& response);
     void detectCapabilities(const _onvifDevice__GetCapabilitiesResponse& response);
-    bool getVideoEncoderTokens(BaseSoapWrapper& soapWrapper,
+
+    bool getVideoEncoder1Tokens(BaseSoapWrapper& soapWrapper,
         const std::vector<onvifXsd__VideoEncoderConfiguration*>& configurations,
         QStringList* tokenList);
+    bool getVideoEncoder2Tokens(BaseSoapWrapper& soapWrapper,
+        const std::vector<onvifXsd__VideoEncoder2Configuration*>& configurations,
+        QStringList* tokenList);
+
     QString getInputPortNumberFromString(const QString& portName);
     QnAudioTransmitterPtr initializeTwoWayAudioByResourceData();
 
