@@ -118,7 +118,7 @@ protected:
     bool atCancelCurrentAction();
 
     /** Called when server responds to /ec2/startUpdate. Connected to ServerUpdateToool. */
-    void atStartUpdateComplete(bool success, const nx::update::Information& info);
+    void atStartUpdateComplete(bool success);
     /** Called when server responds to /ec2/cancelUpdate. Connected to ServerUpdateToool. */
     void atCancelUpdateComplete(bool success);
     /** Called when server responds to /ec2/finishUpdate. Connected to ServerUpdateToool. */

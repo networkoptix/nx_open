@@ -1127,9 +1127,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
     return true;
 }
 
-void MultiServerUpdatesWidget::atStartUpdateComplete(
-    bool success,
-    const nx::update::Information& /*info*/)
+void MultiServerUpdatesWidget::atStartUpdateComplete(bool success)
 {
     if (m_widgetState == WidgetUpdateState::startingDownload)
     {

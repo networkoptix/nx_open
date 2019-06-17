@@ -784,12 +784,11 @@ void ServerUpdateTool::requestStartUpdate(
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         dropAllRequests("requestStartUpdate()");
-        auto callback = [this](bool success, rest::Handle requestId,
-                rest::UpdateInformationData result)
+        auto callback = [this](bool success, rest::Handle requestId)
             {
                 // TODO: Just forcing it, until server side responds with proper nx::update::Information
                 success = true;
-                emit startUpdateComplete(success, result.data);
+                emit startUpdateComplete(success);
             };
         connection->updateActionStart(info, nx::utils::guarded(this, callback));
         m_remoteUpdateManifest = info;
