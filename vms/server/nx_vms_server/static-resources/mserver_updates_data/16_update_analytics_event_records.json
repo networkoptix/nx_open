@@ -4,7 +4,6 @@
     "{153dd879-1cd2-46b7-add6-7c6b48eac1fc}": "nx.stub.car",
     "{c23def4d-04f7-4b4c-994e-0c0e6e8b12cb}": "nx.stub.humanFace",
 
-
     "{e068d6ff-a3ac-43aa-b2d6-1804440af506}": "nx.hanwha.ShockDetection",
     "{5dfc6d1b-3b92-4e55-a627-0db2a2422db3}": "nx.hanwha.FaceDetection",
     "{95f33b59-0ca8-4cb2-9248-1f5e616483f7}": "nx.hanwha.FogDetection",
@@ -30,7 +29,6 @@
     "{495e9a52-66f9-41a1-a994-8f9d0d16bd18}": "nx.hanwha.Queue.3.Level.High",
     "{6f44b0fc-ed45-43e8-bc8b-f361d3f2c361}": "nx.hanwha.Queue.3.Level.Medium",
 
-
     "{a5b9cc7c-6da5-4fe6-a2eb-19dd353fd724}": "nx.dw_mtt.MOTION",
     "{6a34d742-9f83-47ba-93e2-811718fa49ac}": "nx.dw_mtt.SENSOR",
     "{52764a47-bd7d-4447-bb4b-aaf0b0e7518f}": "nx.dw_mtt.PEA.perimeterAlarm",
@@ -43,7 +41,6 @@
     "{32e32ac6-e3ba-437b-a3d8-8fa9ae5b1830}": "nx.dw_mtt.IPD",
     "{ba0cde26-a5c9-4101-ae59-7cda70a2fa76}": "nx.dw_mtt.CDD",
     "{12c841a0-33a4-429e-84de-810a43738d35}": "nx.dw_mtt.VFD",
-
 
     "{98ff85dc-f4ca-4254-bea5-4204ad9e82bd}": "nx.hikvision.loitering",
     "{4168bb12-3005-4855-a5a2-a5753c0894a0}": "nx.hikvision.fielddetection",
@@ -68,10 +65,8 @@
     "{71004ac7-d190-444e-888a-ea61997b6cd2}": "nx.hikvision.otherlist",
     "{4dae9597-7a81-4a48-aedc-37d5b184db11}": "nx.hikvision.Vehicle",
 
-
     "{1558bdc5-3440-454e-93ed-0b34a05fedef}": "nx.ssc.gasGunPickedUp",
     "{e7ec745c-2ea3-43b6-9ea7-8108f47563f5}": "nx.ssc.gasGunHungDown",
-
 
     "{d16b2cfb-4dca-4081-acb9-f4b454c6873f}": "nx.vca.md",
     "{93f513de-41dd-4b4f-8623-e93d88b35174}": "nx.vca.vca",
