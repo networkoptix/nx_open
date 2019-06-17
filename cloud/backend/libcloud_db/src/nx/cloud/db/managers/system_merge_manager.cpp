@@ -246,6 +246,16 @@ void SystemMergeManager::issueVmsMergeRequest(
 {
     using namespace std::placeholders;
 
+    NX_DEBUG(this, "mergeRequestContext->idOfSystemToBeMerged.size() = %1, "
+        "mergeRequestContext->idOfSystemToBeMerged.data() = %2",
+        mergeRequestContext->idOfSystemToBeMerged.size(),
+        (std::size_t) mergeRequestContext->idOfSystemToBeMerged.data());
+
+    NX_DEBUG(this, "mergeRequestContext->idOfSystemToMergeTo.size() = %1, "
+        "mergeRequestContext->idOfSystemToMergeTo.data() = %2",
+        mergeRequestContext->idOfSystemToMergeTo.size(),
+        (std::size_t) mergeRequestContext->idOfSystemToMergeTo.data());
+
     NX_DEBUG(this, lm("Merge %1 into %2. Issuing request to system %1")
         .args(mergeRequestContext->idOfSystemToBeMerged,
             mergeRequestContext->idOfSystemToMergeTo));
