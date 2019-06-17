@@ -1076,10 +1076,11 @@ UpdateItemPtr PeerStateTracker::addItemForClient()
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
     item->protocol = nx_ec::EC2_PROTO_VERSION;
-    NX_VERBOSE(this, "addItemForClient() id=%1", item->id);
     m_clientItem = item;
     m_items.push_back(item);
     updateClientData();
+
+    NX_VERBOSE(this, "addItemForClient() id=%1 version=%2", item->id, item->version);
     emit itemAdded(m_clientItem);
     return m_clientItem;
 }

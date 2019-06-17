@@ -828,15 +828,13 @@ Handle ServerConnection::lookupDetectedObjects(
 }
 
 Handle ServerConnection::updateActionStart(
-    const nx::update::Information& info, QThread* targetThread)
+    const nx::update::Information& info,
+    Result<UpdateInformationData>::type callback,
+    QThread* targetThread)
 {
-    auto callback =
-        [](bool /*success*/, rest::Handle /*handle*/, EmptyResponseType /*response*/)
-        {
-        };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     auto request = QJson::serialized(info);
-    return executePost<EmptyResponseType>(
+    return executePost(
         "/ec2/startUpdate", QnRequestParamList(), contentType, request, callback, targetThread);
 }
 

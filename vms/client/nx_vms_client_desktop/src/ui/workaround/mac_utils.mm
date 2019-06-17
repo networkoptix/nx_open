@@ -6,6 +6,8 @@
 #include <QtCore/QtMath>
 #include <QtCore/QEventLoop>
 
+#include <QtWidgets/QWidget>
+
 #import <objc/runtime.h>
 #import <Cocoa/Cocoa.h>
 
@@ -50,7 +52,6 @@ void saveFileBookmark(NSString* path)
     [prefs setObject:entitlements forKey:@"directoryEntitlements"];
     [prefs synchronize];
 }
-
 
 } // namespace
 
@@ -119,51 +120,34 @@ id customWindowsToEnterFullScreenForWindow(id self, SEL _cmd, NSWindow *window) 
     return [NSArray arrayWithObject:window];
 }
 
-void mac_initFullScreen(void *winId, void *qnmainwindow) {
-    NSView *nsview = (NSView *) winId;
-    NSWindow *nswindow = [nsview window];
+void setFullscreenTransitionHandler(QWidget* widget, TransitionStateCallback callback)
+{
+    NSWindow* nswindow = [reinterpret_cast<NSView *>(widget->winId()) window];
 
     NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
     [defaultCenter addObserverForName:NSWindowWillEnterFullScreenNotification
-                                      object:nswindow
-                                      queue:nil
-                                      usingBlock:^(NSNotification *) {
-                                           disable_animations(qnmainwindow);
-                                      }];
+        object:nswindow
+        queue:nil
+        usingBlock:^(NSNotification *) { callback(true); }];
 
     [defaultCenter addObserverForName:NSWindowWillExitFullScreenNotification
-                                      object:nswindow
-                                      queue:nil
-                                      usingBlock:^(NSNotification *) {
-                                           [nswindow setCollectionBehavior:NSWindowCollectionBehaviorDefault];
-                                           disable_animations(qnmainwindow);
-                                      }];
+        object:nswindow
+        queue:nil
+        usingBlock:^(NSNotification *)
+        {
+            [nswindow setCollectionBehavior:NSWindowCollectionBehaviorDefault];
+            callback(true);
+        }];
+
     [defaultCenter addObserverForName:NSWindowDidEnterFullScreenNotification
-                                      object:nswindow
-                                      queue:nil
-                                      usingBlock:^(NSNotification *) {
-                                           enable_animations(qnmainwindow);
-                                      }];
+        object:nswindow
+        queue:nil
+        usingBlock:^(NSNotification *) { callback(false); }];
 
     [defaultCenter addObserverForName:NSWindowDidExitFullScreenNotification
-                                      object:nswindow
-                                      queue:nil
-                                      usingBlock:^(NSNotification *) {
-                                           enable_animations(qnmainwindow);
-                                      }];
-    [nswindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
-
-//    Class xclass = NSClassFromString(@"QNSWindowDelegate");
-//    class_replaceMethod(xclass, @selector(customWindowsToEnterFullScreenForWindow:), (IMP) customWindowsToEnterFullScreenForWindow, "@@:@");
-//    class_replaceMethod(xclass, @selector(windowDidExitFullScreen:), (IMP) windowSwitchedFullScreen, "@@:@");
-
-//    [nswindow.delegate respondsToSelector: @selector(customWindowsToEnterFullScreenForWindow:)
-//            withKey:nil
-//            usingBlock:^(NSWindow *window) {
-//                int i = 1;
-//                return nil;
-//        }
-//        ];
+        object:nswindow
+        queue:nil
+        usingBlock:^(NSNotification *) { callback(false); }];
 }
 
 void mac_showFullScreen(void *winId, bool fullScreen) {
