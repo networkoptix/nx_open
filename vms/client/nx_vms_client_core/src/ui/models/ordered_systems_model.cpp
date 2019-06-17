@@ -237,8 +237,6 @@ bool QnOrderedSystemsModel::lessThan(
     const auto leftIsFactory = left.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
     const auto rightIsFactory = right.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
 
-    qDebug() << left.data(QnSystemsModel::SearchRoleId).toString() << "?" << right.data(QnSystemsModel::SearchRoleId).toString();
-
     // Localhost systems go first
     if (leftIsLocalhost && rightIsLocalhost)
     {
