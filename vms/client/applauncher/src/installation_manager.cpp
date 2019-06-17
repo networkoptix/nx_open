@@ -98,13 +98,10 @@ InstallationManager::InstallationManager(QObject* parent):
 
 void InstallationManager::updateInstalledVersionsInformation()
 {
-    NX_DEBUG(this, "Entered update installed versions");
-
+    NX_VERBOSE(this, "Entered update installed versions");
     QMap<nx::utils::SoftwareVersion, QnClientInstallationPtr> installations;
 
     // Detect current installation.
-    NX_DEBUG(this, "Checking current version (%1)", QnAppInfo::applicationVersion());
-
     const auto current = QnClientInstallation::installationForPath(applicationRootPath());
     if (current)
     {
@@ -148,7 +145,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     #if defined(Q_OS_MACX)
         static const auto kPathPostfix = QString();
     #else
-         static const auto kPathPostfix = "/client/"; /*< Default client install location. */
+        static const auto kPathPostfix = "/client/"; /*< Default client install location. */
     #endif
     QString baseRoot = QnApplauncherAppInfo::installationRoot() + kPathPostfix;
     fillInstallationsFromDir(m_installationsDir);
@@ -163,14 +160,15 @@ void InstallationManager::updateInstalledVersionsInformation()
     QStringList versions;
     for (const auto& record: installations.keys())
         versions << record.toString();
-    NX_DEBUG(this, "Compatibility versions: %1 found", versions);
+
+    if (!versions.empty())
+        NX_DEBUG(this, "Compatibility versions: %1 found", versions);
+    else
+        NX_DEBUG(this, "No compatibility versions found");
 
     std::unique_lock<std::mutex> lk(m_mutex);
     m_installationByVersion = std::move(installations);
     lk.unlock();
-
-    if (m_installationByVersion.empty())
-        NX_WARNING(this, "No client versions found");
 
     createGhosts();
 }

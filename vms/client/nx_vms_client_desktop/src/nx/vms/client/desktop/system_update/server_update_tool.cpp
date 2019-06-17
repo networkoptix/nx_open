@@ -765,6 +765,8 @@ void ServerUpdateTool::requestStartUpdate(
     const nx::update::Information& info,
     const QSet<QnUuid>& targets)
 {
+    NX_VERBOSE(this, "requestStartUpdate(%1) - sending /ec2/startUpdate command", info.version);
+
     QSet<QnUuid> servers;
     for (const auto& id: targets)
     {
@@ -772,21 +774,20 @@ void ServerUpdateTool::requestStartUpdate(
         if (item->component == UpdateItem::Component::server)
             servers.insert(id);
     }
+
     if (servers.empty())
     {
         NX_WARNING(this, "requestStartUpdate(%1) - target list contains no server to update",
             info.version);
-        return;
     }
-
-    NX_VERBOSE(this, "requestStartUpdate(%1) - sending /ec2/startUpdate command", info.version);
 
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         dropAllRequests("requestStartUpdate()");
-        auto callback = [this](bool success, rest::Handle requestId)
+        auto callback = [this](bool success, rest::Handle /*requestId*/)
             {
-                // TODO: Just forcing it, until server side responds with proper nx::update::Information
+                // TODO: Just forcing it, until server side responds with
+                // a proper nx::update::Information
                 success = true;
                 emit startUpdateComplete(success);
             };

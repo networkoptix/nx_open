@@ -1058,7 +1058,8 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
             return messageBox->exec() == QDialogButtonBox::Yes;
         };
     // Cancel all the downloading.
-    if (m_widgetState == WidgetUpdateState::downloading)
+    if (m_widgetState == WidgetUpdateState::downloading
+        || m_widgetState == WidgetUpdateState::startingDownload)
     {
         if (showCancelDialog())
         {
@@ -1427,16 +1428,6 @@ void MultiServerUpdatesWidget::processInitialCheckState()
         }
 
         NX_INFO(NX_SCOPE_TAG, "mediaservers have an active update process to version %1", updateInfo.info.version);
-
-        bool hasClientUpdate = m_clientUpdateTool->hasUpdate();
-        if (updateInfo.alreadyInstalled && !hasClientUpdate)
-        {
-            // It seems like we should not change the state.
-            NX_INFO(NX_SCOPE_TAG, "looks like we have installed this update already");
-            setTargetState(WidgetUpdateState::ready, {});
-            return;
-        }
-
         // TODO: Client could have no update available for some reason. We should ignore it
         // if update process is already in 'installing' phase.
         if (m_updateInfo.preferOtherUpdate(updateInfo))
@@ -1452,6 +1443,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
         auto peersAreInstalling = m_serverUpdateTool->getServersInstalling();
         auto serversHaveInstalled = m_stateTracker->peersCompleteInstall();
 
+        bool hasClientUpdate = m_clientUpdateTool->shouldInstallThis(updateInfo);
         m_updateLocalStateChanged = true;
 
         if (!peersAreInstalling.empty())

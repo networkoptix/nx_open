@@ -167,7 +167,6 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 
 void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
-    NX_ASSERT(!version.isNull());
     NX_VERBOSE(this, "setUpdateTarget(%1)", version);
     m_targetVersion = version;
 
