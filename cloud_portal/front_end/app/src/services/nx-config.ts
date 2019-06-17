@@ -254,7 +254,7 @@ export class NxConfigService {
                 },
                 youtube : {
                     link: 'https://www.youtube.com/embed/',
-                    regex: '^https?:\\/\\/(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)([\\w]+)$'
+                    regex: '^https?:\\/\\/(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)([\\w\-]+)$'
                 }
             },
             defaultPlatformNames                 : {
