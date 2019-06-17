@@ -72,11 +72,11 @@
     <div class="row pl-3 pr-3 m-0"
          *ngIf="vendors">
 
-        <p>
+        <p *ngIf="CONFIG.feedbackEnabled && lang && lang.ipvd">
             <span [translate]="'disclaimer'"
                   [translateParams]="{value: company}">
             </span>
-            <span *ngIf="CONFIG.feedbackEnabled">
+            <span>
                 {{lang.ipvd.feedback.a_Please}} <a href (click)="openFeedback('page')">{{lang.ipvd.feedback.b_Link}}</a> {{lang.ipvd.feedback.c_Info}}
             </span>
         </p>

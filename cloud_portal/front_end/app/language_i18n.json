@@ -141,7 +141,7 @@
     "dialogs.merge.secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current system. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
     "dialogs.merge.systemOffline": "dialogs.merge.systemOffline",
     "dialogs.merge.systemUnavailable": "System {{targetSystem}} is currently unreachable. Try again in a few minutes or contact",
-    "disclaimer": "disclaimer",
+    "disclaimer": "This list is limited to actual devices auto-reporting data to {{value}}, as approved by anonymous system users. The complete list of supported manufacturers and models is greater in scope.",
     "downloads": {
         "appTypes": {
             "bundle": "Client and Server",
