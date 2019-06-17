@@ -13,6 +13,7 @@ namespace {
 using namespace nx::vms::client::core;
 
 static const QSet<int> kSortingRoles = {
+    QnSystemsModel::SearchRoleId,
     QnSystemsModel::SystemNameRoleId,
     QnSystemsModel::SystemIdRoleId,
     QnSystemsModel::LocalIdRoleId,
@@ -235,6 +236,8 @@ bool QnOrderedSystemsModel::lessThan(
 
     const auto leftIsFactory = left.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
     const auto rightIsFactory = right.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
+
+    qDebug() << left.data(QnSystemsModel::SearchRoleId).toString() << "?" << right.data(QnSystemsModel::SearchRoleId).toString();
 
     // Localhost systems go first
     if (leftIsLocalhost && rightIsLocalhost)
