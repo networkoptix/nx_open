@@ -15,4 +15,4 @@ with open('app/language_i18n_static.json', 'r') as static_language:
     static_file = json.load(static_language)
 
 with open("./app/language_i18n.json", "w") as outfile:
-    json.dump(merge_two_json(base_file, static_file), outfile, indent=4, sort_keys=True)
+    json.dump(merge_two_json(base_file, static_file), outfile, indent=4, sort_keys=True, separators=(',', ': '))
