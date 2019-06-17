@@ -507,9 +507,14 @@ void EventsStorage::scheduleDataCleanup(
     m_dbController->queryExecutor().executeUpdate(
         [this, deviceId, oldestDataToKeepTimestamp](nx::sql::QueryContext* queryContext)
         {
+            // Device id NULL means clean for all devices.
+            const auto internalId = m_deviceDao.deviceIdFromGuid(deviceId);
+            if (internalId == -1 && !deviceId.isNull())
+                return nx::sql::DBResult::ok; //< Not found in the database.
+
             Cleaner cleaner(
                 &m_attributesDao,
-                m_deviceDao.deviceIdFromGuid(deviceId),
+                internalId,
                 oldestDataToKeepTimestamp);
 
             if (cleaner.clean(queryContext) == Cleaner::Result::incomplete)
