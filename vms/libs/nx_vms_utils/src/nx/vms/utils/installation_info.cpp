@@ -16,14 +16,20 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((InstallationInfo), (json), _Fields)
  * Reads the whole file.
  * @return File contents, or empty string on error, having logged the error message.
  */
-static QString readFileIfExist(const QString& filename)
+static QString readFileIfExists(const QString& filename)
 {
     QString result;
-
     QFile file(filename);
+
+    if (!file.exists())
+    {
+        NX_DEBUG(kLogTag, "File %1 is not exists", filename);
+        return result;
+    }
+
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
-        NX_DEBUG(kLogTag, "Unable to open file %1", filename);
+        NX_ERROR(kLogTag, "Unable to open file %1", filename);
         return result;
     }
 
@@ -42,7 +48,7 @@ static void loadInstallationInfo(InstallationInfo* installationInfo)
     const QString installationInfoJsonFilename =
         lm("/opt/%1/installation_info.json").arg(nx::utils::AppInfo::linuxOrganizationName());
 
-    const QString content = readFileIfExist(installationInfoJsonFilename);
+    const QString content = readFileIfExists(installationInfoJsonFilename);
 
     if (content.isEmpty())
         return; //< Error is already logged.
