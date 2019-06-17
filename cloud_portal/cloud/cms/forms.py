@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.template.loader import render_to_string
 from .models import *
+from api.models import Account
 
 from dal import autocomplete
 
@@ -209,6 +210,8 @@ class ProductSettingsForm(forms.Form):
 
 
 class ProductForm(forms.ModelForm):
+    publish_all_customizations = forms.BooleanField(required=False, label='Publish to all Customizations', initial=True)
+
     class Meta:
         model = Product
         exclude = []
@@ -224,6 +227,7 @@ class ProductForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         # Do the normal form initialisation.
         super(ProductForm, self).__init__(*args, **kwargs)
         cloud_portal = ProductType.PRODUCT_TYPES.cloud_portal
@@ -238,6 +242,13 @@ class ProductForm(forms.ModelForm):
             if 'customizations' in [field.name for field in self.visible_fields()]:
                 self.fields['customizations'].queryset = Customization.objects.exclude(name__in=used_customizations)
                 self.initial['customizations'] = self.instance.customizations.all()
+
+        if self.user and not self.user.is_superuser and not self.instance.pk:
+            self.fields['product_type'].queryset = ProductType.objects.exclude(type=ProductType.PRODUCT_TYPES.cloud_portal)
+            self.fields['created_by'] = forms.ModelChoiceField(
+                queryset=Account.objects.filter(id=self.user.id), empty_label=None
+            )
+            self.fields['customizations'].queryset = Customization.objects.filter(name__in=self.user.customizations)
 
     def clean_customizations(self):
         customizations = self.cleaned_data['customizations']
@@ -255,6 +266,14 @@ class ProductForm(forms.ModelForm):
                         not product_id and customization_portal_id:
                     raise forms.ValidationError("Customization is already used for a cloud portal product.")
         return customizations
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if 'publish_all_customizations' in cleaned_data and cleaned_data['publish_all_customizations']:
+            cleaned_data['customizations'] = Customization.objects.all()
+
+        return cleaned_data
 
 
 class CustomizationForm(forms.ModelForm):

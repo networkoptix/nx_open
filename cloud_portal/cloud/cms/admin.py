@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from django.contrib import admin, messages
 from django.contrib.admin import SimpleListFilter
+from django.contrib.auth.models import Permission
 from django.conf.urls import url
 from django.db.models import Q, Case, When, Value, BooleanField
 from django.shortcuts import render, redirect
@@ -150,11 +151,33 @@ class ProductAdmin(CMSAdmin):
     form = ProductForm
     change_form_template = 'cms/product_change_form.html'
 
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        ProductForm = super().get_form(request, obj, change, **kwargs)
+
+        class ProductFormWithUser(ProductForm):
+            def __new__(cls, *args, **kwargs):
+                kwargs['user'] = request.user
+                return ProductForm(*args, **kwargs)
+
+        return ProductFormWithUser
+
     def has_change_permission(self, request, obj=None):
         return request.user.is_superuser or len(request.user.products) > 0
 
     def has_view_permission(self, request, obj=None):
         return request.user.is_superuser or len(request.user.products) > 0
+
+    def has_add_permission(self, request):
+        return super(CMSAdmin, self).has_add_permission(request)
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if not change and not request.user.is_superuser:
+            group = Group.objects.create(name=obj.name + ' Developer')
+            edit_content_permission = Permission.objects.get(codename='edit_content')
+            group.user_set.add(request.user)
+            group.permissions.add(edit_content_permission)
+            UserGroupsToProductPermissions.objects.create(product=obj, group=group)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -183,16 +206,23 @@ class ProductAdmin(CMSAdmin):
         )
 
     def get_fields(self, request, obj=None):
-        if not request.user.is_superuser and not obj.product_type.single_customization:
-            return [field for field in self.form.base_fields if field != 'customizations']
-        return self.form.base_fields
+        fields = [field for field in self.form.base_fields]
+        if obj:
+            fields.remove('publish_all_customizations')
+            if not request.user.is_superuser and not obj.product_type.single_customization:
+                fields.remove('customizations')
+        else:
+            fields.remove('preview_status')
+        return fields
 
     def get_readonly_fields(self, request, obj=None):
-        read_only_fields = super().get_readonly_fields(request, obj)
-        if not request.user.is_superuser:
-            read_only_fields.remove('name')
-            read_only_fields.remove('contact_email')
-        return read_only_fields
+        if obj and not request.user.is_superuser:
+            readonly_fields = super().get_readonly_fields(request, obj)
+            readonly_fields.remove('name')
+            readonly_fields.remove('contact_email')
+            return readonly_fields
+
+        return self.readonly_fields
 
     def get_list_display(self, request):
         if not request.user.is_superuser:
