@@ -530,7 +530,6 @@ void ActionHandler::openResourcesInNewWindow(const QnResourceList &resources)
 void ActionHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
     arguments << lit("--no-single-application");
-    arguments << lit("--no-version-mismatch-check");
 
     if (context()->user())
     {
