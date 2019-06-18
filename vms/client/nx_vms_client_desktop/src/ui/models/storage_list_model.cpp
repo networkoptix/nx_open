@@ -289,7 +289,7 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
         case Qt::DecorationRole:
             if (index.column() == ActionsColumn)
             {
-                const auto &storage = m_storages.at(index.row());
+                const auto& storage = m_storages.at(index.row());
 
                 if (storage.id == m_metadataStorageId)
                     return qnSkin->pixmap("text_buttons/analytics.png");
