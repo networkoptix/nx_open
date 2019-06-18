@@ -426,8 +426,8 @@
             "type": "text"
           },
           {
-            "name": "Legal Company Court",
-            "label": "%LEGAL_COMPANY_COURT%",
+            "label": "Legal Company Court",
+            "name": "%LEGAL_COMPANY_COURT%",
             "value":"state and federal courts located in Los Angeles County, California",
             "description": "Court to handle disputes (for EULA)",
             "type": "text"
