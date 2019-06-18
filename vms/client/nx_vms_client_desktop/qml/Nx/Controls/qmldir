@@ -18,6 +18,8 @@ TextArea 1.0 TextArea.qml
 IconButton 1.0 IconButton.qml
 SidePanel 1.0 SidePanel.qml
 Resizer 1.0 Resizer.qml
+ListView 1.0 ListView.qml
+TreeView 1.0 TreeView.qml
 
 ArrowIcon 1.0 ArrowIcon.qml
 SwitchIcon 1.0 SwitchIcon.qml
