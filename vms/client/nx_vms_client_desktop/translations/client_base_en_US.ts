@@ -8736,6 +8736,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>Starting update to ...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Some servers have no package available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
