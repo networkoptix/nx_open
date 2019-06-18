@@ -48,6 +48,9 @@ struct ClientVerificationData
     /** Peer id for a client. Verification will ignore client if clientId is null. */
     QnUuid clientId;
 
+    /** Client needs this update for compatibility mode. */
+    bool compatibilityMode = false;
+
     /** Fills in systemInfo and currentVersion. */
     void fillDefault();
 };

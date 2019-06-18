@@ -208,8 +208,8 @@ struct UpdateContents
     QSet<QnUuid> invalidVersion;
     /** A set of peers to be ignored during this update. */
     QSet<QnUuid> ignorePeers;
-    /** A set of servers with update packages verified. */
-    QSet<QnUuid> serversWithUpdate;
+    /** A set of peers with update packages verified. */
+    QSet<QnUuid> peersWithUpdate;
     /**
      * Maps a server id, which OS is no longer supported to an error message.
      * The message is displayed to the user.
@@ -239,6 +239,9 @@ struct UpdateContents
     bool packagesGenerated = false;
     /** We have already installed this version. Widget will show appropriate status.*/
     bool alreadyInstalled = false;
+
+    /** Resets data from verification. */
+    void resetVerification();
 
     nx::utils::SoftwareVersion getVersion() const;
 

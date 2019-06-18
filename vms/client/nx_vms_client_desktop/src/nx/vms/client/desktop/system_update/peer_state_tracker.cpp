@@ -167,7 +167,6 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 
 void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
-    NX_ASSERT(!version.isNull());
     NX_VERBOSE(this, "setUpdateTarget(%1)", version);
     m_targetVersion = version;
 
@@ -243,27 +242,27 @@ bool PeerStateTracker::getErrorReport(ErrorReport& report) const
 {
     auto lastCode = UpdateItem::ErrorCode::noError;
 
-    // Maps error code to a set of servers with this code
-    QMap<UpdateItem::ErrorCode, QSet<QnUuid>> errorMap;
-
     for (auto& item: m_items)
     {
         if (item->errorCode == UpdateItem::ErrorCode::noError)
             continue;
 
-        auto& peers = errorMap[item->errorCode];
-        peers.insert(item->id);
-
         auto errorCode = item->errorCode;
         if (errorCode < lastCode || lastCode == UpdateItem::ErrorCode::noError)
+        {
             lastCode = errorCode;
+            // Since all error codes are sorted, we can drop all peers with previous code.
+            report.peers.clear();
+        }
+
+        if (errorCode == lastCode)
+            report.peers.insert(item->id);
     }
 
     if (lastCode == UpdateItem::ErrorCode::noError)
         return false;
 
     report.message = errorString(lastCode);
-    report.peers = errorMap[lastCode];
     return true;
 }
 

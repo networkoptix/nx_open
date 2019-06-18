@@ -98,6 +98,7 @@ void CompatibilityVersionInstallationDialog::processUpdateContents(
     // commonModule->globalSettings()->localSystemId() is zero right now.
     nx::vms::client::desktop::ClientVerificationData clientData;
     clientData.clientId = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+    clientData.compatibilityMode = true;
     clientData.fillDefault();
 
     if (nx::vms::client::desktop::verifyUpdateContents(
