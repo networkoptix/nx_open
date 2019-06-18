@@ -21,7 +21,7 @@ class AbstractObject
 {
 public:
     AbstractObject(const std::string& typeId, Attributes attributes);
-    ~AbstractObject() = default;
+    virtual ~AbstractObject() = default;
 
     Vector2D position() const;
     Size size() const;
