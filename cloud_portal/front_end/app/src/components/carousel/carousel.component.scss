@@ -82,8 +82,28 @@
 
     &.left span {
         left: 20% !important;
+
+        &:nth-child(odd) {
+            transform     : rotate(-65deg);
+            top: 26%;
+        }
+
+        &:nth-child(even) {
+            transform     : rotate(65deg);
+            top: 59%;
+        }
     }
     &.right span {
-        left: 30% !important;
+        left: 25% !important;
+
+        &:nth-child(even) {
+            transform     : rotate(-65deg);
+            top: 59%;
+        }
+
+        &:nth-child(odd) {
+            transform     : rotate(65deg);
+            top: 26%;
+        }
     }
 }

@@ -58,27 +58,31 @@
 }
 
 .nav-arrow.left {
+    position: unset;
     & span:nth-child(odd) {
-        transform     : rotate(-55deg);
-        top: 25%;
+        transform     : rotate(-45deg);
+        top: 30%;
+        left: 20% !important;
     }
     & span:nth-child(even) {
-        transform     : rotate(55deg);
-        top: 55%;
+        transform     : rotate(45deg);
+        top: 50%;
+        left: 20% !important;
     }
 }
 
 .nav-arrow.right {
-    & span:nth-child(odd) {
-        transform     : rotate(-55deg);
-        top: 65%;
-        left: 50%;
+    position: unset;
+    & span:nth-child(even) {
+        transform     : rotate(-45deg);
+        top: 50%;
+        left: 25% !important;
     }
 
-    & span:nth-child(even) {
-        transform     : rotate(55deg);
-        top: 15%;
-        left: 50%;
+    & span:nth-child(odd) {
+        transform     : rotate(45deg);
+        top: 30%;
+        left: 25% !important;
     }
 }
 
