@@ -10,10 +10,6 @@
 #include <QtXml/QDomElement>
 
 #ifdef WIN32
-    #pragma comment(lib, "wevtapi.lib")
-#endif
-
-#ifdef WIN32
 
 DWORD WINAPI SystemEventLogReader::SubscriptionCallback(
     EVT_SUBSCRIBE_NOTIFY_ACTION action, PVOID context, EVT_HANDLE hEvent)
@@ -34,10 +30,10 @@ DWORD WINAPI SystemEventLogReader::SubscriptionCallback(
         &bufferSize, &propertyCount);
 
     const QString kErrorMessage = systemEventLogReader->makeDebugMessage(
-        "Failed to read accepted event log notification message.");
-    if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+        "Failed to read accepted event log notification message. LastError = %1.");
+    if (auto error = GetLastError(); error != ERROR_INSUFFICIENT_BUFFER)
     {
-        NX_DEBUG(systemEventLogReader, kErrorMessage);
+        NX_DEBUG(systemEventLogReader, kErrorMessage.arg(error));
         return 0;
     }
 
@@ -46,9 +42,9 @@ DWORD WINAPI SystemEventLogReader::SubscriptionCallback(
         bufferSize, &buffer.front(),
         &bufferSize, &propertyCount);
 
-    if (GetLastError() != ERROR_SUCCESS)
+    if (auto error = GetLastError(); GetLastError() != ERROR_SUCCESS)
     {
-        NX_DEBUG(systemEventLogReader, kErrorMessage);
+        NX_DEBUG(systemEventLogReader, kErrorMessage.arg(error));
         return 0;
     }
 
@@ -57,18 +53,18 @@ DWORD WINAPI SystemEventLogReader::SubscriptionCallback(
     xmlMessage.replace(QRegExp("\\s+"), " "); //< removing space sequences
 
     NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
-        "System event notification read: %1").arg(xmlMessage));
+        "System event notification read: %1.").arg(xmlMessage));
 
-    const notificationInfo info = systemEventLogReader->parseXmlMessage(xmlMessage);
+    const SystemEventNotificationInfo info = systemEventLogReader->parseXmlMessage(xmlMessage);
     NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
-        "Notification parameters: provider = %1, level = %2, event id = %3, message = %4")
+        "Notification parameters: provider = %1, level = %2, event id = %3, message = %4.")
         .arg(info.providerName, QString::number(info.level), QString::number(info.eventId), info.data));
 
-    if (systemEventLogReader->messageIsSignificant(xmlMessage, info))
+    if (systemEventLogReader->isMessageSignificant(xmlMessage, info))
     {
         NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
             "System event notification is significant and is retransmitted to server: "
-            "provider = %1, level = %2, event id = %3, message = %4")
+            "provider = %1, level = %2, event id = %3, message = %4.")
             .arg(info.providerName, QString::number(info.level), QString::number(info.eventId), info.data));
 
         emit systemEventLogReader->eventOccurred(info.data, systemEventLogReader->reason());
@@ -77,7 +73,7 @@ DWORD WINAPI SystemEventLogReader::SubscriptionCallback(
     {
         NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
             "System event notification is not significant and ignored: "
-            "provider = %1, level = %2, event id = %3, message = %4")
+            "provider = %1, level = %2, event id = %3, message = %4.")
             .arg(info.providerName, QString::number(info.level), QString::number(info.eventId), info.data));
     }
 
@@ -101,74 +97,71 @@ SystemEventLogReader::~SystemEventLogReader()
 bool SystemEventLogReader::subscribe()
 {
     // Currently implemented for Windows only.
-#ifdef WIN32
-    if (m_hSubscription != nullptr)
-    {
-        NX_DEBUG(this, makeDebugMessage(
-            "Server tried to subscribe to system log notifications repeatedly."));
-        return false;
-    }
+    #ifdef WIN32
+        if (m_hSubscription != nullptr)
+        {
+            NX_DEBUG(this, makeDebugMessage(
+                "Server tried to subscribe to system log notifications repeatedly."));
+            return false;
+        }
 
-    const LPCWSTR kXpathQuery = L"*";
-    m_hSubscription = EvtSubscribe(
-        nullptr /*session*/, nullptr /*signal*/, (const wchar_t*) m_logName.utf16(), kXpathQuery,
-        nullptr /*bookmark*/, this /*context*/,
-        (EVT_SUBSCRIBE_CALLBACK)SubscriptionCallback, EvtSubscribeToFutureEvents);
+        const LPCWSTR kXpathQuery = L"*";
+        m_hSubscription = EvtSubscribe(
+            nullptr /*session*/, nullptr /*signal*/, (const wchar_t*) m_logName.utf16(), kXpathQuery,
+            nullptr /*bookmark*/, this /*context*/,
+            (EVT_SUBSCRIBE_CALLBACK)SubscriptionCallback, EvtSubscribeToFutureEvents);
 
-    if (m_hSubscription != nullptr)
-    {
-        NX_INFO(this, makeDebugMessage(
-            "Subscription to system log event notifications succeeded."));
-        return true;
-    }
+        if (m_hSubscription != nullptr)
+        {
+            NX_INFO(this, makeDebugMessage(
+                "Subscription to system log event notifications succeeded."));
+            return true;
+        }
 
-    const DWORD status = GetLastError();
-    switch (status)
-    {
-    case ERROR_EVT_CHANNEL_NOT_FOUND:
-        NX_DEBUG(this, makeDebugMessage(
-            "Subscribing to system log notifications failed. Channel %1 was not found")
-            .arg(m_logName));
-        return false;
-    case ERROR_EVT_INVALID_QUERY:
-        NX_DEBUG(this, makeDebugMessage(
-            "Subscribing to system log notifications failed. The query \"%1\" is not valid")
-            .arg(QString::fromUtf16(reinterpret_cast<const ushort *>(kXpathQuery))));
-        return false;
-    case ERROR_ACCESS_DENIED:
-        NX_DEBUG(this, makeDebugMessage(
-            "Subscribing to system log notifications failed. Access denied."));
-        return false;
-    default:
-        // unexpected error
-        const int kBufferSize = 1024;
-        WCHAR buffer[kBufferSize] = L"unknown"; //< default message if EvtGetExtendedStatus fail
-        DWORD usedBufferSize = 0;
-        EvtGetExtendedStatus(kBufferSize, buffer, &usedBufferSize);
+        const DWORD status = GetLastError();
+        switch (status)
+        {
+            case ERROR_EVT_CHANNEL_NOT_FOUND:
+                NX_DEBUG(this, makeDebugMessage(
+                    "Subscribing to system log notifications failed. Channel %1 was not found.")
+                    .arg(m_logName));
+                break;
+            case ERROR_EVT_INVALID_QUERY:
+                NX_DEBUG(this, makeDebugMessage(
+                    "Subscribing to system log notifications failed. The query \"%1\" is not valid.")
+                    .arg(QString::fromUtf16(reinterpret_cast<const ushort *>(kXpathQuery))));
+                break;
+            case ERROR_ACCESS_DENIED:
+                NX_DEBUG(this, makeDebugMessage(
+                    "Subscribing to system log notifications failed. Access denied."));
+                break;
+            default:
+                // unexpected error
+                const int kBufferSize = 1024;
+                WCHAR buffer[kBufferSize] = L"unknown"; //< default message if EvtGetExtendedStatus fail
+                DWORD usedBufferSize = 0;
+                EvtGetExtendedStatus(kBufferSize, buffer, &usedBufferSize);
 
-        NX_DEBUG(this, makeDebugMessage(
-            "Subscribing to system log notifications failed. The reason is %1")
-            .arg(QString::fromUtf16(reinterpret_cast<ushort *>(buffer))));
-
-        return false;
-    }
-
-#endif
+                NX_DEBUG(this, makeDebugMessage(
+                    "Subscribing to system log notifications failed. The reason is %1.")
+                    .arg(QString::fromUtf16(reinterpret_cast<ushort *>(buffer))));
+        }
+    #endif
     return false;
 }
 
 void SystemEventLogReader::unsubscribe()
 {
-#ifdef WIN32
-    if (m_hSubscription)
-    {
-        EvtClose(m_hSubscription);
-        m_hSubscription = nullptr;
-    }
-#endif
+    #ifdef WIN32
+        if (m_hSubscription)
+        {
+            EvtClose(m_hSubscription);
+            m_hSubscription = nullptr;
+        }
+    #endif
 }
 
-notificationInfo SystemEventLogReader::parseXmlMessage(const QString& xmlMessage)
+SystemEventNotificationInfo SystemEventLogReader::parseXmlMessage(const QString& xmlMessage)
 {
     /*
     The example of the incoming message:
@@ -195,10 +188,9 @@ notificationInfo SystemEventLogReader::parseXmlMessage(const QString& xmlMessage
     Event/System/Level
     Event/System/EventID
     Event/EventData/Data
-
     */
 
-    notificationInfo result;
+    SystemEventNotificationInfo result;
 
     QDomDocument doc;
     doc.setContent(xmlMessage);
@@ -210,19 +202,16 @@ notificationInfo SystemEventLogReader::parseXmlMessage(const QString& xmlMessage
     if (systemNode.isNull() || systemNode.toElement().tagName() != "System")
         return result;
 
-    QDomNode systemChild = systemNode.firstChild();
-    while (!systemChild.isNull())
+    for (QDomNode child = systemNode.firstChild(); !child.isNull(); child = child.nextSibling())
     {
-        if (systemChild.toElement().tagName() == "Provider")
-            result.providerName = systemChild.attributes().namedItem("Name").toAttr().value();
+        if (child.toElement().tagName() == "Provider")
+            result.providerName = child.attributes().namedItem("Name").toAttr().value();
 
-        else if (systemChild.toElement().tagName() == "EventID")
-            result.eventId = systemChild.toElement().text().toInt();
+        else if (child.toElement().tagName() == "EventID")
+            result.eventId = child.toElement().text().toInt();
 
-        else if (systemChild.toElement().tagName() == "Level")
-            result.level = systemChild.toElement().text().toInt();
-
-        systemChild = systemChild.nextSibling();
+        else if (child.toElement().tagName() == "Level")
+            result.level = child.toElement().text().toInt();
     }
 
     // EventData/Data information is not used for filtering, but contains useful information.
@@ -230,21 +219,19 @@ notificationInfo SystemEventLogReader::parseXmlMessage(const QString& xmlMessage
     if (dataNode.isNull() || dataNode.toElement().tagName() != "EventData")
         return result;
 
-    QDomNode dataChild = dataNode.firstChild();
-    while (!dataChild.isNull())
+    for (QDomNode child = dataNode.firstChild(); !child.isNull(); child = child.nextSibling())
     {
-        if (dataChild.toElement().tagName() == "Data")
+        if (child.toElement().tagName() == "Data")
         {
-            result.data = dataChild.toElement().text();
+            result.data = child.toElement().text();
             break;
         }
-        dataChild = dataChild.nextSibling();
     }
     return result;
 }
 
-bool SystemEventLogReader::messageIsSignificant(
-    const QString& xmlMessage, const notificationInfo& parsedMessage)
+bool SystemEventLogReader::isMessageSignificant(
+    const QString& xmlMessage, const SystemEventNotificationInfo& parsedMessage)
 {
     return true;
 }
@@ -254,21 +241,21 @@ QString SystemEventLogReader::makeDebugMessage(const QString& text)
     return text + QString(" LogName = ") + m_logName;
 }
 
-RaidEventLogReader::RaidEventLogReader(QString logName, QString providerName, int maxLevel)
+RaidEventLogReader::RaidEventLogReader(QString logName, QString providerName)
     :
-    SystemEventLogReader(std::move(logName), std::move(providerName), maxLevel,
+    SystemEventLogReader(std::move(logName), std::move(providerName),
+        /*max notification level*/ 5, //< RaidEventLogReader ignores notification level.
         nx::vms::event::EventReason::raidStorageError)
 {
 }
 
-bool RaidEventLogReader::messageIsSignificant(
-    const QString& xmlMessage, const notificationInfo& parsedMessage)
+bool RaidEventLogReader::isMessageSignificant(
+    const QString& xmlMessage, const SystemEventNotificationInfo& parsedMessage)
 {
     if (parsedMessage.providerName != providerName())
         return false;
-    // message level is ignored
 
-    // These event identificators are selected by Daniel Gonzalez <d.gonzalez@hanwha.com>
+    // These event identificators are selected by Daniel Gonzalez <d.gonzalez@hanwha.com>.
     const std::vector<int> significantIds = {
         0x003d, //<  61: Consistency Check failed on %s
         0x0044, //<  68: Initialization failed on %s
@@ -290,8 +277,8 @@ bool RaidEventLogReader::messageIsSignificant(
     if (ok)
         return true;
 
-    // special case
-    if (parsedMessage.eventId == 114 //< State change
+    // Special case.
+    if (parsedMessage.eventId == 114 //< State change.
         && parsedMessage.data.contains("Current = Failed", Qt::CaseInsensitive))
     {
         return true;

@@ -48,6 +48,13 @@ QString Nx1::getSerial()
 
 bool Nx1::isBootedFromSD(nx::vms::server::RootFileSystem* footFs)
 {
+    // On Nx1 in both modes (recovery and normal) both `mount` and `cat /proc/mounts` commands
+    // shows the root device partition as "/dev/root". Further, /dev/root always is a link to
+    // an SD card partition in case of recovery mode or to a hard disk partition in case of normal
+    // mode. In recovery mode the system is booted from SD card. In normal mode - from hard disk.
+    // Thus the direction of this link is used to determine the current mode and the source of the
+    // boot.
+
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     namespace fs = nx::vms::server::fs;
 
