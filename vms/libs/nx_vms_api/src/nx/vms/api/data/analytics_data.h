@@ -23,11 +23,7 @@ struct NX_VMS_API AnalyticsEngineData: ResourceData
 
 #define AnalyticsEngineData_Fields ResourceData_Fields
 
-/**
- * Information about a Server plugin library.
- *
- * See Apidoc for /api/pluginInfo for details.
- */
+/**%apidoc Information about a Server plugin library.*/
 struct NX_VMS_API PluginInfo: Data
 {
     enum class Optionality
@@ -46,34 +42,67 @@ struct NX_VMS_API PluginInfo: Data
 
     enum class Error
     {
-        noError,
-        cannotLoadLibrary,
+        noError, /**<%apidoc No error.*/
+        cannotLoadLibrary, /**<%apidoc OS cannot load the library file.*/
+
+        /**%apidoc The library does not seem to be a valid Nx Plugin library,
+         * e.g. no expected entry point functions found.
+         */
         invalidLibrary,
+
+        /**%apidoc The plugin library failed to initialize, e.g. its entry point function returned
+         * an error.
+         */
         libraryFailure,
+
+        /**%apidoc The plugin has returned a bad manifest, e.g. null, empty, non-json, or json with
+         * an unexpected structure.
+         */
         badManifest,
-        unsupportedVersion
+
+        unsupportedVersion /**<%apidoc The plugin API version is no longer supported.*/
     };
 
     enum class MainInterface
     {
-        undefined,
-        nxpl_PluginInterface,
-        nxpl_Plugin,
-        nxpl_Plugin2,
-        nx_sdk_IPlugin,
-        nx_sdk_analytics_IPlugin,
+        undefined, /**<%apidoc */
+        nxpl_PluginInterface, /**<%apidoc Base interface for the old 3.2 SDK.*/
+        nxpl_Plugin, /**<%apidoc Old 3.2 SDK plugin supporting roSettings.*/
+        nxpl_Plugin2, /**<%apidoc Old 3.2 SDK plugin supporting pluginContainer.*/
+        nx_sdk_IPlugin, /**<%apidoc Base interface for the new 4.0 SDK.*/
+        nx_sdk_analytics_IPlugin, /**<%apidoc New 4.0 SDK Analytics plugin.*/
     };
 
-    QString name;
-    QString description;
+    QString name; /**<%apidoc Name of the plugin from its manifest.*/
+    QString description; /**<%apidoc Description of the plugin from its manifest.*/
+
+    /**%apidoc Absolute path to the plugin dynamic library.*/
     QString libraryFilename;
+
+    /**%apidoc Absolute path to the plugin's dedicated directory where its
+     * dynamic library resides together with its possible dependencies, or an empty
+     * string if the plugin resides in a common directory with other plugins.
+     */
     QString homeDir;
-    QString vendor;
-    QString version;
+
+    QString vendor; /**<%apidoc Vendor of the plugin from its manifest.*/
+    QString version; /**<%apidoc Version of the plugin from its manifest.*/
+
+    /**%apidoc Whether the plugin resides in "plugins_optional" folder
+     * or in the regular "plugins" folder.
+     */
     Optionality optionality = Optionality::nonOptional;
+
+    /**%apidoc Status of the plugin after the plugin loading attempt.*/
     Status status = Status::loaded;
+
+    /**%apidoc Message in English with details about the plugin loading attempt.*/
     QString statusMessage;
+
+    /**%apidoc If the plugin status is "notLoadedBecauseOfError", describes the error.*/
     Error errorCode = Error::noError;
+
+    /**%apidoc The latest Interface type that the Plugin object supports via queryInterface().*/
     MainInterface mainInterface = MainInterface::undefined;
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Optionality)
