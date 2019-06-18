@@ -1288,6 +1288,10 @@
       <translation>Si è verificato un evento sconosciuto</translation>
     </message>
     <message>
+      <source>Multiple %1 events have occured</source>
+      <translation>Si sono verificati più eventi %1</translation>
+    </message>
+    <message>
       <source>Event: %1</source>
       <translation>Evento: %1</translation>
     </message>
@@ -1373,6 +1377,10 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>La connessione alla telecamera (flusso secondario) è stata chiusa in modo imprevisto.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
+      <translation>Rilevata perdita di pacchetti RTP, prev seq. =%1 seq successivo =%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1564,10 +1572,6 @@
     <message>
       <source>Camera time is back to normal</source>
       <translation>L'orario della telecamera è tornato alla normalità</translation>
-    </message>
-    <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>Si sono verificati più eventi %1</translation>
     </message>
   </context>
   <context>

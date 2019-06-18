@@ -77,6 +77,13 @@
     </message>
   </context>
   <context>
+    <name>QObject</name>
+    <message>
+      <source>None</source>
+      <translation>None</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>

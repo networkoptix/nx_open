@@ -1247,6 +1247,10 @@
       <translation>不明なイベント</translation>
     </message>
     <message>
+      <source>Multiple %1 events have occured</source>
+      <translation>複数の%1イベントが発生しました</translation>
+    </message>
+    <message>
       <source>Event: %1</source>
       <translation>イベント: %1</translation>
     </message>
@@ -1329,6 +1333,10 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>カメラ(セコンダリーストリーム)との接続は閉じられました.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
+      <translation>RTPパケットロスが直前のシーケンス=%1 から次のシーケンス=%2.・迄で検知されました.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1518,10 +1526,6 @@
     <message>
       <source>Camera time is back to normal</source>
       <translation>カメラの時間が通常に戻りました</translation>
-    </message>
-    <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>複数の%1イベントが発生しました</translation>
     </message>
   </context>
   <context>

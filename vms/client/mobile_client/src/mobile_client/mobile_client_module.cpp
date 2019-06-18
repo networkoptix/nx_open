@@ -43,8 +43,6 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
-#include <nx/mobile_client/settings/migration_helper.h>
-#include <nx/mobile_client/settings/settings_migration.h>
 #include <nx/client/mobile/software_trigger/event_rules_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
@@ -60,9 +58,6 @@
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <client/client_resource_processor.h>
 #include <utils/media/voice_spectrum_analyzer.h>
-
-
-using namespace nx::mobile_client;
 
 static const QString kQmlRoot = QStringLiteral("qrc:///qml");
 
@@ -93,7 +88,6 @@ QnMobileClientModule::QnMobileClientModule(
 
     /* Init singletons. */
     const auto settings = new QnMobileClientSettings();
-    settings::migrateSettings(); //< This must be done before QnClientCoreModule construction!
 
     m_clientCoreModule.reset(new QnClientCoreModule());
     auto commonModule = m_clientCoreModule->commonModule();
@@ -160,7 +154,6 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->instance<QnSystemsFinder>();
     commonModule->store(new QnSystemsWeightsManager());
 
-    commonModule->store(new settings::SessionsMigrationHelper());
     commonModule->store(new QnVoiceSpectrumAnalyzer());
     commonModule->store(new nx::vms::client::core::ServerTimeWatcher());
 

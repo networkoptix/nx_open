@@ -28,16 +28,19 @@ Item
 
         Repeater
         {
-            model: QnCalendarModel { id: calendarModel }
+            id: repeater
+
+            model: QnCalendarModel
+            {
+                id: calendarModel
+                currentDate: monthGrid.currentDate
+            }
 
             Item
             {
                 id: calendarDay
 
-                property bool current: currentDate.getMonth() + 1 == month &&
-                                       currentDate.getFullYear() === model.date.getFullYear() &&
-                                       currentDate.getMonth() === model.date.getMonth() &&
-                                       currentDate.getDate() === model.date.getDate()
+                property bool current: model.isCurrent
 
                 width: grid.cellWidth
                 height: grid.cellHeight
@@ -67,23 +70,25 @@ Item
                 {
                     anchors.centerIn: parent
                     text: model.display
-                    color: calendarDay.current ? ColorTheme.base3
-                                               : model.date > _today ? ColorTheme.base15
-                                                                     : ColorTheme.windowText
+                    color:
+                    {
+                        if (calendarDay.current)
+                            return ColorTheme.base3
+
+                        return clickArea.enabled ? ColorTheme.windowText : ColorTheme.base15
+                    }
+
                     font.pixelSize: 16
                 }
 
                 MouseArea
                 {
+                    id: clickArea
+
                     anchors.fill: parent
+                    enabled: model.date <= _today
                     onClicked:
                     {
-                        if (model.date.getMonth() + 1 !== calendarModel.month ||
-                            model.date > _today)
-                        {
-                            return
-                        }
-
                         currentDate = model.date
                         monthGrid.datePicked(model.date)
                     }
