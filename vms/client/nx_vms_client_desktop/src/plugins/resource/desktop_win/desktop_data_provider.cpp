@@ -727,6 +727,8 @@ bool QnDesktopDataProvider::needVideoData() const
 
 void QnDesktopDataProvider::run()
 {
+    QThread::currentThread()->setPriority(QThread::HighPriority);
+
     while (!needToStop() || m_grabber->dataExist())
     {
         if (needVideoData())
