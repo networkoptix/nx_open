@@ -861,13 +861,14 @@
             "name": "logo",
             "label": "Logo",
             "value": "",
-            "description": "Logo for integration.<br>Must have a transparent background.",
+            "description": "Logo for integration.<br>Must have a transparent background. (Height should be between 128px and 300px)",
             "type": "external_image",
             "optional": true,
             "meta": {
               "size": 512000,
               "format": "png",
-              "height_ge": 128
+              "height_ge": 128,
+              "height_le": 300
             }
           },
           {

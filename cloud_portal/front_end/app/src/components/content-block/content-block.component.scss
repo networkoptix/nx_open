@@ -37,8 +37,10 @@
         background-color : $light1;
         
         img {
-            max-width : 100%;
-            height    : auto;
+            height     : auto;
+            width      : auto;
+            max-height : 300px;
+            max-width  : 100%;
         }
     }
     
