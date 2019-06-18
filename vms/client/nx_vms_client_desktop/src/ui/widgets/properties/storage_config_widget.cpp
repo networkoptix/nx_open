@@ -190,13 +190,13 @@ namespace
         int m_editedRow;
     };
 
-    class ColumnResizer : public QObject
+    class ColumnResizer: public QObject
     {
     public:
         using QObject::QObject;
 
     protected:
-        bool eventFilter(QObject *object, QEvent *event)
+        bool eventFilter(QObject* object, QEvent* event)
         {
             auto view = qobject_cast<nx::vms::client::desktop::TreeView *>(object);
 
@@ -311,7 +311,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     ui->storageView->header()->setSectionResizeMode(QnStorageListModel::UrlColumn, QHeaderView::Fixed);
     ui->storageView->header()->setSectionResizeMode(QnStorageListModel::SeparatorColumn, QHeaderView::Stretch);
     ui->storageView->setMouseTracking(true);
-    ui->storageView->installEventFilter(m_columnResizer);
+    ui->storageView->installEventFilter(m_columnResizer.data());
 
     auto itemClicked = [this, itemDelegate](const QModelIndex& index)
     {
@@ -438,7 +438,6 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
 QnStorageConfigWidget::~QnStorageConfigWidget()
 {
-    delete m_columnResizer;
 }
 
 void QnStorageConfigWidget::restoreCamerasToBackup()
