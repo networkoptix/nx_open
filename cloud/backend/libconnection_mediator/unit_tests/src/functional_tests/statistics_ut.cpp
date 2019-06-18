@@ -94,7 +94,7 @@ protected:
         std::promise<SystemError::ErrorCode> connected;
         m_stunClient->connect(
             nx::network::url::Builder(httpUrl()).appendPath(api::kStunOverHttpTunnelPath),
-            [this, &connected](SystemError::ErrorCode resultCode)
+            [&connected](SystemError::ErrorCode resultCode)
             {
                 connected.set_value(resultCode);
             });

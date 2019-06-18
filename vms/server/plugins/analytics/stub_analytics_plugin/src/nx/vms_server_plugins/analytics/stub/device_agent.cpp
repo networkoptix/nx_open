@@ -10,6 +10,7 @@
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 #include <nx/sdk/helpers/string_map.h>
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
@@ -108,6 +109,25 @@ void DeviceAgent::settingsReceived()
     }
 }
 
+/** @param func Name of the caller for logging; supply __func__. */
+void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* func)
+{
+    NX_OUTPUT << func << "(): timestamp " << videoFrame->timestampUs() << " us;"
+        << " frame #" << m_frameCounter;
+
+    if (m_frameCounter == ini().crashDeviceAgentOnFrameN)
+    {
+        const std::string message = nx::kit::utils::format(
+            "ATTENTION: Intentionally crashing the process at frame #%d as per %s",
+            m_frameCounter, ini().iniFile());
+        NX_PRINT << message;
+        nx::kit::debug::intentionallyCrash(message.c_str());
+    }
+
+    ++m_frameCounter;
+    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
+}
+
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
     if (engine()->needUncompressedVideoFrames())
@@ -116,9 +136,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
         return false;
     }
 
-    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUs() << " us";
-    ++m_frameCounter;
-    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
+    processVideoFrame(videoFrame, __func__);
     return true;
 }
 
@@ -130,12 +148,8 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
         return false;
     }
 
-    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUs() << " us";
-
-    ++m_frameCounter;
-    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
-
-    return checkFrame(videoFrame);
+    processVideoFrame(videoFrame, __func__);
+    return checkVideoFrame(videoFrame);
 }
 
 bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)
@@ -145,10 +159,10 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     const char* logMessage = "";
     if (ini().generateObjects)
     {
-        IMetadataPacket* const metadataPacket = cookSomeObjects();
-        if (metadataPacket)
+        std::vector<IMetadataPacket*> result = cookSomeObjects();
+        if (!result.empty())
         {
-            metadataPackets->push_back(metadataPacket);
+            *metadataPackets = result;
             logMessage = "Generated 1 metadata packet";
         }
         else
@@ -274,9 +288,9 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 // private
 
 static IObjectMetadata* makeObjectMetadata(
-    std::string objectTypeId,
-    Uuid objectId,
-    double dt,
+    const std::string& objectTypeId,
+    const Uuid& objectId,
+    double offset,
     int64_t lastVideoFrameTimestampUs,
     bool generatePreviewAttributes,
     int objectIndex)
@@ -285,18 +299,18 @@ static IObjectMetadata* makeObjectMetadata(
     objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
     objectMetadata->setTypeId(objectTypeId);
     objectMetadata->setId(objectId);
-    objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) dt,
-        (float) dt + 0.05 * objectIndex, 0.25F, 0.25F));
+    objectMetadata->setBoundingBox(
+		Rect((float) offset, (float) offset + 0.05F * (float) objectIndex, 0.25F, 0.25F));
 
-    if (generatePreviewAttributes)
+    if (generatePreviewAttributes && ini().useOldStylePreviewAttributes)
     {
         // Make a box smaller than the one in setBoundingBox() to make the change visible.
         objectMetadata->addAttributes({
             {IAttribute::Type::number, "nx.sys.preview.timestampUs",
                 std::to_string(lastVideoFrameTimestampUs)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(dt)},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(offset)},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.y",
-                std::to_string(dt)},
+                std::to_string(offset)},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.width", "0.1"},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"},
         });
@@ -332,15 +346,26 @@ static IObjectMetadata* makeObjectMetadata(
     return objectMetadata;
 }
 
+static IObjectTrackBestShotPacket* makeObjectTrackBestShotPacket(
+    const Uuid& objectTrackId,
+    int64_t timestampUs,
+    float offset)
+{
+    return new ObjectTrackBestShotPacket(
+        objectTrackId,
+        timestampUs,
+        Rect(offset, offset, 0.1, 0.1));
+}
+
 void DeviceAgent::generateObjectIds()
 {
-    int objectsCount = ini().objectsCount;
-    if (objectsCount < 1)
+    int objectCount = ini().objectCount;
+    if (objectCount < 1)
     {
         NX_OUTPUT << "Invalid value for objectCount in .ini; assuming 1.";
-        objectsCount = 1;
+        objectCount = 1;
     }
-    m_objectIds.resize(objectsCount);
+    m_objectIds.resize(objectCount);
     for (auto& objectId: m_objectIds)
         objectId = UuidHelper::randomUuid();
 }
@@ -385,13 +410,14 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
     return eventMetadataPacket;
 }
 
-IMetadataPacket* DeviceAgent::cookSomeObjects()
+std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 {
+    std::vector<IMetadataPacket*> result;
     if (m_lastVideoFrameTimestampUs == 0)
-        return nullptr;
+        return {};
 
     if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
-        return nullptr;
+        return {};
 
     double dt = m_objectCounter / 32.0;
     ++m_objectCounter;
@@ -439,12 +465,25 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
             m_lastVideoFrameTimestampUs,
             generatePreviewAttributes,
             i));
+
         objectMetadataPacket->addItem(objectMetadata.get());
+
+        if (generatePreviewAttributes && !ini().useOldStylePreviewAttributes)
+        {
+            auto bestShotMetadataPacket = makeObjectTrackBestShotPacket(
+                m_objectIds[i],
+                m_lastVideoFrameTimestampUs,
+                dt);
+
+            if (bestShotMetadataPacket)
+                result.push_back(bestShotMetadataPacket);
+        }
     }
 
     objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
     objectMetadataPacket->setDurationUs(0);
-    return objectMetadataPacket;
+    result.push_back(objectMetadataPacket);
+    return result;
 }
 
 int64_t DeviceAgent::usSinceEpoch() const
@@ -454,7 +493,7 @@ int64_t DeviceAgent::usSinceEpoch() const
         system_clock::now().time_since_epoch()).count();
 }
 
-bool DeviceAgent::checkFrame(const IUncompressedVideoFrame* frame) const
+bool DeviceAgent::checkVideoFrame(const IUncompressedVideoFrame* frame) const
 {
     if (frame->pixelFormat() != engine()->pixelFormat())
     {
@@ -469,6 +508,9 @@ bool DeviceAgent::checkFrame(const IUncompressedVideoFrame* frame) const
     if (!pixelFormatDescriptor)
         return false; //< Error is already logged.
 
+    NX_KIT_ASSERT(pixelFormatDescriptor->planeCount > 0,
+        nx::kit::utils::format("%d", pixelFormatDescriptor->planeCount));
+
     if (frame->planeCount() != pixelFormatDescriptor->planeCount)
     {
         NX_PRINT << __func__ << "() ERROR: planeCount() is "
@@ -482,43 +524,89 @@ bool DeviceAgent::checkFrame(const IUncompressedVideoFrame* frame) const
         return false;
     }
 
+    bool success = true;
     for (int plane = 0; plane < frame->planeCount(); ++plane)
     {
-        const int bytesPerPlane = (plane == 0)
-            ? (frame->height() * frame->lineSize(plane))
-            : ((frame->height() / pixelFormatDescriptor->chromaHeightFactor)
-                * frame->lineSize(plane));
-
-        if (frame->dataSize(plane) != bytesPerPlane)
+        if (checkVideoFramePlane(frame, pixelFormatDescriptor, plane))
         {
-            NX_PRINT << __func__ << "() ERROR: dataSize(/*plane*/ " << plane << ") is "
-                << frame->dataSize(plane) << " instead of " << bytesPerPlane
-                << ", while lineSize(/*plane*/ " << plane << ") is " << frame->lineSize(plane)
-                << " and height is " << frame->height();
+            if (NX_DEBUG_ENABLE_OUTPUT)
+                dumpSomeFrameBytes(frame, plane);
         }
-
-        // Hex-dump some bytes from raw pixel data.
-        if (NX_DEBUG_ENABLE_OUTPUT)
+        else
         {
-            static const int dumpOffset = 0;
-            static const int dumpSize = 12;
-
-            if (frame->dataSize(plane) < dumpOffset + dumpSize)
-            {
-                NX_PRINT << __func__ << "(): WARNING: dataSize(/*plane*/ " << plane << ") is "
-                    << frame->dataSize(plane) << ", which is suspiciously low";
-            }
-            else
-            {
-                NX_PRINT_HEX_DUMP(
-                    nx::kit::utils::format("Plane %d bytes %d..%d of %d",
-                        plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
-                    frame->data(plane) + dumpOffset, dumpSize);
-            }
+            success = false;
         }
     }
 
+    return success;
+}
+
+bool DeviceAgent::checkVideoFramePlane(
+    const IUncompressedVideoFrame* frame,
+    const PixelFormatDescriptor* pixelFormatDescriptor,
+    int plane) const
+{
+    bool success = true;
+    if (!frame->data(plane))
+    {
+        NX_PRINT << __func__ << "() ERROR: data(/*plane*/ " << plane << ") is null";
+        success = false;
+    }
+
+    if (frame->lineSize(plane) <= 0)
+    {
+        NX_PRINT << __func__ << "() ERROR: lineSize(/*plane*/ " << plane << ") is "
+            << frame->lineSize(plane);
+        success = false;
+    }
+
+    if (frame->dataSize(plane) <= 0)
+    {
+        NX_PRINT << __func__ << "() ERROR: dataSize(/*plane*/ " << plane << ") is "
+            << frame->dataSize(plane);
+        success = false;
+    }
+
+    if (!success)
+        return false;
+
+    const int bytesPerPlane = (plane == 0)
+        ? (frame->height() * frame->lineSize(plane))
+        : ((frame->height() / pixelFormatDescriptor->chromaHeightFactor)
+            * frame->lineSize(plane));
+
+    if (frame->dataSize(plane) != bytesPerPlane)
+    {
+        NX_PRINT << __func__ << "() ERROR: dataSize(/*plane*/ " << plane << ") is "
+            << frame->dataSize(plane) << " instead of " << bytesPerPlane
+            << ", while lineSize(/*plane*/ " << plane << ") is " << frame->lineSize(plane)
+            << " and height is " << frame->height();
+        return false;
+    }
+
     return true;
+}
+
+void DeviceAgent::dumpSomeFrameBytes(
+    const nx::sdk::analytics::IUncompressedVideoFrame* frame, int plane) const
+{
+    // Hex-dump some bytes from raw pixel data.
+
+    static const int dumpOffset = 0;
+    static const int dumpSize = 12;
+
+    if (frame->dataSize(plane) < dumpOffset + dumpSize)
+    {
+        NX_PRINT << __func__ << "(): WARNING: dataSize(/*plane*/ " << plane << ") is "
+            << frame->dataSize(plane) << ", which is suspiciously low";
+    }
+    else
+    {
+        NX_PRINT_HEX_DUMP(
+            nx::kit::utils::format("Plane %d bytes %d..%d of %d",
+                plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
+            frame->data(plane) + dumpOffset, dumpSize);
+    }
 }
 
 } // namespace stub

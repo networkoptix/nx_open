@@ -19,6 +19,8 @@
 namespace nx {
 namespace hpm {
 
+class ListeningPeerDb;
+
 struct ListeningPeerData
 {
     /** true, if peer listens on this mediator instance. */
@@ -27,7 +29,7 @@ struct ListeningPeerData
     nx::String hostName;
     /** Valid for locally-registered peer only. */
     std::shared_ptr<nx::network::stun::ServerConnection> peerConnection;
-    std::list<network::SocketAddress> endpoints;
+    std::vector<network::SocketAddress> endpoints;
     api::CloudConnectVersion cloudConnectVersion;
 
     ListeningPeerData():
@@ -96,7 +98,9 @@ public:
             PeerContainer::iterator peerIter);
     };
 
-    ListeningPeerPool(const conf::ListeningPeer& settings);
+    ListeningPeerPool(
+        const conf::ListeningPeer& settings,
+        ListeningPeerDb* listeningPeerDb);
     virtual ~ListeningPeerPool();
 
     /**
@@ -124,6 +128,7 @@ private:
     mutable QnMutex m_mutex;
     PeerContainer m_peers;
     const conf::ListeningPeer m_settings;
+    ListeningPeerDb* m_listeningPeerDb = nullptr;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     nx::utils::Counter m_counter;
 

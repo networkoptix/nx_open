@@ -1,4 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
+import { NxLanguageProviderService } from '../../../services/nx-language-provider';
+import { TranslateService }          from '@ngx-translate/core';
 
 @Component({
     selector: 'nx-account-settings-select',

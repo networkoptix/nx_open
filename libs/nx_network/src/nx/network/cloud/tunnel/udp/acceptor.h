@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/cloud/mediator_server_connections.h>
 #include <nx/network/cloud/tunnel/abstract_tunnel_acceptor.h>
@@ -22,7 +24,7 @@ class NX_NETWORK_API TunnelAcceptor:
 public:
     TunnelAcceptor(
         const SocketAddress& mediatorUdpEndpoint,
-        std::list<SocketAddress> peerAddresses,
+        std::vector<SocketAddress> peerAddresses,
         nx::hpm::api::ConnectionParameters connectionParametes);
 
     void setUdpRetransmissionTimeout(std::chrono::milliseconds timeout);
@@ -44,7 +46,7 @@ private:
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractIncomingTunnelConnection> connection = nullptr);
 
-    const std::list<SocketAddress> m_peerAddresses;
+    const std::vector<SocketAddress> m_peerAddresses;
     const nx::hpm::api::ConnectionParameters m_connectionParameters;
     SocketAddress m_mediatorUdpEndpoint;
     std::chrono::milliseconds m_udpRetransmissionTimeout;

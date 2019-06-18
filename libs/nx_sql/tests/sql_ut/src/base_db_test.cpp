@@ -8,8 +8,8 @@
 
 namespace nx::sql::test {
 
-BasicFixture::BasicFixture():
-    nx::utils::test::TestWithTemporaryDirectory("utils_ut", "")
+BasicFixture::BasicFixture(const std::string& testModuleName):
+    nx::utils::test::TestWithTemporaryDirectory(testModuleName.c_str(), "")
 {
     init();
 }
@@ -69,7 +69,7 @@ void BaseDbTest::closeDatabase()
     m_dbInstanceController.reset();
 }
 
-AsyncSqlQueryExecutor& BaseDbTest::asyncSqlQueryExecutor()
+AbstractAsyncSqlQueryExecutor& BaseDbTest::asyncSqlQueryExecutor()
 {
     return m_dbInstanceController->queryExecutor();
 }
@@ -88,7 +88,7 @@ void FixtureWithQueryExecutorOnly::closeDatabase()
     m_queryExecutor.reset();
 }
 
-AsyncSqlQueryExecutor& FixtureWithQueryExecutorOnly::asyncSqlQueryExecutor()
+AbstractAsyncSqlQueryExecutor& FixtureWithQueryExecutorOnly::asyncSqlQueryExecutor()
 {
     return *m_queryExecutor;
 }

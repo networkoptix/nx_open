@@ -149,6 +149,16 @@ QnResourceTypePool *QnResourceTypePool::instance()
     return QnResourceTypePool_instance();
 }
 
+QnResourceTypePool::QnResourceTypePool()
+{
+    // Add static data for predefined types.
+    // It needs for UT only. Media server load it from the database as well.
+    QnResourceTypePtr resType(new QnResourceType());
+    resType->setName(nx::vms::api::UserData::kResourceTypeName);
+    resType->setId(nx::vms::api::UserData::kResourceTypeId);
+    addResourceType(resType);
+}
+
 QnResourceTypePtr QnResourceTypePool::getResourceTypeByName(const QString& name) const
 {
     QnMutexLocker lock( &m_mutex );

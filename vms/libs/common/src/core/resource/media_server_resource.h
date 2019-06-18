@@ -13,15 +13,7 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/system_information.h>
 
-namespace nx {
-namespace network {
-namespace http {
-
-class AsyncHttpClientPtr;
-
-} // namespace nx
-} // namespace network
-} // namespace http
+namespace nx::network::http { class AsyncHttpClientPtr; }
 
 class QnMediaServerResource:
     public QnResource,
@@ -135,8 +127,16 @@ public:
      */
     virtual QnUuid getOriginalGuid() const { return getId();  }
 
-    static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
+    /**
+     * @return Ids of Analytics Engines which are actually running on the server.
+     */
+    QSet<QnUuid> activeAnalyticsEngineIds() const;
 
+    QnUuid metadataStorageId() const;
+    void setMetadataStorageId(const QnUuid& value);
+
+    static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
+    QnMediaServerUserAttributesPtr userAttributes() const;
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
@@ -154,6 +154,7 @@ signals:
     void backupScheduleChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr& resource);
     void primaryAddressChanged(const QnResourcePtr& resource);
+    void metadataStorageIdChanged(const QnResourcePtr& resource);
 private:
     nx::network::SocketAddress m_primaryAddress;
     QnMediaServerConnectionPtr m_apiConnection; // deprecated

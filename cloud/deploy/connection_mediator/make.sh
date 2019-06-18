@@ -5,17 +5,10 @@
 
 MODULE=connection_mediator
 
-function stage()
+function stage_cmake_extra()
 {
-    rm -rf stage
-    check_vms_dirs
-
-	mkdir -p stage/connection_mediator/bin stage/connection_mediator/lib stage/qt/lib stage/qt/bin
-	cp -rl $environment/packages/linux-x64/qt-$QT_VERSION/lib/* stage/qt/lib
-	cp -rl $environment/packages/linux-x64/qt-$QT_VERSION/plugins/sqldrivers stage/qt/bin
-
-	cp -rl $NX_VMS_DIR/build_environment/target/bin/$BUILD_CONFIGURATION/connection_mediator stage/connection_mediator/bin/connection_mediator
-	cp -rl $NX_VMS_DIR/build_environment/target/lib/$BUILD_CONFIGURATION/* stage/connection_mediator/lib
+    mkdir -p stage/${moduleName}/var
+    cp -l $environment/packages/any/geolite-2/GeoLite2-City.mmdb stage/${moduleName}/var/
 }
 
 main $@

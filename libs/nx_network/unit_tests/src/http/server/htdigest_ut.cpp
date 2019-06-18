@@ -77,8 +77,8 @@ protected:
             [userAndPassword](PasswordLookupResult result)
             {
                 ASSERT_EQ(PasswordLookupResult::Code::ok, result.code);
-                ASSERT_EQ(PasswordLookupResult::DataType::ha1, result.type);
-                ASSERT_EQ(userAndPassword.second, *result.ha1());
+                ASSERT_EQ(AuthTokenType::ha1, result.authToken.type);
+                ASSERT_EQ(userAndPassword.second, result.authToken.value);
             });
     }
 

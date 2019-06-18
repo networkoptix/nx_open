@@ -7,7 +7,7 @@
                 <span class="ml-1">{{ activeCamera.model }}</span>
             </div>
             <span class="glyphicon close-icon detailsClose"
-                  (click)="activeCamera = undefined; onCloseView.emit(activeCamera)">
+                  (click)="closeView()">
             </span>
         </header>
 
@@ -139,7 +139,7 @@
 
                 <div class="row" *ngIf="!showAll && activeCamera.firmwares.length > 5">
                     <div class="col-12">
-                        <a href (click)="showAll = true; false">Show All</a>
+                        <a href (click)="showAll = true; false" translate>Show All</a>
                     </div>
                 </div>
 
@@ -164,10 +164,11 @@
 
         <nx-section>
             <div>
-                <a href="javascript:void(0);" (click)="onFeedbackClick.emit(activeCamera)">Send feedback about this
-                device</a>
+                <a href translate
+                   (click)="sendFeedback()">Send feedback about this device
+                </a>
             </div>
-            <div style="color: gray;">Updated {{ activeCamera.timestamp | date:'fullDate'}}</div>
+            <div style="color: gray;"><span translate>Updated</span> {{ activeCamera.timestamp | date:'fullDate'}}</div>
 
         </nx-section>
     </nx-block>

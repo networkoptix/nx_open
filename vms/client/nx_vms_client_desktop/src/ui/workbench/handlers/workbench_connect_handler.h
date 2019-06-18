@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QObject>
 
 #include <nx/utils/scope_guard.h>
@@ -58,7 +60,8 @@ public:
         NoFlags = 0x0,
         Force = 0x1,
         ErrorReason = 0x2,
-        ClearAutoLogin = 0x4
+        ClearAutoLogin = 0x4,
+        SessionTimeout = 0x8,
     };
     Q_DECLARE_FLAGS(DisconnectFlags, DisconnectFlag)
 
@@ -140,6 +143,9 @@ private:
     void at_disconnectAction_triggered();
 
     void showPreloader();
+
+    /** Limit the time UI spends in "Loading..." state. */
+    void setupConnectTimeoutTimer(std::chrono::milliseconds timeout);
 
 private:
     struct

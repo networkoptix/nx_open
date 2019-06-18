@@ -39,6 +39,65 @@ params can be <strong>renamed</strong>, though often <strong>deprecated names</s
 supported for a while, when noted below.
 </p>
 <!--============================================================================================-->
+<hr/><h2>VMS <b>4.1</b> relative to <i>4.0</i></h2>
+<!--............................................................................................-->
+<h3>Retaining compatibility until expired</h3>
+<p>
+Made <strong><i>GET</i></strong> deprecated in favor of the newly implemented
+<strong><b>POST</b></strong> methods with the same path and parameters encoded in a JSON object
+body for methods that perform changes on the server side (deprecated method support expires after
+4.2):
+<pre>
+    /api/transmitAudio
+    /api/backupControl (with non-empty "action" URL param)
+    /api/backupDatabase
+    /api/configure
+    /api/debugEvent
+    /api/detachFromSystem
+    /api/execute*
+    /api/createEvent
+    /api/manualCamera/search
+    /api/manualCamera/stop
+    /api/manualCamera/add
+    /api/mergeSystems
+    /api/ptz (with "command" URL param which does not start with "Get")
+    /api/rebuildArchive
+    /api/settime
+    /api/setupCloudSystem
+    /api/setupLocalSystem
+    /api/systemSettings
+    /ec2/bookmarks/add
+    /ec2/bookmarks/delete
+    /ec2/bookmarks/update
+</pre>
+Example:
+<i><pre>
+    GET /api/systemSettings?smtpTimeout=30&smtpUser=test HTTP/1.1
+</pre></i>
+Replaced by:
+<b><pre>
+    POST /api/systemSettings HTTP/1.1
+    Content-Type: application/json
+    Content-Length: 40
+
+    {"smtpTimeout": 30, "smtpUser": "test"}
+</pre></b>
+GET methods with paramiters which do not cause any server changes are still allowed:
+<pre>
+    /api/backupControl (without or with empty "action" URL param)
+    /api/ptz (with "command" URL param which starts with "Get")
+</pre>
+</p>
+
+<p>
+The following modifying <strong><i>GET</i></strong> methods are deprecated because there is already
+incompatible <strong><b>POST</b></strong> version available (see their documentation for details;
+deprecated method support expires after 4.2):
+<pre>
+    /api/setCameraParam
+</pre>
+</p>
+<!--============================================================================================-->
 <hr/><h2>VMS <b>4.0</b> relative to <i>3.2</i></h2>
 <!--............................................................................................-->
 <h3>Breaking compatibility</h3>
@@ -54,6 +113,7 @@ status code has been changed from <strong><code><i>200 OK</i></code></strong> to
     /api/setCameraParam
 </pre>
 </p>
+
 <p>
 Output parameter value list can contain not only parameters specified by the user,
 but also additional parameter values affected by the set operation in the method:

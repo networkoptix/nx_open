@@ -316,7 +316,7 @@ private:
     void resetParserState()
     {
         m_parser.reset();
-        m_message.clear();
+        m_message = Message();
         m_parser.setMessage(&m_message);
         m_messageReported = false;
     }

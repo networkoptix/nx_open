@@ -1,6 +1,10 @@
 #include "storage_url_dialog.h"
 #include "ui_storage_url_dialog.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
+#include <QtCore/QCryptographicHash>
+
 #include <api/media_server_connection.h>
 #include <api/runtime_info_manager.h>
 

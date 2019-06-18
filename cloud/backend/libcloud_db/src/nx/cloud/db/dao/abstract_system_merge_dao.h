@@ -49,7 +49,7 @@ public:
 
 using SystemMergeDaoFactoryFunction =
     std::unique_ptr<AbstractSystemMergeDao>(
-        nx::sql::AsyncSqlQueryExecutor* queryExecutor);
+        nx::sql::AbstractAsyncSqlQueryExecutor* queryExecutor);
 
 class SystemMergeDaoFactory:
     public nx::utils::BasicFactory<SystemMergeDaoFactoryFunction>
@@ -63,7 +63,7 @@ public:
 
 private:
     std::unique_ptr<AbstractSystemMergeDao> defaultFactoryFunction(
-        nx::sql::AsyncSqlQueryExecutor* queryExecutor);
+        nx::sql::AbstractAsyncSqlQueryExecutor* queryExecutor);
 };
 
 } // namespace dao

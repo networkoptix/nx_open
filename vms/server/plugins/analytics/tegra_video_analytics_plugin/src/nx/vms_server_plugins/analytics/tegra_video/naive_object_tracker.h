@@ -82,7 +82,7 @@ private:
     static bool isTooSmall(const TegraVideo::Rect& rectangle);
     static float bottomRightX(const TegraVideo::Rect& rectangle);
     static float bottomRightY(const TegraVideo::Rect& rectangle);
-    static nx::sdk::analytics::IObjectMetadata::Rect toSdkRect(const TegraVideo::Rect& rectangle);
+    static nx::sdk::analytics::Rect toSdkRect(const TegraVideo::Rect& rectangle);
 
 private:
     std::map<nx::sdk::Uuid, CachedObject> m_cachedObjects;

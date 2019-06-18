@@ -2,6 +2,7 @@
 
 #include <memory>
 
+class QWidget;
 class QMenu;
 class QAction;
 class QPoint;

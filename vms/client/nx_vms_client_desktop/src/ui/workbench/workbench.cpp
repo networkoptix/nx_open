@@ -3,7 +3,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
 
+#include <core/resource/layout_reader.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 
@@ -15,6 +17,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -211,17 +214,21 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
     if (m_currentLayout == layout)
         return;
 
+    QString password;
     if (layout) // layout == nullptr is ok in QnWorkbench destructor
     {
-        auto resource = layout->resource();
-        if (resource && layout::requiresPassword(resource))
+        auto resource = layout->resource().dynamicCast<QnFileLayoutResource>();
+        if (resource && resource->requiresPassword())
         {
             // When opening encrypted layout, ask for the password and remove layout if unsuccessful.
-            if (!layout::askAndSetPassword(resource, mainWindowWidget()))
+            password = layout::askPassword(resource.dynamicCast<QnLayoutResource>(), mainWindowWidget());
+            if (password.isEmpty())
             {
                 delete layout;
                 return;
             }
+            layout::reloadFromFile(resource, password);
+            snapshotManager()->store(resource);
         }
     }
 

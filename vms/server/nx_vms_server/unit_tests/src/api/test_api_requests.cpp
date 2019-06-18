@@ -113,7 +113,7 @@ void doExecuteGet(const nx::utils::Url& url,
 
     NX_INFO(typeid(FunctionsTag), lm("GET %1").arg(url.path()));
 
-    httpClient->doGet(url);
+    ASSERT_TRUE(httpClient->doGet(url));
 
     NX_CRITICAL(outResponse);
     *outResponse = readResponseBody(httpClient.get());

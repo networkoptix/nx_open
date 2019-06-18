@@ -1370,10 +1370,6 @@
       <translation>Произошло неизвестное событие</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occured</source>
-      <translation>Произошло несколько событий %1</translation>
-    </message>
-    <message>
       <source>Event: %1</source>
       <translation>Событие: %1</translation>
     </message>
@@ -1465,10 +1461,6 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>Подключение к камере (второй поток) было неожиданно сброшено.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>Обнаружена потеря RTP пакетов, предыдущий пакет%1, следующий пакет %2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1664,6 +1656,10 @@
     <message>
       <source>Camera time is back to normal</source>
       <translation type="unfinished">Camera time is back to normal</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occurred</source>
+      <translation type="unfinished">Multiple %1 events have occurred</translation>
     </message>
   </context>
   <context>

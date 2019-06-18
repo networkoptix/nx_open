@@ -33,6 +33,7 @@ class ForwardingInstrument;
 class SignalingInstrument;
 class SelectionOverlayHackInstrument;
 class FocusListenerInstrument;
+namespace nx::vms::client::desktop { class DebugInfoInstrument; }
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -143,6 +144,7 @@ public:
 
     SignalingInstrument* afterPaintInstrument() const;
 
+    nx::vms::client::desktop::DebugInfoInstrument* debugInfoInstrument() const;
 
     /**
      * Note that this function never returns NULL.
@@ -325,6 +327,8 @@ signals:
     void resourceAdded(const QnResourcePtr &resource);
     void resourceAboutToBeRemoved(const QnResourcePtr &resource);
 
+    void layoutAccessChanged();
+
 protected:
     WidgetAnimator *animator(QnResourceWidget *widget);
 
@@ -489,6 +493,8 @@ private:
 
     SignalingInstrument *m_afterPaintInstrument;
 
+    /* Debug Instrument*/
+    nx::vms::client::desktop::DebugInfoInstrument* m_debugInfoInstrument;
 
     /* Animation-related stuff. */
 

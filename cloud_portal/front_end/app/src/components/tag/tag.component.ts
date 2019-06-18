@@ -18,6 +18,7 @@ export class NxTagComponent implements OnInit, ControlValueAccessor {
     @Input() type: string;
     @Input('value') selected: boolean;
     @Output() onClick = new EventEmitter<boolean>();
+
     private badgeClass: string;
 
     constructor() {}
@@ -47,11 +48,9 @@ export class NxTagComponent implements OnInit, ControlValueAccessor {
     }
 
     selectTag() {
-        if (!this.selected) {
-            this.selected = true;
-            this.badgeClass = this.type ? `-${this.type}-selected` : '-selected';
-            this.changeState(true);
-        }
+        this.selected = true;
+        this.badgeClass = this.type ? `-${this.type}-selected` : '-selected';
+        this.changeState(true);
     }
 
     // Form control functions

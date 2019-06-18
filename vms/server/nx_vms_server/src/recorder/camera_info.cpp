@@ -299,15 +299,10 @@ QString Reader::infoFilePath() const
 bool Reader::readFileData()
 {
     m_fileData = m_getDataFunc(infoFilePath());
-
     if (m_fileData.isNull())
     {
-        m_lastError =  {
-            lit("File data is NULL for archive camera %1")
-                .arg(m_archiveCamData.coreData.physicalId),
-            utils::log::Level::error
-        };
-        return false;
+        NX_DEBUG(
+            this, "File data is NULL for archive camera %1", m_archiveCamData.coreData.physicalId);
     }
 
     return true;

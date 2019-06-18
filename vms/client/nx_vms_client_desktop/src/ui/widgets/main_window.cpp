@@ -510,6 +510,16 @@ void MainWindow::setWelcomeScreenVisible(bool visible)
     updateWidgetsVisibility();
 }
 
+bool MainWindow::isWorkbenchVisible() const
+{
+    return m_view->isVisibleTo(this);
+}
+
+bool MainWindow::isWelcomeScreenVisible() const
+{
+    return m_welcomeScreenVisible;
+}
+
 void MainWindow::setMaximized(bool maximized) {
     if(maximized == isMaximized())
         return;
@@ -521,8 +531,18 @@ void MainWindow::setMaximized(bool maximized) {
     }
 }
 
-void MainWindow::setFullScreen(bool fullScreen) {
-    if(fullScreen == isFullScreen())
+bool MainWindow::isFullScreenMode() const
+{
+#if defined(Q_OS_MAC)
+    return mac_isFullscreen(reinterpret_cast<void*>(winId()));
+#else
+    return isFullScreen();
+#endif
+}
+
+void MainWindow::setFullScreen(bool fullScreen)
+{
+    if(fullScreen == isFullScreenMode())
         return;
 
     /*
@@ -532,17 +552,22 @@ void MainWindow::setFullScreen(bool fullScreen) {
      */
     if (m_inFullscreenTransition)
         return;
+
     QScopedValueRollback<bool> guard(m_inFullscreenTransition, true);
 
 
-    if(fullScreen) {
-#ifndef Q_OS_MACX
+    if(fullScreen)
+    {
+#if !defined(Q_OS_MACX)
         m_storedGeometry = geometry();
 #endif
+
         showFullScreen();
-    } else if(isFullScreen()) {
+    }
+    else if(isFullScreenMode())
+    {
         showNormal();
-#ifndef Q_OS_MACX
+#if !defined(Q_OS_MACX)
         setGeometry(m_storedGeometry);
 #endif
     }
@@ -717,7 +742,7 @@ void MainWindow::updateContentsMargins()
     m_drawCustomFrame = false;
     m_frameMargins = QMargins{};
 
-    if (nx::utils::AppInfo::isLinux() && !isFullScreen() && !isMaximized())
+    if (nx::utils::AppInfo::isLinux() && !isFullScreenMode() && !isMaximized())
     {
         // In Linux window managers cannot disable titlebar leaving window border in place.
         // Thus we have to disable decorations completely and draw our own border.
@@ -796,7 +821,7 @@ void MainWindow::moveEvent(QMoveEvent *event) {
 
 Qt::WindowFrameSection MainWindow::windowFrameSectionAt(const QPoint &pos) const
 {
-    if (isFullScreen() && !isTitleVisible())
+    if (isFullScreenMode() && !isTitleVisible())
         return Qt::NoSection;
 
     Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(
@@ -844,7 +869,7 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
         // an artificial delta is added to make the client area differ from the screen dimensions.
         case WM_NCCALCSIZE:
         {
-            if (!isFullScreen() || isMinimized())
+            if (!isFullScreenMode() || isMinimized())
                 return false;
 
             auto rect = LPRECT(msg->lParam);
@@ -872,7 +897,7 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
         // Block default activation processing in fullscreen.
         case WM_NCACTIVATE:
         {
-            if (!isFullScreen())
+            if (!isFullScreenMode())
                 return false;
 
             *result = TRUE;
@@ -883,7 +908,7 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
         // behavior.
         case WM_NCPAINT:
         {
-            if (!isFullScreen() && !isMinimized())
+            if (!isFullScreenMode() && !isMinimized())
                 return false;
 
             gdi::WindowDC context(msg->hwnd);

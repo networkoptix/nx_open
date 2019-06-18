@@ -25,19 +25,17 @@ void RemoteRelayPeerPoolAioWrapper::findRelayByDomain(
     const std::string& domainName,
     nx::utils::MoveOnlyFunc<void(std::string /*relay host*/)> completionHandler)
 {
-    m_remoteRelayPeerPool.findRelayByDomain(domainName).then(
+    m_remoteRelayPeerPool.findRelayByDomain(
+        domainName,
         [this, lock = m_pendingAsyncCallCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
-                cf::future<std::string> relayDomainFuture) mutable
+                std::string relayDomain) mutable
         {
             m_asyncCallProvider.post(
-                [completionHandler = std::move(completionHandler),
-                    result = relayDomainFuture.get()]() mutable
+                [completionHandler = std::move(completionHandler), relayDomain]() mutable
                 {
-                    completionHandler(std::move(result));
+                    completionHandler(std::move(relayDomain));
                 });
-
-            return cf::unit();
         });
 }
 

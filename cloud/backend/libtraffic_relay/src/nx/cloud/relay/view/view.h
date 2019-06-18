@@ -14,7 +14,7 @@
 #include <nx/network/http/server/http_server_htdigest_authentication_provider.h>
 #include <nx/cloud/relaying/http_view/listening_peer_connection_tunneling.h>
 
-#include "authentication_manager.h"
+//#include "authentication_manager.h"
 #include "client_connection_tunneling.h"
 
 namespace nx {
@@ -44,19 +44,22 @@ public:
     std::vector<network::SocketAddress> httpsEndpoints() const;
 
     const nx::network::http::server::MultiEndpointAcceptor& httpServer() const;
+    nx::network::http::server::rest::MessageDispatcher& messageDispatcher();
+
+    void loadHtdigestAuthenticatorIfNeeded(const conf::Settings& settings);
+    void addPathToHtdigestAuthenticatorIfLoaded(const std::string& regex);
 
 private:
     /** Provides htdigest authentication for maintenance server*/
-    struct MaintenanceAuthenticator
+    struct HtdigestAuthenticator
     {
         nx::network::http::server::HtdigestAuthenticationProvider provider;
         nx::network::http::server::BaseAuthenticationManager manager;
 
-        MaintenanceAuthenticator(const std::string& htdigestPath):
+        HtdigestAuthenticator(const std::string& htdigestPath):
             provider(htdigestPath),
             manager(&provider)
         {
-
         }
     };
 
@@ -67,13 +70,10 @@ private:
     view::ClientConnectionTunnelingServer m_clientConnectionTunnelingServer;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::http::AuthMethodRestrictionList m_authRestrictionList;
-    view::AuthenticationManager m_authenticationManager;
     nx::network::http::server::AuthenticationDispatcher m_authenticationDispatcher;
     nx::network::http::server::MultiEndpointAcceptor m_multiAddressHttpServer;
-    std::unique_ptr<MaintenanceAuthenticator> m_maintenanceAuthenticator;
+    std::unique_ptr<HtdigestAuthenticator> m_htdigestAuthenticator;
     network::maintenance::Server m_maintenanceServer;
-
-    void registerAuthenticators();
 
     void registerApiHandlers();
 

@@ -34,7 +34,7 @@ HttpView::HttpView(
         &controller->systemHealthInfoProvider(),
         &controller->authProvider(),
         &controller->eventManager(),
-        &controller->ec2SyncronizationEngine(),
+        &controller->ec2SynchronizationEngine(),
         &controller->maintenanceManager(),
         controller->cloudModuleUrlProviderDeprecated(),
         controller->cloudModuleUrlProvider());
@@ -54,9 +54,7 @@ HttpView::HttpView(
             });
     }
 
-    m_maintenanceServer.registerRequestHandlers(
-        kApiPrefix,
-        &m_httpMessageDispatcher);
+    m_maintenanceServer.registerRequestHandlers(kApiPrefix, &m_httpMessageDispatcher);
 
     registerAuthenticators();
 }
@@ -87,6 +85,9 @@ void HttpView::listen()
 {
     if (!m_multiAddressHttpServer.listen(m_settings.http().tcpBacklogSize))
         throw std::system_error(SystemError::getLastOSErrorCode(), std::system_category());
+
+    NX_ALWAYS(this, "HTTP server is listening on %1",
+        containerString(m_multiAddressHttpServer.endpoints()));
 }
 
 std::vector<network::SocketAddress> HttpView::endpoints() const
@@ -111,19 +112,26 @@ void HttpView::registerStatisticsApiHandlers(
 
 void HttpView::registerAuthenticators()
 {
+    const auto addPathToHtDigestAuthenticator =
+        [this](const std::string& regex)
+        {
+            NX_INFO(this, "Adding api path regex: '%1' to htdigest authenticator", regex);
+            m_authenticationDispatcher.add(std::regex(regex), &m_htdigestAuthenticator->manager);
+        };
+
     if (!m_settings.http().maintenanceHtdigestPath.empty())
     {
-        NX_INFO(
-            this,
-            lm("htdigest authentication for cloud db maintenance server enabled. File path: %1")
-                .arg(m_settings.http().maintenanceHtdigestPath));
-
-        m_maintenanceAuthenticator = std::make_unique<MaintenanceAuthenticator>(
+        NX_INFO(this,
+            "htdigest authentication for cloud db maintenance server enabled. File path: %1",
             m_settings.http().maintenanceHtdigestPath);
 
-        m_authenticationDispatcher.add(
-            std::regex(network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*")),
-            &m_maintenanceAuthenticator->manager);
+        m_htdigestAuthenticator = std::make_unique<HtdigestAuthenticator>(
+            m_settings.http().maintenanceHtdigestPath);
+
+        addPathToHtDigestAuthenticator(
+            network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*"));
+
+        addPathToHtDigestAuthenticator(network::url::joinPath(kStatisticsPath, "/.*"));
     }
 
     m_authenticationDispatcher.add(
@@ -138,7 +146,7 @@ void HttpView::registerApiHandlers(
     AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
     AuthenticationProvider* const authProvider,
     EventManager* const /*eventManager*/,
-    clusterdb::engine::SyncronizationEngine* const ec2SyncronizationEngine,
+    clusterdb::engine::SynchronizationEngine* const ec2SynchronizationEngine,
     MaintenanceManager* const maintenanceManager,
     const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
     const CloudModuleUrlProvider& cloudModuleUrlProvider)
@@ -272,10 +280,10 @@ void HttpView::registerApiHandlers(
         EntityType::account, DataActionType::fetch);
 
     //---------------------------------------------------------------------------------------------
-    ec2SyncronizationEngine->registerHttpApi(
+    ec2SynchronizationEngine->registerHttpApi(
         kEc2TransactionConnectionPathPrefix, &m_httpMessageDispatcher);
 
-    ec2SyncronizationEngine->registerHttpApi(
+    ec2SynchronizationEngine->registerHttpApi(
         kDeprecatedEc2TransactionConnectionPathPrefix, &m_httpMessageDispatcher);
 
     //---------------------------------------------------------------------------------------------

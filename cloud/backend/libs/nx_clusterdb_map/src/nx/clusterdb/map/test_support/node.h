@@ -15,7 +15,9 @@ public:
     map::Database& database();
 
 protected:
-    virtual void setup() override;
+    virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;
+
+    virtual void setup(const nx::utils::AbstractServiceSettings& settings) override;
     virtual void teardown() override;
 
 private:

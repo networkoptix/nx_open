@@ -89,6 +89,7 @@ public:
     virtual bool deserialize(MessageParserBuffer* buffer) override;
 
     const SocketAddress& endpoint() const;
+    const SocketAddress& get() const;
 
     bool operator==(const MappedAddress& rhs) const;
 

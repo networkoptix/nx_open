@@ -17,6 +17,7 @@
 
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/director/director.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -50,6 +51,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
+#include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 
 using namespace nx::vms::client::desktop::ui;
@@ -118,6 +120,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
         statisticsManager, &QnStatisticsManager::sendStatistics);
 
     instance<nx::vms::client::desktop::SystemHealthState>();
+
+    instance<nx::vmx::client::desktop::Director>();
+    instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
 
     initWorkarounds();
 }
@@ -189,6 +194,11 @@ MainWindow* QnWorkbenchContext::mainWindow() const
     return m_mainWindow.data();
 }
 
+QWidget* QnWorkbenchContext::mainWindowWidget() const
+{
+    return mainWindow();
+}
+
 void QnWorkbenchContext::setMainWindow(MainWindow* mainWindow)
 {
     if (m_mainWindow == mainWindow)
@@ -228,7 +238,6 @@ void QnWorkbenchContext::setUserName(const QString &userName) {
     if(m_userWatcher)
         m_userWatcher->setUserName(userName);
 }
-
 
 bool QnWorkbenchContext::closingDown() const
 {
@@ -290,72 +299,6 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             break;
     }
     return false;
-}
-
-bool QnWorkbenchContext::showEulaFromString(QString eulaText) const
-{
-    // Regexp to dig out a title from html with EULA.
-    QRegExp headerRegExp("<title>(.+)</title>", Qt::CaseInsensitive);
-    headerRegExp.setMinimal(true);
-
-    QString eulaHeader;
-    if (headerRegExp.indexIn(eulaText) != -1)
-    {
-        QString title = headerRegExp.cap(1);
-        eulaHeader = tr("Please review and agree to the %1 in order to proceed").arg(title);
-    }
-    else
-    {
-        // We are here only if some vile monster has chewed our eula file.
-        NX_ASSERT(false);
-        eulaHeader = tr("To use the software you must agree with the end user license agreement");
-    }
-
-    const QString eulaHtmlStyle = NxUi::generateCssStyle();;
-
-    eulaText = eulaText.replace(
-        lit("<head>"),
-        lit("<head><style>%1</style>").arg(eulaHtmlStyle)
-    );
-
-    QnMessageBox eulaDialog(workbench()->context()->mainWindow());
-    eulaDialog.setIcon(QnMessageBoxIcon::Warning);
-    eulaDialog.setText(eulaHeader);
-
-    auto view = new QWebView(&eulaDialog);
-    NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
-    view->setHtml(eulaText);
-    view->setFixedSize(740, 560);
-    view->show();
-    eulaDialog.addCustomWidget(view);
-    eulaDialog.addButton(tr("I Agree"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
-    eulaDialog.addButton(tr("I Do Not Agree"), QDialogButtonBox::RejectRole);
-    return eulaDialog.exec() == QDialogButtonBox::AcceptRole;
-}
-
-bool QnWorkbenchContext::showEulaFromFile(QString eulaPath) const
-{
-    if (eulaPath.isEmpty())
-        eulaPath = ":/license.html";
-
-    const bool acceptedEula =
-        [this, eulaPath]() -> bool
-        {
-            QFile eula(eulaPath);
-            if (!eula.open(QIODevice::ReadOnly))
-            {
-                NX_ERROR(this) << "Failed to open eula file" << eulaPath;
-                return true;
-            }
-            QString eulaText = QString::fromUtf8(eula.readAll());
-            return showEulaFromString(eulaText);
-        }();
-
-    if (!acceptedEula)
-        return false;
-
-    qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
-    return true;
 }
 
 bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& startupParams)
@@ -467,3 +410,7 @@ void QnWorkbenchContext::initWorkarounds()
     menu()->registerAlias(action::EffectiveMaximizeAction, effectiveMaximizeActionId);
 }
 
+bool QnWorkbenchContext::isWorkbenchVisible() const
+{
+    return m_mainWindow && m_mainWindow->isWorkbenchVisible();
+}

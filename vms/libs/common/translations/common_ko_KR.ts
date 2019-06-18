@@ -1247,10 +1247,6 @@
       <translation>알지 못하는 이벤트 발생</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occured</source>
-      <translation>여러 개의 %1 이벤트가 발생했습니다.</translation>
-    </message>
-    <message>
       <source>Event: %1</source>
       <translation>이벤트: %1</translation>
     </message>
@@ -1333,10 +1329,6 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>카메라 2nd 스트림이 에상치 못하게 끊겼습니다.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>RTP 패킷 손실이 발생함, prev seq.=%1 next seq.=%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1526,6 +1518,10 @@
     <message>
       <source>Camera time is back to normal</source>
       <translation type="unfinished">Camera time is back to normal</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occurred</source>
+      <translation type="unfinished">Multiple %1 events have occurred</translation>
     </message>
   </context>
   <context>

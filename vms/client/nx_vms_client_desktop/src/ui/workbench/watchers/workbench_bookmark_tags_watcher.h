@@ -7,13 +7,14 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_bookmark.h>
 
+class QTimer;
 
 // TODO: #ynikitenkov Thionk about usage only on bookmarks dialog showing
 class QnWorkbenchBookmarkTagsWatcher : public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
 public:
-    explicit QnWorkbenchBookmarkTagsWatcher(QObject *parent = 0);
+    explicit QnWorkbenchBookmarkTagsWatcher(QObject* parent = nullptr);
 
     QnCameraBookmarkTagList tags() const;
 

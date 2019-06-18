@@ -77,13 +77,6 @@
     </message>
   </context>
   <context>
-    <name>QObject</name>
-    <message>
-      <source>None</source>
-      <translation>ไม่มี</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>

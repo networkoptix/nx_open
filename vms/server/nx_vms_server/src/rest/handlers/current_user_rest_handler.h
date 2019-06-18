@@ -6,6 +6,7 @@
 class QnCurrentUserRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
+    using nx::network::rest::Handler::executeGet;
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 };
 

@@ -1,6 +1,6 @@
 #include "local_resource_status_watcher.h"
 
-#include <QFileInfo>
+#include <QtCore/QFileInfo>
 
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
@@ -13,9 +13,8 @@ namespace {
 
 Qn::ResourceStatus getAviResourceStatus(QnAviResourcePtr aviResource)
 {
-    const QScopedPointer<QnAviArchiveDelegate> archiveDelegate(
-        aviResource->createArchiveDelegate());
-    return archiveDelegate->open(aviResource) ? Qn::Online : Qn::Offline;
+    QFile file(aviResource->getUrl());
+    return file.open(QFile::ReadOnly) ? Qn::Online : Qn::Offline;
 }
 
 Qn::ResourceStatus getFileLayoutResourceStatus(QnFileLayoutResourcePtr layoutResource)
@@ -40,8 +39,9 @@ void setResourceStatus(const QnResourcePtr resource, Qn::ResourceStatus status)
     }
 }
 
-
 } // namespace
+
+using namespace std::literals::chrono_literals;
 
 QnLocalResourceStatusWatcher::QnLocalResourceStatusWatcher(QObject* parent /*= nullptr*/):
     QObject(parent)
@@ -50,7 +50,7 @@ QnLocalResourceStatusWatcher::QnLocalResourceStatusWatcher(QObject* parent /*= n
     connect(resourcePool, &QnResourcePool::resourceAdded,
         this, &QnLocalResourceStatusWatcher::onResourceAdded);
 
-    static const std::chrono::seconds kUpdatePeriod(1);
+    static const auto kUpdatePeriod = 3s;
     m_timerId = startTimer(kUpdatePeriod);
 }
 

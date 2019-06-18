@@ -47,7 +47,7 @@ bool QnDigitalWatchdogResource::isCproChipset() const
 
 bool QnDigitalWatchdogResource::useOnvifAdvancedParameterProviders() const
 {
-    return isCproChipset() || resourceData().value<bool>(lit("forceOnvifAdvancedParameters"));
+    return isCproChipset() || resourceData().value<bool>("forceOnvifAdvancedParameters");
 }
 
 std::unique_ptr<CLSimpleHTTPClient> QnDigitalWatchdogResource::httpClient() const
@@ -183,8 +183,9 @@ bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(
     return true;
 }
 
-static const QString kCproPrimaryVideoCodec = lit("cproPrimaryVideoCodec");
-static const QString kCproSecondaryVideoCodec = lit("cproSecondaryVideoCodec");
+static const QString kCproPrimaryVideoCodec("cproPrimaryVideoCodec");
+static const QString kCproSecondaryVideoCodec("cproSecondaryVideoCodec");
+static const QString kDwPravisChipset("dw-pravis-chipset");
 static const QStringList kCproParameters{kCproPrimaryVideoCodec, kCproSecondaryVideoCodec};
 
 void QnDigitalWatchdogResource::initAdvancedParametersProvidersUnderLock(QnCameraAdvancedParams &params)
@@ -195,7 +196,7 @@ void QnDigitalWatchdogResource::initAdvancedParametersProvidersUnderLock(QnCamer
         return;
     }
 
-    if (resourceData().value<bool>(lit("dw-pravis-chipset")))
+    if (resourceData().value<bool>(kDwPravisChipset))
         m_cameraProxy.reset(new QnPravisCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
     else
         m_cameraProxy.reset(new QnWin4NetCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));

@@ -16,7 +16,6 @@ namespace nx::cloud::db {
 
 EMailManager::EMailManager(const conf::Settings& settings):
     m_settings(settings),
-    m_terminated(false),
     m_notificationSequence(
         std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count())

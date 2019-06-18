@@ -139,8 +139,9 @@ void ConnectionBase::pleaseStopSync()
         NX_ASSERT(m_startedClassId == typeid(*this).hash_code(),
             "Please call pleaseStopSync() in the destructor of the nested class.");
         m_startedClassId = 0;
-        m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
     }
+
+    m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
 }
 
 ConnectionBase::~ConnectionBase()
@@ -208,10 +209,11 @@ void ConnectionBase::onHttpClientDone()
     {
         // try next credential source
         m_credentialsSource = (CredentialsSource)((int)m_credentialsSource + 1);
-        if (m_credentialsSource < CredentialsSource::none)
+        using namespace std::placeholders;
+        if (m_httpClient->url().userName().isEmpty()
+            && m_credentialsSource < CredentialsSource::none
+            && fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey))
         {
-            using namespace std::placeholders;
-            fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
             m_httpClient->doGet(
                 m_httpClient->url(),
                 std::bind(&ConnectionBase::onHttpClientDone, this));
@@ -344,16 +346,8 @@ void ConnectionBase::startConnection()
 
     m_httpClient->bindToAioThread(m_timer.getAioThread());
 
-    if (requestUrl.userName().isEmpty())
-    {
+    if (requestUrl.password().isEmpty())
         fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
-    }
-    else
-    {
-        m_credentialsSource = CredentialsSource::remoteUrl;
-        m_httpClient->setUserName(requestUrl.userName());
-        m_httpClient->setUserPassword(requestUrl.password());
-    }
 
     m_httpClient->doGet(
         requestUrl,

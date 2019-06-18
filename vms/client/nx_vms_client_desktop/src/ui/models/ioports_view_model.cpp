@@ -1,4 +1,7 @@
 #include "ioports_view_model.h"
+
+#include <QtGui/QFont>
+
 #include <nx/utils/string.h>
 
 namespace

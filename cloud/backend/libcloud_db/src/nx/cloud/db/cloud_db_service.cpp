@@ -58,7 +58,8 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
 
     statistics::Provider statisticsProvider(
         view.httpServer(),
-        controller.ec2SyncronizationEngine().statisticsProvider());
+        controller.ec2SynchronizationEngine().statisticsProvider(),
+        controller.dbInstanceController().statisticsCollector());
     view.registerStatisticsApiHandlers(&statisticsProvider);
 
     // Process privilege reduction.
@@ -67,12 +68,11 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     view.listen();
     NX_INFO(this, lm("Listening on %1").container(view.endpoints()));
 
-    NX_ALWAYS(this, lm("%1 has been started")
-        .arg(QnLibCloudDbAppInfo::applicationDisplayName()));
+    NX_ALWAYS(this, "%1 has been started", QnLibCloudDbAppInfo::applicationDisplayName());
 
     const auto result = runMainLoop();
 
-    NX_ALWAYS(this, lm("Stopping..."));
+    NX_ALWAYS(this, "Stopping...");
 
     return result;
 }

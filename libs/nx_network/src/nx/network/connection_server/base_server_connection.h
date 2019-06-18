@@ -111,24 +111,11 @@ public:
                         });
                 }
 
-                m_receiving = true;
                 m_readBuffer.resize(0);
                 m_streamSocket->readSomeAsync(
                     &m_readBuffer,
                     [this](auto&&... args) { onBytesRead(std::move(args)...); });
             });
-    }
-
-    void stopReading()
-    {
-        NX_ASSERT(isInSelfAioThread());
-        m_receiving = false;
-    }
-
-    void setReceivingStarted()
-    {
-        NX_ASSERT(isInSelfAioThread());
-        m_receiving = true;
     }
 
     /**
@@ -202,7 +189,6 @@ public:
     virtual std::unique_ptr<AbstractStreamSocket> takeSocket()
     {
         m_streamSocket->cancelIOSync(aio::etNone);
-        m_receiving = false;
 
         return std::exchange(m_streamSocket, nullptr);
     }
@@ -219,6 +205,11 @@ public:
             resetInactivityTimer();
         else
             removeInactivityTimer();
+    }
+
+    std::optional<std::chrono::milliseconds> inactivityTimeout() const
+    {
+        return m_inactivityTimeout;
     }
 
 protected:
@@ -245,7 +236,6 @@ private:
 
     std::optional<std::chrono::milliseconds> m_inactivityTimeout;
     bool m_isSendingData = false;
-    bool m_receiving = false;
 
     void onBytesRead(SystemError::ErrorCode errorCode, size_t bytesRead)
     {
@@ -264,7 +254,7 @@ private:
 
         m_readBuffer.resize(0);
 
-        if (!m_receiving)
+        if (!m_streamSocket)
             return;
 
         if (bytesRead == 0)    //< Connection closed by remote peer.

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>720</width>
     <height>603</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>800</width>
+    <width>640</width>
     <height>0</height>
    </size>
   </property>
@@ -244,9 +244,6 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <property name="verticalSpacing">
-              <number>2</number>
-             </property>
              <item row="0" column="1">
               <widget class="QWidget" name="widget" native="true">
                <layout class="QHBoxLayout" name="addressLabelLayout">
@@ -266,22 +263,12 @@
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QLabel" name="addressLabel">
+                 <widget class="nx::vms::client::desktop::LabelWithHint" name="addressLabel">
                   <property name="text">
                    <string>Address</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="explanationLabel">
-                  <property name="text">
-                   <string notr="true">?</string>
-                  </property>
-                  <property name="textFormat">
-                   <enum>Qt::PlainText</enum>
                   </property>
                  </widget>
                 </item>
@@ -341,7 +328,7 @@
                        <number>65535</number>
                       </property>
                       <property name="value">
-                       <number>0</number>
+                       <number>80</number>
                       </property>
                      </widget>
                     </item>
@@ -380,12 +367,6 @@
                  <spacer name="horizontalSpacer_2">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>40</height>
-                   </size>
                   </property>
                  </spacer>
                 </item>
@@ -452,6 +433,9 @@
              <item row="2" column="1">
               <widget class="QWidget" name="widget_3" native="true">
                <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,1">
+                <property name="bottomMargin">
+                 <number>6</number>
+                </property>
                 <item>
                  <widget class="QStackedWidget" name="subnetScanPortSpinWidget">
                   <property name="minimumSize">
@@ -481,6 +465,9 @@
                       </property>
                       <property name="maximum">
                        <number>65535</number>
+                      </property>
+                      <property name="value">
+                       <number>80</number>
                       </property>
                      </widget>
                     </item>
@@ -955,6 +942,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>nx::vms::client::desktop::Panel</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/panel.h</header>
@@ -984,12 +977,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnWordWrappedLabel</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/word_wrapped_label.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QnIpLineEdit</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/common/ip_line_edit.h</header>
@@ -1000,6 +987,11 @@
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::LabelWithHint</class>
+   <extends>QLabel</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/widget_with_hint.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

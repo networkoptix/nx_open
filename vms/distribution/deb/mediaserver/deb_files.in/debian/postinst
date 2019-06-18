@@ -30,6 +30,22 @@ CAMERA_SETTINGS_OPTIMIZATION_DEFAULT=true
 STATISTICS_REPORT_ALLOWED_DEFAULT=true
 SYSTEM_USER=$COMPANY_NAME
 
+TARGET_DEVICE='@targetDevice@'
+WITH_ROOT_TOOL='@withRootTool@'
+
+is_systemd_used() {
+    [[ $(readlink -m /sbin/init) =~ .*systemd$ ]]
+}
+
+is_rpi() {
+    if [[ $TARGET_DEVICE == "linux_arm32" ]]
+    then
+        grep '^Hardware.*:.*BCM2835[[:space:]]*$' /proc/cpuinfo &>/dev/null
+    else
+        false
+    fi
+}
+
 function is_local_addr {
     local hostname=$1;
     local addr=$(gethostip $hostname -d)
@@ -85,11 +101,26 @@ function display_complete_setup_hint {
     fi
 }
 
+install_modification_specific_config()
+{
+    local -r target_device='@targetDevice@'
+    local -r config_file_path="${BASE_DIR}/share/configs/mediaserver.conf.$target_device.template"
+
+    if [[ -f ${config_file_path} ]]
+    then
+        cp  "${config_file_path}" "${BASE_DIR}/etc/mediaserver.conf"
+    fi
+}
+
 # This is necessary because changed configuration options should take effect
 # immediately.
 
 service $COMPANY_NAME-mediaserver stop || true
-service $COMPANY_NAME-root-tool stop || true
+
+if [[ $WITH_ROOT_TOOL == 'true' ]]
+then
+    service $COMPANY_NAME-root-tool stop || true
+fi
 
 case "$1" in
     configure)
@@ -150,7 +181,7 @@ case "$1" in
         # Allow core dumps creation.
         chown "$SYSTEM_USER:$SYSTEM_USER" "$BIN_DIR"
 
-        if [ '@withRootTool@' = 'true' ]
+        if [[ $WITH_ROOT_TOOL == 'true' ]]
         then
             chown "root:${SYSTEM_USER}" "${BIN_DIR}/root-tool-bin"
             chmod u+s "${BIN_DIR}/root-tool-bin"
@@ -175,21 +206,46 @@ echo manual > /etc/init/apport.override
 systemctl disable apport >/dev/null 2>&1 || true
 service apport stop >/dev/null 2>&1 || true
 
-if [ $(which systemctl) ]; then
-    # Systemd requires explicit enabling of the service to start it on boot.
-    systemctl enable $COMPANY_NAME-root-tool || exit $?
-    systemctl enable $COMPANY_NAME-mediaserver || exit $?
+[[ -L "${BASE_DIR}/lib/ffmpeg" ]] && unlink "${BASE_DIR}/lib/ffmpeg"
+
+if is_rpi
+then
+    # RPi requires specially compiled ffmpeg with mmal support - for RPi camera.
+    ( cd "${BASE_DIR}/lib"; ln -s ffmpeg-rpi ffmpeg )
 else
-    update-rc.d $COMPANY_NAME-root-tool defaults || exit $?
-    update-rc.d $COMPANY_NAME-mediaserver defaults || exit $?
+    ( cd "${BASE_DIR}/lib"; ln -s ffmpeg-arm32 ffmpeg )
 fi
 
-if service $COMPANY_NAME-root-tool start && service $COMPANY_NAME-mediaserver start; then
+install_modification_specific_config
+
+if is_systemd_used
+then
+    # Systemd requires explicit enabling of the service to start it on boot.
+    if [[ $WITH_ROOT_TOOL == 'true' ]]
+    then
+        systemctl enable $COMPANY_NAME-root-tool || exit $?
+    fi
+
+    systemctl enable $COMPANY_NAME-mediaserver || exit $?
+fi
+
+startServer()
+{
+    if [[ $WITH_ROOT_TOOL == 'true' ]]
+    then
+        service $COMPANY_NAME-root-tool start || return $?
+    fi
+
+    service $COMPANY_NAME-mediaserver start
+}
+
+if startServer
+then
     sleep 1
-    echo Start service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
+    echo Started service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
 else
     # We do not fail installation process because in this case dpkg makes a package hard to remove.
-    echo WARNING: Unable to start service >&2
+    echo "WARNING: Unable to start service" 1>&2
 fi
 
 display_complete_setup_hint $PORT

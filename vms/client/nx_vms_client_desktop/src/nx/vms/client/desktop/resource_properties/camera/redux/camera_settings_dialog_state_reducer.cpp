@@ -391,6 +391,7 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
+
     if (state.canForcePanTiltCapabilities() &&
         state.expert.forcedPtzPanTiltCapability.valueOr(true))
     {
@@ -446,6 +447,13 @@ bool canForcePanTiltCapabilities(const Camera& camera)
     return camera->ptzCapabilitiesUserIsAllowedToModify() &
         Ptz::Capability::ContinuousPanTiltCapabilities;
 };
+
+bool analyticsEngineIsPresentInList(const QnUuid& id, const State& state)
+{
+    const auto& engines = state.analytics.engines;
+    return std::any_of(engines.cbegin(), engines.cend(),
+        [&id](const auto& info) { return info.id == id; });
+}
 
 } // namespace
 
@@ -538,6 +546,12 @@ State CameraSettingsDialogStateReducer::loadCameras(
         [](const Camera& camera) { return camera->hasMotion(); });
     state.devicesDescription.hasDualStreamingCapability = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasDualStreamingInternal(); });
+
+    state.devicesDescription.isUdpMulticastTransportAllowed = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            return camera->hasCameraCapabilities(Qn::CameraCapability::MulticastStreamCapability);
+        });
 
     state.devicesDescription.hasRemoteArchiveCapability = combinedValue(cameras,
         [](const Camera& camera)
@@ -645,7 +659,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
             nullptr,
             false);
 
-        state.analytics.enabledEngines.setBase(firstCamera->enabledAnalyticsEngines());
+        state.analytics.enabledEngines.setBase(firstCamera->userEnabledAnalyticsEngines());
     }
 
     fetchFromCameras<bool>(state.recording.enabled, cameras,
@@ -754,18 +768,22 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     if (state.canForcePanTiltCapabilities())
     {
-        fetchFromCameras<bool>(
-            state.expert.forcedPtzPanTiltCapability,
-            cameras,
-            canForcePanTiltCapabilities);
+        fetchFromCameras<bool>(state.expert.forcedPtzPanTiltCapability, cameras,
+            [](const Camera& camera)
+            {
+                return camera->ptzCapabilitiesAddedByUser().testFlag(
+                    Ptz::ContinuousPanTiltCapabilities);
+            });
     }
 
     if (state.canForceZoomCapability())
     {
-        fetchFromCameras<bool>(
-            state.expert.forcedPtzZoomCapability,
-            cameras,
-            canForceZoomCapability);
+        fetchFromCameras<bool>(state.expert.forcedPtzZoomCapability, cameras,
+            [](const Camera& camera)
+            {
+                return camera->ptzCapabilitiesAddedByUser().testFlag(
+                    Ptz::ContinuousZoomCapability);
+            });
     }
 
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
@@ -1367,15 +1385,27 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
 State CameraSettingsDialogStateReducer::setAnalyticsEngines(
     State state, const QList<AnalyticsEngineInfo>& value)
 {
+    // If no engine is currently selected, select the first available.
     state.analytics.engines = value;
+    if (value.empty())
+        state.analytics.currentEngineId = {};
+    else if (!analyticsEngineIsPresentInList(state.analytics.currentEngineId, state))
+        state.analytics.currentEngineId = state.analytics.engines[0].id;
+
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setCurrentAnalyticsEngineId(
+std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngineId(
     State state, const QnUuid& value)
 {
+    if (state.analytics.currentEngineId == value)
+        return {false, std::move(state)};
+
+    if (!analyticsEngineIsPresentInList(value, state))
+        return {false, std::move(state)};
+
     state.analytics.currentEngineId = value;
-    return state;
+    return {true, std::move(state)};
 }
 
 State CameraSettingsDialogStateReducer::setAnalyticsSettingsLoading(State state, bool value)
@@ -1387,7 +1417,15 @@ State CameraSettingsDialogStateReducer::setAnalyticsSettingsLoading(State state,
 State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
     State state, const QSet<QnUuid>& value)
 {
-    state.analytics.enabledEngines.setUser(value);
+    // Filter out engines which are not available anymore.
+    QSet<QnUuid> actualValue;
+    for (const auto& id: value)
+    {
+        if (analyticsEngineIsPresentInList(id, state))
+            actualValue.insert(id);
+    }
+
+    state.analytics.enabledEngines.setUser(actualValue);
     state.hasChanges = true;
     return state;
 }

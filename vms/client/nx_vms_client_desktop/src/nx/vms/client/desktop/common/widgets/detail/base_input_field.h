@@ -71,6 +71,9 @@ public:
 
     void setHintColor(const QColor& color);
 
+    bool getUseWarningStyleForControl() const;
+    void setUseWarningStyleForControl(bool useWarningStyle);
+
     bool isValid() const;
 
 public:

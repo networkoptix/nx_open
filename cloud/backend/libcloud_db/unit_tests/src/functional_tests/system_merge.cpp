@@ -313,7 +313,7 @@ private:
 
     std::unique_ptr<AbstractSystemHealthInfoProvider> createSystemHealthInfoProvider(
         clusterdb::engine::ConnectionManager*,
-        nx::sql::AsyncSqlQueryExecutor*)
+        nx::sql::AbstractAsyncSqlQueryExecutor*)
     {
         auto systemHealthInfoProvider = std::make_unique<SystemHealthInfoProviderStub>();
         m_systemHealthInfoProviderStub = systemHealthInfoProvider.get();

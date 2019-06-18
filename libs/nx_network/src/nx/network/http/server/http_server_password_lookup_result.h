@@ -1,13 +1,10 @@
 #pragma once
 
-#include <boost/optional.hpp>
-
 #include <nx/network/buffer.h>
 
-namespace nx {
-namespace network {
-namespace http {
-namespace server {
+#include "../auth_tools.h"
+
+namespace nx::network::http::server {
 
 struct NX_NETWORK_API PasswordLookupResult
 {
@@ -18,18 +15,8 @@ struct NX_NETWORK_API PasswordLookupResult
         otherError,
     };
 
-    enum class DataType
-    {
-        password,
-        ha1
-    };
-
     Code code;
-    DataType type;
-    nx::String data;
-
-    boost::optional<nx::String> password() const;
-    boost::optional<nx::String> ha1() const;
+    AuthToken authToken;
 };
 
 class NX_NETWORK_API PlainTextPasswordLookupResultBuilder
@@ -46,7 +33,4 @@ public:
     static PasswordLookupResult build(PasswordLookupResult::Code errorCode);
 };
 
-} // namespace server
-} // namespace nx {
-} // namespace network {
-} // namespace http {
+} // namespace nx::network::http::server

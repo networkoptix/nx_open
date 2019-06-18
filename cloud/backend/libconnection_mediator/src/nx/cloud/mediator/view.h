@@ -3,6 +3,7 @@
 #include "http/get_listening_peer_list_handler.h"
 #include "http/http_server.h"
 #include "stun_server.h"
+#include "server/redirecting_hole_punching_processor.h"
 
 namespace nx {
 
@@ -48,7 +49,20 @@ private:
     http::Server m_httpServer;
     StunServer m_stunServer;
 
+    // Used to override HolePunchingProcessor::connect().
+    // Move ownership of this object into Controller after registerStunApiHandlers above are
+    // made non static.
+    RedirectingHolePunchingProcessor m_redirectingHolePunchingProcessor;
+
     void registerStunApiHandlers(Controller* controller);
+
+    /**
+     * Overrides HolePunchingProcessor::connect() with
+     * RedirectingHolePunchingProcessor::connect().
+     */
+    void registerRedirectingHolePunchingProcessor(
+        RedirectingHolePunchingProcessor* redirectingHolePunchingProcessor,
+        network::stun::MessageDispatcher* dispatcher);
 };
 
 } // namespace hpm

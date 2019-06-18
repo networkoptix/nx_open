@@ -1,3 +1,5 @@
+#include <QtCore/QCoreApplication>
+
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_global.h>
 
@@ -5,6 +7,9 @@
 
 int main(int argc, char* argv[])
 {
+    // NOTE: QCoreApplication is required for loading SQL plugins on mswin.
+    QCoreApplication app(argc, argv);
+
     nx::network::SocketGlobals::InitGuard sgGuard(
         nx::network::InitializationFlags::disableUdt);
     return libCloudDBMain(argc, argv);

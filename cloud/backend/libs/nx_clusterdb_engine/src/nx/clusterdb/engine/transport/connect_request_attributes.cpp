@@ -8,24 +8,82 @@
 
 namespace nx::clusterdb::engine::transport {
 
+static bool readCommonAttrs(
+    const network::http::HttpHeaders& headers,
+    ConnectionRequestAttributes* value)
+{
+    auto connectionIdIter = headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
+    if (connectionIdIter == headers.end())
+        return false;
+    value->connectionId = connectionIdIter->second.toStdString();
+
+    if (!nx::network::http::readHeader(
+            headers,
+            Qn::EC2_PROTO_VERSION_HEADER_NAME,
+            &value->remotePeerProtocolVersion))
+    {
+        NX_VERBOSE(typeid(ConnectionRequestAttributes),
+            "Missing required header %1", Qn::EC2_PROTO_VERSION_HEADER_NAME);
+        return false;
+    }
+
+    // Checking content encoding requested by remote peer.
+    auto acceptEncodingHeaderIter = headers.find("Accept-Encoding");
+    if (acceptEncodingHeaderIter != headers.end())
+    {
+        nx::network::http::header::AcceptEncodingHeader acceptEncodingHeader(
+            acceptEncodingHeaderIter->second);
+        if (acceptEncodingHeader.encodingIsAllowed("identity"))
+            value->contentEncoding = "identity";
+        else if (acceptEncodingHeader.encodingIsAllowed("gzip"))
+            value->contentEncoding = "gzip";
+    }
+
+    return true;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void ConnectionRequestAttributes::write(network::http::HttpHeaders* headers)
+{
+    headers->emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, connectionId.c_str());
+    headers->emplace(Qn::EC2_PROTO_VERSION_HEADER_NAME, std::to_string(remotePeerProtocolVersion).c_str());
+    headers->emplace(Qn::PEER_GUID_HEADER_NAME, remotePeer.id.toSimpleByteArray());
+    headers->emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, remotePeer.instanceId.toSimpleByteArray());
+}
+
+bool ConnectionRequestAttributes::read(const network::http::HttpHeaders& headers)
+{
+    if (!readCommonAttrs(headers, this))
+        return false;
+
+    auto peerIdIter = headers.find(Qn::PEER_GUID_HEADER_NAME);
+    if (peerIdIter == headers.end())
+        return false;
+    const auto peerId = QnUuid::fromStringSafe(peerIdIter->second);
+
+    auto peerRuntimeIdIter = headers.find(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    if (peerRuntimeIdIter == headers.end())
+        return false;
+    const auto peerRuntimeId = QnUuid::fromStringSafe(peerRuntimeIdIter->second);
+
+    remotePeer = vms::api::PeerData(
+        peerId,
+        peerRuntimeId,
+        vms::api::PeerType::server,
+        Qn::UbjsonFormat);
+
+    return true;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 bool fetchDataFromConnectRequest(
     const nx::network::http::Request& request,
     ConnectionRequestAttributes* connectionRequestAttributes)
 {
-    auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
-    if (connectionIdIter == request.headers.end())
+    if (!readCommonAttrs(request.headers, connectionRequestAttributes))
         return false;
-    connectionRequestAttributes->connectionId = connectionIdIter->second.toStdString();
-
-    if (!nx::network::http::readHeader(
-        request.headers,
-        Qn::EC2_PROTO_VERSION_HEADER_NAME,
-        &connectionRequestAttributes->remotePeerProtocolVersion))
-    {
-        NX_VERBOSE(typeid(ConnectionRequestAttributes),
-            lm("Missing required header %1").arg(Qn::EC2_PROTO_VERSION_HEADER_NAME));
-        return false;
-    }
 
     QUrlQuery query = QUrlQuery(request.requestLine.url.query());
     const bool isClient = query.hasQueryItem("isClient");
@@ -49,18 +107,6 @@ bool fetchDataFromConnectRequest(
                 .arg(query.queryItemValue("format")));
             return false;
         }
-    }
-
-    // Checking content encoding requested by remote peer.
-    auto acceptEncodingHeaderIter = request.headers.find("Accept-Encoding");
-    if (acceptEncodingHeaderIter != request.headers.end())
-    {
-        nx::network::http::header::AcceptEncodingHeader acceptEncodingHeader(
-            acceptEncodingHeaderIter->second);
-        if (acceptEncodingHeader.encodingIsAllowed("identity"))
-            connectionRequestAttributes->contentEncoding = "identity";
-        else if (acceptEncodingHeader.encodingIsAllowed("gzip"))
-            connectionRequestAttributes->contentEncoding = "gzip";
     }
 
     connectionRequestAttributes->remotePeer =

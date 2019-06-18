@@ -4,7 +4,7 @@
 
 #include <nx/vms/api/data/resource_data.h>
 
-namespace nx::clusterdb::engine { class SyncronizationEngine; }
+namespace nx::clusterdb::engine { class SynchronizationEngine; }
 
 namespace nx::cloud::db {
 namespace ec2 {
@@ -26,7 +26,7 @@ class VmsP2pCommandBus:
     public AbstractVmsP2pCommandBus
 {
 public:
-    VmsP2pCommandBus(clusterdb::engine::SyncronizationEngine* syncronizationEngine);
+    VmsP2pCommandBus(clusterdb::engine::SynchronizationEngine* synchronizationEngine);
 
     virtual nx::sql::DBResult saveResourceAttribute(
         nx::sql::QueryContext* queryContext,
@@ -34,7 +34,7 @@ public:
         nx::vms::api::ResourceParamWithRefData data) override;
 
 private:
-    clusterdb::engine::SyncronizationEngine* m_syncronizationEngine;
+    clusterdb::engine::SynchronizationEngine* m_synchronizationEngine;
 };
 
 } // namespace ec2

@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/network/cloud/cloud_connect_type.h>
 #include <nx/network/cloud/data/connection_result_data.h>
 #include <nx/network/socket_common.h>
 
@@ -20,6 +21,7 @@ struct ConnectSession
     nx::String originatingHostName;
     nx::String destinationHostEndpoint;
     nx::String destinationHostName;
+    nx::network::cloud::ConnectType connectType = nx::network::cloud::ConnectType::unknown;
 
     ConnectSession();
 

@@ -4,18 +4,24 @@
 
 static const unsigned int X_STRIDE_FOR_SSE_CONVERT_UTILS = 32;
 
-// All following functions use most effective implementation depending on CPU type (sse on x86, neon on ARM)
+// All the following functions use SSE on x86, but have stub implementations for ARMs, thus, can be
+// compiled on any platform but should be called only on x64.
 
+/** ATTENTION: Despite its name, this function actually converts to BGRA. */
 void yuv444_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned char * pu, const unsigned char * pv,
                             const unsigned int width, const unsigned int height,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha);
+
+/** ATTENTION: Despite its name, this function actually converts to BGRA. */
 void yuv422_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned char * pu, const unsigned char * pv,
                             const unsigned int width, const unsigned int height,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha);
+
+/** ATTENTION: Despite its name, this function actually converts to BGRA. */
 void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned char * pu, const unsigned char * pv,
                             const unsigned int width, const unsigned int height,

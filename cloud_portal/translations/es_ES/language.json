@@ -10,7 +10,15 @@
     "loginButton": "Inicia sesión",
     "logoutAuthorisedTitle": "Ya se ha conectado",
     "logoutAuthorisedContinueButton": "Continuar",
-    "logoutAuthorisedLogoutButton": "Cerrar Sessión"
+    "logoutAuthorisedLogoutButton": "Cerrar Sessión",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Página no encontrada"
   },
   "systemStatuses": {
-    "notActivated": "no activado",
     "activated": "activado",
+    "merging": "merging",
+    "notActivated": "no activado",
     "online": "en línea",
     "offline": "desconectado",
     "unavailable": "no disponible"
@@ -139,7 +148,8 @@
     "thisSystem": "el sistema",
     "oldSafariNotSupported": "Las versiones de Safari anteriores a 10 no son compatibles",
     "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "bueno",
@@ -186,7 +196,8 @@
     "successDisconnected": "El sistema está desconectado de %PRODUCT_NAME%",
     "successDeleted": "Sistema {{systemName}} se ha eliminado de su cuenta",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "Los permisos fueron removidos de {{email}}"
+    "permissionsRemoved": "Los permisos fueron removidos de {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Su cuenta se ha guardado",

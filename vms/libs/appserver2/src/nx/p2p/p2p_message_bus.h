@@ -20,6 +20,7 @@
 #include "connection_context.h"
 #include "p2p_serialization.h"
 #include <transaction/amend_transaction_data.h>
+#include <nx/utils/elapsed_timer.h>
 
 namespace nx {
 namespace p2p {
@@ -82,7 +83,7 @@ public:
     void sendTransaction(const ec2::QnTransaction<vms::api::RuntimeData>& tran)
     {
         QnMutexLocker lock(&m_mutex);
-        vms::api::PersistentIdData peerId(tran.peerID, tran.params.peer.persistentId);
+        vms::api::PersistentIdData peerId(tran.params.peer);
         m_lastRuntimeInfo[peerId] = tran.params;
         for (const auto& connection : m_connections)
             sendTransactionImpl(connection, tran, TransportHeader());
@@ -440,6 +441,8 @@ public:
         std::chrono::milliseconds subscribeIntervalHigh = std::chrono::seconds(15);
 
         std::chrono::milliseconds outConnectionsInterval = std::chrono::seconds(1);
+
+        std::chrono::milliseconds unauthorizedConnectTimeout = std::chrono::seconds(10);
     };
 
     void setDelayIntervals(const DelayIntervals& intervals);
@@ -484,6 +487,7 @@ private:
 
         QnUuid peerId;
         nx::utils::Url url;
+        nx::utils::ElapsedTimer unauthorizedTimer;
     };
 
     std::vector<RemoteConnection> m_remoteUrls;

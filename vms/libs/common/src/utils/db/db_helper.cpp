@@ -11,6 +11,7 @@
 #include <nx/sql/sql_query_execution_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/kit/ini_config.h>
+#include <nx/sql/database.h>
 
 namespace  {
 
@@ -196,7 +197,7 @@ void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)
     if (!QDir().mkpath(dirInfo.absoluteDir().path()))
         NX_ERROR(this, lit("can't create folder for sqlLite database!\n %1").arg(fileName));
     m_connectionName = dbname;
-    m_sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), dbname);
+    m_sdb = nx::sql::Database::addDatabase(lit("QSQLITE"), dbname);
     bool useMemDb = qApp->arguments().contains("--memDb");
     m_sdb.setDatabaseName(useMemDb ? ":memory:" : fileName);
 }
@@ -205,7 +206,7 @@ void QnDbHelper::removeDatabase()
 {
     m_sdb = QSqlDatabase();
     if (!m_connectionName.isEmpty())
-        QSqlDatabase::removeDatabase(m_connectionName);
+        nx::sql::Database::removeDatabase(m_connectionName);
 }
 
 bool QnDbHelper::applyUpdates(const QString &dirName) {

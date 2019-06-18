@@ -80,7 +80,7 @@ private:
     struct ClientBindInfo
     {
         ConnectionWeakRef connection;
-        std::list<network::SocketAddress> tcpReverseEndpoints;
+        std::vector<network::SocketAddress> tcpReverseEndpoints;
     };
 
     using BoundClients = std::map<nx::String, ClientBindInfo>;
@@ -94,7 +94,7 @@ private:
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
 
     void sendListenResponse(
-        boost::optional<QUrl> trafficRelayInstanceUrl,
+        boost::optional<std::vector<nx::utils::Url>> trafficRelayInstanceUrls,
         std::function<void(api::ResultCode, api::ListenResponse)> responseSender);
 
     void reportClientBind(const MediaserverData& mediaserverConnectionKey);

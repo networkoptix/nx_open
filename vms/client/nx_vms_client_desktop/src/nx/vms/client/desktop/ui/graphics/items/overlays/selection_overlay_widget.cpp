@@ -1,6 +1,7 @@
 #include "selection_overlay_widget.h"
 
 #include <QtGui/QPainter>
+#include <QtWidgets/QGraphicsScene>
 
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -18,6 +19,22 @@ static constexpr qreal kSelectionOpacity = 0.2;
 bool hasFrameDistinctionColor(QnResourceWidget* widget)
 {
     return widget->frameDistinctionColor().isValid();
+}
+
+static QnResourceWidget::SelectionState unfocusedState(QnResourceWidget::SelectionState base)
+{
+    switch (base)
+    {
+        case QnResourceWidget::SelectionState::selected:
+            return QnResourceWidget::SelectionState::notSelected;
+
+        case QnResourceWidget::SelectionState::focusedAndSelected:
+        case QnResourceWidget::SelectionState::focused:
+            return QnResourceWidget::SelectionState::inactiveFocused;
+
+        default:
+            return base;
+    }
 }
 
 } // namespace
@@ -51,7 +68,11 @@ void SelectionWidget::paint(QPainter* painter,
 
 QColor SelectionWidget::calculateFrameColor() const
 {
-    switch (m_widget->selectionState())
+    auto state = m_widget->selectionState();
+    if (!m_widget->hasFocus() && !(m_widget->scene() && m_widget->scene()->hasFocus()))
+        state = unfocusedState(state);
+
+    switch (state)
     {
         case QnResourceWidget::SelectionState::focusedAndSelected:
         case QnResourceWidget::SelectionState::selected:

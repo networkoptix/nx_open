@@ -3,12 +3,16 @@ import 'screenfull';
 import 'bootstrap-sass';
 import 'angular-ui-bootstrap';
 import 'angular-clipboard';
+import 'jquery';
 import 'jquery-mousewheel';
+
+// Polyfill
+require('es6-promise/auto');
 
 //Vendor scripts
 require('./vendor/client-detection.js');
 require('./vendor/date.js');
-require('./vendor/hls.js');
+require('../../../node_modules/hls.js');
 require('./vendor/Impetus.js');
 require('./vendor/cast.js');
 require('./vendor/cast-framework.js');

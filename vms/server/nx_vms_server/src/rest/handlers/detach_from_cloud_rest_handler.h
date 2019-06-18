@@ -18,12 +18,6 @@ public:
         QnMediaServerModule* serverModule,
         nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup);
 
-    virtual int executeGet(
-        const QString& path,
-        const QnRequestParams& params,
-        QnJsonRestResult& result,
-        const QnRestConnectionProcessor* owner) override;
-
     virtual int executePost(
         const QString& path,
         const QnRequestParams& params,

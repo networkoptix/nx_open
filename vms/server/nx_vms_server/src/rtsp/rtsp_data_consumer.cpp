@@ -19,6 +19,10 @@
 #include <nx/streaming/rtp/rtp.h>
 #include <media_server/media_server_module.h>
 
+#include <nx/analytics/frame_info.h>
+#include <nx/analytics/analytics_logging_ini.h>
+#include <nx_vms_server_ini.h>
+
 using namespace nx::vms::api;
 
 namespace {
@@ -91,6 +95,22 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
+
+    if (nx::analytics::loggingIni().isLoggingEnabled())
+    {
+        m_primaryLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_",
+            camera->getId(),
+            /*engineId*/ QnUuid(),
+            nx::vms::api::StreamIndex::primary);
+
+        m_secondaryLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_",
+            camera->getId(),
+            /*engineId*/ QnUuid(),
+            nx::vms::api::StreamIndex::secondary);
+    }
+
     auto videoLayout = camera->getVideoLayout();
     if (!videoLayout)
         return;
@@ -426,7 +446,24 @@ bool QnRtspDataConsumer::needData(const QnAbstractDataPacketPtr& data) const
         case QnAbstractMediaData::META_V1:
             return m_streamDataFilter.testFlag(StreamDataFilter::motion);
         case QnAbstractMediaData::GENERIC_METADATA:
-            return m_streamDataFilter.testFlag(StreamDataFilter::objectDetection);
+        {
+            auto metadata = std::dynamic_pointer_cast<const QnAbstractCompressedMetadata>(data);
+            NX_ASSERT(metadata);
+            if (!metadata)
+                return false;
+            switch (metadata->metadataType)
+            {
+                case MetadataType::MediaStreamEvent:
+                    return true;
+                case MetadataType::Motion:
+                    return m_streamDataFilter.testFlag(StreamDataFilter::motion);
+                case MetadataType::ObjectDetection:
+                    return m_streamDataFilter.testFlag(StreamDataFilter::objectDetection);
+                default:
+                    NX_WARNING(this, "Unknown generic metadata type %1", (int) metadata->metadataType);
+                    return false;
+            }
+        }
         default:
             NX_ASSERT(false, "Unexpected data type");
             return true;
@@ -468,11 +505,24 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
     bool isAudio = media->dataType == QnAbstractMediaData::AUDIO;
+    bool isMetadata = media->dataType == QnAbstractMediaData::GENERIC_METADATA;
 
     if (isVideo || isAudio)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
         bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+
+        if (isSecondaryProvider && m_secondaryLogger)
+        {
+            m_secondaryLogger->pushFrameInfo(
+                std::make_unique<nx::analytics::FrameInfo>(media->timestamp));
+        }
+        else if (m_primaryLogger)
+        {
+            m_primaryLogger->pushFrameInfo(
+                std::make_unique<nx::analytics::FrameInfo>(media->timestamp));
+        }
+
         {
             QnMutexLocker lock( &m_qualityChangeMutex );
             if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
@@ -541,6 +591,18 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         {
             m_isLive = false;
         }
+    }
+
+    const auto logger =
+        ini().analyzeSecondaryStream ? m_secondaryLogger.get() : m_primaryLogger.get();
+
+    if (isMetadata && logger)
+    {
+        nx::common::metadata::DetectionMetadataPacketPtr detectionMetadata =
+            nx::common::metadata::fromMetadataPacket(
+                std::dynamic_pointer_cast<const QnCompressedMetadata>(media));
+
+        logger->pushObjectMetadata(*detectionMetadata);
     }
 
     int trackNum = media->channelNumber;
@@ -736,7 +798,7 @@ void QnRtspDataConsumer::addData(const QnAbstractMediaDataPtr& data)
 }
 
 int QnRtspDataConsumer::copyLastGopFromCamera(
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     nx::vms::api::StreamIndex streamIndex,
     qint64 skipTime,
     bool iFramesOnly)

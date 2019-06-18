@@ -9,6 +9,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/guarded_callback.h>
 #include "utils/common/util.h"
 #include "storage_db.h"
 #include <nx/utils/elapsed_timer.h>
@@ -19,7 +20,7 @@
 namespace {
 
 template<typename F>
-auto measureTime(F f, const QString& message) -> std::result_of_t<F()>
+auto measureTime(F f, const QString& message) -> std::invoke_result_t<F>
 {
     NX_DEBUG(typeid(QnStorageDb), lm("%1 Starting").args(message));
     nx::utils::ElapsedTimer timer;
@@ -36,7 +37,7 @@ auto measureTime(F f, const QString& message) -> std::result_of_t<F()>
     return f();
 }
 
-} // namespace <anonynous>
+} // namespace
 
 QnStorageDb::QnStorageDb(
     QnMediaServerModule* serverModule,
@@ -72,7 +73,7 @@ void QnStorageDb::startVacuum(
     VacuumCompletionHandler completionHandler,
     QVector<DeviceFileCatalogPtr> *data)
 {
-    serverModule()->storageDbPool()->addTask(
+    serverModule()->storageDbPool()->addTask(nx::utils::guarded(this,
         [this, completionHandler = std::move(completionHandler), data]()
         {
             m_dbWriter.reset(new nx::media_db::MediaDbWriter());
@@ -81,7 +82,7 @@ void QnStorageDb::startVacuum(
 
             m_dbWriter->setDevice(m_ioDevice.get());
             completionHandler(vacuumResult);
-        });
+        }));
 }
 
 QnStorageDb::~QnStorageDb()
@@ -148,11 +149,11 @@ void QnStorageDb::deleteRecords(
     QnServer::ChunksCatalog catalog,
     qint64 startTimeMs)
 {
-    serverModule()->storageDbPool()->addTask(
+    serverModule()->storageDbPool()->addTask(nx::utils::guarded(this,
         [this,
         cameraUniqueId,
         catalog,
-        startTimeMs]() mutable
+        startTimeMs]()
         {
             const int cameraId = getOrGenerateCameraIdHash(cameraUniqueId);
             if (cameraId == -1)
@@ -170,16 +171,16 @@ void QnStorageDb::deleteRecords(
             mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationDelete);
 
             m_dbWriter->writeRecord(mediaFileOp);
-        });
+        }));
 }
 
 void QnStorageDb::addRecord(
     const QString& cameraUniqueId,
     QnServer::ChunksCatalog catalog,
-    const DeviceFileCatalog::Chunk& chunk)
+    const nx::vms::server::Chunk& chunk)
 {
-    serverModule()->storageDbPool()->addTask(
-        [this, cameraUniqueId, catalog, chunk]() mutable
+    serverModule()->storageDbPool()->addTask(nx::utils::guarded(this,
+        [this, cameraUniqueId, catalog, chunk]()
         {
             nx::media_db::MediaFileOperation mediaFileOp;
             int cameraId = getOrGenerateCameraIdHash(cameraUniqueId);
@@ -201,17 +202,16 @@ void QnStorageDb::addRecord(
             mediaFileOp.setTimeZone(chunk.timeZone);
 
             m_dbWriter->writeRecord(mediaFileOp);
-        });
+        }));
 }
 
 void QnStorageDb::replaceChunks(
-    const QString& cameraUniqueId,
-    QnServer::ChunksCatalog catalog,
-    const std::deque<DeviceFileCatalog::Chunk>& chunks)
+    const QString& cameraUniqueId, QnServer::ChunksCatalog catalog,
+    const nx::vms::server::ChunksDeque& chunks)
 {
     deleteRecords(cameraUniqueId, catalog, -1);
     for (const auto &chunk : chunks)
-        addRecord(cameraUniqueId, catalog, chunk);
+        addRecord(cameraUniqueId, catalog, chunk.chunk());
 }
 
 bool QnStorageDb::open(const QString& fileName)
@@ -447,7 +447,7 @@ void QnStorageDb::putRecordsToCatalog(
     QVector<DeviceFileCatalogPtr>* deviceFileCatalog,
     int cameraId,
     int catalogIndex,
-    std::deque <DeviceFileCatalog::Chunk> chunks,
+    std::deque <nx::vms::server::Chunk> chunks,
     const UuidToHash& uuidToHash)
 {
     auto cameraUuidIt = uuidToHash.right.find(cameraId);
@@ -468,10 +468,10 @@ void QnStorageDb::putRecordsToCatalog(
     deviceFileCatalog->push_back(newFileCatalog);
 }
 
-DeviceFileCatalog::Chunk QnStorageDb::toChunk(
+nx::vms::server::Chunk QnStorageDb::toChunk(
     const nx::media_db::MediaFileOperation& mediaData) const
 {
-    return DeviceFileCatalog::Chunk(
+    return nx::vms::server::Chunk(
         mediaData.getStartTime(),
         m_storageIndex,
         mediaData.getFileTypeIndex(),
@@ -504,7 +504,7 @@ void QnStorageDb::processDbContent(
         int index = itr->first;
         auto& catalog = itr->second;
 
-        std::deque <DeviceFileCatalog::Chunk> chunks;
+        std::deque<nx::vms::server::Chunk> chunks;
         auto& removeCatalog = parsedData.removeRecords[index];
         for (size_t i = 0; i < catalog.size(); ++i)
         {

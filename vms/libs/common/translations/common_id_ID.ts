@@ -1247,10 +1247,6 @@
       <translation type="unfinished">An unknown event has occurred</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
-    </message>
-    <message>
       <source>Event: %1</source>
       <translation type="unfinished">Event: %1</translation>
     </message>
@@ -1333,10 +1329,6 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation type="unfinished">RTP packet loss detected, prev seq.=%1 next seq.=%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1526,6 +1518,10 @@
     <message>
       <source>Camera time is back to normal</source>
       <translation type="unfinished">Camera time is back to normal</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occurred</source>
+      <translation type="unfinished">Multiple %1 events have occurred</translation>
     </message>
   </context>
   <context>

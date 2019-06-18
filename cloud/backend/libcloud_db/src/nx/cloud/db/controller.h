@@ -5,7 +5,7 @@
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/utils/timer_manager.h>
 
-#include <nx/clusterdb/engine/serialization/serializable_transaction.h>
+#include <nx/clusterdb/engine/serialization/serializable_command.h>
 #include <nx/clusterdb/engine/synchronization_engine.h>
 
 #include "access_control/authentication_manager.h"
@@ -44,6 +44,8 @@ public:
         Model* model);
     ~Controller();
 
+    const dao::rdb::DbInstanceController& dbInstanceController() const;
+
     const StreeManager& streeManager() const;
 
     TemporaryAccountPasswordManager& tempPasswordManager();
@@ -52,7 +54,7 @@ public:
 
     EventManager& eventManager();
 
-    clusterdb::engine::SyncronizationEngine& ec2SyncronizationEngine();
+    clusterdb::engine::SynchronizationEngine& ec2SynchronizationEngine();
 
     AbstractSystemHealthInfoProvider& systemHealthInfoProvider();
 
@@ -78,7 +80,7 @@ private:
     TemporaryAccountPasswordManager m_tempPasswordManager;
     AccountManager m_accountManager;
     EventManager m_eventManager;
-    clusterdb::engine::SyncronizationEngine m_ec2SyncronizationEngine;
+    clusterdb::engine::SynchronizationEngine m_ec2SynchronizationEngine;
     ec2::VmsP2pCommandBus m_vmsP2pCommandBus;
     std::unique_ptr<AbstractSystemHealthInfoProvider> m_systemHealthInfoProvider;
     nx::utils::StandaloneTimerManager m_timerManager;

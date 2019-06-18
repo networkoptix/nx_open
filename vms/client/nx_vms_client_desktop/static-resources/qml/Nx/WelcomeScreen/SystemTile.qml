@@ -105,7 +105,7 @@ BaseTile
 
         NxMenuItem
         {
-            text: "Edit";
+            text: qsTr("Edit");
             leftPadding: 16;
             rightPadding: 16;
 
@@ -114,7 +114,7 @@ BaseTile
 
         NxMenuItem
         {
-            text: "Hide";
+            text: qsTr("Hide");
             leftPadding: 16;
             rightPadding: 16;
 

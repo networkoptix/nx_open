@@ -6,13 +6,15 @@
 
 #include <nx/streaming/config.h>
 #include <nx/utils/log/log_main.h>
-#include <mediaserver_ini.h>
+#include <nx/utils/app_info.h>
+#include <nx_vms_server_ini.h>
 
 #include "utils/media/frame_info.h"
 #include "transcoding/transcoder.h"
 #include "transcoding/filters/tiled_image_filter.h"
 #include "transcoding/filters/scale_image_filter.h"
 #include "transcoding/filters/rotate_image_filter.h"
+#include "transcoding/filters/crop_image_filter.h"
 
 #include "plugins/resource/server_archive/server_archive_delegate.h"
 #include "media_server/media_server_module.h"
@@ -296,11 +298,18 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     if (video)
         outFrame->channel = video->channelNumber;
 
+    if (!gotFrame && video)
+    {
+        NX_VERBOSE(this,
+            "%1: Failed to decode frame (ts: %2, size: %3x%4, channel %5, flags: %6, dataType: %7)",
+            __func__, video->timestamp, video->width, video->height, video->channelNumber,
+            video->flags, video->dataType);
+    }
     return gotFrame ? outFrame : nullptr;
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     StreamIndex streamIndex,
     qint64 timestampUs,
     int preferredChannel,
@@ -332,7 +341,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
     StreamIndex streamIndex,
     qint64 timestampUs,
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     int channelNumber) const
 {
     NX_VERBOSE(this, "%1()", __func__);
@@ -383,7 +392,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
 std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTime(
     StreamIndex streamIndex,
     qint64 timestampUs,
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     int channelNumber) const
 {
     const MediaQuality stream = (streamIndex == StreamIndex::primary)
@@ -527,10 +536,11 @@ StreamIndex QnGetImageHelper::determineStreamIndex(
     {
         case StreamSelectionMode::auto_:
         {
-            #if defined(EDGE_SERVER)
+            if (nx::utils::AppInfo::isEdgeServer())
+            {
                 // On edge, we always try to use the secondary stream first.
                 return StreamIndex::secondary;
-            #endif
+            }
 
             const auto secondaryResolution =
                 request.camera->streamInfo(StreamIndex::secondary).getResolution();
@@ -543,8 +553,10 @@ StreamIndex QnGetImageHelper::determineStreamIndex(
 
             return StreamIndex::secondary;
         }
-        case StreamSelectionMode::forcedPrimary: return StreamIndex::primary;
-        case StreamSelectionMode::forcedSecondary: return StreamIndex::secondary;
+        case StreamSelectionMode::forcedPrimary:
+            return StreamIndex::primary;
+        case StreamSelectionMode::forcedSecondary:
+            return StreamIndex::secondary;
         case StreamSelectionMode::sameAsAnalytics:
             return ini().analyzeSecondaryStream ? StreamIndex::secondary : StreamIndex::primary;
         case StreamSelectionMode::sameAsMotion:
@@ -590,6 +602,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
 
     QList<QnAbstractImageFilterPtr> filterChain;
     const QSize dstSize = updateDstSize(camera.get(), request.size, *frame, request.aspectRatio);
+
+    if (!request.crop.isEmpty())
+        filterChain << QnAbstractImageFilterPtr(new QnCropImageFilter(request.crop));
     filterChain << QnAbstractImageFilterPtr(new QnScaleImageFilter(dstSize));
     filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
     filterChain << QnAbstractImageFilterPtr(new QnRotateImageFilter(rotation));

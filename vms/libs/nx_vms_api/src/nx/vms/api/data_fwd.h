@@ -40,6 +40,9 @@ DECLARE_STRUCT_AND_LIST(EventRuleData)
 DECLARE_STRUCT_AND_LIST(EventActionData)
 DECLARE_STRUCT(ResetEventRulesData)
 
+DECLARE_STRUCT(TimeReply)
+DECLARE_STRUCT_AND_LIST(ServerTimeReply)
+
 DECLARE_STRUCT_AND_LIST(ResourceData)
 DECLARE_STRUCT_AND_LIST(ResourceParamData)
 DECLARE_STRUCT_AND_LIST(ResourceParamWithRefData)
@@ -140,6 +143,7 @@ DECLARE_STRUCT_EX(ModuleInformationWithAddresses, (eq)(ubjson)(json)(xml)(csv_re
 
 DECLARE_STRUCT_AND_LIST(AnalyticsPluginData)
 DECLARE_STRUCT_AND_LIST(AnalyticsEngineData)
+DECLARE_STRUCT_AND_LIST(PluginModuleData)
 
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_EX

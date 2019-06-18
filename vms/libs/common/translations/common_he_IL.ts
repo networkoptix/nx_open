@@ -1370,10 +1370,6 @@
       <translation>אירוע לא מוגדר אירע</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occured</source>
-      <translation>התרחשו אירועים מרובים של %1</translation>
-    </message>
-    <message>
       <source>Event: %1</source>
       <translation>אירוע: %1</translation>
     </message>
@@ -1465,10 +1461,6 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>החיבור למצלמה (תזרים משני) נסגר באופן בלתי צפוי.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>זוהה איבוד מנת RTP, רצף קודם=%1 הרצף הבא=%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1664,6 +1656,10 @@
     <message>
       <source>Camera time is back to normal</source>
       <translation>זמן המצלמה חוזר למצב רגיל</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occurred</source>
+      <translation type="unfinished">Multiple %1 events have occurred</translation>
     </message>
   </context>
   <context>

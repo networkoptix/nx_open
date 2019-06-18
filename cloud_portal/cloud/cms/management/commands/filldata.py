@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
-from ...controllers import filldata
-from ...models import Customization, get_cloud_portal_product
+from ...controllers import filldata, structure
+from ...models import Customization, Language, Product, ProductType, get_cloud_portal_product
 from cloud import settings
 from cloud.debug import timer
 
@@ -20,7 +20,19 @@ class Command(BaseCommand):
                 filldata.init_skin(product, options['preview'])
                 self.stdout.write(self.style.SUCCESS('Initiated static content for ' + product.__str__()))
         else:
-            product = get_cloud_portal_product(options['customization'])
+            customization = Customization.objects.filter(name=options['customization'])
+            if not customization.exists():
+                en_us = Language.objects.get(code="en_US")
+                customization = Customization(name=options['customizations'], default_language=en_us)
+                customization.save()
+                customization.languages = [en_us]
+                customization.save()
+
+            if not Product.objects.filter(customizations__in=[customization.first()],
+                                          product_type__type=ProductType.PRODUCT_TYPES.cloud_portal).exists():
+                product = structure.find_or_add_product('Cloud Portal', customization.first())
+            else:
+                product = get_cloud_portal_product(options['customization'])
             filldata.init_skin(product, options['preview'])
             self.stdout.write(self.style.SUCCESS(
                 'Initiated static content for ' + product.__str__()))

@@ -11,7 +11,7 @@
 #include <nx/utils/std/thread.h>
 
 #include "utils.h"
-#include "../media_server_process.h"
+#include <media_server_process.h>
 
 class MediaServerLauncher: public QObject
 {
@@ -80,6 +80,7 @@ public:
 
 signals:
     void started();
+
 private:
     void setLowDelayIntervals();
     void prepareToStart();

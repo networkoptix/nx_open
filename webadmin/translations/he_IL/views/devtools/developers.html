@@ -11,30 +11,34 @@
     <div>
         <h3>מחולל אירועים כלליים</h3>
         <p>
-            אירוע גנרי הוא שיטה לשליחת אירועים ממערכות צד שלישי למערכת, אשר ניתן להשתמש בהם כדי להפעיל פעולות במנוע אירועים וכללים של מערכת ההקלטה.
-            מחולל אירועים כללים הוא כלי המסייע לבנות קריאות אירועים כללים.
+            A Generic Event is a method of sending events from 3rd party systems to a System
+            which can be used to trigger System actions in the Events & Rules engine.
+            The Generic Event Generator is a tool which helps developers and integrators build
+            and test HTTP Generic Event calls.
         </p>
         <p><a href="#/developers/events">מחולל אירועים כלליים</a></p>
     </div>
     <div>
         <h3>ממשק API של שרת</h3>
         <p>
-            ממשק API של שרת מספק קבוצה סטנדרטית של קריאות API למערכות של צד שלישי. זה מאפשר למפתחים יכולת לגשת כמעט לכל תכונה הזמינה בתוכנת  הקליינט הרגילה: שאילתה / ניהול משאבי מערכת (שרתים, מצלמות, משתמשים, הרשאות), למשוך וידאו חי או מוקלט מתוך מערכת, ליצור אירועים, ליצור כללים, מצלמות שליטה בממונעות, ועוד.
+            A REST API that gives developers the ability to access almost every system feature available in the regular
+            client: query/manage system resources (servers, cameras, users, permissions), pull live or recorded video
+            out of System, generate events, create rules, control PTZ cameras, and more.
         </p>
         <p>
-            <a href="#/developers/api"><b> כלי בדיקת ממשק API (חדש) </b></a>
-            - תיעוד אינטראקטיבי עם כלים לבדיקת שיחות API <br>
-            <a href="#/developers/changelog"> שינוי ממשק API </a>
-            - רשימה של שינויי שינויים ב- API <br>
-            <a id="api-doc" href="api.xml" target="_blank"> תיעוד API </a> <br>
-            <a href="#/developers/serverDocumentation"> הגדרות שרת תיעוד </a>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation and tools for testing API calls<br>
+            <a href="#/developers/changelog">API Changelog</a>
+            - a list of breaking changes in API since the last release<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+            - a full list of available Server API calls
         </p>
 
     </div>
     <div>
         <h3>חלון פרטי מצלמה</h3>
         <p>
-            מציג מידע ידידותי נוסף על המצלמות למפתחים בממשק האינטרנט:
+            Displays additional developer-friendly information for individual cameras in the Web Admin Interface’s View tab:
         </p>
         <ul>
             <li>מזהה מצלמה</li>
@@ -47,12 +51,12 @@
         <p><a href="#/view/?cameraLinks">פתח את לוח פרטי המצלמה</a></p>
     </div>
     <div>
-        <h3>Video Source Integration SDK</h3>
+        <h3>Video Source SDK</h3>
         <p>
-            Video Source Integration SDK provides the ability to integrate virtually any live or recorded video source
-            (IP Cameras, NVRs, DVRs, etc) into System. SDK makes possible to create methods for discovering,
-            displaying, analyzing and recording video. It also allows integrating device I/O ports and motion detection
-            information.
+            The Video Source SDK provides the ability to integrate almost any live or recorded video source (IP Cameras,
+            NVRs, DVRs, etc) into System and makes it possible to create methods for discovering, displaying, analyzing
+            and recording video. It also allows integrating I/O ports and devices, as well as pulling motion detection
+            information from 3rd party devices.
         </p>
         <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >קבל SDK</a></p>
     </div>
@@ -60,10 +64,10 @@
     <div>
         <h3>אחסון SDK</h3>
         <p>
-            Storage SDK provides the ability to integrate potential storage  into System. It allows developers to
-            read from or write to any storage location: local, remote, and even cloud one. Creating a storage
-            plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
-            files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
+            The Storage SDK allows developers to read from or write to any storage location: local, remote, and even
+            cloud one. Creating a storage plugin requires implementing standard functions such as: I/O stream, if file
+            exist, delete file, list of files in the folder, etc. The Storage SDK contains an example for using an FTP
+            server as a storage location.
         </p>
         <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >קבל SDK</a></p>
     </div>

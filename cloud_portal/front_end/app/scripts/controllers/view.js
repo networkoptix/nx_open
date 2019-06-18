@@ -6,11 +6,11 @@
         .module('cloudApp')
         .controller('ViewPageCtrl', [ '$rootScope', '$scope', '$window', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
             '$location', '$q', '$poll', 'authorizationCheckService', 'camerasProvider',
-            'nxConfigService', 'languageService',
+            'nxConfigService', 'languageService', 'nxAppStateService',
 
             function ($rootScope, $scope, $window, account, system, $routeParams, systemAPI, dialogs,
                       $location, $q, $poll, authorizationCheckService, camerasProvider,
-                      nxConfigService, languageService) {
+                      nxConfigService, languageService, nxAppStateService) {
     
                 const CONFIG = nxConfigService.getConfig();
                 const LANG = languageService.lang;
@@ -31,10 +31,7 @@
                     });
                 }
 
-                $rootScope.$emit('nx.layout.footer', {
-                    state: true, // hide it
-                    loc  : 'ViewPageCtrl - offline'
-                });
+                nxAppStateService.setFooterVisibility(false)
                 
                 // Check if page is displayed inside an iframe
                 $scope.isInIframe = ($window.location !== $window.parent.location);
@@ -44,10 +41,7 @@
                         state: true, // hide it
                         loc: 'ViewPageCtrl - inIframe'
                     });
-                    $rootScope.$emit('nx.layout.footer', {
-                        state: true, // hide it
-                        loc: 'ViewPageCtrl - inIframe'
-                    });
+                    nxAppStateService.setFooterVisibility(false);
                 }
                 
                 function systemError(){
@@ -111,7 +105,7 @@
                     // Reset visibility state
                     if (!$scope.isInIframe) {
                         $rootScope.$emit('nx.layout.header', {state: false});
-                        $rootScope.$emit('nx.layout.footer', {state: false});
+                        nxAppStateService.setFooterVisibility(true);
                     }
                 });
             }]);

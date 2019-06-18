@@ -258,7 +258,7 @@ void MediaServerEmulator::setServerIdForModuleInformation(
 }
 
 nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(
-    std::list<network::SocketAddress> addresses)
+    std::vector<network::SocketAddress> addresses)
 {
     utils::promise<nx::hpm::api::ResultCode> promise;
     m_mediatorAddressPublisher->updateAddresses(
@@ -351,7 +351,7 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
     udtStreamSocket->bindToAioThread(getAioThread());
     auto mediatorUdpClientSocket = m_mediatorUdpClient->takeSocket();
     m_mediatorUdpClient.reset();
-    if (!udtStreamSocket->bindToUdpSocket(std::move(*mediatorUdpClientSocket)) ||
+    if (!udtStreamSocket->bindToUdpSocket(mediatorUdpClientSocket.get()) ||
         !udtStreamSocket->setNonBlockingMode(true) ||
         !udtStreamSocket->setRendezvous(true))
     {

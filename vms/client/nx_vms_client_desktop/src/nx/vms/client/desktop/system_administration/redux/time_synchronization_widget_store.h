@@ -47,8 +47,9 @@ public:
     void disableSync();
     void selectServer(const QnUuid& serverId);
 
-    void setVmsTime(std::chrono::milliseconds value);
-    void setTimeOffsets(const TimeOffsetInfoList &offsetList);
+    void setBaseTime(milliseconds time);
+    void setElapsedTime(milliseconds time);
+    void setTimeOffsets(const TimeOffsetInfoList &offsetList, milliseconds baseTime);
 
 signals:
     void stateChanged(const TimeSynchronizationWidgetState& state);

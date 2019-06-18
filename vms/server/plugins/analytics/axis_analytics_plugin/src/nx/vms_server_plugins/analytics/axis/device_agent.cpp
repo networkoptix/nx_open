@@ -30,9 +30,6 @@ DeviceAgent::DeviceAgent(
     m_auth.setUser(deviceInfo->login());
     m_auth.setPassword(deviceInfo->password());
 
-    nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
-    for (const auto& eventType: typedManifest.eventTypes)
-        deviceAgentManifest.supportedEventTypeIds.push_back(eventType.id);
     NX_PRINT << "Axis DeviceAgent created";
 }
 

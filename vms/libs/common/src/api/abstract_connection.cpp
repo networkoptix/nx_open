@@ -124,8 +124,9 @@ int QnAbstractConnection::sendAsyncRequest(
             std::inserter(actualHeaders, actualHeaders.end()));
 
     QUrlQuery urlQuery(m_url.toQUrl());
-    for (auto it = m_extraQueryParameters.begin(); it != m_extraQueryParameters.end(); ++it)
-        urlQuery.addQueryItem(it->first, it->second);
+    for (const auto& it: m_extraQueryParameters.toList())
+        urlQuery.addQueryItem(it.first, it.second);
+
     nx::utils::Url url = m_url;
     url.setQuery(urlQuery);
 

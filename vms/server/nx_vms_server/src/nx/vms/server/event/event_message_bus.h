@@ -51,12 +51,8 @@ public slots:
     /** Action received from other module */
     void at_actionReceived(const vms::event::AbstractActionPtr& action);
 
-private slots:
-    void at_DeliverActionFinished(int handle, ec2::ErrorCode errorCode);
-
 private:
     mutable QnMutex m_mutex;
-    QMap<int, vms::event::AbstractActionPtr> m_sendingActions;
 };
 
 #define qnEventMessageBus nx::vms::server::event::EventMessageBus::instance()

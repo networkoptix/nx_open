@@ -3,8 +3,8 @@
 #include <nx/fusion/model_functions.h>
 
 #include "../connection_manager.h"
-#include "../incoming_transaction_dispatcher.h"
-#include "../outgoing_transaction_dispatcher.h"
+#include "../incoming_command_dispatcher.h"
+#include "../outgoing_command_dispatcher.h"
 
 namespace nx::clusterdb::engine::statistics {
 

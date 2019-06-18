@@ -16,7 +16,7 @@ Session::Session(
     std::chrono::milliseconds targetDurationMS,
     bool _isLive,
     MediaQuality streamQuality,
-    const QnVideoCameraPtr& videoCamera,
+    const VideoCameraPtr& videoCamera,
     const QnAuthSession& authSession)
     :
     ServerModuleAware(serverModule),
@@ -69,7 +69,7 @@ Session::~Session()
         if (resource)
         {
             //checking resource stream type. Only h.264 is OK for HLS
-            QnVideoCameraPtr camera = videoCameraPool()->getVideoCamera(resource);
+            VideoCameraPtr camera = videoCameraPool()->getVideoCamera(resource);
             if (camera)
                 camera->notInUse(this);
         }
@@ -100,13 +100,13 @@ void Session::setPlaylistManager(
     MediaQuality streamQuality,
     const AbstractPlaylistManagerPtr& value)
 {
-    NX_ASSERT(streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low);
+    NX_ASSERT(streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Low);
     m_playlistManagers[streamQuality] = value;
 }
 
 const AbstractPlaylistManagerPtr& Session::playlistManager(MediaQuality streamQuality) const
 {
-    NX_ASSERT(streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low);
+    NX_ASSERT(streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Low);
     return m_playlistManagers[streamQuality];
 }
 

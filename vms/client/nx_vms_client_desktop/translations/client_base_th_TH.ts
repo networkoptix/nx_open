@@ -2555,17 +2555,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>การกำหนดค่าเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>การปรับปรุงเซิร์ฟเวอร์</translation>
-    </message>
-  </context>
-  <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
@@ -3179,6 +3168,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>โฟลเดอร์ที่เพิ่มไว้แล้ว</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>ไม่มี</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -5091,219 +5088,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>เซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>สถานะ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>เลือกไฟล์อัพเดต...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>หมายเหตุการเผยแพร่</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>คุณจะต้องจะอัพเดทไคลแอนต์ด้วยตนเองโดยใช้โปรแกรมติดตั้ง.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>ไม่สามารถอัพเดทจากไฟล์นี้ได้.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>อัพเดตล่าสุดที่มีให้</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>ดาวน์โหลดไฟล์อัพเดตเวอร์ชันล่าสุด</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>เวอร์ชันที่เลือก</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>ดาวน์โหลดไฟล์อัปเดต</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>เรียกค้นไฟล์อัปเดต...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>ไฟล์อัปเดตที่เลือก</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>ดาวน์โหลดในเบราเซอร์ภายนอก</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>คัดลอกลิงก์ไปยังคลิปบอร์ด</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>ไม่สามารถตรวจสอบการอัปเดตบนอินเทอร์เน็ต</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>หมายเลขการสร้างที่ไม่รู้จัก</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>ลดระดับลงเป็นเวอร์ชันก่อนหน้านี้</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>ไม่พบการปรับปรุงสำหรับเซิร์ฟเวอร์อย่างน้อยหนึ่งเครื่อง</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>ไม่พบการปรับปรุงไคลเอ็นต์</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>ไม่สามารถดึงข้อมูลแฟ้มการปรับปรุง ไม่มีเนื้อที่ว่างบนดิสก์</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>อัปเดตเสร็จสิ้น...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>ตรวจสอบการปรับปรุง...</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>กำลังดาวน์โหลดการอัปเดต...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>กำลังติดตั้งการอัปเดตไคลเอ็นต์...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>กำลังติดตั้งการอัปเดตไปยังเซิร์ฟเวอร์ที่เข้ากันไม่ได้...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>กำลังอัปเดตเซิร์ฟเวอร์...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>กำลังติดตั้งโปรแกรม...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>สร้างเฉพาะ...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>อัปเดตการสร้างเฉพาะ</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>ปรับปรุงระบบ</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>การอัปเดตระบบในกระบวนการ</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>ยกเลิกการอัปเดต</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>ดำเนินการต่อในเบื้องหลัง</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>เนื้อที่ว่างไม่เพียงพอที่ %n เซิร์ฟเวอร์:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>การพยายามอัปเดตอาจล้มเหลวหรือทำให้เซิร์ฟเวอร์ทำงานไม่ถูกต้อง</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>กำลังปรับปรุง</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>การอัปเดตเซิร์ฟเวอร์เสร็จสมบูรณ์แล้ว</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>อัปเดตเสร็จสมบูรณ์แล้ว</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>ยกเลิกการอัปเดตแล้ว</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>เซิร์ฟเวอร์ทั้งหมดอัปเดตแล้ว</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>การปรับปรุงล้มเหลว</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>โปรดอัปเดต %1 ด้วยตนเองโดยใช้แพ็คเกจการติดตั้ง</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 จะเริ่มต้นใหม่เป็นเวอร์ชันที่ได้รับการปรับปรุง</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>ไม่สามารถยกเลิกการอัปเดตได้ในขั้นตอนนี้</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>โปรดรอจนกว่าจะเสร็จสิ้น</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>ส่วนประกอบทั้งหมดในระบบของคุณเป็นข้อมูลล่าสุด</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>คอมโพเนนต์ทั้งหมดในระบบของคุณอยู่ในเวอร์ชันนี้</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>อินสแตนซ์ %1 ที่ไม่สามารถใช้ร่วมกันได้ ในการยกเลิกการเชื่อมต่อระบบจาก %1 ก่อน</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>อัปเดตไฟล์</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>กำลังตรวจสอบการอัปเดต...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>กำลังตรวจสอบพื้นที่ว่าง...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
       <source>Unsaved changes:</source>
@@ -5982,10 +5766,6 @@ to %1</source>
       <translation>กำลังดำเนินการซิงโครไนส์ข้อมูลสำรองระยะไกล</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>เกิดข้อผิดพลาดในระหว่างการซิงโครไนส์เก็บระยะไกล</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>ซิงโครไนซ์ระยะไกลเก็บเริ่มต้นสำหรับอุปกรณ์ต่อไปนี้:</translation>
     </message>
@@ -6035,17 +5815,13 @@ to %1</source>
       <source>The System is running in safe mode.</source>
       <translation type="unfinished">The System is running in safe mode.</translation>
     </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>เปิดใช้งานอุปกรณ์และเซิร์ฟเวอร์การค้นพบอัตโนมัติ</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>เปิดใช้งานกล้องและการค้นพบเซิร์ฟเวอร์อัตโนมัติ</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>อนุญาตให้ระบบเพิ่มประสิทธิภาพการตั้งค่าอุปกรณ์</translation>
@@ -6061,6 +5837,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>ไม่รวมข้อมูลส่วนบุคคลใด ๆ และไม่ระบุชื่อ</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -6144,79 +5936,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>กดค้างเพื่อพูด</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>ปรับปรุงได้เสร็จสิ้นการประสบความสำเร็จ.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>ปรับปรุงได้ถูกยกเลิก.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>มีใครบางคนได้เริ่มต้นแล้วการปรับปรุง.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>เซิร์ฟเวอร์ทั้งหมดมีการปรับปรุงแล้ว.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>ไม่สามารถดาวน์โหลดโปรแกรมปรับปรุง.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>ไม่มีพื้นที่ว่างเหลือบนดิสก์.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>ไม่สามารถผลักดันการปรับปรุงไปยังเซิร์ฟเวอร์.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>ปัญหานี้เกิดจากเซิร์ฟเวอร์%n:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>ไม่มีพื้นที่ว่างเหลืออยู่บนเซิร์ฟเวอร์%n:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>%n เซิร์ฟเวอร์ไม่ตอบสนอง:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>%n เซิร์ฟเวอร์ออฟไลน์:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>รับรองความถูกต้องล้มเหลวสำหรับ %n ซิร์ฟเวอร์:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>ไม่สามารถติดตั้งโปรแกรมปรับปรุงให้กับไคลแอนต์ได้.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>ไม่สามารถติดตั้งการปรับปรุงในหนึ่งหรือหลายเซิร์ฟเวอร์ได้.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -6667,25 +6386,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6694,10 +6394,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>เซิร์ฟเวอร์จากระบบอื่น ๆ จะปรากฏในโครงสร้างข้อมูล</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>ไม่สามารถอัปเดตเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -6865,29 +6561,6 @@ to %1</source>
     <message>
       <source>JPEG Image</source>
       <translation type="unfinished">JPEG Image</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>หมายเหตุ</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>มีเวอร์ชัน %1</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>ประเด็นสำคัญได้รับการแก้ไขแล้ว ขอแนะนำอย่างยิ่ง</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>อัพเดต...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>อย่าแจ้งให้ทราบอีกครั้งเกี่ยวกับการอัปเดตนี้</translation>
     </message>
   </context>
   <context>
@@ -7324,6 +6997,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7526,6 +7210,14 @@ to %1</source>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>แสดง</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7674,10 +7366,6 @@ to %1</source>
       <translation>พื้นเมือง</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>เซิร์ฟเวอร์จะไม่เปลี่ยนแปลงการตั้งค่ากล้องใด ๆ ระบบจะรับและใช้สตรีมมิ่งกล้องตามที่เป็นอยู่</translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>ช่วยแก้ไขปัญหาคุณภาพของภาพในกล้องบางรุ่น สำหรับคนอื่น ๆ จะทำให้อัตราบิตเพิ่มขึ้นอย่างมีนัยสำคัญ</translation>
     </message>
@@ -7700,6 +7388,14 @@ to %1</source>
       <translation>
         <numerusform>รหัสนี้ใช้กับกล้อง %n ต่อไปนี้: </numerusform>
       </translation>
+    </message>
+    <message>
+      <source>UDP Multicast</source>
+      <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>เซิร์ฟเวอร์จะไม่เปลี่ยนแปลงการตั้งค่ากล้องใด ๆ ระบบจะรับและใช้สตรีมมิ่งกล้องตามที่เป็นอยู่</translation>
     </message>
   </context>
   <context>
@@ -7960,16 +7656,16 @@ to %1</source>
       <translation type="unfinished">Broken update package.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
-    </message>
-    <message>
       <source>Internal error.</source>
       <translation>ข้อผิดพลาดภายใน</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
   </context>
   <context>
@@ -8001,6 +7697,17 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>วาง</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>การกำหนดค่าเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>การปรับปรุงเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -8116,6 +7823,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8185,10 +7903,6 @@ to %1</source>
       <source>No events</source>
       <translation>ไม่พบเหตุการณ์</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation>ไม่มีเหตุการณ์ที่เกิดขึ้น</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
       <translation>
@@ -8198,6 +7912,10 @@ to %1</source>
     <message>
       <source>unnamed analytics engine</source>
       <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation type="unfinished">No events occurred</translation>
     </message>
   </context>
   <context>
@@ -8695,26 +8413,6 @@ to %1</source>
       <translation>เซิร์ฟเวอร์บางเครื่องอยู่ในสถานะออฟไลน์และจะไม่ได้รับการอัพเดท ข้ามไปได้หรือไม่</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation>ติดตั้งเดี๋ยวนี้</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation>เปิดในภายหลัง</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation>ดาวน์โหลดการปรับปรุงเรียบร้อยแล้ว</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation>ไม่สามารถดาวน์โหลดแพคเกจโปรแกรมปรับปรุงได้</translation>
-    </message>
-    <message>
       <source>Please make sure there is enough free storage space and network connection is stable.</source>
       <translation>โปรดตรวจสอบว่ามีเนื้อที่ว่างเพียงพอและการเชื่อมต่อเครือข่ายมีเสถียรภาพ</translation>
     </message>
@@ -8729,10 +8427,6 @@ to %1</source>
     <message>
       <source>Cancel Update</source>
       <translation>ยกเลิกการอัปเดต</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>ไม่สามารถดาวน์โหลดแพคเกจโปรแกรมปรับปรุงสำหรับเซิร์ฟเวอร์บางเครื่องได้</translation>
     </message>
     <message>
       <source>Please make sure they have enough free storage space and stable network connection.</source>
@@ -8880,6 +8574,18 @@ to %1</source>
       <source>There are no online servers to update.</source>
       <translation type="unfinished">There are no online servers to update.</translation>
     </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8904,6 +8610,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>รับทราบ</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>เหตุการณ์ทั่วไป</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Event</source>
+      <translation type="unfinished">Unknown Plugin Event</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8923,10 +8649,6 @@ to %1</source>
       <translation>ไม่มีผู้ใช้ที่เลือกมีสิทธิ์ในการเลือกเค้าโครงที่เลือก การกระทำจะไม่ทำงาน</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>เค้าโครงเฉพาะสามารถแสดงต่อเจ้าของได้เท่านั้น </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>เลือกเค้าโครง</translation>
     </message>
@@ -8941,6 +8663,45 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
     </message>
   </context>
   <context>
@@ -9084,16 +8845,16 @@ to %1</source>
       <translation>ติดตามและบันทึกการทำงานของผู้ใช้ทั้งหมด</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>นาที</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>ชั่วโมง</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
     </message>
   </context>
   <context>
@@ -9114,13 +8875,13 @@ to %1</source>
       <source>Downloaded</source>
       <translation>ดาวน์โหลดแล้ว</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>เวอร์ชั่นปัจจุบัน</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>สถานะ</translation>
@@ -9140,6 +8901,10 @@ to %1</source>
     <message>
       <source>Component</source>
       <translation type="unfinished">Component</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
     </message>
   </context>
   <context>
@@ -9434,12 +9199,62 @@ to %1</source>
       <source>Starting export...</source>
       <translation type="unfinished">Starting export...</translation>
     </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>มีเวอร์ชัน %1</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>หมายเหตุ</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>ประเด็นสำคัญได้รับการแก้ไขแล้ว ขอแนะนำอย่างยิ่ง</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>อัพเดต...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>อย่าแจ้งให้ทราบอีกครั้งเกี่ยวกับการอัปเดตนี้</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>หลายค่า</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation type="unfinished">Reconstruct Resolution</translation>
     </message>
   </context>
   <context>

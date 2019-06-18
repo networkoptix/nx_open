@@ -19,6 +19,9 @@ public:
         CameraSettingsDialogStore* store, QObject* parent = nullptr);
     virtual ~CameraSettingsAnalyticsEnginesWatcher() override;
 
+    QnVirtualCameraResourcePtr camera() const;
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
+
 private:
     class Private;
     const QScopedPointer<Private> d;

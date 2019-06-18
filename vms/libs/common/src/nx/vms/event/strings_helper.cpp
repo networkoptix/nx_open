@@ -28,6 +28,7 @@
 #include <nx/utils/log/assert.h>
 
 #include <nx/analytics/descriptor_manager.h>
+#include <nx/fusion/model_functions.h>
 
 namespace nx {
 namespace vms {
@@ -238,7 +239,7 @@ QString StringsHelper::eventAtResources(const EventParameters& params) const
             .arg(getSoftwareTriggerName(params));
     }
 
-    return tr("Multiple %1 events have occured").arg(eventName(params.eventType));
+    return tr("Multiple %1 events have occurred").arg(eventName(params.eventType));
 }
 
 QString StringsHelper::getResoureNameFromParams(const EventParameters& params,
@@ -450,12 +451,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         }
         case EventReason::networkRtpPacketLoss:
         {
-            NetworkIssueEvent::PacketLossSequence seq = NetworkIssueEvent::decodePacketLossSequence(reasonParamsEncoded);
-            if (seq.valid)
-                result = tr("RTP packet loss detected, prev seq.=%1 next seq.=%2.").arg(seq.prev).arg(seq.next);
-            else
-                result = tr("RTP packet loss detected.");
-            break;
+            return tr("RTP packet loss detected.");
         }
         case EventReason::networkBadCameraTime:
         {
@@ -468,6 +464,25 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         case EventReason::networkNoResponseFromDevice:
         {
             return tr("Device does not respond to network requests.");
+        }
+        case EventReason::networkMulticastAddressConflict:
+        {
+            const auto params =
+                QJson::deserialized<NetworkIssueEvent::MulticastAddressConflictParameters>(
+                    reasonParamsEncoded.toUtf8());
+
+            return tr("Multicast address conflict detected. "
+                "Address %1 is already in use by %2 on %3 stream")
+                    .arg(params.address.toString())
+                    .arg(params.deviceName)
+                    .arg(QnLexical::serialized(params.stream));
+        }
+        case EventReason::networkMulticastAddressIsInvalid:
+        {
+            const auto params = QJson::deserialized<nx::network::SocketAddress>(
+                reasonParamsEncoded.toUtf8());
+
+            return tr("Network address %1 is not a multicast address").arg(params.toString());
         }
         case EventReason::serverTerminated:
         {
@@ -501,6 +516,18 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         {
             QString storageUrl = reasonParamsEncoded;
             result = tr("System disk \"%1\" is almost full.").arg(storageUrl);
+            break;
+        }
+        case EventReason::metadataStorageOffline:
+        {
+            QString storageUrl = reasonParamsEncoded;
+            result = tr("Analytics storage \"%1\" is offline.").arg(storageUrl);
+            break;
+        }
+        case EventReason::metadataStorageFull:
+        {
+            QString storageUrl = reasonParamsEncoded;
+            result = tr("Analytics storage \"%1\" is almost full.").arg(storageUrl);
             break;
         }
         case EventReason::backupFailedNoBackupStorageError:

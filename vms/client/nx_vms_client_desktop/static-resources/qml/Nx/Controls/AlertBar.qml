@@ -1,5 +1,4 @@
 import QtQuick 2.6
-import QtQuick.Controls 1.4
 import Nx 1.0
 
 Item
@@ -10,7 +9,7 @@ Item
     property alias background: backgroundControl
     property int horizontalPadding: 16
 
-    implicitHeight: labelControl.paintedHeight + 16
+    implicitHeight: labelControl.implicitHeight + 16
     implicitWidth: parent.width
 
     Rectangle
@@ -21,17 +20,16 @@ Item
         color: "#61282B"
     }
 
-    Label
+    Text
     {
         id: labelControl
 
-        wrapMode: Label.WordWrap
+        x: control.horizontalPadding
+        width: control.width - control.horizontalPadding * 2
+        anchors.verticalCenter: parent.verticalCenter
+
+        wrapMode: Text.WordWrap
         color: ColorTheme.text
         font.pixelSize: 13
-        width: control.width - control.horizontalPadding * 2
-        anchors.left: parent.left
-        anchors.leftMargin: control.horizontalPadding
-        anchors.rightMargin: control.horizontalPadding
-        anchors.verticalCenter: parent.verticalCenter
     }
 }

@@ -21,15 +21,13 @@ namespace test {
 
 struct RelayingConfiguration
 {
-    const bool useHttpConnect;
     const bool relayAcceptsSslOnly;
 
     RelayingConfiguration() = delete;
 };
 
-static constexpr RelayingConfiguration kUsingHttpConnect{true, false};
-static constexpr RelayingConfiguration kNotUsingHttpConnect{false, false};
-static constexpr RelayingConfiguration kRelayAcceptsSslOnly{false, true};
+static constexpr RelayingConfiguration kRelayAcceptsNonSecureConnections{false};
+static constexpr RelayingConfiguration kRelayAcceptsSslOnly{true};
 
 class Relaying:
     public BasicTestFixture,
@@ -44,15 +42,6 @@ public:
         {
             addRelayStartupArgument("http/listenOn", "");
             addRelayStartupArgument("https/listenOn", "127.0.0.1:0");
-        }
-    }
-
-    ~Relaying()
-    {
-        if (m_useHttpConnectToListenOnRelayBak)
-        {
-            SocketGlobals::cloud().settings().useHttpConnectToListenOnRelay =
-               *m_useHttpConnectToListenOnRelayBak;
         }
     }
 
@@ -78,7 +67,7 @@ protected:
             relayClient->startSession(
                 "",
                 serverSocketCloudAddress(),
-                [this, &requestCompletion](
+                [&requestCompletion](
                     api::ResultCode resultCode,
                     api::CreateClientSessionResponse response)
                 {
@@ -95,20 +84,22 @@ protected:
 
 private:
     std::optional<bool> m_useHttpConnectToListenOnRelayBak;
+    int m_connectMethodMaskBak = 0;
 
     virtual void SetUp() override
     {
         base_type::SetUp();
 
         // Disabling every method except relaying.
-        ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
-
-        m_useHttpConnectToListenOnRelayBak =
-            SocketGlobals::cloud().settings().useHttpConnectToListenOnRelay;
-        SocketGlobals::cloud().settings().useHttpConnectToListenOnRelay =
-            GetParam().useHttpConnect;
+        m_connectMethodMaskBak =
+            ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
 
         startServer();
+    }
+
+    virtual void TearDown() override
+    {
+        ConnectorFactory::setEnabledCloudConnectMask(m_connectMethodMaskBak);
     }
 };
 
@@ -124,13 +115,13 @@ TEST_P(Relaying, server_socket_registers_itself_on_relay)
 
 TEST_P(Relaying, connection_can_be_established)
 {
-    this->assertConnectionCanBeEstablished();
+    this->assertCloudConnectionCanBeEstablished();
 }
 
 TEST_P(Relaying, connecting_using_full_server_name)
 {
     this->setRemotePeerName(this->cloudSystemCredentials().hostName().toStdString());
-    this->assertConnectionCanBeEstablished();
+    this->assertCloudConnectionCanBeEstablished();
 }
 
 TEST_P(Relaying, exchanging_fixed_data)
@@ -146,14 +137,9 @@ TEST_P(Relaying, multiple_connections)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    UsingHttpConnectRelaying,
+    NonSecureConnections,
     Relaying,
-    ::testing::Values(kUsingHttpConnect));
-
-INSTANTIATE_TEST_CASE_P(
-    NotUsingHttpConnect,
-    Relaying,
-    ::testing::Values(kNotUsingHttpConnect));
+    ::testing::Values(kRelayAcceptsNonSecureConnections));
 
 INSTANTIATE_TEST_CASE_P(
     SslOnly,

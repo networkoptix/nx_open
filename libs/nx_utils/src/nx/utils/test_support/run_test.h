@@ -15,6 +15,7 @@
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/rlimit.h>
+#include <nx/utils/scope_guard.h>
 
 #include "test_options.h"
 

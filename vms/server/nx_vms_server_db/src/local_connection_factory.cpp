@@ -117,6 +117,7 @@ void LocalConnectionFactory::shutdown()
     pleaseStop();
     join();
 
+    messageBus()->stop();
     if (m_directConnection)
         messageBus()->removeHandler(m_directConnection->notificationManager());
 }
@@ -336,6 +337,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param backupDuration Duration of the synchronization period (in seconds). -1 if not set.
      * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative
      *     value if not limited.
+     * %param metadataStorageId Storage identifier to keep metadata SQL database.
      * %// AbstractMediaServerManager::saveUserAttributes
      */
     regUpdate<MediaServerUserAttributesDataList>(p, ApiCommand::saveMediaServerUserAttributesList);
@@ -958,6 +960,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value storageTooSlow
      *             %value storageFull
      *             %value systemStorageFull
+     *             %value metadataStorageOffline
+     *             %value metadataStorageFull
      *             %value licenseRemoved
      *             %value backupFailedNoBackupStorageError
      *             %value backupFailedSourceStorageError
@@ -1730,7 +1734,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
             return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(in, out);
         });
 
-    p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_bus.get()));
+    p->registerHandler(
+        "ec2/activeConnections", new rest::handlers::ActiveConnectionsRestHandler(m_bus.get()));
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.
     p->registerHandler(

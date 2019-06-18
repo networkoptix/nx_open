@@ -17,6 +17,7 @@
 
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -193,8 +194,8 @@ void setupLabel(QLabel* label, LabelStyleFlags style)
         : qMax(areaWidth, label->minimumSizeHint().width()));
 
     const auto color = (style.testFlag(kErrorStyle)
-        ? qnNxStyle->mainColor(QnNxStyle::Colors::kRed)
-        : qnNxStyle->mainColor(QnNxStyle::Colors::kContrast));
+        ? colorTheme()->color("red_core")
+        : QColor(qnNxStyle->mainColor(QnNxStyle::Colors::kContrast)));
     setPaletteColor(label, QPalette::WindowText, color);
 }
 

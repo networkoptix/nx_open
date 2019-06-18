@@ -3,9 +3,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/to_string.h>
 #include <common/common_module.h>
-#include <core/resource/camera_resource.h>
+#include <nx/vms/server/resource/camera.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/mserver_resource_discovery_manager.h>
 #include <core/resource_management/camera_driver_restriction_list.h>
 
 namespace {
@@ -58,10 +58,10 @@ bool restrictNewManualCameraByIp(const QnSecurityCamResourcePtr& netRes)
     return false;
 }
 
-QnManualResourceSearchEntry entryFromCamera(const QnSecurityCamResourcePtr& camera)
+QnManualResourceSearchEntry entryFromCamera(const nx::vms::server::resource::CameraPtr& camera)
 {
     const auto type = qnResTypePool->getResourceType(camera->getTypeId());
-    const auto resourceInPool = QnResourceDiscoveryManager::findSameResource(camera);
+    const auto resourceInPool = QnMServerResourceDiscoveryManager::findSameResource(camera);
 
     const bool exists =
         (resourceInPool && resourceInPool->getHostAddress() == camera->getHostAddress())
@@ -74,7 +74,7 @@ QnManualResourceSearchEntry entryFromCamera(const QnSecurityCamResourcePtr& came
 
 QnManualResourceSearchEntry entryFromResource(const QnResourcePtr& resource)
 {
-    if (const QnSecurityCamResourcePtr &camera = resource.dynamicCast<QnSecurityCamResource>())
+    if (const auto &camera = resource.dynamicCast<nx::vms::server::resource::Camera>())
         return entryFromCamera(camera);
 
     return QnManualResourceSearchEntry();

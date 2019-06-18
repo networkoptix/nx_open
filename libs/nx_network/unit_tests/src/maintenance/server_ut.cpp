@@ -13,11 +13,11 @@ namespace nx::network::maintenance::test {
 struct DebugCounters
 {
     int tcpSocketCount = 0;
-    int stunConnectionCount = 0;
+    int stunServerConnectionCount = 0;
     int httpServerConnectionCount = 0;
 };
 
-#define DebugCounters_Fields (tcpSocketCount)(stunConnectionCount)(httpServerConnectionCount)
+#define DebugCounters_Fields (tcpSocketCount)(stunServerConnectionCount)(httpServerConnectionCount)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (DebugCounters),
@@ -75,7 +75,7 @@ protected:
         const auto debugCounters = QJson::deserialized<DebugCounters>(*msgBody);
         ASSERT_EQ(1U, debugCounters.httpServerConnectionCount);
         ASSERT_EQ(2U, debugCounters.tcpSocketCount);
-        ASSERT_EQ(0U, debugCounters.stunConnectionCount);
+        ASSERT_EQ(0U, debugCounters.stunServerConnectionCount);
     }
 
 private:

@@ -8,6 +8,8 @@
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/vms/api/data/peer_data.h>
 
+#include "../abstract_acceptor.h"
+
 namespace nx::clusterdb::engine { 
 
 class ConnectionManager;
@@ -19,19 +21,20 @@ class CommandLog;
 
 namespace nx::clusterdb::engine::transport::p2p::websocket {
 
-class Acceptor
+class Acceptor:
+    public AbstractAcceptor
 {
 public:
     Acceptor(
-        const QnUuid& moduleGuid,
+        const QnUuid& nodeId,
         const ProtocolVersionRange& protocolVersionRange,
-        CommandLog* transactionLog,
+        CommandLog* commandLog,
         ConnectionManager* connectionManager,
         const OutgoingCommandFilter& outgoingCommandFilter);
 
-    void registerHandlers(
+    virtual void registerHandlers(
         const std::string& rootPath,
-        nx::network::http::server::rest::MessageDispatcher* messageDispatcher);
+        nx::network::http::server::rest::MessageDispatcher* messageDispatcher) override;
 
 private:
     const ProtocolVersionRange& m_protocolVersionRange;

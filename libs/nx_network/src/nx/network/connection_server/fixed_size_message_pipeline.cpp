@@ -107,7 +107,7 @@ SerializerState FixedSizeMessageSerializer::serialize(
         sizeof(messageSize));
 
     buffer->append(m_message->data);
-    bytesWritten += m_message->data.size();
+    *bytesWritten += m_message->data.size();
 
     return SerializerState::done;
 }

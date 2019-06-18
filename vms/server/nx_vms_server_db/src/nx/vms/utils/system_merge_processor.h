@@ -11,7 +11,8 @@
 #include <nx/vms/api/data/module_information.h>
 
 class QnCommonModule;
-struct QnJsonRestResult;
+namespace nx::network::rest { struct JsonResult; }
+using QnJsonRestResult = nx::network::rest::JsonResult;
 class MediaServerClient;
 
 namespace nx {
@@ -101,6 +102,12 @@ private:
         const nx::utils::Url &remoteUrl,
         const QString& postKey);
 
+    bool shiftSynchronizationTimestamp(const ConfigureSystemData& remoteSystemData);
+
+    bool changeSystemId(
+        const QnUuid& systemId,
+        const ConfigureSystemData& remoteSystemData);
+
     bool isResponseOK(const nx::network::http::HttpClient& client);
 
     nx::network::http::StatusCode::Value getClientResponse(
@@ -111,7 +118,8 @@ private:
         const nx::utils::Url &remoteUrl,
         const QString& getKey,
         ResultDataType& result,
-        const QString& path);
+        const QString& path,
+        bool post = false);
 
     void addAuthToRequest(nx::utils::Url& request, const QString& remoteAuthKey);
 

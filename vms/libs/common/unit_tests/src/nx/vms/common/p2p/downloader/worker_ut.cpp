@@ -12,12 +12,7 @@
 
 #include "test_peer_manager.h"
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
-namespace test {
+namespace nx::vms::common::p2p::downloader::test {
 
 namespace {
 
@@ -34,15 +29,7 @@ public:
     using Worker::increasePeerRank;
     using Worker::decreasePeerRank;
 
-    TestWorker(
-        const QString& fileName,
-        Storage* storage,
-        AbstractPeerManager* peerManager)
-        :
-        Worker(fileName, storage, peerManager)
-    {
-        setPrintSelfPeerInLogs();
-    }
+    using Worker::Worker;
 
     virtual ~TestWorker() override
     {
@@ -98,7 +85,7 @@ protected:
         {
             if (!QDir().mkpath(directory.absolutePath()))
             {
-                NX_ASSERT("Cannot create directory for test file.");
+                NX_ASSERT(false, "Cannot create directory for test file.");
                 return TestPeerManager::FileInformation();
             }
         }
@@ -131,7 +118,7 @@ protected:
             Storage::calculateChecksums(testFileInfo.filePath, testFileInfo.chunkSize);
         if (testFileInfo.md5.isEmpty())
         {
-            NX_ASSERT("Cannot calculate md5 for file.");
+            NX_ASSERT(false, "Cannot calculate md5 for file.");
             return TestPeerManager::FileInformation();
         }
         testFileInfo.downloadedChunks.resize(
@@ -144,7 +131,7 @@ protected:
     {
         if (!workingDirectory.mkpath(name))
         {
-            NX_ASSERT("Cannot create storage directory");
+            NX_ASSERT(false, "Cannot create storage directory");
             return nullptr;
         }
 
@@ -159,7 +146,8 @@ protected:
         peer->id = peerId;
         peer->peerManager = new ProxyTestPeerManager(commonPeerManager.data(), peerId, peerName);
         peer->storage = createStorage(peerId.toString());
-        peer->worker = std::make_shared<TestWorker>(kTestFileName, peer->storage, peer->peerManager);
+        peer->worker = std::make_shared<TestWorker>(
+            kTestFileName, peer->storage, QList<AbstractPeerManager*>{peer->peerManager}, selfId);
         return peer;
     }
 
@@ -172,6 +160,7 @@ protected:
 
     QDir workingDirectory;
     QScopedPointer<TestPeerManager> commonPeerManager;
+    QnUuid selfId = QnUuid::createUuid();
 
     struct Peer
     {
@@ -218,26 +207,9 @@ TEST_F(DistributedFileDownloaderWorkerTest, simplePeersSelection)
     commonPeerManager->addPeer(QnUuid::createUuid());
     defaultPeer->peerManager->setPeerList(peers);
 
-    auto selectedPeers = defaultPeer->worker->selectPeersForOperation();
+    auto selectedPeers =
+        defaultPeer->worker->selectPeersForOperation(AbstractPeerManager::DownloadChunk);
     ASSERT_EQ(selectedPeers.size(), peers.size());
-}
-
-TEST_F(DistributedFileDownloaderWorkerTest, preferredPeersSelection)
-{
-    const QList<QnUuid> preferredPeers{QnUuid::createUuid()};
-
-    commonPeerManager->addPeer(preferredPeers.first());
-    for (int i = 0; i < 100; ++i)
-        commonPeerManager->addPeer(QnUuid::createUuid());
-
-    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
-    defaultPeer->worker->setPreferredPeers(preferredPeers);
-
-    for (int i = 0; i < 20; ++i)
-    {
-        auto peers = defaultPeer->worker->selectPeersForOperation();
-        ASSERT_TRUE(peers.contains(preferredPeers.first()));
-    }
 }
 
 TEST_F(DistributedFileDownloaderWorkerTest, closestIdPeersSelection)
@@ -249,9 +221,9 @@ TEST_F(DistributedFileDownloaderWorkerTest, closestIdPeersSelection)
     defaultPeer->peerManager->setPeerList(peers);
     std::sort(peers.begin(), peers.end());
 
-    const int selfPos = std::distance(
+    const int selfPos = (int) std::distance(
         peers.begin(),
-        std::lower_bound(peers.begin(), peers.end(), defaultPeer->peerManager->selfId()));
+        std::lower_bound(peers.begin(), peers.end(), selfId));
 
     const int maxDistance = (defaultPeer->worker->peersPerOperation() + 1) / 2;
 
@@ -264,13 +236,14 @@ TEST_F(DistributedFileDownloaderWorkerTest, closestIdPeersSelection)
         };
 
     for (const auto& peer: peers)
-        defaultPeer->worker->increasePeerRank(peer);
+        defaultPeer->worker->increasePeerRank(Worker::Peer{peer, defaultPeer->peerManager});
 
-    const auto& selectedPeers = defaultPeer->worker->selectPeersForOperation();
+    const auto& selectedPeers = defaultPeer->worker->selectPeersForOperation(
+        AbstractPeerManager::DownloadChunk);
     int closestIdPeersCount = 0;
-    for (const auto& peerId: selectedPeers)
+    for (const auto& peer: selectedPeers)
     {
-        if (distance(peerId) <= maxDistance)
+        if (distance(peer.id) <= maxDistance)
             ++closestIdPeersCount;
     }
     ASSERT_GE(closestIdPeersCount, selectedPeers.size() - 1);
@@ -280,7 +253,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
 {
     const auto& fileInfo = createTestFile();
 
-    addPeerWithFile(fileInfo);
+    const QnUuid& peerId = addPeerWithFile(fileInfo);
     defaultPeer->storage->addFile(fileInfo.name);
 
     nx::utils::promise<void> readyPromise;
@@ -288,7 +261,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
     setOnRequestFileInfoCb(
         [readyPromise = std::move(readyPromise)]() mutable { readyPromise.set_value(); });
 
-    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
+    defaultPeer->peerManager->setPeerList({peerId});
     defaultPeer->worker->start();
 
     readyFuture.wait();
@@ -399,7 +372,8 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownloadFromInternet)
     fileInfo.url = "http://test.org/testFile";
     NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
 
-    commonPeerManager->setHasInternetConnection(defaultPeer->peerManager->selfId());
+    commonPeerManager->setHasInternetConnection(defaultPeer->id);
+    commonPeerManager->setIndirectInternetRequestsAllowed(true);
     commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
 
     nx::utils::promise<bool> readyPromise;
@@ -418,7 +392,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownloadFromInternet)
     ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
 }
 
-TEST_F(DistributedFileDownloaderWorkerTest, downloadFromInternetViaNonSetPeer)
+TEST_F(DistributedFileDownloaderWorkerTest, downloadFromInternetByProxyingRequests)
 {
     auto fileInfo = createTestFile();
     fileInfo.url = "http://test.org/testFile";
@@ -427,6 +401,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, downloadFromInternetViaNonSetPeer)
     const auto proxyPeerId = commonPeerManager->addPeer("Proxy Peer");
 
     commonPeerManager->setHasInternetConnection(proxyPeerId);
+    commonPeerManager->setIndirectInternetRequestsAllowed(true);
     commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
 
     nx::utils::promise<bool> readyPromise;
@@ -434,6 +409,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, downloadFromInternetViaNonSetPeer)
     QObject::connect(defaultPeer->worker.get(), &Worker::finished,
         [&readyPromise] { readyPromise.set_value(true); });
 
+    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
     defaultPeer->worker->start();
 
     ASSERT_TRUE(readyFuture.get());
@@ -444,6 +420,9 @@ TEST_F(DistributedFileDownloaderWorkerTest, downloadFromInternetViaNonSetPeer)
     ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
 }
 
+// TODO: #dklychkov Reimplement these tests. The concept of peer managers was changed and now
+// current method of counting requests is not suitable, e.g. for fileInfo requests.
+#if 0
 TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
 {
     auto fileInfo = createTestFile();
@@ -472,7 +451,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
 
     QList<Peer*> peers{defaultPeer};
 
-    for (int i = 1; i <= 10; ++i)
+    for (uint i = 1; i <= 10; ++i)
     {
         auto peer = createPeer(lit("Peer %1").arg(i), QnUuid::createUuidFromPool(baseId, i));
         peers.append(peer);
@@ -602,10 +581,6 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadNonFlatNetwork)
     ASSERT_EQ(pendingPeers.size(), 0);
     ASSERT_LE(commonPeerManager->requestCounter()->totalRequests(), maxRequests);
 }
+#endif
 
-} // namespace test
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::common::p2p::downloader::test

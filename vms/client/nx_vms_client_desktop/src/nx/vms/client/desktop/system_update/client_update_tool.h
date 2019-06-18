@@ -14,7 +14,11 @@
 #include <utils/update/zip_utils.h>
 #include "update_contents.h"
 
-namespace nx::vms::common::p2p::downloader { class SingleConnectionPeerManager; }
+namespace nx::vms::common::p2p::downloader {
+
+class ResourcePoolPeerManager;
+
+} // namespace nx::vms::common::p2p::downloader
 
 namespace nx::vms::client::desktop {
 
@@ -25,15 +29,13 @@ namespace nx::vms::client::desktop {
  */
 class ClientUpdateTool:
     public Connective<QObject>,
-    public QnConnectionContextAware,
-    public nx::vms::common::p2p::downloader::AbstractPeerManagerFactory
+    public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
     using Downloader = vms::common::p2p::downloader::Downloader;
     using FileInformation = vms::common::p2p::downloader::FileInformation;
     using PeerManagerPtr = nx::vms::common::p2p::downloader::AbstractPeerManager*;
-    using SingleConnectionPeerManager = nx::vms::common::p2p::downloader::SingleConnectionPeerManager;
     using UpdateContents = nx::update::UpdateContents;
 
 public:
@@ -140,10 +142,6 @@ public:
      */
     void setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId);
 
-    virtual PeerManagerPtr createPeerManager(
-        FileInformation::PeerSelectionPolicy peerPolicy,
-        const QList<QnUuid>& additionalPeers) override;
-
     std::future<UpdateContents> requestRemoteUpdateInfo();
 
     /** Get cached update information from the mediaservers. */
@@ -185,7 +183,7 @@ protected:
     void atDownloadFailed(const QString& fileName);
     void atExtractFilesFinished(int code);
 
-protected:
+private:
     void setState(State newState);
     void setError(const QString& error);
     void setApplauncherError(const QString& error);
@@ -199,8 +197,8 @@ protected:
     /** Directory to store unpacked files. */
     QDir m_outputDir;
 
-    /** Special peer manager to be used in the downloader. */
-    std::unique_ptr<vms::common::p2p::downloader::SingleConnectionPeerManager> m_peerManager;
+    vms::common::p2p::downloader::ResourcePoolPeerManager* m_peerManager = nullptr;
+    vms::common::p2p::downloader::ResourcePoolPeerManager* m_proxyPeerManager = nullptr;
     nx::update::Package m_clientPackage;
     State m_state = State::initial;
     int m_progress = 0;

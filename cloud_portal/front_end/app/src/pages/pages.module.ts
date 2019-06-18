@@ -16,6 +16,7 @@ import { RightMenuModule }        from './right-menu/right-menu.module';
 import { ContentModule }          from './content/content.module';
 import { IntegrationsModule }     from './integration/integrations.module';
 import { IntegrationsListModule } from './integration/list/list.module';
+import { LandingModule }          from './landing/landing.module';
 
 @NgModule({
     imports        : [
@@ -33,6 +34,7 @@ import { IntegrationsListModule } from './integration/list/list.module';
         RightMenuModule,        // TODO: Remove it after test
         CampageModule,
         Angular2CsvModule,
+        LandingModule,
     ],
     declarations   : [],
     entryComponents: [],
@@ -52,6 +54,7 @@ import { IntegrationsListModule } from './integration/list/list.module';
         RightMenuModule,        // TODO: Remove it after test
         CampageModule,
         Angular2CsvModule,
+        LandingModule,
     ]
 })
 export class PagesModule {

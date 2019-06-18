@@ -168,7 +168,7 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
         return;
     }
 
-    NX_INFO(this, lit("Start new async report"));
+    NX_DEBUG(this, lit("Start new async scan for reports"));
     m_activeCollection = nx::utils::concurrent::run(Ec2ThreadPool::instance(), [=](){
         // \class nx::utils::concurrent posts a job to \class Ec2ThreadPool rather than create new
         // real thread, we need to reverve a thread to avoid possible deadlock

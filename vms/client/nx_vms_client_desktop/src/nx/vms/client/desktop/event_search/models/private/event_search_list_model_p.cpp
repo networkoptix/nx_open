@@ -121,6 +121,11 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
         case Qn::DescriptionTextRole:
             return description(eventParams);
 
+        case Qn::ForcePrecisePreviewRole:
+            return hasPreview(eventParams.eventType)
+                && eventParams.eventTimestampUsec > 0
+                && eventParams.eventTimestampUsec != DATETIME_NOW;
+
         case Qn::PreviewTimeRole:
             if (!hasPreview(eventParams.eventType))
                 return QVariant();
@@ -238,8 +243,16 @@ bool EventSearchListModel::Private::commitInternal(const QnTimePeriod& periodToC
 
             end = iter;
 
-            if (timeUs == lastTimeUs && iter->businessRuleId == last.businessRuleId)
+            // Trying to deduce if we found exactly the same event which is displayed last.
+            const ActionData& data =*iter;
+            if (timeUs == lastTimeUs
+                && data.businessRuleId == last.businessRuleId
+                && data.actionType == last.actionType
+                && data.actionParams.actionResourceId == last.actionParams.actionResourceId
+                && data.eventParams.eventResourceId == last.eventParams.eventResourceId)
+            {
                 break;
+            }
         }
     }
 
@@ -303,6 +316,7 @@ void EventSearchListModel::Private::fetchLive()
                 q->clear(); //< Otherwise there will be a gap between live and archive events.
             }
 
+            q->setFetchDirection(FetchDirection::later);
             q->addToFetchedTimeWindow(periodToCommit);
 
             NX_VERBOSE(q, "Live update commit");

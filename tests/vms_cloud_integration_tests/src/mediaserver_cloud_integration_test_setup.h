@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/utils/test_support/test_with_temporary_directory.h>
+
 #include <nx/cloud/db/test_support/cdb_launcher.h>
 
 #include <common/static_common_module.h>
@@ -19,7 +21,8 @@ struct TestParams
 };
 
 class MediaServerCloudIntegrationTest:
-    public ::testing::TestWithParam<TestParams>
+    public ::testing::TestWithParam<TestParams>,
+    public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
     MediaServerCloudIntegrationTest();

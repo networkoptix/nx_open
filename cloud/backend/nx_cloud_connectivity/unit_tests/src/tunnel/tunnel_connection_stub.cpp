@@ -28,6 +28,11 @@ void TunnelConnectionStub::setControlConnectionClosedHandler(
     m_onClosedHandler = std::move(handler);
 }
 
+ConnectType TunnelConnectionStub::connectType() const
+{
+    return ConnectType::unknown;
+}
+
 std::string TunnelConnectionStub::toString() const
 {
     return "TunnelConnectionStub";

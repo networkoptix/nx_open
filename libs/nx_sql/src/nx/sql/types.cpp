@@ -72,28 +72,28 @@ RdbmsDriverType rdbmsDriverTypeFromString(const char* str)
 
 namespace {
 
-const QLatin1String kDbDriverName("db/driverName");
+const QLatin1String kDbDriverName("driverName");
 
-const QLatin1String kDbHostName("db/hostName");
+const QLatin1String kDbHostName("hostName");
 
-const QLatin1String kDbPort("db/port");
+const QLatin1String kDbPort("port");
 
-const QLatin1String kDbName("db/name");
+const QLatin1String kDbName("name");
 
-const QLatin1String kDbUserName("db/userName");
+const QLatin1String kDbUserName("userName");
 
-const QLatin1String kDbPassword("db/password");
+const QLatin1String kDbPassword("password");
 
-const QLatin1String kDbConnectOptions("db/connectOptions");
+const QLatin1String kDbConnectOptions("connectOptions");
 
-const QLatin1String kDbEncoding("db/encoding");
+const QLatin1String kDbEncoding("encoding");
 
-const QLatin1String kDbMaxConnections("db/maxConnections");
+const QLatin1String kDbMaxConnections("maxConnections");
 
-const QLatin1String kDbInactivityTimeout("db/inactivityTimeout");
+const QLatin1String kDbInactivityTimeout("inactivityTimeout");
 
 const QLatin1String kDbMaxPeriodQueryWaitsForAvailableConnection(
-    "db/maxPeriodQueryWaitsForAvailableConnection");
+    "maxPeriodQueryWaitsForAvailableConnection");
 
 } // namespace
 
@@ -109,50 +109,58 @@ ConnectionOptions::ConnectionOptions():
 {
 }
 
-void ConnectionOptions::loadFromSettings(const QnSettings& settings)
+void ConnectionOptions::loadFromSettings(const QnSettings& settings, const QString& groupName)
 {
     using namespace std::chrono;
 
-    if (settings.contains(kDbDriverName))
+    if (auto str = lm("%1/%2").arg(groupName).arg(kDbDriverName); settings.contains(str))
     {
-        const auto str = settings.value(kDbDriverName).toString().toStdString();
-        driverType = rdbmsDriverTypeFromString(str.c_str());
+        driverType = rdbmsDriverTypeFromString(
+            settings.value(str).toString().toStdString().c_str());
     }
 
-    if (settings.contains(kDbHostName))
-        hostName = settings.value(kDbHostName).toString();
-    if (settings.contains(kDbPort))
-        port = settings.value(kDbPort).toInt();
-    if (settings.contains(kDbName))
-        dbName = settings.value(kDbName).toString();
-    if (settings.contains(kDbUserName))
-        userName = settings.value(kDbUserName).toString();
-    if (settings.contains(kDbPassword))
-        password = settings.value(kDbPassword).toString();
-    if (settings.contains(kDbConnectOptions))
-        connectOptions = settings.value(kDbConnectOptions).toString();
-    if (settings.contains(kDbEncoding))
-        encoding = settings.value(kDbEncoding).toString();
+    if (auto str = lm("%1/%2").arg(groupName).arg(kDbHostName); settings.contains(str))
+        hostName = settings.value(str).toString();
 
-    if (settings.contains(kDbMaxConnections))
+    if (auto str = lm("%1/%2").arg(groupName).arg(kDbPort); settings.contains(str))
+        port = settings.value(str).toInt();
+
+    if (auto str = lm("%1/%2").arg(groupName).arg(kDbName); settings.contains(str))
+        dbName = settings.value(str).toString();
+
+    if (auto str = lm("%1/%2").arg(groupName).arg(kDbUserName); settings.contains(str))
+        userName = settings.value(str).toString();
+
+    if (auto str = lm("%1/%2").arg(groupName).arg(kDbPassword); settings.contains(str))
+        password = settings.value(str).toString();
+
+    if (auto str = lm("%1/%2").arg(groupName).arg(kDbConnectOptions); settings.contains(str))
+        connectOptions = settings.value(str).toString();
+
+    if (auto str = lm("%1/%2").arg(groupName).arg(kDbEncoding); settings.contains(str))
+        encoding = settings.value(str).toString();
+
+    if (auto str = lm("%1/%2").arg(groupName).arg(kDbMaxConnections); settings.contains(str))
     {
-        maxConnectionCount = settings.value(kDbMaxConnections).toInt();
+        maxConnectionCount = settings.value(str).toInt();
         if (maxConnectionCount <= 0)
             maxConnectionCount = std::thread::hardware_concurrency();
     }
 
-    if (settings.contains(kDbInactivityTimeout))
+    if (auto str = lm("%1/%2").arg(groupName).arg(kDbInactivityTimeout); settings.contains(str))
     {
         inactivityTimeout = duration_cast<seconds>(
             nx::utils::parseTimerDuration(
-                settings.value(kDbInactivityTimeout).toString()));
+                settings.value(str).toString()));
     }
 
-    if (settings.contains(kDbMaxPeriodQueryWaitsForAvailableConnection))
+    if (
+        auto str = lm("%1/%2").arg(groupName).arg(kDbMaxPeriodQueryWaitsForAvailableConnection);
+        settings.contains(str))
     {
         maxPeriodQueryWaitsForAvailableConnection = duration_cast<seconds>(
             nx::utils::parseTimerDuration(
-                settings.value(kDbMaxPeriodQueryWaitsForAvailableConnection).toString()));
+                settings.value(str).toString()));
     }
 }
 

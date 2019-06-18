@@ -118,7 +118,8 @@ bool HttpClient::doDelete(const nx::utils::Url& url)
 
 const Response* HttpClient::response() const
 {
-    return m_asyncHttpClient->response();
+    QnMutexLocker lk(&m_mutex);
+    return m_lastResponse ? &(*m_lastResponse) : nullptr;
 }
 
 SystemError::ErrorCode HttpClient::lastSysErrorCode() const
@@ -394,13 +395,19 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         lk.relock();
     }
 
+    m_lastResponse = std::nullopt;
+
     m_done = false;
     m_error = false;
     func(m_asyncHttpClient.get());
 
     m_msgBodyBuffer.clear();
-    while (!m_terminated && (m_asyncHttpClient->state() < AsyncClient::State::sResponseReceived))
+    while (!m_terminated &&
+        (m_asyncHttpClient->state() <= AsyncClient::State::sResponseReceived) &&
+        !m_lastResponse)
+    {
         m_cond.wait(lk.mutex());
+    }
 
     return m_asyncHttpClient->state() != AsyncClient::State::sFailed;
 }
@@ -408,6 +415,9 @@ bool HttpClient::doRequest(AsyncClientFunc func)
 void HttpClient::onResponseReceived()
 {
     QnMutexLocker lk(&m_mutex);
+
+    m_lastResponse = *m_asyncHttpClient->response();
+
     // Message body buffer can be non-empty.
     m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
     if ((std::size_t)m_msgBodyBuffer.size() > m_maxInternalBufferSize)
@@ -420,6 +430,7 @@ void HttpClient::onResponseReceived()
         m_error = true;
         m_asyncHttpClient->pleaseStopSync();
     }
+
     m_cond.wakeAll();
 }
 

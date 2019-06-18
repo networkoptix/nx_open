@@ -39,10 +39,10 @@ private:
     void handleExportBookmarkAction(const ui::action::Parameters& parameters);
 
     void handleExportBookmarksAction();
-    typedef std::pair<QnUuid, std::unique_ptr<AbstractExportTool>> ExportInstance;
+    typedef std::pair<QnUuid, std::unique_ptr<AbstractExportTool>> ExportToolInstance;
     // Extracts selected parameters from the dialog and prepares appropriate export tool.
-    ExportInstance prepareExportTool(const ExportSettingsDialog& dialog);
-    void runExport(ExportInstance&& context);
+    ExportToolInstance prepareExportTool(const ExportSettingsDialog& dialog);
+    void runExport(ExportToolInstance&& context);
 
     bool validateItemTypes(const QnLayoutResourcePtr& layout) const;
 private:

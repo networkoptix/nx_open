@@ -77,6 +77,10 @@ def move_revisions_to_new_cloud_portals(logger):
 
 
 def migrate_18_3_to_18_4(logger):
+    # If there are not products create a ProductType of cloud_portal and we can skip migrating 18 -> 19
+    if not Product.objects.all().exists():
+        structure.find_or_add_product_type(ProductType.PRODUCT_TYPES.cloud_portal)
+
     if ProductType.objects.all().exists():
         logger.stdout.write(logger.style.SUCCESS("Migration has already been completed skipping this step"))
         return

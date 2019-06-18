@@ -11,4 +11,6 @@ public:
         const QByteArray &body,
         QnJsonRestResult &result,
         const QnRestConnectionProcessor*) override;
+private:
+    std::map<QString, QnMutex> m_cameraGroupLock;
 };

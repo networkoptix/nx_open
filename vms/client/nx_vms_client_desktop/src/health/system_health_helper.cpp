@@ -103,7 +103,7 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
         case QnSystemHealth::RemoteArchiveSyncProgress:
             return tr("Remote archive synchronization is in progress");
         case QnSystemHealth::RemoteArchiveSyncError:
-            return tr("Error occured during remote archive synchronization");
+            return tr("Error occurred during remote archive synchronization");
 
         default:
             break;

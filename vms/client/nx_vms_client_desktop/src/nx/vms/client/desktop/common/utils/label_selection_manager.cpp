@@ -10,6 +10,8 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/private/qwidgettextcontrol_p.h>
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::vms::client::desktop {
 
 //-------------------------------------------------------------------------------------------------

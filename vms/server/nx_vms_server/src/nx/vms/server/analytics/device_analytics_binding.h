@@ -22,6 +22,7 @@
 #include <nx/vms/server/analytics/device_agent_handler.h>
 
 #include <nx/vms/server/sdk_support/loggers.h>
+#include <nx/analytics/metadata_logger.h>
 
 namespace nx::vms::server::analytics {
 
@@ -79,6 +80,8 @@ private:
 
     bool setSettingsInternal(const QVariantMap& settingsFromUser);
 
+    void logIncomingFrame(nx::sdk::analytics::IDataPacket* frame);
+
 private:
     mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
@@ -94,6 +97,8 @@ private:
 
     std::atomic<bool> m_started{false};
     std::atomic<bool>m_isStreamConsumer{false};
+
+    nx::analytics::MetadataLogger m_incomingFrameLogger;
 };
 
 } // namespace nx::vms::server::analytics

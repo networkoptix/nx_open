@@ -10,7 +10,7 @@
 
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
-#include <nx/sdk/analytics/i_metadata_packet.h>
+#include <nx/sdk/analytics/i_compound_metadata_packet.h>
 #include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>

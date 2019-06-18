@@ -66,6 +66,13 @@ public:
             m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
             leftHidden = false;
         }
+        else if (data->statusUnknown)
+        {
+            m_left->setText(tr("Waiting for server to respond..."));
+            leftHidden = false;
+            m_animated = true;
+            progressHidden = true;
+        }
         else if (data->installed)
         {
             m_left->setText(tr("Installed"));
@@ -75,6 +82,13 @@ public:
         else if (data->installing)
         {
             m_left->setText(tr("Installing..."));
+            leftHidden = false;
+            m_animated = true;
+            progressHidden = true;
+        }
+        else if (data->offline && data->state != StatusCode::offline)
+        {
+            m_left->setText(tr("Waiting for server to respond..."));
             leftHidden = false;
             m_animated = true;
             progressHidden = true;

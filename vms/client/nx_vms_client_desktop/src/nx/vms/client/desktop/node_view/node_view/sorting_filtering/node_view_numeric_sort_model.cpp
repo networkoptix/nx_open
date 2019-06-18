@@ -1,5 +1,8 @@
 #include "node_view_numeric_sort_model.h"
-#include <QCollator>
+
+#include <QtCore/QCollator>
+
+#include <nx/utils/log/assert.h>
 
 namespace nx::vms::client::desktop {
 namespace node_view {

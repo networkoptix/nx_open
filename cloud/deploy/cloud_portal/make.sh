@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 . ../environment
 . ../common.sh
@@ -34,6 +34,15 @@ function stage_cmake()
     mkdir -p stage/cloud/static/common/static
     rsync -a $cmakeBuildDirectory/cloud_portal/cloud_portal/cloud stage
     rm -rf stage/cloud/.idea
+}
+
+function publish_deps()
+{
+    local dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    local img=009544449203.dkr.ecr.us-west-1.amazonaws.com/devtools/wheel_uploader:2.7-alpine3.7
+
+    docker pull $img
+    docker run --rm -i $img < $dir/../../../cloud_portal/cloud/requirements.txt
 }
 
 main $@

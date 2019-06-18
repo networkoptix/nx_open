@@ -13,6 +13,7 @@ from enum import Enum
 
 logger = logging.getLogger(__name__)
 
+
 class ErrorCodes(Enum):
     ok = 'ok'
 
@@ -33,6 +34,7 @@ class ErrorCodes(Enum):
 
     # CLOUD DB specific errors
     forbidden = 'forbidden'
+    account_activated = 'accountActivated'
     account_not_activated = 'accountNotActivated'
     account_blocked = 'accountBlocked'
     not_found = 'notFound'  # Account not found, activation code not found and so on
@@ -52,15 +54,16 @@ class ErrorCodes(Enum):
     not_acceptable = 'notAcceptable'
 
     def log_level(self):
-        if self in (ErrorCodes.ok,
+        if self in (ErrorCodes.account_exists,
+                    ErrorCodes.account_not_activated,
+                    ErrorCodes.bad_username,
+                    ErrorCodes.ok,
                     ErrorCodes.not_authorized,
                     ErrorCodes.not_found,
-                    ErrorCodes.account_exists,
                     ErrorCodes.wrong_old_password,
-                    ErrorCodes.account_not_activated):
+                    ErrorCodes.wrong_password):
             return logging.INFO
         if self in (ErrorCodes.account_blocked,
-                    ErrorCodes.bad_username,
                     ErrorCodes.forbidden,
                     ErrorCodes.invalid_nonce,
                     ErrorCodes.wrong_code,

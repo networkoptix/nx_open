@@ -182,7 +182,7 @@ private:
     SystemManagerStub m_systemManagerStub;
     SystemHealthInfoProviderStub m_systemHealthInfoProviderStub;
     VmsGatewayStub m_vmsGatewayStub;
-    std::unique_ptr<clusterdb::engine::SyncronizationEngine> m_syncronizationEngine;
+    std::unique_ptr<clusterdb::engine::SynchronizationEngine> m_synchronizationEngine;
     std::unique_ptr<nx::cloud::db::SystemMergeManager> m_systemMergeManager;
     nx::utils::SyncQueue<api::ResultCode> m_mergeResults;
     boost::optional<std::future<void>> m_systemMergeManagerDestroyed;
@@ -197,7 +197,7 @@ private:
 
         m_ownerAccount = insertRandomAccount();
 
-        m_syncronizationEngine = std::make_unique<clusterdb::engine::SyncronizationEngine>(
+        m_synchronizationEngine = std::make_unique<clusterdb::engine::SynchronizationEngine>(
             std::string(),
             m_settings.p2pDb(),
             nx::clusterdb::engine::ProtocolVersionRange(

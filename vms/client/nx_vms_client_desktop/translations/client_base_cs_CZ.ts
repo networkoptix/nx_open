@@ -2644,17 +2644,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>Konfigurování serveru</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>Aktualizování serveru</translation>
-    </message>
-  </context>
-  <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
@@ -3290,6 +3279,14 @@ to %1</source>
       <source>Folder already added</source>
       <translation>Složka již byla přidána</translation>
     </message>
+    <message>
+      <source>None</source>
+      <translation>Žádný</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
+    </message>
   </context>
   <context>
     <name>QnGeneralSystemAdministrationWidget</name>
@@ -3883,21 +3880,21 @@ to %1</source>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 jsou aktuálně používány</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Alespoň %1 jsou požadovány</numerusform>
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
       </translation>
     </message>
   </context>
@@ -5276,222 +5273,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>Stav</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>Vybrat soubor aktualizace...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>Poznámky k verzi</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>Klienta budete muset aktualizovat ručně pomocí instalátoru.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>Z tohoto souboru nelze aktualizovat.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Nejnovější dostupná aktualizace</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>Stáhnout soubor s nejnovější verzí aktualizace</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>Vybraná verze</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>Stáhnout soubor aktualizace</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>Procházet soubor aktualizace...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>Vybraný soubor aktualizace</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>Stahnout v externím prohlížeči</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>Zkopírovat odkaz do schránky</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>Nelze ověřit aktualizace na Internetu.</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>Neznámé číslo sestavení.</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>Přechod na předchozí verzi není povolen.</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>Aktualizace pro jeden nebo více serverů nebyly nalezeny.</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>Aktualizace klienta nebyla nalezena.</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>Nelze rozbalit soubor aktualizace. Na disku není dostatečný volný prostor.</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>Aktualizace je dokončena...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>Kontrola aktualizací...</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>Stahování aktualizací...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>Instalace aktualizace klienta...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>Instalace aktualizací pro nekompatibilní servery...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>Odesílání aktualizací na servery...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>Instalace aktualizací...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>Konkrétní sestavení...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>Aktualizace na konkrétní sestavení</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>Aktualizovat systém</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>Aktualizace systému právě probíhá</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>Zrušit aktualizaci</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>Pokračovat v pozadí</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation type="unfinished">
-        <numerusform>Nedostatek volného místa na serverech %n:</numerusform>
-        <numerusform>Not enough free space at %n Servers:</numerusform>
-        <numerusform>Not enough free space at %n Servers:</numerusform>
-        <numerusform>Not enough free space at %n Servers:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>Pokus o aktualizaci může selhat nebo způsobit špatnou funkci serveru.</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>Vynutit aktualizaci</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>Aktualizace serveru byla dokončena</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>Aktualizace byla dokončena</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>Aktualizace byla zrušena</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>Všechny servery již byly aktualizovány</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>Aktualizace se nezdařila</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Aktualizujte prosím %1 ručně pomocí instalačního balíčku.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 bude restartován za účelem aktualizace verze.</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>Aktualizaci nelze v této fázi zrušit</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>Vyčkejte prosím, dokud není proces dokončen.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>Všechny komponenty ve vašem systému jsou aktuální.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>Všechny komponenty ve vašem systému jsou na této verzi.</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Nekompatibilní situace %1. Chcete-li aktualizovat, jako první odpojte systém od %1.</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>Aktualizovat soubory</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>Ověření aktualizace...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>Kontrola volného místa...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
       <source>Unsaved changes:</source>
@@ -6174,10 +5955,6 @@ to %1</source>
       <translation>Vzdálená synchronizace archivu probíhá</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>Při vzdálené synchronizaci archivu došlo k chybě</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>Vzdálená synchronizace archivu byla spuštěna pro následující zařízení:</translation>
     </message>
@@ -6227,17 +6004,13 @@ to %1</source>
       <source>The System is running in safe mode.</source>
       <translation type="unfinished">The System is running in safe mode.</translation>
     </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>Povolit automatické zjišťování zařízení a serverů</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>Povolit automatické zjišťování kamer a serverů</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>Povolit systému optimalizovat nastavení zařízení</translation>
@@ -6253,6 +6026,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Nezahrnuje žádné osobní údaje a je zcela anonymní.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -6336,94 +6125,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>Přidržet hovor</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>Aktualizace byla úspěšně dokončena.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>Aktualizace byla zrušena.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>Jiný uživatel již spustil aktualizaci.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>Všechny servery jsou již aktualizovány.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>Nelze stáhnout soubory aktualizace.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>Na disku není ponechaný volný prostor.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>Nelze odeslat aktualizace na servery.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>Problém je způsoben %n servery:</numerusform>
-        <numerusform>The problem is caused by %n servers:</numerusform>
-        <numerusform>The problem is caused by %n servers:</numerusform>
-        <numerusform>The problem is caused by %n servers:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>Na serverech %n není ponechán volný prostor:</numerusform>
-        <numerusform>No free space left on %n servers:</numerusform>
-        <numerusform>No free space left on %n servers:</numerusform>
-        <numerusform>No free space left on %n servers:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation type="unfinished">
-        <numerusform>%n servery neodpovídají:</numerusform>
-        <numerusform>%n servery neodpovídají:</numerusform>
-        <numerusform>%n servers are not responding:</numerusform>
-        <numerusform>%n servers are not responding:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation type="unfinished">
-        <numerusform>%n servery jsou offline:</numerusform>
-        <numerusform>%n servers have gone offline:</numerusform>
-        <numerusform>%n servers have gone offline:</numerusform>
-        <numerusform>%n servers have gone offline:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>Ověření selhalo na %n serverech:</numerusform>
-        <numerusform>Authentication failed for %n servers:</numerusform>
-        <numerusform>Authentication failed for %n servers:</numerusform>
-        <numerusform>Authentication failed for %n servers:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>Nelze nainstalovat aktualizaci klienta.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>Nelze nainstalovat aktualizace na jeden nebo více serverů.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -6883,25 +6584,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6910,10 +6592,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>Servery z jiného systému se zobrazí ve stromu zdrojů.</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>Aktualizace serveru se nezdařila</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -7090,29 +6768,6 @@ to %1</source>
     <message>
       <source>JPEG Image</source>
       <translation type="unfinished">JPEG Image</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>Poznámky k vydání</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>%1 verze je dostupná</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>Hlavní problémy byly opraveny. Aktualizace je důrazně doporučena.</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Aktualizace...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>Neupozorňovat znovu na tuto aktualizaci</translation>
     </message>
   </context>
   <context>
@@ -7639,6 +7294,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7844,6 +7510,14 @@ to %1</source>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>Zobrazit</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7998,10 +7672,6 @@ to %1</source>
       <translation>Výchozí</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>Server nezmění žádné nastavení kamer, bude přijímat a používat stream kamery jak je. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Pomáhá vyřešit problémy s kvalitou obrazu u některých kamer, u ostatních kamer způsobí významné zvýšení datového toku.</translation>
     </message>
@@ -8021,12 +7691,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
+        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
+        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
+        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>UDP Multicast</source>
+      <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Server nezmění žádné nastavení kamer, bude přijímat a používat stream kamery jak je.</translation>
     </message>
   </context>
   <context>
@@ -8056,11 +7734,11 @@ to %1</source>
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
       <source>Use License</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Použít licenci</numerusform>
-        <numerusform>Use License</numerusform>
-        <numerusform>Use License</numerusform>
-        <numerusform>Use License</numerusform>
+        <numerusform>Použít licenci</numerusform>
+        <numerusform>Použít licenci</numerusform>
+        <numerusform>Použít licenci</numerusform>
       </translation>
     </message>
   </context>
@@ -8241,20 +7919,20 @@ to %1</source>
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 jsou použity</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+        <numerusform>%1 jsou použity</numerusform>
+        <numerusform>%1 jsou použity</numerusform>
+        <numerusform>%1 jsou použity</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more required</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n více požadovaných</numerusform>
-        <numerusform>%n more required</numerusform>
-        <numerusform>%n more required</numerusform>
-        <numerusform>%n more required</numerusform>
+        <numerusform>%n více požadovaných</numerusform>
+        <numerusform>%n více požadovaných</numerusform>
+        <numerusform>%n více požadovaných</numerusform>
       </translation>
     </message>
   </context>
@@ -8308,16 +7986,16 @@ to %1</source>
       <translation type="unfinished">Broken update package.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
-    </message>
-    <message>
       <source>Internal error.</source>
       <translation>Vnitřní chyba.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
   </context>
   <context>
@@ -8349,6 +8027,17 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>Vloženo</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>Konfigurování serveru</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>Aktualizování serveru</translation>
     </message>
   </context>
   <context>
@@ -8460,16 +8149,27 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Add %n Devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Přidat %n zařízení</numerusform>
-        <numerusform>Add %n Devices</numerusform>
-        <numerusform>Add %n Devices</numerusform>
-        <numerusform>Add %n Devices</numerusform>
+        <numerusform>Přidat %n zařízení</numerusform>
+        <numerusform>Přidat %n zařízení</numerusform>
+        <numerusform>Přidat %n zařízení</numerusform>
       </translation>
     </message>
     <message>
       <source>Address field cannot be empty</source>
       <translation type="unfinished">Address field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
     </message>
   </context>
   <context>
@@ -8542,22 +8242,22 @@ to %1</source>
       <source>No events</source>
       <translation>Žádné události</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation>Žádné události nenastaly</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n událostí</numerusform>
-        <numerusform>%n events</numerusform>
-        <numerusform>%n events</numerusform>
-        <numerusform>%n events</numerusform>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
       </translation>
     </message>
     <message>
       <source>unnamed analytics engine</source>
       <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation type="unfinished">No events occurred</translation>
     </message>
   </context>
   <context>
@@ -9064,26 +8764,6 @@ to %1</source>
       <translation>Některé servery jsou offline a nebudou aktualizovány. Přeskočit je?</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation>Instalovat nyní</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation>Později</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation>Aktualizace byly staženy</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation>Nepodařilo se stáhnout balíčky aktualizací</translation>
-    </message>
-    <message>
       <source>Please make sure there is enough free storage space and network connection is stable.</source>
       <translation>Ujistěte se prosím, že je dostatek volného místa v úložišti a připojení k síti je stabilní.</translation>
     </message>
@@ -9098,10 +8778,6 @@ to %1</source>
     <message>
       <source>Cancel Update</source>
       <translation>Zrušit aktualizaci</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Nepodařilo se stáhnout balíčky aktualizací pro některé servery</translation>
     </message>
     <message>
       <source>Please make sure they have enough free storage space and stable network connection.</source>
@@ -9252,6 +8928,18 @@ to %1</source>
       <source>There are no online servers to update.</source>
       <translation type="unfinished">There are no online servers to update.</translation>
     </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9279,6 +8967,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>Vzít na vědomí</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Obecná událost</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Event</source>
+      <translation type="unfinished">Unknown Plugin Event</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9298,10 +9006,6 @@ to %1</source>
       <translation>Žádný z vybraných uživatelů nemá přístup k vybranému rozložení. Akce nebude fungovat.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>Místní rozložení lze zobrazit pouze jejich majitelům. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>Vybrat rozložení...</translation>
     </message>
@@ -9316,6 +9020,45 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
     </message>
   </context>
   <context>
@@ -9462,16 +9205,16 @@ to %1</source>
       <translation>Sledovat a zaznamenávat všechny akce uživatele.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>minuty</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>hodiny</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
     </message>
   </context>
   <context>
@@ -9492,13 +9235,13 @@ to %1</source>
       <source>Downloaded</source>
       <translation>Staženo</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>Aktuální verze</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>Stav</translation>
@@ -9518,6 +9261,10 @@ to %1</source>
     <message>
       <source>Component</source>
       <translation type="unfinished">Component</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
     </message>
   </context>
   <context>
@@ -9551,11 +9298,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n události pohybu</numerusform>
-        <numerusform>%n motion events</numerusform>
-        <numerusform>%n motion events</numerusform>
-        <numerusform>%n motion events</numerusform>
+        <numerusform>%n události pohybu</numerusform>
+        <numerusform>%n události pohybu</numerusform>
+        <numerusform>%n události pohybu</numerusform>
       </translation>
     </message>
     <message>
@@ -9827,12 +9574,62 @@ to %1</source>
       <source>Starting export...</source>
       <translation type="unfinished">Starting export...</translation>
     </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>%1 verze je dostupná</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>Poznámky k vydání</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>Hlavní problémy byly opraveny. Aktualizace je důrazně doporučena.</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>Aktualizace...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>Neupozorňovat znovu na tuto aktualizaci</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>více hodnot</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation type="unfinished">Reconstruct Resolution</translation>
     </message>
   </context>
   <context>

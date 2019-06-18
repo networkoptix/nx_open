@@ -3,6 +3,7 @@
 #include <QtCore/QEvent>
 
 #include <ui/models/ptz_manage_model.h>
+#include <ui/dialogs/common/message_box.h>
 
 #include <nx/vms/client/desktop/common/widgets/char_combo_box.h>
 

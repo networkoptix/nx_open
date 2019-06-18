@@ -27,7 +27,19 @@ class NX_SQL_API AbstractAsyncSqlQueryExecutor
 public:
     virtual ~AbstractAsyncSqlQueryExecutor() = default;
 
+    virtual void pleaseStopSync() = 0;
+
     virtual const ConnectionOptions& connectionOptions() const = 0;
+
+    /**
+     * By default, each query type has same priority of kDefaultQueryPriority.
+     */
+    virtual void setQueryPriority(QueryType queryType, int newPriority) = 0;
+
+    /**
+     * @param value Zero - no limit. By default, zero.
+     */
+    virtual void setConcurrentModificationQueryLimit(int value) = 0;
 
     //---------------------------------------------------------------------------------------------
     // Asynchronous operations.
@@ -48,6 +60,8 @@ public:
     virtual void executeSelect(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
+
+    virtual int pendingQueryCount() const = 0;
 
     //---------------------------------------------------------------------------------------------
     // Synchronous operations.
@@ -111,6 +125,49 @@ public:
 
         return result;
     }
+
+    //---------------------------------------------------------------------------------------------
+    // Cursor operations.
+
+    template<typename Record>
+    void createCursor(
+        nx::utils::MoveOnlyFunc<void(SqlQuery*)> prepareCursorFunc,
+        nx::utils::MoveOnlyFunc<void(SqlQuery*, Record*)> readRecordFunc,
+        nx::utils::MoveOnlyFunc<void(DBResult, QnUuid /*cursorId*/)> completionHandler)
+    {
+        auto cursorHandler = std::make_unique<detail::CursorHandler<Record>>(
+            std::move(prepareCursorFunc),
+            std::move(readRecordFunc),
+            std::move(completionHandler));
+
+        createCursorImpl(std::move(cursorHandler));
+    }
+
+    virtual void createCursorImpl(std::unique_ptr<detail::AbstractCursorHandler> cursorHandler) = 0;
+
+    /**
+     * @param id Provided by createCursor.
+     */
+    template<typename Record>
+    void fetchNextRecordFromCursor(
+        QnUuid id,
+        nx::utils::MoveOnlyFunc<void(DBResult, Record)> completionHandler)
+    {
+        auto task = std::make_unique<detail::FetchNextRecordFromCursorTask<Record>>(
+            id,
+            std::move(completionHandler));
+        fetchNextRecordFromCursorImpl(std::move(task));
+    }
+
+    virtual void fetchNextRecordFromCursorImpl(
+        std::unique_ptr<detail::AbstractFetchNextRecordFromCursorTask> task) = 0;
+
+    /**
+     * @param id Provided by createCursor.
+     */
+    virtual void removeCursor(QnUuid id) = 0;
+
+    virtual int openCursorCount() const = 0;
 };
 
 template<typename InputData, typename OutputData> using UpdateQueryWithOutputFunc =
@@ -140,7 +197,13 @@ public:
     AsyncSqlQueryExecutor(const ConnectionOptions& connectionOptions);
     virtual ~AsyncSqlQueryExecutor();
 
+    virtual void pleaseStopSync() override;
+
     virtual const ConnectionOptions& connectionOptions() const override;
+
+    virtual void setQueryPriority(QueryType queryType, int newPriority) override;
+
+    virtual void setConcurrentModificationQueryLimit(int value) override;
 
     /**
      * Overload for updates with no input data.
@@ -162,24 +225,14 @@ public:
         const QByteArray& script,
         nx::sql::QueryContext* const queryContext) override;
 
+    virtual int pendingQueryCount() const override;
+
     /** Have to introduce this method because we do not use exceptions. */
     bool init();
 
     void setStatisticsCollector(StatisticsCollector* statisticsCollector);
 
     void reserveConnections(int count);
-
-    /**
-     * @param value Zero - no limit. By default, zero.
-     */
-    void setConcurrentModificationQueryLimit(int value);
-
-    /**
-     * By default, each query type has same priority of kDefaultQueryPriority.
-     */
-    void setQueryPriority(QueryType queryType, int newPriority);
-
-    std::size_t pendingQueryCount() const;
 
     /**
      * Executes data modification request that spawns some output data.
@@ -223,43 +276,15 @@ public:
             std::move(input));
     }
 
-    template<typename Record>
-    void createCursor(
-        nx::utils::MoveOnlyFunc<void(SqlQuery*)> prepareCursorFunc,
-        nx::utils::MoveOnlyFunc<void(SqlQuery*, Record*)> readRecordFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult, QnUuid /*cursorId*/)> completionHandler)
-    {
-        {
-            QnMutexLocker lock(&m_mutex);
-            if (m_cursorProcessorContexts.empty())
-                addCursorProcessingThread(lock);
-        }
+    virtual void createCursorImpl(
+        std::unique_ptr<detail::AbstractCursorHandler> cursorHandler) override;
 
-        auto cursorHandler = std::make_unique<detail::CursorHandler<Record>>(
-            std::move(prepareCursorFunc),
-            std::move(readRecordFunc),
-            std::move(completionHandler));
-        auto cursorCreator = std::make_unique<detail::CursorCreator>(
-            &m_cursorProcessorContexts.front()->cursorContextPool,
-            std::move(cursorHandler));
-        m_cursorTaskQueue.push(std::move(cursorCreator));
-    }
+    virtual void fetchNextRecordFromCursorImpl(
+        std::unique_ptr<detail::AbstractFetchNextRecordFromCursorTask> executor) override;
 
-    template<typename Record>
-    void fetchNextRecordFromCursor(
-        QnUuid id,
-        nx::utils::MoveOnlyFunc<void(DBResult, Record)> completionHandler)
-    {
-        auto task = std::make_unique<detail::FetchCursorDataExecutor<Record>>(
-            &m_cursorProcessorContexts.front()->cursorContextPool,
-            id,
-            std::move(completionHandler));
-        m_cursorTaskQueue.push(std::move(task));
-    }
+    virtual void removeCursor(QnUuid id) override;
 
-    void removeCursor(QnUuid id);
-
-    int openCursorCount() const;
+    virtual int openCursorCount() const override;
 
 private:
     struct CursorProcessorContext

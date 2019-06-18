@@ -2,6 +2,8 @@
 
 #include "integrations_fwd.h"
 
+class QObject;
+
 namespace nx::vms::client::desktop::integrations {
 
 /**
@@ -10,9 +12,26 @@ namespace nx::vms::client::desktop::integrations {
  */
 void initialize(QObject* storageParent);
 
+void connectionEstablished(ec2::AbstractECConnectionPtr connection);
+
 /**
  * Register custom menu actions, provided by the integrations.
  */
 void registerActions(ui::action::MenuFactory* factory);
+
+/**
+ * Called after widget is added to the scene.
+ */
+void registerWidget(QnMediaResourceWidget* widget);
+
+/**
+ * Called before widget is destroyed.
+ */
+void unregisterWidget(QnMediaResourceWidget* widget);
+
+/**
+ * Paint overlays over video.
+ */
+void paintVideoOverlays(QnMediaResourceWidget* widget, QPainter* painter);
 
 } // namespace nx::vms::client::desktop::integrations

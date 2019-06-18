@@ -88,8 +88,7 @@ DeviceAgent::DeviceAgent(
     nx::vms::api::analytics::DeviceAgentManifest typedCameraManifest;
     for (const auto& eventType: typedManifest.eventTypes)
     {
-        if(!eventType.unsupported)
-            typedCameraManifest.supportedEventTypeIds.push_back(eventType.id);
+        typedCameraManifest.supportedEventTypeIds.push_back(eventType.id);
     }
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
@@ -208,7 +207,7 @@ void DeviceAgent::readNextNotificationAsync()
 }
 
 /*
-* New metadata have been received from camera. We try to find there information abount
+* New metadata have been received from camera. We try to find there information about
 * event occurred. If so, we treat this event.
 */
 void DeviceAgent::onReceive(SystemError::ErrorCode code, size_t size)
@@ -382,6 +381,14 @@ QByteArray DeviceAgent::extractRequestFromBuffer()
     m_buffer.remove(0, size);
     m_buffer.reserve(kBufferCapacity);
 
+    // The request may contain leading zeros. They hinder to debug. Let's eliminate them.
+    size_t nonZeroIndex = 0;
+    while (nonZeroIndex < request.size() && request.at(nonZeroIndex) == '\0')
+        ++nonZeroIndex;
+
+    if (nonZeroIndex)
+        request.remove(0, nonZeroIndex);
+
     return request;
 }
 
@@ -404,6 +411,8 @@ Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 
 Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
+    m_terminated = false;
+
     const QByteArray host = m_url.host().toLatin1();
     m_cameraController.setIp(m_url.host().toLatin1());
     m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());

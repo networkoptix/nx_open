@@ -108,7 +108,7 @@ const IString* Engine::manifest(Error* error) const
         ObjectClassDescription licensePlateDescription(
             "License Plate",
             "",
-            kLicensePlateGuid);
+            kLicensePlateObjectTypeId);
 
         objectTypesManifest += buildManifestObectTypeString(licensePlateDescription);
     }
@@ -124,15 +124,14 @@ const IString* Engine::manifest(Error* error) const
 
     m_manifest = /*suppress newline*/1 + R"json(
 {
-    "pluginId": "nx.deepstream",
-    "pluginName": {
-        "value": "DeepStream Driver",
-        "localization": {
-            "ru_RU": "DeepStream driver (translated to Russian)"
-        }
-    },
     "objectTypes": [
 )json" + objectTypesManifest + R"json(
+    ],
+    "eventTypes": [
+        {
+            "id": ")json" + kLicensePlateDetectedEventTypeId + R"json(",
+            "name": "License Plate Detected"
+        }
     ],
     "capabilities": ""
 }
@@ -259,10 +258,7 @@ std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& d
     return /*suppress newline*/1 + R"json(
         {
             "id": ")json" + description.typeId + R"json(",
-            "name": {
-                "value": ")json" + description.name + R"json(",
-                "localization": {}
-            }
+            "name": ")json" + description.name + R"json("
         })json";
 }
 

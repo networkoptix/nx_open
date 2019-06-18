@@ -8,6 +8,7 @@ namespace vms::server {
 ServerModuleAware::ServerModuleAware(QnMediaServerModule* serverModule):
     m_serverModule(serverModule)
 {
+    NX_CRITICAL(m_serverModule != nullptr);
 }
 
 ServerModuleAware::ServerModuleAware(QObject* parent)
@@ -32,11 +33,6 @@ ServerModuleAware::ServerModuleAware(QObject* parent)
 QnMediaServerModule* ServerModuleAware::serverModule() const
 {
     return m_serverModule;
-}
-
-QnResourcePool* ServerModuleAware::resourcePool() const
-{
-    return m_serverModule ? m_serverModule->resourcePool() : nullptr;
 }
 
 QnResourcePropertyDictionary* ServerModuleAware::resourcePropertyDictionary() const

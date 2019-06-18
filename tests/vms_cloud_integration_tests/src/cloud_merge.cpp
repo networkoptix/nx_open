@@ -16,6 +16,8 @@
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
+#include "util.h"
+
 namespace test {
 
 namespace {
@@ -337,21 +339,14 @@ protected:
                 ::ec2::ErrorCode::ok,
                 mediaServerClient->ec2GetTransactionLog(::ec2::ApiTranLogFilter(), &fullVmsTransactionLog));
 
-            ::ec2::ApiTransactionDataList cloudTransactionLog;
+            nx::clusterdb::engine::CommandDataList cloudCommandLog;
             m_cdb.getTransactionLog(
                 m_cloudAccounts[peerIndex].email,
                 m_cloudAccounts[peerIndex].password,
                 m_systemMergeFixture.peer(peerIndex).getCloudCredentials().systemId.toStdString(),
-                &cloudTransactionLog);
+                &cloudCommandLog);
 
-            std::sort(
-                vmsTransactionLog.begin(), vmsTransactionLog.end(),
-                [](const auto& left, const auto& right) { return left.tranGuid < right.tranGuid; });
-            std::sort(
-                cloudTransactionLog.begin(), cloudTransactionLog.end(),
-                [](const auto& left, const auto& right) { return left.tranGuid < right.tranGuid; });
-
-            if (vmsTransactionLog == cloudTransactionLog)
+            if (nx::test::compare(vmsTransactionLog, cloudCommandLog))
                 break;
 
             std::this_thread::sleep_for(std::chrono::milliseconds(10));

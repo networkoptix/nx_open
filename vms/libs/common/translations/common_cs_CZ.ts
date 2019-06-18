@@ -1370,10 +1370,6 @@
       <translation>Došlo k neznámé události</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occured</source>
-      <translation>Došlo k několika událostem %1</translation>
-    </message>
-    <message>
       <source>Event: %1</source>
       <translation>Událost: %1</translation>
     </message>
@@ -1465,10 +1461,6 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>Připojení ke kameře (sekundární stream) bylo neočekávaně ukončeno.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>Byla zjištěna ztráta paketů RTP, předchozí sekvence. =%1 příští sekvence =%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1664,6 +1656,10 @@
     <message>
       <source>Camera time is back to normal</source>
       <translation type="unfinished">Camera time is back to normal</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occurred</source>
+      <translation type="unfinished">Multiple %1 events have occurred</translation>
     </message>
   </context>
   <context>

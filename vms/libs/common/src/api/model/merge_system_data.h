@@ -7,9 +7,6 @@
 
 struct MergeSystemData: public CurrentPasswordData
 {
-    MergeSystemData() = default;
-    MergeSystemData(const QnRequestParams& params);
-
     /**
      * Remote system url.
      */

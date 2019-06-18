@@ -8,6 +8,7 @@ class QPalette;
 class QPushButton;
 class QTabWidget;
 class QStackedWidget;
+class QAbstractButton;
 
 void setWarningStyle(QWidget* widget, qreal disabledOpacity = 1.0);
 void setWarningStyle(QPalette* palette, qreal disabledOpacity = 1.0);

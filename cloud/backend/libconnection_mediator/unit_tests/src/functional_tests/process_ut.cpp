@@ -17,11 +17,6 @@ class FtMediatorProcess:
     public MediatorFunctionalTest
 {
 public:
-    FtMediatorProcess()
-    {
-        startMediator();
-    }
-
     ~FtMediatorProcess()
     {
         if (m_udpClient)
@@ -139,6 +134,8 @@ private:
 
 TEST_F(FtMediatorProcess, correct_manager_destruction_order)
 {
+    startMediator();
+
     startIssuingMediatorRequests();
     std::this_thread::sleep_for(
         std::chrono::milliseconds(nx::utils::random::number<int>(0, 1000)));
@@ -147,8 +144,16 @@ TEST_F(FtMediatorProcess, correct_manager_destruction_order)
 
 TEST_F(FtMediatorProcess, properly_handles_requests_after_receiving_junk_on_input)
 {
+    startMediator();
+
     whenSeveralJunkPacketsHaveBeenSentToMediatorUdpPort();
     thenMediatorStillAbleToProcessCorrectRequests();
+}
+
+TEST_F(FtMediatorProcess, mediator_is_able_to_start_without_listening_peer_db)
+{
+    startMediator();
+    // assertMediatorStartedSuccessfully();
 }
 
 } // namespace test

@@ -69,6 +69,11 @@ protected:
         initializeWatcher();
     }
 
+    void whenStartWatcher()
+    {
+        m_watcher->start([this](auto errorCode) { saveConnectionClosure(errorCode); });
+    }
+
     void whenStartTunnel()
     {
         // TODO: Fill m_clientInfo.
@@ -110,6 +115,11 @@ protected:
         ASSERT_FALSE(m_receivedNotifications.pop(keepAliveProbePeriod() * 3));
     }
 
+    relaying::ListeningPeerConnectionWatcher& watcher()
+    {
+        return *m_watcher;
+    }
+
 private:
     using StartTunnelResult =
         std::tuple<SystemError::ErrorCode, std::unique_ptr<network::AbstractStreamSocket>>;
@@ -130,8 +140,6 @@ private:
             std::exchange(m_acceptedConnection, nullptr),
             PeerCapabilities::protocolVersion,
             kKeepAliveProbePeriod);
-
-        m_watcher->start([this](auto errorCode) { saveConnectionClosure(errorCode); });
     }
 
     void saveConnectionClosure(SystemError::ErrorCode /*errorCode*/)
@@ -156,6 +164,7 @@ TYPED_TEST_CASE_P(ListeningPeerConnectionWatcher);
 
 TYPED_TEST_P(ListeningPeerConnectionWatcher, sends_open_tunnel_notification)
 {
+    this->whenStartWatcher();
     this->whenStartTunnel();
 
     this->thenOpenTunnelNotificationIsReceived();
@@ -164,18 +173,41 @@ TYPED_TEST_P(ListeningPeerConnectionWatcher, sends_open_tunnel_notification)
 
 TYPED_TEST_P(ListeningPeerConnectionWatcher, keep_alive_probes_are_sent_to_peer_with_support)
 {
+    this->whenStartWatcher();
+
     if (this->peerSupportsKeepAlive())
         this->thenKeepAliveNotificationIsReceived();
     else
         this->thenKeepAliveNotificationIsNotReceived();
 }
 
-TYPED_TEST_P(ListeningPeerConnectionWatcher, keep_alive_probe_is_always_sent_before_open_tunnel)
+TYPED_TEST_P(
+    ListeningPeerConnectionWatcher,
+    keep_alive_probe_is_always_sent_before_open_tunnel_from_any_thread)
 {
     if (!this->peerSupportsKeepAlive())
         return;
 
+    this->whenStartWatcher();
     this->whenStartTunnel();
+
+    this->thenKeepAliveNotificationIsReceived();
+    this->thenOpenTunnelNotificationIsReceived();
+}
+
+TYPED_TEST_P(
+    ListeningPeerConnectionWatcher,
+    keep_alive_probe_is_always_sent_before_open_tunnel_from_connections_aio_thread)
+{
+    if (!this->peerSupportsKeepAlive())
+        return;
+
+    this->watcher().executeInAioThreadSync(
+        [this]()
+        {
+            this->whenStartWatcher();
+            this->whenStartTunnel();
+        });
 
     this->thenKeepAliveNotificationIsReceived();
     this->thenOpenTunnelNotificationIsReceived();
@@ -183,6 +215,7 @@ TYPED_TEST_P(ListeningPeerConnectionWatcher, keep_alive_probe_is_always_sent_bef
 
 TYPED_TEST_P(ListeningPeerConnectionWatcher, no_keep_alive_is_sent_after_open_tunnel)
 {
+    this->whenStartWatcher();
     this->whenStartTunnel();
 
     this->thenOpenTunnelNotificationIsReceived();
@@ -192,7 +225,8 @@ TYPED_TEST_P(ListeningPeerConnectionWatcher, no_keep_alive_is_sent_after_open_tu
 REGISTER_TYPED_TEST_CASE_P(ListeningPeerConnectionWatcher,
     sends_open_tunnel_notification,
     keep_alive_probes_are_sent_to_peer_with_support,
-    keep_alive_probe_is_always_sent_before_open_tunnel,
+    keep_alive_probe_is_always_sent_before_open_tunnel_from_any_thread,
+    keep_alive_probe_is_always_sent_before_open_tunnel_from_connections_aio_thread,
     no_keep_alive_is_sent_after_open_tunnel);
 
 //-------------------------------------------------------------------------------------------------

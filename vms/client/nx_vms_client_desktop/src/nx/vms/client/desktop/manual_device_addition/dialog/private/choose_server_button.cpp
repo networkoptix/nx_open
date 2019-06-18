@@ -30,6 +30,7 @@ QnChooseServerButton::QnChooseServerButton(QWidget* parent):
     QnCommonModuleAware(parent),
     m_serverStatus(this)
 {
+    setDisplayActionIcon(true);
 }
 
 bool QnChooseServerButton::setCurrentServer(const QnMediaServerResourcePtr& server)

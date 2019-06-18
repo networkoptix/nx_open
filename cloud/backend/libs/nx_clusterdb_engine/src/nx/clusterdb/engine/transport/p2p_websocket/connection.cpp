@@ -1,13 +1,15 @@
 #include "connection.h"
 
 #include <nx/p2p/p2p_serialization.h>
+#include <nx/vms/api/data/tran_state_data.h>
 #include <transaction/connection_guard.h>
 
-#include "../../transaction_log.h"
+#include "../generic_transport.h"
+#include "../../command_log.h"
 
 namespace nx::clusterdb::engine::transport::p2p::websocket {
 
-static constexpr int kMaxTransactionsPerIteration = 17;
+static constexpr int kMaxTransactionsPerIteration = 117;
 
 Connection::Connection(
     const ProtocolVersionRange& protocolVersionRange,
@@ -57,10 +59,16 @@ Connection::Connection(
         });
 
     auto tranState = m_transactionLogReader->getCurrentState();
-    auto serializedData = nx::p2p::serializeSubscribeAllRequest(tranState);
+    auto serializedData = nx::p2p::serializeSubscribeAllRequest(toVmsTranState(tranState));
     serializedData.data()[0] = (quint8)(nx::p2p::MessageType::subscribeAll);
     sendMessage(serializedData);
     startReading();
+}
+
+Connection::~Connection()
+{
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
 }
 
 void Connection::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
@@ -74,7 +82,11 @@ void Connection::stopWhileInAioThread()
 {
     AbstractConnection::stopWhileInAioThread();
     nx::p2p::ConnectionBase::stopWhileInAioThread();
+
     m_transactionLogReader.reset();
+
+    if (!m_closed)
+        setState(State::Error);
 }
 
 void Connection::onGotMessage(
@@ -98,7 +110,8 @@ void Connection::onGotMessage(
         case nx::p2p::MessageType::subscribeAll:
         {
             bool success = false;
-            m_remoteSubscription = nx::p2p::deserializeSubscribeAllRequest(payload, &success);
+            m_remoteSubscription =
+                toNodeState(nx::p2p::deserializeSubscribeAllRequest(payload, &success));
             if (!success)
             {
                 setState(State::Error);
@@ -134,14 +147,13 @@ void Connection::reportCommandReceived(
         std::move(commandBuffer));
     if (!commandData)
     {
-        NX_DEBUG(this, lm("Failed to deserialize command from %1")
-            .args(remotePeerEndpoint()));
+        NX_DEBUG(this, "Failed to deserialize command from %1", remotePeerEndpoint());
         setState(State::Error);
         return;
     }
 
     NX_VERBOSE(this, "systemId %1. Received command (%2)",
-        m_transactionLogReader->systemId(), toString(commandData->header()));
+        m_transactionLogReader->systemId(), commandData->header());
 
     m_gotTransactionEventHandler(
         std::move(commandData),
@@ -166,7 +178,7 @@ void Connection::readTransactions()
 void Connection::onTransactionsReadFromLog(
     ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
-    vms::api::TranState readedUpTo)
+    NodeState readedUpTo)
 {
     m_tranLogRequestInProgress = false;
     if ((resultCode != ResultCode::ok) && (resultCode != ResultCode::partialContent))
@@ -205,13 +217,15 @@ ConnectionClosedSubscription& Connection::connectionClosedSubscription()
 
 void Connection::setState(State state)
 {
-    if (state == State::Error)
+    if (state == State::Error && !m_closed)
     {
         SystemError::ErrorCode errorCode = SystemError::connectionAbort;
         // TODO: pass correct error code here
         //p2pTransport().socket()->getLastError(&errorCode);
+        m_closed = true;
         m_connectionClosedSubscription.notify(errorCode);
     }
+
     nx::p2p::ConnectionBase::setState(state);
 }
 
@@ -255,11 +269,12 @@ int Connection::highestProtocolVersionCompatibleWithRemotePeer() const
         : remotePeer().protoVersion;
 }
 
-void Connection::fillAuthInfo(
+bool Connection::fillAuthInfo(
     nx::network::http::AsyncClient* /*httpClient*/,
     bool /*authByKey*/)
 {
     NX_ASSERT(false, "This method is used for outgoing connections only. Not implemented");
+    return false;
 }
 
 } // namespace nx::clusterdb::engine::transport::p2p::websocket
