@@ -881,8 +881,8 @@
         }
         
         // iterate blind spots:
-        var blindSpots = this.getBlindSpotsInCache(start, end, parent.level + 1);
-        
+        var blindSpots = this.getBlindSpotsInCache(parent.start, parent.end, parent.level + 1);
+
         for (i = 0; i < blindSpots.length; i++) {
             result.push(blindSpots[i]);
         }
