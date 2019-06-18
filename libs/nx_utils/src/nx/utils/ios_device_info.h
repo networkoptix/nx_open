@@ -4,7 +4,7 @@
 
 namespace nx::utils {
 
-struct IosDeviceInformation
+NX_UTILS_API struct IosDeviceInformation
 {
     enum class Type
     {
