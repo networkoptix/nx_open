@@ -37,12 +37,6 @@ def redirect_login(request):
         target_url += '?%s' % request.META['QUERY_STRING']
     return redirect(target_url)
 
-def health_check(request):
-    executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
-    plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
-    status = 503 if plan else 200
-    return HttpResponse(status=status)
-
 
 def health_check(request):
     executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
