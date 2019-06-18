@@ -240,6 +240,8 @@ signals:
     void packageDownloadFailed(const nx::update::Package& package, const QString& error);
     void moduleInformationReceived(const QList<nx::vms::api::ModuleInformation>& moduleInformation);
 
+    /** Called when /ec2/startUpdate request is complete. */
+    void startUpdateComplete(bool success);
     /** Called when /ec2/cancelUpdate request is complete. */
     void cancelUpdateComplete(bool success);
     /** Called when /ec2/finishUpdate request is complete. */
@@ -271,6 +273,8 @@ private:
     void atDownloadFailed(const QString& fileName);
 
     const nx::update::Package* findPackageForFile(const QString& fileName) const;
+
+    void dropAllRequests(const QString& reason);
 
 private:
     OfflineUpdateState m_offlineUpdaterState = OfflineUpdateState::initial;
@@ -311,6 +315,8 @@ private:
 
     QSet<rest::Handle> m_activeRequests;
     QSet<rest::Handle> m_skippedRequests;
+    /** Expected handle for /ec2/updateStatus response. We will ignore any other responses. */
+    rest::Handle m_expectedStatusHandle = 0;
     std::atomic_bool m_requestingStop = false;
     std::atomic_bool m_requestingFinish = false;
 

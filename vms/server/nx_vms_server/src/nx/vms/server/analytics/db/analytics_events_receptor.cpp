@@ -6,12 +6,17 @@
 
 #include <analytics/common/object_detection_metadata.h>
 #include <analytics/db/abstract_storage.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 
 namespace nx::analytics::db {
 
 AnalyticsEventsReceptor::AnalyticsEventsReceptor(
+    QnCommonModule* commonModule,
     AbstractEventsStorage* eventsStorage)
     :
+    QnCommonModuleAware(commonModule),
     m_eventsStorage(eventsStorage)
 {
 }
@@ -41,8 +46,20 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
             &isParsedSuccessfully);
     if (!isParsedSuccessfully)
     {
-        NX_INFO(this, lm("Failed to parse detection metadata packet"));
+        NX_WARNING(this, lm("Failed to parse detection metadata packet"));
         return;
+    }
+
+    auto resourcePool = commonModule()->resourcePool();
+    if (auto server =
+        resourcePool->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID()))
+    {
+        auto storage = resourcePool->getResourceById(server->metadataStorageId());
+        if (storage && storage->getStatus() != Qn::Online)
+        {
+            NX_DEBUG(this, "Skip writing metadata record to the analytics database because metadata storage is offline");
+            return;
+        }
     }
 
     m_eventsStorage->save(std::move(detectionMetadataPacket));

@@ -167,7 +167,6 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 
 void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
-    NX_ASSERT(!version.isNull());
     NX_VERBOSE(this, "setUpdateTarget(%1)", version);
     m_targetVersion = version;
 
@@ -243,27 +242,27 @@ bool PeerStateTracker::getErrorReport(ErrorReport& report) const
 {
     auto lastCode = UpdateItem::ErrorCode::noError;
 
-    // Maps error code to a set of servers with this code
-    QMap<UpdateItem::ErrorCode, QSet<QnUuid>> errorMap;
-
     for (auto& item: m_items)
     {
         if (item->errorCode == UpdateItem::ErrorCode::noError)
             continue;
 
-        auto& peers = errorMap[item->errorCode];
-        peers.insert(item->id);
-
         auto errorCode = item->errorCode;
         if (errorCode < lastCode || lastCode == UpdateItem::ErrorCode::noError)
+        {
             lastCode = errorCode;
+            // Since all error codes are sorted, we can drop all peers with previous code.
+            report.peers.clear();
+        }
+
+        if (errorCode == lastCode)
+            report.peers.insert(item->id);
     }
 
     if (lastCode == UpdateItem::ErrorCode::noError)
         return false;
 
     report.message = errorString(lastCode);
-    report.peers = errorMap[lastCode];
     return true;
 }
 
@@ -1076,10 +1075,11 @@ UpdateItemPtr PeerStateTracker::addItemForClient()
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
     item->protocol = nx_ec::EC2_PROTO_VERSION;
-    NX_VERBOSE(this, "addItemForClient() id=%1", item->id);
     m_clientItem = item;
     m_items.push_back(item);
     updateClientData();
+
+    NX_VERBOSE(this, "addItemForClient() id=%1 version=%2", item->id, item->version);
     emit itemAdded(m_clientItem);
     return m_clientItem;
 }

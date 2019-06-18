@@ -57,6 +57,26 @@ bool Package::isClient() const
     return component == kClientComponent;
 }
 
+void UpdateContents::resetVerification()
+{
+    error = nx::update::InformationError::noError;
+    for (auto& package: info.packages)
+    {
+        package.targets.clear();
+        package.localFile.clear();
+    }
+
+    filesToUpload.clear();
+    missingUpdate.clear();
+    invalidVersion.clear();
+    ignorePeers.clear();
+
+    unsuportedSystemsReport.clear();
+    peersWithUpdate.clear();
+    manualPackages.clear();
+    packagesGenerated = false;
+}
+
 nx::utils::SoftwareVersion UpdateContents::getVersion() const
 {
     return nx::utils::SoftwareVersion(info.version);

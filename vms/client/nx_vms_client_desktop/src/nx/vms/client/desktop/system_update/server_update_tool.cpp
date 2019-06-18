@@ -586,7 +586,9 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
 
 void ServerUpdateTool::stopUpload()
 {
-    NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::push);
+    if (m_offlineUpdaterState != OfflineUpdateState::push)
+        return;
+
     for (const auto& record: m_uploadStateById)
         m_uploadManager->cancelUpload(record.first);
 
@@ -611,36 +613,6 @@ bool ServerUpdateTool::verifyUpdateManifest(
     clientData.installedVersions = clientVersions;
     return verifyUpdateContents(commonModule(), contents, activeServers, clientData);
 }
-
-/*
-void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
-{
-    int uploading = 0;
-    for (const auto& record: m_uploadStateById)
-    {
-        result.max += 100;
-        qint64 progress = 0;
-        switch (record.second.status)
-        {
-            case UploadState::Uploading:
-                progress = 100 * record.second.uploaded / record.second.size;
-                ++uploading;
-                ++result.active;
-                break;
-            case UploadState::Done:
-                progress = 100;
-                ++result.done;
-                break;
-            default:
-                progress = 0;
-                break;
-        }
-        result.current += progress;
-
-    }
-    result.uploading = uploading != 0;
-}
-*/
 
 void ServerUpdateTool::calculateManualDownloadProgress(ProgressInfo& progress)
 {
@@ -695,6 +667,16 @@ ServerUpdateTool::TimePoint::duration ServerUpdateTool::getInstallDuration() con
     return std::chrono::milliseconds(delta);
 }
 
+void ServerUpdateTool::dropAllRequests(const QString& reason)
+{
+    if (!m_activeRequests.empty())
+    {
+        m_skippedRequests.unite(m_activeRequests);
+        m_expectedStatusHandle = 0;
+        NX_VERBOSE(this, "%1 will skip requests %2", reason, m_skippedRequests);
+    }
+}
+
 bool ServerUpdateTool::requestStopAction()
 {
     if (m_requestingStop)
@@ -706,6 +688,7 @@ bool ServerUpdateTool::requestStopAction()
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         NX_INFO(this, "requestStopAction() - sending request");
+        dropAllRequests("requestStopAction()");
         connection->updateActionStop(nx::utils::guarded(this,
             [this](bool success, rest::Handle /*handle*/)
             {
@@ -715,12 +698,6 @@ bool ServerUpdateTool::requestStopAction()
                 m_requestingStop = false;
                 emit cancelUpdateComplete(success);
             }), thread());
-    }
-
-    if (!m_activeRequests.empty())
-    {
-        m_skippedRequests.unite(m_activeRequests);
-        NX_VERBOSE(this, "requestStopAction() will skip requests %1", m_skippedRequests);
     }
 
     for (const auto& file: m_activeDownloads)
@@ -735,7 +712,7 @@ bool ServerUpdateTool::requestRetryAction()
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         NX_INFO(this, "requestRetryAction() - sending request");
-        auto handle = connection->retryUpdate(nx::utils::guarded(this,
+        m_expectedStatusHandle = connection->retryUpdate(nx::utils::guarded(this,
             [this, tool = QPointer<ServerUpdateTool>(this)](
                 bool success,
                 rest::Handle handle,
@@ -751,7 +728,7 @@ bool ServerUpdateTool::requestRetryAction()
                 if (tool)
                     tool->atUpdateStatusResponse(success, handle, response.data);
             }), thread());
-        return handle != 0;
+        return m_expectedStatusHandle != 0;
     }
     return false;
 }
@@ -788,6 +765,8 @@ void ServerUpdateTool::requestStartUpdate(
     const nx::update::Information& info,
     const QSet<QnUuid>& targets)
 {
+    NX_VERBOSE(this, "requestStartUpdate(%1) - sending /ec2/startUpdate command", info.version);
+
     QSet<QnUuid> servers;
     for (const auto& id: targets)
     {
@@ -795,24 +774,27 @@ void ServerUpdateTool::requestStartUpdate(
         if (item->component == UpdateItem::Component::server)
             servers.insert(id);
     }
+
     if (servers.empty())
     {
-        NX_WARNING(this)
-            << "requestStartUpdate(" << info.version
-            << ") - target list contains no server to update";
-        return;
+        NX_WARNING(this, "requestStartUpdate(%1) - target list contains no server to update",
+            info.version);
     }
-    NX_VERBOSE(this)
-        << "requestStartUpdate(" << info.version
-        << ") - sending /ec2/startUpdate command";
+
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        connection->updateActionStart(info);
+        dropAllRequests("requestStartUpdate()");
+        auto callback = [this](bool success, rest::Handle /*requestId*/)
+            {
+                // TODO: Just forcing it, until server side responds with
+                // a proper nx::update::Information
+                success = true;
+                emit startUpdateComplete(success);
+            };
+        connection->updateActionStart(info, nx::utils::guarded(this, callback));
         m_remoteUpdateManifest = info;
     }
 
-    if (!m_activeRequests.empty())
-        m_skippedRequests.unite(m_activeRequests);
     m_remoteUpdateStatus = {};
 }
 
@@ -827,9 +809,6 @@ void ServerUpdateTool::requestInstallAction(
         if (item->component == UpdateItem::Component::server)
             servers.insert(id);
     }
-
-    if (!m_activeRequests.empty())
-        m_skippedRequests.unite(m_activeRequests);
 
     NX_VERBOSE(this) << "requestInstallAction() for" << servers;
     m_remoteUpdateStatus = {};
@@ -850,6 +829,7 @@ void ServerUpdateTool::requestInstallAction(
 
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
+        dropAllRequests("requestInstallAction()");
         if (auto handle = connection->updateActionInstall(servers, callback, thread()))
             m_requestingInstall.insert(handle);
     }
@@ -877,8 +857,9 @@ void ServerUpdateTool::requestModuleInformation()
             nx::utils::Url serverUrl = connectionInfo.ecUrl;
             m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
         }
-        else {
-            NX_ERROR(this, "requestModuleInformation() - ec2Connection is not available. "
+        else
+        {
+            NX_WARNING(this, "requestModuleInformation() - ec2Connection is not available. "
                 "I will have problems tracking server version during install process.");
         }
     }
@@ -890,10 +871,9 @@ void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
     const std::vector<nx::update::Status>& response)
 {
     m_checkingRemoteUpdateStatus = false;
-    m_activeRequests.remove(handle);
-    if (m_skippedRequests.contains(handle))
+
+    if (m_expectedStatusHandle != handle)
     {
-        m_skippedRequests.remove(handle);
         NX_VERBOSE(this) << "atUpdateStatusResponse handle" << handle << "was skipped";
         return;
     }
@@ -903,10 +883,9 @@ void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
 
     RemoteStatus remoteStatus;
     for (const auto& status : response)
-    {
         remoteStatus[status.serverId] = status;
-    }
 
+    m_expectedStatusHandle = 0;
     m_remoteUpdateStatus = std::move(remoteStatus);
 }
 
@@ -923,6 +902,9 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
 
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
+        // We need to track both /ec2/updateStatus and /ec2/updateInformation to get relevant
+        // information. /ec2/updateInformation is necessary to keep track of the servers
+        // participating in the update.
         auto callback =
             [this, tool = QPointer<ServerUpdateTool>(this)](
                 bool success,
@@ -941,13 +923,11 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
             };
 
         // Requesting update status for mediaservers.
-        rest::Handle handle = 0;
         m_checkingRemoteUpdateStatus = true;
-        handle = connection->getUpdateStatus(callback, thread());
-        m_activeRequests.insert(handle);
+        m_expectedStatusHandle = connection->getUpdateStatus(callback, thread());
 
         // Requesting remote update info.
-        handle = connection->getUpdateInfo(
+        rest::Handle handle = connection->getUpdateInfo(
             [tool = QPointer<ServerUpdateTool>(this)](
                 bool success, rest::Handle handle, rest::UpdateInformationData response)
             {
