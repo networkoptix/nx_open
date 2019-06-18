@@ -76,7 +76,7 @@ def process_context_structure(product, context, content, language,
 
     default_language = product.default_language
     location = product.product_root
-    for datastructure in context.datastructure_set.order_by('order').all():
+    for datastructure in context.datastructure_set.all():
         # noinspection PyBroadException
         try:
             if context_dict and datastructure.name in context_dict:
@@ -319,7 +319,7 @@ def fill_content(product,
             changed_records = changed_records.filter(id__in=changed_records_ids)
 
         changed_context_ids = list(changed_records.values_list('data_structure__context_id', flat=True).distinct())
-        changed_contexts = Context.objects.filter(id__in=changed_context_ids).order_by('order')
+        changed_contexts = Context.objects.filter(id__in=changed_context_ids)
 
         changed_global_contexts = changed_contexts.filter(is_global=True)
         if changed_global_contexts.exists():  # global context was changed - force full rebuild
@@ -343,7 +343,7 @@ def fill_content(product,
                 changed_records = changed_records.filter(id__in=changed_records_ids)
 
     if not incremental:  # If not incremental - iterate all contexts and all languages
-        changed_contexts = Context.objects.filter(product_type=product.product_type).order_by('order')
+        changed_contexts = Context.objects.filter(product_type=product.product_type)
         changed_languages = product.languages_list
 
     default_language_code = product.default_language.code
@@ -419,7 +419,7 @@ def get_zip_package(product, preview=True, version_id=None, add_root=True):
     zip_data = BytesIO()
     zip_file = zipfile.ZipFile(zip_data, "a", zipfile.ZIP_DEFLATED, False)
 
-    global_contexts = Context.objects.filter(is_global=True, product_type=product.product_type).order_by('order')
+    global_contexts = Context.objects.filter(is_global=True, product_type=product.product_type)
     languages = product.languages_list
 
     for context in product.product_type.context_set.all():

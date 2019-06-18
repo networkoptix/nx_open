@@ -323,6 +323,7 @@ class Context(models.Model):
         permissions = (
             ("edit_content", "Can edit content and send for review"),
         )
+        ordering = ['order', 'id']
     # TODO: Remove this after release of 19.1 - Task: CLOUD-2299
     product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
     product_type = models.ForeignKey(ProductType, null=True, on_delete=models.CASCADE)
@@ -391,6 +392,7 @@ class DataStructure(models.Model):
         index_together = [
             ["context", "order"],
         ]
+        ordering = ['order', 'id']
     context = models.ForeignKey(Context, on_delete=models.CASCADE)
     name = models.CharField(max_length=1024)
     description = models.TextField()
