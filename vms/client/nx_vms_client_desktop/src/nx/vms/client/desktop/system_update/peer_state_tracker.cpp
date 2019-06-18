@@ -590,6 +590,27 @@ QSet<QnUuid> PeerStateTracker::peersWithUnknownStatus() const
     return result;
 }
 
+QSet<QnUuid> PeerStateTracker::peersWithDownloaderError() const
+{
+    QSet<UpdateItem::ErrorCode> errorTypes =
+    {
+        UpdateItem::ErrorCode::downloadFailed,
+        UpdateItem::ErrorCode::internalDownloaderError,
+        UpdateItem::ErrorCode::noFreeSpaceToDownload,
+        UpdateItem::ErrorCode::noFreeSpaceToExtract,
+    };
+    QSet<QnUuid> result;
+    QnMutexLocker locker(&m_dataLock);
+    for (const auto& item: m_items)
+    {
+        if (item->state != StatusCode::error)
+            continue;
+        if (errorTypes.contains(item->errorCode))
+            result.insert(item->id);
+    }
+    return result;
+}
+
 void PeerStateTracker::processUnknownStates()
 {
     QList<UpdateItemPtr> itemsChanged;

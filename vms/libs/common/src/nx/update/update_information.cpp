@@ -84,9 +84,6 @@ nx::utils::SoftwareVersion UpdateContents::getVersion() const
 
 bool UpdateContents::isValidToInstall() const
 {
-    // Ignoring all errors when update is already running.
-    if (sourceType == UpdateSourceType::mediaservers)
-        return true;
     return missingUpdate.empty()
         && unsuportedSystemsReport.empty()
         && !info.version.isEmpty()
