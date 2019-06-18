@@ -36,7 +36,7 @@ static const int kNumberOfSyncCycles = 2;
 static const int kDefaultOverlappedId = 0;
 static const int kTriesPerChunk = 2;
 
-std::chrono::seconds secondsPart(const QString& dateTimeString)
+std::chrono::seconds extractSeconds(const QString& dateTimeString)
 {
     const auto fileStartDateTime = QDateTime::fromString(dateTimeString, kDateTimeFormat);
     const auto timePart = fileStartDateTime.time();
@@ -74,12 +74,22 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
         // Sometimes the first entry in the directory is shifted for a few seconds (relatively to
         // the time it reports in its name). This shift is usually equal to the seconds part of the
         // chunks timestamp that follow the first one.
-        const seconds firstEntrySecondsPart = secondsPart(files[0]);
+        // Example: let's imagine that we have the following records:
+        //  2019-08-08 20:21:23
+        //  2019-08-08 20:22:04
+        //  2019-08-08 20:23:04
+        //  ...
+        // In this case the real timestamp of the first record is almost likely 2019-08-08 20:21:19
+        // And the timestamps of the subsequent records are:
+        //  2019-08-08 20:22:00
+        //  2019-08-08 20:23:00
+        // i.e timestamps of all records are shifted for 4 seconds.
+        const seconds firstEntrySecondsPart = extractSeconds(files[0]);
         if (firstEntrySecondsPart != seconds::zero())
         {
             for (int i = 1; i < files.size(); ++i)
             {
-                directoryTimeShift = secondsPart(files[i]);
+                directoryTimeShift = extractSeconds(files[i]);
                 if (directoryTimeShift != seconds::zero())
                     break;
             }
@@ -97,15 +107,13 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
             firstEntryStartTime.addSecs(-duration_cast<seconds>(directoryTimeShift).count());
         }
 
-        static const int64_t kSecondsInMinute = 60;
-        static const int64_t kMillisecondsInSecond = 1000;
-        const int64_t firstEntryDurationMs =
-            (kSecondsInMinute - firstEntryStartTime.time().second()) * kMillisecondsInSecond;
+        const milliseconds firstEntryDuration =
+            minutes(1) - seconds(firstEntryStartTime.time().second());
 
         (*outArchiveEntries)[kDefaultOverlappedId].emplace_back(
             files[0],
             firstEntryStartTime.toMSecsSinceEpoch() - driftMs,
-            firstEntryDurationMs,
+            duration_cast<milliseconds>(firstEntryDuration).count(),
             kDefaultOverlappedId);
 
         // Usually all chunks in the directory (except for the first one) are aligned by the minute
@@ -122,7 +130,7 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
             (*outArchiveEntries)[kDefaultOverlappedId].emplace_back(
                 files[i],
                 entryStartTime.toMSecsSinceEpoch() - driftMs,
-                kSecondsInMinute * kMillisecondsInSecond,
+                duration_cast<milliseconds>(minutes(1)).count(),
                 kDefaultOverlappedId);
         }
     }

@@ -4,6 +4,35 @@ set(depends
     testcamera
 )
 
+set(deb_dependencies
+    "zlib1g (>= 1:1.1.4)"
+    "debconf (>= 0.5) | debconf-2.0"
+    "python"
+    "psmisc"
+    "systemd"
+    "cifs-utils"
+    "net-tools"
+    "libcap2-bin"
+    "libldap-2.4-2"
+)
+
+if(withDesktopClient)
+    # For platforms with desktop clients Server uses the same Qt as Client. Because of this, on
+    # such platforms Server has these "strange" dependencies:
+    list(APPEND deb_dependencies
+        "libxrender1"
+        "libgl1-mesa-glx"
+        "libxfixes3"
+        "libfontconfig1"
+        "libsm6"
+        "libice6"
+        "libaudio2"
+        "libogg0"
+    )
+endif()
+
+list(JOIN deb_dependencies ", " deb.dependencies) #< Make a comma-separated list.
+
 if(withRootTool)
     list(APPEND depends root_tool)
 endif()
