@@ -193,6 +193,8 @@ void AuthenticationHelper::reportFailure(
     api::ResultCode resultCode,
     std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate)
 {
+    NX_VERBOSE(this, "Authentication failed (username %1). %2", m_username, toString(resultCode));
+
     m_transportSecurityManager->onAuthenticationFailure(
         authenticationType,
         m_connection,

@@ -12,6 +12,9 @@
 #include "test_api_requests.h"
 #include <utils/merge_systems_common.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/api/data/full_info_data.h>
+#include <core/resource/user_resource.h>
+#include <nx/vms/api/data/merge_status_reply.h>
 
 using MergeStatus = utils::MergeSystemsStatus::Value;
 using LauncherPtr = std::unique_ptr<MediaServerLauncher>;
@@ -32,7 +35,9 @@ protected:
         const LauncherPtr& requestTarget,
         const LauncherPtr& serverToMerge,
         MergeStatus mergeStatus,
-        nx::vms::api::SystemMergeHistoryRecord* outMergeResult = nullptr)
+        nx::vms::api::SystemMergeHistoryRecord* outMergeResult = nullptr,
+        const QString& requestTargetPassword = "admin",
+        const QString& serverToMergePassword = "admin")
     {
         QnGetNonceReply nonceReply;
         issueGetRequest(requestTarget.get(), "api/getNonce", nonceReply);
@@ -42,15 +47,15 @@ protected:
         MergeSystemData mergeSystemData;
         mergeSystemData.url = serverToMerge->apiUrl().toString();
         mergeSystemData.postKey = QString::fromLatin1(createHttpQueryAuthParam(
-            "admin", "admin", nonceReply.realm, "POST", nonceReply.nonce.toUtf8()));
+            "admin", serverToMergePassword, nonceReply.realm, "POST", nonceReply.nonce.toUtf8()));
         mergeSystemData.getKey = QString::fromLatin1(createHttpQueryAuthParam(
-            "admin", "admin", nonceReply.realm, "GET", nonceReply.nonce.toUtf8()));
+            "admin", serverToMergePassword, nonceReply.realm, "GET", nonceReply.nonce.toUtf8()));
 
         QByteArray responseBody;
         NX_TEST_API_POST(requestTarget.get(), "api/mergeSystems", mergeSystemData,
             [](const QByteArray& data) {return data;},
             nx::network::http::StatusCode::ok,
-            "admin", "admin",
+            "admin", requestTargetPassword,
             &responseBody);
         bool success = false;
         auto result = QJson::deserialized<QnJsonRestResult>(responseBody, QnJsonRestResult(), &success);
@@ -94,6 +99,77 @@ protected:
         configureData.systemName = configureData.localSystemId.toString();
 
         NX_TEST_API_POST(server.get(), "api/configure", configureData);
+    }
+
+    void whenAdminPasswordHasChanged(const LauncherPtr& server, const QString& password)
+    {
+        vms::api::UserDataEx userData;
+        userData.password = password;
+        userData.id = server->commonModule()->resourcePool()->getAdministrator()->getId();
+        NX_TEST_API_POST(server.get(), "ec2/saveUser", userData,
+            keepOnlyJsonFields({ "password", "id" }));
+
+        std::vector<vms::api::UserData> resultData;
+        NX_TEST_API_GET(server.get(), "/ec2/getUsers", &resultData,
+            nx::network::http::StatusCode::ok, "admin", password);
+        NX_ASSERT(1, resultData.size());
+    }
+
+    void whenServerHasData(const LauncherPtr& server, const QString& adminPassword)
+    {
+        const auto serverGuid = server->commonModule()->moduleGUID().toString();
+
+        nx::vms::api::CameraData cameraData;
+        cameraData.parentId = QnUuid::createUuid();
+        cameraData.typeId = qnResTypePool->getResourceTypeByName("Camera")->getId();
+        cameraData.vendor = "test vendor";
+        cameraData.physicalId =
+            lit("matching physicalId %1").arg(serverGuid);
+        cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
+        NX_TEST_API_POST(server.get(), "/ec2/saveCamera", cameraData,
+            nullptr, nx::network::http::StatusCode::ok, "admin", adminPassword);
+
+        vms::api::UserDataList users;
+        vms::api::UserData userData;
+        userData.id = QnUuid::createUuid();
+        userData.fullName = lit("user %1").arg(serverGuid);
+        userData.permissions = GlobalPermission::admin;
+        NX_TEST_API_POST(server.get(), "/ec2/saveUser", userData,
+            nullptr, nx::network::http::StatusCode::ok, "admin", adminPassword);
+
+        nx::vms::api::LayoutData layoutData;
+        layoutData.name = "fixed layout name";
+        layoutData.id = QnUuid::createUuid();
+        layoutData.parentId = userData.id;
+        nx::vms::api::LayoutItemData item;
+        item.resourceId = cameraData.id;
+        item.id = QnUuid::createUuid();
+        layoutData.items.push_back(item);
+        NX_TEST_API_POST(server.get(), "/ec2/saveLayout", layoutData,
+            nullptr, nx::network::http::StatusCode::ok, "admin", adminPassword);
+    }
+
+    void thenFullInfoEqual(const std::vector<LauncherPtr>& servers,
+        const QString& adminPassword = "admin")
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+
+        vms::api::FullInfoData fullInfoData;
+        NX_TEST_API_GET(servers[0].get(), "/ec2/getFullInfo", &fullInfoData,
+            nx::network::http::StatusCode::ok, "admin", adminPassword);
+
+        ASSERT_EQ(servers.size(), fullInfoData.servers.size());
+        ASSERT_EQ(servers.size(), fullInfoData.cameras.size());
+        ASSERT_EQ(servers.size() + 1, fullInfoData.users.size());
+        ASSERT_EQ(servers.size(), fullInfoData.layouts.size());
+
+        for (int i = 1; i < servers.size(); ++i)
+        {
+            vms::api::FullInfoData fullInfoData2;
+            NX_TEST_API_GET(servers[0].get(), "/ec2/getFullInfo", &fullInfoData2,
+                nx::network::http::StatusCode::ok, "admin", adminPassword);
+            ASSERT_EQ(QJson::serialized(fullInfoData), QJson::serialized(fullInfoData2));
+        }
     }
 
 private:
@@ -146,32 +222,21 @@ TEST_F(MergeSystems, SafeMode_To)
 }
 
 void waitForMergeFinished(
-    const std::vector<LauncherPtr>& servers,
-    int serverCount,
-    const nx::vms::api::SystemMergeHistoryRecord& mergeResult)
+    const LauncherPtr& server,
+    const QString& adminPassword = "admin")
 {
     int success = 0;
     do
     {
+        QnJsonRestResult jsonResult;
+        NX_TEST_API_GET(server.get(), "/ec2/mergeStatus", &jsonResult,
+            nx::network::http::StatusCode::ok, "admin", adminPassword);
+        auto mergeStatus = jsonResult.deserialized<vms::api::MergeStatusReply>();
+        if (!mergeStatus.mergeId.isNull() && !mergeStatus.mergeInProgress)
+            break;
+
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        success = 0;
-        for (int i = 0; i < serverCount; ++i)
-        {
-            auto connection = servers[i]->serverModule()->ec2Connection();
-            nx::vms::api::SystemMergeHistoryRecordList mergeData;
-            connection->getMiscManager(Qn::kSystemAccess)->getSystemMergeHistorySync(&mergeData);
-
-            auto itr = std::find_if(
-                mergeData.begin(), mergeData.end(),
-                [&mergeResult](const nx::vms::api::SystemMergeHistoryRecord& record)
-                {
-                    return mergeResult == record;
-                });
-            if (itr != mergeData.end())
-                ++success;
-
-        }
-    } while (success != serverCount);
+    } while (true);
 }
 
 TEST_F(MergeSystems, DoubleMergeWithTakeLocalSettings)
@@ -192,7 +257,7 @@ TEST_F(MergeSystems, DoubleMergeWithTakeLocalSettings)
         /* expectedCode */ MergeStatus::ok,
         &mergeResult);
 
-    waitForMergeFinished(servers, 2, mergeResult);
+    waitForMergeFinished(servers[0]);
 
     assertMergeRequestReturn(
         /* requestTarget */ servers[2],
@@ -200,8 +265,63 @@ TEST_F(MergeSystems, DoubleMergeWithTakeLocalSettings)
         /* expectedCode */ MergeStatus::ok,
         &mergeResult);
 
-    waitForMergeFinished(servers, 3, mergeResult);
+    waitForMergeFinished(servers[0]);
+}
 
+TEST_F(MergeSystems, MergeServersWithData)
+{
+    const int kServerCount = 3;
+    std::vector<LauncherPtr> servers;
+    nx::vms::api::SystemMergeHistoryRecord mergeResult;
+    for (int i = 0; i < kServerCount; ++i)
+    {
+        auto server = givenServer();
+        whenServerLaunched(server, SafeMode::off);
+        whenServerHasData(server, /*password*/ "admin");
+        whenServerIsConfigured(server);
+        servers.push_back(std::move(server));
+    }
+
+    for (int i = 0; i < kServerCount - 1; ++i)
+    {
+        assertMergeRequestReturn(
+            /* requestTarget */ servers[i],
+            /* serverToMerge */ servers[i+1],
+            /* expectedCode */ MergeStatus::ok,
+            &mergeResult);
+    }
+    waitForMergeFinished(servers[0]);
+    thenFullInfoEqual(servers);
+}
+
+TEST_F(MergeSystems, MergeServersWithDifferentPasswords)
+{
+    const int kServerCount = 2;
+    std::vector<LauncherPtr> servers;
+    nx::vms::api::SystemMergeHistoryRecord mergeResult;
+    for (int i = 0; i < kServerCount; ++i)
+    {
+        auto server = givenServer();
+        const auto password = lit("admin_%1").arg(i);
+        whenServerLaunched(server, SafeMode::off);
+        whenServerIsConfigured(server);
+        whenAdminPasswordHasChanged(server, password);
+        whenServerHasData(server, password);
+        servers.push_back(std::move(server));
+    }
+
+    for (int i = 0; i < kServerCount - 1; ++i)
+    {
+        assertMergeRequestReturn(
+            /* requestTarget */ servers[i],
+            /* serverToMerge */ servers[i + 1],
+            /* expectedCode */ MergeStatus::ok,
+            &mergeResult,
+            lit("admin_%1").arg(i),
+            lit("admin_%1").arg(i+1));
+    }
+    waitForMergeFinished(servers[0], "admin_0");
+    thenFullInfoEqual(servers, "admin_0");
 }
 
 } // namespace test

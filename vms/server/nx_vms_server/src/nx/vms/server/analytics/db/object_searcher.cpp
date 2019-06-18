@@ -16,7 +16,7 @@ static const QSize kSearchResolution(
     kTrackSearchResolutionX,
     kTrackSearchResolutionY);
 
-static constexpr int kMaxObjectLookupIterations = 100;
+static constexpr int kMaxObjectLookupIterations = kMaxObjectLookupResultSet;
 
 ObjectSearcher::ObjectSearcher(
     const DeviceDao& deviceDao,

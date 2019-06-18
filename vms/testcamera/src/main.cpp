@@ -98,9 +98,6 @@ int main(int argc, char *argv[])
     //QnCommonModule common(false, nx::core::access::Mode::direct);
 
     QnFfmpegInitializer ffmpeg;
-    QnLongRunnablePool logRunnablePool;
-    //common.instance<QnFfmpegInitializer>();
-    //common.instance<QnLongRunnablePool>();
 
     bool cameraForEachFile = false;
     bool includePts = false;

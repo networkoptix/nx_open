@@ -16,6 +16,7 @@
 #include "mutex.h"
 #include "thread_util.h"
 
+#include <nx/utils/algorithm/same.h>
 #include <nx/utils/log/log.h>
 
 namespace nx::utils {
@@ -171,7 +172,7 @@ bool LockGraphEdgeData::connectedTo(const LockGraphEdgeData& rhs) const
     //note: lockPositions is sorted by threadID
 
     //two edges are connected if there are elements with different thread id
-    return !is_equal_sorted_ranges_if(
+    return !algorithm::same_sorted_ranges_if(
         lockPositions.cbegin(), lockPositions.cend(),
         rhs.lockPositions.cbegin(), rhs.lockPositions.cend(),
         [](const TwoMutexLockData& one, const TwoMutexLockData& two)
@@ -236,6 +237,12 @@ const ThreadContext* ThreadContextGuard::operator->() const
 //-------------------------------------------------------------------------------------------------
 // class MutexLockAnalyzer
 
+MutexLockAnalyzer::MutexLockAnalyzer()
+{
+    // Installing default handler.
+    setDeadlockDetectedHandler(nullptr);
+}
+
 void MutexLockAnalyzer::mutexCreated(MutexDelegate* const /*mutex*/)
 {
 }
@@ -267,13 +274,13 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
         }
 
         threadContext->currentLockPath.push_front(mutexLockPosition);
-        const QString& deadLockMsg = QString::fromLatin1(
+        const auto deadLockMsg = lm(
             "Detected deadlock. Double mutex lock. Path:\n"
-            "    %1\n").
-            arg(pathToString(threadContext->currentLockPath.crbegin(), threadContext->currentLockPath.crend()));
+            "    %1\n")
+            .args(pathToString(threadContext->currentLockPath.crbegin(),
+                threadContext->currentLockPath.crend())).toStdString();
 
-        std::cerr << deadLockMsg.toStdString() << std::endl;
-        NX_ALWAYS(this, deadLockMsg);
+        m_deadlockDetectedHandler(deadLockMsg);
         return;
     }
 
@@ -298,8 +305,8 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
     std::list<LockGraphEdgeData> edgesTravelled;
     //travelling edges containing any thread different from current
     //    This is needed to avoid reporting deadlock in case of loop in the same thread.
-    //    Consider following: m1->m2, m2->m1. But both lock happen in the same thread only,
-    //    so deadlock is possible.
+    //    Consider following: m1->m2, m2->m1. But both locks happen in the same thread only,
+    //    so deadlock is not possible.
     //    NOTE: recursive locking is handled separately
     if (m_lockDigraph.findAnyPathIf(
             mutexLockPosition.mutexPtr, prevLock.mutexPtr,
@@ -331,24 +338,17 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
         if (pathConnected(edgesTravelled))
         {
             //found deadlock between prevLock and mutexLockPosition
-            const QString& deadLockMsg = QString::fromLatin1(
+            const auto deadLockMsg = lm(
                 "Detected deadlock possibility between %1 and %2:\n"
                 "    Existing path:\n%3\n"
-                "    New path:\n%4\n").
-                arg(prevLock.toString()).arg(mutexLockPosition.toString()).
-                arg(pathToString(edgesTravelled)).
-                arg(pathToString(threadContext->currentLockPath.crbegin(), threadContext->currentLockPath.crend()));
+                "    New path:\n%4\n")
+                .args(prevLock.toString(), mutexLockPosition.toString(),
+                    pathToString(edgesTravelled), pathToString(threadContext->currentLockPath.crbegin(),
+                        threadContext->currentLockPath.crend())).toStdString();
 
             readLock.unlock();
 
-            std::cerr << deadLockMsg.toStdString() << std::endl;
-            NX_ALWAYS(this, deadLockMsg);
-
-#if defined(_WIN32)
-            // Do nothing. DebugBreak() will crash the program.
-#elif defined(__linux__)
-            kill(getppid(), SIGTRAP);
-#endif
+            m_deadlockDetectedHandler(deadLockMsg);
         }
     }
 
@@ -392,14 +392,27 @@ void MutexLockAnalyzer::beforeMutexUnlocked(const MutexLockKey& mutexLockPositio
     threadContext->currentLockPath.pop_front();
 }
 
-void MutexLockAnalyzer::threadStarted(std::uintptr_t /*sysThreadID*/)
+void MutexLockAnalyzer::setDeadlockDetectedHandler(DeadlockDetectedHandler handler)
 {
-    //TODO #ak
-}
+    if (handler)
+    {
+        m_deadlockDetectedHandler = std::move(handler);
+    }
+    else
+    {
+        m_deadlockDetectedHandler =
+            [](const auto& message)
+            {
+                std::cerr << message << std::endl;
+                NX_ALWAYS(typeid(MutexLockAnalyzer), message);
 
-void MutexLockAnalyzer::threadStopped(std::uintptr_t /*sysThreadID*/)
-{
-    //TODO #ak
+                #if defined(_WIN32)
+                    DebugBreak();
+                #elif defined(__linux__)
+                    kill(getppid(), SIGTRAP);
+                #endif
+            };
+    }
 }
 
 Q_GLOBAL_STATIC(MutexLockAnalyzer, MutexLockAnalyzer_instance)
