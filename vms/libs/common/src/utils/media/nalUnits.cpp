@@ -883,7 +883,7 @@ void SPSUnit::setFps(double fps)
 
 double SPSUnit::getSar() const
 {
-    if (!vui_parameters_present_flag)
+    if (!vui_parameters_present_flag || !aspect_ratio_info_present_flag)
         return 1.0;
 
     uint32_t width = 0;
