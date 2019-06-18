@@ -23,7 +23,7 @@ static QString readFileIfExists(const QString& filename)
 
     if (!file.exists())
     {
-        NX_DEBUG(kLogTag, "File %1 is not exists", filename);
+        NX_DEBUG(kLogTag, "File %1 is not exist", filename);
         return result;
     }
 
