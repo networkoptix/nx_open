@@ -599,13 +599,13 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
                 const auto updateServerSettings =
                     [this](
                         const nx::vms::api::MetadataStorageChangePolicy policy,
-                        const QnUuid &storageId)
+                        const QnUuid& storageId)
                     {
                         qnGlobalSettings->setMetadataStorageChangePolicy(policy);
                         qnGlobalSettings->synchronizeNow();
 
                         qnResourcesChangesManager->saveServer(m_server,
-                            [storageId](const QnMediaServerResourcePtr &server)
+                            [storageId](const QnMediaServerResourcePtr& server)
                             {
                                 server->setMetadataStorageId(storageId);
                             });
@@ -668,7 +668,7 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
                 }
                 else
                 {
-                    // We don't have analytics database jet, so just assign a new storage.
+                    // We don't have analytics database yet, so just assign a new storage.
 
                     updateServerSettings(
                         nx::vms::api::MetadataStorageChangePolicy::keep, //< Just to be sure...
