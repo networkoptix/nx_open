@@ -352,7 +352,7 @@ def get_records_for_version(product, version, customization):
     else:
         data_records = product.datarecord_set.filter(version__id=version.id)
     data_records = data_records.\
-        order_by('data_structure__context__name', 'language__code', 'data_structure__order', '-id')
+        order_by('data_structure__context__order', 'language__code', 'data_structure__order', '-id')
     contexts = {}
     used_data_structures = set()
 

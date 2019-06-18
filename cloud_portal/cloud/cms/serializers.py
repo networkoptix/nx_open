@@ -50,11 +50,12 @@ class ContextSerializer(BaseCMSSerializer):
     class Meta:
         model = Context
         fields = ("name", "label", "file_path", "description", "url", "translatable", "values")
+        ordering = ('order',)
 
     values = serializers.SerializerMethodField('get_datastructure_values')
 
     def get_datastructure_values(self, obj):
-        return DataStructureSerializer(obj.datastructure_set.all(), many=True, params=self.query).data
+        return DataStructureSerializer(obj.datastructure_set.order_by('order').all(), many=True, params=self.query).data
 
 
 class ProductTypeSerializer(BaseCMSSerializer):
@@ -66,7 +67,7 @@ class ProductTypeSerializer(BaseCMSSerializer):
     type = serializers.SerializerMethodField("get_nice_name")
 
     def get_contexts_values(self, obj):
-        return ContextSerializer(obj.context_set.all(), many=True, params=self.query).data
+        return ContextSerializer(obj.context_set.order_by('order').all(), many=True, params=self.query).data
 
     def get_nice_name(self, obj):
         return ProductType.PRODUCT_TYPES[obj.type]
