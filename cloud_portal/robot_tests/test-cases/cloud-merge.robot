@@ -1,6 +1,6 @@
 *** Settings ***
-Resource          resource.robot
-Resource          APIresource.robot
+Resource          ../resource.robot
+Resource          ../APIresource.robot
 Suite Setup       Startup
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    reset state
