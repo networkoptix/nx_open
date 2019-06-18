@@ -230,6 +230,12 @@ def make_preview(request):
     version_id = request.POST['version_id'] if 'version_id' in request.POST else None
     context = Context.objects.filter(id=request.POST['context_id']).first()
     product = get_product_by_revision(version_id)
+    cloud = get_cloud_portal_product()
+
+    if not UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.edit_content') and \
+            not UserGroupsToProductPermissions.check_permission(request.user, cloud, 'cms.publish_version'):
+        raise PermissionDenied
+
     if product.can_preview_on_portal:
         redirect_url = modify_db.generate_preview(product, context, version_id=version_id, send_to_review=True)
         product.change_preview_status(product.PREVIEW_STATUS.review)
@@ -253,6 +259,10 @@ def response_attachment(data, filename, content_type):
 @permission_required('cms.change_product')
 def product_settings(request, product_id):
     product = Product.objects.get(pk=product_id)
+
+    if not UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.edit_content'):
+        raise PermissionDenied
+
     form = None
     if request.method == "POST":
         form = ProductSettingsForm(request.POST, request.FILES)
@@ -315,10 +325,13 @@ def product_settings(request, product_id):
 
 
 @require_http_methods(["GET"])
+@permission_required('cms.change_product')
 def download_current_structure(request, product_id):
     use_actual_values = "get_values" in request.GET
     product = Product.objects.filter(id=product_id).last()
     if product_id and product:
+        if not UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.edit_content'):
+            raise PermissionDenied
         data = generate_structure.from_database(product, use_actual_values)
         content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
         return response_attachment(content, 'structure.json', 'application/json')
@@ -326,8 +339,12 @@ def download_current_structure(request, product_id):
 
 
 @require_http_methods(["GET"])
+@permission_required('cms.change_product')
 def download_file(request, path):
     product = get_cloud_portal_product()
+
+    if not UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.edit_content'):
+        raise PermissionDenied
 
     language_code = request.GET['lang'] if 'lang' in request.GET else None
     version_id = request.GET['version_id'] if 'version_id' in request.GET else None
@@ -339,8 +356,12 @@ def download_file(request, path):
 
 
 @require_http_methods(["GET"])
+@permission_required('cms.change_product')
 def download_package(request, product_id):
     product = Product.objects.get(id=product_id)
+
+    if not UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.edit_content'):
+        raise PermissionDenied
 
     version_id = request.GET['version_id'] if 'version_id' in request.GET else None
     preview = 'draft' in request.GET
