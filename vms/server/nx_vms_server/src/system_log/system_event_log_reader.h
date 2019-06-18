@@ -1,5 +1,4 @@
-#ifndef __SYSTEM_EVENT_LOG_READER_H__
-#define __SYSTEM_EVENT_LOG_READER_H__
+#pragma once
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/event/event_fwd.h>
@@ -11,7 +10,7 @@
     #include <winevt.h>
 #endif
 
-struct notificationInfo
+struct SystemEventNotificationInfo
 {
     QString providerName;
     QString data;
@@ -29,11 +28,15 @@ public:
 
     bool subscribe();
     void unsubscribe();
-    virtual bool messageIsSignificant(
-        const QString& xmlMessage, const notificationInfo& parsedMessage);
+    virtual bool isMessageSignificant(
+        const QString& xmlMessage, const SystemEventNotificationInfo& parsedMessage);
 
+    /** Name of the log which the events should be read from. */
     QString logName() const { return m_logName; }
+
+    /** Name of the application that generates the events to read. */
     QString providerName() const { return m_providerName; }
+
     int maxLevel() const { return m_maxLevel; }
     nx::vms::event::EventReason reason() const { return m_reason; }
 
@@ -42,43 +45,39 @@ signals:
     void eventOccurred(const QString &description, nx::vms::event::EventReason reason);
 
 private:
-#ifdef WIN32
-    static DWORD WINAPI SubscriptionCallback(
-        EVT_SUBSCRIBE_NOTIFY_ACTION action, PVOID context, EVT_HANDLE hEvent);
-#endif
-    notificationInfo parseXmlMessage(const QString& xmlMessage);
+    #ifdef WIN32
+        static DWORD WINAPI SubscriptionCallback(
+            EVT_SUBSCRIBE_NOTIFY_ACTION action, PVOID context, EVT_HANDLE hEvent);
+    #endif
+    SystemEventNotificationInfo parseXmlMessage(const QString& xmlMessage);
     QString makeDebugMessage(const QString& text);
 
 private:
     void* m_hSubscription = nullptr; //< Used in Windows only and has a type EVT_HANDLE.
-
-    /** Name of the log which the events should be read from. */
     QString m_logName;
-
-    /** Name of the application that generates the events to read. */
     QString m_providerName;
 
     /**
      * Maximum level. All events with the level higher then maxLevel are ignored by this reader.
      * The levels are:
      * 0 - not used
-     * 1 - Critical (aka Fatal)
-     * 2 - Error (aka Critical)
+     * 1 - Critical (Fatal in Hanwha notation)
+     * 2 - Error (Critical in Hanwha notation)
      * 3 - Warning
      * 4 - Information
-     * 5 - Verbose (aka Progress)
+     * 5 - Verbose (Progress in Hanwha notation)
      */
-    int m_maxLevel;
-    nx::vms::event::EventReason m_reason; //< Reason used in signal.
+    int m_maxLevel = 5;
+
+    // Reason used in signal.
+    nx::vms::event::EventReason m_reason = nx::vms::event::EventReason::none;
 };
 
 class RaidEventLogReader: public SystemEventLogReader
 {
 public:
-    RaidEventLogReader(QString logName, QString providerName, int maxLevel);
+    RaidEventLogReader(QString logName, QString providerName);
 
-    virtual bool messageIsSignificant(
-        const QString& xmlMessage, const notificationInfo& parsedMessage) override;
+    virtual bool isMessageSignificant(
+        const QString& xmlMessage, const SystemEventNotificationInfo& parsedMessage) override;
 };
-
-#endif // __STORAGE_MANAGER_H__
