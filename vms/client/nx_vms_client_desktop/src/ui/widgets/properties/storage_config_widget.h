@@ -66,6 +66,8 @@ private:
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
     void updateBackupUi(const QnBackupStatusData& reply, int overallSelectedCameras);
 
+    void confirmNewMetadataStorage(const QnUuid& storageId);
+
     void updateWarnings();
 
     void updateIntervalLabels();

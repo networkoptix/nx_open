@@ -100,6 +100,7 @@ void QnStorageListModel::setServer(const QnMediaServerResourcePtr& server)
 
     ScopedReset reset(this); // TODO: #common Do we need this reset?
     m_server = server;
+    m_metadataStorageId = server->metadataStorageId();
 }
 
 QnUuid QnStorageListModel::metadataStorageId() const
@@ -112,8 +113,12 @@ void QnStorageListModel::setMetadataStorageId(const QnUuid &id)
     if (m_metadataStorageId == id)
         return;
 
-    ScopedReset reset(this); // TODO: #common Do we need this reset?
     m_metadataStorageId = id;
+
+    // We use ActionsColumn to show which storage is used for metadata.
+    emit dataChanged(
+        index(0, ActionsColumn),
+        index(rowCount() - 1, ActionsColumn));
 }
 
 void QnStorageListModel::updateRebuildInfo(QnServerStoragesPool pool, const QnStorageScanData& rebuildStatus)
