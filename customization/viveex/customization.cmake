@@ -42,7 +42,7 @@ set(mac.protocol_handler_bundle.identifier "com.daekyocns.protocol_handler")
 
 set(ios.new_bundle_identifier "com.daekyocns.viveex")
 set(ios.group_identifier "group.com.daekyocns.viveex")
-set(ios.sign.identity "iPhone Developer: Daekyo CNS Co., Ltd. (F9YS49GC96)")
+set(ios.sign.identity "iPhone Distribution: Daekyo CNS Co., Ltd. (F9YS49GC96)")
 
 # Other customizations.
 set(freeLicenseIsTrial "true")
