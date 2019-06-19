@@ -89,7 +89,7 @@ do
         web)
             write_my_cnf
 
-            while ! python manage.py makemigrations --check
+            while [ -z "$(python manage.py healthcheck)" ]
             do
                 echo Waiting for migrations to be applied
                 sleep 1
