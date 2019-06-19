@@ -62,10 +62,12 @@ def update_from_object(product_type_structure, product_type=None):
     update_product_type(product_type, product_type_structure)
 
     order = 0
+    context_order = 0
     deprecate_data_structures_for_product_type(product_type)
 
     for context_data in product_type_structure['contexts']:
-        context = update_context(context_data, product_type)
+        context = update_context(context_data, product_type, context_order)
+        context_order += 1
         has_language = context.translatable
         for record in context_data["values"]:
             update_data_structure(context.id, has_language, record, order)
@@ -262,7 +264,7 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
     return log_messages
 
 
-def update_context(context_data, product_type):
+def update_context(context_data, product_type, order):
     has_language = context_data.get("translatable", False)
     is_global = context_data.get("is_global", False)
     old_name = context_data.get("old_name", None)
@@ -276,6 +278,7 @@ def update_context(context_data, product_type):
     context.url = context_data.get("url", "")
     context.label = context_data.get("label", "")
     context.hidden = context_data.get("hidden", False)
+    context.order = order
     context.save()
     return context
 

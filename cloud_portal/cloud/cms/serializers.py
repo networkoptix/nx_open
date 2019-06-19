@@ -26,7 +26,6 @@ class DataStructureSerializer(BaseCMSSerializer):
     class Meta:
         model = DataStructure
         fields = ("label", "name", "value", "description", "type", "advanced", "optional", "public", "meta")
-        ordering = ('order', )
 
     value = serializers.SerializerMethodField('get_value_for_datastructure')
     meta = serializers.JSONField(source="meta_settings")

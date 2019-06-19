@@ -1,6 +1,6 @@
 *** Settings ***
-Resource          resource.robot
-Resource          APIresource.robot
+Resource          ../resource.robot
+Resource          ../APIresource.robot
 Suite Setup       Startup
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    reset state
@@ -37,7 +37,7 @@ Merge
     sleep    5
     Click Button    ${MERGE OK BUTTON}
     Wait Until Element Is Visible    ${MERGE CHECKING HINT}
-    Wait Until Elements Are Visible    ${MERGE BUTTON MODAL}    ${MERGE PASSWORD INPUT}    ${MERGE CANCEL BUTTON}    timeout=60
+    Wait Until Elements Are Visible    ${MERGE BUTTON MODAL}    ${MERGE PASSWORD INPUT}    ${MERGE CANCEL BUTTON}
     Input Text    ${MERGE PASSWORD INPUT}    ${BASE PASSWORD}
     Click Button    ${MERGE BUTTON MODAL}
     sleep    1
@@ -151,8 +151,8 @@ Reset state
     Log In    ${EMAIL MERGE OWNER 3.0}    ${password}
     Validate Log In
     ${state}    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]    10
-    Run Keyword If    "${state[0]}"=="PASS"    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]    10
-    Run Keyword If    "${state[0]}"=="PASS"    Disconnect from cloud    API made system 1
+    Run Keyword If    "${state[0]}"=="PASS"    Click Element    ${SYSTEMS TILE}//h2[contains(text(),"API made system 1")]
+    Run Keyword If    "${state[0]}"=="PASS"    Disconnect from cloud
 
 
 *** Test Cases ***
@@ -178,7 +178,7 @@ Wrong and empty password
     ...                                ${MERGE CANCEL BUTTON}    ${MERGE CURRENT SYSTEM WITH}    ${MERGE ONLY AS OWNER}
     Click Button    ${MERGE OK BUTTON}
     Wait Until Element Is Visible    ${MERGE CHECKING HINT}
-    Wait Until Elements Are Visible    ${MERGE BUTTON MODAL}    ${MERGE PASSWORD INPUT}    ${MERGE CANCEL BUTTON}    timeout=60
+    Wait Until Elements Are Visible    ${MERGE BUTTON MODAL}    ${MERGE PASSWORD INPUT}    ${MERGE CANCEL BUTTON}
     Click Button    ${MERGE BUTTON MODAL}
     Wait Until Element Is Visible    ${MERGE PASSWORD REQUIRED}
     Input Text    ${MERGE PASSWORD INPUT}    qwerasdf

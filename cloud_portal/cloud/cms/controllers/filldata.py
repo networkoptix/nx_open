@@ -76,7 +76,7 @@ def process_context_structure(product, context, content, language,
 
     default_language = product.default_language
     location = product.product_root
-    for datastructure in context.datastructure_set.order_by('order').all():
+    for datastructure in context.datastructure_set.all():
         # noinspection PyBroadException
         try:
             if context_dict and datastructure.name in context_dict:

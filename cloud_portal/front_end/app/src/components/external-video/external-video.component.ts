@@ -28,7 +28,7 @@ export class NxExternalVideoComponent implements OnInit {
         this.src = this.sanitizeLink(this.FormatSrc(this.videoSrc));
     }
 
-    sanitizeLink(link){
-        return this.sanitizer.bypassSecurityTrustResourceUrl(link);
+    sanitizeLink(link) {
+        return link ? this.sanitizer.bypassSecurityTrustResourceUrl(link) : '';
     }
 }

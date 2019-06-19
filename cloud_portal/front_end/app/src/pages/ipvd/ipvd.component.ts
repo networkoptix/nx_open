@@ -92,7 +92,6 @@ export class NxIpvdComponent implements OnInit {
     }
 
     constructor(private configService: NxConfigService,
-                private language: TranslateService,
                 private translate: TranslateService,
                 private cameraService: CamerasService,
                 private cameraSearchService: IpvdSearchService,
@@ -139,14 +138,23 @@ export class NxIpvdComponent implements OnInit {
                 }
             });
 
-        this.activate();
-
         setTimeout(() => {
-            this.lang = this.translate.translations[this.translate.currentLang];
-            this.title.setTitle(this.lang.pageTitles.supportedDevices);
+            this.translate
+                .getTranslation(this.translate.currentLang)
+                .subscribe((lang) => {
+                    this.lang = lang;
+                    this.title.setTitle(this.lang.pageTitles.supportedDevices);
 
-            this.company = this.CONFIG.companyName;
-            this.placeholder = this.lang.search.search_ipvd;
+                    this.company = this.CONFIG.companyName;
+                    this.placeholder = this.lang.search.search_ipvd;
+
+                    // add hardware types and tags
+                    this.addFilterTags();
+                    this.addFilterTypes();
+                    this.addFilterResolutions();
+
+                    this.activate();
+                });
         });
 
         this.breakpointObserver
@@ -219,11 +227,6 @@ export class NxIpvdComponent implements OnInit {
                 this.vendors.sort(NxUtilsService.byParam((elm) => {
                     return elm.name.toLowerCase();
                 }, NxUtilsService.sortASC));
-
-                // add hardware types and tags
-                this.addFilterTags();
-                this.addFilterTypes();
-                this.addFilterResolutions();
 
                 // reformat vendors to fit the multiselect component
                 this.filterModel
