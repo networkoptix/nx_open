@@ -13,7 +13,6 @@
 #include <managers/videowall_notification_manager.h>
 #include <managers/webpage_notification_manager.h>
 #include <managers/stored_file_notification_manager.h>
-#include <managers/updates_notification_manager.h>
 #include <managers/misc_notification_manager.h>
 #include <managers/discovery_notification_manager.h>
 #include <managers/time_notification_manager.h>
@@ -42,7 +41,6 @@ public:
         QnVideowallNotificationManager* videowallManager,
         QnWebPageNotificationManager* webPageManager,
         QnStoredFileNotificationManager* storedFileManager,
-        QnUpdatesNotificationManager* updatesManager,
         QnMiscNotificationManager* miscManager,
         QnDiscoveryNotificationManager* discoveryManager,
         AnalyticsNotificationManager* analyticsManager);
@@ -64,7 +62,6 @@ public:
             m_videowallManager,
             m_webPageManager,
             m_storedFileManager,
-            m_updatesManager,
             m_miscManager,
             m_discoveryManager,
             m_analyticsManager,
@@ -93,7 +90,6 @@ private:
     QnVideowallNotificationManager* m_videowallManager;
     QnWebPageNotificationManager* m_webPageManager;
     QnStoredFileNotificationManager* m_storedFileManager;
-    QnUpdatesNotificationManager* m_updatesManager;
     QnMiscNotificationManager* m_miscManager;
     QnDiscoveryNotificationManager* m_discoveryManager;
     AnalyticsNotificationManager* m_analyticsManager;

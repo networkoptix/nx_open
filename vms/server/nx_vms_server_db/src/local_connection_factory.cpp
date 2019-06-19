@@ -1675,13 +1675,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // AbstractStoredFileManager::deleteStoredFile
     regUpdate<StoredFilePath>(p, ApiCommand::removeStoredFile);
 
-    // AbstractUpdatesManager::uploadUpdate
-    regUpdate<UpdateUploadData>(p, ApiCommand::uploadUpdate);
-    // AbstractUpdatesManager::uploadUpdateResponce
-    regUpdate<UpdateUploadResponseData>(p, ApiCommand::uploadUpdateResponce);
-    // AbstractUpdatesManager::installUpdate
-    regUpdate<UpdateInstallData>(p, ApiCommand::installUpdate);
-
     // AbstractDiscoveryManager::discoveredServerChanged
     regUpdate<DiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
     // AbstractDiscoveryManager::discoveredServersList
