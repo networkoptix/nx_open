@@ -87,4 +87,26 @@
             <div>{{ current_versions.0.id }}</div>
         {% endif %}
     </div>
+
+    <script>
+        function show_customizations(show) {
+            customizations = $('.field-customizations');
+            if (show)
+                customizations.show();
+            else
+                customizations.hide();
+        }
+
+        $(document).ready(function() {
+            publishAllDiv = $('.field-publish_all_customizations');
+            if(publishAllDiv.length) {
+                publishAllField = publishAllDiv.find('input').first();
+                publishAllField.change(function() {
+                    show_customizations(!this.checked);
+                });
+
+                publishAllField.change();
+            }
+        });
+    </script>
 {% endblock %}
