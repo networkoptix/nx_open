@@ -106,7 +106,7 @@ export class NxIntegrationsComponent implements OnInit {
             return (item.information.name && item.information.name.toLowerCase().indexOf(query) > -1 ||
                     item.information.companyName && item.information.companyName.toLowerCase().indexOf(query) > -1 ||
                     item.information.shortDescription && item.information.shortDescription.toLowerCase().indexOf(query) > -1 ||
-                    item.overview && item.overview.description.toLowerCase().indexOf(query) > -1);
+                    item.overview.description && item.overview.description.toLowerCase().indexOf(query) > -1);
         }
 
         this.elements = this.allElements.map(obj => ({ ...obj }));
