@@ -1,13 +1,8 @@
 #include "system_information.h"
 
-#include <fstream>
-
 #include <QtCore/QFile>
-#include <QtCore/QMap>
-#include <QtCore/QString>
 #include <QtCore/QTextStream>
-
-#include <nx/vms/api/helpers/system_information_helper_linux.h>
+#include <QtCore/QRegularExpression>
 
 namespace nx::vms::api {
 
@@ -22,23 +17,54 @@ static QByteArray osReleaseContents()
     return f.readAll();
 }
 
+static QString unquoteIfNeeded(const QString& s)
+{
+    if (s.size() < 2)
+        return s;
+
+    if (s.startsWith(L'"') && s.endsWith(L'"'))
+        return s.mid(1, s.size() - 2);
+
+    return s;
+}
+
+QString osReleaseContentsValueByKey(
+    const QByteArray& osReleaseContents, const QString& key, const QString& defaultValue = {})
+{
+    if (osReleaseContents.isEmpty())
+        return defaultValue;
+
+    const QRegularExpression re(
+        QString("%1\\s*=\\s*(.+)").arg(key), QRegularExpression::CaseInsensitiveOption);
+
+    QTextStream stream(osReleaseContents);
+    while (!stream.atEnd())
+    {
+        const QString line = stream.readLine().trimmed();
+        const QRegularExpressionMatch match = re.match(line);
+        if (match.hasMatch())
+            return unquoteIfNeeded(match.captured(1));
+    }
+
+    return defaultValue;
+}
+
 } // namespace
 
 QString SystemInformation::currentSystemRuntime()
 {
-    const auto prettyName = osReleaseContentsValueByKey(osReleaseContents(), "pretty_name");
-    return prettyName.isEmpty() ? "GNU/Linux without /etc/os-release" : prettyName;
+    return osReleaseContentsValueByKey(
+        osReleaseContents(), "PRETTY_NAME", "GNU/Linux without /etc/os-release");
+}
+
+QString SystemInformation::runtimeModification()
+{
+    return osReleaseContentsValueByKey(osReleaseContents(), "ID");
 }
 
 QString SystemInformation::runtimeOsVersion()
 {
-    const auto codenameVersion = ubuntuVersionFromCodeName(
-        osReleaseContentsValueByKey(osReleaseContents(), "ubuntu_codename"));
-
-    if (!codenameVersion.isEmpty())
-        return codenameVersion;
-
-    return osReleaseContentsValueByKey(osReleaseContents(), "version_id");
+    return osReleaseContentsValueByKey(osReleaseContents(), "VERSION_ID");
 }
 
 } // namespace nx::vms::api

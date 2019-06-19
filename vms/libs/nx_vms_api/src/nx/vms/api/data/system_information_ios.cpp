@@ -9,6 +9,11 @@ QString SystemInformation::currentSystemRuntime()
     return "iOS";
 }
 
+QString SystemInformation::runtimeModification()
+{
+    return QString();
+}
+
 QString SystemInformation::runtimeOsVersion()
 {
     return QString();

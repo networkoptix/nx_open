@@ -1,6 +1,8 @@
 nx_configure_file(${customization_dir}/license.html
     ${distribution_output_dir}/eula-${eulaVersion}.html)
 
+set(_nx_vms_distribution_dir ${CMAKE_CURRENT_LIST_DIR})
+
 function(get_distributable_plugins_list variable_name property_name)
     get_property(plugins GLOBAL PROPERTY ${property_name})
 
@@ -15,6 +17,29 @@ function(get_distributable_plugins_list variable_name property_name)
     string(REPLACE ";" " " result "${result}")
 
     set(${variable_name} ${result} PARENT_SCOPE)
+endfunction()
+
+function(nx_generate_package_json file_name)
+    cmake_parse_arguments(PACK "" "COMPONENT;VARIANTS;INSTALL_SCRIPT" "" ${ARGN})
+    set(version ${releaseVersion.full})
+    set(platform ${platform_new})
+    set(cloud_host ${cloudHost})
+
+    if(PACK_COMPONENT)
+        set(component ${PACK_COMPONENT})
+    else()
+        set(component server)
+    endif()
+
+    set(variants ${PACK_VARIANTS})
+
+    if(PACK_INSTALL_SCRIPT)
+        set(install_script ${PACK_INSTALL_SCRIPT})
+    elseif(component STREQUAL server)
+        message(FATAL_ERROR "Install script for server must be specified")
+    endif()
+
+    nx_configure_file(${_nx_vms_distribution_dir}/package.json.in ${file_name})
 endfunction()
 
 # These variables are to be substituted into the config files, so they are space-separated lists.
