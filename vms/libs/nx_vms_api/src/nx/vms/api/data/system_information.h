@@ -61,7 +61,7 @@ struct NX_VMS_API SystemInformationNew
 QN_FUSION_DECLARE_FUNCTIONS(SystemInformationNew,
     (eq)(hash)(ubjson)(json), NX_VMS_API)
 
-QString toString(const SystemInformationNew& systemInformation);
+NX_VMS_API QString toString(const SystemInformationNew& systemInformation);
 
 } // namespace api
 } // namespace vms
