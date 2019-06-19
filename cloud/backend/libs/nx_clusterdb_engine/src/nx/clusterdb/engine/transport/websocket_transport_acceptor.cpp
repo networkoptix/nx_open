@@ -90,7 +90,8 @@ void WebSocketTransportAcceptor::createConnection(
                 std::move(localPeer),
                 std::move(remotePeerInfo),
                 systemId,
-                network::http::getHeaderValue(request.headers, "User-Agent").toStdString());
+                network::http::getHeaderValue(request.headers, "User-Agent").toStdString(),
+                network::http::getHeaderValue(request.headers, "Accept-Encoding").toStdString());
         };
     completionHandler(std::move(result));
 }
@@ -100,7 +101,8 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
     vms::api::PeerDataEx localPeerInfo,
     vms::api::PeerDataEx remotePeerInfo,
     const std::string& systemId,
-    const std::string& userAgent)
+    const std::string& userAgent,
+    const std::string& compressionType)
 {
     const auto remoteAddress = connection->getForeignAddress();
     auto p2pTransport = std::make_unique<p2p::P2PWebsocketTransport>(
@@ -118,6 +120,12 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
         std::move(p2pTransport),
         localPeerInfo,
         remotePeerInfo);
+
+    if (transactionTransport->isCompressionSupportedForPeer(
+        remotePeerInfo, QString::fromStdString(compressionType)))
+    {
+        transactionTransport->setUseCompression(true);
+    }
 
     ConnectionManager::ConnectionContext context{
         std::move(transactionTransport),

@@ -357,6 +357,8 @@ void ConnectionProcessor::run()
     const auto dataFormat = remotePeer.dataFormat == Qn::JsonFormat
         ? websocket::FrameType::text : websocket::FrameType::binary;
 
+    const auto encoding = nx::network::http::getHeaderValue(d->request.headers, "Accept-Encoding");
+
     if (useWebSocket)
     {
         p2pTransport = std::make_unique<P2PWebsocketTransport>(std::move(d->socket), dataFormat);
@@ -367,6 +369,7 @@ void ConnectionProcessor::run()
             std::move(sameDirectionConnectionLockGuard),
             std::move(p2pTransport),
             QUrlQuery(d->request.requestLine.url.query()),
+            encoding,
             userAccessData(remotePeer),
             onConnectionClosedCallback);
     }
@@ -383,6 +386,7 @@ void ConnectionProcessor::run()
             sameGuidconnectionLockGuard = std::move(sameGuidconnectionLockGuard),
             p2pHttpServerTransport,
             query = QUrlQuery(d->request.requestLine.url.query()),
+            encoding,
             accessData = userAccessData(remotePeer),
             onConnectionClosedCallback](
                 SystemError::ErrorCode error) mutable
@@ -394,6 +398,7 @@ void ConnectionProcessor::run()
                         std::move(sameDirectionConnectionLockGuard),
                         P2pTransportPtr(p2pHttpServerTransport),
                         query,
+                        encoding,
                         accessData,
                         onConnectionClosedCallback);
                 }

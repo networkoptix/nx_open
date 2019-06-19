@@ -7,7 +7,7 @@
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/vms/api/data/peer_data.h>
 
-namespace nx::clusterdb::engine { 
+namespace nx::clusterdb::engine {
 
 class ConnectionManager;
 class ProtocolVersionRange;
@@ -45,7 +45,8 @@ private:
         vms::api::PeerDataEx localPeerInfo,
         vms::api::PeerDataEx remotePeerInfo,
         const std::string& systemId,
-        const std::string& userAgent);
+        const std::string& userAgent,
+        const std::string& compressionType);
 };
 
 } // namespace nx::clusterdb::engine::transport

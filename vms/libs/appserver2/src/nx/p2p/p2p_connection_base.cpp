@@ -453,6 +453,9 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
             dataWithSequence.append(data);
             m_dataToSend.push_back(dataWithSequence);
 #else
+        if (m_useCompression)
+            m_dataToSend.push_back(qCompress(data));
+        else
             m_dataToSend.push_back(data);
 #endif
 
@@ -503,8 +506,17 @@ void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t b
         return; //< connection closed
     }
 
-    if (errorCode != SystemError::noError ||
-        !handleMessage(m_readBuffer))
+    if (errorCode != SystemError::noError)
+    {
+        setState(State::Error);
+        return;
+    }
+
+    auto data = m_readBuffer;
+    if (m_useCompression)
+        data = qUncompress(m_readBuffer);
+
+    if (!handleMessage(data))
     {
         setState(State::Error);
         return;
@@ -566,6 +578,22 @@ void ConnectionBase::bindToAioThread(nx::network::aio::AbstractAioThread* aioThr
         m_httpClient->bindToAioThread(aioThread);
     if (m_p2pTransport)
         m_p2pTransport->bindToAioThread(aioThread);
+}
+
+bool ConnectionBase::isCompressionSupportedForPeer(
+    const vms::api::PeerDataEx& remotePeer, const QString& acceptEncoding)
+{
+    if (remotePeer.peerType == nx::vms::api::PeerType::desktopClient && remotePeer.dataFormat == Qn::JsonFormat)
+        return false; //< Workaround for old mobile clients. It not fill peerType correctly, but ask json format.
+
+    if (!acceptEncoding.contains("gzip"))
+        return false;
+    return  remotePeer.protoVersion >= 4002 || remotePeer.dataFormat == Qn::JsonFormat;
+}
+
+void ConnectionBase::setUseCompression(bool value)
+{
+    m_useCompression = value;
 }
 
 } // namespace p2p

@@ -449,6 +449,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
     ec2::ConnectionLockGuard connectionLockGuard,
     P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
+    const QString& encoding,
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
 {
@@ -464,6 +465,9 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         userAccessData,
         std::make_unique<nx::p2p::ConnectionContext>(),
         std::move(connectionLockGuard)));
+
+    if (connection->isCompressionSupportedForPeer(remotePeer, encoding))
+        connection->setUseCompression(true);
 
     QnMutexLocker lock(&m_mutex);
 
