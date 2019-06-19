@@ -567,7 +567,7 @@ TEST_F(
     assertMediatorUdpHostMatchesThatInCloudModulesXml();
 }
 
-TEST_F(MediatorConnectorAndStunOverHttpEndpoint, DISABLED_reconnects_to_mediator)
+TEST_F(MediatorConnectorAndStunOverHttpEndpoint, reconnects_to_mediator)
 {
     addMediatorArg("--stun/keepAliveOptions={10ms, 10ms, 10}");
 

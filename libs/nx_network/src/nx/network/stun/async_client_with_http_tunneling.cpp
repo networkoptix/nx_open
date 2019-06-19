@@ -96,18 +96,18 @@ void AsyncClientWithHttpTunneling::setOnConnectionClosedHandler(
 void AsyncClientWithHttpTunneling::sendRequest(
     Message request,
     RequestHandler handler,
-    void* clientId)
+    void* client)
 {
     using namespace std::placeholders;
 
     dispatch(
-        [this, request = std::move(request), handler = std::move(handler), clientId]() mutable
+        [this, request = std::move(request), handler = std::move(handler), client]() mutable
         {
             const auto requestId = ++m_requestIdSequence;
             RequestContext requestContext;
             requestContext.request = std::move(request);
             requestContext.handler = std::move(handler);
-            requestContext.clientId = clientId;
+            requestContext.client = client;
 
             if (m_stunClient)
             {
@@ -191,20 +191,12 @@ void AsyncClientWithHttpTunneling::cancelHandlersSync(void* client)
     {
         QnMutexLocker lock(&m_mutex);
 
-        for (auto it = m_indicationHandlers.begin(); it != m_indicationHandlers.end(); )
-        {
-            if (it->second.client == client)
-                it = m_indicationHandlers.erase(it);
-            else
-                ++it;
-        }
-
+        cancelUserHandlers(m_activeRequests, client);
+        cancelUserHandlers(m_indicationHandlers, client);
         m_reconnectHandlers.erase(client);
 
-        if (!m_stunClient)
-            return;
-
-        m_stunClient->cancelHandlersSync(client);
+        if (m_stunClient)
+            m_stunClient->cancelHandlersSync(client);
     }
     else
     {
@@ -404,7 +396,7 @@ void AsyncClientWithHttpTunneling::onRequestCompleted(
     auto requestIter = m_activeRequests.find(requestId);
     if (requestIter == m_activeRequests.end())
     {
-        NX_ASSERT(false);
+        // Likely, the request has been cancelled.
         NX_DEBUG(this, lm("Received response from %1 with unexpected request id %2")
             .arg(m_url).arg(requestId));
         return;
@@ -414,6 +406,20 @@ void AsyncClientWithHttpTunneling::onRequestCompleted(
     m_activeRequests.erase(requestIter);
 
     requestContext.handler(sysErrorCode, std::move(response));
+}
+
+template<typename Dictionary> 
+void AsyncClientWithHttpTunneling::cancelUserHandlers(
+    Dictionary& dictionary,
+    void* client)
+{
+    for (auto it = dictionary.begin(); it != dictionary.end(); )
+    {
+        if (it->second.client == client)
+            it = dictionary.erase(it);
+        else
+            ++it;
+    }
 }
 
 void AsyncClientWithHttpTunneling::onStunConnectionClosed(
