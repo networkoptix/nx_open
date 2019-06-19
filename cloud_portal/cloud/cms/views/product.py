@@ -281,7 +281,7 @@ def product_settings(request, product_id):
         if file.name.endswith('json'):
             if not update_structure:
                 return HttpResponseBadRequest('json is acceptable only for Updating structure')
-            cms_structure = json.load(file)
+            cms_structure = json.load(file)[0]
             structure.update_from_object(cms_structure, product_type=product.product_type)
             messages.success(request, "Structure updated")
         else:

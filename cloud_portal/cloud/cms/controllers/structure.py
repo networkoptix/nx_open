@@ -59,6 +59,9 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
 
 
 def update_from_object(product_type_structure, product_type=None):
+    if type(product_type_structure) == list:
+        product_type_structure = product_type_structure[0]
+
     update_product_type(product_type, product_type_structure)
 
     order = 0
