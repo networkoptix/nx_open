@@ -2,12 +2,14 @@
 
 import argparse
 import logging
+import os
 import sys
 import yaml
 import zipfile
 
-from os import makedirs, rename
+from filecmp import cmp
 from pathlib import Path
+from shutil import copy2
 
 FILEMAP_NAME = 'filemap.yaml'
 
@@ -31,6 +33,19 @@ def iterate_over_dict(dictionary, path):
             yield (path / key, value)
 
 
+def copy_if_different(source, target):
+    try:
+        os.makedirs(target.parent.as_posix())
+    except WindowsError:
+        pass
+
+    if target.exists() and cmp(source.as_posix(), target.as_posix()):
+        logging.info('Copying %s to %s - SKIPPED', source, target)
+    else:
+        logging.info('Copying %s to %s', source, target)
+        copy2(source.as_posix(), target.as_posix())
+
+
 def pack(customization_path, output_path):
     filemap = find_filemap()
     with zipfile.ZipFile(output_path.as_posix(), "w", zipfile.ZIP_DEFLATED) as zip:
@@ -47,23 +62,20 @@ def pack(customization_path, output_path):
 def unpack(package_path, output_path):
     filemap = find_filemap()
 
+    unpacked_package_path = output_path / '_package_'
     try:
-        makedirs(output_path.as_posix())
+        os.makedirs(unpacked_package_path.as_posix())
     except WindowsError:
         pass
 
     with zipfile.ZipFile(package_path.as_posix(), "r") as zip:
-        relative_path = Path()
-        for source, target in iterate_over_dict(filemap, relative_path):
-            try:
-                fileinfo = zip.getinfo(source.as_posix())
-            except KeyError:
-                logging.warning('File {} not found'.format(source))
-                continue
-            target_path = output_path / target
-            logging.info('Unpacking %s to %s', fileinfo.filename, target_path.as_posix())
-            extracted = zip.extract(fileinfo, target_path.parent.as_posix())
-            rename(extracted, target_path.as_posix())
+        zip.extractall(unpacked_package_path.as_posix())
+
+    for source, target in iterate_over_dict(filemap, unpacked_package_path):
+        if not source.exists():
+            logging.warning('File {} not found'.format(source))
+            continue
+        copy_if_different(source, output_path / target)
 
 
 def _add_pack_command(subparsers):
