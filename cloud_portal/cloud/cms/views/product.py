@@ -281,8 +281,11 @@ def product_settings(request, product_id):
         if file.name.endswith('json'):
             if not update_structure:
                 return HttpResponseBadRequest('json is acceptable only for Updating structure')
-            cms_structure = json.load(file)[0]
-            structure.update_from_object(cms_structure, product_type=product.product_type)
+            cms_structure = json.load(file)
+            if type(cms_structure) == list and len(cms_structure) > 1:
+                messages.warning(request, "You can only update one product_type at a time. "
+                                          "Only the first product type from structure.json was used.")
+            structure.update_from_object(cms_structure[0], product_type=product.product_type)
             messages.success(request, "Structure updated")
         else:
             if not file.name.endswith('zip'):
